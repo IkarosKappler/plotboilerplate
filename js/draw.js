@@ -16,6 +16,7 @@
     _context.drawutils = function( context, fillShapes ) {
 	this.ctx = context;
 	this.offset = { x : 0, y : 0 };
+	this.scale = { x : 1, y : 1 };
 	this.fillShapes = fillShapes;
     };
 
@@ -25,8 +26,8 @@
     // CURRENTLY NOT IN USE
     _context.drawutils.prototype.line = function( zA, zB, color ) {
 	    this.ctx.beginPath();
-	    this.ctx.moveTo( this.offset.x+zA.x, this.offset.y+zA.y );
-	    this.ctx.lineTo( this.offset.x+zB.x, this.offset.y+zB.y );
+	    this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
+	    this.ctx.lineTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
 	    this.ctx.strokeStyle = color;
 	    this.ctx.lineWidth = 1;
 	    this.ctx.stroke();
@@ -49,12 +50,31 @@
     // | Draw the given (cubic) bézier curve.
     // +-------------------------------
     _context.drawutils.prototype.cubicBezierCurve = function( curve ) {
+	if( typeof CubicBezierCurve == 'undefined' || !(curve instanceof CubicBezierCurve) )
+	    throw "The passed curve is not an instance of CubicBezierCurve and thus cannot be plotted with this function.";
+	// Draw curve
+	/*this.ctx.beginPath();
+	this.ctx.moveTo( this.offset.x+curve.startPoint.x*this.scale.y, this.offset.y+curve.startPoint.y*this.scale.y );
+	this.ctx.bezierCurveTo( this.offset.x+curve.startControlPoint.x*this.scale.x, this.offset.y+curve.startControlPoint.y*this.scale.y,
+				this.offset.x+curve.endControlPoint.x*this.scale.x, this.offset.y+curve.endControlPoint.y*this.scale.y,
+				this.offset.x+curve.endPoint.x*this.scale.x, this.offset.y+curve.endPoint.y*this.scale.y );
+	this._fillOrDraw( '#00a822' );
+	*/
+	this.cubicBezier( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
+    };
+    
+
+
+    // +---------------------------------------------------------------------------------
+    // | Draw the given (cubic) bézier curve.
+    // +-------------------------------
+    _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint ) {
 	// Draw curve
 	this.ctx.beginPath();
-	this.ctx.moveTo( curve.startPoint.x, curve.startPoint.y );
-	this.ctx.bezierCurveTo( curve.startControlPoint.x, curve.startControlPoint.y,
-				curve.endControlPoint.x, curve.endControlPoint.y,
-				curve.endPoint.x, curve.endPoint.y );
+	this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
+	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
+				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
+				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
 	this._fillOrDraw( '#00a822' );
 
     };
@@ -90,7 +110,7 @@
     _context.drawutils.prototype.point = function( p, color ) {
 	var radius = 3;
 	this.ctx.beginPath();
-	this.ctx.arc( p.x, p.y, radius, 0, 2 * Math.PI, false );
+	this.ctx.arc( this.offset.x+p.x*this.scale.x, this.offset.y+p.y*this.scale.y, radius, 0, 2 * Math.PI, false );
 	this.ctx.closePath();
 	this._fillOrDraw( color );
     };
@@ -101,7 +121,7 @@
     // +-------------------------------
     _context.drawutils.prototype.circle = function( center, radius, color ) {
 	this.ctx.beginPath();
-	this.ctx.arc( this.offset.x + center.x, this.offset.y + center.y, radius, 0, Math.PI*2 );
+	this.ctx.arc( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radius, 0, Math.PI*2 );
 	this.ctx.closePath();
 	this._fillOrDraw( color );
     };
@@ -112,7 +132,7 @@
     // +-------------------------------
     _context.drawutils.prototype.square = function( center, size, color ) {
 	this.ctx.beginPath();
-	this.ctx.rect( center.x-size/2.0, center.y-size/2.0, size, size );
+	this.ctx.rect( this.offset.x+(center.x-size/2.0)*this.scale.x, this.offset.y+(center.y-size/2.0)*this.scale.y, size*this.scale.x, size*this.scale.y );
 	this.ctx.closePath();
 	this._fillOrDraw( color );
     };
@@ -123,10 +143,10 @@
     // +-------------------------------
     _context.drawutils.prototype.crosshair = function( center, radius, color ) {
 	this.ctx.beginPath();
-	this.ctx.moveTo( center.x-radius, center.y );
-	this.ctx.lineTo( center.x+radius, center.y );
-	this.ctx.moveTo( center.x, center.y-radius );
-	this.ctx.lineTo( center.x, center.y+radius );
+	this.ctx.moveTo( this.offset.x+center.x*this.scale.x-radius, this.offset.y+center.y*this.scale.y );
+	this.ctx.lineTo( this.offset.x+center.x*this.scale.x+radius, this.offset.y+center.y*this.scale.y );
+	this.ctx.moveTo( this.offset.x+center.x*this.scale.x, this.offset.y+center.y*this.scale.y-radius );
+	this.ctx.lineTo( this.offset.x+center.x*this.scale.x, this.offset.y+center.y*this.scale.y+radius );
 	this.ctx.strokeStyle = color;
 	this.ctx.lineWidth = 0.5;
 	this.ctx.stroke();

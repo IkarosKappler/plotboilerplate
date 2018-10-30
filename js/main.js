@@ -41,6 +41,8 @@
 	var config = {
 	    fullSize              : true,
 	    fitToParent           : true,
+	    scaleX                : 1.5,
+	    scaleY                : 1.0,
 	    drawEditorOutlines    : true,
 	    backgroundColor       : '#ffffff',
 	    rebuild               : function() { rebuild(); },
@@ -81,6 +83,9 @@
 	    ctx.fillStyle = config.backgroundColor; 
 	    ctx.fillRect(0,0,canvasSize.width,canvasSize.height);
 
+	    //draw.scale.x = config.scaleX;
+	    //fill.scale.x = config.scaleY;
+
 	    // Draw the background image?
 	    if( image ) {
 		if( config.fitImage ) {
@@ -90,8 +95,26 @@
 		}
 	    }
 
-	    draw.circle( {x:0,y:0}, Math.min(canvasSize.width,canvasSize.height)/3, 0x0088ff );
+	    console.log('draw');
+	    var radius = Math.min(canvasSize.width,canvasSize.height)/3;
+	    draw.circle( {x:0,y:0}, radius, 0x0088ff );
 
+	    draw.cubicBezier( { x : 0, y : -radius },
+			      { x : radius, y : 0 },
+			      { x : radius/2, y : -radius },
+			      { x : radius/2, y : 0 } );
+	    draw.cubicBezier( { x : radius, y : 0 },
+			      { x : 0, y : radius },
+			      { x : radius, y : radius/2 },
+			      { x : 0, y : radius/2 } );
+	    draw.cubicBezier( { x : 0, y : radius },
+			      { x : -radius, y : 0 },
+			      { x : -radius/2, y : radius },
+			      { x : -radius/2, y : 0 } );
+	    draw.cubicBezier( { x : -radius, y : 0 },
+			      { x : 0, y : -radius },
+			      { x : -radius, y : -radius/2 },
+			      { x : 0, y : -radius/2 } );
 	};
 	
 	
@@ -204,6 +227,7 @@
 	    var fold0 = gui.addFolder('Editor settings');
 	    fold0.add(config, 'fullSize').onChange( resizeCanvas ).title("Toggles the fullpage mode.");
 	    fold0.add(config, 'fitToParent').onChange( resizeCanvas ).title("Toggles the fit-to-parent mode (overrides fullsize).");
+	    fold0.add(config, 'scaleX').onChange( function() { console.log('changed'); draw.scale.x = fill.scale.x = config.scaleX; redraw(); } ).title("Scale x.").min(0.0).max(10.0).step(0.1);
 	    fold0.add(config, 'drawEditorOutlines').onChange( redraw ).title("Toggle if editor outlines should be drawn.");
 	    fold0.addColor(config, 'backgroundColor').onChange( redraw ).title("Choose a background color.");
 	    fold0.add(config, 'loadImage').name('Load Image').title("Load a background image to pick triangle colors from.");
