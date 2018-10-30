@@ -1,0 +1,36 @@
+/**
+ * @author Ikaros Kappler
+ * @date   2017-04-10
+ **/
+
+html, body {
+    width              : 100%;
+    height             : 100%;
+    padding            : 0;
+    margin             : 0;
+    border             : 0;
+    overflow           : hidden;
+}
+
+#my-canvas {
+    border             : 1px solid black;
+}
+
+.monospace {
+    font-family        : 'Courier New', Courier,  Monospace;
+    font-size          : 9pt;
+}
+
+
+/* --- BEGIN --- Dialog classes --- */
+/* Headline */
+.od-hl { }
+/* Content node */
+.od-cn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Button line */
+od-bl { }
+/* --- END --- Dialog classes --- */
