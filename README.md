@@ -1,7 +1,7 @@
 # Plotting boilerplate
 For Javascript and canvas with 2d-context.
 
-![Current demo](screenshot-20181031_0.png "Current demo")
+![Current demo](screenshot-20181031_1.png "Current demo")
 
 ### Todos
 * Convert the current main script into a re-usable and extendable class.
