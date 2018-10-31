@@ -7,7 +7,7 @@
  **/
 
 
-(function() {
+(function(_context) {
     "use strict";
 
     // Fetch the GET params
@@ -28,6 +28,24 @@
 	} ) );
     };
 
+
+    // +---------------------------------------------------------------------------------
+    // | A wrapper class for draggable items (mostly vertices).
+    // +----------------------------
+    (function(_context) {
+	var Draggable = function( item, type ) {
+	    this.item = item;
+	    this.type = type;
+	    this.vindex = null;
+	    this.pindex = null;
+	    this.cundex = null;
+	};
+	Draggable.VERTEX = 'vertex';
+	Draggable.prototype.isVertex = function() { return this.type == Draggable.VERTEX; };
+	Draggable.prototype.setVIndex = function(vindex) { this.vindex = vindex; return this; };
+
+	_context.Draggable = Draggable;
+    })(_context);
     
 
     // +---------------------------------------------------------------------------------
@@ -72,7 +90,44 @@
 	var imageBuffer         = null; // A canvas to read the pixel data from.
 	var canvasSize          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
 
+	var vertices            = [];
 
+	var draggedElements     = [];
+
+	var initDrawableObjects = function() {
+	    var radius = Math.min(canvasSize.width,canvasSize.height)/3;
+	    //draw.circle( {x:0,y:0}, radius, '#000000' );
+	    var fract = 0.5;
+	    var bpath = [
+		[ new Vertex( { x : 0, y : -radius } ),
+		  new Vertex( { x : radius, y : 0 } ),
+		  new Vertex( { x : radius*fract, y : -radius } ),
+		  new Vertex( { x : radius*fract, y : 0 } ) ],
+		[ new Vertex( { x : radius, y : 0 } ),
+		  new Vertex( { x : 0, y : radius } ),
+		  new Vertex( { x : radius, y : radius*fract } ),
+		  new Vertex( { x : 0, y : radius*fract } ) ],
+		[ new Vertex( { x : 0, y : radius } ),
+		  new Vertex( { x : -radius, y : 0 } ),
+		  new Vertex( { x : -radius*fract, y : radius } ),
+		  new Vertex( { x : -radius*fract, y : 0 } ) ],
+		[ new Vertex( { x : -radius, y : 0 } ),
+		  new Vertex( { x : 0, y : -radius } ),
+		  new Vertex( { x : -radius, y : -radius*fract } ),
+		  new Vertex( { x : 0, y : -radius*fract } )
+		] ];
+
+	    // Construct
+	    vertices = [];
+	    for( var i in bpath ) {
+		//draw.cubicBezierHandleLines(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3]);
+		//draw.cubicBezierHandles(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
+		vertices.push( bpath[i][0] );
+		vertices.push( bpath[i][1] );
+		vertices.push( bpath[i][2] );
+		vertices.push( bpath[i][3] );
+	    }
+	};
 	
 	
 	// +---------------------------------------------------------------------------------
@@ -97,24 +152,47 @@
 
 	    console.log('draw');
 	    var radius = Math.min(canvasSize.width,canvasSize.height)/3;
-	    draw.circle( {x:0,y:0}, radius, 0x0088ff );
+	    draw.circle( {x:0,y:0}, radius, '#000000' );
 
-	    draw.cubicBezier( { x : 0, y : -radius },
-			      { x : radius, y : 0 },
-			      { x : radius/2, y : -radius },
-			      { x : radius/2, y : 0 } );
-	    draw.cubicBezier( { x : radius, y : 0 },
-			      { x : 0, y : radius },
-			      { x : radius, y : radius/2 },
-			      { x : 0, y : radius/2 } );
-	    draw.cubicBezier( { x : 0, y : radius },
-			      { x : -radius, y : 0 },
-			      { x : -radius/2, y : radius },
-			      { x : -radius/2, y : 0 } );
-	    draw.cubicBezier( { x : -radius, y : 0 },
-			      { x : 0, y : -radius },
-			      { x : -radius, y : -radius/2 },
-			      { x : 0, y : -radius/2 } );
+	    var fract = 0.5;
+	    var bpath = [
+		[ new Vertex( { x : 0, y : -radius } ),
+		  new Vertex( { x : radius, y : 0 } ),
+		  new Vertex( { x : radius*fract, y : -radius } ),
+		  new Vertex( { x : radius*fract, y : 0 } ) ],
+		[ new Vertex( { x : radius, y : 0 } ),
+		  new Vertex( { x : 0, y : radius } ),
+		  new Vertex( { x : radius, y : radius*fract } ),
+		  new Vertex( { x : 0, y : radius*fract } ) ],
+		[ new Vertex( { x : 0, y : radius } ),
+		  new Vertex( { x : -radius, y : 0 } ),
+		  new Vertex( { x : -radius*fract, y : radius } ),
+		  new Vertex( { x : -radius*fract, y : 0 } ) ],
+		[ new Vertex( { x : -radius, y : 0 } ),
+		  new Vertex( { x : 0, y : -radius } ),
+		  new Vertex( { x : -radius, y : -radius*fract } ),
+		  new Vertex( { x : 0, y : -radius*fract } )
+		] ];
+
+	    // Construct
+	    /*
+	    vertices = [];
+	    for( var i in bpath ) {
+		//draw.cubicBezierHandleLines(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3]);
+		//draw.cubicBezierHandles(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
+		vertices.push( bpath[i][0] );
+		vertices.push( bpath[i][1] );
+		vertices.push( bpath[i][2] );
+		vertices.push( bpath[i][3] );
+	    }
+	    */
+
+	    for( var i in vertices ) {
+		draw.square( vertices[i], 5, 'rgba(0,128,192,0.5)' );
+	    }
+	    
+	    for( var i in bpath )
+		draw.cubicBezier(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
 	};
 	
 	
@@ -244,19 +322,121 @@
 	function handleTap(x,y) {
 	    
 	}
-	
+
+	// +---------------------------------------------------------------------------------
+        // | Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
+	// |
+	// | The result is an object { type : 'bpath', pindex, cindex, pid }
+	// |
+        // | Returns false if no point is near the passed position.
+        // +-------------------------------
+        var locatePointNear = function( point ) {
+            var tolerance = 7;
+	    // var point = { x : x, y : y };
+	    // Search in vertices
+	    for( var vindex in vertices ) {
+		var vert = vertices[vindex];
+		if( vert.distance(point) < tolerance ) {
+		    // console.log( 'vertex found.' );
+		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); //{ type : 'vertex', vindex : vindex };
+		}
+	    }
+	    
+	    // Search in paths
+	    /*
+	    for( var pindex = 0; pindex < paths.length; pindex++ ) {
+		var path = paths[pindex];
+		for( var cindex = 0; cindex < path.bezierCurves.length; cindex++ ) {
+		    var curve = path.bezierCurves[cindex];
+		    let p = curve.startControlPoint;
+                    let dist = p.distance(point); // Math.sqrt( Math.pow(x-p.x,2) + Math.pow(y-p.y,2) );
+                    if( dist <= tolerance )
+			return { type : 'bpath', pindex : pindex, cindex : cindex, pid : curve.START_CONTROL_POINT };
+		    p = curve.endControlPoint;
+                    dist = p.distance(point); // Math.sqrt( Math.pow(x-p.x,2) + Math.pow(y-p.y,2) );
+                    if( dist <= tolerance )
+			return { type : 'bpath', pindex : pindex, cindex : cindex, pid : curve.END_CONTROL_POINT };
+		    p = curve.startPoint;
+                    dist = p.distance(point); // Math.sqrt( Math.pow(x-p.x,2) + Math.pow(y-p.y,2) );
+                    if( dist <= tolerance )
+			return { type : 'bpath', pindex : pindex, cindex : cindex, pid : curve.START_POINT };
+		    p = curve.endPoint;
+                    dist = p.distance(point); // Math.sqrt( Math.pow(x-p.x,2) + Math.pow(y-p.y,2) );
+                    if( dist <= tolerance )
+			return { type : 'bpath', pindex : pindex, cindex : cindex, pid : curve.END_POINT };
+		}
+            }
+	    */
+            return false;
+        }
+
+	var transformMousePosition = function( x, y ) {
+	    return { x : x/draw.scale.x-draw.offset.x, y : y/draw.scale.y-draw.offset.y };
+	};
+
+	// +---------------------------------------------------------------------------------
+	// | Install a mouse handler on the canvas.
+	// +-------------------------------
+	new MouseHandler(canvas)
+	    .mousedown( function(e) {
+		if( e.which != 1 )
+		    return; // Only react on left mouse
+		var p = locatePointNear( transformMousePosition(e.params.pos.x, e.params.pos.y) );
+		console.log( p );
+		if( !p ) return;
+		draggedElements.push( p );
+		//p.listeners.fireDragStartEvent( e );
+		if( p.type == 'bpath' )
+		    paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent( e );
+		else if( p.type == 'vertex' )
+		    vertices[p.vindex].listeners.fireDragStartEvent( e );
+		redraw();
+	    } )
+	    .drag( function(e) {
+		for( var i in draggedElements ) {
+		    var p = draggedElements[i];
+		    // console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
+		    if( p.type == 'bpath' ) {
+			paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
+			paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
+		    } else if( p.type == 'vertex' ) {
+			vertices[p.vindex].add( e.params.dragAmount );
+			vertices[p.vindex].listeners.fireDragEvent( e );
+		    }
+		}
+		redraw();
+	    } )
+	    .mouseup( function(e) {
+		if( e.which != 1 )
+		    return; // Only react on eft mouse;
+		if( !e.params.wasDragged )
+		    handleTap( e.params.pos.x, e.params.pos.y );
+		for( var i in draggedElements ) {
+		    var p = draggedElements[i];
+		    // console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
+		    if( p.type == 'bpath' ) {
+			paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEndEvent( e );
+		    } else if( p.type == 'vertex' ) {
+			vertices[p.vindex].listeners.fireDragEndEvent( e );
+		    }
+		}
+		draggedElements = [];
+		redraw();
+	    } );
 
 	
 	// Initialize the dialog
 	window.dialog = new overlayDialog('dialog-wrapper');
 	// window.dialog.show( 'Inhalt', 'Test' );
 
+	initDrawableObjects();
+	
 	// Init	
 	redraw();
 	
     } ); // END document.ready / window.onload
     
-})(); 
+})(window); 
 
 
 
