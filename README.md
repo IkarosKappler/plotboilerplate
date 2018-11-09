@@ -8,6 +8,8 @@ For Javascript and canvas with 2d-context.
 
 
 ### Changelog
+* 2018-11-09
+  * Refactored the main script to a class.
 * 2018-10-31
   * Added the Vertex class from an older project.
   * Added the VertexAttr class (not yet in use).

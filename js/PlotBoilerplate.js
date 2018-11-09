@@ -10,6 +10,8 @@
 (function(_context) {
     "use strict";
 
+    
+    
     // Fetch the GET params
     let GUP = gup();
     
@@ -51,12 +53,12 @@
     // +---------------------------------------------------------------------------------
     // | Initialize everything.
     // +----------------------------
-    window.addEventListener('load',function() {
-	
+    //window.addEventListener('load',function() {
+    var PlotBoilerplate = function( config ) {
 	// +---------------------------------------------------------------------------------
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
-	var config = {
+	this.config = {
 	    fullSize              : true,
 	    fitToParent           : true,
 	    scaleX                : 1.5,
@@ -71,7 +73,7 @@
 	    saveFile              : function() { saveFile(); }
 	};
 	// Merge GET params into config
-	for( var k in config ) {
+	/*for( var k in config ) {
 	    if( !GUP.hasOwnProperty(k) )
 		continue;
 	    var type = typeof config[k];
@@ -79,23 +81,24 @@
 	    else if( type == 'number' ) config[k] = JSON.parse(GUP[k])*1;
 	    else if( type == 'function' ) ;
 	    else config[k] = GUP[k];
-	}
+	}*/
 
 	
-	var canvas              = document.getElementById('my-canvas'); 
-	var ctx                 = canvas.getContext('2d');
-	var draw                = new drawutils(ctx,false);
-	var fill                = new drawutils(ctx,true);
-	var image               = null; // An image.
-	var imageBuffer         = null; // A canvas to read the pixel data from.
-	var canvasSize          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
+	this.canvas              = document.getElementById('my-canvas'); 
+	this.ctx                 = this.canvas.getContext('2d');
+	this.draw                = new drawutils(this.ctx,false);
+	this.fill                = new drawutils(this.ctx,true);
+	this.image               = null; // An image.
+	this.imageBuffer         = null; // A canvas to read the pixel data from.
+	this.canvasSize          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
 
-	var vertices            = [];
+	this.vertices            = [];
 
-	var draggedElements     = [];
+	this.draggedElements     = [];
 
-	var initDrawableObjects = function() {
-	    var radius = Math.min(canvasSize.width,canvasSize.height)/3;
+	var _self = this;
+	PlotBoilerplate.prototype.initDrawableObjects = function() {
+	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
 	    //draw.circle( {x:0,y:0}, radius, '#000000' );
 	    var fract = 0.5;
 	    var bpath = [
@@ -118,14 +121,14 @@
 		] ];
 
 	    // Construct
-	    vertices = [];
+	    this.vertices = [];
 	    for( var i in bpath ) {
 		//draw.cubicBezierHandleLines(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3]);
 		//draw.cubicBezierHandles(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
-		vertices.push( bpath[i][0] );
-		vertices.push( bpath[i][1] );
-		vertices.push( bpath[i][2] );
-		vertices.push( bpath[i][3] );
+		this.vertices.push( bpath[i][0] );
+		this.vertices.push( bpath[i][1] );
+		this.vertices.push( bpath[i][2] );
+		this.vertices.push( bpath[i][3] );
 	    }
 	};
 	
@@ -133,26 +136,26 @@
 	// +---------------------------------------------------------------------------------
 	// | The re-drawing function.
 	// +-------------------------------
-	var redraw = function() {	    
+	PlotBoilerplate.prototype.redraw = function() {	    
 	    // Note that the image might have an alpha channel. Clear the scene first.
-	    ctx.fillStyle = config.backgroundColor; 
-	    ctx.fillRect(0,0,canvasSize.width,canvasSize.height);
+	    this.ctx.fillStyle = _self.config.backgroundColor; 
+	    this.ctx.fillRect(0,0,_self.canvasSize.width,_self.canvasSize.height);
 
 	    //draw.scale.x = config.scaleX;
 	    //fill.scale.x = config.scaleY;
 
 	    // Draw the background image?
-	    if( image ) {
-		if( config.fitImage ) {
-		    ctx.drawImage(image,0,0,image.width,image.height,0,0,canvasSize.width,canvasSize.height);
+	    if( _self.image ) {
+		if( _self.config.fitImage ) {
+		    _self.ctx.drawImage(_self.image,0,0,_self.image.width,_self.image.height,0,0,_self.canvasSize.width,_self.canvasSize.height);
 		} else {
-		    ctx.drawImage(image,0,0);
+		    _self.ctx.drawImage(_self.image,0,0);
 		}
 	    }
 
 	    console.log('draw');
-	    var radius = Math.min(canvasSize.width,canvasSize.height)/3;
-	    draw.circle( {x:0,y:0}, radius, '#000000' );
+	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
+	    _self.draw.circle( {x:0,y:0}, radius, '#000000' );
 
 	    var fract = 0.5;
 	    var bpath = [
@@ -187,12 +190,12 @@
 	    }
 	    */
 
-	    for( var i in vertices ) {
-		draw.square( vertices[i], 5, 'rgba(0,128,192,0.5)' );
+	    for( var i in this.vertices ) {
+		_self.draw.square( this.vertices[i], 5, 'rgba(0,128,192,0.5)' );
 	    }
 	    
 	    for( var i in bpath )
-		draw.cubicBezier(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
+		this.draw.cubicBezier(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
 	};
 	
 	
@@ -207,16 +210,16 @@
 	    }	    
 	    var reader = new FileReader();
 	    reader.onload = function(event){
-		image = new Image();
-		image.onload = function() {
+		this.image = new Image();
+		this.image.onload = function() {
 		    // Create image buffer
 		    imageBuffer        = document.createElement('canvas');
-		    imageBuffer.width  = image.width;
-		    imageBuffer.height = image.height;
-		    imageBuffer.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
+		    imageBuffer.width  = this.image.width;
+		    imageBuffer.height = this.image.height;
+		    imageBuffer.getContext('2d').drawImage(this.image, 0, 0, this.image.width, image.height);
 		    redraw();
 		}
-		image.src = event.target.result;
+		this.image.src = event.target.result;
 	    }
 	    reader.readAsDataURL(e.target.files[0]);     
 	}
@@ -262,41 +265,41 @@
 	// +---------------------------------------------------------------------------------
 	// | This function resizes the canvas to the required settings (toggles fullscreen).
 	// +-------------------------------
-	var resizeCanvas = function() {
+	PlotBoilerplate.prototype.resizeCanvas = function() {
 	    var _setSize = function(w,h) {
-		ctx.canvas.width  = w;
-		ctx.canvas.height = h;		
-		canvas.width      = w;
-		canvas.height     = h;		
-		canvasSize.width  = w;
-		canvasSize.height = h;
+		_self.ctx.canvas.width  = w;
+		_self.ctx.canvas.height = h;		
+		_self.canvas.width      = w;
+		_self.canvas.height     = h;		
+		_self.canvasSize.width  = w;
+		_self.canvasSize.height = h;
 
-		draw.offset.x = fill.offset.x = w/2;
-		draw.offset.y = fill.offset.y = h/2;
+		_self.draw.offset.x = _self.fill.offset.x = w/2;
+		_self.draw.offset.y = _self.fill.offset.y = h/2;
 	    };
-	    if( config.fullSize && !config.fitToParent ) {
+	    if( _self.config.fullSize && !_self.config.fitToParent ) {
 		// Set editor size
 		var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 		var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 		_setSize( width, height );
-	    } else if( config.fitToParent ) {
+	    } else if( _self.config.fitToParent ) {
 		// Set editor size
-		var width  = canvas.parentNode.clientWidth - 2; // 1px border
-		var height = canvas.parentNode.clientHeight - 2; // 1px border
+		var width  = _self.canvas.parentNode.clientWidth - 2; // 1px border
+		var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
 		_setSize( width, height );
 	    } else {
                 _setSize( DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT );
 	    }
-	    redraw();
+	    _self.redraw();
 	};
-	window.addEventListener( 'resize', resizeCanvas );
-	resizeCanvas();
+	_context.addEventListener( 'resize', this.resizeCanvas );
+	this.resizeCanvas();
 
 
 	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
 	// +-------------------------------
-	{ 
+	/* { 
 	    var gui = new dat.gui.GUI();
 	    gui.remember(config);
 
@@ -313,7 +316,7 @@
 	    var fold1 = gui.addFolder('Export');
 	    fold1.add(config, 'saveFile').name('Save a file').title("Save a file.");
  	    
-	}
+	} */
 
 
 	// +---------------------------------------------------------------------------------
@@ -334,8 +337,8 @@
             var tolerance = 7;
 	    // var point = { x : x, y : y };
 	    // Search in vertices
-	    for( var vindex in vertices ) {
-		var vert = vertices[vindex];
+	    for( var vindex in _self.vertices ) {
+		var vert = _self.vertices[vindex];
 		if( vert.distance(point) < tolerance ) {
 		    // console.log( 'vertex found.' );
 		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); //{ type : 'vertex', vindex : vindex };
@@ -371,57 +374,57 @@
         }
 
 	var transformMousePosition = function( x, y ) {
-	    return { x : x/draw.scale.x-draw.offset.x, y : y/draw.scale.y-draw.offset.y };
+	    return { x : x/_self.draw.scale.x-_self.draw.offset.x, y : y/_self.draw.scale.y-_self.draw.offset.y };
 	};
 
 	// +---------------------------------------------------------------------------------
 	// | Install a mouse handler on the canvas.
 	// +-------------------------------
-	new MouseHandler(canvas)
+	new MouseHandler(this.canvas)
 	    .mousedown( function(e) {
 		if( e.which != 1 )
 		    return; // Only react on left mouse
 		var p = locatePointNear( transformMousePosition(e.params.pos.x, e.params.pos.y) );
 		console.log( p );
 		if( !p ) return;
-		draggedElements.push( p );
+		_self.draggedElements.push( p );
 		//p.listeners.fireDragStartEvent( e );
 		if( p.type == 'bpath' )
-		    paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent( e );
+		    _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent( e );
 		else if( p.type == 'vertex' )
-		    vertices[p.vindex].listeners.fireDragStartEvent( e );
-		redraw();
+		    _self.vertices[p.vindex].listeners.fireDragStartEvent( e );
+		_self.redraw();
 	    } )
 	    .drag( function(e) {
-		for( var i in draggedElements ) {
-		    var p = draggedElements[i];
+		for( var i in _self.draggedElements ) {
+		    var p = _self.draggedElements[i];
 		    // console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
 		    if( p.type == 'bpath' ) {
-			paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
-			paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
+			_self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
+			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
 		    } else if( p.type == 'vertex' ) {
-			vertices[p.vindex].add( e.params.dragAmount );
-			vertices[p.vindex].listeners.fireDragEvent( e );
+			_self.vertices[p.vindex].add( e.params.dragAmount );
+			_self.vertices[p.vindex].listeners.fireDragEvent( e );
 		    }
 		}
-		redraw();
+		_self.redraw();
 	    } )
 	    .mouseup( function(e) {
 		if( e.which != 1 )
 		    return; // Only react on left mouse;
 		if( !e.params.wasDragged )
 		    handleTap( e.params.pos.x, e.params.pos.y );
-		for( var i in draggedElements ) {
-		    var p = draggedElements[i];
+		for( var i in _self.draggedElements ) {
+		    var p = _self.draggedElements[i];
 		    // console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
 		    if( p.type == 'bpath' ) {
-			paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEndEvent( e );
+			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEndEvent( e );
 		    } else if( p.type == 'vertex' ) {
-			vertices[p.vindex].listeners.fireDragEndEvent( e );
+			_self.vertices[p.vindex].listeners.fireDragEndEvent( e );
 		    }
 		}
-		draggedElements = [];
-		redraw();
+		_self.draggedElements = [];
+		_self.redraw();
 	    } );
 
 	
@@ -429,14 +432,44 @@
 	window.dialog = new overlayDialog('dialog-wrapper');
 	// window.dialog.show( 'Inhalt', 'Test' );
 
-	initDrawableObjects();
+	this.initDrawableObjects();
 	
 	// Init	
-	redraw();
+	this.redraw();
 	
-    } ); // END document.ready / window.onload
+    }; // END construcor 'PlotBoilerplate'
+
+    _context.PlotBoilerplate = PlotBoilerplate;
     
 })(window); 
+
+
+window.addEventListener( 'load',
+			 function() {
+			     var bp = new PlotBoilerplate();
+
+			     // +---------------------------------------------------------------------------------
+			     // | Initialize dat.gui
+			     // +-------------------------------
+			     { 
+				 var gui = new dat.gui.GUI();
+				 gui.remember(bp.config);
+				 
+				 gui.add(bp.config, 'rebuild').name('Rebuild all').title('Rebuild all.');
+				 
+				 var fold0 = gui.addFolder('Editor settings');
+				 fold0.add(bp.config, 'fullSize').onChange( bp.resizeCanvas ).title("Toggles the fullpage mode.");
+				 fold0.add(bp.config, 'fitToParent').onChange( bp.resizeCanvas ).title("Toggles the fit-to-parent mode (overrides fullsize).");
+				 fold0.add(bp.config, 'scaleX').onChange( function() { console.log('changed'); bp.draw.scale.x = bp.fill.scale.x = bp.config.scaleX; bp.redraw(); } ).title("Scale x.").min(0.0).max(10.0).step(0.1);
+				 fold0.add(bp.config, 'drawEditorOutlines').onChange( bp.redraw ).title("Toggle if editor outlines should be drawn.");
+				 fold0.addColor(bp.config, 'backgroundColor').onChange( bp.redraw ).title("Choose a background color.");
+				 fold0.add(bp.config, 'loadImage').name('Load Image').title("Load a background image to pick triangle colors from.");
+				 
+				 var fold1 = gui.addFolder('Export');
+				 fold1.add(bp.config, 'saveFile').name('Save a file').title("Save a file.");	 
+			     } // END init dat.gui
+			 } );
+
 
 
 
