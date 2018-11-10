@@ -1,0 +1,12 @@
+## Initialize fresh development install
+
+### Get latest npm
+> sudo apt-get install curl python-software-properties
+> curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+
+## Init and install webpack
+> npm init
+> npm install webpack
+
+Then create your webpack.config.js file.
+
