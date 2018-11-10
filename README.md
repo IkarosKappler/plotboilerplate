@@ -4,10 +4,16 @@ For Javascript and canvas with 2d-context.
 ![Current demo](screenshot-20181031_1.png "Current demo")
 
 ### Todos
-* Convert the current main script into a re-usable and extendable class.
+* Make elements selectable (like with holding SHIFT).
+* Implement zoom into dat.gui interface.
+* Implement optional canvas zoom.
+* Implement optional canvas rotation.
+* Add webpack or gulp for publishing.
 
 
 ### Changelog
+* 2018-11-10
+  * Renamed the js/ direcotory to src/.
 * 2018-11-09
   * Refactored the main script to a class.
 * 2018-10-31
