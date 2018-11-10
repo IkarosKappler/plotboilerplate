@@ -1,0 +1,33 @@
+{
+  "name": "plot-boilerplate",
+  "version": "1.0.1",
+  "description": "A simple javascript plotting boilerplate for 2d stuff.",
+  "private": true,
+  "main": "index.js",  
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "npx webpack --mode production --config webpack.config.js",
+    "webpack:w": "webpack -w --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IkarosKappler/plot-boilerplate.git"
+  },
+  "keywords": [
+    "javascript",
+    "canvas",
+    "plot",
+    "2d",
+    "context2d"
+  ],
+  "author": "Ikaros Kappler",
+  "license": "CC-BY-4.0",
+  "bugs": {
+    "url": "https://github.com/IkarosKappler/plot-boilerplate/issues"
+  },
+  "homepage": "https://github.com/IkarosKappler/plot-boilerplate#readme",
+  "devDependencies": {
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2"
+  }
+}
