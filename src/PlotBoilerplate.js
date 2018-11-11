@@ -404,6 +404,17 @@
 		_self.redraw();
 	    } );
 
+	// Install key handler
+	new KeyHandler()
+	    .down('enter',function() { console.log('ENTER was hit.'); } )
+	    .press('enter',function() { console.log('ENTER was pressed.'); } )
+	    .up('enter',function() { console.log('ENTER was released.'); } )
+
+	    .down('e',function() { console.log('e was hit.'); } )
+
+	    .up('windows',function() { console.log('windows was released.'); } )
+	;
+	
 	
 	// Initialize the dialog
 	window.dialog = new overlayDialog('dialog-wrapper');

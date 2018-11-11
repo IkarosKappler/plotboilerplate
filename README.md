@@ -5,6 +5,8 @@ For Javascript and canvas with 2d-context.
 
 ### Todos
 * Make elements selectable (like with holding SHIFT).
+* Add pad/phone support.
+* Add panning (move the canvas origin).
 * Implement zoom into dat.gui interface.
 * Implement optional canvas zoom.
 * Implement optional canvas rotation.
@@ -12,6 +14,8 @@ For Javascript and canvas with 2d-context.
 
 
 ### Changelog
+* 2018-11-11
+  * Added a simple KeyHandler for receiving key events.
 * 2018-11-10
   * Renamed the js/ direcotory to src/.
 * 2018-11-09

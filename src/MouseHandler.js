@@ -28,10 +28,11 @@
  * @modified 2018-04-28 Added the param 'wasDragged'.
  * @modified 2018-08-16 Added the param 'dragAmount'.
  * @modified 2018-08-27 Added the param 'element'.
- * @version  1.0.3
+ * @modified 2018-11-11 Changed the scope from a simple global var to a member of window/_context.
+ * @version  1.0.4
  **/
 
-var MouseHandler = (function() {
+(function(_context) {
 
     // +----------------------------------------------------------------------
     // | The constructor.
@@ -162,5 +163,5 @@ var MouseHandler = (function() {
 	}
     }
 
-    return __constructor;
-})();
+    _context.MouseHandler = __constructor;
+})(window);

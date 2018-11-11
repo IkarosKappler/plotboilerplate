@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
   "private": true,
-  "main": "index.js",  
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "npx webpack --mode production --config webpack.config.js",
@@ -29,5 +29,6 @@
   "devDependencies": {
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2"
-  }
+  },
+  "dependencies": {}
 }
