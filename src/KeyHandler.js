@@ -4,12 +4,12 @@
  * Example
  * =======
  * 
- *	new KeyHandler()
+ *	new KeyHandler( { trackAll : true } )
  *	    .down('enter',function() { console.log('ENTER was hit.'); } )
  *	    .press('enter',function() { console.log('ENTER was pressed.'); } )
  *	    .up('enter',function() { console.log('ENTER was released.'); } )
  *
- *	    .down('e',function() { console.log('e was hit.'); } )
+ *          .down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } )
  *
  *	    .up('windows',function() { console.log('windows was released.'); } )
  *	;
@@ -25,16 +25,25 @@
     // +----------------------------------------------------------------------
     // | The constructor.
     // |
-    // | @param element (optional) The HTML element to listen on; if null then 'window' will be used.
+    // | @param options.element (optional) The HTML element to listen on; if null then 'window' will be used.
+    // | @param options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
     // +-------------------------------------------------
-    var KeyHandler = function( element ) {
-	this.element = element ? element : window;
+    var KeyHandler = function( options ) {
+	options = options || {};
+	this.element = options.element ? options.element : window;
 	this.downListeners = [];
 	this.pressListeners = [];
 	this.upListeners = [];
+	this.keyStates = [];
+	// This could be made configurable in a later version. It allows to
+	// keep track of the key status no matter if there are any listeners
+	// on the key or not.
+	this.trackAllKeys = options.trackAll || false;
+	// For later retrieval
 	this._keyDownListener = null;
 	this._keyPressListener = null;
 	this._keyUpListener = null;
+	// Install the listeners
 	this.installListeners();
     };
 
@@ -43,10 +52,52 @@
     // | A helper function to fire key events from this KeyHandler.
     // +-------------------------------------------------
     var fireEvent = function( event, listeners ) {
+	var hasListener = false;
 	for( var i in listeners ) {
 	    var lis = listeners[i];
-	    if( lis.keyCode == event.keyCode )
-		lis.listener(event);
+	    if( lis.keyCode != event.keyCode )
+		continue;
+	    lis.listener(event);
+	    hasListener = true;
+	}
+	return hasListener;
+    };
+
+
+       
+    // +----------------------------------------------------------------------
+    // | Internal function to fire a new keydown event to all listeners.
+    // | You should not call this function on your own unless you know what you do.
+    // |
+    // | @param e:KeyEvent
+    // +-------------------------------------------------
+    var fireDownEvent = function(e,handler) {
+	if( fireEvent(e,handler.downListeners) || handler.trackAllKeys ) {
+	    // Down event has listeners. Update key state.
+	    handler.keyStates[e.keyCode] = 'down';
+	}
+    };
+   
+    // +----------------------------------------------------------------------
+    // | Internal function to fire a new keypress event to all listeners.
+    // | You should not call this function on your own unless you know what you do.
+    // |
+    // | @param e:KeyEvent
+    // +-------------------------------------------------
+    var firePressEvent = function(e,handler) {
+	fireEvent(e,handler.pressListeners);
+    };
+
+    // +----------------------------------------------------------------------
+    // | Internal function to fire a new keyup event to all listeners.
+    // | You should not call this function on your own unless you know what you do.
+    // |
+    // | @param e:KeyEvent
+    // +-------------------------------------------------
+    var fireUpEvent = function(e,handler) {
+	if( fireEvent(e,handler.upListeners) || handler.trackAllKeys ) {
+	    // Up event has listeners. Clear key state.
+	    delete handler.keyStates[e.keyCode];
 	}
     };
 
@@ -273,9 +324,9 @@
     // +-------------------------------------------------
     KeyHandler.prototype.installListeners = function() {
 	var _self = this;
-	this.element.addEventListener('keydown',this.keyDownListener=function(e) { fireEvent(e,_self.downListeners); });
-	this.element.addEventListener('keypress',this.keyPressListener=function(e) { fireEvent(e,_self.pressListeners); } );
-	this.element.addEventListener('keyup',this.keyUpListener=function(e) { fireEvent(e,_self.upListeners); } );
+	this.element.addEventListener('keydown',this.keyDownListener=function(e) { fireDownEvent(e,_self); });
+	this.element.addEventListener('keypress',this.keyPressListener=function(e) { firePressEvent(e,_self); } );
+	this.element.addEventListener('keyup',this.keyUpListener=function(e) { fireUpEvent(e,_self); } );
     };
 
 
@@ -287,6 +338,7 @@
 	this.element.removeEventListener('keypress',this.keyPressListener);
 	this.element.removeEventListener('keyup',this.keyUpListener);
     };
+
 
     // +----------------------------------------------------------------------
     // | Listen for key down. This function allows chaining.
@@ -326,6 +378,15 @@
 	this.upListeners.push( { key : key, keyCode : key2code(key), listener : listener } );
 	return this;
     };
+
+    // +----------------------------------------------------------------------
+    // | Check if a specific key is currently held pressed.
+    // |
+    // | @param key:string Any key identifier, key code or one from the KEY_CODES list.
+    // +-------------------------------------------------
+    KeyHandler.prototype.isDown = function( key ) {
+	return this.keyStates[ key2code(key) ] ? true : false;
+    }
 
     
     _context.KeyHandler = KeyHandler;

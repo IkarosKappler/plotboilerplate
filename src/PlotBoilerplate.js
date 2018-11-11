@@ -405,12 +405,12 @@
 	    } );
 
 	// Install key handler
-	new KeyHandler()
+	var keyHandler = new KeyHandler( { trackAll : true } )
 	    .down('enter',function() { console.log('ENTER was hit.'); } )
 	    .press('enter',function() { console.log('ENTER was pressed.'); } )
 	    .up('enter',function() { console.log('ENTER was released.'); } )
 
-	    .down('e',function() { console.log('e was hit.'); } )
+	    .down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
 
 	    .up('windows',function() { console.log('windows was released.'); } )
 	;
