@@ -19,6 +19,19 @@
 			     var bp = new PlotBoilerplate();
 
 			     // +---------------------------------------------------------------------------------
+			     // | Merge GET params into config.
+			     // +-------------------------------
+			     for( var k in bp.config ) {
+			       if( !GUP.hasOwnProperty(k) )
+			       continue;
+			       var type = typeof bp.config[k];
+			       if( type == 'boolean' ) bp.config[k] = !!JSON.parse(GUP[k]);
+			       else if( type == 'number' ) bp.config[k] = JSON.parse(GUP[k])*1;
+			       else if( type == 'function' ) ;
+			       else bp.config[k] = GUP[k];
+			     }
+
+			     // +---------------------------------------------------------------------------------
 			     // | Initialize dat.gui
 			     // +-------------------------------
 			     { 

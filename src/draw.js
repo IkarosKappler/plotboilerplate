@@ -204,6 +204,7 @@
     // | Draw a crosshair with given radius and color at the given position.
     // +-------------------------------
     _context.drawutils.prototype.crosshair = function( center, radius, color ) {
+	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x+center.x*this.scale.x-radius, this.offset.y+center.y*this.scale.y );
 	this.ctx.lineTo( this.offset.x+center.x*this.scale.x+radius, this.offset.y+center.y*this.scale.y );
@@ -213,6 +214,7 @@
 	this.ctx.lineWidth = 0.5;
 	this.ctx.stroke();
 	this.ctx.closePath();
+	this.ctx.restore();
     };
 
     // +---------------------------------------------------------------------------------

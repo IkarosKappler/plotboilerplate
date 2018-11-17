@@ -53,7 +53,6 @@
     // +---------------------------------------------------------------------------------
     // | Initialize everything.
     // +----------------------------
-    //window.addEventListener('load',function() {
     var PlotBoilerplate = function( config ) {
 	// +---------------------------------------------------------------------------------
 	// | A global config that's attached to the dat.gui control interface.
@@ -72,18 +71,11 @@
 					       },
 	    saveFile              : function() { saveFile(); }
 	};
-	// Merge GET params into config
-	/*for( var k in config ) {
-	    if( !GUP.hasOwnProperty(k) )
-		continue;
-	    var type = typeof config[k];
-	    if( type == 'boolean' ) config[k] = !!JSON.parse(GUP[k]);
-	    else if( type == 'number' ) config[k] = JSON.parse(GUP[k])*1;
-	    else if( type == 'function' ) ;
-	    else config[k] = GUP[k];
-	}*/
 
-	
+
+	// +---------------------------------------------------------------------------------
+	// | Object members.
+	// +-------------------------------
 	this.canvas              = document.getElementById('my-canvas'); 
 	this.ctx                 = this.canvas.getContext('2d');
 	this.draw                = new drawutils(this.ctx,false);
@@ -124,8 +116,6 @@
 	    // Construct
 	    this.vertices = [];
 	    for( var i in bpath ) {
-		//draw.cubicBezierHandleLines(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3]);
-		//draw.cubicBezierHandles(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
 		this.vertices.push( bpath[i][0] );
 		this.vertices.push( bpath[i][1] );
 		this.vertices.push( bpath[i][2] );
@@ -193,7 +183,7 @@
 
 	    // Draw all vertices (as small squares)
 	    for( var i in this.vertices ) 
-		this.draw.square( this.vertices[i], 5, 'rgba(0,128,192,0.5)' );
+		this.draw.square( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
 
 	    // Draw cubic bezier paths
 	    for( var i in bpath )
@@ -304,6 +294,21 @@
 	_context.addEventListener( 'resize', this.resizeCanvas );
 	this.resizeCanvas();
 
+
+	// +---------------------------------------------------------------------------------
+	// | Add all vertices inside the polygon to the current selection.
+	// | 
+	// | @param polygon:Polygon The polygonal selection area.
+	// +-------------------------------
+	PlotBoilerplate.prototype.selectVerticesInPolygon = function( polygon ) {
+	    for( var i in this.vertices ) {
+		console.log('polygon contains vert ',i,polygon.containsVert(this.vertices[i]));
+		if( polygon.containsVert(this.vertices[i]) ) 
+		    this.vertices[i].attr.isSelected = true;
+	    }
+	};
+	
+	
 	// +---------------------------------------------------------------------------------
         // | Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
 	// |
@@ -429,8 +434,18 @@
 	    .press('enter',function() { console.log('ENTER was pressed.'); } )
 	    .up('enter',function() { console.log('ENTER was released.'); } )
 
-	    .down('shift',function() { console.log('SHIFT was hit.'); _self.selectPolygon = new Polygon(); _self.redraw(); } )
-	    .up('shift',function() { console.log('SHIFT was released.'); _self.selectPolygon = null; _self.redraw(); } )
+	    .down('shift',function() {
+		console.log('SHIFT was hit.');
+		_self.selectPolygon = new Polygon();
+		_self.redraw(); } )
+	    .up('shift',function() {
+		console.log('SHIFT was released.');
+		// Find and select vertices in the drawn area
+		if( _self.selectPolygon == null )
+		    return;
+		_self.selectVerticesInPolygon( _self.selectPolygon );
+		_self.selectPolygon = null;
+		_self.redraw(); } )
 
 	    .down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
 

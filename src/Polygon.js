@@ -27,7 +27,7 @@
     // |
     // | @param v:Vertex The vertex to check.
     // +-------------------------------
-    _context.Polygon.containsVert = function( vert ) {
+    _context.Polygon.prototype.containsVert = function( vert ) {
 	// Original ray-casting algorithm found here
 	//    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
 	// function checkcheck (x, y, cornersX, cornersY) {
@@ -61,8 +61,8 @@
 	for( var i = 0; i < this.vertices.length; i++ ) {
 	    pX = this.vertices[i].x;
 	    pY = this.vertices[i].y;
-	    if ((pY< y && pY>=y ||  pY< y && pY>=y) &&  (pX<=x || pX<=x)) {
-		oddNodes^=(pX+(y-pY)/(pY-pY)*(pX-pX)<x); 
+	    if ((pY< vert.y && pY>=vert.y ||  pY< vert.y && pY>=vert.y) &&  (pX<=vert.x || pX<=vert.x)) {
+		oddNodes^=(pX+(vert.y-pY)/(pY-pY)*(pX-pX)<vert.x); 
 	    }
 
 	    j=i; 
