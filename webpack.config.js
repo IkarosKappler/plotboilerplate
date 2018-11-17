@@ -10,6 +10,7 @@ module.exports = {
         './src/VertexAttr.js',
         './src/VertexListeners.js',
         './src/Vertex.js',
+	'./src/Polygon.js',
 
         './src/MouseHandler.js',
 	'./src/KeyHandler.js',

@@ -12,7 +12,13 @@
 
 (function(_context) {
     "use strict";
-    
+
+    // +---------------------------------------------------------------------------------
+    // | The constructor.
+    // |
+    // | @param context:Context2D The canvas context to draw on.
+    // | @param fillShapes:boolean Indicates if shapes should be filled or not.
+    // +-------------------------------
     _context.drawutils = function( context, fillShapes ) {
 	this.ctx = context;
 	this.offset = { x : 0, y : 0 };
@@ -53,13 +59,6 @@
 	if( typeof CubicBezierCurve == 'undefined' || !(curve instanceof CubicBezierCurve) )
 	    throw "The passed curve is not an instance of CubicBezierCurve and thus cannot be plotted with this function.";
 	// Draw curve
-	/*this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x+curve.startPoint.x*this.scale.y, this.offset.y+curve.startPoint.y*this.scale.y );
-	this.ctx.bezierCurveTo( this.offset.x+curve.startControlPoint.x*this.scale.x, this.offset.y+curve.startControlPoint.y*this.scale.y,
-				this.offset.x+curve.endControlPoint.x*this.scale.x, this.offset.y+curve.endControlPoint.y*this.scale.y,
-				this.offset.x+curve.endPoint.x*this.scale.x, this.offset.y+curve.endPoint.y*this.scale.y );
-	this._fillOrDraw( '#00a822' );
-	*/
 	this.cubicBezier( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, color );
     };
     
@@ -70,13 +69,15 @@
     // +-------------------------------
     _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color ) {
 	// Draw curve
+	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
 	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
+	this.ctx.lineWidth = 2;
 	this._fillOrDraw( color );
-
+	this.ctx.restore();
     };
 
 
@@ -85,12 +86,6 @@
     // +-------------------------------
     _context.drawutils.prototype.cubicBezierCurveHandles = function( curve ) {
 	// Draw handles
-	/*
-	this.point( curve.startPoint, 'rgb(0,32,192)' );
-	this.point( curve.endPoint, 'rgb(0,32,192)' );
-	this.square( curve.startControlPoint, 5, 'rgba(0,128,192,0.5)' );
-	this.square( curve.endControlPoint, 5, 'rgba(0,128,192,0.5)' );
-	*/
 	this.cubicBezierHandles( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
     };
 
@@ -100,10 +95,13 @@
     // +-------------------------------
     _context.drawutils.prototype.cubicBezierHandles = function( startPoint, endPoint, startControlPoint, endControlPoint ) {
 	// Draw handles
+	this.ctx.save();
+	this.ctx.lineWidth = 1;
 	this.point( startPoint, 'rgb(0,32,192)' );
 	this.point( endPoint, 'rgb(0,32,192)' );
 	this.square( startControlPoint, 5, 'rgba(0,128,192,0.5)' );
 	this.square( endControlPoint, 5, 'rgba(0,128,192,0.5)' );
+	this.ctx.restore();
     };
 
 
@@ -217,6 +215,31 @@
 	this.ctx.closePath();
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draw a text at the given position.
+    // +-------------------------------
+    _context.drawutils.prototype.polygon = function( polygon, color ) {
+	if( polygon.vertices.length <= 1 )
+	    return;
+	// options = options || {};
+	this.ctx.save();
+	this.ctx.setLineDash([3, 5]);
+	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
+	for( var i = 0; i < polygon.vertices.length; i++ ) {
+	    this.ctx.lineTo( this.offset.x + polygon.vertices[i].x*this.scale.x, this.offset.y + polygon.vertices[i].y*this.scale.y );
+	}
+	if( !polygon.isOpen )
+	    this.ctx.closePath();
+	// this.strokeStyle = color;
+	// this.ctx.stroke();
+	this._fillOrDraw( color );
+	//this.ctx.setLineDash([]);
+	this.ctx.restore();
+    };
+    
+    // +---------------------------------------------------------------------------------
+    // | Draw a text at the given position.
+    // +-------------------------------
     _context.drawutils.prototype.string = function( text, x, y ) {
 	if( this.fillShapes ) {
 	    this.ctx.fillStyle = 'black';

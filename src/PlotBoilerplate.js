@@ -94,6 +94,7 @@
 
 	this.vertices            = [];
 
+	this.selectPolygon       = null;
 	this.draggedElements     = [];
 
 	var _self = this;
@@ -190,12 +191,20 @@
 	    }
 	    */
 
-	    for( var i in this.vertices ) {
-		_self.draw.square( this.vertices[i], 5, 'rgba(0,128,192,0.5)' );
-	    }
-	    
+	    // Draw all vertices (as small squares)
+	    for( var i in this.vertices ) 
+		this.draw.square( this.vertices[i], 5, 'rgba(0,128,192,0.5)' );
+
+	    // Draw cubic bezier paths
 	    for( var i in bpath )
 		this.draw.cubicBezier(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
+
+	    // Draw select polygon?
+	    if( this.selectPolygon != null && this.selectPolygon.vertices.length > 0 ) {
+		console.log('Drawing selectPolygon',this.selectPolygon.vertices.length,'vertices');
+		this.draw.polygon( this.selectPolygon, '#888888' );
+		this.draw.crosshair( this.selectPolygon.vertices[0], 3, '#008888' );
+	    }
 	};
 	
 	
@@ -295,14 +304,6 @@
 	_context.addEventListener( 'resize', this.resizeCanvas );
 	this.resizeCanvas();
 
-
-	// +---------------------------------------------------------------------------------
-	// | Handle left-click and tap event
-	// +-------------------------------
-	function handleTap(x,y) {
-	    
-	}
-
 	// +---------------------------------------------------------------------------------
         // | Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
 	// |
@@ -350,6 +351,24 @@
             return false;
         }
 
+
+	// +---------------------------------------------------------------------------------
+	// | Handle left-click and tap event.
+	// |
+	// | @param x:Number The tap X position on the canvas.
+	// | @param y:Number The tap Y position on the canvas.
+	// +-------------------------------
+	function handleTap(x,y) {
+	    if( _self.selectPolygon != null ) { // keyHandler.isDown('shift')
+		var vert = transformMousePosition(x, y);
+		_self.selectPolygon.vertices.push( vert );
+		_self.redraw();
+	    }
+	}
+
+	// +---------------------------------------------------------------------------------
+	// | Transform the given x-y-(mouse-)point to coordinates. 
+	// +-------------------------------
 	var transformMousePosition = function( x, y ) {
 	    return { x : x/_self.draw.scale.x-_self.draw.offset.x, y : y/_self.draw.scale.y-_self.draw.offset.y };
 	};
@@ -409,6 +428,9 @@
 	    .down('enter',function() { console.log('ENTER was hit.'); } )
 	    .press('enter',function() { console.log('ENTER was pressed.'); } )
 	    .up('enter',function() { console.log('ENTER was released.'); } )
+
+	    .down('shift',function() { console.log('SHIFT was hit.'); _self.selectPolygon = new Polygon(); _self.redraw(); } )
+	    .up('shift',function() { console.log('SHIFT was released.'); _self.selectPolygon = null; _self.redraw(); } )
 
 	    .down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
 
