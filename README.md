@@ -3,6 +3,24 @@ For Javascript and canvas with 2d-context.
 
 ![Current demo](screenshot-20181031_1.png "Current demo")
 
+## Install webpack
+This will install the npm-webpack package for you from the package.json file.
+~~~~
+ $ npm install
+~~~~
+
+
+## Run webpack
+This will generate the ./dist/plot-boilerplate.min.js file for you
+from the sources code files in ./src/*.
+~~~~
+ $ npm run webpack
+~~~~
+
+## The HTML file
+
+
+
 ### Todos
 * Add pad/phone support.
 * Implement zoom into dat.gui interface.

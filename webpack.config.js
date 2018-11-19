@@ -10,6 +10,8 @@ module.exports = {
         './src/VertexAttr.js',
         './src/VertexListeners.js',
         './src/Vertex.js',
+	'./src/CubicBezierCurve.js',
+	'./src/BezierPath.js',
 	'./src/Polygon.js',
 
         './src/MouseHandler.js',
@@ -17,8 +19,7 @@ module.exports = {
         './src/draw.js',
         './src/overlay-dialog.js',
 
-        './src/PlotBoilerplate.js',
-        './src/index.js'
+        './src/PlotBoilerplate.js'
     ],
     output: {
         path: path.resolve(__dirname, 'dist'),

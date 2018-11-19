@@ -12,10 +12,6 @@
     "use strict";
 
     
-    
-    // Fetch the GET params
-    let GUP = gup();
-    
     const DEFAULT_CANVAS_WIDTH = 1024;
     const DEFAULT_CANVAS_HEIGHT = 768;
 
