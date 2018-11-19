@@ -2,6 +2,7 @@
 For Javascript and canvas with 2d-context.
 
 ![Current demo](screenshot-20181031_1.png "Current demo")
+[Live Demo](https://www.int2byte.de/public/plot-boilerplate/main-dist.html "Live Demo")
 
 ## Install webpack
 This will install the npm-webpack package for you from the package.json file.
