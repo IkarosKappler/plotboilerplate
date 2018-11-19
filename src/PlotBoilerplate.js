@@ -3,7 +3,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23
- * @version  1.0.0
+ * @modified 2018-11-19 Added multi-select and multi-drag.
+ * @version  1.0.1
  **/
 
 
@@ -89,6 +90,11 @@
 	this.selectPolygon       = null;
 	this.draggedElements     = [];
 
+	this.drawables           = [];
+
+	// A square
+	// var tmpPoly = new Polygon( [ {x:-100,y:-100},{x:100,y:-100},{x:100,y:100},{x:-100,y:100} ] );
+
 	var _self = this;
 	PlotBoilerplate.prototype.initDrawableObjects = function() {
 	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
@@ -115,12 +121,21 @@
 
 	    // Construct
 	    this.vertices = [];
+	    
 	    for( var i in bpath ) {
 		this.vertices.push( bpath[i][0] );
 		this.vertices.push( bpath[i][1] );
 		this.vertices.push( bpath[i][2] );
 		this.vertices.push( bpath[i][3] );
 	    }
+	    this.drawables.push( BezierPath.fromArray( bpath ) );
+
+	    var squareSize = 32;
+	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
+	    var square = new Polygon( squareVerts );
+	    this.drawables.push( square );
+	    for( var i in squareVerts )
+		this.vertices.push( squareVerts[i] );
 	};
 	
 	
@@ -132,9 +147,6 @@
 	    this.ctx.fillStyle = _self.config.backgroundColor; 
 	    this.ctx.fillRect(0,0,_self.canvasSize.width,_self.canvasSize.height);
 
-	    //draw.scale.x = config.scaleX;
-	    //fill.scale.x = config.scaleY;
-
 	    // Draw the background image?
 	    if( _self.image ) {
 		if( _self.config.fitImage ) {
@@ -144,50 +156,31 @@
 		}
 	    }
 
-	    console.log('draw');
 	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
 	    _self.draw.circle( {x:0,y:0}, radius, '#000000' );
-
-	    var fract = 0.5;
-	    var bpath = [
-		[ new Vertex( { x : 0, y : -radius } ),
-		  new Vertex( { x : radius, y : 0 } ),
-		  new Vertex( { x : radius*fract, y : -radius } ),
-		  new Vertex( { x : radius*fract, y : 0 } ) ],
-		[ new Vertex( { x : radius, y : 0 } ),
-		  new Vertex( { x : 0, y : radius } ),
-		  new Vertex( { x : radius, y : radius*fract } ),
-		  new Vertex( { x : 0, y : radius*fract } ) ],
-		[ new Vertex( { x : 0, y : radius } ),
-		  new Vertex( { x : -radius, y : 0 } ),
-		  new Vertex( { x : -radius*fract, y : radius } ),
-		  new Vertex( { x : -radius*fract, y : 0 } ) ],
-		[ new Vertex( { x : -radius, y : 0 } ),
-		  new Vertex( { x : 0, y : -radius } ),
-		  new Vertex( { x : -radius, y : -radius*fract } ),
-		  new Vertex( { x : 0, y : -radius*fract } )
-		] ];
-
-	    // Construct
-	    /*
-	    vertices = [];
-	    for( var i in bpath ) {
-		//draw.cubicBezierHandleLines(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3]);
-		//draw.cubicBezierHandles(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
-		vertices.push( bpath[i][0] );
-		vertices.push( bpath[i][1] );
-		vertices.push( bpath[i][2] );
-		vertices.push( bpath[i][3] );
-	    }
-	    */
 
 	    // Draw all vertices (as small squares)
 	    for( var i in this.vertices ) 
 		this.draw.square( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
 
 	    // Draw cubic bezier paths
-	    for( var i in bpath )
-		this.draw.cubicBezier(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
+	    // for( var i in bpath )
+	    //	; // this.draw.cubicBezier(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
+
+	    // Draw drawables
+	    for( var i in this.drawables ) {
+		var d = this.drawables[i];
+		if( d instanceof BezierPath ) {
+		    // console.log( 'Drawing bezier path.' );
+		    for( var c in d.bezierCurves ) {
+			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, '#00a822' );
+		    }
+		} else if( d instanceof Polygon ) {
+		    this.draw.polygon( d, '#0022a8' );
+		} else {
+		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
+		}
+	    }
 
 	    // Draw select polygon?
 	    if( this.selectPolygon != null && this.selectPolygon.vertices.length > 0 ) {
@@ -195,7 +188,7 @@
 		this.draw.polygon( this.selectPolygon, '#888888' );
 		this.draw.crosshair( this.selectPolygon.vertices[0], 3, '#008888' );
 	    }
-	};
+	}; // END redraw
 	
 	
 	// +---------------------------------------------------------------------------------
@@ -222,6 +215,22 @@
 	    }
 	    reader.readAsDataURL(e.target.files[0]);     
 	}
+
+
+	// +---------------------------------------------------------------------------------
+	// | Clear the selection.
+	// |
+	// | @param redraw:boolean Indicates if the redraw function should be triggered.
+	// |
+	// | @return this for chaining.
+	// +-------------------------------
+	PlotBoilerplate.prototype.clearSelection = function( redraw ) {
+	    for( var i in this.vertices ) 
+		this.vertices[i].attr.isSelected = false;
+	    if( redraw )
+		this.redraw();
+	    return this;
+	};
 
 	
 	// +---------------------------------------------------------------------------------
@@ -382,35 +391,53 @@
 	// | Install a mouse handler on the canvas.
 	// +-------------------------------
 	new MouseHandler(this.canvas)
-	    .mousedown( function(e) {
+	    .down( function(e) {
 		if( e.which != 1 )
 		    return; // Only react on left mouse
 		var p = locatePointNear( transformMousePosition(e.params.pos.x, e.params.pos.y) );
 		console.log( p );
 		if( !p ) return;
-		_self.draggedElements.push( p );
-		//p.listeners.fireDragStartEvent( e );
-		if( p.type == 'bpath' )
-		    _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent( e );
-		else if( p.type == 'vertex' )
-		    _self.vertices[p.vindex].listeners.fireDragStartEvent( e );
+		// Drag all selected elements?
+		if( p.type == 'vertex' && _self.vertices[p.vindex].attr.isSelected ) {
+		    // Multi drag
+		    for( var i in _self.vertices ) {
+			if( _self.vertices[i].attr.isSelected ) {
+			    console.log( 'vertex is about to be dragged', _self.vertices[i] );
+			    _self.draggedElements.push( new Draggable( _self.vertices[i], Draggable.VERTEX ).setVIndex(i) );
+			    _self.vertices[i].listeners.fireDragStartEvent( e );
+			}
+		    }
+		} else {
+		    // Single drag
+		    _self.draggedElements.push( p );
+		    if( p.type == 'bpath' )
+			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent( e );
+		    else if( p.type == 'vertex' )
+			_self.vertices[p.vindex].listeners.fireDragStartEvent( e );
+		}
 		_self.redraw();
 	    } )
 	    .drag( function(e) {
-		for( var i in _self.draggedElements ) {
-		    var p = _self.draggedElements[i];
-		    // console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
-		    if( p.type == 'bpath' ) {
-			_self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
-			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
-		    } else if( p.type == 'vertex' ) {
-			_self.vertices[p.vindex].add( e.params.dragAmount );
-			_self.vertices[p.vindex].listeners.fireDragEvent( e );
+		if( keyHandler.isDown('ctrl') ) {
+		    _self.draw.offset.add( e.params.dragAmount );
+		    _self.fill.offset.set( _self.draw.offset );
+		    _self.redraw();
+		} else {
+		    for( var i in _self.draggedElements ) {
+			var p = _self.draggedElements[i];
+			// console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
+			if( p.type == 'bpath' ) {
+			    _self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
+			    _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
+			} else if( p.type == 'vertex' ) {
+			    _self.vertices[p.vindex].add( e.params.dragAmount );
+			    _self.vertices[p.vindex].listeners.fireDragEvent( e );
+			}
 		    }
 		}
 		_self.redraw();
 	    } )
-	    .mouseup( function(e) {
+	    .up( function(e) {
 		if( e.which != 1 )
 		    return; // Only react on left mouse;
 		if( !e.params.wasDragged )
@@ -426,13 +453,24 @@
 		}
 		_self.draggedElements = [];
 		_self.redraw();
-	    } );
+	    } )
+	/*
+	    .move( function(e) {
+		var vert = transformMousePosition(e.params.pos.x, e.params.pos.y);
+		console.log( 'mouse position inside poly?', vert, tmpPoly.containsVert(vert) );
+	    } )
+	*/
+	;
 
 	// Install key handler
 	var keyHandler = new KeyHandler( { trackAll : true } )
 	    .down('enter',function() { console.log('ENTER was hit.'); } )
 	    .press('enter',function() { console.log('ENTER was pressed.'); } )
 	    .up('enter',function() { console.log('ENTER was released.'); } )
+
+	    .down('escape',function() {
+		console.log('ESCAPE was hit.');
+		_self.clearSelection(true); } )
 
 	    .down('shift',function() {
 		console.log('SHIFT was hit.');
@@ -446,6 +484,9 @@
 		_self.selectVerticesInPolygon( _self.selectPolygon );
 		_self.selectPolygon = null;
 		_self.redraw(); } )
+
+	    .down('ctrl',function() { console.log('CTRL was hit.'); } )
+	    .up('ctrl',function() { console.log('CTRL was released.'); } )
 
 	    .down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
 
@@ -461,6 +502,9 @@
 	
 	// Init	
 	this.redraw();
+
+	// Gain focus
+	this.canvas.focus();
 	
     }; // END construcor 'PlotBoilerplate'
 

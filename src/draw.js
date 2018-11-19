@@ -21,8 +21,8 @@
     // +-------------------------------
     _context.drawutils = function( context, fillShapes ) {
 	this.ctx = context;
-	this.offset = { x : 0, y : 0 };
-	this.scale = { x : 1, y : 1 };
+	this.offset = new Vertex( 0, 0 );
+	this.scale = new Vertex( 1, 1 );
 	this.fillShapes = fillShapes;
     };
 
@@ -225,6 +225,7 @@
 	    return;
 	// options = options || {};
 	this.ctx.save();
+	this.ctx.beginPath();
 	this.ctx.setLineDash([3, 5]);
 	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
 	for( var i = 0; i < polygon.vertices.length; i++ ) {

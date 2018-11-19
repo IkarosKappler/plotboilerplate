@@ -815,8 +815,12 @@
 	var lastCurve = null;
 	for( var i = 0; i < arr.length; i++ ) {
 	    
-	    // Convert object to bezier curve
-	    var bCurve = CubicBezierCurve.fromObject( arr[i] );
+	    // Convert object (or array?) to bezier curve
+	    var bCurve = null;
+	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] )
+		bCurve = CubicBezierCurve.fromArray( arr[i] );
+	    else
+		bCurve = CubicBezierCurve.fromObject( arr[i] );
 	    // Set curve start point?
 	    // (avoid duplicate point instances!)
 	    if( lastCurve )

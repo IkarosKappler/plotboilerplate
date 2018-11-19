@@ -10,7 +10,8 @@
  * @modified  2018-08-16 Added the set() function.
  * @modified  2018-08-26 Added VertexAttr.
  * @modified  2018-10-31 Extended the constructor by object{x,y}.
- * @version   2.0.4
+ * @modified  2018-11-19 Extended the set(number,number) function to set(Vertex).
+ * @version   2.0.5
  **/
 
 
@@ -42,8 +43,13 @@
     // | @return Vertex
     // +-------------------------------------------------------
     Vertex.prototype.set = function( x, y ) {
-	this.x = x;
-	this.y = y;
+	if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
+	    this.x = x.x;
+	    this.y = x.y;
+	} else {
+	    this.x = x;
+	    this.y = y;
+	}
 	return this;
     };
 

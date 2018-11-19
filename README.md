@@ -4,16 +4,22 @@ For Javascript and canvas with 2d-context.
 ![Current demo](screenshot-20181031_1.png "Current demo")
 
 ### Todos
-* Make elements selectable (like with holding SHIFT).
 * Add pad/phone support.
-* Add panning (move the canvas origin).
 * Implement zoom into dat.gui interface.
 * Implement optional canvas zoom.
 * Implement optional canvas rotation.
-* Add webpack or gulp for publishing.
+* SVG export.
 
 
 ### Changelog
+* 2018-11-19
+  * Re-animated the CubicBezierCurve class and the BezierPath class.
+  * Added multi-select and multi-drag option.
+  * Made elements selectable (with holding SHIFT).
+  * Added panning (move the canvas origin by pressing CTRL and drag).
+* 2018-11-17
+  * Added the Polygon class.
+  * Added npm/webpack for compiling and code minification.
 * 2018-11-11
   * Added a simple KeyHandler for receiving key events.
 * 2018-11-10

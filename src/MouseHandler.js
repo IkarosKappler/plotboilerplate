@@ -12,10 +12,10 @@
  *	    .move( function(e) {
  *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
  *	    } )
- *          .mouseup( function(e) {
+ *          .up( function(e) {
  *              console.log( 'Mouse up.' );
  *          } )
- *          .mousedown( function(e) {
+ *          .down( function(e) {
  *              console.log( 'Mouse down.' );
  *          } )
  *          .click( function(e) {
@@ -29,7 +29,8 @@
  * @modified 2018-08-16 Added the param 'dragAmount'.
  * @modified 2018-08-27 Added the param 'element'.
  * @modified 2018-11-11 Changed the scope from a simple global var to a member of window/_context.
- * @version  1.0.4
+ * @modified 2017-11-19 Renamed the 'mousedown' function to 'down' and the 'mouseup' function to 'up'.
+ * @version  1.0.5
  **/
 
 (function(_context) {
@@ -129,13 +130,13 @@
 	    listeners.mousemove = callback;
 	    return this;
 	};
-	this.mouseup = function( callback ) {
+	this.up = function( callback ) {
 	    if( listeners.mouseup ) throw "This MouseHandler already has a 'mouseup' callback. To keep the code simple there is only room for one.";
 	    listenFor('mouseup');
 	    listeners.mouseup = callback;
 	    return this;
 	};
-	this.mousedown = function( callback ) {
+	this.down = function( callback ) {
 	    if( listeners.mousedown ) throw "This MouseHandler already has a 'mousedown' callback. To keep the code simple there is only room for one.";
 	    listenFor('mousedown');
 	    listeners.mousedown = callback;

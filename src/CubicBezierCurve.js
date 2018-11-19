@@ -3,10 +3,11 @@
  *
  * @requires Vertex
  *
- * @author Ikaros Kappler
- * @date 2013-08-15
+ * @author   Ikaros Kappler
+ * @date     2013-08-15
  * @modified 2018-08-16 Added a closure. Removed the wrapper class 'IKRS'. Replaced class THREE.Vector2 by Vertex class.
- * @version 1.0.1
+ * @modified 2018-11-19 Added the fromArray(Array) function.
+ * @version  1.0.2
  **/
 
 
@@ -472,7 +473,7 @@
     CubicBezierCurve.fromObject = function( obj ) {
 	
 	if( typeof obj !== "object" ) 
-	    throw "[IKRS.CubicBezierCurve.fromArray] Can only build from object.";
+	    throw "[IKRS.CubicBezierCurve.fromObject] Can only build from object.";
 
 
 	if( !obj.startPoint )
@@ -488,6 +489,27 @@
 				     new Vertex(obj.endPoint[0],          obj.endPoint[1]),
 				     new Vertex(obj.startControlPoint[0], obj.startControlPoint[1]),
 				     new Vertex(obj.endControlPoint[0],   obj.endControlPoint[1])
+				   );
+    };
+
+
+    // +---------------------------------------------------------------------------------
+    // | Convert a 4-element array of vertices to a cubic bézier curve.
+    // |
+    // | @param arr:Array [ startVertex, endVertex, startControlVertex, endControlVertex ]
+    // +-------------------------------
+    CubicBezierCurve.fromArray = function( arr ) {
+	
+	if( !Array.isArray(arr) ) 
+	    throw "[IKRS.CubicBezierCurve.fromArray] Can only build from object.";
+
+	if( arr.length != 4 )
+	    throw "[IKRS.CubicBezierCurve.fromArray] Can only build from array with four elements.";
+
+	return new CubicBezierCurve( arr[0],
+				     arr[1],
+				     arr[2],
+				     arr[3]
 				   );
     };
 

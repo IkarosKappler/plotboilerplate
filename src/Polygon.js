@@ -22,53 +22,46 @@
 	this.isOpen = isOpen;
     };
 
+
     // +---------------------------------------------------------------------------------
     // | Check if the given vertex is inside this polygon.
+    // |
+    // | Ray-casting algorithm found at
+    // |    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
     // |
     // | @param v:Vertex The vertex to check.
     // +-------------------------------
     _context.Polygon.prototype.containsVert = function( vert ) {
-	// Original ray-casting algorithm found here
-	//    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
-	// function checkcheck (x, y, cornersX, cornersY) {
-	//    
-	//    var i, j=cornersX.length-1 ;
-	//    var  oddNodes=false;
-	//    
-	//    var polyX = cornersX;
-	//    var polyY = cornersY;
-	//    
-	//    for (i=0; i<cornersX.length; i++) {
-	//       if ((polyY[i]< y && polyY[j]>=y ||  polyY[j]< y && polyY[i]>=y) &&  (polyX[i]<=x || polyX[j]<=x)) {
-	//          oddNodes^=(polyX[i]+(y-polyY[i])/(polyY[j]-polyY[i])*(polyX[j]-polyX[i])<x); 
-	//       }
-	//    
-	//       j=i; 
+	// function inside(point, vs) {
+	//    // ray-casting algorithm based on
+	//    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+	//
+	//    var x = point[0], y = point[1];
+	//
+	//    var inside = false;
+	//    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+	//	var xi = vs[i][0], yi = vs[i][1];
+	//	var xj = vs[j][0], yj = vs[j][1];
+	//
+	//	var intersect = ((yi > y) != (yj > y))
+	//	    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+	//	if (intersect) inside = !inside;
 	//    }
-	//    
-	//    return oddNodes;
-	// }
+	//
+	//    return inside;
+	// };
 
+	var inside = false;
+	for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
+            var xi = this.vertices[i].x, yi = this.vertices[i].y;
+            var xj = this.vertices[j].x, yj = this.vertices[j].y;
 
-	var i, j = this.vertices.length-1; //cornersX.length-1 ;
-	var oddNodes = false;
-
-	//var polyX = cornersX;
-	//var polyY = cornersY;
-
-	var pX, pY;
-	//for (i=0; i<cornersX.length; i++) {
-	for( var i = 0; i < this.vertices.length; i++ ) {
-	    pX = this.vertices[i].x;
-	    pY = this.vertices[i].y;
-	    if ((pY< vert.y && pY>=vert.y ||  pY< vert.y && pY>=vert.y) &&  (pX<=vert.x || pX<=vert.x)) {
-		oddNodes^=(pX+(vert.y-pY)/(pY-pY)*(pX-pX)<vert.x); 
-	    }
-
-	    j=i; 
+            var intersect = ((yi > vert.y) != (yj > vert.y))
+		&& (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
 	}
 
-	return oddNodes;
+	return inside;
     };
 
 
