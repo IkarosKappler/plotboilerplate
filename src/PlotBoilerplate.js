@@ -37,7 +37,7 @@
 	    this.type = type;
 	    this.vindex = null;
 	    this.pindex = null;
-	    this.cundex = null;
+	    this.cindex = null;
 	};
 	Draggable.VERTEX = 'vertex';
 	Draggable.prototype.isVertex = function() { return this.type == Draggable.VERTEX; };
@@ -59,7 +59,6 @@
 	    fitToParent           : true,
 	    scaleX                : 1.0,
 	    scaleY                : 1.0,
-	    drawEditorOutlines    : true,
 	    backgroundColor       : '#ffffff',
 	    rebuild               : function() { rebuild(); },
 	    loadImage             : function() { var elem = document.getElementById('file');
@@ -117,7 +116,7 @@
 		       ];
 
 	    // Construct
-	    //this.vertices = [];
+	    this.vertices = [];
 	    var path = BezierPath.fromArray( bpath );
 	    path.adjustCircular = true;
 	    this.drawables.push( path );
@@ -226,15 +225,16 @@
 		    return;
 	    }	    
 	    var reader = new FileReader();
-	    reader.onload = function(event){
+	    reader.onload = function(event) {
 		this.image = new Image();
 		this.image.onload = function() {
 		    // Create image buffer
-		    imageBuffer        = document.createElement('canvas');
+		    var imageBuffer    = document.createElement('canvas');
 		    imageBuffer.width  = this.image.width;
 		    imageBuffer.height = this.image.height;
 		    imageBuffer.getContext('2d').drawImage(this.image, 0, 0, this.image.width, image.height);
-		    redraw();
+		    alert( 'Sorry, not yet implemented.' );
+		    //redraw();
 		}
 		this.image.src = event.target.result;
 	    }
@@ -280,7 +280,7 @@
 	var saveFile = function() {
 	    // See documentation for FileSaver.js for usage.
 	    //    https://github.com/eligrey/FileSaver.js
-	    var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
+	    var blob = new Blob(["Hello, world!\nSorry, exporting SVGs is not yet implemented."], {type: "text/plain;charset=utf-8"});
 	    saveAs(blob, "helloworld.txt");
 	};
 	
