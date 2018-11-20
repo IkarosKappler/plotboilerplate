@@ -57,7 +57,7 @@
 	this.config = {
 	    fullSize              : true,
 	    fitToParent           : true,
-	    scaleX                : 1.5,
+	    scaleX                : 1.0,
 	    scaleY                : 1.0,
 	    drawEditorOutlines    : true,
 	    backgroundColor       : '#ffffff',
@@ -96,35 +96,67 @@
 	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
 	    //draw.circle( {x:0,y:0}, radius, '#000000' );
 	    var fract = 0.5;
-	    var bpath = [
-		[ new Vertex( { x : 0, y : -radius } ),
-		  new Vertex( { x : radius, y : 0 } ),
-		  new Vertex( { x : radius*fract, y : -radius } ),
-		  new Vertex( { x : radius*fract, y : 0 } ) ],
-		[ new Vertex( { x : radius, y : 0 } ),
-		  new Vertex( { x : 0, y : radius } ),
-		  new Vertex( { x : radius, y : radius*fract } ),
-		  new Vertex( { x : 0, y : radius*fract } ) ],
-		[ new Vertex( { x : 0, y : radius } ),
-		  new Vertex( { x : -radius, y : 0 } ),
-		  new Vertex( { x : -radius*fract, y : radius } ),
-		  new Vertex( { x : -radius*fract, y : 0 } ) ],
-		[ new Vertex( { x : -radius, y : 0 } ),
-		  new Vertex( { x : 0, y : -radius } ),
-		  new Vertex( { x : -radius, y : -radius*fract } ),
-		  new Vertex( { x : 0, y : -radius*fract } )
-		] ];
+	    // Make a circular connected path
+	    var bpath = [];
+	    bpath[0] = [ new Vertex( 0, -radius ),
+			 new Vertex( radius, 0 ),
+			 new Vertex( radius*fract, -radius ),
+			 new Vertex( radius*fract, 0 ) ];
+	    bpath[1] = [ bpath[0][1], // new Vertex( radius, 0  ),
+			 new Vertex( 0, radius ),
+			 new Vertex( radius, radius*fract ),
+			 new Vertex( 0, radius*fract ) ];
+	    bpath[2] = [ bpath[1][1], // new Vertex( 0, radius ),
+			 new Vertex( -radius, 0 ),
+			 new Vertex( -radius*fract, radius ),
+			 new Vertex( -radius*fract, 0 ) ];
+	    bpath[3] = [ bpath[2][1], // new Vertex( -radius, 0 ),
+			 bpath[0][0], // new Vertex( 0, -radius ),
+			 new Vertex( -radius, -radius*fract ),
+			 new Vertex( 0, -radius*fract )
+		       ];
 
 	    // Construct
-	    this.vertices = [];
-	    
+	    //this.vertices = [];
+	    var path = BezierPath.fromArray( bpath );
+	    path.adjustCircular = true;
+	    this.drawables.push( path );
+
 	    for( var i in bpath ) {
 		this.vertices.push( bpath[i][0] );
 		this.vertices.push( bpath[i][1] );
 		this.vertices.push( bpath[i][2] );
 		this.vertices.push( bpath[i][3] );
+
+		
+		(function(cindex) {
+		     bpath[cindex][0].listeners.addDragListener( function(e) {
+			 //console.log('start handle moved');
+			 bpath[cindex][0].addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+			 path.moveCurvePoint( cindex*1, 
+							    path.START_POINT,            // obtain handle length?
+							    e.params.dragAmount           // update arc lengths
+							);
+		    } );
+		    bpath[cindex][2].listeners.addDragListener( function(e) {
+			//console.log('start handle moved');
+			path.adjustPredecessorControlPoint( cindex*1, 
+							    true,            // obtain handle length?
+							    true            // update arc lengths
+							);
+		    } );
+		    bpath[cindex][3].listeners.addDragListener( function(e) {
+			//console.log('end handle moved'); console.log(cindex);
+			var b = path.adjustSuccessorControlPoint( cindex*1, 
+							    true,            // obtain handle length?
+							    true            // update arc lengths
+								);
+			console.log(b);
+		    } );
+		})(i);
+		
 	    }
-	    this.drawables.push( BezierPath.fromArray( bpath ) );
+	    
 
 	    var squareSize = 32;
 	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
@@ -140,8 +172,8 @@
 	// +-------------------------------
 	PlotBoilerplate.prototype.redraw = function() {	    
 	    // Note that the image might have an alpha channel. Clear the scene first.
-	    this.ctx.fillStyle = _self.config.backgroundColor; 
-	    this.ctx.fillRect(0,0,_self.canvasSize.width,_self.canvasSize.height);
+	    this.ctx.fillStyle = this.config.backgroundColor; 
+	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
 
 	    // Draw the background image?
 	    if( _self.image ) {
@@ -157,19 +189,16 @@
 
 	    // Draw all vertices (as small squares)
 	    for( var i in this.vertices ) 
-		this.draw.square( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
-
-	    // Draw cubic bezier paths
-	    // for( var i in bpath )
-	    //	; // this.draw.cubicBezier(bpath[i][0],bpath[i][1],bpath[i][2],bpath[i][3],'#00a822');
+		this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
 
 	    // Draw drawables
 	    for( var i in this.drawables ) {
 		var d = this.drawables[i];
 		if( d instanceof BezierPath ) {
-		    // console.log( 'Drawing bezier path.' );
 		    for( var c in d.bezierCurves ) {
 			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, '#00a822' );
+			this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
+			this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
 		    }
 		} else if( d instanceof Polygon ) {
 		    this.draw.polygon( d, '#0022a8' );
@@ -329,7 +358,7 @@
 		var vert = _self.vertices[vindex];
 		if( vert.distance(point) < tolerance ) {
 		    // console.log( 'vertex found.' );
-		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); //{ type : 'vertex', vindex : vindex };
+		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); // { type : 'vertex', vindex : vindex };
 		}
 	    }
 	    
@@ -380,7 +409,8 @@
 	// | Transform the given x-y-(mouse-)point to coordinates. 
 	// +-------------------------------
 	var transformMousePosition = function( x, y ) {
-	    return { x : x/_self.draw.scale.x-_self.draw.offset.x, y : y/_self.draw.scale.y-_self.draw.offset.y };
+	    //return { x : x/_self.draw.scale.x-_self.draw.offset.x, y : y/_self.draw.scale.y-_self.draw.offset.y };
+	    return { x : (x-_self.draw.offset.x)/_self.draw.scale.x, y : (y-_self.draw.offset.y)/_self.draw.scale.y };
 	};
 
 	// +---------------------------------------------------------------------------------
@@ -398,7 +428,7 @@
 		    // Multi drag
 		    for( var i in _self.vertices ) {
 			if( _self.vertices[i].attr.isSelected ) {
-			    console.log( 'vertex is about to be dragged', _self.vertices[i] );
+			    // console.log( 'vertex is about to be dragged', _self.vertices[i] );
 			    _self.draggedElements.push( new Draggable( _self.vertices[i], Draggable.VERTEX ).setVIndex(i) );
 			    _self.vertices[i].listeners.fireDragStartEvent( e );
 			}
@@ -414,6 +444,11 @@
 		_self.redraw();
 	    } )
 	    .drag( function(e) {
+		// Convert drag amount by scaling
+		// Warning: this possibly invalidates the dragEvent for other listeners!
+		//          Rethink the solution when other features are added.
+		e.params.dragAmount.x /= _self.draw.scale.x;
+		e.params.dragAmount.y /= _self.draw.scale.y;
 		if( keyHandler.isDown('ctrl') ) {
 		    _self.draw.offset.add( e.params.dragAmount );
 		    _self.fill.offset.set( _self.draw.offset );

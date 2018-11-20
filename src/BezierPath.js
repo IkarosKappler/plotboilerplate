@@ -1,10 +1,13 @@
 /**
  * A refactored BezierPath class.
  *
+ * @require Vertex
+ * 
  * @author Ikaros Kappler
  * @date 2013-08-19
- * @modified 2018-08-16 Added  closure. Removed the 'IKRS' wrapper.
- * @version 1.0.1
+ * @modified 2018-08-16 Added closure. Removed the 'IKRS' wrapper.
+ * @modified 2018-11-20 Added circular auto-adjustment.
+ * @version 1.0.2
  **/
 
 
@@ -27,6 +30,11 @@
 	    pathPoints = [];
 
 	this.totalArcLength = 0.0;
+
+	// Set this flag to true if you want the first point and
+	// last point of the path to be auto adjusted, too.
+	this.adjustCircular = false;
+	
 	this.bezierCurves = [];
 	for( var i = 1; i < pathPoints.length; i++ ) {
 
@@ -58,7 +66,6 @@
 	}
     };
 
-    BezierPath.prototype = new Object();
     BezierPath.prototype.constructor = BezierPath;
 
     // +---------------------------------------------------------------------------------
@@ -87,7 +94,6 @@
 					    );
 	
 	    } else {
-		//this.updateArcLengths();
 		this.totalArcLength += curve.getLength();
 	    }
     };
@@ -134,19 +140,13 @@
 	
 	var bounds    = this.computeBoundingBox();
 	var relativeX = bounds.xMax;
-	
-	//window.alert( "relativeX=" + relativeX );
-
-	var volume = 0.0;
+	var volume    = 0.0;
 	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-
 	    volume += this.bezierCurves[i].computeVerticalRevolutionVolumeSize( relativeX,         // An imaginary x-axis at the right bound
 										//deltaSize, 
 										useAbsoluteValues 
 									      );
-	    
 	}
-
 	return volume;
     };
 
@@ -608,19 +608,19 @@
 
 	// If inner point and NOT control point
 	//  --> move neightbour
-	if( pointID == this.START_POINT && curveIndex > 0 ) {
+	if( pointID == this.START_POINT && (curveIndex > 0 || this.adjustCircular) ) {
 
 	    // Set predecessor's control point!
-	    var predecessor = this.getCurveAt( curveIndex-1 );
+	    var predecessor = this.getCurveAt( curveIndex-1<0 ? this.bezierCurves.length+(curveIndex-1) : curveIndex-1 );
 	    predecessor.moveCurvePoint( this.END_CONTROL_POINT, 
 					moveAmount,
 					true,                    // move control point, too
 					false                    // updateArcLengths
 				      );
 
-	} else if( pointID == this.END_POINT && curveIndex+1 < this.bezierCurves.length ) {
+	} else if( pointID == this.END_POINT && (curveIndex+1 < this.bezierCurves.length || this.adjustCircular) ) {
 	    // Set successcor
-	    var successor = this.getCurveAt( curveIndex+1 );
+	    var successor = this.getCurveAt( (curveIndex+1)%this.bezierCurves.length );
 	    successor.moveCurvePoint( this.START_CONTROL_POINT, 
 				      moveAmount, 
 				      true,                  // move control point, too
@@ -656,11 +656,11 @@
 								   updateArcLengths     // boolean
 								 ) {
 	
-	if( curveIndex <= 0 )
+	if( !this.adjustCircular && curveIndex <= 0 )
 	    return false;
 
 	var mainCurve      = this.getCurveAt( curveIndex );
-	var neighbourCurve = this.getCurveAt( curveIndex-1 );
+	var neighbourCurve = this.getCurveAt( curveIndex-1<0 ? this.getCurveCount()+(curveIndex-1) : curveIndex-1 );
 	return this.adjustNeighbourControlPoint( mainCurve,
 						 neighbourCurve,
 						 mainCurve.getStartPoint(),            // the reference point
@@ -676,13 +676,13 @@
 								 obtainHandleLength,  // boolean
 								 updateArcLengths     // boolean
 							       ) {
-	
-	if( curveIndex+1 > this.getCurveCount() )
-	    return false;
+	// console.log( this.getCurveCount(), curveIndex );
+	if( !this.adjustCirculat && curveIndex+1 > this.getCurveCount() )
+	    return false; 
 
 
 	var mainCurve      = this.getCurveAt( curveIndex );
-	var neighbourCurve = this.getCurveAt( curveIndex+1 );
+	var neighbourCurve = this.getCurveAt( (curveIndex+1)%this.getCurveCount() );
 	return this.adjustNeighbourControlPoint( mainCurve,
 						 neighbourCurve,
 						 mainCurve.getEndPoint(),                // the reference point
