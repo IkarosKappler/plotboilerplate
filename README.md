@@ -20,7 +20,7 @@ from the sources code files in ./src/*.
 ~~~~
 
 ## The HTML file
-
+See main-dist.html
 
 
 ### Todos
@@ -32,6 +32,10 @@ from the sources code files in ./src/*.
 
 
 ### Changelog
+* 2018-11-20
+  * Bézier curve does now auto adjust when dragging path points and control points.
+  * BezierPath implementation now support circular paths.
+  * Fixed some issues in the dat.gui interface configuration. Axis independent scaling works now.
 * 2018-11-19
   * Re-animated the CubicBezierCurve class and the BezierPath class.
   * Added multi-select and multi-drag option.
