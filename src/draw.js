@@ -29,7 +29,6 @@
     // +---------------------------------------------------------------------------------
     // | Draw the given line (between the two points) with the specified (CSS-) color.
     // +-------------------------------
-    // CURRENTLY NOT IN USE
     _context.drawutils.prototype.line = function( zA, zB, color ) {
 	this.ctx.save();
 	this.ctx.beginPath();
@@ -51,22 +50,8 @@
 	    this.ctx.stroke();
 	}
     };
-    
 
     
-    // +---------------------------------------------------------------------------------
-    // | Draw the given (cubic) bézier curve.
-    // +-------------------------------
-    /*
-    _context.drawutils.prototype.cubicBezierCurve = function( curve, color ) {
-	if( typeof CubicBezierCurve == 'undefined' || !(curve instanceof CubicBezierCurve) )
-	    throw "The passed curve is not an instance of CubicBezierCurve and thus cannot be plotted with this function.";
-	// Draw curve
-	this.cubicBezier( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, color );
-    };
-    */
-
-
     // +---------------------------------------------------------------------------------
     // | Draw the given (cubic) bézier curve.
     // +-------------------------------
@@ -91,24 +76,13 @@
     // +---------------------------------------------------------------------------------
     // | Draw the given (cubic) bézier curve.
     // +-------------------------------
-    /*_context.drawutils.prototype.cubicBezierCurveHandles = function( curve ) {
+    _context.drawutils.prototype.handle = function( startPoint, endPoint ) { 
 	// Draw handles
-	this.cubicBezierHandles( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
-    };*/
-
-
-    // +---------------------------------------------------------------------------------
-    // | Draw the given (cubic) bézier curve.
-    // +-------------------------------
-    _context.drawutils.prototype.handle = function( startPoint, endPoint ) { //, startControlPoint, endControlPoint ) {
-	// Draw handles
-	//this.ctx.save();
-	this.ctx.lineWidth = 1;
+	// (No need to save and restore here)
+	// this.ctx.lineWidth = 1;
+	//console.log( 'baa', startPoint.attr.bezierAutoAdjust );
 	this.point( startPoint, 'rgb(0,32,192)' );
-	//this.point( endPoint, 'rgb(0,32,192)' );
-	//this.square( startControlPoint, 5, 'rgba(0,128,192,0.5)' );
 	this.square( endPoint, 5, 'rgba(0,128,192,0.5)' );
-	//this.ctx.restore();
     };
 
 
@@ -152,46 +126,7 @@
 	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radius*this.scale.x, radius*this.scale.y, 0.0, 0.0, Math.PI*2 );
 	this.ctx.closePath();
 	this._fillOrDraw( color );
-    };
-    
-
-    // +---------------------------------------------------------------------------------
-    // | Fill the given point with the specified (CSS-) color.
-    // |
-    // | This version uses four bezier curves to draw it so scaling is possible.
-    // +-------------------------------
-    /*
-    _context.drawutils.prototype.bezierCircle = function( center, radius, color ) {
-	// The ratio of the bezier handles is
-	//    (4/3)*tan(pi/8) = 4*(sqrt(2)-1)/3 = 0.552284749831
-	// See
-	//    https://stackoverflow.com/questions/1734745/how-to-create-circle-with-b%C3%A9zier-curves
-	var ratio = 0.552284749831;
-	this.ctx.beginPath();
-	this.cubicBezier( { x : 0, y : center.y-radius },
-			  { x : center.x+radius, y : 0 },
-			  { x : center.x+radius*ratio, y : center.y-radius },
-			  { x : center.x+radius, y : center.y-radius*ratio },
-			  color );
-	this.cubicBezier( { x : center.x+radius, y : 0 },
-			  { x : 0, y : center.y+radius },
-			  { x : center.x+radius, y : center.y+radius*ratio },
-			  { x : center.x+radius*ratio, y : center.y+radius },
-			  color );
-	this.cubicBezier( { x : 0, y : center.y+radius },
-			  { x : center.x-radius, y : 0 },
-			  { x : center.x-radius*ratio, y : center.y+radius },
-			  { x : center.x-radius, y : center.y+radius*ratio },
-			  color );
-	this.cubicBezier( { x : center.x-radius, y : 0 },
-			  { x : 0, y : center.y-radius },
-			  { x : center.x-radius, y : center.y-radius*ratio },
-			  { x : center.x-radius*ratio, y : center.y-radius },
-			  color );
-	this._fillOrDraw( color );
-    };
-    */
-    
+    };   
 
     
     // +---------------------------------------------------------------------------------

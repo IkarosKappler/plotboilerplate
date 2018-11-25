@@ -7,7 +7,8 @@
  * @date 2013-08-19
  * @modified 2018-08-16 Added closure. Removed the 'IKRS' wrapper.
  * @modified 2018-11-20 Added circular auto-adjustment.
- * @version 1.0.2
+ * @modified 2018-11-25 Added the point constants to the BezierPath class itself.
+ * @version 1.0.3
  **/
 
 
@@ -71,6 +72,10 @@
     // +---------------------------------------------------------------------------------
     // | These constants equal the values from CubicBezierCurve.
     // +-------------------------------
+    BezierPath.START_POINT         = 0;
+    BezierPath.START_CONTROL_POINT = 1;
+    BezierPath.END_CONTROL_POINT   = 2;
+    BezierPath.END_POINT           = 3;
     BezierPath.prototype.START_POINT         = 0;
     BezierPath.prototype.START_CONTROL_POINT = 1;
     BezierPath.prototype.END_CONTROL_POINT   = 2;

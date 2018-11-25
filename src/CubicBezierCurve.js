@@ -14,10 +14,10 @@
 (function(_context) {
     "use strict";
 
-    var CubicBezierCurve = function ( p_startPoint,        // THREE.Vector2
-				      p_endPoint,          // THREE.Vector2
-				      p_startControlPoint, // THREE.Vector2
-				      p_endControlPoint    // THREE.Vector2
+    var CubicBezierCurve = function ( p_startPoint,        // Vertex
+				      p_endPoint,          // Vertex
+				      p_startControlPoint, // Vertex
+				      p_endControlPoint    // Vertex
 				    ) {
 	
 	

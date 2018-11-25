@@ -75,7 +75,9 @@
 	this.canvas              = document.getElementById('my-canvas'); 
 	this.ctx                 = this.canvas.getContext('2d');
 	this.draw                = new drawutils(this.ctx,false);
+	this.draw.scale.set(this.config.scaleX,this.config.scaleY);
 	this.fill                = new drawutils(this.ctx,true);
+	this.fill.scale.set(this.config.scaleX,this.config.scaleY);
 	this.image               = null; // An image.
 	this.imageBuffer         = null; // A canvas to read the pixel data from.
 	this.canvasSize          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
@@ -130,27 +132,23 @@
 		
 		(function(cindex) {
 		     bpath[cindex][0].listeners.addDragListener( function(e) {
-			 //console.log('start handle moved');
 			 bpath[cindex][0].addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
 			 path.moveCurvePoint( cindex*1, 
-							    path.START_POINT,            // obtain handle length?
-							    e.params.dragAmount           // update arc lengths
-							);
+					      path.START_POINT,             // obtain handle length?
+					      e.params.dragAmount           // update arc lengths
+					    );
 		    } );
 		    bpath[cindex][2].listeners.addDragListener( function(e) {
-			//console.log('start handle moved');
 			path.adjustPredecessorControlPoint( cindex*1, 
 							    true,            // obtain handle length?
-							    true            // update arc lengths
+							    true             // update arc lengths
 							);
 		    } );
 		    bpath[cindex][3].listeners.addDragListener( function(e) {
-			//console.log('end handle moved'); console.log(cindex);
-			var b = path.adjustSuccessorControlPoint( cindex*1, 
+			path.adjustSuccessorControlPoint( cindex*1, 
 							    true,            // obtain handle length?
-							    true            // update arc lengths
-								);
-			console.log(b);
+							    true             // update arc lengths
+							);
 		    } );
 		})(i);
 		
@@ -176,13 +174,13 @@
 
 	    // Draw the background image?
 	    if( _self.image ) {
-		if( _self.config.fitImage ) {
+		if( _self.config.fitImage ) 
 		    _self.ctx.drawImage(_self.image,0,0,_self.image.width,_self.image.height,0,0,_self.canvasSize.width,_self.canvasSize.height);
-		} else {
+		else 
 		    _self.ctx.drawImage(_self.image,0,0);
-		}
 	    }
 
+	    // Draw a test circle
 	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
 	    _self.draw.circle( {x:0,y:0}, radius, '#000000' );
 
@@ -196,6 +194,10 @@
 		if( d instanceof BezierPath ) {
 		    for( var c in d.bezierCurves ) {
 			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, '#00a822' );
+			if( d.bezierCurves[c].startPoint.attr.bezierAutoAdjust )
+			    this.fill.circle( d.bezierCurves[c].startPoint, 3, 'orange' );
+			if( d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) 
+			    this.fill.circle( d.bezierCurves[c].endPoint, 3, 'orange' );
 			this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
 			this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
 		    }
@@ -360,33 +362,7 @@
 		    // console.log( 'vertex found.' );
 		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); // { type : 'vertex', vindex : vindex };
 		}
-	    }
-	    
-	    // Search in paths
-	    /*
-	    for( var pindex = 0; pindex < paths.length; pindex++ ) {
-		var path = paths[pindex];
-		for( var cindex = 0; cindex < path.bezierCurves.length; cindex++ ) {
-		    var curve = path.bezierCurves[cindex];
-		    let p = curve.startControlPoint;
-                    let dist = p.distance(point); // Math.sqrt( Math.pow(x-p.x,2) + Math.pow(y-p.y,2) );
-                    if( dist <= tolerance )
-			return { type : 'bpath', pindex : pindex, cindex : cindex, pid : curve.START_CONTROL_POINT };
-		    p = curve.endControlPoint;
-                    dist = p.distance(point); // Math.sqrt( Math.pow(x-p.x,2) + Math.pow(y-p.y,2) );
-                    if( dist <= tolerance )
-			return { type : 'bpath', pindex : pindex, cindex : cindex, pid : curve.END_CONTROL_POINT };
-		    p = curve.startPoint;
-                    dist = p.distance(point); // Math.sqrt( Math.pow(x-p.x,2) + Math.pow(y-p.y,2) );
-                    if( dist <= tolerance )
-			return { type : 'bpath', pindex : pindex, cindex : cindex, pid : curve.START_POINT };
-		    p = curve.endPoint;
-                    dist = p.distance(point); // Math.sqrt( Math.pow(x-p.x,2) + Math.pow(y-p.y,2) );
-                    if( dist <= tolerance )
-			return { type : 'bpath', pindex : pindex, cindex : cindex, pid : curve.END_POINT };
-		}
-            }
-	    */
+	    } 
             return false;
         }
 
@@ -397,9 +373,24 @@
 	// | @param x:Number The tap X position on the canvas.
 	// | @param y:Number The tap Y position on the canvas.
 	// +-------------------------------
-	function handleTap(x,y) {
-	    if( _self.selectPolygon != null ) { // keyHandler.isDown('shift')
-		var vert = transformMousePosition(x, y);
+	function handleTap(x,y) { // console.log( keyHandler.isDown('ctrl') );
+	    var p = locatePointNear( transformMousePosition(x, y) );
+	    if( p ) { 
+		if( keyHandler.isDown('shift') ) {
+		    if( p.type == 'bpath' ) {
+			let vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
+			vert.attr.isSelected = !vert.attr.isSelected;
+		    } else if( p.type == 'vertex' )
+			_self.vertices[p.vindex].attr.isSelected = !_self.vertices[p.vindex].attr.isSelected;
+		    _self.redraw();
+		} else if( keyHandler.isDown('ctrl') /* && p.type=='bpath' && (p.pid==BezierPath.START_POINT || p.pid==BezierPath.END_POINT) */ ) {
+		    _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
+		    console.log( 'bezierAutoAdjust=' + _self.vertices[p.vindex].attr.bezierAutoAdjust );
+		    _self.redraw();
+		}
+	    }
+	    else if( _self.selectPolygon != null ) {
+		var vert = transformMousePosition( x, y );
 		_self.selectPolygon.vertices.push( vert );
 		_self.redraw();
 	    }
@@ -409,7 +400,6 @@
 	// | Transform the given x-y-(mouse-)point to coordinates. 
 	// +-------------------------------
 	var transformMousePosition = function( x, y ) {
-	    //return { x : x/_self.draw.scale.x-_self.draw.offset.x, y : y/_self.draw.scale.y-_self.draw.offset.y };
 	    return { x : (x-_self.draw.offset.x)/_self.draw.scale.x, y : (y-_self.draw.offset.y)/_self.draw.scale.y };
 	};
 
