@@ -32,6 +32,10 @@ See main-dist.html
 
 
 ### Changelog
+* 2018-11-27
+  * Added an attribute model to the VertexAttr class.
+  * Changing bezier path points with holding down 'y'+click is now possible (bezier-autoadjust).
+  * Added a new function to the draw class: diamondHandle.
 * 2018-11-20
   * Bézier curve does now auto adjust when dragging path points and control points.
   * BezierPath implementation now support circular paths.

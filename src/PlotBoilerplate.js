@@ -45,6 +45,12 @@
 
 	_context.Draggable = Draggable;
     })(_context);
+
+
+    // +---------------------------------------------------------------------------------
+    // | Use a special custom attribute set for vertices.
+    // +----------------------------
+    VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0 };
     
 
     // +---------------------------------------------------------------------------------
@@ -129,7 +135,7 @@
 		this.vertices.push( bpath[i][2] );
 		this.vertices.push( bpath[i][3] );
 
-		
+		// This should be wrapped into the BezierPath implementation.
 		(function(cindex) {
 		     bpath[cindex][0].listeners.addDragListener( function(e) {
 			 bpath[cindex][0].addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
@@ -139,12 +145,18 @@
 					    );
 		    } );
 		    bpath[cindex][2].listeners.addDragListener( function(e) {
+			if( !bpath[cindex][0].attr.bezierAutoAdjust )
+			    return;
 			path.adjustPredecessorControlPoint( cindex*1, 
 							    true,            // obtain handle length?
 							    true             // update arc lengths
 							);
 		    } );
 		    bpath[cindex][3].listeners.addDragListener( function(e) {
+			if( !path.adjustCircular && cindex+1 >= path.bezierCurves.length)
+			    return;
+			if( !bpath[(cindex+1)%bpath.length][0].attr.bezierAutoAdjust )
+			    return;
 			path.adjustSuccessorControlPoint( cindex*1, 
 							    true,            // obtain handle length?
 							    true             // update arc lengths
@@ -167,7 +179,10 @@
 	// +---------------------------------------------------------------------------------
 	// | The re-drawing function.
 	// +-------------------------------
-	PlotBoilerplate.prototype.redraw = function() {	    
+	PlotBoilerplate.prototype.redraw = function() {
+	    var renderTime = new Date().getTime();
+	    //console.log( 'renderTime', renderTime );
+	    
 	    // Note that the image might have an alpha channel. Clear the scene first.
 	    this.ctx.fillStyle = this.config.backgroundColor; 
 	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
@@ -184,27 +199,39 @@
 	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
 	    _self.draw.circle( {x:0,y:0}, radius, '#000000' );
 
-	    // Draw all vertices (as small squares)
-	    for( var i in this.vertices ) 
-		this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
-
 	    // Draw drawables
 	    for( var i in this.drawables ) {
 		var d = this.drawables[i];
 		if( d instanceof BezierPath ) {
 		    for( var c in d.bezierCurves ) {
 			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, '#00a822' );
-			if( d.bezierCurves[c].startPoint.attr.bezierAutoAdjust )
-			    this.fill.circle( d.bezierCurves[c].startPoint, 3, 'orange' );
-			if( d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) 
-			    this.fill.circle( d.bezierCurves[c].endPoint, 3, 'orange' );
+
+			if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
+			    this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, 'orange' );
+			    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+			}
+			if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
+			    this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, 'orange' );
+			    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+			}
 			this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
 			this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
+			
+		
 		    }
 		} else if( d instanceof Polygon ) {
 		    this.draw.polygon( d, '#0022a8' );
+		    for( var i in d.vertices )
+			; // d.vertices[i].attr.renderTime = renderTime;
 		} else {
 		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
+		}
+	    }
+
+	    // Draw all vertices as small squares if they were not already drawn by other objects
+	    for( var i in this.vertices ) {
+		if( this.vertices[i].attr.renderTime != renderTime ) {
+		    this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
 		}
 	    }
 
@@ -338,7 +365,6 @@
 	// +-------------------------------
 	PlotBoilerplate.prototype.selectVerticesInPolygon = function( polygon ) {
 	    for( var i in this.vertices ) {
-		console.log('polygon contains vert ',i,polygon.containsVert(this.vertices[i]));
 		if( polygon.containsVert(this.vertices[i]) ) 
 		    this.vertices[i].attr.isSelected = true;
 	    }
@@ -383,7 +409,7 @@
 		    } else if( p.type == 'vertex' )
 			_self.vertices[p.vindex].attr.isSelected = !_self.vertices[p.vindex].attr.isSelected;
 		    _self.redraw();
-		} else if( keyHandler.isDown('ctrl') /* && p.type=='bpath' && (p.pid==BezierPath.START_POINT || p.pid==BezierPath.END_POINT) */ ) {
+		} else if( keyHandler.isDown('y') /* && p.type=='bpath' && (p.pid==BezierPath.START_POINT || p.pid==BezierPath.END_POINT) */ ) {
 		    _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
 		    console.log( 'bezierAutoAdjust=' + _self.vertices[p.vindex].attr.bezierAutoAdjust );
 		    _self.redraw();
@@ -475,12 +501,6 @@
 		_self.draggedElements = [];
 		_self.redraw();
 	    } )
-	/*
-	    .move( function(e) {
-		var vert = transformMousePosition(e.params.pos.x, e.params.pos.y);
-		console.log( 'mouse position inside poly?', vert, tmpPoly.containsVert(vert) );
-	    } )
-	*/
 	;
 
 	// Install key handler
@@ -506,8 +526,8 @@
 		_self.selectPolygon = null;
 		_self.redraw(); } )
 
-	    .down('ctrl',function() { console.log('CTRL was hit.'); } )
-	    .up('ctrl',function() { console.log('CTRL was released.'); } )
+	    .down('y',function() { console.log('y was hit.'); } )
+	    .up('y',function() { console.log('y was released.'); } )
 
 	    .down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
 

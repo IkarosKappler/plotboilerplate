@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = {
     entry: [
-	'./src/gup.js',
+	// './src/gup.js',
         // './src/WebColors.js',
 
         './src/VertexAttr.js',

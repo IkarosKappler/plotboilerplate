@@ -7,7 +7,8 @@
  * @date     2018-04-22
  * @modified 2018-08-16 Added the curve() function to draw cubic bézier curves.
  * @modified 2018-10-23 Recognizing the offset param in the circle() function.
- * @version  1.0.2
+ * @modified 2018-11-27 Added the diamondHandle() function.
+ * @version  1.0.3
  **/
 
 (function(_context) {
@@ -41,6 +42,16 @@
     };
 
 
+    // +---------------------------------------------------------------------------------
+    // | This is the final helper function for drawing and filling stuff.
+    // |
+    // | When in draw mode it draws the current shape.
+    // | When in fill mode it fills the current shape.
+    // |
+    // | This function is usually only called internally.
+    // |
+    // | @param color A stroke/fill color to use.
+    // +-------------------------------
     _context.drawutils.prototype._fillOrDraw = function( color ) {
 	if( this.fillShapes ) {
 	    this.ctx.fillStyle = color;
@@ -79,7 +90,6 @@
     _context.drawutils.prototype.handle = function( startPoint, endPoint ) { 
 	// Draw handles
 	// (No need to save and restore here)
-	// this.ctx.lineWidth = 1;
 	//console.log( 'baa', startPoint.attr.bezierAutoAdjust );
 	this.point( startPoint, 'rgb(0,32,192)' );
 	this.square( endPoint, 5, 'rgba(0,128,192,0.5)' );
@@ -130,7 +140,7 @@
 
     
     // +---------------------------------------------------------------------------------
-    // | Fill a square with the given (CSS-) color.
+    // | Draw a square with the given (CSS-) color.
     // +-------------------------------
     _context.drawutils.prototype.square = function( center, size, color ) {
 	this.ctx.beginPath();
@@ -139,9 +149,24 @@
 	this._fillOrDraw( color );
     };
 
+
+    // +---------------------------------------------------------------------------------
+    // | Draw adiamond handle with the given (CSS-) color.
+    // +-------------------------------
+    _context.drawutils.prototype.diamondHandle = function( center, size, color ) {
+	this.ctx.beginPath();
+	// this.ctx.rect( this.offset.x+(center.x-size/2.0)*this.scale.x, this.offset.y+(center.y-size/2.0)*this.scale.y, size*this.scale.x, size*this.scale.y );
+	this.ctx.moveTo( this.offset.x + center.x*this.scale.x - size/2.0, this.offset.y + center.y*this.scale.y );
+	this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y - size/2.0 );
+	this.ctx.lineTo( this.offset.x + center.x*this.scale.x + size/2.0, this.offset.y + center.y*this.scale.y );
+	this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y + size/2.0 );
+	this.ctx.closePath();
+	this._fillOrDraw( color );
+    };
+
     
     // +---------------------------------------------------------------------------------
-    // | Fill a square with the given (CSS-) color.
+    // |Draw a square handle with the given (CSS-) color.
     // +-------------------------------
     _context.drawutils.prototype.squareHandle = function( center, size, color ) {
 	this.ctx.beginPath();
