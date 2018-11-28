@@ -23,6 +23,14 @@ from the sources code files in ./src/*.
 See main-dist.html
 
 
+## Usage
+ * [SHIFT] + [Click] : Select vertex
+ * [Y] + [Click ]: Toggle Bézier auto-adjustment
+ * [CTRL] + [Mousedown] + [Drag] : Pan the area
+ * [Mousewheel-up] : Zoom in
+ * [Mousewheel-down] : Zoom out
+
+
 ### Todos
 * Add pad/phone support.
 * Implement optional canvas zoom.
