@@ -1,7 +1,7 @@
 # Plotting boilerplate
 For Javascript and canvas with 2d-context.
 
-![Current demo](screenshot-20181031_1.png "Current demo")
+![Current demo](screenshot-20181128_0.png "Current demo")
 
 [Live Demo](https://www.int2byte.de/public/plot-boilerplate/main-dist.html "Live Demo")
 
