@@ -29,14 +29,18 @@ See main-dist.html
 * Implement optional canvas rotation.
 * SVG export.
 * Make Bézier Curves dividable.
-* Add ellipses.
-* Add mousewheel zoom.
+* Implement snap-to-grid.
 
 
 ### Changelog
 * 2018-11-28
   * Extended the VertexAttr class (extended the event params by the affected vertex).
   * Added BezierPath.locateCurveBy*Point(Vertex) functions.
+  * Added the mousewheel listener to the MouseHandler.
+  * Added mousewheel zoom.
+  * Added the VEllipse (vertex-ellipse) class and ellipse drawing.
+  * Added the Grid class.
+  * Added the grid() function to the draw class.
 * 2018-11-27
   * Added an attribute model to the VertexAttr class.
   * Changing bezier path points with holding down 'y'+click is now possible (bezier-autoadjust).

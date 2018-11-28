@@ -10,9 +10,11 @@ module.exports = {
         './src/VertexAttr.js',
         './src/VertexListeners.js',
         './src/Vertex.js',
+	'./src/Grid.js',
 	'./src/CubicBezierCurve.js',
 	'./src/BezierPath.js',
 	'./src/Polygon.js',
+	'./src/VEllipse.js',
 
         './src/MouseHandler.js',
 	'./src/KeyHandler.js',

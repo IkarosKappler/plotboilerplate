@@ -20,7 +20,10 @@
  *          } )
  *          .click( function(e) {
  *              console.log( 'Click.' );
- *          } );
+ *          } )
+ *          .wheel( function(e) {
+ *              console.log( 'Wheel. delta='+e.deltaY );
+ *          } )
  *
  *
  * @author   Ikaros Kappler
@@ -29,8 +32,9 @@
  * @modified 2018-08-16 Added the param 'dragAmount'.
  * @modified 2018-08-27 Added the param 'element'.
  * @modified 2018-11-11 Changed the scope from a simple global var to a member of window/_context.
- * @modified 2017-11-19 Renamed the 'mousedown' function to 'down' and the 'mouseup' function to 'up'.
- * @version  1.0.5
+ * @modified 2018-11-19 Renamed the 'mousedown' function to 'down' and the 'mouseup' function to 'up'.
+ * @modified 2018-11-28 Added the 'wheel' listener.
+ * @version  1.0.6
  **/
 
 (function(_context) {
@@ -63,12 +67,12 @@
 		   };
 	}
 	function mkParams(e,eventName) {
-	    var rel = relPos(e);
+	    var rel = relPos(e); 
 	    e.params = { element : element, name : eventName, pos : rel, button : mouseButton, leftButton : mouseButton==0, middleButton : mouseButton==1, rightButton : mouseButton==2, mouseDownPos : mouseDownPos, draggedFrom : mouseDragPos, wasDragged : (mouseDownPos!=null&&(mouseDownPos.x!=rel.x||mouseDownPos.y!=rel.y)), dragAmount : (mouseDownPos!=null?{x:rel.x-mouseDragPos.x,y:rel.y-mouseDragPos.y}:{x:0,y:0}) };
 	    return e;
 	}
 
-	function listenFor( eventName ) {
+	function listenFor( eventName ) { console.log(eventName);
 	    if( installed[eventName] ) return;
 	    element.addEventListener(eventName,handlers[eventName]);
 	    installed[eventName] = true;
@@ -107,6 +111,9 @@
 	handlers['click'] = function(e) {
 	    if( listeners.click ) listeners.click( mkParams(e,'mousedown') );
 	}
+	handlers['wheel'] = function(e) {
+	    if( listeners.wheel ) listeners.wheel( mkParams(e,'wheel') );
+	}
 
 
 	// +----------------------------------------------------------------------
@@ -125,30 +132,39 @@
 	    return this;
 	};
 	this.move = function( callback ) {
-	    if( listeners.mousemove ) throw "This MouseHandler already has a 'mousemove' callback. To keep the code simple there is only room for one.";
+	    if( listeners.mousemove )  throwAlreadyInstalled('mousemove'); // throw "This MouseHandler already has a 'mousemove' callback. To keep the code simple there is only room for one.";
 	    listenFor('mousemove');
 	    listeners.mousemove = callback;
 	    return this;
 	};
 	this.up = function( callback ) {
-	    if( listeners.mouseup ) throw "This MouseHandler already has a 'mouseup' callback. To keep the code simple there is only room for one.";
+	    if( listeners.mouseup )  throwAlreadyInstalled('mouseup'); // throw "This MouseHandler already has a 'mouseup' callback. To keep the code simple there is only room for one.";
 	    listenFor('mouseup');
 	    listeners.mouseup = callback;
 	    return this;
 	};
 	this.down = function( callback ) {
-	    if( listeners.mousedown ) throw "This MouseHandler already has a 'mousedown' callback. To keep the code simple there is only room for one.";
+	    if( listeners.mousedown )  throwAlreadyInstalled('mousedown'); // throw "This MouseHandler already has a 'mousedown' callback. To keep the code simple there is only room for one.";
 	    listenFor('mousedown');
 	    listeners.mousedown = callback;
 	    return this;
 	};
 	this.click = function( callback ) {
-	    if( listeners.click ) throw "This MouseHandler already has a 'click' callback. To keep the code simple there is only room for one.";
+	    if( listeners.click )  throwAlreadyInstalled('click'); // throw "This MouseHandler already has a 'click' callback. To keep the code simple there is only room for one.";
 	    listenFor('click');
 	    listeners.click = callback;
 	    return this;
 	};
+	this.wheel = function( callback ) {
+	    if( listeners.wheel ) throwAlreadyInstalled('wheel');
+	    listenFor('wheel');
+	    listeners.wheel = callback;
+	    return this;
+	};
 
+	function throwAlreadyInstalled( name ) {
+	    throw "This MouseHandler already has a '"+name+"' callback. To keep the code simple there is only room for one."
+	}
 	
 	// +----------------------------------------------------------------------
 	// | Call this when your work is done.
@@ -161,6 +177,7 @@
 	    unlistenFor('mousemove');
 	    unlistenFor('moseup');
 	    unlistenFor('click');
+	    unlistenFor('wheel');
 	}
     }
 

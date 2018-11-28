@@ -84,6 +84,7 @@
 	this.draw.scale.set(this.config.scaleX,this.config.scaleY);
 	this.fill                = new drawutils(this.ctx,true);
 	this.fill.scale.set(this.config.scaleX,this.config.scaleY);
+	this.grid                = new Grid( new Vertex(0,0), new Vertex(50,50) );
 	this.image               = null; // An image.
 	this.imageBuffer         = null; // A canvas to read the pixel data from.
 	this.canvasSize          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
@@ -133,74 +134,50 @@
 		this.vertices.push( bpath[i][0] );
 		this.vertices.push( bpath[i][1] );
 		this.vertices.push( bpath[i][2] );
-		this.vertices.push( bpath[i][3] );
-
-		
-		// This should be wrapped into the BezierPath implementation.
-		/*
-		(function(cindex) {
-		     bpath[cindex][0].listeners.addDragListener( function(e) {
-			 bpath[cindex][0].addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
-			 path.moveCurvePoint( cindex*1, 
-					      path.START_POINT,             // obtain handle length?
-					      e.params.dragAmount           // update arc lengths
-					    );
-		    } );
-		    bpath[cindex][2].listeners.addDragListener( function(e) {
-			if( !bpath[cindex][0].attr.bezierAutoAdjust )
-			    return;
-			path.adjustPredecessorControlPoint( cindex*1, 
-							    true,            // obtain handle length?
-							    true             // update arc lengths
-							);
-		    } );
-		    bpath[cindex][3].listeners.addDragListener( function(e) {
-			if( !bpath[(cindex)%bpath.length][1].attr.bezierAutoAdjust )
-			    return;
-			path.adjustSuccessorControlPoint( cindex*1, 
-							    true,            // obtain handle length?
-							    true             // update arc lengths
-							);
-		    } );
-		})(i); */
-		
-		
+		this.vertices.push( bpath[i][3] );		
 	    }
 
 
 	    for( var i in path.bezierCurves ) {	
 		// This should be wrapped into the BezierPath implementation.
-		//(function(cindex) {
-		    path.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
-			var cindex = path.locateCurveByStartPoint( e.params.vertex );
-			path.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
-			path.moveCurvePoint( cindex*1, 
-					     path.START_POINT,             // obtain handle length?
-					     e.params.dragAmount           // update arc lengths
-					   );
-		    } );
-		    path.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
-			var cindex = path.locateCurveByStartControlPoint( e.params.vertex );
-			if( !path.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
-			    return;
-			path.adjustPredecessorControlPoint( cindex*1, 
-							    true,            // obtain handle length?
-							    true             // update arc lengths
-							);
-		    } );
-		    path.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
-			var cindex = path.locateCurveByEndControlPoint( e.params.vertex );
-			if( !path.bezierCurves[(cindex)%path.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
-			    return;
-			path.adjustSuccessorControlPoint( cindex*1, 
-							    true,            // obtain handle length?
-							    true             // update arc lengths
-							);
-		    } );
-		//})(i); 	
-	    }
-	    
+		path.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
+		    var cindex = path.locateCurveByStartPoint( e.params.vertex );
+		    path.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+		    path.moveCurvePoint( cindex*1, 
+					 path.START_POINT,             // obtain handle length?
+					 e.params.dragAmount           // update arc lengths
+				       );
+		} );
+		path.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
+		    var cindex = path.locateCurveByStartControlPoint( e.params.vertex );
+		    if( !path.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
+			return;
+		    path.adjustPredecessorControlPoint( cindex*1, 
+							true,            // obtain handle length?
+							true             // update arc lengths
+						      );
+		} );
+		path.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
+		    var cindex = path.locateCurveByEndControlPoint( e.params.vertex );
+		    if( !path.bezierCurves[(cindex)%path.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
+			return;
+		    path.adjustSuccessorControlPoint( cindex*1, 
+						      true,            // obtain handle length?
+						      true             // update arc lengths
+						    );
+		} ); 	
+	    } // END for
 
+	    // Add a circle
+	    var circle = new VEllipse( new Vertex(0,0), new Vertex(60,60) );
+	    this.vertices.push( circle.center );
+	    this.vertices.push( circle.axis );
+	    this.drawables.push( circle );
+	    circle.center.listeners.addDragListener( function(e) {
+		circle.axis.add( e.params.dragAmount );
+	    } );
+
+	    // Add a square (polygon)
 	    var squareSize = 32;
 	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
 	    var square = new Polygon( squareVerts );
@@ -209,44 +186,19 @@
 		this.vertices.push( squareVerts[i] );
 	};
 
-
-	// This should be wrapped into the BezierPath implementation.
-	/* function installBezierHelper( cindex ) {
-		     bpath[cindex][0].listeners.addDragListener( function(e) {
-			 bpath[cindex][0].addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
-			 path.moveCurvePoint( cindex*1, 
-					      path.START_POINT,             // obtain handle length?
-					      e.params.dragAmount           // update arc lengths
-					    );
-		    } );
-		    bpath[cindex][2].listeners.addDragListener( function(e) {
-			if( !bpath[cindex][0].attr.bezierAutoAdjust )
-			    return;
-			path.adjustPredecessorControlPoint( cindex*1, 
-							    true,            // obtain handle length?
-							    true             // update arc lengths
-							);
-		    } );
-		    bpath[cindex][3].listeners.addDragListener( function(e) {
-			if( !bpath[(cindex)%bpath.length][1].attr.bezierAutoAdjust )
-			    return;
-			path.adjustSuccessorControlPoint( cindex*1, 
-							    true,            // obtain handle length?
-							    true             // update arc lengths
-							);
-		    } );
-		})(i); */
 	
 	// +---------------------------------------------------------------------------------
 	// | The re-drawing function.
 	// +-------------------------------
 	PlotBoilerplate.prototype.redraw = function() {
 	    var renderTime = new Date().getTime();
-	    //console.log( 'renderTime', renderTime );
 	    
 	    // Note that the image might have an alpha channel. Clear the scene first.
 	    this.ctx.fillStyle = this.config.backgroundColor; 
 	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
+
+	    // Draw grid
+	    this.draw.grid( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.x, this.grid.size.x, this.grid.size.y, 'rgba(0,128,255,0.075)' );
 
 	    // Draw the background image?
 	    if( _self.image ) {
@@ -284,6 +236,10 @@
 		    this.draw.polygon( d, '#0022a8' );
 		    for( var i in d.vertices )
 			; // d.vertices[i].attr.renderTime = renderTime;
+		} else if( d instanceof VEllipse ) {
+		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), '#2222a8' );
+		    // d.center.renderTime = renderTime;
+		    // d.axis.renderTime = renderTime;
 		} else {
 		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
 		}
@@ -486,17 +442,22 @@
 	}
 
 	// +---------------------------------------------------------------------------------
-	// | Transform the given x-y-(mouse-)point to coordinates. 
+	// | Transform the given x-y-(mouse-)point to coordinates respecting the view offset
+	// | and the zoom settings.
+	// |
+	// | @param x:Number The mouse-x position relative to the canvas.
+	// | @param y:Number The mouse-y position relative to the canvas.
 	// +-------------------------------
 	var transformMousePosition = function( x, y ) {
 	    return { x : (x-_self.draw.offset.x)/_self.draw.scale.x, y : (y-_self.draw.offset.y)/_self.draw.scale.y };
 	};
 
 	// +---------------------------------------------------------------------------------
-	// | Install a mouse handler on the canvas.
+	// | The mouse-down handler.
+	// |
+	// | It selects vertices for dragging.
 	// +-------------------------------
-	new MouseHandler(this.canvas)
-	    .down( function(e) {
+	var mouseDownHandler = function(e) {
 		if( e.which != 1 )
 		    return; // Only react on left mouse
 		var p = locatePointNear( transformMousePosition(e.params.pos.x, e.params.pos.y) );
@@ -521,49 +482,88 @@
 			_self.vertices[p.vindex].listeners.fireDragStartEvent( e );
 		}
 		_self.redraw();
-	    } )
-	    .drag( function(e) {
+	};
+
+	// +---------------------------------------------------------------------------------
+	// | The mouse-drag handler.
+	// |
+	// | It moves selected elements around or performs the panning if the ctrl-key if
+	// | hold down.
+	// +-------------------------------
+	var mouseDragHandler = function(e) {  
+	    if( keyHandler.isDown('ctrl') ) {
+		_self.draw.offset.add( e.params.dragAmount );
+		_self.fill.offset.set( _self.draw.offset );
+		_self.redraw();
+	    } else {
 		// Convert drag amount by scaling
 		// Warning: this possibly invalidates the dragEvent for other listeners!
 		//          Rethink the solution when other features are added.
 		e.params.dragAmount.x /= _self.draw.scale.x;
 		e.params.dragAmount.y /= _self.draw.scale.y;
-		if( keyHandler.isDown('ctrl') ) {
-		    _self.draw.offset.add( e.params.dragAmount );
-		    _self.fill.offset.set( _self.draw.offset );
-		    _self.redraw();
-		} else {
-		    for( var i in _self.draggedElements ) {
-			var p = _self.draggedElements[i];
-			// console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
-			if( p.type == 'bpath' ) {
-			    _self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
-			    _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
-			} else if( p.type == 'vertex' ) {
-			    _self.vertices[p.vindex].add( e.params.dragAmount );
-			    _self.vertices[p.vindex].listeners.fireDragEvent( e );
-			}
-		    }
-		}
-		_self.redraw();
-	    } )
-	    .up( function(e) {
-		if( e.which != 1 )
-		    return; // Only react on left mouse;
-		if( !e.params.wasDragged )
-		    handleTap( e.params.pos.x, e.params.pos.y );
 		for( var i in _self.draggedElements ) {
 		    var p = _self.draggedElements[i];
 		    // console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
 		    if( p.type == 'bpath' ) {
-			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEndEvent( e );
+			_self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
+			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
 		    } else if( p.type == 'vertex' ) {
-			_self.vertices[p.vindex].listeners.fireDragEndEvent( e );
+			_self.vertices[p.vindex].add( e.params.dragAmount );
+			_self.vertices[p.vindex].listeners.fireDragEvent( e );
 		    }
 		}
-		_self.draggedElements = [];
-		_self.redraw();
-	    } )
+	    }
+	    _self.redraw();
+	};
+
+	// +---------------------------------------------------------------------------------
+	// | The mouse-up handler.
+	// |
+	// | It clears the dragging-selection.
+	// +-------------------------------
+	var mouseUpHandler = function(e) {
+	    if( e.which != 1 )
+		return; // Only react on left mouse;
+	    if( !e.params.wasDragged )
+		handleTap( e.params.pos.x, e.params.pos.y );
+	    for( var i in _self.draggedElements ) {
+		var p = _self.draggedElements[i];
+		// console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
+		if( p.type == 'bpath' ) {
+		    _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEndEvent( e );
+		} else if( p.type == 'vertex' ) {
+		    _self.vertices[p.vindex].listeners.fireDragEndEvent( e );
+		}
+	    }
+	    _self.draggedElements = [];
+	    _self.redraw();
+	};
+
+	// +---------------------------------------------------------------------------------
+	// | The mouse-wheel handler.
+	// |
+	// | It performs the zooming.
+	// +-------------------------------
+	var mouseWheelHandler = function(e) {
+	    var zoomStep = 1.25;
+	    if( e.deltaY < 0 ) {
+		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX*zoomStep;
+		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY*zoomStep;
+	    } else if( e.deltaY > 0 ) {
+		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX/zoomStep;
+		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY/zoomStep;
+	    }
+	    _self.redraw();
+	};
+
+	// +---------------------------------------------------------------------------------
+	// | Install a mouse handler on the canvas.
+	// +-------------------------------
+	new MouseHandler(this.canvas)
+	    .down( mouseDownHandler )
+	    .drag( mouseDragHandler )
+	    .up( mouseUpHandler )
+	    .wheel( mouseWheelHandler )
 	;
 
 	// Install key handler
@@ -574,12 +574,14 @@
 
 	    .down('escape',function() {
 		console.log('ESCAPE was hit.');
-		_self.clearSelection(true); } )
+		_self.clearSelection(true);
+	    } )
 
 	    .down('shift',function() {
 		console.log('SHIFT was hit.');
 		_self.selectPolygon = new Polygon();
-		_self.redraw(); } )
+		_self.redraw();
+	    } )
 	    .up('shift',function() {
 		console.log('SHIFT was released.');
 		// Find and select vertices in the drawn area
@@ -587,7 +589,8 @@
 		    return;
 		_self.selectVerticesInPolygon( _self.selectPolygon );
 		_self.selectPolygon = null;
-		_self.redraw(); } )
+		_self.redraw();
+	    } )
 
 	    .down('y',function() { console.log('y was hit.'); } )
 	    .up('y',function() { console.log('y was released.'); } )

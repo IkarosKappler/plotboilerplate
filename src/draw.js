@@ -8,7 +8,8 @@
  * @modified 2018-08-16 Added the curve() function to draw cubic bézier curves.
  * @modified 2018-10-23 Recognizing the offset param in the circle() function.
  * @modified 2018-11-27 Added the diamondHandle() function.
- * @version  1.0.3
+ * @modified 2018-11-28 Added the grid() function and the ellipse() function.
+ * @version  1.0.4
  **/
 
 (function(_context) {
@@ -132,8 +133,18 @@
     // +-------------------------------
     _context.drawutils.prototype.circle = function( center, radius, color ) {
 	this.ctx.beginPath();
-	// this.ctx.arc( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radius, 0, Math.PI*2 );
 	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radius*this.scale.x, radius*this.scale.y, 0.0, 0.0, Math.PI*2 );
+	this.ctx.closePath();
+	this._fillOrDraw( color );
+    };
+
+    
+    // +---------------------------------------------------------------------------------
+    // | Draw an ellipse with the given (CSS-) color.
+    // +-------------------------------
+    _context.drawutils.prototype.ellipse = function( center, radiusX, radiusY, color ) {
+	this.ctx.beginPath();
+	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radiusX*this.scale.x, radiusY*this.scale.y, 0.0, 0.0, Math.PI*2 );
 	this.ctx.closePath();
 	this._fillOrDraw( color );
     };   
@@ -149,6 +160,42 @@
 	this._fillOrDraw( color );
     };
 
+
+    // +---------------------------------------------------------------------------------
+    // | Draw an ellipse with the given (CSS-) color.
+    // +-------------------------------
+    _context.drawutils.prototype.grid = function( center, width, height, sizeX, sizeY, color ) {
+	console.log( 'draw grid' );
+	this.ctx.beginPath();
+	// center to right
+	var x = 0;
+	while( x < width/2 ) {
+	    this.ctx.moveTo( this.offset.x + (center.x+x)*this.scale.x, this.offset.y - (center.y - height*0.5)*this.scale.y  );
+	    this.ctx.lineTo( this.offset.x + (center.x+x)*this.scale.x, this.offset.y - (center.y + height*0.5)*this.scale.y  );
+	    x+=sizeX;
+	}
+	x = sizeX;
+	while( x < width/2 ) {
+	    this.ctx.moveTo( this.offset.x + (center.x-x)*this.scale.x, this.offset.y - (center.y - height*0.5)*this.scale.y  );
+	    this.ctx.lineTo( this.offset.x + (center.x-x)*this.scale.x, this.offset.y - (center.y + height*0.5)*this.scale.y  );
+	    x+=sizeX;
+	}
+	var y = 0;
+	while( y < height/2 ) {
+	    this.ctx.moveTo( this.offset.x - (center.x - width*0.5)*this.scale.x, this.offset.y + (center.y+y)*this.scale.y );
+	    this.ctx.lineTo( this.offset.x - (center.x + width*0.5)*this.scale.x, this.offset.y + (center.y+y)*this.scale.y );
+	    y+=sizeY;
+	}
+	var y = sizeY;
+	while( y < height/2 ) {
+	    this.ctx.moveTo( this.offset.x - (center.x - width*0.5)*this.scale.x, this.offset.y + (center.y-y)*this.scale.y );
+	    this.ctx.lineTo( this.offset.x - (center.x + width*0.5)*this.scale.x, this.offset.y + (center.y-y)*this.scale.y );
+	    y+=sizeY;
+	}
+	this.ctx.closePath();
+	this._fillOrDraw( color );
+    };
+    
 
     // +---------------------------------------------------------------------------------
     // | Draw adiamond handle with the given (CSS-) color.
