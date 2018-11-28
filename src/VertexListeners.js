@@ -1,9 +1,10 @@
 /**
  * An event listeners wrapper.
  *
- * @author  Ikaros Kappler
- * @date    2018-08-27
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2018-08-27
+ * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
+ * @version  1.0.1
  **/
 
 (function(_context) {
@@ -12,10 +13,11 @@
     // +------------------------------------------------------------
     // | The constructor.
     // +-------------------------------------------------------
-    var VertexListeners = function() {
+    var VertexListeners = function( vertex ) {
 	this.drag = [];
 	this.dragStart = [];
 	this.dragEnd = [];
+	this.vertex = vertex;
     };
 
     // +------------------------------------------------------------
@@ -52,7 +54,7 @@
     // | @param e:AnyEvent This event will be fired to all drag listeners. 
     // +-------------------------------------------------------
     VertexListeners.prototype.fireDragEvent = function( e ) {
-	_fireEvent(this.drag,e);
+	_fireEvent(this,this.drag,e);
     };
 
     // +------------------------------------------------------------
@@ -62,7 +64,7 @@
     // | @param e:AnyEvent This event will be fired to all dragStart listeners. 
     // +-------------------------------------------------------
     VertexListeners.prototype.fireDragStartEvent = function( e ) {
-	_fireEvent(this.dragStart,e);
+	_fireEvent(this,this.dragStart,e);
     };
 
     // +------------------------------------------------------------
@@ -72,10 +74,13 @@
     // | @param e:AnyEvent This event will be fired to all dragEnd listeners. 
     // +-------------------------------------------------------
     VertexListeners.prototype.fireDragEndEvent = function( e ) {
-	_fireEvent(this.dragEnd,e);
+	_fireEvent(this,this.dragEnd,e);
     };
 
-    var _fireEvent = function( listeners, e ) {
+    var _fireEvent = function( _self, listeners, e ) {
+	if( typeof e.params == 'undefined' )
+	    e.params = {};
+	e.params.vertex = _self.vertex;
 	for( var i in listeners ) {
 	    listeners[i]( e );
 	}

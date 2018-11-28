@@ -8,7 +8,8 @@
  * @modified 2018-08-16 Added closure. Removed the 'IKRS' wrapper.
  * @modified 2018-11-20 Added circular auto-adjustment.
  * @modified 2018-11-25 Added the point constants to the BezierPath class itself.
- * @version 1.0.3
+ * @modified 2018-11-28 Added the locateCurveByStartPoint() function.
+ * @version 1.0.4
  **/
 
 
@@ -102,6 +103,52 @@
 		this.totalArcLength += curve.getLength();
 	    }
     };
+
+
+    // +---------------------------------------------------------------------------------
+    // | Locate the curve with the given start point.
+    // |
+    // | @param point:Vertex The point to look for.
+    // | @return Number The index or -1 if not found.
+    // +-------------------------------
+    BezierPath.prototype.locateCurveByStartPoint = function( point ) {
+	for( var i in this.bezierCurves ) {
+	    if( this.bezierCurves[i].startPoint.equals(point) )
+		return i;
+	}
+	return -1;
+    };
+
+
+    // +---------------------------------------------------------------------------------
+    // | Locate the curve with the given start control point.
+    // |
+    // | @param point:Vertex The point to look for.
+    // | @return Number The index or -1 if not found.
+    // +-------------------------------
+    BezierPath.prototype.locateCurveByStartControlPoint = function( point ) {
+	for( var i in this.bezierCurves ) {
+	    if( this.bezierCurves[i].startControlPoint.equals(point) )
+		return i;
+	}
+	return -1;
+    };
+    
+
+    // +---------------------------------------------------------------------------------
+    // | Locate the curve with the given end control point.
+    // |
+    // | @param point:Vertex The point to look for.
+    // | @return Number The index or -1 if not found.
+    // +-------------------------------
+    BezierPath.prototype.locateCurveByEndControlPoint = function( point ) {
+	for( var i in this.bezierCurves ) {
+	    if( this.bezierCurves[i].endControlPoint.equals(point) )
+		return i;
+	}
+	return -1;
+    };
+
 
     
     // +---------------------------------------------------------------------------------

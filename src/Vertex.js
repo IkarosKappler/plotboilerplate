@@ -11,7 +11,8 @@
  * @modified  2018-08-26 Added VertexAttr.
  * @modified  2018-10-31 Extended the constructor by object{x,y}.
  * @modified  2018-11-19 Extended the set(number,number) function to set(Vertex).
- * @version   2.0.5
+ * @modified  2018-11-28 Added 'this' to the VertexAttr constructor.
+ * @version   2.0.6
  **/
 
 
@@ -33,7 +34,7 @@
 	    this.y = y;
 	}
 	this.attr = new VertexAttr();
-	this.listeners = new VertexListeners();
+	this.listeners = new VertexListeners( this );
     };
 
 

@@ -25,13 +25,18 @@ See main-dist.html
 
 ### Todos
 * Add pad/phone support.
-* Implement zoom into dat.gui interface.
 * Implement optional canvas zoom.
 * Implement optional canvas rotation.
 * SVG export.
+* Make Bézier Curves dividable.
+* Add ellipses.
+* Add mousewheel zoom.
 
 
 ### Changelog
+* 2018-11-28
+  * Extended the VertexAttr class (extended the event params by the affected vertex).
+  * Added BezierPath.locateCurveBy*Point(Vertex) functions.
 * 2018-11-27
   * Added an attribute model to the VertexAttr class.
   * Changing bezier path points with holding down 'y'+click is now possible (bezier-autoadjust).
@@ -45,6 +50,7 @@ See main-dist.html
   * Added multi-select and multi-drag option.
   * Made elements selectable (with holding SHIFT).
   * Added panning (move the canvas origin by pressing CTRL and drag).
+  * Implemented zoom into dat.gui interface.
 * 2018-11-17
   * Added the Polygon class.
   * Added npm/webpack for compiling and code minification.

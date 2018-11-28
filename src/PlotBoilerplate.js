@@ -135,7 +135,9 @@
 		this.vertices.push( bpath[i][2] );
 		this.vertices.push( bpath[i][3] );
 
+		
 		// This should be wrapped into the BezierPath implementation.
+		/*
 		(function(cindex) {
 		     bpath[cindex][0].listeners.addDragListener( function(e) {
 			 bpath[cindex][0].addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
@@ -153,17 +155,49 @@
 							);
 		    } );
 		    bpath[cindex][3].listeners.addDragListener( function(e) {
-			if( !path.adjustCircular && cindex+1 >= path.bezierCurves.length)
-			    return;
-			if( !bpath[(cindex+1)%bpath.length][0].attr.bezierAutoAdjust )
+			if( !bpath[(cindex)%bpath.length][1].attr.bezierAutoAdjust )
 			    return;
 			path.adjustSuccessorControlPoint( cindex*1, 
 							    true,            // obtain handle length?
 							    true             // update arc lengths
 							);
 		    } );
-		})(i);
+		})(i); */
 		
+		
+	    }
+
+
+	    for( var i in path.bezierCurves ) {	
+		// This should be wrapped into the BezierPath implementation.
+		//(function(cindex) {
+		    path.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
+			var cindex = path.locateCurveByStartPoint( e.params.vertex );
+			path.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+			path.moveCurvePoint( cindex*1, 
+					     path.START_POINT,             // obtain handle length?
+					     e.params.dragAmount           // update arc lengths
+					   );
+		    } );
+		    path.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
+			var cindex = path.locateCurveByStartControlPoint( e.params.vertex );
+			if( !path.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
+			    return;
+			path.adjustPredecessorControlPoint( cindex*1, 
+							    true,            // obtain handle length?
+							    true             // update arc lengths
+							);
+		    } );
+		    path.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
+			var cindex = path.locateCurveByEndControlPoint( e.params.vertex );
+			if( !path.bezierCurves[(cindex)%path.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
+			    return;
+			path.adjustSuccessorControlPoint( cindex*1, 
+							    true,            // obtain handle length?
+							    true             // update arc lengths
+							);
+		    } );
+		//})(i); 	
 	    }
 	    
 
@@ -174,7 +208,34 @@
 	    for( var i in squareVerts )
 		this.vertices.push( squareVerts[i] );
 	};
-	
+
+
+	// This should be wrapped into the BezierPath implementation.
+	/* function installBezierHelper( cindex ) {
+		     bpath[cindex][0].listeners.addDragListener( function(e) {
+			 bpath[cindex][0].addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+			 path.moveCurvePoint( cindex*1, 
+					      path.START_POINT,             // obtain handle length?
+					      e.params.dragAmount           // update arc lengths
+					    );
+		    } );
+		    bpath[cindex][2].listeners.addDragListener( function(e) {
+			if( !bpath[cindex][0].attr.bezierAutoAdjust )
+			    return;
+			path.adjustPredecessorControlPoint( cindex*1, 
+							    true,            // obtain handle length?
+							    true             // update arc lengths
+							);
+		    } );
+		    bpath[cindex][3].listeners.addDragListener( function(e) {
+			if( !bpath[(cindex)%bpath.length][1].attr.bezierAutoAdjust )
+			    return;
+			path.adjustSuccessorControlPoint( cindex*1, 
+							    true,            // obtain handle length?
+							    true             // update arc lengths
+							);
+		    } );
+		})(i); */
 	
 	// +---------------------------------------------------------------------------------
 	// | The re-drawing function.
@@ -377,6 +438,8 @@
 	// | The result is an object { type : 'bpath', pindex, cindex, pid }
 	// |
         // | Returns false if no point is near the passed position.
+	// |
+	// | @param point:Vertex
         // +-------------------------------
         var locatePointNear = function( point ) {
             var tolerance = 7;

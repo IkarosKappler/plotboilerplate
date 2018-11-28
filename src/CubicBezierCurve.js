@@ -7,7 +7,8 @@
  * @date     2013-08-15
  * @modified 2018-08-16 Added a closure. Removed the wrapper class 'IKRS'. Replaced class THREE.Vector2 by Vertex class.
  * @modified 2018-11-19 Added the fromArray(Array) function.
- * @version  1.0.2
+ * @modified 2018-11-28 Added the locateCurveByPoint(Vertex) function.
+ * @version  1.0.3
  **/
 
 
@@ -111,11 +112,11 @@
 	this.endControlPoint.add( amount );
 	this.endPoint.add( amount );   
     };
-    
 
-    CubicBezierCurve._scalePoint = function( point,   // Vector2
-					     anchor,  // Vector2
-					     scaling  // Vector2
+    
+    CubicBezierCurve._scalePoint = function( point,   // Vertex
+					     anchor,  // Vertex
+					     scaling  // Vertex
 					   ) {
 	// Move point to origin
 	point.sub( anchor );
@@ -127,21 +128,46 @@
 	
     };
 
+
+    // +---------------------------------------------------------------------------------
+    // | Get the total curve length.
+    // |
+    // | @return Number
+    // +-------------------------------
     CubicBezierCurve.prototype.getLength = function() {
 	return this.arcLength;
     };
 
-    /**
-     * This function computes the area size of this bezier curve in an y-axis 
-     * integrational approach.
-     *
-     * For each bezier segment (which are linear segments) the distance to a given
-     * relative Y axis is computed (position of Y axis specified by 'relativeX'
-     * parameter).
-     *
-     * Each resulting sub area has a determined segment height and thus a determined
-     * area size. The sum of all segment area sizes is returned.
-     **/
+
+    // +---------------------------------------------------------------------------------
+    // | Get the curve index for the given start or end point.
+    // |
+    // | If the passed vertex does not equal the start- nor the end-point this function
+    // | returns -1.
+    // |
+    // | @param vert:Vertex The start or end point to search for.
+    // | @return Number The curve index.
+    // +-------------------------------
+    CubicBezierCurve.prototype.locateCurveByPoint = function( vert ) {
+	for( var i = 0; i < this.bezierCurves.length; i++ ) {
+	    if( this.bezierCurves[i].startPoint.equals(vert) || this.bezierCurves[i].endPoint.equals(vert) )
+		return i;
+	}
+	return -1;
+    };
+
+    
+    // +---------------------------------------------------------------------------------
+    // |  This function computes the area size of this bezier curve in an y-axis 
+    // |  integrational approach.
+    // | 
+    // |  For each bezier segment (which are linear segments) the distance to a given
+    // |  relative Y axis is computed (position of Y axis specified by 'relativeX'
+    // |  parameter).
+    // | 
+    // |  Each resulting sub area has a determined segment height and thus a determined
+    // |  area size. The sum of all segment area sizes is returned.
+    // +-------------------------------
     CubicBezierCurve.prototype.computeVerticalAreaSize = function( relativeX,
 								   deltaSize, 
 								   useAbsoluteValues 
