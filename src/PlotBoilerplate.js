@@ -65,6 +65,7 @@
 	    fitToParent           : true,
 	    scaleX                : 1.0,
 	    scaleY                : 1.0,
+	    rasterGrid            : true,
 	    backgroundColor       : '#ffffff',
 	    rebuild               : function() { rebuild(); },
 	    loadImage             : function() { var elem = document.getElementById('file');
@@ -198,7 +199,10 @@
 	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
 
 	    // Draw grid
-	    this.draw.grid( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.x, this.grid.size.x, this.grid.size.y, 'rgba(0,128,255,0.075)' );
+	    if( this.config.rasterGrid )
+		this.draw.raster( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x, this.grid.size.y, 'rgba(0,128,255,0.125)' );
+	    else
+		this.draw.grid( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x, this.grid.size.y, 'rgba(0,128,255,0.095)' )
 
 	    // Draw the background image?
 	    if( _self.image ) {

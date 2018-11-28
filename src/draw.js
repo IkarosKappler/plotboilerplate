@@ -162,7 +162,7 @@
 
 
     // +---------------------------------------------------------------------------------
-    // | Draw an ellipse with the given (CSS-) color.
+    // | Draw grid of horizontal and vertical lines with the given (CSS-) color.
     // +-------------------------------
     _context.drawutils.prototype.grid = function( center, width, height, sizeX, sizeY, color ) {
 	console.log( 'draw grid' );
@@ -194,6 +194,40 @@
 	}
 	this.ctx.closePath();
 	this._fillOrDraw( color );
+    };
+
+
+    // +---------------------------------------------------------------------------------
+    // | Draw a raster of crosshairs in the given grid.
+    // |
+    // | This works analogue to the grid() function.
+    // +-------------------------------
+    _context.drawutils.prototype.raster = function( center, width, height, sizeX, sizeY, color ) {
+	this.ctx.save();
+	this.ctx.beginPath();
+	var cx = 0, cy = 0;
+	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
+	    cx++;
+	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
+		if( cx == 1 ) cy++;
+		// Draw a crosshair
+		// this.crosshair( new Vertex({ x : x, y : y }), 5, color );
+		
+		
+		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
+		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );
+		
+		
+	    }
+	}
+	this.ctx.strokeStyle = color;
+	this.ctx.lineWidth = 1.0; // 0.5;
+	this.ctx.stroke();
+	this.ctx.closePath();
+	this.ctx.restore();
+	console.log('cx=',cx,', c=y', cy );
     };
     
 
