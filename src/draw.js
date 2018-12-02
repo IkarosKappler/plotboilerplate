@@ -9,7 +9,8 @@
  * @modified 2018-10-23 Recognizing the offset param in the circle() function.
  * @modified 2018-11-27 Added the diamondHandle() function.
  * @modified 2018-11-28 Added the grid() function and the ellipse() function.
- * @version  1.0.4
+ * @modified 2018-11-30 Renamed the text() function to label() as it is not scaling.
+ * @version  1.0.5
  **/
 
 (function(_context) {
@@ -211,23 +212,17 @@
 	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
 		if( cx == 1 ) cy++;
 		// Draw a crosshair
-		// this.crosshair( new Vertex({ x : x, y : y }), 5, color );
-		
-		
 		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
 		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
 		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
-		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );
-		
-		
+		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );	
 	    }
 	}
 	this.ctx.strokeStyle = color;
-	this.ctx.lineWidth = 1.0; // 0.5;
+	this.ctx.lineWidth = 1.0; 
 	this.ctx.stroke();
 	this.ctx.closePath();
 	this.ctx.restore();
-	console.log('cx=',cx,', c=y', cy );
     };
     
 
@@ -236,7 +231,6 @@
     // +-------------------------------
     _context.drawutils.prototype.diamondHandle = function( center, size, color ) {
 	this.ctx.beginPath();
-	// this.ctx.rect( this.offset.x+(center.x-size/2.0)*this.scale.x, this.offset.y+(center.y-size/2.0)*this.scale.y, size*this.scale.x, size*this.scale.y );
 	this.ctx.moveTo( this.offset.x + center.x*this.scale.x - size/2.0, this.offset.y + center.y*this.scale.y );
 	this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y - size/2.0 );
 	this.ctx.lineTo( this.offset.x + center.x*this.scale.x + size/2.0, this.offset.y + center.y*this.scale.y );
@@ -298,7 +292,24 @@
     // +---------------------------------------------------------------------------------
     // | Draw a text at the given position.
     // +-------------------------------
-    _context.drawutils.prototype.string = function( text, x, y ) {
+    // THIS FUNCTION IS CURRENTLY NOT IN USE
+    // TODO: make text scaling with zoom?
+    _context.drawutils.prototype.text = function( text, x, y, options ) {
+	options = options || {};
+	if( this.fillShapes ) {
+	    this.ctx.fillStyle = 'black';
+	    this.ctx.fillText( text, x, y );
+	} else {
+	    this.ctx.strokeStyle = 'black';
+	    this.ctx.strokeText( text, x, y, );
+	}
+    };
+
+    
+    // +---------------------------------------------------------------------------------
+    // | Draw a non-scaling text label at the given position.
+    // +-------------------------------
+    _context.drawutils.prototype.label = function( text, x, y ) {
 	if( this.fillShapes ) {
 	    this.ctx.fillStyle = 'black';
 	    this.ctx.fillText( text, x, y );

@@ -25,7 +25,7 @@ See main-dist.html
 
 ## Usage
  * [SHIFT] + [Click] : Select vertex
- * [Y] + [Click ]: Toggle Bézier auto-adjustment
+ * [Y] + [Click]: Toggle Bézier auto-adjustment
  * [CTRL] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
  * [Mousewheel-down] : Zoom out
@@ -38,9 +38,12 @@ See main-dist.html
 * SVG export.
 * Make Bézier Curves dividable.
 * Implement snap-to-grid.
+* Show mouse cursor position.
 
 
 ### Changelog
+* 2018-11-30
+  * Added the mouse position display.
 * 2018-11-28
   * Extended the VertexAttr class (extended the event params by the affected vertex).
   * Added BezierPath.locateCurveBy*Point(Vertex) functions.

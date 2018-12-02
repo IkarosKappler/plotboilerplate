@@ -403,13 +403,12 @@
         // +-------------------------------
         var locatePointNear = function( point ) {
             var tolerance = 7;
-	    // var point = { x : x, y : y };
 	    // Search in vertices
 	    for( var vindex in _self.vertices ) {
 		var vert = _self.vertices[vindex];
 		if( vert.distance(point) < tolerance ) {
-		    // console.log( 'vertex found.' );
-		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); // { type : 'vertex', vindex : vindex };
+		    // { type : 'vertex', vindex : vindex };
+		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); 
 		}
 	    } 
             return false;
@@ -423,7 +422,7 @@
 	// | @param y:Number The tap Y position on the canvas.
 	// +-------------------------------
 	function handleTap(x,y) { // console.log( keyHandler.isDown('ctrl') );
-	    var p = locatePointNear( transformMousePosition(x, y) );
+	    var p = locatePointNear( _self.transformMousePosition(x, y) );
 	    if( p ) { 
 		if( keyHandler.isDown('shift') ) {
 		    if( p.type == 'bpath' ) {
@@ -439,7 +438,7 @@
 		}
 	    }
 	    else if( _self.selectPolygon != null ) {
-		var vert = transformMousePosition( x, y );
+		var vert = _self.transformMousePosition( x, y );
 		_self.selectPolygon.vertices.push( vert );
 		_self.redraw();
 	    }
@@ -452,8 +451,8 @@
 	// | @param x:Number The mouse-x position relative to the canvas.
 	// | @param y:Number The mouse-y position relative to the canvas.
 	// +-------------------------------
-	var transformMousePosition = function( x, y ) {
-	    return { x : (x-_self.draw.offset.x)/_self.draw.scale.x, y : (y-_self.draw.offset.y)/_self.draw.scale.y };
+	PlotBoilerplate.prototype.transformMousePosition = function( x, y ) {
+	    return { x : (x-this.draw.offset.x)/this.draw.scale.x, y : (y-this.draw.offset.y)/this.draw.scale.y };
 	};
 
 	// +---------------------------------------------------------------------------------
@@ -464,7 +463,7 @@
 	var mouseDownHandler = function(e) {
 		if( e.which != 1 )
 		    return; // Only react on left mouse
-		var p = locatePointNear( transformMousePosition(e.params.pos.x, e.params.pos.y) );
+		var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y) );
 		console.log( p );
 		if( !p ) return;
 		// Drag all selected elements?
@@ -532,7 +531,6 @@
 		handleTap( e.params.pos.x, e.params.pos.y );
 	    for( var i in _self.draggedElements ) {
 		var p = _self.draggedElements[i];
-		// console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
 		if( p.type == 'bpath' ) {
 		    _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEndEvent( e );
 		} else if( p.type == 'vertex' ) {
