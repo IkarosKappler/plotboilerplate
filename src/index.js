@@ -18,7 +18,7 @@
     
     window.addEventListener(
 	'load',
-	function() {
+	function() {	    
 	    var bp = new PlotBoilerplate();
 
 	    // +---------------------------------------------------------------------------------
@@ -65,6 +65,56 @@
 		    if( cx ) cx.innerHTML = relPos.x;
 		    if( cy ) cy.innerHTML = relPos.y;
 		} );
+
+
+	    // +---------------------------------------------------------------------------------
+	    // | Add some elements to draw (demo).
+	    // +-------------------------------
+	    var diameter = Math.min(bp.canvasSize.width,bp.canvasSize.height)/3;
+	    var radius   = diameter*0.5;
+	    var hypo     = Math.sqrt( radius*radius*2 );
+	    
+	    // Add some Lines
+	    bp.add( new Line( new Vertex(-diameter,-diameter), new Vertex(-hypo*1.0,-hypo*1.0) ) );
+	    bp.add( new Line( new Vertex(-diameter,diameter), new Vertex(-hypo*1.0,hypo*1.0) ) );
+	    bp.add( new Line( new Vertex(diameter,-diameter), new Vertex(hypo*1.0,-hypo*1.0) ) );
+	    bp.add( new Line( new Vertex(diameter,diameter), new Vertex(hypo*1.0,hypo*1.0) ) );
+
+	    // Add square
+	    var squareSize = 32;
+	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
+	    var square = new Polygon( squareVerts );
+	    bp.add( square );
+
+	    // Add a circle
+	    var circle = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
+	    bp.add( circle );
+
+	    // Add a bezier path
+	    var fract = 0.5;
+	    // Make a circular connected path
+	    var bpath = [];
+	    bpath[0] = [ new Vertex( 0, -diameter ),
+			 new Vertex( diameter, 0 ),
+			 new Vertex( diameter*fract, -diameter ),
+			 new Vertex( diameter*fract, 0 ) ];
+	    bpath[1] = [ bpath[0][1], // Use same reference
+			 new Vertex( 0, diameter ),
+			 new Vertex( diameter, diameter*fract ),
+			 new Vertex( 0, diameter*fract ) ];
+	    bpath[2] = [ bpath[1][1], // Use same reference
+			 new Vertex( -diameter, 0 ),
+			 new Vertex( -diameter*fract, diameter ),
+			 new Vertex( -diameter*fract, 0 ) ];
+	    bpath[3] = [ bpath[2][1], // Use same reference
+			 bpath[0][0], // Use same reference
+			 new Vertex( -diameter, -diameter*fract ),
+			 new Vertex( 0, -diameter*fract )
+		       ];
+	    // Construct
+	    var path = BezierPath.fromArray( bpath );
+	    path.adjustCircular = true;
+	    bp.add( path );
 	} );
     
 })(window); 

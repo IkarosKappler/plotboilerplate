@@ -24,7 +24,7 @@ See main-dist.html
 
 
 ## Usage
- * [SHIFT] + [Click] : Select vertex
+ * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment
  * [CTRL] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
@@ -40,9 +40,18 @@ See main-dist.html
 * Implement snap-to-grid.
 * Add toSVGString to VEllipse class.
 * Add toSVGString to Polygon class.
+* Add a Line class.
+* Add logarithmic reduction of the grid (too many grid points when zoom gets too small, too few when zoom gets too high).
+* Make ellipses rotatable.
+* Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
 
 
 ### Changelog
+* 2018-12-05
+  * Added the Vertex.sub(x,y) function.
+  * Added the Line class.
+  * Moved the demo code (Line, Polygon, Bezier, Circle) to the index.js file.
+  * Expanded the Vertex.add(...) function. Now add(number,number) and add(Vertex) are allowed.
 * 2018-12-04
   * Added a simple SVGBuilder.
 * 2018-11-30
@@ -90,9 +99,9 @@ See main-dist.html
 
 ### Dependencies
 * HTML5 Canvas
-* HTML5 WebGL
-
 
 
 ### Used Libraries
 * dat.gui
+* Color.js
+* FileSaver.js

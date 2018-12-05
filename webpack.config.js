@@ -12,6 +12,7 @@ module.exports = [
         './src/VertexListeners.js',
         './src/Vertex.js',
     	'./src/Grid.js',
+	'./src/Line.js', 
     	'./src/CubicBezierCurve.js',
     	'./src/BezierPath.js',
     	'./src/Polygon.js',

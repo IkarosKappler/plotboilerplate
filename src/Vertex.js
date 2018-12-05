@@ -12,7 +12,8 @@
  * @modified  2018-10-31 Extended the constructor by object{x,y}.
  * @modified  2018-11-19 Extended the set(number,number) function to set(Vertex).
  * @modified  2018-11-28 Added 'this' to the VertexAttr constructor.
- * @version   2.0.6
+ * @modified  2018-12-05 Added the sub(...) function. Changed the signature of the add() function! add(Vertex) and add(number,number) are now possible.
+ * @version   2.0.7
  **/
 
 
@@ -58,13 +59,20 @@
     // +------------------------------------------------------------
     // | Add the passed amount to x- and y- component of this vertex.
     // |
-    // | @param amount:Vertex
+    // | @param x:Vertex|number
+    // | @param y:number (optional)
     // |
     // | @return Vertex
     // +-------------------------------------------------------
-    Vertex.prototype.add = function( amount ) {
-	this.x += amount.x;
-	this.y += amount.y;
+    Vertex.prototype.add = function( x, y ) {
+	if( typeof x == 'number' ) {
+	    this.x += x;
+	    if( typeof y == 'number' )
+		this.y += y;
+	} else {
+	    this.x += x.x;
+	    this.y += x.y
+	}
 	return this;
     };
 
@@ -80,6 +88,23 @@
     Vertex.prototype.addXY = function( amountX, amountY ) {
 	this.x += amountX;
 	this.y += amountY;
+	return this;
+    };
+
+
+    // +------------------------------------------------------------
+    // | Substract the passed vertex/components from this vertex.
+    // |
+    // | @return Vertex
+    // +-------------------------------------------------------
+    Vertex.prototype.sub = function( x, y ) {
+	if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
+	    this.x -= x.x;
+	    this.y -= x.y;
+	} else {
+	    this.x -= x;
+	    this.y -= y;
+	}
 	return this;
     };
     

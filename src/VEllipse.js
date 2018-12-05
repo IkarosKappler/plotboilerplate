@@ -23,7 +23,7 @@
 
 
     // +---------------------------------------------------------------------------------
-    // | Create an SVG representation of this polygon.
+    // | Create an SVG representation of this ellipse.
     // |
     // | @return string The SVG string
     // +-------------------------------

@@ -98,94 +98,80 @@
 
 	this.drawables           = [];
 
-	// A square
-	// var tmpPoly = new Polygon( [ {x:-100,y:-100},{x:100,y:-100},{x:100,y:100},{x:-100,y:100} ] );
-
 	var _self = this;
-	PlotBoilerplate.prototype.initDrawableObjects = function() {
-	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
-	    //draw.circle( {x:0,y:0}, radius, '#000000' );
-	    var fract = 0.5;
-	    // Make a circular connected path
-	    var bpath = [];
-	    bpath[0] = [ new Vertex( 0, -radius ),
-			 new Vertex( radius, 0 ),
-			 new Vertex( radius*fract, -radius ),
-			 new Vertex( radius*fract, 0 ) ];
-	    bpath[1] = [ bpath[0][1], // new Vertex( radius, 0  ),
-			 new Vertex( 0, radius ),
-			 new Vertex( radius, radius*fract ),
-			 new Vertex( 0, radius*fract ) ];
-	    bpath[2] = [ bpath[1][1], // new Vertex( 0, radius ),
-			 new Vertex( -radius, 0 ),
-			 new Vertex( -radius*fract, radius ),
-			 new Vertex( -radius*fract, 0 ) ];
-	    bpath[3] = [ bpath[2][1], // new Vertex( -radius, 0 ),
-			 bpath[0][0], // new Vertex( 0, -radius ),
-			 new Vertex( -radius, -radius*fract ),
-			 new Vertex( 0, -radius*fract )
-		       ];
 
-	    // Construct
-	    this.vertices = [];
-	    var path = BezierPath.fromArray( bpath );
-	    path.adjustCircular = true;
-	    this.drawables.push( path );
 
-	    for( var i in bpath ) {
-		this.vertices.push( bpath[i][0] );
-		this.vertices.push( bpath[i][1] );
-		this.vertices.push( bpath[i][2] );
-		this.vertices.push( bpath[i][3] );		
+	// +---------------------------------------------------------------------------------
+	// | Add a drawable object.
+	// |
+	// | This must be either:
+	// |  * a Line
+	// |  * a VEllipse
+	// |  * a Polygon
+	// |  * a BezierPath
+	// |
+	// | @param drawable:Object The drawable (of one of the allowed class instance) to add.
+	// +-------------------------------
+	PlotBoilerplate.prototype.add = function( drawable ) {
+	    if( drawable instanceof Line ) {
+		// Add some lines
+		this.drawables.push( drawable );
+		this.vertices.push( drawable.a );
+		this.vertices.push( drawable.b );
+	    } else if( drawable instanceof VEllipse ) {
+		this.vertices.push( drawable.center );
+		this.vertices.push( drawable.axis );
+		this.drawables.push( drawable );
+		drawable.center.listeners.addDragListener( function(e) {
+		    drawable.axis.add( e.params.dragAmount );
+		} ); 
+	    } else if( drawable instanceof Polygon ) {
+		this.drawables.push( drawable );
+		for( var i in drawable.vertices )
+		    this.vertices.push( drawable.vertices[i] );
+	    } else if( drawable instanceof BezierPath ) {
+		this.drawables.push( drawable );
+		for( var i in drawable.bezierCurves ) {
+		    if( !drawable.adjustCircular && i == 0 )
+			this.vertices.push( drawable.bezierCurves[i].startPoint );
+		    this.vertices.push( drawable.bezierCurves[i].endPoint );
+		    this.vertices.push( drawable.bezierCurves[i].startControlPoint );
+		    this.vertices.push( drawable.bezierCurves[i].endControlPoint );		
+		}
+		for( var i in drawable.bezierCurves ) {	
+		    // This should be wrapped into the BezierPath implementation.
+		    drawable.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
+			var cindex = drawable.locateCurveByStartPoint( e.params.vertex );
+			drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+			drawable.moveCurvePoint( cindex*1, 
+						 drawable.START_POINT,         // obtain handle length?
+						 e.params.dragAmount           // update arc lengths
+					       );
+		    } );
+		    drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
+			var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
+			if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
+			    return;
+			drawable.adjustPredecessorControlPoint( cindex*1, 
+								true,          // obtain handle length?
+								true           // update arc lengths
+							      );
+		    } );
+		    drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
+			var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
+			if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
+			    return;
+			drawable.adjustSuccessorControlPoint( cindex*1, 
+							      true,            // obtain handle length?
+							      true             // update arc lengths
+							    );
+		    } );
+		} // END for
+	    } else {
+		throw "Cannot add drawable of unrecognized type: " + drawable.constructor.name;
 	    }
 
-
-	    for( var i in path.bezierCurves ) {	
-		// This should be wrapped into the BezierPath implementation.
-		path.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
-		    var cindex = path.locateCurveByStartPoint( e.params.vertex );
-		    path.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
-		    path.moveCurvePoint( cindex*1, 
-					 path.START_POINT,             // obtain handle length?
-					 e.params.dragAmount           // update arc lengths
-				       );
-		} );
-		path.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
-		    var cindex = path.locateCurveByStartControlPoint( e.params.vertex );
-		    if( !path.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
-			return;
-		    path.adjustPredecessorControlPoint( cindex*1, 
-							true,            // obtain handle length?
-							true             // update arc lengths
-						      );
-		} );
-		path.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
-		    var cindex = path.locateCurveByEndControlPoint( e.params.vertex );
-		    if( !path.bezierCurves[(cindex)%path.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
-			return;
-		    path.adjustSuccessorControlPoint( cindex*1, 
-						      true,            // obtain handle length?
-						      true             // update arc lengths
-						    );
-		} ); 	
-	    } // END for
-
-	    // Add a circle
-	    var circle = new VEllipse( new Vertex(0,0), new Vertex(60,60) );
-	    this.vertices.push( circle.center );
-	    this.vertices.push( circle.axis );
-	    this.drawables.push( circle );
-	    circle.center.listeners.addDragListener( function(e) {
-		circle.axis.add( e.params.dragAmount );
-	    } );
-
-	    // Add a square (polygon)
-	    var squareSize = 32;
-	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
-	    var square = new Polygon( squareVerts );
-	    this.drawables.push( square );
-	    for( var i in squareVerts )
-		this.vertices.push( squareVerts[i] );
+	    this.redraw();
 	};
 
 	
@@ -239,12 +225,19 @@
 		    }
 		} else if( d instanceof Polygon ) {
 		    this.draw.polygon( d, '#0022a8' );
-		    for( var i in d.vertices )
-			; // d.vertices[i].attr.renderTime = renderTime;
+		    //for( var i in d.vertices )
+		    //	d.vertices[i].attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
+		    //this.draw.line( d.center, d.axis, '#ff0000' );
+		    this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+		    this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
 		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), '#2222a8' );
 		    // d.center.renderTime = renderTime;
 		    // d.axis.renderTime = renderTime;
+		} else if( d instanceof Line ) {
+		    this.draw.line( d.a, d.b, '#a844a8' );
+		    // d.a.renderTime = renderTime;
+		    // d.b.renderTime = renderTime;
 		} else {
 		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
 		}
@@ -608,8 +601,6 @@
 	// Initialize the dialog
 	window.dialog = new overlayDialog('dialog-wrapper');
 	// window.dialog.show( 'Inhalt', 'Test' );
-
-	this.initDrawableObjects();
 	
 	// Init	
 	this.redraw();
