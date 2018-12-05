@@ -6,7 +6,8 @@
  * @author   Ikaros Kappler
  * @date     2018-04-14
  * @modified 2018-11-17 Added the containsVert function.
- * @version  1.0.1
+ * @modified 2018-12-04 Added the toSVGString function.
+ * @version  1.0.2
  **/
 
 (function(_context) {
@@ -15,12 +16,14 @@
     // |
     // | @param vertices Array:Vertex An array of 2d vertices that shape the polygon
     // +-------------------------------
-    _context.Polygon = function( vertices, isOpen ) {
+    var Polygon = function( vertices, isOpen ) {
 	if( typeof vertices == 'undefined' )
 	    vertices = [];
 	this.vertices = vertices;
 	this.isOpen = isOpen;
     };
+
+    _context.Polygon = Polygon;
 
 
     // +---------------------------------------------------------------------------------
@@ -171,6 +174,38 @@
 	    buffer.push( 'C ' + qdata[i].x+' '+qdata[i].y + ', ' + qdata[i+1].x+' '+qdata[i+1].y + ', ' + qdata[i+2].x + ' ' + qdata[i+2].y );
 	}
 	return buffer.join(' ');
+    };
+
+
+    // +---------------------------------------------------------------------------------
+    // | Create an SVG representation of this polygon.
+    // |
+    // | @return string The SVG string
+    // +-------------------------------
+    _context.Polygon.prototype.toSVGString = function( options ) {
+	options = options || {};
+	var buffer = [];
+	buffer.push( '<path' );
+	if( options.className )
+	    buffer.push( ' class="' + options.className + '"' );
+	buffer.push( ' d="' );
+	if( this.vertices.length > 0 ) {
+	    buffer.push( 'M ' );
+	    buffer.push( this.vertices[0].x )
+	    buffer.push( ' ' );
+	    buffer.push( this.vertices[0].y );
+	    for( var i = 1; i < this.vertices.length; i++ ) {
+		buffer.push( ' L ' );
+		buffer.push( this.vertices[i].x )
+		buffer.push( ' ' );
+		buffer.push( this.vertices[i].y );
+	    }
+	    if( !this.isOpen ) {
+		buffer.push( ' Z' );
+	    }
+	}
+	buffer.push( '" />' );
+	return buffer.join('');
     };
     
 })(window ? window : module.export );

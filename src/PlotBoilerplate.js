@@ -4,7 +4,8 @@
  * @author   Ikaros Kappler
  * @date     2018-10-23
  * @modified 2018-11-19 Added multi-select and multi-drag.
- * @version  1.0.1
+ * modified  2018-12-04 Added basic SVG export.
+ * @version  1.0.2
  **/
 
 
@@ -328,10 +329,11 @@
 	// | Just a generic save-file dialog.
 	// +-------------------------------
 	var saveFile = function() {
+	    var svgCode = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.zoom } );
 	    // See documentation for FileSaver.js for usage.
 	    //    https://github.com/eligrey/FileSaver.js
-	    var blob = new Blob(["Hello, world!\nSorry, exporting SVGs is not yet implemented."], {type: "text/plain;charset=utf-8"});
-	    saveAs(blob, "helloworld.txt");
+	    var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
+	    saveAs(blob, "plot-boilerplate.svg");
 	};
 	
 	

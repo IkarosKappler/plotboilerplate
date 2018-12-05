@@ -38,10 +38,13 @@ See main-dist.html
 * SVG export.
 * Make Bézier Curves dividable.
 * Implement snap-to-grid.
-* Show mouse cursor position.
+* Add toSVGString to VEllipse class.
+* Add toSVGString to Polygon class.
 
 
 ### Changelog
+* 2018-12-04
+  * Added a simple SVGBuilder.
 * 2018-11-30
   * Added the mouse position display.
 * 2018-11-28

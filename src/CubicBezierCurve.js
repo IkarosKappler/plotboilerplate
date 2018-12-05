@@ -8,7 +8,8 @@
  * @modified 2018-08-16 Added a closure. Removed the wrapper class 'IKRS'. Replaced class THREE.Vector2 by Vertex class.
  * @modified 2018-11-19 Added the fromArray(Array) function.
  * @modified 2018-11-28 Added the locateCurveByPoint(Vertex) function.
- * @version  1.0.3
+ * @modified 2018-12-04 Added the toSVGPathData() function.
+ * @version  1.0.4
  **/
 
 
@@ -447,7 +448,6 @@
 					  this.getStartControlPoint().clone(),
 					  this.getEndControlPoint().clone()
 					);
-	//curve.updateArcLengths();
 	return curve;
     }
 
@@ -470,6 +470,37 @@
 	
     }
 
+
+    // +---------------------------------------------------------------------------------
+    // | Create an SVG representation of this bézier curve.
+    // |
+    // | Path data string format is:
+    // |  'M x0 y1 C dx0 dy1 dx1 dy1 x1 x2'
+    // | or in other words
+    // |  'M startoint.x startPoint.y C startControlPoint.x startControlPoint.y endControlPoint.x endControlPoint.y endPoint.x endPoint.y'
+    // |
+    // | @return string The SVG path data string.
+    // +-------------------------------
+    CubicBezierCurve.prototype.toSVGPathData = function() {
+	var buffer = [];
+	buffer.push( 'M ' );
+	buffer.push( this.startPoint.x );
+	buffer.push( ' ' );
+	buffer.push( this.startPoint.y );
+	buffer.push( ' C ' );
+	buffer.push( this.startControlPoint.x );
+	buffer.push( ' ' );
+	buffer.push( this.startControlPoint.y );
+	buffer.push( ' ' );
+	buffer.push( this.endControlPoint.x );
+	buffer.push( ' ' );
+	buffer.push( this.endControlPoint.y );
+	buffer.push( ' ' );
+	buffer.push( this.endPoint.x );
+	buffer.push( ' ' );
+	buffer.push( this.endPoint.y );
+	return buffer.join('');
+    }
 
     CubicBezierCurve.prototype.toJSON = function( prettyFormat ) {
 	

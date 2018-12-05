@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const GitRevisionPlugin = require("git-revision-webpack-plugin")
 
 
 module.exports = [
@@ -26,7 +27,12 @@ module.exports = [
         output: {
             path: path.resolve(__dirname, 'dist'),
             filename: 'plot-boilerplate.min.js'
-        }
+        },
+        plugins: [
+            new webpack.BannerPlugin({
+              banner: 'PlotBoilerplate,\nGit branch https://github.com/IkarosKappler/plot-boilerplate/commit/' + new GitRevisionPlugin().version(),
+            }),
+          ]
     }
     // Un-comment this block if you also want to re-compile the Color class.
     /* ,{

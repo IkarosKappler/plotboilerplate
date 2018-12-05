@@ -50,7 +50,7 @@
 	    // fold0.add(bp.config, 'loadImage').name('Load Image').title("Load a background image.");
 	    
 	    var fold1 = gui.addFolder('Export');
-	    fold1.add(bp.config, 'saveFile').name('Save a file').title("Save a file.");	 
+	    fold1.add(bp.config, 'saveFile').name('Save a file').title("Save as SVG.");	 
 	    // END init dat.gui
 	    
 

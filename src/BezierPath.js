@@ -9,7 +9,8 @@
  * @modified 2018-11-20 Added circular auto-adjustment.
  * @modified 2018-11-25 Added the point constants to the BezierPath class itself.
  * @modified 2018-11-28 Added the locateCurveByStartPoint() function.
- * @version 1.0.4
+ * @modified 2018-12-04 Added the toSVGString() function.
+ * @version 1.0.5
  **/
 
 
@@ -822,6 +823,27 @@
 
 	return true;
     }
+
+    // +---------------------------------------------------------------------------------
+    // | Create an SVG representation of this bézier curve.
+    // |
+    // | @return string The SVG string
+    // +-------------------------------
+    BezierPath.prototype.toSVGString = function( options ) {
+	options = options || {};
+	var buffer = [];
+	buffer.push( '<path' );
+	if( options.className )
+	    buffer.push( ' class="' + options.className + '"' );
+	buffer.push( ' d="' );
+	for( var c = 0; c < this.bezierCurves.length; c++ ) {
+	    if( c > 0 )
+		buffer.push( ' ' );
+	    buffer.push( this.bezierCurves[c].toSVGPathData() );
+	}
+	buffer.push( '" />' );
+	return buffer.join('');
+    };
 
     BezierPath.prototype.toJSON = function( prettyFormat ) {
 
