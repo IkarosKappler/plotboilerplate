@@ -20,7 +20,27 @@ from the sources code files in ./src/*.
 ~~~~
 
 ## The HTML file
-See main-dist.html
+For details see main-dist.html:
+~~~~html
+    <canvas id="my-canvas">Your browser does not support the canvas tag.</canvas>
+
+    <div class="info monospace">
+      [<span id="cx">-</span>,<span id="cy">-</span>]
+    </div>
+~~~~
+
+
+## Initialize the canvas
+~~~~javascript
+ var bp = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
+					    fullSize              : true,
+					    fitToParent           : true,
+					    scaleX                : 1.0,
+					    scaleY                : 1.0,
+					    rasterGrid            : true,
+					    backgroundColor       : '#ffffff'
+					  } );
+~~~~					  
 
 
 ## Usage

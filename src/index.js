@@ -20,14 +20,14 @@
 	'load',
 	function() {
 	    // All config params are optional.
-	    var bp = new PlotBoilerplate( {
-		fullSize              : true,
-		fitToParent           : true,
-		scaleX                : 1.0,
-		scaleY                : 1.0,
-		rasterGrid            : true,
-		backgroundColor       : '#ffffff'
-	    } );
+	    var bp = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
+					    fullSize              : true,
+					    fitToParent           : true,
+					    scaleX                : 1.0,
+					    scaleY                : 1.0,
+					    rasterGrid            : true,
+					    backgroundColor       : '#ffffff'
+					  } );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Merge GET params into config.

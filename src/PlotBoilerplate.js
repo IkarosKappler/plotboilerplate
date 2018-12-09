@@ -5,7 +5,8 @@
  * @date     2018-10-23
  * @modified 2018-11-19 Added multi-select and multi-drag.
  * modified  2018-12-04 Added basic SVG export.
- * @version  1.0.2
+ * @modified 2018-12-09 Extended the constructor (canvas).
+ * @version  1.1.0
  **/
 
 
@@ -55,10 +56,14 @@
     
 
     // +---------------------------------------------------------------------------------
-    // | Initialize everything.
+    // | The constructor.
+    // |
+    // 
     // +----------------------------
     var PlotBoilerplate = function( config ) {
 	config = config || {};
+	if( typeof config.canvas == 'undefined' )
+	    throw "No canvas specified.";
 	// +---------------------------------------------------------------------------------
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
@@ -82,7 +87,7 @@
 	// +---------------------------------------------------------------------------------
 	// | Object members.
 	// +-------------------------------
-	this.canvas              = document.getElementById('my-canvas'); 
+	this.canvas              = typeof config.canvas == 'string' ? document.getElementById(config.canvas) : config.canvas;
 	this.ctx                 = this.canvas.getContext('2d');
 	this.draw                = new drawutils(this.ctx,false);
 	this.draw.scale.set(this.config.scaleX,this.config.scaleY);
