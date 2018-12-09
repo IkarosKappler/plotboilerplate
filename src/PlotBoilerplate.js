@@ -51,23 +51,25 @@
     // +---------------------------------------------------------------------------------
     // | Use a special custom attribute set for vertices.
     // +----------------------------
-    VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0 };
+    VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true };
     
 
     // +---------------------------------------------------------------------------------
     // | Initialize everything.
     // +----------------------------
     var PlotBoilerplate = function( config ) {
+	config = config || {};
 	// +---------------------------------------------------------------------------------
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	this.config = {
-	    fullSize              : true,
-	    fitToParent           : true,
-	    scaleX                : 1.0,
-	    scaleY                : 1.0,
-	    rasterGrid            : true,
-	    backgroundColor       : '#ffffff',
+	    fullSize              : config.fullSize || true,
+	    fitToParent           : config.fitToParent || true,
+	    scaleX                : config.scaleX || 1.0,
+	    scaleY                : config.scaleY || 1.0,
+	    rasterGrid            : config.rasterGrid || true,
+	    rasterAdjustFactor    : config.rasterAdjustFactor || 2.0,
+	    backgroundColor       : config.backgroundColor || '#ffffff',
 	    rebuild               : function() { rebuild(); },
 	    loadImage             : function() { var elem = document.getElementById('file');
 						 elem.setAttribute('data-type','image-upload');
@@ -90,16 +92,17 @@
 	this.image               = null; // An image.
 	this.imageBuffer         = null; // A canvas to read the pixel data from.
 	this.canvasSize          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
-
 	this.vertices            = [];
-
 	this.selectPolygon       = null;
 	this.draggedElements     = [];
-
 	this.drawables           = [];
-
 	var _self = this;
 
+	// !!! PRE ALPHA TEST !!!
+	var _testArc = { a : new Vertex(-200,0), b : new Vertex(200,0), radius : new Vertex(100,100), rotation : 0.0, largeArcFlag : false, sweepFlag : false };
+	this.vertices.push( _testArc.a );
+	this.vertices.push( _testArc.b );
+	this.vertices.push( _testArc.radius );
 
 	// +---------------------------------------------------------------------------------
 	// | Add a drawable object.
@@ -136,7 +139,9 @@
 			this.vertices.push( drawable.bezierCurves[i].startPoint );
 		    this.vertices.push( drawable.bezierCurves[i].endPoint );
 		    this.vertices.push( drawable.bezierCurves[i].startControlPoint );
-		    this.vertices.push( drawable.bezierCurves[i].endControlPoint );		
+		    this.vertices.push( drawable.bezierCurves[i].endControlPoint );
+		    drawable.bezierCurves[i].startControlPoint.attr.selectable = false;
+		    drawable.bezierCurves[i].endControlPoint.attr.selectable = false;
 		}
 		for( var i in drawable.bezierCurves ) {	
 		    // This should be wrapped into the BezierPath implementation.
@@ -186,10 +191,28 @@
 	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
 
 	    // Draw grid
+	    /* function baseLog(base,num) { return Math.log(base) / Math.log(num); };
+	    function mapRasterScale( adjustFactor, scale ) {
+		var gf = 1.0;
+		if( scale >= 1 ) {
+		    gf = Math.abs( Math.floor( 1/baseLog(adjustFactor,scale) ) );
+		    gf = 1 / Math.pow( adjustFactor, gf );
+		} else {
+		    gf = Math.abs( Math.floor( baseLog(1/adjustFactor,scale+1) ) );
+		    gf = Math.pow( adjustFactor, gf );
+		}
+		return gf;
+	    }
+	    var gf = { x : mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
+		       y : mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
+	    */
+	    var gf = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
+		       y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
+	    console.log( this.config.rasterAdjustFactor, this.draw.scale.x, gf.x, gf.y );
 	    if( this.config.rasterGrid )
-		this.draw.raster( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x, this.grid.size.y, 'rgba(0,128,255,0.125)' );
+		this.draw.raster( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x*gf.x, this.grid.size.y*gf.y, 'rgba(0,128,255,0.125)' );
 	    else
-		this.draw.grid( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x, this.grid.size.y, 'rgba(0,128,255,0.095)' )
+		this.draw.grid( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x*gf.x, this.grid.size.y*gf.y, 'rgba(0,128,255,0.095)' )
 
 	    // Draw the background image?
 	    if( _self.image ) {
@@ -199,6 +222,17 @@
 		    _self.ctx.drawImage(_self.image,0,0);
 	    }
 
+	    // !!! Draw some test stuff !!!
+	    var d = _testArc;
+	    try {
+		// First draw helper	
+		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, !d.largeArcFlag, !d.sweepFlag, d.b.x, d.b.y, '#c8c8c8' );
+		// Then draw arc itself
+		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, d.largeArcFlag, d.sweepFlag, d.b.x, d.b.y, '#008888' );
+	    } catch( e ) {
+		console.error( e );
+	    }
+		
 	    // Draw a test circle
 	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
 	    _self.draw.circle( {x:0,y:0}, radius, '#000000' );
@@ -218,6 +252,10 @@
 			    this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, 'orange' );
 			    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
 			}
+			this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, '#008888' );
+			this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, '#008888' );
+			d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+			d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
 			this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
 			this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
 			
@@ -256,6 +294,8 @@
 		this.draw.polygon( this.selectPolygon, '#888888' );
 		this.draw.crosshair( this.selectPolygon.vertices[0], 3, '#008888' );
 	    }
+
+	    
 	}; // END redraw
 	
 	
@@ -322,7 +362,7 @@
 	// | Just a generic save-file dialog.
 	// +-------------------------------
 	var saveFile = function() {
-	    var svgCode = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.zoom } );
+	    var svgCode = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
 	    // See documentation for FileSaver.js for usage.
 	    //    https://github.com/eligrey/FileSaver.js
 	    var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
@@ -416,15 +456,19 @@
 	// | @param x:Number The tap X position on the canvas.
 	// | @param y:Number The tap Y position on the canvas.
 	// +-------------------------------
-	function handleTap(x,y) { // console.log( keyHandler.isDown('ctrl') );
+	function handleTap(x,y) {
 	    var p = locatePointNear( _self.transformMousePosition(x, y) );
 	    if( p ) { 
 		if( keyHandler.isDown('shift') ) {
 		    if( p.type == 'bpath' ) {
 			let vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
-			vert.attr.isSelected = !vert.attr.isSelected;
-		    } else if( p.type == 'vertex' )
-			_self.vertices[p.vindex].attr.isSelected = !_self.vertices[p.vindex].attr.isSelected;
+			if( vert.attr.selectable )
+			    vert.attr.isSelected = !vert.attr.isSelected;
+		    } else if( p.type == 'vertex' ) {
+			let vert = _self.vertices[p.vindex];
+			if( vert.attr.selectable )
+			    vert.attr.isSelected = !vert.attr.isSelected;
+		    }
 		    _self.redraw();
 		} else if( keyHandler.isDown('y') /* && p.type=='bpath' && (p.pid==BezierPath.START_POINT || p.pid==BezierPath.END_POINT) */ ) {
 		    _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
@@ -459,14 +503,12 @@
 		if( e.which != 1 )
 		    return; // Only react on left mouse
 		var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y) );
-		console.log( p );
 		if( !p ) return;
 		// Drag all selected elements?
 		if( p.type == 'vertex' && _self.vertices[p.vindex].attr.isSelected ) {
 		    // Multi drag
 		    for( var i in _self.vertices ) {
 			if( _self.vertices[i].attr.isSelected ) {
-			    // console.log( 'vertex is about to be dragged', _self.vertices[i] );
 			    _self.draggedElements.push( new Draggable( _self.vertices[i], Draggable.VERTEX ).setVIndex(i) );
 			    _self.vertices[i].listeners.fireDragStartEvent( e );
 			}
@@ -489,7 +531,7 @@
 	// | hold down.
 	// +-------------------------------
 	var mouseDragHandler = function(e) {  
-	    if( keyHandler.isDown('ctrl') ) {
+	    if( keyHandler.isDown('alt') ) {
 		_self.draw.offset.add( e.params.dragAmount );
 		_self.fill.offset.set( _self.draw.offset );
 		_self.redraw();
@@ -568,6 +610,10 @@
 	    .down('enter',function() { console.log('ENTER was hit.'); } )
 	    .press('enter',function() { console.log('ENTER was pressed.'); } )
 	    .up('enter',function() { console.log('ENTER was released.'); } )
+
+	    .down('alt',function() { console.log('alt was hit.'); } )
+	    .press('alt',function() { console.log('alt was pressed.'); } )
+	    .up('alt',function() { console.log('alt was released.'); } )
 
 	    .down('escape',function() {
 		console.log('ESCAPE was hit.');

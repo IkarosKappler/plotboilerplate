@@ -26,27 +26,37 @@ See main-dist.html
 ## Usage
  * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment
- * [CTRL] + [Mousedown] + [Drag] : Pan the area
+ * [ALT] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
  * [Mousewheel-down] : Zoom out
 
 
 ### Todos
+* Make strokes configurable (color, width, style).
 * Add pad/phone support.
 * Implement optional canvas zoom.
 * Implement optional canvas rotation.
-* SVG export.
 * Make Bézier Curves dividable.
 * Implement snap-to-grid.
-* Add toSVGString to VEllipse class.
-* Add toSVGString to Polygon class.
-* Add a Line class.
 * Add logarithmic reduction of the grid (too many grid points when zoom gets too small, too few when zoom gets too high).
 * Make ellipses rotatable.
 * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
+* Add arcs?
 
 
 ### Changelog
+* 2018-12-09
+  * Added Grid.utils.baseLog(Nnumber,Number) and Grid.utils.mapRasterScale(Number,Number).
+  * Bézier control points are not selectable any more.
+  * Basic SVG export works now.
+  * Added toSVGString to VEllipse class.
+  * Added to SVGString to Polygon class.
+  * Added a Line class.
+  * Changed Bézier control points rendering.
+* 2018-12-06
+  * Changed the CTRL key to the ALT key (for panning).
+  * Fixed a translate an scale issue in the SVG builder.
+  * The constructor's config-param is in use now.
 * 2018-12-05
   * Added the Vertex.sub(x,y) function.
   * Added the Line class.
@@ -105,3 +115,5 @@ See main-dist.html
 * dat.gui
 * Color.js
 * FileSaver.js
+* SGV-arcto to Canvas-arc transform from https://github.com/canvg/canvg by Gabe Lerner
+   

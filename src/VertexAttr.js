@@ -37,7 +37,7 @@
     // +----------------------------
     VertexAttr.model = {
 	draggable : true,
-	isSelected : false,
+	isSelected : false
     };
 
     // Export constructor to context.

@@ -18,8 +18,16 @@
     
     window.addEventListener(
 	'load',
-	function() {	    
-	    var bp = new PlotBoilerplate();
+	function() {
+	    // All config params are optional.
+	    var bp = new PlotBoilerplate( {
+		fullSize              : true,
+		fitToParent           : true,
+		scaleX                : 1.0,
+		scaleY                : 1.0,
+		rasterGrid            : true,
+		backgroundColor       : '#ffffff'
+	    } );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Merge GET params into config.
@@ -62,8 +70,8 @@
 		    var relPos = bp.transformMousePosition( e.params.pos.x, e.params.pos.y );
 		    var cx = document.getElementById('cx');
 		    var cy = document.getElementById('cy');
-		    if( cx ) cx.innerHTML = relPos.x;
-		    if( cy ) cy.innerHTML = relPos.y;
+		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
+		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 		} );
 
 
@@ -73,26 +81,33 @@
 	    var diameter = Math.min(bp.canvasSize.width,bp.canvasSize.height)/3;
 	    var radius   = diameter*0.5;
 	    var hypo     = Math.sqrt( radius*radius*2 );
-	    
-	    // Add some Lines
-	    bp.add( new Line( new Vertex(-diameter,-diameter), new Vertex(-hypo*1.0,-hypo*1.0) ) );
-	    bp.add( new Line( new Vertex(-diameter,diameter), new Vertex(-hypo*1.0,hypo*1.0) ) );
-	    bp.add( new Line( new Vertex(diameter,-diameter), new Vertex(hypo*1.0,-hypo*1.0) ) );
-	    bp.add( new Line( new Vertex(diameter,diameter), new Vertex(hypo*1.0,hypo*1.0) ) );
 
-	    // Add square
+	    // +---------------------------------------------------------------------------------
+	    // | Add some Lines.
+	    // +-------------------------------
+	    bp.add( new Line( new Vertex(-diameter,-diameter), new Vertex(-hypo,-hypo) ) );
+	    bp.add( new Line( new Vertex(-diameter,diameter), new Vertex(-hypo,hypo) ) );
+	    bp.add( new Line( new Vertex(diameter,-diameter), new Vertex(hypo,-hypo) ) );
+	    bp.add( new Line( new Vertex(diameter,diameter), new Vertex(hypo,hypo) ) );
+
+	    // +---------------------------------------------------------------------------------
+	    // | Add square.
+	    // +-------------------------------
 	    var squareSize = 32;
 	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
 	    var square = new Polygon( squareVerts );
 	    bp.add( square );
 
-	    // Add a circle
+	    // +---------------------------------------------------------------------------------
+	    // | Add a circle.
+	    // +-------------------------------
 	    var circle = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
 	    bp.add( circle );
 
-	    // Add a bezier path
+	    // +---------------------------------------------------------------------------------
+	    // | Add a circular connected bezier path
+	    // +-------------------------------
 	    var fract = 0.5;
-	    // Make a circular connected path
 	    var bpath = [];
 	    bpath[0] = [ new Vertex( 0, -diameter ),
 			 new Vertex( diameter, 0 ),
