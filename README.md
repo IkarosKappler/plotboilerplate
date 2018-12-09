@@ -33,13 +33,13 @@ For details see main-dist.html:
 ## Initialize the canvas
 ~~~~javascript
  var bp = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
-					    fullSize              : true,
-					    fitToParent           : true,
-					    scaleX                : 1.0,
-					    scaleY                : 1.0,
-					    rasterGrid            : true,
-					    backgroundColor       : '#ffffff'
-					  } );
+			       	 fullSize              : true,
+				 fitToParent           : true,
+				 scaleX                : 1.0,
+				 scaleY                : 1.0,
+				 rasterGrid            : true,
+				 backgroundColor       : '#ffffff'
+				} );
 ~~~~					  
 
 

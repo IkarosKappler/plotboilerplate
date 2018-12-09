@@ -6,7 +6,7 @@
  * @modified 2018-11-19 Added multi-select and multi-drag.
  * modified  2018-12-04 Added basic SVG export.
  * @modified 2018-12-09 Extended the constructor (canvas).
- * @version  1.1.0
+ * @version  1.0.3
  **/
 
 
