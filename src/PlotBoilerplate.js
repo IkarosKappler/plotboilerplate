@@ -589,8 +589,8 @@
 		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX*zoomStep;
 		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY*zoomStep;
 	    } else if( e.deltaY > 0 ) {
-		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX/zoomStep;
-		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY/zoomStep;
+		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = Math.max(_self.config.scaleX/zoomStep,0.01);
+		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = Math.max(_self.config.scaleY/zoomStep,0.01);
 	    }
 	    _self.redraw();
 	};

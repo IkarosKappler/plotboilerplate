@@ -46,6 +46,7 @@ See main-dist.html
 
 ### Changelog
 * 2018-12-09
+  * Minimal zoom is now 0.01.
   * Added Grid.utils.baseLog(Nnumber,Number) and Grid.utils.mapRasterScale(Number,Number).
   * Bézier control points are not selectable any more.
   * Basic SVG export works now.

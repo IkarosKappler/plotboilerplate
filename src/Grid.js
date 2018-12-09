@@ -56,8 +56,8 @@
 		gf = Math.abs( Math.floor( 1/Grid.utils.baseLog(adjustFactor,scale) ) );
 		gf = 1 / Math.pow( adjustFactor, gf );
 	    } else {
-		gf = Math.abs( Math.floor( Grid.utils.baseLog(1/adjustFactor,scale+1) ) );
-		gf = Math.pow( adjustFactor, gf );
+		gf = Math.abs( Math.floor( Grid.utils.baseLog(1/adjustFactor,1/(scale+1)) ) );
+		//gf = Math.pow( adjustFactor, gf );
 	    }
 	    return gf;
 	}
