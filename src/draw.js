@@ -11,7 +11,8 @@
  * @modified 2018-11-28 Added the grid() function and the ellipse() function.
  * @modified 2018-11-30 Renamed the text() function to label() as it is not scaling.
  * @modified 2018-12-06 Added a test function for drawing arc in SVG style.
- * @version  1.0.6
+ * @modified 2018-12-09 Added the dot(Vertex,color) function (copied from Feigenbaum-plot-script).
+ * @version  1.0.7
  **/
 
 (function(_context) {
@@ -116,6 +117,22 @@
 	this.line( startPoint, endPoint, 'rgb(192,192,192)' );	
     };
 
+
+    
+    // +---------------------------------------------------------------------------------
+    // | Draw a 1x1 dot with the specified (CSS-) color.
+    // +-------------------------------
+    _context.drawutils.prototype.dot = function( p, color ) {
+	this.ctx.save();
+	this.ctx.beginPath();
+	this.ctx.moveTo( this.offset.x + this.scale.x*p.x, this.offset.y + this.scale.y*p.y );
+	this.ctx.lineTo( this.offset.x + this.scale.x*p.x+1, this.offset.y + this.scale.y*p.y+1 );
+	this.ctx.closePath();
+	this._fillOrDraw( color );
+	this.ctx.restore();
+    };
+
+    
     
     // +---------------------------------------------------------------------------------
     // | Fill the given point with the specified (CSS-) color.

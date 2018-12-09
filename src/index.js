@@ -47,7 +47,6 @@
 	    // +-------------------------------
 	    var gui = new dat.gui.GUI();
 	    gui.remember(bp.config);
-	    gui.add(bp.config, 'rebuild').name('Rebuild all').title('Rebuild all.');
 	    var fold0 = gui.addFolder('Editor settings');
 	    fold0.add(bp.config, 'fullSize').onChange( function() { bp.resizeCanvas(); } ).title("Toggles the fullpage mode.");
 	    fold0.add(bp.config, 'fitToParent').onChange( function() { bp.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).");
@@ -99,10 +98,12 @@
 	    bp.add( square );
 
 	    // +---------------------------------------------------------------------------------
-	    // | Add a circle.
+	    // | Add two circles.
 	    // +-------------------------------
-	    var circle = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
-	    bp.add( circle );
+	    var circle1 = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
+	    bp.add( circle1 );
+	    var circle2 = new VEllipse( new Vertex(0,0), new Vertex(diameter,diameter) );
+	    bp.add( circle2 );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add a circular connected bezier path

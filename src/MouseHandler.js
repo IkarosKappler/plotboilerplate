@@ -34,7 +34,8 @@
  * @modified 2018-11-11 Changed the scope from a simple global var to a member of window/_context.
  * @modified 2018-11-19 Renamed the 'mousedown' function to 'down' and the 'mouseup' function to 'up'.
  * @modified 2018-11-28 Added the 'wheel' listener.
- * @version  1.0.6
+ * @modified 2018-12-09 Cleaned up some code.
+ * @version  1.0.7
  **/
 
 (function(_context) {
@@ -72,7 +73,7 @@
 	    return e;
 	}
 
-	function listenFor( eventName ) { console.log(eventName);
+	function listenFor( eventName ) {
 	    if( installed[eventName] ) return;
 	    element.addEventListener(eventName,handlers[eventName]);
 	    installed[eventName] = true;
@@ -132,25 +133,25 @@
 	    return this;
 	};
 	this.move = function( callback ) {
-	    if( listeners.mousemove )  throwAlreadyInstalled('mousemove'); // throw "This MouseHandler already has a 'mousemove' callback. To keep the code simple there is only room for one.";
+	    if( listeners.mousemove )  throwAlreadyInstalled('mousemove');
 	    listenFor('mousemove');
 	    listeners.mousemove = callback;
 	    return this;
 	};
 	this.up = function( callback ) {
-	    if( listeners.mouseup )  throwAlreadyInstalled('mouseup'); // throw "This MouseHandler already has a 'mouseup' callback. To keep the code simple there is only room for one.";
+	    if( listeners.mouseup )  throwAlreadyInstalled('mouseup'); 
 	    listenFor('mouseup');
 	    listeners.mouseup = callback;
 	    return this;
 	};
 	this.down = function( callback ) {
-	    if( listeners.mousedown )  throwAlreadyInstalled('mousedown'); // throw "This MouseHandler already has a 'mousedown' callback. To keep the code simple there is only room for one.";
+	    if( listeners.mousedown )  throwAlreadyInstalled('mousedown'); 
 	    listenFor('mousedown');
 	    listeners.mousedown = callback;
 	    return this;
 	};
 	this.click = function( callback ) {
-	    if( listeners.click )  throwAlreadyInstalled('click'); // throw "This MouseHandler already has a 'click' callback. To keep the code simple there is only room for one.";
+	    if( listeners.click )  throwAlreadyInstalled('click'); 
 	    listenFor('click');
 	    listeners.click = callback;
 	    return this;

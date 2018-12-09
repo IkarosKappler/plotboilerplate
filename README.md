@@ -3,6 +3,9 @@ For Javascript and canvas with 2d-context.
 
 ![Current demo](screenshot-20181209_0.png "Current demo")
 
+![Plotting the Feigenbaum bifurcation](screenshot-20181209_3_feigenbaum.png "Plotting the Feigenbaum bifurcation")
+
+
 [Live Demo](https://www.int2byte.de/public/plot-boilerplate/main-dist.html "Live Demo")
 
 ## Install webpack
@@ -38,7 +41,9 @@ For details see main-dist.html:
 				 scaleX                : 1.0,
 				 scaleY                : 1.0,
 				 rasterGrid            : true,
-				 backgroundColor       : '#ffffff'
+				 backgroundColor       : '#ffffff',
+				 preDraw               : function() { console.log('before drawing.'); },
+				 postDraw              : function() { console.log('after drawing.'); }
 				} );
 ~~~~					  
 
@@ -62,6 +67,7 @@ For details see main-dist.html:
 * Make ellipses rotatable.
 * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
 * Add arcs?
+* Add a flag indicating if the resize handler should really always re-center the draw offset.
 
 
 ### Changelog
@@ -74,6 +80,7 @@ For details see main-dist.html:
   * Added to SVGString to Polygon class.
   * Added a Line class.
   * Changed Bézier control points rendering.
+  * Added a demo plot: main-feigenbaum.html.
 * 2018-12-06
   * Changed the CTRL key to the ALT key (for panning).
   * Fixed a translate an scale issue in the SVG builder.

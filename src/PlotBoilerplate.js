@@ -74,13 +74,18 @@
 	    scaleY                : config.scaleY || 1.0,
 	    rasterGrid            : config.rasterGrid || true,
 	    rasterAdjustFactor    : config.rasterAdjustFactor || 2.0,
+	    autoCenterOffset      : config.autoCenterOffset || true,
 	    backgroundColor       : config.backgroundColor || '#ffffff',
 	    rebuild               : function() { rebuild(); },
 	    loadImage             : function() { var elem = document.getElementById('file');
 						 elem.setAttribute('data-type','image-upload');
 						 triggerClickEvent(elem);
 					       },
-	    saveFile              : function() { saveFile(); }
+	    saveFile              : function() { saveFile(); },
+
+	    // Listeners/observers
+	    preDraw               : (typeof config.preDraw == 'function' ? config.preDraw : null),
+	    postDraw              : (typeof config.postDraw == 'function' ? config.postDraw : null)
 	};
 
 
@@ -104,10 +109,12 @@
 	var _self = this;
 
 	// !!! PRE ALPHA TEST !!!
+	/*
 	var _testArc = { a : new Vertex(-200,0), b : new Vertex(200,0), radius : new Vertex(100,100), rotation : 0.0, largeArcFlag : false, sweepFlag : false };
 	this.vertices.push( _testArc.a );
 	this.vertices.push( _testArc.b );
 	this.vertices.push( _testArc.radius );
+	*/
 
 	// +---------------------------------------------------------------------------------
 	// | Add a drawable object.
@@ -191,34 +198,21 @@
 	PlotBoilerplate.prototype.redraw = function() {
 	    var renderTime = new Date().getTime();
 	    
-	    // Note that the image might have an alpha channel. Clear the scene first.
-	    this.ctx.fillStyle = this.config.backgroundColor; 
-	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
+	    this.clear();
 
+	    if( this.config.preDraw )
+		this.config.preDraw();
+	    
 	    // Draw grid
-	    /* function baseLog(base,num) { return Math.log(base) / Math.log(num); };
-	    function mapRasterScale( adjustFactor, scale ) {
-		var gf = 1.0;
-		if( scale >= 1 ) {
-		    gf = Math.abs( Math.floor( 1/baseLog(adjustFactor,scale) ) );
-		    gf = 1 / Math.pow( adjustFactor, gf );
-		} else {
-		    gf = Math.abs( Math.floor( baseLog(1/adjustFactor,scale+1) ) );
-		    gf = Math.pow( adjustFactor, gf );
-		}
-		return gf;
-	    }
-	    var gf = { x : mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
-		       y : mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
-	    */
 	    var gf = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
 		       y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
-	    console.log( this.config.rasterAdjustFactor, this.draw.scale.x, gf.x, gf.y );
+	    // console.log( this.config.rasterAdjustFactor, this.draw.scale.x, gf.x, gf.y );
 	    if( this.config.rasterGrid )
 		this.draw.raster( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x*gf.x, this.grid.size.y*gf.y, 'rgba(0,128,255,0.125)' );
 	    else
 		this.draw.grid( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x*gf.x, this.grid.size.y*gf.y, 'rgba(0,128,255,0.095)' )
 
+	    
 	    // Draw the background image?
 	    if( _self.image ) {
 		if( _self.config.fitImage ) 
@@ -227,7 +221,9 @@
 		    _self.ctx.drawImage(_self.image,0,0);
 	    }
 
+	    
 	    // !!! Draw some test stuff !!!
+	    /*
 	    var d = _testArc;
 	    try {
 		// First draw helper	
@@ -237,10 +233,9 @@
 	    } catch( e ) {
 		console.error( e );
 	    }
-		
-	    // Draw a test circle
-	    var radius = Math.min(_self.canvasSize.width,_self.canvasSize.height)/3;
-	    _self.draw.circle( {x:0,y:0}, radius, '#000000' );
+	    */
+
+	    
 
 	    // Draw drawables
 	    for( var i in this.drawables ) {
@@ -301,7 +296,21 @@
 	    }
 
 	    
+	    if( this.config.postDraw )
+		this.config.postDraw();
+	    
 	}; // END redraw
+
+
+
+	// +---------------------------------------------------------------------------------
+	// | This function clears the canvas with the configured background color.
+	// +-------------------------------
+	PlotBoilerplate.prototype.clear = function() {
+	    // Note that the image might have an alpha channel. Clear the scene first.
+	    this.ctx.fillStyle = this.config.backgroundColor; 
+	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
+	};
 	
 	
 	// +---------------------------------------------------------------------------------
@@ -397,8 +406,10 @@
 		_self.canvasSize.width  = w;
 		_self.canvasSize.height = h;
 
-		_self.draw.offset.x = _self.fill.offset.x = w/2;
-		_self.draw.offset.y = _self.fill.offset.y = h/2;
+		if( _self.config.autoCenterOffset ) {
+		    _self.draw.offset.x = _self.fill.offset.x = w/2;
+		    _self.draw.offset.y = _self.fill.offset.y = h/2;
+		}
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {
 		// Set editor size
