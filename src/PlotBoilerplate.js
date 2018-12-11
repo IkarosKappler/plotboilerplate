@@ -399,13 +399,14 @@
 	// +-------------------------------
 	PlotBoilerplate.prototype.resizeCanvas = function() {
 	    var _setSize = function(w,h) {
+		var wdpr = w * config.pixelRatio;
+		var hdpr = h * config.pixelRatio;
 		_self.ctx.canvas.width  = w;
-		_self.ctx.canvas.height = h;		
-		_self.canvas.width      = w;
-		_self.canvas.height     = h;		
+		_self.ctx.canvas.height = h; 
+		_self.canvas.width      = w; 
+		_self.canvas.height     = h; 
 		_self.canvasSize.width  = w;
 		_self.canvasSize.height = h;
-
 		if( _self.config.autoCenterOffset ) {
 		    _self.draw.offset.x = _self.fill.offset.x = w/2;
 		    _self.draw.offset.y = _self.fill.offset.y = h/2;

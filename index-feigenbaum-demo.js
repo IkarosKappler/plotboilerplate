@@ -29,12 +29,12 @@
 					  } );
 	    bp.config.autoCenterOffset = false; // Only once at initialization
 	    bp.config.preDraw = function() {
-		console.log('pre draw');
+		// pre draw
 		bp.draw.offset.x = bp.fill.offset.x = 0;
 		bp.draw.offset.y = bp.fill.offset.y = bp.canvasSize.height-1;
 	    };
 	    bp.config.postDraw = function() {
-		console.log('post draw');
+		// post draw
 		drawBufferedFeigenbaum();
 	    };
 
@@ -70,25 +70,27 @@
 
 	    var config = {
 		plotX0                : 0.2,
-		plotIterations        : 1000,
+		plotIterations        : 500,
 		plotStart             : 3.2,
 		plotEnd               : 3.83,
 		plotStep              : 0.1,
 		plotChunkSize         : 1.0,
 		plotScale             : 1.0,
 		normalizePlot         : true,
+		alphaThreshold        : 0.05,		
 
 		rebuild               : function() { console.log('Rebuilding ... '); rebuild(); }
 	    }
 	    var fold2 = gui.addFolder('Plot settings');
 	    fold2.add(config, 'plotX0').title('Set the x0 value to start the logistic function at.').min(0.01).max(2.0).step(0.01);
 	    fold2.add(config, 'plotIterations').title('Set the number of max iterations for the logistic function.').min(1).max(10000).step(1);
-	    fold2.add(config, 'plotStart').title('Set the lambda value to start at.').min(3.2).max(10.0).step(0.01);
+	    fold2.add(config, 'plotStart').title('Set the lambda value to start at.').min(3.0).max(4.2).step(0.01);
 	    fold2.add(config, 'plotEnd').title('Set to lambda value to stop at.').min(3.2).max(20.0).step(0.01);
 	    fold2.add(config, 'plotStep').title('Set the plot step. 1 means one lambda step per pixel.').min(0.0001).max(1.0).step(0.0001);
 	    fold2.add(config, 'plotChunkSize').title('What chunk size should be used for updating. 1 means each pixel.').min(0.001).max(1.0).step(0.0001);
 	    fold2.add(config, 'plotScale').title('Scale the calculated values by this factor.').min(0.01).max(1000.0).step(0.01);
 	    fold2.add(config, 'normalizePlot').title('Scale the range 0..1 to the full viewport height.');
+	    fold2.add(config, 'alphaThreshold').title('Specify the alhpa minimum to plot weighted samples (0: full transparency allowed, 1: no transparency at all).').min(0.0).max(1.0).step(0.05);
 	    fold2.add(config, 'rebuild').name('Rebuild all').title('Rebuild all.');
 	    // END init dat.gui
 	    
@@ -118,7 +120,6 @@
 	    var bufferedFeigenbaum = [];
 	    var plotFeigenbaum = function() {
 		dialog.show( 'Starting ...', 'Calculating', [ { label : 'Cancel', action : function() { console.log('cancel'); timeoutKey = null; dialog.hide(); } }], {} );
-		//iterativeFeigenbaum( [4.1, 6.0], 0, 0, canvasSize.width, 0.01, 1.0, 1000, 0.2, 1.0 );
 		iterativeFeigenbaum( [ Math.min(config.plotStart,config.plotEnd), Math.max(config.plotStart,config.plotEnd) ],
 				     0, // currentX
 				     0, // Start at left canvas border
@@ -128,9 +129,9 @@
 				     config.plotIterations,
 				     config.plotX0,
 				     config.plotScale,
-				     function() {
+				     function() {	
 					 bp.fill.ctx.font = '8pt Monospace';
-					 bp.fill.label('range=['+Math.min(config.plotStart,config.plotEnd)+','+Math.max(config.plotStart,config.plotEnd)+'], xStep='+config.plotStep+', iterations='+config.plotIterations+', x0='+config.plotX0+', scale='+config.plotScale,5,10);  
+					 bp.fill.label('range=['+Math.min(config.plotStart,config.plotEnd)+','+Math.max(config.plotStart,config.plotEnd)+'], xStep='+config.plotStep+', iterations='+config.plotIterations+', x0='+config.plotX0+', scale='+config.plotScale+',normalize='+config.normalizePlot+',threshold='+config.alphaThreshold,5,10);  
 				     }
 				   );	    
 	    }
@@ -150,10 +151,6 @@
 		    lambda = range[0] + (range[1] - range[0])*(x/(maxX-minX));
 		    var result = logisticMap( x0, lambda, plotIterations, new WeightedCollection(), 0 );
 		    bufferedFeigenbaum.push( { x : x, lambda : lambda, data : result } );
-		    //for( var i in result.elements ) {
-		//	var alpha = result.elements[i].w/result.elements.length;
-		//	draw.dot( { x : x, y : result.elements[i].v * scaleFactor * (config.normalizePlot?canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')', 1 );
-		    //  }
 		    plotCollection( x, lambda, result );
 		}
 		if( curX+xChunkSize < maxX ) {
@@ -233,6 +230,35 @@
 	    })(window);
 
 	    // +---------------------------------------------------------------------------------
+	    // | A weighted & balanced numeric collection implementation working with epsilon.
+	    // +-------------------------------
+	    (function(_context) {
+		_context.WeightedBalancedCollection = (function() {
+		    var WeightedBalancedCollection = function() {
+			// this.elements = [];
+			this.tree = new BBTree();
+			this.maxWeight = 0;
+			this.size = 0;
+			// this.tolerance = tolerance | Collection.EPS;
+		    };
+		    // WeightedBalancedCollection.EPS = 0.0000000001;
+		    WeightedBalancedCollection.prototype.add = function( num ) {
+			var record = this.tree.find(num);
+			if( !record ) {
+			    this.tree.insert( num, { v : num, w : 1 } );
+			    this.maxWeight = Math.max(this.maxWeight,1);
+			} else {
+			    record.w++;
+			    this.maxWeight = Math.max(this.maxWeight,record.w);
+			}
+			this.size++;
+			return true;
+		    };
+		    return WeightedBalancedCollection;
+		})();
+	    })(window);
+
+	    // +---------------------------------------------------------------------------------
 	    // | The actual logistic function (recursive implementation).
 	    // +-------------------------------
 	    var logisticMap = function( value, lambda, iterations, collection ) {
@@ -252,6 +278,8 @@
 	    function drawBufferedFeigenbaum() {
 		console.log( 'Rendering buffered plot ...' );
 		var record = null;
+		// Note: this for loop times out on really large sample sets!
+		//   --> implement async drawing!
 		for( var k in bufferedFeigenbaum ) {
 		    record = bufferedFeigenbaum[k];
 		    plotCollection( record.x, record.lambda, record.data );
@@ -261,12 +289,34 @@
 
 	    function plotCollection( x, lambda, data ) {
 		bp.draw.offset.x = bp.fill.offset.x = 0;
-		bp.draw.offset.y = bp.fill.offset.y = 0; // bp.canvasSize.height/2;
-		//console.log( x, bp.draw.offset.x, bp.config.autoCenterOffset );
-		for( var i in data.elements ) {
-		    var alpha = data.elements[i].w/data.elements.length;
-		    bp.draw.dot( { x : x, y : data.elements[i].v * config.plotScale * (config.normalizePlot?bp.canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')' );
+		bp.draw.offset.y = bp.fill.offset.y = 0;
+		if( data instanceof WeightedBalancedCollection ) {
+		    plotBalancedCollection( x, lambda, data, data.root );
+		} else {
+		    // Collection or WeightedCollection
+		    for( var i in data.elements ) {
+			//var alpha = config.useAlphaWeights ? data.elements[i].w/data.elements.length : 1.0;
+			var alpha = config.alphaThreshold + (data.elements[i].w/data.elements.length)*(1-config.alphaThreshold);
+			alpha = Math.max(0.0, Math.min(1.0, alpha));
+			//console.log(alpha);
+			bp.draw.dot( { x : x, y : data.elements[i].v * config.plotScale * (config.normalizePlot?bp.canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')' );
+		    }
 		}
+	    }
+
+	    function plotBalancedCollection( x, lambda, data, node ) {
+		bp.draw.offset.x = bp.fill.offset.x = 0;
+		bp.draw.offset.y = bp.fill.offset.y = 0;
+		if( !node )
+		    return;
+		
+		//var alpha = config.useAlphaWeights ? node.value.w/data.size : 1.0;
+		var alpha = (config.alphaThreshold)+(node.value.w/data.size)*(1-config.alphaThreshold);
+		alpha = Math.max(0.0, Math.min(1.0, alpha));
+		// console.log( node.value.v );
+		bp.draw.dot( { x : x, y : node.value.v * config.plotScale * (config.normalizePlot?bp.canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')' );
+		plotBalancedCollection( x, lambda, data, node.left );
+		plotBalancedCollection( x, lambda, data, node.right );
 	    }
 
 	    function rebuild() {

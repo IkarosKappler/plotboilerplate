@@ -3,7 +3,9 @@ For Javascript and canvas with 2d-context.
 
 ![Current demo](screenshot-20181209_0.png "Current demo")
 
-![Plotting the Feigenbaum bifurcation](screenshot-20181209_3_feigenbaum.png "Plotting the Feigenbaum bifurcation")
+![Plotting the Feigenbaum bifurcation](screenshot-20181212_3_feigenbaum "Plotting the Feigenbaum bifurcation")
+
+[For a detailed description of this plot see my Feigenbaum-plot mini-project](https://github.com/IkarosKappler/feigenbaum-plot "Feigenbaum bifurcation diagram")
 
 
 [Live Demo](https://www.int2byte.de/public/plot-boilerplate/main-dist.html "Live Demo")
@@ -68,6 +70,11 @@ For details see main-dist.html:
 * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
 * Add arcs?
 * Add a flag indicating if the resize handler should really always re-center the draw offset.
+* Allow other resolutions than 1:1. The canvas size and the draw buffer size are independent.
+
+
+### Known bugs
+* The raster is not completely drawn when the draw offset is not centered.
 
 
 ### Changelog
