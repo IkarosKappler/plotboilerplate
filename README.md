@@ -2,9 +2,12 @@
 For Javascript and canvas with 2d-context.
 
 ![Current demo](screenshot-20181209_0.png "Current demo")
+
 [Live Demo](https://www.int2byte.de/public/plot-boilerplate/main-dist.html "Live Demo")
 
+Feigenbaum bifurcation (logistic map)
 ![Plotting the Feigenbaum bifurcation](screenshot-20181212_3_feigenbaum.png "Plotting the Feigenbaum bifurcation")
+
 [For a detailed description of this plot see my Feigenbaum-plot mini-project](https://github.com/IkarosKappler/feigenbaum-plot "Feigenbaum bifurcation diagram")
 
 
