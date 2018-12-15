@@ -26,6 +26,8 @@
 					    scaleX                : 1.0,
 					    scaleY                : 1.0,
 					    rasterGrid            : true,
+					    rasterAdjustFactor    : 2.0,
+					    autoCenterOffset      : false,
 					    backgroundColor       : '#ffffff'
 					  } );
 

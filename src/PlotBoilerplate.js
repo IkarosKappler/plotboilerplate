@@ -399,8 +399,10 @@
 	// +-------------------------------
 	PlotBoilerplate.prototype.resizeCanvas = function() {
 	    var _setSize = function(w,h) {
-		var wdpr = w * config.pixelRatio;
-		var hdpr = h * config.pixelRatio;
+		//var wdpr = w * config.pixelRatio;
+		//var hdpr = h * config.pixelRatio;
+		//w = 28000; 
+		//h = 1800; 
 		_self.ctx.canvas.width  = w;
 		_self.ctx.canvas.height = h; 
 		_self.canvas.width      = w; 
