@@ -135,10 +135,10 @@
     // +-------------------------------
     function _addButton( dialog, buttonConfig ) {
 	if( typeof buttonConfig == 'string' && buttonConfig == 'close' ) {
-	    _addButton( dialog, { label : 'Close', onclick : function() { _hide(dialog); } } );
+	    _addButton( dialog, { label : 'Close', action : function() { _hide(dialog); } } );
 	} else if( typeof buttonConfig == 'string' && buttonConfig == 'ok' ) {
 	    console.log( 'add ok button' );
-	    _addButton( dialog, { label : 'OK', onclick : function() { _hide(dialog); } } );
+	    _addButton( dialog, { label : 'OK', action : function() { _hide(dialog); } } );
 	} else {
 	    // { label, onclick }
 	    // Add button(s)

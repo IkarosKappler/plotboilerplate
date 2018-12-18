@@ -19,19 +19,28 @@
 	'load',
 	function() {
 	    // All config params are optional.
-	    var bp = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
-					    fullSize              : true,
-					    fitToParent           : true,
-					    scaleX                : 1.0,
-					    scaleY                : 1.0,
-					    rasterGrid            : true,
-					    backgroundColor       : '#ffffff'
-					  } );
+	     var bp = new PlotBoilerplate(
+		PlotBoilerplate.utils.saveMergeByKeys(
+		    { canvas                : document.getElementById('my-canvas'),					    
+		      fullSize              : true,
+		      fitToParent           : true,
+		      scaleX                : 1.0,
+		      scaleY                : 1.0,
+		      rasterGrid            : true,
+		      rasterAdjustFactor    : 2.0,
+		      redrawOnResize        : true,
+		      defaultCanvasWidth    : 1024,
+		      defaultCanvasHeight   : 768,
+		      autoCenterOffset      : true,
+		      backgroundColor       : '#ffffff'
+		    }, GUP
+		)
+	    );
 	    bp.config.autoCenterOffset = false; // Only once at initialization
 	    bp.config.preDraw = function() {
 		// pre draw
-		bp.draw.offset.x = bp.fill.offset.x = grid.center.x = 0;
-		bp.draw.offset.y = bp.fill.offset.y = grid.center.y = bp.canvasSize.height-1;
+		bp.draw.offset.x = bp.fill.offset.x = bp.grid.center.x = 0;
+		bp.draw.offset.y = bp.fill.offset.y = bp.grid.center.y = bp.canvasSize.height-1;
 	    };
 	    bp.config.postDraw = function() {
 		// post draw
@@ -41,6 +50,7 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Merge GET params into config.
 	    // +-------------------------------
+	    /*
 	    for( var k in bp.config ) {
 		if( !GUP.hasOwnProperty(k) )
 		    continue;
@@ -50,23 +60,12 @@
 		else if( type == 'function' ) ;
 		else bp.config[k] = GUP[k];
 	    }
+	    */
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
-	    var gui = new dat.gui.GUI();
-	    gui.remember(bp.config);
-	    var fold0 = gui.addFolder('Editor settings');
-	    fold0.add(bp.config, 'fullSize').onChange( function() { bp.resizeCanvas(); } ).title("Toggles the fullpage mode.");
-	    fold0.add(bp.config, 'fitToParent').onChange( function() { bp.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).");
-	    fold0.add(bp.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { bp.draw.scale.x = bp.fill.scale.x = bp.config.scaleX; bp.redraw(); } ).listen();
-	    fold0.add(bp.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { bp.draw.scale.y = bp.fill.scale.y = bp.config.scaleY; bp.redraw(); } ).listen();
-	    fold0.add(bp.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { bp.redraw(); } ).listen();
-	    fold0.addColor(bp.config, 'backgroundColor').onChange( function() { bp.redraw(); } ).title("Choose a background color.");
-	    // fold0.add(bp.config, 'loadImage').name('Load Image').title("Load a background image.");
-	    
-	    var fold1 = gui.addFolder('Export');
-	    fold1.add(bp.config, 'saveFile').name('Save a file').title("Save as SVG.");
+	    var gui = bp.createGUI();
 
 	    var config = {
 		plotX0                : 0.2,
@@ -75,9 +74,12 @@
 		plotEnd               : 3.83,
 		plotStep              : 0.1,
 		plotChunkSize         : 1.0,
+		bufferData            : false,
 		plotScale             : 1.0,
 		normalizePlot         : true,
-		alphaThreshold        : 0.05,		
+		normalizeToMin        : 0.0,
+		normalizeToMax        : 1.0, 
+		alphaThreshold        : 0.05,	
 
 		rebuild               : function() { console.log('Rebuilding ... '); rebuild(); }
 	    }
@@ -88,8 +90,12 @@
 	    fold2.add(config, 'plotEnd').title('Set to lambda value to stop at.').min(3.2).max(20.0).step(0.01);
 	    fold2.add(config, 'plotStep').title('Set the plot step. 1 means one lambda step per pixel.').min(0.0001).max(1.0).step(0.0001);
 	    fold2.add(config, 'plotChunkSize').title('What chunk size should be used for updating. 1 means each pixel.').min(0.001).max(1.0).step(0.0001);
+	    fold2.add(config, 'bufferData').title('If data is buffered more space is needed, if no buffers are used no redraw is possible.');	    
+	    var fold22 = fold2.addFolder('Normalization');
 	    fold2.add(config, 'plotScale').title('Scale the calculated values by this factor.').min(0.01).max(1000.0).step(0.01);
-	    fold2.add(config, 'normalizePlot').title('Scale the range 0..1 to the full viewport height.');
+	    fold22.add(config, 'normalizePlot').title('Scale the range [min..max6 to the full viewport height.');
+	    fold22.add(config, 'normalizeToMin').title('The minimal value for the normalization (default is 0.0).').step(0.025);
+	    fold22.add(config, 'normalizeToMax').title('The maximal value for the normalization (default is 1.0).').step(0.025);
 	    fold2.add(config, 'alphaThreshold').title('Specify the alhpa minimum to plot weighted samples (0: full transparency allowed, 1: no transparency at all).').min(0.0).max(1.0).step(0.05);
 	    fold2.add(config, 'rebuild').name('Rebuild all').title('Rebuild all.');
 	    // END init dat.gui
@@ -120,6 +126,7 @@
 	    var bufferedFeigenbaum = [];
 	    var plotFeigenbaum = function() {
 		dialog.show( 'Starting ...', 'Calculating', [ { label : 'Cancel', action : function() { console.log('cancel'); timeoutKey = null; dialog.hide(); } }], {} );
+		bufferedFeigenbaum = [];
 		iterativeFeigenbaum( [ Math.min(config.plotStart,config.plotEnd), Math.max(config.plotStart,config.plotEnd) ],
 				     0, // currentX
 				     0, // Start at left canvas border
@@ -129,9 +136,10 @@
 				     config.plotIterations,
 				     config.plotX0,
 				     config.plotScale,
-				     function() {	
-					 bp.fill.ctx.font = '8pt Monospace';
-					 bp.fill.label('range=['+Math.min(config.plotStart,config.plotEnd)+','+Math.max(config.plotStart,config.plotEnd)+'], xStep='+config.plotStep+', iterations='+config.plotIterations+', x0='+config.plotX0+', scale='+config.plotScale+',normalize='+config.normalizePlot+',threshold='+config.alphaThreshold,5,10);  
+				     function() {
+					 // On really large canvases this failes! (NS_ERROR_FAILURE)
+					 //bp.fill.ctx.font = '8pt Monospace';
+					 //bp.fill.label('range=['+Math.min(config.plotStart,config.plotEnd)+','+Math.max(config.plotStart,config.plotEnd)+'], xStep='+config.plotStep+', iterations='+config.plotIterations+', x0='+config.plotX0+', scale='+config.plotScale+',normalize='+config.normalizePlot+',threshold='+config.alphaThreshold,5,10);  
 				     }
 				   );	    
 	    }
@@ -150,11 +158,11 @@
 		for( var x = curX; x < curX+xChunkSize; x += xStep ) {
 		    lambda = range[0] + (range[1] - range[0])*(x/(maxX-minX));
 		    var result = logisticMap( x0, lambda, plotIterations, new WeightedCollection(), 0 );
-		    bufferedFeigenbaum.push( { x : x, lambda : lambda, data : result } );
+		    if( config.bufferData )
+			bufferedFeigenbaum.push( { x : x, lambda : lambda, data : result } );
 		    plotCollection( x, lambda, result );
 		}
 		if( curX+xChunkSize < maxX ) {
-		    // console.log( "Starting next iteration." );
 		    timeoutKey = Math.random();
 		    window.setTimeout( function() {
 			if( timeoutKey == null )
@@ -295,12 +303,17 @@
 		    plotBalancedCollection( x, lambda, data, data.root );
 		} else {
 		    // Collection or WeightedCollection
+		    var value;
 		    for( var i in data.elements ) {
-			//var alpha = config.useAlphaWeights ? data.elements[i].w/data.elements.length : 1.0;
+			value = data.elements[i].v;
 			var alpha = config.alphaThreshold + (data.elements[i].w/data.elements.length)*(1-config.alphaThreshold);
 			alpha = Math.max(0.0, Math.min(1.0, alpha));
-			//console.log(alpha);
-			bp.draw.dot( { x : x, y : data.elements[i].v * config.plotScale * (config.normalizePlot?bp.canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')' );
+			value *= config.plotScale;
+			// console.log( config.normalizeToMin );
+			if( config.normalizePlot ) 
+			    value = ((value-config.normalizeToMin)/(config.normalizeToMax-config.normalizeToMin)) * (bp.canvasSize.height);
+			//bp.draw.dot( { x : x, y : data.elements[i].v * config.plotScale * (config.normalizePlot?bp.canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')' );
+			bp.draw.dot( { x : x, y : value }, 'rgba(0,127,255,'+alpha+')' );
 		    }
 		}
 	    }
@@ -310,12 +323,15 @@
 		bp.draw.offset.y = bp.fill.offset.y = bp.grid.center.y = 0;
 		if( !node )
 		    return;
-		
-		//var alpha = config.useAlphaWeights ? node.value.w/data.size : 1.0;
+
+		value = node.value.v;
 		var alpha = (config.alphaThreshold)+(node.value.w/data.size)*(1-config.alphaThreshold);
 		alpha = Math.max(0.0, Math.min(1.0, alpha));
-		// console.log( node.value.v );
-		bp.draw.dot( { x : x, y : node.value.v * config.plotScale * (config.normalizePlot?bp.canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')' );
+		
+		if( config.normalizePlot )
+		    value = ((value-config.normalizeToMin)/(config.normalizeToMax-config.normalizeToMin)) * (bp.canvasSize.height);
+		// bp.draw.dot( { x : x, y : node.value.v * config.plotScale * (config.normalizePlot?bp.canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')' );
+		bp.draw.dot( { x : x, y : value }, 'rgba(0,127,255,'+alpha+')' );
 		plotBalancedCollection( x, lambda, data, node.left );
 		plotBalancedCollection( x, lambda, data, node.right );
 	    }
@@ -331,8 +347,7 @@
 	    window.dialog = new overlayDialog('dialog-wrapper');
 	    // window.dialog.show( 'Inhalt', 'Test' );
 
-	    // Init	
-	    // redraw();
+	    // Init
 	    dialog.show( 'Click <button id="_btn_rebuild">Rebuild</button> to plot the curves.', 'Hint', null, {} );
 	    document.getElementById('_btn_rebuild').addEventListener('click', rebuild);
 	    

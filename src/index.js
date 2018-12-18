@@ -6,7 +6,8 @@
  * @author   Ikaros Kappler
  * @date     2018-10-23
  * @modified 2018-11-09 Refactored the old code.
- * @version  1.0.1
+ * @modified 2018-12-17 Added the config.redrawOnResize param.
+ * @version  1.0.2
  **/
 
 
@@ -20,20 +21,28 @@
 	'load',
 	function() {
 	    // All config params are optional.
-	    var bp = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
-					    fullSize              : true,
-					    fitToParent           : true,
-					    scaleX                : 1.0,
-					    scaleY                : 1.0,
-					    rasterGrid            : true,
-					    rasterAdjustFactor    : 2.0,
-					    autoCenterOffset      : false,
-					    backgroundColor       : '#ffffff'
-					  } );
+	    var bp = new PlotBoilerplate(
+		PlotBoilerplate.utils.saveMergeByKeys(
+		    { canvas                : document.getElementById('my-canvas'),					    
+		      fullSize              : true,
+		      fitToParent           : true,
+		      scaleX                : 1.0,
+		      scaleY                : 1.0,
+		      rasterGrid            : true,
+		      rasterAdjustFactor    : 2.0,
+		      redrawOnResize        : true,
+		      defaultCanvasWidth    : 1024,
+		      defaultCanvasHeight   : 768,
+		      autoCenterOffset      : true,
+		      backgroundColor       : '#ffffff'
+		    }, GUP
+		)
+	    );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Merge GET params into config.
 	    // +-------------------------------
+	    /*
 	    for( var k in bp.config ) {
 		if( !GUP.hasOwnProperty(k) )
 		    continue;
@@ -42,24 +51,12 @@
 		else if( type == 'number' ) bp.config[k] = JSON.parse(GUP[k])*1;
 		else if( type == 'function' ) ;
 		else bp.config[k] = GUP[k];
-	    }
+	    }*/
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
-	    var gui = new dat.gui.GUI();
-	    gui.remember(bp.config);
-	    var fold0 = gui.addFolder('Editor settings');
-	    fold0.add(bp.config, 'fullSize').onChange( function() { bp.resizeCanvas(); } ).title("Toggles the fullpage mode.");
-	    fold0.add(bp.config, 'fitToParent').onChange( function() { bp.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).");
-	    fold0.add(bp.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { bp.draw.scale.x = bp.fill.scale.x = bp.config.scaleX; bp.redraw(); } ).listen();
-	    fold0.add(bp.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { bp.draw.scale.y = bp.fill.scale.y = bp.config.scaleY; bp.redraw(); } ).listen();
-	    fold0.add(bp.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { bp.redraw(); } ).listen();
-	    fold0.addColor(bp.config, 'backgroundColor').onChange( function() { bp.redraw(); } ).title("Choose a background color.");
-	    // fold0.add(bp.config, 'loadImage').name('Load Image').title("Load a background image.");
-	    
-	    var fold1 = gui.addFolder('Export');
-	    fold1.add(bp.config, 'saveFile').name('Save a file').title("Save as SVG.");	 
+	    bp.createGUI(); 
 	    // END init dat.gui
 	    
 

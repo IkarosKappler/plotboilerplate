@@ -4,9 +4,11 @@
  * @author   Ikaros Kappler
  * @date     2018-10-23
  * @modified 2018-11-19 Added multi-select and multi-drag.
- * modified  2018-12-04 Added basic SVG export.
+ * @modified 2018-12-04 Added basic SVG export.
  * @modified 2018-12-09 Extended the constructor (canvas).
- * @version  1.0.3
+ * @modified 2018-12-18 Added the config.redrawOnResize param.
+ * @modified 2018-12-18 Added the config.defaultCanvas{Width,Height} params.
+ * @version  1.0.5
  **/
 
 
@@ -68,14 +70,18 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	this.config = {
-	    fullSize              : config.fullSize || true,
-	    fitToParent           : config.fitToParent || true,
+	    fullSize              : typeof config.fullSize != 'undefined' ? config.fullSize : true,
+	    fitToParent           : typeof config.fitToParent != 'undefined' ? config.fitToParent : true,
 	    scaleX                : config.scaleX || 1.0,
 	    scaleY                : config.scaleY || 1.0,
-	    rasterGrid            : config.rasterGrid || true,
+	    rasterGrid            : typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
 	    rasterAdjustFactor    : config.rasterAdjustFactor || 2.0,
-	    autoCenterOffset      : config.autoCenterOffset || true,
+	    autoCenterOffset      : typeof config.autoCenterOffset != 'undefined' ? config.autoCenterOffset : true,
 	    backgroundColor       : config.backgroundColor || '#ffffff',
+	    redrawOnResize        : typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
+	    drawLabel             : typeof config.drawLabel != 'undefined' ? config.drawLabel : true,
+	    defaultCanvasWidth    : typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
+	    defaultCanvasHeight   : typeof config.defaultCanvasHeight == 'number' ? config.defaultCanvasHeight : DEFAULT_CANVAS_HEIGHT,
 	    rebuild               : function() { rebuild(); },
 	    loadImage             : function() { var elem = document.getElementById('file');
 						 elem.setAttribute('data-type','image-upload');
@@ -401,10 +407,11 @@
 	    var _setSize = function(w,h) {
 		//var wdpr = w * config.pixelRatio;
 		//var hdpr = h * config.pixelRatio;
-		//w = 28000; 
-		//h = 1800; 
-		_self.ctx.canvas.width  = w;
-		_self.ctx.canvas.height = h; 
+		//w = 14000; 
+		//h = 9500;
+		
+		//_self.ctx.canvas.width  = w;
+		//_self.ctx.canvas.height = h; 
 		_self.canvas.width      = w; 
 		_self.canvas.height     = h; 
 		_self.canvasSize.width  = w;
@@ -425,9 +432,11 @@
 		var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
 		_setSize( width, height );
 	    } else {
-                _setSize( DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT );
+                _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight ); // DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT );
 	    }
-	    _self.redraw();
+	    
+	    if( _self.config.redrawOnResize )
+		_self.redraw();
 	};
 	_context.addEventListener( 'resize', this.resizeCanvas );
 	this.resizeCanvas();
@@ -675,6 +684,68 @@
 	
     }; // END construcor 'PlotBoilerplate'
 
+
+    // +---------------------------------------------------------------------------------
+    // | A static function to create a control GUI (a dat.gui instance) for the given
+    // | plot boilerplate.
+    // | 
+    // | @return dat.gui
+    // +-------------------------------
+    PlotBoilerplate.prototype.createGUI = function() {
+	var gui = new dat.gui.GUI();
+	var _self = this;
+	gui.remember(this.config);
+	var fold0 = gui.addFolder('Editor settings');
+	var fold00 = fold0.addFolder('Canvas size');
+	fold00.add(this.config, 'fullSize').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fullpage mode.");
+	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).");
+	fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
+	fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
+	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
+	fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();
+	fold0.add(this.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();
+	fold0.add(this.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
+	fold0.addColor(this.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");
+	// fold0.add(bp.config, 'loadImage').name('Load Image').title("Load a background image.");
+	
+	var fold1 = gui.addFolder('Export');
+	fold1.add(this.config, 'saveFile').name('Save a file').title("Save as SVG.");	 
+	
+	return gui;
+    };
+
+
+    // +---------------------------------------------------------------------------------
+    // | A set of helper functions.
+    // +-------------------------------
+    PlotBoilerplate.utils = {
+	
+	// +---------------------------------------------------------------------------------
+	// | Merge the elements in the 'extension' object into the 'base' object based on
+	// | the keys of 'base'.
+	// |
+	// | @param base:Object
+	// | @param extension:Object
+	// | @return Object base extended by the new attributes.
+	// +-------------------------------
+	saveMergeByKeys : function( base, extension ) {
+	    for( var k in base ) {
+		if( !extension.hasOwnProperty(k) )
+		    continue;
+		var type = typeof base[k];
+		try {
+		    if( type == 'boolean' ) base[k] = !!JSON.parse(extension[k]);
+		    else if( type == 'number' ) base[k] = JSON.parse(extension[k])*1;
+		    else if( type == 'function' && typeofextension[k] == 'function' ) base[k] = extension[k] ;
+		    else base[k] = extension[k];
+		} catch( e ) {
+		    console.error( 'error in key ', k, extension[k], e );
+		}
+	    }
+	    return base;
+	}
+    };
+    
     _context.PlotBoilerplate = PlotBoilerplate;
     
 })(window); 

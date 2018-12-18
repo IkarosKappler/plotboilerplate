@@ -43,10 +43,13 @@ For details see main-dist.html:
  var bp = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
 			       	 fullSize              : true,
 				 fitToParent           : true,
+				 defaultCanvasWidth    : 1024,
+				 defaultCanvasHeight   : 768,
 				 scaleX                : 1.0,
 				 scaleY                : 1.0,
 				 rasterGrid            : true,
 				 backgroundColor       : '#ffffff',
+				 redrawOnResize        : true,
 				 preDraw               : function() { console.log('before drawing.'); },
 				 postDraw              : function() { console.log('after drawing.'); }
 				} );
@@ -81,6 +84,11 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2018-12-18
+  * Added the config.redrawOnResize param.
+  * Added the config.defaultCanvasWidth and config.defaultCanvasHeight params.
+  * Fixed the action bugs for the default overlay buttons (OK and cancel had no action assigned).
+  * Added a default function for creating a dat.gui interface.
 * 2018-12-09
   * Minimal zoom is now 0.01.
   * Added Grid.utils.baseLog(Nnumber,Number) and Grid.utils.mapRasterScale(Number,Number).
