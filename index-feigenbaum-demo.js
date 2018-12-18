@@ -67,7 +67,7 @@
 	    // +-------------------------------
 	    var gui = bp.createGUI();
 
-	    var config = {
+	    var config = PlotBoilerplate.utils.saveMergeByKeys( {
 		plotX0                : 0.2,
 		plotIterations        : 500,
 		plotStart             : 3.2,
@@ -82,7 +82,8 @@
 		alphaThreshold        : 0.05,	
 
 		rebuild               : function() { console.log('Rebuilding ... '); rebuild(); }
-	    }
+	    }, GUP );
+	    console.log( JSON.stringify(config) );
 	    var fold2 = gui.addFolder('Plot settings');
 	    fold2.add(config, 'plotX0').title('Set the x0 value to start the logistic function at.').min(0.01).max(2.0).step(0.01);
 	    fold2.add(config, 'plotIterations').title('Set the number of max iterations for the logistic function.').min(1).max(10000).step(1);
