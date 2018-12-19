@@ -31,8 +31,10 @@
 		      rasterGrid            : true,
 		      rasterAdjustFactor    : 2.0,
 		      redrawOnResize        : true,
-		      defaultCanvasWidth    : 1024,
-		      defaultCanvasHeight   : 768,
+		      defaultCanvasWidth    : 1024*2,
+		      defaultCanvasHeight   : 768*2,
+		      cssScaleX             : 0.5,
+		      cssScaleY             : 0.5,
 		      autoCenterOffset      : true,
 		      backgroundColor       : '#ffffff'
 		    }, GUP

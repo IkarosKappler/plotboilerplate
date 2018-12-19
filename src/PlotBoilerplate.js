@@ -8,14 +8,14 @@
  * @modified 2018-12-09 Extended the constructor (canvas).
  * @modified 2018-12-18 Added the config.redrawOnResize param.
  * @modified 2018-12-18 Added the config.defaultCanvas{Width,Height} params.
- * @version  1.0.5
+ * @modified 2018-12-19 Added CSS scaling.
+ * @version  1.0.6
  **/
 
 
 (function(_context) {
     "use strict";
 
-    
     const DEFAULT_CANVAS_WIDTH = 1024;
     const DEFAULT_CANVAS_HEIGHT = 768;
 
@@ -31,6 +31,20 @@
 	} ) );
     };
 
+    // +---------------------------------------------------------------------------------
+    // | A helper function to scale elements (usually the canvas) using CSS.
+    // |
+    // | transform-origin is at (0,0).
+    // |
+    // | @param element:HTMLElement The DOM element to scale.
+    // | @param scaleX:number The X scale factor.
+    // | @param scaleY:number The Y scale factor.
+    // +----------------------------
+    var setCSSscale = function( element, scaleX, scaleY ) {
+	element.style['transform-origin'] = '0 0';
+	if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
+	else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY+')';
+    };
 
     // +---------------------------------------------------------------------------------
     // | A wrapper class for draggable items (mostly vertices).
@@ -82,6 +96,9 @@
 	    drawLabel             : typeof config.drawLabel != 'undefined' ? config.drawLabel : true,
 	    defaultCanvasWidth    : typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
 	    defaultCanvasHeight   : typeof config.defaultCanvasHeight == 'number' ? config.defaultCanvasHeight : DEFAULT_CANVAS_HEIGHT,
+	    cssScaleX             : typeof config.cssScaleX == 'number' ? config.cssScaleX : 1.0,
+	    cssScaleY             : typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
+	    cssUniformScale       : true,
 	    rebuild               : function() { rebuild(); },
 	    loadImage             : function() { var elem = document.getElementById('file');
 						 elem.setAttribute('data-type','image-upload');
@@ -114,6 +131,19 @@
 	this.drawables           = [];
 	var _self = this;
 
+
+	// +---------------------------------------------------------------------------------
+	// | Object members.
+	// +-------------------------------
+	PlotBoilerplate.prototype.updateCSSscale = function() {
+	    console.log('update css scale');
+	    if( this.config.cssUniformScale ) {
+		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
+	    } else {
+		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleY );
+	    }
+	};
+	
 	// !!! PRE ALPHA TEST !!!
 	/*
 	var _testArc = { a : new Vertex(-200,0), b : new Vertex(200,0), radius : new Vertex(100,100), rotation : 0.0, largeArcFlag : false, sweepFlag : false };
@@ -675,6 +705,9 @@
 	// Initialize the dialog
 	window.dialog = new overlayDialog('dialog-wrapper');
 	// window.dialog.show( 'Inhalt', 'Test' );
+
+	// Apply the configured CSS scale.
+	this.updateCSSscale();
 	
 	// Init	
 	this.redraw();
@@ -701,6 +734,9 @@
 	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).");
 	fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
 	fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
+	fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
+	fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
+	fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");
 	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();

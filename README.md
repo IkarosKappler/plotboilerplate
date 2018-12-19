@@ -84,6 +84,8 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2018-12-19
+  * Added cssScaling for the canvas.
 * 2018-12-18
   * Added the config.redrawOnResize param.
   * Added the config.defaultCanvasWidth and config.defaultCanvasHeight params.
