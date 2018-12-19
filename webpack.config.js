@@ -45,5 +45,15 @@ module.exports = [
             filename: 'Color.min.js'
         }
     } */
+    // Un-comment this block if you also want to re-compile the Color class.
+    ,{
+        entry: [
+        './lib/bbtree.js',
+        ],
+        output: {
+            path: path.resolve(__dirname, 'lib'),
+            filename: 'bbtree.min.js'
+        }
+    } 
 ];
 
