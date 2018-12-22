@@ -75,13 +75,13 @@
     VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true };
     
 
-    // +---------------------------------------------------------------------------------
-    /** The constructor.
+    /** 
+     * The constructor.
      *
      * @constructor
      *
      * @param {object} [config] The configuration.
-     **/ // +----------------------------
+     **/
     var PlotBoilerplate = function( config ) {
 	config = config || {};
 	if( typeof config.canvas == 'undefined' )

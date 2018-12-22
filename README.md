@@ -43,10 +43,15 @@ For details see main-dist.html:
  var bp = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
 			       	 fullSize              : true,
 				 fitToParent           : true,
-				 defaultCanvasWidth    : 1024,
-				 defaultCanvasHeight   : 768,
 				 scaleX                : 1.0,
 				 scaleY                : 1.0,
+				 rasterAdjustFactor    : 2.0,
+				 autoCenterOffset      : true,
+				 defaultCanvasWidth    : 1024,
+				 defaultCanvasHeight   : 768,
+				 cssScaleX	       : 1.0,
+				 cssScaleY	       : 1.0,
+				 cssUniformscale       : true,
 				 rasterGrid            : true,
 				 backgroundColor       : '#ffffff',
 				 redrawOnResize        : true,
@@ -58,8 +63,8 @@ For details see main-dist.html:
 
 ## Usage
  * [SHIFT] + [Click] : Select/Deselect vertex
- * [Y] + [Click]: Toggle Bézier auto-adjustment
- * [ALT] + [Mousedown] + [Drag] : Pan the area
+ * [Y] + [Click]: Toggle Bézier auto-adjustment for clicked bézier path point
+ * [ALT or CTRL] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
  * [Mousewheel-down] : Zoom out
 
@@ -76,8 +81,9 @@ For details see main-dist.html:
  * Add arcs?
 
 
+
 ### Known bugs
--
+ * Currently none known. Please report bugs.
 
 
 ### Changelog
