@@ -10,3 +10,28 @@
 
 Then create your webpack.config.js file.
 
+
+
+## Initialize ESDoc
+See https://doc.esdoc.org/github.com/esdoc/esdoc/manual/index.html
+
+~~~
+# Move to a your project directory.
+cd your-project/
+
+# Install ESDoc and standard plugin.
+npm install --save-dev esdoc esdoc-standard-plugin
+
+# Create a configuration file.
+echo '{
+  "source": "./src",
+  "destination": "./docs",
+  "plugins": [{"name": "esdoc-standard-plugin"}]
+}' > .esdoc.json
+
+# Run ESDoc.
+./node_modules/.bin/esdoc
+
+# View a documentation
+open ./docs/index.html
+~~~

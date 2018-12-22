@@ -21,8 +21,9 @@
 
 
     // +---------------------------------------------------------------------------------
-    // | A helper function to trigger fake click events.
-    // +----------------------------
+    /** 
+     * A helper function to trigger fake click events.
+     **/ // +----------------------------
     var triggerClickEvent = function(element) {
 	element.dispatchEvent( new MouseEvent('click', {
 	    view: window,
@@ -32,14 +33,15 @@
     };
 
     // +---------------------------------------------------------------------------------
-    // | A helper function to scale elements (usually the canvas) using CSS.
-    // |
-    // | transform-origin is at (0,0).
-    // |
-    // | @param element:HTMLElement The DOM element to scale.
-    // | @param scaleX:number The X scale factor.
-    // | @param scaleY:number The Y scale factor.
-    // +----------------------------
+    /** 
+     * A helper function to scale elements (usually the canvas) using CSS.
+     *
+     * transform-origin is at (0,0).
+     *
+     * @param {HTMLElement} element The DOM element to scale.
+     * @param {number} scaleX The X scale factor.
+     * @param {number} scaleY The Y scale factor.
+     **/ // +----------------------------
     var setCSSscale = function( element, scaleX, scaleY ) {
 	element.style['transform-origin'] = '0 0';
 	if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
@@ -47,8 +49,9 @@
     };
 
     // +---------------------------------------------------------------------------------
-    // | A wrapper class for draggable items (mostly vertices).
-    // +----------------------------
+    /**
+     * A wrapper class for draggable items (mostly vertices).
+     **/ // +----------------------------
     (function(_context) {
 	var Draggable = function( item, type ) {
 	    this.item = item;
@@ -66,16 +69,19 @@
 
 
     // +---------------------------------------------------------------------------------
-    // | Use a special custom attribute set for vertices.
-    // +----------------------------
+    /**
+     * Use a special custom attribute set for vertices.
+    **/ // +----------------------------
     VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true };
     
 
     // +---------------------------------------------------------------------------------
-    // | The constructor.
-    // |
-    // 
-    // +----------------------------
+    /** The constructor.
+     *
+     * @constructor
+     *
+     * @param {object} [config] The configuration.
+     **/ // +----------------------------
     var PlotBoilerplate = function( config ) {
 	config = config || {};
 	if( typeof config.canvas == 'undefined' )
@@ -144,7 +150,8 @@
 	    }
 	};
 	
-	// !!! PRE ALPHA TEST !!!
+	// !!! PRE ALPHA TEST FOR ELLIPSES !!!
+	// THIS IS A BIT DIFFICULT BECAUSE CANVAS ELLIPSES AND SVG ELLIPSES ARE FUNDAMENTALLY DIFFERENT
 	/*
 	var _testArc = { a : new Vertex(-200,0), b : new Vertex(200,0), radius : new Vertex(100,100), rotation : 0.0, largeArcFlag : false, sweepFlag : false };
 	this.vertices.push( _testArc.a );
@@ -153,16 +160,17 @@
 	*/
 
 	// +---------------------------------------------------------------------------------
-	// | Add a drawable object.
-	// |
-	// | This must be either:
-	// |  * a Line
-	// |  * a VEllipse
-	// |  * a Polygon
-	// |  * a BezierPath
-	// |
-	// | @param drawable:Object The drawable (of one of the allowed class instance) to add.
-	// +-------------------------------
+	/**
+	 * Add a drawable object.
+	 *
+	 * This must be either:
+	 *  * a Line
+	 *  * a VEllipse
+	 *  * a Polygon
+	 *  * a BezierPath
+	 *
+	 * @param drawable:Object The drawable (of one of the allowed class instance) to add.
+	 **/ // +-------------------------------
 	PlotBoilerplate.prototype.add = function( drawable ) {
 	    if( drawable instanceof Line ) {
 		// Add some lines
@@ -227,52 +235,51 @@
 	    this.redraw();
 	};
 
-	
+
 	// +---------------------------------------------------------------------------------
-	// | The re-drawing function.
-	// +-------------------------------
-	PlotBoilerplate.prototype.redraw = function() {
-	    var renderTime = new Date().getTime();
-	    
-	    this.clear();
-
-	    if( this.config.preDraw )
-		this.config.preDraw();
-	    
-	    // Draw grid
-	    var gf = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
-		       y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
-	    // console.log( this.config.rasterAdjustFactor, this.draw.scale.x, gf.x, gf.y );
+	/**
+	 * Draw the grid.
+	 **/ // +-------------------------------
+	PlotBoilerplate.prototype.drawGrid = function() {
+	    var gScale = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
+			   y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
+	    var gSize = { w : this.grid.size.x*gScale.x, h : this.grid.size.y*gScale.y };
+	    var cs = { w : this.canvasSize.width/2, h : this.canvasSize.height/2 };
+	    var offset = this.draw.offset.clone().inv();
+	    offset.x = (Math.round(offset.x+cs.w)/Math.round(gSize.w))*(gSize.w)/this.draw.scale.x + (((this.draw.offset.x-cs.w)/this.draw.scale.x)%gSize.w);
+	    offset.y = (Math.round(offset.y+cs.h)/Math.round(gSize.h))*(gSize.h)/this.draw.scale.y + (((this.draw.offset.y-cs.h)/this.draw.scale.x)%gSize.h);
 	    if( this.config.rasterGrid )
-		this.draw.raster( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x*gf.x, this.grid.size.y*gf.y, 'rgba(0,128,255,0.125)' );
+		this.draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.125)' );
 	    else
-		this.draw.grid( this.grid.center, (this.canvasSize.width+this.draw.offset.x)/this.draw.scale.x, (this.canvasSize.height+this.draw.offset.y)/this.draw.scale.y, this.grid.size.x*gf.x, this.grid.size.y*gf.y, 'rgba(0,128,255,0.095)' )
+		this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.095)' )
+	    // Add a crosshair to mark center (for debugging)
+	    this.draw.crosshair( offset, 10, '#000000' );
+	};
 
-	    
+
+	// +---------------------------------------------------------------------------------
+	/**
+	 * Draw the background image (if present).
+	 **/ // +-------------------------------
+	// Note: this function is currently not in use.
+	PlotBoilerplate.prototype.drawBackgroundImage = function() {
 	    // Draw the background image?
+	    /*
 	    if( _self.image ) {
 		if( _self.config.fitImage ) 
 		    _self.ctx.drawImage(_self.image,0,0,_self.image.width,_self.image.height,0,0,_self.canvasSize.width,_self.canvasSize.height);
 		else 
 		    _self.ctx.drawImage(_self.image,0,0);
 	    }
-
-	    
-	    // !!! Draw some test stuff !!!
-	    /*
-	    var d = _testArc;
-	    try {
-		// First draw helper	
-		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, !d.largeArcFlag, !d.sweepFlag, d.b.x, d.b.y, '#c8c8c8' );
-		// Then draw arc itself
-		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, d.largeArcFlag, d.sweepFlag, d.b.x, d.b.y, '#008888' );
-	    } catch( e ) {
-		console.error( e );
-	    }
 	    */
+	};
 
-	    
 
+	// +---------------------------------------------------------------------------------
+	/**
+	 * Draw all drawable elements.
+	**/ // +-------------------------------
+	PlotBoilerplate.prototype.drawDrawables = function( renderTime ) {
 	    // Draw drawables
 	    for( var i in this.drawables ) {
 		var d = this.drawables[i];
@@ -295,7 +302,7 @@
 			this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
 			this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
 			
-		
+			
 		    }
 		} else if( d instanceof Polygon ) {
 		    this.draw.polygon( d, '#0022a8' );
@@ -316,32 +323,71 @@
 		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
 		}
 	    }
+	};
 
-	    // Draw all vertices as small squares if they were not already drawn by other objects
-	    for( var i in this.vertices ) {
-		if( this.vertices[i].attr.renderTime != renderTime ) {
-		    this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
-		}
-	    }
 
+	/** +---------------------------------------------------------------------------------
+	 * Draw all drawable elements.
+	**/ // +-------------------------------
+	PlotBoilerplate.prototype.drawSelectPolygon = function() {
 	    // Draw select polygon?
 	    if( this.selectPolygon != null && this.selectPolygon.vertices.length > 0 ) {
 		console.log('Drawing selectPolygon',this.selectPolygon.vertices.length,'vertices');
 		this.draw.polygon( this.selectPolygon, '#888888' );
 		this.draw.crosshair( this.selectPolygon.vertices[0], 3, '#008888' );
 	    }
-
+	};
 	    
-	    if( this.config.postDraw )
-		this.config.postDraw();
+
+	/** +---------------------------------------------------------------------------------
+	 * Draw the (remaining) vertices.
+	**/ // +-------------------------------
+	PlotBoilerplate.prototype.drawVertices = function( renderTime ) {
+	    // Draw all vertices as small squares if they were not already drawn by other objects
+	    for( var i in this.vertices ) {
+		if( this.vertices[i].attr.renderTime != renderTime ) {
+		    this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
+		}
+	    }
+	};
+	
+	
+	/** +---------------------------------------------------------------------------------
+	 * The re-drawing function.
+	 **/ // +-------------------------------
+	PlotBoilerplate.prototype.redraw = function() {
+	    var renderTime = new Date().getTime();
+	    
+	    this.clear();
+	    if( this.config.preDraw ) this.config.preDraw();
+	    
+	    this.drawGrid();
+	    this.drawBackgroundImage();  
+	    // !!! Draw some test stuff !!!
+	    /*
+	    var d = _testArc;
+	    try {
+		// First draw helper	
+		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, !d.largeArcFlag, !d.sweepFlag, d.b.x, d.b.y, '#c8c8c8' );
+		// Then draw arc itself
+		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, d.largeArcFlag, d.sweepFlag, d.b.x, d.b.y, '#008888' );
+	    } catch( e ) {
+		console.error( e );
+	    }
+	    */
+	    this.drawDrawables(renderTime);
+	    this.drawVertices(renderTime);
+	    this.drawSelectPolygon();
+
+	    if( this.config.postDraw ) this.config.postDraw();
 	    
 	}; // END redraw
 
 
 
-	// +---------------------------------------------------------------------------------
-	// | This function clears the canvas with the configured background color.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * This function clears the canvas with the configured background color.
+	 **/ // +-------------------------------
 	PlotBoilerplate.prototype.clear = function() {
 	    // Note that the image might have an alpha channel. Clear the scene first.
 	    this.ctx.fillStyle = this.config.backgroundColor; 
@@ -349,9 +395,9 @@
 	};
 	
 	
-	// +---------------------------------------------------------------------------------
-	// | Handle a dropped image: initially draw the image (to fill the background).
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * Handle a dropped image: initially draw the image (to fill the background).
+	 **/ // +-------------------------------
 	var handleImage = function(e) {
 	    var validImageTypes = "image/gif,image/jpeg,image/jpg,image/gif,image/png";
 	    if( validImageTypes.indexOf(e.target.files[0].type) == -1 ) {
@@ -376,13 +422,13 @@
 	}
 
 
-	// +---------------------------------------------------------------------------------
-	// | Clear the selection.
-	// |
-	// | @param redraw:boolean Indicates if the redraw function should be triggered.
-	// |
-	// | @return this for chaining.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * Clear the selection.
+	 *
+	 * @param redraw:boolean Indicates if the redraw function should be triggered.
+	 *
+	 * @return this for chaining.
+	**/ // +-------------------------------
 	PlotBoilerplate.prototype.clearSelection = function( redraw ) {
 	    for( var i in this.vertices ) 
 		this.vertices[i].attr.isSelected = false;
@@ -392,11 +438,11 @@
 	};
 
 	
-	// +---------------------------------------------------------------------------------
-	// | Decide which file type should be handled:
-	// |  - image for the background or
-	// |  - JSON (for the point set)
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * Decide which file type should be handled:
+	 *  - image for the background or
+	 *  - JSON (for the point set)
+	**/ // +-------------------------------
 	var handleFile = function(e) {
 	    var type = document.getElementById('file').getAttribute('data-type');
 	    if( type == 'image-upload' ) {
@@ -408,9 +454,9 @@
 	document.getElementById( 'file' ).addEventListener('change', handleFile );
 	
 
-	// +---------------------------------------------------------------------------------
-	// | Just a generic save-file dialog.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * Just a generic save-file dialog.
+	 **/ // +-------------------------------
 	var saveFile = function() {
 	    var svgCode = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
 	    // See documentation for FileSaver.js for usage.
@@ -420,28 +466,25 @@
 	};
 	
 	
-	// +---------------------------------------------------------------------------------
-	// | The rebuild function just evaluates the input and
-	// |  - triangulate the point set?
-	// |  - build the voronoi diagram?
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * The rebuild function just evaluates the input and
+	 *  - triangulate the point set?
+	 *  - build the voronoi diagram?
+	**/ // +-------------------------------
 	var rebuild = function() {
 	    // ...
 	};
 
 
-	// +---------------------------------------------------------------------------------
-	// | This function resizes the canvas to the required settings (toggles fullscreen).
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * This function resizes the canvas to the required settings (toggles fullscreen).
+	 **/ // +-------------------------------
 	PlotBoilerplate.prototype.resizeCanvas = function() {
 	    var _setSize = function(w,h) {
 		//var wdpr = w * config.pixelRatio;
 		//var hdpr = h * config.pixelRatio;
 		//w = 14000; 
 		//h = 9500;
-		
-		//_self.ctx.canvas.width  = w;
-		//_self.ctx.canvas.height = h; 
 		_self.canvas.width      = w; 
 		_self.canvas.height     = h; 
 		_self.canvasSize.width  = w;
@@ -472,11 +515,11 @@
 	this.resizeCanvas();
 
 
-	// +---------------------------------------------------------------------------------
-	// | Add all vertices inside the polygon to the current selection.
-	// | 
-	// | @param polygon:Polygon The polygonal selection area.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * Add all vertices inside the polygon to the current selection.
+	 * 
+	 * @param polygon:Polygon The polygonal selection area.
+	**/ // +-------------------------------
 	PlotBoilerplate.prototype.selectVerticesInPolygon = function( polygon ) {
 	    for( var i in this.vertices ) {
 		if( polygon.containsVert(this.vertices[i]) ) 
@@ -485,15 +528,15 @@
 	};
 	
 	
-	// +---------------------------------------------------------------------------------
-        // | Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
-	// |
-	// | The result is an object { type : 'bpath', pindex, cindex, pid }
-	// |
-        // | Returns false if no point is near the passed position.
-	// |
-	// | @param point:Vertex
-        // +-------------------------------
+	/** +---------------------------------------------------------------------------------
+         * Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
+	 *
+	 * The result is an object { type : 'bpath', pindex, cindex, pid }
+	 *
+         * Returns false if no point is near the passed position.
+	 *
+	 * @param point:Vertex
+         **/ // +-------------------------------
         var locatePointNear = function( point ) {
             var tolerance = 7;
 	    // Search in vertices
@@ -508,12 +551,12 @@
         }
 
 
-	// +---------------------------------------------------------------------------------
-	// | Handle left-click and tap event.
-	// |
-	// | @param x:Number The tap X position on the canvas.
-	// | @param y:Number The tap Y position on the canvas.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * Handle left-click and tap event.
+	 *
+	 * @param x:Number The tap X position on the canvas.
+	 * @param y:Number The tap Y position on the canvas.
+	 **/ // +-------------------------------
 	function handleTap(x,y) {
 	    var p = locatePointNear( _self.transformMousePosition(x, y) );
 	    if( p ) { 
@@ -541,22 +584,23 @@
 	    }
 	}
 
-	// +---------------------------------------------------------------------------------
-	// | Transform the given x-y-(mouse-)point to coordinates respecting the view offset
-	// | and the zoom settings.
-	// |
-	// | @param x:Number The mouse-x position relative to the canvas.
-	// | @param y:Number The mouse-y position relative to the canvas.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * Transform the given x-y-(mouse-)point to coordinates respecting the view offset
+	 * and the zoom settings.
+	 *
+	 * @param x:Number The mouse-x position relative to the canvas.
+	 * @param y:Number The mouse-y position relative to the canvas.
+	**/ // +-------------------------------
 	PlotBoilerplate.prototype.transformMousePosition = function( x, y ) {
-	    return { x : (x-this.draw.offset.x)/this.draw.scale.x, y : (y-this.draw.offset.y)/this.draw.scale.y };
+	    return { x : (x/this.config.cssScaleX-this.draw.offset.x)/(this.draw.scale.x), y : (y/this.config.cssScaleY-this.draw.offset.y)/(this.draw.scale.y) };
 	};
+	
 
-	// +---------------------------------------------------------------------------------
-	// | The mouse-down handler.
-	// |
-	// | It selects vertices for dragging.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * The mouse-down handler.
+	 *
+	 * It selects vertices for dragging.
+	 **/ // +-------------------------------
 	var mouseDownHandler = function(e) {
 		if( e.which != 1 )
 		    return; // Only react on left mouse
@@ -582,14 +626,16 @@
 		_self.redraw();
 	};
 
-	// +---------------------------------------------------------------------------------
-	// | The mouse-drag handler.
-	// |
-	// | It moves selected elements around or performs the panning if the ctrl-key if
-	// | hold down.
-	// +-------------------------------
-	var mouseDragHandler = function(e) {  
-	    if( keyHandler.isDown('alt') ) {
+	/** +---------------------------------------------------------------------------------
+	 * The mouse-drag handler.
+	 *
+	 * It moves selected elements around or performs the panning if the ctrl-key if
+	 * hold down.
+	 **/ // +-------------------------------
+	var mouseDragHandler = function(e) {
+	    e.params.dragAmount.x /= _self.config.cssScaleX;
+	    e.params.dragAmount.y /= _self.config.cssScaleY;
+	    if( keyHandler.isDown('alt') || keyHandler.isDown('ctrl') ) {
 		_self.draw.offset.add( e.params.dragAmount );
 		_self.fill.offset.set( _self.draw.offset );
 		_self.redraw();
@@ -614,11 +660,11 @@
 	    _self.redraw();
 	};
 
-	// +---------------------------------------------------------------------------------
-	// | The mouse-up handler.
-	// |
-	// | It clears the dragging-selection.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * The mouse-up handler.
+	 *
+	 * It clears the dragging-selection.
+	 **/ // +-------------------------------
 	var mouseUpHandler = function(e) {
 	    if( e.which != 1 )
 		return; // Only react on left mouse;
@@ -636,11 +682,11 @@
 	    _self.redraw();
 	};
 
-	// +---------------------------------------------------------------------------------
-	// | The mouse-wheel handler.
-	// |
-	// | It performs the zooming.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * The mouse-wheel handler.
+	 *
+	 * It performs the zooming.
+	 **/ // +-------------------------------
 	var mouseWheelHandler = function(e) {
 	    var zoomStep = 1.25;
 	    if( e.deltaY < 0 ) {
@@ -653,9 +699,9 @@
 	    _self.redraw();
 	};
 
-	// +---------------------------------------------------------------------------------
-	// | Install a mouse handler on the canvas.
-	// +-------------------------------
+	/** +---------------------------------------------------------------------------------
+	 * Install a mouse handler on the canvas.
+	 **/ // +-------------------------------
 	new MouseHandler(this.canvas)
 	    .down( mouseDownHandler )
 	    .drag( mouseDragHandler )
@@ -672,6 +718,10 @@
 	    .down('alt',function() { console.log('alt was hit.'); } )
 	    .press('alt',function() { console.log('alt was pressed.'); } )
 	    .up('alt',function() { console.log('alt was released.'); } )
+
+	    .down('ctrl',function() { console.log('ctrl was hit.'); } )
+	    .press('ctrl',function() { console.log('ctrl was pressed.'); } )
+	    .up('ctrl',function() { console.log('ctrl was released.'); } )
 
 	    .down('escape',function() {
 		console.log('ESCAPE was hit.');
@@ -718,12 +768,12 @@
     }; // END construcor 'PlotBoilerplate'
 
 
-    // +---------------------------------------------------------------------------------
-    // | A static function to create a control GUI (a dat.gui instance) for the given
-    // | plot boilerplate.
-    // | 
-    // | @return dat.gui
-    // +-------------------------------
+    /** +---------------------------------------------------------------------------------
+     * A static function to create a control GUI (a dat.gui instance) for the given
+     * plot boilerplate.
+     * 
+     * @return dat.gui
+     **/ // +-------------------------------
     PlotBoilerplate.prototype.createGUI = function() {
 	var gui = new dat.gui.GUI();
 	var _self = this;
@@ -751,20 +801,20 @@
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | A set of helper functions.
-    // +-------------------------------
+    /** +---------------------------------------------------------------------------------
+     * A set of helper functions.
+    **/ // +-------------------------------
     PlotBoilerplate.utils = {
 	
-	// +---------------------------------------------------------------------------------
-	// | Merge the elements in the 'extension' object into the 'base' object based on
-	// | the keys of 'base'.
-	// |
-	// | @param base:Object
-	// | @param extension:Object
-	// | @return Object base extended by the new attributes.
-	// +-------------------------------
-	saveMergeByKeys : function( base, extension ) {
+	/** +---------------------------------------------------------------------------------
+	 * Merge the elements in the 'extension' object into the 'base' object based on
+	 * the keys of 'base'.
+	 *
+	 * @param base:Object
+	 * @param extension:Object
+	 * @return Object base extended by the new attributes.
+	 **/ // +-------------------------------
+	safeMergeByKeys : function( base, extension ) {
 	    for( var k in base ) {
 		if( !extension.hasOwnProperty(k) )
 		    continue;

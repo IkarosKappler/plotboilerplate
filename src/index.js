@@ -22,7 +22,7 @@
 	function() {
 	    // All config params are optional.
 	    var bp = new PlotBoilerplate(
-		PlotBoilerplate.utils.saveMergeByKeys(
+		PlotBoilerplate.utils.safeMergeByKeys(
 		    { canvas                : document.getElementById('my-canvas'),					    
 		      fullSize              : true,
 		      fitToParent           : true,
@@ -35,25 +35,12 @@
 		      defaultCanvasHeight   : 768*2,
 		      cssScaleX             : 0.5,
 		      cssScaleY             : 0.5,
+		      cssUniformScale       : true,
 		      autoCenterOffset      : true,
 		      backgroundColor       : '#ffffff'
 		    }, GUP
 		)
 	    );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Merge GET params into config.
-	    // +-------------------------------
-	    /*
-	    for( var k in bp.config ) {
-		if( !GUP.hasOwnProperty(k) )
-		    continue;
-		var type = typeof bp.config[k];
-		if( type == 'boolean' ) bp.config[k] = !!JSON.parse(GUP[k]);
-		else if( type == 'number' ) bp.config[k] = JSON.parse(GUP[k])*1;
-		else if( type == 'function' ) ;
-		else bp.config[k] = GUP[k];
-	    }*/
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui

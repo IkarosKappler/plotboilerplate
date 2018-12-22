@@ -3,17 +3,18 @@
  *
  * @require VertexAttr
  * 
- * @author    Ikaros Kappler
- * @date_init 2012-10-17
- * @date      2018-04-03
- * @modified  2018-04-28 Added some documentation.
- * @modified  2018-08-16 Added the set() function.
- * @modified  2018-08-26 Added VertexAttr.
- * @modified  2018-10-31 Extended the constructor by object{x,y}.
- * @modified  2018-11-19 Extended the set(number,number) function to set(Vertex).
- * @modified  2018-11-28 Added 'this' to the VertexAttr constructor.
- * @modified  2018-12-05 Added the sub(...) function. Changed the signature of the add() function! add(Vertex) and add(number,number) are now possible.
- * @version   2.0.7
+ * @author   Ikaros Kappler
+ * @date     2012-10-17
+ * @modified 2018-04-03 Refactored the code of october 2012 into a new class.
+ * @modified 2018-04-28 Added some documentation.
+ * @modified 2018-08-16 Added the set() function.
+ * @modified 2018-08-26 Added VertexAttr.
+ * @modified 2018-10-31 Extended the constructor by object{x,y}.
+ * @modified 2018-11-19 Extended the set(number,number) function to set(Vertex).
+ * @modified 2018-11-28 Added 'this' to the VertexAttr constructor.
+ * @modified 2018-12-05 Added the sub(...) function. Changed the signature of the add() function! add(Vertex) and add(number,number) are now possible.
+ * @modified 2018-12-21 (It's winter solstice) Added the inv()-function.
+ * @version  2.0.8
  **/
 
 
@@ -194,6 +195,19 @@
 	this.y = Math.round(this.y);
 	return this;
     };
+
+
+    // +------------------------------------------------------------
+    // | Change this vertex (x,y) to its inverse (-x,-y).
+    // |
+    // | @return Vertex This vertec for chaining.
+    // +-------------------------------------------------------
+    Vertex.prototype.inv = function() {
+	this.x = -this.x;
+	this.y = -this.y;
+	return this;
+    };
+    
     
     // +------------------------------------------------------------
     // | Convert this vertex into a human-readable format.

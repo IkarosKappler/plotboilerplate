@@ -65,27 +65,32 @@ For details see main-dist.html:
 
 
 ### Todos
-* Make strokes configurable (color, width, style).
-* Add pad/phone support.
-* Implement optional canvas zoom.
-* Implement optional canvas rotation.
-* Make Bézier Curves dividable.
-* Implement snap-to-grid.
-* Add logarithmic reduction of the grid (too many grid points when zoom gets too small, too few when zoom gets too high).
-* Make ellipses rotatable.
-* Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
-* Add arcs?
-* Add a flag indicating if the resize handler should really always re-center the draw offset.
-* Allow other resolutions than 1:1. The canvas size and the draw buffer size are independent.
+ * Make strokes configurable (color, width, style).
+ * Add pad/phone support.
+ * Implement optional canvas zoom.
+ * Implement optional canvas rotation.
+ * Make Bézier Curves dividable.
+ * Implement snap-to-grid.
+ * Make ellipses rotatable.
+ * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
+ * Add arcs?
 
 
 ### Known bugs
-* The raster is not completely drawn when the draw offset is not centered.
+-
 
 
 ### Changelog
+* 2018-12-21
+  * Added the Vertex.inv() function.
+  * Fixed the grid offset problem. Grid is now always drawn in visible center.
+  * Logarithmic reduction of the grid is now working.
+  * Added a small test case for balanced binary search trees.
+  * Refactored the redraw() function into several sub-functions for drawing several elements.
+* 2018-12-20
+  * Fixed a bug in the location-transformation (did not consider the CSS scale yet).
 * 2018-12-19
-  * Added cssScaling for the canvas.
+  * Added cssScaling for the canvas. This allows other resolutions than 1:1.
 * 2018-12-18
   * Added the config.redrawOnResize param.
   * Added the config.defaultCanvasWidth and config.defaultCanvasHeight params.
