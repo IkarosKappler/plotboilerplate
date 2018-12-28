@@ -340,7 +340,7 @@
 		bp.draw.offset.y = bp.fill.offset.y = bp.grid.center.y = 0;
 		//console.log('node',node);
 		//console.log('node.isLeaf=', (node && node.isLeaf()));
-		if( !node || node.isLeaf() )
+		if( !node || node.isNull() )
 		    return;
 
 		var value = node.key;
