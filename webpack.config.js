@@ -54,6 +54,15 @@ module.exports = [
             path: path.resolve(__dirname, 'lib'),
             filename: 'bbtree.min.js'
         }
+    }
+    ,{
+        entry: [
+        './lib/bbtree.collection.js',
+        ],
+        output: {
+            path: path.resolve(__dirname, 'lib'),
+            filename: 'bbtree.collection.min.js'
+        }
     } 
 ];
 
