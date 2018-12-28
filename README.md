@@ -79,7 +79,7 @@ For details see main-dist.html:
  * Make ellipses rotatable.
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
  * Add arcs?
-
+ * The click-/tap-area scales with the canvas- and CSS-scale. It should have fixed size.
 
 
 ### Known bugs
@@ -87,6 +87,9 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2018-12-28
+  * Removed the unused 'drawLabel' param.
+  * Added the 'enableMouse' and 'enableKeys' params.
 * 2018-12-21
   * Added the Vertex.inv() function.
   * Fixed the grid offset problem. Grid is now always drawn in visible center.

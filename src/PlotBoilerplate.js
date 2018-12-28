@@ -9,7 +9,8 @@
  * @modified 2018-12-18 Added the config.redrawOnResize param.
  * @modified 2018-12-18 Added the config.defaultCanvas{Width,Height} params.
  * @modified 2018-12-19 Added CSS scaling.
- * @version  1.0.6
+ * @modified 2018-12-29 Removed the unused 'drawLabel' param. Added the 'enableMouse' and 'enableKeys' params.
+ * @version  1.0.7
  **/
 
 
@@ -79,9 +80,10 @@
      * The constructor.
      *
      * @constructor
+     * @class PlotBoilerplate
      *
      * @param {object} [config] The configuration.
-     **/
+     */
     var PlotBoilerplate = function( config ) {
 	config = config || {};
 	if( typeof config.canvas == 'undefined' )
@@ -99,7 +101,6 @@
 	    autoCenterOffset      : typeof config.autoCenterOffset != 'undefined' ? config.autoCenterOffset : true,
 	    backgroundColor       : config.backgroundColor || '#ffffff',
 	    redrawOnResize        : typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
-	    drawLabel             : typeof config.drawLabel != 'undefined' ? config.drawLabel : true,
 	    defaultCanvasWidth    : typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
 	    defaultCanvasHeight   : typeof config.defaultCanvasHeight == 'number' ? config.defaultCanvasHeight : DEFAULT_CANVAS_HEIGHT,
 	    cssScaleX             : typeof config.cssScaleX == 'number' ? config.cssScaleX : 1.0,
@@ -114,7 +115,11 @@
 
 	    // Listeners/observers
 	    preDraw               : (typeof config.preDraw == 'function' ? config.preDraw : null),
-	    postDraw              : (typeof config.postDraw == 'function' ? config.postDraw : null)
+	    postDraw              : (typeof config.postDraw == 'function' ? config.postDraw : null),
+
+	    // Interaction
+	    enableMouse           : typeof config.enableMouse != 'undefined' ? config.enableMouse : true,
+	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true
 	};
 
 
@@ -660,6 +665,7 @@
 	    _self.redraw();
 	};
 
+	
 	/** +---------------------------------------------------------------------------------
 	 * The mouse-up handler.
 	 *
@@ -699,58 +705,63 @@
 	    _self.redraw();
 	};
 
-	/** +---------------------------------------------------------------------------------
-	 * Install a mouse handler on the canvas.
-	 **/ // +-------------------------------
-	new MouseHandler(this.canvas)
-	    .down( mouseDownHandler )
-	    .drag( mouseDragHandler )
-	    .up( mouseUpHandler )
-	    .wheel( mouseWheelHandler )
-	;
 
-	// Install key handler
-	var keyHandler = new KeyHandler( { trackAll : true } )
-	    .down('enter',function() { console.log('ENTER was hit.'); } )
-	    .press('enter',function() { console.log('ENTER was pressed.'); } )
-	    .up('enter',function() { console.log('ENTER was released.'); } )
+	if( this.config.enableMouse ) { 
+	    /** +---------------------------------------------------------------------------------
+	     * Install a mouse handler on the canvas.
+	     **/ // +-------------------------------
+	    new MouseHandler(this.canvas)
+		.down( mouseDownHandler )
+		.drag( mouseDragHandler )
+		.up( mouseUpHandler )
+		.wheel( mouseWheelHandler )
+	    ;
+	} else { console.log('Mouse interaction disabled.'); }
 
-	    .down('alt',function() { console.log('alt was hit.'); } )
-	    .press('alt',function() { console.log('alt was pressed.'); } )
-	    .up('alt',function() { console.log('alt was released.'); } )
+	if( this.config.enableKeys ) {
+	    // Install key handler
+	    var keyHandler = new KeyHandler( { trackAll : true } )
+		.down('enter',function() { console.log('ENTER was hit.'); } )
+		.press('enter',function() { console.log('ENTER was pressed.'); } )
+		.up('enter',function() { console.log('ENTER was released.'); } )
 
-	    .down('ctrl',function() { console.log('ctrl was hit.'); } )
-	    .press('ctrl',function() { console.log('ctrl was pressed.'); } )
-	    .up('ctrl',function() { console.log('ctrl was released.'); } )
+		.down('alt',function() { console.log('alt was hit.'); } )
+		.press('alt',function() { console.log('alt was pressed.'); } )
+		.up('alt',function() { console.log('alt was released.'); } )
 
-	    .down('escape',function() {
-		console.log('ESCAPE was hit.');
-		_self.clearSelection(true);
-	    } )
+		.down('ctrl',function() { console.log('ctrl was hit.'); } )
+		.press('ctrl',function() { console.log('ctrl was pressed.'); } )
+		.up('ctrl',function() { console.log('ctrl was released.'); } )
 
-	    .down('shift',function() {
-		console.log('SHIFT was hit.');
+		.down('escape',function() {
+		    console.log('ESCAPE was hit.');
+		    _self.clearSelection(true);
+		} )
+
+		.down('shift',function() {
+		    console.log('SHIFT was hit.');
 		_self.selectPolygon = new Polygon();
-		_self.redraw();
-	    } )
-	    .up('shift',function() {
-		console.log('SHIFT was released.');
-		// Find and select vertices in the drawn area
-		if( _self.selectPolygon == null )
-		    return;
-		_self.selectVerticesInPolygon( _self.selectPolygon );
-		_self.selectPolygon = null;
-		_self.redraw();
-	    } )
+		    _self.redraw();
+		} )
+		.up('shift',function() {
+		    console.log('SHIFT was released.');
+		    // Find and select vertices in the drawn area
+		    if( _self.selectPolygon == null )
+			return;
+		    _self.selectVerticesInPolygon( _self.selectPolygon );
+		    _self.selectPolygon = null;
+		    _self.redraw();
+		} )
 
-	    .down('y',function() { console.log('y was hit.'); } )
-	    .up('y',function() { console.log('y was released.'); } )
+		.down('y',function() { console.log('y was hit.'); } )
+		.up('y',function() { console.log('y was released.'); } )
 
-	    .down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
+		.down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
 
-	    .up('windows',function() { console.log('windows was released.'); } )
-	;
-	
+		.up('windows',function() { console.log('windows was released.'); } )
+	    ;
+	} // END IF enableKeys?
+	else  { console.log('Keyboard interaction disabled.'); }
 	
 	// Initialize the dialog
 	window.dialog = new overlayDialog('dialog-wrapper');

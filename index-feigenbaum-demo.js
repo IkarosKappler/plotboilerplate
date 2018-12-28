@@ -28,13 +28,15 @@
 		      scaleY                : 1.0,
 		      rasterGrid            : true,
 		      rasterAdjustFactor    : 2.0,
-		      redrawOnResize        : true,
-		      defaultCanvasWidth    : 1024*2,
-		      defaultCanvasHeight   : 768*2,
-		      cssScaleX             : 0.5,
-		      cssScaleY             : 0.5,
+		      redrawOnResize        : false,
+		      defaultCanvasWidth    : 1024,
+		      defaultCanvasHeight   : 768,
+		      cssScaleX             : 1.0,
+		      cssScaleY             : 1.0,
 		      autoCenterOffset      : true,
-		      backgroundColor       : '#ffffff'
+		      backgroundColor       : '#ffffff',
+		      enableMouse           : false,
+		      enableKeys            : false
 		    }, GUP
 		)
 	    );
@@ -50,26 +52,11 @@
 	    };
 
 	    // +---------------------------------------------------------------------------------
-	    // | Merge GET params into config.
-	    // +-------------------------------
-	    /*
-	    for( var k in bp.config ) {
-		if( !GUP.hasOwnProperty(k) )
-		    continue;
-		var type = typeof bp.config[k];
-		if( type == 'boolean' ) bp.config[k] = !!JSON.parse(GUP[k]);
-		else if( type == 'number' ) bp.config[k] = JSON.parse(GUP[k])*1;
-		else if( type == 'function' ) ;
-		else bp.config[k] = GUP[k];
-	    }
-	    */
-
-	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
 	    var gui = bp.createGUI();
 
-	    var config = PlotBoilerplate.utils.saveMergeByKeys( {
+	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
 		plotX0                : 0.2,
 		plotIterations        : 500,
 		plotStart             : 3.2,
@@ -77,7 +64,8 @@
 		plotStep              : 0.1,
 		plotChunkSize         : 1.0,
 		bufferData            : false,
-		plotScale             : 1.0,
+		drawLabel             : false,
+		// plotScale             : 1.0,
 		normalizePlot         : true,
 		normalizeToMin        : 0.0,
 		normalizeToMax        : 1.0, 
@@ -95,7 +83,7 @@
 	    fold2.add(config, 'plotChunkSize').title('What chunk size should be used for updating. 1 means each pixel.').min(0.001).max(1.0).step(0.0001);
 	    fold2.add(config, 'bufferData').title('If data is buffered more space is needed, if no buffers are used no redraw is possible.');	    
 	    var fold22 = fold2.addFolder('Normalization');
-	    fold2.add(config, 'plotScale').title('Scale the calculated values by this factor.').min(0.01).max(1000.0).step(0.01);
+	    // fold2.add(config, 'plotScale').title('Scale the calculated values by this factor.').min(0.01).max(1000.0).step(0.01);
 	    fold22.add(config, 'normalizePlot').title('Scale the range [min..max6 to the full viewport height.');
 	    fold22.add(config, 'normalizeToMin').title('The minimal value for the normalization (default is 0.0).').step(0.025);
 	    fold22.add(config, 'normalizeToMax').title('The maximal value for the normalization (default is 1.0).').step(0.025);
@@ -128,6 +116,7 @@
 	    // +-------------------------------
 	    var bufferedFeigenbaum = [];
 	    var plotFeigenbaum = function() {
+		var startTime = new Date();
 		dialog.show( 'Starting ...', 'Calculating', [ { label : 'Cancel', action : function() { console.log('cancel'); timeoutKey = null; dialog.hide(); } }], {} );
 		bufferedFeigenbaum = [];
 		iterativeFeigenbaum( [ Math.min(config.plotStart,config.plotEnd), Math.max(config.plotStart,config.plotEnd) ],
@@ -140,9 +129,13 @@
 				     config.plotX0,
 				     config.plotScale,
 				     function() {
-					 // On really large canvases this failes! (NS_ERROR_FAILURE)
-					 //bp.fill.ctx.font = '8pt Monospace';
-					 //bp.fill.label('range=['+Math.min(config.plotStart,config.plotEnd)+','+Math.max(config.plotStart,config.plotEnd)+'], xStep='+config.plotStep+', iterations='+config.plotIterations+', x0='+config.plotX0+', scale='+config.plotScale+',normalize='+config.normalizePlot+',threshold='+config.alphaThreshold,5,10);  
+					 var endTime = new Date();
+					 // On really large canvases this fails in Firefox! (NS_ERROR_FAILURE)
+					 if( config.drawLabel ) {
+					     bp.fill.ctx.font = '8pt Monospace';
+					     bp.fill.label('range=['+Math.min(config.plotStart,config.plotEnd)+','+Math.max(config.plotStart,config.plotEnd)+'], xStep='+config.plotStep+', iterations='+config.plotIterations+', x0='+config.plotX0+', scale='+config.plotScale+',normalize='+config.normalizePlot+',threshold='+config.alphaThreshold,5,10);
+					 }
+					 console.log('Elapsed plotting time: ' + (endTime-startTime)/1000 + 's' );
 				     }
 				   );	    
 	    }
@@ -161,6 +154,7 @@
 		for( var x = curX; x < curX+xChunkSize; x += xStep ) {
 		    lambda = range[0] + (range[1] - range[0])*(x/(maxX-minX));
 		    var result = logisticMap( x0, lambda, plotIterations, new WeightedCollection(), 0 );
+		    //var result = logisticMap( x0, lambda, plotIterations, new WeightedBalancedCollection(), 0 );
 		    if( config.bufferData )
 			bufferedFeigenbaum.push( { x : x, lambda : lambda, data : result } );
 		    plotCollection( x, lambda, result );
@@ -243,7 +237,8 @@
 	    // +---------------------------------------------------------------------------------
 	    // | A weighted & balanced numeric collection implementation working with epsilon.
 	    // +-------------------------------
-	    (function(_context) {
+	    // THIS WAS REPLACED BY A BBTREE COLLECTION
+	    /*(function(_context) {
 		_context.WeightedBalancedCollection = (function() {
 		    var WeightedBalancedCollection = function() {
 			// this.elements = [];
@@ -267,6 +262,28 @@
 		    };
 		    return WeightedBalancedCollection;
 		})();
+	    })(window);
+	    */
+
+	    // +---------------------------------------------------------------------------------
+	    // | A weighted & balanced numeric collection implementation working with epsilon.
+	    // +-------------------------------
+	    // THIS WAS REPLACED BY A BBTREE COLLECTION
+	    (function(_context) {
+		var WeightedBalancedCollection = function() {
+		    this.tree = new BBTree();
+		    this.maxWeight = 0;
+		    
+		    this.add = function( k ) {
+			var v = 1;
+			var s = this.tree.size;
+			var node = this.tree.insert(k,v);
+			if( s==this.tree.size ) 
+			    node.value++;
+			this.maxWeight = Math.max( this.maxWeight, node.value );
+		    };
+		};
+		_context.WeightedBalancedCollection = WeightedBalancedCollection;
 	    })(window);
 
 	    // +---------------------------------------------------------------------------------
@@ -303,7 +320,7 @@
 		bp.draw.offset.x = bp.fill.offset.x = bp.grid.center.x = 0;
 		bp.draw.offset.y = bp.fill.offset.y = bp.grid.center.y = 0;
 		if( data instanceof WeightedBalancedCollection ) {
-		    plotBalancedCollection( x, lambda, data, data.root );
+		    plotBalancedCollection( x, lambda, data, data.tree.root );
 		} else {
 		    // Collection or WeightedCollection
 		    var value;
@@ -311,11 +328,8 @@
 			value = data.elements[i].v;
 			var alpha = config.alphaThreshold + (data.elements[i].w/data.elements.length)*(1-config.alphaThreshold);
 			alpha = Math.max(0.0, Math.min(1.0, alpha));
-			value *= config.plotScale;
-			// console.log( config.normalizeToMin );
 			if( config.normalizePlot ) 
 			    value = ((value-config.normalizeToMin)/(config.normalizeToMax-config.normalizeToMin)) * (bp.canvasSize.height);
-			//bp.draw.dot( { x : x, y : data.elements[i].v * config.plotScale * (config.normalizePlot?bp.canvasSize.height:1) }, 'rgba(0,127,255,'+alpha+')' );
 			bp.draw.dot( { x : x, y : value }, 'rgba(0,127,255,'+alpha+')' );
 		    }
 		}
@@ -324,11 +338,13 @@
 	    function plotBalancedCollection( x, lambda, data, node ) {
 		bp.draw.offset.x = bp.fill.offset.x = bp.grid.center.x = 0;
 		bp.draw.offset.y = bp.fill.offset.y = bp.grid.center.y = 0;
-		if( !node )
+		//console.log('node',node);
+		//console.log('node.isLeaf=', (node && node.isLeaf()));
+		if( !node || node.isLeaf() )
 		    return;
 
-		value = node.value.v;
-		var alpha = (config.alphaThreshold)+(node.value.w/data.size)*(1-config.alphaThreshold);
+		var value = node.key;
+		var alpha = (config.alphaThreshold)+(node.value/data.tree.size)*(1-config.alphaThreshold);
 		alpha = Math.max(0.0, Math.min(1.0, alpha));
 		
 		if( config.normalizePlot )
