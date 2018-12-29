@@ -9,8 +9,9 @@
  * @modified 2018-12-18 Added the config.redrawOnResize param.
  * @modified 2018-12-18 Added the config.defaultCanvas{Width,Height} params.
  * @modified 2018-12-19 Added CSS scaling.
- * @modified 2018-12-29 Removed the unused 'drawLabel' param. Added the 'enableMouse' and 'enableKeys' params.
- * @version  1.0.7
+ * @modified 2018-12-28 Removed the unused 'drawLabel' param. Added the 'enableMouse' and 'enableKeys' params.
+ * @modified 2018-12-29 Added the 'drawOrigin' param.
+ * @version  1.0.8
  **/
 
 
@@ -97,6 +98,7 @@
 	    scaleX                : config.scaleX || 1.0,
 	    scaleY                : config.scaleY || 1.0,
 	    rasterGrid            : typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
+	    drawOrigin            : typeof config.drawOrigin != 'undefined' ? config.drawOrigin : true,
 	    rasterAdjustFactor    : config.rasterAdjustFactor || 2.0,
 	    autoCenterOffset      : typeof config.autoCenterOffset != 'undefined' ? config.autoCenterOffset : true,
 	    backgroundColor       : config.backgroundColor || '#ffffff',
@@ -257,8 +259,17 @@
 		this.draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.125)' );
 	    else
 		this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.095)' )
-	    // Add a crosshair to mark center (for debugging)
-	    this.draw.crosshair( offset, 10, '#000000' );
+	    // Add a crosshair to mark the grid center (for debugging)
+	    //this.draw.crosshair( offset, 10, '#000000' );
+	};
+
+	// +---------------------------------------------------------------------------------
+	/**
+	 * Draw the origin as a crosshair.
+	 **/ // +-------------------------------
+	PlotBoilerplate.prototype.drawOrigin = function() {
+	    // Add a crosshair to mark the origin
+	    this.draw.crosshair( { x : 0, y : 0 }, 10, '#000000' );
 	};
 
 
@@ -367,6 +378,8 @@
 	    if( this.config.preDraw ) this.config.preDraw();
 	    
 	    this.drawGrid();
+	    if( this.config.drawOrigin )
+		this.drawOrigin();
 	    this.drawBackgroundImage();  
 	    // !!! Draw some test stuff !!!
 	    /*

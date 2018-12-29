@@ -400,14 +400,19 @@
     // +---------------------------------------------------------------------------------
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
-    _context.drawutils.prototype.label = function( text, x, y ) {
+    _context.drawutils.prototype.label = function( text, x, y, rotation ) {
+	// console.log('x',x,'y',y,'rotation',rotation);
+	this.ctx.save();
+	this.ctx.translate(x, y);
+	if( typeof rotation != 'undefined' )
+	    this.ctx.rotate(rotation);
+	this.ctx.fillStyle = 'black';
 	if( this.fillShapes ) {
-	    this.ctx.fillStyle = 'black';
-	    this.ctx.fillText( text, x, y );
+	    this.ctx.fillText( text, 0,0); //x, y );
 	} else {
-	    this.ctx.strokeStyle = 'black';
-	    this.ctx.strokeText( text, x, y, );
+	    this.ctx.strokeText( text, 0,0);//x, y, );
 	}
+	this.ctx.restore();
     };
     
     

@@ -87,6 +87,8 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2018-12-29
+  * Fixed a bug in the Feigenbaum demo: y was plotted inverted.
 * 2018-12-28
   * Removed the unused 'drawLabel' param.
   * Added the 'enableMouse' and 'enableKeys' params.

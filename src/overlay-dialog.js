@@ -40,8 +40,8 @@
 
 	// Set fullscreen and center; hide by default
 	_setStyles( this.wrapper, { display : 'none', position : 'fixed', left : '0px', top : '0px', width : '100vw', height : '100vh' } );
-	_setStyles( this.blanket, { width : '100%', height : '100%', display : 'flex', 'align-items' : 'center', 'justify-content' : 'center', background : 'rgba(0,0,0,0.5)' } );
-	_setStyles( this.content, { width : '500px', height : '500px', 'max-width' : '50%', 'max-height' : '50%', background : 'white', border : '1px solid grey', 'border-radius' : '5px', position : 'relative' } );
+	_setStyles( this.blanket, { width : '100%', height : '100%', display : 'flex', 'align-items' : 'center', 'justify-content' : 'center', background : 'rgba(0,0,0,0.15)' } );
+	_setStyles( this.content, { width : '500px', height : '500px', 'max-width' : '50%', 'max-height' : '50%', background : 'rgba(255,255,255,0.8)', border : '1px solid grey', 'border-radius' : '5px', position : 'relative' } );
 
 	// Add headline, main container and button line
 	this._headLine = document.createElement("h3");           

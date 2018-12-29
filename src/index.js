@@ -29,6 +29,7 @@
 		      scaleX                : 1.0,
 		      scaleY                : 1.0,
 		      rasterGrid            : true,
+		      drawOrigin            : true,
 		      rasterAdjustFactor    : 2.0,
 		      redrawOnResize        : true,
 		      defaultCanvasWidth    : 1024,
