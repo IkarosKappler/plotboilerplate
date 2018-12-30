@@ -87,6 +87,13 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2018-12-30
+  * Added the PlotBoilerplate.RectSelector helper for selecting sub
+    areas of the current plot without interfering with the current
+    plot progress.
+* 2018-12-29
+  * Renamed the 'autoCenterOffset' param to 'autoAdjustOffset'.
+  * Added the params 'offsetAdjustXPercent' and 'offsetAdjustYPercent'.
 * 2018-12-29
   * Fixed a bug in the Feigenbaum demo: y was plotted inverted.
 * 2018-12-28

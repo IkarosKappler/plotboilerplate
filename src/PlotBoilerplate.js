@@ -11,7 +11,8 @@
  * @modified 2018-12-19 Added CSS scaling.
  * @modified 2018-12-28 Removed the unused 'drawLabel' param. Added the 'enableMouse' and 'enableKeys' params.
  * @modified 2018-12-29 Added the 'drawOrigin' param.
- * @version  1.0.8
+ * @modified 2018-12-29 Renamed the 'autoCenterOffset' param to 'autoAdjustOffset'. Added the params 'offsetAdjustXPercent' and 'offsetAdjustYPercent'.
+ * @version  1.1.0
  **/
 
 
@@ -99,8 +100,10 @@
 	    scaleY                : config.scaleY || 1.0,
 	    rasterGrid            : typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
 	    drawOrigin            : typeof config.drawOrigin != 'undefined' ? config.drawOrigin : true,
-	    rasterAdjustFactor    : config.rasterAdjustFactor || 2.0,
-	    autoCenterOffset      : typeof config.autoCenterOffset != 'undefined' ? config.autoCenterOffset : true,
+	    rasterAdjustFactor    : typeof config.rasterAdjustFactor == 'number' ? config.rasterAdjustFactor : 2.0,
+	    autoAdjustOffset      : typeof config.autoAdjustOffset != 'undefined' ? config.autoAdjustOffset : true,
+	    offsetAdjustXPercent  : typeof config.offsetAdjustXPercent == 'number' ? config.offsetAdjustXPercent : 50,
+	    offsetAdjustYPercent  : typeof config.offsetAdjustYPercent == 'number' ? config.offsetAdjustYPercent : 50,
 	    backgroundColor       : config.backgroundColor || '#ffffff',
 	    redrawOnResize        : typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
 	    defaultCanvasWidth    : typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
@@ -507,9 +510,9 @@
 		_self.canvas.height     = h; 
 		_self.canvasSize.width  = w;
 		_self.canvasSize.height = h;
-		if( _self.config.autoCenterOffset ) {
-		    _self.draw.offset.x = _self.fill.offset.x = w/2;
-		    _self.draw.offset.y = _self.fill.offset.y = h/2;
+		if( _self.config.autoAdjustOffset ) {
+		    _self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); // w/2;
+		    _self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100); // h/2;
 		}
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {

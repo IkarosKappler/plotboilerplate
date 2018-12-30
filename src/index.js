@@ -37,7 +37,9 @@
 		      cssScaleX             : 1.0,
 		      cssScaleY             : 1.0,
 		      cssUniformScale       : true,
-		      autoCenterOffset      : true,
+		      autoAdjustOffset      : true,
+		      offsetAdjustXPercent  : 50,
+		      offsetAdjustYPercent  : 50,
 		      backgroundColor       : '#ffffff'
 		    }, GUP
 		)

@@ -23,7 +23,8 @@ module.exports = [
         './src/draw.js',
         './src/overlay-dialog.js',
 
-        './src/PlotBoilerplate.js'
+        './src/PlotBoilerplate.js',
+	'./src/PlotBoilerplate.RectSelector.js'
         ],
         output: {
             path: path.resolve(__dirname, 'dist'),
