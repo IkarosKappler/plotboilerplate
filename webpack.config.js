@@ -37,7 +37,7 @@ module.exports = [
           ]
     }
     // Un-comment this block if you also want to re-compile the Color class.
-    /* ,{
+    ,{
         entry: [
         './lib/Color.js',
         ],
@@ -45,7 +45,7 @@ module.exports = [
             path: path.resolve(__dirname, 'lib'),
             filename: 'Color.min.js'
         }
-    } */
+    }
     // Un-comment this block if you also want to re-compile the Color class.
     ,{
         entry: [
