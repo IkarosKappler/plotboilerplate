@@ -40,7 +40,9 @@
 		      autoAdjustOffset      : true,
 		      offsetAdjustXPercent  : 50,
 		      offsetAdjustYPercent  : 50,
-		      backgroundColor       : '#ffffff'
+		      backgroundColor       : '#ffffff',
+		      enableMouse           : true,
+		      enableKeys            : true
 		    }, GUP
 		)
 	    );

@@ -18,25 +18,20 @@
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
 	// +-------------------------------
-	var rect = document.getElementById(divID); // 'drag-rect');
+	var rect = document.getElementById(divID);
 	var rectBounds = { xMin : 0, yMin : 0, xMax : 0, yMax : 0 };
 	new MouseHandler(rect).up( function(e) {
+	    if( e.button != 0 ) // Left mouse button?
+		return;
 	    rect.style.display = 'none';
 	    console.log('xMin',rectBounds.xMin,'yMin',rectBounds.yMin,'xMax',rectBounds.xMax,'yMax',rectBounds.yMax);
 	    if( rectBounds.xMin != rectBounds.xMax && rectBounds.yMin != rectBounds.yMax )
 		callback( rectBounds );
 	} );
 	var mouseHandler = new MouseHandler(bp.canvas)
-	    /*.move( function(e) {
-		var relPos = bp.transformMousePosition( e.params.pos.x, e.params.pos.y );
-		relPos.x = normalization.unNormalizeX(relPos.x);
-		relPos.y = normalization.unNormalizeY(relPos.y);
-		var cx = document.getElementById('cx');
-		var cy = document.getElementById('cy');
-		if( cx ) cx.innerHTML = relPos.x.toFixed(2);
-		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-	    } )*/
 	    .down( function(e) {
+		if( e.button != 0 ) // Left mouse button?
+		    return;
 		rect.style.display = 'inherit';
 		rect.style.left = e.clientX+'px';
 		rect.style.top = e.clientY+'px';
@@ -47,6 +42,8 @@
 		rectBounds.yMin = rectBounds.yMax = normalization.unNormalizeY(relPos.y);
 	    } )
 	    .up( function(e) {
+		if( e.button != 0 ) // Left mouse button?
+		    return;
 		console.log('up');
 		rect.style.display = 'none';
 		console.log('xMin',rectBounds.xStart,'yMin',rectBounds.yStart,'xMax',rectBounds.xEnd,'yMax',rectBounds.yEnd);
@@ -55,6 +52,8 @@
 		    callback( rectBounds );
 	    } )
 	    .drag( function(e) {
+		if( e.button != 0 ) // Left mouse button?
+		    return;
 		var bounds = {
 		    xStart : e.params.mouseDownPos.x,
 		    yStart : e.params.mouseDownPos.y,

@@ -70,10 +70,13 @@
 		normalizePlot         : true,
 		normalizeToMin        : 0.0,
 		normalizeToMax        : 1.0, 
-		alphaThreshold        : 0.05,	
+		alphaThreshold        : 0.05,
 
 		rebuild               : function() { console.log('Rebuilding ... '); rebuild(); },
-		stampLabel            : function() { drawPlotLabel(); }
+		stampLabel            : function() { drawPlotLabel(); },
+
+		// This is not a 'real' param that can be changed after the page loaded.
+		autostart             : false
 	    }, GUP );
 	    
 	    console.log( JSON.stringify(config) );
@@ -143,27 +146,16 @@
 			      (bp.canvasSize.width-bp.fill.ctx.measureText(label).width)/2, // 15,
 			      10);
 
-		// bp.fill.ctx.font = '6pt Monospace'
-		// label = 'plotEnd=' + config.plotEnd;
-		//label = 'normalizeToMax=' + config.normalizeToMax;
 		label = 'normalizeToMin=' + config.normalizeToMin;
 		bp.fill.label(label, 15, bp.canvasSize.height - 3 );
-		
-		//label = 'plotStart=' + config.plotStart;
-		//label = 'normalizeToMin=' + config.normalizeToMin;
+
 		label = 'normalizeToMax=' + config.normalizeToMax;
-		//bp.fill.label(label, bp.canvasSize.width-bp.fill.ctx.measureText(label).width-3, bp.canvasSize.height - 3 );
 		bp.fill.label(label, 3, 10 );
 
-		//label = 'normalizeToMax=' + config.normalizeToMax;
-		// label = 'plotEnd=' + config.plotEnd;
 		label = 'plotStart=' + config.plotStart;
 		bp.fill.label(label, 12, bp.canvasSize.height-12, -Math.PI/2 );
-;
-		//label = 'normalizeToMin=' + config.normalizeToMin;
-		// label = 'plotStart=' + config.plotStart;
+		
 		label = 'plotEnd=' + config.plotEnd;
-		// bp.fill.label(label, 12, bp.fill.ctx.measureText(label).width+12, -Math.PI/2 );
 		bp.fill.label(label, bp.canvasSize.width-3, bp.canvasSize.height-3, -Math.PI/2 );
 	    };
 	    drawPlotLabel();
@@ -181,10 +173,12 @@
 		var lambda;
 		for( var x = curX; x < curX+xChunkSize; x += xStep ) {
 		    lambda = range[0] + (range[1] - range[0])*(x/(maxX-minX));
-		    //var result = logisticMap( x0, lambda, plotIterations, new WeightedCollection(), 0 );
-		    var result = logisticMap( x0, lambda, plotIterations, new WeightedBalancedCollection(), 0 );
+		    var collection = new WeightedBalancedCollection();
+		    collection.iterationsLeft = 0;
+		    var result = logisticMap( x0, lambda, plotIterations, collection, 0 );
 		    if( config.bufferData )
 			bufferedFeigenbaum.push( { x : x, lambda : lambda, data : result } );
+		    collection.iterationCount = plotIterations-collection.iterationsLeft;
 		    plotBalancedCollection( x, lambda, result, result.tree.root );
 		}
 		if( curX+xChunkSize < maxX ) {
@@ -205,13 +199,16 @@
 	    // +---------------------------------------------------------------------------------
 	    // | The actual logistic function (recursive implementation).
 	    // +-------------------------------
-	    var logisticMap = function( value, lambda, iterations, collection ) {
+	    var logisticMap = function( value, lambda, iterations, collection, curIteration ) {
 		var next_value = lambda * value * ( 1 - value );
 		// console.log( next_value );
-		if( next_value == null || next_value == undefined || isNaN(next_value) || !isFinite(next_value) || typeof next_value == 'undefined' || iterations-- <= 0 )
+		if( next_value == null || next_value == undefined || isNaN(next_value) || !isFinite(next_value) || typeof next_value == 'undefined' || iterations-- <= 0 ) {
+		    // collection.iterationsLefts = curIteration;
 		    return collection;
-		collection.add( next_value );
-		return logisticMap( next_value, lambda, iterations, collection );
+		}
+		collection.add( next_value, { iteration : curIteration } );
+		// console.log('curIteration',curIteration,'iterationsLeft',);
+		return logisticMap( next_value, lambda, iterations, collection, curIteration+1 );
 	    }
 	    // +---------------------------------------------------------------------------------
 	    // | ==============================
@@ -233,16 +230,25 @@
 		}
 		console.log( 'Finished rendering.' );
 	    }
-	    
+
+	    var startColor = Color.makeRGB(0,127,255);
+	    var endColor   = Color.makeRGB(0,255,127);
 	    function plotBalancedCollection( x, lambda, data, node ) {
 		if( !node || node.isNull() )
 		    return;
 		var value = node.key;
-		var alpha = (config.alphaThreshold)+(node.value/data.tree.size)*(1-config.alphaThreshold);
+		var weight = node.value.weight;
+		var iteration = node.value.iteration;
+		var alpha = (config.alphaThreshold)+(weight/data.tree.size)*(1-config.alphaThreshold);
+		//console.log(iteration);
 		alpha = Math.max(0.0, Math.min(1.0, alpha));		
 		if( config.normalizePlot )
-		    value = normalizeYValue(value);		
+		    value = normalizeYValue(value);
+		//console.log(data.iterationCount,data.iterationCount);
+		var color = startColor.clone().interpolate(endColor,iteration/data.iterationCount);
+		color.a = alpha;
 		bp.draw.dot( { x : x, y : value }, 'rgba(0,127,255,'+alpha+')' );
+		//bp.draw.dot( { x : x, y : value }, color.cssRGBA() );
 		plotBalancedCollection( x, lambda, data, node.left );
 		plotBalancedCollection( x, lambda, data, node.right );
 	    }
@@ -265,14 +271,25 @@
 	    }
 
 	    function wrapToArea( bounds ) {
-		config.plotStart = Math.min( bounds.xMax, bounds.xMin );
-		config.plotEnd = Math.max( bounds.xMax, bounds.xMin );
-		// Huh, yMin and yMax should never be negative
-		config.normalizeToMin = Math.min( Math.abs(bounds.yMin), Math.abs(bounds.yMax) );
-		config.normalizeToMax = Math.max( Math.abs(bounds.yMin), Math.abs(bounds.yMax) );
-		config.normalizePlot = true;
-		if( window.confirm('Plot again with new settings?') )
-		    rebuild();
+		var msg = "Plot again with new settings?\nxMin="+bounds.xMin + "\nxMax=" + bounds.xMax + "\nyMin=" + bounds.yMin + "\nyMax=" + bounds.yMax;
+		if( !window.confirm(msg) )
+		    return;
+		var params = {
+		    plotStart : Math.min( bounds.xMax, bounds.xMin ),
+		    plotEnd : Math.max( bounds.xMax, bounds.xMin ),
+		    normalizeToMin : Math.min( Math.abs(bounds.yMin), Math.abs(bounds.yMax) ),
+		    normalizeToMax : Math.max( Math.abs(bounds.yMin), Math.abs(bounds.yMax) ),
+		    normalizePlot : true,
+		    autostart : true
+		};
+		var str = "";
+		for (var key in params) {
+		    if (str != "") {
+			str += "&";
+		    }
+		    str += encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+		}
+		window.location.search = '?' + str;
 	    };
 
 	    function rebuild() {
@@ -287,12 +304,6 @@
 	    // +-------------------------------
 	    var rect = document.getElementById('drag-rect');
 	    var rectBounds = { xMin : 0, yMin : 0, xMax : 0, yMax : 0 };
-	    /*new MouseHandler(rect).up( function(e) {
-		rect.style.display = 'none';
-		console.log('xMin',rectBounds.xMin,'yMin',rectBounds.yMin,'xMax',rectBounds.xMax,'yMax',rectBounds.yMax);
-		wrapToArea( rectBounds );
-	    } );
-	    */
 	    new PlotBoilerplate.RectSelector( bp,
 					      'drag-rect',
 					      { normalizeY : normalizeYValue, unNormalizeX : unNormalizeXValue, unNormalizeY : unNormalizeYValue },
@@ -308,40 +319,7 @@
 		    var cy = document.getElementById('cy');
 		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-		} )
-	    ;
-	    /*
-		.down( function(e) {
-		    rect.style.display = 'inherit';
-		    rect.style.left = e.clientX+'px';
-		    rect.style.top = e.clientY+'px';
-		    rect.style.width = '1px';
-		    rect.style.height = '1px';
-		    var relPos = bp.transformMousePosition(e.params.mouseDownPos.x,e.params.mouseDownPos.y);
-		    rectBounds.xMin = unNormalizeXValue(relPos.x);
-		    rectBounds.yMin = unNormalizeYValue(relPos.y);
-		} )
-		.up( function(e) {
-		    console.log('up');
-		    rect.style.display = 'none';
-		    console.log('xMin',rectBounds.xStart,'yMin',rectBounds.yStart,'xMax',rectBounds.xEnd,'yMax',rectBounds.yEnd);
-		    wrapToArea( rectBounds );
-		} )
-		.drag( function(e) {
-		    var bounds = {
-			xStart : e.params.mouseDownPos.x,
-			yStart : e.params.mouseDownPos.y,
-			xEnd   : e.params.pos.x,
-			yEnd   : e.params.pos.y
-		    };
-		    var relPos = bp.transformMousePosition(e.params.pos.x,e.params.pos.y);
-		    rectBounds.xMax = unNormalizeXValue(relPos.x);
-		    rectBounds.yMax = unNormalizeYValue(relPos.y);
-		    rect.style.width = (bounds.xEnd-bounds.xStart)+'px';
-		    rect.style.height = (bounds.yEnd-bounds.yStart)+'px';
-		} )
-	    ;
-	    */
+		} );
 
 
 	    // Initialize the dialog
@@ -350,7 +328,9 @@
 	    // Init
 	    dialog.show( 'Click <button id="_btn_rebuild">Rebuild</button> to plot the curves.', 'Hint', null, {} );
 	    document.getElementById('_btn_rebuild').addEventListener('click', rebuild);
-	    
+
+	    if( config.autostart  )
+		rebuild();
 	   
 	} );
     

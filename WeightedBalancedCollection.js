@@ -6,13 +6,14 @@
 	this.tree = new BBTree();
 	this.maxWeight = 0;
 	
-	this.add = function( k ) {
-	    var v = 1;
+	this.add = function( k, data ) {
+	    //var v = 1;
+	    data.weight = 1;
 	    var s = this.tree.size;
-	    var node = this.tree.insert(k,v);
+	    var node = this.tree.insert(k,data); // v);
 	    if( s==this.tree.size ) 
-		node.value++;
-	    this.maxWeight = Math.max( this.maxWeight, node.value );
+		node.value.weight++;
+	    this.maxWeight = Math.max( this.maxWeight, node.value.weight );
 	};
     };
     _context.WeightedBalancedCollection = WeightedBalancedCollection;
