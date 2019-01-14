@@ -92,7 +92,8 @@ For details see main-dist.html:
 
 ### Changelog
 * 2019-01-14
-  * Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints'
+  * Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints'.
+  * Added the 'redraw' param to the add() function.
 * 2018-12-30
   * Added the PlotBoilerplate.RectSelector helper for selecting sub
     areas of the current plot without interfering with the current

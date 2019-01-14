@@ -12,7 +12,7 @@
  * @modified 2018-12-28 Removed the unused 'drawLabel' param. Added the 'enableMouse' and 'enableKeys' params.
  * @modified 2018-12-29 Added the 'drawOrigin' param.
  * @modified 2018-12-29 Renamed the 'autoCenterOffset' param to 'autoAdjustOffset'. Added the params 'offsetAdjustXPercent' and 'offsetAdjustYPercent'.
- * @modified 2019-01-14 Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints';
+ * @modified 2019-01-14 Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints'. Added the 'redraw' praam to the add() function.
  * @version  1.1.1
  **/
 
@@ -184,8 +184,9 @@
 	 *  * a BezierPath
 	 *
 	 * @param drawable:Object The drawable (of one of the allowed class instance) to add.
+	 * @param redraw:boolean
 	 **/ // +-------------------------------
-	PlotBoilerplate.prototype.add = function( drawable ) {
+	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
 	    if( drawable instanceof Line ) {
 		// Add some lines
 		this.drawables.push( drawable );
@@ -246,7 +247,8 @@
 		throw "Cannot add drawable of unrecognized type: " + drawable.constructor.name;
 	    }
 
-	    this.redraw();
+	    if( redraw )
+		this.redraw();
 	};
 
 

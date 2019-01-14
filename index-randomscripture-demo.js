@@ -79,9 +79,10 @@
 		    //console.log( 'Added curve' );
 
 		    // Stop word?
-		    if( Math.random() < 0.1 && x+xSize < pb.canvasSize.width ) {
-			pb.add( BezierPath.fromArray( curves ));
+		    if( Math.random() < 0.1 && x+2*xSize < pb.canvasSize.width ) {
+			pb.add( BezierPath.fromArray( curves ), false );
 			curves = [];
+			x+=xSize;
 		    }
 		    
 		    //pb.add( BezierPath.fromArray( curves )); // new BezierPath([curves]) );
@@ -89,8 +90,9 @@
 		
 		//console.log( 'Adding curves', curves.length );
 		//pb.add( new BezierPath(curves) );
-		pb.add( BezierPath.fromArray( curves )); 
+		pb.add( BezierPath.fromArray( curves ), false ); 
 	    }
+	    pb.redraw();
 		
 
 	    // +---------------------------------------------------------------------------------
