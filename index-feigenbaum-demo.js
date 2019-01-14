@@ -231,8 +231,8 @@
 		console.log( 'Finished rendering.' );
 	    }
 
-	    var startColor = Color.makeRGB(0,127,255);
-	    var endColor   = Color.makeRGB(0,255,127);
+	    //var startColor = Color.makeRGB(0,127,255);
+	    //var endColor   = Color.makeRGB(0,255,127);
 	    function plotBalancedCollection( x, lambda, data, node ) {
 		if( !node || node.isNull() )
 		    return;
@@ -245,8 +245,8 @@
 		if( config.normalizePlot )
 		    value = normalizeYValue(value);
 		//console.log(data.iterationCount,data.iterationCount);
-		var color = startColor.clone().interpolate(endColor,iteration/data.iterationCount);
-		color.a = alpha;
+		//var color = startColor.clone().interpolate(endColor,iteration/data.iterationCount);
+		//color.a = alpha;
 		bp.draw.dot( { x : x, y : value }, 'rgba(0,127,255,'+alpha+')' );
 		//bp.draw.dot( { x : x, y : value }, color.cssRGBA() );
 		plotBalancedCollection( x, lambda, data, node.left );

@@ -12,7 +12,8 @@
  * @modified 2018-12-28 Removed the unused 'drawLabel' param. Added the 'enableMouse' and 'enableKeys' params.
  * @modified 2018-12-29 Added the 'drawOrigin' param.
  * @modified 2018-12-29 Renamed the 'autoCenterOffset' param to 'autoAdjustOffset'. Added the params 'offsetAdjustXPercent' and 'offsetAdjustYPercent'.
- * @version  1.1.0
+ * @modified 2019-01-14 Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints';
+ * @version  1.1.1
  **/
 
 
@@ -118,6 +119,9 @@
 					       },
 	    saveFile              : function() { saveFile(); },
 
+	    drawBezierHandleLines : typeof config.drawBezierHandleLines != 'undefined' ? config.drawBezierHandleLines : true,
+	    drawBezierHandlePoints : typeof config.drawBezierHandlePoints != 'undefined' ? config.drawBezierHandlePoints : true,
+	    
 	    // Listeners/observers
 	    preDraw               : (typeof config.preDraw == 'function' ? config.preDraw : null),
 	    postDraw              : (typeof config.postDraw == 'function' ? config.postDraw : null),
@@ -306,38 +310,40 @@
 		    for( var c in d.bezierCurves ) {
 			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, '#00a822' );
 
-			if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
-			    this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, 'orange' );
+			if( this.config.drawBezierHandlePoints ) {
+			    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
+				this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, 'orange' );
+				d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+			    }
+			    if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
+				this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, 'orange' );
+				d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+			    }
+			    this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, '#008888' );
+			    this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, '#008888' );
+			    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+			    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
+			} else {
 			    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
-			}
-			if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
-			    this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, 'orange' );
 			    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+			    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+			    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
 			}
-			this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, '#008888' );
-			this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, '#008888' );
-			d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
-			d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
-			this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
-			this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
 			
+			if( this.config.drawBezierHandleLines ) {
+			    this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
+			    this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
+			}
 			
 		    }
 		} else if( d instanceof Polygon ) {
 		    this.draw.polygon( d, '#0022a8' );
-		    //for( var i in d.vertices )
-		    //	d.vertices[i].attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
-		    //this.draw.line( d.center, d.axis, '#ff0000' );
 		    this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
 		    this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
 		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), '#2222a8' );
-		    // d.center.renderTime = renderTime;
-		    // d.axis.renderTime = renderTime;
 		} else if( d instanceof Line ) {
 		    this.draw.line( d.a, d.b, '#a844a8' );
-		    // d.a.renderTime = renderTime;
-		    // d.b.renderTime = renderTime;
 		} else {
 		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
 		}

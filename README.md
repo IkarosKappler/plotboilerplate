@@ -55,6 +55,8 @@ For details see main-dist.html:
 				 rasterGrid            : true,
 				 backgroundColor       : '#ffffff',
 				 redrawOnResize        : true,
+				 drawBezierHandleLines : true,
+	    			 drawBezierHandlePoints : true,
 				 preDraw               : function() { console.log('before drawing.'); },
 				 postDraw              : function() { console.log('after drawing.'); }
 				} );
@@ -83,10 +85,14 @@ For details see main-dist.html:
 
 
 ### Known bugs
- * Currently none known. Please report bugs.
+ * BezierPath counstructor fails.
+ * offsetAdjustXPercent and offsetAdjustYPercent do not work properly.
+ (* Currently no more known. Please report bugs.)
 
 
 ### Changelog
+* 2019-01-14
+  * Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints'
 * 2018-12-30
   * Added the PlotBoilerplate.RectSelector helper for selecting sub
     areas of the current plot without interfering with the current
