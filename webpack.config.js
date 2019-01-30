@@ -12,7 +12,8 @@ module.exports = [
         './src/VertexListeners.js',
         './src/Vertex.js',
     	'./src/Grid.js',
-	'./src/Line.js', 
+	'./src/Line.js',
+	'./src/Vector.js',
     	'./src/CubicBezierCurve.js',
     	'./src/BezierPath.js',
     	'./src/Polygon.js',
@@ -23,7 +24,8 @@ module.exports = [
         './src/draw.js',
         './src/overlay-dialog.js',
 
-        './src/PlotBoilerplate.js'
+        './src/PlotBoilerplate.js',
+	'./src/PlotBoilerplate.RectSelector.js'
         ],
         output: {
             path: path.resolve(__dirname, 'dist'),
@@ -36,7 +38,7 @@ module.exports = [
           ]
     }
     // Un-comment this block if you also want to re-compile the Color class.
-    /* ,{
+    ,{
         entry: [
         './lib/Color.js',
         ],
@@ -44,7 +46,7 @@ module.exports = [
             path: path.resolve(__dirname, 'lib'),
             filename: 'Color.min.js'
         }
-    } */
+    }
     // Un-comment this block if you also want to re-compile the Color class.
     ,{
         entry: [

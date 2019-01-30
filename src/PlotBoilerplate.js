@@ -11,7 +11,11 @@
  * @modified 2018-12-19 Added CSS scaling.
  * @modified 2018-12-28 Removed the unused 'drawLabel' param. Added the 'enableMouse' and 'enableKeys' params.
  * @modified 2018-12-29 Added the 'drawOrigin' param.
- * @version  1.0.8
+ * @modified 2018-12-29 Renamed the 'autoCenterOffset' param to 'autoAdjustOffset'. Added the params 'offsetAdjustXPercent' and 'offsetAdjustYPercent'.
+ * @modified 2019-01-14 Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints'. Added the 'redraw' praam to the add() function.
+ * @modified 2019-01-16 Added params 'drawHandleLines' and 'drawHandlePoints'. Added the new params to the dat.gui interface.
+ * @modified 2019-01-30 Added the 'Vector' type (extending the Line class).
+ * @version  1.2.0
  **/
 
 
@@ -99,8 +103,10 @@
 	    scaleY                : config.scaleY || 1.0,
 	    rasterGrid            : typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
 	    drawOrigin            : typeof config.drawOrigin != 'undefined' ? config.drawOrigin : true,
-	    rasterAdjustFactor    : config.rasterAdjustFactor || 2.0,
-	    autoCenterOffset      : typeof config.autoCenterOffset != 'undefined' ? config.autoCenterOffset : true,
+	    rasterAdjustFactor    : typeof config.rasterAdjustFactor == 'number' ? config.rasterAdjustFactor : 2.0,
+	    autoAdjustOffset      : typeof config.autoAdjustOffset != 'undefined' ? config.autoAdjustOffset : true,
+	    offsetAdjustXPercent  : typeof config.offsetAdjustXPercent == 'number' ? config.offsetAdjustXPercent : 50,
+	    offsetAdjustYPercent  : typeof config.offsetAdjustYPercent == 'number' ? config.offsetAdjustYPercent : 50,
 	    backgroundColor       : config.backgroundColor || '#ffffff',
 	    redrawOnResize        : typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
 	    defaultCanvasWidth    : typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
@@ -115,6 +121,11 @@
 					       },
 	    saveFile              : function() { saveFile(); },
 
+	    drawBezierHandleLines : typeof config.drawBezierHandleLines != 'undefined' ? config.drawBezierHandleLines : true,
+	    drawBezierHandlePoints : typeof config.drawBezierHandlePoints != 'undefined' ? config.drawBezierHandlePoints : true,
+	    drawHandleLines       : typeof config.drawHandleLines != 'undefined' ? config.drawHandleLines : true,
+	    drawHandlePoints      : typeof config.drawHandlePoints != 'undefined' ? config.drawHandlePoints : true,
+	    
 	    // Listeners/observers
 	    preDraw               : (typeof config.preDraw == 'function' ? config.preDraw : null),
 	    postDraw              : (typeof config.postDraw == 'function' ? config.postDraw : null),
@@ -172,15 +183,21 @@
 	 *
 	 * This must be either:
 	 *  * a Line
+	 *  * a Vector
 	 *  * a VEllipse
 	 *  * a Polygon
 	 *  * a BezierPath
 	 *
 	 * @param drawable:Object The drawable (of one of the allowed class instance) to add.
+	 * @param redraw:boolean
 	 **/ // +-------------------------------
-	PlotBoilerplate.prototype.add = function( drawable ) {
+	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
 	    if( drawable instanceof Line ) {
 		// Add some lines
+		this.drawables.push( drawable );
+		this.vertices.push( drawable.a );
+		this.vertices.push( drawable.b );
+	    } else if( drawable instanceof Vector ) {
 		this.drawables.push( drawable );
 		this.vertices.push( drawable.a );
 		this.vertices.push( drawable.b );
@@ -239,7 +256,9 @@
 		throw "Cannot add drawable of unrecognized type: " + drawable.constructor.name;
 	    }
 
-	    this.redraw();
+	    // This is a workaround for backwards compatibility when the 'redraw' param was not yet present.
+	    if( redraw || typeof redraw == 'undefined' )
+		this.redraw();
 	};
 
 
@@ -259,8 +278,8 @@
 		this.draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.125)' );
 	    else
 		this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.095)' )
-	    // Add a crosshair to mark the grid center (for debugging)
-	    //this.draw.crosshair( offset, 10, '#000000' );
+	    // Add a crosshair to mark the grid center (good for visual debugging)
+	    // this.draw.crosshair( offset, 10, '#000000' );
 	};
 
 	// +---------------------------------------------------------------------------------
@@ -303,38 +322,63 @@
 		    for( var c in d.bezierCurves ) {
 			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, '#00a822' );
 
-			if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
-			    this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, 'orange' );
+			if( this.config.drawBezierHandlePoints && this.config.drawHandlePoints ) {
+			    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
+				this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, 'orange' );
+				d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+			    }
+			    if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
+				this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, 'orange' );
+				d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+			    }
+			    this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, '#008888' );
+			    this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, '#008888' );
+			    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+			    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
+			} else {
 			    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
-			}
-			if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
-			    this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, 'orange' );
 			    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+			    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+			    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
 			}
-			this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, '#008888' );
-			this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, '#008888' );
-			d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
-			d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
-			this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
-			this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
 			
+			if( this.config.drawBezierHandleLines && this.config.drawHandleLines ) {
+			    this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
+			    this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
+			}
 			
 		    }
 		} else if( d instanceof Polygon ) {
 		    this.draw.polygon( d, '#0022a8' );
-		    //for( var i in d.vertices )
-		    //	d.vertices[i].attr.renderTime = renderTime;
+		    if( !this.config.drawHandlePoints ) {
+			for( var i in d.vertices )
+			    d.vertices[i].attr.renderTime = renderTime;
+		    }
 		} else if( d instanceof VEllipse ) {
-		    //this.draw.line( d.center, d.axis, '#ff0000' );
-		    this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
-		    this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
+		    if( this.config.drawHandleLines ) {
+			this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+			this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
+		    }
 		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), '#2222a8' );
-		    // d.center.renderTime = renderTime;
-		    // d.axis.renderTime = renderTime;
+		    if( !this.config.drawHandlePoints ) {
+			d.center.attr.renderTime = renderTime;
+			d.axis.attr.renderTime = renderTime;
+		    }
 		} else if( d instanceof Line ) {
 		    this.draw.line( d.a, d.b, '#a844a8' );
-		    // d.a.renderTime = renderTime;
-		    // d.b.renderTime = renderTime;
+		    if( !this.config.drawHandlePoints ) {
+			d.a.attr.renderTime = renderTime;
+			d.b.attr.renderTime = renderTime;
+		    }
+		} else if( d instanceof Vector ) {
+		    // this.draw.line( d.a, d.b, '#ff44a8' );
+		    this.draw.arrow( d.a, d.b, '#ff44a8' );
+		    if( this.config.drawHandlePoints ) {
+			this.draw.circleHandle( d.b, 7, '#a8a8a8' );
+		    } else {
+			d.a.attr.renderTime = renderTime;	
+		    }
+		    d.b.attr.renderTime = renderTime;
 		} else {
 		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
 		}
@@ -507,9 +551,9 @@
 		_self.canvas.height     = h; 
 		_self.canvasSize.width  = w;
 		_self.canvasSize.height = h;
-		if( _self.config.autoCenterOffset ) {
-		    _self.draw.offset.x = _self.fill.offset.x = w/2;
-		    _self.draw.offset.y = _self.fill.offset.y = h/2;
+		if( _self.config.autoAdjustOffset ) {
+		    _self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); // w/2;
+		    _self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100); // h/2;
 		}
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {
@@ -811,6 +855,13 @@
 	fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
 	fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
 	fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");
+	
+	var fold01 = fold0.addFolder('Draw settings');
+	fold01.add(this.config, 'drawBezierHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle points.");
+	fold01.add(this.config, 'drawBezierHandleLines').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle lines.");
+	fold01.add(this.config, 'drawHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw handle points (overrides all other settings).");
+	fold01.add(this.config, 'drawHandleLines').onChange( function() { _self.redraw(); } ).title("Draw handle lines in general (overrides all other settings).");
+	
 	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();

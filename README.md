@@ -55,6 +55,8 @@ For details see main-dist.html:
 				 rasterGrid            : true,
 				 backgroundColor       : '#ffffff',
 				 redrawOnResize        : true,
+				 drawBezierHandleLines : true,
+	    			 drawBezierHandlePoints : true,
 				 preDraw               : function() { console.log('before drawing.'); },
 				 postDraw              : function() { console.log('after drawing.'); }
 				} );
@@ -74,19 +76,35 @@ For details see main-dist.html:
  * Add pad/phone support.
  * Implement optional canvas zoom.
  * Implement optional canvas rotation.
- * Make Bézier Curves dividable.
+ * Make Bézier Curves dividable (by double click?).
  * Implement snap-to-grid.
  * Make ellipses rotatable.
+ * Add images.
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
  * Add arcs?
  * The click-/tap-area scales with the canvas- and CSS-scale. It should have fixed size.
 
 
 ### Known bugs
- * Currently none known. Please report bugs.
+ * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
+ * Currently no more known. Please report bugs.
 
 
 ### Changelog
+* 2019-01-30
+  * Fixed the offsetAdjustXPercent and offsetAdjustYPercent bug. They are working properly now.
+  * Added the Vector class (subclass of Line).
+  * Added the draw.arrow(Vertex,Vertex,color) function for drawing arrow heads.
+* 2019-01-14
+  * Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints'.
+  * Added the 'redraw' param to the add() function.
+* 2018-12-30
+  * Added the PlotBoilerplate.RectSelector helper for selecting sub
+    areas of the current plot without interfering with the current
+    plot progress.
+* 2018-12-29
+  * Renamed the 'autoCenterOffset' param to 'autoAdjustOffset'.
+  * Added the params 'offsetAdjustXPercent' and 'offsetAdjustYPercent'.
 * 2018-12-29
   * Fixed a bug in the Feigenbaum demo: y was plotted inverted.
 * 2018-12-28

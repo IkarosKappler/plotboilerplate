@@ -37,8 +37,12 @@
 		      cssScaleX             : 1.0,
 		      cssScaleY             : 1.0,
 		      cssUniformScale       : true,
-		      autoCenterOffset      : true,
-		      backgroundColor       : '#ffffff'
+		      autoAdjustOffset      : true,
+		      offsetAdjustXPercent  : 50,
+		      offsetAdjustYPercent  : 50,
+		      backgroundColor       : '#ffffff',
+		      enableMouse           : true,
+		      enableKeys            : true
 		    }, GUP
 		)
 	    );
@@ -66,7 +70,7 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Add some elements to draw (demo).
 	    // +-------------------------------
-	    var diameter = Math.min(bp.canvasSize.width,bp.canvasSize.height)/3;
+	    var diameter = Math.min(bp.canvasSize.width,bp.canvasSize.height)/3.5;
 	    var radius   = diameter*0.5;
 	    var hypo     = Math.sqrt( radius*radius*2 );
 
@@ -77,6 +81,14 @@
 	    bp.add( new Line( new Vertex(-diameter,diameter), new Vertex(-hypo,hypo) ) );
 	    bp.add( new Line( new Vertex(diameter,-diameter), new Vertex(hypo,-hypo) ) );
 	    bp.add( new Line( new Vertex(diameter,diameter), new Vertex(hypo,hypo) ) );
+
+	    // +---------------------------------------------------------------------------------
+	    // | Add some Vectors.
+	    // +-------------------------------
+	    bp.add( new Vector( new Vertex(-diameter*1.6,0), new Vertex(-diameter*1.2,0) ) );
+	    bp.add( new Vector( new Vertex(diameter*1.6,0), new Vertex(diameter*1.2,0) ) );
+	    bp.add( new Vector( new Vertex(0,-diameter*1.6), new Vertex(0,-diameter*1.2) ) );
+	    bp.add( new Vector( new Vertex(0,diameter*1.6), new Vertex(0,diameter*1.2) ) );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add square.
