@@ -83,6 +83,7 @@ For details see main-dist.html:
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
  * Add arcs?
  * The click-/tap-area scales with the canvas- and CSS-scale. It should have fixed size.
+ * Added image flipping.
 
 
 ### Known bugs
@@ -95,6 +96,9 @@ For details see main-dist.html:
   * Fixed the offsetAdjustXPercent and offsetAdjustYPercent bug. They are working properly now.
   * Added the Vector class (subclass of Line).
   * Added the draw.arrow(Vertex,Vertex,color) function for drawing arrow heads.
+  * Added the Vertex.setX(Number) and Vertex.setY(Number) functions.
+  * Added the PBImage type.
+  * Added image rendering.
 * 2019-01-14
   * Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints'.
   * Added the 'redraw' param to the add() function.

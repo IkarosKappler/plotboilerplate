@@ -14,7 +14,8 @@
  * @modified 2018-11-28 Added 'this' to the VertexAttr constructor.
  * @modified 2018-12-05 Added the sub(...) function. Changed the signature of the add() function! add(Vertex) and add(number,number) are now possible.
  * @modified 2018-12-21 (It's winter solstice) Added the inv()-function.
- * @version  2.0.8
+ * @modified 2019-01-30 Added the setX(Number) and setY(Number) functions.
+ * @version  2.0.9
  **/
 
 
@@ -56,6 +57,26 @@
 	return this;
     };
 
+
+    // +------------------------------------------------------------
+    // | Set the x-component of this vertex.
+    // |
+    // | @return Vertex
+    // +-------------------------------------------------------
+    Vertex.prototype.setX = function( x ) {
+	this.x = x;
+	return this;
+    };
+
+    // +------------------------------------------------------------
+    // | Set the y-component of this vertex.
+    // |
+    // | @return Vertex
+    // +-------------------------------------------------------
+    Vertex.prototype.setY = function( y ) {
+	this.y = y;
+	return this;
+    };
 
     // +------------------------------------------------------------
     // | Add the passed amount to x- and y- component of this vertex.

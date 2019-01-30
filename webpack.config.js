@@ -18,6 +18,7 @@ module.exports = [
     	'./src/BezierPath.js',
     	'./src/Polygon.js',
     	'./src/VEllipse.js',
+	'./src/PBImage.js',
 
         './src/MouseHandler.js',
     	'./src/KeyHandler.js',

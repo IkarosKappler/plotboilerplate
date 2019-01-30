@@ -15,7 +15,8 @@
  * @modified 2019-01-14 Added params 'drawBezierHandleLines' and 'drawBezierHandlePoints'. Added the 'redraw' praam to the add() function.
  * @modified 2019-01-16 Added params 'drawHandleLines' and 'drawHandlePoints'. Added the new params to the dat.gui interface.
  * @modified 2019-01-30 Added the 'Vector' type (extending the Line class).
- * @version  1.2.0
+ * @modified 2019-01-30 Added the 'PBImage' type (a wrapper for images).
+ * @version  1.3.0
  **/
 
 
@@ -252,6 +253,14 @@
 							    );
 		    } );
 		} // END for
+	    } else if( drawable instanceof PBImage ) {
+		this.vertices.push( drawable.upperLeft );
+		this.vertices.push( drawable.lowerRight );
+		this.drawables.push( drawable );
+		drawable.upperLeft.listeners.addDragListener( function(e) {
+		    drawable.lowerRight.add( e.params.dragAmount );
+		} );
+		drawable.lowerRight.attr.selectable = false
 	    } else {
 		throw "Cannot add drawable of unrecognized type: " + drawable.constructor.name;
 	    }
@@ -379,6 +388,14 @@
 			d.a.attr.renderTime = renderTime;	
 		    }
 		    d.b.attr.renderTime = renderTime;
+		} else if( d instanceof PBImage ) {
+		    if( this.config.drawHandleLines )
+			this.draw.line( d.upperLeft, d.lowerRight, '#a8a8a8' );
+		    this.fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
+		    if( this.config.drawHandlePoints ) {
+			this.draw.circleHandle( d.lowerRight, 7, '#a8a8a8' );
+			d.lowerRight.attr.renderTime = renderTime;
+		    }
 		} else {
 		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
 		}

@@ -21,7 +21,7 @@
 	'load',
 	function() {
 	    // All config params are optional.
-	    var bp = new PlotBoilerplate(
+	    var pb = new PlotBoilerplate(
 		PlotBoilerplate.utils.safeMergeByKeys(
 		    { canvas                : document.getElementById('my-canvas'),					    
 		      fullSize              : true,
@@ -50,16 +50,16 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
-	    bp.createGUI(); 
+	    pb.createGUI(); 
 	    // END init dat.gui
 	    
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add a mouse listener to track the mouse position.
 	    // +-------------------------------
-	    new MouseHandler(bp.canvas)
+	    new MouseHandler(pb.canvas)
 		.move( function(e) {
-		    var relPos = bp.transformMousePosition( e.params.pos.x, e.params.pos.y );
+		    var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
 		    var cx = document.getElementById('cx');
 		    var cy = document.getElementById('cy');
 		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
@@ -70,41 +70,47 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Add some elements to draw (demo).
 	    // +-------------------------------
-	    var diameter = Math.min(bp.canvasSize.width,bp.canvasSize.height)/3.5;
+	    var diameter = Math.min(pb.canvasSize.width,pb.canvasSize.height)/3.5;
 	    var radius   = diameter*0.5;
 	    var hypo     = Math.sqrt( radius*radius*2 );
 
 	    // +---------------------------------------------------------------------------------
+	    // | Add an image.
+	    // +-------------------------------
+	    var img = new Image(50,50);
+	    pb.add( new PBImage(img, new Vertex(-25,-25), new Vertex(25,25)) );
+	    
+	    // +---------------------------------------------------------------------------------
 	    // | Add some Lines.
 	    // +-------------------------------
-	    bp.add( new Line( new Vertex(-diameter,-diameter), new Vertex(-hypo,-hypo) ) );
-	    bp.add( new Line( new Vertex(-diameter,diameter), new Vertex(-hypo,hypo) ) );
-	    bp.add( new Line( new Vertex(diameter,-diameter), new Vertex(hypo,-hypo) ) );
-	    bp.add( new Line( new Vertex(diameter,diameter), new Vertex(hypo,hypo) ) );
+	    pb.add( new Line( new Vertex(-diameter,-diameter), new Vertex(-hypo,-hypo) ) );
+	    pb.add( new Line( new Vertex(-diameter,diameter), new Vertex(-hypo,hypo) ) );
+	    pb.add( new Line( new Vertex(diameter,-diameter), new Vertex(hypo,-hypo) ) );
+	    pb.add( new Line( new Vertex(diameter,diameter), new Vertex(hypo,hypo) ) );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add some Vectors.
 	    // +-------------------------------
-	    bp.add( new Vector( new Vertex(-diameter*1.6,0), new Vertex(-diameter*1.2,0) ) );
-	    bp.add( new Vector( new Vertex(diameter*1.6,0), new Vertex(diameter*1.2,0) ) );
-	    bp.add( new Vector( new Vertex(0,-diameter*1.6), new Vertex(0,-diameter*1.2) ) );
-	    bp.add( new Vector( new Vertex(0,diameter*1.6), new Vertex(0,diameter*1.2) ) );
+	    pb.add( new Vector( new Vertex(-diameter*1.6,0), new Vertex(-diameter*1.2,0) ) );
+	    pb.add( new Vector( new Vertex(diameter*1.6,0), new Vertex(diameter*1.2,0) ) );
+	    pb.add( new Vector( new Vertex(0,-diameter*1.6), new Vertex(0,-diameter*1.2) ) );
+	    pb.add( new Vector( new Vertex(0,diameter*1.6), new Vertex(0,diameter*1.2) ) );
 
 	    // +---------------------------------------------------------------------------------
-	    // | Add square.
+	    // | Add polygon (here a square).
 	    // +-------------------------------
-	    var squareSize = 32;
+	    var squareSize = diameter*0.35;
 	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
 	    var square = new Polygon( squareVerts );
-	    bp.add( square );
+	    pb.add( square );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add two circles.
 	    // +-------------------------------
 	    var circle1 = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
-	    bp.add( circle1 );
+	    pb.add( circle1 );
 	    var circle2 = new VEllipse( new Vertex(0,0), new Vertex(diameter,diameter) );
-	    bp.add( circle2 );
+	    pb.add( circle2 );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add a circular connected bezier path
@@ -131,7 +137,12 @@
 	    // Construct
 	    var path = BezierPath.fromArray( bpath );
 	    path.adjustCircular = true;
-	    bp.add( path );
+	    pb.add( path );
+
+
+	    // Finally load the image
+	    img.addEventListener('load', function() { pb.redraw(); } );
+	    img.src = 'example-image.svg';
 	} );
     
 })(window); 

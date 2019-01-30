@@ -13,7 +13,8 @@
  * @modified 2018-12-06 Added a test function for drawing arc in SVG style.
  * @modified 2018-12-09 Added the dot(Vertex,color) function (copied from Feigenbaum-plot-script).
  * @modified 2019-01-30 Added the arrow(Vertex,Vertex,color) function for drawing arrow heads.
- * @version  1.1.0
+ * @modified 2019-01-30 Added the image(Image,Vertex,Vertex) function for drawing images.
+ * @version  1.2.0
  **/
 
 (function(_context) {
@@ -56,9 +57,7 @@
 	this.line( zA, { x : zB.x-(headlen*0.7)*Math.cos(angle)/this.scale.x, y : zB.y-(headlen*0.7)*Math.sin(angle)/this.scale.y }, color );
 	this.ctx.save();
 	this.ctx.beginPath();
-	// Thanks for howto draw arrow heads to
-	//    https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
-	this.ctx.moveTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y ); //tox, toy);
+	this.ctx.moveTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
 	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle-Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle-Math.PI/8));
 	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-(headlen*0.7)*Math.cos(angle), this.offset.y+zB.y*this.scale.y-(headlen*0.7)*Math.sin(angle));
 	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle+Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle+Math.PI/8))
@@ -68,6 +67,20 @@
 	this.ctx.restore();
     };
 
+
+    // +---------------------------------------------------------------------------------
+    // | Draw an image at the given position with the given size.
+    // +-------------------------------
+    _context.drawutils.prototype.image = function( image, position, size ) {
+	//size = size.clone();
+	//position = position.clone();
+	this.ctx.save();
+	//this.ctx.scale( size.x < 0 ? -1 : 1, size.y < 0 ? -1 : 1 );
+	//if( size.x < 0 ) { position.x = -position.x; size.x = -size.x; }
+	//if( size.y < 0 ) { position.y = -position.y; size.y = -size.y; }
+	this.ctx.drawImage( image, this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y, size.x*this.scale.x, size.y*this.scale.y );
+	this.ctx.restore();	
+    };
 
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff.
