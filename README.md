@@ -40,13 +40,15 @@ For details see main-dist.html:
 
 ## Initialize the canvas
 ~~~~javascript
- var bp = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
+ var pb = new PlotBoilerplate( { canvas                : document.getElementById('my-canvas'),					    
 			       	 fullSize              : true,
 				 fitToParent           : true,
 				 scaleX                : 1.0,
 				 scaleY                : 1.0,
 				 rasterAdjustFactor    : 2.0,
-				 autoCenterOffset      : true,
+				 autoAdjustOffset      : true, // was autoCenterOffset before
+				 offsetAdjustXPercent  : 50,
+				 offsetAdjustYPercent  : 50,
 				 defaultCanvasWidth    : 1024,
 				 defaultCanvasHeight   : 768,
 				 cssScaleX	       : 1.0,
@@ -84,10 +86,14 @@ For details see main-dist.html:
  * Add arcs?
  * The click-/tap-area scales with the canvas- and CSS-scale. It should have fixed size.
  * Added image flipping.
+ * Add Vectors to the SVGBuilder.
+ * Add Images to the SVGBuiler.
 
 
 ### Known bugs
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
+ * Image resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes).
+ * canvasContext.drawImage(...) with SVG resizing seems not to work in safari and firefox at all. Until there is a solution please use raster images.
  * Currently no more known. Please report bugs.
 
 

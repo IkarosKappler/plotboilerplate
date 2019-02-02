@@ -70,14 +70,11 @@
 
     // +---------------------------------------------------------------------------------
     // | Draw an image at the given position with the given size.
+    // |
+    // | Note: SVG images may have resizing issues at the moment.
     // +-------------------------------
     _context.drawutils.prototype.image = function( image, position, size ) {
-	//size = size.clone();
-	//position = position.clone();
 	this.ctx.save();
-	//this.ctx.scale( size.x < 0 ? -1 : 1, size.y < 0 ? -1 : 1 );
-	//if( size.x < 0 ) { position.x = -position.x; size.x = -size.x; }
-	//if( size.y < 0 ) { position.y = -position.y; size.y = -size.y; }
 	this.ctx.drawImage( image, this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y, size.x*this.scale.x, size.y*this.scale.y );
 	this.ctx.restore();	
     };
@@ -437,16 +434,15 @@
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
     _context.drawutils.prototype.label = function( text, x, y, rotation ) {
-	// console.log('x',x,'y',y,'rotation',rotation);
 	this.ctx.save();
 	this.ctx.translate(x, y);
 	if( typeof rotation != 'undefined' )
 	    this.ctx.rotate(rotation);
 	this.ctx.fillStyle = 'black';
 	if( this.fillShapes ) {
-	    this.ctx.fillText( text, 0,0); //x, y );
+	    this.ctx.fillText( text, 0,0); 
 	} else {
-	    this.ctx.strokeText( text, 0,0);//x, y, );
+	    this.ctx.strokeText( text, 0,0);
 	}
 	this.ctx.restore();
     };
