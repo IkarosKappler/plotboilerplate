@@ -34,6 +34,8 @@
 		      redrawOnResize        : true,
 		      defaultCanvasWidth    : 1024,
 		      defaultCanvasHeight   : 768,
+		      canvasWidthFactor     : 1.0,
+		      canvasHeightFactor    : 1.0,
 		      cssScaleX             : 1.0,
 		      cssScaleY             : 1.0,
 		      cssUniformScale       : true,

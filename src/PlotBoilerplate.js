@@ -16,7 +16,8 @@
  * @modified 2019-01-16 Added params 'drawHandleLines' and 'drawHandlePoints'. Added the new params to the dat.gui interface.
  * @modified 2019-01-30 Added the 'Vector' type (extending the Line class).
  * @modified 2019-01-30 Added the 'PBImage' type (a wrapper for images).
- * @version  1.3.0
+ * @modified 2019-02-02 Added the 'canvasWidthFactor' and 'canvasHeightFactor' params.
+ * @version  1.3.1
  **/
 
 
@@ -112,6 +113,8 @@
 	    redrawOnResize        : typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
 	    defaultCanvasWidth    : typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
 	    defaultCanvasHeight   : typeof config.defaultCanvasHeight == 'number' ? config.defaultCanvasHeight : DEFAULT_CANVAS_HEIGHT,
+	    canvasWidthFactor     : typeof config.canvasWidthFactor == 'number' ? config.canvasWidthFactor : 1.0,
+	    canvasHeightFactor    : typeof config.canvasHeightFactor == 'number' ? config.canvasHeightFactor : 1.0,
 	    cssScaleX             : typeof config.cssScaleX == 'number' ? config.cssScaleX : 1.0,
 	    cssScaleY             : typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
 	    cssUniformScale       : true,
@@ -155,7 +158,6 @@
 	this.draggedElements     = [];
 	this.drawables           = [];
 	var _self = this;
-
 
 	// +---------------------------------------------------------------------------------
 	// | Object members.
@@ -560,17 +562,15 @@
 	 **/ // +-------------------------------
 	PlotBoilerplate.prototype.resizeCanvas = function() {
 	    var _setSize = function(w,h) {
-		//var wdpr = w * config.pixelRatio;
-		//var hdpr = h * config.pixelRatio;
-		//w = 14000; 
-		//h = 9500;
+		w *= _self.config.canvasWidthFactor;
+		h *= _self.config.canvasHeightFactor;
 		_self.canvas.width      = w; 
 		_self.canvas.height     = h; 
 		_self.canvasSize.width  = w;
 		_self.canvasSize.height = h;
 		if( _self.config.autoAdjustOffset ) {
-		    _self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); // w/2;
-		    _self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100); // h/2;
+		    _self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); 
+		    _self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100);
 		}
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {
@@ -869,6 +869,8 @@
 	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).");
 	fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
 	fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
+	fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.");
+	fold00.add(this.config, 'canvasHeightFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current height.");
 	fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
 	fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
 	fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");

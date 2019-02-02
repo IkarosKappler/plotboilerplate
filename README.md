@@ -51,6 +51,8 @@ For details see main-dist.html:
 				 offsetAdjustYPercent  : 50,
 				 defaultCanvasWidth    : 1024,
 				 defaultCanvasHeight   : 768,
+				 canvasWidthFactor     : 1.0,
+				 canvasHeightFactor    : 1.0,
 				 cssScaleX	       : 1.0,
 				 cssScaleY	       : 1.0,
 				 cssUniformscale       : true,
@@ -98,6 +100,8 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2019-02-02
+  *  Added the 'canvasWidthFactor' and 'canvasHeightFactor' params.
 * 2019-01-30
   * Fixed the offsetAdjustXPercent and offsetAdjustYPercent bug. They are working properly now.
   * Added the Vector class (subclass of Line).
