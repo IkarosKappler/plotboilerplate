@@ -44,14 +44,7 @@
 
 	buffer.push( indent + '<defs>' + nl );
 	buffer.push( indent + '<style>' + nl);
-	/* if( options.zoom || options.offset ) {    
-	    buffer.push( indent + indent + '.main-g { transform:' );
-	    if( options.zoom )
-		buffer.push( ' scale(' + options.zoom.x + ',' + options.zoom.y + ')' );
-	    if( options.offset )
-		buffer.push( ' translate(' + options.offset.x + 'px,' + options.offset.y + 'px)' );
-	    buffer.push( ' }' + nl );
-	} */
+
 	buffer.push( indent + indent + ' .Polygon { fill : none; stroke : green; stroke-width : 2px; } ' + nl );
 	buffer.push( indent + indent + ' .BezierPath { fill : none; stroke : blue; stroke-width : 2px; } ' + nl );
 	buffer.push( indent + indent + ' .VEllipse { fill : none; stroke : black; stroke-width : 1px; } ' + nl );

@@ -55,6 +55,10 @@
     /**
      * Get line point at position t in [0 ... 1]:
      *  [P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]
+     *
+     * The counterpart of this function is Line.getClosestT(Vertex).
+     *
+     * @param {Number} t
      **/
     Line.prototype.vertAt = function( t ) {
 	return new Vertex( this.a.x + (this.b.x-this.a.x)*t,
@@ -84,27 +88,13 @@
     // +---------------------------------------------------------------------------------
     // | Create an SVG representation of this line.
     // |
-    // | @return string The SVG string
+    // | The counterpart for this function is Line.getVertAt(Number).
+    // |
+    // | @return {Number} The position of the perpendicular intersection as a ratio T.
     // +-------------------------------
-    Line.prototype.toSVGString = function( options ) {
-	options = options || {};
-	var buffer = [];
-	buffer.push( '<line' );
-	if( options.className )
-	    buffer.push( ' class="' + options.className + '"' );
-	buffer.push( ' x1="' + this.a.x + '"' );
-	buffer.push( ' y1="' + this.a.y + '"' );
-	buffer.push( ' x2="' + this.b.x + '"' );
-	buffer.push( ' y2="' + this.b.y + '"' );
-	buffer.push( ' />' );
-	return buffer.join('');
-    };
-
-
-    Line.prototype.getClosestLineT = function( p ) {
+    Line.prototype.getClosestT = function( p ) {
 	var l2 = Line.util.dist2(this.a, this.b);
-	if( l2 === 0 ) return 0; // dist2(p, v);
-	//var t = ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
+	if( l2 === 0 ) return 0; 
 	var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
 	// t = Math.max(0, Math.min(1, t));
 	return t;
@@ -138,7 +128,26 @@
 
 	return Math.sqrt( distToSegmentSquared(p, this.a, this.b) );
     }
+
     
+    // +---------------------------------------------------------------------------------
+    // | Create an SVG representation of this line.
+    // |
+    // | @return string The SVG string
+    // +-------------------------------
+    Line.prototype.toSVGString = function( options ) {
+	options = options || {};
+	var buffer = [];
+	buffer.push( '<line' );
+	if( options.className )
+	    buffer.push( ' class="' + options.className + '"' );
+	buffer.push( ' x1="' + this.a.x + '"' );
+	buffer.push( ' y1="' + this.a.y + '"' );
+	buffer.push( ' x2="' + this.b.x + '"' );
+	buffer.push( ' y2="' + this.b.y + '"' );
+	buffer.push( ' />' );
+	return buffer.join('');
+    };
     
     this.toString = function() {
 	return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";

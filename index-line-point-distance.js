@@ -109,8 +109,8 @@
 	    // | each vertex change.
 	    // +-------------------------------
 	    var update = function() {
-		console.log('update');
-		intersection.set( line.vertAt(line.getClosestLineT(point)) );
+		// console.log('update');
+		intersection.set( line.vertAt(line.getClosestT(point)) );
 		perpendicular.a.set( point );
 		perpendicular.b.set( intersection );
 		pb.redraw();
