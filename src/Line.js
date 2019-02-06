@@ -50,7 +50,6 @@
 	// Thank you, Javascript, for this second atan function. No additional math is needed here!
 	// The result might be negative, but isn't it usually nicer to determine angles in positive values only?
 	return Math.atan2( v1.x, v1.y ) - Math.atan2( v0.x, v0.y );
-	//var tmp = Math.atan2( v1.x, v1.y ) - Math.atan2( v0.x, v0.y );
     };
     
     /**
@@ -100,10 +99,55 @@
 	buffer.push( ' />' );
 	return buffer.join('');
     };
+
+
+    Line.prototype.getClosestLineT = function( p ) {
+	var l2 = Line.util.dist2(this.a, this.b);
+	if( l2 === 0 ) return 0; // dist2(p, v);
+	//var t = ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
+	var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
+	// t = Math.max(0, Math.min(1, t));
+	return t;
+    };
+    
+    Line.prototype.pointDistance = function( p ) {
+	// Taken From:
+	// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+
+	function dist2(v, w) {
+	    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
+	}
+
+	// p - point
+	// v - start point of segment
+	// w - end point of segment
+	function distToSegmentSquared (p, v, w) {
+	    //var l2 = dist2(v, w);
+	    //if( l2 === 0 ) return dist2(p, v);
+	    //var t = ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
+	    //t = Math.max(0, Math.min(1, t));
+	    return dist2(p, this.vertAt(this.getClosestLineT(p))); // dist2(p, [ v[0] + t * (w[0] - v[0]), v[1] + t * (w[1] - v[1]) ]);
+	}
+
+	// p - point
+	// v - start point of segment
+	// w - end point of segment
+	//function distToSegment (p, v, w) {
+	//    return Math.sqrt(distToSegmentSquared(p, v, w));
+	//}
+
+	return Math.sqrt( distToSegmentSquared(p, this.a, this.b) );
+    }
     
     
     this.toString = function() {
 	return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
+    };
+
+    Line.util = {
+	dist2 : function(v, w) {
+	    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
+	}
     };
 
     _context.Line = Line;

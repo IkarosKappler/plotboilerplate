@@ -7,7 +7,8 @@
  **/
 
 (function(_context) {
-
+    'use strict';
+    
     /**
      * +---------------------------------------------------------------------------------
      * | The constructor.
@@ -18,7 +19,8 @@
     var Vector = function( vertA, vertB ) {
 	Line.call(this,vertA,vertB);
     };
-
+    Object.extendClass(Line,Vector);
+    
     _context.Vector = Vector;
     
 })(window ? window : module.export);

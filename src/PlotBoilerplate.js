@@ -17,7 +17,9 @@
  * @modified 2019-01-30 Added the 'Vector' type (extending the Line class).
  * @modified 2019-01-30 Added the 'PBImage' type (a wrapper for images).
  * @modified 2019-02-02 Added the 'canvasWidthFactor' and 'canvasHeightFactor' params.
- * @version  1.3.1
+ * @modified 2019-02-03 Removed the drawBackgroundImage() function, with had no purpose at all. Just add an image to the drawables-list.
+ * @modified 2019-02-06 Vertices (instace of Vertex) can now be added. Added the 'draggable' attribute to the vertex attributes.
+ * @version  1.3.3
  **/
 
 
@@ -80,7 +82,7 @@
     /**
      * Use a special custom attribute set for vertices.
     **/ // +----------------------------
-    VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true };
+    VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true, isSelected : false, draggable : true };
     
 
     /** 
@@ -185,17 +187,22 @@
 	 * Add a drawable object.
 	 *
 	 * This must be either:
+	 *  * a Vertex
 	 *  * a Line
 	 *  * a Vector
 	 *  * a VEllipse
 	 *  * a Polygon
 	 *  * a BezierPath
+	 *  * a BPImage
 	 *
 	 * @param drawable:Object The drawable (of one of the allowed class instance) to add.
 	 * @param redraw:boolean
 	 **/ // +-------------------------------
 	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
-	    if( drawable instanceof Line ) {
+	    if( drawable instanceof Vertex ) {
+		this.drawables.push( drawable );
+		this.vertices.push( drawable );
+	    } else if( drawable instanceof Line ) {
 		// Add some lines
 		this.drawables.push( drawable );
 		this.vertices.push( drawable.a );
@@ -305,24 +312,6 @@
 
 	// +---------------------------------------------------------------------------------
 	/**
-	 * Draw the background image (if present).
-	 **/ // +-------------------------------
-	// Note: this function is currently not in use.
-	PlotBoilerplate.prototype.drawBackgroundImage = function() {
-	    // Draw the background image?
-	    /*
-	    if( _self.image ) {
-		if( _self.config.fitImage ) 
-		    _self.ctx.drawImage(_self.image,0,0,_self.image.width,_self.image.height,0,0,_self.canvasSize.width,_self.canvasSize.height);
-		else 
-		    _self.ctx.drawImage(_self.image,0,0);
-	    }
-	    */
-	};
-
-
-	// +---------------------------------------------------------------------------------
-	/**
 	 * Draw all drawable elements.
 	**/ // +-------------------------------
 	PlotBoilerplate.prototype.drawDrawables = function( renderTime ) {
@@ -375,21 +364,32 @@
 			d.center.attr.renderTime = renderTime;
 			d.axis.attr.renderTime = renderTime;
 		    }
+		} else if( d instanceof Vertex ) {
+		    if( !d.attr.selectable || !d.attr.draggable ) {
+			// Draw as special point (grey)
+			this.draw.circleHandle( d, 7, '#a8a8a8' );
+			d.attr.renderTime = renderTime;
+		    }
 		} else if( d instanceof Line ) {
 		    this.draw.line( d.a, d.b, '#a844a8' );
-		    if( !this.config.drawHandlePoints ) {
+		    if( !this.config.drawHandlePoints || !d.a.attr.selectable ) 
 			d.a.attr.renderTime = renderTime;
+		    if( !this.config.drawHandlePoints || !d.b.attr.selectable ) 
 			d.b.attr.renderTime = renderTime;
-		    }
 		} else if( d instanceof Vector ) {
 		    // this.draw.line( d.a, d.b, '#ff44a8' );
 		    this.draw.arrow( d.a, d.b, '#ff44a8' );
-		    if( this.config.drawHandlePoints ) {
+		    if( this.config.drawHandlePoints && d.b.attr.selectable ) {
 			this.draw.circleHandle( d.b, 7, '#a8a8a8' );
 		    } else {
-			d.a.attr.renderTime = renderTime;	
+			d.b.attr.renderTime = renderTime;	
 		    }
-		    d.b.attr.renderTime = renderTime;
+		    // d.a.attr.renderTime = renderTime;
+		    if( !this.config.drawHandlePoints || !d.a.attr.selectable ) 
+			d.a.attr.renderTime = renderTime;
+		    if( !this.config.drawHandlePoints || !d.b.attr.selectable ) 
+			d.b.attr.renderTime = renderTime;
+		    
 		} else if( d instanceof PBImage ) {
 		    if( this.config.drawHandleLines )
 			this.draw.line( d.upperLeft, d.lowerRight, '#a8a8a8' );
@@ -442,8 +442,7 @@
 	    
 	    this.drawGrid();
 	    if( this.config.drawOrigin )
-		this.drawOrigin();
-	    this.drawBackgroundImage();  
+		this.drawOrigin(); 
 	    // !!! Draw some test stuff !!!
 	    /*
 	    var d = _testArc;
@@ -696,6 +695,8 @@
 		    }
 		} else {
 		    // Single drag
+		    if( !_self.vertices[p.vindex].attr.selectable )
+			return;
 		    _self.draggedElements.push( p );
 		    if( p.type == 'bpath' )
 			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent( e );
@@ -731,6 +732,8 @@
 			_self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
 			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
 		    } else if( p.type == 'vertex' ) {
+			if( !_self.vertices[p.vindex].attr.draggable )
+			    continue;
 			_self.vertices[p.vindex].add( e.params.dragAmount );
 			_self.vertices[p.vindex].listeners.fireDragEvent( e );
 		    }
@@ -839,14 +842,10 @@
 	
 	// Initialize the dialog
 	window.dialog = new overlayDialog('dialog-wrapper');
-	// window.dialog.show( 'Inhalt', 'Test' );
-
 	// Apply the configured CSS scale.
-	this.updateCSSscale();
-	
+	this.updateCSSscale();	
 	// Init	
 	this.redraw();
-
 	// Gain focus
 	this.canvas.focus();
 	

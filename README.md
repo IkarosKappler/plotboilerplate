@@ -94,12 +94,18 @@ For details see main-dist.html:
 
 ### Known bugs
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
- * Image resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes).
+ * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes).
  * canvasContext.drawImage(...) with SVG resizing seems not to work in safari and firefox at all. Until there is a solution please use raster images.
  * Currently no more known. Please report bugs.
 
 
 ### Changelog
+* 2019-02-06
+  * Vertices (instace of Vertex) can now be added using PlotBoilerplate.add(Object).
+  * Added the 'draggable' attribute to the vertex attributes.
+  * Added the point-to-line distance demo.
+* 2019-02-03
+  * Removed the drawBackgroundImage() function, with had no purpose at all. Just add an image to the drawables-list.
 * 2019-02-02
   *  Added the 'canvasWidthFactor' and 'canvasHeightFactor' params.
 * 2019-01-30
