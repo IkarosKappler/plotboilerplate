@@ -23,7 +23,6 @@
 	    throw Error('upperLeft must not be null.');
 	if( typeof lowerRight == 'undefined' )
 	    throw Error('lowerRight must not be null.');
-	console.log( typeof image );
 	this.image = image;
 	this.upperLeft = upperLeft;
 	this.lowerRight = lowerRight;

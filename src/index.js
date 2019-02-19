@@ -44,10 +44,25 @@
 		      offsetAdjustYPercent  : 50,
 		      backgroundColor       : '#ffffff',
 		      enableMouse           : true,
+		      enableTouch           : true,
 		      enableKeys            : true
 		    }, GUP
 		)
 	    );
+
+	    pb.setConsole( { warn : function() {
+		                 console.warn(arguments);
+		                 humane.log(arguments[0]);
+	                     }, 
+			     log : function() {
+				 console.log(arguments);
+				 humane.log(arguments[0]);
+			     },
+			     error : function() {
+				 console.error(arguments);
+				 humane.log(arguments[0]);
+			     }
+			   } );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
@@ -67,7 +82,21 @@
 		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 		} );
-
+	    // +---------------------------------------------------------------------------------
+	    // | Add a touch listener to track the touch position.
+	    // +-------------------------------
+	    /*
+	    new TouchHandler(pb.canvas)
+		.touchstart( function(e) {
+		    var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
+		    console.log(e.params);
+		    var cx = document.getElementById('cx');
+		    var cy = document.getElementById('cy');
+		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
+		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
+		    // cy.style.backgroundColor='#ff0000';
+		} );
+		*/
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add some elements to draw (demo).

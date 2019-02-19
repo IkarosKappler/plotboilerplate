@@ -15,7 +15,8 @@
  * @modified 2018-12-05 Added the sub(...) function. Changed the signature of the add() function! add(Vertex) and add(number,number) are now possible.
  * @modified 2018-12-21 (It's winter solstice) Added the inv()-function.
  * @modified 2019-01-30 Added the setX(Number) and setY(Number) functions.
- * @version  2.0.9
+ * @modified 2019-02-19 Added the difference(Vertex) function.
+ * @version  2.0.10
  **/
 
 
@@ -168,6 +169,18 @@
     // +-------------------------------------------------------
     Vertex.prototype.distance = function( vert ) {
 	return Math.sqrt( Math.pow(vert.x-this.x,2) + Math.pow(vert.y-this.y,2) );
+    };
+
+
+    // +------------------------------------------------------------
+    // | Get the difference to the passed point.
+    // |
+    // | @param vert:Vertex
+    // | 
+    // | @return Vertex
+    // +-------------------------------------------------------
+    Vertex.prototype.difference = function( vert ) {
+	return new Vertex( vert.x-this.x, vert.y-this.y );
     };
 
 

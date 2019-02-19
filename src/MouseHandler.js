@@ -35,7 +35,8 @@
  * @modified 2018-11-19 Renamed the 'mousedown' function to 'down' and the 'mouseup' function to 'up'.
  * @modified 2018-11-28 Added the 'wheel' listener.
  * @modified 2018-12-09 Cleaned up some code.
- * @version  1.0.7
+ * @modified 2019-02-10 Cleaned up some more code.
+ * @version  1.0.8
  **/
 
 (function(_context) {
@@ -124,34 +125,34 @@
 	// | Note: they support chaining.
 	// +-------------------------------------------------
 	this.drag = function( callback ) {
-	    if( listeners.drag ) throw "This MouseHandler already has a 'drag' callback.";
+	    if( listeners.drag ) throwAlreadyInstalled('drag');
 	    listeners.drag = callback;
 	    listenFor('mousedown');
 	    listenFor('mousemove');
 	    listenFor('mouseup');
-	    listeners.drag = callback;
+	    //listeners.drag = callback;
 	    return this;
 	};
 	this.move = function( callback ) {
-	    if( listeners.mousemove )  throwAlreadyInstalled('mousemove');
+	    if( listeners.mousemove ) throwAlreadyInstalled('mousemove');
 	    listenFor('mousemove');
 	    listeners.mousemove = callback;
 	    return this;
 	};
 	this.up = function( callback ) {
-	    if( listeners.mouseup )  throwAlreadyInstalled('mouseup'); 
+	    if( listeners.mouseup ) throwAlreadyInstalled('mouseup'); 
 	    listenFor('mouseup');
 	    listeners.mouseup = callback;
 	    return this;
 	};
 	this.down = function( callback ) {
-	    if( listeners.mousedown )  throwAlreadyInstalled('mousedown'); 
+	    if( listeners.mousedown ) throwAlreadyInstalled('mousedown'); 
 	    listenFor('mousedown');
 	    listeners.mousedown = callback;
 	    return this;
 	};
 	this.click = function( callback ) {
-	    if( listeners.click )  throwAlreadyInstalled('click'); 
+	    if( listeners.click ) throwAlreadyInstalled('click'); 
 	    listenFor('click');
 	    listeners.click = callback;
 	    return this;
@@ -164,7 +165,7 @@
 	};
 
 	function throwAlreadyInstalled( name ) {
-	    throw "This MouseHandler already has a '"+name+"' callback. To keep the code simple there is only room for one."
+	    throw "This MouseHandler already has a '"+name+"' callback. To keep the code simple there is only room for one.";
 	}
 	
 	// +----------------------------------------------------------------------
@@ -173,7 +174,6 @@
 	// | The function will un-install all event listeners.
 	// +-------------------------------------------------
 	this.destroy = function() {
-	    console.log('destroy');
 	    unlistenFor('mousedown');
 	    unlistenFor('mousemove');
 	    unlistenFor('moseup');

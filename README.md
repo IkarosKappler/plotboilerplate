@@ -100,6 +100,16 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2019-02-19
+  * Added the Vertex.difference(Vertex) function.
+  * Put the TouchHandler back because it is badly coded and rubbish. Used Touchy.js instead.
+  * Added two new constants: DEFAULT_CLICK_TOLERANCE and DEFAULT_TOUCH_TOLERANCE. Touch devices have larger tolerance now.
+  * Added the second param to the locatePointNear(Vertex,Number) function.
+* 2019-02-14
+  * Added the console for debugging (setConsole(object)).
+* 2019-02-10
+  * Fixed a draggable-bug in PBImage handling (scaling was not possible).
+  * Added the 'enableTouch' option (default is true).
 * 2019-02-06
   * Vertices (instace of Vertex) can now be added using PlotBoilerplate.add(Object).
   * Added the 'draggable' attribute to the vertex attributes.
@@ -218,4 +228,5 @@ For details see main-dist.html:
 * Color.js
 * FileSaver.js
 * SGV-arcto to Canvas-arc transform from https://github.com/canvg/canvg by Gabe Lerner
+* Touchy.js by jairajs89. https://github.com/jairajs89/Touchy.js
    

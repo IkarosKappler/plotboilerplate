@@ -39,7 +39,8 @@
 		      offsetAdjustYPercent  : 100, // ... -lower corner
 		      backgroundColor       : '#ffffff',
 		      enableMouse           : false,
-		      enableKeys            : false
+		      enableKeys            : false,
+		      enableTouch           : false
 		    }, GUP
 		)
 	    );

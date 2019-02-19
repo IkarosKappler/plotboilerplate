@@ -19,7 +19,12 @@
  * @modified 2019-02-02 Added the 'canvasWidthFactor' and 'canvasHeightFactor' params.
  * @modified 2019-02-03 Removed the drawBackgroundImage() function, with had no purpose at all. Just add an image to the drawables-list.
  * @modified 2019-02-06 Vertices (instace of Vertex) can now be added. Added the 'draggable' attribute to the vertex attributes.
- * @version  1.3.3
+ * @modified 2019-02-10 Fixed a draggable-bug in PBImage handling (scaling was not possible).
+ * @modified 2019-02-10 Added the 'enableTouch' option (default is true).
+ * @modified 2019-02-14 Added the console for debugging (setConsole(object)).
+ * @modified 2019-02-19 Added two new constants: DEFAULT_CLICK_TOLERANCE and DEFAULT_TOUCH_TOLERANCE.
+ * @modified 2019-02-19 Added the second param to the locatePointNear(Vertex,Number) function.
+ * @version  1.3.5
  **/
 
 
@@ -28,6 +33,8 @@
 
     const DEFAULT_CANVAS_WIDTH = 1024;
     const DEFAULT_CANVAS_HEIGHT = 768;
+    const DEFAULT_CLICK_TOLERANCE = 8;
+    const DEFAULT_TOUCH_TOLERANCE = 32;
 
 
     // +---------------------------------------------------------------------------------
@@ -138,6 +145,7 @@
 
 	    // Interaction
 	    enableMouse           : typeof config.enableMouse != 'undefined' ? config.enableMouse : true,
+	    enableTouch           : typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
 	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true
 	};
 
@@ -159,13 +167,25 @@
 	this.selectPolygon       = null;
 	this.draggedElements     = [];
 	this.drawables           = [];
+	this.console             = console;
 	var _self = this;
+
 
 	// +---------------------------------------------------------------------------------
 	// | Object members.
 	// +-------------------------------
+	PlotBoilerplate.prototype.setConsole = function( con ) {
+	    if( typeof con.log != 'function' ) throw "Console object must have a 'log' function.";
+	    if( typeof con.warn != 'function' ) throw "Console object must have a 'warn' function.";
+	    if( typeof con.error != 'function' ) throw "Console object must have a 'error' function.";
+	    this.console = con;
+	};
+	
+	// +---------------------------------------------------------------------------------
+	// | Object members.
+	// +-------------------------------
 	PlotBoilerplate.prototype.updateCSSscale = function() {
-	    console.log('update css scale');
+	    // this.console.log('update css scale');
 	    if( this.config.cssUniformScale ) {
 		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
 	    } else {
@@ -399,7 +419,7 @@
 			d.lowerRight.attr.renderTime = renderTime;
 		    }
 		} else {
-		    console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
+		    this.console.error( 'Cannot draw object. Unknown class ' + d.constructor.name + '.' );
 		}
 	    }
 	};
@@ -411,7 +431,7 @@
 	PlotBoilerplate.prototype.drawSelectPolygon = function() {
 	    // Draw select polygon?
 	    if( this.selectPolygon != null && this.selectPolygon.vertices.length > 0 ) {
-		console.log('Drawing selectPolygon',this.selectPolygon.vertices.length,'vertices');
+		// this.console.log('Drawing selectPolygon',this.selectPolygon.vertices.length,'vertices');
 		this.draw.polygon( this.selectPolygon, '#888888' );
 		this.draw.crosshair( this.selectPolygon.vertices[0], 3, '#008888' );
 	    }
@@ -452,7 +472,7 @@
 		// Then draw arc itself
 		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, d.largeArcFlag, d.sweepFlag, d.b.x, d.b.y, '#008888' );
 	    } catch( e ) {
-		console.error( e );
+		this.console.error( e );
 	    }
 	    */
 	    this.drawDrawables(renderTime);
@@ -478,6 +498,7 @@
 	/** +---------------------------------------------------------------------------------
 	 * Handle a dropped image: initially draw the image (to fill the background).
 	 **/ // +-------------------------------
+	/*
 	var handleImage = function(e) {
 	    var validImageTypes = "image/gif,image/jpeg,image/jpg,image/gif,image/png";
 	    if( validImageTypes.indexOf(e.target.files[0].type) == -1 ) {
@@ -500,6 +521,7 @@
 	    }
 	    reader.readAsDataURL(e.target.files[0]);     
 	}
+	*/
 
 
 	/** +---------------------------------------------------------------------------------
@@ -522,17 +544,18 @@
 	 * Decide which file type should be handled:
 	 *  - image for the background or
 	 *  - JSON (for the point set)
-	**/ // +-------------------------------
+	 **/ // +-------------------------------
+	/*
 	var handleFile = function(e) {
 	    var type = document.getElementById('file').getAttribute('data-type');
 	    if( type == 'image-upload' ) {
 		handleImage(e);
 	    } else {
-		console.warn('Unrecognized upload type: ' + type );
+		_self.console.warn('Unrecognized upload type: ' + type );
 	    }   
 	}
 	document.getElementById( 'file' ).addEventListener('change', handleFile );
-	
+	*/
 
 	/** +---------------------------------------------------------------------------------
 	 * Just a generic save-file dialog.
@@ -615,8 +638,10 @@
 	 *
 	 * @param point:Vertex
          **/ // +-------------------------------
-        var locatePointNear = function( point ) {
-            var tolerance = 7;
+        var locatePointNear = function( point, tolerance ) {
+            // var tolerance = 7;
+	    if( typeof tolerance == 'undefined' )
+		tolerance = 7;
 	    // Search in vertices
 	    for( var vindex in _self.vertices ) {
 		var vert = _self.vertices[vindex];
@@ -636,7 +661,7 @@
 	 * @param y:Number The tap Y position on the canvas.
 	 **/ // +-------------------------------
 	function handleTap(x,y) {
-	    var p = locatePointNear( _self.transformMousePosition(x, y) );
+	    var p = locatePointNear( _self.transformMousePosition(x, y), DEFAULT_CLICK_TOLERANCE );
 	    if( p ) { 
 		if( keyHandler.isDown('shift') ) {
 		    if( p.type == 'bpath' ) {
@@ -651,7 +676,7 @@
 		    _self.redraw();
 		} else if( keyHandler.isDown('y') /* && p.type=='bpath' && (p.pid==BezierPath.START_POINT || p.pid==BezierPath.END_POINT) */ ) {
 		    _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
-		    console.log( 'bezierAutoAdjust=' + _self.vertices[p.vindex].attr.bezierAutoAdjust );
+		    // _self.console.log( 'bezierAutoAdjust=' + _self.vertices[p.vindex].attr.bezierAutoAdjust );
 		    _self.redraw();
 		}
 	    }
@@ -680,30 +705,32 @@
 	 * It selects vertices for dragging.
 	 **/ // +-------------------------------
 	var mouseDownHandler = function(e) {
-		if( e.which != 1 )
-		    return; // Only react on left mouse
-		var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y) );
-		if( !p ) return;
-		// Drag all selected elements?
-		if( p.type == 'vertex' && _self.vertices[p.vindex].attr.isSelected ) {
-		    // Multi drag
-		    for( var i in _self.vertices ) {
-			if( _self.vertices[i].attr.isSelected ) {
-			    _self.draggedElements.push( new Draggable( _self.vertices[i], Draggable.VERTEX ).setVIndex(i) );
-			    _self.vertices[i].listeners.fireDragStartEvent( e );
-			}
+	    // _self.console.log( 'is touch event', e instanceof TouchEvent );
+	    if( e.which != 1 && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
+		return; // Only react on left mouse or touch events
+	    var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE );
+	    _self.console.log('point at position found: '+p );
+	    if( !p ) return;
+	    // Drag all selected elements?
+	    if( p.type == 'vertex' && _self.vertices[p.vindex].attr.isSelected ) {
+		// Multi drag
+		for( var i in _self.vertices ) {
+		    if( _self.vertices[i].attr.isSelected ) {
+			_self.draggedElements.push( new Draggable( _self.vertices[i], Draggable.VERTEX ).setVIndex(i) );
+			_self.vertices[i].listeners.fireDragStartEvent( e );
 		    }
-		} else {
-		    // Single drag
-		    if( !_self.vertices[p.vindex].attr.selectable )
-			return;
-		    _self.draggedElements.push( p );
-		    if( p.type == 'bpath' )
-			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent( e );
-		    else if( p.type == 'vertex' )
-			_self.vertices[p.vindex].listeners.fireDragStartEvent( e );
 		}
-		_self.redraw();
+	    } else {
+		// Single drag
+		if( !_self.vertices[p.vindex].attr.draggable )
+		    return;
+		_self.draggedElements.push( p );
+		if( p.type == 'bpath' )
+		    _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent( e );
+		else if( p.type == 'vertex' )
+		    _self.vertices[p.vindex].listeners.fireDragStartEvent( e );
+	    }
+	    _self.redraw();
 	};
 
 	/** +---------------------------------------------------------------------------------
@@ -713,6 +740,7 @@
 	 * hold down.
 	 **/ // +-------------------------------
 	var mouseDragHandler = function(e) {
+	    var oldDragAmount = { x : e.params.dragAmount.x, y : e.params.dragAmount.y };
 	    e.params.dragAmount.x /= _self.config.cssScaleX;
 	    e.params.dragAmount.y /= _self.config.cssScaleY;
 	    if( keyHandler.isDown('alt') || keyHandler.isDown('ctrl') ) {
@@ -725,9 +753,12 @@
 		//          Rethink the solution when other features are added.
 		e.params.dragAmount.x /= _self.draw.scale.x;
 		e.params.dragAmount.y /= _self.draw.scale.y;
+		
+		// _self.console.log( 'draggedElements',_self.draggedElements );
+		
 		for( var i in _self.draggedElements ) {
 		    var p = _self.draggedElements[i];
-		    // console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
+		    // _self.console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
 		    if( p.type == 'bpath' ) {
 			_self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
 			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
@@ -739,6 +770,9 @@
 		    }
 		}
 	    }
+	    // Restore old event values!
+	    e.params.dragAmount.x = oldDragAmount.x;
+	    e.params.dragAmount.y = oldDragAmount.y;
 	    _self.redraw();
 	};
 
@@ -793,35 +827,93 @@
 		.up( mouseUpHandler )
 		.wheel( mouseWheelHandler )
 	    ;
-	} else { console.log('Mouse interaction disabled.'); }
+	} else { _self.console.log('Mouse interaction disabled.'); }
+
+	if( this.config.enableTouch) { // && typeof TouchHandler != 'undefined' ) { 
+	    /** +---------------------------------------------------------------------------------
+	     * Install a touch handler on the canvas.
+	     **/ // +-------------------------------
+	    _self.console.log( 'Installing touch handler' );
+	    var touchMovePos = null;
+	    var touchDownPos = null;
+	    var draggedElement = null;
+	    new Touchy( this.canvas,
+			{ one : function( hand, finger ) {
+			    //console.log('one', hand, finger );
+			    touchMovePos = new Vertex(finger.lastPoint);
+			    touchDownPos = new Vertex(finger.lastPoint);
+			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE );
+			    //console.log( draggedElement );
+			    if( draggedElement ) {
+				hand.on('move', function (points) {
+				    //console.log( points );	    
+				    var trans = _self.transformMousePosition( points[0].x, points[0].y );
+				    var moveTrans = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y ));
+				    var diff = moveTrans.difference(trans);
+				    if( draggedElement.type == 'vertex' ) {
+					if( !_self.vertices[draggedElement.vindex].attr.draggable )
+					    return;
+					_self.vertices[draggedElement.vindex].add( diff );
+					var fakeEvent = { params : { dragAmount : diff.clone(), wasDragged : true, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone().add(diff) }};
+					_self.vertices[draggedElement.vindex].listeners.fireDragEvent( fakeEvent );
+					_self.redraw();
+				    }
+				    // console.log(diff);
+				    touchMovePos = new Vertex(points[0]);
+				} );
+			    }
+
+			} /*,
+			  two : function( hand, finger1, finger2 ) {
+			      console.log('two', hand, finger1, finger2 );
+			      hand.on('move', function (points) {
+				  console.log( points );
+			      } );
+			  } */
+			} );
+	    /*
+	    new TouchHandler(this.canvas)
+		.touchstart( function(e) {
+		    _self.console.log('touch start');
+		    mouseDownHandler(e);
+		} )
+		.touchmove( function(e) {
+		    _self.console.log('touch move');
+		    _self.console.log( e.params.dragAmount );
+		    mouseDragHandler(e);
+		} )
+		.touchend( mouseUpHandler )
+		.touchcancel( mouseUpHandler )
+		; */
+	} else { _self.console.log('Touch interaction disabled.'); }
 
 	if( this.config.enableKeys ) {
 	    // Install key handler
 	    var keyHandler = new KeyHandler( { trackAll : true } )
-		.down('enter',function() { console.log('ENTER was hit.'); } )
-		.press('enter',function() { console.log('ENTER was pressed.'); } )
-		.up('enter',function() { console.log('ENTER was released.'); } )
+		.down('enter',function() { _self.console.log('ENTER was hit.'); } )
+		.press('enter',function() { _self.console.log('ENTER was pressed.'); } )
+		.up('enter',function() { _self.console.log('ENTER was released.'); } )
 
-		.down('alt',function() { console.log('alt was hit.'); } )
-		.press('alt',function() { console.log('alt was pressed.'); } )
-		.up('alt',function() { console.log('alt was released.'); } )
+		.down('alt',function() { _self.console.log('alt was hit.'); } )
+		.press('alt',function() { _self.console.log('alt was pressed.'); } )
+		.up('alt',function() { _self.console.log('alt was released.'); } )
 
-		.down('ctrl',function() { console.log('ctrl was hit.'); } )
-		.press('ctrl',function() { console.log('ctrl was pressed.'); } )
-		.up('ctrl',function() { console.log('ctrl was released.'); } )
+		.down('ctrl',function() { _self.console.log('ctrl was hit.'); } )
+		.press('ctrl',function() { _self.console.log('ctrl was pressed.'); } )
+		.up('ctrl',function() { _self.console.log('ctrl was released.'); } )
 
 		.down('escape',function() {
-		    console.log('ESCAPE was hit.');
+		    _self.console.log('ESCAPE was hit.');
 		    _self.clearSelection(true);
 		} )
 
 		.down('shift',function() {
-		    console.log('SHIFT was hit.');
+		    _self.console.log('SHIFT was hit.');
 		_self.selectPolygon = new Polygon();
 		    _self.redraw();
 		} )
 		.up('shift',function() {
-		    console.log('SHIFT was released.');
+		    _self.console.log('SHIFT was released.');
 		    // Find and select vertices in the drawn area
 		    if( _self.selectPolygon == null )
 			return;
@@ -830,15 +922,15 @@
 		    _self.redraw();
 		} )
 
-		.down('y',function() { console.log('y was hit.'); } )
-		.up('y',function() { console.log('y was released.'); } )
+		.down('y',function() { _self.console.log('y was hit.'); } )
+		.up('y',function() { _self.console.log('y was released.'); } )
 
-		.down('e',function() { console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
+		.down('e',function() { _self.console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
 
-		.up('windows',function() { console.log('windows was released.'); } )
+		.up('windows',function() { _self.console.log('windows was released.'); } )
 	    ;
 	} // END IF enableKeys?
-	else  { console.log('Keyboard interaction disabled.'); }
+	else  { _self.console.log('Keyboard interaction disabled.'); }
 	
 	// Initialize the dialog
 	window.dialog = new overlayDialog('dialog-wrapper');
@@ -918,7 +1010,7 @@
 		    else if( type == 'function' && typeofextension[k] == 'function' ) base[k] = extension[k] ;
 		    else base[k] = extension[k];
 		} catch( e ) {
-		    console.error( 'error in key ', k, extension[k], e );
+		    _self.console.error( 'error in key ', k, extension[k], e );
 		}
 	    }
 	    return base;
