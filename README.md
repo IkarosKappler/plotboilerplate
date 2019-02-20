@@ -110,7 +110,7 @@ For details see main-dist.html:
 		pb.redraw();
 	    } );
 ~~~~
-[And the demo is here](https://www.int2byte.de/public/plot-boilerplate/main-simpledemo.html "And the demo is here")
+[And the simple demo is here](https://www.int2byte.de/public/plot-boilerplate/main-simpledemo.html "And the simple demo is here")
 
 ![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
