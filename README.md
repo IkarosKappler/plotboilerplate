@@ -83,7 +83,10 @@ For details see main-dist.html:
 				 drawBezierHandleLines : true,
 	    			 drawBezierHandlePoints : true,
 				 preDraw               : function() { console.log('before drawing.'); },
-				 postDraw              : function() { console.log('after drawing.'); }
+				 postDraw              : function() { console.log('after drawing.'); },
+				 enableMouse           : true,
+				 enableTouch           : true,
+		      		 enableKeys            : true
 				} );
 ~~~~					  
 
