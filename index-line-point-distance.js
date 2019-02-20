@@ -78,8 +78,11 @@
 	    // | Create a random vertex inside the canvas viewport.
 	    // +-------------------------------
 	    var randomVertex = function() {
-		return new Vertex( Math.random()*pb.canvasSize.width/3,
-				   Math.random()*pb.canvasSize.height/3
+		//return new Vertex( Math.random()*pb.canvasSize.width/3,
+		//		   Math.random()*pb.canvasSize.height/3
+		//		 );
+		return new Vertex( Math.random()*pb.canvasSize.width*0.5 - pb.canvasSize.width/2*0.5,
+				   Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
 				 );
 	    };
 	    
@@ -122,13 +125,9 @@
 		point.listeners.addDragListener( function() { update(); } );
 		update();
 	    }
-	    newPerp(line);
-	    newPerp(line);
-	    newPerp(line);
-	    newPerp(line);
-	    newPerp(line);
-	    newPerp(line);
-	    newPerp(line);
+	    for( var i = 0; i < 7; i++ ) {
+		newPerp(line);
+	    }
 
 	    /*
 	    var point = randomVertex();
