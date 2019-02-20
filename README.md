@@ -91,6 +91,30 @@ For details see main-dist.html:
 ~~~~					  
 
 
+## Add elements to your canvas
+~~~~javascript
+	    // Create two points. The origin is at the visual center by default.
+	    var pointA = new Vertex( -100, -100 );
+	    var pointB = new Vertex( 100, 100 );
+	    pb.add( new Line(pointA,pointB) );
+
+	    // When point A is moved by the user then move point B in the opposite direction
+	    pointA.listeners.addDragListener( function(e) {
+		pointB.sub( e.params.dragAmount );
+		pb.redraw();
+	    } );
+
+	    // and when point B is moved then move point A
+	    pointB.listeners.addDragListener( function(e) {
+		pointA.sub( e.params.dragAmount );
+		pb.redraw();
+	    } );
+~~~~
+[And the demo is here](https://www.int2byte.de/public/plot-boilerplate/main-simpledemo.html "And the demo is here")
+
+![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+
+
 ## Usage
  * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment for clicked bézier path point
