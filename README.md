@@ -15,7 +15,7 @@ Feigenbaum bifurcation (logistic map)
 
 Perpendiducular point-to-line-distance demo
 
-![Perpendiducular point-to-line distance](screenshots/screenshot-20190220_0_line-to-point.png "Perpendiducular point-to-line distance")
+![Perpendiducular point-to-line distance](screenshots/screenshot-20190220_2_line-to-point.png "Perpendiducular point-to-line distance")
 
 [See the demo](https://www.int2byte.de/public/plot-boilerplate/main-line-point-distance.html "Random-scripture demo")
 
