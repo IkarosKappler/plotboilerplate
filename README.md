@@ -7,22 +7,30 @@ For Javascript and canvas with 2d-context.
 
 Feigenbaum bifurcation (logistic map)
 ![Plotting the Feigenbaum bifurcation](screenshots/screenshot-20181212_3_feigenbaum.png "Plotting the Feigenbaum bifurcation")
+
 [For a detailed description of this plot see my Feigenbaum-plot mini-project](https://github.com/IkarosKappler/feigenbaum-plot "Feigenbaum bifurcation diagram")
+
 [And here is a tiny article about it](http://www.polygon-berlin.de/deterministisches-chaos "Article about deterministic chaos")
 
 
 Perpendiducular point-to-line-distance demo
+
 ![Perpendiducular point-to-line distance](screenshots/screenshot-20190220_0_line-to-point.png "Perpendiducular point-to-line distance")
+
 [See the demo](https://www.int2byte.de/public/plot-boilerplate/main-line-point-distance.html "Random-scripture demo")
 
 
 Random-scripture demo
+
 ![Random-scripture demo](screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
+
 [See the demo](https://www.int2byte.de/public/plot-boilerplate/main-randomscripture.html "Random-scripture demo")
 
 
 Vector field test (still in development)
+
 ![Vectorfield test](screenshots/screenshot-20190220_1_vectorfield.png "Vectorfield test demo (still in development)")
+
 [See the demo](https://www.int2byte.de/public/plot-boilerplate/main-vectorfield.html "Demo of the vector field implementation ... still in development")
 
 
