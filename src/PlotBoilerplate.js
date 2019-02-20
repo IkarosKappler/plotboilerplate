@@ -129,7 +129,7 @@
 	    canvasHeightFactor    : typeof config.canvasHeightFactor == 'number' ? config.canvasHeightFactor : 1.0,
 	    cssScaleX             : typeof config.cssScaleX == 'number' ? config.cssScaleX : 1.0,
 	    cssScaleY             : typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
-	    cssUniformScale       : true,
+	    cssUniformScale       : typeof config.cssUniformScale != 'undefined' ? config.cssUniformScale : true,
 	    rebuild               : function() { rebuild(); },
 	    /* loadImage             : function() { var elem = document.getElementById('file');
 						 elem.setAttribute('data-type','image-upload');

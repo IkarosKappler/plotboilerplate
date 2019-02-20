@@ -76,7 +76,7 @@ For details see main-dist.html:
 				 canvasHeightFactor    : 1.0,
 				 cssScaleX	       : 1.0,
 				 cssScaleY	       : 1.0,
-				 cssUniformscale       : true,
+				 cssUniformScale       : true,
 				 rasterGrid            : true,
 				 backgroundColor       : '#ffffff',
 				 redrawOnResize        : true,
