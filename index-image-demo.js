@@ -66,13 +66,7 @@
 			       } );
 	    }
 	    humane.log('PlotBoilerplate');
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | Initialize dat.gui
-	    // +-------------------------------
-	    pb.createGUI(); 
-	    // END init dat.gui
-	    
+	   	    
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add a mouse listener to track the mouse position.
@@ -115,72 +109,78 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Add an image.
 	    // +-------------------------------
-	    var img = new Image(50,50);
-	    pb.add( new PBImage(img, new Vertex(-25,-25), new Vertex(25,25)), false );
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | Add some Lines.
-	    // +-------------------------------
-	    pb.add( new Line( new Vertex(-diameter,-diameter), new Vertex(-hypo,-hypo) ), false );
-	    pb.add( new Line( new Vertex(-diameter,diameter), new Vertex(-hypo,hypo) ), false );
-	    pb.add( new Line( new Vertex(diameter,-diameter), new Vertex(hypo,-hypo) ), false );
-	    pb.add( new Line( new Vertex(diameter,diameter), new Vertex(hypo,hypo) ), false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add some Vectors.
-	    // +-------------------------------
-	    pb.add( new Vector( new Vertex(-diameter*1.6,0), new Vertex(-diameter*1.2,0) ), false );
-	    pb.add( new Vector( new Vertex(diameter*1.6,0), new Vertex(diameter*1.2,0) ), false );
-	    pb.add( new Vector( new Vertex(0,-diameter*1.6), new Vertex(0,-diameter*1.2) ), false );
-	    pb.add( new Vector( new Vertex(0,diameter*1.6), new Vertex(0,diameter*1.2) ), false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add polygon (here a square).
-	    // +-------------------------------
-	    var squareSize = diameter*0.35;
-	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
-	    var square = new Polygon( squareVerts );
-	    pb.add( square, false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add two circles.
-	    // +-------------------------------
-	    var circle1 = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
-	    pb.add( circle1, false );
-	    var circle2 = new VEllipse( new Vertex(0,0), new Vertex(diameter,diameter) );
-	    pb.add( circle2, false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add a circular connected bezier path
-	    // +-------------------------------
-	    var fract = 0.5;
-	    var bpath = [];
-	    bpath[0] = [ new Vertex( 0, -diameter ),
-			 new Vertex( diameter, 0 ),
-			 new Vertex( diameter*fract, -diameter ),
-			 new Vertex( diameter*fract, 0 ) ];
-	    bpath[1] = [ bpath[0][1], // Use same reference
-			 new Vertex( 0, diameter ),
-			 new Vertex( diameter, diameter*fract ),
-			 new Vertex( 0, diameter*fract ) ];
-	    bpath[2] = [ bpath[1][1], // Use same reference
-			 new Vertex( -diameter, 0 ),
-			 new Vertex( -diameter*fract, diameter ),
-			 new Vertex( -diameter*fract, 0 ) ];
-	    bpath[3] = [ bpath[2][1], // Use same reference
-			 bpath[0][0], // Use same reference
-			 new Vertex( -diameter, -diameter*fract ),
-			 new Vertex( 0, -diameter*fract )
-		       ];
-	    // Construct
-	    var path = BezierPath.fromArray( bpath );
-	    path.adjustCircular = true;
-	    pb.add( path, false );
-
-
+	    var img = new Image(diameter,diameter);
+	    pb.add( new PBImage(img, new Vertex(-radius,-radius), new Vertex(radius,radius)), false );
+	   
 	    // Finally load the image
 	    img.addEventListener('load', function() { pb.redraw(); } );
 	    img.src = 'example-image.png';
+
+
+
+	    /** +---------------------------------------------------------------------------------
+	     * Handle a dropped image: initially draw the image (to fill the background).
+	     **/ // +-------------------------------
+	    var handleImage = function(e) {
+		var validImageTypes = "image/gif,image/jpeg,image/jpg,image/gif,image/png,image/tiff";
+		if( validImageTypes.indexOf(e.target.files[0].type) == -1 ) {
+		    if( !window.confirm('This seems not to be an image ('+e.target.files[0].type+'). Continue?') )
+			return;
+		}	    
+		var reader = new FileReader();
+		reader.onload = function(event) {
+		    var _image = new Image();
+		    _image.onload = function() {
+			// Create image buffer
+			var imageBuffer    = document.createElement('canvas');
+			imageBuffer.width  = _image.naturalWidth;
+			imageBuffer.height = _image.naturalHeight;
+			imageBuffer.getContext('2d').drawImage(_image, 0, 0, _image.width, _image.height);
+			var ratio = _image.naturalWidth/_image.naturalHeight;
+			pb.add( new PBImage(_image, new Vertex(-radius,-radius/ratio), new Vertex(radius,radius/ratio) ) );
+		    }
+		    _image.onerror = function(error) {
+			console.log( error );
+			pb.console.error('Could not load image due to unkown reasons. Does it exist?' );
+		    };
+		    _image.src = event.target.result;
+		}
+		reader.readAsDataURL(e.target.files[0]);     
+	    }
+	    /** +---------------------------------------------------------------------------------
+	     * Decide which file type should be handled:
+	     *  - image for the background or
+	     *  - JSON (for the point set)
+	     **/ // +-------------------------------
+	    var handleFile = function(e) {
+		var type = document.getElementById('file').getAttribute('data-type');
+		if( type == 'image-upload' ) {
+		    handleImage(e);
+		} else {
+		    _self.console.warn('Unrecognized upload type: ' + type );
+		}   
+	    }
+	    document.getElementById( 'file' ).addEventListener('change', handleFile );
+
+	    /** 
+	     * A helper function to trigger fake click events.
+	     **/ // +----------------------------
+	    var triggerClickEvent = function(element) {
+		element.dispatchEvent( new MouseEvent('click', {
+		    view: window,
+		    bubbles: true,
+		    cancelable: true
+		} ) );
+	    };
+
+
+	    // +---------------------------------------------------------------------------------
+	    // | Initialize dat.gui
+	    // +-------------------------------
+	    var gui = pb.createGUI();
+	    var folder = gui.addFolder('Import');
+	    folder.add({ uploadImage : function() { triggerClickEvent(document.getElementById( 'file' )); } }, 'uploadImage').title("Upload an image to the canvas.");
+	    // END init dat.gui
 	} );
     
 })(window); 

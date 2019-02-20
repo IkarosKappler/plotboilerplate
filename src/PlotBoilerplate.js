@@ -24,23 +24,25 @@
  * @modified 2019-02-14 Added the console for debugging (setConsole(object)).
  * @modified 2019-02-19 Added two new constants: DEFAULT_CLICK_TOLERANCE and DEFAULT_TOUCH_TOLERANCE.
  * @modified 2019-02-19 Added the second param to the locatePointNear(Vertex,Number) function.
- * @version  1.3.5
+ * @modified 2019-02-20 Removed the 'loadFile' entry from the GUI as it was experimental and never in use.
+ * @version  1.3.6
  **/
 
 
 (function(_context) {
     "use strict";
 
-    const DEFAULT_CANVAS_WIDTH = 1024;
-    const DEFAULT_CANVAS_HEIGHT = 768;
-    const DEFAULT_CLICK_TOLERANCE = 8;
-    const DEFAULT_TOUCH_TOLERANCE = 32;
+    const DEFAULT_CANVAS_WIDTH    = 1024;
+    const DEFAULT_CANVAS_HEIGHT   =  768;
+    const DEFAULT_CLICK_TOLERANCE =    8;
+    const DEFAULT_TOUCH_TOLERANCE =   32;
 
 
     // +---------------------------------------------------------------------------------
     /** 
      * A helper function to trigger fake click events.
      **/ // +----------------------------
+    /*
     var triggerClickEvent = function(element) {
 	element.dispatchEvent( new MouseEvent('click', {
 	    view: window,
@@ -48,6 +50,7 @@
 	    cancelable: true
 	} ) );
     };
+    */
 
     // +---------------------------------------------------------------------------------
     /** 
@@ -128,10 +131,10 @@
 	    cssScaleY             : typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
 	    cssUniformScale       : true,
 	    rebuild               : function() { rebuild(); },
-	    loadImage             : function() { var elem = document.getElementById('file');
+	    /* loadImage             : function() { var elem = document.getElementById('file');
 						 elem.setAttribute('data-type','image-upload');
 						 triggerClickEvent(elem);
-					       },
+					       }, */
 	    saveFile              : function() { saveFile(); },
 
 	    drawBezierHandleLines : typeof config.drawBezierHandleLines != 'undefined' ? config.drawBezierHandleLines : true,
@@ -316,8 +319,6 @@
 		this.draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.125)' );
 	    else
 		this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.095)' )
-	    // Add a crosshair to mark the grid center (good for visual debugging)
-	    // this.draw.crosshair( offset, 10, '#000000' );
 	};
 
 	// +---------------------------------------------------------------------------------
@@ -431,7 +432,6 @@
 	PlotBoilerplate.prototype.drawSelectPolygon = function() {
 	    // Draw select polygon?
 	    if( this.selectPolygon != null && this.selectPolygon.vertices.length > 0 ) {
-		// this.console.log('Drawing selectPolygon',this.selectPolygon.vertices.length,'vertices');
 		this.draw.polygon( this.selectPolygon, '#888888' );
 		this.draw.crosshair( this.selectPolygon.vertices[0], 3, '#008888' );
 	    }
@@ -493,35 +493,6 @@
 	    this.ctx.fillStyle = this.config.backgroundColor; 
 	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
 	};
-	
-	
-	/** +---------------------------------------------------------------------------------
-	 * Handle a dropped image: initially draw the image (to fill the background).
-	 **/ // +-------------------------------
-	/*
-	var handleImage = function(e) {
-	    var validImageTypes = "image/gif,image/jpeg,image/jpg,image/gif,image/png";
-	    if( validImageTypes.indexOf(e.target.files[0].type) == -1 ) {
-		if( !window.confirm('This seems not to be an image ('+e.target.files[0].type+'). Continue?') )
-		    return;
-	    }	    
-	    var reader = new FileReader();
-	    reader.onload = function(event) {
-		this.image = new Image();
-		this.image.onload = function() {
-		    // Create image buffer
-		    var imageBuffer    = document.createElement('canvas');
-		    imageBuffer.width  = this.image.width;
-		    imageBuffer.height = this.image.height;
-		    imageBuffer.getContext('2d').drawImage(this.image, 0, 0, this.image.width, image.height);
-		    alert( 'Sorry, not yet implemented.' );
-		    //redraw();
-		}
-		this.image.src = event.target.result;
-	    }
-	    reader.readAsDataURL(e.target.files[0]);     
-	}
-	*/
 
 
 	/** +---------------------------------------------------------------------------------
@@ -539,23 +510,6 @@
 	    return this;
 	};
 
-	
-	/** +---------------------------------------------------------------------------------
-	 * Decide which file type should be handled:
-	 *  - image for the background or
-	 *  - JSON (for the point set)
-	 **/ // +-------------------------------
-	/*
-	var handleFile = function(e) {
-	    var type = document.getElementById('file').getAttribute('data-type');
-	    if( type == 'image-upload' ) {
-		handleImage(e);
-	    } else {
-		_self.console.warn('Unrecognized upload type: ' + type );
-	    }   
-	}
-	document.getElementById( 'file' ).addEventListener('change', handleFile );
-	*/
 
 	/** +---------------------------------------------------------------------------------
 	 * Just a generic save-file dialog.
@@ -606,7 +560,7 @@
 		var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
 		_setSize( width, height );
 	    } else {
-                _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight ); // DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT );
+                _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
 	    }
 	    
 	    if( _self.config.redrawOnResize )
@@ -655,12 +609,12 @@
 
 
 	/** +---------------------------------------------------------------------------------
-	 * Handle left-click and tap event.
+	 * Handle left-click event.
 	 *
-	 * @param x:Number The tap X position on the canvas.
-	 * @param y:Number The tap Y position on the canvas.
+	 * @param x:Number The click X position on the canvas.
+	 * @param y:Number The click Y position on the canvas.
 	 **/ // +-------------------------------
-	function handleTap(x,y) {
+	function handleClick(x,y) {
 	    var p = locatePointNear( _self.transformMousePosition(x, y), DEFAULT_CLICK_TOLERANCE );
 	    if( p ) { 
 		if( keyHandler.isDown('shift') ) {
@@ -786,7 +740,7 @@
 	    if( e.which != 1 )
 		return; // Only react on left mouse;
 	    if( !e.params.wasDragged )
-		handleTap( e.params.pos.x, e.params.pos.y );
+		handleClick( e.params.pos.x, e.params.pos.y );
 	    for( var i in _self.draggedElements ) {
 		var p = _self.draggedElements[i];
 		if( p.type == 'bpath' ) {
@@ -829,6 +783,8 @@
 	    ;
 	} else { _self.console.log('Mouse interaction disabled.'); }
 
+
+	
 	if( this.config.enableTouch) { // && typeof TouchHandler != 'undefined' ) { 
 	    /** +---------------------------------------------------------------------------------
 	     * Install a touch handler on the canvas.
@@ -839,17 +795,14 @@
 	    var draggedElement = null;
 	    new Touchy( this.canvas,
 			{ one : function( hand, finger ) {
-			    //console.log('one', hand, finger );
 			    touchMovePos = new Vertex(finger.lastPoint);
 			    touchDownPos = new Vertex(finger.lastPoint);
 			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE );
-			    //console.log( draggedElement );
 			    if( draggedElement ) {
 				hand.on('move', function (points) {
 				    //console.log( points );	    
 				    var trans = _self.transformMousePosition( points[0].x, points[0].y );
-				    var moveTrans = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y ));
-				    var diff = moveTrans.difference(trans);
+				    var diff = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
 				    if( draggedElement.type == 'vertex' ) {
 					if( !_self.vertices[draggedElement.vindex].attr.draggable )
 					    return;
@@ -858,41 +811,17 @@
 					_self.vertices[draggedElement.vindex].listeners.fireDragEvent( fakeEvent );
 					_self.redraw();
 				    }
-				    // console.log(diff);
 				    touchMovePos = new Vertex(points[0]);
 				} );
 			    }
 
-			} /*,
-			  two : function( hand, finger1, finger2 ) {
-			      console.log('two', hand, finger1, finger2 );
-			      hand.on('move', function (points) {
-				  console.log( points );
-			      } );
-			  } */
+			}
 			} );
-	    /*
-	    new TouchHandler(this.canvas)
-		.touchstart( function(e) {
-		    _self.console.log('touch start');
-		    mouseDownHandler(e);
-		} )
-		.touchmove( function(e) {
-		    _self.console.log('touch move');
-		    _self.console.log( e.params.dragAmount );
-		    mouseDragHandler(e);
-		} )
-		.touchend( mouseUpHandler )
-		.touchcancel( mouseUpHandler )
-		; */
 	} else { _self.console.log('Touch interaction disabled.'); }
 
 	if( this.config.enableKeys ) {
 	    // Install key handler
 	    var keyHandler = new KeyHandler( { trackAll : true } )
-		.down('enter',function() { _self.console.log('ENTER was hit.'); } )
-		.press('enter',function() { _self.console.log('ENTER was pressed.'); } )
-		.up('enter',function() { _self.console.log('ENTER was released.'); } )
 
 		.down('alt',function() { _self.console.log('alt was hit.'); } )
 		.press('alt',function() { _self.console.log('alt was pressed.'); } )
@@ -903,17 +832,17 @@
 		.up('ctrl',function() { _self.console.log('ctrl was released.'); } )
 
 		.down('escape',function() {
-		    _self.console.log('ESCAPE was hit.');
+		    // _self.console.log('ESCAPE was hit.');
 		    _self.clearSelection(true);
 		} )
 
 		.down('shift',function() {
-		    _self.console.log('SHIFT was hit.');
+		    //_self.console.log('SHIFT was hit.');
 		_self.selectPolygon = new Polygon();
 		    _self.redraw();
 		} )
 		.up('shift',function() {
-		    _self.console.log('SHIFT was released.');
+		    //_self.console.log('SHIFT was released.');
 		    // Find and select vertices in the drawn area
 		    if( _self.selectPolygon == null )
 			return;

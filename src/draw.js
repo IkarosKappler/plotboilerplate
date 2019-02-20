@@ -75,7 +75,14 @@
     // +-------------------------------
     _context.drawutils.prototype.image = function( image, position, size ) {
 	this.ctx.save();
-	this.ctx.drawImage( image, this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y, size.x*this.scale.x, size.y*this.scale.y );
+	console.log( image.width, image.height );
+	// Note that there is a Safari bug with the 3 or 5 params variant.
+	// Only the 9-param varaint works.
+	this.ctx.drawImage( image,
+			    0, 0,
+			    image.naturalWidth, image.naturalHeight,
+			    this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y,
+			    size.x*this.scale.x, size.y*this.scale.y );
 	this.ctx.restore();	
     };
 
