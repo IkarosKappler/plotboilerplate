@@ -79,11 +79,12 @@
 	    // | Add some interactive control Vectors.
 	    // +-------------------------------
 	    var cv0, cv1, cv2, cv3;
-	    pb.add( cv0 = new Vector( new Vertex(-diameter*1.6,0), new Vertex(-diameter*1.2,0) ), false );
+	    // pb.add( cv0 = new Vector( new Vertex(-diameter*1.6,0), new Vertex(-diameter*1.2,0) ), false );
 	    //pb.add( cv1 = new Vector( new Vertex(diameter*1.6,0), new Vertex(diameter*1.2,0) ), false );
 	    //pb.add( cv2 = new Vector( new Vertex(0,-diameter*1.6), new Vertex(0,-diameter*1.2) ), false );
 	    //pb.add( cv3 = new Vector( new Vertex(0,diameter*1.6), new Vertex(0,diameter*1.2) ), false );
 
+	    pb.add( cv0 = new Vector( new Vertex(0,0), new Vertex(diameter*0.8,0) ), false );
 	    var controlVectors = [ cv0 ]; // , cv1, cv2, cv3 ];
 	    var field = [];
 	    
@@ -107,36 +108,42 @@
 
 
 	    function adjustVectorField() {
-		for( var fi in field ) {
-		    var anyVector = field[fi];
-		    // Set to length 0
-		    anyVector.b.set(anyVector.a);
+		for( var ci in controlVectors ) {
+		    var controlVector = controlVectors[ci];
+		    var strength = controlVector.length();
+		    
+		    for( var fi in field ) {
+			var anyVector = field[fi];
+			// Set to length 0
+			anyVector.b.set(anyVector.a);
+			
+			if( ci == 0 && fi == 0 ) {
+			    // console.log(strength);
+			}	
+			
+			adjustVector_radial( controlVector, strength, anyVector );
 
-		    for( var ci in controlVectors ) {
-			var controlVector = controlVectors[ci];
-			var strength = controlVector.length();
-			// Any real value. Only those in [0..1] are of interest.
-			var t = Math.min(1, Math.max(0, controlVector.getClosestT(v.a)));
-			var closestPoint = controlVector.vertAt(t);
-			// Is the vertex inside the strengh area of thi control Vector?
-			var dist = anyVector.a.distance(closestPoint);
-			//if( ci == 0 ) console.log(dist,strength);
-			if( dist < strength ) {
-			    // console.log('x');
-			    anyVector.b.x += (controlVector.b.x-controlVector.a.x)*((strength-dist)/strength);
-			    anyVector.b.y += (controlVector.b.y-controlVector.a.y)*((strength-dist)/strength);
-			}
-			// Fancy stuff for an animation =)
-			/*
-			if( true || dist < strength ) {
-			    // console.log('x');
-			    anyVector.b.x += (controlVector.b.x-controlVector.a.x)*(dist/strength);
-			    anyVector.b.y += (controlVector.b.y-controlVector.a.y)*(dist/strength);
-			}
-			*/
 		    }
 		}
 		pb.redraw();
+	    }
+
+	    function adjustVector_radial( controlVector, strength, anyVector ) {
+		//var dist = anyVector.a.distance(controlVector.a);
+		var t = controlVector.getClosestT(anyVector.a);
+		// t = Math.max(0, Math.min(1,t));
+		var pointOnControlVector = controlVector.vertAt(t);
+		var dist = pointOnControlVector.distance( anyVector.a );
+		// Is the vertex inside the strengh area of thi control Vector?
+		if( dist < strength ) {
+		    // console.log('x');
+
+		    // dist -= strength;
+		    anyVector.b.x += (anyVector.a.x-controlVector.a.x)*(strength/dist);
+		    anyVector.b.y += (anyVector.a.y-controlVector.a.y)*(strength/dist);
+		    //anyVector.b.x += (anyVector.a.x-controlVector.a.x)*(dist/strength);
+		    //anyVector.b.y += (anyVector.a.y-controlVector.a.y)*(dist/strength);
+		}
 	    }
 
 	    // Install listeners

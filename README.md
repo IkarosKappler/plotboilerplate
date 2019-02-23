@@ -125,20 +125,18 @@ For details see main-dist.html:
 
 ### Todos
  * Make strokes configurable (color, width, style).
- * Add pad/phone support.
  * Implement optional canvas zoom.
  * Implement optional canvas rotation.
  * Make Bézier Curves dividable (by double click?).
  * Implement snap-to-grid.
  * Make ellipses rotatable.
- * Add images.
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
  * Add arcs?
- * The click-/tap-area scales with the canvas- and CSS-scale. It should have fixed size.
- * Added image flipping.
+ * Add image flipping.
  * Add Vectors to the SVGBuilder.
  * Add Images to the SVGBuiler.
-
+ * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
+ 
 
 ### Known bugs
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
@@ -148,6 +146,12 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2019-02-23
+  * Removed the 'rebuild' function as it had no purpose.
+  * Added scaling of the click-/touch-tolerance with the CSS scale.
+  * Added the helper function PlotBoilerplate.utils.buildArrowHead(Vertex,Vertex,Number,Number,Number).
+  * Added the Vector.toSVGString function, overriding Line.toSVGString.
+  * Tweaked the initial vector field demo a little bit (it's really fancy now but still not yet finished).
 * 2019-02-20
   * Removed the 'loadFile' entry from the GUI as it was experimental and never in use.
 * 2019-02-19

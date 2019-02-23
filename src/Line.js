@@ -88,7 +88,7 @@
     // +---------------------------------------------------------------------------------
     // | Create an SVG representation of this line.
     // |
-    // | The counterpart for this function is Line.getVertAt(Number).
+    // | The counterpart for this function is Line.vertAt(Number).
     // |
     // | @return {Number} The position of the perpendicular intersection as a ratio T.
     // +-------------------------------

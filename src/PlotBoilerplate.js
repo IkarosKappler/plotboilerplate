@@ -25,7 +25,9 @@
  * @modified 2019-02-19 Added two new constants: DEFAULT_CLICK_TOLERANCE and DEFAULT_TOUCH_TOLERANCE.
  * @modified 2019-02-19 Added the second param to the locatePointNear(Vertex,Number) function.
  * @modified 2019-02-20 Removed the 'loadFile' entry from the GUI as it was experimental and never in use.
- * @version  1.3.6
+ * @modified 2019-02-23 Removed the 'rebuild' function as it had no purpose.
+ * @modified 2019-02-23 Added scaling of the click-/touch-tolerance with the CSS scale.
+ * @version  1.3.7
  **/
 
 
@@ -131,10 +133,6 @@
 	    cssScaleY             : typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
 	    cssUniformScale       : typeof config.cssUniformScale != 'undefined' ? config.cssUniformScale : true,
 	    rebuild               : function() { rebuild(); },
-	    /* loadImage             : function() { var elem = document.getElementById('file');
-						 elem.setAttribute('data-type','image-upload');
-						 triggerClickEvent(elem);
-					       }, */
 	    saveFile              : function() { saveFile(); },
 
 	    drawBezierHandleLines : typeof config.drawBezierHandleLines != 'undefined' ? config.drawBezierHandleLines : true,
@@ -521,16 +519,6 @@
 	    var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
 	    saveAs(blob, "plot-boilerplate.svg");
 	};
-	
-	
-	/** +---------------------------------------------------------------------------------
-	 * The rebuild function just evaluates the input and
-	 *  - triangulate the point set?
-	 *  - build the voronoi diagram?
-	**/ // +-------------------------------
-	var rebuild = function() {
-	    // ...
-	};
 
 
 	/** +---------------------------------------------------------------------------------
@@ -615,7 +603,7 @@
 	 * @param y:Number The click Y position on the canvas.
 	 **/ // +-------------------------------
 	function handleClick(x,y) {
-	    var p = locatePointNear( _self.transformMousePosition(x, y), DEFAULT_CLICK_TOLERANCE );
+	    var p = locatePointNear( _self.transformMousePosition(x, y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 	    if( p ) { 
 		if( keyHandler.isDown('shift') ) {
 		    if( p.type == 'bpath' ) {
@@ -662,7 +650,7 @@
 	    // _self.console.log( 'is touch event', e instanceof TouchEvent );
 	    if( e.which != 1 && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
 		return; // Only react on left mouse or touch events
-	    var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE );
+	    var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 	    _self.console.log('point at position found: '+p );
 	    if( !p ) return;
 	    // Drag all selected elements?
@@ -797,7 +785,7 @@
 			{ one : function( hand, finger ) {
 			    touchMovePos = new Vertex(finger.lastPoint);
 			    touchDownPos = new Vertex(finger.lastPoint);
-			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE );
+			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 			    if( draggedElement ) {
 				hand.on('move', function (points) {
 				    //console.log( points );	    
@@ -943,6 +931,60 @@
 		}
 	    }
 	    return base;
+	},
+
+	
+	/**
+	 * Generate a four-point arrow head, starting at the vector end minus the
+	 * arrow head length.
+	 *
+	 * The first vertex in the returned array is guaranteed to be the located
+	 * at the vector line end minus the arrow head length.
+	 *
+	 *
+	 * Due to performance all params are required.
+	 *
+	 * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+	 * scaling different). Arrow heads should not look distored on non-uniform scaling.
+	 *
+	 * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+	 * For headlen use 8, it's a good arrow head size.
+	 *
+	 * Example:
+	 *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+	 *
+	 * @param zA:Vertex The start vertex of the vector to calculate the arrow head for.
+	 * @param zB:Vertex The end vertex of the vector.
+	 * @param headlen:Number The length of the arrow head (along the vector direction).
+	 * @param scaleX:Number The horizontal scaling during draw.
+	 * @param scaleY:Number the vertical scaling during draw.
+	 **/
+	buildArrowHead : function( zA, zB, headlen, scaleX, scaleY ) {
+	    //var headlen = 12;   // length of head in pixels
+	    // var angle = Math.atan2( (zB.y-zA.y)*this.scale.y, (zB.x-zA.x)*this.scale.x );
+	    var angle = Math.atan2( (zB.y-zA.y)*scaleY, (zB.x-zA.x)*scaleX );
+	    
+	    var vertices = [];
+	    /*
+	    //this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-(headlen*0.7)*Math.cos(angle), this.offset.y+zB.y*this.scale.y-(headlen*0.7)*Math.sin(angle));
+	    vertices.push( new Vertex( zB.x*scaleX-(headlen*0.7)*Math.cos(angle), zB.y*scaleY-(headlen*0.7)*Math.sin(angle)) );    
+			   
+	    // this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle-Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle-Math.PI/8));
+	    vertices.push( new Vertex(zB.x*scaleX-headlen*Math.cos(angle-Math.PI/8), zB.y*scaleY-headlen*Math.sin(angle-Math.PI/8) ) );
+
+	    // this.ctx.moveTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
+	    vertices.push( new Vertex(zB.x*scaleX, zB.y*scaleY) );
+	    
+	    //this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle+Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle+Math.PI/8));
+	    vertices.push( new Vertex(zB.x*scaleX-headlen*Math.cos(angle+Math.PI/8), zB.y*scaleY-headlen*Math.sin(angle+Math.PI/8)) );
+	    */
+
+	    vertices.push( new Vertex(zB.x*scaleX-(headlen)*Math.cos(angle), zB.y*scaleY-(headlen)*Math.sin(angle)) );    
+	    vertices.push( new Vertex(zB.x*scaleX-(headlen*1.35)*Math.cos(angle-Math.PI/8), zB.y*scaleY-(headlen*1.35)*Math.sin(angle-Math.PI/8) ) );
+	    vertices.push( new Vertex(zB.x*scaleX, zB.y*scaleY) );
+	    vertices.push( new Vertex(zB.x*scaleX-(headlen*1.35)*Math.cos(angle+Math.PI/8), zB.y*scaleY-(headlen*1.35)*Math.sin(angle+Math.PI/8)) );
+
+	    return vertices;
 	}
     };
     
