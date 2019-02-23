@@ -133,7 +133,6 @@ For details see main-dist.html:
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
  * Add arcs?
  * Add image flipping.
- * Add Vectors to the SVGBuilder.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  
