@@ -68,11 +68,11 @@ For details see main-dist.html:
 				 scaleX                : 1.0,
 				 scaleY                : 1.0,
 				 rasterAdjustFactor    : 2.0,
-				 autoAdjustOffset      : true, // was autoCenterOffset before
+				 autoAdjustOffset      : true,
 				 offsetAdjustXPercent  : 50,
 				 offsetAdjustYPercent  : 50,
-				 defaultCanvasWidth    : 1024,
-				 defaultCanvasHeight   : 768,
+				 defaultCanvasWidth    : 1024, // Fallback size
+				 defaultCanvasHeight   : 768,  // Fallback size
 				 canvasWidthFactor     : 1.0,
 				 canvasHeightFactor    : 1.0,
 				 cssScaleX	       : 1.0,
@@ -133,8 +133,8 @@ For details see main-dist.html:
  * Make ellipses rotatable.
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
  * Add arcs?
- * Add image flipping.
- * Add Images to the SVGBuiler.
+ * Add image flipping?
+ * Add Images to the SVGBuiler?
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  
 
@@ -146,6 +146,8 @@ For details see main-dist.html:
 
 
 ### Changelog
+* 2019-03-03
+  * Added a page builder (Jekyll-ruby with Bootstrap 4).
 * 2019-02-23
   * Removed the 'rebuild' function as it had no purpose.
   * Added scaling of the click-/touch-tolerance with the CSS scale.

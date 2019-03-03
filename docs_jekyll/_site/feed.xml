@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>plotboilerplate.js</title>
+    <description>Documentation for the plotboilerplate.js plotting library.
+</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sun, 03 Mar 2019 18:04:53 +0100</pubDate>
+    <lastBuildDate>Sun, 03 Mar 2019 18:04:53 +0100</lastBuildDate>
+    <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>Generating the docs with Jekyll</title>
+        <description>&lt;p&gt;Generate the docs from the Jekyll configuration.&lt;/p&gt;
+
+&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;   &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; .
+   &lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;docs_jekyll
+   bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;jekyll serve&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Check out the &lt;a href=&quot;/installation_notes.txt&quot;&gt;installation-notes&lt;/a&gt; for more info.&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 03 Mar 2019 17:11:27 +0100</pubDate>
+        <link>http://localhost:4000/docs/jekyll/generate/2019/03/03/welcome-to-jekyll.html</link>
+        <guid isPermaLink="true">http://localhost:4000/docs/jekyll/generate/2019/03/03/welcome-to-jekyll.html</guid>
+        
+        
+        <category>docs</category>
+        
+        <category>jekyll</category>
+        
+        <category>generate</category>
+        
+      </item>
+    
+  </channel>
+</rss>
