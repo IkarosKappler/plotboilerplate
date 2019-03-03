@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Generating the docs with Jekyll"
+title:  "Generating the docs"
 date:   2019-03-03 17:11:27 +0100
 categories: docs jekyll generate
 ---
@@ -16,7 +16,7 @@ Jekyll also offers powerful support for code snippets:
 
 Check out the [installation-notes](/installation_notes.txt) for more info.
 {% highlight bash %}
-   {% include _assets/installation_notes.txt %}      
+   {% include _assets/howto-generate-docs.txt %}      
 {% endhighlight %}
 
 

@@ -6,26 +6,58 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 03 Mar 2019 18:04:53 +0100</pubDate>
-    <lastBuildDate>Sun, 03 Mar 2019 18:04:53 +0100</lastBuildDate>
+    <pubDate>Sun, 03 Mar 2019 19:10:57 +0100</pubDate>
+    <lastBuildDate>Sun, 03 Mar 2019 19:10:57 +0100</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
-        <title>Generating the docs with Jekyll</title>
-        <description>&lt;p&gt;Generate the docs from the Jekyll configuration.&lt;/p&gt;
+        <title>Generating the docs</title>
+        <description>Generate the docs from the Jekyll configuration.
 
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+Jekyll also offers powerful support for code snippets:
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;   &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; .
    &lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;docs_jekyll
    bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;jekyll serve&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;Check out the &lt;a href=&quot;/installation_notes.txt&quot;&gt;installation-notes&lt;/a&gt; for more info.&lt;/p&gt;
+Check out the [installation-notes](/installation_notes.txt) for more info.
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;   
+&lt;span class=&quot;c&quot;&gt;# Generate docs with jekyll&lt;/span&gt;
 
+
+This required nodejs/npm installed. If you have troubles installing npm
+on Debian derivates, follow these instructions:
+https://tecadmin.net/install-latest-nodejs-npm-on-debian/
+
+You would have to run these commands
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install curl software-properties-common
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
+
+
+&lt;span class=&quot;c&quot;&gt;# Jekyll requires Ruby to installed (gem command)&lt;/span&gt;
+
+Install ruby and ruby-dev &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;your matching version
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install ruby ruby-all-dev
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install ruby&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;ruby -e &lt;span class=&quot;s1&quot;&gt;'puts RUBY_VERSION[/\d+\.\d+/]'&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;-dev
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install ruby-full build-essential zlib1g-dev
+
+&lt;span class=&quot;c&quot;&gt;# Run the bundler&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo gem install bundler
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;install bundler
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;bundle update
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;gem install jekyll
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;bundle &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;jekyll serve
+
+      &lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+
+[jekyll-docs]: http://jekyllrb.com/docs/home
+[jekyll-gh]:   https://github.com/jekyll/jekyll
+[jekyll-talk]: https://talk.jekyllrb.com/
 </description>
         <pubDate>Sun, 03 Mar 2019 17:11:27 +0100</pubDate>
-        <link>http://localhost:4000/docs/jekyll/generate/2019/03/03/welcome-to-jekyll.html</link>
-        <guid isPermaLink="true">http://localhost:4000/docs/jekyll/generate/2019/03/03/welcome-to-jekyll.html</guid>
+        <link>http://localhost:4000/docs/jekyll/generate/2019/03/03/generating-the-docs.markdown</link>
+        <guid isPermaLink="true">http://localhost:4000/docs/jekyll/generate/2019/03/03/generating-the-docs.markdown</guid>
         
         
         <category>docs</category>

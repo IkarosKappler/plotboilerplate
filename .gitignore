@@ -1,5 +1,7 @@
 *~
 node_modules
 npm-debug.log
-
-
+package.lock
+docs_jekyll/screeshots
+docs_jekyll/_includes/_assets
+docs_jekyll/_site/*

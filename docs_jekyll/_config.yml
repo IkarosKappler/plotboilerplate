@@ -16,7 +16,6 @@ twitter_username: kpplr
 github_username:  ikaroskappler
 
 exclude: [
-  "_assets",
   "Gemfile",
   "Gemfile.lock",
   "gulpfile.js",
@@ -29,3 +28,5 @@ exclude: [
 
 # Build settings
 markdown: kramdown
+
+markdown_ext: md
