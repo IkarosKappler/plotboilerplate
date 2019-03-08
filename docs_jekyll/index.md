@@ -1,3 +1,8 @@
+---
+layout: page
+---
+  
+
 # Plotting boilerplate
 For Javascript and canvas with 2d-context.
 
@@ -189,3 +194,6 @@ The Vertex class has basic event support:
 * FileSaver.js
 * SGV-arcto to Canvas-arc transform from [canvg](https://github.com/canvg/canvg "canvg") by Gabe Lerner
 * [Touchy.js](https://github.com/jairajs89/Touchy.js "Touchy.js") by [jairajs89](https://github.com/jairajs89 "jairajs89") 
+
+## Changelog
+[View changelog](changelog/ "View changelog")

@@ -16,6 +16,8 @@ twitter_username: kpplr
 github_username:  ikaroskappler
 
 exclude: [
+  "*~",
+  "#*#",
   "Gemfile",
   "Gemfile.lock",
   "gulpfile.js",
@@ -23,10 +25,12 @@ exclude: [
   "package.json",
   "publish.sh",
   "yarn-error.log",
-  "yarn.lock"
+  "yarn.lock",
+  "__partials",
+  "__index.original.html"
 ]
 
 # Build settings
 markdown: kramdown
 
-markdown_ext: md
+# markdown_ext: md

@@ -4,12 +4,10 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+This is the documentation for the javascript/html5/canvas plotting boilerplate.
 
-You can find the source code for the Jekyll new theme at:
-{% include icon-github.html username="jglovier" %} /
-[jekyll-new](https://github.com/jglovier/jekyll-new)
+You can find the source code for the Plotboilerplate at
+{% include icon-github.html username="ikaroskappler" %} /
+[plotboilerplate.js](https://github.com/ikaroskappler/plotboilerplate)
 
-You can find the source code for Jekyll at
-{% include icon-github.html username="jekyll" %} /
-[jekyll](https://github.com/jekyll/jekyll)
+If you have questions, recommendations, bug reports, feature requests or want to contact the author and developer, please send a message to [info@int2byte.de](mailto:info@int2byte.de "info@int2byte.de")

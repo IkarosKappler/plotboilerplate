@@ -5,3 +5,4 @@ package.lock
 docs_jekyll/screenshots
 docs_jekyll/_includes/_assets
 docs_jekyll/_site/*
+docs_jekyll/.sass-cache
