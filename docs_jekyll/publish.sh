@@ -16,11 +16,11 @@ do
    : 
    # do whatever on $file
    # echo $file
-   if [ ! -f _includes/_assests/$file ]; then
-       echo "Copy of file $file doesn't exist. Creating ..."
+   # if [ ! -f _includes/_assests/$file ]; then
+       echo "Copying $file ..."
        cp ../$file _includes/_assets
        echo "Done."
-   fi
+   # fi
 done
 
 echo "Checking dirs ..."

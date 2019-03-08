@@ -20,8 +20,7 @@ $ sudo apt-get install ruby-full build-essential zlib1g-dev
 
 # Run the bundler
 $ sudo gem install bundler
-$ install bundler
 $ bundle update
-$ gem install jekyll
+$ sudo gem install jekyll redcarpet
 $ bundle exec jekyll serve
 
