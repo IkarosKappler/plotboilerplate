@@ -14,6 +14,9 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://plotboilerplate.io" # the base hostname & protocol for your site
 twitter_username: kpplr
 github_username:  ikaroskappler
+image: /screenshots/preview-image-large.png
+date: 2019-03-11
+
 
 exclude: [
   "*~",

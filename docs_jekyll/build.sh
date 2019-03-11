@@ -10,7 +10,7 @@ echo '---' >> changelog.md
 cat ../changelog.md >> changelog.md
 
 echo "Starting jekyll ..."
-bundle exec jekyll serve
+# bundle exec jekyll serve
 
 # Do not start with 'serve' if you want to compile for production!
-# bundle exec jekyll build
+bundle exec jekyll build
