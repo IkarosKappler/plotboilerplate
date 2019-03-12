@@ -9,18 +9,19 @@ For plotting visual 2D data with Javascript and canvas (in 2d-context).
 
 This started as a simple collection of useful functions I repetively used for
 visualizing 2D stuff on HTML canvas. Basic features are
- * Adding elements like vertices, lines, vectors, polygons, ellipes, images
+ * Adding elements like vertices, lines, vectors, polygons, ellipses, images
  * Javascript based cofiguration of the canvas behavior (fullsize, interaction, raster)
- * Mouse interaction
+ * Mouse interaction (zoom, pan, drag elements)
  * Keyboard interaction
- * Touch interaction (phone, tablet, mobile)
+ * Touch interaction (phone, tablet)
 
 
+## Example Screenshots
 ![Current demo](screenshots/screenshot-20181209_0.png "Current demo")
 
-[Live Demo](https://www.int2byte.de/public/plot-boilerplate/main-dist.html "Live Demo")
+[Live Demo](https://plotboilerplate.io/repo/main-dist.html "Live Demo")
 
-Feigenbaum bifurcation (logistic map)
+### Feigenbaum bifurcation (logistic map)
 ![Plotting the Feigenbaum bifurcation](screenshots/screenshot-20181212_3_feigenbaum.png "Plotting the Feigenbaum bifurcation")
 ![Plotting the Feigenbaum bifurcation](screenshots/screenshot-20190223_0_feigenbaum.png "Plotting the Feigenbaum bifurcation")
 
@@ -29,25 +30,25 @@ Feigenbaum bifurcation (logistic map)
 [And here is a tiny article about it](http://www.polygon-berlin.de/deterministisches-chaos "Article about deterministic chaos")
 
 
-Perpendiducular point-to-line-distance demo
+### Perpendiducular point-to-line-distance demo
 
 ![Perpendiducular point-to-line distance](screenshots/screenshot-20190220_2_line-to-point.png "Perpendiducular point-to-line distance")
 
-[See the demo](https://www.int2byte.de/public/plot-boilerplate/main-line-point-distance.html "Random-scripture demo")
+[See the demo](https://plotboilerplate.io/repo/main-line-point-distance.html "Random-scripture demo")
 
 
-Random-scripture demo
+### Random-scripture demo
 
 ![Random-scripture demo](screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
 
-[See the demo](https://www.int2byte.de/public/plot-boilerplate/main-randomscripture.html "Random-scripture demo")
+[See the demo](https://plotboilerplate.io/repo/main-randomscripture.html "Random-scripture demo")
 
 
-Vector field test (still in development)
+### Vector field test (still in development)
 
 ![Vectorfield test](screenshots/screenshot-20190220_1_vectorfield.png "Vectorfield test demo (still in development)")
 
-[See the demo](https://www.int2byte.de/public/plot-boilerplate/main-vectorfield.html "Demo of the vector field implementation ... still in development")
+[See the demo](https://plotboilerplate.io/repo/main-vectorfield.html "Demo of the vector field implementation ... still in development")
 
 
 
@@ -249,7 +250,7 @@ The Vertex class has basic drag event support:
 	pb.redraw();
    } );
 ~~~
-[And the simple demo is here](https://www.int2byte.de/public/plot-boilerplate/main-simpledemo.html "And the simple demo is here")
+[And the simple demo is here](https://plotboilerplate.io/repo/main-simpledemo.html "And the simple demo is here")
 
 ![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
@@ -282,10 +283,8 @@ from the sources code files in ./src/*.
 ~~~
 
 
-### Todos
+## Todos
  * Make strokes configurable (color, width, style).
- * Implement optional canvas zoom.
- * Implement optional canvas rotation.
  * Make Bézier Curves dividable (by double click?).
  * Implement snap-to-grid.
  * Make ellipses rotatable.
@@ -294,16 +293,19 @@ from the sources code files in ./src/*.
  * Add image flipping.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
+ * Add image/svg support (adding SVG images).
  
 
 
-### Known bugs
- * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
- * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
- * Currently no more known. Please report bugs.
 
+## Browsers support
 
+| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari-ios/safari-ios_48x48.png" alt="iOS Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br>iOS Safari |
+| --------- | --------- | --------- | --------- |
+| IE11 & Edge| latest    | latest    | latest    |
   
+
+
 
 ### Dependencies
 * HTML5 Canvas
@@ -315,6 +317,18 @@ from the sources code files in ./src/*.
 * FileSaver.js
 * SGV-arcto to Canvas-arc transform from [canvg](https://github.com/canvg/canvg "canvg") by Gabe Lerner
 * [Touchy.js](https://github.com/jairajs89/Touchy.js "Touchy.js") by [jairajs89](https://github.com/jairajs89 "jairajs89") 
+
+
+
+## Known bugs
+ * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
+ * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
+ * Currently no more known. Please report bugs.
+
+
+
+
+
 
 ## Changelog
 [View changelog](changelog/ "View changelog")
