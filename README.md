@@ -10,7 +10,30 @@ visualizing 2D stuff on HTML canvas. Basic features are
  * Touch interaction (phone, tablet)
 
 
-## Example Screenshots
+
+## The HTML file
+For a full example see main-dist.html:
+~~~html
+    <canvas id="my-canvas">Your browser does not support the canvas tag.</canvas>
+
+    <div class="info monospace">
+      [<span id="cx">-</span>,<span id="cy">-</span>]
+    </div>
+~~~
+The 'info' block is just for displaying the current mouse/touch coordinates.
+
+
+## The javascript
+~~~javascript
+    var pb = new PlotBoilerplate( {
+        canvas			: document.getElementById('my-canvas'),
+     	fullSize              	: true
+     } );
+~~~
+
+
+
+## Examples and screenshots
 ![Current demo](screenshots/screenshot-20181209_0.png "Current demo")
 
 [Live Demo](https://plotboilerplate.io/repo/main-dist.html "Live Demo")
@@ -46,18 +69,8 @@ visualizing 2D stuff on HTML canvas. Basic features are
 
 
 
-## The HTML file
-For a full example see main-dist.html:
-~~~html
-    <canvas id="my-canvas">Your browser does not support the canvas tag.</canvas>
 
-    <div class="info monospace">
-      [<span id="cx">-</span>,<span id="cy">-</span>]
-    </div>
-~~~
-
-
-## Initialize the canvas
+## Parameters during initialization
 ~~~javascript
  var pb = new PlotBoilerplate(
      {  // HTMLElement
