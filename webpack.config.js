@@ -41,22 +41,6 @@ module.exports = [
             }),
           ]
     }
-/*
-    ,{
-        entry: [
-        'script-loader!uglify-loader!./lib/humane.min.js',
-    	'script-loader!uglify-loader!./lib/dat.gui.min.js',
-	'script-loader!uglify-loader!./lib/dat.gui.title.polyfill.js',
-        'script-loader!uglify-loader!./lib/FileSaver.min.js',
-        'script-loader!uglify-loader!./lib/Color.js',
-	'script-loader!uglify-loader!./lib/Touchy.min.js'
-        ],
-        output: {
-            path: path.resolve(__dirname, 'lib'),
-            filename: 'vendor.min.js'
-        }
-    }
-*/
     // Un-comment this block if you also want to re-compile the Color class.
     ,{
         entry: [

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>2D plotting boilerplate (Feigenbaum Demo)</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2018-08-16">
+
+
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/dat.gui.title.polyfill.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/Color.js"></script>
+    <script src="../../lib/bbtree.js"></script>
+    
+    <script src="../../src/gup.js"></script>
+    
+    <!-- For production -->
+    <script src="../../dist/plot-boilerplate.min.js"></script>
+    <script src="../../src/PlotBoilerplate.RectSelector.js"></script>
+    <script src="../../WeightedBalancedCollection.js"></script>
+    
+    <script src="index-feigenbaum-demo.js"></script>
+    <link rel="stylesheet" href="../../style.css">
+  </head>
+  <body>
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+
+    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+
+    <div class="info monospace">
+      [<span id="cx">-</span>,<span id="cy">-</span>]
+    </div>
+
+    <!-- This is for the rectangular selector -->
+    <div id="drag-rect"></div>
+
+    <!-- This is a custom tailored dialog overlay -->
+    <div id="dialog-wrapper" class="overlay-wrapper">
+      <div class="overlay-blanket">
+	<div class="overlay-content">Test</div>
+      </div>
+    </div>
+  </body>
+</html>

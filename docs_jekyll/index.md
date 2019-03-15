@@ -4,7 +4,7 @@ date: 2019-03-11
 ---
   
 
-# Plotting boilerplate
+# A Javascript Plotting Boilerplate
 For plotting visual 2D data with Javascript and canvas (in 2d-context).
 
 This started as a simple collection of useful functions I repetively used for
@@ -38,6 +38,36 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ~~~
 
 
+## Add elements to your canvas
+~~~javascript
+   // Create two points:
+   //   The origin is at the visual center by default.
+   var pointA = new Vertex( -100, -100 );
+   var pointB = new Vertex( 100, 100 );
+   pb.add( new Line(pointA,pointB) );
+
+   // When point A is moved by the user
+   //   then move point B in the opposite direction
+   pointA.listeners.addDragListener( function(e) {
+   	pointB.sub( e.params.dragAmount );
+	pb.redraw();
+   } );
+   
+   // and when point B is moved
+   //   then move point A
+   pointB.listeners.addDragListener( function(e) {
+   	pointA.sub( e.params.dragAmount );
+	pb.redraw();
+   } );
+~~~
+[And the simple demo is here](https://plotboilerplate.io/repo/demos/simple/main-simpledemo.html "And the simple demo is here")
+
+<a href="https://plotboilerplate.io/repo/demos/simple/main-simpledemo.html" title="And the simple demo is here">And the simple demo is here</a>
+
+![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+
+
+
 
 ## Examples and screenshots
 ![Current demo](screenshots/screenshot-20181209_0.png "Current demo")
@@ -57,21 +87,21 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ![Perpendiducular point-to-line distance](screenshots/screenshot-20190220_2_line-to-point.png "Perpendiducular point-to-line distance")
 
-[See the demo](https://plotboilerplate.io/repo/main-line-point-distance.html "Random-scripture demo")
+[See the demo](https://plotboilerplate.io/repo/demos/line-point-distance/main-line-point-distance.html "Random-scripture demo")
 
 
 ### Random-scripture demo
 
 ![Random-scripture demo](screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
 
-[See the demo](https://plotboilerplate.io/repo/main-randomscripture.html "Random-scripture demo")
+[See the demo](https://plotboilerplate.io/repo/demo/random-scripture/main-randomscripture.html "Random-scripture demo")
 
 
 ### Vector field test (still in development)
 
 ![Vectorfield test](screenshots/screenshot-20190220_1_vectorfield.png "Vectorfield test demo (still in development)")
 
-[See the demo](https://plotboilerplate.io/repo/main-vectorfield.html "Demo of the vector field implementation ... still in development")
+[See the demo](https://plotboilerplate.io/repo/demo/vectorfield/main-vectorfield.html "Demo of the vector field implementation ... still in development")
 
 
 
@@ -241,31 +271,6 @@ The Vertex class has basic drag event support:
 ~~~
 
 
-## Add elements to your canvas
-~~~javascript
-   // Create two points:
-   //   The origin is at the visual center by default.
-   var pointA = new Vertex( -100, -100 );
-   var pointB = new Vertex( 100, 100 );
-   pb.add( new Line(pointA,pointB) );
-
-   // When point A is moved by the user
-   //   then move point B in the opposite direction
-   pointA.listeners.addDragListener( function(e) {
-   	pointB.sub( e.params.dragAmount );
-	pb.redraw();
-   } );
-   
-   // and when point B is moved
-   //   then move point A
-   pointB.listeners.addDragListener( function(e) {
-   	pointA.sub( e.params.dragAmount );
-	pb.redraw();
-   } );
-~~~
-[And the simple demo is here](https://plotboilerplate.io/repo/main-simpledemo.html "And the simple demo is here")
-
-![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
 
 ## Usage

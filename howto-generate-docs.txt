@@ -24,3 +24,6 @@ $ bundle update
 $ sudo gem install jekyll redcarpet
 $ bundle exec jekyll serve
 
+If there are still problems try
+$ sudo gem update
+and repeat the last 4 steps.

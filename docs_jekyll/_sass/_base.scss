@@ -8,6 +8,10 @@ dl, dd, ol, ul, figure {
     padding: 0;
 }
 
+/* Add some margin before the level-2-headlines (except the first) */
+h2:not(:first-child) {
+    margin-top : 3em;
+}
 
 
 /**

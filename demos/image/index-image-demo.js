@@ -114,7 +114,7 @@
 	   
 	    // Finally load the image
 	    img.addEventListener('load', function() { pb.redraw(); } );
-	    img.src = 'example-image.png';
+	    img.src = '../../example-image.png';
 
 
 
