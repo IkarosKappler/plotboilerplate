@@ -208,3 +208,24 @@ pre {
         }
     }
 }
+
+
+.btn {
+     display : inline-block;
+     border : 1px solid grey;
+     background : lightgray;
+     padding : 0.4em 0.6em;
+     border-radius : 0.25em;
+
+     &.btn-link {
+       background : $brand-color;
+       color : white;
+     }
+     &.btn-link {
+       &:hover {
+       	       background : lighten($brand-color, 5%);
+       	       color : white;
+       }
+     }
+     
+}
