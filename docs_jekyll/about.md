@@ -10,4 +10,4 @@ You can find the source code for the Plotboilerplate at
 {% include icon-github.html username="ikaroskappler" %} /
 [plotboilerplate.js](https://github.com/ikaroskappler/plotboilerplate)
 
-If you have questions, recommendations, bug reports, feature requests or want to contact the author and developer, please send a message to [info@int2byte.de](mailto:info@int2byte.de "info@int2byte.de")
+If you have questions, recommendations, bug reports, feature requests or want to contact the author and developer, please send a message to [{{ site.email }}](mailto:{{site.email}} "{{ site.email }}")

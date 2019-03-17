@@ -7,7 +7,7 @@
 
 # Site settings
 title: plotboilerplate.js
-email: info@int2byte.de
+email: info@plotboilerplate.io
 description: > # this means to ignore newlines until "baseurl:"
   A lightweight html5/javascript/canvas plotting boilerplate library: plotboilerplate.js.
 baseurl: "" # the subpath of your site, e.g. /blog
