@@ -1,6 +1,7 @@
 
-# Generate docs with jekyll
+# Generate the documentation
 
+## Generate docs with jekyll
 
 This required nodejs/npm installed. If you have troubles installing npm
 on Debian derivates, follow these instructions:
@@ -11,14 +12,14 @@ $ sudo apt-get install curl software-properties-common
 $ curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
 
 
-# Jekyll requires Ruby to installed (gem command)
+### Jekyll requires Ruby to installed (gem command)
 
 Install ruby and ruby-dev for your matching version
 $ sudo apt-get install ruby ruby-all-dev
 $ sudo apt-get install ruby`ruby -e 'puts RUBY_VERSION[/\d+\.\d+/]'`-dev
 $ sudo apt-get install ruby-full build-essential zlib1g-dev
 
-# Run the bundler
+### Run the bundler
 $ sudo gem install bundler
 $ bundle update
 $ sudo gem install jekyll redcarpet
@@ -27,3 +28,25 @@ $ bundle exec jekyll serve
 If there are still problems try
 $ sudo gem update
 and repeat the last 4 steps.
+
+
+
+### Compile
+Now run
+$ bundle exec jekyll serve
+for continuous local HTML generation
+
+or
+
+$ bundle exec jekyll build
+for building the docs for production.
+
+
+## Generate the technical documentation with JSDoc
+
+Just run the command
+$ ./node_modules/.bin/jsdoc --debug -r src/ -d docs
+
+or run the shell script
+$ ./mkdocs.sh
+

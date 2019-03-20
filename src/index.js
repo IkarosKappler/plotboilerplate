@@ -3,11 +3,13 @@
  *
  * @require PlotBoilerplate, MouseHandler, gup, dat.gui
  * 
- * @author   Ikaros Kappler
- * @date     2018-10-23
- * @modified 2018-11-09 Refactored the old code.
- * @modified 2018-12-17 Added the config.redrawOnResize param.
- * @version  1.0.2
+ * @projectname Plotboilerplate.js
+ * @author      Ikaros Kappler
+ * @date        2018-10-23
+ * @modified    2018-11-09 Refactored the old code.
+ * @modified    2018-12-17 Added the config.redrawOnResize param.
+ * @modified    2019-03-20 Added the 'projectname' tag.
+ * @version     1.0.3
  **/
 
 

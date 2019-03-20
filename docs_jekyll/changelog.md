@@ -4,6 +4,8 @@ layout: page
 
 
 ### Changelog
+* 2019-03-20
+  * Added JSDoc inline documentation for these classes: Vertex, Line, Vector, VertexAttr, VertexListeners, Polygon.
 * 2019-02-23
   * Removed the 'rebuild' function as it had no purpose.
   * Added scaling of the click-/touch-tolerance with the CSS scale.

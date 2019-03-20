@@ -1,4 +1,32 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Polygon.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Polygon.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @classdesc A polygon class.
  *
  * @requires Vertex
@@ -49,9 +77,9 @@
 
 
     /**
-     * Check if the given vertex is inside this polygon.<br>
-     * <br>
-     * Ray-casting algorithm found at<br>
+     * Check if the given vertex is inside this polygon.&lt;br>
+     * &lt;br>
+     * Ray-casting algorithm found at&lt;br>
      *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
      *
      * @method containsVert
@@ -68,12 +96,12 @@
 	//    var x = point[0], y = point[1];
 	//
 	//    var inside = false;
-	//    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+	//    for (var i = 0, j = vs.length - 1; i &lt; vs.length; j = i++) {
 	//	var xi = vs[i][0], yi = vs[i][1];
 	//	var xj = vs[j][0], yj = vs[j][1];
 	//
 	//	var intersect = ((yi > y) != (yj > y))
-	//	    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+	//	    &amp;&amp; (x &lt; (xj - xi) * (y - yi) / (yj - yi) + xi);
 	//	if (intersect) inside = !inside;
 	//    }
 	//
@@ -81,12 +109,12 @@
 	// };
 
 	var inside = false;
-	for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
+	for (var i = 0, j = this.vertices.length - 1; i &lt; this.vertices.length; j = i++) {
             var xi = this.vertices[i].x, yi = this.vertices[i].y;
             var xj = this.vertices[j].x, yj = this.vertices[j].y;
 
             var intersect = ((yi > vert.y) != (yj > vert.y))
-		&& (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
+		&amp;&amp; (vert.x &lt; (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
             if (intersect) inside = !inside;
 	}
 
@@ -96,11 +124,11 @@
 
 
     /**
-     * Convert this polygon to a sequence of quadratic Bézier curves.<br>
-     * <br>
-     * The first vertex in the returned array is the start point.<br>
+     * Convert this polygon to a sequence of quadratic Bézier curves.&lt;br>
+     * &lt;br>
+     * The first vertex in the returned array is the start point.&lt;br>
      * The following sequence are pairs of control-point-and-end-point:
-     * <pre>startPoint, controlPoint0, pathPoint1, controlPoint1, pathPoint2, controlPoint2, ..., endPoint<pre>
+     * &lt;pre>startPoint, controlPoint0, pathPoint1, controlPoint1, pathPoint2, controlPoint2, ..., endPoint&lt;pre>
      *
      * @method toQuadraticBezierData
      * @return {Vertex[]}  An array of 2d vertices that shape the quadratic Bézier curve.
@@ -108,7 +136,7 @@
      * @memberof Polygon
      **/
     _context.Polygon.prototype.toQuadraticBezierData = function() {
-	if( this.vertices.length < 3 )
+	if( this.vertices.length &lt; 3 )
 	    return [];
 	var qbezier = [];
 	var cc0 = this.vertices[0]; 
@@ -117,7 +145,7 @@
 				     cc0.y + (cc1.y-cc0.y)/2 );
 	qbezier.push( edgeCenter );
 	var limit = this.isOpen ? this.vertices.length : this.vertices.length+1;
-	for( var t = 1; t < limit; t++ ) {  
+	for( var t = 1; t &lt; limit; t++ ) {  
 	    cc0 = this.vertices[ t%this.vertices.length ];
 	    cc1 = this.vertices[ (t+1)%this.vertices.length ];
 	    var edgeCenter = new Vertex( cc0.x + (cc1.x-cc0.x)/2,
@@ -143,7 +171,7 @@
 	if( qdata.length == 0 )
 	    return "";
 	var buffer = [ 'M ' + qdata[0].x+' '+qdata[0].y ];
-	for( var i = 1; i < qdata.length; i+=2 ) {
+	for( var i = 1; i &lt; qdata.length; i+=2 ) {
 	    buffer.push( 'Q ' + qdata[i].x+' '+qdata[i].y + ', ' + qdata[i+1].x+' '+qdata[i+1].y );
 	}
 	return buffer.join(' ');
@@ -152,11 +180,11 @@
 
     
     /**
-     * Convert this polygon to a sequence of cubic Bézier curves.<br>
-     * <br>
-     * The first vertex in the returned array is the start point.<br>
-     * The following sequence are triplets of (first-control-point, secnond-control-point, end-point):<br>
-     * <pre>startPoint, controlPoint0_0, controlPoint1_1, pathPoint1, controlPoint1_0, controlPoint1_1, ..., endPoint</pre>
+     * Convert this polygon to a sequence of cubic Bézier curves.&lt;br>
+     * &lt;br>
+     * The first vertex in the returned array is the start point.&lt;br>
+     * The following sequence are triplets of (first-control-point, secnond-control-point, end-point):&lt;br>
+     * &lt;pre>startPoint, controlPoint0_0, controlPoint1_1, pathPoint1, controlPoint1_0, controlPoint1_1, ..., endPoint&lt;/pre>
      *
      * @method toCubicBezierData
      * @param {number=} threshold - An optional threshold (default=1.0) how strong the curve segments 
@@ -171,7 +199,7 @@
 	if( typeof threshold == 'undefined' )
 	    threshold = 1.0;
 	
-	if( this.vertices.length < 3 )
+	if( this.vertices.length &lt; 3 )
 	    return [];
 	var cbezier = [];
 	var a = this.vertices[0]; 
@@ -180,7 +208,7 @@
 	cbezier.push( edgeCenter );
 	
 	var limit = this.isOpen ? this.vertices.length-1 : this.vertices.length;
-	for( var t = 0; t < limit; t++ ) {
+	for( var t = 0; t &lt; limit; t++ ) {
 	    var a = this.vertices[ t%this.vertices.length ];
 	    var b = this.vertices[ (t+1)%this.vertices.length ];
 	    var c = this.vertices[ (t+2)%this.vertices.length ];
@@ -215,7 +243,7 @@
 	if( qdata.length == 0 )
 	    return "";
 	var buffer = [ 'M ' + qdata[0].x+' '+qdata[0].y ];
-	for( var i = 1; i < qdata.length; i+=3 ) {
+	for( var i = 1; i &lt; qdata.length; i+=3 ) {
 	    buffer.push( 'C ' + qdata[i].x+' '+qdata[i].y + ', ' + qdata[i+1].x+' '+qdata[i+1].y + ', ' + qdata[i+2].x + ' ' + qdata[i+2].y );
 	}
 	return buffer.join(' ');
@@ -235,7 +263,7 @@
     _context.Polygon.prototype.toSVGString = function( options ) {
 	options = options || {};
 	var buffer = [];
-	buffer.push( '<path' );
+	buffer.push( '&lt;path' );
 	if( options.className )
 	    buffer.push( ' class="' + options.className + '"' );
 	buffer.push( ' d="' );
@@ -244,7 +272,7 @@
 	    buffer.push( this.vertices[0].x )
 	    buffer.push( ' ' );
 	    buffer.push( this.vertices[0].y );
-	    for( var i = 1; i < this.vertices.length; i++ ) {
+	    for( var i = 1; i &lt; this.vertices.length; i++ ) {
 		buffer.push( ' L ' );
 		buffer.push( this.vertices[i].x )
 		buffer.push( ' ' );
@@ -259,3 +287,26 @@
     };
     
 })(window ? window : module.export );
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Line.html">Line</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Vector.html">Vector</a></li><li><a href="Vertex.html">Vertex</a></li><li><a href="VertexAttr.html">VertexAttr</a></li><li><a href="VertexListeners.html">VertexListeners</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 20 2019 21:58:21 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

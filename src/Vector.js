@@ -1,33 +1,47 @@
 /**
- * A vector (vertex,vertex) implementation.
+ * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
+ *            <br>
+ *            Vectors are drawn with an arrow at their end point.<br>
+ *            <b>The Vector class extends the Line class.</b>
  *
  * @author   Ikaros Kappler
  * @date     2019-01-30
  * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
- * @version  1.0.1
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @version  1.0.2
+ *
+ * @file Vector
+ * @public
  **/
 
 (function(_context) {
     'use strict';
     
     /**
-     * +---------------------------------------------------------------------------------
-     * | The constructor.
-     * |
-     * @param {Vertex} vertA
-     * @param {Vertex} vertB
+     * The constructor.
+     * 
+     * @constructor
+     * @name Vector
+     * @extends Line
+     * @param {Vertex} vertA - The start vertex of the vector.
+     * @param {Vertex} vertB - The end vertex of the vector.
      **/
     var Vector = function( vertA, vertB ) {
 	Line.call(this,vertA,vertB);
     };
     Object.extendClass(Line,Vector);
 
-    // +---------------------------------------------------------------------------------
-    // | Create an SVG representation of this line.
-    // |
-    // | @override
-    // | @return string The SVG string
-    // +-------------------------------
+    
+    /**
+     * Create an SVG representation of this line.
+     *
+     * @method toSVGString
+     * @override
+     * @param {object=} options - A set of options, like 'className'.
+     * @return {string} The SVG string representation.
+     * @instance
+     * @memberof Vector
+     **/
     Vector.prototype.toSVGString = function( options ) {
 	options = options || {};
 	var buffer = [];
