@@ -1,7 +1,7 @@
 /**
  * The main script of the generic plotter.
  *
- * @require PlotBoilerplate, MouseHandler, gup, dat.gui
+ * @requires PlotBoilerplate, MouseHandler, gup, dat.gui
  * 
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler

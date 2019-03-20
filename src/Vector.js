@@ -4,6 +4,8 @@
  *            Vectors are drawn with an arrow at their end point.<br>
  *            <b>The Vector class extends the Line class.</b>
  *
+ * @requires Vertex, Line
+ *
  * @author   Ikaros Kappler
  * @date     2019-01-30
  * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.

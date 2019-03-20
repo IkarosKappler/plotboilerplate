@@ -3,7 +3,7 @@
  * <br>
  * It is used to identify a 2-dimensional point on the x-y-plane.
  *
- * @require VertexAttr
+ * @requires VertexAttr
  * 
  * @author   Ikaros Kappler
  * @date     2012-10-17

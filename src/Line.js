@@ -4,6 +4,8 @@
  * This is some refactored code from my 'Morley Triangle' test<br>
  *   https://github.com/IkarosKappler/morleys-trisector-theorem
  *
+ * @requires Vertex
+ *
  * @author   Ikaros Kappler
  * @date     2016-03-12
  * @modified 2018-12-05 Refactored the code from the morley-triangle script.
