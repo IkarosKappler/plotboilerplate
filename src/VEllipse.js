@@ -1,5 +1,5 @@
 /**
- * An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
+ * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
  * @requires Vertex
  * 
@@ -7,19 +7,40 @@
  * @date     2018-11-28
  * @modified 2018-12-04 Added the toSVGString function.
  * @version  1.0.1
+ *
+ * @file VEllipse
+ * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 
 (function(_context) {
-    // +---------------------------------------------------------------------------------
-    // | The constructor.
-    // |
-    // | @param center:Vertex The ellipses center.
-    // | @param axis:Vertex The x- and y-axis.
-    // +-------------------------------
+
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @param center:Vertex The ellipses center.
+     * @param axis:Vertex The x- and y-axis.
+     * @name VEllipse
+     **/
     var VEllipse = function( center, axis ) {
 	this.center = center;
 	this.axis = axis;
     };
+
+
+    /** 
+     * @member {Vertex} 
+     * @memberof VEllipse
+     * @instance
+     */
+    VEllipse.prototype.center = null;
+
+    /** 
+     * @member {Vertex} 
+     * @memberof VEllipse
+     * @instance
+     */
+    VEllipse.prototype.axis = null;
 
 
     // +---------------------------------------------------------------------------------

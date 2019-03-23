@@ -32,6 +32,22 @@
 	this.b = b;
     };
 
+
+    /** 
+     * @member {Vertex} 
+     * @memberof Line
+     * @instance
+     */
+    Line.prototype.a = null;
+
+    /** 
+     * @member {Vertex} 
+     * @memberof Line
+     * @instance
+     */
+    Line.prototype.b = null;
+    
+
     /**
      * Get the length of this line.
      *

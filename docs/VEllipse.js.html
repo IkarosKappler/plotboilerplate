@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: VertexAttr.js</title>
+    <title>JSDoc: Source: VEllipse.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: VertexAttr.js</h1>
+    <h1 class="page-title">Source: VEllipse.js</h1>
 
     
 
@@ -27,60 +27,72 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @classdesc The VertexAttr is a helper class to wrap together additional attributes
- * to vertices that do not belong to the 'standard canonical' vertex implementation.&lt;br>
- * &lt;br>
- * This is some sort of 'userData' object, but the constructor uses a global model
- * to obtain a (configurable) default attribute set to all instances.&lt;br>
+ * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
+ * @requires Vertex
+ * 
  * @author   Ikaros Kappler
- * @date     2018-08-26
- * @modified 2018-11-17 Added the 'isSelected' attribute.
- * @modified 2018-11-27 Added the global model for instantiating with custom attributes.
- * @modified 2019-03-20 Added JSDoc tags.
- * @version  1.0.3
+ * @date     2018-11-28
+ * @modified 2018-12-04 Added the toSVGString function.
+ * @version  1.0.1
  *
- * @file VertexAttr
- * @public
+ * @file VEllipse
+ * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 
 (function(_context) {
-    "use strict";
 
-    
     /**
      * The constructor.
      *
-     * Attributes will be initialized as defined in the model object 
-     * which serves as a singleton.
-     *
      * @constructor
-     * @name VertexAttr
+     * @param center:Vertex The ellipses center.
+     * @param axis:Vertex The x- and y-axis.
+     * @name VEllipse
      **/
-    var VertexAttr = function() {
-	this.draggable = true;
-	this.isSelected = false;
-
-	for( var key in VertexAttr.model ) 
-	    this[key] = VertexAttr.model[key];
+    var VEllipse = function( center, axis ) {
+	this.center = center;
+	this.axis = axis;
     };
 
 
-    /**
-     * This is the global attribute model. Set these object on the initialization
-     * of your app to gain all VertexAttr instances have these attributes.
-     *
-     * @type {object}
-     **/
-    VertexAttr.model = {
-	draggable : true,
-	isSelected : false
+    /** 
+     * @member {Vertex} 
+     * @memberof VEllipse
+     * @instance
+     */
+    VEllipse.prototype.center = null;
+
+    /** 
+     * @member {Vertex} 
+     * @memberof VEllipse
+     * @instance
+     */
+    VEllipse.prototype.axis = null;
+
+
+    // +---------------------------------------------------------------------------------
+    // | Create an SVG representation of this ellipse.
+    // |
+    // | @return string The SVG string
+    // +-------------------------------
+    VEllipse.prototype.toSVGString = function( options ) {
+	options = options || {};
+	var buffer = [];
+	buffer.push( '&lt;ellipse' );
+	if( options.className )
+	    buffer.push( ' class="' + options.className + '"' );
+	buffer.push( ' cx="' + this.center.x + '"' );
+	buffer.push( ' cy="' + this.center.y + '"' );
+	buffer.push( ' rx="' + this.axis.x + '"' );
+	buffer.push( ' ry="' + this.axis.y + '"' );
+	buffer.push( ' />' );
+	return buffer.join('');
     };
 
-    // Export constructor to context.
-    _context.VertexAttr = VertexAttr;
+    _context.VEllipse = VEllipse;
     
-})(window);
+})(window ? window : module.export );
 </code></pre>
         </article>
     </section>

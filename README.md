@@ -298,6 +298,7 @@ from the sources code files in ./src/*.
 
 
 ## Todos
+ * The BezierPath uses a _scalePoint helper function. Replace this by Vertex.scale().
  * Make strokes configurable (color, width, style).
  * Make Bézier Curves dividable (by double click?).
  * Implement snap-to-grid.

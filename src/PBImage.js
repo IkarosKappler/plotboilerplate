@@ -1,20 +1,28 @@
 /**
- * A wrapper for image objects.
+ * @classdesc A wrapper for image objects.
  *
  * @author  Ikaros Kappler
  * @date    2019-01-30
- * @version 1.0.0
+ * @modified 2019-03-23 Added JSDoc tags.
+ * @version 1.0.1
+ *
+ * @file PBImage
+ * @fileoverview As native Image objects have only a position and with 
+ *               and height thei are not suitable for UI dragging interfaces.
+ * @public
  **/
 
 (function(_context) {
+    'use strict';
 
     /**
-     * +---------------------------------------------------------------------------------
-     * | The constructor.
-     * |
-     * @param {Image} image
-     * @param {Vertex} upperLeft
-     * @param {Vertex} lowerRight
+     * The constructor.
+     * 
+     * @constructor
+     * @name PBImage
+     * @param {Image} image - The actual image.
+     * @param {Vertex} upperLeft - The upper left corner.
+     * @param {Vertex} lowerRight - The lower right corner.
      **/
     var PBImage = function( image, upperLeft, lowerRight ) {
 	if( typeof image == 'undefined' )

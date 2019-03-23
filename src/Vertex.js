@@ -58,6 +58,20 @@
     };
 
 
+    /** 
+     * @member {Vertex} 
+     * @memberof Vertex
+     * @instance
+     */
+    Vertex.prototype.x = null;
+
+    /** 
+     * @member {Vertex} 
+     * @memberof Vertex
+     * @instance
+     */
+    Vertex.prototype.y = null;
+
 
     /**
      * Set the x- and y- component of this vertex.
