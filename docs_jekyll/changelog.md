@@ -3,7 +3,11 @@ layout: page
 ---
 
 
-### Changelog
+# Changelog
+* 2019-03-23
+  * Added more JSDoc code.
+  * Changed the default value of config param 'drawOrigin' to false.
+  * Swapped the BezierPath.getPoint and getPointAt to match the semantics with linear interpolation in the Line class. This makes the class incompatible with older versions! Thus: BezierPath version 2.0.
 * 2019-03-20
   * Added JSDoc inline documentation for these classes: Vertex, Line, Vector, VertexAttr, VertexListeners, Polygon.
 * 2019-02-23
