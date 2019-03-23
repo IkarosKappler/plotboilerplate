@@ -27,7 +27,9 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * The main class of the PlotBoilerplate.
+ * @classdesc The main class of the PlotBoilerplate.
+ *
+ * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23
@@ -55,53 +57,49 @@
  * @modified 2019-02-20 Removed the 'loadFile' entry from the GUI as it was experimental and never in use.
  * @modified 2019-02-23 Removed the 'rebuild' function as it had no purpose.
  * @modified 2019-02-23 Added scaling of the click-/touch-tolerance with the CSS scale.
- * @version  1.3.7
+ * @modified 2019-03-23 Added JSDoc tags. Changed the default value of config.drawOrigin to false.
+ * @version  1.3.8
+ *
+ * @file PlotBoilerplate This is a test.
+ * @public
  **/
 
 
 (function(_context) {
     "use strict";
 
+    /** @constant {number} */
     const DEFAULT_CANVAS_WIDTH    = 1024;
+    /** @constant {number} */
     const DEFAULT_CANVAS_HEIGHT   =  768;
+    /** @constant {number} */
     const DEFAULT_CLICK_TOLERANCE =    8;
+    /** @constant {number} */
     const DEFAULT_TOUCH_TOLERANCE =   32;
 
 
-    // +---------------------------------------------------------------------------------
-    /** 
-     * A helper function to trigger fake click events.
-     **/ // +----------------------------
-    /*
-    var triggerClickEvent = function(element) {
-	element.dispatchEvent( new MouseEvent('click', {
-	    view: window,
-	    bubbles: true,
-	    cancelable: true
-	} ) );
-    };
-    */
-
-    // +---------------------------------------------------------------------------------
+ 
     /** 
      * A helper function to scale elements (usually the canvas) using CSS.
      *
      * transform-origin is at (0,0).
      *
-     * @param {HTMLElement} element The DOM element to scale.
-     * @param {number} scaleX The X scale factor.
-     * @param {number} scaleY The Y scale factor.
-     **/ // +----------------------------
+     * @param {HTMLElement} element - The DOM element to scale.
+     * @param {number} scaleX The - X scale factor.
+     * @param {number} scaleY The - Y scale factor.
+     * @return {void}
+     **/ 
     var setCSSscale = function( element, scaleX, scaleY ) {
 	element.style['transform-origin'] = '0 0';
 	if( scaleX==1.0 &amp;&amp; scaleY==1.0 ) element.style.transform = null;
 	else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY+')';
     };
 
-    // +---------------------------------------------------------------------------------
+
     /**
      * A wrapper class for draggable items (mostly vertices).
-     **/ // +----------------------------
+     * @private
+     **/
     (function(_context) {
 	var Draggable = function( item, type ) {
 	    this.item = item;
@@ -118,10 +116,9 @@
     })(_context);
 
 
-    // +---------------------------------------------------------------------------------
     /**
      * Use a special custom attribute set for vertices.
-    **/ // +----------------------------
+     **/
     VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true, isSelected : false, draggable : true };
     
 
@@ -129,9 +126,49 @@
      * The constructor.
      *
      * @constructor
-     * @class PlotBoilerplate
-     *
-     * @param {object} [config] The configuration.
+     * @name PlotBoilerplate
+     * @param {object} config={} - The configuration.
+     * @param {HTMLElement} config.canvas - Your canvas element in the DOM (required).
+     * @param {boolean=} [config.fullSize=true] - If set to true the canvas will gain full window size.
+     * @param {boolean=} [config.fitToParent=true] - If set to true the canvas will gain the size of its parent container (overrides fullSize).
+     * @param {number=} [config.scaleX=1.0] - The initial x-zoom. Default is 1.0.
+     * @param {number=} [config.scaleY=1.0] - The initial y-zoom. Default is 1.0.
+     * @param {boolean=} [config.rasterGrid=true] - If set to true the background grid will be drawn rastered.
+     * @param {number=} [config.rasterAdjustFactor=1.0] - The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
+     * @param {boolean=} [config.drawOrigin=false] - Draw a crosshair at (0,0).
+     * @param {boolean=} [config.autoAdjustOffset=true] -  When set to true then the origin of the XY plane will
+     *                         be re-adjusted automatically (see the params
+     *                         offsetAdjust{X,Y}Percent for more).
+     * @param {number=} [config.offsetAdjustXPercent=50] - The x-fallback position for the origin after
+     *                         resizing the canvas.
+     * @param {number=} [config.offsetAdjustYPercent=50] - The y-fallback position for the origin after
+     *                         resizing the canvas.
+     * @param {number=} [config.defaultCanvasWidth=1024] - The canvas size fallback (width) if no automatic resizing
+     *                         is switched on. 
+     * @param {number=} [config.defaultCanvasHeight=768] - The canvas size fallback (height) if no automatic resizing
+     *                         is switched on. 
+     * @param {number=} [config.canvasWidthFactor=1.0] - Scaling factor (width) upon the canvas size.
+     *                         In combination with cssScale{X,Y} this can be used to obtain
+     *                         sub pixel resolutions for retina displays.
+     * @param {number=} [config.canvasHeightFactor=1.0] - Scaling factor (height) upon the canvas size.
+     *                         In combination with cssScale{X,Y} this can be used to obtain
+     *                         sub pixel resolutions for retina displays.
+     * @param {number=} [config.cssScaleX=1.0] - Visually resize the canvas (horizontally) using CSS transforms (scale).
+     * @param {number=} [config.cssScaleY=1.0] - Visually resize the canvas (vertically) using CSS transforms (scale).
+     * @param {boolan=} [config.cssUniformScale=true] - CSS scale x and y obtaining aspect ratio.
+     * @param {string=} [config.backgroundColor=#ffffff] - The backround color.
+     * @param {boolean=} [config.redrawOnResize=true] - Switch auto-redrawing on resize on/off (some applications
+     *                         might want to prevent automatic redrawing to avoid data loss from the draw buffer).
+     * @param {boolean=} [config.drawBezierHandleLines=true] - Indicates if Bézier curve handles should be drawn (used for
+     *                         editors, no required in pure visualizations).
+     * @param {boolean=} [config.drawBezierHandlePoints=true] - Indicates if Bézier curve handle points should be drawn.
+     * @param {function=} [config.preDraw=null] - A callback function that will be triggered just before the draw
+     *                         function starts.
+     * @param {function=} [config.postDraw=null] - A callback function that will be triggered right after the drawing
+     *                         process finished.
+     * @param {boolean=} [config.enableMouse=true] - Indicates if the application should handle mouse events for you.
+     * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle touch events for you.
+     * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle key events for you.
      */
     var PlotBoilerplate = function( config ) {
 	config = config || {};
@@ -146,8 +183,8 @@
 	    scaleX                : config.scaleX || 1.0,
 	    scaleY                : config.scaleY || 1.0,
 	    rasterGrid            : typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
-	    drawOrigin            : typeof config.drawOrigin != 'undefined' ? config.drawOrigin : true,
 	    rasterAdjustFactor    : typeof config.rasterAdjustFactor == 'number' ? config.rasterAdjustFactor : 2.0,
+	    drawOrigin            : typeof config.drawOrigin != 'undefined' ? config.drawOrigin : false,
 	    autoAdjustOffset      : typeof config.autoAdjustOffset != 'undefined' ? config.autoAdjustOffset : true,
 	    offsetAdjustXPercent  : typeof config.offsetAdjustXPercent == 'number' ? config.offsetAdjustXPercent : 50,
 	    offsetAdjustYPercent  : typeof config.offsetAdjustYPercent == 'number' ? config.offsetAdjustYPercent : 50,
@@ -201,18 +238,37 @@
 
 
 	// +---------------------------------------------------------------------------------
-	// | Object members.
+	// | After this line: object members.
 	// +-------------------------------
+	
+	/**
+	 * Set the console for this instance.
+	 *
+	 * @method setConsole
+	 * @param {object} con - The new console object (default is window.console).
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.setConsole = function( con ) {
 	    if( typeof con.log != 'function' ) throw "Console object must have a 'log' function.";
 	    if( typeof con.warn != 'function' ) throw "Console object must have a 'warn' function.";
 	    if( typeof con.error != 'function' ) throw "Console object must have a 'error' function.";
 	    this.console = con;
 	};
+
 	
-	// +---------------------------------------------------------------------------------
-	// | Object members.
-	// +-------------------------------
+	/**
+	 * Update the CSS scale for the canvas depending onf the cssScale{X,Y} settings.&lt;br>
+	 * &lt;br>
+	 * This function is usually only used inernally.
+	 *
+	 * @method updateCSSscale
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 * @private
+	 **/
 	PlotBoilerplate.prototype.updateCSSscale = function() {
 	    // this.console.log('update css scale');
 	    if( this.config.cssUniformScale ) {
@@ -222,20 +278,13 @@
 	    }
 	};
 	
-	// !!! PRE ALPHA TEST FOR ELLIPSES !!!
-	// THIS IS A BIT DIFFICULT BECAUSE CANVAS ELLIPSES AND SVG ELLIPSES ARE FUNDAMENTALLY DIFFERENT
-	/*
-	var _testArc = { a : new Vertex(-200,0), b : new Vertex(200,0), radius : new Vertex(100,100), rotation : 0.0, largeArcFlag : false, sweepFlag : false };
-	this.vertices.push( _testArc.a );
-	this.vertices.push( _testArc.b );
-	this.vertices.push( _testArc.radius );
-	*/
 
-	// +---------------------------------------------------------------------------------
+
 	/**
-	 * Add a drawable object.
-	 *
-	 * This must be either:
+	 * Add a drawable object.&lt;br>
+	 * &lt;br>
+	 * This must be either:&lt;br>
+	 * &lt;pre>
 	 *  * a Vertex
 	 *  * a Line
 	 *  * a Vector
@@ -243,10 +292,15 @@
 	 *  * a Polygon
 	 *  * a BezierPath
 	 *  * a BPImage
+	 * &lt;/pre>
 	 *
-	 * @param drawable:Object The drawable (of one of the allowed class instance) to add.
-	 * @param redraw:boolean
-	 **/ // +-------------------------------
+	 * @param {Object} drawable:Object The drawable (of one of the allowed class instance) to add.
+	 * @param {boolean} [redraw=true]
+	 * @method add
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
 	    if( drawable instanceof Vertex ) {
 		this.drawables.push( drawable );
@@ -329,10 +383,17 @@
 	};
 
 
-	// +---------------------------------------------------------------------------------
 	/**
-	 * Draw the grid.
-	 **/ // +-------------------------------
+	 * Draw the grid with the current config settings.&lt;br>
+	 *
+	 * This function is usually only used internally.
+	 *
+	 * @method drawGrid
+	 * @private
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.drawGrid = function() {
 	    var gScale = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
 			   y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
@@ -347,20 +408,37 @@
 		this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.095)' )
 	};
 
-	// +---------------------------------------------------------------------------------
+	
 	/**
-	 * Draw the origin as a crosshair.
-	 **/ // +-------------------------------
+	 * Draw the origin with the current config settings.&lt;br>
+	 *
+	 * This function is usually only used internally.
+	 *
+	 * @method drawOrigin
+	 * @private
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.drawOrigin = function() {
 	    // Add a crosshair to mark the origin
 	    this.draw.crosshair( { x : 0, y : 0 }, 10, '#000000' );
 	};
 
 
-	// +---------------------------------------------------------------------------------
 	/**
-	 * Draw all drawable elements.
-	**/ // +-------------------------------
+	 * Draw all drawables.
+	 *
+	 * This function is usually only used internally.
+	 *
+	 * @method drawDrawables
+	 * @private
+	 * @param {number} renderTime - The current render time. It will be used to distinct 
+	 *                              already draw vertices from non-draw-yet vertices.
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.drawDrawables = function( renderTime ) {
 	    // Draw drawables
 	    for( var i in this.drawables ) {
@@ -452,9 +530,18 @@
 	};
 
 
-	/** +---------------------------------------------------------------------------------
-	 * Draw all drawable elements.
-	**/ // +-------------------------------
+
+	/**
+	 * Draw the select-polygon (if there is one).
+	 *
+	 * This function is usually only used internally.
+	 *
+	 * @method drawSelectPolygon
+	 * @private
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.drawSelectPolygon = function() {
 	    // Draw select polygon?
 	    if( this.selectPolygon != null &amp;&amp; this.selectPolygon.vertices.length > 0 ) {
@@ -464,9 +551,20 @@
 	};
 	    
 
-	/** +---------------------------------------------------------------------------------
-	 * Draw the (remaining) vertices.
-	**/ // +-------------------------------
+	
+	/**
+	 * Draw all vertices that were not yet drawn with the given render time.&lt;br>
+	 * &lt;br>
+	 * This function is usually only used internally.
+	 *
+	 * @method drawVertices
+	 * @private
+	 * @param {number} renderTime - The current render time. It is used to distinct 
+	 *                              already draw vertices from non-draw-yet vertices.
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.drawVertices = function( renderTime ) {
 	    // Draw all vertices as small squares if they were not already drawn by other objects
 	    for( var i in this.vertices ) {
@@ -476,10 +574,18 @@
 	    }
 	};
 	
+
 	
-	/** +---------------------------------------------------------------------------------
-	 * The re-drawing function.
-	 **/ // +-------------------------------
+	/**
+	 * Trigger redrawing of all objects.&lt;br>
+	 * &lt;br>
+	 * Usually this function is automatically called when objects change.
+	 *
+	 * @method redraw
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.redraw = function() {
 	    var renderTime = new Date().getTime();
 	    
@@ -489,18 +595,6 @@
 	    this.drawGrid();
 	    if( this.config.drawOrigin )
 		this.drawOrigin(); 
-	    // !!! Draw some test stuff !!!
-	    /*
-	    var d = _testArc;
-	    try {
-		// First draw helper	
-		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, !d.largeArcFlag, !d.sweepFlag, d.b.x, d.b.y, '#c8c8c8' );
-		// Then draw arc itself
-		this.draw.arcto( d.a.x, d.a.y, d.radius.x, Math.abs(d.radius.y), d.rotation, d.largeArcFlag, d.sweepFlag, d.b.x, d.b.y, '#008888' );
-	    } catch( e ) {
-		this.console.error( e );
-	    }
-	    */
 	    this.drawDrawables(renderTime);
 	    this.drawVertices(renderTime);
 	    this.drawSelectPolygon();
@@ -511,9 +605,17 @@
 
 
 
-	/** +---------------------------------------------------------------------------------
-	 * This function clears the canvas with the configured background color.
-	 **/ // +-------------------------------
+	/**
+	 * This function clears the canvas with the configured background color.&lt;br>
+	 * &lt;br>
+	 * This function is usually only used internally.
+	 *
+	 * @method clear
+	 * @private
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.clear = function() {
 	    // Note that the image might have an alpha channel. Clear the scene first.
 	    this.ctx.fillStyle = this.config.backgroundColor; 
@@ -521,13 +623,18 @@
 	};
 
 
-	/** +---------------------------------------------------------------------------------
-	 * Clear the selection.
+	/**
+	 * Clear the selection.&lt;br>
+	 * &lt;br>
+	 * This function is usually only used internally.
 	 *
-	 * @param redraw:boolean Indicates if the redraw function should be triggered.
-	 *
-	 * @return this for chaining.
-	**/ // +-------------------------------
+	 * @method clearSelection
+	 * @private
+	 * @param {boolean=} [redraw=false] - Indicates if the redraw function should be triggered.
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {PlotBoilerplate} this
+	 **/
 	PlotBoilerplate.prototype.clearSelection = function( redraw ) {
 	    for( var i in this.vertices ) 
 		this.vertices[i].attr.isSelected = false;
@@ -537,9 +644,16 @@
 	};
 
 
-	/** +---------------------------------------------------------------------------------
-	 * Just a generic save-file dialog.
-	 **/ // +-------------------------------
+
+	/**
+	 * This function opens a save-as file dialog and – once an output file is
+	 * selected – stores the current canvas contents as an SVG image.
+	 *
+	 * @method saveFile
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	var saveFile = function() {
 	    var svgCode = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
 	    // See documentation for FileSaver.js for usage.
@@ -549,9 +663,17 @@
 	};
 
 
-	/** +---------------------------------------------------------------------------------
-	 * This function resizes the canvas to the required settings (toggles fullscreen).
-	 **/ // +-------------------------------
+
+	/**
+	 * This function resizes the canvas to the required settings (toggles fullscreen).&lt;br>
+	 * &lt;br>
+	 * This function is usually only used internally but feel free to call it if resizing required.
+	 *
+	 * @method resizeCanvas
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.resizeCanvas = function() {
 	    var _setSize = function(w,h) {
 		w *= _self.config.canvasWidthFactor;
@@ -586,11 +708,16 @@
 	this.resizeCanvas();
 
 
-	/** +---------------------------------------------------------------------------------
-	 * Add all vertices inside the polygon to the current selection.
-	 * 
-	 * @param polygon:Polygon The polygonal selection area.
-	**/ // +-------------------------------
+
+	/**
+	 *  Add all vertices inside the polygon to the current selection.&lt;br>
+	 *
+	 * @method selectVerticesInPolygon
+	 * @param {Polygon} polygon - The polygonal selection area.
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
 	PlotBoilerplate.prototype.selectVerticesInPolygon = function( polygon ) {
 	    for( var i in this.vertices ) {
 		if( polygon.containsVert(this.vertices[i]) ) 
@@ -599,15 +726,20 @@
 	};
 	
 	
-	/** +---------------------------------------------------------------------------------
-         * Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
+
+	/**
+	 * (Helper) Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
 	 *
 	 * The result is an object { type : 'bpath', pindex, cindex, pid }
 	 *
-         * Returns false if no point is near the passed position.
+         * Returns false if no point is near the passed position.  
 	 *
-	 * @param point:Vertex
-         **/ // +-------------------------------
+	 * @method locatePointNear
+	 * @param {Vertex} point - The polygonal selection area.
+	 * @param {number=} [tolerance=7] - The tolerance to use identtifying vertices.
+	 * @private
+	 * @return {Draggable} Or false if none found.
+	 **/
         var locatePointNear = function( point, tolerance ) {
             // var tolerance = 7;
 	    if( typeof tolerance == 'undefined' )
@@ -624,12 +756,15 @@
         }
 
 
-	/** +---------------------------------------------------------------------------------
-	 * Handle left-click event.
+	/**
+	 * Handle left-click event.&lt;br> 
 	 *
-	 * @param x:Number The click X position on the canvas.
-	 * @param y:Number The click Y position on the canvas.
-	 **/ // +-------------------------------
+	 * @method handleClick
+	 * @param {number} x - The click X position on the canvas.
+	 * @param {number} y - The click Y position on the canvas.
+	 * @private
+	 * @return {void}
+	 **/
 	function handleClick(x,y) {
 	    var p = locatePointNear( _self.transformMousePosition(x, y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 	    if( p ) { 
@@ -646,7 +781,6 @@
 		    _self.redraw();
 		} else if( keyHandler.isDown('y') /* &amp;&amp; p.type=='bpath' &amp;&amp; (p.pid==BezierPath.START_POINT || p.pid==BezierPath.END_POINT) */ ) {
 		    _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
-		    // _self.console.log( 'bezierAutoAdjust=' + _self.vertices[p.vindex].attr.bezierAutoAdjust );
 		    _self.redraw();
 		}
 	    }
@@ -657,25 +791,36 @@
 	    }
 	}
 
-	/** +---------------------------------------------------------------------------------
-	 * Transform the given x-y-(mouse-)point to coordinates respecting the view offset
+
+	
+	/**
+	 * Transforms the given x-y-(mouse-)point to coordinates respecting the view offset
 	 * and the zoom settings.
 	 *
-	 * @param x:Number The mouse-x position relative to the canvas.
-	 * @param y:Number The mouse-y position relative to the canvas.
-	**/ // +-------------------------------
+	 * @method transformMousePosition
+	 * @param {number} x - The x position relative to the canvas.
+	 * @param {number} y - The y position relative to the canvas.
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {object} A simple object &lt;pre>{ x : Number, y : Number }&lt;/pre> with the transformed coordinates.
+	 **/
 	PlotBoilerplate.prototype.transformMousePosition = function( x, y ) {
 	    return { x : (x/this.config.cssScaleX-this.draw.offset.x)/(this.draw.scale.x), y : (y/this.config.cssScaleY-this.draw.offset.y)/(this.draw.scale.y) };
 	};
 	
 
-	/** +---------------------------------------------------------------------------------
-	 * The mouse-down handler.
+
+	/**
+	 * (Helper) The mouse-down handler.
 	 *
 	 * It selects vertices for dragging.
-	 **/ // +-------------------------------
+	 *
+	 * @method mouseDownHandler.
+	 * @param {Event} e - The event to handle
+	 * @private
+	 * @return {void}
+	 **/
 	var mouseDownHandler = function(e) {
-	    // _self.console.log( 'is touch event', e instanceof TouchEvent );
 	    if( e.which != 1 &amp;&amp; !(window.TouchEvent &amp;&amp; e.originalEvent instanceof TouchEvent) )
 		return; // Only react on left mouse or touch events
 	    var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
@@ -703,12 +848,19 @@
 	    _self.redraw();
 	};
 
-	/** +---------------------------------------------------------------------------------
+
+	
+	/**
 	 * The mouse-drag handler.
 	 *
 	 * It moves selected elements around or performs the panning if the ctrl-key if
 	 * hold down.
-	 **/ // +-------------------------------
+	 *
+	 * @method mouseDownHandler.
+	 * @param {Event} e - The event to handle
+	 * @private
+	 * @return {void}
+	 **/
 	var mouseDragHandler = function(e) {
 	    var oldDragAmount = { x : e.params.dragAmount.x, y : e.params.dragAmount.y };
 	    e.params.dragAmount.x /= _self.config.cssScaleX;
@@ -747,11 +899,17 @@
 	};
 
 	
-	/** +---------------------------------------------------------------------------------
-	 * The mouse-up handler.
+
+	/**
+	  * The mouse-up handler.
 	 *
 	 * It clears the dragging-selection.
-	 **/ // +-------------------------------
+	 *
+	 * @method mouseDownHandler.
+	 * @param {Event} e - The event to handle
+	 * @private
+	 * @return {void}
+	 **/
 	var mouseUpHandler = function(e) {
 	    if( e.which != 1 )
 		return; // Only react on left mouse;
@@ -769,11 +927,18 @@
 	    _self.redraw();
 	};
 
-	/** +---------------------------------------------------------------------------------
+
+	
+	/**
 	 * The mouse-wheel handler.
 	 *
 	 * It performs the zooming.
-	 **/ // +-------------------------------
+	 *
+	 * @method mouseWheelHandler.
+	 * @param {Event} e - The event to handle
+	 * @private
+	 * @return {void}
+	 **/
 	var mouseWheelHandler = function(e) {
 	    var zoomStep = 1.25;
 	    if( e.deltaY &lt; 0 ) {
@@ -889,12 +1054,16 @@
     }; // END construcor 'PlotBoilerplate'
 
 
-    /** +---------------------------------------------------------------------------------
-     * A static function to create a control GUI (a dat.gui instance) for the given
-     * plot boilerplate.
-     * 
-     * @return dat.gui
-     **/ // +-------------------------------
+
+    /**
+     * Creates a control GUI (a dat.gui instance) for this 
+     * plot boilerplate instance.
+     *
+     * @method createGUI
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {dat.gui} 
+     **/
     PlotBoilerplate.prototype.createGUI = function() {
 	var gui = new dat.gui.GUI();
 	var _self = this;
@@ -931,19 +1100,21 @@
     };
 
 
-    /** +---------------------------------------------------------------------------------
+
+    /**
      * A set of helper functions.
-    **/ // +-------------------------------
+     * @private
+     **/
     PlotBoilerplate.utils = {
 	
-	/** +---------------------------------------------------------------------------------
+	/** 
 	 * Merge the elements in the 'extension' object into the 'base' object based on
 	 * the keys of 'base'.
 	 *
-	 * @param base:Object
-	 * @param extension:Object
-	 * @return Object base extended by the new attributes.
-	 **/ // +-------------------------------
+	 * @param {Object} base
+	 * @param {Object} extension
+	 * @return {Object} base extended by the new attributes.
+	 **/
 	safeMergeByKeys : function( base, extension ) {
 	    for( var k in base ) {
 		if( !extension.hasOwnProperty(k) )
@@ -981,32 +1152,16 @@
 	 * Example:
 	 *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
 	 *
-	 * @param zA:Vertex The start vertex of the vector to calculate the arrow head for.
-	 * @param zB:Vertex The end vertex of the vector.
-	 * @param headlen:Number The length of the arrow head (along the vector direction).
-	 * @param scaleX:Number The horizontal scaling during draw.
-	 * @param scaleY:Number the vertical scaling during draw.
+	 * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
+	 * @param {Vertex} zB - The end vertex of the vector.
+	 * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+	 * @param {number} scaleX  - The horizontal scaling during draw.
+	 * @param {number} scaleY  - the vertical scaling during draw.
 	 **/
 	buildArrowHead : function( zA, zB, headlen, scaleX, scaleY ) {
-	    //var headlen = 12;   // length of head in pixels
-	    // var angle = Math.atan2( (zB.y-zA.y)*this.scale.y, (zB.x-zA.x)*this.scale.x );
 	    var angle = Math.atan2( (zB.y-zA.y)*scaleY, (zB.x-zA.x)*scaleX );
 	    
 	    var vertices = [];
-	    /*
-	    //this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-(headlen*0.7)*Math.cos(angle), this.offset.y+zB.y*this.scale.y-(headlen*0.7)*Math.sin(angle));
-	    vertices.push( new Vertex( zB.x*scaleX-(headlen*0.7)*Math.cos(angle), zB.y*scaleY-(headlen*0.7)*Math.sin(angle)) );    
-			   
-	    // this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle-Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle-Math.PI/8));
-	    vertices.push( new Vertex(zB.x*scaleX-headlen*Math.cos(angle-Math.PI/8), zB.y*scaleY-headlen*Math.sin(angle-Math.PI/8) ) );
-
-	    // this.ctx.moveTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
-	    vertices.push( new Vertex(zB.x*scaleX, zB.y*scaleY) );
-	    
-	    //this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle+Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle+Math.PI/8));
-	    vertices.push( new Vertex(zB.x*scaleX-headlen*Math.cos(angle+Math.PI/8), zB.y*scaleY-headlen*Math.sin(angle+Math.PI/8)) );
-	    */
-
 	    vertices.push( new Vertex(zB.x*scaleX-(headlen)*Math.cos(angle), zB.y*scaleY-(headlen)*Math.sin(angle)) );    
 	    vertices.push( new Vertex(zB.x*scaleX-(headlen*1.35)*Math.cos(angle-Math.PI/8), zB.y*scaleY-(headlen*1.35)*Math.sin(angle-Math.PI/8) ) );
 	    vertices.push( new Vertex(zB.x*scaleX, zB.y*scaleY) );
@@ -1034,13 +1189,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Line.html">Line</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Vector.html">Vector</a></li><li><a href="Vertex.html">Vertex</a></li><li><a href="VertexAttr.html">VertexAttr</a></li><li><a href="VertexListeners.html">VertexListeners</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Line.html">Line</a></li><li><a href="PlotBoilerplate.html">PlotBoilerplate</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Vector.html">Vector</a></li><li><a href="Vertex.html">Vertex</a></li><li><a href="VertexAttr.html">VertexAttr</a></li><li><a href="VertexListeners.html">VertexListeners</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 20 2019 21:58:21 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Mar 23 2019 14:44:21 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

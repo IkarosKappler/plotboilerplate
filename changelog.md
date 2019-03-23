@@ -1,6 +1,9 @@
 
 
-### Changelog
+# Changelog
+* 2019-03-23
+  * Added more JSDoc code.
+  * Changed the default value of config param 'drawOrigin' to false.
 * 2019-03-20
   * Added JSDoc inline documentation for these classes: Vertex, Line, Vector, VertexAttr, VertexListeners, Polygon.
 * 2019-02-23

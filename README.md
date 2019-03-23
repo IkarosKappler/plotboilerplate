@@ -103,7 +103,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ~~~javascript
  var pb = new PlotBoilerplate(
      {  // HTMLElement
-     	//   Your canvas element in the DOM.
+     	//   Your canvas element in the DOM (required).
      	canvas			: document.getElementById('my-canvas'),
 
 	// boolean
@@ -121,10 +121,16 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 	scaleX                	: 1.0,
 	scaleY                	: 1.0,
 
+	// If set to true the background grid will be drawn rastered.
+	rasterGrid              : true,
+
 	// float
 	//    The exponential limit for wrapping down the grid.
 	//    (2.0 means: halve the grid each 2.0*n zoom step).
 	rasterAdjustFactor    	: 2.0,
+
+	// Draw a crosshair at (0,0).
+	drawOrigin              : false,
 
 	// boolean
 	//   When set to true then the origin of the XY plane will
@@ -159,17 +165,14 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 	//   If set to true only cssScaleX applies for both dimensions.
 	cssUniformScale         : true,
 
-	// boolean
-	//   Display a gris raster.
-	rasterGrid            	: true,
-
 	// string
 	//   A background color (CSS string) for the canvas.
 	backgroundColor       	: '#ffffff',
 
 	// boolean
 	//   Switch auto-redrawing on resize on/off (some applications
-	//   might want to prevent automatic redrawing to avoid data loss).
+	//   might want to prevent automatic redrawing to avoid data
+	//   loss from the drae buffer).
 	redrawOnResize        	: true,
 
 	// boolean
@@ -182,12 +185,12 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 	drawBezierHandlePoints 	: true,
 
 	// function
-	//   A function that will be triggered just before the draw
+	//   A callback function that will be triggered just before the draw
 	//   function starts.
 	preDraw               	: function() { console.log('before drawing.'); },
 
 	// function
-	//   A function that will be triggered right after the drawing
+	//   A callback function that will be triggered right after the drawing
 	//   process finished.
 	postDraw              	: function() { console.log('after drawing.'); },
 
