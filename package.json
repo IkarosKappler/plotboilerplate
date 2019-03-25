@@ -1,9 +1,9 @@
 {
   "name": "plot-boilerplate",
-  "version": "1.0.1",
+  "version": "1.3.8",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
-  "private": true,
-  "main": "index.js",
+  "private": false,
+  "main": "dist/plotboilerplate.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "npx webpack --mode production --config webpack.config.js",
@@ -25,7 +25,7 @@
   "bugs": {
     "url": "https://github.com/IkarosKappler/plot-boilerplate/issues"
   },
-  "homepage": "https://github.com/IkarosKappler/plot-boilerplate#readme",
+  "homepage": "https://plotboilerplate.io",
   "devDependencies": {
     "git-revision-webpack-plugin": "^3.0.3",
     "jsdoc": "^3.5.5",
