@@ -330,7 +330,7 @@ from the sources code files in ./src/*.
 * dat.gui
 * Color.js
 * FileSaver.js
-* SGV-arcto to Canvas-arc transform from [canvg](https://github.com/canvg/canvg "canvg") by Gabe Lerner
+* SVG-arcto to Canvas-arc transform from [canvg](https://github.com/canvg/canvg "canvg") by Gabe Lerner
 * [Touchy.js](https://github.com/jairajs89/Touchy.js "Touchy.js") by [jairajs89](https://github.com/jairajs89 "jairajs89") 
 
 
