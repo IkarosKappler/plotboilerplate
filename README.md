@@ -290,7 +290,7 @@ for you from the package.json file.
 
 
 ### Run webpack
-This will generate the ./dist/plot-boilerplate.min.js file for you
+This will generate the ./dist/plotboilerplate.min.js file for you
 from the sources code files in ./src/*.
 ~~~bash
  $ npm run webpack

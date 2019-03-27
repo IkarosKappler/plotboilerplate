@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2019-03-27
+  * Renamed the repository from plot-boilerplate to plotboilerplate.
 * 2019-03-25
   * Moved the collection demo scripts to demo/.
 * 2019-03-23

@@ -1,5 +1,5 @@
 {
-  "name": "plot-boilerplate",
+  "name": "plotboilerplate",
   "version": "1.3.9",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
   "private": false,
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IkarosKappler/plot-boilerplate.git"
+    "url": "git+https://github.com/IkarosKappler/plotboilerplate.git"
   },
   "keywords": [
     "javascript",
@@ -23,7 +23,7 @@
   "author": "Ikaros Kappler",
   "license": "CC-BY-4.0",
   "bugs": {
-    "url": "https://github.com/IkarosKappler/plot-boilerplate/issues"
+    "url": "https://github.com/IkarosKappler/plotboilerplate/issues"
   },
   "homepage": "https://plotboilerplate.io",
   "devDependencies": {

@@ -33,11 +33,11 @@ module.exports = [
         ],
         output: {
             path: path.resolve(__dirname, 'dist'),
-            filename: 'plot-boilerplate.min.js'
+            filename: 'plotboilerplate.min.js'
         },
         plugins: [
             new webpack.BannerPlugin({
-              banner: 'PlotBoilerplate,\nGit branch https://github.com/IkarosKappler/plot-boilerplate/commit/' + new GitRevisionPlugin().version(),
+              banner: 'PlotBoilerplate,\nGit branch https://github.com/IkarosKappler/plotboilerplate/commit/' + new GitRevisionPlugin().version(),
             }),
           ]
     }
