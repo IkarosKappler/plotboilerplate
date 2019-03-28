@@ -60,7 +60,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 	pb.redraw();
    } );
 ~~~
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/simple/main-simpledemo.html" title="And the simple demo is here">And the simple demo is here</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
 ![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
@@ -78,7 +78,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 [For a detailed description of this plot see my Feigenbaum-plot mini-project](https://github.com/IkarosKappler/feigenbaum-plot "Feigenbaum bifurcation diagram")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/feigenbaum/main-feigenbaum.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/feigenbaum/index.html" title="See the demo">See the demo</a>
 
 [And here is a tiny article about it](http://www.polygon-berlin.de/deterministisches-chaos "Article about deterministic chaos")
 
@@ -87,21 +87,21 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ![Perpendiducular point-to-line distance](screenshots/screenshot-20190220_2_line-to-point.png "Perpendiducular point-to-line distance")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/line-point-distance/main-line-point-distance.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/line-point-distance/index.html" title="See the demo">See the demo</a>
 
 
 ### Random-scripture demo
 
 ![Random-scripture demo](screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demo/random-scripture/main-randomscripture.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/random-scripture/index.html" title="See the demo">See the demo</a>
 
 
 ### Vector field test (still in development)
 
 ![Vectorfield test](screenshots/screenshot-20190220_1_vectorfield.png "Vectorfield test demo (still in development)")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demo/vectorfield/main-vectorfield.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/vectorfield/index.html" title="See the demo">See the demo</a>
 
 
 

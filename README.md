@@ -88,14 +88,14 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ![Random-scripture demo](screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demo/random-scripture/index.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/random-scripture/index.html" title="See the demo">See the demo</a>
 
 
 ### Vector field test (still in development)
 
 ![Vectorfield test](screenshots/screenshot-20190220_1_vectorfield.png "Vectorfield test demo (still in development)")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demo/vectorfield/index.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/vectorfield/index.html" title="See the demo">See the demo</a>
 
 
 
