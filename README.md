@@ -8,7 +8,7 @@ visualizing 2D stuff on HTML canvas. Basic features are
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
  * touch interaction for dragging vertices (desktop and mobile)
-
+ 
 
 
 ## Install the package via npm
@@ -315,6 +315,10 @@ from the sources code files in ./src/*.
 
 
 ## Todos
+ * Include Touchy.js as a package dependency.
+ * Include FileSaver.js as a package dependency.
+ * Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
+ * Add config item for deactivating mouse wheel zoom.
  * The BezierPath uses a _scalePoint helper function. Replace this by Vertex.scale().
  * Make strokes configurable (color, width, style).
  * Make Bézier Curves dividable (by double click?).
@@ -348,7 +352,6 @@ from the sources code files in ./src/*.
 * dat.gui
 * Color.js
 * FileSaver.js
-* SVG-arcto to Canvas-arc transform from [canvg](https://github.com/canvg/canvg "canvg") by Gabe Lerner
 * [Touchy.js](https://github.com/jairajs89/Touchy.js "Touchy.js") by [jairajs89](https://github.com/jairajs89 "jairajs89") 
 
 

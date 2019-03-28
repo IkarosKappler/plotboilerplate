@@ -920,6 +920,7 @@
 		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = Math.max(_self.config.scaleX/zoomStep,0.01);
 		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = Math.max(_self.config.scaleY/zoomStep,0.01);
 	    }
+	    e.preventDefault();
 	    _self.redraw();
 	};
 
@@ -1014,8 +1015,6 @@
 	} // END IF enableKeys?
 	else  { _self.console.log('Keyboard interaction disabled.'); }
 	
-	// Initialize the dialog
-	window.dialog = new overlayDialog('dialog-wrapper');
 	// Apply the configured CSS scale.
 	this.updateCSSscale();	
 	// Init	

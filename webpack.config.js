@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
-const GitRevisionPlugin = require("git-revision-webpack-plugin")
+const GitRevisionPlugin = require("git-revision-webpack-plugin");
+const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 
 
 module.exports = [
@@ -26,7 +27,7 @@ module.exports = [
     	'./src/KeyHandler.js',
 	'./src/TouchHandler.js',
         './src/draw.js',
-        './src/overlay-dialog.js',
+        // './src/overlay-dialog.js',
 
         './src/PlotBoilerplate.js',
 	'./src/PlotBoilerplate.RectSelector.js'
@@ -39,6 +40,7 @@ module.exports = [
             new webpack.BannerPlugin({
               banner: 'PlotBoilerplate,\nGit branch https://github.com/IkarosKappler/plotboilerplate/commit/' + new GitRevisionPlugin().version(),
             }),
+	    new UnminifiedWebpackPlugin()
           ]
     }
     // Un-comment this block if you also want to re-compile the Color class.

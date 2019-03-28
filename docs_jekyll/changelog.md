@@ -4,6 +4,10 @@ layout: page
 
 
 # Changelog
+*2019-03-28
+  * Mouse wheel zoom now calls e.preventDefault().
+  * Added the unminified-webpack-plugin.
+  * Removed the overlay-dialog from the plot-boilerplate as it was not used at all.
 * 2019-03-27
   * Renamed the repository from plot-boilerplate to plotboilerplate.
 * 2019-03-25

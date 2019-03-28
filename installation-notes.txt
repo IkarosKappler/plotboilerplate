@@ -35,3 +35,9 @@ echo '{
 # View a documentation
 open ./docs/index.html
 ~~~
+
+
+
+### Note
+For implementing arcs use
+* SVG-arcto to Canvas-arc transform from [canvg](https://github.com/canvg/canvg "canvg") by Gabe Lerner
