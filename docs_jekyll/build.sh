@@ -3,6 +3,9 @@
 echo "Copying screenshots ... "
 cp -R ../screenshots/ .
 
+echo "Generating markdown docs from sources ..."
+./renderjsdoc.sh
+
 echo "Building markdown page from template and readme ..."
 echo '---' > index.md
 echo 'layout: home' >> index.md
@@ -11,8 +14,6 @@ echo '---' >> index.md
 cat ../README.md >> index.md
 echo '## Changelog' >> index.md
 echo '[View changelog](changelog.html "View changelog")' >> index.md
-
-# cat __partials/index-head.partial.html ../README.md __partials/index-foot.partial.html > index.md
 
 echo "Building the changelog file ..."
 echo '---' > changelog.md

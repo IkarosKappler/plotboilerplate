@@ -100,7 +100,7 @@
      * <br>
      * The first vertex in the returned array is the start point.<br>
      * The following sequence are pairs of control-point-and-end-point:
-     * <pre>startPoint, controlPoint0, pathPoint1, controlPoint1, pathPoint2, controlPoint2, ..., endPoint<pre>
+     * <pre>startPoint, controlPoint0, pathPoint1, controlPoint1, pathPoint2, controlPoint2, ..., endPoint</pre>
      *
      * @method toQuadraticBezierData
      * @return {Vertex[]}  An array of 2d vertices that shape the quadratic Bézier curve.
