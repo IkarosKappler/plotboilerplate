@@ -25,7 +25,7 @@ module.exports = [
 
         './src/MouseHandler.js',
     	'./src/KeyHandler.js',
-	'./src/TouchHandler.js',
+	// './src/TouchHandler.js',
         './src/draw.js',
         // './src/overlay-dialog.js',
 
