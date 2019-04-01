@@ -635,6 +635,34 @@
 	};
 
 
+	/**
+	 * Get the available inner space of the given container.
+	 *
+	 * Size minus padding minus border.
+	 **/
+	// NOT IN USE
+	var getAvailableContainerSpace = function() {
+	    var container = _self.canvas.parentNode;
+	    var canvas = _self.canvas;
+	    canvas.style.display = 'none';
+	    var
+	    padding = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding') ),
+	    border = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-width') ),
+	    pl = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
+	    pr = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
+	    pt = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
+	    pb = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
+	    bl = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-left-width') ) || border,
+	    br = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
+	    bt = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
+	    bb = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
+	    var w = container.clientWidth; // 1px border
+	    var h = container.clientHeight; // 1px border
+	    console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
+	    canvas.style.display = 'block';
+	    return { width : (w-pl-pr-bl-br), height : (h-pt-pb-bt-bb) };
+	};
+
 
 	/**
 	 * This function resizes the canvas to the required settings (toggles fullscreen).<br>
@@ -669,6 +697,9 @@
 		var width  = _self.canvas.parentNode.clientWidth - 2; // 1px border
 		var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
 		_setSize( width, height );
+		//var space = getAvailableContainerSpace( _self.canvas.parentNode );
+		//console.log( space );
+		//_setSize( space.width, space.height );
 	    } else {
                 _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
 	    }
@@ -944,13 +975,21 @@
 	     * Install a touch handler on the canvas.
 	     **/ // +-------------------------------
 	    _self.console.log( 'Installing touch handler' );
+	    // +----------------------------------------------------------------------
+	    // | Some private vars to store the current mouse/position/button state.
+	    // +-------------------------------------------------
+	    function relPos(e) {
+		return { x : e.pageX - e.target.offsetLeft,
+			 y : e.pageY - e.target.offsetTop
+		       };
+	    }
 	    var touchMovePos = null;
 	    var touchDownPos = null;
 	    var draggedElement = null;
 	    new Touchy( this.canvas,
 			{ one : function( hand, finger ) {
-			    touchMovePos = new Vertex(finger.lastPoint);
-			    touchDownPos = new Vertex(finger.lastPoint);
+			    touchMovePos = new Vertex( relPos(finger.lastPoint) );
+			    touchDownPos = new Vertex( relPos(finger.lastPoint) );
 			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 			    if( draggedElement ) {
 				hand.on('move', function (points) {
