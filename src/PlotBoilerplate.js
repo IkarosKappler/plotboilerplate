@@ -32,7 +32,7 @@
  * @modified 2019-03-23 Added JSDoc tags. Changed the default value of config.drawOrigin to false.
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
- * @version  1.4.2
+ * @version  1.4.3
  *
  * @file PlotBoilerplate
  * @public

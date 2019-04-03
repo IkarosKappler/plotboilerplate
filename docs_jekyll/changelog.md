@@ -8,6 +8,7 @@ layout: page
 * 2019-04-03
   * Fixed wrong positioning on touch devices when canvas is not located at (0,0). Touch-drag is now working.
   * Tweaked the fit-to-parent function. This is now working and respecting paddings and borders.
+  * Added a fix for Touchy.js: e.preventDefault() to avoid window scrolling during element drag (touch-move).
 * 2019-03-28
   * Mouse wheel zoom now calls e.preventDefault().
   * Added the unminified-webpack-plugin.

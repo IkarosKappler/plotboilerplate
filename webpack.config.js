@@ -53,6 +53,16 @@ module.exports = [
             filename: 'Color.min.js'
         }
     }
+    // Un-comment this block if you also want to re-compile the Touchy-updated class.
+    ,{
+        entry: [
+        './lib/Touchy-updated.js',
+        ],
+        output: {
+            path: path.resolve(__dirname, 'lib'),
+            filename: 'Touchy-updated.min.js'
+        }
+    }
     // Un-comment this block if you also want to re-compile the Color class.
     ,{
         entry: [
