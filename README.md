@@ -14,7 +14,7 @@ visualizing 2D stuff on HTML canvas. Basic features are
 ## Install the package via npm
 ~~~sh
    $ npm i -g npm
-   $ npm i polotboilerplate
+   $ npm i plotboilerplate
 ~~~
 
 
