@@ -1,11 +1,14 @@
 ---
 layout: page
-title: Changelog
 ---
 
 
 # Changelog
-*2019-03-28
+
+* 2019-04-03
+  * Fixed wrong positioning on touch devices when canvas is not located at (0,0). Touch-drag is now working.
+  * Tweaked the fit-to-parent function. This is now working and respecting paddings and borders.
+* 2019-03-28
   * Mouse wheel zoom now calls e.preventDefault().
   * Added the unminified-webpack-plugin.
   * Removed the overlay-dialog from the plot-boilerplate as it was not used at all.

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="fullscreen">
   <head>
     <title>2D plotting boilerplate (Feigenbaum Demo)</title>
     <meta charset="UTF-8">
@@ -15,19 +15,18 @@
     <script src="../../lib/Color.js"></script>
     <script src="../../lib/bbtree.js"></script>
     
-    <script src="../../src/gup.js"></script>
-    <script src="../../src/overlay-dialog.js"></script>
-    
     <!-- For production -->
     <script src="../../dist/plotboilerplate.min.js"></script>
 
     <!-- Only for this demo -->
+    <script src="../gup.js"></script>
+    <script src="../overlay-dialog.js"></script>
     <script src="../WeightedBalancedCollection.js"></script>
     
     <script src="index.js"></script>
     <link rel="stylesheet" href="../style.css">
   </head>
-  <body>
+  <body class="fullscreen">
     <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
 
     <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>

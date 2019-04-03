@@ -30,7 +30,9 @@
  * @modified 2019-02-23 Removed the 'rebuild' function as it had no purpose.
  * @modified 2019-02-23 Added scaling of the click-/touch-tolerance with the CSS scale.
  * @modified 2019-03-23 Added JSDoc tags. Changed the default value of config.drawOrigin to false.
- * @version  1.3.8
+ * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
+ * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
+ * @version  1.4.2
  *
  * @file PlotBoilerplate
  * @public
@@ -641,13 +643,14 @@
 	 * Size minus padding minus border.
 	 **/
 	// NOT IN USE
+	
 	var getAvailableContainerSpace = function() {
 	    var container = _self.canvas.parentNode;
 	    var canvas = _self.canvas;
 	    canvas.style.display = 'none';
 	    var
-	    padding = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding') ),
-	    border = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-width') ),
+	    padding = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
+	    border = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-width') ) || 0,
 	    pl = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
 	    pr = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
 	    pt = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
@@ -661,7 +664,7 @@
 	    console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
 	    canvas.style.display = 'block';
 	    return { width : (w-pl-pr-bl-br), height : (h-pt-pb-bt-bb) };
-	};
+	}; 
 
 
 	/**
@@ -691,15 +694,37 @@
 		// Set editor size
 		var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 		var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+		_self.canvas.style.position = 'absolute';
+		_self.canvas.style.width = width+'px';
+		_self.canvas.style.height = height+'px';
+		_self.canvas.style.top = 0;
+		_self.canvas.style.left = 0;
 		_setSize( width, height );
 	    } else if( _self.config.fitToParent ) {
 		// Set editor size
-		var width  = _self.canvas.parentNode.clientWidth - 2; // 1px border
-		var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
-		_setSize( width, height );
-		//var space = getAvailableContainerSpace( _self.canvas.parentNode );
-		//console.log( space );
-		//_setSize( space.width, space.height );
+		//var width  = _self.canvas.parentNode.clientWidth - 2; // 1px border
+		//var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
+		//_setSize( width, height );
+		_self.canvas.style.position = 'absolute';
+		var space = getAvailableContainerSpace( _self.canvas.parentNode );
+		_self.canvas.style.width = space.width+'px';
+		_self.canvas.style.height = space.height+'px';
+		_self.canvas.style.top = null;
+		_self.canvas.style.left = null;
+		console.log( space );
+		_setSize( space.width, space.height );
+
+		//_self.canvas.style.position = 'absolute';
+		//_self.canvas.style.width = '100%';
+		//_self.canvas.style.height = '100%';
+		////_self.canvas.style.top = 0;
+		////_self.canvas.style.left = 0;
+		//// Now fetch the actual size
+		//var width = _self.canvas.clientWidth;
+		//var height = _self.canvas.clientHeight;
+		//console.log( 'parent.width', width, 'parent.height', height );
+		//_setSize(width,height);
+		
 	    } else {
                 _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
 	    }
@@ -976,13 +1001,17 @@
 	     **/ // +-------------------------------
 	    _self.console.log( 'Installing touch handler' );
 	    // +----------------------------------------------------------------------
-	    // | Some private vars to store the current mouse/position/button state.
+	    // | Convert absolute touch positions to relative DOM element position (relative to canvas)
 	    // +-------------------------------------------------
-	    function relPos(e) {
-		return { x : e.pageX - e.target.offsetLeft,
-			 y : e.pageY - e.target.offsetTop
+	    function relPos(pos) {
+		// console.log( pos, _self.canvas.offsetLeft, _self.canvas.offsetTop );
+		return { x : pos.x - _self.canvas.offsetLeft,
+			 y : pos.y - _self.canvas.offsetTop
 		       };
 	    }
+	    // +----------------------------------------------------------------------
+	    // | Some private vars to store the current mouse/position/button state.
+	    // +-------------------------------------------------
 	    var touchMovePos = null;
 	    var touchDownPos = null;
 	    var draggedElement = null;
@@ -993,8 +1022,9 @@
 			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 			    if( draggedElement ) {
 				hand.on('move', function (points) {
-				    //console.log( points );	    
-				    var trans = _self.transformMousePosition( points[0].x, points[0].y );
+				    //console.log( points );
+				    var rel = relPos( points[0] );
+				    var trans = _self.transformMousePosition( rel.x, rel.y ); // points[0].x, points[0].y );
 				    var diff = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
 				    if( draggedElement.type == 'vertex' ) {
 					if( !_self.vertices[draggedElement.vindex].attr.draggable )
@@ -1004,7 +1034,7 @@
 					_self.vertices[draggedElement.vindex].listeners.fireDragEvent( fakeEvent );
 					_self.redraw();
 				    }
-				    touchMovePos = new Vertex(points[0]);
+				    touchMovePos = new Vertex(rel); // points[0]);
 				} );
 			    }
 
@@ -1015,27 +1045,14 @@
 	if( this.config.enableKeys ) {
 	    // Install key handler
 	    var keyHandler = new KeyHandler( { trackAll : true } )
-
-		.down('alt',function() { _self.console.log('alt was hit.'); } )
-		.press('alt',function() { _self.console.log('alt was pressed.'); } )
-		.up('alt',function() { _self.console.log('alt was released.'); } )
-
-		.down('ctrl',function() { _self.console.log('ctrl was hit.'); } )
-		.press('ctrl',function() { _self.console.log('ctrl was pressed.'); } )
-		.up('ctrl',function() { _self.console.log('ctrl was released.'); } )
-
 		.down('escape',function() {
-		    // _self.console.log('ESCAPE was hit.');
 		    _self.clearSelection(true);
 		} )
-
 		.down('shift',function() {
-		    //_self.console.log('SHIFT was hit.');
 		_self.selectPolygon = new Polygon();
 		    _self.redraw();
 		} )
 		.up('shift',function() {
-		    //_self.console.log('SHIFT was released.');
 		    // Find and select vertices in the drawn area
 		    if( _self.selectPolygon == null )
 			return;
@@ -1043,13 +1060,7 @@
 		    _self.selectPolygon = null;
 		    _self.redraw();
 		} )
-
-		.down('y',function() { _self.console.log('y was hit.'); } )
-		.up('y',function() { _self.console.log('y was released.'); } )
-
 		.down('e',function() { _self.console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
-
-		.up('windows',function() { _self.console.log('windows was released.'); } )
 	    ;
 	} // END IF enableKeys?
 	else  { _self.console.log('Keyboard interaction disabled.'); }

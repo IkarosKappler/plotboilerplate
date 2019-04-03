@@ -132,8 +132,7 @@ __webpack_require__(14);
 __webpack_require__(15);
 __webpack_require__(16);
 __webpack_require__(17);
-__webpack_require__(18);
-module.exports = __webpack_require__(19);
+module.exports = __webpack_require__(18);
 
 
 /***/ }),
@@ -3421,7 +3420,7 @@ Object.extendClass = function( superClass, subClass ) {
      * <br>
      * The first vertex in the returned array is the start point.<br>
      * The following sequence are pairs of control-point-and-end-point:
-     * <pre>startPoint, controlPoint0, pathPoint1, controlPoint1, pathPoint2, controlPoint2, ..., endPoint<pre>
+     * <pre>startPoint, controlPoint0, pathPoint1, controlPoint1, pathPoint2, controlPoint2, ..., endPoint</pre>
      *
      * @method toQuadraticBezierData
      * @return {Vertex[]}  An array of 2d vertices that shape the quadratic Bézier curve.
@@ -4302,186 +4301,6 @@ Object.extendClass = function( superClass, subClass ) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
- * A simple touch event handle for demos. 
- * Use to avoid loading massive libraries like jQuery.
- *
- * Usage: 
- *   new TouchHandler( document.getElementById('mycanvas') )
- *	    .touchstart( function(e) {
- *		console.log( 'Touch start: ' + JSON.stringify(e) );
- *	    } )
- *
- *
- * @author   Ikaros Kappler
- * @date     2019-02-10
- * @version  1.0.0
- **/
-
-(function(_context) {
-
-    // +----------------------------------------------------------------------
-    // | The constructor.
-    // |
-    // | Pass the DOM element you want to receive mouse events from.
-    // +-------------------------------------------------
-    function __constructor( element ) {
-
-	// +----------------------------------------------------------------------
-	// | Some private vars to store the current mouse/position/button state.
-	// +-------------------------------------------------
-	var touchStartPositions = {};
-	var touchMovePositions = {};
-	var listeners    = {};
-	var installed    = {};
-	var handlers     = {};
-	// var recentEvent  = null;
-
-
-	// +----------------------------------------------------------------------
-	// | Some private vars to store the current mouse/position/button state.
-	// +-------------------------------------------------
-	function relPos( e ) {
-	    // console.log( e );
-	    var positions = [];
-	    for( var i = 0; i < e.touches.length; i++ ) {
-		// console.log( 'touch['+i+']' );
-		positions.push( { x : e.touches[i].clientX - e.target.offsetLeft,
-				  y : e.touches[i].clientY - e.target.offsetTop
-				} );
-	    };
-	    return positions;
-	}
-	function mkParams( e, eventName ) {
-	    var relPositions = relPos(e);
-	    // e.params = { element : element, name : eventName, pos : rel };
-	    e.params = { element : element, name : eventName, pos : relPositions[0], positions : relPositions, button : -1, leftButton : false, middleButton : false, rightButton : false, mouseDownPos : null, draggedFrom : null, wasDragged : false, dragAmount : {x:0,y:0}, dragAmounts : [] };
-	    return e;
-	}
-
-	function listenFor( eventName ) {
-	    if( installed[eventName] ) return;
-	    element.addEventListener(eventName,handlers[eventName]);
-	    installed[eventName] = true;
-	}
-
-	function unlistenFor( eventName ) {
-	    if( !installed[eventName] ) return;
-	    element.removeEventListener(eventName,handlers[eventName]);
-	    delete installed[eventName];
-	}
-
-
-	// +----------------------------------------------------------------------
-	// | Define the internal event handlers.
-	// |
-	// | They will dispatch the modified event (relative mouse position,
-	// | drag offset, ...) to the callbacks.
-	// +-------------------------------------------------
-	handlers['touchstart'] = function(e) {
-	    if( listeners.touchstart ) listeners.touchstart( mkParams(e,'touchstart') );
-	    touchStartPositions = e.params.positions;
-	    touchMovePositions = e.params.positions;
-	}
-	handlers['touchmove'] = function(e) {
-	    if( listeners.touchmove ) {
-		e.preventDefault();
-		mkParams(e,'touchmove')
-		e.params.dragAmounts = [];
-		// console.log('zzz',touchMovePositions);
-		if( touchMovePositions && touchMovePositions.length > 0 ) {
-		    //console.log('touch move events');
-		    for( var i in touchMovePositions ) {
-			e.params.dragAmounts[i] = { x: e.params.positions[i].x-touchMovePositions[i].x,
-						    y: e.params.positions[i].y-touchMovePositions[i].y
-						  };
-		    }
-		    e.params.dragAmount = e.params.dragAmounts[0];
-		    e.params.wasDragged = true;
-		    console.log( e.params.dragAmounts );
-		}
-		listeners.touchmove( e );
-	    }
-	   
-	    //touchMovePositions = [];
-	    //for( var i in e.params.positions )
-	    //	touchMovePositions[i] = e.params.positions[i];
-	    touchMovePositions = e.params.positions;
-	}
-	handlers['touchcancel'] = function(e) {
-	    if( listeners.touchcancel ) listeners.touchcancel( mkParams(e,'touchcancel') );
-	    touchStartPositions = null;
-	}
-	handlers['touchend'] = function(e) {
-	    if( listeners.touchend ) listeners.click( mkParams(e,'touchend') );
-	    touchStartPositions = null;
-	}
-
-
-	// +----------------------------------------------------------------------
-	// | The installer functions.
-	// |
-	// | Pass your callbacks here.
-	// | Note: they support chaining.
-	// +-------------------------------------------------
-	this.touchstart = function( callback ) {
-	    if( listeners.touchstart ) throwAlreadyInstalled('touchstart');
-	    listenFor('touchstart');
-	    listeners.touchstart = callback;
-	    return this;
-	};
-	this.touchmove = function( callback ) {
-	    console.log('touchmove')
-	    if( listeners.touchmove ) throwAlreadyInstalled('touchmove');
-	    listenFor('touchmove');
-	    listeners.touchmove = callback;
-	    return this;
-	};
-	this.touchcancel = function( callback ) {
-	    if( listeners.touchcancel ) throwAlreadyInstalled('mouseup'); 
-	    listenFor('mouseup');
-	    listeners.mouseup = callback;
-	    return this;
-	};
-	this.touchend = function( callback ) {
-	    if( listeners.mousedown )  throwAlreadyInstalled('mousedown'); 
-	    listenFor('mousedown');
-	    listeners.mousedown = callback;
-	    return this;
-	};
-	this.touchcancel = function( callback ) {
-	    if( listeners.click )  throwAlreadyInstalled('click'); 
-	    listenFor('click');
-	    listeners.click = callback;
-	    return this;
-	};
-
-	function throwAlreadyInstalled( name ) {
-	    throw "This TouchHandler already has a '"+name+"' callback. To keep the code simple there is only room for one.";
-	}
-	
-	// +----------------------------------------------------------------------
-	// | Call this when your work is done.
-	// |
-	// | The function will un-install all event listeners.
-	// +-------------------------------------------------
-	this.destroy = function() {
-	    unlistenFor('touchstart');
-	    unlistenFor('touchmove');
-	    unlistenFor('touchend');
-	    unlistenFor('touchcancel');
-	}
-    }
-
-    _context.TouchHandler = __constructor;
-})(typeof window != 'undefined' ? window : module.export);
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)(module)))
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(module) {/**
  * Moved some draw functions to this wrapper.
  *
  * @require Vertex
@@ -4961,7 +4780,7 @@ Object.extendClass = function( superClass, subClass ) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)(module)))
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports) {
 
 /**
@@ -4996,7 +4815,9 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-02-23 Removed the 'rebuild' function as it had no purpose.
  * @modified 2019-02-23 Added scaling of the click-/touch-tolerance with the CSS scale.
  * @modified 2019-03-23 Added JSDoc tags. Changed the default value of config.drawOrigin to false.
- * @version  1.3.8
+ * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
+ * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
+ * @version  1.4.2
  *
  * @file PlotBoilerplate
  * @public
@@ -5601,6 +5422,35 @@ Object.extendClass = function( superClass, subClass ) {
 	};
 
 
+	/**
+	 * Get the available inner space of the given container.
+	 *
+	 * Size minus padding minus border.
+	 **/
+	// NOT IN USE
+	
+	var getAvailableContainerSpace = function() {
+	    var container = _self.canvas.parentNode;
+	    var canvas = _self.canvas;
+	    canvas.style.display = 'none';
+	    var
+	    padding = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
+	    border = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-width') ) || 0,
+	    pl = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
+	    pr = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
+	    pt = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
+	    pb = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
+	    bl = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-left-width') ) || border,
+	    br = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
+	    bt = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
+	    bb = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
+	    var w = container.clientWidth; // 1px border
+	    var h = container.clientHeight; // 1px border
+	    console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
+	    canvas.style.display = 'block';
+	    return { width : (w-pl-pr-bl-br), height : (h-pt-pb-bt-bb) };
+	}; 
+
 
 	/**
 	 * This function resizes the canvas to the required settings (toggles fullscreen).<br>
@@ -5629,12 +5479,37 @@ Object.extendClass = function( superClass, subClass ) {
 		// Set editor size
 		var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 		var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+		_self.canvas.style.position = 'absolute';
+		_self.canvas.style.width = width+'px';
+		_self.canvas.style.height = height+'px';
+		_self.canvas.style.top = 0;
+		_self.canvas.style.left = 0;
 		_setSize( width, height );
 	    } else if( _self.config.fitToParent ) {
 		// Set editor size
-		var width  = _self.canvas.parentNode.clientWidth - 2; // 1px border
-		var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
-		_setSize( width, height );
+		//var width  = _self.canvas.parentNode.clientWidth - 2; // 1px border
+		//var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
+		//_setSize( width, height );
+		_self.canvas.style.position = 'absolute';
+		var space = getAvailableContainerSpace( _self.canvas.parentNode );
+		_self.canvas.style.width = space.width+'px';
+		_self.canvas.style.height = space.height+'px';
+		_self.canvas.style.top = null;
+		_self.canvas.style.left = null;
+		console.log( space );
+		_setSize( space.width, space.height );
+
+		//_self.canvas.style.position = 'absolute';
+		//_self.canvas.style.width = '100%';
+		//_self.canvas.style.height = '100%';
+		////_self.canvas.style.top = 0;
+		////_self.canvas.style.left = 0;
+		//// Now fetch the actual size
+		//var width = _self.canvas.clientWidth;
+		//var height = _self.canvas.clientHeight;
+		//console.log( 'parent.width', width, 'parent.height', height );
+		//_setSize(width,height);
+		
 	    } else {
                 _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
 	    }
@@ -5910,18 +5785,31 @@ Object.extendClass = function( superClass, subClass ) {
 	     * Install a touch handler on the canvas.
 	     **/ // +-------------------------------
 	    _self.console.log( 'Installing touch handler' );
+	    // +----------------------------------------------------------------------
+	    // | Convert absolute touch positions to relative DOM element position (relative to canvas)
+	    // +-------------------------------------------------
+	    function relPos(pos) {
+		// console.log( pos, _self.canvas.offsetLeft, _self.canvas.offsetTop );
+		return { x : pos.x - _self.canvas.offsetLeft,
+			 y : pos.y - _self.canvas.offsetTop
+		       };
+	    }
+	    // +----------------------------------------------------------------------
+	    // | Some private vars to store the current mouse/position/button state.
+	    // +-------------------------------------------------
 	    var touchMovePos = null;
 	    var touchDownPos = null;
 	    var draggedElement = null;
 	    new Touchy( this.canvas,
 			{ one : function( hand, finger ) {
-			    touchMovePos = new Vertex(finger.lastPoint);
-			    touchDownPos = new Vertex(finger.lastPoint);
+			    touchMovePos = new Vertex( relPos(finger.lastPoint) );
+			    touchDownPos = new Vertex( relPos(finger.lastPoint) );
 			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 			    if( draggedElement ) {
 				hand.on('move', function (points) {
-				    //console.log( points );	    
-				    var trans = _self.transformMousePosition( points[0].x, points[0].y );
+				    //console.log( points );
+				    var rel = relPos( points[0] );
+				    var trans = _self.transformMousePosition( rel.x, rel.y ); // points[0].x, points[0].y );
 				    var diff = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
 				    if( draggedElement.type == 'vertex' ) {
 					if( !_self.vertices[draggedElement.vindex].attr.draggable )
@@ -5931,7 +5819,7 @@ Object.extendClass = function( superClass, subClass ) {
 					_self.vertices[draggedElement.vindex].listeners.fireDragEvent( fakeEvent );
 					_self.redraw();
 				    }
-				    touchMovePos = new Vertex(points[0]);
+				    touchMovePos = new Vertex(rel); // points[0]);
 				} );
 			    }
 
@@ -5942,27 +5830,14 @@ Object.extendClass = function( superClass, subClass ) {
 	if( this.config.enableKeys ) {
 	    // Install key handler
 	    var keyHandler = new KeyHandler( { trackAll : true } )
-
-		.down('alt',function() { _self.console.log('alt was hit.'); } )
-		.press('alt',function() { _self.console.log('alt was pressed.'); } )
-		.up('alt',function() { _self.console.log('alt was released.'); } )
-
-		.down('ctrl',function() { _self.console.log('ctrl was hit.'); } )
-		.press('ctrl',function() { _self.console.log('ctrl was pressed.'); } )
-		.up('ctrl',function() { _self.console.log('ctrl was released.'); } )
-
 		.down('escape',function() {
-		    // _self.console.log('ESCAPE was hit.');
 		    _self.clearSelection(true);
 		} )
-
 		.down('shift',function() {
-		    //_self.console.log('SHIFT was hit.');
 		_self.selectPolygon = new Polygon();
 		    _self.redraw();
 		} )
 		.up('shift',function() {
-		    //_self.console.log('SHIFT was released.');
 		    // Find and select vertices in the drawn area
 		    if( _self.selectPolygon == null )
 			return;
@@ -5970,13 +5845,7 @@ Object.extendClass = function( superClass, subClass ) {
 		    _self.selectPolygon = null;
 		    _self.redraw();
 		} )
-
-		.down('y',function() { _self.console.log('y was hit.'); } )
-		.up('y',function() { _self.console.log('y was released.'); } )
-
 		.down('e',function() { _self.console.log('e was hit. shift is pressed?',keyHandler.isDown('shift')); } ) 
-
-		.up('windows',function() { _self.console.log('windows was released.'); } )
 	    ;
 	} // END IF enableKeys?
 	else  { _self.console.log('Keyboard interaction disabled.'); }
@@ -6119,7 +5988,7 @@ Object.extendClass = function( superClass, subClass ) {
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**

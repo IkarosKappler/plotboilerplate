@@ -57,7 +57,7 @@
 	                         }, 
 				 log : function() {
 				     console.log(arguments);
-				     humane.log(arguments[0]);
+				     // humane.log(arguments[0]);
 				 },
 				 error : function() {
 				     console.error(arguments);
