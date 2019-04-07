@@ -77,23 +77,30 @@ nav.jsdoc
     margin-top: 28px;
     width: 30%;
     box-sizing: border-box;
-    border-left: 1px solid #ccc;
+    /* border-left: 1px solid #ccc; */
     padding-left: 16px;
 }
 
 nav.jsdoc ul {
-    font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif;
+    /* font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif; */
     font-size: 100%;
     line-height: 17px;
     padding: 0;
     margin: 0;
     list-style-type: none;
+
+    -moz-column-count: 1;
+    -moz-column-gap: 20px;
+    -webkit-column-count: 1;
+    -webkit-column-gap: 20px;
+    column-count: 1;
+    column-gap: 20px;
 }
 
 nav.jsdoc ul a, nav.jsdoc ul a:visited, nav.jsdoc ul a:active {
-    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    /* font-family: Consolas, Monaco, 'Andale Mono', monospace; */
     line-height: 18px;
-    color: #4D4E53;
+    /* color: #4D4E53; */
 }
 
 nav.jsdoc h3 {
@@ -110,6 +117,33 @@ footer {
     margin-top: 12px;
     font-style: italic;
     font-size: 90%;
+}
+
+/* Small device break point */
+@media only screen and (max-width: 768px) {
+    /* Below this screen width the nav and main element should align vertically */
+    #main {
+        width : 100%;
+    }
+    nav.jsdoc { 
+        width : 100%; 
+        margin-top : 0px;
+    }
+    nav.jsdoc ul {
+        -moz-column-count: 3;
+        -webkit-column-count: 3;
+        column-count: 3;
+    }
+}
+
+/* Small device break point */
+@media only screen and (max-width: 576px) {
+    /* Below this screen width the nav and main element should align vertically */
+    nav.jsdoc ul {
+        -moz-column-count: 2;
+        -webkit-column-count: 2;
+        column-count: 2;
+    }
 }
 
 h1, h2, h3, h4 {
@@ -258,10 +292,10 @@ tr > th:last-child { border-right: 1px solid #ddd; }
 
 .prettyprint code
 {
-    font-size: 100%;
-    line-height: 18px;
+    font-size: 0.75em; /* 100%; */
+    line-height: 0.75em; /* 18px; */
     display: block;
-    padding: 4px 12px;
+    padding: 0px 12px; /* 4px 12px; */
     margin: 0;
     background-color: #fff;
     color: #4D4E53;
@@ -279,6 +313,7 @@ tr > th:last-child { border-right: 1px solid #ddd; }
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  font-size : 0.75em;
 }
 
 .prettyprint.linenums ol
