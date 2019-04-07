@@ -56,7 +56,7 @@ section
     background-color: #fff;
     padding: 12px 24px;
     border-bottom: 1px solid #ccc;
-    margin-right: 30px;
+    /* margin-right: 30px; */
 }
 
 .variation {
@@ -102,6 +102,13 @@ nav.jsdoc ul {
     column-gap: 20px;
 }
 
+/* Nav has full width in source code view */
+nav.jsdoc[data-type=source] ul {
+    -moz-column-count: 3;
+    -webkit-column-count: 3;
+    column-count: 3;
+}
+
 nav.jsdoc ul a, nav.jsdoc ul a:visited, nav.jsdoc ul a:active {
     /* font-family: Consolas, Monaco, 'Andale Mono', monospace; */
     line-height: 18px;
@@ -134,7 +141,7 @@ footer {
         width : 100%; 
         margin-top : 0px;
     }
-    nav.jsdoc ul {
+    nav.jsdoc ul, nav.jsdoc[data-type=source] ul {
         -moz-column-count: 3;
         -webkit-column-count: 3;
         column-count: 3;
@@ -144,7 +151,7 @@ footer {
 /* Small device break point */
 @media only screen and (max-width: 576px) {
     /* Below this screen width the nav and main element should align vertically */
-    nav.jsdoc ul {
+    nav.jsdoc ul, nav.jsdoc[data-type=source] ul {
         -moz-column-count: 2;
         -webkit-column-count: 2;
         column-count: 2;
