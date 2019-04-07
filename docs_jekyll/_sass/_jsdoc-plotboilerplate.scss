@@ -81,6 +81,11 @@ nav.jsdoc
     padding-left: 16px;
 }
 
+/* Source code should display with full width */
+#main[data-type=source], nav[data-type=source] {
+    width : 100%;
+}
+
 nav.jsdoc ul {
     /* font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif; */
     font-size: 100%;
@@ -292,8 +297,8 @@ tr > th:last-child { border-right: 1px solid #ddd; }
 
 .prettyprint code
 {
-    font-size: 0.75em; /* 100%; */
-    line-height: 0.75em; /* 18px; */
+    font-size: 100%; /* 0.75em; /* 100%; */
+    line-height: 18px; /* 0.75em; /* 18px; */
     display: block;
     padding: 0px 12px; /* 4px 12px; */
     margin: 0;
@@ -313,7 +318,7 @@ tr > th:last-child { border-right: 1px solid #ddd; }
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  font-size : 0.75em;
+  /* font-size : 0.75em; */
 }
 
 .prettyprint.linenums ol
