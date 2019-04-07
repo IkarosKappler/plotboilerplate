@@ -2,7 +2,7 @@
 layout: home
 date: 2019-03-11
 ---
-# An interaction Javascript Plotting Boilerplate
+# An interactive Javascript Plotting Boilerplate
 For plotting visual 2D data with Javascript and canvas (in 2d-context).
 
 This is a simple collection of useful functions I repetively used for
