@@ -1,13 +1,49 @@
+@font-face {
+    font-family: 'Open Sans';
+    font-weight: normal;
+    font-style: normal;
+    src: url('./fonts/OpenSans-Regular-webfont.eot');
+    src:
+        local('Open Sans'),
+        local('OpenSans'),
+        url('./fonts/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/OpenSans-Regular-webfont.woff') format('woff'),
+        url('./fonts/OpenSans-Regular-webfont.svg#open_sansregular') format('svg');
+}
+
+@font-face {
+    font-family: 'Open Sans Light';
+    font-weight: normal;
+    font-style: normal;
+    src: url('../fonts/OpenSans-Light-webfont.eot');
+    src:
+        local('Open Sans Light'),
+        local('OpenSans Light'),
+        url('./fonts/OpenSans-Light-webfont.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/OpenSans-Light-webfont.woff') format('woff'),
+        url('./fonts/OpenSans-Light-webfont.svg#open_sanslight') format('svg');
+}
+
+
 /**
  * Site header
  */
 .site-header {
-    border-top: 15px solid $brand-color; /* $grey-color-dark; */
+    border-top: 15px solid $brand-color;
     border-bottom: 1px solid $grey-color-light;
     min-height: 56px;
+    height : 56px;
 
-    // Positioning context for the mobile navigation icon
-    position: relative;
+    /* Positioning context for the mobile navigation icon */
+    /* position: relative; */
+    position: fixed;
+    width : 100%;
+    background: white;
+    z-index : 999;
+}
+
+.header-padding {
+    padding-top : 72px; /* header-height plus -borders */
 }
 
 .site-headerdemo {
@@ -31,8 +67,16 @@
 }
 
 .site-nav {
+    /* In comobination with JSDoc-CSS these would be overridden */
     float: right;
     line-height: 56px;
+    /*
+    float: right !important;
+    line-height: 56px !important;
+    width: auto !important; 
+    border-left: none !important;
+    padding-left: 0px !important;
+    margin-top: 0px !important; */
 
     .menu-icon {
         display: none;

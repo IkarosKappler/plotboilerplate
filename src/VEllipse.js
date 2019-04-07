@@ -18,8 +18,8 @@
      * The constructor.
      *
      * @constructor
-     * @param center:Vertex The ellipses center.
-     * @param axis:Vertex The x- and y-axis.
+     * @param {Vertex} center The ellipses center.
+     * @param {Vertex} axis The x- and y-axis.
      * @name VEllipse
      **/
     var VEllipse = function( center, axis ) {

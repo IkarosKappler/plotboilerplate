@@ -21,9 +21,11 @@ date: 2019-03-11
 exclude: [
   "*~",
   "#*#",
+  "docs_md", # Intermediate jsdoc markdown files are not needed any more
   "Gemfile",
   "Gemfile.lock",
   "gulpfile.js",
+  "jsdoc_template/",
   "node_modules",
   "package.json",
   "publish.sh",
@@ -33,7 +35,11 @@ exclude: [
   "__index.original.html"
 ]
 
+keep_files : [
+  "docs"
+]
+
 # Build settings
 markdown: kramdown
 
-# markdown_ext: md
+markdown_ext: md

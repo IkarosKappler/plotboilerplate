@@ -4,6 +4,9 @@
 
     <h2 class="footer-heading">{{ site.title }}</h2>
 
+    {% if page.footertext %}
+      {{ page.footertext }}<br><br>
+    {% endif %}
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">
         <ul class="contact-list">
@@ -34,12 +37,13 @@
     </div>
 
     <div class="footer-col-wrapper" style="text-align: center;">
-	This page was created with <a href="http://jekyllrb.com">Jekyll</a><br>
-	Jekyll new theme at 
-	{% include icon-github.html username="jglovier" %}<br>
-	Source code for Jekyll at
-	{% include icon-github.html username="jekyll" %}<br>
+  This page was created with <a href="http://jekyllrb.com">Jekyll</a><br>
+  Jekyll new theme at 
+  {% include icon-github.html username="jglovier" %}<br>
+  Source code for Jekyll at
+  {% include icon-github.html username="jekyll" %}<br>
     </div>
   </div>
+
 
 </footer>

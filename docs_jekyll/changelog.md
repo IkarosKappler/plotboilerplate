@@ -1,10 +1,12 @@
 ---
 layout: page
+title: Changelog
 ---
 
 
 # Changelog
-
+* 2019-04-07
+  * Re-styled the website, optimized the css, merged jekyll-css with jsdoc-css.
 * 2019-04-03
   * Fixed wrong positioning on touch devices when canvas is not located at (0,0). Touch-drag is now working.
   * Tweaked the fit-to-parent function. This is now working and respecting paddings and borders.

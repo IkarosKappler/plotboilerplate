@@ -3,8 +3,13 @@
 echo "Copying screenshots ... "
 cp -R ../screenshots/ .
 
-echo "Generating markdown docs from sources ..."
-./renderjsdoc.sh
+# ::: This is not in use.
+# ::: Instead of jsdoc-to-markdown use the overridden jsdoc-template.
+# echo "Generating markdown docs from sources ..."
+# ./renderjsdoc.sh
+
+# Use thie docs build script instead
+(cd .. && ./mkdocs.sh)
 
 echo "Building markdown page from template and readme ..."
 echo '---' > index.md

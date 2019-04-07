@@ -1,0 +1,7 @@
+{
+    "templates" : {
+		"default" : {
+	    	"layoutFile" : "./docs_jekyll/jsdoc_template/layout.tmpl"
+		}	
+    }
+}
