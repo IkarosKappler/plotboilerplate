@@ -435,6 +435,8 @@ Object.extendClass = function( superClass, subClass ) {
 	    this.x = x.x;
 	    this.y = x.y;
 	} else {
+	    if( typeof x == 'undefined' ) x = 0;
+	    if( typeof y == 'undefined' ) y = 0;
 	    this.x = x;
 	    this.y = y;
 	}
@@ -3606,8 +3608,8 @@ Object.extendClass = function( superClass, subClass ) {
      * The constructor.
      *
      * @constructor
-     * @param center:Vertex The ellipses center.
-     * @param axis:Vertex The x- and y-axis.
+     * @param {Vertex} center The ellipses center.
+     * @param {Vertex} axis The x- and y-axis.
      * @name VEllipse
      **/
     var VEllipse = function( center, axis ) {
@@ -4817,7 +4819,7 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-03-23 Added JSDoc tags. Changed the default value of config.drawOrigin to false.
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
- * @version  1.4.2
+ * @version  1.4.3
  *
  * @file PlotBoilerplate
  * @public
@@ -4851,7 +4853,7 @@ Object.extendClass = function( superClass, subClass ) {
     var setCSSscale = function( element, scaleX, scaleY ) {
 	element.style['transform-origin'] = '0 0';
 	if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
-	else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY+')';
+	else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
     };
 
 
@@ -4941,6 +4943,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    fitToParent           : typeof config.fitToParent != 'undefined' ? config.fitToParent : true,
 	    scaleX                : config.scaleX || 1.0,
 	    scaleY                : config.scaleY || 1.0,
+	    drawGrid              : typeof config.drawGrid != 'undefined' ? config.drawGrid : true,
 	    rasterGrid            : typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
 	    rasterAdjustFactor    : typeof config.rasterAdjustFactor == 'number' ? config.rasterAdjustFactor : 2.0,
 	    drawOrigin            : typeof config.drawOrigin != 'undefined' ? config.drawOrigin : false,
@@ -5161,10 +5164,12 @@ Object.extendClass = function( superClass, subClass ) {
 	    var offset = this.draw.offset.clone().inv();
 	    offset.x = (Math.round(offset.x+cs.w)/Math.round(gSize.w))*(gSize.w)/this.draw.scale.x + (((this.draw.offset.x-cs.w)/this.draw.scale.x)%gSize.w);
 	    offset.y = (Math.round(offset.y+cs.h)/Math.round(gSize.h))*(gSize.h)/this.draw.scale.y + (((this.draw.offset.y-cs.h)/this.draw.scale.x)%gSize.h);
-	    if( this.config.rasterGrid )
-		this.draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.125)' );
-	    else
-		this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.095)' )
+	    if( this.config.drawGrid ) {
+		if( this.config.rasterGrid )
+		    this.draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.125)' );
+		else
+		    this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.095)' );
+	    }
 	};
 
 	
@@ -5403,6 +5408,25 @@ Object.extendClass = function( superClass, subClass ) {
 	};
 
 
+	/**
+	 * Get the current view port.
+	 *
+	 * @method viewPort
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {Bounds} The current viewport.
+	 **/
+	PlotBoilerplate.prototype.viewport = function() {
+	    return { min : this.transformMousePosition(0,0),
+		     max : this.transformMousePosition(this.canvasSize.width,this.canvasSize.height)
+		   };
+	};
+	/**
+	 * @typedef {Object} Bounds
+	 * @property {Vertex*} min The upper left position.
+	 * @property {Vertex*} max The lower right position;.
+	 */
+
 
 	/**
 	 * This function opens a save-as file dialog and – once an output file is
@@ -5637,7 +5661,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    if( e.which != 1 && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
 		return; // Only react on left mouse or touch events
 	    var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
-	    _self.console.log('point at position found: '+p );
+	    //_self.console.log('point at position found: '+p );
 	    if( !p ) return;
 	    // Drag all selected elements?
 	    if( p.type == 'vertex' && _self.vertices[p.vindex].attr.isSelected ) {
