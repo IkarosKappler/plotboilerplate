@@ -1,10 +1,13 @@
 ---
 layout: page
-title: Changelog
 ---
 
 
 # Changelog
+* 2019-04-11
+  * Added the 'drawGrid' config param.
+  * Added the simple animation demo.
+  * Added the PlotBoilerplate.viewport() function.
 * 2019-04-07
   * Re-styled the website, optimized the css, merged jekyll-css with jsdoc-css.
 * 2019-04-03
