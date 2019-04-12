@@ -4938,6 +4938,14 @@ Object.extendClass = function( superClass, subClass ) {
 	// +---------------------------------------------------------------------------------
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
+
+	/** 
+	 * A config.
+	 *
+	 * @member {Object} 
+	 * @memberof PlotBoilerplate
+	 * @instance
+	 */
 	this.config = {
 	    fullSize              : typeof config.fullSize != 'undefined' ? config.fullSize : true,
 	    fitToParent           : typeof config.fitToParent != 'undefined' ? config.fitToParent : true,
@@ -4977,6 +4985,17 @@ Object.extendClass = function( superClass, subClass ) {
 	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true
 	};
 
+
+	/** 
+	 * Configuration for drawing things.
+	 *
+	 * @member {Object} 
+	 * @memberof PlotBoilerplate
+	 * @instance
+	 */
+	this.drawConfig = {
+	    drawVertices : true
+	};
 
 	// +---------------------------------------------------------------------------------
 	// | Object members.
@@ -5254,7 +5273,8 @@ Object.extendClass = function( superClass, subClass ) {
 			d.axis.attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Vertex ) {
-		    if( !d.attr.selectable || !d.attr.draggable ) {
+		    if( this.drawConfig.drawVertices &&
+			(!d.attr.selectable || !d.attr.draggable) ) {
 			// Draw as special point (grey)
 			this.draw.circleHandle( d, 7, '#a8a8a8' );
 			d.attr.renderTime = renderTime;
@@ -5332,7 +5352,7 @@ Object.extendClass = function( superClass, subClass ) {
 	PlotBoilerplate.prototype.drawVertices = function( renderTime ) {
 	    // Draw all vertices as small squares if they were not already drawn by other objects
 	    for( var i in this.vertices ) {
-		if( this.vertices[i].attr.renderTime != renderTime ) {
+		if( this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime ) {
 		    this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
 		}
 	    }
@@ -5915,6 +5935,8 @@ Object.extendClass = function( superClass, subClass ) {
 	fold01.add(this.config, 'drawBezierHandleLines').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle lines.");
 	fold01.add(this.config, 'drawHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw handle points (overrides all other settings).");
 	fold01.add(this.config, 'drawHandleLines').onChange( function() { _self.redraw(); } ).title("Draw handle lines in general (overrides all other settings).");
+	fold01.add(this.drawConfig, 'drawVertices').onChange( function() { _self.redraw(); } ).title("Draw vertices in general.");
+	
 	
 	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();

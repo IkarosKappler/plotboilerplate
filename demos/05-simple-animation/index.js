@@ -51,6 +51,8 @@
 		)
 	    );
 
+	    pb.drawConfig.drawVertices = false;
+
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
@@ -104,7 +106,7 @@
 	    pA.listeners.addDragListener( function() { updateCircles() } );
 	    pB.listeners.addDragListener( function() { updateCircles() } );
 
-	    for( var i = 0; i < 3; i++ ) {
+	    for( var i = 0; i < 10; i++ ) {
 		var p = randomVertex();
 		var tri = new Triangle(pA, pB, p);
 		var circumCircle = tri.getCircumcircle();
