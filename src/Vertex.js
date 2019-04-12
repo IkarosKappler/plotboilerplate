@@ -50,6 +50,8 @@
 	    this.x = x.x;
 	    this.y = x.y;
 	} else {
+	    if( typeof x == 'undefined' ) x = 0;
+	    if( typeof y == 'undefined' ) y = 0;
 	    this.x = x;
 	    this.y = y;
 	}

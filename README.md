@@ -65,7 +65,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 	pb.redraw();
    } );
 ~~~
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
 ![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
@@ -83,7 +83,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 [For a detailed description of this plot see my Feigenbaum-plot mini-project](https://github.com/IkarosKappler/feigenbaum-plot "Feigenbaum bifurcation diagram")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/feigenbaum/index.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/06-feigenbaum/index.html" title="See the demo">See the demo</a>
 
 [And here is a tiny article about it](http://www.polygon-berlin.de/deterministisches-chaos "Article about deterministic chaos")
 
@@ -92,21 +92,21 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ![Perpendiducular point-to-line distance](screenshots/screenshot-20190220_2_line-to-point.png "Perpendiducular point-to-line distance")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/line-point-distance/index.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html" title="See the demo">See the demo</a>
 
 
 ### Random-scripture demo
 
 ![Random-scripture demo](screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/random-scripture/index.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/03-random-scripture/index.html" title="See the demo">See the demo</a>
 
 
 ### Vector field test (still in development)
 
 ![Vectorfield test](screenshots/screenshot-20190220_1_vectorfield.png "Vectorfield test demo (still in development)")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/vectorfield/index.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/04-vectorfield/index.html" title="See the demo">See the demo</a>
 
 
 
@@ -131,6 +131,9 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 	//   The initial zoom. Default is 1.0.
 	scaleX                	: 1.0,
 	scaleY                	: 1.0,
+
+	// Specifies if the raster should be drawn.
+	drawGrid                : true,
 
 	// If set to true the background grid will be drawn rastered.
 	rasterGrid              : true,
@@ -268,7 +271,7 @@ The Vertex class has basic drag event support:
 
       // The most recent draw position (position before
       //   current drag step).
-      draggedFrom : mouseDragPos,
+      draggedFrom : { x : Number, y : Number },
 
       // True if this is a drag event (nothing else possible at the moment).
       wasDragged : boolean,
@@ -317,6 +320,7 @@ from the sources code files in ./src/*.
 ## Todos
  * Include Touchy.js as a package dependency.
  * Include FileSaver.js as a package dependency.
+ * Add a triangle helper class (like in the animation demo)?
  * Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
  * Add config item for deactivating mouse wheel zoom.
  * The BezierPath uses a _scalePoint helper function. Replace this by Vertex.scale().
@@ -325,6 +329,7 @@ from the sources code files in ./src/*.
  * Implement snap-to-grid.
  * Make ellipses rotatable.
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
+ * The PlotBoilerplate.viewport() function already returns a bounding box (min:{Vertex},max:{Vertex}).
  * Add arcs?
  * Add image flipping.
  * Add Images to the SVGBuiler.
