@@ -117,7 +117,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 
 
-## Parameters during initialization
+## Parameters for initialization
 ~~~javascript
  var pb = new PlotBoilerplate(
      {  // HTMLElement
