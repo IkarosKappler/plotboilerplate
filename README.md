@@ -109,6 +109,13 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/04-vectorfield/index.html" title="See the demo">See the demo</a>
 
 
+### Simple circumcircles of walking triangles animation
+
+![Circumcircle animation](screenshots/screenshot-20190415_1_circumcircles.png "Circumcircles (of walking triangles) animation")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/05-circumcircle-animation/index.html" title="See the demo">See the demo</a>
+
+
 
 ## Parameters during initialization
 ~~~javascript

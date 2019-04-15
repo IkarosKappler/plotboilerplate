@@ -53,21 +53,6 @@
     // +-------------------------------
     _context.drawutils.prototype.arrow = function( zA, zB, color ) {
 	var headlen = 8;   // length of head in pixels
-	//var angle = Math.atan2( (zB.y-zA.y)*this.scale.y, (zB.x-zA.x)*this.scale.x );
-	//this.line( zA, { x : zB.x-(headlen*0.7)*Math.cos(angle)/this.scale.x, y : zB.y-(headlen*0.7)*Math.sin(angle)/this.scale.y }, color );
-	/*
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
-	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle-Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle-Math.PI/8));
-	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-(headlen*0.7)*Math.cos(angle), this.offset.y+zB.y*this.scale.y-(headlen*0.7)*Math.sin(angle));
-	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle+Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle+Math.PI/8))
-	this.ctx.closePath();
-	this.ctx.lineWidth = 1;
-	this._fillOrDraw( color );
-	this.ctx.restore();
-	*/
-
 	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	this.line( zA, vertices[0], color );
 	

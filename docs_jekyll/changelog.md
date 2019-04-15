@@ -4,6 +4,9 @@ layout: page
 
 
 # Changelog
+* 2019-04-12
+  * Added the PlotBoilerplate.drawConfig with 'drawVerices' attribute.
+  * Extended the gui a bit.
 * 2019-04-11
   * Added the 'drawGrid' config param.
   * Added the simple animation demo.

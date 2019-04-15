@@ -28,7 +28,7 @@
 		      scaleY                : 1.0,
 		      drawGrid              : false,
 		      rasterGrid            : true,
-		      drawOrigin            : true,
+		      drawOrigin            : false,
 		      rasterAdjustFactor    : 2.0,
 		      redrawOnResize        : true,
 		      defaultCanvasWidth    : 1024,
@@ -82,11 +82,8 @@
 	    };
 	    
 	    // +---------------------------------------------------------------------------------
-	    // | Add some interactive elements: a line and a point.
+	    // | Add some interactive elements: point sets (triangles) and circles.
 	    // +-------------------------------
-	    //var line = new Line( randomVertex(), randomVertex() );
-	    //pb.add( line );
-
 	    var triangles = [];
 	    function updateCircles() {
 		for( var i in triangles ) {
