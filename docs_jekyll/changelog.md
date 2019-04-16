@@ -4,6 +4,10 @@ layout: page
 
 
 # Changelog
+* 2019-04-16
+  * Added the PlotboilerPlate.remove(drawable) function.
+  * Added the draw.cubicBezierPath(path,color) function.
+  * Added the Voronoi and Delaunay demo.
 * 2019-04-12
   * Added the PlotBoilerplate.drawConfig with 'drawVerices' attribute.
   * Extended the gui a bit.

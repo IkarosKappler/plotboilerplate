@@ -120,8 +120,15 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/05-circumcircle-animation/index.html" title="See the demo">See the demo</a>
 
 
+### Interactive Delaunay triangulation and Voronoi diagram
 
-## Parameters during initialization
+![Delaunay and Voronoi](screenshots/screenshot-20190416_0_voronoi_delaunay.png "Delaunay triangulation and Voronoi diagrams")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/07-voronoi-and-delaunay/index.html" title="See the demo">See the demo</a>
+
+
+
+## Parameters for initialization
 ~~~javascript
  var pb = new PlotBoilerplate(
      {  // HTMLElement
