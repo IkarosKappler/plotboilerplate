@@ -378,6 +378,37 @@
 
 
 	/**
+	 * Remove a drawable object.<br>
+	 * <br>
+	 * This must be either:<br>
+	 * <pre>
+	 *  * a Vertex
+	 *  * a Line
+	 *  * a Vector
+	 *  * a VEllipse
+	 *  * a Polygon
+	 *  * a BezierPath
+	 *  * a BPImage
+	 * </pre>
+	 *
+	 * @param {Object} drawable:Object The drawable (of one of the allowed class instance) to remove.
+	 * @param {boolean} [redraw=true]
+	 * @method remove
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
+	PlotBoilerplate.prototype.remove = function( drawable, redraw ) {
+	    for( var i in this.drawables ) {
+		if( this.drawables[i] === drawable ) {
+		    delete this.drawables[i];
+		    return;
+		}
+	    }
+	};
+	
+
+	/**
 	 * Draw the grid with the current config settings.<br>
 	 *
 	 * This function is usually only used internally.

@@ -20,12 +20,14 @@
 (function(_context) {
     "use strict";
 
-    // +---------------------------------------------------------------------------------
-    // | The constructor.
-    // |
-    // | @param context:Context2D The canvas context to draw on.
-    // | @param fillShapes:boolean Indicates if shapes should be filled or not.
-    // +-------------------------------
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name drawutils
+     * @param {Context2D} context - The drawing context.
+     * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
+     **/
     _context.drawutils = function( context, fillShapes ) {
 	this.ctx = context;
 	this.offset = new Vertex( 0, 0 );
@@ -125,6 +127,34 @@
 	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
+	this.ctx.closePath();
+	this.ctx.lineWidth = 2;
+	this._fillOrDraw( color );
+	this.ctx.restore();
+    };
+
+
+    // +---------------------------------------------------------------------------------
+    // | Draw the given (cubic) bézier path.
+    // +-------------------------------
+    _context.drawutils.prototype.cubicBezierPath = function( path, color ) {
+	if( !path || path.length == 0 )
+	    return;
+	// Draw curve
+	this.ctx.save();
+	this.ctx.beginPath();
+	var curve, startPoint, endPoint, startControlPoint, endControlPoint;
+	this.ctx.moveTo( this.offset.x+path[0].x*this.scale.x, this.offset.y+path[0].y*this.scale.y );
+	for( var i = 1; i < path.length; i+=3 ) {
+	    //startPoint = curve[0];
+	    startControlPoint = path[i];
+	    endControlPoint = path[i+1];
+	    endPoint = path[i+2];
+	    this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
+				    this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
+				    this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
+	}
+	this.ctx.closePath();
 	this.ctx.lineWidth = 2;
 	this._fillOrDraw( color );
 	this.ctx.restore();

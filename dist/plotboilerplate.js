@@ -4324,12 +4324,14 @@ Object.extendClass = function( superClass, subClass ) {
 (function(_context) {
     "use strict";
 
-    // +---------------------------------------------------------------------------------
-    // | The constructor.
-    // |
-    // | @param context:Context2D The canvas context to draw on.
-    // | @param fillShapes:boolean Indicates if shapes should be filled or not.
-    // +-------------------------------
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name drawutils
+     * @param {Context2D} context - The drawing context.
+     * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
+     **/
     _context.drawutils = function( context, fillShapes ) {
 	this.ctx = context;
 	this.offset = new Vertex( 0, 0 );
@@ -4357,21 +4359,6 @@ Object.extendClass = function( superClass, subClass ) {
     // +-------------------------------
     _context.drawutils.prototype.arrow = function( zA, zB, color ) {
 	var headlen = 8;   // length of head in pixels
-	//var angle = Math.atan2( (zB.y-zA.y)*this.scale.y, (zB.x-zA.x)*this.scale.x );
-	//this.line( zA, { x : zB.x-(headlen*0.7)*Math.cos(angle)/this.scale.x, y : zB.y-(headlen*0.7)*Math.sin(angle)/this.scale.y }, color );
-	/*
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
-	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle-Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle-Math.PI/8));
-	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-(headlen*0.7)*Math.cos(angle), this.offset.y+zB.y*this.scale.y-(headlen*0.7)*Math.sin(angle));
-	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x-headlen*Math.cos(angle+Math.PI/8), this.offset.y+zB.y*this.scale.y-headlen*Math.sin(angle+Math.PI/8))
-	this.ctx.closePath();
-	this.ctx.lineWidth = 1;
-	this._fillOrDraw( color );
-	this.ctx.restore();
-	*/
-
 	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	this.line( zA, vertices[0], color );
 	
@@ -4444,6 +4431,34 @@ Object.extendClass = function( superClass, subClass ) {
 	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
+	this.ctx.closePath();
+	this.ctx.lineWidth = 2;
+	this._fillOrDraw( color );
+	this.ctx.restore();
+    };
+
+
+    // +---------------------------------------------------------------------------------
+    // | Draw the given (cubic) bézier path.
+    // +-------------------------------
+    _context.drawutils.prototype.cubicBezierPath = function( path, color ) {
+	if( !path || path.length == 0 )
+	    return;
+	// Draw curve
+	this.ctx.save();
+	this.ctx.beginPath();
+	var curve, startPoint, endPoint, startControlPoint, endControlPoint;
+	this.ctx.moveTo( this.offset.x+path[0].x*this.scale.x, this.offset.y+path[0].y*this.scale.y );
+	for( var i = 1; i < path.length; i+=3 ) {
+	    //startPoint = curve[0];
+	    startControlPoint = path[i];
+	    endControlPoint = path[i+1];
+	    endPoint = path[i+2];
+	    this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
+				    this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
+				    this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
+	}
+	this.ctx.closePath();
 	this.ctx.lineWidth = 2;
 	this._fillOrDraw( color );
 	this.ctx.restore();
@@ -5163,6 +5178,37 @@ Object.extendClass = function( superClass, subClass ) {
 		this.redraw();
 	};
 
+
+	/**
+	 * Remove a drawable object.<br>
+	 * <br>
+	 * This must be either:<br>
+	 * <pre>
+	 *  * a Vertex
+	 *  * a Line
+	 *  * a Vector
+	 *  * a VEllipse
+	 *  * a Polygon
+	 *  * a BezierPath
+	 *  * a BPImage
+	 * </pre>
+	 *
+	 * @param {Object} drawable:Object The drawable (of one of the allowed class instance) to remove.
+	 * @param {boolean} [redraw=true]
+	 * @method remove
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
+	PlotBoilerplate.prototype.remove = function( drawable, redraw ) {
+	    for( var i in this.drawables ) {
+		if( this.drawables[i] === drawable ) {
+		    delete this.drawables[i];
+		    return;
+		}
+	    }
+	};
+	
 
 	/**
 	 * Draw the grid with the current config settings.<br>
