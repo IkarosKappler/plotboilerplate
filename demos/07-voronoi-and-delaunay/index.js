@@ -296,7 +296,6 @@
 		    for( var i in pointList )
 			pb.remove( pointList[i], false );
 		    pointList = [];
-		    console.log( pointList, pb.drawables );
 		}
 		// Generate random points on image border?
 		if( fullCover ) {

@@ -5607,29 +5607,13 @@ Object.extendClass = function( superClass, subClass ) {
 		_setSize( width, height );
 	    } else if( _self.config.fitToParent ) {
 		// Set editor size
-		//var width  = _self.canvas.parentNode.clientWidth - 2; // 1px border
-		//var height = _self.canvas.parentNode.clientHeight - 2; // 1px border
-		//_setSize( width, height );
 		_self.canvas.style.position = 'absolute';
 		var space = getAvailableContainerSpace( _self.canvas.parentNode );
 		_self.canvas.style.width = space.width+'px';
 		_self.canvas.style.height = space.height+'px';
 		_self.canvas.style.top = null;
 		_self.canvas.style.left = null;
-		console.log( space );
-		_setSize( space.width, space.height );
-
-		//_self.canvas.style.position = 'absolute';
-		//_self.canvas.style.width = '100%';
-		//_self.canvas.style.height = '100%';
-		////_self.canvas.style.top = 0;
-		////_self.canvas.style.left = 0;
-		//// Now fetch the actual size
-		//var width = _self.canvas.clientWidth;
-		//var height = _self.canvas.clientHeight;
-		//console.log( 'parent.width', width, 'parent.height', height );
-		//_setSize(width,height);
-		
+		_setSize( space.width, space.height );		
 	    } else {
                 _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
 	    }
@@ -5798,7 +5782,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    var oldDragAmount = { x : e.params.dragAmount.x, y : e.params.dragAmount.y };
 	    e.params.dragAmount.x /= _self.config.cssScaleX;
 	    e.params.dragAmount.y /= _self.config.cssScaleY;
-	    if( keyHandler.isDown('alt') || keyHandler.isDown('ctrl') ) {
+	    if( keyHandler.isDown('alt') || keyHandler.isDown('ctrl') || keyHandler.isDown('spacebar') ) {
 		_self.draw.offset.add( e.params.dragAmount );
 		_self.fill.offset.set( _self.draw.offset );
 		_self.redraw();
@@ -5929,7 +5913,7 @@ Object.extendClass = function( superClass, subClass ) {
 				hand.on('move', function (points) {
 				    //console.log( points );
 				    var rel = relPos( points[0] );
-				    var trans = _self.transformMousePosition( rel.x, rel.y ); // points[0].x, points[0].y );
+				    var trans = _self.transformMousePosition( rel.x, rel.y ); 
 				    var diff = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
 				    if( draggedElement.type == 'vertex' ) {
 					if( !_self.vertices[draggedElement.vindex].attr.draggable )
@@ -5939,7 +5923,7 @@ Object.extendClass = function( superClass, subClass ) {
 					_self.vertices[draggedElement.vindex].listeners.fireDragEvent( fakeEvent );
 					_self.redraw();
 				    }
-				    touchMovePos = new Vertex(rel); // points[0]);
+				    touchMovePos = new Vertex(rel);
 				} );
 			    }
 
@@ -5954,7 +5938,7 @@ Object.extendClass = function( superClass, subClass ) {
 		    _self.clearSelection(true);
 		} )
 		.down('shift',function() {
-		_self.selectPolygon = new Polygon();
+		    _self.selectPolygon = new Polygon();
 		    _self.redraw();
 		} )
 		.up('shift',function() {
