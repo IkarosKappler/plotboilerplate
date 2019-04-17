@@ -4459,7 +4459,7 @@ Object.extendClass = function( superClass, subClass ) {
 				    this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
 	}
 	this.ctx.closePath();
-	this.ctx.lineWidth = 2;
+	this.ctx.lineWidth = 1;
 	this._fillOrDraw( color );
 	this.ctx.restore();
     };
@@ -5193,17 +5193,47 @@ Object.extendClass = function( superClass, subClass ) {
 	 *  * a BPImage
 	 * </pre>
 	 *
-	 * @param {Object} drawable:Object The drawable (of one of the allowed class instance) to remove.
-	 * @param {boolean} [redraw=true]
+	 * @param {Object} drawable - The drawable (of one of the allowed class instance) to remove.
+	 * @param {boolean} [redraw=false]
 	 * @method remove
 	 * @instance
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
 	PlotBoilerplate.prototype.remove = function( drawable, redraw ) {
+	    if( drawable instanceof Vertex )
+		this.removeVertex( drawable, false );
 	    for( var i in this.drawables ) {
 		if( this.drawables[i] === drawable ) {
-		    delete this.drawables[i];
+		    //console.log( 'deleting', this.drawables.length );
+		    this.drawables.splice(i,1);
+		    if( redraw )
+			this.redraw();
+		    //console.log( 'deleted', this.drawables.length );
+		    return;
+		}
+	    }
+	};
+
+
+	/**
+	 * Remove a vertex from the vertex list.<br>
+	 *
+	 * @param {Vertex} vert - The vertex to remove.
+	 * @param {boolean} [redraw=false]
+	 * @method removeVertex
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
+	PlotBoilerplate.prototype.removeVertex = function( vert, redraw ) {
+	    for( var i in this.drawables ) {
+		if( this.vertices[i] === vert ) {
+		    //console.log( 'deleting', this.drawables.length );
+		    this.vertices.splice(i,1);
+		    //console.log( 'deleted', this.drawables.length );
+		    if( redraw )
+			this.redraw();
 		    return;
 		}
 	    }
