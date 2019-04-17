@@ -4,6 +4,8 @@ layout: page
 
 
 # Changelog
+* 2019-04-17
+  * Added the PlotBoilerplate.removeVertex(Vertex,boolean) function.
 * 2019-04-16
   * Added the PlotboilerPlate.remove(drawable) function.
   * Added the draw.cubicBezierPath(path,color) function.

@@ -155,7 +155,7 @@
 				    this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
 	}
 	this.ctx.closePath();
-	this.ctx.lineWidth = 2;
+	this.ctx.lineWidth = 1;
 	this._fillOrDraw( color );
 	this.ctx.restore();
     };
