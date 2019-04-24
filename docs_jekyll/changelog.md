@@ -4,6 +4,9 @@ layout: page
 
 
 # Changelog
+* 2019-04-24
+  * Added the Vertex.randomVertex(ViewPort) fuction.
+  * Added the VertexAnimator for demos.
 * 2019-04-17
   * Added the PlotBoilerplate.removeVertex(Vertex,boolean) function.
 * 2019-04-16

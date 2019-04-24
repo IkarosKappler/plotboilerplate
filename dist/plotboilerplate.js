@@ -404,7 +404,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-01-30 Added the setX(Number) and setY(Number) functions.
  * @modified 2019-02-19 Added the difference(Vertex) function.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  2.0.11
+ * @mosified 2019-04-24 Added the randomVertex(ViewPort) function.
+ * @version  2.1.0
  *
  * @file Vertex
  * @public
@@ -724,6 +725,20 @@ Object.extendClass = function( superClass, subClass ) {
     };
     // END Vertex
 
+
+    /**
+     * Create a new random vertex inside the given viewport.
+     *
+     * @param {ViewPort} viewPort - A {min:Vertex, max:Vertex} viewport specifying the bounds.
+     * @return A new vertex with a random position.
+     **/
+    Vertex.randomVertex = function( viewPort ) {
+	return new Vertex( viewPort.min.x + Math.random()*(viewPort.max.x-viewPort.min.x),
+			   viewPort.min.y + Math.random()*(viewPort.max.y-viewPort.min.y)
+			 );
+    };
+    
+    
     _context.Vertex = Vertex;
 
 })( window ? window : module.export );
@@ -5546,9 +5561,7 @@ Object.extendClass = function( superClass, subClass ) {
 	 * Get the available inner space of the given container.
 	 *
 	 * Size minus padding minus border.
-	 **/
-	// NOT IN USE
-	
+	 **/	
 	var getAvailableContainerSpace = function() {
 	    var container = _self.canvas.parentNode;
 	    var canvas = _self.canvas;
@@ -5564,9 +5577,9 @@ Object.extendClass = function( superClass, subClass ) {
 	    br = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
 	    bt = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
 	    bb = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
-	    var w = container.clientWidth; // 1px border
-	    var h = container.clientHeight; // 1px border
-	    console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
+	    var w = container.clientWidth; 
+	    var h = container.clientHeight;
+	    // console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
 	    canvas.style.display = 'block';
 	    return { width : (w-pl-pr-bl-br), height : (h-pt-pb-bt-bb) };
 	}; 
