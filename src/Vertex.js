@@ -19,7 +19,8 @@
  * @modified 2019-01-30 Added the setX(Number) and setY(Number) functions.
  * @modified 2019-02-19 Added the difference(Vertex) function.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  2.0.11
+ * @mosified 2019-04-24 Added the randomVertex(ViewPort) function.
+ * @version  2.1.0
  *
  * @file Vertex
  * @public
@@ -339,6 +340,20 @@
     };
     // END Vertex
 
+
+    /**
+     * Create a new random vertex inside the given viewport.
+     *
+     * @param {ViewPort} viewPort - A {min:Vertex, max:Vertex} viewport specifying the bounds.
+     * @return A new vertex with a random position.
+     **/
+    Vertex.randomVertex = function( viewPort ) {
+	return new Vertex( viewPort.min.x + Math.random()*(viewPort.max.x-viewPort.min.x),
+			   viewPort.min.y + Math.random()*(viewPort.max.y-viewPort.min.y)
+			 );
+    };
+    
+    
     _context.Vertex = Vertex;
 
 })( window ? window : module.export );

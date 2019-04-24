@@ -744,9 +744,7 @@
 	 * Get the available inner space of the given container.
 	 *
 	 * Size minus padding minus border.
-	 **/
-	// NOT IN USE
-	
+	 **/	
 	var getAvailableContainerSpace = function() {
 	    var container = _self.canvas.parentNode;
 	    var canvas = _self.canvas;
@@ -762,9 +760,9 @@
 	    br = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
 	    bt = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
 	    bb = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
-	    var w = container.clientWidth; // 1px border
-	    var h = container.clientHeight; // 1px border
-	    console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
+	    var w = container.clientWidth; 
+	    var h = container.clientHeight;
+	    // console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
 	    canvas.style.display = 'block';
 	    return { width : (w-pl-pr-bl-br), height : (h-pt-pb-bt-bb) };
 	}; 

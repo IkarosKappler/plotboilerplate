@@ -123,42 +123,9 @@
 		p.listeners.addDragListener( updateCircles );
 	    }
 
-
-	    // Get two 'normalized' directions
-	    var dirA = new Line(new Vertex(), randomVertex()).normalize().b;
-	    var dirB = new Line(new Vertex(), randomVertex()).normalize().b;
-
-	    function animateVert( v, dir, viewport ) {
-		v.x += dir.x;
-		v.y += dir.y;
-		if( v.x <= viewport.min.x ) {
-		    v.x = viewport.min.x;
-		    dir.x *= -1;
-		}
-		if( v.y <= viewport.min.y ) {
-		    v.y = viewport.min.y;
-		    dir.y *= -1;
-		}
-		if( v.x >= viewport.max.x ) {
-		    v.x = viewport.max.x;
-		    dir.x *= -1;
-		}
-		if( v.y >= viewport.max.y ) {
-		    v.y = viewport.max.y;
-		    dir.y *= -1;
-		}
-	    }
-	    
-	    function render() {
-		updateCircles();
-		var viewport = pb.viewport();
-		animateVert( pA, dirA, viewport );
-		animateVert( pB, dirB, viewport );
-		
-		window.requestAnimationFrame( render );
-	    };
-	    render();
-	    
+	    // Animate the vertices: make them bounce around and reflect on the walls.
+	    var animator = new VertexAnimator( pb.vertices, pb.viewport(), updateCircles );
+	    animator.start();   
 
 	} );
     

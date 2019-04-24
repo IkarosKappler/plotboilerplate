@@ -13,12 +13,13 @@
  * @modified 2018-04-28 Added a better mouse handler.
  * @modified 2018-04-29 Added web colors.
  * @modified 2018-05-04 Drawing voronoi cells by their paths now, not the triangles' circumcenters.
- * @version  1.0.9
+ * @modified 2019-04-24 Refactored the whole code and added an animator.
+ * @version  2.0.0
  **/
 
 
 
-(function(_context) {
+(function() {
     "use strict";
 
     // Fetch the GET params
@@ -61,6 +62,8 @@
 	    );
 
 	    pb.config.postDraw = function() {
+		// In this demo the PlotBoilerplate only draws the vertices.
+		// Everything else is drawn by this script, with the help of some PB functions.
 		redraw();
 	    };
 
@@ -105,11 +108,11 @@
 		drawCubicCurves       : false,
 		voronoiCubicThreshold : 1.0,
 		pointCount            : 25,
-		backgroundColor       : '#ffffff',
 		rebuild               : function() { rebuild(); },
 		randomize             : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuild(); },
 		fullCover             : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuild(); },
 		//fullCoverExtended     : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuild() }
+		animate               : false
 	    }, GUP );
 
 
@@ -161,9 +164,9 @@
 	    };
 	    
 	    
-	    // +---------------------------------------------------------------------------------
-	    // | The re-drawing function.
-	    // +-------------------------------
+	    /**
+	     * The re-drawing function.
+	     */
 	    var redraw = function() {
 		// Draw triangles
 		if( config.drawTriangles )
@@ -182,6 +185,10 @@
 		    drawCubicBezierVoronoi();
 	    };
 
+	    
+	    /**
+	     * A function for drawing the triangles.
+	     */
 	    var drawTriangles = function() {
 		for( var i in triangles ) {
 		    var t = triangles[i];
@@ -189,9 +196,9 @@
 		}
 	    };
 	    
-	    // +---------------------------------------------------------------------------------
-	    // | Draw the stored voronoi diagram.
-	    // +-------------------------------	
+	    /**
+	     * Draw the stored voronoi diagram.
+	     */
 	    var drawVoronoiDiagram = function() {
 		for( var v in voronoiDiagram ) {
 		    var cell = voronoiDiagram[v];
@@ -205,9 +212,9 @@
 	    };
 
 	    
-	    // +---------------------------------------------------------------------------------
-	    // | Draw the circumcircles of all triangles.
-	    // +-------------------------------
+	    /**
+	     * Draw the circumcircles of all triangles.
+	     */
 	    var drawCircumCircles = function() {
 		for( var t in triangles ) {
 		    var cc = triangles[t].getCircumcircle();
@@ -215,9 +222,9 @@
 		}
 	    };
 
-	    // +---------------------------------------------------------------------------------
-	    // | Draw the voronoi cells as quadratic bezier curves.
-	    // +-------------------------------
+	    /**
+	     * Draw the voronoi cells as quadratic bezier curves.
+	     */
 	    var drawCubicBezierVoronoi = function() {
 		for( var c in voronoiDiagram ) {
 		    var cell = voronoiDiagram[c];
@@ -230,11 +237,11 @@
 	    }; // END drawCubicBezierVoronoi
 	    
 	    
-	    // +---------------------------------------------------------------------------------
-	    // | The rebuild function just evaluates the input and
-	    // |  - triangulate the point set?
-	    // |  - build the voronoi diagram?
-	    // +-------------------------------
+	    /**
+	     * The rebuild function just evaluates the input and
+	     *  - triangulate the point set?
+	     *  - build the voronoi diagram?
+	     */
 	    var rebuild = function() {
 		// Only re-triangulate if the point list changed.
 		var draw = true;
@@ -248,9 +255,9 @@
 	    };
 
 	    
-	    // +---------------------------------------------------------------------------------
-	    // | Make the triangulation (Delaunay).
-	    // +-------------------------------
+	    /**
+	     * Make the triangulation (Delaunay).
+	     */
 	    var triangulate = function() {
 		var delau = new Delaunay( pointList, {} );
 		triangles  = delau.triangulate();
@@ -260,9 +267,9 @@
 	    };
 
 
-	    // +---------------------------------------------------------------------------------
-	    // | Convert the triangle set to the Voronoi diagram.
-	    // +-------------------------------
+	    /**
+	     * Convert the triangle set to the Voronoi diagram.
+	     */
 	    var makeVoronoiDiagram = function() {
 		var voronoiBuilder = new delaunay2voronoi(pointList,triangles);
 		voronoiDiagram = voronoiBuilder.build();
@@ -287,10 +294,11 @@
 		}
 	    };
 
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | Add n random points.
-	    // +-------------------------------
+	    /**
+	     * Add or remove n random points; depends on the config settings.
+	     *
+	     * I have no idea how tired I was when I wrote this function but it seems working pretty well.
+	     */
 	    var randomPoints = function( clear, fullCover, doRebuild ) {
 		if( clear ) {
 		    for( var i in pointList )
@@ -328,13 +336,14 @@
 		for( var i = pointList.length; i < config.pointCount; i++ ) {
 		    addRandomPoint();
 		}
+		updateAnimator();
 		if( doRebuild )
 		    rebuild();
 	    };
 
-	    // +---------------------------------------------------------------------------------
-	    // | Called when the desired number of points changes.
-	    // +-------------------------------
+	    /**
+	     * Called when the desired number of points changes.
+	     **/
 	    var updatePointCount = function() {
 		if( config.pointCount > pointList.length )
 		    randomPoints(false,false,true); // Do not clear ; no full cover ; do rebuild
@@ -343,21 +352,35 @@
 		    for( var i = config.pointCount; i < pointList.length; i++ )
 			pb.remove( pointList[i] );
 		    pointList = pointList.slice( 0, config.pointCount );
+		    updateAnimator();
 		    rebuild();
 		}
 		
 	    };
 	    
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | This function exports the point set as a JSON string.
-	    // +-------------------------------
-	    var exportPointset = function() {
-		var json = JSON.stringify(pointList);
-		var blob = new Blob([json], {
-		    type: 'application/json;charset=utf-8'
-		});
-		saveAs(blob,'pointset.json');	    
+
+	    // Animate the vertices: make them bounce around and reflect on the walls.
+	    var animator = null;
+	    var toggleAnimation = function() {
+		if( config.animate ) {
+		    animator = new VertexAnimator( pointList, pb.viewport(), rebuild );
+		    animator.start();
+		} else {
+		    animator.stop();
+		    animator = null;
+		}
+	    };
+
+	    /**
+	     * Unfortunately the animator is not smart, so we have to create a new
+	     * one (and stop the old one) each time the vertex count changes.
+	     **/
+	    var updateAnimator = function() {
+		if( !animator )
+		    return;
+		animator.stop();
+		animator = null;
+		toggleAnimation(); 
 	    };
 	    
 	    
@@ -372,7 +395,7 @@
 		f0.add(config, 'pointCount').min(3).max(200).onChange( function() { config.pointCount = Math.round(config.pointCount); updatePointCount(); } ).title("The total number of points.");
 		f0.add(config, 'randomize').name('Randomize').title("Randomize the point set.");
 		f0.add(config, 'fullCover').name('Full Cover').title("Randomize the point set with full canvas coverage.");
-		//f0.add(config, 'drawPoints').onChange( function() { pb.redraw() } ).title("If checked the points will be drawn.");
+		f0.add(config, 'animate').onChange( toggleAnimation ).title("Toggle point animation on/off.");
 		f0.open();
 		
 		var f1 = gui.addFolder('Delaunay');
@@ -393,7 +416,7 @@
 	    
 	} ); // END document.ready / window.onload
     
-})(null); // Removed jQuery in version 1.0.7
+})();
 
 
 
