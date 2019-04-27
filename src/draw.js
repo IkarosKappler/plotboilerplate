@@ -14,7 +14,8 @@
  * @modified 2018-12-09 Added the dot(Vertex,color) function (copied from Feigenbaum-plot-script).
  * @modified 2019-01-30 Added the arrow(Vertex,Vertex,color) function for drawing arrow heads.
  * @modified 2019-01-30 Added the image(Image,Vertex,Vertex) function for drawing images.
- * @version  1.2.0
+ * @modified 2019-04-28 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
+ * @version  1.2.1
  **/
 
 (function(_context) {
@@ -56,17 +57,19 @@
     _context.drawutils.prototype.arrow = function( zA, zB, color ) {
 	var headlen = 8;   // length of head in pixels
 	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-	this.line( zA, vertices[0], color );
+	//this.line( zA, vertices[0], color );
 	
 	this.ctx.save();
 	this.ctx.beginPath();
 	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	
-	this.ctx.moveTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
-	for( var i = 1; i < vertices.length; i++ ) {
+	//this.ctx.moveTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
+	this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
+	for( var i = 0; i < vertices.length; i++ ) {
 	    this.ctx.lineTo( this.offset.x+vertices[i].x, this.offset.y+vertices[i].y );
 	}
-	this.ctx.closePath();
+	this.ctx.lineTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
+	//this.ctx.closePath();
 	this.ctx.lineWidth = 1;
 	this._fillOrDraw( color );
 	this.ctx.restore();

@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2019-04-28
+  * Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
+  * Changed the vectorfield demo to a more beautiful one.
+  * Watched the ending of star trek discovery when doing that.
 * 2019-04-24
   * Added the Vertex.randomVertex(ViewPort) fuction.
   * Added the VertexAnimator for demos.
