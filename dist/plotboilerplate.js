@@ -872,7 +872,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @date     2016-03-12
  * @modified 2018-12-05 Refactored the code from the morley-triangle script.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  2.0.1
+ * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
+ * @version  2.0.2
  *
  * @file Line
  * @public
@@ -932,9 +933,8 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof Line
      **/
     Line.prototype.sub = function( amount ) {
-	//return new Line( this.a.sub(point), this.b.sub(point) );
-	this.a.sub(point);
-	this.b.sub(point);
+	this.a.sub( amount );
+	this.b.sub( amount );
 	return this;
     };
 
@@ -4333,7 +4333,9 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2018-12-09 Added the dot(Vertex,color) function (copied from Feigenbaum-plot-script).
  * @modified 2019-01-30 Added the arrow(Vertex,Vertex,color) function for drawing arrow heads.
  * @modified 2019-01-30 Added the image(Image,Vertex,Vertex) function for drawing images.
- * @version  1.2.0
+ * @modified 2019-04-27 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
+ * @modified 2019-04-28 Added Math.round to the dot() drawing parameters to really draw a singlt dot.
+ * @version  1.2.2
  **/
 
 (function(_context) {
@@ -4354,9 +4356,17 @@ Object.extendClass = function( superClass, subClass ) {
 	this.fillShapes = fillShapes;
     };
 
-    // +---------------------------------------------------------------------------------
-    // | Draw the given line (between the two points) with the specified (CSS-) color.
-    // +-------------------------------
+    /**
+     * Draw the line between the given two points with the specified (CSS-) color.
+     *
+     * @method line
+     * @param {Vertex} zA - The start point of the line.
+     * @param {Vertex} zB - The end point of the line.
+     * @param {string} color - Any valid CSS color string.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
     _context.drawutils.prototype.line = function( zA, zB, color ) {
 	this.ctx.save();
 	this.ctx.beginPath();
@@ -4368,35 +4378,51 @@ Object.extendClass = function( superClass, subClass ) {
 	this.ctx.restore();
     };
 
+    
 
-    // +---------------------------------------------------------------------------------
-    // | Draw an arrow at the end (zB) of the given line with the specified (CSS-) color.
-    // +-------------------------------
+    /**
+     * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method arrow
+     * @param {Vertex} zA - The start point of the arrow-line.
+     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
     _context.drawutils.prototype.arrow = function( zA, zB, color ) {
 	var headlen = 8;   // length of head in pixels
 	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-	this.line( zA, vertices[0], color );
 	
 	this.ctx.save();
 	this.ctx.beginPath();
 	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	
-	this.ctx.moveTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
-	for( var i = 1; i < vertices.length; i++ ) {
+	this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
+	for( var i = 0; i < vertices.length; i++ ) {
 	    this.ctx.lineTo( this.offset.x+vertices[i].x, this.offset.y+vertices[i].y );
 	}
-	this.ctx.closePath();
+	this.ctx.lineTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
 	this.ctx.lineWidth = 1;
 	this._fillOrDraw( color );
 	this.ctx.restore();
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw an image at the given position with the given size.
-    // |
-    // | Note: SVG images may have resizing issues at the moment.
-    // +-------------------------------
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method image
+     * @param {Image} image - The image object to draw.
+     * @param {Vertex} position - The position to draw the the upper left corner at.
+     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
     _context.drawutils.prototype.image = function( image, position, size ) {
 	this.ctx.save();
 	console.log( image.width, image.height );
@@ -4410,8 +4436,10 @@ Object.extendClass = function( superClass, subClass ) {
 	this.ctx.restore();	
     };
 
+    
     // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff.
+    // | This is the final helper function for drawing and filling stuff. It is not
+    // | intended to be used from the outside.
     // |
     // | When in draw mode it draws the current shape.
     // | When in fill mode it fills the current shape.
@@ -4430,10 +4458,20 @@ Object.extendClass = function( superClass, subClass ) {
 	}
     };
 
-    
-    // +---------------------------------------------------------------------------------
-    // | Draw the given (cubic) bézier curve.
-    // +-------------------------------
+
+    /**
+     * Draw the given (cubic) bézier curve.
+     *
+     * @method cubicBezier
+     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
+     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
+     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color ) {
 	if( startPoint instanceof CubicBezierCurve ) {
 	    this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, endPoint );
@@ -4453,9 +4491,20 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw the given (cubic) bézier path.
-    // +-------------------------------
+    /**
+     * Draw the given (cubic) Bézier path.
+     *
+     * The given path must be an array with n*3+1 vertices, where n is the number of
+     * curves in the path:
+     * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre> 
+     *
+     * @method cubicBezierPath
+     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {string} color - The CSS colot to draw the path with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.cubicBezierPath = function( path, color ) {
 	if( !path || path.length == 0 )
 	    return;
@@ -4465,7 +4514,6 @@ Object.extendClass = function( superClass, subClass ) {
 	var curve, startPoint, endPoint, startControlPoint, endControlPoint;
 	this.ctx.moveTo( this.offset.x+path[0].x*this.scale.x, this.offset.y+path[0].y*this.scale.y );
 	for( var i = 1; i < path.length; i+=3 ) {
-	    //startPoint = curve[0];
 	    startControlPoint = path[i];
 	    endControlPoint = path[i+1];
 	    endPoint = path[i+2];
@@ -4480,9 +4528,18 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw the given (cubic) bézier curve.
-    // +-------------------------------
+    /**
+     * Draw the given handle and handle point (used to draw interactive Bézier curves).
+     *
+     * The colors for this are fixed and cannot be specified.
+     *
+     * @method handle
+     * @param {Vertex} startPoint - The start of the handle.
+     * @param {Vertex} endPoint - The end point of the handle.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.handle = function( startPoint, endPoint ) { 
 	// Draw handles
 	// (No need to save and restore here)
@@ -4491,19 +4548,33 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw the given (cubic) bézier curve.
-    // +-------------------------------
+    /**
+     * Draw the given handle cubic Bézier curve handle lines.
+     *
+     * The colors for this are fixed and cannot be specified.
+     *
+     * @method cubicBezierCurveHandleLines
+     * @param {BezierCurve} curve - The curve.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.cubicBezierCurveHandleLines = function( curve ) {
 	// Draw handle lines
 	this.cubicBezierHandleLines( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
     };
 
     
-    // +---------------------------------------------------------------------------------
-    // | Draw the given (cubic) bézier curve.
-    // +-------------------------------
-    
+    /**
+     * Draw a handle line (with a light grey).
+     *
+     * @method handleLine
+     * @param {Vertex} startPoint - The start point to draw the handle at.
+     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.handleLine = function( startPoint, endPoint ) {
 	// Draw handle lines
 	this.line( startPoint, endPoint, 'rgb(192,192,192)' );	
@@ -4511,24 +4582,37 @@ Object.extendClass = function( superClass, subClass ) {
 
 
     
-    // +---------------------------------------------------------------------------------
-    // | Draw a 1x1 dot with the specified (CSS-) color.
-    // +-------------------------------
+    /**
+     * Draw a 1x1 dot with the specified (CSS-) color.
+     *
+     * @method dot
+     * @param {Vertex} p - The position to draw the dot at.
+     * @param {string} color - The CSS color to draw the dot with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.dot = function( p, color ) {
 	this.ctx.save();
 	this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x + this.scale.x*p.x, this.offset.y + this.scale.y*p.y );
-	this.ctx.lineTo( this.offset.x + this.scale.x*p.x+1, this.offset.y + this.scale.y*p.y+1 );
+	this.ctx.moveTo( Math.round(this.offset.x + this.scale.x*p.x), Math.round(this.offset.y + this.scale.y*p.y) );
+	this.ctx.lineTo( Math.round(this.offset.x + this.scale.x*p.x+1), Math.round(this.offset.y + this.scale.y*p.y+1) );
 	this.ctx.closePath();
 	this._fillOrDraw( color );
 	this.ctx.restore();
     };
 
     
-    
-    // +---------------------------------------------------------------------------------
-    // | Fill the given point with the specified (CSS-) color.
-    // +-------------------------------
+    /**
+     * Draw the given point with the specified (CSS-) color and radius 3.
+     *
+     * @method point
+     * @param {Vertex} p - The position to draw the point at.
+     * @param {string} color - The CSS color to draw the point with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.point = function( p, color ) {
 	var radius = 3;
 	this.ctx.beginPath();
@@ -4538,9 +4622,19 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw a circle with the given (CSS-) color.
-    // +-------------------------------
+    /**
+     * Draw a circle with the specified (CSS-) color and radius.<br>
+     * <br>
+     * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
+     *
+     * @method circle
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.circle = function( center, radius, color ) {
 	this.ctx.beginPath();
 	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radius*this.scale.x, radius*this.scale.y, 0.0, 0.0, Math.PI*2 );
@@ -4548,10 +4642,19 @@ Object.extendClass = function( superClass, subClass ) {
 	this._fillOrDraw( color );
     };
 
-    
-    // +---------------------------------------------------------------------------------
-    // | Draw an ellipse with the given (CSS-) color.
-    // +-------------------------------
+
+    /**
+     * Draw an ellipse with the specified (CSS-) color and thw two radii.
+     *
+     * @method ellipse
+     * @param {Vertex} center - The center of the ellipse.
+     * @param {number} radiusX - The radius of the ellipse.
+     * @param {number} radiusY - The radius of the ellipse.
+     * @param {string} color - The CSS color to draw the ellipse with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.ellipse = function( center, radiusX, radiusY, color ) {
 	this.ctx.beginPath();
 	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radiusX*this.scale.x, radiusY*this.scale.y, 0.0, 0.0, Math.PI*2 );
@@ -4559,10 +4662,20 @@ Object.extendClass = function( superClass, subClass ) {
 	this._fillOrDraw( color );
     };   
 
-    
-    // +---------------------------------------------------------------------------------
-    // | Draw a square with the given (CSS-) color.
-    // +-------------------------------
+
+    /**
+     * Draw square at the given center, size and with the specified (CSS-) color.<br>
+     * <br>
+     * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
+     *
+     * @method square
+     * @param {Vertex} center - The center of the square.
+     * @param {Vertex} size - The size of the square.
+     * @param {string} color - The CSS color to draw the square with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.square = function( center, size, color ) {
 	this.ctx.beginPath();
 	this.ctx.rect( this.offset.x+(center.x-size/2.0)*this.scale.x, this.offset.y+(center.y-size/2.0)*this.scale.y, size*this.scale.x, size*this.scale.y );
@@ -4571,11 +4684,21 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw grid of horizontal and vertical lines with the given (CSS-) color.
-    // +-------------------------------
+    /**
+     * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
+     *
+     * @method grid
+     * @param {Vertex} center - The center of the grid.
+     * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
+     * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
+     * @param {number} sizeX - The horizontal grid size.
+     * @param {number} sizeY - The vertical grid size.
+     * @param {string} color - The CSS color to draw the grid with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.grid = function( center, width, height, sizeX, sizeY, color ) {
-	console.log( 'draw grid' );
 	this.ctx.beginPath();
 	// center to right
 	var x = 0;
@@ -4607,11 +4730,22 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw a raster of crosshairs in the given grid.
-    // |
-    // | This works analogue to the grid() function.
-    // +-------------------------------
+    /**
+     * Draw a raster of crosshairs in the given grid.<br>
+     *
+     * This works analogue to the grid() function
+     *
+     * @method raster
+     * @param {Vertex} center - The center of the raster.
+     * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
+     * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
+     * @param {number} sizeX - The horizontal raster size.
+     * @param {number} sizeY - The vertical raster size.
+     * @param {string} color - The CSS color to draw the raster with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.raster = function( center, width, height, sizeX, sizeY, color ) {
 	this.ctx.save();
 	this.ctx.beginPath();
@@ -4635,9 +4769,21 @@ Object.extendClass = function( superClass, subClass ) {
     };
     
 
-    // +---------------------------------------------------------------------------------
-    // | Draw adiamond handle with the given (CSS-) color.
-    // +-------------------------------
+    /**
+     * Draw a diamond handle (square rotated by 45°) with the given CSS color.
+     *
+     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped diamonds.
+     *
+     * @method diamondHandle
+     * @param {Vertex} center - The center of the diamond.
+     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {string} color - The CSS color to draw the diamond with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.diamondHandle = function( center, size, color ) {
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x + center.x*this.scale.x - size/2.0, this.offset.y + center.y*this.scale.y );
@@ -4648,10 +4794,22 @@ Object.extendClass = function( superClass, subClass ) {
 	this._fillOrDraw( color );
     };
 
-    
-    // +---------------------------------------------------------------------------------
-    // | Draw a square handle with the given (CSS-) color.
-    // +-------------------------------
+
+    /**
+     * Draw a square handle with the given CSS color.<br>
+     * <br>
+     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped squares.
+     *
+     * @method squareHandle
+     * @param {Vertex} center - The center of the square.
+     * @param {Vertex} size - The x/y-size of the square.
+     * @param {string} color - The CSS color to draw the square with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.squareHandle = function( center, size, color ) {
 	this.ctx.beginPath();
 	this.ctx.rect( this.offset.x+center.x*this.scale.x-size/2.0, this.offset.y+center.y*this.scale.y-size/2.0, size, size );
@@ -4660,9 +4818,21 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw a circle handle with the given (CSS-) color.
-    // +-------------------------------
+    /**
+     * Draw a circle handle with the given CSS color.<br>
+     * <br>
+     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped circles.
+     *
+     * @method circleHandle
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.circleHandle = function( center, size, color ) {
 	var radius = 3;
 	this.ctx.beginPath();
@@ -4672,9 +4842,19 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Draw a crosshair with given radius and color at the given position.
-    // +-------------------------------
+    /**
+     * Draw a crosshair with given radius and color at the given position.<br>
+     * <br>
+     * Note that the crosshair radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {Vertex} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.crosshair = function( center, radius, color ) {
 	this.ctx.save();
 	this.ctx.beginPath();
@@ -4689,9 +4869,17 @@ Object.extendClass = function( superClass, subClass ) {
 	this.ctx.restore();
     };
 
-    // +---------------------------------------------------------------------------------
-    // | Draw a text at the given position.
-    // +-------------------------------
+
+    /**
+     * Draw a polygon.
+     *
+     * @method polygon
+     * @param {Polygon} polygon - The polygon to draw.
+     * @param {string} color - The CSS color to draw the polygon with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     _context.drawutils.prototype.polygon = function( polygon, color ) {
 	if( polygon.vertices.length <= 1 )
 	    return;
@@ -4710,8 +4898,12 @@ Object.extendClass = function( superClass, subClass ) {
 	this.ctx.restore();
     };
 
+    
+    // THIS FUNCTION IS CURRENTLY NOT IN USE, AS SVG TO CANVAS ARC CONVERSION IS UN-NECESSARY COMPLICATED.
+    // BUT IT IS WORKING.
     // Found in an old version of
     //    https://github.com/canvg/canvg
+    /*
     _context.drawutils.prototype.arcto = function(lastX,lastY,rx,ry,xAxisRotation,largeArcFlag,sweepFlag,x,y, color)
     {
 	lastX = this.offset.x + this.scale.x*lastX;
@@ -4771,24 +4963,37 @@ Object.extendClass = function( superClass, subClass ) {
 	this._fillOrDraw( color );
 	this.ctx.restore();
     }; 
+    */
+
     
-    // +---------------------------------------------------------------------------------
-    // | Draw a text at the given position.
-    // +-------------------------------
     // THIS FUNCTION IS CURRENTLY NOT IN USE
     // TODO: make text scaling with zoom?
-    _context.drawutils.prototype.text = function( text, x, y, options ) {
-	options = options || {};
+    /*
+    _context.drawutils.prototype.text = function( text, x, y ) { // , options ) {
+	//options = options || {};
 	if( this.fillShapes ) {
 	    this.ctx.fillStyle = 'black';
 	    this.ctx.fillText( text, x, y );
 	} else {
 	    this.ctx.strokeStyle = 'black';
-	    this.ctx.strokeText( text, x, y, );
+	    this.ctx.strokeText( text, x, y );
 	}
     };
+    */
 
-    
+
+    /**
+     * Draw a non-scaling text label at the given position.
+     *
+     * @method label
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     // +---------------------------------------------------------------------------------
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
@@ -4849,7 +5054,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-03-23 Added JSDoc tags. Changed the default value of config.drawOrigin to false.
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
- * @version  1.4.3
+ * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
+ * @version  1.4.4
  *
  * @file PlotBoilerplate
  * @public
@@ -4953,6 +5159,8 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {boolean=} [config.drawBezierHandleLines=true] - Indicates if Bézier curve handles should be drawn (used for
      *                         editors, no required in pure visualizations).
      * @param {boolean=} [config.drawBezierHandlePoints=true] - Indicates if Bézier curve handle points should be drawn.
+     * @param {function=} [config.preClear=null] - A callback function that will be triggered just before the
+     *                         draw function clears the canvas (before anything else was drawn).
      * @param {function=} [config.preDraw=null] - A callback function that will be triggered just before the draw
      *                         function starts.
      * @param {function=} [config.postDraw=null] - A callback function that will be triggered right after the drawing
@@ -5006,6 +5214,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    drawHandlePoints      : typeof config.drawHandlePoints != 'undefined' ? config.drawHandlePoints : true,
 	    
 	    // Listeners/observers
+	    preClear              : (typeof config.preClear == 'function' ? config.preClear : null),
 	    preDraw               : (typeof config.preDraw == 'function' ? config.preDraw : null),
 	    postDraw              : (typeof config.postDraw == 'function' ? config.postDraw : null),
 
@@ -5463,7 +5672,8 @@ Object.extendClass = function( superClass, subClass ) {
 	 **/
 	PlotBoilerplate.prototype.redraw = function() {
 	    var renderTime = new Date().getTime();
-	    
+
+	    if( this.config.preClear ) this.config.preClear();
 	    this.clear();
 	    if( this.config.preDraw ) this.config.preDraw();
 	    

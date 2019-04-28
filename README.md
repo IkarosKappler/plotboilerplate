@@ -215,8 +215,13 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 	// function
 	//   A callback function that will be triggered just before the
+	//   draw function clears the canvas (before anything else was drawn).
+	preClear              	: function() { console.log('before clearing the canvas on redraw.'); },
+	
+	// function
+	//   A callback function that will be triggered just before the
 	//   draw function starts.
-	preDraw               	: function() { console.log('before drawing.'); },
+	preDraw               	: function() { console.log('before clearing and before drawing.'); },
 
 	// function
 	//   A callback function that will be triggered right after the

@@ -2,6 +2,10 @@
 
 # Changelog
 * 2019-04-28
+  * Added Math.round to the dot() drawing parameters to really draw a singlt dot.
+  * Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
+  * Fixed a bug in the Line.sub( Vertex ) function (was not working).
+* 2019-04-27
   * Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
   * Changed the vectorfield demo to a more beautiful one.
   * Watched the ending of star trek discovery when doing that.

@@ -32,7 +32,8 @@
  * @modified 2019-03-23 Added JSDoc tags. Changed the default value of config.drawOrigin to false.
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
- * @version  1.4.3
+ * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
+ * @version  1.4.4
  *
  * @file PlotBoilerplate
  * @public
@@ -136,6 +137,8 @@
      * @param {boolean=} [config.drawBezierHandleLines=true] - Indicates if Bézier curve handles should be drawn (used for
      *                         editors, no required in pure visualizations).
      * @param {boolean=} [config.drawBezierHandlePoints=true] - Indicates if Bézier curve handle points should be drawn.
+     * @param {function=} [config.preClear=null] - A callback function that will be triggered just before the
+     *                         draw function clears the canvas (before anything else was drawn).
      * @param {function=} [config.preDraw=null] - A callback function that will be triggered just before the draw
      *                         function starts.
      * @param {function=} [config.postDraw=null] - A callback function that will be triggered right after the drawing
@@ -189,6 +192,7 @@
 	    drawHandlePoints      : typeof config.drawHandlePoints != 'undefined' ? config.drawHandlePoints : true,
 	    
 	    // Listeners/observers
+	    preClear              : (typeof config.preClear == 'function' ? config.preClear : null),
 	    preDraw               : (typeof config.preDraw == 'function' ? config.preDraw : null),
 	    postDraw              : (typeof config.postDraw == 'function' ? config.postDraw : null),
 
@@ -646,7 +650,8 @@
 	 **/
 	PlotBoilerplate.prototype.redraw = function() {
 	    var renderTime = new Date().getTime();
-	    
+
+	    if( this.config.preClear ) this.config.preClear();
 	    this.clear();
 	    if( this.config.preDraw ) this.config.preDraw();
 	    

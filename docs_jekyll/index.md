@@ -106,9 +106,9 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/03-random-scripture/index.html" title="See the demo">See the demo</a>
 
 
-### Vector field test (still in development)
+### Vector field test 
 
-![Vectorfield test](screenshots/screenshot-20190220_1_vectorfield.png "Vectorfield test demo (still in development)")
+![Vectorfield test](screenshots/screenshot-20190428_0_vector_field_changes.png "Vectorfield test demo")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/04-vectorfield/index.html" title="See the demo">See the demo</a>
 
@@ -219,8 +219,13 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 	// function
 	//   A callback function that will be triggered just before the
+	//   draw function clears the canvas (before anything else was drawn).
+	preClear              	: function() { console.log('before clearing the canvas on redraw.'); },
+	
+	// function
+	//   A callback function that will be triggered just before the
 	//   draw function starts.
-	preDraw               	: function() { console.log('before drawing.'); },
+	preDraw               	: function() { console.log('before clearing and before drawing.'); },
 
 	// function
 	//   A callback function that will be triggered right after the

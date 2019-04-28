@@ -94,7 +94,6 @@
 				   Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
 				 );
 	    };
-	    // var randomPoint = randomVertex;
 
 	    
 	    // +---------------------------------------------------------------------------------

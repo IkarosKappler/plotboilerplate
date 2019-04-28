@@ -10,7 +10,8 @@
  * @date     2016-03-12
  * @modified 2018-12-05 Refactored the code from the morley-triangle script.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  2.0.1
+ * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
+ * @version  2.0.2
  *
  * @file Line
  * @public
@@ -70,9 +71,8 @@
      * @memberof Line
      **/
     Line.prototype.sub = function( amount ) {
-	//return new Line( this.a.sub(point), this.b.sub(point) );
-	this.a.sub(point);
-	this.b.sub(point);
+	this.a.sub( amount );
+	this.b.sub( amount );
 	return this;
     };
 
