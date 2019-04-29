@@ -1094,6 +1094,19 @@ Object.extendClass = function( superClass, subClass ) {
 	return Math.sqrt( distToSegmentSquared(p, this.a, this.b) );
     }
 
+
+    /**
+     * Create a deep clone of this line.
+     *
+     * @method clone
+     * @return {Line} A copy if this line.
+     * @instance
+     * @memberof Line
+     **/
+    Line.prototype.clone = function() {
+	return new Line( this.a.clone(), this.b.clone() );
+    };
+    
     
 
     /**
@@ -1165,7 +1178,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @date     2019-01-30
  * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  1.0.2
+ * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
+ * @version  1.0.3
  *
  * @file Vector
  * @public
@@ -1187,6 +1201,20 @@ Object.extendClass = function( superClass, subClass ) {
 	Line.call(this,vertA,vertB);
     };
     Object.extendClass(Line,Vector);
+
+
+    /**
+     * Create a deep clone of this Vector.
+     *
+     * @method clone
+     * @override
+     * @return {Vector} A copy if this line.
+     * @instance
+     * @memberof Vector
+     **/
+    Line.prototype.clone = function() {
+	return new Vector( this.a.clone(), this.b.clone() );
+    };
 
     
     /**

@@ -4,6 +4,10 @@ layout: page
 
 
 # Changelog
+
+* 2019-04-29
+  * Added the Vector.clone function (overriding Line.clone()).
+  * Added the Line.clone function.
 * 2019-04-28
   * Added Math.round to the dot() drawing parameters to really draw a singlt dot.
   * Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).

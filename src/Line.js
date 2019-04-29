@@ -232,6 +232,19 @@
 	return Math.sqrt( distToSegmentSquared(p, this.a, this.b) );
     }
 
+
+    /**
+     * Create a deep clone of this line.
+     *
+     * @method clone
+     * @return {Line} A copy if this line.
+     * @instance
+     * @memberof Line
+     **/
+    Line.prototype.clone = function() {
+	return new Line( this.a.clone(), this.b.clone() );
+    };
+    
     
 
     /**
