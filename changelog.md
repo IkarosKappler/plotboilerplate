@@ -2,6 +2,8 @@
 
 # Changelog
 
+* 2019-05-07
+  * Made the point cloud in the vector field demo configurable.
 * 2019-04-29
   * Added the Vector.clone function (overriding Line.clone()).
   * Added the Line.clone function.

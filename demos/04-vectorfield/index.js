@@ -51,16 +51,28 @@
 
 	    // A list of vectors (position plus velocity)
 	    var pointlist = [];
-	    
+
+	    // +---------------------------------------------------------------------------------
+	    // | Clear and rebuild the point cloud with random points.
+	    // +-------------------------------
 	    var resetPointCloud = function() {
 		pointlist = [];
+		adjustPointCloud();
+	    };
+
+	    // +---------------------------------------------------------------------------------
+	    // | Expand or reduce the point cloud so the desired point count is obtained.
+	    // +-------------------------------
+	    var adjustPointCloud = function() {
 		var v;
-		for( var i = 0; i < 100; i++ ) {
+		while( pointlist.length < config.pointCount ) {
 		    v = Vertex.randomVertex(pb.viewport());
 		    pointlist.push( new Vector(v, v.clone()) );
 		}
-	    }
-	    resetPointCloud();
+		if( pointlist.length > config.pointCount ) {
+		    pointlist = pointlist.slice(0,config.pointCount);
+		}
+	    };
 	    
 
 	    // +---------------------------------------------------------------------------------
@@ -82,6 +94,7 @@
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
 		showFieldVectors      : true,
 		animate               : false,
+		pointCount            : 100,
 		resetPointCloud       : function() { resetPointCloud(); }
 	    }, GUP );
 	    
@@ -194,10 +207,12 @@
 		var f0 = gui.addFolder('Points');
 		f0.add(config, 'showFieldVectors').onChange( function() { pb.redraw(); } ).name('Show field vectors').title('Show field vectors.');
 		f0.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate a point cloud').title('Animate a point cloud.');
+		f0.add(config, 'pointCount').min(1).max(1000).onChange( function() { adjustPointCloud(); } ).name('The number of points you want to animate').title('The number of points you want to animate.');
 		f0.add(config, 'resetPointCloud').name('Reset point cloud').title('Reset point cloud.');
 		f0.open();
 	    }
 
+	    resetPointCloud();
 	    toggleAnimation();
 
 	} );
