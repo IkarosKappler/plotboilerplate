@@ -16,7 +16,8 @@
  * @modified 2019-01-30 Added the image(Image,Vertex,Vertex) function for drawing images.
  * @modified 2019-04-27 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
  * @modified 2019-04-28 Added Math.round to the dot() drawing parameters to really draw a singlt dot.
- * @version  1.2.2
+ * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
+ * @version  1.2.3
  **/
 
 (function(_context) {
@@ -165,7 +166,7 @@
 	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-	this.ctx.closePath();
+	//this.ctx.closePath();
 	this.ctx.lineWidth = 2;
 	this._fillOrDraw( color );
 	this.ctx.restore();

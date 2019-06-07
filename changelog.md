@@ -2,6 +2,9 @@
 
 # Changelog
 
+* 2019-06-07
+  * Fixed an issue in the draw.cubicBezier() function. Paths were always closed.
+  * Fixed an issue in the PlotBoilerplate.resizeCanvas() function. CSS scaling and widtg/height factors were not properly applied.
 * 2019-05-07
   * Made the point cloud in the vector field demo configurable.
 * 2019-04-29

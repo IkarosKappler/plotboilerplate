@@ -33,7 +33,8 @@
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
- * @version  1.4.4
+ * @modified 2019-06-07 Fixed a css scale in combination with canvasWidthFactor and canvasHeightFactor.
+ * @version  1.4.7
  *
  * @file PlotBoilerplate
  * @public
@@ -64,10 +65,10 @@
      * @param {number} scaleY The - Y scale factor.
      * @return {void}
      **/ 
-    var setCSSscale = function( element, scaleX, scaleY ) {
-	element.style['transform-origin'] = '0 0';
-	if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
-	else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
+    var setCSSscale = function( element, scaleX, scaleY ) { 
+		element.style['transform-origin'] = '0 0';
+		if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
+		else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
     };
 
 
@@ -201,7 +202,7 @@
 	    enableTouch           : typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
 	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true
 	};
-
+	console.log( this.config.canvasWidthFactor )
 
 	/** 
 	 * Configuration for drawing things.
@@ -268,11 +269,10 @@
 	 * @private
 	 **/
 	PlotBoilerplate.prototype.updateCSSscale = function() {
-	    // this.console.log('update css scale');
 	    if( this.config.cssUniformScale ) {
-		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
+			setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
 	    } else {
-		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleY );
+			setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleY );
 	    }
 	};
 	
@@ -785,38 +785,44 @@
 	 **/
 	PlotBoilerplate.prototype.resizeCanvas = function() {
 	    var _setSize = function(w,h) {
-		w *= _self.config.canvasWidthFactor;
-		h *= _self.config.canvasHeightFactor;
-		_self.canvas.width      = w; 
-		_self.canvas.height     = h; 
-		_self.canvasSize.width  = w;
-		_self.canvasSize.height = h;
-		if( _self.config.autoAdjustOffset ) {
-		    _self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); 
-		    _self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100);
-		}
+			w *= _self.config.canvasWidthFactor;
+			h *= _self.config.canvasHeightFactor;
+			_self.canvas.width      = w; 
+			_self.canvas.height     = h; 
+			_self.canvasSize.width  = w;
+			_self.canvasSize.height = h;
+			if( _self.config.autoAdjustOffset ) {
+				_self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); 
+				_self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100);
+			}
+			_self.updateCSSscale();
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {
-		// Set editor size
-		var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-		var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-		_self.canvas.style.position = 'absolute';
-		_self.canvas.style.width = width+'px';
-		_self.canvas.style.height = height+'px';
-		_self.canvas.style.top = 0;
-		_self.canvas.style.left = 0;
-		_setSize( width, height );
+			// Set editor size
+			var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+			var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+			width *= _self.config.canvasWidthFactor;
+			height *= _self.config.canvasHeightFactor;
+			_self.canvas.style.position = 'absolute';
+			_self.canvas.style.width = width+'px';
+			_self.canvas.style.height = height+'px';
+			_self.canvas.style.top = 0;
+			_self.canvas.style.left = 0;
+			_setSize( width, height );
 	    } else if( _self.config.fitToParent ) {
-		// Set editor size
-		_self.canvas.style.position = 'absolute';
-		var space = getAvailableContainerSpace( _self.canvas.parentNode );
-		_self.canvas.style.width = space.width+'px';
-		_self.canvas.style.height = space.height+'px';
-		_self.canvas.style.top = null;
-		_self.canvas.style.left = null;
-		_setSize( space.width, space.height );		
+			// Set editor size
+			_self.canvas.style.position = 'absolute';
+			var space = getAvailableContainerSpace( _self.canvas.parentNode );
+			var width = space.width * _self.config.canvasWidthFactor;
+			var height = space.height * _self.config.canvasHeightFactor;
+			_self.canvas.style.width = width+'px';
+			_self.canvas.style.height = height+'px';
+			_self.canvas.style.top = null;
+			_self.canvas.style.left = null;
+			_setSize( width, height );
 	    } else {
-                _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
+			_setSize( _self.config.defaultCanvasWidth * _self.config.canvasWidthFactor, 
+						_self.config.defaultCanvasHeight * _self.config.canvasHeightFactor );
 	    }
 	    
 	    if( _self.config.redrawOnResize )
