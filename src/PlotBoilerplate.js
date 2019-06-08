@@ -34,7 +34,7 @@
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
  * @modified 2019-06-07 Fixed a css scale in combination with canvasWidthFactor and canvasHeightFactor.
- * @version  1.4.7
+ * @version  1.4.8
  *
  * @file PlotBoilerplate
  * @public
@@ -301,78 +301,78 @@
 	 **/
 	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
 	    if( drawable instanceof Vertex ) {
-		this.drawables.push( drawable );
-		this.vertices.push( drawable );
+			this.drawables.push( drawable );
+			this.vertices.push( drawable );
 	    } else if( drawable instanceof Line ) {
-		// Add some lines
-		this.drawables.push( drawable );
-		this.vertices.push( drawable.a );
-		this.vertices.push( drawable.b );
+			// Add some lines
+			this.drawables.push( drawable );
+			this.vertices.push( drawable.a );
+			this.vertices.push( drawable.b );
 	    } else if( drawable instanceof Vector ) {
-		this.drawables.push( drawable );
-		this.vertices.push( drawable.a );
-		this.vertices.push( drawable.b );
+			this.drawables.push( drawable );
+			this.vertices.push( drawable.a );
+			this.vertices.push( drawable.b );
 	    } else if( drawable instanceof VEllipse ) {
-		this.vertices.push( drawable.center );
-		this.vertices.push( drawable.axis );
-		this.drawables.push( drawable );
-		drawable.center.listeners.addDragListener( function(e) {
-		    drawable.axis.add( e.params.dragAmount );
-		} ); 
+			this.vertices.push( drawable.center );
+			this.vertices.push( drawable.axis );
+			this.drawables.push( drawable );
+			drawable.center.listeners.addDragListener( function(e) {
+				drawable.axis.add( e.params.dragAmount );
+			} ); 
 	    } else if( drawable instanceof Polygon ) {
-		this.drawables.push( drawable );
-		for( var i in drawable.vertices )
-		    this.vertices.push( drawable.vertices[i] );
+			this.drawables.push( drawable );
+			for( var i in drawable.vertices )
+				this.vertices.push( drawable.vertices[i] );
 	    } else if( drawable instanceof BezierPath ) {
-		this.drawables.push( drawable );
-		for( var i in drawable.bezierCurves ) {
-		    if( !drawable.adjustCircular && i == 0 )
-			this.vertices.push( drawable.bezierCurves[i].startPoint );
-		    this.vertices.push( drawable.bezierCurves[i].endPoint );
-		    this.vertices.push( drawable.bezierCurves[i].startControlPoint );
-		    this.vertices.push( drawable.bezierCurves[i].endControlPoint );
-		    drawable.bezierCurves[i].startControlPoint.attr.selectable = false;
-		    drawable.bezierCurves[i].endControlPoint.attr.selectable = false;
-		}
-		for( var i in drawable.bezierCurves ) {	
-		    // This should be wrapped into the BezierPath implementation.
-		    drawable.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByStartPoint( e.params.vertex );
-			drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
-			drawable.moveCurvePoint( cindex*1, 
-						 drawable.START_POINT,         // obtain handle length?
-						 e.params.dragAmount           // update arc lengths
-					       );
-		    } );
-		    drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
-			if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
-			    return;
-			drawable.adjustPredecessorControlPoint( cindex*1, 
-								true,          // obtain handle length?
-								true           // update arc lengths
-							      );
-		    } );
-		    drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
-			if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
-			    return;
-			drawable.adjustSuccessorControlPoint( cindex*1, 
-							      true,            // obtain handle length?
-							      true             // update arc lengths
-							    );
-		    } );
-		} // END for
+			this.drawables.push( drawable );
+			for( var i in drawable.bezierCurves ) {
+				if( !drawable.adjustCircular && i == 0 )
+				this.vertices.push( drawable.bezierCurves[i].startPoint );
+				this.vertices.push( drawable.bezierCurves[i].endPoint );
+				this.vertices.push( drawable.bezierCurves[i].startControlPoint );
+				this.vertices.push( drawable.bezierCurves[i].endControlPoint );
+				drawable.bezierCurves[i].startControlPoint.attr.selectable = false;
+				drawable.bezierCurves[i].endControlPoint.attr.selectable = false;
+			}
+			for( var i in drawable.bezierCurves ) {	
+				// This should be wrapped into the BezierPath implementation.
+				drawable.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
+				var cindex = drawable.locateCurveByStartPoint( e.params.vertex );
+				drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+				drawable.moveCurvePoint( cindex*1, 
+							drawable.START_POINT,         // obtain handle length?
+							e.params.dragAmount           // update arc lengths
+							);
+				} );
+				drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
+				var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
+				if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
+					return;
+				drawable.adjustPredecessorControlPoint( cindex*1, 
+									true,          // obtain handle length?
+									true           // update arc lengths
+									);
+				} );
+				drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
+				var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
+				if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
+					return;
+				drawable.adjustSuccessorControlPoint( cindex*1, 
+									true,            // obtain handle length?
+									true             // update arc lengths
+									);
+				} );
+			} // END for
 	    } else if( drawable instanceof PBImage ) {
-		this.vertices.push( drawable.upperLeft );
-		this.vertices.push( drawable.lowerRight );
-		this.drawables.push( drawable );
-		drawable.upperLeft.listeners.addDragListener( function(e) {
-		    drawable.lowerRight.add( e.params.dragAmount );
-		} );
-		drawable.lowerRight.attr.selectable = false
+			this.vertices.push( drawable.upperLeft );
+			this.vertices.push( drawable.lowerRight );
+			this.drawables.push( drawable );
+			drawable.upperLeft.listeners.addDragListener( function(e) {
+				drawable.lowerRight.add( e.params.dragAmount );
+			} );
+			drawable.lowerRight.attr.selectable = false;
 	    } else {
-		throw "Cannot add drawable of unrecognized type: " + drawable.constructor.name;
+			throw "Cannot add drawable of unrecognized type: " + drawable.constructor.name;
 	    }
 
 	    // This is a workaround for backwards compatibility when the 'redraw' param was not yet present.

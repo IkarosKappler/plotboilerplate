@@ -4363,7 +4363,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-01-30 Added the image(Image,Vertex,Vertex) function for drawing images.
  * @modified 2019-04-27 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
  * @modified 2019-04-28 Added Math.round to the dot() drawing parameters to really draw a singlt dot.
- * @version  1.2.2
+ * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
+ * @version  1.2.3
  **/
 
 (function(_context) {
@@ -4512,7 +4513,7 @@ Object.extendClass = function( superClass, subClass ) {
 	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-	this.ctx.closePath();
+	//this.ctx.closePath();
 	this.ctx.lineWidth = 2;
 	this._fillOrDraw( color );
 	this.ctx.restore();
@@ -5083,7 +5084,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
- * @version  1.4.4
+ * @modified 2019-06-07 Fixed a css scale in combination with canvasWidthFactor and canvasHeightFactor.
+ * @version  1.4.8
  *
  * @file PlotBoilerplate
  * @public
@@ -5114,10 +5116,10 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {number} scaleY The - Y scale factor.
      * @return {void}
      **/ 
-    var setCSSscale = function( element, scaleX, scaleY ) {
-	element.style['transform-origin'] = '0 0';
-	if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
-	else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
+    var setCSSscale = function( element, scaleX, scaleY ) { 
+		element.style['transform-origin'] = '0 0';
+		if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
+		else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
     };
 
 
@@ -5251,7 +5253,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    enableTouch           : typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
 	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true
 	};
-
+	console.log( this.config.canvasWidthFactor )
 
 	/** 
 	 * Configuration for drawing things.
@@ -5318,11 +5320,10 @@ Object.extendClass = function( superClass, subClass ) {
 	 * @private
 	 **/
 	PlotBoilerplate.prototype.updateCSSscale = function() {
-	    // this.console.log('update css scale');
 	    if( this.config.cssUniformScale ) {
-		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
+			setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
 	    } else {
-		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleY );
+			setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleY );
 	    }
 	};
 	
@@ -5351,78 +5352,78 @@ Object.extendClass = function( superClass, subClass ) {
 	 **/
 	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
 	    if( drawable instanceof Vertex ) {
-		this.drawables.push( drawable );
-		this.vertices.push( drawable );
+			this.drawables.push( drawable );
+			this.vertices.push( drawable );
 	    } else if( drawable instanceof Line ) {
-		// Add some lines
-		this.drawables.push( drawable );
-		this.vertices.push( drawable.a );
-		this.vertices.push( drawable.b );
+			// Add some lines
+			this.drawables.push( drawable );
+			this.vertices.push( drawable.a );
+			this.vertices.push( drawable.b );
 	    } else if( drawable instanceof Vector ) {
-		this.drawables.push( drawable );
-		this.vertices.push( drawable.a );
-		this.vertices.push( drawable.b );
+			this.drawables.push( drawable );
+			this.vertices.push( drawable.a );
+			this.vertices.push( drawable.b );
 	    } else if( drawable instanceof VEllipse ) {
-		this.vertices.push( drawable.center );
-		this.vertices.push( drawable.axis );
-		this.drawables.push( drawable );
-		drawable.center.listeners.addDragListener( function(e) {
-		    drawable.axis.add( e.params.dragAmount );
-		} ); 
+			this.vertices.push( drawable.center );
+			this.vertices.push( drawable.axis );
+			this.drawables.push( drawable );
+			drawable.center.listeners.addDragListener( function(e) {
+				drawable.axis.add( e.params.dragAmount );
+			} ); 
 	    } else if( drawable instanceof Polygon ) {
-		this.drawables.push( drawable );
-		for( var i in drawable.vertices )
-		    this.vertices.push( drawable.vertices[i] );
+			this.drawables.push( drawable );
+			for( var i in drawable.vertices )
+				this.vertices.push( drawable.vertices[i] );
 	    } else if( drawable instanceof BezierPath ) {
-		this.drawables.push( drawable );
-		for( var i in drawable.bezierCurves ) {
-		    if( !drawable.adjustCircular && i == 0 )
-			this.vertices.push( drawable.bezierCurves[i].startPoint );
-		    this.vertices.push( drawable.bezierCurves[i].endPoint );
-		    this.vertices.push( drawable.bezierCurves[i].startControlPoint );
-		    this.vertices.push( drawable.bezierCurves[i].endControlPoint );
-		    drawable.bezierCurves[i].startControlPoint.attr.selectable = false;
-		    drawable.bezierCurves[i].endControlPoint.attr.selectable = false;
-		}
-		for( var i in drawable.bezierCurves ) {	
-		    // This should be wrapped into the BezierPath implementation.
-		    drawable.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByStartPoint( e.params.vertex );
-			drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
-			drawable.moveCurvePoint( cindex*1, 
-						 drawable.START_POINT,         // obtain handle length?
-						 e.params.dragAmount           // update arc lengths
-					       );
-		    } );
-		    drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
-			if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
-			    return;
-			drawable.adjustPredecessorControlPoint( cindex*1, 
-								true,          // obtain handle length?
-								true           // update arc lengths
-							      );
-		    } );
-		    drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
-			if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
-			    return;
-			drawable.adjustSuccessorControlPoint( cindex*1, 
-							      true,            // obtain handle length?
-							      true             // update arc lengths
-							    );
-		    } );
-		} // END for
+			this.drawables.push( drawable );
+			for( var i in drawable.bezierCurves ) {
+				if( !drawable.adjustCircular && i == 0 )
+				this.vertices.push( drawable.bezierCurves[i].startPoint );
+				this.vertices.push( drawable.bezierCurves[i].endPoint );
+				this.vertices.push( drawable.bezierCurves[i].startControlPoint );
+				this.vertices.push( drawable.bezierCurves[i].endControlPoint );
+				drawable.bezierCurves[i].startControlPoint.attr.selectable = false;
+				drawable.bezierCurves[i].endControlPoint.attr.selectable = false;
+			}
+			for( var i in drawable.bezierCurves ) {	
+				// This should be wrapped into the BezierPath implementation.
+				drawable.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
+				var cindex = drawable.locateCurveByStartPoint( e.params.vertex );
+				drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+				drawable.moveCurvePoint( cindex*1, 
+							drawable.START_POINT,         // obtain handle length?
+							e.params.dragAmount           // update arc lengths
+							);
+				} );
+				drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
+				var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
+				if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
+					return;
+				drawable.adjustPredecessorControlPoint( cindex*1, 
+									true,          // obtain handle length?
+									true           // update arc lengths
+									);
+				} );
+				drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
+				var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
+				if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
+					return;
+				drawable.adjustSuccessorControlPoint( cindex*1, 
+									true,            // obtain handle length?
+									true             // update arc lengths
+									);
+				} );
+			} // END for
 	    } else if( drawable instanceof PBImage ) {
-		this.vertices.push( drawable.upperLeft );
-		this.vertices.push( drawable.lowerRight );
-		this.drawables.push( drawable );
-		drawable.upperLeft.listeners.addDragListener( function(e) {
-		    drawable.lowerRight.add( e.params.dragAmount );
-		} );
-		drawable.lowerRight.attr.selectable = false
+			this.vertices.push( drawable.upperLeft );
+			this.vertices.push( drawable.lowerRight );
+			this.drawables.push( drawable );
+			drawable.upperLeft.listeners.addDragListener( function(e) {
+				drawable.lowerRight.add( e.params.dragAmount );
+			} );
+			drawable.lowerRight.attr.selectable = false;
 	    } else {
-		throw "Cannot add drawable of unrecognized type: " + drawable.constructor.name;
+			throw "Cannot add drawable of unrecognized type: " + drawable.constructor.name;
 	    }
 
 	    // This is a workaround for backwards compatibility when the 'redraw' param was not yet present.
@@ -5835,38 +5836,44 @@ Object.extendClass = function( superClass, subClass ) {
 	 **/
 	PlotBoilerplate.prototype.resizeCanvas = function() {
 	    var _setSize = function(w,h) {
-		w *= _self.config.canvasWidthFactor;
-		h *= _self.config.canvasHeightFactor;
-		_self.canvas.width      = w; 
-		_self.canvas.height     = h; 
-		_self.canvasSize.width  = w;
-		_self.canvasSize.height = h;
-		if( _self.config.autoAdjustOffset ) {
-		    _self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); 
-		    _self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100);
-		}
+			w *= _self.config.canvasWidthFactor;
+			h *= _self.config.canvasHeightFactor;
+			_self.canvas.width      = w; 
+			_self.canvas.height     = h; 
+			_self.canvasSize.width  = w;
+			_self.canvasSize.height = h;
+			if( _self.config.autoAdjustOffset ) {
+				_self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); 
+				_self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100);
+			}
+			_self.updateCSSscale();
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {
-		// Set editor size
-		var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-		var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-		_self.canvas.style.position = 'absolute';
-		_self.canvas.style.width = width+'px';
-		_self.canvas.style.height = height+'px';
-		_self.canvas.style.top = 0;
-		_self.canvas.style.left = 0;
-		_setSize( width, height );
+			// Set editor size
+			var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+			var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+			width *= _self.config.canvasWidthFactor;
+			height *= _self.config.canvasHeightFactor;
+			_self.canvas.style.position = 'absolute';
+			_self.canvas.style.width = width+'px';
+			_self.canvas.style.height = height+'px';
+			_self.canvas.style.top = 0;
+			_self.canvas.style.left = 0;
+			_setSize( width, height );
 	    } else if( _self.config.fitToParent ) {
-		// Set editor size
-		_self.canvas.style.position = 'absolute';
-		var space = getAvailableContainerSpace( _self.canvas.parentNode );
-		_self.canvas.style.width = space.width+'px';
-		_self.canvas.style.height = space.height+'px';
-		_self.canvas.style.top = null;
-		_self.canvas.style.left = null;
-		_setSize( space.width, space.height );		
+			// Set editor size
+			_self.canvas.style.position = 'absolute';
+			var space = getAvailableContainerSpace( _self.canvas.parentNode );
+			var width = space.width * _self.config.canvasWidthFactor;
+			var height = space.height * _self.config.canvasHeightFactor;
+			_self.canvas.style.width = width+'px';
+			_self.canvas.style.height = height+'px';
+			_self.canvas.style.top = null;
+			_self.canvas.style.left = null;
+			_setSize( width, height );
 	    } else {
-                _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
+			_setSize( _self.config.defaultCanvasWidth * _self.config.canvasWidthFactor, 
+						_self.config.defaultCanvasHeight * _self.config.canvasHeightFactor );
 	    }
 	    
 	    if( _self.config.redrawOnResize )

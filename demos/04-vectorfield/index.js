@@ -56,22 +56,22 @@
 	    // | Clear and rebuild the point cloud with random points.
 	    // +-------------------------------
 	    var resetPointCloud = function() {
-		pointlist = [];
-		adjustPointCloud();
+			pointlist = [];
+			adjustPointCloud();
 	    };
 
 	    // +---------------------------------------------------------------------------------
 	    // | Expand or reduce the point cloud so the desired point count is obtained.
 	    // +-------------------------------
 	    var adjustPointCloud = function() {
-		var v;
-		while( pointlist.length < config.pointCount ) {
-		    v = Vertex.randomVertex(pb.viewport());
-		    pointlist.push( new Vector(v, v.clone()) );
-		}
-		if( pointlist.length > config.pointCount ) {
-		    pointlist = pointlist.slice(0,config.pointCount);
-		}
+			var v;
+			while( pointlist.length < config.pointCount ) {
+				v = Vertex.randomVertex(pb.viewport());
+				pointlist.push( new Vector(v, v.clone()) );
+			}
+			if( pointlist.length > config.pointCount ) {
+				pointlist = pointlist.slice(0,config.pointCount);
+			}
 	    };
 	    
 
@@ -79,24 +79,24 @@
 	    // | Add a mouse listener to track the mouse position.
 	    // +-------------------------------
 	    new MouseHandler(pb.canvas)
-		.move( function(e) {
-		    var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
-		    var cx = document.getElementById('cx');
-		    var cy = document.getElementById('cy');
-		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
-		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-		} );
+			.move( function(e) {
+				var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
+				var cx = document.getElementById('cx');
+				var cy = document.getElementById('cy');
+				if( cx ) cx.innerHTML = relPos.x.toFixed(2);
+				if( cy ) cy.innerHTML = relPos.y.toFixed(2);
+			} );
 
 
 	    // +---------------------------------------------------------------------------------
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		showFieldVectors      : true,
-		animate               : false,
-		pointCount            : 100,
-		resetPointCloud       : function() { resetPointCloud(); }
-	    }, GUP );
+			showFieldVectors      : true,
+			animate               : false,
+			pointCount            : 100,
+			resetPointCloud       : function() { resetPointCloud(); }
+			}, GUP );
 	    
 
 	    // +---------------------------------------------------------------------------------
@@ -121,82 +121,82 @@
 	    var displayStep = 25;
 
 	    function drawFieldVectorAt( vertex ) {
-		var vector = new Vector( vertex, vertex.clone() );
-		for( var ci in controlVectors ) {
-		    var controlVector = controlVectors[ci];
-		    var strength = controlVector.length();
-		    
-		    adjustVector_radial( controlVector, strength, vector );
-		}
-		if( vector.length() > 0 )
-		    pb.draw.arrow( vector.a, vector.b, '#e888e8' );
-		else
-		    pb.draw.dot( vector.a, '#e800e8' );
+			var vector = new Vector( vertex, vertex.clone() );
+			for( var ci in controlVectors ) {
+				var controlVector = controlVectors[ci];
+				var strength = controlVector.length();
+				
+				adjustVector_radial( controlVector, strength, vector );
+			}
+			if( vector.length() > 0 )
+				pb.draw.arrow( vector.a, vector.b, '#e888e8' );
+			else
+				pb.draw.dot( vector.a, '#e800e8' );
 	    }
 	    function preDraw() {
-		if( config.showFieldVectors ) {
-		    for( var x = 0; x < pb.canvasSize.width/2; x+=displayStep ) {
-			for( var y = 0; y < pb.canvasSize.height/2; y+=displayStep ) {
-			    drawFieldVectorAt( vert(x,y) );
-			    drawFieldVectorAt( vert(-x,y) );
-			    drawFieldVectorAt( vert(x,-y) );
-			    drawFieldVectorAt( vert(-x,-y) );
+			if( config.showFieldVectors ) {
+				for( var x = 0; x < pb.canvasSize.width/2; x+=displayStep ) {
+				for( var y = 0; y < pb.canvasSize.height/2; y+=displayStep ) {
+					drawFieldVectorAt( vert(x,y) );
+					drawFieldVectorAt( vert(-x,y) );
+					drawFieldVectorAt( vert(x,-y) );
+					drawFieldVectorAt( vert(-x,-y) );
+				}
+				}
 			}
-		    }
-		}
-		if( config.animate ) {
-		    for( var i in pointlist ) {
-			pb.draw.arrow( pointlist[i].a, pointlist[i].b, 'black' );
-			pb.fill.circle( pointlist[i].a, 2, 'black' );
-		    }
-		}
+			if( config.animate ) {
+				for( var i in pointlist ) {
+				pb.draw.arrow( pointlist[i].a, pointlist[i].b, 'black' );
+				pb.fill.circle( pointlist[i].a, 2, 'black' );
+				}
+			}
 		    
 	    };
 
 	    function adjustPointList( stepFactor ) {
-		for( var fi in pointlist ) {
-		    var pointWithVelocity = pointlist[fi];
-		    var anyVector = pointWithVelocity.clone();
-		    anyVector.b.set( anyVector.a );
-		    
-		    for( var ci in controlVectors ) {
-			var controlVector = controlVectors[ci];
-			var strength = controlVector.length();
-			adjustVector_radial( controlVector, strength, anyVector );
+			for( var fi in pointlist ) {
+				var pointWithVelocity = pointlist[fi];
+				// var anyVector = pointWithVelocity.clone();
+				anyVector.b.set( anyVector.a );
+				
+				for( var ci in controlVectors ) {
+					var controlVector = controlVectors[ci];
+					var strength = controlVector.length();
+					var anyVector = pointWithVelocity.clone();
+					adjustVector_radial( controlVector, strength, anyVector );
 
-		    }
-
-		    // Relocate vector to a=(0,0), but keep an only copy.
-		    pointWithVelocity.a.add( anyVector.clone().sub(anyVector.a).b.multiplyScalar(stepFactor) );
-		    pointWithVelocity.b.set( anyVector.b );
+					// Relocate vector to a=(0,0), but keep an only copy.
+					pointWithVelocity.a.add( anyVector.clone().sub(anyVector.a).b.multiplyScalar(stepFactor) );
+					pointWithVelocity.b.set( anyVector.b );
+				}
+			}
+			pb.redraw();
 		}
-		pb.redraw();
-	    }
 
-	    function adjustVector_radial( controlVector, strength, anyVector ) {
-		var dist = controlVector.a.distance( anyVector.a );
-		if( dist > strength )
-		    return;
-		var influence = dist-strength;
-		anyVector.b.x += (controlVector.a.x-controlVector.b.x)*(influence/strength);
-		anyVector.b.y += (controlVector.a.y-controlVector.b.y)*(influence/strength);
-		
-	    }
-
-	    function renderAnimation() {
-		//adjustVectorField();
-		adjustPointList( 0.01 );
-		//pb.redraw();
-		if( config.animate )
-		    window.requestAnimationFrame( renderAnimation );
-	    };
-	    
-	    function toggleAnimation() {
-		if( config.animate ) {
-		    renderAnimation();
-		} else {
-		    pb.redraw();
+		function adjustVector_radial( controlVector, strength, anyVector ) {
+			var dist = controlVector.a.distance( anyVector.a );
+			if( dist > strength )
+				return;
+			var influence = dist-strength;
+			anyVector.b.x += (controlVector.a.x-controlVector.b.x)*(influence/strength);
+			anyVector.b.y += (controlVector.a.y-controlVector.b.y)*(influence/strength);
+			
 		}
+
+		function renderAnimation() {
+			//adjustVectorField();
+			adjustPointList( 0.01 );
+			//pb.redraw();
+			if( config.animate )
+				window.requestAnimationFrame( renderAnimation );
+			};
+			
+			function toggleAnimation() {
+			if( config.animate ) {
+				renderAnimation();
+			} else {
+				pb.redraw();
+			}
 	    }
 
 	    // +---------------------------------------------------------------------------------
