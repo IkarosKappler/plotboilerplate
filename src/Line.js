@@ -11,7 +11,11 @@
  * @modified 2018-12-05 Refactored the code from the morley-triangle script.
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
- * @version  2.0.2
+ * @modified 2019-09-02 Added the Line.add( Vertex ) function.
+ * @modified 2019-09-02 Added the Line.denominator( Line ) function.
+ * @modified 2019-09-02 Added the Line.colinear( Line ) function.
+ * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
+ * @version  2.0.4
  *
  * @file Line
  * @public
@@ -73,6 +77,22 @@
     Line.prototype.sub = function( amount ) {
 	this.a.sub( amount );
 	this.b.sub( amount );
+	return this;
+    };
+
+
+    /**
+     * Add the given vertex from this line's end points.
+     *
+     * @method add
+     * @param {Vertex} amount The amount (x,y) to add.
+     * @return {Line} this
+     * @instance
+     * @memberof Line
+     **/
+    Line.prototype.add = function( amount ) {
+	this.a.add( amount );
+	this.b.add( amount );
 	return this;
     };
 
@@ -155,8 +175,7 @@
      * @memberof Line
      **/
     Line.prototype.intersection = function( line ) {
-	//  http://jsfiddle.net/justin_c_rounds/Gd2S2/
-	var denominator = ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
+	var denominator = this.denominator(line);
 	if( denominator == 0 ) 
 	    return null;
 	
@@ -168,8 +187,35 @@
 	b = numerator2 / denominator;
 	
 	// if we cast these lines infinitely in both directions, they intersect here:
-	return new Point( this.a.x + (a * (this.b.x - this.a.x)),
-			  this.a.y + (a * (this.b.y - this.a.y)) );
+	return new Vertex( this.a.x + (a * (this.b.x - this.a.x)),
+			   this.a.y + (a * (this.b.y - this.a.y)) );
+    };
+
+
+    /**
+     * Get the denominator of this and the given line.
+     * 
+     * If the denominator is zero (or close to zero) both line are co-linear.
+     *
+     * @param {Line} line
+     * @return {Number}
+     **/
+    Line.prototype.denominator = function( line ) {
+	// http://jsfiddle.net/justin_c_rounds/Gd2S2/
+	return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
+    };
+
+
+    /**
+     * Checks if this and the given line are co-linear.
+     *
+     * The constant Vertex.EPSILON is used for tolerance.
+     *
+     * @param {Line} line
+     * @return true if both lines are co-linear.
+     */
+    Line.prototype.colinear = function( line ) {
+	return Math.abs( this.denominator(line) ) < Vertex.EPSILON;
     };
 
 

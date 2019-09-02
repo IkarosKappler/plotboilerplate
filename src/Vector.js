@@ -11,7 +11,9 @@
  * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
- * @version  1.0.3
+ * @modified 2019-09-02 Added the Vector.perp() function.
+ * @modified 2019-09-02 Added the Vector.inverse() function.
+ * @version  1.0.4
  *
  * @file Vector
  * @public
@@ -36,6 +38,31 @@
 
 
     /**
+     * Get the perpendicular of this vector which is located at a.
+     *
+     * @param {Number} t The position on the vector.
+     * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
+     **/
+    Vector.prototype.perp = function() {
+	var v = this.clone().sub( this.a );
+	return new Vector( new Vertex(), new Vertex(-v.b.y,v.b.x) ).add( this.a );
+    };
+
+    
+    /**
+     * The inverse of a vector is a vector witht the same magnitude but oppose direction.
+     *
+     * @return {Vector}
+     **/
+    Vector.prototype.inverse = function() {
+	var tmp = this.a;
+	this.a = this.b;
+	this.b = tmp;
+	return this;
+    };
+    
+
+    /**
      * Create a deep clone of this Vector.
      *
      * @method clone
@@ -44,7 +71,7 @@
      * @instance
      * @memberof Vector
      **/
-    Line.prototype.clone = function() {
+    Vector.prototype.clone = function() {
 	return new Vector( this.a.clone(), this.b.clone() );
     };
 
