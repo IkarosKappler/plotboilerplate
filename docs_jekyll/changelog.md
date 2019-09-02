@@ -1,13 +1,16 @@
 ---
 layout: page
+title: Changelog
 ---
 
 
 # Changelog
-
-* 2019-04-29
-  * Added the Vector.clone function (overriding Line.clone()).
-  * Added the Line.clone function.
+* 2019-09-02
+  * Added the Line.add( Vertex ) function.
+  * Added the Vector.perp() function for calculating perpendiculars (required for the upcoming GLSL support).
+  * Added the Vector.inverse() function.
+  * Added the Line.denominator( Line ) function.
+  * Fixed a severe error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
 * 2019-04-28
   * Added Math.round to the dot() drawing parameters to really draw a singlt dot.
   * Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
