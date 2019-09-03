@@ -51,31 +51,47 @@
 		)
 	    );
 
-		//pb.drawConfig.drawVertices = false;
-		pb.config.postDraw = function() {
+	    var config = {
+		animate : true,
+		pointCount : (pb.canvas.width*pb.canvas.height)/20000,
+		maxDistance : 100,
+		maxArea : 1200,
+		smoothLines : false,
+		fillTriangles : false,
+		smoothTriangles : true
+	    };
 
-			pb.draw.circle( new Vertex(0,0), 100, 'black' );
-
-			for( var a in pb.vertices ) {
-				var pa = pb.vertices[a];
-				for( var b in pb.vertices ) {
-					// var pb = pb.vertices[b];
-					// for( var c in pb.vertices ) {
-					// 	var pc = pb.vertices[c];
-					// 	var tri = new Triangle(pa, pc, pc);
-					// 	var circumCircle = tri.getCircumcircle();
-					// 	var circle = new VEllipse( new Vertex(circumCircle.center),
-					// 								new Vertex(circumCircle.center).add(circumCircle.radius,circumCircle.radius) );
-					// }
-				}
+	    //pb.drawConfig.drawVertices = false;
+	    pb.config.postDraw = function() {
+		// pb.draw.circle( new Vertex(0,0), 100, 'black' );
+		for( var a in pb.vertices ) {
+		    let A = pb.vertices[a];
+		    for( var b in pb.vertices ) {
+			let B = pb.vertices[b];
+			let dist = A.distance( B );
+			if( dist < config.maxDistance ) {
+			    let alpha = config.smoothLines ? 1.0-dist/config.maxDistance : 1.0;
+			    pb.draw.line( pb.vertices[a], pb.vertices[b], 'rgba(0,0,0,'+alpha+')' );
 			}
+			if( config.fillTriangles ) {
+			    // BAD PERFORMANCE!
+			    for( var c in pb.vertices ) {
+				let C = pb.vertices[c];
+				if( dist < config.maxDistance &&
+				    B.distance(C) < config.maxDistance &&
+				    C.distance(A) < config.maxDistance ) {
+				    let area = Math.abs( A.x*(B.y-C.y) + B.x*(C.y-A.y) + C.x*(A.y-B.y) ) / 2.0;
+				    // if( a == 0 ) console.log( area );
+				    if( area < config.maxArea ) {
+					let alpha = config.smoothTriangles ? 1.0-area/config.maxArea : 1.0;
+					pb.fill.polygon( new Polygon([A,B,C],false), 'rgba(0,0,0,'+alpha+')' );
+				    }
+				}
+			    }
+			}
+		    }
 		}
-
-	    // +---------------------------------------------------------------------------------
-	    // | Initialize dat.gui
-	    // +-------------------------------
-	    pb.createGUI(); 
-	    // END init dat.gui
+	    }
 	    
 
 	    // +---------------------------------------------------------------------------------
@@ -94,56 +110,160 @@
 	    // | Create a random vertex inside the canvas viewport.
 	    // +-------------------------------
 	    var randomVertex = function() {
-			return new Vertex( Math.random()*pb.canvasSize.width*0.5 - pb.canvasSize.width/2*0.5,
+		return new Vertex( Math.random()*pb.canvasSize.width*0.5 - pb.canvasSize.width/2*0.5,
 				   Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
 				 );
 	    };
+
+	    /**
+	     * Called when the desired number of points changes.
+	     **/
+	    var updatePointCount = function() {
+		if( config.pointCount > pb.vertices.length )
+		    randomPoints(false,false,true); // Do not clear ; no full cover ; do rebuild
+		else if( config.pointCount < pb.vertices.length ) {
+		    // Remove n-m points
+		    for( var i = config.pointCount; i < pb.vertices.length; i++ )
+			pb.remove( pb.vertices[i] );
+		    // pointList = pointList.slice( 0, config.pointCount );
+		    updateAnimator();
+		    // rebuild();
+		}
+		
+	    };
+
+	    /**
+	     * Add or remove n random points; depends on the config settings.
+	     *
+	     * I have no idea how tired I was when I wrote this function but it seems working pretty well.
+	     */
+	    var randomPoints = function( clear, fullCover, doRebuild ) {
+		if( clear ) {
+		    for( var i in pointList )
+			pb.remove( pointList[i], false );
+		    //pointList = [];
+		}
+		// Generate random points on image border?
+		if( fullCover ) {
+		    var remainingPoints = config.pointCount-pointList.length;
+		    var borderPoints    = Math.sqrt(remainingPoints);
+		    var ratio           = pb.canvasSize.height/pb.canvasSize.width;
+		    var hCount          = Math.round( (borderPoints/2)*ratio );
+		    var vCount          = (borderPoints/2)-hCount;
+		    
+		    while( vCount > 0 ) {
+			addVertex( new Vertex(-pb.canvasSize.width/2, randomInt(pb.canvasSize.height/2)-pb.canvasSize.height/2) );
+			addVertex( new Vertex(pb.canvasSize.width/2, randomInt(pb.canvasSize.height/2)-pb.canvasSize.height/2) );		    
+			vCount--;
+		    }
+		    
+		    while( hCount > 0 ) {
+			addVertex( new Vertex(randomInt(pb.canvasSize.width/2)-pb.canvasSize.width/2,0) );
+			addVertex( new Vertex(randomInt(pb.canvasSize.width/2)-pb.canvasSize.width/2,pb.canvasSize.height/2) );
+			hCount--;
+		    }
+
+		    // Additionally add 4 points to the corners
+		    addVertex( new Vertex(0,0) );
+		    addVertex( new Vertex(pb.canvasSize.width/2,0) );
+		    addVertex( new Vertex(pb.canvasSize.width/2,pb.canvasSize.height/2) );
+		    addVertex( new Vertex(0,pb.canvasSize.height/2) );	
+		}
+		
+		// Generate random points.
+		for( var i = pb.vertices.length; i < config.pointCount; i++ ) {
+		    addRandomPoint();
+		}
+		updateAnimator();
+		if( doRebuild )
+		    ; // rebuild();
+	    };
+
+	    // +---------------------------------------------------------------------------------
+	    // | Adds a random point to the point list. Needed for initialization.
+	    // +-------------------------------
+	    var addRandomPoint = function() {
+		addVertex( randomVertex() );	
+	    };
+
+	    var addVertex = function( vert ) {
+		pb.add( vert );
+		vert.listeners.addDragListener( function() { rebuild(); } );
+	    };
+
+	    /**
+	     * Unfortunately the animator is not smart, so we have to create a new
+	     * one (and stop the old one) each time the vertex count changes.
+	     **/
+	    var updateAnimator = function() {
+		if( animator )
+		    animator.stop();
+		// animator = null;
+		if( config.animate ) {
+		    animator = new VertexAnimator( pb.vertices, pb.viewport(), updateTriangles );
+		    animator.start();
+		} else {
+		    animator = null;
+		}
+	    };
+
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Add some interactive elements: point sets (triangles) and circles.
 	    // +-------------------------------
 	    //var triangles = [];
 	    function updateTriangles() {
-			// for( var i in triangles ) {
-			// 	triangles[i].calcCircumcircle();
-			// 	var circumCircle = triangles[i].getCircumcircle();
-			// 	triangles[i]._circle.center.set(circumCircle.center);
-			// 	triangles[i]._circle.axis.set( new Vertex(circumCircle.center).add(circumCircle.radius,circumCircle.radius) );
-			// }
-			pb.redraw();
-		};
-			
-		var pA = randomVertex();
-		var pB = randomVertex();
-		pb.add( pA );
-		pb.add( pB );
+		pb.redraw();
+	    };
+	    
+	    var pA = randomVertex();
+	    var pB = randomVertex();
+	    pb.add( pA );
+	    pb.add( pB );
+	    pA.listeners.addDragListener( function() { updateCircles() } );
+	    pB.listeners.addDragListener( function() { updateCircles() } );
 
-		pA.listeners.addDragListener( function() { updateCircles() } );
-		pB.listeners.addDragListener( function() { updateCircles() } );
-
-		for( var i = 0; i < 10; i++ ) {
-			var p = randomVertex();
-			//var tri = new Triangle(pA, pB, p);
-			//var circumCircle = tri.getCircumcircle();
-			//var circle = new VEllipse( new Vertex(circumCircle.center),
-			//			new Vertex(circumCircle.center).add(circumCircle.radius,circumCircle.radius) );
-			// Set circles un-draggable
-			//circle.center.attr.selectable = circle.center.attr.draggable = false;
-			//circle.axis.attr.selectable = circle.axis.attr.draggable = false;
-
-			// Remember circumcircle with triangle
-			//tri._circle = circle;
-			
-			//pb.add( circle );
-			pb.add( p );
-			//triangles.push( tri );
-
-			p.listeners.addDragListener( updateTriangles ); // updateCircles );
+	    for( var i = 0; i < config.pointCount; i++ ) {
+		var p = randomVertex();
+		pb.add( p );
+		p.listeners.addDragListener( updateTriangles ); 
 	    }
 
 	    // Animate the vertices: make them bounce around and reflect on the walls.
+	    // Animate the vertices: make them bounce around and reflect on the walls.
 	    var animator = new VertexAnimator( pb.vertices, pb.viewport(), updateTriangles );
-	    animator.start();   
+	    var toggleAnimation = function() {
+		if( config.animate ) {
+		    animator = new VertexAnimator( pointList, pb.viewport(), rebuild );
+		    animator.start();
+		} else {
+		    animator.stop();
+		    animator = null;
+		}
+	    };
+	    animator.start();
+
+
+	    // +---------------------------------------------------------------------------------
+	    // | Initialize dat.gui
+	    // +-------------------------------
+            {
+		
+		var gui = pb.createGUI(); 
+		// END init dat.gui
+
+		// gui.add(config, 'rebuild').name('Rebuild all').title("Rebuild all.");
+
+		var f0 = gui.addFolder('Distance walk');
+		f0.add(config, 'pointCount').min(3).max(200).onChange( function() { config.pointCount = Math.round(config.pointCount); updatePointCount(); } ).title("The total number of points.");
+		f0.add(config, 'smoothLines').name('Smooth lines').title('Set if you want smooth lines.');
+		f0.add(config, 'maxDistance').name('Max distance').min(1).max(1000).title('Defines the max distance for vertices before they connect.');
+		f0.add(config, 'fillTriangles').name('Fill triangles').title('This might affect your performance.');
+		f0.add(config, 'maxArea').name('The maximum area for filling triangles.').title('This might affect your performance.');
+		f0.add(config, 'smoothTriangles').name('Smooth triangles').title('Render triangles with smooth alpha.');
+		f0.open();
+	
+	    }
 
 	} );
     

@@ -55,9 +55,10 @@
 	    }
 	};
 
-	function animateAll() {
+	function animateAll() { console.log('animate');
 	    for( var i in vertices ) {
-		animateVert( vertices[i], velocities[i], _self.viewport );
+		if( i < velocities.length )
+		    animateVert( vertices[i], velocities[i], _self.viewport );
 	    }
 	    renderCallback( _self );
 	    if( _self.running )

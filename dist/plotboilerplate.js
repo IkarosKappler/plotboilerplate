@@ -5846,8 +5846,8 @@ Object.extendClass = function( superClass, subClass ) {
 	};
 	/**
 	 * @typedef {Object} Bounds
-	 * @property {Vertex*} min The upper left position.
-	 * @property {Vertex*} max The lower right position;.
+	 * @property {Vertex} min The upper left position.
+	 * @property {Vertex} max The lower right position;.
 	 */
 
 
