@@ -126,9 +126,9 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Walking triangle demo
 
-![Walking Triangles, Demo A](screenshots/screenshot-201909011_0_walking_triangles.png "Walking triangles, demo a")
-![Walking Triangles, Demo B](screenshots/screenshot-201909011_1_walking_triangles.png "Walking triangles, demo b")
-![Walking Triangles, Demo C](screenshots/screenshot-201909011_2_walking_triangles.png "Walking triangles, demo c")
+![Walking Triangles, Demo A](screenshots/screenshot-20190911_0_walking_triangles.png "Walking triangles, demo a")
+![Walking Triangles, Demo B](screenshots/screenshot-20190911_1_walking_triangles.png "Walking triangles, demo b")
+![Walking Triangles, Demo C](screenshots/screenshot-20190911_2_walking_triangles.png "Walking triangles, demo c")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/08-walking-triangles/index.html" title="See the demo">See the demo</a>
 
