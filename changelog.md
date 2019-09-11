@@ -1,8 +1,8 @@
 
 
 # Changelog
-* 2019-09-03
-  * Added a basic walking-triangles demo.
+* 2019-09-11
+  * (Inofficial) Added the Triangle.scaleToCentroid(Number) function (used by the walking triangle demo).
 * 2019-09-02
   * Added the Line.add( Vertex ) function.
   * Added the Vector.perp() function for calculating perpendiculars (required for the upcoming GLSL support).

@@ -8,7 +8,8 @@
  * @date_init 2012-10-17 (Wrote a first version of this in that year).
  * @date      2018-04-03 (Refactored the code into a new class).
  * @modified  2018-04-28 Added some documentation.
- * @version   2.0.1
+ * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
+ * @version   2.0.2
  **/
 
 
@@ -46,6 +47,21 @@
     };
 
 
+
+    // +------------------------------------------------------------
+    // | Scale the triangle towards its centroid.
+    // |
+    // | @return {Triangle} this for chaining
+    // +--------------------------------------------------------
+    Triangle.prototype.scaleToCentroid = function( factor ) {
+	let centroid = this.getCentroid();
+	this.a.scale( factor, centroid );
+	this.b.scale( factor, centroid );
+	this.c.scale( factor, centroid );
+	return this;
+    };
+    
+    
 
     // +------------------------------------------------------------
     // | Get the circumcircle of this triangle.

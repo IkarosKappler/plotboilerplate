@@ -5157,7 +5157,7 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
- * @version  1.4.5
+ * @version  1.4.11
  *
  * @file PlotBoilerplate
  * @public
