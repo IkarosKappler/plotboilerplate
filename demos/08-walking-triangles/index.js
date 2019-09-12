@@ -51,19 +51,21 @@
 		)
 	    );
 
-	    var config = {
-		animate : true,
-		pointCount : (pb.canvas.width*pb.canvas.height)/20000,
-		maxDistance : 100,
-		lineColor : '#004488',
-		maxArea : 1200,
-		smoothLines : false,
-		fillTriangles : false,
-		triangleColor: '#000000',
+	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
+		animate         : true,
+		pointCount      : (pb.canvas.width*pb.canvas.height)/20000,
+		maxDistance     : 100,
+		drawLines       : true,
+		lineColor       : '#004488',
+		maxArea         : 1200,
+		smoothLines     : false,
+		fillTriangles   : false,
+		triangleColor   : '#000000',
 		smoothTriangles : true,
-		triangleScale : 1.0
-	    };
-	    // Color instances
+		triangleScale   : 1.0
+	    }, GUP );
+	    
+	    // Color instances (this is what my renderer here is working with)
 	    var lineColor = Color.makeHEX( config.lineColor );
 	    var triangleColor = Color.makeHEX( config.triangleColor );
 
@@ -77,7 +79,7 @@
 		    for( var b = 0; b < a; b++ ) {
 			let B = pb.vertices[b];
 			let dist = A.distance( B );
-			if( dist < config.maxDistance ) {
+			if( dist < config.maxDistance && config.drawLines ) {
 			    lineColor.a = config.smoothLines ? 1.0-dist/config.maxDistance : 1.0;
 			    pb.draw.line( pb.vertices[a], pb.vertices[b], lineColor.cssRGBA() );
 			}
@@ -92,6 +94,7 @@
 				    // if( a == 0 ) console.log( area );
 				    if( area < config.maxArea ) {
 					triangleColor.a = config.smoothTriangles ? 1.0-area/config.maxArea : 1.0;
+					triangleColor.a *= lineColor.a;
 					triangle.a.set(A); triangle.b.set(B); triangle.c.set(C);
 					triangle.scaleToCentroid( config.triangleScale );
 					pb.fill.polygon( new Polygon([triangle.a,triangle.b,triangle.c],false), triangleColor.cssRGBA() );
@@ -217,7 +220,6 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Add some interactive elements: point sets (triangles) and circles.
 	    // +-------------------------------
-	    //var triangles = [];
 	    function updateTriangles() {
 		pb.redraw();
 	    };
@@ -236,18 +238,41 @@
 	    }
 
 	    // Animate the vertices: make them bounce around and reflect on the walls.
-	    var animator = new VertexAnimator( pb.vertices, pb.viewport(), updateTriangles );
+	    var animator = null;
+
+	    /**
+	     * This function is called if the point set changed.
+	     *
+	     * As the animator class is a disposable class, the old one needs to be
+	     * stopped and destroyed and a new one needs to be instantiated.
+	     */
 	    var toggleAnimation = function() {
 		if( config.animate ) {
-		    animator = new VertexAnimator( pointList, pb.viewport(), rebuild );
+		    animator = new VertexAnimator( pb.vertices, pb.viewport(), updateTriangles );
 		    animator.start();
 		} else {
 		    animator.stop();
 		    animator = null;
 		}
 	    };
-	    animator.start();
+	    toggleAnimation();
 
+	    
+
+	    /**
+	     * This function switches the existing animator on/off.
+	     **/
+	    var toggleAnimationPaused = function() {
+		if( config.animate ) {
+		    if( animator ) 
+			animator.start();
+		    else
+			toggleAnimation();
+		} else {
+		    if( animator )
+			animator.stop();
+		}
+	    }
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
@@ -261,12 +286,14 @@
 		f0.add(config, 'pointCount').min(3).max(200).onChange( function() { config.pointCount = Math.round(config.pointCount); updatePointCount(); } ).title("The total number of points.");
 		f0.add(config, 'smoothLines').name('Smooth lines').title('Set if you want smooth lines.');
 		f0.add(config, 'maxDistance').name('Max distance').min(1).max(1000).title('Defines the max distance for vertices before they connect.');
+		f0.add(config, 'drawLines').name('Draw Lines').title('Draw lines?');
 		f0.addColor(config, 'lineColor').name('Line color').onChange( function() { lineColor=Color.makeHEX(config.lineColor); console.log(config.lineColor,lineColor.cssRGB()); } ).title("Choose a line color.");
 		f0.add(config, 'fillTriangles').name('Fill triangles').title('This might affect your performance.');
-		f0.add(config, 'maxArea').name('Max area').title('This might affect your performance.');
+		f0.add(config, 'maxArea').name('Max area').min(0).title('This might affect your performance.');
 		f0.addColor(config, 'triangleColor').name('Triangle color').onChange( function() { triangleColor=Color.makeHEX(config.triangleColor); console.log(config.triangleColor); } ).title("Choose a triangle color.");
 		f0.add(config, 'smoothTriangles').name('Smooth triangles').title('Render triangles with smooth alpha.');
-		f0.add(config, 'triangleScale').min(-2.0).max(2.0).step(0.05).onChange().name('Triangle Scale').title("Scale each triangle towards its centroid.");
+		f0.add(config, 'triangleScale').min(-2.0).max(2.0).step(0.05).name('Triangle Scale').title("Scale each triangle towards its centroid.");
+		f0.add(config, 'animate').onChange( function() { toggleAnimationPaused(); } ).name('Animate').title('Toggle animation on/off.');
 		f0.open();
 	
 	    }

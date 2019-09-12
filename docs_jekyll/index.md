@@ -128,121 +128,130 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/07-voronoi-and-delaunay/index.html" title="See the demo">See the demo</a>
 
 
+### Walking triangle demo
+
+![Walking Triangles, Demo A](screenshots/screenshot-20190911_0_walking_triangles.png "Walking triangles, demo a")
+![Walking Triangles, Demo B](screenshots/screenshot-20190911_1_walking_triangles.png "Walking triangles, demo b")
+![Walking Triangles, Demo C](screenshots/screenshot-20190911_2_walking_triangles.png "Walking triangles, demo c")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/08-walking-triangles/index.html" title="See the demo">See the demo</a>
+
+
 
 ## Parameters for initialization
 ~~~javascript
- var pb = new PlotBoilerplate(
-     {  // HTMLElement
-     	//   Your canvas element in the DOM (required).
-     	canvas			: document.getElementById('my-canvas'),
+ var pb = new PlotBoilerplate( {
+    // HTMLElement
+    //   Your canvas element in the DOM (required).
+    canvas			: document.getElementById('my-canvas'),
 
-	// boolean
-	//   If set to true the canvas will gain full window size.
-      	fullSize              	: true,
+    // boolean
+    //   If set to true the canvas will gain full window size.
+    fullSize              	: true,
 
-	// boolean
-	//   If set to true the canvas will gain the size of its parent
-	//   container.
-	// @overrides fullSize
-	fitToParent           	: true,
+    // boolean
+    //   If set to true the canvas will gain the size of its parent
+    //   container.
+    // @overrides fullSize
+    fitToParent           	: true,
 
-	// float
-	//   The initial zoom. Default is 1.0.
-	scaleX                	: 1.0,
-	scaleY                	: 1.0,
+    // float
+    //   The initial zoom. Default is 1.0.
+    scaleX                	: 1.0,
+    scaleY                	: 1.0,
 
-	// Specifies if the raster should be drawn.
-	drawGrid                : true,
+    // Specifies if the raster should be drawn.
+    drawGrid                : true,
 
-	// If set to true the background grid will be drawn rastered.
-	rasterGrid              : true,
+    // If set to true the background grid will be drawn rastered.
+    rasterGrid              : true,
 
-	// float
-	//    The exponential limit for wrapping down the grid.
-	//    (2.0 means: halve the grid each 2.0*n zoom step).
-	rasterAdjustFactor    	: 2.0,
+    // float
+    //    The exponential limit for wrapping down the grid.
+    //    (2.0 means: halve the grid each 2.0*n zoom step).
+    rasterAdjustFactor    	: 2.0,
 
-	// Draw a crosshair at (0,0).
-	drawOrigin              : false,
+    // Draw a crosshair at (0,0).
+    drawOrigin              : false,
 
-	// boolean
-	//   When set to true then the origin of the XY plane will
-	//   be re-adjusted automatically (see the params
-	//    offsetAdjust{X,Y}Percent for more).
-	autoAdjustOffset      	: true,
-	// float
-	//   The x- and y- fallback position for the origin after
-	//   resizing the canvas.
-	offsetAdjustXPercent  	: 50,
-	offsetAdjustYPercent  	: 50,
+    // boolean
+    //   When set to true then the origin of the XY plane will
+    //   be re-adjusted automatically (see the params
+    //    offsetAdjust{X,Y}Percent for more).
+    autoAdjustOffset      	: true,
+    // float
+    //   The x- and y- fallback position for the origin after
+    //   resizing the canvas.
+    offsetAdjustXPercent  	: 50,
+    offsetAdjustYPercent  	: 50,
 
-	// int
-	//   The canvas size fallback if no automatic resizing
-	//   is switched on.
-	defaultCanvasWidth    	: 1024,
-	defaultCanvasHeight   	: 768,
+    // int
+    //   The canvas size fallback if no automatic resizing
+    //   is switched on.
+    defaultCanvasWidth    	: 1024,
+    defaultCanvasHeight   	: 768,
 
-	// float
-	//   Two scaling factors (width and height) upon the canvas size.
-	//   In combination with cssScale{X,Y} this can be used to obtain
-	//   sub pixel resolutions for retina displays.
-	canvasWidthFactor     	: 1.0,
-	canvasHeightFactor    	: 1.0,
+    // float
+    //   Two scaling factors (width and height) upon the canvas size.
+    //   In combination with cssScale{X,Y} this can be used to obtain
+    //   sub pixel resolutions for retina displays.
+    canvasWidthFactor     	: 1.0,
+    canvasHeightFactor    	: 1.0,
 
-	// float
-	//   Visually resize the canvas using CSS transforms (scale).
-	cssScaleX	       	: 1.0,
-	cssScaleY	       	: 1.0,
+    // float
+    //   Visually resize the canvas using CSS transforms (scale).
+    cssScaleX	       	: 1.0,
+    cssScaleY	       	: 1.0,
 
-	// boolean
-	//   If set to true only cssScaleX applies for both dimensions.
-	cssUniformScale         : true,
+    // boolean
+    //   If set to true only cssScaleX applies for both dimensions.
+    cssUniformScale         : true,
 
-	// string
-	//   A background color (CSS string) for the canvas.
-	backgroundColor       	: '#ffffff',
+    // string
+    //   A background color (CSS string) for the canvas.
+    backgroundColor       	: '#ffffff',
 
-	// boolean
-	//   Switch auto-redrawing on resize on/off (some applications
-	//   might want to prevent automatic redrawing to avoid data
-	//   loss from the drae buffer).
-	redrawOnResize        	: true,
+    // boolean
+    //   Switch auto-redrawing on resize on/off (some applications
+    //   might want to prevent automatic redrawing to avoid data
+    //   loss from the drae buffer).
+    redrawOnResize        	: true,
 
-	// boolean
-	//   Indicates if Bézier curve handles should be drawn (used for
-	//   editors, no required in pure visualizations).
-	drawBezierHandleLines 	: true,
+    // boolean
+    //   Indicates if Bézier curve handles should be drawn (used for
+    //   editors, no required in pure visualizations).
+    drawBezierHandleLines 	: true,
 
-	// boolean
-	//   Indicates if Bézier curve handle points should be drawn.
-	drawBezierHandlePoints 	: true,
+    // boolean
+    //   Indicates if Bézier curve handle points should be drawn.
+    drawBezierHandlePoints 	: true,
 
-	// function
-	//   A callback function that will be triggered just before the
-	//   draw function clears the canvas (before anything else was drawn).
-	preClear              	: function() { console.log('before clearing the canvas on redraw.'); },
+    // function
+    //   A callback function that will be triggered just before the
+    //   draw function clears the canvas (before anything else was drawn).
+    preClear              	: function() { console.log('before clearing the canvas on redraw.'); },
 	
-	// function
-	//   A callback function that will be triggered just before the
-	//   draw function starts.
-	preDraw               	: function() { console.log('before clearing and before drawing.'); },
+    // function
+    //   A callback function that will be triggered just before the
+    //   draw function starts.
+    preDraw               	: function() { console.log('before clearing and before drawing.'); },
 
-	// function
-	//   A callback function that will be triggered right after the
-	//   drawing process finished.
-	postDraw              	: function() { console.log('after drawing.'); },
+    // function
+    //   A callback function that will be triggered right after the
+    //   drawing process finished.
+    postDraw              	: function() { console.log('after drawing.'); },
 
-	// boolean
-	//   Indicates if the application should handle mouse events for you.
-	enableMouse           	: true,
+    // boolean
+    //   Indicates if the application should handle mouse events for you.
+    enableMouse           	: true,
 
-	// boolean
-	//   Indicates if the application should handle touch events for you.
-	enableTouch           	: true,
+    // boolean
+    //   Indicates if the application should handle touch events for you.
+    enableTouch           	: true,
 
-	// boolean
-	//   Indicates if the application should handle key events for you.
-	enableKeys            	: true
+    // boolean
+    //   Indicates if the application should handle key events for you.
+    enableKeys            	: true
   } );
 ~~~					  
 
@@ -293,7 +302,7 @@ The Vertex class has basic drag event support:
       //   started. This will not change during one drag process.
       mouseDownPos : { x : Number, y : Number },
 
-      // The most recent draw position (position before
+      // The most recent drag position (position before
       //   current drag step).
       draggedFrom : { x : Number, y : Number },
 
@@ -359,6 +368,8 @@ from the sources code files in ./src/*.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
+ * Make the triangle class an official helper. It is currently only used in demos.
+ * Add proper JSDoc to the Triangle source.
  
 
 

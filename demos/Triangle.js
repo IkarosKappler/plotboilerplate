@@ -1,6 +1,11 @@
 /**
- * The triangle class for the triangulation.
+ * @classdesc A triangle class for triangulations.
  *
+ * The class was written for a Delaunay trinagulation demo so it might 
+ * contain some strange and unexpected functions.
+ *
+ * @requires Vertex
+ * 
  * Inspired by Delaunay at Travellermap
  *   http://www.travellermap.com/tmp/delaunay.htm
  *
@@ -9,20 +14,32 @@
  * @date      2018-04-03 (Refactored the code into a new class).
  * @modified  2018-04-28 Added some documentation.
  * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
- * @version   2.0.2
+ * @modified  2019-09-12 Added  beautiful JSDoc compliable comments.
+ * @version   2.0.3
+ *
+ * @file Triangle
+ * @public
  **/
 
 
-// Use a closure.
 (function(_context) {
 
-    // This should be the same epsilon as in Vertex.
+    /**
+     * An epsilon for comparison.
+     * This should be the same epsilon as in Vertex.
+     *
+     * @private
+     **/
     var EPSILON = 1.0e-6;
 
 
-    // +--------------------------------------------------------------
-    // | Triangle class
-    // +-----------------------------------------------------------
+    /**
+     * The constructor.
+     * 
+     * @param {Vertex} a - The first vertex of the triangle.
+     * @param {Vertex} b - The second vertex of the triangle.
+     * @param {Vertex} c - The third vertex of the triangle.
+     **/
     var Triangle = _context.Triangle = function( a, b, c )	{
 	this.a = a;
 	this.b = b;
@@ -32,14 +49,13 @@
 	
     }
 
-    // +------------------------------------------------------------
-    // | Get the centroid of this triangle.
-    // |
-    // | The centroid is the average midpoint for each side.
-    // |
-    // | @return Vertex The centroid.
-    // +--------------------------------------------------------
-    // Currently Not in use
+    /**
+     * Get the centroid of this triangle.
+     *
+     * The centroid is the average midpoint for each side.
+     *
+     * @return {Vertex} The centroid
+     **/
     Triangle.prototype.getCentroid = function() {
 	return new Vertex( (this.a.x + this.b.x + this.c.x)/3,
 			   (this.a.y + this.b.y + this.c.y)/3
@@ -48,11 +64,12 @@
 
 
 
-    // +------------------------------------------------------------
-    // | Scale the triangle towards its centroid.
-    // |
-    // | @return {Triangle} this for chaining
-    // +--------------------------------------------------------
+    /**
+     * Scale the triangle towards its centroid.
+     *
+     * @param {Number} - The scale factor to use. This can be any scalar.
+     * @return {Triangle} this for chaining
+     */
     Triangle.prototype.scaleToCentroid = function( factor ) {
 	let centroid = this.getCentroid();
 	this.a.scale( factor, centroid );
@@ -63,14 +80,14 @@
     
     
 
-    // +------------------------------------------------------------
-    // | Get the circumcircle of this triangle.
-    // |
-    // | The circumcircle is that unique circle on which all three
-    // | vertices of this triangle are located on.
-    // |
-    // | @return { center:Vertex, radius:float }
-    // +--------------------------------------------------------
+    /**
+     * Get the circumcircle of this triangle.
+     *
+     * The circumcircle is that unique circle on which all three
+     * vertices of this triangle are located on.
+     *
+     * @return {Object} - { center:Vertex, radius:float }
+     */
     Triangle.prototype.getCircumcircle = function() {
 	if( !this.center || !this.radius ) 
 	    this.calcCircumcircle();
@@ -79,15 +96,17 @@
 
 
 
-    // +------------------------------------------------------------
-    // | Check if this triangle and the passed triangle share an
-    // | adjacent edge.
-    // |
-    // | For edge-checking Vertex.equals is used which uses an
-    // | an epsilon for comparison.
-    // |
-    // | @return boolean
-    // +--------------------------------------------------------
+    /**
+     * Check if this triangle and the passed triangle share an
+     * adjacent edge.
+     *
+     * For edge-checking Vertex.equals is used which uses an
+     * an epsilon for comparison.
+     *
+     * @param {Triangle} tri - The second triangle to check adjacency with.
+     *
+     * @return {boolean} - True if this and the passed triangle have at least one common edge.
+     */
     Triangle.prototype.isAdjacent = function( tri ) {
 	var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
 	var b = this.b.equals(tri.a) || this.b.equals(tri.b) || this.b.equals(tri.c);
@@ -97,12 +116,14 @@
 
 
     
-    // +------------------------------------------------------------
-    // | Get that vertex of (a,b,c) that is not vert1 nor vert2 of 
-    // | passed two.
-    // |
-    // | @return Vertex
-    // +--------------------------------------------------------
+    /**
+     * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of 
+     * the passed two.
+     *
+     * @param {Vertex} vert1 - The first vertex.
+     * @param {Vertex} vert2 - The second vertex.
+     * @return Vertex - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
+     */
     Triangle.prototype.getThirdVertex = function( vert1, vert2 ) {
 	if( this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1) ) return this.c;
 	if( this.b.equals(vert1) && this.c.equals(vert2) || this.b.equals(vert2) && this.c.equals(vert1) ) return this.a;
@@ -111,15 +132,15 @@
     };
 
 
-    // +------------------------------------------------------------
-    // | Re-compute the circumcircle of this triangle (if the vertices
-    // | have changed.
-    // |
-    // | The circumcenter and radius are stored in this.center and
-    // | this radius. There is a third result: radius_squared.
-    // |
-    // | @return void
-    // +--------------------------------------------------------
+    /**
+     * Re-compute the circumcircle of this triangle (if the vertices
+     * have changed).
+     *
+     * The circumcenter and radius are stored in this.center and
+     * this radius. There is a third result: radius_squared.
+     *
+     * @return void
+     */
     Triangle.prototype.calcCircumcircle = function() {
 	// From
 	//    http://www.exaflop.org/docs/cgafaq/cga1.html
@@ -155,18 +176,17 @@
 
 	this.radius_squared = dx * dx + dy * dy;
 	this.radius = Math.sqrt( this.radius_squared );
-    }; // calcCircumcircle
+    }; // END calcCircumcircle
 
 
 
-    // +------------------------------------------------------------
-    // | Check if the passed vertex is inside this triangle's
-    // | circumcircle.
-    // |
-    // | @param v:Vertex The vertex to check.
-    // |
-    // | @return boolean
-    // +--------------------------------------------------------
+    /**
+     * Check if the passed vertex is inside this triangle's
+     * circumcircle.
+     *
+     * @param {Vertex} v - The vertex to check.
+     * @return boolean
+     */
     Triangle.prototype.inCircumcircle = function( v ) {
 	var dx = this.center.x - v.x;
 	var dy = this.center.y - v.y;
@@ -178,11 +198,11 @@
 
 
 
-    // +------------------------------------------------------------
-    // | Get the rectangular bounds for this triangle.
-    // |
-    // | @return { xMin:float, xMax:float, yMin:float, yMax:float, width:float, height:float }
-    // +--------------------------------------------------------
+    /**
+     * Get the rectangular bounds for this triangle.
+     *
+     * @return {Object} - { xMin:float, xMax:float, yMin:float, yMax:float, width:float, height:float }
+     */
     Triangle.prototype.bounds = function() {
 	function max3( a, b, c ) { return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c; }
 	function min3( a, b, c ) { return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c; }
@@ -194,22 +214,24 @@
     };
 
 
-    // +------------------------------------------------------------
-    // | Get the determinant of this triangle.
-    // |
-    // | @return float
-    // +--------------------------------------------------------
+    /**
+     * Get the determinant of this triangle.
+     *
+     * @return {Number} - The determinant (float).
+     */
     Triangle.prototype.determinant = function() {
 	return this.b.x*this.b.y* 0.5 * ( - this.b.x*this.a.y - this.a.x*this.b.y - this.b.x*this.c.y + this.c.x*this.a.y + this.a.x*this.c.y );
     };
+
     
-    // +------------------------------------------------------------
-    // | Checks if the passed vertex (p) is inside this triangle.
-    // |
-    // | Note: matrix determinants rock.
-    // |
-    // | @return boolean
-    // +--------------------------------------------------------
+    /**
+     * Checks if the passed vertex (p) is inside this triangle.
+     *
+     * Note: matrix determinants rock.
+     *
+     * @param {Vertex} p - The vertex to check.
+     * @return {boolean}
+     */
     Triangle.prototype.containsPoint = function( p ) {
 	//
 	// Point-in-Triangle test found at
@@ -230,11 +252,11 @@
 
 
     
-    // +------------------------------------------------------------
-    // | Converts this triangle into a human-readable string.
-    // |
-    // | @return String
-    // +--------------------------------------------------------
+    /**
+     * Converts this triangle into a human-readable string.
+     *
+     * @return {string}
+     */
     Triangle.prototype.toString = function() {
 	return '{ a : ' + this.a.toString () + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
     };
