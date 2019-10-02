@@ -1,15 +1,12 @@
 /**
- * The main script of the generic plotter.
+ * The main script of the generic plotter: the Gl version.
  *
- * @requires PlotBoilerplate, MouseHandler, gup, dat.gui, draw
+ * @requires PlotBoilerplate, MouseHandler, gup, dat.gui, drawgl
  * 
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
- * @date        2018-10-23
- * @modified    2018-11-09 Refactored the old code.
- * @modified    2018-12-17 Added the config.redrawOnResize param.
- * @modified    2019-03-20 Added the 'projectname' tag.
- * @version     1.0.3
+ * @date        2019-09-18
+ * @version     0.0.1
  **/
 
 
@@ -48,7 +45,7 @@
 		      enableMouse           : true,
 		      enableTouch           : true,
 		      enableKeys            : true,
-		      enableGL              : false // experimental
+		      enableGL              : true   // This one is experimental
 		    }, GUP
 		)
 	    );
@@ -68,7 +65,7 @@
 				 }
 			       } );
 	    }
-	    humane.log('plotboilerplate');
+	    humane.log('plotboilerplate-gl');
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
@@ -93,14 +90,14 @@
 	    // +-------------------------------
 	    new Touchy( pb.canvas,
 			{ one : function( hand, finger ) {
-			    var relPos = pb.transformMousePosition( finger.lastPoint.x, finger.lastPoint.y ); //e.params.pos.x, e.params.pos.y );
+			    var relPos = pb.transformMousePosition( finger.lastPoint.x, finger.lastPoint.y ); 
 			    var cx = document.getElementById('cx');
 			    var cy = document.getElementById('cy');
 			    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 			    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 			    
 			    hand.on('move', function (points) {
-				relPos = pb.transformMousePosition( points[0].x, points[0].y ); //e.params.pos.x, e.params.pos.y );
+				relPos = pb.transformMousePosition( points[0].x, points[0].y ); 
 				if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 				if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 			    } );

@@ -1,42 +1,89 @@
 /**
- * A wrapper class for basic drawing operations.
+ * A wrapper class for basic drawing operations. This is the WebGL
+ * implementation whih sould work with shaders.
  *
  * @require Vertex
  *
  * @author   Ikaros Kappler
- * @date     2018-04-22
- * @modified 2018-08-16 Added the curve() function to draw cubic bézier curves.
- * @modified 2018-10-23 Recognizing the offset param in the circle() function.
- * @modified 2018-11-27 Added the diamondHandle() function.
- * @modified 2018-11-28 Added the grid() function and the ellipse() function.
- * @modified 2018-11-30 Renamed the text() function to label() as it is not scaling.
- * @modified 2018-12-06 Added a test function for drawing arc in SVG style.
- * @modified 2018-12-09 Added the dot(Vertex,color) function (copied from Feigenbaum-plot-script).
- * @modified 2019-01-30 Added the arrow(Vertex,Vertex,color) function for drawing arrow heads.
- * @modified 2019-01-30 Added the image(Image,Vertex,Vertex) function for drawing images.
- * @modified 2019-04-27 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
- * @modified 2019-04-28 Added Math.round to the dot() drawing parameters to really draw a singlt dot.
- * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
- * @version  1.2.3
+ * @date     2019-09-18
+ * @version  0.0.1
  **/
 
 (function(_context) {
-    "use strict";
 
+    // Vertex shader source code
+    var vertCode = `
+    precision mediump float;
+
+    attribute vec2 position;
+
+    uniform vec2 uRotationVector;
+
+    void main(void) {
+	vec2 rotatedPosition = vec2(
+	    position.x * uRotationVector.y +
+		position.y * uRotationVector.x,
+	    position.y * uRotationVector.y -
+		position.x * uRotationVector.x
+	);
+
+	gl_Position = vec4(rotatedPosition, 0.0, 1.0);
+    }`;
+
+    // Fragment shader source code
+    var fragCode = `
+    precision highp float;
+
+    void main(void) {
+	gl_FragColor = vec4(0.0,0.75,1.0,1.0);
+    }`;
+
+    
     /**
      * The constructor.
      *
      * @constructor
      * @name drawutils
-     * @param {Context2D} context - The drawing context.
+     * @param {ContextGL} context - The drawing context.
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    _context.drawutils = function( context, fillShapes ) {
-	this.ctx = context;
+    _context.drawutilsgl = function( context, fillShapes ) {
+	this.gl = context;
 	this.offset = new Vertex( 0, 0 );
 	this.scale = new Vertex( 1, 1 );
 	this.fillShapes = fillShapes;
+
+	this._zindex = 0.0;
+
+	if( context == null || typeof context === 'undefined' )
+	    return;
+
+	this.glutils = new GLU(context);
+	// PROBLEM: CANNOT USE MULTIPLE SHADER PROGRAM INSTANCES ON THE SAME CONTEXT!
+	// SOLUTION: USE SHARED SHADER PROGRAM!!! ... somehow ...
+	this._vertShader = this.glutils.compileShader( vertCode, this.gl.VERTEX_SHADER );
+	this._fragShader = this.glutils.compileShader( fragCode, this.gl.FRAGMENT_SHADER );
+	this._program = this.glutils.makeProgram( this._vertShader, this._fragShader );
+
+	console.log('gl initialized');
     };
+
+    /**
+     * Creates a 'shallow' (non deep) copy of this instance. This implies
+     * that under the hood the same gl context and gl program will be used.
+     */
+    _context.drawutilsgl.prototype.copyInstance = function( fillShapes ) {
+	var copy = new drawutilsgl(null,fillShapes);
+	copy.gl = this.gl;
+	copy.glutils = this.glutils;
+	copy._vertShader = this._vertshader;
+	copy._fragShader = this._fragShader;
+	copy._program = this._program;
+	return copy;
+    };
+
+    _context.drawutilsgl.prototype._x2rel = function(x) { return (this.scale.x*x+this.offset.x)/this.gl.canvas.width*2.0-1.0; };
+    _context.drawutilsgl.prototype._y2rel = function(y) { return (this.offset.y-this.scale.y*y)/this.gl.canvas.height*2.0-1.0; };
 
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
@@ -49,18 +96,51 @@
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutils.prototype.line = function( zA, zB, color ) {
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
-	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
-	this.ctx.strokeStyle = color;
-	this.ctx.lineWidth = 1;
-	this.ctx.stroke();
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.line = function( zA, zB, color ) {	
+	const vertices = new Float32Array( 6 );
+	vertices[0] = this._x2rel(zA.x);
+	vertices[1] = this._y2rel(zA.y);
+	vertices[2] = this.zindex;
+	vertices[3] = this._x2rel(zB.x);
+	vertices[4] = this._y2rel(zB.y);
+	vertices[5] = this.zindex;
+	this.zindex+=0.01;
+
+	// Create an empty buffer object
+	const vertex_buffer = this.gl.createBuffer();
+	// Bind appropriate array buffer to it
+	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
+	// Pass the vertex data to the buffer
+	this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+	// Bind vertex buffer object
+	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
+	// Get the attribute location
+	var coord = this.gl.getAttribLocation(this._program, "position");
+	// Point an attribute to the currently bound VBO
+	this.gl.vertexAttribPointer(coord, 3, this.gl.FLOAT, false, 0, 0);
+	// Enable the attribute
+	this.gl.enableVertexAttribArray(coord);
+	// Unbind the buffer?
+	// this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+	// Set the view port
+	this.gl.viewport(0,0,this.gl.canvas.width,this.gl.canvas.height);
+
+	
+	let uRotationVector =
+	    this.gl.getUniformLocation(this._program, "uRotationVector");
+	// let radians = currentAngle * Math.PI / 180.0;
+	let currentRotation = [ 0.0, 1.0 ];
+	//currentRotation[0] = Math.sin(radians);
+	//currentRotation[1] = Math.cos(radians);
+	this.gl.uniform2fv( uRotationVector, currentRotation );
+	
+	
+	// Draw the line
+	this.gl.drawArrays(this.gl.LINES, 0, vertices.length/3);
+	// POINTS, LINE_STRIP, LINE_LOOP, LINES,
+	// TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
     };
 
-    
 
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
@@ -73,22 +153,8 @@
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutils.prototype.arrow = function( zA, zB, color ) {
-	var headlen = 8;   // length of head in pixels
-	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-	
-	this.ctx.save();
-	this.ctx.beginPath();
-	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-	
-	this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
-	for( var i = 0; i < vertices.length; i++ ) {
-	    this.ctx.lineTo( this.offset.x+vertices[i].x, this.offset.y+vertices[i].y );
-	}
-	this.ctx.lineTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
-	this.ctx.lineWidth = 1;
-	this._fillOrDraw( color );
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.arrow = function( zA, zB, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -105,16 +171,8 @@
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutils.prototype.image = function( image, position, size ) {
-	this.ctx.save();
-	// Note that there is a Safari bug with the 3 or 5 params variant.
-	// Only the 9-param varaint works.
-	this.ctx.drawImage( image,
-			    0, 0,
-			    image.naturalWidth, image.naturalHeight,
-			    this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y,
-			    size.x*this.scale.x, size.y*this.scale.y );
-	this.ctx.restore();	
+    _context.drawutilsgl.prototype.image = function( image, position, size ) {
+	// NOT YET IMPLEMENTED
     };
 
     
@@ -129,14 +187,8 @@
     // |
     // | @param color A stroke/fill color to use.
     // +-------------------------------
-    _context.drawutils.prototype._fillOrDraw = function( color ) {
-	if( this.fillShapes ) {
-	    this.ctx.fillStyle = color;
-	    this.ctx.fill();
-	} else {
-	    this.ctx.strokeStyle = color;
-	    this.ctx.stroke();
-	}
+    _context.drawutilsgl.prototype._fillOrDraw = function( color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -153,22 +205,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color ) {
-	if( startPoint instanceof CubicBezierCurve ) {
-	    this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, endPoint );
-	    return;
-	}
-	// Draw curve
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
-	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
-				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
-				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-	//this.ctx.closePath();
-	this.ctx.lineWidth = 2;
-	this._fillOrDraw( color );
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -186,26 +224,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.cubicBezierPath = function( path, color ) {
-	if( !path || path.length == 0 )
-	    return;
-	// Draw curve
-	this.ctx.save();
-	this.ctx.beginPath();
-	var curve, startPoint, endPoint, startControlPoint, endControlPoint;
-	this.ctx.moveTo( this.offset.x+path[0].x*this.scale.x, this.offset.y+path[0].y*this.scale.y );
-	for( var i = 1; i < path.length; i+=3 ) {
-	    startControlPoint = path[i];
-	    endControlPoint = path[i+1];
-	    endPoint = path[i+2];
-	    this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
-				    this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
-				    this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-	}
-	this.ctx.closePath();
-	this.ctx.lineWidth = 1;
-	this._fillOrDraw( color );
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.cubicBezierPath = function( path, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -221,11 +241,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.handle = function( startPoint, endPoint ) { 
-	// Draw handles
-	// (No need to save and restore here)
-	this.point( startPoint, 'rgb(0,32,192)' );
-	this.square( endPoint, 5, 'rgba(0,128,192,0.5)' );
+    _context.drawutilsgl.prototype.handle = function( startPoint, endPoint ) { 
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -240,9 +257,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.cubicBezierCurveHandleLines = function( curve ) {
-	// Draw handle lines
-	this.cubicBezierHandleLines( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
+    _context.drawutilsgl.prototype.cubicBezierCurveHandleLines = function( curve ) {
+	// NOT YET IMPLEMENTED
     };
 
     
@@ -256,9 +272,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.handleLine = function( startPoint, endPoint ) {
-	// Draw handle lines
-	this.line( startPoint, endPoint, 'rgb(192,192,192)' );	
+    _context.drawutilsgl.prototype.handleLine = function( startPoint, endPoint ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -273,14 +288,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.dot = function( p, color ) {
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo( Math.round(this.offset.x + this.scale.x*p.x), Math.round(this.offset.y + this.scale.y*p.y) );
-	this.ctx.lineTo( Math.round(this.offset.x + this.scale.x*p.x+1), Math.round(this.offset.y + this.scale.y*p.y+1) );
-	this.ctx.closePath();
-	this._fillOrDraw( color );
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.dot = function( p, color ) {
+	// NOT YET IMPLEMENTED
     };
 
     
@@ -294,12 +303,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.point = function( p, color ) {
-	var radius = 3;
-	this.ctx.beginPath();
-	this.ctx.arc( this.offset.x+p.x*this.scale.x, this.offset.y+p.y*this.scale.y, radius, 0, 2 * Math.PI, false );
-	this.ctx.closePath();
-	this._fillOrDraw( color );
+    _context.drawutilsgl.prototype.point = function( p, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -316,11 +321,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.circle = function( center, radius, color ) {
-	this.ctx.beginPath();
-	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radius*this.scale.x, radius*this.scale.y, 0.0, 0.0, Math.PI*2 );
-	this.ctx.closePath();
-	this._fillOrDraw( color );
+    _context.drawutilsgl.prototype.circle = function( center, radius, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -336,11 +338,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.ellipse = function( center, radiusX, radiusY, color ) {
-	this.ctx.beginPath();
-	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radiusX*this.scale.x, radiusY*this.scale.y, 0.0, 0.0, Math.PI*2 );
-	this.ctx.closePath();
-	this._fillOrDraw( color );
+    _context.drawutilsgl.prototype.ellipse = function( center, radiusX, radiusY, color ) {
+	// NOT YET IMPLEMENTED
     };   
 
 
@@ -357,11 +356,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.square = function( center, size, color ) {
-	this.ctx.beginPath();
-	this.ctx.rect( this.offset.x+(center.x-size/2.0)*this.scale.x, this.offset.y+(center.y-size/2.0)*this.scale.y, size*this.scale.x, size*this.scale.y );
-	this.ctx.closePath();
-	this._fillOrDraw( color );
+    _context.drawutilsgl.prototype.square = function( center, size, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -379,35 +375,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.grid = function( center, width, height, sizeX, sizeY, color ) {
-	this.ctx.beginPath();
-	// center to right
-	var x = 0;
-	while( x < width/2 ) {
-	    this.ctx.moveTo( this.offset.x + (center.x+x)*this.scale.x, this.offset.y - (center.y - height*0.5)*this.scale.y  );
-	    this.ctx.lineTo( this.offset.x + (center.x+x)*this.scale.x, this.offset.y - (center.y + height*0.5)*this.scale.y  );
-	    x+=sizeX;
-	}
-	x = sizeX;
-	while( x < width/2 ) {
-	    this.ctx.moveTo( this.offset.x + (center.x-x)*this.scale.x, this.offset.y - (center.y - height*0.5)*this.scale.y  );
-	    this.ctx.lineTo( this.offset.x + (center.x-x)*this.scale.x, this.offset.y - (center.y + height*0.5)*this.scale.y  );
-	    x+=sizeX;
-	}
-	var y = 0;
-	while( y < height/2 ) {
-	    this.ctx.moveTo( this.offset.x - (center.x - width*0.5)*this.scale.x, this.offset.y + (center.y+y)*this.scale.y );
-	    this.ctx.lineTo( this.offset.x - (center.x + width*0.5)*this.scale.x, this.offset.y + (center.y+y)*this.scale.y );
-	    y+=sizeY;
-	}
-	var y = sizeY;
-	while( y < height/2 ) {
-	    this.ctx.moveTo( this.offset.x - (center.x - width*0.5)*this.scale.x, this.offset.y + (center.y-y)*this.scale.y );
-	    this.ctx.lineTo( this.offset.x - (center.x + width*0.5)*this.scale.x, this.offset.y + (center.y-y)*this.scale.y );
-	    y+=sizeY;
-	}
-	this.ctx.closePath();
-	this._fillOrDraw( color );
+    _context.drawutilsgl.prototype.grid = function( center, width, height, sizeX, sizeY, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -427,26 +396,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.raster = function( center, width, height, sizeX, sizeY, color ) {
-	this.ctx.save();
-	this.ctx.beginPath();
-	var cx = 0, cy = 0;
-	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
-	    cx++;
-	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
-		if( cx == 1 ) cy++;
-		// Draw a crosshair
-		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
-		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
-		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
-		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );	
-	    }
-	}
-	this.ctx.strokeStyle = color;
-	this.ctx.lineWidth = 1.0; 
-	this.ctx.stroke();
-	this.ctx.closePath();
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.raster = function( center, width, height, sizeX, sizeY, color ) {
+	// NOT YET IMPLEMENTED
     };
     
 
@@ -465,14 +416,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.diamondHandle = function( center, size, color ) {
-	this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x + center.x*this.scale.x - size/2.0, this.offset.y + center.y*this.scale.y );
-	this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y - size/2.0 );
-	this.ctx.lineTo( this.offset.x + center.x*this.scale.x + size/2.0, this.offset.y + center.y*this.scale.y );
-	this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y + size/2.0 );
-	this.ctx.closePath();
-	this._fillOrDraw( color );
+    _context.drawutilsgl.prototype.diamondHandle = function( center, size, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -491,11 +436,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.squareHandle = function( center, size, color ) {
-	this.ctx.beginPath();
-	this.ctx.rect( this.offset.x+center.x*this.scale.x-size/2.0, this.offset.y+center.y*this.scale.y-size/2.0, size, size );
-	this.ctx.closePath();
-	this._fillOrDraw( color );
+    _context.drawutilsgl.prototype.squareHandle = function( center, size, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -514,12 +456,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.circleHandle = function( center, size, color ) {
-	var radius = 3;
-	this.ctx.beginPath();
-	this.ctx.arc( this.offset.x+center.x*this.scale.x, this.offset.y+center.y*this.scale.y, radius, 0, 2 * Math.PI, false );
-	this.ctx.closePath();
-	this._fillOrDraw( color );
+    _context.drawutilsgl.prototype.circleHandle = function( center, size, color ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -536,18 +474,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.crosshair = function( center, radius, color ) {
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x+center.x*this.scale.x-radius, this.offset.y+center.y*this.scale.y );
-	this.ctx.lineTo( this.offset.x+center.x*this.scale.x+radius, this.offset.y+center.y*this.scale.y );
-	this.ctx.moveTo( this.offset.x+center.x*this.scale.x, this.offset.y+center.y*this.scale.y-radius );
-	this.ctx.lineTo( this.offset.x+center.x*this.scale.x, this.offset.y+center.y*this.scale.y+radius );
-	this.ctx.strokeStyle = color;
-	this.ctx.lineWidth = 0.5;
-	this.ctx.stroke();
-	this.ctx.closePath();
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.crosshair = function( center, radius, color ) {
+	// NOT YET IMPLEMENTED	
     };
 
 
@@ -561,22 +489,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.polygon = function( polygon, color ) {
-	if( polygon.vertices.length <= 1 )
-	    return;
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.setLineDash([3, 5]);
-	this.ctx.lineWidth = 1.0;
-	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
-	for( var i = 0; i < polygon.vertices.length; i++ ) {
-	    this.ctx.lineTo( this.offset.x + polygon.vertices[i].x*this.scale.x, this.offset.y + polygon.vertices[i].y*this.scale.y );
-	}
-	if( !polygon.isOpen && polygon.vertices.length > 2 )
-	    this.ctx.closePath();
-	this._fillOrDraw( color );
-	this.ctx.setLineDash([]);
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.polygon = function( polygon, color ) {
+	// NOT YET IMPLEMENTED	
     };
 
     
@@ -678,18 +592,8 @@
     // +---------------------------------------------------------------------------------
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
-    _context.drawutils.prototype.label = function( text, x, y, rotation ) {
-	this.ctx.save();
-	this.ctx.translate(x, y);
-	if( typeof rotation != 'undefined' )
-	    this.ctx.rotate(rotation);
-	this.ctx.fillStyle = 'black';
-	if( this.fillShapes ) {
-	    this.ctx.fillText( text, 0,0); 
-	} else {
-	    this.ctx.strokeText( text, 0,0);
-	}
-	this.ctx.restore();
+    _context.drawutilsgl.prototype.label = function( text, x, y, rotation ) {
+	// NOT YET IMPLEMENTED
     };
 
 
@@ -701,10 +605,93 @@
      *
      * @param {string} color - The color to clear with.
      **/
-    _context.drawutils.prototype.clear = function( color ) {
-	this.ctx.fillStyle = color; 
-	this.ctx.fillRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
+    _context.drawutilsgl.prototype.clear = function( color ) {
+	// NOT YET IMPLEMENTED
+
+	if( typeof color == 'string' )
+	    color = Color.parse(color);
+	
+	// Clear the canvas
+	this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
+
+	// Enable the depth test
+	this.gl.enable(this.gl.DEPTH_TEST);
+
+	// Clear the color and depth buffer
+	this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    };
+
+    
+})(window ? window : (global ? global : module.export) );
+
+
+
+/**
+ * Some GL helper utils.
+ **/
+(function(_context) {
+    var GLU = function( gl ) {
+	this.gl = gl;
+    };
+
+    GLU.prototype.bufferData = function( verts ) {
+	// Create an empty buffer object
+	var vbuffer = this.gl.createBuffer();
+	// Bind appropriate array buffer to it
+	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbuffer);
+	// Pass the vertex data to the buffer
+	this.gl.bufferData(this.gl.ARRAY_BUFFER, verts, this.gl.STATIC_DRAW);
+	// Unbind the buffer
+	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+	return vbuffer;
     };
     
-    
-})(window ? window : module.export );
+
+    /*=================== Shaders ====================*/
+    GLU.prototype.compileShader = function( shaderCode, type ) {
+	// Create a vertex shader object
+	var shader = this.gl.createShader(type);
+	// Attach vertex shader source code
+	this.gl.shaderSource(shader, shaderCode);
+	// Compile the vertex shader
+	this.gl.compileShader(shader);
+	const vertStatus = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
+	if (!vertStatus) {
+	    console.warn("Error in shader:" + this.gl.getShaderInfoLog(shader) );	
+	    this.gl.deleteShader(shader);
+	    return null;
+	}
+	return shader;
+    };
+
+
+    GLU.prototype.makeProgram = function( vertShader, fragShader ) {
+	// Create a shader program object to store
+	// the combined shader program
+	var program = this.gl.createProgram();
+
+	// Attach a vertex shader
+	this.gl.attachShader(program, vertShader);
+
+	// Attach a fragment shader
+	this.gl.attachShader(program, fragShader);
+
+	// Link both the programs
+	this.gl.linkProgram(program);
+
+	// Use the combined shader program object
+	this.gl.useProgram(program);
+
+	/*======= Do some cleanup ======*/
+	this.gl.detachShader(program, vertShader);
+	this.gl.detachShader(program, fragShader);
+	this.gl.deleteShader(vertShader);
+	this.gl.deleteShader(fragShader);
+
+	return program;
+    };
+
+    // Export constructor
+    _context.GLU = GLU;
+
+})(window ? window : (global ? global : module.export) );

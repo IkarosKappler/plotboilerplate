@@ -1,7 +1,7 @@
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
- * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath
+ * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, drawutils, drawutilsgl
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23
@@ -33,7 +33,8 @@
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
- * @version  1.4.12
+ * @modified 2019-09-18 Added basics for WebGL support (strictly experimental).
+ * @version  1.4.13
  *
  * @file PlotBoilerplate
  * @public
@@ -146,6 +147,7 @@
      * @param {boolean=} [config.enableMouse=true] - Indicates if the application should handle mouse events for you.
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle touch events for you.
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle key events for you.
+     * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features.
      */
     var PlotBoilerplate = function( config ) {
 	config = config || {};
@@ -199,7 +201,9 @@
 	    // Interaction
 	    enableMouse           : typeof config.enableMouse != 'undefined' ? config.enableMouse : true,
 	    enableTouch           : typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
-	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true
+	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true,
+
+	    enableGL              : typeof config.enableGL != 'undefined' ? config.enableGL : false
 	};
 
 
@@ -218,10 +222,17 @@
 	// | Object members.
 	// +-------------------------------
 	this.canvas              = typeof config.canvas == 'string' ? document.getElementById(config.canvas) : config.canvas;
-	this.ctx                 = this.canvas.getContext('2d');
-	this.draw                = new drawutils(this.ctx,false);
+	if( this.config.enableGL ) {
+	    this.ctx                 = this.canvas.getContext( 'webgl' ); // webgl-experimental?
+	    this.draw                = new drawutilsgl(this.ctx,false);
+	    // PROBLEM: same instance of fill and draw when using WebGL. Shader program cannot be duplicated on the same context
+	    this.fill                = this.draw.copyInstance(true);
+	} else {
+	    this.ctx                 = this.canvas.getContext( '2d' );
+	    this.draw                = new drawutils(this.ctx,false);
+	    this.fill                = new drawutils(this.ctx,true);
+	}
 	this.draw.scale.set(this.config.scaleX,this.config.scaleY);
-	this.fill                = new drawutils(this.ctx,true);
 	this.fill.scale.set(this.config.scaleX,this.config.scaleY);
 	this.grid                = new Grid( new Vertex(0,0), new Vertex(50,50) );
 	this.image               = null; // An image.
@@ -407,11 +418,9 @@
 		this.removeVertex( drawable, false );
 	    for( var i in this.drawables ) {
 		if( this.drawables[i] === drawable ) {
-		    //console.log( 'deleting', this.drawables.length );
 		    this.drawables.splice(i,1);
 		    if( redraw )
 			this.redraw();
-		    //console.log( 'deleted', this.drawables.length );
 		    return;
 		}
 	    }
@@ -431,9 +440,7 @@
 	PlotBoilerplate.prototype.removeVertex = function( vert, redraw ) {
 	    for( var i in this.drawables ) {
 		if( this.vertices[i] === vert ) {
-		    //console.log( 'deleting', this.drawables.length );
 		    this.vertices.splice(i,1);
-		    //console.log( 'deleted', this.drawables.length );
 		    if( redraw )
 			this.redraw();
 		    return;
@@ -681,8 +688,9 @@
 	 **/
 	PlotBoilerplate.prototype.clear = function() {
 	    // Note that the image might have an alpha channel. Clear the scene first.
-	    this.ctx.fillStyle = this.config.backgroundColor; 
-	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
+	    //this.ctx.fillStyle = this.config.backgroundColor; 
+	    //this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
+	    this.draw.clear( this.config.backgroundColor );
 	};
 
 
@@ -1072,9 +1080,7 @@
 
 
 	if( this.config.enableMouse ) { 
-	    /** +---------------------------------------------------------------------------------
-	     * Install a mouse handler on the canvas.
-	     **/ // +-------------------------------
+	    // Install a mouse handler on the canvas.
 	    new MouseHandler(this.canvas)
 		.down( mouseDownHandler )
 		.drag( mouseDragHandler )
@@ -1085,23 +1091,17 @@
 
 
 	
-	if( this.config.enableTouch) { // && typeof TouchHandler != 'undefined' ) { 
-	    /** +---------------------------------------------------------------------------------
-	     * Install a touch handler on the canvas.
-	     **/ // +-------------------------------
-	    _self.console.log( 'Installing touch handler' );
-	    // +----------------------------------------------------------------------
-	    // | Convert absolute touch positions to relative DOM element position (relative to canvas)
-	    // +-------------------------------------------------
+	if( this.config.enableTouch) { 
+	    // Install a touch handler on the canvas.
+
+	    // Convert absolute touch positions to relative DOM element position (relative to canvas)
 	    function relPos(pos) {
 		// console.log( pos, _self.canvas.offsetLeft, _self.canvas.offsetTop );
 		return { x : pos.x - _self.canvas.offsetLeft,
 			 y : pos.y - _self.canvas.offsetTop
 		       };
 	    }
-	    // +----------------------------------------------------------------------
-	    // | Some private vars to store the current mouse/position/button state.
-	    // +-------------------------------------------------
+	    // Some private vars to store the current mouse/position/button state.
 	    var touchMovePos = null;
 	    var touchDownPos = null;
 	    var draggedElement = null;
