@@ -6,7 +6,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2019-09-18
- * @version  0.0.1
+ * @modified 2019-10-03 Added the beginDrawCycle hook.
+ * @version  0.0.2
  **/
 
 (function(_context) {
@@ -15,7 +16,7 @@
     var vertCode = `
     precision mediump float;
 
-    attribute vec2 position;
+    attribute vec3 position;
 
     uniform vec2 uRotationVector;
 
@@ -27,7 +28,7 @@
 		position.x * uRotationVector.x
 	);
 
-	gl_Position = vec4(rotatedPosition, 0.0, 1.0);
+	gl_Position = vec4(rotatedPosition, position.z, 1.0);
     }`;
 
     // Fragment shader source code
@@ -61,13 +62,28 @@
 	this.glutils = new GLU(context);
 	// PROBLEM: CANNOT USE MULTIPLE SHADER PROGRAM INSTANCES ON THE SAME CONTEXT!
 	// SOLUTION: USE SHARED SHADER PROGRAM!!! ... somehow ...
+	// This needs to be considered in the overlying component; both draw-instances need to
+	// share their gl context.
+	// That's what the copyInstace(boolean) method is good for.
 	this._vertShader = this.glutils.compileShader( vertCode, this.gl.VERTEX_SHADER );
 	this._fragShader = this.glutils.compileShader( fragCode, this.gl.FRAGMENT_SHADER );
 	this._program = this.glutils.makeProgram( this._vertShader, this._fragShader );
 
+	// Create an empty buffer object
+	this.vertex_buffer = this.gl.createBuffer();
+	// Bind appropriate array buffer to it
+	// this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
+	
 	console.log('gl initialized');
     };
 
+    /**
+     * Called before each draw cycle.
+     **/
+    _context.drawutilsgl.prototype.beginDrawCycle = function() {
+	this._zindex = 0.0;
+    };
+    
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
@@ -96,24 +112,24 @@
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutilsgl.prototype.line = function( zA, zB, color ) {	
+    _context.drawutilsgl.prototype.line = function( zA, zB, color ) {
 	const vertices = new Float32Array( 6 );
 	vertices[0] = this._x2rel(zA.x);
 	vertices[1] = this._y2rel(zA.y);
-	vertices[2] = this.zindex;
+	vertices[2] = this._zindex;
 	vertices[3] = this._x2rel(zB.x);
 	vertices[4] = this._y2rel(zB.y);
-	vertices[5] = this.zindex;
-	this.zindex+=0.01;
-
+	vertices[5] = this._zindex;
+	this._zindex+=0.001;
+	
 	// Create an empty buffer object
-	const vertex_buffer = this.gl.createBuffer();
+	// const vertex_buffer = this.gl.createBuffer();
 	// Bind appropriate array buffer to it
-	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
+	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
 	// Pass the vertex data to the buffer
 	this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
 	// Bind vertex buffer object
-	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
+	// this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
 	// Get the attribute location
 	var coord = this.gl.getAttribLocation(this._program, "position");
 	// Point an attribute to the currently bound VBO
@@ -121,11 +137,10 @@
 	// Enable the attribute
 	this.gl.enableVertexAttribArray(coord);
 	// Unbind the buffer?
-	// this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+	//this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 	// Set the view port
 	this.gl.viewport(0,0,this.gl.canvas.width,this.gl.canvas.height);
 
-	
 	let uRotationVector =
 	    this.gl.getUniformLocation(this._program, "uRotationVector");
 	// let radians = currentAngle * Math.PI / 180.0;
@@ -133,7 +148,6 @@
 	//currentRotation[0] = Math.sin(radians);
 	//currentRotation[1] = Math.cos(radians);
 	this.gl.uniform2fv( uRotationVector, currentRotation );
-	
 	
 	// Draw the line
 	this.gl.drawArrays(this.gl.LINES, 0, vertices.length/3);
@@ -490,92 +504,50 @@
      * @memberof drawutils
      */
     _context.drawutilsgl.prototype.polygon = function( polygon, color ) {
-	// NOT YET IMPLEMENTED	
-    };
-
-    
-    // THIS FUNCTION IS CURRENTLY NOT IN USE, AS SVG TO CANVAS ARC CONVERSION IS UN-NECESSARY COMPLICATED.
-    // BUT IT IS WORKING.
-    // Found in an old version of
-    //    https://github.com/canvg/canvg
-    /*
-    _context.drawutils.prototype.arcto = function(lastX,lastY,rx,ry,xAxisRotation,largeArcFlag,sweepFlag,x,y, color)
-    {
-	lastX = this.offset.x + this.scale.x*lastX;
-	lastY = this.offset.y + this.scale.y*lastY;
-	x = this.offset.x + this.scale.x*x;
-	y = this.offset.y + this.scale.y*y;
-	rx *= this.scale.x;
-	ry *= this.scale.y;
-	//--------------------
-	// rx, ry, xAxisRotation, largeArcFlag, sweepFlag, x, y
-	// are the 6 data items in the SVG path declaration following the A
-	//
-	// lastX and lastY are the previous point on the path before the arc
-	//--------------------
-	// useful functions
-	var m   = function (   v) {return Math.sqrt (Math.pow (v[0],2) + Math.pow (v[1],2))};
-	var r   = function (u, v) {return ( u[0]*v[0] + u[1]*v[1]) / (m(u) * m(v))};
-	var ang = function (u, v) {return ((u[0]*v[1] < u[1]*v[0])? -1 : 1) * Math.acos (r (u,v))};
-	//--------------------
-
-	var currpX =  Math.cos (xAxisRotation) * (lastX - x) / 2.0 + Math.sin (xAxisRotation) * (lastY - y) / 2.0 ;
-	var currpY = -Math.sin (xAxisRotation) * (lastX - x) / 2.0 + Math.cos (xAxisRotation) * (lastY - y) / 2.0 ;
-
-	var l = Math.pow (currpX,2) / Math.pow (rx,2) + Math.pow (currpY,2) / Math.pow (ry,2);
-	if (l > 1) {rx *= Math.sqrt (l); ry *= Math.sqrt (l)};
-	var s = ((largeArcFlag == sweepFlag)? -1 : 1) * Math.sqrt 
-	(( (Math.pow (rx,2) * Math.pow (ry    ,2)) - (Math.pow (rx,2) * Math.pow (currpY,2)) - (Math.pow (ry,2) * Math.pow (currpX,2))) 
-	 / (Math.pow (rx,2) * Math.pow (currpY,2) +   Math.pow (ry,2) * Math.pow (currpX,2)));
-	if (isNaN (s)) s = 0 ;
-
-	var cppX = s *  rx * currpY / ry ;
-	var cppY = s * -ry * currpX / rx ;
-	var centpX = (lastX + x) / 2.0 + Math.cos (xAxisRotation) * cppX - Math.sin (xAxisRotation) * cppY ;
-	var centpY = (lastY + y) / 2.0 + Math.sin (xAxisRotation) * cppX + Math.cos (xAxisRotation) * cppY ;
-
-	var ang1 = ang ([1,0], [(currpX-cppX)/rx,(currpY-cppY)/ry]);
-	var a = [(  currpX-cppX)/rx,(currpY-cppY)/ry];
-	var b = [(-currpX-cppX)/rx,(-currpY-cppY)/ry];
-	var angd = ang (a,b);
-	if (r (a,b) <= -1) angd = Math.PI;
-	if (r (a,b) >=  1) angd = 0;
-
-	var rad = (rx > ry)? rx : ry;
-	var sx  = (rx > ry)? 1 : rx / ry;
-	var sy  = (rx > ry)? ry / rx : 1;
-
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo( lastX, lastY );
-	this.ctx.translate (centpX,centpY);
-	this.ctx.rotate (xAxisRotation);
-	this.ctx.scale (sx, sy);
-	this.ctx.arc (0, 0, rad, ang1, ang1 + angd, 1 - sweepFlag);
-	this.ctx.scale (1/sx, 1/sy);
-	this.ctx.rotate (-xAxisRotation);
-	this.ctx.translate (-centpX, -centpY);
-	this._fillOrDraw( color );
-	this.ctx.restore();
-    }; 
-    */
-
-    
-    // THIS FUNCTION IS CURRENTLY NOT IN USE
-    // TODO: make text scaling with zoom?
-    /*
-    _context.drawutils.prototype.text = function( text, x, y ) { // , options ) {
-	//options = options || {};
-	if( this.fillShapes ) {
-	    this.ctx.fillStyle = 'black';
-	    this.ctx.fillText( text, x, y );
-	} else {
-	    this.ctx.strokeStyle = 'black';
-	    this.ctx.strokeText( text, x, y );
+	// NOT YET IMPLEMENTED
+	//console.log( 'polygon' );
+	
+	const vertices = new Float32Array( polygon.vertices.length*3 );
+	for( var i = 0; i < polygon.vertices.length; i++ ) {
+	    vertices[i*3+0] = this._x2rel(polygon.vertices[i].x);
+	    vertices[i*3+1] = this._y2rel(polygon.vertices[i].y);
+	    vertices[i*3+2] = this._zindex;
 	}
-    };
-    */
+	this._zindex+=0.001;
+	//console.log( vertices );
+	
+	// Create an empty buffer object
+	// const vertex_buffer = this.gl.createBuffer();
+	// Bind appropriate array buffer to it
+	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
+	// Pass the vertex data to the buffer
+	this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+	// Bind vertex buffer object
+	// this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
+	// Get the attribute location
+	var coord = this.gl.getAttribLocation(this._program, "position");
+	// Point an attribute to the currently bound VBO
+	this.gl.vertexAttribPointer(coord, 3, this.gl.FLOAT, false, 0, 0);
+	// Enable the attribute
+	this.gl.enableVertexAttribArray(coord);
+	// Unbind the buffer?
+	this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+	// Set the view port
+	this.gl.viewport(0,0,this.gl.canvas.width,this.gl.canvas.height);
 
+	let uRotationVector =
+	    this.gl.getUniformLocation(this._program, "uRotationVector");
+	// let radians = currentAngle * Math.PI / 180.0;
+	let currentRotation = [ 0.0, 1.0 ];
+	//currentRotation[0] = Math.sin(radians);
+	//currentRotation[1] = Math.cos(radians);
+	this.gl.uniform2fv( uRotationVector, currentRotation );
+	
+	// Draw the polygon
+	this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, vertices.length/3);
+	// POINTS, LINE_STRIP, LINE_LOOP, LINES,
+	// TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
+    };
 
     /**
      * Draw a non-scaling text label at the given position.

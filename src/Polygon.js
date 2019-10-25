@@ -8,7 +8,8 @@
  * @modified 2018-11-17 Added the containsVert function.
  * @modified 2018-12-04 Added the toSVGString function.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  1.0.3
+ * @modified 2019-10-25 Added the scale function.
+ * @version  1.0.4
  *
  * @file Polygon
  * @public
@@ -91,6 +92,28 @@
 	}
 
 	return inside;
+    };
+
+
+
+    /**
+     * Scale the polygon relative to the given center.
+     
+     * @method scale
+     * @param {number} factor - The scale factor.
+     * @param {Vertex} center - The center of scaling.
+     * @return {Polygon} this, for chaining.
+     * @instance
+     * @memberof Polygon
+     **/
+    _context.Polygon.prototype.scale = function( factor, center ) {
+	for( var i in this.vertices ) {
+	    if( typeof this.vertices[i].scale == 'function' ) 
+		this.vertices[i].scale( factor, center );
+	    else
+		console.log( 'There seems to be a null vertex!', this.vertices[i] );
+	}
+	return this;
     };
 
 

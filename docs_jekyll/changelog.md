@@ -4,6 +4,8 @@ layout: page
 
 
 # Changelog
+* 2019-09-12
+  * Added JSDoc compliant comments to the (inofficial) Triangle class.
 * 2019-09-11
   * (Inofficial) Added the Triangle.scaleToCentroid(Number) function (used by the walking triangle demo).
 * 2019-09-02

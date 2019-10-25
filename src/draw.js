@@ -17,7 +17,9 @@
  * @modified 2019-04-27 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
  * @modified 2019-04-28 Added Math.round to the dot() drawing parameters to really draw a singlt dot.
  * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
- * @version  1.2.3
+ * @modified 2019-10-03 Added the beginDrawCycle hook.
+ * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
+ * @version  1.2.5
  **/
 
 (function(_context) {
@@ -36,6 +38,13 @@
 	this.offset = new Vertex( 0, 0 );
 	this.scale = new Vertex( 1, 1 );
 	this.fillShapes = fillShapes;
+    };
+
+    /**
+     * Called before each draw cycle.
+     **/
+    _context.drawutils.prototype.beginDrawCycle = function() {
+	// NOOP
     };
 
     /**
@@ -555,8 +564,8 @@
      * Draw a polygon.
      *
      * @method polygon
-     * @param {Polygon} polygon - The polygon to draw.
-     * @param {string} color - The CSS color to draw the polygon with.
+     * @param {Polygon}  polygon - The polygon to draw.
+     * @param {string}   color - The CSS color to draw the polygon with.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -566,7 +575,7 @@
 	    return;
 	this.ctx.save();
 	this.ctx.beginPath();
-	this.ctx.setLineDash([3, 5]);
+	// this.ctx.setLineDash([3, 5]);
 	this.ctx.lineWidth = 1.0;
 	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
 	for( var i = 0; i < polygon.vertices.length; i++ ) {

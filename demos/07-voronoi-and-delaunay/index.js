@@ -14,7 +14,8 @@
  * @modified 2018-04-29 Added web colors.
  * @modified 2018-05-04 Drawing voronoi cells by their paths now, not the triangles' circumcenters.
  * @modified 2019-04-24 Refactored the whole code and added an animator.
- * @version  2.0.0
+ * @modified 2019-10-25 Using draw.polygon(...) to draw Voronoi cells now. Added configurable colors.
+ * @version  2.0.1
  **/
 
 
@@ -105,7 +106,10 @@
 		drawTriangles         : true,
 		drawCircumCircles     : false,
 		drawCubicCurves       : false,
+		fillVoronoiCells      : true,
+		voronoiCellColor      : 'rgba(0,128,192, 0.5)',
 		voronoiCubicThreshold : 1.0,
+		voronoiCellScale      : 0.8,
 		pointCount            : 25,
 		rebuild               : function() { rebuild(); },
 		randomize             : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuild(); },
@@ -180,8 +184,8 @@
 		    drawVoronoiDiagram();
 
 		// Draw cubic curves
-		if( config.drawCubicCurves )
-		    drawCubicBezierVoronoi();
+		// if( config.drawCubicCurves )
+		//    drawCubicBezierVoronoi();
 	    };
 
 	    
@@ -201,12 +205,24 @@
 	    var drawVoronoiDiagram = function() {
 		for( var v in voronoiDiagram ) {
 		    var cell = voronoiDiagram[v];
-		    var path = cell.toPathArray();
+		    /*var path = cell.toPathArray();
 		    for( var t = 1; t < path.length; t++ ) {
 			pb.draw.line( path[t-1], path[t], '#00a828' );
 		    }
 		    if( !cell.isOpen() )
 			pb.draw.line( path[0], path[path.length-1], '#00a828' );
+		    */
+		    var polygon = new Polygon(cell.toPathArray(),cell.isOpen());
+		    polygon.scale( config.voronoiCellScale, cell.sharedVertex );
+		    pb.draw.polygon( polygon, '#00a828' );
+
+		    if( config.drawCubicCurves && !cell.isOpen() && cell.triangles.length >= 3 ) {
+			var cbezier = polygon.toCubicBezierData( config.voronoiCubicThreshold );
+			if( config.fillVoronoiCells )
+			    pb.fill.cubicBezierPath( cbezier, config.voronoiCellColor );
+			else
+			    pb.draw.cubicBezierPath( cbezier, config.voronoiCellColor );
+		    }
 		}
 	    };
 
@@ -224,16 +240,21 @@
 	    /**
 	     * Draw the voronoi cells as quadratic bezier curves.
 	     */
-	    var drawCubicBezierVoronoi = function() {
+	    /* var drawCubicBezierVoronoi = function() {
 		for( var c in voronoiDiagram ) {
 		    var cell = voronoiDiagram[c];
 		    if( cell.isOpen() || cell.triangles.length < 3 )
 			continue;
-		    var cbezier = new Polygon(cell.toPathArray(),cell.isOpen()).toCubicBezierData( config.voronoiCubicThreshold );
-		    pb.draw.cubicBezierPath( cbezier, '#0088e8' );
+		    
+		    var cbezier = new Polygon(cell.toPathArray(),cell.isOpen()).toCubicBezierData( config.voronoiCellThreshold );
+		    if( config.fillVoronoiCells )
+			pb.fill.cubicBezierPath( cbezier, config.voronoiCellColor );
+		    else
+			pb.draw.cubicBezierPath( cbezier, config.voronoiCellColor );
 		}
 		
 	    }; // END drawCubicBezierVoronoi
+	    */
 	    
 	    
 	    /**
@@ -404,7 +425,12 @@
 		var f2 = gui.addFolder('Voronoi');
 		f2.add(config, 'makeVoronoiDiagram').onChange( rebuild ).title("Make voronoi diagram from the triangle set.");
 		f2.add(config, 'drawCubicCurves').onChange( rebuild ).title("If checked the Voronoi's cubic curves will be drawn.");
-		f2.add(config, 'voronoiCubicThreshold').min(0.0).max(1.0).onChange( function() { pb.redraw() } ).title("(Experimental) Specifiy the cubic coefficients.");
+		f2.add(config, 'fillVoronoiCells').onChange( rebuild ).title("If checked the Voronoi cells will be filled.");
+		f2.addColor(config, 'voronoiCellColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi cell color.");
+		f2.add(config, 'voronoiCubicThreshold').min(0.0).max(1.0).onChange( function() { pb.redraw() } ).title("(Experimental) Specifiy the cubic or cell coefficients.");
+		f2.add(config, 'voronoiCellScale').min(-1.0).max(2.0).onChange( function() { pb.redraw() } ).title("Scale each voronoi cell before rendering.");
+
+		if( config.animate ) toggleAnimation();
 	    }
 
 

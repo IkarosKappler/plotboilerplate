@@ -34,7 +34,8 @@
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
  * @modified 2019-09-18 Added basics for WebGL support (strictly experimental).
- * @version  1.4.13
+ * @modified 2019-10-03 Added the .beginDrawCycle call in the redraw function.
+ * @version  1.4.14
  *
  * @file PlotBoilerplate
  * @public
@@ -661,6 +662,10 @@
 	    if( this.config.preClear ) this.config.preClear();
 	    this.clear();
 	    if( this.config.preDraw ) this.config.preDraw();
+
+	    // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+	    this.draw.beginDrawCycle();
+	    this.fill.beginDrawCycle();
 	    
 	    this.drawGrid();
 	    if( this.config.drawOrigin )

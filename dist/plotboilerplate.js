@@ -3446,7 +3446,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2018-11-17 Added the containsVert function.
  * @modified 2018-12-04 Added the toSVGString function.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  1.0.3
+ * @modified 2019-10-25 Added the scale function.
+ * @version  1.0.4
  *
  * @file Polygon
  * @public
@@ -3529,6 +3530,28 @@ Object.extendClass = function( superClass, subClass ) {
 	}
 
 	return inside;
+    };
+
+
+
+    /**
+     * Scale the polygon relative to the given center.
+     
+     * @method scale
+     * @param {number} factor - The scale factor.
+     * @param {Vertex} center - The center of scaling.
+     * @return {Polygon} this, for chaining.
+     * @instance
+     * @memberof Polygon
+     **/
+    _context.Polygon.prototype.scale = function( factor, center ) {
+	for( var i in this.vertices ) {
+	    if( typeof this.vertices[i].scale == 'function' ) 
+		this.vertices[i].scale( factor, center );
+	    else
+		console.log( 'There seems to be a null vertex!', this.vertices[i] );
+	}
+	return this;
     };
 
 
@@ -4419,7 +4442,7 @@ Object.extendClass = function( superClass, subClass ) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
- * Moved some draw functions to this wrapper.
+ * A wrapper class for basic drawing operations.
  *
  * @require Vertex
  *
@@ -4437,7 +4460,9 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-04-27 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
  * @modified 2019-04-28 Added Math.round to the dot() drawing parameters to really draw a singlt dot.
  * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
- * @version  1.2.3
+ * @modified 2019-10-03 Added the beginDrawCycle hook.
+ * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
+ * @version  1.2.5
  **/
 
 (function(_context) {
@@ -4456,6 +4481,13 @@ Object.extendClass = function( superClass, subClass ) {
 	this.offset = new Vertex( 0, 0 );
 	this.scale = new Vertex( 1, 1 );
 	this.fillShapes = fillShapes;
+    };
+
+    /**
+     * Called before each draw cycle.
+     **/
+    _context.drawutils.prototype.beginDrawCycle = function() {
+	// NOOP
     };
 
     /**
@@ -4527,7 +4559,6 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     _context.drawutils.prototype.image = function( image, position, size ) {
 	this.ctx.save();
-	console.log( image.width, image.height );
 	// Note that there is a Safari bug with the 3 or 5 params variant.
 	// Only the 9-param varaint works.
 	this.ctx.drawImage( image,
@@ -4976,8 +5007,8 @@ Object.extendClass = function( superClass, subClass ) {
      * Draw a polygon.
      *
      * @method polygon
-     * @param {Polygon} polygon - The polygon to draw.
-     * @param {string} color - The CSS color to draw the polygon with.
+     * @param {Polygon}  polygon - The polygon to draw.
+     * @param {string}   color - The CSS color to draw the polygon with.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -4987,7 +5018,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    return;
 	this.ctx.save();
 	this.ctx.beginPath();
-	this.ctx.setLineDash([3, 5]);
+	// this.ctx.setLineDash([3, 5]);
 	this.ctx.lineWidth = 1.0;
 	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
 	for( var i = 0; i < polygon.vertices.length; i++ ) {
@@ -5112,6 +5143,20 @@ Object.extendClass = function( superClass, subClass ) {
 	}
 	this.ctx.restore();
     };
+
+
+    /**
+     * Due to gl compatibility there is a generic 'clear' function required
+     * to avoid accessing the context object itself directly.
+     *
+     * This function just fills the whole canvas with a single color.
+     *
+     * @param {string} color - The color to clear with.
+     **/
+    _context.drawutils.prototype.clear = function( color ) {
+	this.ctx.fillStyle = color; 
+	this.ctx.fillRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
+    };
     
     
 })(window ? window : module.export );
@@ -5125,7 +5170,7 @@ Object.extendClass = function( superClass, subClass ) {
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
- * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath
+ * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, drawutils, drawutilsgl
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23
@@ -5157,7 +5202,9 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-04-03 Fixed the touch-drag position detection for canvas elements that are not located at document position (0,0). 
  * @modified 2019-04-03 Tweaked the fit-to-parent function to work with paddings and borders.
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
- * @version  1.4.12
+ * @modified 2019-09-18 Added basics for WebGL support (strictly experimental).
+ * @modified 2019-10-03 Added the .beginDrawCycle call in the redraw function.
+ * @version  1.4.14
  *
  * @file PlotBoilerplate
  * @public
@@ -5270,6 +5317,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {boolean=} [config.enableMouse=true] - Indicates if the application should handle mouse events for you.
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle touch events for you.
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle key events for you.
+     * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features.
      */
     var PlotBoilerplate = function( config ) {
 	config = config || {};
@@ -5323,7 +5371,9 @@ Object.extendClass = function( superClass, subClass ) {
 	    // Interaction
 	    enableMouse           : typeof config.enableMouse != 'undefined' ? config.enableMouse : true,
 	    enableTouch           : typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
-	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true
+	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true,
+
+	    enableGL              : typeof config.enableGL != 'undefined' ? config.enableGL : false
 	};
 
 
@@ -5342,10 +5392,17 @@ Object.extendClass = function( superClass, subClass ) {
 	// | Object members.
 	// +-------------------------------
 	this.canvas              = typeof config.canvas == 'string' ? document.getElementById(config.canvas) : config.canvas;
-	this.ctx                 = this.canvas.getContext('2d');
-	this.draw                = new drawutils(this.ctx,false);
+	if( this.config.enableGL ) {
+	    this.ctx                 = this.canvas.getContext( 'webgl' ); // webgl-experimental?
+	    this.draw                = new drawutilsgl(this.ctx,false);
+	    // PROBLEM: same instance of fill and draw when using WebGL. Shader program cannot be duplicated on the same context
+	    this.fill                = this.draw.copyInstance(true);
+	} else {
+	    this.ctx                 = this.canvas.getContext( '2d' );
+	    this.draw                = new drawutils(this.ctx,false);
+	    this.fill                = new drawutils(this.ctx,true);
+	}
 	this.draw.scale.set(this.config.scaleX,this.config.scaleY);
-	this.fill                = new drawutils(this.ctx,true);
 	this.fill.scale.set(this.config.scaleX,this.config.scaleY);
 	this.grid                = new Grid( new Vertex(0,0), new Vertex(50,50) );
 	this.image               = null; // An image.
@@ -5531,11 +5588,9 @@ Object.extendClass = function( superClass, subClass ) {
 		this.removeVertex( drawable, false );
 	    for( var i in this.drawables ) {
 		if( this.drawables[i] === drawable ) {
-		    //console.log( 'deleting', this.drawables.length );
 		    this.drawables.splice(i,1);
 		    if( redraw )
 			this.redraw();
-		    //console.log( 'deleted', this.drawables.length );
 		    return;
 		}
 	    }
@@ -5555,9 +5610,7 @@ Object.extendClass = function( superClass, subClass ) {
 	PlotBoilerplate.prototype.removeVertex = function( vert, redraw ) {
 	    for( var i in this.drawables ) {
 		if( this.vertices[i] === vert ) {
-		    //console.log( 'deleting', this.drawables.length );
 		    this.vertices.splice(i,1);
-		    //console.log( 'deleted', this.drawables.length );
 		    if( redraw )
 			this.redraw();
 		    return;
@@ -5778,6 +5831,10 @@ Object.extendClass = function( superClass, subClass ) {
 	    if( this.config.preClear ) this.config.preClear();
 	    this.clear();
 	    if( this.config.preDraw ) this.config.preDraw();
+
+	    // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+	    this.draw.beginDrawCycle();
+	    this.fill.beginDrawCycle();
 	    
 	    this.drawGrid();
 	    if( this.config.drawOrigin )
@@ -5805,8 +5862,9 @@ Object.extendClass = function( superClass, subClass ) {
 	 **/
 	PlotBoilerplate.prototype.clear = function() {
 	    // Note that the image might have an alpha channel. Clear the scene first.
-	    this.ctx.fillStyle = this.config.backgroundColor; 
-	    this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
+	    //this.ctx.fillStyle = this.config.backgroundColor; 
+	    //this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
+	    this.draw.clear( this.config.backgroundColor );
 	};
 
 
@@ -6196,9 +6254,7 @@ Object.extendClass = function( superClass, subClass ) {
 
 
 	if( this.config.enableMouse ) { 
-	    /** +---------------------------------------------------------------------------------
-	     * Install a mouse handler on the canvas.
-	     **/ // +-------------------------------
+	    // Install a mouse handler on the canvas.
 	    new MouseHandler(this.canvas)
 		.down( mouseDownHandler )
 		.drag( mouseDragHandler )
@@ -6209,23 +6265,17 @@ Object.extendClass = function( superClass, subClass ) {
 
 
 	
-	if( this.config.enableTouch) { // && typeof TouchHandler != 'undefined' ) { 
-	    /** +---------------------------------------------------------------------------------
-	     * Install a touch handler on the canvas.
-	     **/ // +-------------------------------
-	    _self.console.log( 'Installing touch handler' );
-	    // +----------------------------------------------------------------------
-	    // | Convert absolute touch positions to relative DOM element position (relative to canvas)
-	    // +-------------------------------------------------
+	if( this.config.enableTouch) { 
+	    // Install a touch handler on the canvas.
+
+	    // Convert absolute touch positions to relative DOM element position (relative to canvas)
 	    function relPos(pos) {
 		// console.log( pos, _self.canvas.offsetLeft, _self.canvas.offsetTop );
 		return { x : pos.x - _self.canvas.offsetLeft,
 			 y : pos.y - _self.canvas.offsetTop
 		       };
 	    }
-	    // +----------------------------------------------------------------------
-	    // | Some private vars to store the current mouse/position/button state.
-	    // +-------------------------------------------------
+	    // Some private vars to store the current mouse/position/button state.
 	    var touchMovePos = null;
 	    var touchDownPos = null;
 	    var draggedElement = null;
