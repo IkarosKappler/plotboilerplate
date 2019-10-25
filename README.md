@@ -120,6 +120,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ![Delaunay and Voronoi](screenshots/screenshot-20190416_0_voronoi_delaunay.png "Delaunay triangulation and Voronoi diagrams")
 ![Voronoi Bézier Cells](screenshots/screenshot-20190417_0_voronoi_bezier_cells.png "Voronoi Bézier Cells")
+![Voronoi Bézier Cells with scaling](screenshots/screenshot-20191025_1_voronoir_with_scaling.png "Voronoi Bézier with scaling")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/07-voronoi-and-delaunay/index.html" title="See the demo">See the demo</a>
 
@@ -131,6 +132,9 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ![Walking Triangles, Demo C](screenshots/screenshot-20190911_2_walking_triangles.png "Walking triangles, demo c")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/08-walking-triangles/index.html" title="See the demo">See the demo</a>
+
+
+
 
 
 
@@ -247,7 +251,11 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
     // boolean
     //   Indicates if the application should handle key events for you.
-    enableKeys            	: true
+    enableKeys            	: true,
+
+    // boolean
+    //   Indicates if the application should use the experimental WebGL features.
+    enableGL                    : false
   } );
 ~~~					  
 
@@ -347,6 +355,8 @@ from the sources code files in ./src/*.
 
 
 ## Todos
+ * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
+ * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
  * Include Touchy.js as a package dependency.
  * Include FileSaver.js as a package dependency.
  * Add a triangle helper class (like in the animation demo)?

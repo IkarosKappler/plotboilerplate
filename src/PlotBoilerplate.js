@@ -35,7 +35,7 @@
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
  * @modified 2019-09-18 Added basics for WebGL support (strictly experimental).
  * @modified 2019-10-03 Added the .beginDrawCycle call in the redraw function.
- * @version  1.4.14
+ * @version  1.4.15
  *
  * @file PlotBoilerplate
  * @public
