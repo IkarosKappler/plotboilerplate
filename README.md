@@ -120,7 +120,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ![Delaunay and Voronoi](screenshots/screenshot-20190416_0_voronoi_delaunay.png "Delaunay triangulation and Voronoi diagrams")
 ![Voronoi Bézier Cells](screenshots/screenshot-20190417_0_voronoi_bezier_cells.png "Voronoi Bézier Cells")
-![Voronoi Bézier Cells with scaling](screenshots/screenshot-20191025_1_voronoir_with_scaling.png "Voronoi Bézier with scaling")
+![Voronoi Bézier Cells with scaling](screenshots/screenshot-20191025_1_voronoi_with_scaling.png "Voronoi Bézier with scaling")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/07-voronoi-and-delaunay/index.html" title="See the demo">See the demo</a>
 
