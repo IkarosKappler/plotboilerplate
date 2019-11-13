@@ -9,3 +9,4 @@ docs_jekyll/_site/*
 docs_jekyll/.sass-cache
 *.lock
 package-lock.json
+.env
