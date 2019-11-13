@@ -1,9 +1,11 @@
 /**
  * A default SVG builder.
  *
- * @author  Ikaros Kappler
- * @date    2018-12-04
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2018-12-04
+ * @modified 2019-11-07 Added the 'Triangle' style class.
+ * @modified 2019-11-13 Added the <?xml ...?> tag.
+ * @version  1.0.2
  **/
 
 
@@ -18,8 +20,8 @@
     // +---------------------------------------------------------------------------------
     // | Builds teh SVG code from the given list of drawables.
     // |
-    // | @param drawables:Array The drawable elements to be converted (each must have a toSVGString-function).
-    // | @param options:Object { canvasSize, zoom, offset }
+    // | @param {object[]} drawables - The drawable elements (should implement Drawable) to be converted (each must have a toSVGString-function).
+    // | @param {object}   options  - { canvasSize, zoom, offset }
     // | 
     // +-------------------------------
     SVGBuilder.prototype.build = function( drawables, options ) {
@@ -28,7 +30,7 @@
 	var indent = '  ';
 	var buffer = [];
 	
-	// buffer.push( '<svg width="'+options.canvasSize.width+'" height="'+options.canvasSize.height+'" xmlns="http://www.w3.org/2000/svg">' + nl );
+	buffer.push( '<?xml version="1.0" encoding="UTF-8"?>' + nl );
 	buffer.push( '<svg width="'+options.canvasSize.width+'" height="'+options.canvasSize.height+'"' );
 	buffer.push( ' viewBox="' );
 	buffer.push( 0 );
@@ -45,6 +47,8 @@
 	buffer.push( indent + '<defs>' + nl );
 	buffer.push( indent + '<style>' + nl);
 
+	buffer.push( indent + indent + ' .Vertex { fill : blue; stroke : none; } ' + nl );
+	buffer.push( indent + indent + ' .Triangle { fill : none; stroke : turquoise; stroke-width : 1px; } ' + nl );
 	buffer.push( indent + indent + ' .Polygon { fill : none; stroke : green; stroke-width : 2px; } ' + nl );
 	buffer.push( indent + indent + ' .BezierPath { fill : none; stroke : blue; stroke-width : 2px; } ' + nl );
 	buffer.push( indent + indent + ' .VEllipse { fill : none; stroke : black; stroke-width : 1px; } ' + nl );

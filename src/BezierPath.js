@@ -1107,10 +1107,15 @@
 	    
 	    // Convert object (or array?) to bezier curve
 	    var bCurve = null;
-	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] )
+	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
+		//console.log('1', arr[i]);
+		if( !arr[i][0] || !arr[i][1] || !arr[i][2] || !arr[i][3] )
+		    throw "Cannot convert path data to BezierPath instance. At least one element is undefined (index="+i+"): " + arr[i];
 		bCurve = CubicBezierCurve.fromArray( arr[i] );
-	    else
+	    } else {
+		//console.log('2');
 		bCurve = CubicBezierCurve.fromObject( arr[i] );
+	    }
 	    // Set curve start point?
 	    // (avoid duplicate point instances!)
 	    if( lastCurve )

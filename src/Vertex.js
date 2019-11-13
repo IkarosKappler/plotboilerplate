@@ -19,8 +19,9 @@
  * @modified 2019-01-30 Added the setX(Number) and setY(Number) functions.
  * @modified 2019-02-19 Added the difference(Vertex) function.
  * @modified 2019-03-20 Added JSDoc tags.
- * @mosified 2019-04-24 Added the randomVertex(ViewPort) function.
- * @version  2.1.0
+ * @modified 2019-04-24 Added the randomVertex(ViewPort) function.
+ * @modified 2019-11-07 Added toSVGString(object) function.
+ * @version  2.1.1
  *
  * @file Vertex
  * @public
@@ -337,6 +338,29 @@
      **/
     Vertex.prototype.toString = function() {
 	return '('+this.x+','+this.y+')';
+    };
+
+
+    /**
+     * Convert this vertex to SVG code.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.toSVGString = function( options ) {
+	options = options || {};
+	var buffer = [];
+	buffer.push( '<circle' );
+	if( options.className )
+	    buffer.push( ' class="' + options.className + '"' );
+	buffer.push( ' cx="' + this.x + '"' );
+	buffer.push( ' cy="' + this.y + '"' );
+	buffer.push( ' r="2"' );
+	buffer.push( ' />' );
+	return buffer.join('');
     };
     // END Vertex
 

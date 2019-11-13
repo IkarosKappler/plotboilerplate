@@ -14,8 +14,9 @@
  * @date      2018-04-03 (Refactored the code into a new class).
  * @modified  2018-04-28 Added some documentation.
  * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
- * @modified  2019-09-12 Added  beautiful JSDoc compliable comments.
- * @version   2.0.3
+ * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
+ * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
+ * @version   2.0.4
  *
  * @file Triangle
  * @public
@@ -40,7 +41,7 @@
      * @param {Vertex} b - The second vertex of the triangle.
      * @param {Vertex} c - The third vertex of the triangle.
      **/
-    var Triangle = _context.Triangle = function( a, b, c )	{
+    var Triangle = function( a, b, c )	{
 	this.a = a;
 	this.b = b;
 	this.c = c;
@@ -260,6 +261,45 @@
     Triangle.prototype.toString = function() {
 	return '{ a : ' + this.a.toString () + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
     };
+
+
+    /**
+     * Create an SVG representation of this triangle.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} The SVG string.
+     * @instance
+     * @memberof Polygon
+     **/
+    Triangle.prototype.toSVGString = function( options ) {
+	options = options || {};
+	var buffer = [];
+	buffer.push( '<path' );
+	if( options.className )
+	    buffer.push( ' class="' + options.className + '"' );
+	buffer.push( ' d="' );
+	var vertices = [ this.a, this.b, this.c ];
+	if( vertices.length > 0 ) {
+	    buffer.push( 'M ' );
+	    buffer.push( vertices[0].x )
+	    buffer.push( ' ' );
+	    buffer.push( vertices[0].y );
+	    for( var i = 1; i < vertices.length; i++ ) {
+		buffer.push( ' L ' );
+		buffer.push( vertices[i].x )
+		buffer.push( ' ' );
+		buffer.push( vertices[i].y );
+	    }
+	    //if( !this.isOpen ) {
+		buffer.push( ' Z' );
+	    //}
+	}
+	buffer.push( '" />' );
+	return buffer.join('');
+    };
+
+    _context.Triangle = Triangle;
     // END Triangle
 
 })( window ? window : module.export );

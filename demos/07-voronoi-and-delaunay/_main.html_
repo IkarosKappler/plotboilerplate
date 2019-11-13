@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Triangulation</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="A random point set image triangulation made with Javascript.">
+    <meta name="keywords" content="Javascript, Canvas, Triangulation, Triangle, Delaunay, Voronoi, Diagram, Math, 2D">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2017-07-31">
+
+   
+    <script src="lib/dat.gui.min.js"></script>
+    <script src="lib/dat.gui.title.polyfill.js"></script>
+    <script src="lib/FileSaver.js"></script>
+    <script src="lib/Color.js"></script>
+    <script src="js/gup.js"></script>
+    <script src="js/WebColors.js"></script>
+    <script src="js/Vertex.js"></script>
+    <script src="js/Triangle.js"></script>
+    <script src="js/VoronoiCell.js"></script>
+    <script src="js/Polygon.js"></script>
+    <script src="js/delaunay.js"></script>
+    <script src="js/delaunay2voronoi.js"></script>
+    <script src="js/draw.js"></script>
+    <script src="js/MouseHandler.js"></script>
+
+    <script src="Color.lib.js"></script>
+    
+    <script src="js/main.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css"> 
+  </head>
+  <body>
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+    </div>
+    <div id="canvas-wrapper">
+      <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+    </div>
+    <div id="svg-preview"></div>
+  </body>
+</html>

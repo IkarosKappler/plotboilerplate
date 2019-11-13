@@ -1,7 +1,7 @@
 /**
  * A simple 2d point set and image triangulation (color fill).
  *
- * @requires Vertex, Triangle, Polygon, VoronoiCell, delaunay, delaunay2voronoi
+ * @requires Vertex, Triangle, Polygon, VoronoiCell, delaunay, delaunay2voronoi, saveAs
  *
  * @author   Ikaros Kappler
  * @date     2017-07-31
@@ -52,12 +52,14 @@
 		      autoAdjustOffset      : true,
 		      offsetAdjustXPercent  : 50,
 		      offsetAdjustYPercent  : 50,
-		      backgroundColor       : '#ffffff',
+		      backgroundColor       : '#000000',
 		      drawHandleLines       : false,
 		      drawHandlePoints      : false,
 		      enableMouse           : true,
 		      enableKeys            : true,
-		      enableTouch           : true
+		      enableTouch           : true,
+		      enableMouseWheel      : true
+		      enableExport          : true
 		    }, GUP
 		)
 	    );
@@ -68,11 +70,51 @@
 		redraw();
 	    };
 
-	    // +---------------------------------------------------------------------------------
-	    // | Initialize dat.gui
-	    // +-------------------------------
-	    var gui = pb.createGUI(); 
-	    // END init dat.gui
+	    /**
+	     * This is a function hooked into the plot boilerplate's savefile-handler.
+	     **/
+	    pb.hooks.saveFile = function() {
+		var v2svg = new drawablesToSVG( { canvasSize : pb.canvasSize, offset : pb.draw.offset, zoom : pb.draw.scale } );
+		if( config.drawTriangles ) {
+		    // let color = config.makeVoronoiDiagram ? 'rgba(0,128,224,0.33)' : '#0088d8';
+		    for( var i in triangles ) {
+			var t = triangles[i];
+			v2svg.addDrawable( t );
+		    }
+		}
+
+		if( config.drawCircumCircles )
+		    ; // Draw circumcircles in the SVG? 
+		
+		if( config.makeVoronoiDiagram ) {
+		    for( var v in voronoiDiagram ) {
+			var cell = voronoiDiagram[v];
+			var polygon = new Polygon(cell.toPathArray(),cell.isOpen());
+			polygon.scale( config.voronoiCellScale, cell.sharedVertex );
+			// let pcolor = config.voronoiOutlineColor;
+			v2svg.addDrawable( polygon );
+
+			if( config.drawCubicCurves && !cell.isOpen() && cell.triangles.length >= 3 ) {
+			    var cbezier = polygon.toCubicBezierData( config.voronoiCubicThreshold );
+			    // let vcolor = config.voronoiCellColor;
+				pb.draw.cubicBezierPath( cbezier, config.voronoiCellColor );
+			    // Add cubic bezier path
+			    v2svg.addDrawable( polygon.toCubicBezierPath() );
+    
+			}
+		    }
+		}
+
+		if( pb.drawConfig.drawVertices ) {
+		    for( var i in pb.vertices ) {
+			v2svg.addDrawable( pb.vertices[i] );
+		    }
+		}
+
+		var svgCode = v2svg.build();
+		var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
+		saveAs(blob, "voronoi-delaunay.svg");
+	    };
 	    
 
 	    // +---------------------------------------------------------------------------------
@@ -107,6 +149,7 @@
 		drawCircumCircles     : false,
 		drawCubicCurves       : false,
 		fillVoronoiCells      : true,
+		voronoiOutlineColor   : 'rgba(0,168,40, 1.0)',
 		voronoiCellColor      : 'rgba(0,128,192, 0.5)',
 		voronoiCubicThreshold : 1.0,
 		voronoiCellScale      : 0.8,
@@ -114,8 +157,8 @@
 		rebuild               : function() { rebuild(); },
 		randomize             : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuild(); },
 		fullCover             : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuild(); },
-		//fullCoverExtended     : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuild() }
-		animate               : false
+		animate               : false,
+		animationType         : 'linear' // 'linear' or 'circular'
 	    }, GUP );
 
 
@@ -183,9 +226,6 @@
 		if( config.makeVoronoiDiagram )
 		    drawVoronoiDiagram();
 
-		// Draw cubic curves
-		// if( config.drawCubicCurves )
-		//    drawCubicBezierVoronoi();
 	    };
 
 	    
@@ -205,16 +245,9 @@
 	    var drawVoronoiDiagram = function() {
 		for( var v in voronoiDiagram ) {
 		    var cell = voronoiDiagram[v];
-		    /*var path = cell.toPathArray();
-		    for( var t = 1; t < path.length; t++ ) {
-			pb.draw.line( path[t-1], path[t], '#00a828' );
-		    }
-		    if( !cell.isOpen() )
-			pb.draw.line( path[0], path[path.length-1], '#00a828' );
-		    */
 		    var polygon = new Polygon(cell.toPathArray(),cell.isOpen());
 		    polygon.scale( config.voronoiCellScale, cell.sharedVertex );
-		    pb.draw.polygon( polygon, '#00a828' );
+		    pb.draw.polygon( polygon, config.voronoiOutlineColor ); 
 
 		    if( config.drawCubicCurves && !cell.isOpen() && cell.triangles.length >= 3 ) {
 			var cbezier = polygon.toCubicBezierData( config.voronoiCubicThreshold );
@@ -265,7 +298,6 @@
 	    var rebuild = function() {
 		// Only re-triangulate if the point list changed.
 		var draw = true;
-		//if( (config.triangulate || config.makeVoronoiDiagram) ) // && trianglesPointCount != pointList.length )
 		triangulate();
 		if( config.makeVoronoiDiagram || config.drawCubicCurves )
 		    draw = makeVoronoiDiagram();
@@ -294,6 +326,7 @@
 		var voronoiBuilder = new delaunay2voronoi(pointList,triangles);
 		voronoiDiagram = voronoiBuilder.build();
 		redraw();
+		// Handle errors if vertices are too close and/or co-linear:
 		if( voronoiBuilder.failedTriangleSets.length != 0 ) {
 		    console.log( 'The error report contains '+voronoiBuilder.failedTriangleSets.length+' unconnected set(s) of triangles:' );
 		    // Draw illegal triangle sets?
@@ -307,7 +340,6 @@
 			    draw.circle( tri.center, tri.radius, 'rgb(255,'+Math.floor(255*(i/n))+',0)' );
 			}
 		    }
-		    // throw e;
 		    return false;
 		} else {
 		    return true;
@@ -383,7 +415,12 @@
 	    var animator = null;
 	    var toggleAnimation = function() {
 		if( config.animate ) {
-		    animator = new VertexAnimator( pointList, pb.viewport(), rebuild );
+		    if( animator )
+			animator.stop();
+		    if( config.animationType=='radial' )
+			animator = new CircularVertexAnimator( pointList, pb.viewport(), rebuild );
+		    else // 'linear'
+			animator = new LinearVertexAnimator( pointList, pb.viewport(), rebuild );
 		    animator.start();
 		} else {
 		    animator.stop();
@@ -407,7 +444,8 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
-            { 
+            {
+		var gui = pb.createGUI(); 
 
 		gui.add(config, 'rebuild').name('Rebuild all').title("Rebuild all.");
 
@@ -416,6 +454,7 @@
 		f0.add(config, 'randomize').name('Randomize').title("Randomize the point set.");
 		f0.add(config, 'fullCover').name('Full Cover').title("Randomize the point set with full canvas coverage.");
 		f0.add(config, 'animate').onChange( toggleAnimation ).title("Toggle point animation on/off.");
+		f0.add(config, 'animationType', { Linear: 'linear', Radial : 'radial' } ).onChange( function() { toggleAnimation(); } );
 		f0.open();
 		
 		var f1 = gui.addFolder('Delaunay');
@@ -424,6 +463,7 @@
 
 		var f2 = gui.addFolder('Voronoi');
 		f2.add(config, 'makeVoronoiDiagram').onChange( rebuild ).title("Make voronoi diagram from the triangle set.");
+		f2.addColor(config, 'voronoiOutlineColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi outline color.");
 		f2.add(config, 'drawCubicCurves').onChange( rebuild ).title("If checked the Voronoi's cubic curves will be drawn.");
 		f2.add(config, 'fillVoronoiCells').onChange( rebuild ).title("If checked the Voronoi cells will be filled.");
 		f2.addColor(config, 'voronoiCellColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi cell color.");

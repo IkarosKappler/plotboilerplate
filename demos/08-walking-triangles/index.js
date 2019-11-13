@@ -46,7 +46,8 @@
 		      drawHandlePoints      : false,
 		      enableMouse           : true,
 		      enableKeys            : true,
-		      enableTouch           : true
+		      enableTouch           : true,
+		      enableGL              : false
 		    }, GUP
 		)
 	    );
@@ -152,7 +153,6 @@
 		if( clear ) {
 		    for( var i in pointList )
 			pb.remove( pointList[i], false );
-		    //pointList = [];
 		}
 		// Generate random points on image border?
 		if( fullCover ) {
@@ -200,22 +200,6 @@
 		vert.listeners.addDragListener( function() { rebuild(); } );
 	    };
 
-	    /**
-	     * Unfortunately the animator is not smart, so we have to create a new
-	     * one (and stop the old one) each time the vertex count changes.
-	     **/
-	    var updateAnimator = function() {
-		if( animator )
-		    animator.stop();
-		// animator = null;
-		if( config.animate ) {
-		    animator = new VertexAnimator( pb.vertices, pb.viewport(), updateTriangles );
-		    animator.start();
-		} else {
-		    animator = null;
-		}
-	    };
-
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Add some interactive elements: point sets (triangles) and circles.
@@ -237,42 +221,27 @@
 		p.listeners.addDragListener( updateTriangles ); 
 	    }
 
+
 	    // Animate the vertices: make them bounce around and reflect on the walls.
 	    var animator = null;
-
+	    
 	    /**
-	     * This function is called if the point set changed.
-	     *
-	     * As the animator class is a disposable class, the old one needs to be
-	     * stopped and destroyed and a new one needs to be instantiated.
-	     */
-	    var toggleAnimation = function() {
+	     * Unfortunately the animator is not smart, so we have to create a new
+	     * one (and stop the old one) each time the vertex count changes.
+	     **/
+	    var updateAnimator = function() {
+		if( animator )
+		    animator.stop();
+		// animator = null;
 		if( config.animate ) {
-		    animator = new VertexAnimator( pb.vertices, pb.viewport(), updateTriangles );
+		    animator = new LinearVertexAnimator( pb.vertices, pb.viewport(), updateTriangles );
 		    animator.start();
 		} else {
-		    animator.stop();
 		    animator = null;
 		}
 	    };
-	    toggleAnimation();
-
+	    updateAnimator();
 	    
-
-	    /**
-	     * This function switches the existing animator on/off.
-	     **/
-	    var toggleAnimationPaused = function() {
-		if( config.animate ) {
-		    if( animator ) 
-			animator.start();
-		    else
-			toggleAnimation();
-		} else {
-		    if( animator )
-			animator.stop();
-		}
-	    }
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
@@ -293,7 +262,7 @@
 		f0.addColor(config, 'triangleColor').name('Triangle color').onChange( function() { triangleColor=Color.makeHEX(config.triangleColor); console.log(config.triangleColor); } ).title("Choose a triangle color.");
 		f0.add(config, 'smoothTriangles').name('Smooth triangles').title('Render triangles with smooth alpha.');
 		f0.add(config, 'triangleScale').min(-2.0).max(2.0).step(0.05).name('Triangle Scale').title("Scale each triangle towards its centroid.");
-		f0.add(config, 'animate').onChange( function() { toggleAnimationPaused(); } ).name('Animate').title('Toggle animation on/off.');
+		f0.add(config, 'animate').onChange( function() { updateAnimator(); } ).name('Animate').title('Toggle animation on/off.');
 		f0.open();
 	
 	    }

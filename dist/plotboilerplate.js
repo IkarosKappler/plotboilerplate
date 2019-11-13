@@ -404,8 +404,9 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-01-30 Added the setX(Number) and setY(Number) functions.
  * @modified 2019-02-19 Added the difference(Vertex) function.
  * @modified 2019-03-20 Added JSDoc tags.
- * @mosified 2019-04-24 Added the randomVertex(ViewPort) function.
- * @version  2.1.0
+ * @modified 2019-04-24 Added the randomVertex(ViewPort) function.
+ * @modified 2019-11-07 Added toSVGString(object) function.
+ * @version  2.1.1
  *
  * @file Vertex
  * @public
@@ -722,6 +723,29 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     Vertex.prototype.toString = function() {
 	return '('+this.x+','+this.y+')';
+    };
+
+
+    /**
+     * Convert this vertex to SVG code.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.toSVGString = function( options ) {
+	options = options || {};
+	var buffer = [];
+	buffer.push( '<circle' );
+	if( options.className )
+	    buffer.push( ' class="' + options.className + '"' );
+	buffer.push( ' cx="' + this.x + '"' );
+	buffer.push( ' cy="' + this.y + '"' );
+	buffer.push( ' r="2"' );
+	buffer.push( ' />' );
+	return buffer.join('');
     };
     // END Vertex
 
@@ -3250,10 +3274,15 @@ Object.extendClass = function( superClass, subClass ) {
 	    
 	    // Convert object (or array?) to bezier curve
 	    var bCurve = null;
-	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] )
+	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
+		//console.log('1', arr[i]);
+		if( !arr[i][0] || !arr[i][1] || !arr[i][2] || !arr[i][3] )
+		    throw "Cannot convert path data to BezierPath instance. At least one element is undefined (index="+i+"): " + arr[i];
 		bCurve = CubicBezierCurve.fromArray( arr[i] );
-	    else
+	    } else {
+		//console.log('2');
 		bCurve = CubicBezierCurve.fromObject( arr[i] );
+	    }
 	    // Set curve start point?
 	    // (avoid duplicate point instances!)
 	    if( lastCurve )
@@ -3447,7 +3476,9 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2018-12-04 Added the toSVGString function.
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-10-25 Added the scale function.
- * @version  1.0.4
+ * @modified 2019-11-06 JSDoc update.
+ * @modified 2019-11-07 Added toCubicBezierPath(number) function.
+ * @version  1.0.6
  *
  * @file Polygon
  * @public
@@ -3682,12 +3713,32 @@ Object.extendClass = function( superClass, subClass ) {
 	return buffer.join(' ');
     };
 
+    
+
+    /**
+     * Convert this polygon to a cubic bezier path instance.
+     *
+     * @method toCubicBezierPath
+     * @param {number} threshold - The threshold, usually from 0.0 to 1.0.
+     * @return {BezierPath}      - A bezier path instance.
+     * @instance
+     * @memberof Polygon
+     **/
+    _context.Polygon.prototype.toCubicBezierPath = function( threshold ) {
+	var qdata = this.toCubicBezierData( threshold );
+	// Conver the linear path vertices to a two-dimensional path array
+	var pathdata = [];
+	for( var i = 0; i+3 < qdata.length; i+=3 ) {
+	    pathdata.push( [ qdata[i], qdata[i+3], qdata[i+1], qdata[i+2] ] );
+	}
+	return BezierPath.fromArray( pathdata );
+    };
 
  
     /**
      * Create an SVG representation of this polygon.
      *
-     * @method toCubicBezierSVGString
+     * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} The SVG string.
      * @instance
@@ -5204,7 +5255,10 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-04-28 Added the preClear callback param (called before the canvas was cleared on redraw and before any elements are drawn).
  * @modified 2019-09-18 Added basics for WebGL support (strictly experimental).
  * @modified 2019-10-03 Added the .beginDrawCycle call in the redraw function.
- * @version  1.4.15
+ * @modified 2019-11-06 Added fetch.num, fetch.val, fetch.bool, fetch.func functions.
+ * @modified 2019-11-13 Fixed an issue with the mouse-sensitive area around vertices (were affected by zoom).
+ * @modified 2019-11-13 Added the 'enableMouseWheel' param.
+ * @version  1.4.16
  *
  * @file PlotBoilerplate
  * @public
@@ -5317,7 +5371,10 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {boolean=} [config.enableMouse=true] - Indicates if the application should handle mouse events for you.
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle touch events for you.
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle key events for you.
-     * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features.
+     * @param {boolean=} [config.enableMouseWheel=true] - Indicates if the application should handle mouse wheel events for you.
+     * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features (not recommended).
+     * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true). 
+     *                                                   Note that changes from the postDraw hook might not be visible in the export.
      */
     var PlotBoilerplate = function( config ) {
 	config = config || {};
@@ -5335,45 +5392,47 @@ Object.extendClass = function( superClass, subClass ) {
 	 * @instance
 	 */
 	this.config = {
-	    fullSize              : typeof config.fullSize != 'undefined' ? config.fullSize : true,
-	    fitToParent           : typeof config.fitToParent != 'undefined' ? config.fitToParent : true,
-	    scaleX                : config.scaleX || 1.0,
-	    scaleY                : config.scaleY || 1.0,
-	    drawGrid              : typeof config.drawGrid != 'undefined' ? config.drawGrid : true,
-	    rasterGrid            : typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
-	    rasterAdjustFactor    : typeof config.rasterAdjustFactor == 'number' ? config.rasterAdjustFactor : 2.0,
-	    drawOrigin            : typeof config.drawOrigin != 'undefined' ? config.drawOrigin : false,
-	    autoAdjustOffset      : typeof config.autoAdjustOffset != 'undefined' ? config.autoAdjustOffset : true,
-	    offsetAdjustXPercent  : typeof config.offsetAdjustXPercent == 'number' ? config.offsetAdjustXPercent : 50,
-	    offsetAdjustYPercent  : typeof config.offsetAdjustYPercent == 'number' ? config.offsetAdjustYPercent : 50,
+	    fullSize              : fetch.val(config,'fullSize',true), // typeof config.fullSize != 'undefined' ? config.fullSize : true,
+	    fitToParent           : fetch.bool(config,'fitToParent',true), //  typeof config.fitToParent != 'undefined' ? config.fitToParent : true,
+	    scaleX                : fetch.num(config,'scaleX',1.0), // config.scaleX || 1.0,
+	    scaleY                : fetch.num(config,'scaleY',1.0), // config.scaleY || 1.0,
+	    drawGrid              : fetch.bool(config,'drawGrid',true), // typeof config.drawGrid != 'undefined' ? config.drawGrid : true,
+	    rasterGrid            : fetch.bool(config,'rasterGrid',true), // typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
+	    rasterAdjustFactor    : fetch.num(config,'rasterAdjustdFactror',2.0), // typeof config.rasterAdjustFactor == 'number' ? config.rasterAdjustFactor : 2.0,
+	    drawOrigin            : fetch.bool(config,'drawOrigin',false), // typeof config.drawOrigin != 'undefined' ? config.drawOrigin : false,
+	    autoAdjustOffset      : fetch.val(config,'autoAdjustOffset',true), // typeof config.autoAdjustOffset != 'undefined' ? config.autoAdjustOffset : true,
+	    offsetAdjustXPercent  : fetch.num(config,'offsetAdjustXPercent',50), // typeof config.offsetAdjustXPercent == 'number' ? config.offsetAdjustXPercent : 50,
+	    offsetAdjustYPercent  : fetch.num(config,'offsetAdjustYPercent',50), // typeof config.offsetAdjustYPercent == 'number' ? config.offsetAdjustYPercent : 50,
 	    backgroundColor       : config.backgroundColor || '#ffffff',
-	    redrawOnResize        : typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
-	    defaultCanvasWidth    : typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
-	    defaultCanvasHeight   : typeof config.defaultCanvasHeight == 'number' ? config.defaultCanvasHeight : DEFAULT_CANVAS_HEIGHT,
-	    canvasWidthFactor     : typeof config.canvasWidthFactor == 'number' ? config.canvasWidthFactor : 1.0,
-	    canvasHeightFactor    : typeof config.canvasHeightFactor == 'number' ? config.canvasHeightFactor : 1.0,
-	    cssScaleX             : typeof config.cssScaleX == 'number' ? config.cssScaleX : 1.0,
-	    cssScaleY             : typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
-	    cssUniformScale       : typeof config.cssUniformScale != 'undefined' ? config.cssUniformScale : true,
+	    redrawOnResize        : fetch.bool(config,'redrawOnResize',true), //  typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
+	    defaultCanvasWidth    : fetch.num(config,'defaultCanvasWidth',DEFAULT_CANVAS_WIDTH), // typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
+	    defaultCanvasHeight   : fetch.num(config,'defaultCanvasHeight',DEFAULT_CANVAS_HEIGHT), // ,typeof config.defaultCanvasHeight == 'number' ? config.defaultCanvasHeight : DEFAULT_CANVAS_HEIGHT,
+	    canvasWidthFactor     : fetch.num(config,'canvasWidthFactor',1.0), // ,typeof config.canvasWidthFactor == 'number' ? config.canvasWidthFactor : 1.0,
+	    canvasHeightFactor    : fetch.num(config,'canvasHeightFactor',1.0), // typeof config.canvasHeightFactor == 'number' ? config.canvasHeightFactor : 1.0,
+	    cssScaleX             : fetch.num(config,'cssScaleX',1.0), // typeof config.cssScaleX == 'number' ? config.cssScaleX : 1.0,
+	    cssScaleY             : fetch.num(config,'cssScaleY',1.0), // typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
+	    cssUniformScale       : fetch.bool(config,'cssUniformScale',true), //typeof config.cssUniformScale != 'undefined' ? config.cssUniformScale : true,
 	    rebuild               : function() { rebuild(); },
-	    saveFile              : function() { saveFile(); },
+	    saveFile              : function() { _self.saveFile(); },
+	    enableExport          : fetch.bool(config,'enableExport',true), // typeof config.enableExport != 'undefined' ? config.enableExport : true,
 
-	    drawBezierHandleLines : typeof config.drawBezierHandleLines != 'undefined' ? config.drawBezierHandleLines : true,
-	    drawBezierHandlePoints : typeof config.drawBezierHandlePoints != 'undefined' ? config.drawBezierHandlePoints : true,
-	    drawHandleLines       : typeof config.drawHandleLines != 'undefined' ? config.drawHandleLines : true,
-	    drawHandlePoints      : typeof config.drawHandlePoints != 'undefined' ? config.drawHandlePoints : true,
+	    drawBezierHandleLines : fetch.bool(config,'drawBezierHandleLines',true), // typeof config.drawBezierHandleLines != 'undefined' ? config.drawBezierHandleLines : true,
+	    drawBezierHandlePoints : fetch.bool(config,'drawBezierHandlePoints',true), // typeof config.drawBezierHandlePoints != 'undefined' ? config.drawBezierHandlePoints : true,
+	    drawHandleLines       : fetch.bool(config,'drawHandleLines',true), // typeof config.drawHandleLines != 'undefined' ? config.drawHandleLines : true,
+	    drawHandlePoints      : fetch.bool(config,'drawHandlePoints',true), // typeof config.drawHandlePoints != 'undefined' ? config.drawHandlePoints : true,
 	    
 	    // Listeners/observers
-	    preClear              : (typeof config.preClear == 'function' ? config.preClear : null),
-	    preDraw               : (typeof config.preDraw == 'function' ? config.preDraw : null),
-	    postDraw              : (typeof config.postDraw == 'function' ? config.postDraw : null),
+	    preClear              : fetch.func(config,'preClear',null), // (typeof config.preClear == 'function' ? config.preClear : null),
+	    preDraw               : fetch.func(config,'preDraw',null), // (typeof config.preDraw == 'function' ? config.preDraw : null),
+	    postDraw              : fetch.func(config,'postDraw',null), // (typeof config.postDraw == 'function' ? config.postDraw : null),
 
 	    // Interaction
-	    enableMouse           : typeof config.enableMouse != 'undefined' ? config.enableMouse : true,
-	    enableTouch           : typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
-	    enableKeys            : typeof config.enableKeys != 'undefined' ? config.enableKeys : true,
+	    enableMouse           : fetch.bool(config,'enableMouse',true), // typeof config.enableMouse != 'undefined' ? config.enableMouse : true,
+	    enableTouch           : fetch.bool(config,'enableTouch',true), // typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
+	    enableKeys            : fetch.bool(config,'enableKeys',true), // typeof config.enableKeys != 'undefined' ? config.enableKeys : true,
+	    enableMouseWheel      : fetch.bool(config,'enableMouseWheel',true), // typeof config.enableMouseWheel != 'undefined' ? config.enableMouseWheel : true,
 
-	    enableGL              : typeof config.enableGL != 'undefined' ? config.enableGL : false
+	    enableGL              : fetch.bool(config,'enableGL',false) // typeof config.enableGL != 'undefined' ? config.enableGL : false
 	};
 
 
@@ -5387,6 +5446,7 @@ Object.extendClass = function( superClass, subClass ) {
 	this.drawConfig = {
 	    drawVertices : true
 	};
+
 
 	// +---------------------------------------------------------------------------------
 	// | Object members.
@@ -5416,6 +5476,34 @@ Object.extendClass = function( superClass, subClass ) {
 	var _self = this;
 
 
+	/**
+	 * This function opens a save-as file dialog and – once an output file is
+	 * selected – stores the current canvas contents as an SVG image.
+	 *
+	 * It is the default hook for saving files and can be overwritten.
+	 *
+	 * @method saveFile
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {void}
+	 **/
+	var _saveFile = function() {
+	    var svgCode = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
+	    // See documentation for FileSaver.js for usage.
+	    //    https://github.com/eligrey/FileSaver.js
+	    var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
+	    saveAs(blob, "plot-boilerplate.svg");
+	};
+
+
+	/**
+	 * A set of hook functions.
+	 **/
+	this.hooks = {
+	    saveFile : _saveFile
+	};
+
+	
 	// +---------------------------------------------------------------------------------
 	// | After this line: object members.
 	// +-------------------------------
@@ -5909,22 +5997,19 @@ Object.extendClass = function( superClass, subClass ) {
 	 */
 
 
+	
 	/**
-	 * This function opens a save-as file dialog and – once an output file is
-	 * selected – stores the current canvas contents as an SVG image.
+	 * Trigger the saveFile.hook.
 	 *
 	 * @method saveFile
 	 * @instance
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	var saveFile = function() {
-	    var svgCode = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
-	    // See documentation for FileSaver.js for usage.
-	    //    https://github.com/eligrey/FileSaver.js
-	    var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
-	    saveAs(blob, "plot-boilerplate.svg");
+	PlotBoilerplate.prototype.saveFile = function() {
+	    this.hooks.saveFile();
 	};
+
 
 
 	/**
@@ -6044,6 +6129,8 @@ Object.extendClass = function( superClass, subClass ) {
             // var tolerance = 7;
 	    if( typeof tolerance == 'undefined' )
 		tolerance = 7;
+	    // Apply the zoom (the tolerant area should not shrink or grow when zooming)
+	    tolerance /= _self.draw.scale.x;
 	    // Search in vertices
 	    for( var vindex in _self.vertices ) {
 		var vert = _self.vertices[vindex];
@@ -6259,9 +6346,16 @@ Object.extendClass = function( superClass, subClass ) {
 		.down( mouseDownHandler )
 		.drag( mouseDragHandler )
 		.up( mouseUpHandler )
-		.wheel( mouseWheelHandler )
 	    ;
 	} else { _self.console.log('Mouse interaction disabled.'); }
+
+
+	if( this.config.enableMouseWheel ) { 
+	    // Install a mouse handler on the canvas.
+	    new MouseHandler(this.canvas)
+		.wheel( mouseWheelHandler )
+	    ;
+	} else { _self.console.log('Mouse wheel interaction disabled.'); }
 
 
 	
@@ -6379,9 +6473,11 @@ Object.extendClass = function( superClass, subClass ) {
 	fold0.add(this.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
 	fold0.addColor(this.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");
 	// fold0.add(bp.config, 'loadImage').name('Load Image').title("Load a background image.");
-	
-	var fold1 = gui.addFolder('Export');
-	fold1.add(this.config, 'saveFile').name('Save a file').title("Save as SVG.");	 
+
+	if( this.config.enableExport ) {
+	    var fold1 = gui.addFolder('Export');
+	    fold1.add(this.config, 'saveFile').name('Save a file').title("Save as SVG.");
+	}
 	
 	return gui;
     };
@@ -6456,6 +6552,72 @@ Object.extendClass = function( superClass, subClass ) {
 
 	    return vertices;
 	}
+    };
+
+
+    // A helper for fetching data from objects.
+    let fetch = {
+	/**
+	 * A helper function to the the object property value specified by the given key.
+	 *
+	 * @param {object} object   - The object to get the property's value from. Must not be null.
+	 * @param {string} key      - The key of the object property (the name).
+	 * @param {any}    fallback - A default value if the key does not exist.
+	 **/
+	val : function( obj, key, fallback ) {
+	    if( !obj.hasOwnProperty(key) )
+		return fallback;
+	    if( typeof obj[key] == 'undefined' )
+		return fallback;
+	    return obj[key];
+	},
+
+
+	/**
+	 * A helper function to the the object property numeric value specified by the given key.
+	 *
+	 * @param {object} object   - The object to get the property's value from. Must not be null.
+	 * @param {string} key      - The key of the object property (the name).
+	 * @param {any}    fallback - A default value if the key does not exist.
+	 **/
+	num : function( obj, key, fallback ) {
+	    if( !obj.hasOwnProperty(key) )
+		return fallback;
+	    if( typeof obj[key] !== 'number' )
+		return fallback;
+	    return obj[key];
+	},
+
+	/**
+	 * A helper function to the the object property boolean value specified by the given key.
+	 *
+	 * @param {object} object   - The object to get the property's value from. Must not be null.
+	 * @param {string} key      - The key of the object property (the name).
+	 * @param {any}    fallback - A default value if the key does not exist.
+	 **/
+	bool : function( obj, key, fallback ) {
+	    if( !obj.hasOwnProperty(key) )
+		return fallback;
+	    if( typeof obj[key] !== 'boolean' )
+		return fallback;
+	    return obj[key];
+	},
+
+
+	/**
+	 * A helper function to the the object property function-value specified by the given key.
+	 *
+	 * @param {object} object   - The object to get the property's value from. Must not be null.
+	 * @param {string} key      - The key of the object property (the name).
+	 * @param {any}    fallback - A default value if the key does not exist.
+	 **/
+	func : function( obj, key, fallback ) {
+	    if( !obj.hasOwnProperty(key) )
+		return fallback;
+	    if( typeof obj[key] !== 'function' )
+		return fallback;
+	    return obj[key];
+	},
     };
     
     _context.PlotBoilerplate = PlotBoilerplate;

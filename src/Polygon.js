@@ -9,7 +9,9 @@
  * @modified 2018-12-04 Added the toSVGString function.
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-10-25 Added the scale function.
- * @version  1.0.4
+ * @modified 2019-11-06 JSDoc update.
+ * @modified 2019-11-07 Added toCubicBezierPath(number) function.
+ * @version  1.0.6
  *
  * @file Polygon
  * @public
@@ -244,12 +246,32 @@
 	return buffer.join(' ');
     };
 
+    
+
+    /**
+     * Convert this polygon to a cubic bezier path instance.
+     *
+     * @method toCubicBezierPath
+     * @param {number} threshold - The threshold, usually from 0.0 to 1.0.
+     * @return {BezierPath}      - A bezier path instance.
+     * @instance
+     * @memberof Polygon
+     **/
+    _context.Polygon.prototype.toCubicBezierPath = function( threshold ) {
+	var qdata = this.toCubicBezierData( threshold );
+	// Conver the linear path vertices to a two-dimensional path array
+	var pathdata = [];
+	for( var i = 0; i+3 < qdata.length; i+=3 ) {
+	    pathdata.push( [ qdata[i], qdata[i+3], qdata[i+1], qdata[i+2] ] );
+	}
+	return BezierPath.fromArray( pathdata );
+    };
 
  
     /**
      * Create an SVG representation of this polygon.
      *
-     * @method toCubicBezierSVGString
+     * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} The SVG string.
      * @instance

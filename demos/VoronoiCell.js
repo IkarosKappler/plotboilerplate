@@ -7,21 +7,21 @@
  * @author   Ikaros Kappler
  * @date     2018-04-11
  * @modified 2018-05-04 Added the 'sharedVertex' param to the constructor. Extended open cells into 'infinity'.
+ * @modified 2019-10-25 Fixed a serious bug in the toPathArray function; cell with only one vertex (extreme cases) returned invalid arrays which broke the rendering. 
  * @version  1.0.1
  **/
 
 (function(context) {
     "strict mode";
     
-    // +---------------------------------------------------------------------------------
-    // | The constructor.
-    // |
-    // | @param triangles:Array{Triangle} The passed triangle array must contain an ordered sequence of
-    // |                                  adjacent triangles.
-    // | @param sharedVertex:Vertex       This is the 'center' of the voronoi cell; all triangles must share
-    // |                                  that vertex.
-    // | 
-    // +-------------------------------
+    /**
+     * The constructor.
+     *
+     * @param {Triangle[]} triangles    The passed triangle array must contain an ordered sequence of
+     *                                  adjacent triangles.
+     * @param {Vertex}     sharedVertex This is the 'center' of the voronoi cell; all triangles must share
+     *                                  that vertex.
+     **/
     context.VoronoiCell = function( triangles, sharedVertex ) {
 	if( typeof triangles == 'undefined' )
 	    triangles = [];
@@ -32,20 +32,24 @@
     };
 
     
-    // +--------------------------------------------------------------------------------
-    // | Check if the first and the last triangle in the path are NOT connected.
-    // +-------------------------------
+    /**
+     * Check if the first and the last triangle in the path are NOT connected.
+     *
+     * @return {boolean}
+     **/
     context.VoronoiCell.prototype.isOpen = function() {
 	// There must be at least three triangles
 	return this.triangles.length < 3 || !this.triangles[0].isAdjacent(this.triangles[this.triangles.length-1]);	   
     };
 
 
-    // +---------------------------------------------------------------------------------
-    // | Convert the voronoi cell path data to an SVG polygon data string.
-    // |
-    // | "x0,y0 x1,y1 x2,y2 ..." 
-    // +-------------------------------
+    /**
+     * Convert the voronoi cell path data to an SVG polygon data string.
+     *
+     * "x0,y0 x1,y1 x2,y2 ..." 
+     *
+     * @return {string}
+     **/
     context.VoronoiCell.prototype.toPathSVGString = function() {
 	if( this.triangles.length == 0 )
 	    return "";	
@@ -53,17 +57,19 @@
 	return arr.map( function(vert) { return ''+vert.x+','+vert.y; } ).join(' '); 
     };
 
-    
-    // +---------------------------------------------------------------------------------
-    // | Convert the voronoi cell path data to an array.
-    // |
-    // | [vertex0, vertex1, vertex2, ... ] 
-    // +-------------------------------
+
+    /**
+     * Convert the voronoi cell path data to an array.
+     *
+     * [vertex0, vertex1, vertex2, ... ] 
+     *
+     * @return {Vertex[]}
+     **/
     context.VoronoiCell.prototype.toPathArray = function() {	
 	if( this.triangles.length == 0 )
 	    return [];
 	if( this.triangles.length == 1 )
-	    return [ this.triangles[0].getCircumcircle() ];
+	    return [ this.triangles[0].getCircumcircle().center ];
 	
 	var arr = [];
 
@@ -84,15 +90,18 @@
 	return arr;
     }
 
+    
 
-    // +---------------------------------------------------------------------------------
-    // | Calculate the 'infinite' open edge point based on the open path triangle
-    // | 'tri' and its neighbour 'neigh'.
-    // |
-    // | This function is used to determine outer hull points.
-    // |
-    // | @return Vertex
-    // +-------------------------------
+    /**
+     * A helper function.
+     *  
+     * Calculate the 'infinite' open edge point based on the open path triangle
+     * 'tri' and its neighbour 'neigh'.
+     *
+     * This function is used to determine outer hull points.
+     *
+     * @return {Vertex}
+     **/
     var _calcOpenEdgePoint = function( tri, neigh, sharedVertex ) {
 	var center  = tri.getCircumcircle().center;
 	// Find non-adjacent edge (=outer edge)
@@ -108,13 +117,15 @@
 	return openEdgePoint;
     };
     
-    // +---------------------------------------------------------------------------------
-    // | Find the outer (not adjacent) vertex in triangle 'tri' which has triangle 'neighbour'.
-    // |
-    // | This function is used to determine outer hull points.
-    // |
-    // | @return Vertex
-    // +-------------------------------
+    /**
+     * A helper function.
+     *
+     * Find the outer (not adjacent) vertex in triangle 'tri' which has triangle 'neighbour'.
+     *
+     * This function is used to determine outer hull points.
+     *
+     * @return {Vertex}
+     **/
     var _findOuterEdgePoint = function( tri, neighbour, sharedVertex ) {
 	if( tri.a.equals(sharedVertex) ) {
 	    if( neighbour.a.equals(tri.b) || neighbour.b.equals(tri.b) || neighbour.c.equals(tri.b) ) return tri.c;
@@ -130,7 +141,10 @@
 	else return tri.a;
     };
 
-    
+
+    /**
+     * A helper function.
+     **/
     var _perpendicularLinePoint = function( lineA, lineB, point ) {
 	// Found at
 	//    https://stackoverflow.com/questions/1811549/perpendicular-on-a-line-from-a-given-point?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa

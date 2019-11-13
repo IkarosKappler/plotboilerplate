@@ -7,10 +7,7 @@ const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 module.exports = [
     {
         entry: [
-	// gup is not really required. Just the demos use it.
-        // './src/gup.js',
-
-	'./src/extend.js', // The Vector class extends the Line class    
+	'./src/extend.js',    
         './src/VertexAttr.js',
         './src/VertexListeners.js',
         './src/Vertex.js',
@@ -25,9 +22,7 @@ module.exports = [
 
         './src/MouseHandler.js',
     	'./src/KeyHandler.js',
-	// './src/TouchHandler.js',
         './src/draw.js',
-        // './src/overlay-dialog.js',
 
         './src/PlotBoilerplate.js',
 	'./src/PlotBoilerplate.RectSelector.js'
@@ -53,6 +48,7 @@ module.exports = [
             filename: 'Color.min.js'
         }
     }
+    /*
     // Un-comment this block if you also want to re-compile the Touchy-updated class.
     ,{
         entry: [
@@ -82,6 +78,7 @@ module.exports = [
             filename: 'bbtree.collection.min.js'
         }
     } 
+    */
 ];
 
 
@@ -105,7 +102,6 @@ new ConcatPlugin({
        './lib/Color.js',
        './lib/Touchy.min.js'
      ],
-    // filesToConcat: ['jquery', './src/lib/**', './dep/dep.js', ['./some/**', '!./some/excludes/**']],
     attributes: {
         async: false
     }

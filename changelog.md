@@ -1,6 +1,27 @@
 
 
 # Changelog
+* 2019-11-13
+  * Fixed an issue with the mouse-sensitive area around vertices (were affected by zoom).
+* 2019-11-07
+  * Added Vertex.toSVGString(object) function.
+  * Added Polygon.Added toCubicBezierPath(number) function.
+  * Added SVG export for postDraw-rendering in the Voronoi demo.
+  * Added the 'Triangle' style class to the SVGBuilder.
+* 2019-11-06
+  * Added fetch.num, fetch.val, fetch.bool, fetch.func functions for easier config props fetching.
+* 2019-10-30
+  * Renamed the demo/VertexAnimator to demo/VertexAnimator.Linear.
+  * Added a new class demo/VertexAnimator.Cirular.
+* 2019-10-25
+  * Added proper JSDoc comments to the Voronoi cell code.
+  * Polygons are no longer drawn with dashed lines (solid lines instead).
+  * Added the Polygon.scale(number,Vertex) function.
+  * Fixed a serious bug in the VoronoiCell.toPathArray function; cell with only one vertex (extreme cases) returned invalid arrays which broke the rendering.
+* 2019-10-03
+  * Added the {draw,drawgl}.beginDrawCycle fuction.
+* 2019-09-18
+  * Added an experimental GL drawing stub (drawgl).
 * 2019-09-12
   * Added JSDoc compliant comments to the (inofficial) Triangle class.
 * 2019-09-11

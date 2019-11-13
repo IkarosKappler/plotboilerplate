@@ -124,7 +124,7 @@
 	    }
 
 	    // Animate the vertices: make them bounce around and reflect on the walls.
-	    var animator = new VertexAnimator( pb.vertices, pb.viewport(), updateCircles );
+	    var animator = new LinearVertexAnimator( pb.vertices, pb.viewport(), updateCircles );
 	    animator.start();   
 
 	} );
