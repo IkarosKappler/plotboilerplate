@@ -26,8 +26,20 @@ echo 'layout: page' >> changelog.md
 echo '---' >> changelog.md
 cat ../changelog.md >> changelog.md
 
+if [ -f "_tracker.js" ]; then
+    echo "Adding tracking code ..."
+    cp _tracker.js _includes/_tracker.js
+else 
+    echo "No tracking code found (add the _tracker.js file if you have one)."
+fi
+
+
 echo "Starting jekyll ..."
 # bundle exec jekyll serve
 
 # Do not start with 'serve' if you want to compile for production!
 bundle exec jekyll build
+
+if [ -f "_tracker.js" ]; then
+    echo "/* No tracking code */" > _includes/_tracker.js
+fi

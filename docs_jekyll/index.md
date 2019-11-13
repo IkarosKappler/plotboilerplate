@@ -258,6 +258,10 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
     enableKeys            	: true,
 
     // boolean
+    //   Indicates if the application should handle mouse wheelevents for you.
+    enableMouseWheel            : true,
+
+    // boolean
     //   Indicates if the application should use the experimental WebGL features.
     enableGL                    : false
   } );
@@ -363,7 +367,6 @@ from the sources code files in ./src/*.
  * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
  * Include Touchy.js as a package dependency.
  * Include FileSaver.js as a package dependency.
- * Add a triangle helper class (like in the animation demo)?
  * Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
  * Add config item for deactivating mouse wheel zoom.
  * The BezierPath uses a _scalePoint helper function. Replace this by Vertex.scale().
@@ -379,7 +382,6 @@ from the sources code files in ./src/*.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
  * Make the triangle class an official helper. It is currently only used in demos.
- * Add proper JSDoc to the Triangle source.
  
 
 
@@ -390,12 +392,6 @@ from the sources code files in ./src/*.
 | --------- | --------- | --------- | --------- |
 | IE11 & Edge| latest    | latest    | latest    |
   
-
-
-
-### Dependencies
-* HTML5 Canvas
-
 
 
 ### Used Libraries

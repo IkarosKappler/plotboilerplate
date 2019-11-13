@@ -27,6 +27,11 @@ echo 'title: Changelog' >> changelog.md
 echo '---' >> changelog.md
 cat ../changelog.md >> changelog.md
 
+if [ -f "_tracker.js" ]; then
+    echo "[Dev] Clearing tracking code if exists ..."
+    echo "/* No tracking code */" > _includes/_tracker.js
+fi
+
 echo "Starting jekyll ..."
 bundle exec jekyll serve
 
