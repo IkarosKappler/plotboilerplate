@@ -58,7 +58,7 @@
 		      enableMouse           : true,
 		      enableKeys            : true,
 		      enableTouch           : true,
-		      enableMouseWheel      : true
+		      enableMouseWheel      : true,
 		      enableExport          : true
 		    }, GUP
 		)
