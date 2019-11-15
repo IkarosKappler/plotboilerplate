@@ -8,8 +8,10 @@ cp -R ../screenshots/ .
 # echo "Generating markdown docs from sources ..."
 # ./renderjsdoc.sh
 
+
 # Use thie docs build script instead
 (cd .. && ./mkdocs.sh)
+
 
 echo "Building markdown page from template and readme ..."
 echo '---' > index.md
