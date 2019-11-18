@@ -17,6 +17,7 @@ module.exports = [
     	'./src/CubicBezierCurve.js',
     	'./src/BezierPath.js',
     	'./src/Polygon.js',
+	'./src/Triangle.js',
     	'./src/VEllipse.js',
 	'./src/PBImage.js',
 

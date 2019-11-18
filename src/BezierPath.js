@@ -12,7 +12,8 @@
  * @modified 2018-12-04 Added the toSVGString() function.
  * @modified 2019-03-23 Added JSDoc tags.
  * @modified 2019-03-23 Changed the fuctions getPoint and getPointAt to match semantics in the Line class.
- * @version 2.0.0
+ * @modified 2019-11-18 Fixed the clone function: adjustCircular attribute was not cloned.
+ * @version 2.0.1
  *
  * @file BezierPath
  * @public
@@ -530,27 +531,61 @@
 					 ) {
 	
 	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-	    var curve = this.bezierCurves[ i ];	    
-	    BezierPath._scalePoint( curve.getStartPoint(),        anchor, scaling );
-	    BezierPath._scalePoint( curve.getStartControlPoint(), anchor, scaling );
-	    BezierPath._scalePoint( curve.getEndControlPoint(),   anchor, scaling );
+	    var curve = this.bezierCurves[ i ];
+	    curve.getStartPoint().scale( scaling, anchor );
+	    curve.getStartControlPoint().scale( scaling, anchor );
+	    curve.getEndControlPoint().scale( scaling, anchor );
+	    //BezierPath._scalePoint( curve.getStartPoint(),        anchor, scaling );
+	    //BezierPath._scalePoint( curve.getStartControlPoint(), anchor, scaling );
+	    //BezierPath._scalePoint( curve.getEndControlPoint(),   anchor, scaling );
 	    // Do NOT scale the end point here!
 	    // Don't forget that the curves are connected and on curve's end point
 	    // the the successor's start point (same instance)!
 	}
 	
 	// Finally move the last end point (was not scaled yet)
-	if( this.bezierCurves.length > 0 ) {
+	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
 	    // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS
-	    BezierPath._scalePoint( this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint(),
+	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().scale( scaling, anchor );
+	    /* BezierPath._scalePoint( this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint(),
 				    anchor,
 				    scaling
-				  );
+				  );*/ 
 	}
 	
 	this.updateArcLengths();	
     };
 
+
+    /**
+     * Rotate the whole bezier path around a point..
+     *
+     * @method rotate
+     * @param {Vertex} angle  - The angle to rotate this path by.
+     * @param {Vertex} center - The rotation center.
+     * @instance
+     * @memberof BezierPath
+     * @return {void}
+     **/
+    BezierPath.prototype.rotate = function( angle,  // float
+					    center  // Vertex
+					 ) {
+
+	for( var i = 0; i < this.bezierCurves.length; i++ ) {
+	    var curve = this.bezierCurves[ i ];	    
+	    curve.getStartPoint().rotate( angle, center ); 
+	    curve.getStartControlPoint().rotate( angle, center );
+	    curve.getEndControlPoint().rotate( angle, center );
+	    // Do NOT rotate the end point here!
+	    // Don't forget that the curves are connected and on curve's end point
+	    // the the successor's start point (same instance)!
+	}
+	
+	// Finally move the last end point (was not scaled yet)
+	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
+	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().rotate( angle, center );
+	}
+    };
 
     
     /**
@@ -565,19 +600,23 @@
      * @return {void}
      **/
     // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS!!!
+    /*
     BezierPath._scalePoint = function( point,   // Vertex
 				       anchor,  // Vertex
 				       scaling  // Vertex
 				     ) {
+	
 	// Move point to origin
-	point.sub( anchor );
+	//point.sub( anchor );
 	// Apply scaling
-	point.setX( point.x * scaling.x );
-	point.setY( point.y * scaling.y );
+	//point.setX( point.x * scaling.x );
+	//point.setY( point.y * scaling.y );
 	// Move back to original position
-	point.add( anchor );	
+	//point.add( anchor );	
+	
+	point.scale( scaling, anchor );
     };
-
+    */
 
 
     /**
@@ -975,6 +1014,7 @@
 		path.bezierCurves[i-1].endPoint = path.bezierCurves[i].startPoint;
 	}
 	path.updateArcLengths();
+	path.adjustCircular = this.adjustCircular;
 	return path;
     };
 

@@ -549,6 +549,23 @@
 	// TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
     };
 
+
+    /**
+     * Draw a polygon line (alternative function to the polygon).
+     *
+     * @method polyline
+     * @param {Vertex[]} vertices - The polygon vertices to draw.
+     * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
+     * @param {string}   color    - The CSS color to draw the polygon with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    _context.drawutilsgl.prototype.polyline = function( vertices, isOpen, color ) {
+	// NOT YET IMPLEMENTED
+    };
+    
+
     /**
      * Draw a non-scaling text label at the given position.
      *

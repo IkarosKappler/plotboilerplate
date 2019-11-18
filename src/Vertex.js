@@ -21,7 +21,8 @@
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-04-24 Added the randomVertex(ViewPort) function.
  * @modified 2019-11-07 Added toSVGString(object) function.
- * @version  2.1.1
+ * @modified 2019-11-18 Added the rotate(number,Vertex) function.
+ * @version  2.2.0
  *
  * @file Vertex
  * @public
@@ -278,6 +279,29 @@
 	return this;
     };
 
+
+    /**
+     * This is a vector-like behavior and 'rotates' this vertex
+     * around given center.
+     *
+     * @method rotate
+     * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
+     * @param {Vertex=} center - The center of rotation; default is (0,0).
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.rotate = function( angle, center ) {
+	if( !center || typeof center === "undefined" )
+	    center = new Vertex(0,0);
+	angle += Math.atan2(this.y,this.x);
+	this.sub( center );
+	let len = this.distance({x:0,y:0});
+	this.x = center.x + ( Math.cos(angle) * len + Math.sin(angle) * len);
+	this.y = center.y + ( -Math.sin(angle) * len + Math.cos(angle) * len);
+	this.add( center );
+	return this;
+    };
 
     /**
      * Multiply both components of this vertex with the given scalar.<br>

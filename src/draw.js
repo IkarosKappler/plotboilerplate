@@ -19,7 +19,8 @@
  * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
- * @version  1.2.5
+ * @modified 2019-11-18 Added the polyline function.
+ * @version  1.3.0
  **/
 
 (function(_context) {
@@ -571,17 +572,47 @@
      * @memberof drawutils
      */
     _context.drawutils.prototype.polygon = function( polygon, color ) {
-	if( polygon.vertices.length <= 1 )
+	/* if( polygon.vertices.length <= 1 )
 	    return;
 	this.ctx.save();
 	this.ctx.beginPath();
-	// this.ctx.setLineDash([3, 5]);
 	this.ctx.lineWidth = 1.0;
 	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
 	for( var i = 0; i < polygon.vertices.length; i++ ) {
 	    this.ctx.lineTo( this.offset.x + polygon.vertices[i].x*this.scale.x, this.offset.y + polygon.vertices[i].y*this.scale.y );
 	}
 	if( !polygon.isOpen && polygon.vertices.length > 2 )
+	    this.ctx.closePath();
+	this._fillOrDraw( color );
+	this.ctx.setLineDash([]);
+	this.ctx.restore();
+	*/
+	this.polyline( polygon.vertices, polygon.isOpen, color );
+    };
+
+
+    /**
+     * Draw a polygon line (alternative function to the polygon).
+     *
+     * @method polyline
+     * @param {Vertex[]} vertices - The polygon vertices to draw.
+     * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
+     * @param {string}   color    - The CSS color to draw the polygon with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    _context.drawutils.prototype.polyline = function( vertices, isOpen, color ) {
+	if( vertices.length <= 1 )
+	    return;
+	this.ctx.save();
+	this.ctx.beginPath();
+	this.ctx.lineWidth = 1.0;
+	this.ctx.moveTo( this.offset.x + vertices[0].x*this.scale.x, this.offset.y + vertices[0].y*this.scale.y );
+	for( var i = 0; i < vertices.length; i++ ) {
+	    this.ctx.lineTo( this.offset.x + vertices[i].x*this.scale.x, this.offset.y + vertices[i].y*this.scale.y );
+	}
+	if( !isOpen && vertices.length > 2 )
 	    this.ctx.closePath();
 	this._fillOrDraw( color );
 	this.ctx.setLineDash([]);

@@ -1,7 +1,7 @@
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
- * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, drawutils, drawutilsgl
+ * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, Triangle, drawutils, drawutilsgl
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23
@@ -38,7 +38,10 @@
  * @modified 2019-11-06 Added fetch.num, fetch.val, fetch.bool, fetch.func functions.
  * @modified 2019-11-13 Fixed an issue with the mouse-sensitive area around vertices (were affected by zoom).
  * @modified 2019-11-13 Added the 'enableMouseWheel' param.
- * @version  1.4.16
+ * @modified 2019-11-18 Added the Triangle class as a regular drawable element.
+ * @modified 2019-11-18 The add function now works with arrays, too.
+ * @modified 2019-11-18 Added the _handleColor helper function to determine the render color of non-draggable vertices.
+ * @version  1.5.0
  *
  * @file PlotBoilerplate
  * @public
@@ -111,32 +114,32 @@
      * @param {HTMLElement} config.canvas - Your canvas element in the DOM (required).
      * @param {boolean=} [config.fullSize=true] - If set to true the canvas will gain full window size.
      * @param {boolean=} [config.fitToParent=true] - If set to true the canvas will gain the size of its parent container (overrides fullSize).
-     * @param {number=} [config.scaleX=1.0] - The initial x-zoom. Default is 1.0.
-     * @param {number=} [config.scaleY=1.0] - The initial y-zoom. Default is 1.0.
+     * @param {number=}  [config.scaleX=1.0] - The initial x-zoom. Default is 1.0.
+     * @param {number=}  [config.scaleY=1.0] - The initial y-zoom. Default is 1.0.
      * @param {boolean=} [config.rasterGrid=true] - If set to true the background grid will be drawn rastered.
-     * @param {number=} [config.rasterAdjustFactor=1.0] - The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
+     * @param {number=}  [config.rasterAdjustFactor=1.0] - The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
      * @param {boolean=} [config.drawOrigin=false] - Draw a crosshair at (0,0).
      * @param {boolean=} [config.autoAdjustOffset=true] -  When set to true then the origin of the XY plane will
      *                         be re-adjusted automatically (see the params
      *                         offsetAdjust{X,Y}Percent for more).
-     * @param {number=} [config.offsetAdjustXPercent=50] - The x-fallback position for the origin after
+     * @param {number=}  [config.offsetAdjustXPercent=50] - The x-fallback position for the origin after
      *                         resizing the canvas.
-     * @param {number=} [config.offsetAdjustYPercent=50] - The y-fallback position for the origin after
+     * @param {number=}  [config.offsetAdjustYPercent=50] - The y-fallback position for the origin after
      *                         resizing the canvas.
-     * @param {number=} [config.defaultCanvasWidth=1024] - The canvas size fallback (width) if no automatic resizing
+     * @param {number=}  [config.defaultCanvasWidth=1024] - The canvas size fallback (width) if no automatic resizing
      *                         is switched on. 
-     * @param {number=} [config.defaultCanvasHeight=768] - The canvas size fallback (height) if no automatic resizing
+     * @param {number=}  [config.defaultCanvasHeight=768] - The canvas size fallback (height) if no automatic resizing
      *                         is switched on. 
-     * @param {number=} [config.canvasWidthFactor=1.0] - Scaling factor (width) upon the canvas size.
+     * @param {number=}  [config.canvasWidthFactor=1.0] - Scaling factor (width) upon the canvas size.
      *                         In combination with cssScale{X,Y} this can be used to obtain
      *                         sub pixel resolutions for retina displays.
-     * @param {number=} [config.canvasHeightFactor=1.0] - Scaling factor (height) upon the canvas size.
+     * @param {number=}  [config.canvasHeightFactor=1.0] - Scaling factor (height) upon the canvas size.
      *                         In combination with cssScale{X,Y} this can be used to obtain
      *                         sub pixel resolutions for retina displays.
-     * @param {number=} [config.cssScaleX=1.0] - Visually resize the canvas (horizontally) using CSS transforms (scale).
-     * @param {number=} [config.cssScaleY=1.0] - Visually resize the canvas (vertically) using CSS transforms (scale).
-     * @param {boolan=} [config.cssUniformScale=true] - CSS scale x and y obtaining aspect ratio.
-     * @param {string=} [config.backgroundColor=#ffffff] - The backround color.
+     * @param {number=}  [config.cssScaleX=1.0] - Visually resize the canvas (horizontally) using CSS transforms (scale).
+     * @param {number=}  [config.cssScaleY=1.0] - Visually resize the canvas (vertically) using CSS transforms (scale).
+     * @param {boolan=}  [config.cssUniformScale=true] - CSS scale x and y obtaining aspect ratio.
+     * @param {string=}  [config.backgroundColor=#ffffff] - The backround color.
      * @param {boolean=} [config.redrawOnResize=true] - Switch auto-redrawing on resize on/off (some applications
      *                         might want to prevent automatic redrawing to avoid data loss from the draw buffer).
      * @param {boolean=} [config.drawBezierHandleLines=true] - Indicates if Bézier curve handles should be drawn (used for
@@ -172,47 +175,48 @@
 	 * @instance
 	 */
 	this.config = {
-	    fullSize              : fetch.val(config,'fullSize',true), // typeof config.fullSize != 'undefined' ? config.fullSize : true,
-	    fitToParent           : fetch.bool(config,'fitToParent',true), //  typeof config.fitToParent != 'undefined' ? config.fitToParent : true,
-	    scaleX                : fetch.num(config,'scaleX',1.0), // config.scaleX || 1.0,
-	    scaleY                : fetch.num(config,'scaleY',1.0), // config.scaleY || 1.0,
-	    drawGrid              : fetch.bool(config,'drawGrid',true), // typeof config.drawGrid != 'undefined' ? config.drawGrid : true,
-	    rasterGrid            : fetch.bool(config,'rasterGrid',true), // typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
-	    rasterAdjustFactor    : fetch.num(config,'rasterAdjustdFactror',2.0), // typeof config.rasterAdjustFactor == 'number' ? config.rasterAdjustFactor : 2.0,
-	    drawOrigin            : fetch.bool(config,'drawOrigin',false), // typeof config.drawOrigin != 'undefined' ? config.drawOrigin : false,
-	    autoAdjustOffset      : fetch.val(config,'autoAdjustOffset',true), // typeof config.autoAdjustOffset != 'undefined' ? config.autoAdjustOffset : true,
-	    offsetAdjustXPercent  : fetch.num(config,'offsetAdjustXPercent',50), // typeof config.offsetAdjustXPercent == 'number' ? config.offsetAdjustXPercent : 50,
-	    offsetAdjustYPercent  : fetch.num(config,'offsetAdjustYPercent',50), // typeof config.offsetAdjustYPercent == 'number' ? config.offsetAdjustYPercent : 50,
+	    fullSize              : fetch.val(config,'fullSize',true), 
+	    fitToParent           : fetch.bool(config,'fitToParent',true),
+	    scaleX                : fetch.num(config,'scaleX',1.0), 
+	    scaleY                : fetch.num(config,'scaleY',1.0), 
+	    drawGrid              : fetch.bool(config,'drawGrid',true),
+	    rasterGrid            : fetch.bool(config,'rasterGrid',true),
+	    rasterAdjustFactor    : fetch.num(config,'rasterAdjustdFactror',2.0),
+	    drawOrigin            : fetch.bool(config,'drawOrigin',false),
+	    autoAdjustOffset      : fetch.val(config,'autoAdjustOffset',true),
+	    offsetAdjustXPercent  : fetch.num(config,'offsetAdjustXPercent',50),
+	    offsetAdjustYPercent  : fetch.num(config,'offsetAdjustYPercent',50),
 	    backgroundColor       : config.backgroundColor || '#ffffff',
-	    redrawOnResize        : fetch.bool(config,'redrawOnResize',true), //  typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
-	    defaultCanvasWidth    : fetch.num(config,'defaultCanvasWidth',DEFAULT_CANVAS_WIDTH), // typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
-	    defaultCanvasHeight   : fetch.num(config,'defaultCanvasHeight',DEFAULT_CANVAS_HEIGHT), // ,typeof config.defaultCanvasHeight == 'number' ? config.defaultCanvasHeight : DEFAULT_CANVAS_HEIGHT,
-	    canvasWidthFactor     : fetch.num(config,'canvasWidthFactor',1.0), // ,typeof config.canvasWidthFactor == 'number' ? config.canvasWidthFactor : 1.0,
-	    canvasHeightFactor    : fetch.num(config,'canvasHeightFactor',1.0), // typeof config.canvasHeightFactor == 'number' ? config.canvasHeightFactor : 1.0,
-	    cssScaleX             : fetch.num(config,'cssScaleX',1.0), // typeof config.cssScaleX == 'number' ? config.cssScaleX : 1.0,
-	    cssScaleY             : fetch.num(config,'cssScaleY',1.0), // typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
-	    cssUniformScale       : fetch.bool(config,'cssUniformScale',true), //typeof config.cssUniformScale != 'undefined' ? config.cssUniformScale : true,
+	    redrawOnResize        : fetch.bool(config,'redrawOnResize',true), 
+	    defaultCanvasWidth    : fetch.num(config,'defaultCanvasWidth',DEFAULT_CANVAS_WIDTH),
+	    defaultCanvasHeight   : fetch.num(config,'defaultCanvasHeight',DEFAULT_CANVAS_HEIGHT),
+	    canvasWidthFactor     : fetch.num(config,'canvasWidthFactor',1.0),
+	    canvasHeightFactor    : fetch.num(config,'canvasHeightFactor',1.0),
+	    cssScaleX             : fetch.num(config,'cssScaleX',1.0),
+	    cssScaleY             : fetch.num(config,'cssScaleY',1.0),
+	    cssUniformScale       : fetch.bool(config,'cssUniformScale',true),
 	    rebuild               : function() { rebuild(); },
 	    saveFile              : function() { _self.saveFile(); },
-	    enableExport          : fetch.bool(config,'enableExport',true), // typeof config.enableExport != 'undefined' ? config.enableExport : true,
+	    enableExport          : fetch.bool(config,'enableExport',true),
 
-	    drawBezierHandleLines : fetch.bool(config,'drawBezierHandleLines',true), // typeof config.drawBezierHandleLines != 'undefined' ? config.drawBezierHandleLines : true,
-	    drawBezierHandlePoints : fetch.bool(config,'drawBezierHandlePoints',true), // typeof config.drawBezierHandlePoints != 'undefined' ? config.drawBezierHandlePoints : true,
-	    drawHandleLines       : fetch.bool(config,'drawHandleLines',true), // typeof config.drawHandleLines != 'undefined' ? config.drawHandleLines : true,
-	    drawHandlePoints      : fetch.bool(config,'drawHandlePoints',true), // typeof config.drawHandlePoints != 'undefined' ? config.drawHandlePoints : true,
+	    drawBezierHandleLines : fetch.bool(config,'drawBezierHandleLines',true),
+	    drawBezierHandlePoints : fetch.bool(config,'drawBezierHandlePoints',true),
+	    drawHandleLines       : fetch.bool(config,'drawHandleLines',true),
+	    drawHandlePoints      : fetch.bool(config,'drawHandlePoints',true),
 	    
 	    // Listeners/observers
-	    preClear              : fetch.func(config,'preClear',null), // (typeof config.preClear == 'function' ? config.preClear : null),
-	    preDraw               : fetch.func(config,'preDraw',null), // (typeof config.preDraw == 'function' ? config.preDraw : null),
-	    postDraw              : fetch.func(config,'postDraw',null), // (typeof config.postDraw == 'function' ? config.postDraw : null),
+	    preClear              : fetch.func(config,'preClear',null),
+	    preDraw               : fetch.func(config,'preDraw',null),
+	    postDraw              : fetch.func(config,'postDraw',null),
 
 	    // Interaction
-	    enableMouse           : fetch.bool(config,'enableMouse',true), // typeof config.enableMouse != 'undefined' ? config.enableMouse : true,
-	    enableTouch           : fetch.bool(config,'enableTouch',true), // typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
-	    enableKeys            : fetch.bool(config,'enableKeys',true), // typeof config.enableKeys != 'undefined' ? config.enableKeys : true,
-	    enableMouseWheel      : fetch.bool(config,'enableMouseWheel',true), // typeof config.enableMouseWheel != 'undefined' ? config.enableMouseWheel : true,
+	    enableMouse           : fetch.bool(config,'enableMouse',true),
+	    enableTouch           : fetch.bool(config,'enableTouch',true),
+	    enableKeys            : fetch.bool(config,'enableKeys',true),
+	    enableMouseWheel      : fetch.bool(config,'enableMouseWheel',true),
 
-	    enableGL              : fetch.bool(config,'enableGL',false) // typeof config.enableGL != 'undefined' ? config.enableGL : false
+	    // Experimental (and unfinished)
+	    enableGL              : fetch.bool(config,'enableGL',false)
 	};
 
 
@@ -317,7 +321,6 @@
 	 * @private
 	 **/
 	PlotBoilerplate.prototype.updateCSSscale = function() {
-	    // this.console.log('update css scale');
 	    if( this.config.cssUniformScale ) {
 		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
 	    } else {
@@ -337,19 +340,23 @@
 	 *  * a Vector
 	 *  * a VEllipse
 	 *  * a Polygon
+	 *  * a Triangle
 	 *  * a BezierPath
 	 *  * a BPImage
 	 * </pre>
 	 *
-	 * @param {Object} drawable:Object The drawable (of one of the allowed class instance) to add.
-	 * @param {boolean} [redraw=true]
+	 * @param {Drawable|Drawable[]} drawable - The drawable (of one of the allowed class instance) to add.
+	 * @param {boolean} [redraw=true] - If true the function will trigger redraw after the drawable(s) was/were added.
 	 * @method add
 	 * @instance
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
 	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
-	    if( drawable instanceof Vertex ) {
+	    if( Array.isArray(drawable) ) {
+		for( var i in drawable )
+		    this.add( drawable[i] );
+	    } else if( drawable instanceof Vertex ) {
 		this.drawables.push( drawable );
 		this.vertices.push( drawable );
 	    } else if( drawable instanceof Line ) {
@@ -372,6 +379,11 @@
 		this.drawables.push( drawable );
 		for( var i in drawable.vertices )
 		    this.vertices.push( drawable.vertices[i] );
+	    } else if( drawable instanceof Triangle ) {
+		this.drawables.push( drawable );
+		this.vertices.push( drawable.a );
+		this.vertices.push( drawable.b );
+		this.vertices.push( drawable.c );
 	    } else if( drawable instanceof BezierPath ) {
 		this.drawables.push( drawable );
 		for( var i in drawable.bezierCurves ) {
@@ -533,6 +545,14 @@
 
 
 	/**
+	 * This is just a tiny helper function to determine the render color of vertices.
+	 **/
+	function _handleColor( h, color ) {
+	    return h.attr.draggable ? color : 'rgba(128,128,128,0.5)';
+	}
+
+
+	/**
 	 * Draw all drawables.
 	 *
 	 * This function is usually only used internally.
@@ -546,6 +566,7 @@
 	 * @return {void}
 	 **/
 	PlotBoilerplate.prototype.drawDrawables = function( renderTime ) {
+	    
 	    // Draw drawables
 	    for( var i in this.drawables ) {
 		var d = this.drawables[i];
@@ -555,15 +576,15 @@
 
 			if( this.config.drawBezierHandlePoints && this.config.drawHandlePoints ) {
 			    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
-				this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, 'orange' );
+				this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, _handleColor(d.bezierCurves[c].startPoint,'orange') );
 				d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
 			    }
 			    if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
-				this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, 'orange' );
+				this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7,  _handleColor(d.bezierCurves[c].endPoint,'orange') );
 				d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
 			    }
-			    this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, '#008888' );
-			    this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, '#008888' );
+			    this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, _handleColor(d.bezierCurves[c].startControlPoint,'#008888') );
+			    this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, _handleColor(d.bezierCurves[c].endControlPoint,'#008888') );
 			    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
 			    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
 			} else {
@@ -585,6 +606,10 @@
 			for( var i in d.vertices )
 			    d.vertices[i].attr.renderTime = renderTime;
 		    }
+		} else if( d instanceof Triangle ) {
+		    this.draw.polyline( [d.a,d.b,d.c], false, '#6600ff' );
+		    if( !this.config.drawHandlePoints ) 
+			d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
 		    if( this.config.drawHandleLines ) {
 			this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
@@ -676,7 +701,7 @@
 	    // Draw all vertices as small squares if they were not already drawn by other objects
 	    for( var i in this.vertices ) {
 		if( this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime ) {
-		    this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
+		    this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : _handleColor(this.vertices[i],'rgb(0,128,192)') );
 		}
 	    }
 	};
@@ -730,8 +755,6 @@
 	 **/
 	PlotBoilerplate.prototype.clear = function() {
 	    // Note that the image might have an alpha channel. Clear the scene first.
-	    //this.ctx.fillStyle = this.config.backgroundColor; 
-	    //this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
 	    this.draw.clear( this.config.backgroundColor );
 	};
 
@@ -991,7 +1014,6 @@
 	    if( e.which != 1 && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
 		return; // Only react on left mouse or touch events
 	    var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
-	    //_self.console.log('point at position found: '+p );
 	    if( !p ) return;
 	    // Drag all selected elements?
 	    if( p.type == 'vertex' && _self.vertices[p.vindex].attr.isSelected ) {
@@ -1041,13 +1063,9 @@
 		// Warning: this possibly invalidates the dragEvent for other listeners!
 		//          Rethink the solution when other features are added.
 		e.params.dragAmount.x /= _self.draw.scale.x;
-		e.params.dragAmount.y /= _self.draw.scale.y;
-		
-		// _self.console.log( 'draggedElements',_self.draggedElements );
-		
+		e.params.dragAmount.y /= _self.draw.scale.y;		
 		for( var i in _self.draggedElements ) {
 		    var p = _self.draggedElements[i];
-		    // _self.console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
 		    if( p.type == 'bpath' ) {
 			_self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
 			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
@@ -1144,7 +1162,6 @@
 
 	    // Convert absolute touch positions to relative DOM element position (relative to canvas)
 	    function relPos(pos) {
-		// console.log( pos, _self.canvas.offsetLeft, _self.canvas.offsetTop );
 		return { x : pos.x - _self.canvas.offsetLeft,
 			 y : pos.y - _self.canvas.offsetTop
 		       };
@@ -1160,7 +1177,6 @@
 			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 			    if( draggedElement ) {
 				hand.on('move', function (points) {
-				    //console.log( points );
 				    var rel = relPos( points[0] );
 				    var trans = _self.transformMousePosition( rel.x, rel.y ); 
 				    var diff = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
