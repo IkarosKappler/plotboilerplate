@@ -132,7 +132,8 @@ __webpack_require__(14);
 __webpack_require__(15);
 __webpack_require__(16);
 __webpack_require__(17);
-module.exports = __webpack_require__(18);
+__webpack_require__(18);
+module.exports = __webpack_require__(19);
 
 
 /***/ }),
@@ -406,7 +407,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-04-24 Added the randomVertex(ViewPort) function.
  * @modified 2019-11-07 Added toSVGString(object) function.
- * @version  2.1.1
+ * @modified 2019-11-18 Added the rotate(number,Vertex) function.
+ * @version  2.2.0
  *
  * @file Vertex
  * @public
@@ -663,6 +665,29 @@ Object.extendClass = function( superClass, subClass ) {
 	return this;
     };
 
+
+    /**
+     * This is a vector-like behavior and 'rotates' this vertex
+     * around given center.
+     *
+     * @method rotate
+     * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
+     * @param {Vertex=} center - The center of rotation; default is (0,0).
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.rotate = function( angle, center ) {
+	if( !center || typeof center === "undefined" )
+	    center = new Vertex(0,0);
+	angle += Math.atan2(this.y,this.x);
+	this.sub( center );
+	let len = this.distance({x:0,y:0});
+	this.x = center.x + ( Math.cos(angle) * len + Math.sin(angle) * len);
+	this.y = center.y + ( -Math.sin(angle) * len + Math.cos(angle) * len);
+	this.add( center );
+	return this;
+    };
 
     /**
      * Multiply both components of this vertex with the given scalar.<br>
@@ -950,6 +975,9 @@ Object.extendClass = function( superClass, subClass ) {
 	return Math.sqrt( Math.pow(this.b.x-this.a.x,2) + Math.pow(this.b.y-this.a.y,2) );
     };
 
+    Line.prototype.setLength = function( length ) {
+	this.scale( length/this.length() );
+    };
     
     /**
      * Substract the given vertex from this line's end points.
@@ -2179,7 +2207,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2018-12-04 Added the toSVGString() function.
  * @modified 2019-03-23 Added JSDoc tags.
  * @modified 2019-03-23 Changed the fuctions getPoint and getPointAt to match semantics in the Line class.
- * @version 2.0.0
+ * @modified 2019-11-18 Fixed the clone function: adjustCircular attribute was not cloned.
+ * @version 2.0.1
  *
  * @file BezierPath
  * @public
@@ -2697,27 +2726,61 @@ Object.extendClass = function( superClass, subClass ) {
 					 ) {
 	
 	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-	    var curve = this.bezierCurves[ i ];	    
-	    BezierPath._scalePoint( curve.getStartPoint(),        anchor, scaling );
-	    BezierPath._scalePoint( curve.getStartControlPoint(), anchor, scaling );
-	    BezierPath._scalePoint( curve.getEndControlPoint(),   anchor, scaling );
+	    var curve = this.bezierCurves[ i ];
+	    curve.getStartPoint().scale( scaling, anchor );
+	    curve.getStartControlPoint().scale( scaling, anchor );
+	    curve.getEndControlPoint().scale( scaling, anchor );
+	    //BezierPath._scalePoint( curve.getStartPoint(),        anchor, scaling );
+	    //BezierPath._scalePoint( curve.getStartControlPoint(), anchor, scaling );
+	    //BezierPath._scalePoint( curve.getEndControlPoint(),   anchor, scaling );
 	    // Do NOT scale the end point here!
 	    // Don't forget that the curves are connected and on curve's end point
 	    // the the successor's start point (same instance)!
 	}
 	
 	// Finally move the last end point (was not scaled yet)
-	if( this.bezierCurves.length > 0 ) {
+	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
 	    // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS
-	    BezierPath._scalePoint( this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint(),
+	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().scale( scaling, anchor );
+	    /* BezierPath._scalePoint( this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint(),
 				    anchor,
 				    scaling
-				  );
+				  );*/ 
 	}
 	
 	this.updateArcLengths();	
     };
 
+
+    /**
+     * Rotate the whole bezier path around a point..
+     *
+     * @method rotate
+     * @param {Vertex} angle  - The angle to rotate this path by.
+     * @param {Vertex} center - The rotation center.
+     * @instance
+     * @memberof BezierPath
+     * @return {void}
+     **/
+    BezierPath.prototype.rotate = function( angle,  // float
+					    center  // Vertex
+					 ) {
+
+	for( var i = 0; i < this.bezierCurves.length; i++ ) {
+	    var curve = this.bezierCurves[ i ];	    
+	    curve.getStartPoint().rotate( angle, center ); 
+	    curve.getStartControlPoint().rotate( angle, center );
+	    curve.getEndControlPoint().rotate( angle, center );
+	    // Do NOT rotate the end point here!
+	    // Don't forget that the curves are connected and on curve's end point
+	    // the the successor's start point (same instance)!
+	}
+	
+	// Finally move the last end point (was not scaled yet)
+	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
+	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().rotate( angle, center );
+	}
+    };
 
     
     /**
@@ -2732,19 +2795,23 @@ Object.extendClass = function( superClass, subClass ) {
      * @return {void}
      **/
     // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS!!!
+    /*
     BezierPath._scalePoint = function( point,   // Vertex
 				       anchor,  // Vertex
 				       scaling  // Vertex
 				     ) {
+	
 	// Move point to origin
-	point.sub( anchor );
+	//point.sub( anchor );
 	// Apply scaling
-	point.setX( point.x * scaling.x );
-	point.setY( point.y * scaling.y );
+	//point.setX( point.x * scaling.x );
+	//point.setY( point.y * scaling.y );
 	// Move back to original position
-	point.add( anchor );	
+	//point.add( anchor );	
+	
+	point.scale( scaling, anchor );
     };
-
+    */
 
 
     /**
@@ -3142,6 +3209,7 @@ Object.extendClass = function( superClass, subClass ) {
 		path.bezierCurves[i-1].endPoint = path.bezierCurves[i].startPoint;
 	}
 	path.updateArcLengths();
+	path.adjustCircular = this.adjustCircular;
 	return path;
     };
 
@@ -3779,6 +3847,318 @@ Object.extendClass = function( superClass, subClass ) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
+ * @classdesc A triangle class for triangulations.
+ *
+ * The class was written for a Delaunay trinagulation demo so it might 
+ * contain some strange and unexpected functions.
+ *
+ * @requires Vertex
+ * 
+ * Inspired by Delaunay at Travellermap
+ *   http://www.travellermap.com/tmp/delaunay.htm
+ *
+ * @author    Ikaros Kappler
+ * @date_init 2012-10-17 (Wrote a first version of this in that year).
+ * @date      2018-04-03 (Refactored the code into a new class).
+ * @modified  2018-04-28 Added some documentation.
+ * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
+ * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
+ * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
+ * @version   2.0.4
+ *
+ * @file Triangle
+ * @public
+ **/
+
+
+(function(_context) {
+
+    /**
+     * An epsilon for comparison.
+     * This should be the same epsilon as in Vertex.
+     *
+     * @private
+     **/
+    var EPSILON = 1.0e-6;
+
+
+    /**
+     * The constructor.
+     * 
+     * @param {Vertex} a - The first vertex of the triangle.
+     * @param {Vertex} b - The second vertex of the triangle.
+     * @param {Vertex} c - The third vertex of the triangle.
+     **/
+    var Triangle = function( a, b, c )	{
+	this.a = a;
+	this.b = b;
+	this.c = c;
+
+	this.calcCircumcircle();
+	
+    }
+
+    /**
+     * Get the centroid of this triangle.
+     *
+     * The centroid is the average midpoint for each side.
+     *
+     * @return {Vertex} The centroid
+     **/
+    Triangle.prototype.getCentroid = function() {
+	return new Vertex( (this.a.x + this.b.x + this.c.x)/3,
+			   (this.a.y + this.b.y + this.c.y)/3
+			 );
+    };
+
+
+
+    /**
+     * Scale the triangle towards its centroid.
+     *
+     * @param {Number} - The scale factor to use. This can be any scalar.
+     * @return {Triangle} this for chaining
+     */
+    Triangle.prototype.scaleToCentroid = function( factor ) {
+	let centroid = this.getCentroid();
+	this.a.scale( factor, centroid );
+	this.b.scale( factor, centroid );
+	this.c.scale( factor, centroid );
+	return this;
+    };
+    
+    
+
+    /**
+     * Get the circumcircle of this triangle.
+     *
+     * The circumcircle is that unique circle on which all three
+     * vertices of this triangle are located on.
+     *
+     * @return {Object} - { center:Vertex, radius:float }
+     */
+    Triangle.prototype.getCircumcircle = function() {
+	if( !this.center || !this.radius ) 
+	    this.calcCircumcircle();
+	return { center : this.center.clone(), radius : this.radius };
+    };
+
+
+
+    /**
+     * Check if this triangle and the passed triangle share an
+     * adjacent edge.
+     *
+     * For edge-checking Vertex.equals is used which uses an
+     * an epsilon for comparison.
+     *
+     * @param {Triangle} tri - The second triangle to check adjacency with.
+     *
+     * @return {boolean} - True if this and the passed triangle have at least one common edge.
+     */
+    Triangle.prototype.isAdjacent = function( tri ) {
+	var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
+	var b = this.b.equals(tri.a) || this.b.equals(tri.b) || this.b.equals(tri.c);
+	var c = this.c.equals(tri.a) || this.c.equals(tri.b) || this.c.equals(tri.c);
+	return (a&&b) || (a&&c) || (b&&c);
+    };
+
+
+    
+    /**
+     * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of 
+     * the passed two.
+     *
+     * @param {Vertex} vert1 - The first vertex.
+     * @param {Vertex} vert2 - The second vertex.
+     * @return Vertex - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
+     */
+    Triangle.prototype.getThirdVertex = function( vert1, vert2 ) {
+	if( this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1) ) return this.c;
+	if( this.b.equals(vert1) && this.c.equals(vert2) || this.b.equals(vert2) && this.c.equals(vert1) ) return this.a;
+	//if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
+	return this.b;
+    };
+
+
+    /**
+     * Re-compute the circumcircle of this triangle (if the vertices
+     * have changed).
+     *
+     * The circumcenter and radius are stored in this.center and
+     * this radius. There is a third result: radius_squared.
+     *
+     * @return void
+     */
+    Triangle.prototype.calcCircumcircle = function() {
+	// From
+	//    http://www.exaflop.org/docs/cgafaq/cga1.html
+
+	var A = this.b.x - this.a.x; 
+	var B = this.b.y - this.a.y; 
+	var C = this.c.x - this.a.x; 
+	var D = this.c.y - this.a.y; 
+
+	var E = A*(this.a.x + this.b.x) + B*(this.a.y + this.b.y); 
+	var F = C*(this.a.x + this.c.x) + D*(this.a.y + this.c.y); 
+
+	var G = 2.0*(A*(this.c.y - this.b.y)-B*(this.c.x - this.b.x)); 
+	
+	var dx, dy;
+	
+	if( Math.abs(G) < EPSILON ) {
+	    // Collinear - find extremes and use the midpoint		
+	    var bounds = this.bounds();
+	    this.center = new Vertex( ( bounds.xMin + bounds.xMax ) / 2, ( bounds.yMin + bounds.yMax ) / 2 );
+
+	    dx = this.center.x - bounds.xMin;
+	    dy = this.center.y - bounds.yMin;
+	} else {
+	    var cx = (D*E - B*F) / G; 
+	    var cy = (A*F - C*E) / G;
+
+	    this.center = new Vertex( cx, cy );
+
+	    dx = this.center.x - this.a.x;
+	    dy = this.center.y - this.a.y;
+	}
+
+	this.radius_squared = dx * dx + dy * dy;
+	this.radius = Math.sqrt( this.radius_squared );
+    }; // END calcCircumcircle
+
+
+
+    /**
+     * Check if the passed vertex is inside this triangle's
+     * circumcircle.
+     *
+     * @param {Vertex} v - The vertex to check.
+     * @return boolean
+     */
+    Triangle.prototype.inCircumcircle = function( v ) {
+	var dx = this.center.x - v.x;
+	var dy = this.center.y - v.y;
+	var dist_squared = dx * dx + dy * dy;
+
+	return ( dist_squared <= this.radius_squared );
+	
+    }; // inCircumcircle
+
+
+
+    /**
+     * Get the rectangular bounds for this triangle.
+     *
+     * @return {Object} - { xMin:float, xMax:float, yMin:float, yMax:float, width:float, height:float }
+     */
+    Triangle.prototype.bounds = function() {
+	function max3( a, b, c ) { return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c; }
+	function min3( a, b, c ) { return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c; }
+	var minx = min3( this.a.x, this.b.x, this.c.x );
+	var miny = min3( this.a.y, this.b.y, this.c.y );
+	var maxx = max3( this.a.x, this.b.x, this.c.x );
+	var maxy = max3( this.a.y, this.b.y, this.c.y );
+	return { xMin : minx, yMin : miny, xMax : maxx, yMax : maxy, width : maxx-minx, height : maxy-miny };
+    };
+
+
+    /**
+     * Get the determinant of this triangle.
+     *
+     * @return {Number} - The determinant (float).
+     */
+    Triangle.prototype.determinant = function() {
+	return this.b.x*this.b.y* 0.5 * ( - this.b.x*this.a.y - this.a.x*this.b.y - this.b.x*this.c.y + this.c.x*this.a.y + this.a.x*this.c.y );
+    };
+
+    
+    /**
+     * Checks if the passed vertex (p) is inside this triangle.
+     *
+     * Note: matrix determinants rock.
+     *
+     * @param {Vertex} p - The vertex to check.
+     * @return {boolean}
+     */
+    Triangle.prototype.containsPoint = function( p ) {
+	//
+	// Point-in-Triangle test found at
+	//   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
+	//
+	function pointIsInTriangle( px, py, p0x, p0y, p1x, p1y, p2x, p2y ) {
+	    
+	    var area = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+
+	    var s = 1/(2*area)*(p0y*p2x - p0x*p2y + (p2y - p0y)*px + (p0x - p2x)*py);
+	    var t = 1/(2*area)*(p0x*p1y - p0y*p1x + (p0y - p1y)*px + (p1x - p0x)*py);
+
+	    return s > 0 && t > 0 && (1-s-t) > 0;
+	};
+
+	return pointIsInTriangle( p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y );
+    };
+
+
+    
+    /**
+     * Converts this triangle into a human-readable string.
+     *
+     * @return {string}
+     */
+    Triangle.prototype.toString = function() {
+	return '{ a : ' + this.a.toString () + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
+    };
+
+
+    /**
+     * Create an SVG representation of this triangle.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} The SVG string.
+     * @instance
+     * @memberof Polygon
+     **/
+    Triangle.prototype.toSVGString = function( options ) {
+	options = options || {};
+	var buffer = [];
+	buffer.push( '<path' );
+	if( options.className )
+	    buffer.push( ' class="' + options.className + '"' );
+	buffer.push( ' d="' );
+	var vertices = [ this.a, this.b, this.c ];
+	if( vertices.length > 0 ) {
+	    buffer.push( 'M ' );
+	    buffer.push( vertices[0].x )
+	    buffer.push( ' ' );
+	    buffer.push( vertices[0].y );
+	    for( var i = 1; i < vertices.length; i++ ) {
+		buffer.push( ' L ' );
+		buffer.push( vertices[i].x )
+		buffer.push( ' ' );
+		buffer.push( vertices[i].y );
+	    }
+	    //if( !this.isOpen ) {
+		buffer.push( ' Z' );
+	    //}
+	}
+	buffer.push( '" />' );
+	return buffer.join('');
+    };
+
+    _context.Triangle = Triangle;
+    // END Triangle
+
+})( window ? window : module.export );
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)(module)))
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(module) {/**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
  * @requires Vertex
@@ -3849,7 +4229,7 @@ Object.extendClass = function( superClass, subClass ) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)(module)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
@@ -3897,7 +4277,7 @@ Object.extendClass = function( superClass, subClass ) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)(module)))
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /**
@@ -4089,7 +4469,7 @@ Object.extendClass = function( superClass, subClass ) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 /**
@@ -4489,7 +4869,7 @@ Object.extendClass = function( superClass, subClass ) {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
@@ -4513,7 +4893,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
- * @version  1.2.5
+ * @modified 2019-11-18 Added the polyline function.
+ * @version  1.3.0
  **/
 
 (function(_context) {
@@ -5065,17 +5446,47 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof drawutils
      */
     _context.drawutils.prototype.polygon = function( polygon, color ) {
-	if( polygon.vertices.length <= 1 )
+	/* if( polygon.vertices.length <= 1 )
 	    return;
 	this.ctx.save();
 	this.ctx.beginPath();
-	// this.ctx.setLineDash([3, 5]);
 	this.ctx.lineWidth = 1.0;
 	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
 	for( var i = 0; i < polygon.vertices.length; i++ ) {
 	    this.ctx.lineTo( this.offset.x + polygon.vertices[i].x*this.scale.x, this.offset.y + polygon.vertices[i].y*this.scale.y );
 	}
 	if( !polygon.isOpen && polygon.vertices.length > 2 )
+	    this.ctx.closePath();
+	this._fillOrDraw( color );
+	this.ctx.setLineDash([]);
+	this.ctx.restore();
+	*/
+	this.polyline( polygon.vertices, polygon.isOpen, color );
+    };
+
+
+    /**
+     * Draw a polygon line (alternative function to the polygon).
+     *
+     * @method polyline
+     * @param {Vertex[]} vertices - The polygon vertices to draw.
+     * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
+     * @param {string}   color    - The CSS color to draw the polygon with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    _context.drawutils.prototype.polyline = function( vertices, isOpen, color ) {
+	if( vertices.length <= 1 )
+	    return;
+	this.ctx.save();
+	this.ctx.beginPath();
+	this.ctx.lineWidth = 1.0;
+	this.ctx.moveTo( this.offset.x + vertices[0].x*this.scale.x, this.offset.y + vertices[0].y*this.scale.y );
+	for( var i = 0; i < vertices.length; i++ ) {
+	    this.ctx.lineTo( this.offset.x + vertices[i].x*this.scale.x, this.offset.y + vertices[i].y*this.scale.y );
+	}
+	if( !isOpen && vertices.length > 2 )
 	    this.ctx.closePath();
 	this._fillOrDraw( color );
 	this.ctx.setLineDash([]);
@@ -5215,13 +5626,13 @@ Object.extendClass = function( superClass, subClass ) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(0)(module)))
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
- * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, drawutils, drawutilsgl
+ * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, Triangle, drawutils, drawutilsgl
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23
@@ -5258,7 +5669,10 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-11-06 Added fetch.num, fetch.val, fetch.bool, fetch.func functions.
  * @modified 2019-11-13 Fixed an issue with the mouse-sensitive area around vertices (were affected by zoom).
  * @modified 2019-11-13 Added the 'enableMouseWheel' param.
- * @version  1.4.16
+ * @modified 2019-11-18 Added the Triangle class as a regular drawable element.
+ * @modified 2019-11-18 The add function now works with arrays, too.
+ * @modified 2019-11-18 Added the _handleColor helper function to determine the render color of non-draggable vertices.
+ * @version  1.5.0
  *
  * @file PlotBoilerplate
  * @public
@@ -5331,32 +5745,32 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {HTMLElement} config.canvas - Your canvas element in the DOM (required).
      * @param {boolean=} [config.fullSize=true] - If set to true the canvas will gain full window size.
      * @param {boolean=} [config.fitToParent=true] - If set to true the canvas will gain the size of its parent container (overrides fullSize).
-     * @param {number=} [config.scaleX=1.0] - The initial x-zoom. Default is 1.0.
-     * @param {number=} [config.scaleY=1.0] - The initial y-zoom. Default is 1.0.
+     * @param {number=}  [config.scaleX=1.0] - The initial x-zoom. Default is 1.0.
+     * @param {number=}  [config.scaleY=1.0] - The initial y-zoom. Default is 1.0.
      * @param {boolean=} [config.rasterGrid=true] - If set to true the background grid will be drawn rastered.
-     * @param {number=} [config.rasterAdjustFactor=1.0] - The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
+     * @param {number=}  [config.rasterAdjustFactor=1.0] - The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
      * @param {boolean=} [config.drawOrigin=false] - Draw a crosshair at (0,0).
      * @param {boolean=} [config.autoAdjustOffset=true] -  When set to true then the origin of the XY plane will
      *                         be re-adjusted automatically (see the params
      *                         offsetAdjust{X,Y}Percent for more).
-     * @param {number=} [config.offsetAdjustXPercent=50] - The x-fallback position for the origin after
+     * @param {number=}  [config.offsetAdjustXPercent=50] - The x-fallback position for the origin after
      *                         resizing the canvas.
-     * @param {number=} [config.offsetAdjustYPercent=50] - The y-fallback position for the origin after
+     * @param {number=}  [config.offsetAdjustYPercent=50] - The y-fallback position for the origin after
      *                         resizing the canvas.
-     * @param {number=} [config.defaultCanvasWidth=1024] - The canvas size fallback (width) if no automatic resizing
+     * @param {number=}  [config.defaultCanvasWidth=1024] - The canvas size fallback (width) if no automatic resizing
      *                         is switched on. 
-     * @param {number=} [config.defaultCanvasHeight=768] - The canvas size fallback (height) if no automatic resizing
+     * @param {number=}  [config.defaultCanvasHeight=768] - The canvas size fallback (height) if no automatic resizing
      *                         is switched on. 
-     * @param {number=} [config.canvasWidthFactor=1.0] - Scaling factor (width) upon the canvas size.
+     * @param {number=}  [config.canvasWidthFactor=1.0] - Scaling factor (width) upon the canvas size.
      *                         In combination with cssScale{X,Y} this can be used to obtain
      *                         sub pixel resolutions for retina displays.
-     * @param {number=} [config.canvasHeightFactor=1.0] - Scaling factor (height) upon the canvas size.
+     * @param {number=}  [config.canvasHeightFactor=1.0] - Scaling factor (height) upon the canvas size.
      *                         In combination with cssScale{X,Y} this can be used to obtain
      *                         sub pixel resolutions for retina displays.
-     * @param {number=} [config.cssScaleX=1.0] - Visually resize the canvas (horizontally) using CSS transforms (scale).
-     * @param {number=} [config.cssScaleY=1.0] - Visually resize the canvas (vertically) using CSS transforms (scale).
-     * @param {boolan=} [config.cssUniformScale=true] - CSS scale x and y obtaining aspect ratio.
-     * @param {string=} [config.backgroundColor=#ffffff] - The backround color.
+     * @param {number=}  [config.cssScaleX=1.0] - Visually resize the canvas (horizontally) using CSS transforms (scale).
+     * @param {number=}  [config.cssScaleY=1.0] - Visually resize the canvas (vertically) using CSS transforms (scale).
+     * @param {boolan=}  [config.cssUniformScale=true] - CSS scale x and y obtaining aspect ratio.
+     * @param {string=}  [config.backgroundColor=#ffffff] - The backround color.
      * @param {boolean=} [config.redrawOnResize=true] - Switch auto-redrawing on resize on/off (some applications
      *                         might want to prevent automatic redrawing to avoid data loss from the draw buffer).
      * @param {boolean=} [config.drawBezierHandleLines=true] - Indicates if Bézier curve handles should be drawn (used for
@@ -5392,47 +5806,48 @@ Object.extendClass = function( superClass, subClass ) {
 	 * @instance
 	 */
 	this.config = {
-	    fullSize              : fetch.val(config,'fullSize',true), // typeof config.fullSize != 'undefined' ? config.fullSize : true,
-	    fitToParent           : fetch.bool(config,'fitToParent',true), //  typeof config.fitToParent != 'undefined' ? config.fitToParent : true,
-	    scaleX                : fetch.num(config,'scaleX',1.0), // config.scaleX || 1.0,
-	    scaleY                : fetch.num(config,'scaleY',1.0), // config.scaleY || 1.0,
-	    drawGrid              : fetch.bool(config,'drawGrid',true), // typeof config.drawGrid != 'undefined' ? config.drawGrid : true,
-	    rasterGrid            : fetch.bool(config,'rasterGrid',true), // typeof config.rasterGrid != 'undefined' ? config.rasterGrid : true,
-	    rasterAdjustFactor    : fetch.num(config,'rasterAdjustdFactror',2.0), // typeof config.rasterAdjustFactor == 'number' ? config.rasterAdjustFactor : 2.0,
-	    drawOrigin            : fetch.bool(config,'drawOrigin',false), // typeof config.drawOrigin != 'undefined' ? config.drawOrigin : false,
-	    autoAdjustOffset      : fetch.val(config,'autoAdjustOffset',true), // typeof config.autoAdjustOffset != 'undefined' ? config.autoAdjustOffset : true,
-	    offsetAdjustXPercent  : fetch.num(config,'offsetAdjustXPercent',50), // typeof config.offsetAdjustXPercent == 'number' ? config.offsetAdjustXPercent : 50,
-	    offsetAdjustYPercent  : fetch.num(config,'offsetAdjustYPercent',50), // typeof config.offsetAdjustYPercent == 'number' ? config.offsetAdjustYPercent : 50,
+	    fullSize              : fetch.val(config,'fullSize',true), 
+	    fitToParent           : fetch.bool(config,'fitToParent',true),
+	    scaleX                : fetch.num(config,'scaleX',1.0), 
+	    scaleY                : fetch.num(config,'scaleY',1.0), 
+	    drawGrid              : fetch.bool(config,'drawGrid',true),
+	    rasterGrid            : fetch.bool(config,'rasterGrid',true),
+	    rasterAdjustFactor    : fetch.num(config,'rasterAdjustdFactror',2.0),
+	    drawOrigin            : fetch.bool(config,'drawOrigin',false),
+	    autoAdjustOffset      : fetch.val(config,'autoAdjustOffset',true),
+	    offsetAdjustXPercent  : fetch.num(config,'offsetAdjustXPercent',50),
+	    offsetAdjustYPercent  : fetch.num(config,'offsetAdjustYPercent',50),
 	    backgroundColor       : config.backgroundColor || '#ffffff',
-	    redrawOnResize        : fetch.bool(config,'redrawOnResize',true), //  typeof config.redrawOnResize != 'undefined' ? config.redrawOnResize : true,
-	    defaultCanvasWidth    : fetch.num(config,'defaultCanvasWidth',DEFAULT_CANVAS_WIDTH), // typeof config.defaultCanvasWidth == 'number' ? config.defaultCanvasWidth : DEFAULT_CANVAS_WIDTH,
-	    defaultCanvasHeight   : fetch.num(config,'defaultCanvasHeight',DEFAULT_CANVAS_HEIGHT), // ,typeof config.defaultCanvasHeight == 'number' ? config.defaultCanvasHeight : DEFAULT_CANVAS_HEIGHT,
-	    canvasWidthFactor     : fetch.num(config,'canvasWidthFactor',1.0), // ,typeof config.canvasWidthFactor == 'number' ? config.canvasWidthFactor : 1.0,
-	    canvasHeightFactor    : fetch.num(config,'canvasHeightFactor',1.0), // typeof config.canvasHeightFactor == 'number' ? config.canvasHeightFactor : 1.0,
-	    cssScaleX             : fetch.num(config,'cssScaleX',1.0), // typeof config.cssScaleX == 'number' ? config.cssScaleX : 1.0,
-	    cssScaleY             : fetch.num(config,'cssScaleY',1.0), // typeof config.cssScaleY == 'number' ? config.cssScaleY : 1.0,
-	    cssUniformScale       : fetch.bool(config,'cssUniformScale',true), //typeof config.cssUniformScale != 'undefined' ? config.cssUniformScale : true,
+	    redrawOnResize        : fetch.bool(config,'redrawOnResize',true), 
+	    defaultCanvasWidth    : fetch.num(config,'defaultCanvasWidth',DEFAULT_CANVAS_WIDTH),
+	    defaultCanvasHeight   : fetch.num(config,'defaultCanvasHeight',DEFAULT_CANVAS_HEIGHT),
+	    canvasWidthFactor     : fetch.num(config,'canvasWidthFactor',1.0),
+	    canvasHeightFactor    : fetch.num(config,'canvasHeightFactor',1.0),
+	    cssScaleX             : fetch.num(config,'cssScaleX',1.0),
+	    cssScaleY             : fetch.num(config,'cssScaleY',1.0),
+	    cssUniformScale       : fetch.bool(config,'cssUniformScale',true),
 	    rebuild               : function() { rebuild(); },
 	    saveFile              : function() { _self.saveFile(); },
-	    enableExport          : fetch.bool(config,'enableExport',true), // typeof config.enableExport != 'undefined' ? config.enableExport : true,
+	    enableExport          : fetch.bool(config,'enableExport',true),
 
-	    drawBezierHandleLines : fetch.bool(config,'drawBezierHandleLines',true), // typeof config.drawBezierHandleLines != 'undefined' ? config.drawBezierHandleLines : true,
-	    drawBezierHandlePoints : fetch.bool(config,'drawBezierHandlePoints',true), // typeof config.drawBezierHandlePoints != 'undefined' ? config.drawBezierHandlePoints : true,
-	    drawHandleLines       : fetch.bool(config,'drawHandleLines',true), // typeof config.drawHandleLines != 'undefined' ? config.drawHandleLines : true,
-	    drawHandlePoints      : fetch.bool(config,'drawHandlePoints',true), // typeof config.drawHandlePoints != 'undefined' ? config.drawHandlePoints : true,
+	    drawBezierHandleLines : fetch.bool(config,'drawBezierHandleLines',true),
+	    drawBezierHandlePoints : fetch.bool(config,'drawBezierHandlePoints',true),
+	    drawHandleLines       : fetch.bool(config,'drawHandleLines',true),
+	    drawHandlePoints      : fetch.bool(config,'drawHandlePoints',true),
 	    
 	    // Listeners/observers
-	    preClear              : fetch.func(config,'preClear',null), // (typeof config.preClear == 'function' ? config.preClear : null),
-	    preDraw               : fetch.func(config,'preDraw',null), // (typeof config.preDraw == 'function' ? config.preDraw : null),
-	    postDraw              : fetch.func(config,'postDraw',null), // (typeof config.postDraw == 'function' ? config.postDraw : null),
+	    preClear              : fetch.func(config,'preClear',null),
+	    preDraw               : fetch.func(config,'preDraw',null),
+	    postDraw              : fetch.func(config,'postDraw',null),
 
 	    // Interaction
-	    enableMouse           : fetch.bool(config,'enableMouse',true), // typeof config.enableMouse != 'undefined' ? config.enableMouse : true,
-	    enableTouch           : fetch.bool(config,'enableTouch',true), // typeof config.enableTouch != 'undefined' ? config.enableTouch : true,
-	    enableKeys            : fetch.bool(config,'enableKeys',true), // typeof config.enableKeys != 'undefined' ? config.enableKeys : true,
-	    enableMouseWheel      : fetch.bool(config,'enableMouseWheel',true), // typeof config.enableMouseWheel != 'undefined' ? config.enableMouseWheel : true,
+	    enableMouse           : fetch.bool(config,'enableMouse',true),
+	    enableTouch           : fetch.bool(config,'enableTouch',true),
+	    enableKeys            : fetch.bool(config,'enableKeys',true),
+	    enableMouseWheel      : fetch.bool(config,'enableMouseWheel',true),
 
-	    enableGL              : fetch.bool(config,'enableGL',false) // typeof config.enableGL != 'undefined' ? config.enableGL : false
+	    // Experimental (and unfinished)
+	    enableGL              : fetch.bool(config,'enableGL',false)
 	};
 
 
@@ -5537,7 +5952,6 @@ Object.extendClass = function( superClass, subClass ) {
 	 * @private
 	 **/
 	PlotBoilerplate.prototype.updateCSSscale = function() {
-	    // this.console.log('update css scale');
 	    if( this.config.cssUniformScale ) {
 		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
 	    } else {
@@ -5557,19 +5971,23 @@ Object.extendClass = function( superClass, subClass ) {
 	 *  * a Vector
 	 *  * a VEllipse
 	 *  * a Polygon
+	 *  * a Triangle
 	 *  * a BezierPath
 	 *  * a BPImage
 	 * </pre>
 	 *
-	 * @param {Object} drawable:Object The drawable (of one of the allowed class instance) to add.
-	 * @param {boolean} [redraw=true]
+	 * @param {Drawable|Drawable[]} drawable - The drawable (of one of the allowed class instance) to add.
+	 * @param {boolean} [redraw=true] - If true the function will trigger redraw after the drawable(s) was/were added.
 	 * @method add
 	 * @instance
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
 	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
-	    if( drawable instanceof Vertex ) {
+	    if( Array.isArray(drawable) ) {
+		for( var i in drawable )
+		    this.add( drawable[i] );
+	    } else if( drawable instanceof Vertex ) {
 		this.drawables.push( drawable );
 		this.vertices.push( drawable );
 	    } else if( drawable instanceof Line ) {
@@ -5592,6 +6010,11 @@ Object.extendClass = function( superClass, subClass ) {
 		this.drawables.push( drawable );
 		for( var i in drawable.vertices )
 		    this.vertices.push( drawable.vertices[i] );
+	    } else if( drawable instanceof Triangle ) {
+		this.drawables.push( drawable );
+		this.vertices.push( drawable.a );
+		this.vertices.push( drawable.b );
+		this.vertices.push( drawable.c );
 	    } else if( drawable instanceof BezierPath ) {
 		this.drawables.push( drawable );
 		for( var i in drawable.bezierCurves ) {
@@ -5753,6 +6176,14 @@ Object.extendClass = function( superClass, subClass ) {
 
 
 	/**
+	 * This is just a tiny helper function to determine the render color of vertices.
+	 **/
+	function _handleColor( h, color ) {
+	    return h.attr.draggable ? color : 'rgba(128,128,128,0.5)';
+	}
+
+
+	/**
 	 * Draw all drawables.
 	 *
 	 * This function is usually only used internally.
@@ -5766,6 +6197,7 @@ Object.extendClass = function( superClass, subClass ) {
 	 * @return {void}
 	 **/
 	PlotBoilerplate.prototype.drawDrawables = function( renderTime ) {
+	    
 	    // Draw drawables
 	    for( var i in this.drawables ) {
 		var d = this.drawables[i];
@@ -5775,15 +6207,15 @@ Object.extendClass = function( superClass, subClass ) {
 
 			if( this.config.drawBezierHandlePoints && this.config.drawHandlePoints ) {
 			    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
-				this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, 'orange' );
+				this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, _handleColor(d.bezierCurves[c].startPoint,'orange') );
 				d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
 			    }
 			    if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
-				this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, 'orange' );
+				this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7,  _handleColor(d.bezierCurves[c].endPoint,'orange') );
 				d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
 			    }
-			    this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, '#008888' );
-			    this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, '#008888' );
+			    this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 7, _handleColor(d.bezierCurves[c].startControlPoint,'#008888') );
+			    this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 7, _handleColor(d.bezierCurves[c].endControlPoint,'#008888') );
 			    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
 			    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
 			} else {
@@ -5805,6 +6237,10 @@ Object.extendClass = function( superClass, subClass ) {
 			for( var i in d.vertices )
 			    d.vertices[i].attr.renderTime = renderTime;
 		    }
+		} else if( d instanceof Triangle ) {
+		    this.draw.polyline( [d.a,d.b,d.c], false, '#6600ff' );
+		    if( !this.config.drawHandlePoints ) 
+			d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
 		    if( this.config.drawHandleLines ) {
 			this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
@@ -5896,7 +6332,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    // Draw all vertices as small squares if they were not already drawn by other objects
 	    for( var i in this.vertices ) {
 		if( this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime ) {
-		    this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : 'rgb(0,128,192)' );
+		    this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : _handleColor(this.vertices[i],'rgb(0,128,192)') );
 		}
 	    }
 	};
@@ -5950,8 +6386,6 @@ Object.extendClass = function( superClass, subClass ) {
 	 **/
 	PlotBoilerplate.prototype.clear = function() {
 	    // Note that the image might have an alpha channel. Clear the scene first.
-	    //this.ctx.fillStyle = this.config.backgroundColor; 
-	    //this.ctx.fillRect(0,0,this.canvasSize.width,this.canvasSize.height);
 	    this.draw.clear( this.config.backgroundColor );
 	};
 
@@ -6211,7 +6645,6 @@ Object.extendClass = function( superClass, subClass ) {
 	    if( e.which != 1 && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
 		return; // Only react on left mouse or touch events
 	    var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
-	    //_self.console.log('point at position found: '+p );
 	    if( !p ) return;
 	    // Drag all selected elements?
 	    if( p.type == 'vertex' && _self.vertices[p.vindex].attr.isSelected ) {
@@ -6261,13 +6694,9 @@ Object.extendClass = function( superClass, subClass ) {
 		// Warning: this possibly invalidates the dragEvent for other listeners!
 		//          Rethink the solution when other features are added.
 		e.params.dragAmount.x /= _self.draw.scale.x;
-		e.params.dragAmount.y /= _self.draw.scale.y;
-		
-		// _self.console.log( 'draggedElements',_self.draggedElements );
-		
+		e.params.dragAmount.y /= _self.draw.scale.y;		
 		for( var i in _self.draggedElements ) {
 		    var p = _self.draggedElements[i];
-		    // _self.console.log( 'i', i, 'pid', p.pid, 'pindex', p.pindex, 'cindex', p.cindex );
 		    if( p.type == 'bpath' ) {
 			_self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, e.params.dragAmount );
 			_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent( e );
@@ -6364,7 +6793,6 @@ Object.extendClass = function( superClass, subClass ) {
 
 	    // Convert absolute touch positions to relative DOM element position (relative to canvas)
 	    function relPos(pos) {
-		// console.log( pos, _self.canvas.offsetLeft, _self.canvas.offsetTop );
 		return { x : pos.x - _self.canvas.offsetLeft,
 			 y : pos.y - _self.canvas.offsetTop
 		       };
@@ -6380,7 +6808,6 @@ Object.extendClass = function( superClass, subClass ) {
 			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 			    if( draggedElement ) {
 				hand.on('move', function (points) {
-				    //console.log( points );
 				    var rel = relPos( points[0] );
 				    var trans = _self.transformMousePosition( rel.x, rel.y ); 
 				    var diff = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
@@ -6631,7 +7058,7 @@ Object.extendClass = function( superClass, subClass ) {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {/**
