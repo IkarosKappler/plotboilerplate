@@ -4,6 +4,16 @@ layout: page
 
 
 # Changelog
+* 2019-11-18
+  * Added the Triangle class as a direct drawable class to the PlotBoilerplate (was in the demos only before).
+  * Added the drawutils.polyline(Vertex[],boolean,color) function.
+  * The PlotBoilerplate.add(...) function now works with arrays, too.
+  * Added the _handleColor helper function to determine the render color of non-draggable vertices.
+  * Fixed the BezierPath.clone function: adjustCircular attribute was not cloned.
+  * Added the Vertex.rotate(number,Vertex) function.
+  * Added the BezierPath.rotate(number,Vertex) function.
+  * Non-draggable vertices are now be excluded by the locateNear(...) function. There is no use locating
+	 non-draggable vertcies as they may block underlying draggable vertices.
 * 2019-11-13
   * Fixed an issue with the mouse-sensitive area around vertices (were affected by zoom).
 * 2019-11-07

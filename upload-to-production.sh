@@ -26,17 +26,9 @@ function addTrackerToDemos() {
     
     for d in demos_with_tracker/*; do
 	if [ -d "$d" ]; then
-            # $d is a directory
-	    # sed -i 's/original/new/g' file.txt
-	    echo "DIR $d"
-	    # ls $d
 	    for f in "$d"/*.html; do
 		if [ -f "$f" ]; then
-		    echo "FILE $f"
 		    cp "$f" ./demos_with_tracker/_tmp.html
-		    # sed -i -e 's/\<\/body\>/\<\/BaDy\>/gI' ./demos_with_tracker/_tmp.html
-		    # cat ./demos_with_tracker/_tmp.html | sed 's/<\/body>/$tracker/gI' "$f"
-		    # sed -e "/$str/r $fileToInsert" -e "/$str/d" "$f"
 		    sed -e "/$str/r $fileToInsert" -e "/$str/d" ./demos_with_tracker/_tmp.html > "$f"
 		    rm ./demos_with_tracker/_tmp.html 
 		fi
