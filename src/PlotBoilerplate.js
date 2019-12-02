@@ -41,7 +41,8 @@
  * @modified 2019-11-18 Added the Triangle class as a regular drawable element.
  * @modified 2019-11-18 The add function now works with arrays, too.
  * @modified 2019-11-18 Added the _handleColor helper function to determine the render color of non-draggable vertices.
- * @version  1.5.0
+ * @modified 2019-11-19 Fixed a bug in the resizeCanvas function; retina resolution was not possible.
+ * @version  1.5.1
  *
  * @file PlotBoilerplate
  * @public
@@ -880,12 +881,14 @@
 		// Set editor size
 		_self.canvas.style.position = 'absolute';
 		var space = getAvailableContainerSpace( _self.canvas.parentNode );
-		_self.canvas.style.width = space.width+'px';
-		_self.canvas.style.height = space.height+'px';
+		_self.canvas.style.width = (_self.config.canvasWidthFactor*space.width)+'px';
+		_self.canvas.style.height = (_self.config.canvasHeightFactor*space.height)+'px';
 		_self.canvas.style.top = null;
 		_self.canvas.style.left = null;
 		_setSize( space.width, space.height );		
 	    } else {
+		_self.canvas.style.width = null; // space.width+'px';
+		_self.canvas.style.height = null; //space.height+'px';
                 _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
 	    }
 	    
@@ -937,7 +940,7 @@
 	    // Search in vertices
 	    for( var vindex in _self.vertices ) {
 		var vert = _self.vertices[vindex];
-		if( vert.distance(point) < tolerance ) {
+		if( (vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance ) {
 		    // { type : 'vertex', vindex : vindex };
 		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); 
 		}

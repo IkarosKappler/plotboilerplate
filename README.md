@@ -1,9 +1,9 @@
 # An interactive Javascript Plotting Boilerplate
 For plotting visual 2D data with Javascript and canvas (in 2d-context).
 
-This is a simple collection of useful functions I repetively used for
-visualizing 2D stuff on HTML canvas. Basic features are
- * adding elements like vertices, lines, vectors, polygons, ellipses, images
+This is a simple collection of useful functions I repetitively used for
+visualizing 2D geometries on HTML canvas. Basic features are
+ * adding elements like vertices, lines, vectors, triangles, curves, polygons, ellipses, images
  * cofiguration of the canvas behavior (fullsize, interaction, raster)
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
@@ -13,8 +13,8 @@ visualizing 2D stuff on HTML canvas. Basic features are
 
 ## Install the package via npm
 ~~~sh
-   $ npm i -g npm
-   $ npm i plotboilerplate
+   $ npm i -g npm          # Updates your npm if necessary
+   $ npm i plotboilerplate # Installs the package
 ~~~
 
 
@@ -138,7 +138,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 
 
-## Parameters for initialization
+## Initialization parameters
 ~~~javascript
  var pb = new PlotBoilerplate( {
     // HTMLElement
@@ -364,8 +364,6 @@ from the sources code files in ./src/*.
  * Include Touchy.js as a package dependency.
  * Include FileSaver.js as a package dependency.
  * Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
- * Add config item for deactivating mouse wheel zoom.
- * The BezierPath uses a _scalePoint helper function. Replace this by Vertex.scale().
  * Make strokes configurable (color, width, style).
  * Make Bézier Curves dividable (by double click?).
  * Implement snap-to-grid.
@@ -377,9 +375,15 @@ from the sources code files in ./src/*.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
- * Make the triangle class an official helper. It is currently only used in demos.
- 
-
+ * Add a CSS class with a peusdo grid (inline-PNG) for the canvas wrapper (placeholder while loading).
+ * main-dist.html has a wrong document title. 
+ * Add a proper webpack entry point file (like index.js or entry.js?).
+ * Add typescript and define an interface for drawables (Drawable.ts?).
+ * Add a vertex attribute: visible. (to hide vertices).
+ * Implement relative zoom at mouse position (current zoom is fixed a origin).
+ * Add control button: reset zoom.
+ * Add control button: reset to origin.
+ * Add control button: set to retina resolution (size factors and css scale).
 
 
 ## Browsers support
@@ -399,6 +403,7 @@ from the sources code files in ./src/*.
 
 
 ## Known bugs
+ * Vertex rotation is faulty (angle=0 is wrong somehow, see the polygon).
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
  * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
  * Currently no more known. Please report bugs.

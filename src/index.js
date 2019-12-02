@@ -139,12 +139,18 @@
 	    pb.add( new Vector( new Vertex(0,diameter*1.6), new Vertex(0,diameter*1.2) ), false );
 
 	    // +---------------------------------------------------------------------------------
-	    // | Add polygon (here a square).
+	    // | Add polygon (here a hexagon).
 	    // +-------------------------------
-	    var squareSize = diameter*0.35;
-	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
-	    var square = new Polygon( squareVerts );
-	    pb.add( square, false );
+	    let n = 6;
+	    var polygonRadius = radius;
+	    var polygonVerts = [];
+	    for( var i = 0; i < n; i++ ) {
+		let vert = new Vertex(polygonRadius,0).rotate( (Math.PI*2/n)*i );
+		vert.attr.draggable = vert.attr.selectable = false;
+		polygonVerts.push( vert );
+	    }
+	    var polygon = new Polygon( polygonVerts );
+	    pb.add( polygon, false );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add two circles.
@@ -203,7 +209,7 @@
 	    };
 	    for( var i in triangles ) {
 		let tri = triangles[i];
-		tri.c.attr.draggable = false;
+		tri.c.attr.draggable = tri.c.attr.selectable = false;
 		tri.a.listeners.addDragListener( function(e) { setEquilateral(tri) } );
 		tri.b.listeners.addDragListener( function(e) { setEquilateral(tri) } );
 	    }
@@ -235,8 +241,8 @@
 	    // Construct
 	    var path2 = BezierPath.fromArray( bpath2 ); 
 	    path2.adjustCircular = true;
-	    path2.scale( new Vertex(0,0), 1.13 );
-	    path2.rotate( Math.PI/2 );
+	    path2.scale( new Vertex(0,0), 1.6 );
+	    path2.rotate( Math.PI/4 );
 	    for( var i in path2.bezierCurves ) {
 		path2.bezierCurves[i].startPoint.attr.bezierAutoAdjust = true;
 		path2.bezierCurves[i].endPoint.attr.bezierAutoAdjust = true;
@@ -249,6 +255,16 @@
 	    // +-------------------------------
 	    img.addEventListener('load', function() { pb.redraw(); } );
 	    img.src = 'example-image.png';
+
+
+	    
+	    function animate(time) { 
+		polygon.rotate(0.01);
+		pb.redraw();
+		window.requestAnimationFrame( animate );
+	    }
+	    animate(0);
+	    
 	} );
     
 })(window); 

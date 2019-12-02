@@ -20,7 +20,8 @@
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
  * @modified 2019-11-18 Added the polyline function.
- * @version  1.3.0
+ * @modified 2019-11-22 Added a second workaround for th drawImage bug in Safari.
+ * @version  1.3.1
  **/
 
 (function(_context) {
@@ -121,9 +122,12 @@
 	// Only the 9-param varaint works.
 	this.ctx.drawImage( image,
 			    0, 0,
-			    image.naturalWidth, image.naturalHeight,
-			    this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y,
-			    size.x*this.scale.x, size.y*this.scale.y );
+			    image.naturalWidth-1,  // There is this horrible Safari bug (fixed in newer versions)
+			    image.naturalHeight-1, // To avoid errors substract 1 here.
+			    this.offset.x+position.x*this.scale.x,
+			    this.offset.y+position.y*this.scale.y,
+			    size.x*this.scale.x,
+			    size.y*this.scale.y );
 	this.ctx.restore();	
     };
 

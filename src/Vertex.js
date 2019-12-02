@@ -22,7 +22,8 @@
  * @modified 2019-04-24 Added the randomVertex(ViewPort) function.
  * @modified 2019-11-07 Added toSVGString(object) function.
  * @modified 2019-11-18 Added the rotate(number,Vertex) function.
- * @version  2.2.0
+ * @modified 2019-11-21 Fixed a bug in the rotate(...) function (elements were moved).
+ * @version  2.2.1
  *
  * @file Vertex
  * @public
@@ -294,11 +295,18 @@
     Vertex.prototype.rotate = function( angle, center ) {
 	if( !center || typeof center === "undefined" )
 	    center = new Vertex(0,0);
-	angle += Math.atan2(this.y,this.x);
 	this.sub( center );
+	angle += Math.atan2(this.y,this.x);
+	// console.log( angle );
 	let len = this.distance({x:0,y:0});
-	this.x = center.x + ( Math.cos(angle) * len + Math.sin(angle) * len);
-	this.y = center.y + ( -Math.sin(angle) * len + Math.cos(angle) * len);
+	let lenX = this.x;
+	let lenY = this.y;
+	//this.x = ( Math.cos(angle) * len + Math.sin(angle) * len);
+	//this.y = ( -Math.sin(angle) * len + Math.cos(angle) * len);
+	//this.x = ( Math.cos(angle) * lenX - Math.sin(angle) * lenY);
+	//this.y = ( Math.sin(angle) * lenX + Math.cos(angle) * lenY);
+	this.x = len * Math.cos(angle);
+	this.y = len * Math.sin(angle);
 	this.add( center );
 	return this;
     };

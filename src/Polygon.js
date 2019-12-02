@@ -11,7 +11,8 @@
  * @modified 2019-10-25 Added the scale function.
  * @modified 2019-11-06 JSDoc update.
  * @modified 2019-11-07 Added toCubicBezierPath(number) function.
- * @version  1.0.6
+ * @modified 2019-11-22 Added the rotate(number,Vertex) function.
+ * @version 1.1.0
  *
  * @file Polygon
  * @public
@@ -100,7 +101,7 @@
 
     /**
      * Scale the polygon relative to the given center.
-     
+     *
      * @method scale
      * @param {number} factor - The scale factor.
      * @param {Vertex} center - The center of scaling.
@@ -118,6 +119,23 @@
 	return this;
     };
 
+
+    /**
+     * Rotatee the polygon around the given center.
+     *
+     * @method rotate
+     * @param {number} angle  - The rotation angle.
+     * @param {Vertex} center - The center of rotation.
+     * @return {Polygon} this, for chaining.
+     * @instance
+     * @memberof Polygon
+     **/
+    _context.Polygon.prototype.rotate = function( angle, center ) {
+	for( var i in this.vertices ) {
+	    this.vertices[i].rotate( angle, center );
+	}
+	return this;
+    };
 
 
     /**
