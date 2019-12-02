@@ -11,7 +11,8 @@
  * @modified 2018-12-04 Added the toSVGPathData() function.
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-03-23 Changed the signatures of getPoint, getPointAt and getTangent (!version 2.0).
- * @version  2.0.0
+ * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
+ * @version  2.0.1
  *
  * @file CubicBezierCurve
  * @public
@@ -367,7 +368,7 @@
 	this.arcLength = 0.0;
 
 	for( var i = 0; i < this.curveIntervals; i++) {	    
-	    pointB = this.getPoint( (i+1) * curveStep );  // parameter is 'u' (not 't')
+	    pointB = this.getPointAt( (i+1) * curveStep );  // parameter is 'u' (not 't')
 	    
 	    // Store point into cache
 	    this.segmentCache.push( pointB ); 
@@ -543,7 +544,7 @@
      * @memberof CubicBezierCurve
      * @return {number} 
      **/
-    CubicBezierCurve.prototype.convertU2T = function( u ) {
+    CubicBezierCurve.prototype.convertU2T = function( u ) { 
 	return Math.max( 0.0, 
 			 Math.min( 1.0, 
 				   ( u / this.arcLength ) 
@@ -600,7 +601,7 @@
      * @return {Vertex} 
      **/
     //CubicBezierCurve.prototype.getPerpendicular = function( t ) {
-    CubicBezierCurve.prototype.getPerpendicularAt = function( t ) {
+    CubicBezierCurve.prototype.getPerpendicularAt = function( t ) { 
 	//var tangentVector = this.getTangent( t );
 	var tangentVector = this.getTangentAt( t );
 	var perpendicular = new Vertex( tangentVector.y, - tangentVector.x );

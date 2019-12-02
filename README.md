@@ -134,7 +134,18 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/08-walking-triangles/index.html" title="See the demo">See the demo</a>
 
 
+### Simple tweening animation using the GSAP library
 
+![Simple Tweening Animation](screenshots/screenshot-20191202-simple-gsap-animation.png "Simple Tweening Animation")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/10-bezier-animation-gsap/index.html" title="See the demo">See the demo</a>
+
+
+### Perpendiculars of a Bézier path
+
+![Perpendiculars of a Bézier path](screenshots/screenshot-20191202-bezier-perpendiculars.png "Perpendiculars of a Bézier path")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
 
 
 

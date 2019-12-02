@@ -64,8 +64,17 @@
 	return Math.sqrt( Math.pow(this.b.x-this.a.x,2) + Math.pow(this.b.y-this.a.y,2) );
     };
 
+
+    /**
+     * Set the length of this vector to the given amount. This only works if this
+     * vector is not a null vector.
+     *
+     * @method setLength
+     * @param {number} length - The desired length.
+     * @return {Line} this (for chaining)
+     **/
     Line.prototype.setLength = function( length ) {
-	this.scale( length/this.length() );
+	return this.scale( length/this.length() );
     };
     
     /**

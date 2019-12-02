@@ -13,7 +13,8 @@
  * @modified 2019-03-23 Added JSDoc tags.
  * @modified 2019-03-23 Changed the fuctions getPoint and getPointAt to match semantics in the Line class.
  * @modified 2019-11-18 Fixed the clone function: adjustCircular attribute was not cloned.
- * @version 2.0.1
+ * @modified 2019-12-02 Removed some excessive comments.
+ * @version 2.0.2
  *
  * @file BezierPath
  * @public
@@ -535,9 +536,6 @@
 	    curve.getStartPoint().scale( scaling, anchor );
 	    curve.getStartControlPoint().scale( scaling, anchor );
 	    curve.getEndControlPoint().scale( scaling, anchor );
-	    //BezierPath._scalePoint( curve.getStartPoint(),        anchor, scaling );
-	    //BezierPath._scalePoint( curve.getStartControlPoint(), anchor, scaling );
-	    //BezierPath._scalePoint( curve.getEndControlPoint(),   anchor, scaling );
 	    // Do NOT scale the end point here!
 	    // Don't forget that the curves are connected and on curve's end point
 	    // the the successor's start point (same instance)!
@@ -547,10 +545,6 @@
 	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
 	    // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS
 	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().scale( scaling, anchor );
-	    /* BezierPath._scalePoint( this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint(),
-				    anchor,
-				    scaling
-				  );*/ 
 	}
 	
 	this.updateArcLengths();	
@@ -588,36 +582,6 @@
     };
 
     
-    /**
-     * A helper function for scaling points.
-     *
-     * @method _scalePoint
-     * @param {Vertex} point - The point to scale.
-     * @param {Vertex} anchor - 
-     * @param {Vertex} scaling -
-     * @private
-     * @memberof BezierPath
-     * @return {void}
-     **/
-    // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS!!!
-    /*
-    BezierPath._scalePoint = function( point,   // Vertex
-				       anchor,  // Vertex
-				       scaling  // Vertex
-				     ) {
-	
-	// Move point to origin
-	//point.sub( anchor );
-	// Apply scaling
-	//point.setX( point.x * scaling.x );
-	//point.setY( point.y * scaling.y );
-	// Move back to original position
-	//point.add( anchor );	
-	
-	point.scale( scaling, anchor );
-    };
-    */
-
 
     /**
      * Get the point on the bézier path at the given relative path location.
@@ -628,7 +592,6 @@
      * @memberof BezierPath
      * @return {Vertex} The point at the relative path position.
      **/
-    //BezierPath.prototype.getPointAt = function( u ) {
     BezierPath.prototype.getPoint = function( u ) {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.log( "[BezierPath.getPoint(u)] u is out of bounds: " + u + "." );
@@ -652,7 +615,6 @@
 	
 	var bCurve    = this.bezierCurves[ i ];
 	var relativeU = u - uTemp;
-	//return bCurve.getPointAt( relativeU );
 	return bCurve.getPoint( relativeU );
     };
 
@@ -667,9 +629,7 @@
      * @memberof BezierPath
      * @return {Vertex} The point at the absolute path position.
      **/
-    //BezierPath.prototype.getPoint = function( t ) {
     BezierPath.prototype.getPointAt = function( t ) {
-	//return this.getPointAt( t * this.totalArcLength );
 	return this.getPoint( t * this.totalArcLength );
     };
 
@@ -686,9 +646,7 @@
      * @memberof BezierPath
      * @return {Vertex} The tangent vector at the absolute path position.
      **/
-    //BezierPath.prototype.getTangent = function( t ) {
     BezierPath.prototype.getTangentAt = function( t ) {
-	//return this.getTangentAt( t * this.totalArcLength );
 	return this.getTangent( t * this.totalArcLength );
     };
 
@@ -705,7 +663,6 @@
      * @memberof BezierPath
      * @return {Vertex} The tangent vector at the relative path position.
      **/
-    //BezierPath.prototype.getTangentAt = function( u ) {
     BezierPath.prototype.getTangent = function( u ) {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.warn( "[BezierPath.getTangent(u)] u is out of bounds: " + u + "." );
@@ -722,7 +679,6 @@
 	}
 	var bCurve    = this.bezierCurves[ i ];
 	var relativeU = u - uTemp;
-	//return bCurve.getTangentAt( relativeU );
 	return bCurve.getTangent( relativeU );
     };
 
@@ -739,9 +695,7 @@
      * @memberof BezierPath
      * @return {Vertex} The perpendicluar vector at the absolute path position.
      **/
-    //BezierPath.prototype.getPerpendicular = function( t ) {
-    BezierPath.prototype.getPerpendicularAt = function( t ) {
-	//return this.getPerpendicularAt( t * this.totalArcLength );
+    BezierPath.prototype.getPerpendicularAt = function( t ) { 
 	return this.getPerpendicular( t * this.totalArcLength );
     };
 
@@ -758,7 +712,6 @@
      * @memberof BezierPath
      * @return {Vertex} The perpendicluar vector at the relative path position.
      **/
-    //BezierPath.prototype.getPerpendicularAt = function( u ) {
     BezierPath.prototype.getPerpendicular = function( u ) {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.log( "[IKRS.BezierPath.getPerpendicular(u)] u is out of bounds: " + u + "." );
@@ -780,8 +733,6 @@
 
 	var bCurve    = this.bezierCurves[ i ];
 	var relativeU = u - uTemp;
-
-	// return bCurve.getPerpendicularAt( relativeU );
 	return bCurve.getPerpendicular( relativeU );
     };
 
@@ -928,7 +879,6 @@
 								 obtainHandleLength,  // boolean
 								 updateArcLengths     // boolean
 							       ) {
-	// console.log( this.getCurveCount(), curveIndex );
 	if( !this.adjustCirculat && curveIndex+1 > this.getCurveCount() )
 	    return false; 
 
@@ -1148,12 +1098,10 @@
 	    // Convert object (or array?) to bezier curve
 	    var bCurve = null;
 	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
-		//console.log('1', arr[i]);
 		if( !arr[i][0] || !arr[i][1] || !arr[i][2] || !arr[i][3] )
 		    throw "Cannot convert path data to BezierPath instance. At least one element is undefined (index="+i+"): " + arr[i];
 		bCurve = CubicBezierCurve.fromArray( arr[i] );
 	    } else {
-		//console.log('2');
 		bCurve = CubicBezierCurve.fromObject( arr[i] );
 	    }
 	    // Set curve start point?
@@ -1163,16 +1111,11 @@
 	    
 	    // Add to path's internal list
 	    bPath.bezierCurves.push( bCurve );
-	    bPath.totalArcLength += bCurve.getLength();
-	    
+	    bPath.totalArcLength += bCurve.getLength(); 	    
 	    
 	    lastCurve = bCurve;
 	}   
-	// Bezier segments added.
-	// Recalculate length?
-	//bPath.updateArcLengths();
-	
-	// Done
+	// Bezier segments added. Done
 	return bPath;
     }
 
@@ -1261,13 +1204,12 @@
 	// Convert to object
 	var bezierPath = new BezierPath( null ); // No points yet
         
-	var startPoint        = null; // new THREE.Vector2( pointArray[i], pointArray[i+1] );
-	var startControlPoint = null; // new THREE.Vector2( pointArray[i+2], pointArray[i+3] );
-	var endControlPoint   = null; // new THREE.Vector2( pointArray[i+4], pointArray[i+5] );
-	var endPoint          = null; // new THREE.Vector2( pointArray[i+6], pointArray[i+7] );
+	var startPoint        = null;
+	var startControlPoint = null;
+	var endControlPoint   = null;
+	var endPoint          = null;
 	var i = 0;
 
-	//for( var i = 0; i < pointArray.length; i+=3 ) {
 	do {
 	    
 	    if( i == 0 )
@@ -1316,8 +1258,7 @@
 	number = Math.round( number * magnitude );
 	var result = "" + (number  /  magnitude);
 	var index = result.lastIndexOf(".");
-	if( index == -1 ) {	
-	    //result += ".0";
+	if( index == -1 ) {
 	    index = result.length;
 	}
 	if( enforceInvisibleDigits ) {

@@ -1,7 +1,11 @@
 
 
 # Changelog
-* 2019-11-22 (1.5.1)
+* 2019-12-02 (1.5.1)
+  * Fixed the CubicBezierCurve.updateArcLength function. It used the wrong pointAt function.
+  * Added the Bézier perpendicular demo (11).
+  * Added the demo for simple tween animations (using GSAP).
+* 2019-11-22 
   * Added the Polygon.rotate(number,Vertex) function.
   * Fixed a bug in Vertex.rotate(...).
   * Added a second workaround for th drawImage bug in Safari.
