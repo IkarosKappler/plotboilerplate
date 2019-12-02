@@ -408,7 +408,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-04-24 Added the randomVertex(ViewPort) function.
  * @modified 2019-11-07 Added toSVGString(object) function.
  * @modified 2019-11-18 Added the rotate(number,Vertex) function.
- * @version  2.2.0
+ * @modified 2019-11-21 Fixed a bug in the rotate(...) function (elements were moved).
+ * @version  2.2.1
  *
  * @file Vertex
  * @public
@@ -680,11 +681,18 @@ Object.extendClass = function( superClass, subClass ) {
     Vertex.prototype.rotate = function( angle, center ) {
 	if( !center || typeof center === "undefined" )
 	    center = new Vertex(0,0);
-	angle += Math.atan2(this.y,this.x);
 	this.sub( center );
+	angle += Math.atan2(this.y,this.x);
+	// console.log( angle );
 	let len = this.distance({x:0,y:0});
-	this.x = center.x + ( Math.cos(angle) * len + Math.sin(angle) * len);
-	this.y = center.y + ( -Math.sin(angle) * len + Math.cos(angle) * len);
+	let lenX = this.x;
+	let lenY = this.y;
+	//this.x = ( Math.cos(angle) * len + Math.sin(angle) * len);
+	//this.y = ( -Math.sin(angle) * len + Math.cos(angle) * len);
+	//this.x = ( Math.cos(angle) * lenX - Math.sin(angle) * lenY);
+	//this.y = ( Math.sin(angle) * lenX + Math.cos(angle) * lenY);
+	this.x = len * Math.cos(angle);
+	this.y = len * Math.sin(angle);
 	this.add( center );
 	return this;
     };
@@ -975,8 +983,17 @@ Object.extendClass = function( superClass, subClass ) {
 	return Math.sqrt( Math.pow(this.b.x-this.a.x,2) + Math.pow(this.b.y-this.a.y,2) );
     };
 
+
+    /**
+     * Set the length of this vector to the given amount. This only works if this
+     * vector is not a null vector.
+     *
+     * @method setLength
+     * @param {number} length - The desired length.
+     * @return {Line} this (for chaining)
+     **/
     Line.prototype.setLength = function( length ) {
-	this.scale( length/this.length() );
+	return this.scale( length/this.length() );
     };
     
     /**
@@ -1402,7 +1419,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2018-12-04 Added the toSVGPathData() function.
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-03-23 Changed the signatures of getPoint, getPointAt and getTangent (!version 2.0).
- * @version  2.0.0
+ * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
+ * @version  2.0.1
  *
  * @file CubicBezierCurve
  * @public
@@ -1758,7 +1776,7 @@ Object.extendClass = function( superClass, subClass ) {
 	this.arcLength = 0.0;
 
 	for( var i = 0; i < this.curveIntervals; i++) {	    
-	    pointB = this.getPoint( (i+1) * curveStep );  // parameter is 'u' (not 't')
+	    pointB = this.getPointAt( (i+1) * curveStep );  // parameter is 'u' (not 't')
 	    
 	    // Store point into cache
 	    this.segmentCache.push( pointB ); 
@@ -1934,7 +1952,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof CubicBezierCurve
      * @return {number} 
      **/
-    CubicBezierCurve.prototype.convertU2T = function( u ) {
+    CubicBezierCurve.prototype.convertU2T = function( u ) { 
 	return Math.max( 0.0, 
 			 Math.min( 1.0, 
 				   ( u / this.arcLength ) 
@@ -1991,7 +2009,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @return {Vertex} 
      **/
     //CubicBezierCurve.prototype.getPerpendicular = function( t ) {
-    CubicBezierCurve.prototype.getPerpendicularAt = function( t ) {
+    CubicBezierCurve.prototype.getPerpendicularAt = function( t ) { 
 	//var tangentVector = this.getTangent( t );
 	var tangentVector = this.getTangentAt( t );
 	var perpendicular = new Vertex( tangentVector.y, - tangentVector.x );
@@ -2208,7 +2226,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-03-23 Added JSDoc tags.
  * @modified 2019-03-23 Changed the fuctions getPoint and getPointAt to match semantics in the Line class.
  * @modified 2019-11-18 Fixed the clone function: adjustCircular attribute was not cloned.
- * @version 2.0.1
+ * @modified 2019-12-02 Removed some excessive comments.
+ * @version 2.0.2
  *
  * @file BezierPath
  * @public
@@ -2730,9 +2749,6 @@ Object.extendClass = function( superClass, subClass ) {
 	    curve.getStartPoint().scale( scaling, anchor );
 	    curve.getStartControlPoint().scale( scaling, anchor );
 	    curve.getEndControlPoint().scale( scaling, anchor );
-	    //BezierPath._scalePoint( curve.getStartPoint(),        anchor, scaling );
-	    //BezierPath._scalePoint( curve.getStartControlPoint(), anchor, scaling );
-	    //BezierPath._scalePoint( curve.getEndControlPoint(),   anchor, scaling );
 	    // Do NOT scale the end point here!
 	    // Don't forget that the curves are connected and on curve's end point
 	    // the the successor's start point (same instance)!
@@ -2742,10 +2758,6 @@ Object.extendClass = function( superClass, subClass ) {
 	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
 	    // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS
 	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().scale( scaling, anchor );
-	    /* BezierPath._scalePoint( this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint(),
-				    anchor,
-				    scaling
-				  );*/ 
 	}
 	
 	this.updateArcLengths();	
@@ -2783,36 +2795,6 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
     
-    /**
-     * A helper function for scaling points.
-     *
-     * @method _scalePoint
-     * @param {Vertex} point - The point to scale.
-     * @param {Vertex} anchor - 
-     * @param {Vertex} scaling -
-     * @private
-     * @memberof BezierPath
-     * @return {void}
-     **/
-    // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS!!!
-    /*
-    BezierPath._scalePoint = function( point,   // Vertex
-				       anchor,  // Vertex
-				       scaling  // Vertex
-				     ) {
-	
-	// Move point to origin
-	//point.sub( anchor );
-	// Apply scaling
-	//point.setX( point.x * scaling.x );
-	//point.setY( point.y * scaling.y );
-	// Move back to original position
-	//point.add( anchor );	
-	
-	point.scale( scaling, anchor );
-    };
-    */
-
 
     /**
      * Get the point on the bézier path at the given relative path location.
@@ -2823,7 +2805,6 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {Vertex} The point at the relative path position.
      **/
-    //BezierPath.prototype.getPointAt = function( u ) {
     BezierPath.prototype.getPoint = function( u ) {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.log( "[BezierPath.getPoint(u)] u is out of bounds: " + u + "." );
@@ -2847,7 +2828,6 @@ Object.extendClass = function( superClass, subClass ) {
 	
 	var bCurve    = this.bezierCurves[ i ];
 	var relativeU = u - uTemp;
-	//return bCurve.getPointAt( relativeU );
 	return bCurve.getPoint( relativeU );
     };
 
@@ -2862,9 +2842,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {Vertex} The point at the absolute path position.
      **/
-    //BezierPath.prototype.getPoint = function( t ) {
     BezierPath.prototype.getPointAt = function( t ) {
-	//return this.getPointAt( t * this.totalArcLength );
 	return this.getPoint( t * this.totalArcLength );
     };
 
@@ -2881,9 +2859,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {Vertex} The tangent vector at the absolute path position.
      **/
-    //BezierPath.prototype.getTangent = function( t ) {
     BezierPath.prototype.getTangentAt = function( t ) {
-	//return this.getTangentAt( t * this.totalArcLength );
 	return this.getTangent( t * this.totalArcLength );
     };
 
@@ -2900,7 +2876,6 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {Vertex} The tangent vector at the relative path position.
      **/
-    //BezierPath.prototype.getTangentAt = function( u ) {
     BezierPath.prototype.getTangent = function( u ) {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.warn( "[BezierPath.getTangent(u)] u is out of bounds: " + u + "." );
@@ -2917,7 +2892,6 @@ Object.extendClass = function( superClass, subClass ) {
 	}
 	var bCurve    = this.bezierCurves[ i ];
 	var relativeU = u - uTemp;
-	//return bCurve.getTangentAt( relativeU );
 	return bCurve.getTangent( relativeU );
     };
 
@@ -2934,9 +2908,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {Vertex} The perpendicluar vector at the absolute path position.
      **/
-    //BezierPath.prototype.getPerpendicular = function( t ) {
-    BezierPath.prototype.getPerpendicularAt = function( t ) {
-	//return this.getPerpendicularAt( t * this.totalArcLength );
+    BezierPath.prototype.getPerpendicularAt = function( t ) { 
 	return this.getPerpendicular( t * this.totalArcLength );
     };
 
@@ -2953,7 +2925,6 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {Vertex} The perpendicluar vector at the relative path position.
      **/
-    //BezierPath.prototype.getPerpendicularAt = function( u ) {
     BezierPath.prototype.getPerpendicular = function( u ) {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.log( "[IKRS.BezierPath.getPerpendicular(u)] u is out of bounds: " + u + "." );
@@ -2975,8 +2946,6 @@ Object.extendClass = function( superClass, subClass ) {
 
 	var bCurve    = this.bezierCurves[ i ];
 	var relativeU = u - uTemp;
-
-	// return bCurve.getPerpendicularAt( relativeU );
 	return bCurve.getPerpendicular( relativeU );
     };
 
@@ -3123,7 +3092,6 @@ Object.extendClass = function( superClass, subClass ) {
 								 obtainHandleLength,  // boolean
 								 updateArcLengths     // boolean
 							       ) {
-	// console.log( this.getCurveCount(), curveIndex );
 	if( !this.adjustCirculat && curveIndex+1 > this.getCurveCount() )
 	    return false; 
 
@@ -3343,12 +3311,10 @@ Object.extendClass = function( superClass, subClass ) {
 	    // Convert object (or array?) to bezier curve
 	    var bCurve = null;
 	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
-		//console.log('1', arr[i]);
 		if( !arr[i][0] || !arr[i][1] || !arr[i][2] || !arr[i][3] )
 		    throw "Cannot convert path data to BezierPath instance. At least one element is undefined (index="+i+"): " + arr[i];
 		bCurve = CubicBezierCurve.fromArray( arr[i] );
 	    } else {
-		//console.log('2');
 		bCurve = CubicBezierCurve.fromObject( arr[i] );
 	    }
 	    // Set curve start point?
@@ -3358,16 +3324,11 @@ Object.extendClass = function( superClass, subClass ) {
 	    
 	    // Add to path's internal list
 	    bPath.bezierCurves.push( bCurve );
-	    bPath.totalArcLength += bCurve.getLength();
-	    
+	    bPath.totalArcLength += bCurve.getLength(); 	    
 	    
 	    lastCurve = bCurve;
 	}   
-	// Bezier segments added.
-	// Recalculate length?
-	//bPath.updateArcLengths();
-	
-	// Done
+	// Bezier segments added. Done
 	return bPath;
     }
 
@@ -3456,13 +3417,12 @@ Object.extendClass = function( superClass, subClass ) {
 	// Convert to object
 	var bezierPath = new BezierPath( null ); // No points yet
         
-	var startPoint        = null; // new THREE.Vector2( pointArray[i], pointArray[i+1] );
-	var startControlPoint = null; // new THREE.Vector2( pointArray[i+2], pointArray[i+3] );
-	var endControlPoint   = null; // new THREE.Vector2( pointArray[i+4], pointArray[i+5] );
-	var endPoint          = null; // new THREE.Vector2( pointArray[i+6], pointArray[i+7] );
+	var startPoint        = null;
+	var startControlPoint = null;
+	var endControlPoint   = null;
+	var endPoint          = null;
 	var i = 0;
 
-	//for( var i = 0; i < pointArray.length; i+=3 ) {
 	do {
 	    
 	    if( i == 0 )
@@ -3511,8 +3471,7 @@ Object.extendClass = function( superClass, subClass ) {
 	number = Math.round( number * magnitude );
 	var result = "" + (number  /  magnitude);
 	var index = result.lastIndexOf(".");
-	if( index == -1 ) {	
-	    //result += ".0";
+	if( index == -1 ) {
 	    index = result.length;
 	}
 	if( enforceInvisibleDigits ) {
@@ -3546,7 +3505,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-10-25 Added the scale function.
  * @modified 2019-11-06 JSDoc update.
  * @modified 2019-11-07 Added toCubicBezierPath(number) function.
- * @version  1.0.6
+ * @modified 2019-11-22 Added the rotate(number,Vertex) function.
+ * @version 1.1.0
  *
  * @file Polygon
  * @public
@@ -3635,7 +3595,7 @@ Object.extendClass = function( superClass, subClass ) {
 
     /**
      * Scale the polygon relative to the given center.
-     
+     *
      * @method scale
      * @param {number} factor - The scale factor.
      * @param {Vertex} center - The center of scaling.
@@ -3653,6 +3613,23 @@ Object.extendClass = function( superClass, subClass ) {
 	return this;
     };
 
+
+    /**
+     * Rotatee the polygon around the given center.
+     *
+     * @method rotate
+     * @param {number} angle  - The rotation angle.
+     * @param {Vertex} center - The center of rotation.
+     * @return {Polygon} this, for chaining.
+     * @instance
+     * @memberof Polygon
+     **/
+    _context.Polygon.prototype.rotate = function( angle, center ) {
+	for( var i in this.vertices ) {
+	    this.vertices[i].rotate( angle, center );
+	}
+	return this;
+    };
 
 
     /**
@@ -4894,7 +4871,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
  * @modified 2019-11-18 Added the polyline function.
- * @version  1.3.0
+ * @modified 2019-11-22 Added a second workaround for th drawImage bug in Safari.
+ * @version  1.3.1
  **/
 
 (function(_context) {
@@ -4995,9 +4973,12 @@ Object.extendClass = function( superClass, subClass ) {
 	// Only the 9-param varaint works.
 	this.ctx.drawImage( image,
 			    0, 0,
-			    image.naturalWidth, image.naturalHeight,
-			    this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y,
-			    size.x*this.scale.x, size.y*this.scale.y );
+			    image.naturalWidth-1,  // There is this horrible Safari bug (fixed in newer versions)
+			    image.naturalHeight-1, // To avoid errors substract 1 here.
+			    this.offset.x+position.x*this.scale.x,
+			    this.offset.y+position.y*this.scale.y,
+			    size.x*this.scale.x,
+			    size.y*this.scale.y );
 	this.ctx.restore();	
     };
 
@@ -5672,7 +5653,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-11-18 Added the Triangle class as a regular drawable element.
  * @modified 2019-11-18 The add function now works with arrays, too.
  * @modified 2019-11-18 Added the _handleColor helper function to determine the render color of non-draggable vertices.
- * @version  1.5.0
+ * @modified 2019-11-19 Fixed a bug in the resizeCanvas function; retina resolution was not possible.
+ * @version  1.5.1
  *
  * @file PlotBoilerplate
  * @public
@@ -6511,12 +6493,14 @@ Object.extendClass = function( superClass, subClass ) {
 		// Set editor size
 		_self.canvas.style.position = 'absolute';
 		var space = getAvailableContainerSpace( _self.canvas.parentNode );
-		_self.canvas.style.width = space.width+'px';
-		_self.canvas.style.height = space.height+'px';
+		_self.canvas.style.width = (_self.config.canvasWidthFactor*space.width)+'px';
+		_self.canvas.style.height = (_self.config.canvasHeightFactor*space.height)+'px';
 		_self.canvas.style.top = null;
 		_self.canvas.style.left = null;
 		_setSize( space.width, space.height );		
 	    } else {
+		_self.canvas.style.width = null; // space.width+'px';
+		_self.canvas.style.height = null; //space.height+'px';
                 _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
 	    }
 	    
@@ -6568,7 +6552,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    // Search in vertices
 	    for( var vindex in _self.vertices ) {
 		var vert = _self.vertices[vindex];
-		if( vert.distance(point) < tolerance ) {
+		if( (vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance ) {
 		    // { type : 'vertex', vindex : vindex };
 		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); 
 		}
