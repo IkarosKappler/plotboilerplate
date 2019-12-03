@@ -137,24 +137,6 @@
     };
 
 
-    // THIS SEEMS NOT TO BE IN USE
-    /*
-    CubicBezierCurve._scalePoint = function( point,   // Vertex
-					     anchor,  // Vertex
-					     scaling  // Vertex
-					   ) {
-	// Move point to origin
-	point.sub( anchor );
-	// Apply scaling
-	point.setX( point.x * scaling.x );
-	point.setY( point.y * scaling.y );
-	// Move back to original position
-	point.add( anchor );
-	
-    };
-    */
-
-
     
     /**
      * Get the total curve length.<br>
@@ -174,171 +156,6 @@
     CubicBezierCurve.prototype.getLength = function() {
 	return this.arcLength;
     };
-
-
-    // +---------------------------------------------------------------------------------
-    // | Get the curve index for the given start or end point.
-    // |
-    // | If the passed vertex does not equal the start- nor the end-point this function
-    // | returns -1.
-    // |
-    // | @param vert:Vertex The start or end point to search for.
-    // | @return Number The curve index.
-    // +-------------------------------
-    /*
-    CubicBezierCurve.prototype.locateCurveByPoint = function( vert ) {
-	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-	    if( this.bezierCurves[i].startPoint.equals(vert) || this.bezierCurves[i].endPoint.equals(vert) )
-		return i;
-	}
-	return -1;
-    };
-    */
-
-    
-    // +---------------------------------------------------------------------------------
-    // |  This function computes the area size of this bezier curve in an y-axis 
-    // |  integrational approach.
-    // | 
-    // |  For each bezier segment (which are linear segments) the distance to a given
-    // |  relative Y axis is computed (position of Y axis specified by 'relativeX'
-    // |  parameter).
-    // | 
-    // |  Each resulting sub area has a determined segment height and thus a determined
-    // |  area size. The sum of all segment area sizes is returned.
-    // +-------------------------------
-    // NOT IN USE.
-    /*
-    CubicBezierCurve.prototype.computeVerticalAreaSize = function( relativeX,
-								   deltaSize, 
-								   useAbsoluteValues 
-								 ) {
-	
-	if( deltaSize == 0 )
-	    throw "Cannot compute bezier curve's vertical area size with delta=0.";
-	
-	if( this.segmentCache.length <= 1 )
-	    return 0.0;
-
-
-	var size = 0.0;
-	for( var i = 0; i+1 < this.segmentCache.length; i++ ) {
-
-	    size += this._computeVerticalAreaSizeForSegment( relativeX,
-							     deltaSize,
-							     useAbsoluteValues,
-							     i
-							   );
-
-	}
-
-	return size;
-    };
-    */
-
-    /**
-     * This helper function computes the area size of the given segment (param segmentIndex).
-     **/
-    // NOT IN USE
-    /*
-    CubicBezierCurve.prototype._computeVerticalAreaSizeForSegment = function( relativeX,
-									      deltaSize, 
-									      useAbsoluteValues, 
-									      segmentIndex 
-									    ) {
-
-	// Two points make a segment.
-	// So at least two points must be available. Otherwise there is no area (size=0).
-	if( segmentIndex+1 >= this.segmentCache.length )
-	    return 0.0;
-
-	var segmentA      = this.segmentCache[ segmentIndex ];
-	var segmentB      = this.segmentCache[ segmentIndex+1 ];
-	var segmentHeight = segmentB.y - segmentA.y;
-	
-	
-	var relativeA = relativeX - segmentA.x;
-	var relativeB = relativeX - segmentB.x;
-	var averageX = relativeB + (relativeA - relativeB) / 2.0;
-        
-	if( useAbsoluteValues )
-	    return Math.abs( segmentHeight * averageX );
-	else
-	    return segmentHeight * averageX;              // May be negative
-	
-    };
-    */
-    
-
-    /**
-     * This function computes the volume size of that revolution solid which outline
-     * is determined by the bezier curve.
-     *
-     * The calculation uses the segments area sizes to compute each layer's volume.
-     **/
-    // NOT IN USE
-    /*
-    CubicBezierCurve.prototype.computeVerticalRevolutionVolumeSize = function( relativeX,
-									       //deltaSize, 
-									       useAbsoluteValues 
-									     ) {
-		
-	if( this.segmentCache.length <= 1 )
-	    return 0.0;
-
-
-	var volume = 0.0;
-	for( var i = 0; i+1 < this.segmentCache.length; i++ ) {
-
-	    volume += this._computeVerticalRevolutionVolumeSizeForSegment( relativeX,
-									   //deltaSize,
-									   useAbsoluteValues,
-									   i
-									 );
-
-	}
-
-	return volume;
-    };
-    */
-
-    /**
-     * This helper function computes the area size of the given segment (param segmentIndex).
-     **/
-    // NOT IN USE
-    /*
-    CubicBezierCurve.prototype._computeVerticalRevolutionVolumeSizeForSegment = function( relativeX,
-											  //deltaSize, 
-											  useAbsoluteValues, 
-											  segmentIndex 
-											) {
-
-	// Two points make a segment.
-	// So at least two points must be available. Otherwise there is no area (size=0).
-	if( segmentIndex+1 >= this.segmentCache.length )
-	    return 0.0;
-
-	var segmentA      = this.segmentCache[ segmentIndex ];
-	var segmentB      = this.segmentCache[ segmentIndex+1 ];
-	var segmentHeight = segmentB.y - segmentA.y;
-	
-	
-	var relativeA = relativeX - segmentA.x;
-	var relativeB = relativeX - segmentB.x;
-	//var averageX  = relativeB + (relativeA - relativeB) / 2.0;
-	var averageX  = (relativeA + relativeB) / 2.0;
-
-	// Volume is PI * square(radius) * height
-	var volume    = Math.PI * Math.pow(averageX,2) * segmentHeight;
-
-	if( useAbsoluteValues )
-	    return Math.abs( volume );
-	else
-	    return volume;              // May be negative
-	
-    };
-    */
-
 
     
     /**
@@ -364,23 +181,48 @@
 	this.segmentCache = [];
 	// Push start point into buffer
 	this.segmentCache.push( this.startPoint );	
-	this.segmentLengths = [];	
-	this.arcLength = 0.0;
+	this.segmentLengths = [];
+	//this.arcLength = 0.0;
+	let newLength = 0.0;
 
+	/*
 	for( var i = 0; i < this.curveIntervals; i++) {	    
 	    pointB = this.getPointAt( (i+1) * curveStep );  // parameter is 'u' (not 't')
+	    //pointB = this.getPoint( (i+1) * curveStep );  // parameter is 'u' (not 't')
 	    
 	    // Store point into cache
 	    this.segmentCache.push( pointB ); 
 
 	    // Calculate segment length
-	    var tmpLength = Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
+	    var tmpLength = pointA.distance(pointB); // Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
 	    this.segmentLengths.push( tmpLength );
-	    this.arcLength += tmpLength;
+	    newLength += tmpLength;
 	    
 	    pointA = pointB;
             u += curveStep;
 	} // END for
+	this.arcLength = newLength;
+*/
+	
+	
+	var t = 0.0;
+	while( t <= 1.0 ) { //console.log('x',t);
+	    pointB = this.getPointAt(t); // (i+1) * curveStep );  // parameter is 'u' (not 't')
+	    
+	    // Store point into cache
+	    this.segmentCache.push( pointB ); 
+
+	    // Calculate segment length
+	    var tmpLength = pointA.distance(pointB); // Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
+	    this.segmentLengths.push( tmpLength );
+	    this.arcLength += tmpLength;
+	    
+	    pointA = pointB;
+            // u += curveStep;
+	    
+	    t += curveStep;
+	}
+	
     }; // END function
 
 
@@ -501,7 +343,7 @@
     /**
      * Get the curve tangent vector at a given absolute curve position t in [0,1].<br>
      * <br>
-     * Note that the returned tangent vector (end point) is not normalized.
+     * Note that the returned tangent vector (end point) is not normalized and relative to (0,0).
      *
      * @method getTangent
      * @param {number} t - The position on the curve in [0,1].
@@ -509,7 +351,8 @@
      * @memberof CubicBezierCurve
      * @return {Vertex} 
      **/
-    CubicBezierCurve.prototype.getTangentAt = function( t ) {
+    CubicBezierCurve.prototype.getTangentAt = function( t ) {// console.log(t);
+	
 	var a = this.getStartPoint();
 	var b = this.getStartControlPoint();
 	var c = this.getEndControlPoint();
@@ -532,7 +375,108 @@
 	
 	// Note: my implementation does NOT normalize tangent vectors!
 	return new Vertex( tX, tY );
+	
+
+	/*
+	// http://www.independent-software.com/determining-coordinates-on-a-html-canvas-bezier-curve.html
+	function getBezierAngle(t, sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey) {
+	    var dx = Math.pow(1-t, 2)*(cp1x-sx) + 2*t*(1-t)*(cp2x-cp1x) + t * t * (ex - cp2x);
+	    var dy = Math.pow(1-t, 2)*(cp1y-sy) + 2*t*(1-t)*(cp2y-cp1y) + t * t * (ey - cp2y);
+	    //return -Math.atan2(dx, dy) + 0.5*Math.PI;
+	    return new Vertex(dx,dy);
+	}
+	return getBezierAngle(t,
+			      this.startPoint.x, this.startPoint.y,
+			      this.startControlPoint.x, this.startControlPoint.y,
+			      this.endControlPoint.x, this.endControlPoint.y,
+			      this.endPoint.x, this.endPoint.y );
+	*/
+
+	/*
+	__normal2: function(t) {
+	    var d = this.derivative(t);
+	    var q = sqrt(d.x * d.x + d.y * d.y);
+	    return { x: -d.y / q, y: d.x / q };
+	},
+	*/
+
+	/*
+	var dpoints = [ this.startPoint, this.startControlPoint, this.endControlPoint, this.endPoint ];
+	//var p = dpoints;
+	
+	var mt = 1.0 - t,
+            a,
+            b,
+            c = 0,
+            p = dpoints; //this.startPoint; //this.dpoints[0];
+	//if (this.order === 3) {
+            a = mt * mt;
+            b = mt * t * 2;
+            c = t * t;
+	//}
+	var ret = {
+            x: a * p[0].x + b * p[1].x + c * p[2].x,
+            y: a * p[0].y + b * p[1].y + c * p[2].y
+	};
+	//if (this._3d) {
+        //    ret.z = a * p[0].z + b * p[1].z + c * p[2].z;
+	//}
+	//return new Vertex(ret.x, ret.y); //ret;
+
+	*/
+	/*
+	function __normal2(curve,t) {
+	    var d = derivative(curve,t);
+	    var q = Math.sqrt(d.x * d.x + d.y * d.y);
+	    return { x: -d.y / q, y: d.x / q };
+	}
+	return __normal2(this,t);
+	*/
     }
+
+    /*
+    function derivative(curve,t) {
+	// !!!
+	var dpoints = derive([ curve.startPoint, curve.startControlPoint, curve.endControlPoint, curve.endPoint ]);
+	
+      var mt = 1 - t,
+        a,
+        b,
+        c = 0,
+          p = [0];
+
+        a = mt * mt;
+        b = mt * t * 2;
+        c = t * t;
+
+      var ret = {
+        x: a * p[0].x + b * p[1].x + c * p[2].x,
+        y: a * p[0].y + b * p[1].y + c * p[2].y
+      };
+      return ret;
+    }
+
+
+    function derive(points) {
+      var dpoints = [];
+      for (var p = points, d = p.length, c = d - 1; d > 1; d--, c--) {
+        var list = [];
+        for (var j = 0, dpt; j < c; j++) {
+          dpt = {
+            x: c * (p[j + 1].x - p[j].x),
+            y: c * (p[j + 1].y - p[j].y)
+          };
+          //if (_3d) {
+          //  dpt.z = c * (p[j + 1].z - p[j].z);
+          //}
+          list.push(dpt);
+        }
+        dpoints.push(list);
+        p = list;
+      }
+      return dpoints;
+    };
+    */
 
 
     /**
@@ -604,17 +548,12 @@
     CubicBezierCurve.prototype.getPerpendicularAt = function( t ) { 
 	//var tangentVector = this.getTangent( t );
 	var tangentVector = this.getTangentAt( t );
-	var perpendicular = new Vertex( tangentVector.y, - tangentVector.x );
-	return perpendicular;
+	return new Vertex( tangentVector.y, - tangentVector.x );
+	//return new Vertex( - tangentVector.y, tangentVector.x );
+	// return perpendicular;
     }
 
 
-    // NOT IN USE
-    /*
-    CubicBezierCurve.prototype.computeBoundingBox = function() {
-	return BoundingBox2.computeFromPoints( this.segmentCache );
-    }
-    */
 
 
     /**

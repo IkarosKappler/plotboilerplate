@@ -54,6 +54,7 @@
 	    pb.config.postDraw = function() {
 		// In this demo the PlotBoilerplate only draws the vertices.
 		// Everything else is drawn by this script, with the help of some PB functions.
+		path.updateArcLengths();
 		redraw();
 	    };
 
@@ -68,17 +69,73 @@
 
 	    var step = 0.01;
 	    var redraw = function() {
-		var t = 0.0;
 		var vec = new Vector();
+		
+		var t = 0.0;
 		while( t <= 1.0 ) {
-		    vec.a = path.getPointAt(t);
-		    vec.b = path.getPerpendicularAt(t);
-		    vec.scale( 0.05 );
+		    vec.a = path.bezierCurves[0].getPointAt(t);
+		    vec.b = path.bezierCurves[0].getPerpendicularAt(t);
+		    //vec.setLength(40);
+		    //vec.b = path.getTangentAt(t);
+		    vec.b.add( vec.a );
+		    vec.scale( 0.1 ); // 100 ); // 0.05 );   
+		    pb.draw.line( vec.a, vec.b );
+		    t += step;
+		}
+
+
+		/*
+		//var curve = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
+		var firstC = path.bezierCurves[0];
+		var curve = new Bezier(
+		    firstC.startPoint.x, firstC.startPoint.y,
+		    firstC.startControlPoint.x, firstC.startControlPoint.y,
+		    firstC.endControlPoint.x, firstC.endControlPoint.y,
+		    firstC.endPoint.x, firstC.endPoint.y
+		);
+		var draw = function() {
+		    //drawSkeleton(curve);
+		    //drawCurve(curve);
+		    //setColor("red");
+		    var pt, nv, d=20;
+		    for(var t=0; t<=1; t+=0.1) {
+			var pt = curve.get(t);
+			var nv = curve.normal(t);
+			//drawLine(pt, { x: pt.x + d*nv.x, y: pt.y + d*nv.y} );
+			pb.draw.line( pt, { x: pt.x + d*nv.x, y: pt.y + d*nv.y} );
+		    }
+		}
+		draw();
+		*/
+
+
+		/*
+		var pDistance = 6; // px
+		var i = 0;
+		while( i*pDistance <= path.bezierCurves[0].getLength() ) {
+		    var t             = (i*pDistance)/path.bezierCurves[0].getLength();
+		    var point         = path.bezierCurves[0].getPointAt( t );
+		    // Draw inner or outer perpendicular???
+		    var perp = path.bezierCurves[0].getPerpendicularAt( t );
+		    pb.draw.line( point, perp );
+		    i++;
+		}
+		*/
+		
+
+		/*
+		var u = 0.0;
+		var step = path.totalArcLength/1000;
+		while( u <= path.totalArcLength ) {
+		    vec.a = path.getPoint(u);
+		    vec.b = path.getPerpendicular(u);
+		    vec.scale( 0.05 ); // 100 ); // 0.05 );
 		    
 		    pb.draw.line( vec.a, vec.b );
 
-		    t += step;
+		    u += step;
 		}
+		*/
 	    };
 	    
 

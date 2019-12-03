@@ -4,7 +4,20 @@ layout: page
 
 
 # Changelog
-* 2019-11-18
+* 2019-12-02 (1.5.1)
+  * Fixed the CubicBezierCurve.updateArcLength function. It used the wrong pointAt function.
+  * Added the Bézier perpendicular demo (11).
+  * Added the demo for simple tween animations (using GSAP).
+* 2019-11-22 
+  * Added the Polygon.rotate(number,Vertex) function.
+  * Fixed a bug in Vertex.rotate(...).
+  * Added a second workaround for th drawImage bug in Safari.
+  * Added a GSAP/TweenMax animation example.
+* 2019-11-21
+  * Fixed a bug in the rotate(...) function (elements were moved).
+* 2019-11-19
+  * Fixed a bug in the resizeCanvas function; retina resolution was not possible.
+* 2019-11-18 (1.5.0)
   * Added the Triangle class as a direct drawable class to the PlotBoilerplate (was in the demos only before).
   * Added the drawutils.polyline(Vertex[],boolean,color) function.
   * The PlotBoilerplate.add(...) function now works with arrays, too.

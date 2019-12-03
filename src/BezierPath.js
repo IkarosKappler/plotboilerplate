@@ -300,6 +300,7 @@
      * @memberof BezierPath
      * @return {boolean} Indicating if the last curve was removed.
      **/
+    /*
     BezierPath.prototype.removeEndPoint = function() {
 	if( this.bezierCurves.length <= 1 )
 	    return false;
@@ -314,6 +315,7 @@
 	this.bezierCurves = newArray;	
 	return true;
     }
+    */
 
 
     /**
@@ -327,6 +329,7 @@
      * @memberof BezierPath
      * @return {boolean} Indicating if the first curve was removed.
      **/
+    /*
     BezierPath.prototype.removeStartPoint = function() {
 
 	if( this.bezierCurves.length <= 1 )
@@ -345,6 +348,7 @@
 	
 	return true;
     }
+    */
 
 
     
@@ -361,6 +365,7 @@
      * @memberof BezierPath
      * @return {boolean} True if the passed index indicated an inner vertex and the two curves were joined.
      **/
+    /*
     BezierPath.prototype.joinAt = function( curveIndex ) {
 
 	if( curveIndex < 0 || curveIndex >= this.bezierCurves.length )
@@ -402,6 +407,7 @@
 
 	return true;
     }
+    */
 
 
 
@@ -418,6 +424,7 @@
      * @memberof BezierPath
      * @return {boolean} True if the passed indices were valid and the path was split.
      **/
+    /*
     BezierPath.prototype.splitAt = function( curveIndex,
 					     segmentIndex 
 					   ) {
@@ -487,6 +494,7 @@
 
 	return true;
     };
+    */
 
 
    
@@ -697,6 +705,7 @@
      **/
     BezierPath.prototype.getPerpendicularAt = function( t ) { 
 	return this.getPerpendicular( t * this.totalArcLength );
+	// return this.bezierCurves[0].getPerpendicularAt(t);
     };
 
 
