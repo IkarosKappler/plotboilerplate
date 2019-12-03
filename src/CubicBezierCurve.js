@@ -351,8 +351,7 @@
      * @memberof CubicBezierCurve
      * @return {Vertex} 
      **/
-    CubicBezierCurve.prototype.getTangentAt = function( t ) {// console.log(t);
-	
+    CubicBezierCurve.prototype.getTangentAt = function( t ) {
 	var a = this.getStartPoint();
 	var b = this.getStartControlPoint();
 	var c = this.getEndControlPoint();
@@ -375,108 +374,7 @@
 	
 	// Note: my implementation does NOT normalize tangent vectors!
 	return new Vertex( tX, tY );
-	
-
-	/*
-	// http://www.independent-software.com/determining-coordinates-on-a-html-canvas-bezier-curve.html
-	function getBezierAngle(t, sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey) {
-	    var dx = Math.pow(1-t, 2)*(cp1x-sx) + 2*t*(1-t)*(cp2x-cp1x) + t * t * (ex - cp2x);
-	    var dy = Math.pow(1-t, 2)*(cp1y-sy) + 2*t*(1-t)*(cp2y-cp1y) + t * t * (ey - cp2y);
-	    //return -Math.atan2(dx, dy) + 0.5*Math.PI;
-	    return new Vertex(dx,dy);
-	}
-	return getBezierAngle(t,
-			      this.startPoint.x, this.startPoint.y,
-			      this.startControlPoint.x, this.startControlPoint.y,
-			      this.endControlPoint.x, this.endControlPoint.y,
-			      this.endPoint.x, this.endPoint.y );
-	*/
-
-	/*
-	__normal2: function(t) {
-	    var d = this.derivative(t);
-	    var q = sqrt(d.x * d.x + d.y * d.y);
-	    return { x: -d.y / q, y: d.x / q };
-	},
-	*/
-
-	/*
-	var dpoints = [ this.startPoint, this.startControlPoint, this.endControlPoint, this.endPoint ];
-	//var p = dpoints;
-	
-	var mt = 1.0 - t,
-            a,
-            b,
-            c = 0,
-            p = dpoints; //this.startPoint; //this.dpoints[0];
-	//if (this.order === 3) {
-            a = mt * mt;
-            b = mt * t * 2;
-            c = t * t;
-	//}
-	var ret = {
-            x: a * p[0].x + b * p[1].x + c * p[2].x,
-            y: a * p[0].y + b * p[1].y + c * p[2].y
-	};
-	//if (this._3d) {
-        //    ret.z = a * p[0].z + b * p[1].z + c * p[2].z;
-	//}
-	//return new Vertex(ret.x, ret.y); //ret;
-
-	*/
-	/*
-	function __normal2(curve,t) {
-	    var d = derivative(curve,t);
-	    var q = Math.sqrt(d.x * d.x + d.y * d.y);
-	    return { x: -d.y / q, y: d.x / q };
-	}
-	return __normal2(this,t);
-	*/
-    }
-
-    /*
-    function derivative(curve,t) {
-	// !!!
-	var dpoints = derive([ curve.startPoint, curve.startControlPoint, curve.endControlPoint, curve.endPoint ]);
-	
-      var mt = 1 - t,
-        a,
-        b,
-        c = 0,
-          p = [0];
-
-        a = mt * mt;
-        b = mt * t * 2;
-        c = t * t;
-
-      var ret = {
-        x: a * p[0].x + b * p[1].x + c * p[2].x,
-        y: a * p[0].y + b * p[1].y + c * p[2].y
-      };
-      return ret;
-    }
-
-
-    function derive(points) {
-      var dpoints = [];
-      for (var p = points, d = p.length, c = d - 1; d > 1; d--, c--) {
-        var list = [];
-        for (var j = 0, dpt; j < c; j++) {
-          dpt = {
-            x: c * (p[j + 1].x - p[j].x),
-            y: c * (p[j + 1].y - p[j].y)
-          };
-          //if (_3d) {
-          //  dpt.z = c * (p[j + 1].z - p[j].z);
-          //}
-          list.push(dpt);
-        }
-        dpoints.push(list);
-        p = list;
-      }
-      return dpoints;
     };
-    */
 
 
     /**
@@ -494,7 +392,7 @@
 				   ( u / this.arcLength ) 
 				 )
 		       );
-    }
+    };
 
     
     /**
@@ -510,9 +408,8 @@
      **/
     //CubicBezierCurve.prototype.getTangentAt = function( u ) {
     CubicBezierCurve.prototype.getTangent = function( u ) {
-	// return this.getTangent( this.convertU2T(u) );
 	return this.getTangentAt( this.convertU2T(u) );
-    }
+    };
     
 
     /**
@@ -526,11 +423,9 @@
      * @memberof CubicBezierCurve
      * @return {Vertex} 
      **/
-    //CubicBezierCurve.prototype.getPerpendicularAt = function( u ) {
     CubicBezierCurve.prototype.getPerpendicular = function( u ) {
-	//return this.getPerpendicular( this.convertU2T(u) );
 	return this.getPerpendicularAt( this.convertU2T(u) );
-    }
+    };
 
 
     /**
@@ -544,13 +439,9 @@
      * @memberof CubicBezierCurve
      * @return {Vertex} 
      **/
-    //CubicBezierCurve.prototype.getPerpendicular = function( t ) {
     CubicBezierCurve.prototype.getPerpendicularAt = function( t ) { 
-	//var tangentVector = this.getTangent( t );
 	var tangentVector = this.getTangentAt( t );
 	return new Vertex( tangentVector.y, - tangentVector.x );
-	//return new Vertex( - tangentVector.y, tangentVector.x );
-	// return perpendicular;
     }
 
 

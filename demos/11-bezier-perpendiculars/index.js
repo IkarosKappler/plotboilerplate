@@ -63,7 +63,7 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		animate               : false
+		animate               : true
 	    }, GUP );
 	    
 
@@ -75,67 +75,14 @@
 		while( t <= 1.0 ) {
 		    vec.a = path.bezierCurves[0].getPointAt(t);
 		    vec.b = path.bezierCurves[0].getPerpendicularAt(t);
-		    //vec.setLength(40);
-		    //vec.b = path.getTangentAt(t);
+		    // The perpendicular (vec.b) is relative. Make absolute
 		    vec.b.add( vec.a );
-		    vec.scale( 0.1 ); // 100 ); // 0.05 );   
+		    // And scale down a bit. It might be pretty long. Not that long is bad, but
+		    // it might be a bit unhandy here.
+		    vec.scale( 0.1 );   
 		    pb.draw.line( vec.a, vec.b );
 		    t += step;
 		}
-
-
-		/*
-		//var curve = new Bezier(100,25 , 10,90 , 110,100 , 150,195);
-		var firstC = path.bezierCurves[0];
-		var curve = new Bezier(
-		    firstC.startPoint.x, firstC.startPoint.y,
-		    firstC.startControlPoint.x, firstC.startControlPoint.y,
-		    firstC.endControlPoint.x, firstC.endControlPoint.y,
-		    firstC.endPoint.x, firstC.endPoint.y
-		);
-		var draw = function() {
-		    //drawSkeleton(curve);
-		    //drawCurve(curve);
-		    //setColor("red");
-		    var pt, nv, d=20;
-		    for(var t=0; t<=1; t+=0.1) {
-			var pt = curve.get(t);
-			var nv = curve.normal(t);
-			//drawLine(pt, { x: pt.x + d*nv.x, y: pt.y + d*nv.y} );
-			pb.draw.line( pt, { x: pt.x + d*nv.x, y: pt.y + d*nv.y} );
-		    }
-		}
-		draw();
-		*/
-
-
-		/*
-		var pDistance = 6; // px
-		var i = 0;
-		while( i*pDistance <= path.bezierCurves[0].getLength() ) {
-		    var t             = (i*pDistance)/path.bezierCurves[0].getLength();
-		    var point         = path.bezierCurves[0].getPointAt( t );
-		    // Draw inner or outer perpendicular???
-		    var perp = path.bezierCurves[0].getPerpendicularAt( t );
-		    pb.draw.line( point, perp );
-		    i++;
-		}
-		*/
-		
-
-		/*
-		var u = 0.0;
-		var step = path.totalArcLength/1000;
-		while( u <= path.totalArcLength ) {
-		    vec.a = path.getPoint(u);
-		    vec.b = path.getPerpendicular(u);
-		    vec.scale( 0.05 ); // 100 ); // 0.05 );
-		    
-		    pb.draw.line( vec.a, vec.b );
-
-		    u += step;
-		}
-		*/
 	    };
 	    
 
