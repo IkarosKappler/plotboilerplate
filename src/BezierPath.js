@@ -192,51 +192,7 @@
 	return this.totalArcLength;
     };
 
-
-    // +---------------------------------------------------------------------------------
-    // | computeVerticalAreaSize()
-    // |
-    // | @experimental
-    // +-------------------------------
-    // NOT IN USE
-    /*
-    BezierPath.prototype.computeVerticalAreaSize = function( deltaSize, useAbsoluteValues ) {
-	var bounds    = this.computeBoundingBox();
-	var relativeX = bounds.xMax;
-	var size = 0.0;
-	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-	    size += this.bezierCurves[i].computeVerticalAreaSize( relativeX,         // An imaginary x-axis at the right bound
-								  deltaSize, 
-								  useAbsoluteValues 
-								);
-	}
-	return size;
-    };
-    */
-
-
-    // +---------------------------------------------------------------------------------
-    // | computeVerticalRevolutionVolumeSize()
-    // |
-    // | @experimental
-    // +-------------------------------
-    // NOT IN USE
-    /*
-    BezierPath.prototype.computeVerticalRevolutionVolumeSize = function( useAbsoluteValues ) {	
-	var bounds    = this.computeBoundingBox();
-	var relativeX = bounds.xMax;
-	var volume    = 0.0;
-	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-	    volume += this.bezierCurves[i].computeVerticalRevolutionVolumeSize( relativeX,         // An imaginary x-axis at the right bound
-										//deltaSize, 
-										useAbsoluteValues 
-									      );
-	}
-	return volume;
-    };
-    */
-
-
+    
     
     /**
      * This function is internally called whenever the curve or path configuration
@@ -705,7 +661,6 @@
      **/
     BezierPath.prototype.getPerpendicularAt = function( t ) { 
 	return this.getPerpendicular( t * this.totalArcLength );
-	// return this.bezierCurves[0].getPerpendicularAt(t);
     };
 
 
@@ -743,29 +698,7 @@
 	var bCurve    = this.bezierCurves[ i ];
 	var relativeU = u - uTemp;
 	return bCurve.getPerpendicular( relativeU );
-    };
-
-    
-
-    // NOT IN USE
-    /*
-    BezierPath.prototype.computeBoundingBox = function() {
-	if( this.bezierCurves.length == 0 ) {	    
-	    // Empty box
-	    return new BoundingBox( 0, 0, 0, 0 );
-	}
-	var boundingBox = this.bezierCurves[ 0 ].computeBoundingBox();
-	for( var i = 1; i < this.bezierCurves.length; i++ ) {
-	    var tmpBounds = this.bezierCurves[ i ].computeBoundingBox();
-	    boundingBox.xMin = Math.min( boundingBox.xMin, tmpBounds.xMin );
-	    boundingBox.xMax = Math.max( boundingBox.xMax, tmpBounds.xMax );
-	    boundingBox.yMin = Math.min( boundingBox.yMin, tmpBounds.yMin );
-	    boundingBox.yMax = Math.max( boundingBox.yMax, tmpBounds.yMax );    
-	}
-	return boundingBox;
-    };
-    */
-    
+    };    
 
     /**
      * This function moves the addressed curve point (or control point) with

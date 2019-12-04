@@ -42,7 +42,10 @@
  * @modified 2019-11-18 The add function now works with arrays, too.
  * @modified 2019-11-18 Added the _handleColor helper function to determine the render color of non-draggable vertices.
  * @modified 2019-11-19 Fixed a bug in the resizeCanvas function; retina resolution was not possible.
- * @version  1.5.1
+ * @modified 2019-12-04 Added relative positioned zooming.
+ * @modified 2019-12-04 Added offsetX and offsetY params.
+ * @modified 2019-12-04 Added an 'Set to fullsize retina' button to the GUI config.
+ * @version  1.6.0
  *
  * @file PlotBoilerplate
  * @public
@@ -117,6 +120,8 @@
      * @param {boolean=} [config.fitToParent=true] - If set to true the canvas will gain the size of its parent container (overrides fullSize).
      * @param {number=}  [config.scaleX=1.0] - The initial x-zoom. Default is 1.0.
      * @param {number=}  [config.scaleY=1.0] - The initial y-zoom. Default is 1.0.
+     * @param {number=}  [config.offsetX=1.0] - The initial x-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
+     * @param {number=}  [config.offsetY=1.0] - The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
      * @param {boolean=} [config.rasterGrid=true] - If set to true the background grid will be drawn rastered.
      * @param {number=}  [config.rasterAdjustFactor=1.0] - The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
      * @param {boolean=} [config.drawOrigin=false] - Draw a crosshair at (0,0).
@@ -179,7 +184,9 @@
 	    fullSize              : fetch.val(config,'fullSize',true), 
 	    fitToParent           : fetch.bool(config,'fitToParent',true),
 	    scaleX                : fetch.num(config,'scaleX',1.0), 
-	    scaleY                : fetch.num(config,'scaleY',1.0), 
+	    scaleY                : fetch.num(config,'scaleY',1.0),
+	    offsetX               : fetch.num(config,'offsetX',0.0), 
+	    offsetY               : fetch.num(config,'offsetY',0.0), 
 	    drawGrid              : fetch.bool(config,'drawGrid',true),
 	    rasterGrid            : fetch.bool(config,'rasterGrid',true),
 	    rasterAdjustFactor    : fetch.num(config,'rasterAdjustdFactror',2.0),
@@ -198,6 +205,7 @@
 	    cssUniformScale       : fetch.bool(config,'cssUniformScale',true),
 	    rebuild               : function() { rebuild(); },
 	    saveFile              : function() { _self.saveFile(); },
+	    setToRetina           : function() { _self._setToRetina(); },
 	    enableExport          : fetch.bool(config,'enableExport',true),
 
 	    drawBezierHandleLines : fetch.bool(config,'drawBezierHandleLines',true),
@@ -242,6 +250,7 @@
 	    this.draw                = new drawutilsgl(this.ctx,false);
 	    // PROBLEM: same instance of fill and draw when using WebGL. Shader program cannot be duplicated on the same context
 	    this.fill                = this.draw.copyInstance(true);
+	    console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
 	} else {
 	    this.ctx                 = this.canvas.getContext( '2d' );
 	    this.draw                = new drawutils(this.ctx,false);
@@ -280,6 +289,14 @@
 	    saveAs(blob, "plot-boilerplate.svg");
 	};
 
+
+	this._setToRetina = function() {
+	    this.config.cssScaleX = this.config.cssScaleY = 0.5;
+	    this.config.canvasWidthFactor = this.config.canvasHeightFactor = 2.0;
+	    //this.config.fullSize = false;
+	    this.config.fitToParent = false;
+	    this.resizeCanvas();
+	};
 
 	/**
 	 * A set of hook functions.
@@ -863,8 +880,8 @@
 		_self.canvasSize.width  = w;
 		_self.canvasSize.height = h;
 		if( _self.config.autoAdjustOffset ) {
-		    _self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); 
-		    _self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100);
+		    _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = w*(_self.config.offsetAdjustXPercent/100); 
+		    _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = h*(_self.config.offsetAdjustYPercent/100);
 		}
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {
@@ -998,8 +1015,25 @@
 	 * @return {object} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
 	 **/
 	PlotBoilerplate.prototype.transformMousePosition = function( x, y ) {
-	    return { x : (x/this.config.cssScaleX-this.draw.offset.x)/(this.draw.scale.x), y : (y/this.config.cssScaleY-this.draw.offset.y)/(this.draw.scale.y) };
+	    return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
+		     y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) };
 	};
+
+
+	/**
+	 * Reverse transform a point on the canvas.
+	 *
+	 * @method reverseTransformMousePosition
+	 * @param {number} x - The x position relative to the canvas.
+	 * @param {number} y - The y position relative to the canvas.
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {object} The reverse-transformed position.
+	 **/
+	// NOT IN USE
+	//PlotBoilerplate.prototype.reverseTransformMousePosition = function( x, y ) {
+	//    return { x : x*this.draw.scale.x - this.draw.offset.x, y : y*this.draw.scale.y - this.draw.offset.y };
+	//};
 	
 
 
@@ -1060,6 +1094,8 @@
 	    if( keyHandler.isDown('alt') || keyHandler.isDown('ctrl') || keyHandler.isDown('spacebar') ) {
 		_self.draw.offset.add( e.params.dragAmount );
 		_self.fill.offset.set( _self.draw.offset );
+		_self.config.offsetX = _self.draw.offset.x;
+		_self.config.offsetY = _self.draw.offset.y;
 		_self.redraw();
 	    } else {
 		// Convert drag amount by scaling
@@ -1129,6 +1165,7 @@
 	 **/
 	var mouseWheelHandler = function(e) {
 	    var zoomStep = 1.25;
+	    let oldPos = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
 	    if( e.deltaY < 0 ) {
 		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX*zoomStep;
 		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY*zoomStep;
@@ -1136,6 +1173,13 @@
 		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = Math.max(_self.config.scaleX/zoomStep,0.01);
 		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = Math.max(_self.config.scaleY/zoomStep,0.01);
 	    }
+	    let newPos = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+	    // Apply relative positioned zoom
+	    let newOffsetX = _self.draw.offset.x + (newPos.x-oldPos.x)*_self.draw.scale.x;
+	    let newOffsetY = _self.draw.offset.y + (newPos.y-oldPos.y)*_self.draw.scale.y;
+	    _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = newOffsetX;
+	    _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = newOffsetY;
+	    
 	    e.preventDefault();
 	    _self.redraw();
 	};
@@ -1248,8 +1292,8 @@
 	gui.remember(this.config);
 	var fold0 = gui.addFolder('Editor settings');
 	var fold00 = fold0.addFolder('Canvas size');
-	fold00.add(this.config, 'fullSize').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fullpage mode.");
-	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).");
+	fold00.add(this.config, 'fullSize').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fullpage mode.").listen();
+	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).").listen();
 	fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
 	fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
 	fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.");
@@ -1257,6 +1301,7 @@
 	fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
 	fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
 	fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");
+	fold00.add(this.config, 'setToRetina').name('Set to fullsize retina').title('Set canvas to retina resoultion (x2).');
 	
 	var fold01 = fold0.addFolder('Draw settings');
 	fold01.add(this.config, 'drawBezierHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle points.");
@@ -1268,10 +1313,12 @@
 	
 	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();
+	fold0.add(this.config, 'offsetX').title("Offset x.").step(10.0).onChange( function() { _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX; _self.redraw(); } ).listen();
+	fold0.add(this.config, 'offsetY').title("Offset y.").step(10.0).onChange( function() { _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();
 	fold0.add(this.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
 	fold0.addColor(this.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");
-	// fold0.add(bp.config, 'loadImage').name('Load Image').title("Load a background image.");
+	// fold0.add(this.config, 'loadImage').name('Load Image').title("Load a background image.");
 
 	if( this.config.enableExport ) {
 	    var fold1 = gui.addFolder('Export');
