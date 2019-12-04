@@ -57,6 +57,10 @@
 		// In this demo the PlotBoilerplate only draws the vertices.
 		// Everything else is drawn by this script, with the help of some PB functions.
 		path.updateArcLengths();
+		// Adjust all bezier control points to keep the path smooth
+		for( var i in path.bezierCurves ) {
+		    path.adjustPredecessorControlPoint(i,false,true);
+		}
 		redraw();
 	    };
 
@@ -69,13 +73,13 @@
 	    }, GUP );
 	    
 
-	    var step = 0.01;
+	    var step = 0.005;
 	    var redraw = function() {
 		var vec = new Vector();
 		var t = 0.0;
 		while( t <= 1.0 ) {
-		    vec.a = path.bezierCurves[0].getPointAt(t);
-		    vec.b = path.bezierCurves[0].getPerpendicularAt(t);
+		    vec.a = path.getPointAt(t);
+		    vec.b = path.getPerpendicularAt(t);
 		    // The perpendicular (vec.b) is relative. Make absolute.
 		    vec.b.add( vec.a );
 		    // And scale down a bit. It might be pretty long. Not that long is bad, but
@@ -111,11 +115,21 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Add a circular connected bezier path.
 	    // +-------------------------------
-	    var fract = 0.5;
+	    var numCurves = 2;
 	    var bpath = [];
-	    fract *= 0.66;
-	    bpath[0] = [ randomVertex(), randomVertex(), randomVertex(), randomVertex() ];
+	    var animatableVertices = [];	    
+	    for( var i = 0; i < numCurves; i++ ) {
+		bpath[i] = [ randomVertex(), randomVertex(), randomVertex(), randomVertex() ];
+		animatableVertices.push( bpath[i][0] ); // start point
+		animatableVertices.push( bpath[i][1] ); // end point
+		animatableVertices.push( bpath[i][2] ); // start control point
+		// Do not add the end control point here. It will be animated corresponding to
+		// the succeeding path curve (to keep the path smooth)
+	    }
+	    
 	    var path = BezierPath.fromArray( bpath );
+	    
+
 
 	    pb.add( path );
 
@@ -129,9 +143,9 @@
 		    if( animator )
 			animator.stop();
 		    if( config.animationType=='radial' )
-			animator = new CircularVertexAnimator( pb.vertices, pb.viewport(), function() { pb.redraw(); } );
+			animator = new CircularVertexAnimator( animatableVertices, pb.viewport(), function() { pb.redraw(); } );
 		    else // 'linear'
-			animator = new LinearVertexAnimator( pb.vertices, pb.viewport(), function() { pb.redraw(); } );
+			animator = new LinearVertexAnimator( animatableVertices, pb.viewport(), function() { pb.redraw(); } );
 		    animator.start();
 		} else {
 		    animator.stop();
