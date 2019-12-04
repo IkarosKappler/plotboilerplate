@@ -13,7 +13,8 @@
  * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
  * @modified 2019-09-02 Added the Vector.perp() function.
  * @modified 2019-09-02 Added the Vector.inverse() function.
- * @version  1.0.4
+ * @modified 2019-12-04 Added the Vector.inv() function.
+ * @version  1.1.0
  *
  * @file Vector
  * @public
@@ -52,12 +53,21 @@
     /**
      * The inverse of a vector is a vector witht the same magnitude but oppose direction.
      *
+     * Please not that the origin of this vector changes here: a->b becomes b->a.
+     *
      * @return {Vector}
      **/
     Vector.prototype.inverse = function() {
 	var tmp = this.a;
 	this.a = this.b;
 	this.b = tmp;
+	return this;
+    };
+
+    // New
+    Vector.prototype.inv = function() {
+	this.b.x = this.a.x-(this.b.x-this.a.x);
+	this.b.y = this.a.y-(this.b.y-this.a.y);
 	return this;
     };
     

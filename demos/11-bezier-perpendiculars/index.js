@@ -81,7 +81,9 @@
 		    // And scale down a bit. It might be pretty long. Not that long is bad, but
 		    // it might be a bit unhandy here.
 		    vec.scale( 0.1 );   
-		    pb.draw.line( vec.a, vec.b, 'rgba(0,128,64,1.0)' );
+		    pb.draw.line( vec.a, vec.b, 'rgba(0,108,192,0.75)' );
+		    vec.inv().scale(0.333);
+		    pb.draw.line( vec.a, vec.b, 'rgba(255,108,32,1.0)' );
 		    t += step;
 		}
 	    };
