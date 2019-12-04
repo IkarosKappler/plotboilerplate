@@ -143,7 +143,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Perpendiculars of a Bézier path
 
-![Perpendiculars of a Bézier path](screenshots/screenshot-20191202-bezier-perpendiculars.png "Perpendiculars of a Bézier path")
+![Perpendiculars of a Bézier path](screenshots/screenshot-20191204-bezier-path-with-perpendiculars "Perpendiculars of a Bézier path")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
 
@@ -404,7 +404,8 @@ from the sources code files in ./src/*.
  * Extend the perpendicular Bézier demo (currently working with one curve only).
 
 ## Todos for future Version 2 (not backwards compatible)
- * Change the Vector.inverse() function. This is not what the inverse of a vector should be.
+ * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
+ * Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
 
 ## Browsers support
 
