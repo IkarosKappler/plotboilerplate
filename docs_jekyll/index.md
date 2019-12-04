@@ -175,6 +175,11 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
     scaleX                	: 1.0,
     scaleY                	: 1.0,
 
+    // float
+    //   The initial offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
+    offsetX                	: 0.0,
+    offsetY                	: 0.0,
+
     // Specifies if the raster should be drawn.
     drawGrid                : true,
 
@@ -374,6 +379,7 @@ from the sources code files in ./src/*.
 
 
 ## Todos
+ * Add config.offset{X,Y} and make it configurable. Perform the relative zooming on basis of this value (currently taken from draw.offset).
  * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
  * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
  * Include Touchy.js as a package dependency.
@@ -399,7 +405,10 @@ from the sources code files in ./src/*.
  * Add control button: reset zoom.
  * Add control button: reset to origin.
  * Add control button: set to retina resolution (size factors and css scale).
+ * Extend the perpendicular Bézier demo (currently working with one curve only).
 
+## Todos for future Version 2 (not backwards compatible)
+ * Change the Vector.inverse() function. This is not what the inverse of a vector should be.
 
 ## Browsers support
 

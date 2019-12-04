@@ -4,6 +4,11 @@ layout: page
 
 
 # Changelog
+* 2019-12-04 (1.6.0)
+  * Added relative positioned zooming.
+  * Added offsetX and offsetY params.
+  * Added an 'Set to fullsize retina' button to the GUI config.
+  * Added the Vector.inv() function.
 * 2019-12-03
   * Fixed a bug in the Bézier perpenicular demo (arc length were not updated after changes or before redraw).
 * 2019-12-02 (1.5.1)

@@ -1296,7 +1296,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
  * @modified 2019-09-02 Added the Vector.perp() function.
  * @modified 2019-09-02 Added the Vector.inverse() function.
- * @version  1.0.4
+ * @modified 2019-12-04 Added the Vector.inv() function.
+ * @version  1.1.0
  *
  * @file Vector
  * @public
@@ -1335,12 +1336,21 @@ Object.extendClass = function( superClass, subClass ) {
     /**
      * The inverse of a vector is a vector witht the same magnitude but oppose direction.
      *
+     * Please not that the origin of this vector changes here: a->b becomes b->a.
+     *
      * @return {Vector}
      **/
     Vector.prototype.inverse = function() {
 	var tmp = this.a;
 	this.a = this.b;
 	this.b = tmp;
+	return this;
+    };
+
+    // New
+    Vector.prototype.inv = function() {
+	this.b.x = this.a.x-(this.b.x-this.a.x);
+	this.b.y = this.a.y-(this.b.y-this.a.y);
 	return this;
     };
     
@@ -1545,24 +1555,6 @@ Object.extendClass = function( superClass, subClass ) {
     };
 
 
-    // THIS SEEMS NOT TO BE IN USE
-    /*
-    CubicBezierCurve._scalePoint = function( point,   // Vertex
-					     anchor,  // Vertex
-					     scaling  // Vertex
-					   ) {
-	// Move point to origin
-	point.sub( anchor );
-	// Apply scaling
-	point.setX( point.x * scaling.x );
-	point.setY( point.y * scaling.y );
-	// Move back to original position
-	point.add( anchor );
-	
-    };
-    */
-
-
     
     /**
      * Get the total curve length.<br>
@@ -1582,171 +1574,6 @@ Object.extendClass = function( superClass, subClass ) {
     CubicBezierCurve.prototype.getLength = function() {
 	return this.arcLength;
     };
-
-
-    // +---------------------------------------------------------------------------------
-    // | Get the curve index for the given start or end point.
-    // |
-    // | If the passed vertex does not equal the start- nor the end-point this function
-    // | returns -1.
-    // |
-    // | @param vert:Vertex The start or end point to search for.
-    // | @return Number The curve index.
-    // +-------------------------------
-    /*
-    CubicBezierCurve.prototype.locateCurveByPoint = function( vert ) {
-	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-	    if( this.bezierCurves[i].startPoint.equals(vert) || this.bezierCurves[i].endPoint.equals(vert) )
-		return i;
-	}
-	return -1;
-    };
-    */
-
-    
-    // +---------------------------------------------------------------------------------
-    // |  This function computes the area size of this bezier curve in an y-axis 
-    // |  integrational approach.
-    // | 
-    // |  For each bezier segment (which are linear segments) the distance to a given
-    // |  relative Y axis is computed (position of Y axis specified by 'relativeX'
-    // |  parameter).
-    // | 
-    // |  Each resulting sub area has a determined segment height and thus a determined
-    // |  area size. The sum of all segment area sizes is returned.
-    // +-------------------------------
-    // NOT IN USE.
-    /*
-    CubicBezierCurve.prototype.computeVerticalAreaSize = function( relativeX,
-								   deltaSize, 
-								   useAbsoluteValues 
-								 ) {
-	
-	if( deltaSize == 0 )
-	    throw "Cannot compute bezier curve's vertical area size with delta=0.";
-	
-	if( this.segmentCache.length <= 1 )
-	    return 0.0;
-
-
-	var size = 0.0;
-	for( var i = 0; i+1 < this.segmentCache.length; i++ ) {
-
-	    size += this._computeVerticalAreaSizeForSegment( relativeX,
-							     deltaSize,
-							     useAbsoluteValues,
-							     i
-							   );
-
-	}
-
-	return size;
-    };
-    */
-
-    /**
-     * This helper function computes the area size of the given segment (param segmentIndex).
-     **/
-    // NOT IN USE
-    /*
-    CubicBezierCurve.prototype._computeVerticalAreaSizeForSegment = function( relativeX,
-									      deltaSize, 
-									      useAbsoluteValues, 
-									      segmentIndex 
-									    ) {
-
-	// Two points make a segment.
-	// So at least two points must be available. Otherwise there is no area (size=0).
-	if( segmentIndex+1 >= this.segmentCache.length )
-	    return 0.0;
-
-	var segmentA      = this.segmentCache[ segmentIndex ];
-	var segmentB      = this.segmentCache[ segmentIndex+1 ];
-	var segmentHeight = segmentB.y - segmentA.y;
-	
-	
-	var relativeA = relativeX - segmentA.x;
-	var relativeB = relativeX - segmentB.x;
-	var averageX = relativeB + (relativeA - relativeB) / 2.0;
-        
-	if( useAbsoluteValues )
-	    return Math.abs( segmentHeight * averageX );
-	else
-	    return segmentHeight * averageX;              // May be negative
-	
-    };
-    */
-    
-
-    /**
-     * This function computes the volume size of that revolution solid which outline
-     * is determined by the bezier curve.
-     *
-     * The calculation uses the segments area sizes to compute each layer's volume.
-     **/
-    // NOT IN USE
-    /*
-    CubicBezierCurve.prototype.computeVerticalRevolutionVolumeSize = function( relativeX,
-									       //deltaSize, 
-									       useAbsoluteValues 
-									     ) {
-		
-	if( this.segmentCache.length <= 1 )
-	    return 0.0;
-
-
-	var volume = 0.0;
-	for( var i = 0; i+1 < this.segmentCache.length; i++ ) {
-
-	    volume += this._computeVerticalRevolutionVolumeSizeForSegment( relativeX,
-									   //deltaSize,
-									   useAbsoluteValues,
-									   i
-									 );
-
-	}
-
-	return volume;
-    };
-    */
-
-    /**
-     * This helper function computes the area size of the given segment (param segmentIndex).
-     **/
-    // NOT IN USE
-    /*
-    CubicBezierCurve.prototype._computeVerticalRevolutionVolumeSizeForSegment = function( relativeX,
-											  //deltaSize, 
-											  useAbsoluteValues, 
-											  segmentIndex 
-											) {
-
-	// Two points make a segment.
-	// So at least two points must be available. Otherwise there is no area (size=0).
-	if( segmentIndex+1 >= this.segmentCache.length )
-	    return 0.0;
-
-	var segmentA      = this.segmentCache[ segmentIndex ];
-	var segmentB      = this.segmentCache[ segmentIndex+1 ];
-	var segmentHeight = segmentB.y - segmentA.y;
-	
-	
-	var relativeA = relativeX - segmentA.x;
-	var relativeB = relativeX - segmentB.x;
-	//var averageX  = relativeB + (relativeA - relativeB) / 2.0;
-	var averageX  = (relativeA + relativeB) / 2.0;
-
-	// Volume is PI * square(radius) * height
-	var volume    = Math.PI * Math.pow(averageX,2) * segmentHeight;
-
-	if( useAbsoluteValues )
-	    return Math.abs( volume );
-	else
-	    return volume;              // May be negative
-	
-    };
-    */
-
 
     
     /**
@@ -1772,23 +1599,48 @@ Object.extendClass = function( superClass, subClass ) {
 	this.segmentCache = [];
 	// Push start point into buffer
 	this.segmentCache.push( this.startPoint );	
-	this.segmentLengths = [];	
-	this.arcLength = 0.0;
+	this.segmentLengths = [];
+	//this.arcLength = 0.0;
+	let newLength = 0.0;
 
+	/*
 	for( var i = 0; i < this.curveIntervals; i++) {	    
 	    pointB = this.getPointAt( (i+1) * curveStep );  // parameter is 'u' (not 't')
+	    //pointB = this.getPoint( (i+1) * curveStep );  // parameter is 'u' (not 't')
 	    
 	    // Store point into cache
 	    this.segmentCache.push( pointB ); 
 
 	    // Calculate segment length
-	    var tmpLength = Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
+	    var tmpLength = pointA.distance(pointB); // Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
 	    this.segmentLengths.push( tmpLength );
-	    this.arcLength += tmpLength;
+	    newLength += tmpLength;
 	    
 	    pointA = pointB;
             u += curveStep;
 	} // END for
+	this.arcLength = newLength;
+*/
+	
+	
+	var t = 0.0;
+	while( t <= 1.0 ) { //console.log('x',t);
+	    pointB = this.getPointAt(t); // (i+1) * curveStep );  // parameter is 'u' (not 't')
+	    
+	    // Store point into cache
+	    this.segmentCache.push( pointB ); 
+
+	    // Calculate segment length
+	    var tmpLength = pointA.distance(pointB); // Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
+	    this.segmentLengths.push( tmpLength );
+	    this.arcLength += tmpLength;
+	    
+	    pointA = pointB;
+            // u += curveStep;
+	    
+	    t += curveStep;
+	}
+	
     }; // END function
 
 
@@ -1909,7 +1761,7 @@ Object.extendClass = function( superClass, subClass ) {
     /**
      * Get the curve tangent vector at a given absolute curve position t in [0,1].<br>
      * <br>
-     * Note that the returned tangent vector (end point) is not normalized.
+     * Note that the returned tangent vector (end point) is not normalized and relative to (0,0).
      *
      * @method getTangent
      * @param {number} t - The position on the curve in [0,1].
@@ -1940,7 +1792,7 @@ Object.extendClass = function( superClass, subClass ) {
 	
 	// Note: my implementation does NOT normalize tangent vectors!
 	return new Vertex( tX, tY );
-    }
+    };
 
 
     /**
@@ -1958,7 +1810,7 @@ Object.extendClass = function( superClass, subClass ) {
 				   ( u / this.arcLength ) 
 				 )
 		       );
-    }
+    };
 
     
     /**
@@ -1974,9 +1826,8 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     //CubicBezierCurve.prototype.getTangentAt = function( u ) {
     CubicBezierCurve.prototype.getTangent = function( u ) {
-	// return this.getTangent( this.convertU2T(u) );
 	return this.getTangentAt( this.convertU2T(u) );
-    }
+    };
     
 
     /**
@@ -1990,11 +1841,9 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof CubicBezierCurve
      * @return {Vertex} 
      **/
-    //CubicBezierCurve.prototype.getPerpendicularAt = function( u ) {
     CubicBezierCurve.prototype.getPerpendicular = function( u ) {
-	//return this.getPerpendicular( this.convertU2T(u) );
 	return this.getPerpendicularAt( this.convertU2T(u) );
-    }
+    };
 
 
     /**
@@ -2008,21 +1857,12 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof CubicBezierCurve
      * @return {Vertex} 
      **/
-    //CubicBezierCurve.prototype.getPerpendicular = function( t ) {
     CubicBezierCurve.prototype.getPerpendicularAt = function( t ) { 
-	//var tangentVector = this.getTangent( t );
 	var tangentVector = this.getTangentAt( t );
-	var perpendicular = new Vertex( tangentVector.y, - tangentVector.x );
-	return perpendicular;
+	return new Vertex( tangentVector.y, - tangentVector.x );
     }
 
 
-    // NOT IN USE
-    /*
-    CubicBezierCurve.prototype.computeBoundingBox = function() {
-	return BoundingBox2.computeFromPoints( this.segmentCache );
-    }
-    */
 
 
     /**
@@ -2405,51 +2245,7 @@ Object.extendClass = function( superClass, subClass ) {
 	return this.totalArcLength;
     };
 
-
-    // +---------------------------------------------------------------------------------
-    // | computeVerticalAreaSize()
-    // |
-    // | @experimental
-    // +-------------------------------
-    // NOT IN USE
-    /*
-    BezierPath.prototype.computeVerticalAreaSize = function( deltaSize, useAbsoluteValues ) {
-	var bounds    = this.computeBoundingBox();
-	var relativeX = bounds.xMax;
-	var size = 0.0;
-	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-	    size += this.bezierCurves[i].computeVerticalAreaSize( relativeX,         // An imaginary x-axis at the right bound
-								  deltaSize, 
-								  useAbsoluteValues 
-								);
-	}
-	return size;
-    };
-    */
-
-
-    // +---------------------------------------------------------------------------------
-    // | computeVerticalRevolutionVolumeSize()
-    // |
-    // | @experimental
-    // +-------------------------------
-    // NOT IN USE
-    /*
-    BezierPath.prototype.computeVerticalRevolutionVolumeSize = function( useAbsoluteValues ) {	
-	var bounds    = this.computeBoundingBox();
-	var relativeX = bounds.xMax;
-	var volume    = 0.0;
-	for( var i = 0; i < this.bezierCurves.length; i++ ) {
-	    volume += this.bezierCurves[i].computeVerticalRevolutionVolumeSize( relativeX,         // An imaginary x-axis at the right bound
-										//deltaSize, 
-										useAbsoluteValues 
-									      );
-	}
-	return volume;
-    };
-    */
-
-
+    
     
     /**
      * This function is internally called whenever the curve or path configuration
@@ -2513,6 +2309,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {boolean} Indicating if the last curve was removed.
      **/
+    /*
     BezierPath.prototype.removeEndPoint = function() {
 	if( this.bezierCurves.length <= 1 )
 	    return false;
@@ -2527,6 +2324,7 @@ Object.extendClass = function( superClass, subClass ) {
 	this.bezierCurves = newArray;	
 	return true;
     }
+    */
 
 
     /**
@@ -2540,6 +2338,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {boolean} Indicating if the first curve was removed.
      **/
+    /*
     BezierPath.prototype.removeStartPoint = function() {
 
 	if( this.bezierCurves.length <= 1 )
@@ -2558,6 +2357,7 @@ Object.extendClass = function( superClass, subClass ) {
 	
 	return true;
     }
+    */
 
 
     
@@ -2574,6 +2374,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {boolean} True if the passed index indicated an inner vertex and the two curves were joined.
      **/
+    /*
     BezierPath.prototype.joinAt = function( curveIndex ) {
 
 	if( curveIndex < 0 || curveIndex >= this.bezierCurves.length )
@@ -2615,6 +2416,7 @@ Object.extendClass = function( superClass, subClass ) {
 
 	return true;
     }
+    */
 
 
 
@@ -2631,6 +2433,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {boolean} True if the passed indices were valid and the path was split.
      **/
+    /*
     BezierPath.prototype.splitAt = function( curveIndex,
 					     segmentIndex 
 					   ) {
@@ -2700,6 +2503,7 @@ Object.extendClass = function( superClass, subClass ) {
 
 	return true;
     };
+    */
 
 
    
@@ -2947,29 +2751,7 @@ Object.extendClass = function( superClass, subClass ) {
 	var bCurve    = this.bezierCurves[ i ];
 	var relativeU = u - uTemp;
 	return bCurve.getPerpendicular( relativeU );
-    };
-
-    
-
-    // NOT IN USE
-    /*
-    BezierPath.prototype.computeBoundingBox = function() {
-	if( this.bezierCurves.length == 0 ) {	    
-	    // Empty box
-	    return new BoundingBox( 0, 0, 0, 0 );
-	}
-	var boundingBox = this.bezierCurves[ 0 ].computeBoundingBox();
-	for( var i = 1; i < this.bezierCurves.length; i++ ) {
-	    var tmpBounds = this.bezierCurves[ i ].computeBoundingBox();
-	    boundingBox.xMin = Math.min( boundingBox.xMin, tmpBounds.xMin );
-	    boundingBox.xMax = Math.max( boundingBox.xMax, tmpBounds.xMax );
-	    boundingBox.yMin = Math.min( boundingBox.yMin, tmpBounds.yMin );
-	    boundingBox.yMax = Math.max( boundingBox.yMax, tmpBounds.yMax );    
-	}
-	return boundingBox;
-    };
-    */
-    
+    };    
 
     /**
      * This function moves the addressed curve point (or control point) with
@@ -5654,7 +5436,10 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-11-18 The add function now works with arrays, too.
  * @modified 2019-11-18 Added the _handleColor helper function to determine the render color of non-draggable vertices.
  * @modified 2019-11-19 Fixed a bug in the resizeCanvas function; retina resolution was not possible.
- * @version  1.5.1
+ * @modified 2019-12-04 Added relative positioned zooming.
+ * @modified 2019-12-04 Added offsetX and offsetY params.
+ * @modified 2019-12-04 Added an 'Set to fullsize retina' button to the GUI config.
+ * @version  1.6.0
  *
  * @file PlotBoilerplate
  * @public
@@ -5729,6 +5514,8 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {boolean=} [config.fitToParent=true] - If set to true the canvas will gain the size of its parent container (overrides fullSize).
      * @param {number=}  [config.scaleX=1.0] - The initial x-zoom. Default is 1.0.
      * @param {number=}  [config.scaleY=1.0] - The initial y-zoom. Default is 1.0.
+     * @param {number=}  [config.offsetX=1.0] - The initial x-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
+     * @param {number=}  [config.offsetY=1.0] - The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
      * @param {boolean=} [config.rasterGrid=true] - If set to true the background grid will be drawn rastered.
      * @param {number=}  [config.rasterAdjustFactor=1.0] - The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
      * @param {boolean=} [config.drawOrigin=false] - Draw a crosshair at (0,0).
@@ -5791,7 +5578,9 @@ Object.extendClass = function( superClass, subClass ) {
 	    fullSize              : fetch.val(config,'fullSize',true), 
 	    fitToParent           : fetch.bool(config,'fitToParent',true),
 	    scaleX                : fetch.num(config,'scaleX',1.0), 
-	    scaleY                : fetch.num(config,'scaleY',1.0), 
+	    scaleY                : fetch.num(config,'scaleY',1.0),
+	    offsetX               : fetch.num(config,'offsetX',0.0), 
+	    offsetY               : fetch.num(config,'offsetY',0.0), 
 	    drawGrid              : fetch.bool(config,'drawGrid',true),
 	    rasterGrid            : fetch.bool(config,'rasterGrid',true),
 	    rasterAdjustFactor    : fetch.num(config,'rasterAdjustdFactror',2.0),
@@ -5810,6 +5599,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    cssUniformScale       : fetch.bool(config,'cssUniformScale',true),
 	    rebuild               : function() { rebuild(); },
 	    saveFile              : function() { _self.saveFile(); },
+	    setToRetina           : function() { _self._setToRetina(); },
 	    enableExport          : fetch.bool(config,'enableExport',true),
 
 	    drawBezierHandleLines : fetch.bool(config,'drawBezierHandleLines',true),
@@ -5854,6 +5644,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    this.draw                = new drawutilsgl(this.ctx,false);
 	    // PROBLEM: same instance of fill and draw when using WebGL. Shader program cannot be duplicated on the same context
 	    this.fill                = this.draw.copyInstance(true);
+	    console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
 	} else {
 	    this.ctx                 = this.canvas.getContext( '2d' );
 	    this.draw                = new drawutils(this.ctx,false);
@@ -5892,6 +5683,14 @@ Object.extendClass = function( superClass, subClass ) {
 	    saveAs(blob, "plot-boilerplate.svg");
 	};
 
+
+	this._setToRetina = function() {
+	    this.config.cssScaleX = this.config.cssScaleY = 0.5;
+	    this.config.canvasWidthFactor = this.config.canvasHeightFactor = 2.0;
+	    //this.config.fullSize = false;
+	    this.config.fitToParent = false;
+	    this.resizeCanvas();
+	};
 
 	/**
 	 * A set of hook functions.
@@ -6475,8 +6274,8 @@ Object.extendClass = function( superClass, subClass ) {
 		_self.canvasSize.width  = w;
 		_self.canvasSize.height = h;
 		if( _self.config.autoAdjustOffset ) {
-		    _self.draw.offset.x = _self.fill.offset.x = w*(_self.config.offsetAdjustXPercent/100); 
-		    _self.draw.offset.y = _self.fill.offset.y = h*(_self.config.offsetAdjustYPercent/100);
+		    _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = w*(_self.config.offsetAdjustXPercent/100); 
+		    _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = h*(_self.config.offsetAdjustYPercent/100);
 		}
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {
@@ -6610,8 +6409,25 @@ Object.extendClass = function( superClass, subClass ) {
 	 * @return {object} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
 	 **/
 	PlotBoilerplate.prototype.transformMousePosition = function( x, y ) {
-	    return { x : (x/this.config.cssScaleX-this.draw.offset.x)/(this.draw.scale.x), y : (y/this.config.cssScaleY-this.draw.offset.y)/(this.draw.scale.y) };
+	    return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
+		     y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) };
 	};
+
+
+	/**
+	 * Reverse transform a point on the canvas.
+	 *
+	 * @method reverseTransformMousePosition
+	 * @param {number} x - The x position relative to the canvas.
+	 * @param {number} y - The y position relative to the canvas.
+	 * @instance
+	 * @memberof PlotBoilerplate
+	 * @return {object} The reverse-transformed position.
+	 **/
+	// NOT IN USE
+	//PlotBoilerplate.prototype.reverseTransformMousePosition = function( x, y ) {
+	//    return { x : x*this.draw.scale.x - this.draw.offset.x, y : y*this.draw.scale.y - this.draw.offset.y };
+	//};
 	
 
 
@@ -6672,6 +6488,8 @@ Object.extendClass = function( superClass, subClass ) {
 	    if( keyHandler.isDown('alt') || keyHandler.isDown('ctrl') || keyHandler.isDown('spacebar') ) {
 		_self.draw.offset.add( e.params.dragAmount );
 		_self.fill.offset.set( _self.draw.offset );
+		_self.config.offsetX = _self.draw.offset.x;
+		_self.config.offsetY = _self.draw.offset.y;
 		_self.redraw();
 	    } else {
 		// Convert drag amount by scaling
@@ -6741,6 +6559,7 @@ Object.extendClass = function( superClass, subClass ) {
 	 **/
 	var mouseWheelHandler = function(e) {
 	    var zoomStep = 1.25;
+	    let oldPos = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
 	    if( e.deltaY < 0 ) {
 		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX*zoomStep;
 		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY*zoomStep;
@@ -6748,6 +6567,13 @@ Object.extendClass = function( superClass, subClass ) {
 		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = Math.max(_self.config.scaleX/zoomStep,0.01);
 		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = Math.max(_self.config.scaleY/zoomStep,0.01);
 	    }
+	    let newPos = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+	    // Apply relative positioned zoom
+	    let newOffsetX = _self.draw.offset.x + (newPos.x-oldPos.x)*_self.draw.scale.x;
+	    let newOffsetY = _self.draw.offset.y + (newPos.y-oldPos.y)*_self.draw.scale.y;
+	    _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = newOffsetX;
+	    _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = newOffsetY;
+	    
 	    e.preventDefault();
 	    _self.redraw();
 	};
@@ -6860,8 +6686,8 @@ Object.extendClass = function( superClass, subClass ) {
 	gui.remember(this.config);
 	var fold0 = gui.addFolder('Editor settings');
 	var fold00 = fold0.addFolder('Canvas size');
-	fold00.add(this.config, 'fullSize').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fullpage mode.");
-	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).");
+	fold00.add(this.config, 'fullSize').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fullpage mode.").listen();
+	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).").listen();
 	fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
 	fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
 	fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.");
@@ -6869,6 +6695,7 @@ Object.extendClass = function( superClass, subClass ) {
 	fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
 	fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
 	fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");
+	fold00.add(this.config, 'setToRetina').name('Set to fullsize retina').title('Set canvas to retina resoultion (x2).');
 	
 	var fold01 = fold0.addFolder('Draw settings');
 	fold01.add(this.config, 'drawBezierHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle points.");
@@ -6880,10 +6707,12 @@ Object.extendClass = function( superClass, subClass ) {
 	
 	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();
+	fold0.add(this.config, 'offsetX').title("Offset x.").step(10.0).onChange( function() { _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX; _self.redraw(); } ).listen();
+	fold0.add(this.config, 'offsetY').title("Offset y.").step(10.0).onChange( function() { _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY; _self.redraw(); } ).listen();
 	fold0.add(this.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();
 	fold0.add(this.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
 	fold0.addColor(this.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");
-	// fold0.add(bp.config, 'loadImage').name('Load Image').title("Load a background image.");
+	// fold0.add(this.config, 'loadImage').name('Load Image').title("Load a background image.");
 
 	if( this.config.enableExport ) {
 	    var fold1 = gui.addFolder('Export');
