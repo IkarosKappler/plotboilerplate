@@ -14,7 +14,8 @@
  * @modified 2019-03-23 Changed the fuctions getPoint and getPointAt to match semantics in the Line class.
  * @modified 2019-11-18 Fixed the clone function: adjustCircular attribute was not cloned.
  * @modified 2019-12-02 Removed some excessive comments.
- * @version 2.0.2
+ * @modified 2019-12-04 Fixed the missing obtainHandleLengths behavior in the adjustNeightbourControlPoint function.
+ * @version 2.0.3
  *
  * @file BezierPath
  * @public
@@ -880,10 +881,16 @@
 	    return; // no secure length available for division
 	
 	
-	// Just invert the main handle	
-	neighbourControlPoint.set( neighbourPoint.x - mainHandleBounds.x * (neighbourHandleLength/mainHandleLength),
-				   neighbourPoint.y - mainHandleBounds.y * (neighbourHandleLength/mainHandleLength)
-				 );
+	// Just invert the main handle (keep length or not?
+	if( obtainHandleLengths ) {
+	    neighbourControlPoint.set( neighbourPoint.x - mainHandleBounds.x * (neighbourHandleLength/mainHandleLength),
+				       neighbourPoint.y - mainHandleBounds.y * (neighbourHandleLength/mainHandleLength)
+				     );
+	} else {
+	    neighbourControlPoint.set( neighbourPoint.x - mainHandleBounds.x, // * (neighbourHandleLength/mainHandleLength),
+				       neighbourPoint.y - mainHandleBounds.y // * (neighbourHandleLength/mainHandleLength)
+				     );
+	}
 	neighbourCurve.updateArcLengths();
     };
 

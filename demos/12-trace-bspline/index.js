@@ -37,8 +37,8 @@
 		      canvasHeightFactor     : 1.0,
 		      cssScaleX              : 1.0,
 		      cssScaleY              : 1.0,
-		      drawBezierHandleLines  : false,
-		      drawBezierHandlePoints : false, 
+		      drawBezierHandleLines  : true, // false,
+		      drawBezierHandlePoints : true, // false, 
 		      cssUniformScale        : true,
 		      autoAdjustOffset       : true,
 		      offsetAdjustXPercent   : 50,
@@ -52,6 +52,10 @@
 		)
 	    );
 
+	    pb.drawConfig.bezier.handleLine.color = 'rgba(180,180,180,0.25)';
+
+	    if( typeof humane != 'undefined' )
+		humane.log("Click, hold and drag your mouse or click 'animate' in the controls.");
 
 	    pb.config.postDraw = function() {
 		// In this demo the PlotBoilerplate only draws the vertices.
@@ -69,27 +73,47 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		animate               : true
+		animate               : false
 	    }, GUP );
 	    
 
+	    
+	    // +---------------------------------------------------------------------------------
+	    // | This is the part where the Bézier magic happens
+	    // +-------------------------------
 	    var step = 0.003;
+	    var t = 0.0;
 	    var redraw = function() {
-		var vec = new Vector();
-		var t = 0.0;
-		while( t <= 1.0 ) {
-		    vec.a = path.getPointAt(t);
-		    vec.b = path.getPerpendicularAt(t);
-		    // The perpendicular (vec.b) is relative. Make absolute.
-		    vec.b.add( vec.a );
-		    // And scale down a bit. It might be pretty long. Not that long is bad, but
-		    // it might be a bit unhandy here.
-		    vec.scale( 0.1 );   
-		    pb.draw.line( vec.a, vec.b, 'rgba(0,108,192,0.75)' );
-		    vec.inv().scale(0.333);
-		    pb.draw.line( vec.a, vec.b, 'rgba(255,108,32,1.0)' );
-		    t += step;
-		}
+		// Each redraw loop determines the current start vector and the current
+		// end vector on the curve.
+		var startVec = new Vector(
+		    path.bezierCurves[0].getPointAt(0),
+		    path.bezierCurves[0].getTangentAt(0)
+		);
+		var endVec = new Vector(
+		    path.bezierCurves[0].getPointAt(t),
+		    path.bezierCurves[0].getTangentAt(t).inv()
+		);
+
+		// Tangents are relative. Make absolute.
+		startVec.b.add( startVec.a )
+		endVec.b.add( endVec.a );
+
+		// This 'splits' the curve at the given point at t.
+		startVec.scale(0.33333333*t);
+		endVec.scale(0.33333333*t);
+
+		// Draw the bezier curve
+		pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
+		// And for better visualization draw the fake control handles (=the tangents).
+		pb.draw.line( startVec.a, startVec.b, '#a8a800', 1 );
+		pb.draw.line( endVec.a, endVec.b, '#a8a800', 1 );
+		// And draw the current position on the curve as a grey point.
+		pb.fill.circle( endVec.a, 3, 'rgba(255,255,255,0.5)' );
+
+		t+=step;
+		if( t >= 1.0 )
+		    t = 0.0; // Reset t after each rendering loop
 	    };
 	    
 
@@ -115,7 +139,7 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Add a circular connected bezier path.
 	    // +-------------------------------
-	    var numCurves = 3;
+	    var numCurves = 1;
 	    var bpath = [];
 	    var animatableVertices = [];	    
 	    for( var i = 0; i < numCurves; i++ ) {
@@ -123,17 +147,14 @@
 		animatableVertices.push( bpath[i][0] ); // start point
 		animatableVertices.push( bpath[i][1] ); // end point
 		animatableVertices.push( bpath[i][2] ); // start control point
-		// Do not add the end control point here. It will be animated corresponding to
-		// the succeeding path curve (to keep the path smooth)
+		// Do not add the end control point here if there are more than one curve. It will
+		// be animated corresponding to the succeeding path curve (to keep the path smooth).
+		if( numCurves == 1 )
+		    animatableVertices.push( bpath[i][3] ); // end control point
 	    }
 	    
 	    var path = BezierPath.fromArray( bpath );
-	    
-
-
 	    pb.add( path );
-
-
 
 
 	    // Animate the vertices: make them bounce around and reflect on the walls.
@@ -174,7 +195,6 @@
 		var gui = pb.createGUI();
 		var f0 = gui.addFolder('Points');
 		f0.add(config, 'animate').onChange( toggleAnimation ).title("Toggle point animation on/off.");
-		//f0.add(config, 'animationType', { Linear: 'linear', Radial : 'radial' } ).onChange( function() { toggleAnimation(); } );
 		f0.open();
 		
 		if( config.animate )

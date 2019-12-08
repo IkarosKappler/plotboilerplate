@@ -45,7 +45,9 @@
  * @modified 2019-12-04 Added relative positioned zooming.
  * @modified 2019-12-04 Added offsetX and offsetY params.
  * @modified 2019-12-04 Added an 'Set to fullsize retina' button to the GUI config.
- * @version  1.6.0
+ * @modified 2019-12-07 Added the drawConfig for lines, polygons, ellipse, triangles, bezier curves and image control lines.
+ * @modified 2019-12-08 Fixed a css scale bug in the viewport() function.
+ * @version  1.6.1
  *
  * @file PlotBoilerplate
  * @public
@@ -237,7 +239,43 @@
 	 * @instance
 	 */
 	this.drawConfig = {
-	    drawVertices : true
+	    drawVertices : true,
+	    bezier : {
+		color : '#00a822',
+		lineWidth : 2,
+		handleLine : {
+		    color : 'rgba(180,180,180,0.5)',
+		    lineWidth : 1
+		}
+	    },
+	    polygon : {
+		color : '#0022a8',
+		lineWidth : 1
+	    },
+	    triangle : {
+		color : '#6600ff',
+		lineWidth : 1
+	    },
+	    ellipse : {
+		color : '#2222a8',
+		lineWidth : 1
+	    },
+	    vertex : {
+		color : '#a8a8a8',
+		lineWidth : 1
+	    },
+	    line : {
+		color : '#a844a8',
+		lineWidth : 1
+	    },
+	    vector : {
+		color : '#ff44a8',
+		lineWidth : 1
+	    },
+	    image : {
+		line : '#a8a8a8',
+		lineWidth : 1
+	    }
 	};
 
 
@@ -590,7 +628,7 @@
 		var d = this.drawables[i];
 		if( d instanceof BezierPath ) {
 		    for( var c in d.bezierCurves ) {
-			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, '#00a822' );
+			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth ); // '#00a822' );
 
 			if( this.config.drawBezierHandlePoints && this.config.drawHandlePoints ) {
 			    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
@@ -613,19 +651,21 @@
 			}
 			
 			if( this.config.drawBezierHandleLines && this.config.drawHandleLines ) {
-			    this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
-			    this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
+			    //this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
+			    //this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
+			    this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
+			    this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
 			}
 			
 		    }
 		} else if( d instanceof Polygon ) {
-		    this.draw.polygon( d, '#0022a8' );
+		    this.draw.polygon( d, this.drawConfig.polygon.color ); //'#0022a8' );
 		    if( !this.config.drawHandlePoints ) {
 			for( var i in d.vertices )
 			    d.vertices[i].attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Triangle ) {
-		    this.draw.polyline( [d.a,d.b,d.c], false, '#6600ff' );
+		    this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color ); // '#6600ff' );
 		    if( !this.config.drawHandlePoints ) 
 			d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
@@ -633,7 +673,7 @@
 			this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
 			this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
 		    }
-		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), '#2222a8' );
+		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color ); //'#2222a8' );
 		    if( !this.config.drawHandlePoints ) {
 			d.center.attr.renderTime = renderTime;
 			d.axis.attr.renderTime = renderTime;
@@ -642,18 +682,18 @@
 		    if( this.drawConfig.drawVertices &&
 			(!d.attr.selectable || !d.attr.draggable) ) {
 			// Draw as special point (grey)
-			this.draw.circleHandle( d, 7, '#a8a8a8' );
+			this.draw.circleHandle( d, 7, this.drawConfig.vertex.color ); // '#a8a8a8' );
 			d.attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Line ) {
-		    this.draw.line( d.a, d.b, '#a844a8' );
+		    this.draw.line( d.a, d.b, this.drawConfig.line.color ); // '#a844a8' );
 		    if( !this.config.drawHandlePoints || !d.a.attr.selectable ) 
 			d.a.attr.renderTime = renderTime;
 		    if( !this.config.drawHandlePoints || !d.b.attr.selectable ) 
 			d.b.attr.renderTime = renderTime;
 		} else if( d instanceof Vector ) {
 		    // this.draw.line( d.a, d.b, '#ff44a8' );
-		    this.draw.arrow( d.a, d.b, '#ff44a8' );
+		    this.draw.arrow( d.a, d.b, this.drawConfig.vector.color ); // '#ff44a8' );
 		    if( this.config.drawHandlePoints && d.b.attr.selectable ) {
 			this.draw.circleHandle( d.b, 7, '#a8a8a8' );
 		    } else {
@@ -667,10 +707,10 @@
 		    
 		} else if( d instanceof PBImage ) {
 		    if( this.config.drawHandleLines )
-			this.draw.line( d.upperLeft, d.lowerRight, '#a8a8a8' );
+			this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color ); // '#a8a8a8' );
 		    this.fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
 		    if( this.config.drawHandlePoints ) {
-			this.draw.circleHandle( d.lowerRight, 7, '#a8a8a8' );
+			this.draw.circleHandle( d.lowerRight, 7, this.drawConfig.image.color ); // '#a8a8a8' );
 			d.lowerRight.attr.renderTime = renderTime;
 		    }
 		} else {
@@ -808,7 +848,7 @@
 	 **/
 	PlotBoilerplate.prototype.viewport = function() {
 	    return { min : this.transformMousePosition(0,0),
-		     max : this.transformMousePosition(this.canvasSize.width,this.canvasSize.height)
+		     max : this.transformMousePosition(this.canvasSize.width*this.config.cssScaleX,this.canvasSize.height*this.config.cssScaleY)
 		   };
 	};
 	/**
@@ -1018,22 +1058,6 @@
 	    return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
 		     y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) };
 	};
-
-
-	/**
-	 * Reverse transform a point on the canvas.
-	 *
-	 * @method reverseTransformMousePosition
-	 * @param {number} x - The x position relative to the canvas.
-	 * @param {number} y - The y position relative to the canvas.
-	 * @instance
-	 * @memberof PlotBoilerplate
-	 * @return {object} The reverse-transformed position.
-	 **/
-	// NOT IN USE
-	//PlotBoilerplate.prototype.reverseTransformMousePosition = function( x, y ) {
-	//    return { x : x*this.draw.scale.x - this.draw.offset.x, y : y*this.draw.scale.y - this.draw.offset.y };
-	//};
 	
 
 
@@ -1296,12 +1320,12 @@
 	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).").listen();
 	fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
 	fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
-	fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.");
-	fold00.add(this.config, 'canvasHeightFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current height.");
+	fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.").listen();
+	fold00.add(this.config, 'canvasHeightFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current height.").listen();
 	fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
 	fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
 	fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");
-	fold00.add(this.config, 'setToRetina').name('Set to fullsize retina').title('Set canvas to retina resoultion (x2).');
+	fold00.add(this.config, 'setToRetina').name('Set to highres fullsize').title('Set canvas to high-res retina resoultion (x2).');
 	
 	var fold01 = fold0.addFolder('Draw settings');
 	fold01.add(this.config, 'drawBezierHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle points.");

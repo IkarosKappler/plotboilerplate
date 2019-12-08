@@ -64,7 +64,11 @@
 	return this;
     };
 
-    // New
+    /**
+     * This function computes the inverse of the vector, which means a stays untouched.
+     *
+     * @return {Vector} this for chaining.
+     **/
     Vector.prototype.inv = function() {
 	this.b.x = this.a.x-(this.b.x-this.a.x);
 	this.b.y = this.a.y-(this.b.y-this.a.y);

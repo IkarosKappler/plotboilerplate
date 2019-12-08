@@ -375,7 +375,7 @@ from the sources code files in ./src/*.
 
 
 ## Todos
- * Add config.offset{X,Y} and make it configurable. Perform the relative zooming on basis of this value (currently taken from draw.offset).
+ * [Done] Add config.offset{X,Y} and make it configurable. Perform the relative zooming on basis of this value (currently taken from draw.offset).
  * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
  * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
  * Include Touchy.js as a package dependency.
@@ -392,16 +392,18 @@ from the sources code files in ./src/*.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
- * Add a CSS class with a peusdo grid (inline-PNG) for the canvas wrapper (placeholder while loading).
- * main-dist.html has a wrong document title. 
+ * [Done] Add a CSS class with a peusdo grid (inline-PNG) for the canvas wrapper (placeholder while loading).
+ * [Done] main-dist.html has a wrong document title. 
  * Add a proper webpack entry point file (like index.js or entry.js?).
  * Add typescript and define an interface for drawables (Drawable.ts?).
  * Add a vertex attribute: visible. (to hide vertices).
- * Implement relative zoom at mouse position (current zoom is fixed a origin).
+ * [Done] Implement relative zoom at mouse position (current zoom is fixed a origin).
  * Add control button: reset zoom.
  * Add control button: reset to origin.
- * Add control button: set to retina resolution (size factors and css scale).
- * Extend the perpendicular Bézier demo (currently working with one curve only).
+ * [Partially] Add control button: set to retina resolution (size factors and css scale).
+ * [Done] Extend the perpendicular Bézier demo (currently working with one curve only).
+ * Add a demo that draws a proper mathematical xy-grid.
+ * [Done] Possible bug in the demos: it seems that the retina resolution settings do not properly do out-of-viewport detection.
 
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.

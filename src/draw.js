@@ -21,7 +21,9 @@
  * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
  * @modified 2019-11-18 Added the polyline function.
  * @modified 2019-11-22 Added a second workaround for th drawImage bug in Safari.
- * @version  1.3.1
+ * @modified 2019-12-07 Added the 'lineWidth' param to the line(...) function.
+ * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
+ * @version  1.3.2
  **/
 
 (function(_context) {
@@ -56,17 +58,18 @@
      * @param {Vertex} zA - The start point of the line.
      * @param {Vertex} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
+     * @param {number|string} lineWidth? - [optional] The line's width.
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutils.prototype.line = function( zA, zB, color ) {
+    _context.drawutils.prototype.line = function( zA, zB, color, lineWidth ) {
 	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
 	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
 	this.ctx.strokeStyle = color;
-	this.ctx.lineWidth = 1;
+	this.ctx.lineWidth = lineWidth || 1;
 	this.ctx.stroke();
 	this.ctx.restore();
     };
@@ -163,11 +166,12 @@
      * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
      * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
+     * @param {number|string} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color ) {
+    _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth ) {
 	if( startPoint instanceof CubicBezierCurve ) {
 	    this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, endPoint );
 	    return;
@@ -180,7 +184,7 @@
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
 	//this.ctx.closePath();
-	this.ctx.lineWidth = 2;
+	this.ctx.lineWidth = lineWidth || 2;
 	this._fillOrDraw( color );
 	this.ctx.restore();
     };
