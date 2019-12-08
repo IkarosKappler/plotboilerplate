@@ -5457,7 +5457,7 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-07 Added the drawConfig for lines, polygons, ellipse, triangles, bezier curves and image control lines.
  * @modified 2019-12-08 Fixed a css scale bug in the viewport() function.
  * @modified 2019-12-08 Added the drawconfig UI panel (line colors and line widths).
- * @version  1.6.3
+ * @version  1.6.4
  *
  * @file PlotBoilerplate
  * @public

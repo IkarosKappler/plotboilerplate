@@ -147,9 +147,16 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Perpendiculars of a Bézier path
 
-![Perpendiculars of a Bézier path](screenshots/screenshot-20191202-bezier-perpendiculars.png "Perpendiculars of a Bézier path")
+![Perpendiculars of a Bézier path](screenshots/screenshot-20191204-bezier-path-with-perpendiculars "Perpendiculars of a Bézier path")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
+
+
+### Tracing a cubic Bézier spline (finding the tangent values for each vertex)
+
+![Tracing a cubic Bézier spline](screenshots/screenshot-20191204-bezier-path-with-perpendiculars "Tracing a cubic Bézier spline")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/12-trace-bspline/index.html" title="See the demo">See the demo</a>
 
 
 
@@ -379,7 +386,6 @@ from the sources code files in ./src/*.
 
 
 ## Todos
- * Add config.offset{X,Y} and make it configurable. Perform the relative zooming on basis of this value (currently taken from draw.offset).
  * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
  * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
  * Include Touchy.js as a package dependency.
@@ -396,19 +402,18 @@ from the sources code files in ./src/*.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
- * Add a CSS class with a peusdo grid (inline-PNG) for the canvas wrapper (placeholder while loading).
- * main-dist.html has a wrong document title. 
  * Add a proper webpack entry point file (like index.js or entry.js?).
  * Add typescript and define an interface for drawables (Drawable.ts?).
  * Add a vertex attribute: visible. (to hide vertices).
- * Implement relative zoom at mouse position (current zoom is fixed a origin).
  * Add control button: reset zoom.
  * Add control button: reset to origin.
- * Add control button: set to retina resolution (size factors and css scale).
- * Extend the perpendicular Bézier demo (currently working with one curve only).
+ * [Partially done] Add control button: set to retina resolution (size factors and css scale).
+ * Add a demo that draws a proper mathematical xy-grid.
+ * Switching browser tabs back and forth sometimes locks the Ctrl-Key. Check that.
 
 ## Todos for future Version 2 (not backwards compatible)
- * Change the Vector.inverse() function. This is not what the inverse of a vector should be.
+ * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
+ * Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
 
 ## Browsers support
 

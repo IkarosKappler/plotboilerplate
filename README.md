@@ -143,14 +143,14 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Perpendiculars of a Bézier path
 
-![Perpendiculars of a Bézier path](screenshots/screenshot-20191204-bezier-path-with-perpendiculars "Perpendiculars of a Bézier path")
+![Perpendiculars of a Bézier path](screenshots/screenshot-20191204-bezier-path-with-perpendiculars.png "Perpendiculars of a Bézier path")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
 
 
 ### Tracing a cubic Bézier spline (finding the tangent values for each vertex)
 
-![Tracing a cubic Bézier spline](screenshots/screenshot-20191204-bezier-path-with-perpendiculars "Tracing a cubic Bézier spline")
+![Tracing a cubic Bézier spline](screenshots/screenshot-20191204-bezier-path-with-perpendiculars.png "Tracing a cubic Bézier spline")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/12-trace-bspline/index.html" title="See the demo">See the demo</a>
 
