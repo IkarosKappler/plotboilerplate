@@ -1,8 +1,9 @@
 
 
 # Changelog
-* 2019-12-08
+* 2019-12-08 (1.6.3)
   * Fixed a css scale bug in the viewport() function.
+  * Added the drawconfig UI panel (line colors and line widths).
 * 2019-12-07
   * Added a fallback CSS raster (inline PNG).
   * Added the drawConfig for lines, polygons, ellipse, triangles, bezier curves and image control lines.

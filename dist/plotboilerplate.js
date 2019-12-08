@@ -1347,7 +1347,11 @@ Object.extendClass = function( superClass, subClass ) {
 	return this;
     };
 
-    // New
+    /**
+     * This function computes the inverse of the vector, which means a stays untouched.
+     *
+     * @return {Vector} this for chaining.
+     **/
     Vector.prototype.inv = function() {
 	this.b.x = this.a.x-(this.b.x-this.a.x);
 	this.b.y = this.a.y-(this.b.y-this.a.y);
@@ -2067,7 +2071,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-03-23 Changed the fuctions getPoint and getPointAt to match semantics in the Line class.
  * @modified 2019-11-18 Fixed the clone function: adjustCircular attribute was not cloned.
  * @modified 2019-12-02 Removed some excessive comments.
- * @version 2.0.2
+ * @modified 2019-12-04 Fixed the missing obtainHandleLengths behavior in the adjustNeightbourControlPoint function.
+ * @version 2.0.3
  *
  * @file BezierPath
  * @public
@@ -2933,10 +2938,16 @@ Object.extendClass = function( superClass, subClass ) {
 	    return; // no secure length available for division
 	
 	
-	// Just invert the main handle	
-	neighbourControlPoint.set( neighbourPoint.x - mainHandleBounds.x * (neighbourHandleLength/mainHandleLength),
-				   neighbourPoint.y - mainHandleBounds.y * (neighbourHandleLength/mainHandleLength)
-				 );
+	// Just invert the main handle (keep length or not?
+	if( obtainHandleLengths ) {
+	    neighbourControlPoint.set( neighbourPoint.x - mainHandleBounds.x * (neighbourHandleLength/mainHandleLength),
+				       neighbourPoint.y - mainHandleBounds.y * (neighbourHandleLength/mainHandleLength)
+				     );
+	} else {
+	    neighbourControlPoint.set( neighbourPoint.x - mainHandleBounds.x, // * (neighbourHandleLength/mainHandleLength),
+				       neighbourPoint.y - mainHandleBounds.y // * (neighbourHandleLength/mainHandleLength)
+				     );
+	}
 	neighbourCurve.updateArcLengths();
     };
 
@@ -4654,7 +4665,9 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
  * @modified 2019-11-18 Added the polyline function.
  * @modified 2019-11-22 Added a second workaround for th drawImage bug in Safari.
- * @version  1.3.1
+ * @modified 2019-12-07 Added the 'lineWidth' param to the line(...) function.
+ * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
+ * @version  1.3.2
  **/
 
 (function(_context) {
@@ -4689,17 +4702,18 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {Vertex} zA - The start point of the line.
      * @param {Vertex} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
+     * @param {number|string} lineWidth? - [optional] The line's width.
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutils.prototype.line = function( zA, zB, color ) {
+    _context.drawutils.prototype.line = function( zA, zB, color, lineWidth ) {
 	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
 	this.ctx.lineTo( this.offset.x+zB.x*this.scale.x, this.offset.y+zB.y*this.scale.y );
 	this.ctx.strokeStyle = color;
-	this.ctx.lineWidth = 1;
+	this.ctx.lineWidth = lineWidth || 1;
 	this.ctx.stroke();
 	this.ctx.restore();
     };
@@ -4796,11 +4810,12 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
      * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
+     * @param {number|string} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color ) {
+    _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth ) {
 	if( startPoint instanceof CubicBezierCurve ) {
 	    this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, endPoint );
 	    return;
@@ -4813,7 +4828,7 @@ Object.extendClass = function( superClass, subClass ) {
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
 	//this.ctx.closePath();
-	this.ctx.lineWidth = 2;
+	this.ctx.lineWidth = lineWidth || 2;
 	this._fillOrDraw( color );
 	this.ctx.restore();
     };
@@ -5439,7 +5454,10 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-04 Added relative positioned zooming.
  * @modified 2019-12-04 Added offsetX and offsetY params.
  * @modified 2019-12-04 Added an 'Set to fullsize retina' button to the GUI config.
- * @version  1.6.0
+ * @modified 2019-12-07 Added the drawConfig for lines, polygons, ellipse, triangles, bezier curves and image control lines.
+ * @modified 2019-12-08 Fixed a css scale bug in the viewport() function.
+ * @modified 2019-12-08 Added the drawconfig UI panel (line colors and line widths).
+ * @version  1.6.3
  *
  * @file PlotBoilerplate
  * @public
@@ -5631,7 +5649,43 @@ Object.extendClass = function( superClass, subClass ) {
 	 * @instance
 	 */
 	this.drawConfig = {
-	    drawVertices : true
+	    drawVertices : true,
+	    bezier : {
+		color : '#00a822',
+		lineWidth : 2,
+		handleLine : {
+		    color : 'rgba(180,180,180,0.5)',
+		    lineWidth : 1
+		}
+	    },
+	    polygon : {
+		color : '#0022a8',
+		lineWidth : 1
+	    },
+	    triangle : {
+		color : '#6600ff',
+		lineWidth : 1
+	    },
+	    ellipse : {
+		color : '#2222a8',
+		lineWidth : 1
+	    },
+	    vertex : {
+		color : '#a8a8a8',
+		lineWidth : 1
+	    },
+	    line : {
+		color : '#a844a8',
+		lineWidth : 1
+	    },
+	    vector : {
+		color : '#ff44a8',
+		lineWidth : 1
+	    },
+	    image : {
+		line : '#a8a8a8',
+		lineWidth : 1
+	    }
 	};
 
 
@@ -5984,7 +6038,7 @@ Object.extendClass = function( superClass, subClass ) {
 		var d = this.drawables[i];
 		if( d instanceof BezierPath ) {
 		    for( var c in d.bezierCurves ) {
-			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, '#00a822' );
+			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth ); // '#00a822' );
 
 			if( this.config.drawBezierHandlePoints && this.config.drawHandlePoints ) {
 			    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
@@ -6007,19 +6061,21 @@ Object.extendClass = function( superClass, subClass ) {
 			}
 			
 			if( this.config.drawBezierHandleLines && this.config.drawHandleLines ) {
-			    this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
-			    this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
+			    //this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
+			    //this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
+			    this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
+			    this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
 			}
 			
 		    }
 		} else if( d instanceof Polygon ) {
-		    this.draw.polygon( d, '#0022a8' );
+		    this.draw.polygon( d, this.drawConfig.polygon.color ); //'#0022a8' );
 		    if( !this.config.drawHandlePoints ) {
 			for( var i in d.vertices )
 			    d.vertices[i].attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Triangle ) {
-		    this.draw.polyline( [d.a,d.b,d.c], false, '#6600ff' );
+		    this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color ); // '#6600ff' );
 		    if( !this.config.drawHandlePoints ) 
 			d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
@@ -6027,7 +6083,7 @@ Object.extendClass = function( superClass, subClass ) {
 			this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
 			this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
 		    }
-		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), '#2222a8' );
+		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color ); //'#2222a8' );
 		    if( !this.config.drawHandlePoints ) {
 			d.center.attr.renderTime = renderTime;
 			d.axis.attr.renderTime = renderTime;
@@ -6036,18 +6092,18 @@ Object.extendClass = function( superClass, subClass ) {
 		    if( this.drawConfig.drawVertices &&
 			(!d.attr.selectable || !d.attr.draggable) ) {
 			// Draw as special point (grey)
-			this.draw.circleHandle( d, 7, '#a8a8a8' );
+			this.draw.circleHandle( d, 7, this.drawConfig.vertex.color ); // '#a8a8a8' );
 			d.attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Line ) {
-		    this.draw.line( d.a, d.b, '#a844a8' );
+		    this.draw.line( d.a, d.b, this.drawConfig.line.color ); // '#a844a8' );
 		    if( !this.config.drawHandlePoints || !d.a.attr.selectable ) 
 			d.a.attr.renderTime = renderTime;
 		    if( !this.config.drawHandlePoints || !d.b.attr.selectable ) 
 			d.b.attr.renderTime = renderTime;
 		} else if( d instanceof Vector ) {
 		    // this.draw.line( d.a, d.b, '#ff44a8' );
-		    this.draw.arrow( d.a, d.b, '#ff44a8' );
+		    this.draw.arrow( d.a, d.b, this.drawConfig.vector.color ); // '#ff44a8' );
 		    if( this.config.drawHandlePoints && d.b.attr.selectable ) {
 			this.draw.circleHandle( d.b, 7, '#a8a8a8' );
 		    } else {
@@ -6061,10 +6117,10 @@ Object.extendClass = function( superClass, subClass ) {
 		    
 		} else if( d instanceof PBImage ) {
 		    if( this.config.drawHandleLines )
-			this.draw.line( d.upperLeft, d.lowerRight, '#a8a8a8' );
+			this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color ); // '#a8a8a8' );
 		    this.fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
 		    if( this.config.drawHandlePoints ) {
-			this.draw.circleHandle( d.lowerRight, 7, '#a8a8a8' );
+			this.draw.circleHandle( d.lowerRight, 7, this.drawConfig.image.color ); // '#a8a8a8' );
 			d.lowerRight.attr.renderTime = renderTime;
 		    }
 		} else {
@@ -6202,7 +6258,7 @@ Object.extendClass = function( superClass, subClass ) {
 	 **/
 	PlotBoilerplate.prototype.viewport = function() {
 	    return { min : this.transformMousePosition(0,0),
-		     max : this.transformMousePosition(this.canvasSize.width,this.canvasSize.height)
+		     max : this.transformMousePosition(this.canvasSize.width*this.config.cssScaleX,this.canvasSize.height*this.config.cssScaleY)
 		   };
 	};
 	/**
@@ -6412,22 +6468,6 @@ Object.extendClass = function( superClass, subClass ) {
 	    return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
 		     y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) };
 	};
-
-
-	/**
-	 * Reverse transform a point on the canvas.
-	 *
-	 * @method reverseTransformMousePosition
-	 * @param {number} x - The x position relative to the canvas.
-	 * @param {number} y - The y position relative to the canvas.
-	 * @instance
-	 * @memberof PlotBoilerplate
-	 * @return {object} The reverse-transformed position.
-	 **/
-	// NOT IN USE
-	//PlotBoilerplate.prototype.reverseTransformMousePosition = function( x, y ) {
-	//    return { x : x*this.draw.scale.x - this.draw.offset.x, y : y*this.draw.scale.y - this.draw.offset.y };
-	//};
 	
 
 
@@ -6690,12 +6730,12 @@ Object.extendClass = function( superClass, subClass ) {
 	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).").listen();
 	fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
 	fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
-	fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.");
-	fold00.add(this.config, 'canvasHeightFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current height.");
+	fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.").listen();
+	fold00.add(this.config, 'canvasHeightFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current height.").listen();
 	fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
 	fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
 	fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");
-	fold00.add(this.config, 'setToRetina').name('Set to fullsize retina').title('Set canvas to retina resoultion (x2).');
+	fold00.add(this.config, 'setToRetina').name('Set to highres fullsize').title('Set canvas to high-res retina resoultion (x2).');
 	
 	var fold01 = fold0.addFolder('Draw settings');
 	fold01.add(this.config, 'drawBezierHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle points.");
@@ -6703,6 +6743,25 @@ Object.extendClass = function( superClass, subClass ) {
 	fold01.add(this.config, 'drawHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw handle points (overrides all other settings).");
 	fold01.add(this.config, 'drawHandleLines').onChange( function() { _self.redraw(); } ).title("Draw handle lines in general (overrides all other settings).");
 	fold01.add(this.drawConfig, 'drawVertices').onChange( function() { _self.redraw(); } ).title("Draw vertices in general.");
+	
+	var fold0100 = fold01.addFolder('Colors and Lines');
+	var _addDrawConfigElement = function( fold, basePath, conf ) {
+	    for( var i in conf ) {
+		if( typeof conf[i] == 'object' ) {
+		    if( conf[i].hasOwnProperty('color') )
+			fold.addColor(conf[i], 'color').onChange( function() { _self.redraw(); } ).name(basePath+i+'.color').title(basePath+i+'.color').listen();
+		    if( conf[i].hasOwnProperty('lineWidth') )
+			fold.add(conf[i], 'lineWidth').min(1).max(10).step(1).onChange( function() { _self.redraw(); } ).name(basePath+i+'.lineWidth').title(basePath+i+'.lineWidth').listen();
+		    for( var e in conf[i] ) {
+			if( conf[i].hasOwnProperty(e) && typeof conf[i][e] == 'object' ) { // console.log(e);
+			    _addDrawConfigElement( fold, (basePath!=''?basePath+'.':'')+i+'.'+e, conf[i] );
+			}
+		    }
+		}
+	    }
+	};
+	_addDrawConfigElement(fold0100, '', this.drawConfig);
+	
 	
 	
 	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();

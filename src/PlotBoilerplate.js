@@ -47,7 +47,8 @@
  * @modified 2019-12-04 Added an 'Set to fullsize retina' button to the GUI config.
  * @modified 2019-12-07 Added the drawConfig for lines, polygons, ellipse, triangles, bezier curves and image control lines.
  * @modified 2019-12-08 Fixed a css scale bug in the viewport() function.
- * @version  1.6.1
+ * @modified 2019-12-08 Added the drawconfig UI panel (line colors and line widths).
+ * @version  1.6.3
  *
  * @file PlotBoilerplate
  * @public
@@ -1333,6 +1334,25 @@
 	fold01.add(this.config, 'drawHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw handle points (overrides all other settings).");
 	fold01.add(this.config, 'drawHandleLines').onChange( function() { _self.redraw(); } ).title("Draw handle lines in general (overrides all other settings).");
 	fold01.add(this.drawConfig, 'drawVertices').onChange( function() { _self.redraw(); } ).title("Draw vertices in general.");
+	
+	var fold0100 = fold01.addFolder('Colors and Lines');
+	var _addDrawConfigElement = function( fold, basePath, conf ) {
+	    for( var i in conf ) {
+		if( typeof conf[i] == 'object' ) {
+		    if( conf[i].hasOwnProperty('color') )
+			fold.addColor(conf[i], 'color').onChange( function() { _self.redraw(); } ).name(basePath+i+'.color').title(basePath+i+'.color').listen();
+		    if( conf[i].hasOwnProperty('lineWidth') )
+			fold.add(conf[i], 'lineWidth').min(1).max(10).step(1).onChange( function() { _self.redraw(); } ).name(basePath+i+'.lineWidth').title(basePath+i+'.lineWidth').listen();
+		    for( var e in conf[i] ) {
+			if( conf[i].hasOwnProperty(e) && typeof conf[i][e] == 'object' ) { // console.log(e);
+			    _addDrawConfigElement( fold, (basePath!=''?basePath+'.':'')+i+'.'+e, conf[i] );
+			}
+		    }
+		}
+	    }
+	};
+	_addDrawConfigElement(fold0100, '', this.drawConfig);
+	
 	
 	
 	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
