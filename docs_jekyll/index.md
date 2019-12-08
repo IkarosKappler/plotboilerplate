@@ -147,14 +147,14 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Perpendiculars of a Bézier path
 
-![Perpendiculars of a Bézier path](screenshots/screenshot-20191204-bezier-path-with-perpendiculars "Perpendiculars of a Bézier path")
+![Perpendiculars of a Bézier path](screenshots/screenshot-20191204-bezier-path-with-perpendiculars.png "Perpendiculars of a Bézier path")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
 
 
 ### Tracing a cubic Bézier spline (finding the tangent values for each vertex)
 
-![Tracing a cubic Bézier spline](screenshots/screenshot-20191204-bezier-path-with-perpendiculars "Tracing a cubic Bézier spline")
+![Tracing a cubic Bézier spline](screenshots/screenshot-20191208-bezier-path-tangent-tracing.png "Tracing a cubic Bézier spline")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/12-trace-bspline/index.html" title="See the demo">See the demo</a>
 
@@ -410,6 +410,7 @@ from the sources code files in ./src/*.
  * [Partially done] Add control button: set to retina resolution (size factors and css scale).
  * Add a demo that draws a proper mathematical xy-grid.
  * Switching browser tabs back and forth sometimes locks the Ctrl-Key. Check that.
+ * Add a pre-publish check if there are unstaged changes.
 
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
