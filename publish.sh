@@ -18,3 +18,5 @@ fi
 
 echo "Publish ..."
 # npm publish
+
+echo " !!! Don't forget to upload the compiled package to your staging environment !!!"
