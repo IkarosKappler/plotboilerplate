@@ -3,6 +3,9 @@
 echo "Compile ..."
 npm run webpack
 [ $? -eq 0 ]  || exit 1
+git add dist/plotboilerplate.min.js
+git add dist/plotboilerplate.js
+git commit -m "Automatic commit."
 
 
 if [[ `git status --porcelain --untracked-files=no` ]]; then
