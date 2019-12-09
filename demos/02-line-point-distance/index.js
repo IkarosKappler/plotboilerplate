@@ -27,7 +27,7 @@
 		      scaleX                : 1.0,
 		      scaleY                : 1.0,
 		      rasterGrid            : true,
-		      drawOrigin            : true,
+		      drawOrigin            : false,
 		      rasterAdjustFactor    : 2.0,
 		      redrawOnResize        : true,
 		      defaultCanvasWidth    : 1024,
@@ -43,7 +43,8 @@
 		      backgroundColor       : '#ffffff',
 		      enableMouse           : true,
 		      enableKeys            : true,
-		      enableTouch           : true
+		      enableTouch           : true,
+		      enableMouseWheel      : true
 		    }, GUP
 		)
 	    );
@@ -53,6 +54,89 @@
 	    // +-------------------------------
 	    pb.createGUI(); 
 	    // END init dat.gui
+
+
+	    pb.config.postDraw = function() { 
+		let _line = null;
+		let pdist = 10;
+		let leftElements = {};
+		let rightElements = {};
+		var t = -10000;
+		var minT = Number.MAX_VALUE;
+		var maxT = Number.MIN_VALUE;
+		//leftElements[ t+'_l'+'_-1' ] = { t : t, tri : new Triangle(line.a, line.a, line.a) };
+		for( var i in pb.drawables ) { 
+		    if( !(pb.drawables[i] instanceof Line ) )
+			continue;
+
+		    _line = pb.drawables[i];
+		    if( _line == line )
+			continue;
+		    // line.a is the end point, line.b is the intersection point
+		    let vec = new Vector(_line.b, _line.a);
+		    let perpStart = vec.perp().setLength(pdist);
+		    perpStart.add( vec.clone().setLength(pdist).sub(vec.a).b );
+		    let perpEnd = perpStart.clone().add( vec.clone().setLength(vec.length()-2*pdist).sub(vec.a).b );
+
+		    // console.log(perp);
+		    pb.draw.line( perpStart.b, perpEnd.b, 'grey', 2 );
+		    pb.draw.line( perpStart.clone().inv().b, perpEnd.clone().inv().b, 'grey', 2 );
+
+		    let tipVec = vec.clone().setLength( vec.length()+1.5*pdist );
+		    let tipPerp = tipVec.perp().setLength(2*pdist).sub( tipVec.a ).add( tipVec.b );
+		    let tipHandleA = perpEnd.clone().setLength( 2*pdist );
+		    
+
+		    //pb.draw.circle( tipVec.b, 3 );
+		    //pb.draw.circle( tipPerp.b, 2, 'red' );
+		    //pb.draw.circle( tipHandleA.b, 2, 'green' );
+
+		    pb.draw.cubicBezier( perpEnd.b, tipVec.b, tipHandleA.b, tipPerp.b, 'grey' );
+		    pb.draw.cubicBezier( perpEnd.clone().inv().b, tipVec.b, tipHandleA.clone().inv().b, tipPerp.clone().inv().b, 'grey' );
+
+		    let t = line.getClosestT(_line.a);
+		    var tri = new Triangle( perpStart.b, perpStart.clone().inv().b, _line.b ); // vec.b );
+		    
+		    let det = new Triangle(line.a, line.b, _line.a).determinant();
+		    pb.fill.polyline( [tri.a, tri.b, tri.c], false, det<0 ? 'rgba(0,255,0,0.5)' : 'rgba(255,0,255,0.5)' );
+		    // console.log( det );
+		    // elements.push( [ t+'_'+(det<0?'l':'r')+'_'+elements.length, { t : t, det : det, tri : tri, line : _line  } ] );
+		    if( det<0 ) leftElements[ t ]  = { t : t, tri : tri };
+		    else        rightElements[ t ] = { t : t, tri : tri };
+
+		    minT = Math.min( minT, t );
+		    maxT = Math.max( maxT, t );
+		}
+
+		var drawConnectingElements = function( elements, l2r ) {
+		    var keys = Object.keys(elements).sort();
+		    if( !l2r ) keys = keys.reverse();
+		    //console.log( l2r?'l2r':'non-ltr', keys );
+		    var firstKey = null;
+		    var lastKey = null;
+		    var last = null;
+		    for( var k = 0; k < keys.length; k++ ) {
+			// console.log( 'key'+k, keys[k] );
+			var next = elements[ keys[k] ];
+			if( last != null ) {
+			    if( l2r ) pb.draw.line( last.tri.b, next.tri.a, 'grey', 2 );
+			    else      pb.draw.line( next.tri.a, last.tri.b, 'grey', 2 );
+			} else {
+			    firstKey = keys[k];
+			}
+			last = next;
+			lastKey = keys[k];
+		    }
+		    return { first: firstKey?elements[firstKey].t:(l2r?0.0:1.0), last : lastKey?elements[lastKey].t:(l2r?1.0:0.0) }; 
+		}
+		var leftEndTs  = drawConnectingElements( leftElements, true );
+		var rightEndTs = drawConnectingElements( rightElements, false );
+
+		//var leftVec = new Vector( line.vertAt(leftEndTs.first), line.vertAt(leftEndTs.last) );
+		//var rightVec = new Vector( line.vertAt(rightEndTs.first), line.vertAt(rightEndTs.last) );
+		//pb.draw.line( leftVec.a, leftVec.b, 'red', 3 );
+		//pb.draw.line( rightVec.a, rightVec.b, 'orange', 3 );
+	    };
 	    
 
 	    // +---------------------------------------------------------------------------------
@@ -105,7 +189,6 @@
 		// | each vertex change.
 		// +-------------------------------
 		var update = function() {
-		    // console.log('update');
 		    intersection.set( line.vertAt(line.getClosestT(point)) );
 		    perpendicular.a.set( point );
 		    perpendicular.b.set( intersection );

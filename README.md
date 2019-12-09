@@ -157,133 +157,170 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 
 ## Initialization parameters
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `canvas`| _HTMLCamvasElement_ | `null` | The canvas (must not be null). |
+| `fullsize | _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
+| `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
+| `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
+| `scaleY`| _number_ | `1.0` | The initial vertical zoom. Default is 1.0. |
+| `offsetX`| | | |
+| `offsetY`| | | |
+| `drawGrid`| | | |
+| `rasterGrid`| | | |
+| `rasterAdjustFactor`| | | |
+| `drawOrigin`| | | |
+| `autoAdjustOffset`| | | |
+| `offsetAdjustXPercent`| | | |
+| `offsetAdjustYPercent`| | | |
+| `defaultCanvasWidth`| | | |
+| `defaultCanvasHeight`| | | |
+| `canvasWidthFactor`| | | |
+| `canvasHeightFactor`| | | |
+| `cssScaleX`| | | |
+| `cssScaleY`| | | |
+| `cssUniformScale`| | | |
+| `backgroundColor`| | | |
+| `redrawOnResize`| | | |
+| `drawBezierHandleLines`| | | |
+| `drawBezierHandlePoints`| | | |
+| `preClear`| | | |
+| `preDraw`| | | |
+| `postDraw`| | | |
+| `enableMouse`| | | |
+| `enableTouch`| | | |
+| `enableKeys`| | | |
+| `enableMouseWheel`| | | |
+| `enableGL`| | | |
+
+
 ~~~javascript
  var pb = new PlotBoilerplate( {
-    // HTMLElement
-    //   Your canvas element in the DOM (required).
-    canvas			: document.getElementById('my-canvas'),
+  // HTMLElement
+  //   Your canvas element in the DOM (required).
+  canvas			: document.getElementById('my-canvas'),
 
-    // boolean
-    //   If set to true the canvas will gain full window size.
-    fullSize              	: true,
+  // boolean
+  //   If set to true the canvas will gain full window size.
+  fullSize              	: true,
 
-    // boolean
-    //   If set to true the canvas will gain the size of its parent
-    //   container.
-    // @overrides fullSize
-    fitToParent           	: true,
+  // boolean
+  //   If set to true the canvas will gain the size of its parent
+  //   container.
+  // @overrides fullSize
+  fitToParent           	: true,
 
-    // float
-    //   The initial zoom. Default is 1.0.
-    scaleX                	: 1.0,
-    scaleY                	: 1.0,
+  // float
+  //   The initial zoom. Default is 1.0.
+  scaleX                	: 1.0,
+  scaleY                	: 1.0,
 
-    // float
-    //   The initial offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
-    offsetX                	: 0.0,
-    offsetY                	: 0.0,
+  // float
+  //   The initial offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
+  offsetX                	: 0.0,
+  offsetY                	: 0.0,
 
-    // Specifies if the raster should be drawn.
-    drawGrid                : true,
+  // Specifies if the raster should be drawn.
+  drawGrid                : true,
 
-    // If set to true the background grid will be drawn rastered.
-    rasterGrid              : true,
+  // If set to true the background grid will be drawn rastered.
+  rasterGrid              : true,
 
-    // float
-    //    The exponential limit for wrapping down the grid.
-    //    (2.0 means: halve the grid each 2.0*n zoom step).
-    rasterAdjustFactor    	: 2.0,
+  // float
+  //    The exponential limit for wrapping down the grid.
+  //    (2.0 means: halve the grid each 2.0*n zoom step).
+  rasterAdjustFactor    	: 2.0,
 
-    // Draw a crosshair at (0,0).
-    drawOrigin              : false,
+  // Draw a crosshair at (0,0).
+  drawOrigin              : false,
 
-    // boolean
-    //   When set to true then the origin of the XY plane will
-    //   be re-adjusted automatically (see the params
-    //    offsetAdjust{X,Y}Percent for more).
-    autoAdjustOffset      	: true,
-    // float
-    //   The x- and y- fallback position for the origin after
-    //   resizing the canvas.
-    offsetAdjustXPercent  	: 50,
-    offsetAdjustYPercent  	: 50,
+  // boolean
+  //   When set to true then the origin of the XY plane will
+  //   be re-adjusted automatically (see the params
+  //    offsetAdjust{X,Y}Percent for more).
+  autoAdjustOffset      	: true,
+  // float
+  //   The x- and y- fallback position for the origin after
+  //   resizing the canvas.
+  offsetAdjustXPercent  	: 50,
+  offsetAdjustYPercent  	: 50,
 
-    // int
-    //   The canvas size fallback if no automatic resizing
-    //   is switched on.
-    defaultCanvasWidth    	: 1024,
-    defaultCanvasHeight   	: 768,
+  // int
+  //   The canvas size fallback if no automatic resizing
+  //   is switched on.
+  defaultCanvasWidth    	: 1024,
+  defaultCanvasHeight   	: 768,
 
-    // float
-    //   Two scaling factors (width and height) upon the canvas size.
-    //   In combination with cssScale{X,Y} this can be used to obtain
-    //   sub pixel resolutions for retina displays.
-    canvasWidthFactor     	: 1.0,
-    canvasHeightFactor    	: 1.0,
+  // float
+  //   Two scaling factors (width and height) upon the canvas size.
+  //   In combination with cssScale{X,Y} this can be used to obtain
+  //   sub pixel resolutions for retina displays.
+  canvasWidthFactor     	: 1.0,
+  canvasHeightFactor    	: 1.0,
 
-    // float
-    //   Visually resize the canvas using CSS transforms (scale).
-    cssScaleX	       	: 1.0,
-    cssScaleY	       	: 1.0,
+  // float
+  //   Visually resize the canvas using CSS transforms (scale).
+  cssScaleX	       	: 1.0,
+  cssScaleY	       	: 1.0,
 
-    // boolean
-    //   If set to true only cssScaleX applies for both dimensions.
-    cssUniformScale         : true,
+  // boolean
+  //   If set to true only cssScaleX applies for both dimensions.
+  cssUniformScale         : true,
 
-    // string
-    //   A background color (CSS string) for the canvas.
-    backgroundColor       	: '#ffffff',
+  // string
+  //   A background color (CSS string) for the canvas.
+  backgroundColor       	: '#ffffff',
 
-    // boolean
-    //   Switch auto-redrawing on resize on/off (some applications
-    //   might want to prevent automatic redrawing to avoid data
-    //   loss from the drae buffer).
-    redrawOnResize        	: true,
+  // boolean
+  //   Switch auto-redrawing on resize on/off (some applications
+  //   might want to prevent automatic redrawing to avoid data
+  //   loss from the drae buffer).
+  redrawOnResize        	: true,
 
-    // boolean
-    //   Indicates if Bézier curve handles should be drawn (used for
-    //   editors, no required in pure visualizations).
-    drawBezierHandleLines 	: true,
+  // boolean
+  //   Indicates if Bézier curve handles should be drawn (used for
+  //   editors, no required in pure visualizations).
+  drawBezierHandleLines 	: true,
 
-    // boolean
-    //   Indicates if Bézier curve handle points should be drawn.
-    drawBezierHandlePoints 	: true,
+  // boolean
+  //   Indicates if Bézier curve handle points should be drawn.
+  drawBezierHandlePoints 	: true,
 
-    // function
-    //   A callback function that will be triggered just before the
-    //   draw function clears the canvas (before anything else was drawn).
-    preClear              	: function() { console.log('before clearing the canvas on redraw.'); },
+  // function
+  //   A callback function that will be triggered just before the
+  //   draw function clears the canvas (before anything else was drawn).
+  preClear              	: function() { console.log('before clearing the canvas on redraw.'); },
 	
-    // function
-    //   A callback function that will be triggered just before the
-    //   draw function starts.
-    preDraw               	: function() { console.log('before clearing and before drawing.'); },
+  // function
+  //   A callback function that will be triggered just before the
+  //   draw function starts.
+  preDraw               	: function() { console.log('before clearing and before drawing.'); },
 
-    // function
-    //   A callback function that will be triggered right after the
-    //   drawing process finished.
-    postDraw              	: function() { console.log('after drawing.'); },
+  // function
+  //   A callback function that will be triggered right after the
+  //   drawing process finished.
+  postDraw              	: function() { console.log('after drawing.'); },
 
-    // boolean
-    //   Indicates if the application should handle mouse events for you.
-    enableMouse           	: true,
+  // boolean
+  //   Indicates if the application should handle mouse events for you.
 
-    // boolean
-    //   Indicates if the application should handle touch events for you.
-    enableTouch           	: true,
+  enableMouse           	: true,
+  // boolean
+  //   Indicates if the application should handle touch events for you.
+  enableTouch           	: true,
 
-    // boolean
-    //   Indicates if the application should handle key events for you.
-    enableKeys            	: true,
+  // boolean
+  //   Indicates if the application should handle key events for you.
+  enableKeys            	: true,
 
-    // boolean
-    //   Indicates if the application should handle mouse wheelevents for you.
-    enableMouseWheel            : true,
+  // boolean
+  //   Indicates if the application should handle mouse wheelevents for you.
+  enableMouseWheel            : true,
 
-    // boolean
-    //   Indicates if the application should use the experimental WebGL features.
-    enableGL                    : false
-  } );
+  // boolean
+  //   Indicates if the application should use the experimental WebGL features.
+  enableGL                    : false
+ } );
 ~~~					  
 
 
@@ -291,60 +328,60 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ## Events
 The Vertex class has basic drag event support:
 ~~~javascript
-   var vert = new Vertex(100,100);
-   vert.listeners.addDragListener( function(e) {
+ var vert = new Vertex(100,100);
+ vert.listeners.addDragListener( function(e) {
    // e is of type Event.
    // You are encouraged to use the values in the object e.params
    console.log( 'vertex was dragged by: ',
-   		'x='+e.params.dragAmount.x,
-		'y='+e.params.dragAmount.y );
-	} );
+   	        'x='+e.params.dragAmount.x,
+	        'y='+e.params.dragAmount.y );
+ } );
 ~~~
 
 
 
 ### The e.params object
 ~~~javascript
-   {
-      // The canvas that fired the event.
-      element : [HTMLElement],
-      
-      // The event name.
-      //   Default: 'drag'
-      name : string,
+ {
+  // The canvas that fired the event.
+  element : [HTMLElement],
+    
+  // The event name.
+  //   Default: 'drag'
+  name : string,
 
-      // The current drag position.
-      pos : { x : Number, y : Number },
+  // The current drag position.
+  pos : { x : Number, y : Number },
 
-      // A mouse button indicator (if mouse event).
-      //    0=left, 1=middle, 2=right
-      button : Number,
+  // A mouse button indicator (if mouse event).
+  //    0=left, 1=middle, 2=right
+  button : Number,
 
-      // A flag indicating if event comes from left mouse button.
-      leftButton : boolean,
+  // A flag indicating if event comes from left mouse button.
+  leftButton : boolean,
 
-      // A flag indicating if event comes from middle mouse button.
-      middleButton : boolean,
+  // A flag indicating if event comes from middle mouse button.
+  middleButton : boolean,
 
-      // A flag indicating if event comes from right mouse button.
-      rightButton : boolean,
+  // A flag indicating if event comes from right mouse button.
+  rightButton : boolean,
 
-      // A mouse-down-position: position where the dragging
-      //   started. This will not change during one drag process.
-      mouseDownPos : { x : Number, y : Number },
+  // A mouse-down-position: position where the dragging
+  //   started. This will not change during one drag process.
+  mouseDownPos : { x : Number, y : Number },
 
-      // The most recent drag position (position before
-      //   current drag step).
-      draggedFrom : { x : Number, y : Number },
+  // The most recent drag position (position before
+  //   current drag step).
+  draggedFrom : { x : Number, y : Number },
 
-      // True if this is a drag event (nothing else possible at the moment).
-      wasDragged : boolean,
+  // True if this is a drag event (nothing else possible at the moment).
+  wasDragged : boolean,
 
-      // The x-y-amount of the current drag step.
-      //   This is the difference between the recent drag step
-      //   and the actual drag position.
-      dragAmount : { x : Number, y : Number }
-   }
+  // The x-y-amount of the current drag step.
+  //   This is the difference between the recent drag step
+  //   and the actual drag position.
+  dragAmount : { x : Number, y : Number }
+ }
 ~~~
 
 
@@ -406,7 +443,10 @@ from the sources code files in ./src/*.
  * [Partially done] Add control button: set to retina resolution (size factors and css scale).
  * Add a demo that draws a proper mathematical xy-grid.
  * Switching browser tabs back and forth sometimes locks the Ctrl-Key. Check that.
- * Add a pre-publish check if there are unstaged changes.
+ * [NPM/Bash] Add a pre-publish check if there are unstaged changes.
+ * [Readme] Add params as table.
+ * The intersection points in the line-point-distance demo are draggable. Why?
+ * Move the helper function triangle.pointIsInTriangle()...pointIsInTriangle() should be in a utils wrapper somewhere.
 
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.

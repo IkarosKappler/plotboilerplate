@@ -8,7 +8,8 @@
  * @date     2018-04-11
  * @modified 2018-05-04 Added the 'sharedVertex' param to the constructor. Extended open cells into 'infinity'.
  * @modified 2019-10-25 Fixed a serious bug in the toPathArray function; cell with only one vertex (extreme cases) returned invalid arrays which broke the rendering. 
- * @version  1.0.1
+ * @modified 2019-12-09 Removed an unnecesary if-condition from the _calculateOpenEdgePoint(...) helper function.
+ * @version  1.0.2
  **/
 
 (function(context) {
@@ -108,12 +109,16 @@
 	var edgePoint = _findOuterEdgePoint( tri, neigh, sharedVertex );
 	var perpendicular = _perpendicularLinePoint( sharedVertex, edgePoint, center );
 	var openEdgePoint = null;
-	if( new Triangle(sharedVertex,center,edgePoint).determinant() <= 0 ) 
+	/* if( new Triangle(sharedVertex,center,edgePoint).determinant() <= 0 ) 
 	    openEdgePoint = new Vertex( perpendicular.x + (center.x-perpendicular.x)*1000,
 					perpendicular.y + (center.y-perpendicular.y)*1000 );
 	else
 	    openEdgePoint = new Vertex( perpendicular.x + (perpendicular.x-center.x)*1000,
 					perpendicular.y + (perpendicular.y-center.y)*1000 );
+	*/
+	// It is not necesary to make a difference on the determinant here
+	openEdgePoint = new Vertex( perpendicular.x + (center.x-perpendicular.x)*1000,
+				    perpendicular.y + (center.y-perpendicular.y)*1000 );
 	return openEdgePoint;
     };
     

@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2019-12-09
+  * Fixed the Triangle.determinant() function. The calculation was just wrong.
+  * Removed an unnecesary if-condition from the VoronoiCell._calculateOpenEdgePoint(...) helper function.
+  * Extended the line-point-distance demo with some toy features.
 * 2019-12-08 (1.6.3)
   * Fixed a css scale bug in the viewport() function.
   * Added the drawconfig UI panel (line colors and line widths).

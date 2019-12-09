@@ -16,7 +16,8 @@
  * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
  * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
  * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
- * @version   2.0.4
+ * @modified  2019-12-09 Fixed the determinant() function. The calculation was just wrong.
+ * @version   2.0.5
  *
  * @file Triangle
  * @public
@@ -221,7 +222,11 @@
      * @return {Number} - The determinant (float).
      */
     Triangle.prototype.determinant = function() {
-	return this.b.x*this.b.y* 0.5 * ( - this.b.x*this.a.y - this.a.x*this.b.y - this.b.x*this.c.y + this.c.x*this.a.y + this.a.x*this.c.y );
+	// This is wrong.
+	// return this.b.x*this.b.y* 0.5 * ( - this.b.x*this.a.y - this.a.x*this.b.y - this.b.x*this.c.y + this.c.x*this.a.y + this.a.x*this.c.y );
+	// This is correct:
+	// (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
+	return (this.b.y - this.a.y)*(this.c.x - this.b.x) - (this.c.y - this.b.y)*(this.b.x - this.a.x);
     };
 
     
@@ -303,3 +308,4 @@
     // END Triangle
 
 })( window ? window : module.export );
+

@@ -7,6 +7,8 @@ docs_jekyll/screenshots
 docs_jekyll/_includes/_assets
 docs_jekyll/_site/*
 docs_jekyll/.sass-cache
+docs_jekyll/docs
+docs_jekyll/docs_md
 *.lock
 package-lock.json
 .env
