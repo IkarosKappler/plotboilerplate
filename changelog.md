@@ -3,6 +3,8 @@
 # Changelog
 * 2019-12-11
   * Added the 'color' param to the draw.label(...) function.
+  * Fixed the draggable-intersection-point issue in the line-point-distance demo.
+  * Added a working bark-beetle-tunnel demo to the line-point-distance demo. There was an odering problem.
 * 2019-12-09
   * Fixed the Triangle.determinant() function. The calculation was just wrong.
   * Removed an unnecesary if-condition from the VoronoiCell._calculateOpenEdgePoint(...) helper function.

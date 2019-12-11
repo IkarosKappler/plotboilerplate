@@ -4673,7 +4673,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-11-22 Added a second workaround for th drawImage bug in Safari.
  * @modified 2019-12-07 Added the 'lineWidth' param to the line(...) function.
  * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
- * @version  1.3.2
+ * @modified 2019-12-11 Added the 'color' param to the label(...) function.
+ * @version  1.4.0
  **/
 
 (function(_context) {
@@ -5346,42 +5347,47 @@ Object.extendClass = function( superClass, subClass ) {
 
     
     // THIS FUNCTION IS CURRENTLY NOT IN USE
-    // TODO: make text scaling with zoom?
     /*
-    _context.drawutils.prototype.text = function( text, x, y ) { // , options ) {
-	//options = options || {};
+    _context.drawutils.prototype.text = function( text, x, y, options ) {
+	options = options || {};
+	//this.ctx.save();
+	x = this.offset.x+x*this.scale.x;
+	y = this.offset.y+y*this.scale.y;
+	var color = options.color || 'black';
 	if( this.fillShapes ) {
-	    this.ctx.fillStyle = 'black';
+	    this.ctx.fillStyle = color;
 	    this.ctx.fillText( text, x, y );
 	} else {
-	    this.ctx.strokeStyle = 'black';
+	    this.ctx.strokeStyle = color;
 	    this.ctx.strokeText( text, x, y );
 	}
+	//this.ctx.restore();
     };
     */
+    
 
 
     /**
      * Draw a non-scaling text label at the given position.
+     *
+     * Note that these are absolute label positions, they are not affected by offset or scale.
      *
      * @method label
      * @param {string} text - The text to draw.
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {string='black'} color - The color to render the text with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    // +---------------------------------------------------------------------------------
-    // | Draw a non-scaling text label at the given position.
-    // +-------------------------------
-    _context.drawutils.prototype.label = function( text, x, y, rotation ) {
+    _context.drawutils.prototype.label = function( text, x, y, rotation, color ) {
 	this.ctx.save();
 	this.ctx.translate(x, y);
 	if( typeof rotation != 'undefined' )
 	    this.ctx.rotate(rotation);
-	this.ctx.fillStyle = 'black';
+	this.ctx.fillStyle = color || 'black';
 	if( this.fillShapes ) {
 	    this.ctx.fillText( text, 0,0); 
 	} else {

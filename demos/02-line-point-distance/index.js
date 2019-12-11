@@ -189,7 +189,7 @@
 		perpendicular.b.attr.selectable = perpendicular.b.attr.draggable = false;
 		pb.add( perpendicular );
 		var intersection = randomVertex();
-		intersection.attr.selectable = perpendicular.a.attr.draggable = false;
+		intersection.attr.selectable = intersection.attr.draggable = false;
 		pb.add( intersection );
 
 
