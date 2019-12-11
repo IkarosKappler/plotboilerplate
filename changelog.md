@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2019-12-11
+  * Added the 'color' param to the draw.label(...) function.
 * 2019-12-09
   * Fixed the Triangle.determinant() function. The calculation was just wrong.
   * Removed an unnecesary if-condition from the VoronoiCell._calculateOpenEdgePoint(...) helper function.

@@ -164,34 +164,34 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
 | `scaleY`| _number_ | `1.0` | The initial vertical zoom. Default is 1.0. |
-| `offsetX`| | | |
-| `offsetY`| | | |
-| `drawGrid`| | | |
-| `rasterGrid`| | | |
-| `rasterAdjustFactor`| | | |
-| `drawOrigin`| | | |
-| `autoAdjustOffset`| | | |
-| `offsetAdjustXPercent`| | | |
-| `offsetAdjustYPercent`| | | |
-| `defaultCanvasWidth`| | | |
-| `defaultCanvasHeight`| | | |
-| `canvasWidthFactor`| | | |
-| `canvasHeightFactor`| | | |
-| `cssScaleX`| | | |
-| `cssScaleY`| | | |
-| `cssUniformScale`| | | |
-| `backgroundColor`| | | |
-| `redrawOnResize`| | | |
-| `drawBezierHandleLines`| | | |
-| `drawBezierHandlePoints`| | | |
-| `preClear`| | | |
-| `preDraw`| | | |
-| `postDraw`| | | |
-| `enableMouse`| | | |
-| `enableTouch`| | | |
-| `enableKeys`| | | |
-| `enableMouseWheel`| | | |
-| `enableGL`| | | |
+| `offsetX`| _number_ | `0.0` | The initial offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values. |
+| `offsetY`| _number_ | `0.0`| The initial offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values. |
+| `drawGrid`| _boolean_ | `true` |  Specifies if the raster should be drawn. |
+| `rasterGrid`| _boolean_ | `true` | If set to true the background grid will be drawn rastered. |
+| `rasterAdjustFactor`| _number_ | `2.0` | The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step). |
+| `drawOrigin`| _boolean_ | `false` | Draw a crosshair at (0,0). |
+| `autoAdjustOffset`| _boolean_ | `true` | When set to true then the origin of the XY plane will be re-adjusted automatically (see the params offsetAdjust{X,Y}Percent for more). |
+| `offsetAdjustXPercent`| _number_ | `50` | The x- and y- fallback position for the origin after resizing the canvas. |
+| `offsetAdjustYPercent`| _number_ | `50` | The x- and y- fallback position for the origin after resizing the canvas. |
+| `defaultCanvasWidth`| _number_ | `1024`| The canvas size fallback if no automatic resizing is switched on. |
+| `defaultCanvasHeight`| _number_ | `768` | The canvas size fallback if no automatic resizing is switched on. |
+| `canvasWidthFactor`| _number_ | `1.0` | Two scaling factors (width and height) upon the canvas size. In combination with cssScale{X,Y} this can be used to obtain sub pixel resolutions for retina displays. |
+| `canvasHeightFactor`| _number_ | `1.0` | Two scaling factors (width and height) upon the canvas size. In combination with cssScale{X,Y} this can be used to obtain sub pixel resolutions for retina displays. |
+| `cssScaleX`| _number_ | `1.0` | Visually resize the canvas using CSS transforms (scale x). |
+| `cssScaleY`| _number_ | `1.0` | Visually resize the canvas using CSS transforms (scale y). |
+| `cssUniformScale`| _boolean_ | `1.0` |  If set to true only cssScaleX applies for both dimensions. |
+| `backgroundColor`| _string_ | `#ffffff` | A background color (CSS string) for the canvas. |
+| `redrawOnResize`| _boolean_ | `true` | Switch auto-redrawing on resize on/off (some applications might want to prevent automatic redrawing to avoid data loss from the drae buffer).|
+| `drawBezierHandleLines`| _boolean_ | `true` | Indicates if Bézier curve handle points should be drawn. |
+| `drawBezierHandlePoints`| _boolean_ | `true` | Indicates if Bézier curve handle points should be drawn. |
+| `preClear`| _function_ | `null` | A callback function that will be triggered just before the draw function clears the canvas (before anything else was drawn).|
+| `preDraw`| _function_| `null` | A callback function that will be triggered just before the draw function starts. |
+| `postDraw`| _function_| `null` | A callback function that will be triggered right after the drawing process finished.|
+| `enableMouse`| _boolean_ | `true` | Indicates if the application should handle touch events for you. |
+| `enableTouch`| _boolean_ | `true` | Indicates if the application should handle touch events for you. |
+| `enableKeys`| _boolean_ | `true` | Indicates if the application should handle key events for you. |
+| `enableMouseWheel`| _boolean_ | `true` | Indicates if the application should handle mouse wheelevents for you. |
+| `enableGL`| _boolean_ | `false` | [Experimental] Indicates if the application should use the experimental WebGL features. |
 
 
 ~~~javascript
@@ -419,6 +419,7 @@ from the sources code files in ./src/*.
 
 
 ## Todos
+ * Use a sorted map in the line-point-distance demo.
  * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
  * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
  * Include Touchy.js as a package dependency.

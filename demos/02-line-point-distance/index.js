@@ -48,15 +48,19 @@
 		    }, GUP
 		)
 	    );
+	    
 
 	    // +---------------------------------------------------------------------------------
-	    // | Initialize dat.gui
+	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
-	    pb.createGUI(); 
-	    // END init dat.gui
+	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
+		showBarkBeetleTunnels       : false
+	    }, GUP );
 
 
-	    pb.config.postDraw = function() { 
+	    pb.config.postDraw = function() {
+		if( !config.showBarkBeetleTunnels )
+		    return;
 		let _line = null;
 		let pdist = 10;
 		let leftElements = {};
@@ -64,7 +68,6 @@
 		var t = -10000;
 		var minT = Number.MAX_VALUE;
 		var maxT = Number.MIN_VALUE;
-		//leftElements[ t+'_l'+'_-1' ] = { t : t, tri : new Triangle(line.a, line.a, line.a) };
 		for( var i in pb.drawables ) { 
 		    if( !(pb.drawables[i] instanceof Line ) )
 			continue;
@@ -87,10 +90,6 @@
 		    let tipHandleA = perpEnd.clone().setLength( 2*pdist );
 		    
 
-		    //pb.draw.circle( tipVec.b, 3 );
-		    //pb.draw.circle( tipPerp.b, 2, 'red' );
-		    //pb.draw.circle( tipHandleA.b, 2, 'green' );
-
 		    pb.draw.cubicBezier( perpEnd.b, tipVec.b, tipHandleA.b, tipPerp.b, 'grey' );
 		    pb.draw.cubicBezier( perpEnd.clone().inv().b, tipVec.b, tipHandleA.clone().inv().b, tipPerp.clone().inv().b, 'grey' );
 
@@ -99,8 +98,7 @@
 		    
 		    let det = new Triangle(line.a, line.b, _line.a).determinant();
 		    pb.fill.polyline( [tri.a, tri.b, tri.c], false, det<0 ? 'rgba(0,255,0,0.5)' : 'rgba(255,0,255,0.5)' );
-		    // console.log( det );
-		    // elements.push( [ t+'_'+(det<0?'l':'r')+'_'+elements.length, { t : t, det : det, tri : tri, line : _line  } ] );
+		    
 		    if( det<0 ) leftElements[ t ]  = { t : t, tri : tri };
 		    else        rightElements[ t ] = { t : t, tri : tri };
 
@@ -108,10 +106,20 @@
 		    maxT = Math.max( maxT, t );
 		}
 
+		
 		var drawConnectingElements = function( elements, l2r ) {
-		    var keys = Object.keys(elements).sort();
+		    // This is really bad code: converting the object keys to numbers
+		    // because I know they represent numbers.
+		    // Better: use a real sorted map here.
+		    var keys = Object.keys(elements).sort(
+			function(a,b) {
+			    // Here we know that the keys represent floats!
+			    return parseFloat(a) > parseFloat(b);
+			}
+		    );
 		    if( !l2r ) keys = keys.reverse();
 		    //console.log( l2r?'l2r':'non-ltr', keys );
+		    
 		    var firstKey = null;
 		    var lastKey = null;
 		    var last = null;
@@ -124,6 +132,7 @@
 			} else {
 			    firstKey = keys[k];
 			}
+			//pb.fill.text( (l2r?'l':'r')+k+'['+next.t+']', next.tri.c.x, next.tri.c.y, { color : 'black' } );
 			last = next;
 			lastKey = keys[k];
 		    }
@@ -201,6 +210,16 @@
 	    }
 	    for( var i = 0; i < 7; i++ ) {
 		newPerp(line);
+	    }
+
+
+
+	    // +---------------------------------------------------------------------------------
+	    // | Initialize dat.gui
+	    // +-------------------------------
+            {
+		var gui = pb.createGUI(); 
+		gui.add(config, 'showBarkBeetleTunnels').onChange( function() { pb.redraw(); } ).title("Show bark beetle tunnels :)");
 	    }
 
 	} );
