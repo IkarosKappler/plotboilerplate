@@ -54,6 +54,7 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
+		pointCount                  : 7,
 		showBarkBeetleTunnels       : false
 	    }, GUP );
 
@@ -97,7 +98,7 @@
 		    var tri = new Triangle( perpStart.b, perpStart.clone().inv().b, _line.b ); // vec.b );
 		    
 		    let det = new Triangle(line.a, line.b, _line.a).determinant();
-		    pb.fill.polyline( [tri.a, tri.b, tri.c], false, det<0 ? 'rgba(0,255,0,0.5)' : 'rgba(255,0,255,0.5)' );
+		    pb.fill.polyline( [tri.a, tri.b, tri.c], false, det<0 ? 'rgba(0,255,0,0.35)' : 'rgba(255,0,255,0.35)' );
 		    
 		    if( det<0 ) leftElements[ t ]  = { t : t, tri : tri };
 		    else        rightElements[ t ] = { t : t, tri : tri };
@@ -118,13 +119,11 @@
 			}
 		    );
 		    if( !l2r ) keys = keys.reverse();
-		    //console.log( l2r?'l2r':'non-ltr', keys );
 		    
 		    var firstKey = null;
 		    var lastKey = null;
 		    var last = null;
 		    for( var k = 0; k < keys.length; k++ ) {
-			// console.log( 'key'+k, keys[k] );
 			var next = elements[ keys[k] ];
 			if( last != null ) {
 			    if( l2r ) pb.draw.line( last.tri.b, next.tri.a, 'grey', 2 );
@@ -132,7 +131,6 @@
 			} else {
 			    firstKey = keys[k];
 			}
-			//pb.fill.text( (l2r?'l':'r')+k+'['+next.t+']', next.tri.c.x, next.tri.c.y, { color : 'black' } );
 			last = next;
 			lastKey = keys[k];
 		    }
@@ -208,7 +206,7 @@
 		point.listeners.addDragListener( function() { update(); } );
 		update();
 	    }
-	    for( var i = 0; i < 7; i++ ) {
+	    for( var i = 0; i < config.pointCount; i++ ) {
 		newPerp(line);
 	    }
 
