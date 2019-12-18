@@ -1,5 +1,14 @@
 #!/bin/bash
 
+while true; do
+    read -p "Do you really want to publish the new version? Did you run webpack? Did you run Jekyll? (y/n)? " yn
+    case $yn in
+        [Yy]* ) echo "Failsafe."; break;;
+        [Nn]* ) break;; #exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
 echo "Compile ..."
 npm run webpack
 [ $? -eq 0 ]  || exit 1

@@ -161,6 +161,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _PlotBoilerplate_js__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(_PlotBoilerplate_js__WEBPACK_IMPORTED_MODULE_16__);
 /* harmony import */ var _PlotBoilerplate_RectSelector_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(20);
 /* harmony import */ var _PlotBoilerplate_RectSelector_js__WEBPACK_IMPORTED_MODULE_17___default = /*#__PURE__*/__webpack_require__.n(_PlotBoilerplate_RectSelector_js__WEBPACK_IMPORTED_MODULE_17__);
+/* Imports for webpack */
 
 
 
@@ -982,7 +983,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-09-02 Added the Line.denominator( Line ) function.
  * @modified 2019-09-02 Added the Line.colinear( Line ) function.
  * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
- * @version  2.0.4
+ * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
+ * @version  2.1.0
  *
  * @file Line
  * @public
@@ -1103,6 +1105,23 @@ Object.extendClass = function( superClass, subClass ) {
     Line.prototype.scale = function( factor ) {
 	this.b.set( this.a.x + (this.b.x-this.a.x)*factor,
 		    this.a.y + (this.b.y-this.a.y)*factor );
+	return this;
+    };
+
+
+    /**
+     * Move this line to a new location.
+     *
+     * @method moveTo
+     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @return {Line} this
+     * @instance
+     * @memberof Line
+     **/
+    Line.prototype.moveTo = function( newA ) {
+	let diff = this.a.difference( newA );
+	this.a.add( diff );
+	this.b.add( diff );
 	return this;
     };
 
@@ -1345,7 +1364,7 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-09-02 Added the Vector.perp() function.
  * @modified 2019-09-02 Added the Vector.inverse() function.
  * @modified 2019-12-04 Added the Vector.inv() function.
- * @version  1.1.0
+ * @version  1.2.0
  *
  * @file Vector
  * @public
@@ -1394,6 +1413,7 @@ Object.extendClass = function( superClass, subClass ) {
 	this.b = tmp;
 	return this;
     };
+    
 
     /**
      * This function computes the inverse of the vector, which means a stays untouched.
@@ -4722,7 +4742,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-07 Added the 'lineWidth' param to the line(...) function.
  * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
  * @modified 2019-12-11 Added the 'color' param to the label(...) function.
- * @version  1.4.0
+ * @modified 2019-12-18 Added the quadraticBezier(...) function (for the sake of approximating Lissajous curves).
+ * @version  1.5.0
  **/
 
 (function(_context) {
@@ -4882,6 +4903,34 @@ Object.extendClass = function( superClass, subClass ) {
 	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
+	//this.ctx.closePath();
+	this.ctx.lineWidth = lineWidth || 2;
+	this._fillOrDraw( color );
+	this.ctx.restore();
+    };
+
+
+    
+    /**
+     * Draw the given (quadratic) bézier curve.
+     *
+     * @method quadraticBezier
+     * @param {Vertex} startPoint   - The start point of the cubic Bézier curve
+     * @param {Vertex} controlPoint - The control point the cubic Bézier curve.
+     * @param {Vertex} endPoint     - The end control point the cubic Bézier curve.
+     * @param {string} color        - The CSS color to draw the curve with.
+     * @param {number|string} lineWidth - (optional) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    _context.drawutils.prototype.quadraticBezier = function( startPoint, controlPoint, endPoint, color, lineWidth ) {
+	// Draw curve
+	this.ctx.save();
+	this.ctx.beginPath();
+	this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
+	this.ctx.quadraticCurveTo( this.offset.x+controlPoint.x*this.scale.x, this.offset.y+controlPoint.y*this.scale.y,
+				   this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
 	//this.ctx.closePath();
 	this.ctx.lineWidth = lineWidth || 2;
 	this._fillOrDraw( color );
