@@ -136,21 +136,21 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Simple tweening animation using the GSAP library
 
-![Simple Tweening Animation](screenshots/screenshot-20191202-simple-gsap-animation.png "Simple Tweening Animation")
+![Simple Tweening Animation](screenshots/screenshot-20191218-tweenmax-bezier-animation.png "Simple Tweening Animation")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/10-bezier-animation-gsap/index.html" title="See the demo">See the demo</a>
 
 
 ### Perpendiculars of a Bézier path
 
-![Perpendiculars of a Bézier path](screenshots/screenshot-20191204-bezier-path-with-perpendiculars.png "Perpendiculars of a Bézier path")
+![Perpendiculars of a Bézier path](screenshots/screenshot-20191218-tweenmax-bezier-animation.png "Perpendiculars of a Bézier path")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
 
 
 ### Tracing a cubic Bézier spline (finding the tangent values for each vertex)
 
-![Tracing a cubic Bézier spline](screenshots/screenshot-20191208-bezier-path-tangent-tracing.png "Tracing a cubic Bézier spline")
+![Tracing a cubic Bézier spline](screenshots/screenshot-20191218-tracing-bsplines.png "Tracing a cubic Bézier spline")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/12-trace-bspline/index.html" title="See the demo">See the demo</a>
 
@@ -448,6 +448,7 @@ from the sources code files in ./src/*.
  * [Readme] Add params as table.
  * The intersection points in the line-point-distance demo are draggable. Why?
  * Move the helper function triangle.pointIsInTriangle()...pointIsInTriangle() should be in a utils wrapper somewhere.
+ * Add a demo: Lissajous-Curves (direct and Bézier approximation).
 
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
@@ -470,9 +471,10 @@ from the sources code files in ./src/*.
 
 
 ## Known bugs
- * Vertex rotation is faulty (angle=0 is wrong somehow, see the polygon).
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
  * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
+ * The BBTree.iterator() fails if the tree is empty! (Demos)
+ * The minifid BBTree and BBTreeCollection files do not export anything. The un-minified to. Why that?
  * Currently no more known. Please report bugs.
 
 

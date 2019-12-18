@@ -7,27 +7,8 @@ const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 module.exports = [
     {
         entry: [
-	'./src/extend.js',    
-        './src/VertexAttr.js',
-        './src/VertexListeners.js',
-        './src/Vertex.js',
-    	'./src/Grid.js',
-	'./src/Line.js',
-	'./src/Vector.js',
-    	'./src/CubicBezierCurve.js',
-    	'./src/BezierPath.js',
-    	'./src/Polygon.js',
-	'./src/Triangle.js',
-    	'./src/VEllipse.js',
-	'./src/PBImage.js',
-
-        './src/MouseHandler.js',
-    	'./src/KeyHandler.js',
-        './src/draw.js',
-
-        './src/PlotBoilerplate.js',
-	'./src/PlotBoilerplate.RectSelector.js'
-        ],
+	    './src/entry.js'
+	],
         output: {
             path: path.resolve(__dirname, 'dist'),
             filename: 'plotboilerplate.min.js'
@@ -96,13 +77,14 @@ new ConcatPlugin({
     outputPath: 'lib/',
     //fileName: '[name].[hash:8].js',
     fileName: '[name].js',
-    filesToConcat: [ './lib/humane.min.js',
-       './lib/dat.gui.min.js',
-       './lib/dat.gui.title.polyfill.js',
-       './lib/FileSaver.min.js',
-       './lib/Color.js',
-       './lib/Touchy.min.js'
-     ],
+    filesToConcat: [
+	'./lib/humane.min.js',
+	'./lib/dat.gui.min.js',
+	'./lib/dat.gui.title.polyfill.js',
+	'./lib/FileSaver.min.js',
+	'./lib/Color.js',
+	'./lib/Touchy.min.js'
+    ],
     attributes: {
         async: false
     }

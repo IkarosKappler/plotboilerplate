@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2019-12-15
+  * Added the Line.moveTo(Vertex) fucnction.
 * 2019-12-11
   * Added the 'color' param to the draw.label(...) function.
   * Fixed the draggable-intersection-point issue in the line-point-distance demo.
