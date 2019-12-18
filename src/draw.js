@@ -24,7 +24,8 @@
  * @modified 2019-12-07 Added the 'lineWidth' param to the line(...) function.
  * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
  * @modified 2019-12-11 Added the 'color' param to the label(...) function.
- * @version  1.4.0
+ * @modified 2019-12-18 Added the quadraticBezier(...) function (for the sake of approximating Lissajous curves).
+ * @version  1.5.0
  **/
 
 (function(_context) {
@@ -184,6 +185,34 @@
 	this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
 				this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
 				this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
+	//this.ctx.closePath();
+	this.ctx.lineWidth = lineWidth || 2;
+	this._fillOrDraw( color );
+	this.ctx.restore();
+    };
+
+
+    
+    /**
+     * Draw the given (quadratic) bézier curve.
+     *
+     * @method quadraticBezier
+     * @param {Vertex} startPoint   - The start point of the cubic Bézier curve
+     * @param {Vertex} controlPoint - The control point the cubic Bézier curve.
+     * @param {Vertex} endPoint     - The end control point the cubic Bézier curve.
+     * @param {string} color        - The CSS color to draw the curve with.
+     * @param {number|string} lineWidth - (optional) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    _context.drawutils.prototype.quadraticBezier = function( startPoint, controlPoint, endPoint, color, lineWidth ) {
+	// Draw curve
+	this.ctx.save();
+	this.ctx.beginPath();
+	this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
+	this.ctx.quadraticCurveTo( this.offset.x+controlPoint.x*this.scale.x, this.offset.y+controlPoint.y*this.scale.y,
+				   this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
 	//this.ctx.closePath();
 	this.ctx.lineWidth = lineWidth || 2;
 	this._fillOrDraw( color );

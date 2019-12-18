@@ -14,7 +14,7 @@
  * @modified 2019-09-02 Added the Vector.perp() function.
  * @modified 2019-09-02 Added the Vector.inverse() function.
  * @modified 2019-12-04 Added the Vector.inv() function.
- * @version  1.1.0
+ * @version  1.2.0
  *
  * @file Vector
  * @public
@@ -63,6 +63,7 @@
 	this.b = tmp;
 	return this;
     };
+    
 
     /**
      * This function computes the inverse of the vector, which means a stays untouched.

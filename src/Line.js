@@ -15,7 +15,8 @@
  * @modified 2019-09-02 Added the Line.denominator( Line ) function.
  * @modified 2019-09-02 Added the Line.colinear( Line ) function.
  * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
- * @version  2.0.4
+ * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
+ * @version  2.1.0
  *
  * @file Line
  * @public
@@ -136,6 +137,23 @@
     Line.prototype.scale = function( factor ) {
 	this.b.set( this.a.x + (this.b.x-this.a.x)*factor,
 		    this.a.y + (this.b.y-this.a.y)*factor );
+	return this;
+    };
+
+
+    /**
+     * Move this line to a new location.
+     *
+     * @method moveTo
+     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @return {Line} this
+     * @instance
+     * @memberof Line
+     **/
+    Line.prototype.moveTo = function( newA ) {
+	let diff = this.a.difference( newA );
+	this.a.add( diff );
+	this.b.add( diff );
 	return this;
     };
 

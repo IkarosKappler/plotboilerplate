@@ -168,8 +168,8 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ## Initialization parameters
 
-| Name | Type | Default | Description
-|:=====|:=====|:========|:===========
+| Name | Type | Default | Description |
+|---|---|---|---|
 | `canvas`| _HTMLCamvasElement_ | `null` | The canvas (must not be null). |
 | `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
@@ -203,6 +203,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 | `enableKeys`| _boolean_ | `true` | Indicates if the application should handle key events for you. |
 | `enableMouseWheel`| _boolean_ | `true` | Indicates if the application should handle mouse wheelevents for you. |
 | `enableGL`| _boolean_ | `false` | [Experimental] Indicates if the application should use the experimental WebGL features. |
+
 
 
 #### Example
