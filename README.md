@@ -94,6 +94,12 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html" title="See the demo">See the demo</a>
 
+#### This second demo draws 'bark beetle tunnels' 
+
+![Perpendiducular point-to-line distance](screenshots/screenshot-20191218-barkbeetletunnels.png "Barkbeetle demo")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html?backgroundColor=#fff&showBarkBeetleTunnels=true&pointCount=15" title="See the demo">See the demo</a>
+
 
 ### Random-scripture demo
 
