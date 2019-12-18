@@ -43,3 +43,6 @@ keep_files : [
 markdown: kramdown
 
 markdown_ext: md
+
+kramdown:
+   tables: true

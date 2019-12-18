@@ -163,10 +163,11 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 
 ## Initialization parameters
-| Name | Type | Default | Description |
-|---|---|---|---|
+
+| Name | Type | Default | Description
+|:=====|:=====|:========|:===========
 | `canvas`| _HTMLCamvasElement_ | `null` | The canvas (must not be null). |
-| `fullsize | _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
+| `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
 | `scaleY`| _number_ | `1.0` | The initial vertical zoom. Default is 1.0. |
@@ -200,6 +201,8 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 | `enableGL`| _boolean_ | `false` | [Experimental] Indicates if the application should use the experimental WebGL features. |
 
 
+
+#### Example
 ~~~javascript
  var pb = new PlotBoilerplate( {
   // HTMLElement

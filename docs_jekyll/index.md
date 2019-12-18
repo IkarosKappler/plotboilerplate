@@ -100,7 +100,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 #### This second demo draws 'bark beetle tunnels' 
 
-![Perpendiducular point-to-line distance](screenshots/screenshot-20191218-barkbeetletunnels.png "Barkbeetle demo")
+![Perpendiducular point-to-line distance](screenshots/ "Barkbeetle demo")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html?backgroundColor=#fff&showBarkBeetleTunnels=true&pointCount=15" title="See the demo">See the demo</a>
 
@@ -153,7 +153,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Perpendiculars of a Bézier path
 
-![Perpendiculars of a Bézier path](screenshots/screenshot-20191218-tweenmax-bezier-animation.png "Perpendiculars of a Bézier path")
+![Perpendiculars of a Bézier path](screenshots/screenshot-20191218-bezier-perpendiculars.png "Perpendiculars of a Bézier path")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
 
@@ -167,10 +167,11 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 
 ## Initialization parameters
-| Name | Type | Default | Description |
-|---|---|---|---|
+
+| Name | Type | Default | Description
+|:=====|:=====|:========|:===========
 | `canvas`| _HTMLCamvasElement_ | `null` | The canvas (must not be null). |
-| `fullsize | _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
+| `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
 | `scaleY`| _number_ | `1.0` | The initial vertical zoom. Default is 1.0. |
@@ -204,6 +205,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 | `enableGL`| _boolean_ | `false` | [Experimental] Indicates if the application should use the experimental WebGL features. |
 
 
+#### Example
 ~~~javascript
  var pb = new PlotBoilerplate( {
   // HTMLElement
