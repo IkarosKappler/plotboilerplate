@@ -165,6 +165,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ## Initialization parameters
 
 | Name | Type | Default | Description |
+|---|---|---|---|
 | `canvas`| _HTMLCamvasElement_ | `null` | The canvas (must not be null). |
 | `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
