@@ -96,7 +96,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 #### This second demo draws 'bark beetle tunnels' 
 
-![Perpendiducular point-to-line distance](screenshots/screenshot-20191218-barkbeetletunnels.png "Barkbeetle demo")
+![Perpendiducular point-to-line distance](screenshots/ "Barkbeetle demo")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html?backgroundColor=#fff&showBarkBeetleTunnels=true&pointCount=15" title="See the demo">See the demo</a>
 
@@ -149,7 +149,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Perpendiculars of a Bézier path
 
-![Perpendiculars of a Bézier path](screenshots/screenshot-20191218-tweenmax-bezier-animation.png "Perpendiculars of a Bézier path")
+![Perpendiculars of a Bézier path](screenshots/screenshot-20191218-bezier-perpendiculars.png "Perpendiculars of a Bézier path")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
 

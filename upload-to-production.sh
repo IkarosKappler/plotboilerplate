@@ -7,6 +7,16 @@ set -o allexport
 set +o allexport
 
 
+while true; do
+    read -p "Do you wish compile the jekyll pages before uploading (y/n)? " yn
+    case $yn in
+        [Yy]* ) cd docs_jekyll; bash build.sh; break;;
+        [Nn]* ) break;; #exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+
 function addTrackerToDemos() {
     # Read tracker code into file
     if [ ! -f ./docs_jekyll/_tracker.js ]; then
