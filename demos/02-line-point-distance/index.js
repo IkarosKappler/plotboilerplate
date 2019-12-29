@@ -1,7 +1,7 @@
 /**
  * A script for demonstrating the line-point-distance.
  *
- * @require PlotBoilerplate, MouseHandler, gup, dat.gui
+ * @require PlotBoilerplate, MouseHandler, gup, dat.gui, 
  * 
  * @author   Ikaros Kappler
  * @date     2019-02-06
@@ -18,7 +18,7 @@
     window.addEventListener(
 	'load',
 	function() {
-	    // All config params are optional.
+	    // All config params except the canvas are optional.
 	    var pb = new PlotBoilerplate(
 		PlotBoilerplate.utils.safeMergeByKeys(
 		    { canvas                : document.getElementById('my-canvas'),					    
@@ -59,9 +59,9 @@
 	    }, GUP );
 	    
 	    
-	    /**
-	     * Draw the bark beetle tunnels if checked.
-	     **/
+	    // +---------------------------------------------------------------------------------
+	    // | Draw the bark beetle tunnels if checked.
+	    // +-------------------------------
 	    pb.config.postDraw = function() {
 		if( !config.showBarkBeetleTunnels )
 		    return;

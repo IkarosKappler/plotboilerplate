@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2019-12-20
+  * Added the 'lineWidth' param to the polyline(...) function.
+* 2019-12-18
+  * Added the draw.quadraticBezier(...) function (for the sake of approximating Lissajous curves).
 * 2019-12-15
   * Added the Line.moveTo(Vertex) fucnction.
 * 2019-12-11

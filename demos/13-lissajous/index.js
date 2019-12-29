@@ -1,5 +1,5 @@
 /**
- * A demo to show Bézier perpendiculars.
+ * A demo to show BÃ©zier perpendiculars.
  *
  * @requires PlotBoilerplate, MouseHandler, gup, dat.gui, draw
  * 
@@ -37,8 +37,8 @@
 		      canvasHeightFactor     : 1.0,
 		      cssScaleX              : 1.0,
 		      cssScaleY              : 1.0,
-		      drawBezierHandleLines  : true, // false,
-		      drawBezierHandlePoints : true, // false, 
+		      drawBezierHandleLines  : true,
+		      drawBezierHandlePoints : true,
 		      cssUniformScale        : true,
 		      autoAdjustOffset       : true,
 		      offsetAdjustXPercent   : 50,
@@ -52,8 +52,8 @@
 		)
 	    );
 
-	    if( typeof humane != 'undefined' )
-		humane.log("Click, hold and drag your mouse or click 'animate' in the controls.");
+	    //if( typeof humane != 'undefined' )
+	//	humane.log("Click, hold and drag your mouse or click 'animate' in the controls.");
 
 	    pb.config.postDraw = function() {
 		redraw();
@@ -64,90 +64,113 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		offsetA               : 0.0,
-		offsetB               : 0.0,
-		phaseA                : 2, // 0.0, // 2.0,
-		phaseB                : 3, // 0.0, // 3.0,
-		stepSize              : 0.1,
+		phaseA                : 0.0,
+		phaseB                : 0.0,
+		freqA                 : 2,
+		freqB                 : 3,
+		stepSize              : 0.05,
+		alternating           : true,
 		closeGap              : true,
-		animate               : false
+		animate               : true
 	    }, GUP );
-	    
 
+	    var time = 0;
+	    var Lissajous = function(freqA,freqB,phaseA,phaseB) {
+		this.freqA = freqA;
+		this.freqB = freqB;
+		this.phaseA = phaseA;
+		this.phaseB = phaseB;
+
+		this.getPointAt = function(t) {
+		    //return new Vertex( Math.sin(this.phaseA + this.freqA*t), Math.sin(this.phaseB + this.freqB*t) );
+		    return new Vertex( Math.sin(this.phaseA + this.freqA*t), Math.sin(this.phaseB + this.freqB*t) );
+		};
+
+		this.getDerivationAt = function(t) {
+		    
+		}
+	    };
+
+	    var randColor = function() {
+		return Color.makeRGB( Math.floor(255*Math.random()),Math.floor(255*Math.random()),Math.floor(255*Math.random())).cssRGB();
+	    };
 	    
 	    // +---------------------------------------------------------------------------------
-	    // | This is the part where the Bézier magic happens
+	    // | This is the part where the BÃ©zier magic happens
 	    // +-------------------------------
 	    var step = 0.003;
-	    var t = 0.0;
 	    var redraw = function() {
 
-		//var a = 2, b = 3, c= 0.3;
+		var scale = Math.min( pb.canvasSize.width, pb.canvasSize.height )*0.35; 
 		
-		function lissajous(a, b, c) {
-		    var str = "M";
-		    let dt  = c;
+		function lissajous(freqA, freqB, phaseA, phaseB, stepSize) {
+		    //var str = "M";
+		    //let dt  = c;
 		    var polyLine = [];
-		    let offsetA = config.offsetA;
-		    let offsetB = config.offsetB;
+		    //let offsetA = config.offsetA;
+		    //let offsetB = config.offsetB;
+		    var figure = new Lissajous(freqA,freqB,phaseA,phaseB,stepSize);
+		    var staticFigure = new Lissajous(freqA,freqB,0,0,stepSize);
 		    let pA = new Vertex(0,0);
 
-		    for (var t = 0; t <= 2*Math.PI; t += dt) {
-
-			let x = Math.sin(a*t);
-			let y = Math.sin(b*t);
-			
-			pA.set( 10+200.*x, 10-(200.*y) );
+		    for (var t = 0; t <= 2*Math.PI; t += stepSize) {
+			pA = staticFigure.getPointAt(t).scale(scale); // .add( 2, -2 );
 			polyLine.push( pA.clone() );
-	
 		    }
-		    pb.draw.polyline( polyLine, config.drawGap, 'rgba(192,0,192,0.333)' );
-		    let x1=0; let y1=0;
-		    let dx1=a; let dy1=b;
-		    pA.set(offsetA + a*dt, offsetB + b*dt);
+		    pb.draw.polyline( polyLine, config.drawGap, 'rgba(192,0,192,0.233)', 3 );
+		    // let x1=0; let y1=0;
+		    let p1 = new Vertex(0,0);
+		    let dx1=freqA; let dy1=freqB;
+		    // pA.set(phaseA + freqA*stepSize, phaseB + freqB*stepSize);
+		    pA = figure.getPointAt(stepSize);
 		    let pB = new Vertex(0,0);
 		    let x2, y2, dx2, dy2, det, x3, y3;
 		    var i = 0;
-		    for (var t=dt; t <= 2*Math.PI+2*dt; t += dt) {
-			x2 = Math.sin(offsetA + a*t); // + Math.cos(offsetB + b*t);
-			y2 = Math.sin(offsetB + b*t); //  + Math.cos(offsetA + a*t);
-			dx2 = a*Math.cos(offsetA + a*t); // + b*Math.sin(offsetB + b*t);
-			dy2 = b*Math.cos(offsetB + b*t); // + a*Math.sin(offsetA + a*t);
+		    for (var t=stepSize; t <= 2*Math.PI+2*stepSize; t += stepSize) {
+			x2 = Math.sin(phaseA + freqA*t);
+			y2 = Math.sin(phaseB + freqB*t); 
+			dx2 = freqA*Math.cos(phaseA + freqA*t); 
+			dy2 = freqB*Math.cos(phaseB + freqB*t); 
 			det = dx1*dy2-dy1*dx2;
 			if (Math.abs(det)>0.1) {
-			    x3=((x2*dy2-y2*dx2)*dx1-(x1*dy1-y1*dx1)*dx2)/det;
-			    y3=((x2*dy2-y2*dx2)*dy1-(x1*dy1-y1*dx1)*dy2)/det;
+			    //x3=((x2*dy2-y2*dx2)*dx1-(x1*dy1-y1*dx1)*dx2)/det;
+			    //y3=((x2*dy2-y2*dx2)*dy1-(x1*dy1-y1*dx1)*dy2)/det;
+			    x3=((x2*dy2-y2*dx2)*dx1-(p1.x*dy1-p1.y*dx1)*dx2)/det;
+			    y3=((x2*dy2-y2*dx2)*dy1-(p1.x*dy1-p1.y*dx1)*dy2)/det;
 			    //str+= "Q" + (250. + 200.*x3) + " " + (250. - 200.*y3) + " " + (250. + 200.*x2) + " " +(250. - 200.*y2)
-			    pB.set( (200.*x2), (-200.*y2) );
-			    if( i > 0 )
-				pb.draw.quadraticBezier( pA, new Vertex((200.*x3), (-200.*y3)), pB, 'rgba(0,108,255,1.0)', 1 ); 
+			    pB.set( (scale*x2), (scale*y2) * (config.alternating? -1 : 1) );
+			    if( i > 0 ) {
+				pb.draw.quadraticBezier( pA, new Vertex((scale*x3), (scale*y3)), pB, 'rgba(0,108,255,1.0)', 1 );
+				//pb.draw.quadraticBezier( pA, new Vertex((scale*x3), (-scale*y3)), pB, randColor(), 1 ); // 'rgba(0,108,255,1.0)', 1 );
+			    }
 			} else {
 			    //str+= "L" + (250. + 200.*x2) + " " + (250. - 200.*y2)
-			    pB.set( 200.*x2, -200.*y2 );
+			    pB.set( scale*x2, scale*y2 );
 			    if( i > 0 )
 				pb.draw.line( pA, pB, 'rgba(0,192,192,0.8)' );
 			};
-			x1=x2;
-			y1=y2;
+			//x1=x2;
+			//y1=y2;
+			p1.set( x2, y2 );
 			dx1=dx2;
 			dy1=dy2;
 			pA.set( pB );
 			i++;
-		    }
-		    
-		}
-		function Coeffs() {
-		    let a = config.phaseA;
-		    let b = config.phaseB;
-		    let c = config.stepSize; 
-		    lissajous(a, b, c)
+		    } // END for
+		    pA = figure.getPointAt(time/1500);
+		    pA.scale(scale);
+		    pb.draw.circle( pA, 3, 'orange' );
+		    pB = staticFigure.getPointAt(time/1500);
+		    pB.scale(scale);
+		    pb.draw.circle( pB, 3, 'rgba(128,128,128,0.33)' );
+		} // END function
+		
+		function renderFigure() {
+		    lissajous(config.freqA, config.freqB, config.phaseA, config.phaseB, config.stepSize);
 		}
 
-		Coeffs();
-		
-		t+=step;
-		if( t >= 1.0 )
-		    t = 0.0; // Reset t after each rendering loop
+		renderFigure();
+
 	    };
 	    
 
@@ -161,11 +184,20 @@
 	    var hypo     = Math.sqrt( radius*radius*2 );
 
 	
-	    var renderLoop = function(time) {
+	    var renderLoop = function(_time) {
+		if( !config.animate ) {
+		    time = 0;
+		    pb.redraw();
+		    return;
+		}
+		time = _time;
+		// Animate from -PI to +PI
+		config.phaseA = -Math.PI + ((time/5000)*Math.PI)%(2*Math.PI);
 		pb.redraw();
 		window.requestAnimationFrame( renderLoop );
 	    }
-	    renderLoop();
+
+	    var startAnimation = function() { window.requestAnimationFrame(renderLoop); };
 
 
 	    // +---------------------------------------------------------------------------------
@@ -174,21 +206,21 @@
             {
 		var gui = pb.createGUI();
 		var f0 = gui.addFolder('Points');
-		f0.add(config, 'offsetA').onChange( function() { pb.redraw(); } ).min(-Math.PI).max(Math.PI).step(0.01).listen().title("Offset A.");
-		//f0.add(config, 'offsetB').onChange( function() { pb.redraw(); } ).min(-Math.PI).max(Math.PI).step(0.1).listen().title("Offset B.");
-		f0.add(config, 'phaseA').onChange( function() { pb.redraw(); } ).min(1).max(10).step(1).listen().title("The first phase.");
-		f0.add(config, 'phaseB').onChange( function() { pb.redraw(); } ).min(1).max(10).step(1).listen().title("The second phase.");
+		f0.add(config, 'phaseA').onChange( function() { pb.redraw(); } ).min(-Math.PI).max(Math.PI).step(0.01).listen().title("Phase A.");
+		//f0.add(config, 'phaseB').onChange( function() { pb.redraw(); } ).min(-Math.PI).max(Math.PI).step(0.1).listen().title("Phase B.");
+		f0.add(config, 'freqA').onChange( function() { pb.redraw(); } ).min(1).max(10).step(1).listen().title("The first frequency.");
+		f0.add(config, 'freqB').onChange( function() { pb.redraw(); } ).min(1).max(10).step(1).listen().title("The second frequency.");
 		f0.add(config, 'stepSize').onChange( function() { pb.redraw(); } ).min(0.05).max(1.0).step(0.05).listen().title("The second phase.");
 		f0.add(config, 'closeGap').onChange( function() { pb.redraw(); } ).listen().title("Close the draw gap between begin and and of curve.");
-		//f0.add(config, 'animate').onChange( toggleAnimation ).title("Toggle point animation on/off.");
+		f0.add(config, 'alternating').onChange( function() { pb.redraw(); } ).listen().title("Draw alternating curve segments.");
+		f0.add(config, 'animate').onChange( startAnimation ).title("Toggle phase animation on/off.");
 		f0.open();
-		
-		//if( config.animate )
-		//    toggleAnimation();
+
+		// Will stop after first draw if config.animate==false
+		startAnimation();
 	    }
 	    
 	} );
     
 })(window); 
-
 

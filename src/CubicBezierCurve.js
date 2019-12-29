@@ -182,44 +182,21 @@
 	// Push start point into buffer
 	this.segmentCache.push( this.startPoint );	
 	this.segmentLengths = [];
-	//this.arcLength = 0.0;
-	let newLength = 0.0;
-
-	/*
-	for( var i = 0; i < this.curveIntervals; i++) {	    
-	    pointB = this.getPointAt( (i+1) * curveStep );  // parameter is 'u' (not 't')
-	    //pointB = this.getPoint( (i+1) * curveStep );  // parameter is 'u' (not 't')
-	    
-	    // Store point into cache
-	    this.segmentCache.push( pointB ); 
-
-	    // Calculate segment length
-	    var tmpLength = pointA.distance(pointB); // Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
-	    this.segmentLengths.push( tmpLength );
-	    newLength += tmpLength;
-	    
-	    pointA = pointB;
-            u += curveStep;
-	} // END for
-	this.arcLength = newLength;
-*/
-	
+	let newLength = 0.0;	
 	
 	var t = 0.0;
-	while( t <= 1.0 ) { //console.log('x',t);
-	    pointB = this.getPointAt(t); // (i+1) * curveStep );  // parameter is 'u' (not 't')
+	while( t <= 1.0 ) {
+	    pointB = this.getPointAt(t); 
 	    
 	    // Store point into cache
 	    this.segmentCache.push( pointB ); 
 
 	    // Calculate segment length
-	    var tmpLength = pointA.distance(pointB); // Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
+	    var tmpLength = pointA.distance(pointB);
 	    this.segmentLengths.push( tmpLength );
 	    this.arcLength += tmpLength;
 	    
-	    pointA = pointB;
-            // u += curveStep;
-	    
+	    pointA = pointB;	    
 	    t += curveStep;
 	}
 	

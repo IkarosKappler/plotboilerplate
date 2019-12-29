@@ -94,12 +94,6 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html" title="See the demo">See the demo</a>
 
-#### This second demo draws 'bark beetle tunnels' 
-
-![Perpendiducular point-to-line distance](screenshots/ "Barkbeetle demo")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html?backgroundColor=#fff&showBarkBeetleTunnels=true&pointCount=15" title="See the demo">See the demo</a>
-
 
 ### Random-scripture demo
 
@@ -166,7 +160,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `canvas`| _HTMLCamvasElement_ | `null` | The canvas (must not be null). |
+| `canvas`| _HTMLCanvasElement_ | `null` | The canvas (must not be null). |
 | `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |

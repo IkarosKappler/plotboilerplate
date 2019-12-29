@@ -25,7 +25,8 @@
  * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
  * @modified 2019-12-11 Added the 'color' param to the label(...) function.
  * @modified 2019-12-18 Added the quadraticBezier(...) function (for the sake of approximating Lissajous curves).
- * @version  1.5.0
+ * @modified 2019-12-20 Added the 'lineWidth' param to the polyline(...) function.
+ * @version  1.5.1
  **/
 
 (function(_context) {
@@ -633,19 +634,20 @@
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices - The polygon vertices to draw.
-     * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
-     * @param {string}   color    - The CSS color to draw the polygon with.
+     * @param {Vertex[]} vertices   - The polygon vertices to draw.
+     * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
+     * @param {string}   color      - The CSS color to draw the polygon with.
+     * @param {number}   lineWidth  - The line width (default is 1.0);
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.polyline = function( vertices, isOpen, color ) {
+    _context.drawutils.prototype.polyline = function( vertices, isOpen, color, lineWidth ) {
 	if( vertices.length <= 1 )
 	    return;
 	this.ctx.save();
 	this.ctx.beginPath();
-	this.ctx.lineWidth = 1.0;
+	this.ctx.lineWidth = lineWidth || 1.0;
 	this.ctx.moveTo( this.offset.x + vertices[0].x*this.scale.x, this.offset.y + vertices[0].y*this.scale.y );
 	for( var i = 0; i < vertices.length; i++ ) {
 	    this.ctx.lineTo( this.offset.x + vertices[i].x*this.scale.x, this.offset.y + vertices[i].y*this.scale.y );
