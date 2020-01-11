@@ -1,8 +1,10 @@
 
 
 # Changelog
+* 2020-01-09
+  * Added the 'lineWidth' param to the draw.ellipse(...) function.
 * 2019-12-20
-  * Added the 'lineWidth' param to the polyline(...) function.
+  * Added the 'lineWidth' param to the draw.polyline(...) function.
 * 2019-12-18
   * Added the draw.quadraticBezier(...) function (for the sake of approximating Lissajous curves).
 * 2019-12-15

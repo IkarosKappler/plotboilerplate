@@ -377,7 +377,7 @@ The Vertex class has basic drag event support:
   //   current drag step).
   draggedFrom : { x : Number, y : Number },
 
-  // True if this is a drag event (nothing else possible at the moment).
+  // True if this is a drag event (nothing else available the moment).
   wasDragged : boolean,
 
   // The x-y-amount of the current drag step.
@@ -387,13 +387,25 @@ The Vertex class has basic drag event support:
  }
 ~~~
 
-
+| Name | Type | Example value | Description |
+|---|---|---|---|
+| `element`| _HTMLCanvasElement_ | `[HTMLCanvasElement]` | The canvas that fired the event. |
+| `name`| _string_ | `drag` | The event name (default is 'drag'). |
+| `pos`| _position_ | `{ x : 20, y : 50 }` | The current drag position. |
+| `button`| _number_ | `0` | A mouse button indicator (if mouse event). 0=left, 1=middle, 2=right |
+| `leftButton`| _boolean_ | `true` | A flag indicating if event comes from left mouse button. |
+| `middleButton`| _boolean_ | `false` | A flag indicating if event comes from middle mouse button. |
+| `rightButton`| _boolean_ | `false` | A flag indicating if event comes from right mouse button. |
+| `mouseDownPos`| _position_ | `{ x : 0, y : 20 }` | A mouse-down-position: position where the dragging started. This will not change during one drag process. |
+| `draggedFrom`| _position_ | `{ x : 10, y : -5 }` | The most recent drag position (position before current drag step). |
+| `wasDragged`| _boolean_ | `true` | True if this is a drag event (nothing else available at the moment). |
+| `dragAmount`| _position_ | `{ x : 100, y : 34 }` | The x-y-amount of the current drag step. This is the difference between the recent drag step and the actual drag position. |
 
 
 ## Usage
  * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment for clicked bézier path point
- * [ALT or CTRL] + [Mousedown] + [Drag] : Pan the area
+ * [ALT or CTRL or SPACE] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
  * [Mousewheel-down] : Zoom out
 
@@ -439,7 +451,7 @@ from the sources code files in ./src/*.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
- * Add a proper webpack entry point file (like index.js or entry.js?).
+ * [Done] Add a proper webpack entry point file (like index.js or entry.js?).
  * Add typescript and define an interface for drawables (Drawable.ts?).
  * Add a vertex attribute: visible. (to hide vertices).
  * Add control button: reset zoom.
@@ -448,8 +460,8 @@ from the sources code files in ./src/*.
  * Add a demo that draws a proper mathematical xy-grid.
  * Switching browser tabs back and forth sometimes locks the Ctrl-Key. Check that.
  * [NPM/Bash] Add a pre-publish check if there are unstaged changes.
- * [Readme] Add params as table.
- * The intersection points in the line-point-distance demo are draggable. Why?
+ * [Done] Add params as table.
+ * [Solved] The intersection points in the line-point-distance demo are draggable. Why?
  * Move the helper function triangle.pointIsInTriangle()...pointIsInTriangle() should be in a utils wrapper somewhere.
  * Add a demo: Lissajous-Curves (direct and Bézier approximation).
 
