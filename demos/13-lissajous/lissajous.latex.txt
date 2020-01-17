@@ -1,0 +1,21 @@
+
+Simple:
+-------
+
+\begin{align*}
+A,B \epsilon \mathbb{N} \\
+Lissajous_A_,_B: \mathbb{R} \mapsto \mathbb{R}\times\mathbb{R} \\
+\phi &\mapsto ( sin(A*\phi), sin(B*\phi) )  \\
+\end{align*}
+
+
+Extended:
+---------
+
+\begin{align*}
+A,B \epsilon \mathbb{N} \\
+phaseA, phaseB \epsilon \mathbb{R} \\
+Lissajous_A_,_B: \mathbb{R} \mapsto \mathbb{R}\times\mathbb{R} \\
+\phi &\mapsto ( sin(phaseA + A*\phi), sin(phaseB + B*\phi) )  \\
+\end{align*}
+

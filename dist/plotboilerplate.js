@@ -1672,44 +1672,21 @@ Object.extendClass = function( superClass, subClass ) {
 	// Push start point into buffer
 	this.segmentCache.push( this.startPoint );	
 	this.segmentLengths = [];
-	//this.arcLength = 0.0;
-	let newLength = 0.0;
-
-	/*
-	for( var i = 0; i < this.curveIntervals; i++) {	    
-	    pointB = this.getPointAt( (i+1) * curveStep );  // parameter is 'u' (not 't')
-	    //pointB = this.getPoint( (i+1) * curveStep );  // parameter is 'u' (not 't')
-	    
-	    // Store point into cache
-	    this.segmentCache.push( pointB ); 
-
-	    // Calculate segment length
-	    var tmpLength = pointA.distance(pointB); // Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
-	    this.segmentLengths.push( tmpLength );
-	    newLength += tmpLength;
-	    
-	    pointA = pointB;
-            u += curveStep;
-	} // END for
-	this.arcLength = newLength;
-*/
-	
+	let newLength = 0.0;	
 	
 	var t = 0.0;
-	while( t <= 1.0 ) { //console.log('x',t);
-	    pointB = this.getPointAt(t); // (i+1) * curveStep );  // parameter is 'u' (not 't')
+	while( t <= 1.0 ) {
+	    pointB = this.getPointAt(t); 
 	    
 	    // Store point into cache
 	    this.segmentCache.push( pointB ); 
 
 	    // Calculate segment length
-	    var tmpLength = pointA.distance(pointB); // Math.sqrt( Math.pow(pointA.x-pointB.x,2) + Math.pow(pointA.y-pointB.y,2) );
+	    var tmpLength = pointA.distance(pointB);
 	    this.segmentLengths.push( tmpLength );
 	    this.arcLength += tmpLength;
 	    
-	    pointA = pointB;
-            // u += curveStep;
-	    
+	    pointA = pointB;	    
 	    t += curveStep;
 	}
 	
@@ -4743,7 +4720,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
  * @modified 2019-12-11 Added the 'color' param to the label(...) function.
  * @modified 2019-12-18 Added the quadraticBezier(...) function (for the sake of approximating Lissajous curves).
- * @version  1.5.0
+ * @modified 2019-12-20 Added the 'lineWidth' param to the polyline(...) function.
+ * @version  1.5.1
  **/
 
 (function(_context) {
@@ -5351,19 +5329,20 @@ Object.extendClass = function( superClass, subClass ) {
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices - The polygon vertices to draw.
-     * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
-     * @param {string}   color    - The CSS color to draw the polygon with.
+     * @param {Vertex[]} vertices   - The polygon vertices to draw.
+     * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
+     * @param {string}   color      - The CSS color to draw the polygon with.
+     * @param {number}   lineWidth  - The line width (default is 1.0);
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.polyline = function( vertices, isOpen, color ) {
+    _context.drawutils.prototype.polyline = function( vertices, isOpen, color, lineWidth ) {
 	if( vertices.length <= 1 )
 	    return;
 	this.ctx.save();
 	this.ctx.beginPath();
-	this.ctx.lineWidth = 1.0;
+	this.ctx.lineWidth = lineWidth || 1.0;
 	this.ctx.moveTo( this.offset.x + vertices[0].x*this.scale.x, this.offset.y + vertices[0].y*this.scale.y );
 	for( var i = 0; i < vertices.length; i++ ) {
 	    this.ctx.lineTo( this.offset.x + vertices[i].x*this.scale.x, this.offset.y + vertices[i].y*this.scale.y );
