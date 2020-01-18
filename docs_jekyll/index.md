@@ -98,12 +98,6 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html" title="See the demo">See the demo</a>
 
-#### This second demo draws 'bark beetle tunnels' 
-
-![Perpendiducular point-to-line distance](screenshots/ "Barkbeetle demo")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html?backgroundColor=#fff&showBarkBeetleTunnels=true&pointCount=15" title="See the demo">See the demo</a>
-
 
 ### Random-scripture demo
 
@@ -170,7 +164,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `canvas`| _HTMLCamvasElement_ | `null` | The canvas (must not be null). |
+| `canvas`| _HTMLCanvasElement_ | `null` | The canvas (must not be null). |
 | `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
@@ -387,7 +381,7 @@ The Vertex class has basic drag event support:
   //   current drag step).
   draggedFrom : { x : Number, y : Number },
 
-  // True if this is a drag event (nothing else possible at the moment).
+  // True if this is a drag event (nothing else available the moment).
   wasDragged : boolean,
 
   // The x-y-amount of the current drag step.
@@ -397,13 +391,25 @@ The Vertex class has basic drag event support:
  }
 ~~~
 
-
+| Name | Type | Example value | Description |
+|---|---|---|---|
+| `element`| _HTMLCanvasElement_ | `[HTMLCanvasElement]` | The canvas that fired the event. |
+| `name`| _string_ | `drag` | The event name (default is 'drag'). |
+| `pos`| _position_ | `{ x : 20, y : 50 }` | The current drag position. |
+| `button`| _number_ | `0` | A mouse button indicator (if mouse event). 0=left, 1=middle, 2=right |
+| `leftButton`| _boolean_ | `true` | A flag indicating if event comes from left mouse button. |
+| `middleButton`| _boolean_ | `false` | A flag indicating if event comes from middle mouse button. |
+| `rightButton`| _boolean_ | `false` | A flag indicating if event comes from right mouse button. |
+| `mouseDownPos`| _position_ | `{ x : 0, y : 20 }` | A mouse-down-position: position where the dragging started. This will not change during one drag process. |
+| `draggedFrom`| _position_ | `{ x : 10, y : -5 }` | The most recent drag position (position before current drag step). |
+| `wasDragged`| _boolean_ | `true` | True if this is a drag event (nothing else available at the moment). |
+| `dragAmount`| _position_ | `{ x : 100, y : 34 }` | The x-y-amount of the current drag step. This is the difference between the recent drag step and the actual drag position. |
 
 
 ## Usage
  * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment for clicked bézier path point
- * [ALT or CTRL] + [Mousedown] + [Drag] : Pan the area
+ * [ALT or CTRL or SPACE] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
  * [Mousewheel-down] : Zoom out
 
@@ -449,7 +455,7 @@ from the sources code files in ./src/*.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
- * Add a proper webpack entry point file (like index.js or entry.js?).
+ * [Done] Add a proper webpack entry point file (like index.js or entry.js?).
  * Add typescript and define an interface for drawables (Drawable.ts?).
  * Add a vertex attribute: visible. (to hide vertices).
  * Add control button: reset zoom.
@@ -458,8 +464,8 @@ from the sources code files in ./src/*.
  * Add a demo that draws a proper mathematical xy-grid.
  * Switching browser tabs back and forth sometimes locks the Ctrl-Key. Check that.
  * [NPM/Bash] Add a pre-publish check if there are unstaged changes.
- * [Readme] Add params as table.
- * The intersection points in the line-point-distance demo are draggable. Why?
+ * [Done] Add params as table.
+ * [Solved] The intersection points in the line-point-distance demo are draggable. Why?
  * Move the helper function triangle.pointIsInTriangle()...pointIsInTriangle() should be in a utils wrapper somewhere.
  * Add a demo: Lissajous-Curves (direct and Bézier approximation).
 

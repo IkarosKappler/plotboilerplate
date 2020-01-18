@@ -24,6 +24,7 @@ exclude: [
   "docs_md", # Intermediate jsdoc markdown files are not needed any more
   "Gemfile",
   "Gemfile.lock",
+  "generate-demo-page.sh",
   "gulpfile.js",
   "jsdoc_template/",
   "node_modules",

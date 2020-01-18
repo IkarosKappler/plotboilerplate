@@ -8,6 +8,11 @@ cp -R ../screenshots/ .
 # echo "Generating markdown docs from sources ..."
 # ./renderjsdoc.sh
 
+./generate-demo-page.sh
+
+bundle exec jekyll serve
+exit 0
+
 # Use thie docs build script instead
 (cd .. && ./mkdocs.sh)
 
