@@ -10,7 +10,7 @@ set +o allexport
 while true; do
     read -p "Do you wish compile the jekyll pages before uploading (y/n)? " yn
     case $yn in
-        [Yy]* ) cd docs_jekyll; bash build.sh; break;;
+        [Yy]* ) cd docs_jekyll; bash build.sh; cd ..; break;;
         [Nn]* ) break;; #exit;;
         * ) echo "Please answer yes or no.";;
     esac

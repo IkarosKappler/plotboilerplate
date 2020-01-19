@@ -1,5 +1,6 @@
 ---
 layout: demos
+permalink: /demos/
 date: 2020-01-19
 ---
 

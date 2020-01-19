@@ -441,6 +441,7 @@ from the sources code files in ./src/*.
  * Use a sorted map in the line-point-distance demo.
  * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
  * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
+ * Replace all color params: replace type string by color. (tinycolor?)
  * Include Touchy.js as a package dependency.
  * Include FileSaver.js as a package dependency.
  * Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
@@ -467,7 +468,10 @@ from the sources code files in ./src/*.
  * [Done] Add params as table.
  * [Solved] The intersection points in the line-point-distance demo are draggable. Why?
  * Move the helper function triangle.pointIsInTriangle()...pointIsInTriangle() should be in a utils wrapper somewhere.
- * Add a demo: Lissajous-Curves (direct and Bézier approximation).
+ * [Done] Add a demo: Lissajous-Curves (direct and Bézier approximation).
+ * Code the leaf venation generator demo.
+ * Add thumbnails for the demo preview.
+ * Add a thumbnail generator script for the screenshots (like with imagick).
 
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.

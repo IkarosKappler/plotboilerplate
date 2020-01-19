@@ -15,6 +15,7 @@ function mkDemoPage() {
 
     echo '---' > $outFile
     echo 'layout: demos' >> $outFile
+    echo 'permalink: /demos/' >> $outFile
     date +'date: %Y-%m-%d' >> $outFile
     echo '---' >> $outFile
     echo '' >> $outFile
