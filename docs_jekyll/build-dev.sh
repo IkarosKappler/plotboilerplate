@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 echo "Copying screenshots ... "
 cp -R ../screenshots/ .
 
@@ -9,6 +10,7 @@ cp -R ../screenshots/ .
 # ./renderjsdoc.sh
 
 ./generate-demo-page.sh
+
 
 # Use thie docs build script instead
 (cd .. && ./mkdocs.sh)

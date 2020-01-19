@@ -230,13 +230,32 @@ pre {
      
 }
 
+a.no-decoration {
+     text-decoration: none;
+}
+
 .demo-box {
      width: 31%;
      margin: 0;
      padding-top: 31%;
+     position: relative;
      display: inline-block;
-     background-size: cover;
-     background-repeat: no-repeat;
-     background-position: center;
+     overflow: hidden;
+
+     & div {
+        width : 100%;
+	position: absolute;
+	top : 0;
+	padding-top : 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+	transform-origin: center center;
+	transition: transform 0.25s;
+
+	&:hover, &:active {
+ 	   transform: scale(1.1);
+	}	
+     }
 }
 

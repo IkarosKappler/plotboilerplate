@@ -78,9 +78,9 @@ var BarkBeetles = function( pb, line ) {
 	// to numbers knowing that they do represent floats might work but it's not really good style.
 	// Better: use a real sorted map here.
 	var keys = Object.keys(elements).sort(
-	    function(a,b) {
-		// Here we know that the keys represent floats!
-		return parseFloat(a) > parseFloat(b);
+	    function(a,b) { 
+		// Here I know that the keys represent floats!
+		return parseFloat(a)-parseFloat(b);
 	    }
 	);
 	if( !l2r ) keys = keys.reverse();

@@ -1,11 +1,16 @@
 ---
 layout: page
+title: Changelog
 ---
 
 
 # Changelog
+* 2020-01-13
+  * Added a 'CanvasPointList' to the demos to make point count managing easier.
 * 2020-01-09
   * Added the 'lineWidth' param to the draw.ellipse(...) function.
+  * Fixed a bug in the Color.parse(string) function. Hex color with three elements were consideres faulty.
+  * Added a getContrastColor(color) helper function to the demo directory. This requires a color object, not a string!
 * 2019-12-20
   * Added the 'lineWidth' param to the draw.polyline(...) function.
 * 2019-12-18
