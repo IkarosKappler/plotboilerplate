@@ -155,6 +155,13 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/12-trace-bspline/index.html" title="See the demo">See the demo</a>
 
 
+### Drawing pursuit curves (each point following one other point)
+
+![Drawing pursuit curves (each point following one other point)](screenshots/screenshot-2020014-pursuit-curves.png "Drawing pursuit curves")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/14-pursuit-curves/index.html" title="See the demo">See the demo</a>
+
+
 
 ## Initialization parameters
 
@@ -297,7 +304,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
   // function
   //   A callback function that will be triggered just before the
   //   draw function starts.
-  preDraw               	: function() { console.log('before clearing and before drawing.'); },
+  preDraw               	: function() { console.log('after clearing and before drawing.'); },
 
   // function
   //   A callback function that will be triggered right after the
@@ -468,6 +475,7 @@ from the sources code files in ./src/*.
  * Code the leaf venation generator demo.
  * Add thumbnails for the demo preview.
  * Add a thumbnail generator script for the screenshots (like with imagick).
+ * Add a screenshot of the pursuit curves to the README.
 
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
