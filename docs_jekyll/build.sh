@@ -10,6 +10,7 @@ cp -R ../screenshots/ .
 
 ./generate-demo-page.sh
 
+
 # Use thie docs build script instead
 (cd .. && ./mkdocs.sh)
 
