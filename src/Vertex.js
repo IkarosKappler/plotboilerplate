@@ -297,14 +297,9 @@
 	    center = new Vertex(0,0);
 	this.sub( center );
 	angle += Math.atan2(this.y,this.x);
-	// console.log( angle );
 	let len = this.distance({x:0,y:0});
 	let lenX = this.x;
 	let lenY = this.y;
-	//this.x = ( Math.cos(angle) * len + Math.sin(angle) * len);
-	//this.y = ( -Math.sin(angle) * len + Math.cos(angle) * len);
-	//this.x = ( Math.cos(angle) * lenX - Math.sin(angle) * lenY);
-	//this.y = ( Math.sin(angle) * lenX + Math.cos(angle) * lenY);
 	this.x = len * Math.cos(angle);
 	this.y = len * Math.sin(angle);
 	this.add( center );

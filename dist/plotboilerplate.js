@@ -732,14 +732,9 @@ Object.extendClass = function( superClass, subClass ) {
 	    center = new Vertex(0,0);
 	this.sub( center );
 	angle += Math.atan2(this.y,this.x);
-	// console.log( angle );
 	let len = this.distance({x:0,y:0});
 	let lenX = this.x;
 	let lenY = this.y;
-	//this.x = ( Math.cos(angle) * len + Math.sin(angle) * len);
-	//this.y = ( -Math.sin(angle) * len + Math.cos(angle) * len);
-	//this.x = ( Math.cos(angle) * lenX - Math.sin(angle) * lenY);
-	//this.y = ( Math.sin(angle) * lenX + Math.cos(angle) * lenY);
 	this.x = len * Math.cos(angle);
 	this.y = len * Math.sin(angle);
 	this.add( center );
@@ -4721,7 +4716,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-11 Added the 'color' param to the label(...) function.
  * @modified 2019-12-18 Added the quadraticBezier(...) function (for the sake of approximating Lissajous curves).
  * @modified 2019-12-20 Added the 'lineWidth' param to the polyline(...) function.
- * @version  1.5.1
+ * @modified 2020-01-09 Added the 'lineWidth' param to the ellipse(...) function.
+ * @version  1.5.2
  **/
 
 (function(_context) {
@@ -5076,14 +5072,16 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
+     * @param {number} lineWidth=1 - An optional line width param (default is 1).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.ellipse = function( center, radiusX, radiusY, color ) {
+    _context.drawutils.prototype.ellipse = function( center, radiusX, radiusY, color, lineWidth ) {
 	this.ctx.beginPath();
 	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radiusX*this.scale.x, radiusY*this.scale.y, 0.0, 0.0, Math.PI*2 );
 	this.ctx.closePath();
+	this.ctx.lineWidth = lineWidth || 1;
 	this._fillOrDraw( color );
     };   
 
