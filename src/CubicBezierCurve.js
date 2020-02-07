@@ -12,7 +12,9 @@
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-03-23 Changed the signatures of getPoint, getPointAt and getTangent (!version 2.0).
  * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
- * @version  2.0.1
+ * @modified 2020-05-05 Added the getSubCurveAt(number,number) function.
+ * @modified 2020-05-05 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
+ * @version  2.1.1
  *
  * @file CubicBezierCurve
  * @public
@@ -172,7 +174,7 @@
      **/
     CubicBezierCurve.prototype.updateArcLengths = function() {
 	var 
-	pointA = new Vertex( this.startPoint.x, this.startPoint.y ),
+	pointA = this.startPoint.clone(), // new Vertex( this.startPoint.x, this.startPoint.y ),
 	pointB = new Vertex( 0, 0 ),
 	curveStep = 1.0/this.curveIntervals;
 	
@@ -194,12 +196,13 @@
 	    // Calculate segment length
 	    var tmpLength = pointA.distance(pointB);
 	    this.segmentLengths.push( tmpLength );
-	    this.arcLength += tmpLength;
+	    //this.arcLength += tmpLength;
+	    newLength += tmpLength;
 	    
 	    pointA = pointB;	    
 	    t += curveStep;
 	}
-	
+	this.arcLength = newLength;
     }; // END function
 
 
@@ -355,6 +358,41 @@
 
 
     /**
+     * Get a sub curve at the given start end end offsets (values between 0.0 and 1.0).
+     *
+     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+     *
+     * @method getSubCurveAt
+     * @param {number} tStart – The start offset of the desired sub curve (must be in [0..1]).
+     * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
+     * @instance
+     * @return {CubicBezierCurve} The sub curve as a new curve.
+     **/
+    CubicBezierCurve.prototype.getSubCurveAt = function( tStart, tEnd ) {
+	var startVec = new Vector(
+	    this.getPointAt(tStart),
+	    this.getTangentAt(tStart)
+	);
+	var endVec = new Vector(
+	    this.getPointAt(tEnd),
+	    this.getTangentAt(tEnd).inv()
+	);
+
+	// Tangents are relative. Make absolute.
+	startVec.b.add( startVec.a )
+	endVec.b.add( endVec.a );
+
+	// This 'splits' the curve at the given point at t.
+	startVec.scale(0.33333333*(tEnd-tStart));
+	endVec.scale(0.33333333*(tEnd-tStart));
+
+	// Draw the bezier curve
+	// pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
+	return new CubicBezierCurve( startVec.a, endVec.a, startVec.b, endVec.b );
+    };
+    
+
+    /**
      * Convert a relative curve position u to the absolute curve position t.
      *
      * @method convertU2t
@@ -471,6 +509,21 @@
     }
 
 
+    // Quick check for class instance. Is there a better way?
+    CubicBezierCurve.isCubicBezierCurve = function( obj ) {
+	//console.log('iscurve',obj);
+	if( typeof obj == "undefined" )
+	    return false;
+	function hasXY(v) { //console.log('x');
+	    return typeof v != "undefined" && typeof v.x == "number" && typeof v.y == "number";
+	}
+	return typeof obj.startPoint == "object" && hasXY(obj.startPoint)
+	    && typeof obj.endPoint == "object" && hasXY(obj.endPoint)
+	    && typeof obj.startControlPoint == "object" && hasXY(obj.startControlPoint)
+	    && typeof obj.endControlPoint == "object" && hasXY(obj.endControlPoint);
+    };
+
+    
   
     /**
      * Create an SVG path data representation of this bézier curve.

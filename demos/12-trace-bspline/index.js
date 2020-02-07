@@ -1,12 +1,13 @@
 /**
- * A demo to show Bézier perpendiculars.
+ * A demo to trace Bézier sub curves (and their tangents).
  *
  * @requires PlotBoilerplate, MouseHandler, gup, dat.gui, draw
  * 
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
- * @date        2018-11-22
- * @version     1.0.0
+ * @date        2019-11-22
+ * @modified    2020-05-06 Replace the direct subcurve calculation by the new CubicBezierPath.getSubCurveAt(number,number) function call.
+ * @version     1.0.1
  **/
 
 
@@ -85,31 +86,14 @@
 	    var t = 0.0;
 	    var redraw = function() {
 		// Each redraw loop determines the current start vector and the current
-		// end vector on the curve.
-		var startVec = new Vector(
-		    path.bezierCurves[0].getPointAt(0),
-		    path.bezierCurves[0].getTangentAt(0)
-		);
-		var endVec = new Vector(
-		    path.bezierCurves[0].getPointAt(t),
-		    path.bezierCurves[0].getTangentAt(t).inv()
-		);
+		// end vector on the curve. (get a subcurve for that)
 
-		// Tangents are relative. Make absolute.
-		startVec.b.add( startVec.a )
-		endVec.b.add( endVec.a );
-
-		// This 'splits' the curve at the given point at t.
-		startVec.scale(0.33333333*t);
-		endVec.scale(0.33333333*t);
-
-		// Draw the bezier curve
-		pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
-		// And for better visualization draw the fake control handles (=the tangents).
-		pb.draw.line( startVec.a, startVec.b, '#a8a800', 1 );
-		pb.draw.line( endVec.a, endVec.b, '#a8a800', 1 );
+		var subCurve = path.bezierCurves[0].getSubCurveAt(0,t);
+		pb.draw.cubicBezier( subCurve.startPoint, subCurve.endPoint, subCurve.startControlPoint, subCurve.endControlPoint, '#8800ff', 2 );
+		pb.draw.line( subCurve.startPoint, subCurve.startControlPoint, '#a8a800', 1 );
+		pb.draw.line( subCurve.endPoint, subCurve.endControlPoint, '#a8a800', 1 );
 		// And draw the current position on the curve as a grey point.
-		pb.fill.circle( endVec.a, 3, 'rgba(255,255,255,0.5)' );
+		pb.fill.circle( subCurve.endPoint, 3, 'rgba(255,255,255,0.5)' );
 
 		t+=step;
 		if( t >= 1.0 )

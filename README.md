@@ -476,6 +476,7 @@ from the sources code files in ./src/*.
  * Add thumbnails for the demo preview.
  * Add a thumbnail generator script for the screenshots (like with imagick).
  * Add a screenshot of the pursuit curves to the README.
+ * Restore old entry point (src/entry.js) for webpack.
 
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.

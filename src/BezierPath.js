@@ -15,7 +15,8 @@
  * @modified 2019-11-18 Fixed the clone function: adjustCircular attribute was not cloned.
  * @modified 2019-12-02 Removed some excessive comments.
  * @modified 2019-12-04 Fixed the missing obtainHandleLengths behavior in the adjustNeightbourControlPoint function.
- * @version 2.0.3
+ * @modified 2020-05-06 Added function locateCurveByEndPoint( Vertex ).
+ * @version 2.1.0
  *
  * @file BezierPath
  * @public
@@ -145,9 +146,27 @@
 
 
     /**
-     * Locate the curve with the given start point (function returns the index).
+     * Locate the curve with the given end point (function returns the index).
      *
      * @method locateCurveByEndPoint
+     * @param {Vertex} point - The (curve end-) point to look for.
+     * @instance
+     * @memberof BezierPath
+     * @return {number} The curve index or -1 if curve (end-) point not found
+     **/
+    BezierPath.prototype.locateCurveByEndPoint = function( point ) {
+	for( var i in this.bezierCurves ) {
+	    if( this.bezierCurves[i].endPoint.equals(point) )
+		return i;
+	}
+	return -1;
+    };
+
+
+    /**
+     * Locate the curve with the given start point (function returns the index).
+     *
+     * @method locateCurveByStartControlPoint
      * @param {Vertex} point - The (curve endt-) point to look for.
      * @instance
      * @memberof BezierPath
@@ -686,7 +705,7 @@
 	// Find the spline to extract the value from
 	var i = 0;
 	var uTemp = 0.0;
-	
+	/*
 	while( i < this.bezierCurves.length &&
 	       (uTemp + this.bezierCurves[i].getLength()) < u 
 	     ) {
@@ -695,11 +714,65 @@
 	    i++;
 
 	}
+	*/
+	var uResult = this._locateUIndex( u );
 
-	var bCurve    = this.bezierCurves[ i ];
-	var relativeU = u - uTemp;
+	var bCurve    = this.bezierCurves[ uResult.i ]; // i ];
+	var relativeU = u - uResult.uPart; // uTemp;
 	return bCurve.getPerpendicular( relativeU );
-    };    
+    };
+
+
+    BezierPath.prototype._locateUIndex = function( u ) {
+	//console.log('u',u);
+	var i = 0;
+	var uTemp = 0.0;
+	var uBefore = 0.0;
+	while( i < this.bezierCurves.length &&
+	       (uTemp + this.bezierCurves[i].getLength()) < u 
+	     ) {
+	    uTemp += this.bezierCurves[ i ].getLength();
+	    if( i+1 < this.bezierCurves.length )
+		uBefore += this.bezierCurves[ i ].getLength();
+	    i++;
+	}
+	return { i : i, uPart : uTemp, uBefore : uBefore };
+    };
+
+
+    BezierPath.prototype.getSubPath = function( startT, endT ) {
+	let startU = startT * this.totalArcLength;
+	let endU = startU * this.totalArcLength;
+
+	var uStartResult = this._locateUIndex( startU ); // { i, uPart }
+	var uEndResult = this._locateUIndex( endU );     // { i, uPart }
+	//console.log( "uStartResult", uStartResult, "uEndResult", uEndResult );
+
+	var curves = [];
+
+	var firstT = (startU-uStartResult.uBefore) / this.bezierCurves[uStartResult.i].getLength();
+	var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT, 1.0);
+	curves.push(firstCurve);
+	
+	var i = uStartResult.i+1;
+	var tmpU = uStartResult.uPart;
+	var uBefore = uStartResult.uBefore;
+	while( i+1 < uEndResult.i ) { // this.bezierCurves.length ) {
+	    var t = (uBefore+startU)/this.totalArcLength;
+	    //console.log('t',t,'i',i);
+	    var subCurve = this.bezierCurves[i].getSubCurveAt( 0.0, 1.0 );
+	    curves.push( subCurve );
+	    
+	    i++;
+	}
+
+	/*var lastT = (startU-uStartResult.uBefore) / this.bezierCurves[uStartResult.i].getLength();
+	var lastCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT, 1.0);
+	curves.push(lastCurve);*/
+	
+	return BezierPath.fromArray( curves ); // this;
+    };
+    
 
     /**
      * This function moves the addressed curve point (or control point) with
@@ -739,14 +812,18 @@
 					false                    // updateArcLengths
 				      );
 
-	} else if( pointID == this.END_POINT && (curveIndex+1 < this.bezierCurves.length || this.adjustCircular) ) {
-	    // Set successcor
-	    var successor = this.getCurveAt( (curveIndex+1)%this.bezierCurves.length );
-	    successor.moveCurvePoint( this.START_CONTROL_POINT, 
-				      moveAmount, 
-				      true,                  // move control point, too
-				      false                  // updateArcLengths
-				    );
+	} else if( pointID == this.END_POINT ) {
+	    if( curveIndex+1 < this.bezierCurves.length || this.adjustCircular ) {
+		// Set successcor
+		var successor = this.getCurveAt( (curveIndex+1)%this.bezierCurves.length );
+		successor.moveCurvePoint( this.START_CONTROL_POINT, 
+					  moveAmount, 
+					  true,                  // move control point, too
+					  false                  // updateArcLengths
+					);
+	    } else {
+		// console.log('move non circular end point');
+	    }
 	    
 	} else if( pointID == this.START_CONTROL_POINT && curveIndex > 0 ) {
 	    
@@ -894,7 +971,6 @@
 	neighbourCurve.updateArcLengths();
     };
 
-
     
     /**
      * Clone this BezierPath (deep clone).
@@ -1031,7 +1107,7 @@
      * @memberof BezierPath
      * @return {BezierPath} The bezier path instance retrieved from the array data.
      **/
-    BezierPath.fromArray = function( arr ) {
+    BezierPath.fromArray = function( arr ) { 
 
 	if( !Array.isArray(arr) )
 	    throw "[BezierPath.fromArray] Passed object must be an array.";
@@ -1046,7 +1122,9 @@
 	    
 	    // Convert object (or array?) to bezier curve
 	    var bCurve = null;
-	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
+	    if( CubicBezierCurve.isCubicBezierCurve(arr[i]) ) { //console.log('is');
+		bCurve = arr[i].clone();
+	    } else if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
 		if( !arr[i][0] || !arr[i][1] || !arr[i][2] || !arr[i][3] )
 		    throw "Cannot convert path data to BezierPath instance. At least one element is undefined (index="+i+"): " + arr[i];
 		bCurve = CubicBezierCurve.fromArray( arr[i] );
@@ -1066,7 +1144,7 @@
 	}   
 	// Bezier segments added. Done
 	return bPath;
-    }
+    };
 
 
     

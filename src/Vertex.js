@@ -23,7 +23,8 @@
  * @modified 2019-11-07 Added toSVGString(object) function.
  * @modified 2019-11-18 Added the rotate(number,Vertex) function.
  * @modified 2019-11-21 Fixed a bug in the rotate(...) function (elements were moved).
- * @version  2.2.1
+ * @modified 2020-05-06 Added functions invX() and invY().
+ * @version  2.3.0
  *
  * @file Vertex
  * @public
@@ -127,6 +128,34 @@
      **/
     Vertex.prototype.setY = function( y ) {
 	this.y = y;
+	return this;
+    };
+
+
+    /**
+     * Set the x-component if this vertex to the inverse of its value.
+     *
+     * @method invX
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.invX = function() {
+	this.x = -this.x;
+	return this;
+    };
+
+
+    /**
+     * Set the y-component if this vertex to the inverse of its value.
+     *
+     * @method invy
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.invY = function() {
+	this.y = -this.y;
 	return this;
     };
     

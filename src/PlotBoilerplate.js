@@ -48,7 +48,9 @@
  * @modified 2019-12-07 Added the drawConfig for lines, polygons, ellipse, triangles, bezier curves and image control lines.
  * @modified 2019-12-08 Fixed a css scale bug in the viewport() function.
  * @modified 2019-12-08 Added the drawconfig UI panel (line colors and line widths).
- * @version  1.6.4
+ * @modified 2020-05-06 Added handling for the end- and end-control-points of non-cirular Bézier paths (was still missing).
+ * @modified 2020-05-06 Fixed a drag-amount bug in the move handling of end points of Bezier paths (control points was not properly moved when non circular).
+ * @version  1.7.0
  *
  * @file PlotBoilerplate
  * @public
@@ -458,28 +460,48 @@
 			var cindex = drawable.locateCurveByStartPoint( e.params.vertex );
 			drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
 			drawable.moveCurvePoint( cindex*1, 
-						 drawable.START_POINT,         // obtain handle length?
-						 e.params.dragAmount           // update arc lengths
+						 drawable.START_POINT,     
+						 e.params.dragAmount     
 					       );
+			//drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
 			var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
 			if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
 			    return;
 			drawable.adjustPredecessorControlPoint( cindex*1, 
-								true,          // obtain handle length?
-								true           // update arc lengths
+								true,      // obtain handle length?
+								true       // update arc lengths
 							      );
+			//drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
 			var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
 			if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
 			    return;
 			drawable.adjustSuccessorControlPoint( cindex*1, 
-							      true,            // obtain handle length?
-							      true             // update arc lengths
+							      true,        // obtain handle length?
+							      true         // update arc lengths
 							    );
+			//drawable.updateArcLengths();
 		    } );
+		    if( i+1 > drawable.bezierCurves.length ) { 
+			// Move last control point with the end point (if not circular)
+			drawable.bezierCurves[drawable.bezierCurves.length-1].endPoint.listeners.addDragListener( function(e) {
+			    //console.log('x');
+			    if( !drawable.adjustCircular ) {
+				var cindex = drawable.locateCurveByEndPoint( e.params.vertex );
+				//console.log('y', cindex);
+				//if( cindex+1 > drawable.bezierCurves.length ) return;
+				// drawable.bezierCurves[cindex].endControlPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+				drawable.moveCurvePoint( cindex*1, 
+							 drawable.END_CONTROL_POINT,     
+							 { x: e.params.dragAmount.x/2, y : e.params.dragAmount.y/2 }
+						       ); 
+			    }
+			    //drawable.updateArcLengths();
+			} ); 
+		    }
 		} // END for
 	    } else if( drawable instanceof PBImage ) {
 		this.vertices.push( drawable.upperLeft );

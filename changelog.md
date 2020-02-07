@@ -1,6 +1,13 @@
 
 
 # Changelog
+* 2020-02-06
+  * Added function BezierPath.locateCurveByEndPoint( Vertex ).
+  * Added handling for the end- and end-control-points of non-cirular Bézier paths (was still missing).
+  * Added functions Vertex.invX() and Vertex.invY().
+  * Added the CubicBezierCurve.getSubCurveAt(number,number) function.
+  * Fixed a drag-amount bug in the move handling of end points of Bezier paths (control points was not properly moved when non circular).
+  * Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
 * 2020-01-13
   * Added a 'CanvasPointList' to the demos to make point count managing easier.
 * 2020-01-09
