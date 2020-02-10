@@ -705,25 +705,10 @@
 	// Find the spline to extract the value from
 	var i = 0;
 	var uTemp = 0.0;
-	/*
-	while( i < this.bezierCurves.length &&
-	       (uTemp + this.bezierCurves[i].getLength()) < u 
-	     ) {
-	    
-	    uTemp += this.bezierCurves[ i ].getLength();
-	    i++;
-
-	}
-	*/
 	var uResult = _locateUIndex( this, u );
-	var bCurve    = this.bezierCurves[ uResult.i ]; // i ];
-	var relativeU = u - uResult.uPart; // uTemp;
+	var bCurve    = this.bezierCurves[ uResult.i ];
+	var relativeU = u - uResult.uPart;
 
-	//var uResult = this._locateUIndex( u );
-
-	//var bCurve    = this.bezierCurves[ i ];
-	//var relativeU = u - uTemp;
-	if( typeof bCurve == 'undefined' ) { console.log('Curve at index',uResult.i,this.bezierCurves.length,'is null!', 'u=', u, 'arcLength=', this.totalArcLength); console.log(this);  }
 	return bCurve.getPerpendicular( relativeU );
     };
 
@@ -740,20 +725,6 @@
      * - {number} uPart - the absolute curve length sum (length from the beginning to u, should equal u itself).
      * - {number} uBefore - the absolute curve length for all segments _before_ the matched curve (usually uBefore <= uPart).
      **/
-    /*BezierPath.prototype._locateUIndex = function( u ) {
-	var i = 0;
-	var uTemp = 0.0;
-	var uBefore = 0.0;
-	while( i < this.bezierCurves.length &&
-	       (uTemp + this.bezierCurves[i].getLength()) < u 
-	     ) {
-	    uTemp += this.bezierCurves[ i ].getLength();
-	    if( i+1 < this.bezierCurves.length )
-		uBefore += this.bezierCurves[ i ].getLength();
-	    i++;
-	}
-	return { i : i, uPart : uTemp, uBefore : uBefore };
-    };*/
     var _locateUIndex = function( path, u ) {
 	var i = 0;
 	var uTemp = 0.0;
@@ -767,7 +738,7 @@
 	    i++;
 	}
 	return { i : i, uPart : uTemp, uBefore : uBefore };
-     };
+    };
     
 
     /**
@@ -794,12 +765,10 @@
 	let startU = startT * this.totalArcLength;
 	let endU = endT * this.totalArcLength;
 
-	var uStartResult = _locateUIndex( this, startU ); // { i, uPart }
-	var uEndResult = _locateUIndex( this, endU );     // { i, uPart }
-	// console.log( "uStartResult", uStartResult, "uEndResult", uEndResult );
-
+	var uStartResult = _locateUIndex( this, startU ); // { i:int, uPart:float, uBefore:float }
+	var uEndResult = _locateUIndex( this, endU );     // { i:int, uPart:float, uBefore:float }
+	
 	var firstT = (startU-uStartResult.uBefore) / this.bezierCurves[uStartResult.i].getLength();
-
 	if( uStartResult.i == uEndResult.i ) {
 	    // Subpath begins and ends in the same path segment (just get a simple sub curve from that path element).
 	    var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
@@ -807,16 +776,27 @@
 	    return BezierPath.fromArray( [ firstCurve ] ); 
 	} else {
 	    var curves = [];
-	    var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT, 1.0);
-	    curves.push(firstCurve);
-
-	    for( var i = uStartResult.i+1; i < uEndResult.i && i < this.bezierCurves.length; i++ ) {
-		curves.push( this.bezierCurves[i].clone() );
+	    if( uStartResult.i > uEndResult.i ) {
+		// Back to front direction
+		var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT,0.0);
+		curves.push(firstCurve);	
+		for( var i = uStartResult.i-1; i > uEndResult.i; i-- ) {
+		    curves.push( this.bezierCurves[i].clone().reverse() ); 
+		}
+		var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
+		curves.push( this.bezierCurves[uEndResult.i].getSubCurveAt(1.0,lastT) );
+	    } else {
+		// Front to back direction
+		var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT, 1.0);
+		curves.push(firstCurve);
+		
+		for( var i = uStartResult.i+1; i < uEndResult.i && i < this.bezierCurves.length; i++ ) {
+		    curves.push( this.bezierCurves[i].clone() );
+		}
+		
+		var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
+		curves.push( this.bezierCurves[uEndResult.i].getSubCurveAt(0,lastT) );
 	    }
-
-	    var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
-	    curves.push( this.bezierCurves[uEndResult.i].getSubCurveAt(0,lastT) );
-	    
 	    return BezierPath.fromArray( curves );
 	}
     };

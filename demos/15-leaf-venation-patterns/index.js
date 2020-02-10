@@ -57,7 +57,7 @@
 					 path.bezierCurves[c].endPoint.clone().invX(),
 					 path.bezierCurves[c].startControlPoint.clone().invX(),
 					 path.bezierCurves[c].endControlPoint.clone().invX(),
-					 'rgba(0,0,0,0.5)',
+					 'rgba(128,128,128,.5)',
 					 1 );
 		}
 		// Mark start point
@@ -129,8 +129,8 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		startT                : 0.2,
-		endT                  : 0.8,
+		startT                : 0.25,
+		endT                  : 0.98,
 		//pointCount            : 64,
 		//drawTraces            : false,
 		//animate               : false
@@ -168,8 +168,8 @@
             {
 		var gui = pb.createGUI(); 
 		var f0 = gui.addFolder('Points');
-		f0.add(config, 'startT').min(0.0).max(1.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Set start T.').title('Set start T.');
-		f0.add(config, 'endT').min(0.0).max(1.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Set end T.').title('Set end T.');
+		f0.add(config, 'startT').min(0.0).max(1.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Set start T').title('Set start T.');
+		f0.add(config, 'endT').min(0.0).max(1.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Set end T').title('Set end T.');
 		//f0.add(config, 'pointCount').onChange( function() { updatePointList(); pb.redraw(); } ).min(4).name('Change point count').title('Change point count.');
 		//f0.add(config, 'drawTraces').onChange( function() { pb.redraw(); } ).name('Draw trace').title('Draw trace.');
 		//f0.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate a point cloud').title('Animate a point cloud.');

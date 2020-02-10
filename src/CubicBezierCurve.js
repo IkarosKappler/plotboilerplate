@@ -14,8 +14,10 @@
  * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
  * @modified 2020-05-06 Added the getSubCurveAt(number,number) function.
  * @modified 2020-05-06 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
- * @modified 2020-05-07 Added the isInstance(any) function. 
- * @version 2.2.0
+ * @modified 2020-05-07 Added the isInstance(any) function.
+ * @modified 2020-05-10 Added the reverse() function.
+ * @modified 2020-05-10 Fixed the translate(...) function (returning 'this' was missing).
+ * @version 2.3.1
  *
  * @file CubicBezierCurve
  * @public
@@ -114,12 +116,12 @@
 		this.getEndControlPoint().add( moveAmount );
 
 	} else {
-	    console.log( "[IKRS.CubicBezierCurve.moveCurvePoint] pointID '" + pointID +"' invalid." );
+	    console.log( "[CubicBezierCurve.moveCurvePoint] pointID '" + pointID +"' invalid." );
 	}
 	
 	if( updateArcLengths )
 	    this.updateArcLengths();
-    }
+    };
 
 
 
@@ -130,15 +132,36 @@
      * @param {Vertex} amount - The amount to translate this curve by.
      * @instance
      * @memberof CubicBezierCurve
-     * @return {CubicBezierCurve} this
+     * @return {CubicBezierCurve} this (for chaining).
      **/
     CubicBezierCurve.prototype.translate = function( amount ) {
 	this.startPoint.add( amount );
 	this.startControlPoint.add( amount );
 	this.endControlPoint.add( amount );
-	this.endPoint.add( amount );   
+	this.endPoint.add( amount );
+	return this;
     };
 
+
+    
+    /**
+     * Reverse this curve, means swapping start- and end-point and swapping
+     * start-control- and end-control-point.
+     *
+     * @method reverse
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} this (for chaining).
+     **/
+    CubicBezierCurve.prototype.reverse = function() {
+	var tmp = this.startPoint;
+	this.startPoint = this.endPoint;
+	this.endPoint = tmp;
+	tmp = this.startControlPoint;
+	this.startControlPoint = this.endControlPoint;
+	this.endControlPoint = tmp;
+	return this;
+    };
 
     
     /**
