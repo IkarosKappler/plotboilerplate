@@ -458,7 +458,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-11-07 Added toSVGString(object) function.
  * @modified 2019-11-18 Added the rotate(number,Vertex) function.
  * @modified 2019-11-21 Fixed a bug in the rotate(...) function (elements were moved).
- * @version  2.2.1
+ * @modified 2020-05-06 Added functions invX() and invY().
+ * @version  2.3.0
  *
  * @file Vertex
  * @public
@@ -562,6 +563,34 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     Vertex.prototype.setY = function( y ) {
 	this.y = y;
+	return this;
+    };
+
+
+    /**
+     * Set the x-component if this vertex to the inverse of its value.
+     *
+     * @method invX
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.invX = function() {
+	this.x = -this.x;
+	return this;
+    };
+
+
+    /**
+     * Set the y-component if this vertex to the inverse of its value.
+     *
+     * @method invy
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.invY = function() {
+	this.y = -this.y;
 	return this;
     };
     
@@ -1497,7 +1526,10 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-03-23 Changed the signatures of getPoint, getPointAt and getTangent (!version 2.0).
  * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
- * @version  2.0.1
+ * @modified 2020-05-06 Added the getSubCurveAt(number,number) function.
+ * @modified 2020-05-06 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
+ * @modified 2020-05-07 Added the isInstance(any) function. 
+ * @version 2.2.0
  *
  * @file CubicBezierCurve
  * @public
@@ -1657,7 +1689,7 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     CubicBezierCurve.prototype.updateArcLengths = function() {
 	var 
-	pointA = new Vertex( this.startPoint.x, this.startPoint.y ),
+	pointA = this.startPoint.clone(), // new Vertex( this.startPoint.x, this.startPoint.y ),
 	pointB = new Vertex( 0, 0 ),
 	curveStep = 1.0/this.curveIntervals;
 	
@@ -1679,12 +1711,13 @@ Object.extendClass = function( superClass, subClass ) {
 	    // Calculate segment length
 	    var tmpLength = pointA.distance(pointB);
 	    this.segmentLengths.push( tmpLength );
-	    this.arcLength += tmpLength;
+	    //this.arcLength += tmpLength;
+	    newLength += tmpLength;
 	    
 	    pointA = pointB;	    
 	    t += curveStep;
 	}
-	
+	this.arcLength = newLength;
     }; // END function
 
 
@@ -1840,6 +1873,41 @@ Object.extendClass = function( superClass, subClass ) {
 
 
     /**
+     * Get a sub curve at the given start end end offsets (values between 0.0 and 1.0).
+     *
+     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+     *
+     * @method getSubCurveAt
+     * @param {number} tStart – The start offset of the desired sub curve (must be in [0..1]).
+     * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
+     * @instance
+     * @return {CubicBezierCurve} The sub curve as a new curve.
+     **/
+    CubicBezierCurve.prototype.getSubCurveAt = function( tStart, tEnd ) {
+	var startVec = new Vector(
+	    this.getPointAt(tStart),
+	    this.getTangentAt(tStart)
+	);
+	var endVec = new Vector(
+	    this.getPointAt(tEnd),
+	    this.getTangentAt(tEnd).inv()
+	);
+
+	// Tangents are relative. Make absolute.
+	startVec.b.add( startVec.a )
+	endVec.b.add( endVec.a );
+
+	// This 'splits' the curve at the given point at t.
+	startVec.scale(0.33333333*(tEnd-tStart));
+	endVec.scale(0.33333333*(tEnd-tStart));
+
+	// Draw the bezier curve
+	// pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
+	return new CubicBezierCurve( startVec.a, endVec.a, startVec.b, endVec.b );
+    };
+    
+
+    /**
      * Convert a relative curve position u to the absolute curve position t.
      *
      * @method convertU2t
@@ -1956,6 +2024,29 @@ Object.extendClass = function( superClass, subClass ) {
     }
 
 
+    /**
+     * Quick check for class instance. 
+     * Is there a better way?
+     *
+     * @method isInstance
+     * @param {any} obj - Check if the passed object/value is an instance of CubicBezierCurve.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {boolean} 
+     **/
+    CubicBezierCurve.isInstance = function( obj ) {
+	if( typeof obj != "object" )
+	    return false;
+	function hasXY(v) { 
+	    return typeof v != "undefined" && typeof v.x == "number" && typeof v.y == "number";
+	}
+	return typeof obj.startPoint == "object" && hasXY(obj.startPoint)
+	    && typeof obj.endPoint == "object" && hasXY(obj.endPoint)
+	    && typeof obj.startControlPoint == "object" && hasXY(obj.startControlPoint)
+	    && typeof obj.endControlPoint == "object" && hasXY(obj.endControlPoint);
+    };
+
+    
   
     /**
      * Create an SVG path data representation of this bézier curve.
@@ -2112,7 +2203,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-11-18 Fixed the clone function: adjustCircular attribute was not cloned.
  * @modified 2019-12-02 Removed some excessive comments.
  * @modified 2019-12-04 Fixed the missing obtainHandleLengths behavior in the adjustNeightbourControlPoint function.
- * @version 2.0.3
+ * @modified 2020-05-06 Added function locateCurveByEndPoint( Vertex ).
+ * @version 2.1.0
  *
  * @file BezierPath
  * @public
@@ -2242,9 +2334,27 @@ Object.extendClass = function( superClass, subClass ) {
 
 
     /**
-     * Locate the curve with the given start point (function returns the index).
+     * Locate the curve with the given end point (function returns the index).
      *
      * @method locateCurveByEndPoint
+     * @param {Vertex} point - The (curve end-) point to look for.
+     * @instance
+     * @memberof BezierPath
+     * @return {number} The curve index or -1 if curve (end-) point not found
+     **/
+    BezierPath.prototype.locateCurveByEndPoint = function( point ) {
+	for( var i in this.bezierCurves ) {
+	    if( this.bezierCurves[i].endPoint.equals(point) )
+		return i;
+	}
+	return -1;
+    };
+
+
+    /**
+     * Locate the curve with the given start point (function returns the index).
+     *
+     * @method locateCurveByStartControlPoint
      * @param {Vertex} point - The (curve endt-) point to look for.
      * @instance
      * @memberof BezierPath
@@ -2776,14 +2886,14 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     BezierPath.prototype.getPerpendicular = function( u ) {
 	if( u < 0 || u > this.totalArcLength ) {
-	    console.log( "[IKRS.BezierPath.getPerpendicular(u)] u is out of bounds: " + u + "." );
+	    console.log( "[BezierPath.getPerpendicular(u)] u is out of bounds: " + u + "." );
 	    return null;
 	}
 
 	// Find the spline to extract the value from
 	var i = 0;
 	var uTemp = 0.0;
-	
+	/*
 	while( i < this.bezierCurves.length &&
 	       (uTemp + this.bezierCurves[i].getLength()) < u 
 	     ) {
@@ -2792,11 +2902,113 @@ Object.extendClass = function( superClass, subClass ) {
 	    i++;
 
 	}
+	*/
+	var uResult = _locateUIndex( this, u );
+	var bCurve    = this.bezierCurves[ uResult.i ]; // i ];
+	var relativeU = u - uResult.uPart; // uTemp;
 
-	var bCurve    = this.bezierCurves[ i ];
-	var relativeU = u - uTemp;
+	//var uResult = this._locateUIndex( u );
+
+	//var bCurve    = this.bezierCurves[ i ];
+	//var relativeU = u - uTemp;
+	if( typeof bCurve == 'undefined' ) { console.log('Curve at index',uResult.i,this.bezierCurves.length,'is null!', 'u=', u, 'arcLength=', this.totalArcLength); console.log(this);  }
 	return bCurve.getPerpendicular( relativeU );
-    };    
+    };
+
+
+    /**
+     * This is a helper function to locate the curve index for a given
+     * absolute path position u.
+     *
+     * I decided to put this into privat scope as it is really specific. Maybe
+     * put this into a utils wrapper.
+     *
+     * Returns:
+     * - {number} i - the index of the containing curve.
+     * - {number} uPart - the absolute curve length sum (length from the beginning to u, should equal u itself).
+     * - {number} uBefore - the absolute curve length for all segments _before_ the matched curve (usually uBefore <= uPart).
+     **/
+    /*BezierPath.prototype._locateUIndex = function( u ) {
+	var i = 0;
+	var uTemp = 0.0;
+	var uBefore = 0.0;
+	while( i < this.bezierCurves.length &&
+	       (uTemp + this.bezierCurves[i].getLength()) < u 
+	     ) {
+	    uTemp += this.bezierCurves[ i ].getLength();
+	    if( i+1 < this.bezierCurves.length )
+		uBefore += this.bezierCurves[ i ].getLength();
+	    i++;
+	}
+	return { i : i, uPart : uTemp, uBefore : uBefore };
+    };*/
+    var _locateUIndex = function( path, u ) {
+	var i = 0;
+	var uTemp = 0.0;
+	var uBefore = 0.0;
+	while( i < path.bezierCurves.length &&
+	       (uTemp + path.bezierCurves[i].getLength()) < u 
+	     ) {
+	    uTemp += path.bezierCurves[ i ].getLength();
+	    if( i+1 < path.bezierCurves.length )
+		uBefore += path.bezierCurves[ i ].getLength();
+	    i++;
+	}
+	return { i : i, uPart : uTemp, uBefore : uBefore };
+     };
+    
+
+    /**
+     * Get a specific sub path from this path. The start and end position are specified by
+     * ratio number in [0..1].
+     *
+     * 0.0 is at the beginning of the path.
+     * 1.0 is at the end of the path.
+     *
+     * Values below 0 or beyond 1 are cropped down to the [0..1] interval.
+     *
+     * startT > endT is allowed, the returned sub path will have inverse direction then.
+     *
+     * @method getSubPathAt
+     * @param {number} startT - The start position of the sub path.
+     * @param {number} endT - The end position of the sub path.
+     * @instance
+     * @memberof BezierPath
+     * @return {BezierPath} The desired sub path in the bounds [startT..endT].
+     **/
+    BezierPath.prototype.getSubPathAt = function( startT, endT ) {
+	startT = Math.max(0,startT);
+	endT = Math.min(1.0,endT);
+	let startU = startT * this.totalArcLength;
+	let endU = endT * this.totalArcLength;
+
+	var uStartResult = _locateUIndex( this, startU ); // { i, uPart }
+	var uEndResult = _locateUIndex( this, endU );     // { i, uPart }
+	// console.log( "uStartResult", uStartResult, "uEndResult", uEndResult );
+
+	var firstT = (startU-uStartResult.uBefore) / this.bezierCurves[uStartResult.i].getLength();
+
+	if( uStartResult.i == uEndResult.i ) {
+	    // Subpath begins and ends in the same path segment (just get a simple sub curve from that path element).
+	    var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
+	    var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT, lastT); 
+	    return BezierPath.fromArray( [ firstCurve ] ); 
+	} else {
+	    var curves = [];
+	    var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT, 1.0);
+	    curves.push(firstCurve);
+
+	    for( var i = uStartResult.i+1; i < uEndResult.i && i < this.bezierCurves.length; i++ ) {
+		curves.push( this.bezierCurves[i].clone() );
+	    }
+
+	    var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
+	    curves.push( this.bezierCurves[uEndResult.i].getSubCurveAt(0,lastT) );
+	    
+	    return BezierPath.fromArray( curves );
+	}
+    };
+        
 
     /**
      * This function moves the addressed curve point (or control point) with
@@ -2844,6 +3056,7 @@ Object.extendClass = function( superClass, subClass ) {
 				      true,                  // move control point, too
 				      false                  // updateArcLengths
 				    );
+	   
 	    
 	} else if( pointID == this.START_CONTROL_POINT && curveIndex > 0 ) {
 	    
@@ -2991,7 +3204,6 @@ Object.extendClass = function( superClass, subClass ) {
 	neighbourCurve.updateArcLengths();
     };
 
-
     
     /**
      * Clone this BezierPath (deep clone).
@@ -3128,7 +3340,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof BezierPath
      * @return {BezierPath} The bezier path instance retrieved from the array data.
      **/
-    BezierPath.fromArray = function( arr ) {
+    BezierPath.fromArray = function( arr ) { 
 
 	if( !Array.isArray(arr) )
 	    throw "[BezierPath.fromArray] Passed object must be an array.";
@@ -3143,7 +3355,9 @@ Object.extendClass = function( superClass, subClass ) {
 	    
 	    // Convert object (or array?) to bezier curve
 	    var bCurve = null;
-	    if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
+	    if( CubicBezierCurve.isInstance(arr[i]) ) { 
+		bCurve = arr[i].clone();
+	    } else if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
 		if( !arr[i][0] || !arr[i][1] || !arr[i][2] || !arr[i][3] )
 		    throw "Cannot convert path data to BezierPath instance. At least one element is undefined (index="+i+"): " + arr[i];
 		bCurve = CubicBezierCurve.fromArray( arr[i] );
@@ -3157,13 +3371,14 @@ Object.extendClass = function( superClass, subClass ) {
 	    
 	    // Add to path's internal list
 	    bPath.bezierCurves.push( bCurve );
-	    bPath.totalArcLength += bCurve.getLength(); 	    
+	    // bPath.totalArcLength += bCurve.getLength(); 	    
 	    
 	    lastCurve = bCurve;
-	}   
+	}
+	bPath.updateArcLengths();
 	// Bezier segments added. Done
 	return bPath;
-    }
+    };
 
 
     
@@ -5543,7 +5758,9 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-07 Added the drawConfig for lines, polygons, ellipse, triangles, bezier curves and image control lines.
  * @modified 2019-12-08 Fixed a css scale bug in the viewport() function.
  * @modified 2019-12-08 Added the drawconfig UI panel (line colors and line widths).
- * @version  1.6.4
+ * @modified 2020-05-06 Added handling for the end- and end-control-points of non-cirular Bézier paths (was still missing).
+ * @modified 2020-05-06 Fixed a drag-amount bug in the move handling of end points of Bezier paths (control points was not properly moved when non circular).
+ * @version  1.7.0
  *
  * @file PlotBoilerplate
  * @public
@@ -5953,28 +6170,48 @@ Object.extendClass = function( superClass, subClass ) {
 			var cindex = drawable.locateCurveByStartPoint( e.params.vertex );
 			drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
 			drawable.moveCurvePoint( cindex*1, 
-						 drawable.START_POINT,         // obtain handle length?
-						 e.params.dragAmount           // update arc lengths
+						 drawable.START_POINT,     
+						 e.params.dragAmount     
 					       );
+			//drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
 			var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
 			if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
 			    return;
 			drawable.adjustPredecessorControlPoint( cindex*1, 
-								true,          // obtain handle length?
-								true           // update arc lengths
+								true,      // obtain handle length?
+								true       // update arc lengths
 							      );
+			//drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
 			var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
 			if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
 			    return;
 			drawable.adjustSuccessorControlPoint( cindex*1, 
-							      true,            // obtain handle length?
-							      true             // update arc lengths
+							      true,        // obtain handle length?
+							      true         // update arc lengths
 							    );
+			//drawable.updateArcLengths();
 		    } );
+		    if( i+1 > drawable.bezierCurves.length ) { 
+			// Move last control point with the end point (if not circular)
+			drawable.bezierCurves[drawable.bezierCurves.length-1].endPoint.listeners.addDragListener( function(e) {
+			    //console.log('x');
+			    if( !drawable.adjustCircular ) {
+				var cindex = drawable.locateCurveByEndPoint( e.params.vertex );
+				//console.log('y', cindex);
+				//if( cindex+1 > drawable.bezierCurves.length ) return;
+				// drawable.bezierCurves[cindex].endControlPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+				drawable.moveCurvePoint( cindex*1, 
+							 drawable.END_CONTROL_POINT,     
+							 { x: e.params.dragAmount.x/2, y : e.params.dragAmount.y/2 }
+						       ); 
+			    }
+			    //drawable.updateArcLengths();
+			} ); 
+		    }
 		} // END for
 	    } else if( drawable instanceof PBImage ) {
 		this.vertices.push( drawable.upperLeft );

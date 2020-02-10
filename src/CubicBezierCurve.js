@@ -12,9 +12,10 @@
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-03-23 Changed the signatures of getPoint, getPointAt and getTangent (!version 2.0).
  * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
- * @modified 2020-05-05 Added the getSubCurveAt(number,number) function.
- * @modified 2020-05-05 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
- * @version  2.1.1
+ * @modified 2020-05-06 Added the getSubCurveAt(number,number) function.
+ * @modified 2020-05-06 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
+ * @modified 2020-05-07 Added the isInstance(any) function. 
+ * @version 2.2.0
  *
  * @file CubicBezierCurve
  * @public
@@ -509,12 +510,20 @@
     }
 
 
-    // Quick check for class instance. Is there a better way?
-    CubicBezierCurve.isCubicBezierCurve = function( obj ) {
-	//console.log('iscurve',obj);
-	if( typeof obj == "undefined" )
+    /**
+     * Quick check for class instance. 
+     * Is there a better way?
+     *
+     * @method isInstance
+     * @param {any} obj - Check if the passed object/value is an instance of CubicBezierCurve.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {boolean} 
+     **/
+    CubicBezierCurve.isInstance = function( obj ) {
+	if( typeof obj != "object" )
 	    return false;
-	function hasXY(v) { //console.log('x');
+	function hasXY(v) { 
 	    return typeof v != "undefined" && typeof v.x == "number" && typeof v.y == "number";
 	}
 	return typeof obj.startPoint == "object" && hasXY(obj.startPoint)

@@ -56,11 +56,15 @@
 	    pb.config.postDraw = function() {
 		// In this demo the PlotBoilerplate only draws the vertices.
 		// Everything else is drawn by this script, with the help of some PB functions.
-		path.updateArcLengths();
+
 		// Adjust all bezier control points to keep the path smooth
 		for( var i in path.bezierCurves ) {
-		    path.adjustPredecessorControlPoint(i,false,true);
+		    path.adjustPredecessorControlPoint( i,     
+							false, // obtainHandleLength
+							false   // updateArcLength  (we will do this after the loop)
+						      );
 		}
+		path.updateArcLengths();
 		redraw();
 	    };
 
@@ -128,14 +132,9 @@
 	    }
 	    
 	    var path = BezierPath.fromArray( bpath );
-	    
-
-
 	    pb.add( path );
 
-
-
-
+	    
 	    // Animate the vertices: make them bounce around and reflect on the walls.
 	    var animator = null;
 	    var toggleAnimation = function() {
@@ -150,7 +149,7 @@
 		} else {
 		    animator.stop();
 		    animator = null;
-		}
+		} 
 	    };
 
 	    /**

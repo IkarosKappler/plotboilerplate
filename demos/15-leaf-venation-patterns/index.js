@@ -64,6 +64,7 @@
 		pb.draw.circle( path.bezierCurves[0].startPoint, 20 );
 
 
+
 		// Draw a single sub curve (test)
 		var subCurve = path.bezierCurves[0].getSubCurveAt( config.startT, config.endT );
 		//console.log("subCurve", subCurve);
@@ -75,10 +76,10 @@
 				     2 );*/
 		
 		// Draw a sub path
-		
-		var subPath = path.getSubPath( config.startT, config.endT );
-		// console.log('subPath.length', subPath.bezierCurves.length, subPath );
+		var subPath = path.getSubPathAt( config.startT, config.endT );
+		// Mark sub path's start and end point
 		pb.draw.circle( subPath.bezierCurves[0].startPoint.clone().invX(), 10 );
+		pb.draw.circle( subPath.bezierCurves[subPath.bezierCurves.length-1].endPoint.clone().invX(), 6 );
 		for( var c in subPath.bezierCurves ) {
 		    pb.draw.cubicBezier( subPath.bezierCurves[c].startPoint.clone().invX(),
 					 subPath.bezierCurves[c].endPoint.clone().invX(),
