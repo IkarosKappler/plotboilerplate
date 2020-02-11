@@ -463,7 +463,7 @@
 						 drawable.START_POINT,     
 						 e.params.dragAmount     
 					       );
-			//drawable.updateArcLengths();
+			drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
 			var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
@@ -471,9 +471,9 @@
 			    return;
 			drawable.adjustPredecessorControlPoint( cindex*1, 
 								true,      // obtain handle length?
-								true       // update arc lengths
+								false      // update arc lengths
 							      );
-			//drawable.updateArcLengths();
+			drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
 			var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
@@ -481,25 +481,21 @@
 			    return;
 			drawable.adjustSuccessorControlPoint( cindex*1, 
 							      true,        // obtain handle length?
-							      true         // update arc lengths
+							      false        // update arc lengths
 							    );
-			//drawable.updateArcLengths();
+			drawable.updateArcLengths();
 		    } );
 		    if( i+1 > drawable.bezierCurves.length ) { 
 			// Move last control point with the end point (if not circular)
 			drawable.bezierCurves[drawable.bezierCurves.length-1].endPoint.listeners.addDragListener( function(e) {
-			    //console.log('x');
 			    if( !drawable.adjustCircular ) {
 				var cindex = drawable.locateCurveByEndPoint( e.params.vertex );
-				//console.log('y', cindex);
-				//if( cindex+1 > drawable.bezierCurves.length ) return;
-				// drawable.bezierCurves[cindex].endControlPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
 				drawable.moveCurvePoint( cindex*1, 
 							 drawable.END_CONTROL_POINT,     
 							 { x: e.params.dragAmount.x/2, y : e.params.dragAmount.y/2 }
 						       ); 
 			    }
-			    //drawable.updateArcLengths();
+			    drawable.updateArcLengths();
 			} ); 
 		    }
 		} // END for
@@ -651,7 +647,7 @@
 		var d = this.drawables[i];
 		if( d instanceof BezierPath ) {
 		    for( var c in d.bezierCurves ) {
-			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth ); // '#00a822' );
+			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth );
 
 			if( this.config.drawBezierHandlePoints && this.config.drawHandlePoints ) {
 			    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {

@@ -1528,8 +1528,10 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
  * @modified 2020-05-06 Added the getSubCurveAt(number,number) function.
  * @modified 2020-05-06 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
- * @modified 2020-05-07 Added the isInstance(any) function. 
- * @version 2.2.0
+ * @modified 2020-05-07 Added the isInstance(any) function.
+ * @modified 2020-05-10 Added the reverse() function.
+ * @modified 2020-05-10 Fixed the translate(...) function (returning 'this' was missing).
+ * @version 2.3.1
  *
  * @file CubicBezierCurve
  * @public
@@ -1628,12 +1630,12 @@ Object.extendClass = function( superClass, subClass ) {
 		this.getEndControlPoint().add( moveAmount );
 
 	} else {
-	    console.log( "[IKRS.CubicBezierCurve.moveCurvePoint] pointID '" + pointID +"' invalid." );
+	    console.log( "[CubicBezierCurve.moveCurvePoint] pointID '" + pointID +"' invalid." );
 	}
 	
 	if( updateArcLengths )
 	    this.updateArcLengths();
-    }
+    };
 
 
 
@@ -1644,15 +1646,36 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {Vertex} amount - The amount to translate this curve by.
      * @instance
      * @memberof CubicBezierCurve
-     * @return {CubicBezierCurve} this
+     * @return {CubicBezierCurve} this (for chaining).
      **/
     CubicBezierCurve.prototype.translate = function( amount ) {
 	this.startPoint.add( amount );
 	this.startControlPoint.add( amount );
 	this.endControlPoint.add( amount );
-	this.endPoint.add( amount );   
+	this.endPoint.add( amount );
+	return this;
     };
 
+
+    
+    /**
+     * Reverse this curve, means swapping start- and end-point and swapping
+     * start-control- and end-control-point.
+     *
+     * @method reverse
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} this (for chaining).
+     **/
+    CubicBezierCurve.prototype.reverse = function() {
+	var tmp = this.startPoint;
+	this.startPoint = this.endPoint;
+	this.endPoint = tmp;
+	tmp = this.startControlPoint;
+	this.startControlPoint = this.endControlPoint;
+	this.endControlPoint = tmp;
+	return this;
+    };
 
     
     /**
@@ -2204,7 +2227,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-02 Removed some excessive comments.
  * @modified 2019-12-04 Fixed the missing obtainHandleLengths behavior in the adjustNeightbourControlPoint function.
  * @modified 2020-05-06 Added function locateCurveByEndPoint( Vertex ).
- * @version 2.1.0
+ * @modified 2020-05-11 Added 'return this' to the scale(Vertex,number) and to the translace(Vertex) function.
+ * @version 2.1.1
  *
  * @file BezierPath
  * @public
@@ -2670,7 +2694,7 @@ Object.extendClass = function( superClass, subClass ) {
      *                          to each vertex of the curve.
      * @instance
      * @memberof BezierPath
-     * @return {void}
+     * @return {BezierPath} this for chaining
      **/
     BezierPath.prototype.translate = function( amount ) {	
 	for( var i = 0; i < this.bezierCurves.length; i++ ) {
@@ -2685,6 +2709,7 @@ Object.extendClass = function( superClass, subClass ) {
 	curve.getEndPoint().add( amount );
 
 	this.updateArcLengths();
+	return this;
     };
 
 
@@ -2697,7 +2722,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {Vertex} amount - The scalars to be multiplied with (ascaling.x and scaling.y)
      * @instance
      * @memberof BezierPath
-     * @return {void}
+     * @return {BezierPath} this for chaining.
      **/
     BezierPath.prototype.scale = function( anchor,  // Vertex
 					   scaling  // Vertex
@@ -2715,11 +2740,11 @@ Object.extendClass = function( superClass, subClass ) {
 	
 	// Finally move the last end point (was not scaled yet)
 	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
-	    // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS
 	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().scale( scaling, anchor );
 	}
 	
-	this.updateArcLengths();	
+	this.updateArcLengths();
+	return this;
     };
 
 
@@ -2893,25 +2918,10 @@ Object.extendClass = function( superClass, subClass ) {
 	// Find the spline to extract the value from
 	var i = 0;
 	var uTemp = 0.0;
-	/*
-	while( i < this.bezierCurves.length &&
-	       (uTemp + this.bezierCurves[i].getLength()) < u 
-	     ) {
-	    
-	    uTemp += this.bezierCurves[ i ].getLength();
-	    i++;
-
-	}
-	*/
 	var uResult = _locateUIndex( this, u );
-	var bCurve    = this.bezierCurves[ uResult.i ]; // i ];
-	var relativeU = u - uResult.uPart; // uTemp;
+	var bCurve    = this.bezierCurves[ uResult.i ];
+	var relativeU = u - uResult.uPart;
 
-	//var uResult = this._locateUIndex( u );
-
-	//var bCurve    = this.bezierCurves[ i ];
-	//var relativeU = u - uTemp;
-	if( typeof bCurve == 'undefined' ) { console.log('Curve at index',uResult.i,this.bezierCurves.length,'is null!', 'u=', u, 'arcLength=', this.totalArcLength); console.log(this);  }
 	return bCurve.getPerpendicular( relativeU );
     };
 
@@ -2928,20 +2938,6 @@ Object.extendClass = function( superClass, subClass ) {
      * - {number} uPart - the absolute curve length sum (length from the beginning to u, should equal u itself).
      * - {number} uBefore - the absolute curve length for all segments _before_ the matched curve (usually uBefore <= uPart).
      **/
-    /*BezierPath.prototype._locateUIndex = function( u ) {
-	var i = 0;
-	var uTemp = 0.0;
-	var uBefore = 0.0;
-	while( i < this.bezierCurves.length &&
-	       (uTemp + this.bezierCurves[i].getLength()) < u 
-	     ) {
-	    uTemp += this.bezierCurves[ i ].getLength();
-	    if( i+1 < this.bezierCurves.length )
-		uBefore += this.bezierCurves[ i ].getLength();
-	    i++;
-	}
-	return { i : i, uPart : uTemp, uBefore : uBefore };
-    };*/
     var _locateUIndex = function( path, u ) {
 	var i = 0;
 	var uTemp = 0.0;
@@ -2955,7 +2951,7 @@ Object.extendClass = function( superClass, subClass ) {
 	    i++;
 	}
 	return { i : i, uPart : uTemp, uBefore : uBefore };
-     };
+    };
     
 
     /**
@@ -2982,12 +2978,10 @@ Object.extendClass = function( superClass, subClass ) {
 	let startU = startT * this.totalArcLength;
 	let endU = endT * this.totalArcLength;
 
-	var uStartResult = _locateUIndex( this, startU ); // { i, uPart }
-	var uEndResult = _locateUIndex( this, endU );     // { i, uPart }
-	// console.log( "uStartResult", uStartResult, "uEndResult", uEndResult );
-
+	var uStartResult = _locateUIndex( this, startU ); // { i:int, uPart:float, uBefore:float }
+	var uEndResult = _locateUIndex( this, endU );     // { i:int, uPart:float, uBefore:float }
+	
 	var firstT = (startU-uStartResult.uBefore) / this.bezierCurves[uStartResult.i].getLength();
-
 	if( uStartResult.i == uEndResult.i ) {
 	    // Subpath begins and ends in the same path segment (just get a simple sub curve from that path element).
 	    var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
@@ -2995,16 +2989,27 @@ Object.extendClass = function( superClass, subClass ) {
 	    return BezierPath.fromArray( [ firstCurve ] ); 
 	} else {
 	    var curves = [];
-	    var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT, 1.0);
-	    curves.push(firstCurve);
-
-	    for( var i = uStartResult.i+1; i < uEndResult.i && i < this.bezierCurves.length; i++ ) {
-		curves.push( this.bezierCurves[i].clone() );
+	    if( uStartResult.i > uEndResult.i ) {
+		// Back to front direction
+		var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT,0.0);
+		curves.push(firstCurve);	
+		for( var i = uStartResult.i-1; i > uEndResult.i; i-- ) {
+		    curves.push( this.bezierCurves[i].clone().reverse() ); 
+		}
+		var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
+		curves.push( this.bezierCurves[uEndResult.i].getSubCurveAt(1.0,lastT) );
+	    } else {
+		// Front to back direction
+		var firstCurve = this.bezierCurves[uStartResult.i].getSubCurveAt(firstT, 1.0);
+		curves.push(firstCurve);
+		
+		for( var i = uStartResult.i+1; i < uEndResult.i && i < this.bezierCurves.length; i++ ) {
+		    curves.push( this.bezierCurves[i].clone() );
+		}
+		
+		var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
+		curves.push( this.bezierCurves[uEndResult.i].getSubCurveAt(0,lastT) );
 	    }
-
-	    var lastT = (endU-uEndResult.uBefore) / this.bezierCurves[uEndResult.i].getLength();
-	    curves.push( this.bezierCurves[uEndResult.i].getSubCurveAt(0,lastT) );
-	    
 	    return BezierPath.fromArray( curves );
 	}
     };
@@ -6173,7 +6178,7 @@ Object.extendClass = function( superClass, subClass ) {
 						 drawable.START_POINT,     
 						 e.params.dragAmount     
 					       );
-			//drawable.updateArcLengths();
+			drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
 			var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
@@ -6181,9 +6186,9 @@ Object.extendClass = function( superClass, subClass ) {
 			    return;
 			drawable.adjustPredecessorControlPoint( cindex*1, 
 								true,      // obtain handle length?
-								true       // update arc lengths
+								false      // update arc lengths
 							      );
-			//drawable.updateArcLengths();
+			drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
 			var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
@@ -6191,25 +6196,21 @@ Object.extendClass = function( superClass, subClass ) {
 			    return;
 			drawable.adjustSuccessorControlPoint( cindex*1, 
 							      true,        // obtain handle length?
-							      true         // update arc lengths
+							      false        // update arc lengths
 							    );
-			//drawable.updateArcLengths();
+			drawable.updateArcLengths();
 		    } );
 		    if( i+1 > drawable.bezierCurves.length ) { 
 			// Move last control point with the end point (if not circular)
 			drawable.bezierCurves[drawable.bezierCurves.length-1].endPoint.listeners.addDragListener( function(e) {
-			    //console.log('x');
 			    if( !drawable.adjustCircular ) {
 				var cindex = drawable.locateCurveByEndPoint( e.params.vertex );
-				//console.log('y', cindex);
-				//if( cindex+1 > drawable.bezierCurves.length ) return;
-				// drawable.bezierCurves[cindex].endControlPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
 				drawable.moveCurvePoint( cindex*1, 
 							 drawable.END_CONTROL_POINT,     
 							 { x: e.params.dragAmount.x/2, y : e.params.dragAmount.y/2 }
 						       ); 
 			    }
-			    //drawable.updateArcLengths();
+			    drawable.updateArcLengths();
 			} ); 
 		    }
 		} // END for
@@ -6361,7 +6362,7 @@ Object.extendClass = function( superClass, subClass ) {
 		var d = this.drawables[i];
 		if( d instanceof BezierPath ) {
 		    for( var c in d.bezierCurves ) {
-			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth ); // '#00a822' );
+			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth );
 
 			if( this.config.drawBezierHandlePoints && this.config.drawHandlePoints ) {
 			    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {

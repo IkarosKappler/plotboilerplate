@@ -1,7 +1,16 @@
 
 
 # Changelog
-* 2020-02-06
+* 2020-05-11
+  * Added 'return this' to the BezierPath.scale(Vertex,number) and to the .translace(Vertex) functions.
+* 2020-05-10
+  * Added the CubixBezierCurve.reverse() function.
+  * Fixed the CubicbezierCurve.translate(Vector) function (returning 'this' was missing).
+* 2020-05-09
+  * Added the BezierPath.getSubPathAt(number,number) function.
+* 2020-02-08
+  * Added the CubicBezierCurve isInstance(any) function.
+* 2020-02-07
   * Added function BezierPath.locateCurveByEndPoint( Vertex ).
   * Added handling for the end- and end-control-points of non-cirular Bézier paths (was still missing).
   * Added functions Vertex.invX() and Vertex.invY().

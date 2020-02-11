@@ -1,6 +1,6 @@
 
 
-function makeLeafShape( size ) {
+function makeLeafShape( size, changeHandler ) {
 
     /*
     // Make a nice Bézier path
@@ -33,7 +33,7 @@ function makeLeafShape( size ) {
     bcurves.push( [
 	bcurves[0][1].clone(),
 	new Vertex(0.75,-0.25).scale(size),
-	bcurves[0][3].clone().rotate( Math.PI, bcurves[0][1] ).scale( 0.5, bcurves[0][1]), // new Vertex(0.75,1.5).scale(size),
+	bcurves[0][3].clone().rotate( Math.PI, bcurves[0][1] ).scale( 0.5, bcurves[0][1]), 
 	new Vertex(1.0,-0.05).scale(size)
     ] );
     bcurves.push( [
@@ -43,9 +43,16 @@ function makeLeafShape( size ) {
 	new Vertex(0.45,-0.9).scale(size)
     ] );
     var path = BezierPath.fromArray( bcurves );
-    
 
     
+    // Insall drag listeners to get informed about path changes
+    for( var c in path.bezierCurves ) {
+	path.bezierCurves[c].startPoint.listeners.addDragListener( changeHandler );
+	path.bezierCurves[c].endPoint.listeners.addDragListener( changeHandler );
+	path.bezierCurves[c].startControlPoint.listeners.addDragListener( changeHandler );
+	if( c+1 >= path.bezierCurves.length && !path.isCircular )
+	    path.bezierCurves[c].endControlPoint.listeners.addDragListener( changeHandler );
+    }
     
     
     return path;

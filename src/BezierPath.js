@@ -16,7 +16,8 @@
  * @modified 2019-12-02 Removed some excessive comments.
  * @modified 2019-12-04 Fixed the missing obtainHandleLengths behavior in the adjustNeightbourControlPoint function.
  * @modified 2020-05-06 Added function locateCurveByEndPoint( Vertex ).
- * @version 2.1.0
+ * @modified 2020-05-11 Added 'return this' to the scale(Vertex,number) and to the translace(Vertex) function.
+ * @version 2.1.1
  *
  * @file BezierPath
  * @public
@@ -482,7 +483,7 @@
      *                          to each vertex of the curve.
      * @instance
      * @memberof BezierPath
-     * @return {void}
+     * @return {BezierPath} this for chaining
      **/
     BezierPath.prototype.translate = function( amount ) {	
 	for( var i = 0; i < this.bezierCurves.length; i++ ) {
@@ -497,6 +498,7 @@
 	curve.getEndPoint().add( amount );
 
 	this.updateArcLengths();
+	return this;
     };
 
 
@@ -509,7 +511,7 @@
      * @param {Vertex} amount - The scalars to be multiplied with (ascaling.x and scaling.y)
      * @instance
      * @memberof BezierPath
-     * @return {void}
+     * @return {BezierPath} this for chaining.
      **/
     BezierPath.prototype.scale = function( anchor,  // Vertex
 					   scaling  // Vertex
@@ -527,11 +529,11 @@
 	
 	// Finally move the last end point (was not scaled yet)
 	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
-	    // !!! TODO: THIS CAN BE DROPPED BECAUSE Vertex.scale ALREADY DOES THIS
 	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().scale( scaling, anchor );
 	}
 	
-	this.updateArcLengths();	
+	this.updateArcLengths();
+	return this;
     };
 
 

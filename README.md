@@ -481,6 +481,8 @@ from the sources code files in ./src/*.
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
  * Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
+ * Change BezierPath.getPointAt to .getVertexAt (or .getVertAt or vertAt?).
+ * Change BezierPath.scale( center, factor ) to BezierPath.scale( factor, center ) and make center optional (like in Polygon).
 
 ## Browsers support
 
