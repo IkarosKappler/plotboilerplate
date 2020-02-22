@@ -67,15 +67,17 @@
 	    var mainVenePosition = null;
 	    
 	    // Get the sub path
-	    var leafPath = null;
-	    var scaledPath = null;
-	    var scaledSubPath = null;
+	    var leafShape = null;
+	    var auxinSources = null;
 
 	    var startAuxin = null;
 	    
 	    var postDraw = function() {
+		pb.fill.polygon( leafShape.boundingPolygon, 'rgba(192,192,192,0.2)' );
+		var scaledPath = leafShape.path.clone().scale( startAuxin, config.leafScale ); 
+		var scaledSubPath = scaledPath.getSubPathAt( config.startT, config.endT );
 		// console.log('postDraw');
-		pb.draw.label( "Sorry, not yet finished.", pb.canvasSize.width/2, pb.canvasSize.height/2 );
+		pb.draw.label( "Sorry, not yet finished.", pb.canvasSize.width/2-60, pb.canvasSize.height/2 );
 		// Draw a normal and a mirrored clone
 		drawBezierPath( scaledPath, 'rgba(128,128,128,.5)', 1, function(v) { return v; } );
 		drawBezierPath( scaledPath, 'rgba(128,128,128,.5)', 1, function(v) { return v.clone().invX(); } );
@@ -91,6 +93,12 @@
 		    for( var a in auxinPositions ) {
 			var auxin = scaledSubPath.getPointAt( auxinPositions[a] );
 			pb.fill.circle( auxin, 4, 'rgb(255,96,0)' );
+		    }
+
+		    for( var a in auxinSources.vertices ) {
+			var auxin = auxinSources.vertices[a];
+			if( leafShape.containsVert(auxin) )
+			    pb.fill.circle( auxin, config.growthSize, 'rgba(255,96,0,0.25)' );
 		    }
 		}
 		
@@ -118,31 +126,38 @@
 	    // | This function is called whenever the main leaf shape (the outer path) changed.
 	    // +-------------------------------
 	    var updatePathInfo = function() {
-		startAuxin = leafPath.getPointAt(0).setX(0);
-		scaledPath = leafPath.clone().scale( startAuxin, config.leafScale ); // Scale??!!
-		scaledSubPath = scaledPath.getSubPathAt( config.startT, config.endT );
-		mainVenePosition = startAuxin.clone();
 		currentAuxins = [];
-		currentAuxins.push( startAuxin );
+	    };
+
+	    // +---------------------------------------------------------------------------------
+	    // | This function is called whenever the main leaf shape (the outer path) changed.
+	    // +-------------------------------
+	    var updateAuxinInfo = function() {
+		var bounds = leafShape.getBounds();
+		console.log( config.growthSize, bounds, bounds.getWidth(), bounds.getHeight(), bounds.getArea() );
+		auxinSources = new RandomRect( bounds.min,
+					       bounds.getWidth(), bounds.getHeight(),
+					       bounds.getArea()*(1/Math.pow(config.growthSize,2)), // Imagine a growthSize*growthSize raster for possible auxin positions
+					       config.growthSize*2  // minDist ist twice the growthSize, so auxins cannot overlap
+					     );
 	    };
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize the outline of the leaf (a Bézier path).
 	    // +-------------------------------
-	    let height = Math.min( pb.canvasSize.height, pb.canvasSize.width )*0.7;
-	    leafPath = makeLeafShape( height*0.5, function() { updatePathInfo(); } );
-	    pb.add( leafPath );
+	    let height = Math.min( pb.canvasSize.height, pb.canvasSize.width )*0.35;
+	    leafShape = new GrowableShape( height, function() { updatePathInfo(); }, null, function() { updateAuxinInfo(); } );
+	    pb.add( leafShape.path );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Set path auto-adjustable
 	    // +-------------------------------
-	    for( var i in leafPath.bezierCurves ) {
+	    for( var i in leafShape.path.bezierCurves ) {
 		if( i > 0 )
-		    leafPath.bezierCurves[i].startPoint.attr.bezierAutoAdjust = true;
-		if( i+1 < leafPath.bezierCurves.length )
-		    leafPath.bezierCurves[i].endPoint.attr.bezierAutoAdjust = true;
+		    leafShape.path.bezierCurves[i].startPoint.attr.bezierAutoAdjust = true;
+		if( i+1 < leafShape.path.bezierCurves.length )
+		    leafShape.path.bezierCurves[i].endPoint.attr.bezierAutoAdjust = true;
 	    }
-	    
 	    
 	
 	    // +---------------------------------------------------------------------------------
@@ -173,12 +188,12 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Move each outer auxin a little my.
 	    // +-------------------------------
-	    var mystificeAuxinPositions = function() {
+	    /*var mystificeAuxinPositions = function() {
 		for( var p in auxinPositions ) {
 		    var pos = auxinPositions[p] + (0.02 - Math.random()*0.04);
 		    auxinPositions[p] = Math.min(1.0, Math.max(0.0, pos) );
 		}
-	    };
+	    };*/
 
 
 	    var locateClosestOuterAuxin = function( pos ) {
@@ -197,51 +212,13 @@
 	    };
 
 	    var iterno = 0;
-	    var growVenes = function() {
-		// console.log('grow venes');
-		// For each growth auxin find the outer auxin with the smalles distance
-		var newAuxins = [];
-		iterno++;
-		if( iterno%10 == 5 ) {
-		    mystificeAuxinPositions();
-		}
-		// Grow main vene?
-		if( mainVenePosition.y > scaledPath.getPointAt(1).y ) {
-		    var vene = new Line( mainVenePosition, mainVenePosition.clone().addXY(0, -config.growthSize ) );
-		    vene.a.attr.selectable = vene.b.attr.selectable = false;
-		    if( iterno%10 == 0 ) {
-			// Add child vene
-			currentAuxins.push( vene.b.clone() );
-		    }
-		    pb.add( vene );
-		    mainVenePosition = vene.b.clone();
-		}
-		// Grow child venes
-		for( var i in currentAuxins ) {
-		    var cur = currentAuxins[i];
-		    var closest = scaledSubPath.getPointAt( auxinPositions[ locateClosestOuterAuxin(cur) ] );
-		    if( closest.distance(cur) > config.growthSize*1.1 ) {
-			// Stop growth when outer auxin is reached
-			var vene = new Line(cur.clone(),closest.clone()).setLength( config.growthSize );
-			vene.a.attr.selectable = vene.b.attr.selectable = false;
-			pb.add( vene );
-			newAuxins.push( vene.b );
-
-			// Copy
-			vene = new Line( vene.a.clone().invX(), vene.b.clone().invX() );
-			vene.a.attr.selectable = vene.b.attr.selectable = false;
-			pb.add( vene );
-		    }
-		}
-		currentAuxins = newAuxins;
-	    };
 	    
 	    function renderAnimation() {
 		growVenes();
 		if( config.animateGrowth )
 		    window.requestAnimationFrame( renderAnimation );
 		else // Animation stopped
-		    ; // drawTraces();
+		    ; 
 	    };
 	    
 	    function toggleAnimation() {
@@ -271,6 +248,7 @@
 	    toggleAnimation();
 	    randomizeAuxinPositions();
 	    updatePathInfo();
+	    updateAuxinInfo();
 	    pb.config.preDraw = postDraw;
 	    pb.redraw();
 

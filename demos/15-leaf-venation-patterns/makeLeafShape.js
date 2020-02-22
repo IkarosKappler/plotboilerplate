@@ -1,6 +1,6 @@
 
 
-function makeLeafShape( size, changeHandler ) {
+function makeLeafShape( size, changeHandler, changeStartListener, changeEndListener ) {
 
     /*
     // Make a nice Bézier path
@@ -44,14 +44,21 @@ function makeLeafShape( size, changeHandler ) {
     ] );
     var path = BezierPath.fromArray( bcurves );
 
+    var installVertexListeners = function(vert) {
+	vert.listeners.addDragListener( changeHandler );
+	if( typeof changeStartListener == 'function' )
+	    vert.listeners.addDragStartListener( changeStartListener );
+	if( typeof changeEndListener == 'function' )
+	    vert.listeners.addDragEndListener( changeEndListener );
+    };
     
     // Insall drag listeners to get informed about path changes
     for( var c in path.bezierCurves ) {
-	path.bezierCurves[c].startPoint.listeners.addDragListener( changeHandler );
-	path.bezierCurves[c].endPoint.listeners.addDragListener( changeHandler );
-	path.bezierCurves[c].startControlPoint.listeners.addDragListener( changeHandler );
+	installVertexListeners( path.bezierCurves[c].startPoint );
+	installVertexListeners( path.bezierCurves[c].endPoint );
+	installVertexListeners( path.bezierCurves[c].startControlPoint );
 	if( c+1 >= path.bezierCurves.length && !path.isCircular )
-	    path.bezierCurves[c].endControlPoint.listeners.addDragListener( changeHandler );
+	    installVertexListeners( path.bezierCurves[c].endControlPoint );
     }
     
     
