@@ -7,7 +7,8 @@
  * @date     2018-08-27
  * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  1.0.2
+ * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
+ * @version  1.0.3
  *
  * @file VertexListeners
  * @public
@@ -43,6 +44,7 @@
      **/
     VertexListeners.prototype.addDragListener = function( listener ) {
 	this.drag.push( listener );
+	return this;
     };
     /**
      * The drag listener is a function with a single drag event param.
@@ -63,6 +65,7 @@
      **/
     VertexListeners.prototype.addDragStartListener = function( listener ) {
 	this.dragStart.push( listener );
+	return this;
     };
     /**
      * The drag-start listener is a function with a single drag event param.
@@ -83,6 +86,7 @@
      **/
     VertexListeners.prototype.addDragEndListener = function( listener ) {
 	this.dragEnd.push( listener );
+	return this;
     };
     /**
      * The drag-end listener is a function with a single drag event param.

@@ -614,21 +614,6 @@
      * @memberof drawutils
      */
     _context.drawutils.prototype.polygon = function( polygon, color ) {
-	/* if( polygon.vertices.length <= 1 )
-	    return;
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.lineWidth = 1.0;
-	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
-	for( var i = 0; i < polygon.vertices.length; i++ ) {
-	    this.ctx.lineTo( this.offset.x + polygon.vertices[i].x*this.scale.x, this.offset.y + polygon.vertices[i].y*this.scale.y );
-	}
-	if( !polygon.isOpen && polygon.vertices.length > 2 )
-	    this.ctx.closePath();
-	this._fillOrDraw( color );
-	this.ctx.setLineDash([]);
-	this.ctx.restore();
-	*/
 	this.polyline( polygon.vertices, polygon.isOpen, color );
     };
 

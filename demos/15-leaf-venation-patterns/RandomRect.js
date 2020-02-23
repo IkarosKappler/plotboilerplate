@@ -16,13 +16,13 @@
      * @param {number} maxNumVerts
      * @param {number} minDist
      **/
-    var RandomRect = function( offset, w, h, numMaxVerts, minDist ) {
+    var RandomRect = function( offset, w, h, numMaxVerts, killRange ) {
 	this.vertices = null;
 	this.offset = offset;
 	this.width = w;
 	this.height = h;
 	this.numMaxVerts = numMaxVerts;
-	this.minDist = minDist;
+	this.killRange = killRange;
 
 	this.randomize();
     };
@@ -37,12 +37,12 @@
 	    var vert = this.randomVert();
 	    this.tryAdd(vert);
 	}
-	console.log('added', this.vertices.length, ' of ', this.numMaxVerts, 'minDist', this.minDist );
+	console.log('added', this.vertices.length, ' of ', this.numMaxVerts, 'killRange', this.killRange );
     };
 
     RandomRect.prototype.tryAdd = function( vert ) {
 	for( var i in this.vertices ) {
-	    if( this.vertices[i].distance(vert) < this.minDist )
+	    if( this.vertices[i].distance(vert) < this.killRange )
 		return false;
 	}
 	this.vertices.push( vert );

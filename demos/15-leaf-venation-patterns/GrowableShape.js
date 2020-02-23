@@ -28,10 +28,13 @@
 				       if( typeof onChangeEnd == 'function' ) onChangeEnd();
 				   } // onChangeEnd
 				 );
-	var scaledPath = null;
-	var scaledSubPath = null;
-
+	this.petiole = null;
 	this.boundingPolygon = null;
+	this._init();
+    };
+
+    GrowableShape.prototype._init = function() {
+	this.petiole = this.path.getPointAt(0);
 	this.updateBoundingPolygon();
     };
 
@@ -41,19 +44,30 @@
     GrowableShape.prototype.updateBoundingPolygon = function() {
 	console.log('rebuild bounding polygon' );
 
-	console.log('path',this.path, this);
-	
+	//console.log('path',this.path, this);
+
+	/*
 	// Each 10 pixels of arc length
 	var length = this.path.getLength();
-	var steps = Math.round( length*0.1 );
+	var steps = Math.round( length*0.05 );
 	var verts = [], t;
 	for( var i = 0; i <= steps; i++ ) {
 	    t = i/steps;
 	    verts.push( this.path.getPointAt( Math.max(0,Math.min(t,1) ) ) );
 	}
 	this.boundingPolygon = new Polygon( verts, false );
+	*/
+	this.boundingPolygon = pbutils.BezierPath.toPolygon( this.path, 0.05 );
     };
-	    
+
+    /*
+    GrowableShape.prototype.clone = function(onChange, onChangeStart, onChangeEnd) {
+	var shape = new GrowableShape( this.size, onChange, onChangeStart, onChangeEnd );
+	shape.path = this.path;
+	shape._init();
+	return shape;
+    };*/
+    
     
     GrowableShape.prototype.containsVert = function( vert ) {
 	return this.boundingPolygon.containsVert( vert );

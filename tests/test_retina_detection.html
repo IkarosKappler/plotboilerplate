@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Testing Retina Detection</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Testing retina detection.">
+    <meta name="keywords" content="javascript, retina, detect">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2020-02-12">
+    <script>
+      var isRetina = function(){
+	  var mediaQuery = "(-webkit-min-device-pixel-ratio: 1.5),\
+            (min--moz-device-pixel-ratio: 1.5),\
+            (-o-min-device-pixel-ratio: 3/2),\
+            (min-resolution: 1.5dppx)";
+	  if (window.devicePixelRatio > 1)
+              return true;
+	  if (window.matchMedia && window.matchMedia(mediaQuery).matches)
+              return true;
+	  return false;
+      };
+      function detectRetina() {
+	  document.getElementById('output').innerHTML = isRetina() ? 'Yes' : 'No';
+      }
+      window.addEventListener('load', function() { detectRetina(); });
+    </script>
+  </head>
+  <body>
+    Is retina: <pre id="output"></pre>
+    <br>
+    <br>
+    Problem: this one also detects zoom > 100% as retina.
+  </body>

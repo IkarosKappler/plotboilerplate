@@ -16,7 +16,7 @@
  * @modified 2019-12-02 Removed some excessive comments.
  * @modified 2019-12-04 Fixed the missing obtainHandleLengths behavior in the adjustNeightbourControlPoint function.
  * @modified 2020-05-06 Added function locateCurveByEndPoint( Vertex ).
- * @modified 2020-05-11 Added 'return this' to the scale(Vertex,number) and to the translace(Vertex) function.
+ * @modified 2020-05-11 Added 'return this' to the scale(Vertex,number) and to the translate(Vertex) function.
  * @version 2.1.1
  *
  * @file BezierPath

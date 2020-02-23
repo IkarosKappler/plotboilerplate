@@ -59,7 +59,8 @@
 		auxinCount            : 8,
 		drawAuxins            : false,
 		animateGrowth         : false,
-		growthSize            : 6 // Size of each growth step
+		growthSize            : 6, // Size of each growth step,
+		randomizeAuxins       : function() { randomizeAuxins(); pb.redraw(); }
 	    }, GUP );
 
 	    var auxinPositions = [];
@@ -70,12 +71,14 @@
 	    var leafShape = null;
 	    var auxinSources = null;
 
-	    var startAuxin = null;
+	    var scaledPath = null; // leafShape.path.clone().scale( leafShape.petiole, config.leafScale ); 
+	    var scaledSubPath = null; // scaledPath.getSubPathAt( config.startT, config.endT );
+	    var scaledBoundingPolygon = null;
+
 	    
 	    var postDraw = function() {
 		pb.fill.polygon( leafShape.boundingPolygon, 'rgba(192,192,192,0.2)' );
-		var scaledPath = leafShape.path.clone().scale( startAuxin, config.leafScale ); 
-		var scaledSubPath = scaledPath.getSubPathAt( config.startT, config.endT );
+		
 		// console.log('postDraw');
 		pb.draw.label( "Sorry, not yet finished.", pb.canvasSize.width/2-60, pb.canvasSize.height/2 );
 		// Draw a normal and a mirrored clone
@@ -94,10 +97,10 @@
 			var auxin = scaledSubPath.getPointAt( auxinPositions[a] );
 			pb.fill.circle( auxin, 4, 'rgb(255,96,0)' );
 		    }
-
+ 
 		    for( var a in auxinSources.vertices ) {
 			var auxin = auxinSources.vertices[a];
-			if( leafShape.containsVert(auxin) )
+			if( scaledBoundingPolygon.containsVert(auxin) )
 			    pb.fill.circle( auxin, config.growthSize, 'rgba(255,96,0,0.25)' );
 		    }
 		}
@@ -127,6 +130,9 @@
 	    // +-------------------------------
 	    var updatePathInfo = function() {
 		currentAuxins = [];
+		scaledPath = leafShape.path.clone().scale( leafShape.petiole, config.leafScale ); 
+		scaledSubPath = scaledPath.getSubPathAt( config.startT, config.endT );
+		scaledBoundingPolygon = pbutils.BezierPath.toPolygon( scaledPath, 0.05 );
 	    };
 
 	    // +---------------------------------------------------------------------------------
@@ -137,7 +143,7 @@
 		console.log( config.growthSize, bounds, bounds.getWidth(), bounds.getHeight(), bounds.getArea() );
 		auxinSources = new RandomRect( bounds.min,
 					       bounds.getWidth(), bounds.getHeight(),
-					       bounds.getArea()*(1/Math.pow(config.growthSize,2)), // Imagine a growthSize*growthSize raster for possible auxin positions
+					       bounds.getArea()*(1/Math.pow(config.growthSize*2,2)), // Imagine a growthSize*growthSize raster for possible auxin positions
 					       config.growthSize*2  // minDist ist twice the growthSize, so auxins cannot overlap
 					     );
 	    };
@@ -182,6 +188,14 @@
 		for( var a = 0; a < config.auxinCount; a++ ) {
 		    auxinPositions.push( Math.random() ); // A value betwenn 0.0 and 1.0
 		}
+	    };
+
+
+	    // +---------------------------------------------------------------------------------
+	    // | Randomize Auxins
+	    // +-------------------------------
+	    var randomizeAuxins = function() {
+		auxinSources.randomize();
 	    };
 
 
@@ -240,8 +254,9 @@
 		f0.add(config, 'leafScale').min(0.0).max(1.0).step(0.01).onChange( function() { updatePathInfo(); pb.redraw(); } ).name('Leaf Scale').title('Scale the leaf path.');
 		f0.add(config, 'auxinCount').min(1).max(1000).step(1).onChange( function() { randomizeAuxinPositions(); pb.redraw(); } ).name('#Auxins').title('Change auxin count.');
 		f0.add(config, 'drawAuxins').onChange( function() { pb.redraw(); } ).name('Draw auxins').title('Draw auxins.');
-		f0.add(config, 'animateGrowth').onChange( function() { toggleAnimation(); } ).name('Animate').title('Animate.');
+		f0.add(config, 'animateGrowth').onChange( function() { toggleAnimation(); } ).name('Animate').title('Animate.').arrowBounce('Click here',{fadeDelay:5000,detachAfter:6000});
 		f0.add(config, 'growthSize').onChange( function() { pb.redraw(); } ).name('Growth size').title('The amount of growth in each step.');
+		f0.add(config, 'randomizeAuxins').name('Rand Auxins').title('Randomize the auxin sources.');
 		f0.open();
 	    }
 

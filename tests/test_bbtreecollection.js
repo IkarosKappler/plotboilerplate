@@ -17,6 +17,7 @@ window.addEventListener(
 	
 	echo("Creating new tree collection ...");
 	var coll = new BBTreeCollection();
+	// Print the empty collection
 
 	var COUNT = 1000;
 	echo("Adding " + COUNT + " elements ...");
