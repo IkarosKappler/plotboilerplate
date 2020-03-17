@@ -4,6 +4,33 @@ layout: page
 
 
 # Changelog
+* 2020-03-17
+  * Added the Triangle.toPolygon() function.
+  * Added proper JSDoc tags to the Triangle class.
+  * Added a new demo: ported the Morley-Triangle visualization (from an older project).
+* 2020-03-16
+  * Added Triangle.fromArray(Array) function.
+  * The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
+* 2020-02-29
+  * Added the VertexAttr.selectable attribute.
+* 2020-02-22
+  * Added 'return this' to VertexListeners addDragListener, addDragStartListener, addDragEnd functions (for chanining).
+* 2020-02-11
+  * Added 'return this' to the BezierPath.scale(Vertex,number) and to the .translace(Vertex) functions.
+* 2020-02-10
+  * Added the CubixBezierCurve.reverse() function.
+  * Fixed the CubicbezierCurve.translate(Vector) function (returning 'this' was missing).
+* 2020-02-09
+  * Added the BezierPath.getSubPathAt(number,number) function.
+* 2020-02-08
+  * Added the CubicBezierCurve isInstance(any) function.
+* 2020-02-07
+  * Added function BezierPath.locateCurveByEndPoint( Vertex ).
+  * Added handling for the end- and end-control-points of non-cirular Bézier paths (was still missing).
+  * Added functions Vertex.invX() and Vertex.invY().
+  * Added the CubicBezierCurve.getSubCurveAt(number,number) function.
+  * Fixed a drag-amount bug in the move handling of end points of Bezier paths (control points was not properly moved when non circular).
+  * Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
 * 2020-01-13
   * Added a 'CanvasPointList' to the demos to make point count managing easier.
 * 2020-01-09

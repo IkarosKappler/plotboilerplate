@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-01-19
+date: 2020-03-17
 ---
 
 <div class="full-width">
@@ -77,7 +77,17 @@ date: 2020-01-19
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/14-pursuit-curves/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-2020014-pursuit-curves.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200114-pursuit-curves.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/15-leaf-venation-patterns/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200317-leaf-venation-test.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/16-morley-trisectors/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200317-morley-triangle.png');"></div>
    </a>
 </div>
 </div>
