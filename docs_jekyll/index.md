@@ -166,6 +166,20 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/14-pursuit-curves/index.html" title="See the demo">See the demo</a>
 
 
+### Drawing leaf venations (approach inspired by bleeptrack, see [Operation Mindfuck](https://media.ccc.de/v/36c3-66-operation-mindfuck-vol-3#t=2524 "Operation Mindfuck @ 36c3"))
+
+![Drawing leaf venations (venation patterns in a leaf shape)](screenshots/screenshot-20200317-leaf-venation-test.png "Drawing leaf venations")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/15-leaf-venation-patterns/index.html" title="See the demo">See the demo</a>
+
+
+### Morley triangle
+
+![Presenting the Morley triangle theorem](screenshots/screenshot-20200317-morley-triangle.png "The Morley trisector triangle")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/16-morley-trisectors/index.html" title="See the demo">See the demo</a>
+
+
 
 ## Initialization parameters
 
