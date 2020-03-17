@@ -17,7 +17,10 @@
  * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
  * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
  * @modified  2019-12-09 Fixed the determinant() function. The calculation was just wrong.
- * @version   2.0.5
+ * @modified  2020-03-16 (Corona times) Added the 'fromArray' function.
+ * @modified  2020-03-17 Added the Triangle.toPolygon() function.
+ * @modified  2020-03-17 Added proper JSDoc comments.
+ * @version   2.2.1
  *
  * @file Triangle
  * @public
@@ -36,8 +39,37 @@
 
 
     /**
+     * Used in the bounds() function.
+     *
+     * @private
+     **/
+    function max3( a, b, c ) { return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c; }
+    function min3( a, b, c ) { return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c; }
+
+    
+    /**
+     * Used by the containsPoint() function.
+     *
+     * @private
+     **/
+    function pointIsInTriangle( px, py, p0x, p0y, p1x, p1y, p2x, p2y ) {
+	//
+	// Point-in-Triangle test found at
+	//   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
+	//
+	var area = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+
+	var s = 1/(2*area)*(p0y*p2x - p0x*p2y + (p2y - p0y)*px + (p0x - p2x)*py);
+	var t = 1/(2*area)*(p0x*p1y - p0y*p1x + (p0y - p1y)*px + (p1x - p0x)*py);
+
+	return s > 0 && t > 0 && (1-s-t) > 0;
+    };
+    
+
+    /**
      * The constructor.
      * 
+     * @constructor
      * @param {Vertex} a - The first vertex of the triangle.
      * @param {Vertex} b - The second vertex of the triangle.
      * @param {Vertex} c - The third vertex of the triangle.
@@ -51,12 +83,37 @@
 	
     }
 
+
+    /**
+     * Create a new triangle from the given array of vertices.
+     *
+     * The array must have at least three vertices, otherwise an error will be raised.
+     * This function will not create copies of the vertices.
+     *
+     * @method fromArray
+     * @static
+     * @param {Array<Vertex>} arr - The required array with at least three vertices.
+     * @memberof Vertex
+     * @return {Triangle}
+     **/
+    Triangle.fromArray = function( arr ) {
+	if( !Array.isArray(arr) )
+	    throw new Exception("Cannot create triangle fromArray from non-array.");
+	if( arr.length < 3 )
+	    throw new Exception("Cannot create triangle from array with less than three vertices ("+arr.length+")");
+	return new Triangle( arr[0], arr[1], arr[2] );
+    };
+    
+
     /**
      * Get the centroid of this triangle.
      *
      * The centroid is the average midpoint for each side.
      *
+     * @method getCentroid
      * @return {Vertex} The centroid
+     * @instance
+     * @memberof Triangle
      **/
     Triangle.prototype.getCentroid = function() {
 	return new Vertex( (this.a.x + this.b.x + this.c.x)/3,
@@ -69,8 +126,11 @@
     /**
      * Scale the triangle towards its centroid.
      *
-     * @param {Number} - The scale factor to use. This can be any scalar.
-     * @return {Triangle} this for chaining
+     * @method scaleToCentroid
+     * @param {number} - The scale factor to use. That can be any scalar.
+     * @return {Triangle} this (for chaining)
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.scaleToCentroid = function( factor ) {
 	let centroid = this.getCentroid();
@@ -88,7 +148,14 @@
      * The circumcircle is that unique circle on which all three
      * vertices of this triangle are located on.
      *
+     * Please note that for performance reasons any changes to vertices will not reflect in changes 
+     * of the circumcircle (center or radius). Please call the calcCirumcircle() function
+     * after triangle vertex changes.
+     *
+     * @method getCircumcircle
      * @return {Object} - { center:Vertex, radius:float }
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.getCircumcircle = function() {
 	if( !this.center || !this.radius ) 
@@ -105,9 +172,11 @@
      * For edge-checking Vertex.equals is used which uses an
      * an epsilon for comparison.
      *
+     * @method isAdjacent
      * @param {Triangle} tri - The second triangle to check adjacency with.
-     *
      * @return {boolean} - True if this and the passed triangle have at least one common edge.
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.isAdjacent = function( tri ) {
 	var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
@@ -122,9 +191,12 @@
      * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of 
      * the passed two.
      *
+     * @method getThirdVertex
      * @param {Vertex} vert1 - The first vertex.
      * @param {Vertex} vert2 - The second vertex.
-     * @return Vertex - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
+     * @return {Vertex} - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.getThirdVertex = function( vert1, vert2 ) {
 	if( this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1) ) return this.c;
@@ -139,9 +211,12 @@
      * have changed).
      *
      * The circumcenter and radius are stored in this.center and
-     * this radius. There is a third result: radius_squared.
+     * this.radius. There is a third result: radius_squared (for internal computations).
      *
+     * @method calcCircumcircle
      * @return void
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.calcCircumcircle = function() {
 	// From
@@ -186,28 +261,31 @@
      * Check if the passed vertex is inside this triangle's
      * circumcircle.
      *
+     * @method inCircumcircle
      * @param {Vertex} v - The vertex to check.
-     * @return boolean
+     * @return {boolean}
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.inCircumcircle = function( v ) {
 	var dx = this.center.x - v.x;
 	var dy = this.center.y - v.y;
 	var dist_squared = dx * dx + dy * dy;
 
-	return ( dist_squared <= this.radius_squared );
-	
-    }; // inCircumcircle
+	return ( dist_squared <= this.radius_squared );	
+    }; 
 
 
 
     /**
      * Get the rectangular bounds for this triangle.
      *
+     * @method bounds
      * @return {Object} - { xMin:float, xMax:float, yMin:float, yMax:float, width:float, height:float }
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.bounds = function() {
-	function max3( a, b, c ) { return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c; }
-	function min3( a, b, c ) { return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c; }
 	var minx = min3( this.a.x, this.b.x, this.c.x );
 	var miny = min3( this.a.y, this.b.y, this.c.y );
 	var maxx = max3( this.a.x, this.b.x, this.c.x );
@@ -217,14 +295,29 @@
 
 
     /**
+     * Convert this triangle to a polygon instance.
+     *
+     * Plase note that this conversion does not perform a deep clone.
+     *
+     * @method toPolygon
+     * @return {Polygon} A new polygon representing this triangle.
+     * @instance
+     * @memberof Triangle
+     **/
+    Triangle.prototype.toPolygon = function() {
+	return new Polygon( [ this.a, this.b, this.c ] );
+    };
+
+
+    /**
      * Get the determinant of this triangle.
      *
-     * @return {Number} - The determinant (float).
+     * @method determinant
+     * @return {number} - The determinant (float).
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.determinant = function() {
-	// This is wrong.
-	// return this.b.x*this.b.y* 0.5 * ( - this.b.x*this.a.y - this.a.x*this.b.y - this.b.x*this.c.y + this.c.x*this.a.y + this.a.x*this.c.y );
-	// This is correct:
 	// (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
 	return (this.b.y - this.a.y)*(this.c.x - this.b.x) - (this.c.y - this.b.y)*(this.b.x - this.a.x);
     };
@@ -235,24 +328,13 @@
      *
      * Note: matrix determinants rock.
      *
+     * @method containsPoint
      * @param {Vertex} p - The vertex to check.
      * @return {boolean}
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.containsPoint = function( p ) {
-	//
-	// Point-in-Triangle test found at
-	//   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-	//
-	function pointIsInTriangle( px, py, p0x, p0y, p1x, p1y, p2x, p2y ) {
-	    
-	    var area = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
-
-	    var s = 1/(2*area)*(p0y*p2x - p0x*p2y + (p2y - p0y)*px + (p0x - p2x)*py);
-	    var t = 1/(2*area)*(p0x*p1y - p0y*p1x + (p0y - p1y)*px + (p1x - p0x)*py);
-
-	    return s > 0 && t > 0 && (1-s-t) > 0;
-	};
-
 	return pointIsInTriangle( p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y );
     };
 
@@ -261,7 +343,10 @@
     /**
      * Converts this triangle into a human-readable string.
      *
+     * @method toString
      * @return {string}
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.toString = function() {
 	return '{ a : ' + this.a.toString () + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
@@ -275,7 +360,7 @@
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} The SVG string.
      * @instance
-     * @memberof Polygon
+     * @memberof Triangle
      **/
     Triangle.prototype.toSVGString = function( options ) {
 	options = options || {};

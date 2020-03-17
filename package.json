@@ -1,6 +1,6 @@
 {
   "name": "plotboilerplate",
-  "version": "1.6.6",
+  "version": "1.6.7",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
   "private": false,
   "main": "dist/plotboilerplate.min.js",

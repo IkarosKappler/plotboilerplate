@@ -135,7 +135,7 @@
 		var gui = pb.createGUI(); 
 		var f0 = gui.addFolder('Points');
 		f0.add(config, 'pointCount').onChange( function() { updatePointList(); pb.redraw(); } ).min(4).name('Change point count').title('Change point count.');
-		f0.add(config, 'drawTraces').onChange( function() { pb.redraw(); if( config.drawTraces ) drawTraces() } ).name('Draw trace').title('Draw trace.');
+		f0.add(config, 'drawTraces').onChange( function() { pb.redraw(); if( config.drawTraces ) drawTraces() } ).name('Draw traces').title('Draw traces.');
 		f0.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate a point cloud').title('Animate a point cloud.');
 		f0.open();
 	    }

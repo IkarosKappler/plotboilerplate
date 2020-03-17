@@ -678,13 +678,13 @@
 			
 		    }
 		} else if( d instanceof Polygon ) {
-		    this.draw.polygon( d, this.drawConfig.polygon.color ); //'#0022a8' );
+		    this.draw.polygon( d, this.drawConfig.polygon.color );
 		    if( !this.config.drawHandlePoints ) {
 			for( var i in d.vertices )
 			    d.vertices[i].attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Triangle ) {
-		    this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color ); // '#6600ff' );
+		    this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color );
 		    if( !this.config.drawHandlePoints ) 
 			d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
@@ -692,7 +692,7 @@
 			this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
 			this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
 		    }
-		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color ); //'#2222a8' );
+		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color );
 		    if( !this.config.drawHandlePoints ) {
 			d.center.attr.renderTime = renderTime;
 			d.axis.attr.renderTime = renderTime;
@@ -701,18 +701,18 @@
 		    if( this.drawConfig.drawVertices &&
 			(!d.attr.selectable || !d.attr.draggable) ) {
 			// Draw as special point (grey)
-			this.draw.circleHandle( d, 7, this.drawConfig.vertex.color ); // '#a8a8a8' );
+			this.draw.circleHandle( d, 7, this.drawConfig.vertex.color );
 			d.attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Line ) {
-		    this.draw.line( d.a, d.b, this.drawConfig.line.color ); // '#a844a8' );
+		    this.draw.line( d.a, d.b, this.drawConfig.line.color );
 		    if( !this.config.drawHandlePoints || !d.a.attr.selectable ) 
 			d.a.attr.renderTime = renderTime;
 		    if( !this.config.drawHandlePoints || !d.b.attr.selectable ) 
 			d.b.attr.renderTime = renderTime;
 		} else if( d instanceof Vector ) {
 		    // this.draw.line( d.a, d.b, '#ff44a8' );
-		    this.draw.arrow( d.a, d.b, this.drawConfig.vector.color ); // '#ff44a8' );
+		    this.draw.arrow( d.a, d.b, this.drawConfig.vector.color );
 		    if( this.config.drawHandlePoints && d.b.attr.selectable ) {
 			this.draw.circleHandle( d.b, 7, '#a8a8a8' );
 		    } else {
@@ -726,10 +726,10 @@
 		    
 		} else if( d instanceof PBImage ) {
 		    if( this.config.drawHandleLines )
-			this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color ); // '#a8a8a8' );
+			this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color );
 		    this.fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
 		    if( this.config.drawHandlePoints ) {
-			this.draw.circleHandle( d.lowerRight, 7, this.drawConfig.image.color ); // '#a8a8a8' );
+			this.draw.circleHandle( d.lowerRight, 7, this.drawConfig.image.color );
 			d.lowerRight.attr.renderTime = renderTime;
 		    }
 		} else {

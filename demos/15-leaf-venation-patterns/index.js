@@ -60,7 +60,8 @@
 		drawAuxins            : false,
 		animateGrowth         : false,
 		growthSize            : 6, // Size of each growth step,
-		randomizeAuxins       : function() { randomizeAuxins(); pb.redraw(); }
+		randomizeAuxins       : function() { randomizeAuxins(); pb.redraw(); },
+		animateStep           : function() { animateStep(); }
 	    }, GUP );
 
 	    var auxinPositions = [];
@@ -100,6 +101,8 @@
  
 		    for( var a in auxinSources.vertices ) {
 			var auxin = auxinSources.vertices[a];
+			//if( !auxin )
+			//    return;
 			if( scaledBoundingPolygon.containsVert(auxin) )
 			    pb.fill.circle( auxin, config.growthSize, 'rgba(255,96,0,0.25)' );
 		    }
@@ -183,12 +186,12 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Update the number and positions of the outer auxins.
 	    // +-------------------------------
-	    var randomizeAuxinPositions = function() {
+	    /* var randomizeAuxinPositions = function() {
 		auxinPositions = [];
 		for( var a = 0; a < config.auxinCount; a++ ) {
 		    auxinPositions.push( Math.random() ); // A value betwenn 0.0 and 1.0
 		}
-	    };
+	    }; */
 
 
 	    // +---------------------------------------------------------------------------------
@@ -209,7 +212,7 @@
 		}
 	    };*/
 
-
+	    /*
 	    var locateClosestOuterAuxin = function( pos ) {
 		if( auxinPositions.length == 0 )
 		    return -1;
@@ -224,19 +227,131 @@
 		}
 		return closesti;
 	    };
+	    */
 
+	    var nodeList = [];
+	    var minScale = 0.0; // 1;
+	    var growthSteps = 100;
+	    var auxinClosestNode = {};
+	    var nodeAffectingAuxins = {};
+	    var initGrowth = function() {
+		iterno = 0;
+		nodeList = [ leafShape.petiole.clone() ];
+	    };
+	    
 	    var iterno = 0;
+
+	    var clearAuxinsFromNodes = function() {
+		var newAuxinList = [];
+		for( var a in auxinSources.vertices ) {
+		    var auxin = auxinSources.vertices[a];
+		    var remove = false;
+		    for( var i in nodeList ) {
+			var node = nodeList[i];
+			if( node.distance(auxin) < config.growthSize )
+			    remove = true;
+		    }
+		    if( !remove )
+			newAuxinList.push(auxin);
+		}
+		auxinSources.vertices = newAuxinList;
+	    };
+
+	    var auxinListToNormalizedSum = function( node, auxinIndexList ) {
+		if( auxinIndexList.length == 0 )
+		    return null;
+		var vector = new Vector( node.clone(), node.clone() );
+		for( var a in auxinIndexList ) {
+		    var auxinIndex = auxinIndexList[a];
+		    var auxin = auxinSources.vertices[auxinIndex];
+		    vector.b.add( node.difference(auxin) );
+		}
+		// Move to origin
+		vector.sub( vector.a );
+		console.log('vector', vector );
+		return vector; // .setLength( config.growthSize );
+	    };
+
+	    // Find the closest node for each auxin
+	    var mapAuxinsToClosestNodes = function() {
+		for( var a in auxinSources.vertices ) {
+		    var auxin = auxinSources.vertices[a];
+		    // Auxin out of current scale rate?
+		    if( !scaledBoundingPolygon.containsVert(auxin) )
+			continue;
+		    // Find the closest node to this auxin
+		    var closestn = 0;
+		    for( var n in nodeList ) {
+			if( nodeList[n].distance(auxin) < nodeList[closestn].distance(auxin) )
+			    closestn = n;
+		    }
+		    auxinClosestNode[a] = closestn;
+		    if( !(closestn in nodeAffectingAuxins) || typeof nodeAffectingAuxins[closestn] == "undefined" )
+			nodeAffectingAuxins[closestn] = [];
+		    nodeAffectingAuxins[closestn].push(parseInt(a));
+		}
+	    };
+	    
+	    var growVenes = function() {
+		var scaleFactor = minScale + (iterno/growthSteps) * (1.0-minScale);
+		config.leafScale = scaleFactor;
+		updatePathInfo();
+		randomizeAuxins();
+		auxinClosestNode = {};
+		nodeAffectingAuxins = {};
+		clearAuxinsFromNodes();
+		mapAuxinsToClosestNodes();
+
+		// Now for each node:
+		//  * take the associated list of affecting auxins
+		//  * determine the normalized vector sum
+		//  * grow the node into that direction by one unit
+		var newNodeList = [];
+		for( var n in nodeList ) {
+		    if( typeof nodeAffectingAuxins[n] == "undefined" || nodeAffectingAuxins[n].length == 0 )
+			continue;
+		    console.log('auxins affecting node', n, nodeAffectingAuxins[n] );
+		    var vector = auxinListToNormalizedSum( nodeList[n], nodeAffectingAuxins[n] );
+		    if( vector == null )
+			continue;
+		    var vene = new Line(nodeList[n].clone(), vector.b.clone());
+		    // var vene = new Line(nodeList[n].clone(), nodeList[n].clone().add(vector.b));
+		    vene.a.attr.selectable = vene.b.attr.selectable = false;
+		    vene.a.attr.draggable = vene.b.attr.draggable = false;
+		    console.log('new vene', vene );
+		    pb.add( vene  );
+		    newNodeList.push( vector.b.clone() ); // Clone???
+		    // newNodeList.push( vene.b.clone() ); // vector.b.clone() ); // Clone???
+		}
+
+		for( var n in newNodeList ) {
+		    console.log('adding new nodes', newNodeList.length );
+		    nodeList.push( newNodeList[n] );
+		}
+
+		iterno++;
+		pb.redraw();
+	    };
 	    
 	    function renderAnimation() {
+		console.log(' === ITERATION step', iterno, 'nodeList.length', nodeList.length);
 		growVenes();
-		if( config.animateGrowth )
+		// if( iterno >= 2 ) config.animateGrowth = false;
+		if( config.animateGrowth && iterno <= growthSteps )
 		    window.requestAnimationFrame( renderAnimation );
 		else // Animation stopped
-		    ; 
+		    config.animateGrowth = false;
+	    };
+
+	    function animateStep() {
+		if( nodeList.length == 0 )
+		    initGrowth();
+		growVenes();
 	    };
 	    
 	    function toggleAnimation() {
 		if( config.animateGrowth ) {
+		    initGrowth();
 		    renderAnimation();
 		} else {
 		    pb.redraw();
@@ -251,17 +366,18 @@
 		var f0 = gui.addFolder('Points');
 		f0.add(config, 'startT').min(0.0).max(1.0).step(0.01).onChange( function() { updatePathInfo(); pb.redraw(); } ).name('Set start T').title('Set start T.');
 		f0.add(config, 'endT').min(0.0).max(1.0).step(0.01).onChange( function() { updatePathInfo(); pb.redraw(); } ).name('Set end T').title('Set end T.');
-		f0.add(config, 'leafScale').min(0.0).max(1.0).step(0.01).onChange( function() { updatePathInfo(); pb.redraw(); } ).name('Leaf Scale').title('Scale the leaf path.');
+		f0.add(config, 'leafScale').min(0.0).max(1.0).step(0.01).onChange( function() { updatePathInfo(); pb.redraw(); } ).listen().name('Leaf Scale').title('Scale the leaf path.');
 		f0.add(config, 'auxinCount').min(1).max(1000).step(1).onChange( function() { randomizeAuxinPositions(); pb.redraw(); } ).name('#Auxins').title('Change auxin count.');
 		f0.add(config, 'drawAuxins').onChange( function() { pb.redraw(); } ).name('Draw auxins').title('Draw auxins.');
-		f0.add(config, 'animateGrowth').onChange( function() { toggleAnimation(); } ).name('Animate').title('Animate.').arrowBounce('Click here',{fadeDelay:5000,detachAfter:6000});
+		f0.add(config, 'animateGrowth').onChange( function() { toggleAnimation(); } ).name('Animate').title('Animate.').listen().arrowBounce('Click here',{fadeDelay:5000,detachAfter:6000});
+		f0.add(config, 'animateStep').name('Animate Step').title('Animate next step.');
 		f0.add(config, 'growthSize').onChange( function() { pb.redraw(); } ).name('Growth size').title('The amount of growth in each step.');
 		f0.add(config, 'randomizeAuxins').name('Rand Auxins').title('Randomize the auxin sources.');
 		f0.open();
 	    }
 
 	    toggleAnimation();
-	    randomizeAuxinPositions();
+	    // randomizeAuxinPositions();
 	    updatePathInfo();
 	    updateAuxinInfo();
 	    pb.config.preDraw = postDraw;

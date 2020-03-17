@@ -219,7 +219,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2018-11-17 Added the 'isSelected' attribute.
  * @modified 2018-11-27 Added the global model for instantiating with custom attributes.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  1.0.3
+ * @modified 2020-02-29 Added the 'selectable' attribute.
+ * @version  1.1.0
  *
  * @file VertexAttr
  * @public
@@ -240,6 +241,7 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     var VertexAttr = function() {
 	this.draggable = true;
+	this.selectable = true;
 	this.isSelected = false;
 
 	for( var key in VertexAttr.model ) 
@@ -255,6 +257,7 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     VertexAttr.model = {
 	draggable : true,
+	selectable: true,
 	isSelected : false
     };
 
@@ -277,7 +280,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @date     2018-08-27
  * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  1.0.2
+ * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
+ * @version  1.0.3
  *
  * @file VertexListeners
  * @public
@@ -313,6 +317,7 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     VertexListeners.prototype.addDragListener = function( listener ) {
 	this.drag.push( listener );
+	return this;
     };
     /**
      * The drag listener is a function with a single drag event param.
@@ -333,6 +338,7 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     VertexListeners.prototype.addDragStartListener = function( listener ) {
 	this.dragStart.push( listener );
+	return this;
     };
     /**
      * The drag-start listener is a function with a single drag event param.
@@ -353,6 +359,7 @@ Object.extendClass = function( superClass, subClass ) {
      **/
     VertexListeners.prototype.addDragEndListener = function( listener ) {
 	this.dragEnd.push( listener );
+	return this;
     };
     /**
      * The drag-end listener is a function with a single drag event param.
@@ -1008,7 +1015,8 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-09-02 Added the Line.colinear( Line ) function.
  * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
  * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
- * @version  2.1.0
+ * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
+ * @version  2.1.1
  *
  * @file Line
  * @public
@@ -1154,12 +1162,14 @@ Object.extendClass = function( superClass, subClass ) {
      * Get the angle between this and the passed line (in radians).
      *
      * @method angle
-     * @param {Line} line The line to calculate the angle to.
+     * @param {Line} [line] - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
      * @return {number} this
      * @instance
      * @memberof Line
      **/
-    Line.prototype.angle = function( line ) {	
+    Line.prototype.angle = function( line ) {
+	if( typeof line == 'undefined' )
+	    line = new Line( new Vertex(0,0), new Vertex(100,0) );
 	// Compute the angle from x axis and the return the difference :)
 	var v0 = this.b.clone().sub( this.a );
 	var v1 = line.b.clone().sub( line.a );
@@ -2227,7 +2237,7 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified 2019-12-02 Removed some excessive comments.
  * @modified 2019-12-04 Fixed the missing obtainHandleLengths behavior in the adjustNeightbourControlPoint function.
  * @modified 2020-05-06 Added function locateCurveByEndPoint( Vertex ).
- * @modified 2020-05-11 Added 'return this' to the scale(Vertex,number) and to the translace(Vertex) function.
+ * @modified 2020-05-11 Added 'return this' to the scale(Vertex,number) and to the translate(Vertex) function.
  * @version 2.1.1
  *
  * @file BezierPath
@@ -3612,25 +3622,8 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof Polygon
      **/
     _context.Polygon.prototype.containsVert = function( vert ) {
-	// function inside(point, vs) {
 	//    // ray-casting algorithm based on
 	//    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-	//
-	//    var x = point[0], y = point[1];
-	//
-	//    var inside = false;
-	//    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-	//	var xi = vs[i][0], yi = vs[i][1];
-	//	var xj = vs[j][0], yj = vs[j][1];
-	//
-	//	var intersect = ((yi > y) != (yj > y))
-	//	    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-	//	if (intersect) inside = !inside;
-	//    }
-	//
-	//    return inside;
-	// };
-
 	var inside = false;
 	for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
             var xi = this.vertices[i].x, yi = this.vertices[i].y;
@@ -3640,7 +3633,6 @@ Object.extendClass = function( superClass, subClass ) {
 		&& (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
             if (intersect) inside = !inside;
 	}
-
 	return inside;
     };
 
@@ -3895,7 +3887,10 @@ Object.extendClass = function( superClass, subClass ) {
  * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
  * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
  * @modified  2019-12-09 Fixed the determinant() function. The calculation was just wrong.
- * @version   2.0.5
+ * @modified  2020-03-16 (Corona times) Added the 'fromArray' function.
+ * @modified  2020-03-17 Added the Triangle.toPolygon() function.
+ * @modified  2020-03-17 Added proper JSDoc comments.
+ * @version   2.2.1
  *
  * @file Triangle
  * @public
@@ -3914,8 +3909,37 @@ Object.extendClass = function( superClass, subClass ) {
 
 
     /**
+     * Used in the bounds() function.
+     *
+     * @private
+     **/
+    function max3( a, b, c ) { return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c; }
+    function min3( a, b, c ) { return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c; }
+
+    
+    /**
+     * Used by the containsPoint() function.
+     *
+     * @private
+     **/
+    function pointIsInTriangle( px, py, p0x, p0y, p1x, p1y, p2x, p2y ) {
+	//
+	// Point-in-Triangle test found at
+	//   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
+	//
+	var area = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+
+	var s = 1/(2*area)*(p0y*p2x - p0x*p2y + (p2y - p0y)*px + (p0x - p2x)*py);
+	var t = 1/(2*area)*(p0x*p1y - p0y*p1x + (p0y - p1y)*px + (p1x - p0x)*py);
+
+	return s > 0 && t > 0 && (1-s-t) > 0;
+    };
+    
+
+    /**
      * The constructor.
      * 
+     * @constructor
      * @param {Vertex} a - The first vertex of the triangle.
      * @param {Vertex} b - The second vertex of the triangle.
      * @param {Vertex} c - The third vertex of the triangle.
@@ -3929,12 +3953,37 @@ Object.extendClass = function( superClass, subClass ) {
 	
     }
 
+
+    /**
+     * Create a new triangle from the given array of vertices.
+     *
+     * The array must have at least three vertices, otherwise an error will be raised.
+     * This function will not create copies of the vertices.
+     *
+     * @method fromArray
+     * @static
+     * @param {Array<Vertex>} arr - The required array with at least three vertices.
+     * @memberof Vertex
+     * @return {Triangle}
+     **/
+    Triangle.fromArray = function( arr ) {
+	if( !Array.isArray(arr) )
+	    throw new Exception("Cannot create triangle fromArray from non-array.");
+	if( arr.length < 3 )
+	    throw new Exception("Cannot create triangle from array with less than three vertices ("+arr.length+")");
+	return new Triangle( arr[0], arr[1], arr[2] );
+    };
+    
+
     /**
      * Get the centroid of this triangle.
      *
      * The centroid is the average midpoint for each side.
      *
+     * @method getCentroid
      * @return {Vertex} The centroid
+     * @instance
+     * @memberof Triangle
      **/
     Triangle.prototype.getCentroid = function() {
 	return new Vertex( (this.a.x + this.b.x + this.c.x)/3,
@@ -3947,8 +3996,11 @@ Object.extendClass = function( superClass, subClass ) {
     /**
      * Scale the triangle towards its centroid.
      *
-     * @param {Number} - The scale factor to use. This can be any scalar.
-     * @return {Triangle} this for chaining
+     * @method scaleToCentroid
+     * @param {number} - The scale factor to use. That can be any scalar.
+     * @return {Triangle} this (for chaining)
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.scaleToCentroid = function( factor ) {
 	let centroid = this.getCentroid();
@@ -3966,7 +4018,14 @@ Object.extendClass = function( superClass, subClass ) {
      * The circumcircle is that unique circle on which all three
      * vertices of this triangle are located on.
      *
+     * Please note that for performance reasons any changes to vertices will not reflect in changes 
+     * of the circumcircle (center or radius). Please call the calcCirumcircle() function
+     * after triangle vertex changes.
+     *
+     * @method getCircumcircle
      * @return {Object} - { center:Vertex, radius:float }
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.getCircumcircle = function() {
 	if( !this.center || !this.radius ) 
@@ -3983,9 +4042,11 @@ Object.extendClass = function( superClass, subClass ) {
      * For edge-checking Vertex.equals is used which uses an
      * an epsilon for comparison.
      *
+     * @method isAdjacent
      * @param {Triangle} tri - The second triangle to check adjacency with.
-     *
      * @return {boolean} - True if this and the passed triangle have at least one common edge.
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.isAdjacent = function( tri ) {
 	var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
@@ -4000,9 +4061,12 @@ Object.extendClass = function( superClass, subClass ) {
      * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of 
      * the passed two.
      *
+     * @method getThirdVertex
      * @param {Vertex} vert1 - The first vertex.
      * @param {Vertex} vert2 - The second vertex.
-     * @return Vertex - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
+     * @return {Vertex} - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.getThirdVertex = function( vert1, vert2 ) {
 	if( this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1) ) return this.c;
@@ -4017,9 +4081,12 @@ Object.extendClass = function( superClass, subClass ) {
      * have changed).
      *
      * The circumcenter and radius are stored in this.center and
-     * this radius. There is a third result: radius_squared.
+     * this.radius. There is a third result: radius_squared (for internal computations).
      *
+     * @method calcCircumcircle
      * @return void
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.calcCircumcircle = function() {
 	// From
@@ -4064,28 +4131,31 @@ Object.extendClass = function( superClass, subClass ) {
      * Check if the passed vertex is inside this triangle's
      * circumcircle.
      *
+     * @method inCircumcircle
      * @param {Vertex} v - The vertex to check.
-     * @return boolean
+     * @return {boolean}
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.inCircumcircle = function( v ) {
 	var dx = this.center.x - v.x;
 	var dy = this.center.y - v.y;
 	var dist_squared = dx * dx + dy * dy;
 
-	return ( dist_squared <= this.radius_squared );
-	
-    }; // inCircumcircle
+	return ( dist_squared <= this.radius_squared );	
+    }; 
 
 
 
     /**
      * Get the rectangular bounds for this triangle.
      *
+     * @method bounds
      * @return {Object} - { xMin:float, xMax:float, yMin:float, yMax:float, width:float, height:float }
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.bounds = function() {
-	function max3( a, b, c ) { return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c; }
-	function min3( a, b, c ) { return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c; }
 	var minx = min3( this.a.x, this.b.x, this.c.x );
 	var miny = min3( this.a.y, this.b.y, this.c.y );
 	var maxx = max3( this.a.x, this.b.x, this.c.x );
@@ -4095,14 +4165,29 @@ Object.extendClass = function( superClass, subClass ) {
 
 
     /**
+     * Convert this triangle to a polygon instance.
+     *
+     * Plase note that this conversion does not perform a deep clone.
+     *
+     * @method toPolygon
+     * @return {Polygon} A new polygon representing this triangle.
+     * @instance
+     * @memberof Triangle
+     **/
+    Triangle.prototype.toPolygon = function() {
+	return new Polygon( [ this.a, this.b, this.c ] );
+    };
+
+
+    /**
      * Get the determinant of this triangle.
      *
-     * @return {Number} - The determinant (float).
+     * @method determinant
+     * @return {number} - The determinant (float).
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.determinant = function() {
-	// This is wrong.
-	// return this.b.x*this.b.y* 0.5 * ( - this.b.x*this.a.y - this.a.x*this.b.y - this.b.x*this.c.y + this.c.x*this.a.y + this.a.x*this.c.y );
-	// This is correct:
 	// (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
 	return (this.b.y - this.a.y)*(this.c.x - this.b.x) - (this.c.y - this.b.y)*(this.b.x - this.a.x);
     };
@@ -4113,24 +4198,13 @@ Object.extendClass = function( superClass, subClass ) {
      *
      * Note: matrix determinants rock.
      *
+     * @method containsPoint
      * @param {Vertex} p - The vertex to check.
      * @return {boolean}
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.containsPoint = function( p ) {
-	//
-	// Point-in-Triangle test found at
-	//   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-	//
-	function pointIsInTriangle( px, py, p0x, p0y, p1x, p1y, p2x, p2y ) {
-	    
-	    var area = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
-
-	    var s = 1/(2*area)*(p0y*p2x - p0x*p2y + (p2y - p0y)*px + (p0x - p2x)*py);
-	    var t = 1/(2*area)*(p0x*p1y - p0y*p1x + (p0y - p1y)*px + (p1x - p0x)*py);
-
-	    return s > 0 && t > 0 && (1-s-t) > 0;
-	};
-
 	return pointIsInTriangle( p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y );
     };
 
@@ -4139,7 +4213,10 @@ Object.extendClass = function( superClass, subClass ) {
     /**
      * Converts this triangle into a human-readable string.
      *
+     * @method toString
      * @return {string}
+     * @instance
+     * @memberof Triangle
      */
     Triangle.prototype.toString = function() {
 	return '{ a : ' + this.a.toString () + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
@@ -4153,7 +4230,7 @@ Object.extendClass = function( superClass, subClass ) {
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} The SVG string.
      * @instance
-     * @memberof Polygon
+     * @memberof Triangle
      **/
     Triangle.prototype.toSVGString = function( options ) {
 	options = options || {};
@@ -5524,21 +5601,6 @@ Object.extendClass = function( superClass, subClass ) {
      * @memberof drawutils
      */
     _context.drawutils.prototype.polygon = function( polygon, color ) {
-	/* if( polygon.vertices.length <= 1 )
-	    return;
-	this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.lineWidth = 1.0;
-	this.ctx.moveTo( this.offset.x + polygon.vertices[0].x*this.scale.x, this.offset.y + polygon.vertices[0].y*this.scale.y );
-	for( var i = 0; i < polygon.vertices.length; i++ ) {
-	    this.ctx.lineTo( this.offset.x + polygon.vertices[i].x*this.scale.x, this.offset.y + polygon.vertices[i].y*this.scale.y );
-	}
-	if( !polygon.isOpen && polygon.vertices.length > 2 )
-	    this.ctx.closePath();
-	this._fillOrDraw( color );
-	this.ctx.setLineDash([]);
-	this.ctx.restore();
-	*/
 	this.polyline( polygon.vertices, polygon.isOpen, color );
     };
 
@@ -6393,13 +6455,13 @@ Object.extendClass = function( superClass, subClass ) {
 			
 		    }
 		} else if( d instanceof Polygon ) {
-		    this.draw.polygon( d, this.drawConfig.polygon.color ); //'#0022a8' );
+		    this.draw.polygon( d, this.drawConfig.polygon.color );
 		    if( !this.config.drawHandlePoints ) {
 			for( var i in d.vertices )
 			    d.vertices[i].attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Triangle ) {
-		    this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color ); // '#6600ff' );
+		    this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color );
 		    if( !this.config.drawHandlePoints ) 
 			d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
@@ -6407,7 +6469,7 @@ Object.extendClass = function( superClass, subClass ) {
 			this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
 			this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
 		    }
-		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color ); //'#2222a8' );
+		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color );
 		    if( !this.config.drawHandlePoints ) {
 			d.center.attr.renderTime = renderTime;
 			d.axis.attr.renderTime = renderTime;
@@ -6416,18 +6478,18 @@ Object.extendClass = function( superClass, subClass ) {
 		    if( this.drawConfig.drawVertices &&
 			(!d.attr.selectable || !d.attr.draggable) ) {
 			// Draw as special point (grey)
-			this.draw.circleHandle( d, 7, this.drawConfig.vertex.color ); // '#a8a8a8' );
+			this.draw.circleHandle( d, 7, this.drawConfig.vertex.color );
 			d.attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Line ) {
-		    this.draw.line( d.a, d.b, this.drawConfig.line.color ); // '#a844a8' );
+		    this.draw.line( d.a, d.b, this.drawConfig.line.color );
 		    if( !this.config.drawHandlePoints || !d.a.attr.selectable ) 
 			d.a.attr.renderTime = renderTime;
 		    if( !this.config.drawHandlePoints || !d.b.attr.selectable ) 
 			d.b.attr.renderTime = renderTime;
 		} else if( d instanceof Vector ) {
 		    // this.draw.line( d.a, d.b, '#ff44a8' );
-		    this.draw.arrow( d.a, d.b, this.drawConfig.vector.color ); // '#ff44a8' );
+		    this.draw.arrow( d.a, d.b, this.drawConfig.vector.color );
 		    if( this.config.drawHandlePoints && d.b.attr.selectable ) {
 			this.draw.circleHandle( d.b, 7, '#a8a8a8' );
 		    } else {
@@ -6441,10 +6503,10 @@ Object.extendClass = function( superClass, subClass ) {
 		    
 		} else if( d instanceof PBImage ) {
 		    if( this.config.drawHandleLines )
-			this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color ); // '#a8a8a8' );
+			this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color );
 		    this.fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
 		    if( this.config.drawHandlePoints ) {
-			this.draw.circleHandle( d.lowerRight, 7, this.drawConfig.image.color ); // '#a8a8a8' );
+			this.draw.circleHandle( d.lowerRight, 7, this.drawConfig.image.color );
 			d.lowerRight.attr.renderTime = renderTime;
 		    }
 		} else {

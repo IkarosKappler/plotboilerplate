@@ -10,7 +10,8 @@
  * @modified 2018-11-17 Added the 'isSelected' attribute.
  * @modified 2018-11-27 Added the global model for instantiating with custom attributes.
  * @modified 2019-03-20 Added JSDoc tags.
- * @version  1.0.3
+ * @modified 2020-02-29 Added the 'selectable' attribute.
+ * @version  1.1.0
  *
  * @file VertexAttr
  * @public
@@ -31,6 +32,7 @@
      **/
     var VertexAttr = function() {
 	this.draggable = true;
+	this.selectable = true;
 	this.isSelected = false;
 
 	for( var key in VertexAttr.model ) 
@@ -46,6 +48,7 @@
      **/
     VertexAttr.model = {
 	draggable : true,
+	selectable: true,
 	isSelected : false
     };
 

@@ -16,7 +16,8 @@
  * @modified 2019-09-02 Added the Line.colinear( Line ) function.
  * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
  * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
- * @version  2.1.0
+ * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
+ * @version  2.1.1
  *
  * @file Line
  * @public
@@ -162,12 +163,14 @@
      * Get the angle between this and the passed line (in radians).
      *
      * @method angle
-     * @param {Line} line The line to calculate the angle to.
+     * @param {Line} [line] - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
      * @return {number} this
      * @instance
      * @memberof Line
      **/
-    Line.prototype.angle = function( line ) {	
+    Line.prototype.angle = function( line ) {
+	if( typeof line == 'undefined' )
+	    line = new Line( new Vertex(0,0), new Vertex(100,0) );
 	// Compute the angle from x axis and the return the difference :)
 	var v0 = this.b.clone().sub( this.a );
 	var v1 = line.b.clone().sub( line.a );
