@@ -461,7 +461,7 @@ from the sources code files in ./src/*.
 The package is compiled with npm typescript. See the tsconfig.json file.
 
 ### Run the typescript compiler
-This is not yet finished; the old vanilla-JS file will soon be dropped abe replaced
+This is not yet finished; the old vanilla-JS files will soon be dropped and replaced
 by generated files, compiled from Typescript.
 ~~~bash
  $ npm run compile-typescript
