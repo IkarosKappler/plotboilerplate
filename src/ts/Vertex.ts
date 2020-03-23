@@ -415,7 +415,7 @@ class Vertex implements XYTuple {
      * @instance
      * @memberof Vertex
      **/
-    rotate( angle:number, center:Vertex ):Vertex {
+    rotate( angle:number, center:Vertex|undefined ):Vertex {
 	if( !center || typeof center === "undefined" )
 	    center = new Vertex(0,0);
 	this.sub( center );
