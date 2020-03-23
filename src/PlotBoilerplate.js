@@ -164,7 +164,7 @@
      *                         process finished.
      * @param {boolean=} [config.enableMouse=true] - Indicates if the application should handle mouse events for you.
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle touch events for you.
-     * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle key events for you.
+     * @param {boolean=} [config.enableKeys=true] - Indicates if the application should handle key events for you.
      * @param {boolean=} [config.enableMouseWheel=true] - Indicates if the application should handle mouse wheel events for you.
      * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features (not recommended).
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true). 
@@ -670,21 +670,19 @@
 			}
 			
 			if( this.config.drawBezierHandleLines && this.config.drawHandleLines ) {
-			    //this.draw.handleLine( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint );
-			    //this.draw.handleLine( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint );
 			    this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
 			    this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
 			}
 			
 		    }
 		} else if( d instanceof Polygon ) {
-		    this.draw.polygon( d, this.drawConfig.polygon.color );
+		    this.draw.polygon( d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth );
 		    if( !this.config.drawHandlePoints ) {
 			for( var i in d.vertices )
 			    d.vertices[i].attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Triangle ) {
-		    this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color );
+		    this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth );
 		    if( !this.config.drawHandlePoints ) 
 			d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
 		} else if( d instanceof VEllipse ) {
@@ -692,7 +690,7 @@
 			this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
 			this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
 		    }
-		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color );
+		    this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color,  this.drawConfig.ellipse.lineWidth );
 		    if( !this.config.drawHandlePoints ) {
 			d.center.attr.renderTime = renderTime;
 			d.axis.attr.renderTime = renderTime;
@@ -705,20 +703,18 @@
 			d.attr.renderTime = renderTime;
 		    }
 		} else if( d instanceof Line ) {
-		    this.draw.line( d.a, d.b, this.drawConfig.line.color );
+		    this.draw.line( d.a, d.b, this.drawConfig.line.color,  this.drawConfig.line.lineWidth );
 		    if( !this.config.drawHandlePoints || !d.a.attr.selectable ) 
 			d.a.attr.renderTime = renderTime;
 		    if( !this.config.drawHandlePoints || !d.b.attr.selectable ) 
 			d.b.attr.renderTime = renderTime;
 		} else if( d instanceof Vector ) {
-		    // this.draw.line( d.a, d.b, '#ff44a8' );
-		    this.draw.arrow( d.a, d.b, this.drawConfig.vector.color );
+		    this.draw.arrow( d.a, d.b, this.drawConfig.vector.color, this.drawConfig.vector.lineWidth );
 		    if( this.config.drawHandlePoints && d.b.attr.selectable ) {
 			this.draw.circleHandle( d.b, 7, '#a8a8a8' );
 		    } else {
 			d.b.attr.renderTime = renderTime;	
 		    }
-		    // d.a.attr.renderTime = renderTime;
 		    if( !this.config.drawHandlePoints || !d.a.attr.selectable ) 
 			d.a.attr.renderTime = renderTime;
 		    if( !this.config.drawHandlePoints || !d.b.attr.selectable ) 
@@ -726,7 +722,7 @@
 		    
 		} else if( d instanceof PBImage ) {
 		    if( this.config.drawHandleLines )
-			this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color );
+			this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth );
 		    this.fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
 		    if( this.config.drawHandlePoints ) {
 			this.draw.circleHandle( d.lowerRight, 7, this.drawConfig.image.color );
@@ -1414,7 +1410,7 @@
 		try {
 		    if( type == 'boolean' ) base[k] = !!JSON.parse(extension[k]);
 		    else if( type == 'number' ) base[k] = JSON.parse(extension[k])*1;
-		    else if( type == 'function' && typeofextension[k] == 'function' ) base[k] = extension[k] ;
+		    else if( type == 'function' && typeof extension[k] == 'function' ) base[k] = extension[k] ;
 		    else base[k] = extension[k];
 		} catch( e ) {
 		    _self.console.error( 'error in key ', k, extension[k], e );
@@ -1449,7 +1445,9 @@
 	 * @param {number} scaleX  - The horizontal scaling during draw.
 	 * @param {number} scaleY  - the vertical scaling during draw.
 	 **/
+	// @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
 	buildArrowHead : function( zA, zB, headlen, scaleX, scaleY ) {
+	    console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
 	    var angle = Math.atan2( (zB.y-zA.y)*scaleY, (zB.x-zA.x)*scaleX );
 	    
 	    var vertices = [];
@@ -1459,7 +1457,7 @@
 	    vertices.push( new Vertex(zB.x*scaleX-(headlen*1.35)*Math.cos(angle+Math.PI/8), zB.y*scaleY-(headlen*1.35)*Math.sin(angle+Math.PI/8)) );
 
 	    return vertices;
-	}
+	} 
     };
 
 

@@ -746,7 +746,7 @@
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (aoptional) rotation in radians.
-     * @param {string='black'} color - The color to render the text with.
+     * @param {string=black} color - The color to render the text with.
      * @return {void}
      * @instance
      * @memberof drawutils

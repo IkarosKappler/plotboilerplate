@@ -1,10 +1,13 @@
 
 
 # Changelog
+* 2020-03-23
+  * Ported following classes to Typescript: Vertex, Line, VertexAttr, VertexListeners.	
 * 2020-03-17
   * Added the Triangle.toPolygon() function.
   * Added proper JSDoc tags to the Triangle class.
   * Added a new demo: ported the Morley-Triangle visualization (from an older project).
+  * Fixed an issue in the safeMergeKeys function ('funcion' type was flawed).
 * 2020-03-16
   * Added Triangle.fromArray(Array) function.
   * The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.

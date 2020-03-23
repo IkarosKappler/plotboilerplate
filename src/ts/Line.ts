@@ -17,15 +17,34 @@
  * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
  * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
  * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
- * @version  2.1.1
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @version  2.1.2
  *
  * @file Line
  * @public
  **/
 
 
-(function(_context) {
+class Line<L extends Line<L>> {
 
+
+    
+    // Fields
+
+    /** 
+     * @member {Vertex} 
+     * @memberof Line
+     * @instance
+     */
+    a:Vertex;
+
+    /** 
+     * @member {Vertex} 
+     * @memberof Line
+     * @instance
+     */
+    b:Vertex;
+ 
     /**
      * Creates an instance of Line.
      *
@@ -34,26 +53,10 @@
      * @param {Vertex} a The line's first point.
      * @param {Vertex} b The line's second point.
      **/
-    var Line = function( a, b ) {
-	this.a = a;
+    constructor(a:Vertex,b:Vertex) { 
+       	this.a = a;
 	this.b = b;
-    };
-
-
-    /** 
-     * @member {Vertex} 
-     * @memberof Line
-     * @instance
-     */
-    Line.prototype.a = null;
-
-    /** 
-     * @member {Vertex} 
-     * @memberof Line
-     * @instance
-     */
-    Line.prototype.b = null;
-    
+    }
 
     /**
      * Get the length of this line.
@@ -62,7 +65,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.length = function() {
+    length():number {
 	return Math.sqrt( Math.pow(this.b.x-this.a.x,2) + Math.pow(this.b.y-this.a.y,2) );
     };
 
@@ -76,7 +79,7 @@
      * @memberof Line
      * @return {Line} this (for chaining)
      **/
-    Line.prototype.setLength = function( length ) {
+    setLength( length:number ):Line<L> {
 	return this.scale( length/this.length() );
     };
     
@@ -89,7 +92,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.sub = function( amount ) {
+    sub( amount:Vertex ):Line<L> {
 	this.a.sub( amount );
 	this.b.sub( amount );
 	return this;
@@ -105,7 +108,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.add = function( amount ) {
+    add( amount:Vertex ):Line<L> {
 	this.a.add( amount );
 	this.b.add( amount );
 	return this;
@@ -120,7 +123,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.normalize = function() {
+    normalize():Line<L> {
 	this.b.set( this.a.x + (this.b.x-this.a.x)/this.length(),
 		    this.a.y + (this.b.y-this.a.y)/this.length() );
 	return this;
@@ -136,7 +139,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.scale = function( factor ) {
+    scale( factor:number ):Line<L> {
 	this.b.set( this.a.x + (this.b.x-this.a.x)*factor,
 		    this.a.y + (this.b.y-this.a.y)*factor );
 	return this;
@@ -152,7 +155,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.moveTo = function( newA ) {
+    moveTo( newA:Vertex ):Line<L> {
 	let diff = this.a.difference( newA );
 	this.a.add( diff );
 	this.b.add( diff );
@@ -169,9 +172,9 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.angle = function( line ) {
+    angle( line:Line<L> ):number {
 	if( typeof line == 'undefined' )
-	    line = new Line( new Vertex(0,0), new Vertex(100,0) );
+	    line = new Line<L>( new Vertex(0,0), new Vertex(100,0) );
 	// Compute the angle from x axis and the return the difference :)
 	var v0 = this.b.clone().sub( this.a );
 	var v1 = line.b.clone().sub( line.a );
@@ -193,7 +196,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.vertAt = function( t ) {
+    vertAt( t:number ):Vertex {
 	return new Vertex( this.a.x + (this.b.x-this.a.x)*t,
 			  this.a.y + (this.b.y-this.a.y)*t );
     };
@@ -208,7 +211,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.intersection = function( line ) {
+    intersection( line:L ):Vertex {
 	var denominator = this.denominator(line);
 	if( denominator == 0 ) 
 	    return null;
@@ -234,7 +237,7 @@
      * @param {Line} line
      * @return {Number}
      **/
-    Line.prototype.denominator = function( line ) {
+    denominator( line:L ):number {
 	// http://jsfiddle.net/justin_c_rounds/Gd2S2/
 	return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
     };
@@ -248,7 +251,7 @@
      * @param {Line} line
      * @return true if both lines are co-linear.
      */
-    Line.prototype.colinear = function( line ) {
+    colinear( line:L ):boolean {
 	return Math.abs( this.denominator(line) ) < Vertex.EPSILON;
     };
 
@@ -264,7 +267,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.getClosestT = function( p ) {
+    getClosestT( p:Vertex ):number {
 	var l2 = Line.util.dist2(this.a, this.b);
 	if( l2 === 0 ) return 0; 
 	var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
@@ -283,7 +286,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.pointDistance = function( p ) {
+    pointDistance( p:Vertex ):number {
 	// Taken From:
 	// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
 
@@ -321,8 +324,8 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.clone = function() {
-	return new Line( this.a.clone(), this.b.clone() );
+    clone():L {
+	return (new Line( this.a.clone(), this.b.clone() ) as L);
     };
     
     
@@ -337,7 +340,7 @@
      * @instance
      * @memberof Line
      **/
-    Line.prototype.toSVGString = function( options ) {
+    toSVGString( options:{ className?: string } ):string {
 	options = options || {};
 	var buffer = [];
 	buffer.push( '<line' );
@@ -360,7 +363,7 @@
      * @instance
      * @memberof Line
      **/
-    this.toString = function() {
+    toString():string {
 	return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
     };
 
@@ -368,12 +371,12 @@
     /**
      * @private
      **/
-    Line.util = {
-	dist2 : function(v, w) {
+    static util = {
+	dist2 : function(v:Vertex, w:Vertex) {
 	    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
 	}
     };
 
-    _context.Line = Line;
+    //_context.Line = Line;
 
-})(window ? window : module.export);
+}

@@ -1,14 +1,16 @@
 # An interactive Javascript Plotting Boilerplate
-For plotting visual 2D data with Javascript and canvas (in 2d-context).
+For plotting visual 2D data with Javascript and HTML canvas (in 2d-context).
 
-This is a simple collection of useful functions I repetitively used for
-visualizing 2D geometries on HTML canvas. Basic features are
+This is a simple collection of useful functions I am repetitively using for
+visualizing 2D geometries. Basic features are
  * adding elements like vertices, lines, vectors, triangles, curves, polygons, ellipses, images
  * cofiguration of the canvas behavior (fullsize, interaction, raster)
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
  * touch interaction for dragging vertices (desktop and mobile)
- 
+
+
+The compressed library has 70kb.
 
 
 ## Install the package via npm
@@ -20,13 +22,13 @@ visualizing 2D geometries on HTML canvas. Basic features are
 
 
 ## The HTML file
-For a full example see main-dist.html:
+For a full example see [main-dist.html](https://github.com/IkarosKappler/plotboilerplate/blob/master/main-dist.html xsmain-dist.html):
 ~~~html
    <canvas id="my-canvas">
       Your browser does not support the canvas tag.
    </canvas>
 
-   <!-- Optional: a helper to display mouse/touch position -->
+   <!-- Optional: a helper to display the mouse/touch position -->
    <div class="info monospace">
       [<span id="cx">-</span>,<span id="cy">-</span>]
    </div>
@@ -432,9 +434,9 @@ The Vertex class has basic drag event support:
 
 
 
-## Re-compile the package
+## Minimize the package
 
-The package is compiled with webpack. See the webpack.config.js file.
+The package is minimized with webpack. See the webpack.config.js file.
 
 ### Install webpack
 This will install the npm-webpack package with the required dependencies
@@ -444,13 +446,29 @@ for you from the package.json file.
 ~~~
 
 
-
 ### Run webpack
 This will generate the ./dist/plotboilerplate.min.js file for you
 from the sources code files in ./src/*.
 ~~~bash
  $ npm run webpack
 ~~~
+
+
+
+
+## [In development] Compile Typescripts
+
+The package is compiled with npm typescript. See the tsconfig.json file.
+
+### Run the typescript compiler
+This is not yet finished; the old vanilla-JS file will soon be dropped abe replaced
+by generated files, compiled from Typescript.
+~~~bash
+ $ npm run compile-typescript
+~~~
+There is also a sandbox script, compiling and running the typescript files inside your browser. Please note that
+due to performance reasons it is not recommended to use this in production. Always compile your typescript files
+for this purpose.
 
 
 
@@ -495,12 +513,15 @@ from the sources code files in ./src/*.
  * Add a test implementation with Hobby-curves (demo?).
  * Remove the BezierPath._roundToDigits(...) function (replace by Number.toFixed).
 
+
 ## Todos for future Version 2 (not backwards compatible)
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
  * Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
  * Change BezierPath.getPointAt to .getVertexAt (or .getVertAt or vertAt?).
  * Change BezierPath.scale( center, factor ) to BezierPath.scale( factor, center ) and make center optional (like in Polygon).
  * Rename BezierPath.adjustCircular to .isCircular, because cirularity does not only affect vertex adjustment.
+ * The inverse-functions are called Vertex.inv() but Vector.inverse(). Harmonize this.
+
 
 ## Browsers support
 

@@ -390,6 +390,7 @@
      * @param {number} tStart – The start offset of the desired sub curve (must be in [0..1]).
      * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
      * @instance
+     * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
     CubicBezierCurve.prototype.getSubCurveAt = function( tStart, tEnd ) {
