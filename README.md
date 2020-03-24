@@ -521,6 +521,7 @@ for this purpose.
  * Change BezierPath.scale( center, factor ) to BezierPath.scale( factor, center ) and make center optional (like in Polygon).
  * Rename BezierPath.adjustCircular to .isCircular, because cirularity does not only affect vertex adjustment.
  * The inverse-functions are called Vertex.inv() but Vector.inverse(). Harmonize this.
+ * CubicBezierCurve.getTangentAt(number) and .getTangent(number) return Vertex, why not a Vector?
 
 
 ## Browsers support

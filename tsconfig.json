@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-	"outDir": "./src/js-generated"
+	"outDir": "./src/ts-to-js"
     },
     "inclue": ["./ts/*"],
     "exclude": []

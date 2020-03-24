@@ -31,16 +31,6 @@
  * @public
  **/
 
-// TODO: replace by real class
-/*interface IVertexAttr {
-    
-}*/
-
-// TODO: replace by real calss
-/*interface IVertexListeners {
-
-}*/
-
 type XYTuple = {
     x : number;
     y : number;
@@ -56,7 +46,6 @@ class Vertex implements XYTuple {
      * @private
      **/
     static readonly EPSILON = 1.0e-6;
-    // var EPSILON = 1.0e-6;
 
 
     /** 

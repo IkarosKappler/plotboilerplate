@@ -53,8 +53,8 @@ window.pbPreventAutoLoad = true;
 	    "src/draw.js",
 	    
 	    "src/PlotBoilerplate.js",
-	    "demos/gup.js"
-	    //"src/index.js"
+	    // "demos/gup.js"
+	    // "src/index.js"
 	];
 	var head = document.getElementsByTagName('head')[0];
 	var scriptsLoaded = 0;
