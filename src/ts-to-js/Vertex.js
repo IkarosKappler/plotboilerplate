@@ -44,7 +44,11 @@ var Vertex = /** @class */ (function () {
             this.x = x.x;
             this.y = x.y;
             } */
-        if (typeof x == 'number' && typeof y == 'number') {
+        if (typeof x == 'undefined') {
+            this.x = 0;
+            this.y = 0;
+        }
+        else if (typeof x == 'number' && typeof y == 'number') {
             this.x = x;
             this.y = y;
         }

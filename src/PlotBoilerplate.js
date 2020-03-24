@@ -1447,7 +1447,7 @@
 	 **/
 	// @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
 	buildArrowHead : function( zA, zB, headlen, scaleX, scaleY ) {
-	    console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+	    // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
 	    var angle = Math.atan2( (zB.y-zA.y)*scaleY, (zB.x-zA.x)*scaleX );
 	    
 	    var vertices = [];

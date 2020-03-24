@@ -23,7 +23,33 @@
  * @file Line
  * @public
  **/
-var Line = /** @class */ (function () {
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var Line = /** @class */ (function (_super) {
+    __extends(Line, _super);
+    /**
+     * @member {Vertex}
+     * @memberof Line
+     * @instance
+     */
+    //a:Vertex;
+    /**
+     * @member {Vertex}
+     * @memberof Line
+     * @instance
+     */
+    //b:Vertex;
     /**
      * Creates an instance of Line.
      *
@@ -33,8 +59,9 @@ var Line = /** @class */ (function () {
      * @param {Vertex} b The line's second point.
      **/
     function Line(a, b) {
-        this.a = a;
-        this.b = b;
+        return _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
+        //this.a = a;
+        //this.b = b;
     }
     /**
      * Get the length of this line.
@@ -43,10 +70,9 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.length = function () {
-        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
-    };
-    ;
+    //length():number {
+    //	return Math.sqrt( Math.pow(this.b.x-this.a.x,2) + Math.pow(this.b.y-this.a.y,2) );
+    //  };
     /**
      * Set the length of this vector to the given amount. This only works if this
      * vector is not a null vector.
@@ -56,10 +82,9 @@ var Line = /** @class */ (function () {
      * @memberof Line
      * @return {Line} this (for chaining)
      **/
-    Line.prototype.setLength = function (length) {
-        return this.scale(length / this.length());
-    };
-    ;
+    //   setLength( length:number ):Line {
+    //	return this.scale( length/this.length() );
+    //  };
     /**
      * Substract the given vertex from this line's end points.
      *
@@ -69,14 +94,13 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.sub = function (amount) {
-        this.a.sub(amount);
-        this.b.sub(amount);
-        return this;
-    };
-    ;
+    //  sub( amount:Vertex ):Line {
+    //	this.a.sub( amount );
+    //	this.b.sub( amount );
+    //	return this;
+    //  };
     /**
-     * Add the given vertex from this line's end points.
+     * Add the given vertex to this line's end points.
      *
      * @method add
      * @param {Vertex} amount The amount (x,y) to add.
@@ -84,12 +108,11 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.add = function (amount) {
-        this.a.add(amount);
-        this.b.add(amount);
-        return this;
-    };
-    ;
+    //    add( amount:Vertex ):Line {
+    //	this.a.add( amount );
+    //	this.b.add( amount );
+    //	return this;
+    //  };
     /**
      * Normalize this line (set to length 1).
      *
@@ -98,11 +121,11 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.normalize = function () {
-        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
-        return this;
-    };
-    ;
+    //   normalize():Line {
+    //	this.b.set( this.a.x + (this.b.x-this.a.x)/this.length(),
+    //		    this.a.y + (this.b.y-this.a.y)/this.length() );
+    //	return this;
+    //  }; 
     /**
      * Scale this line by the given factor.
      *
@@ -112,11 +135,11 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.scale = function (factor) {
-        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
-        return this;
-    };
-    ;
+    //scale( factor:number ):Line {
+    //	this.b.set( this.a.x + (this.b.x-this.a.x)*factor,
+    //		    this.a.y + (this.b.y-this.a.y)*factor );
+    //	return this;
+    //  };
     /**
      * Move this line to a new location.
      *
@@ -126,13 +149,12 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.moveTo = function (newA) {
-        var diff = this.a.difference(newA);
-        this.a.add(diff);
-        this.b.add(diff);
-        return this;
-    };
-    ;
+    //   moveTo( newA:Vertex ):Line {
+    //	let diff = this.a.difference( newA );
+    //	this.a.add( diff );
+    //	this.b.add( diff );
+    //	return this;
+    //  };
     /**
      * Get the angle between this and the passed line (in radians).
      *
@@ -142,17 +164,16 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.angle = function (line) {
-        if (typeof line == 'undefined')
-            line = new Line(new Vertex(0, 0), new Vertex(100, 0));
-        // Compute the angle from x axis and the return the difference :)
-        var v0 = this.b.clone().sub(this.a);
-        var v1 = line.b.clone().sub(line.a);
-        // Thank you, Javascript, for this second atan function. No additional math is needed here!
-        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
-        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
-    };
-    ;
+    //angle( line:Line ):number {
+    //	if( typeof line == 'undefined' )
+    //	    line = new Line( new Vertex(0,0), new Vertex(100,0) );
+    //	// Compute the angle from x axis and the return the difference :)
+    //	var v0 = this.b.clone().sub( this.a );
+    //	var v1 = line.b.clone().sub( line.a );
+    //	// Thank you, Javascript, for this second atan function. No additional math is needed here!
+    //	// The result might be negative, but isn't it usually nicer to determine angles in positive values only?
+    //	return Math.atan2( v1.x, v1.y ) - Math.atan2( v0.x, v0.y );
+    //  };
     /**
      * Get line point at position t in [0 ... 1]:<br>
      * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
@@ -165,10 +186,10 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.vertAt = function (t) {
-        return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
-    };
-    ;
+    //vertAt( t:number ):Vertex {
+    //	return new Vertex( this.a.x + (this.b.x-this.a.x)*t,
+    //			  this.a.y + (this.b.y-this.a.y)*t );
+    //  };
     /**
      * Get the intersection if this line and the specified line.
      *
@@ -178,6 +199,7 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
+    // !!! TO NOT MOVE TO VertTuple
     Line.prototype.intersection = function (line) {
         var denominator = this.denominator(line);
         if (denominator == 0)
@@ -200,11 +222,10 @@ var Line = /** @class */ (function () {
      * @param {Line} line
      * @return {Number}
      **/
-    Line.prototype.denominator = function (line) {
-        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
-        return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
-    };
-    ;
+    /*denominator( line:Line ):number {
+    // http://jsfiddle.net/justin_c_rounds/Gd2S2/
+    return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
+    };*/
     /**
      * Checks if this and the given line are co-linear.
      *
@@ -213,10 +234,9 @@ var Line = /** @class */ (function () {
      * @param {Line} line
      * @return true if both lines are co-linear.
      */
-    Line.prototype.colinear = function (line) {
-        return Math.abs(this.denominator(line)) < Vertex.EPSILON;
-    };
-    ;
+    /*colinear( line:Line ):boolean {
+    return Math.abs( this.denominator(line) ) < Vertex.EPSILON;
+    };*/
     /**
      * Get the closest position T from this line to the specified point.
      *
@@ -228,16 +248,14 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.getClosestT = function (p) {
-        var l2 = Line.util.dist2(this.a, this.b);
-        if (l2 === 0)
-            return 0;
-        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
-        // Wrap to [0,1]?
-        // t = Math.max(0, Math.min(1, t));
-        return t;
-    };
-    ;
+    /*getClosestT( p:Vertex ):number {
+    var l2 = Line.util.dist2(this.a, this.b);
+    if( l2 === 0 ) return 0;
+    var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
+    // Wrap to [0,1]?
+    // t = Math.max(0, Math.min(1, t));
+    return t;
+    };*/
     /**
      * The the minimal distance between this line and the specified point.
      *
@@ -247,42 +265,56 @@ var Line = /** @class */ (function () {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.pointDistance = function (p) {
-        // Taken From:
-        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-        function dist2(v, w) {
-            return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
-        }
-        // p - point
-        // v - start point of segment
-        // w - end point of segment
-        function distToSegmentSquared(p, v, w) {
-            //var l2 = dist2(v, w);
-            //if( l2 === 0 ) return dist2(p, v);
-            //var t = ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
-            //t = Math.max(0, Math.min(1, t));
-            return dist2(p, this.vertAt(this.getClosestLineT(p))); // dist2(p, [ v[0] + t * (w[0] - v[0]), v[1] + t * (w[1] - v[1]) ]);
-        }
-        // p - point
-        // v - start point of segment
-        // w - end point of segment
-        //function distToSegment (p, v, w) {
-        //    return Math.sqrt(distToSegmentSquared(p, v, w));
-        //}
-        return Math.sqrt(distToSegmentSquared(p, this.a, this.b));
-    };
+    /*pointDistance( p:Vertex ):number {
+    // Taken From:
+    // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+
+    function dist2(v, w) {
+        return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
+    }
+
+    // p - point
+    // v - start point of segment
+    // w - end point of segment
+    function distToSegmentSquared (p, v, w) {
+        //var l2 = dist2(v, w);
+        //if( l2 === 0 ) return dist2(p, v);
+        //var t = ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
+        //t = Math.max(0, Math.min(1, t));
+        return dist2(p, this.vertAt(this.getClosestLineT(p))); // dist2(p, [ v[0] + t * (w[0] - v[0]), v[1] + t * (w[1] - v[1]) ]);
+    }
+
+    // p - point
+    // v - start point of segment
+    // w - end point of segment
+    //function distToSegment (p, v, w) {
+    //    return Math.sqrt(distToSegmentSquared(p, v, w));
+    //}
+
+    return Math.sqrt( distToSegmentSquared(p, this.a, this.b) );
+    }*/
     /**
      * Create a deep clone of this line.
      *
      * @method clone
-     * @return {Line} A copy if this line.
+     * @return {object} A copy if this line as an object.
      * @instance
      * @memberof Line
      **/
-    Line.prototype.clone = function () {
-        return new Line(this.a.clone(), this.b.clone());
-    };
-    ;
+    //clone():object {
+    //	return this.cloneLine();
+    //};
+    /**
+     * Create a deep clone of this line.
+     *
+     * @method cloneLine
+     * @return {Line} A type safe clone if this line as as Line.
+     * @instance
+     * @memberof Line
+     **/
+    //cloneLine():Line {
+    //	return new Line( this.a.clone(), this.b.clone() );
+    //};    
     /**
      * Create an SVG representation of this line.
      *
@@ -307,25 +339,5 @@ var Line = /** @class */ (function () {
         return buffer.join('');
     };
     ;
-    /**
-     * Create a string representation of this line.
-     *
-     * @method totring
-     * @return {string} The string representing this line.
-     * @instance
-     * @memberof Line
-     **/
-    Line.prototype.toString = function () {
-        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
-    };
-    ;
-    /**
-     * @private
-     **/
-    Line.util = {
-        dist2: function (v, w) {
-            return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
-        }
-    };
     return Line;
-}());
+}(VertTuple));

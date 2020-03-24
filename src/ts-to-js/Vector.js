@@ -33,8 +33,42 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+/*
+function applyMixins(derivedCtor: any, baseCtors: any[]) {
+    baseCtors.forEach(baseCtor => {
+        Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+            Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
+        });
+    });
+}
+
+class Addable<B,P> {
+    addTest(p:P):B {
+    console.log('addTest');
+    }
+}
+
+
+class Cloneable {
+    cloneTest() {
+    console.log('cloneTest');
+    }
+}*/
+// class Vector extends Line {
 var Vector = /** @class */ (function (_super) {
     __extends(Vector, _super);
+    /**
+     * @member {Vertex}
+     * @memberof Vertex
+     * @instance
+     */
+    //a:Vertex;
+    /**
+     * @member {Vertex}
+     * @memberof Vertex
+     * @instance
+     */
+    //b:Vertex;
     /**
      * The constructor.
      *
@@ -45,10 +79,11 @@ var Vector = /** @class */ (function (_super) {
      * @param {Vertex} vertB - The end vertex of the vector.
      **/
     function Vector(vertA, vertB) {
-        return _super.call(this, vertA, vertB) || this;
+        return _super.call(this, vertA, vertB, function (a, b) { return new Vector(a, b); }) || this;
+        //this.a = a;
+        //this.b = b;
     }
     ;
-    // Object.extendClass(Line,Vector);
     /**
      * Get the perpendicular of this vector which is located at a.
      *
@@ -56,8 +91,14 @@ var Vector = /** @class */ (function (_super) {
      * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
      **/
     Vector.prototype.perp = function () {
-        var v = this.clone().sub(this.a);
-        return new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x)).add(this.a);
+        var v = this.clone(); // .sub( this.a );
+        v.sub(this.a);
+        //return new Vector( new Vertex(), new Vertex(-v.b.y,v.b.x) ).add( this.a );
+        v = new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x));
+        v.a.add(this.a);
+        v.b.add(this.a);
+        // v.b.y = -v.b.y; // new Vertex(-v.b.y,v.b.x) ).add( this.a );
+        return v;
     };
     ;
     /**
@@ -90,12 +131,48 @@ var Vector = /** @class */ (function (_super) {
      *
      * @method clone
      * @override
-     * @return {Vector} A copy if this line.
+     * @return {object} A copy of this vector as an object.
      * @instance
      * @memberof Vector
      **/
-    Vector.prototype.clone = function () {
-        return new Vector(this.a.clone(), this.b.clone());
+    /*clone():object {
+    return this.cloneVector();
+    };*/
+    /**
+     * Create a deep clone of this Vector.
+     *
+     * @method clone
+     * @override
+     * @return {Vector} A type-safe clone of this vector as a Vector.
+     * @instance
+     * @memberof Vector
+     **/
+    /*cloneVector():Vector {
+    return new Vector( this.a.clone(), this.b.clone() );
+    };*/
+    /**
+     * Get the intersection if this vector and the specified vector.
+     *
+     * @method intersection
+     * @param {Vector} line The second vector.
+     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @instance
+     * @memberof Line
+     **/
+    Vector.prototype.intersection = function (line) {
+        var denominator = this.denominator(line);
+        if (denominator == 0)
+            return null;
+        var a = this.a.y - line.a.y;
+        var b = this.a.x - line.a.x;
+        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
+        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+        a = numerator1 / denominator; // NaN if parallel lines
+        b = numerator2 / denominator;
+        // TODO:
+        // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
+        // if we cast these lines infinitely in both directions, they intersect here:
+        return new Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
     };
     ;
     /**
@@ -171,4 +248,14 @@ var Vector = /** @class */ (function (_super) {
         }
     };
     return Vector;
-}(Line));
+}(VertTuple));
+/*
+interface Vector extends Addable, Cloneable {}
+applyMixins(Vector, [Addable, Cloneable]);
+
+const testV : Vector = new Vector( new Vertex(), new Vertex() );
+testV.addTest();
+testV.cloneTest();
+*/
+var testV = new Vector(new Vertex(1, 2), new Vertex(3, 4));
+console.log('cloned', testV.clone());

@@ -25,25 +25,21 @@
  **/
 
 
-class Line<L extends Line<L>> {
-
-
-    
-    // Fields
+class Line extends VertTuple<Line> {
 
     /** 
      * @member {Vertex} 
      * @memberof Line
      * @instance
      */
-    a:Vertex;
+    //a:Vertex;
 
     /** 
      * @member {Vertex} 
      * @memberof Line
      * @instance
      */
-    b:Vertex;
+    //b:Vertex;
  
     /**
      * Creates an instance of Line.
@@ -53,9 +49,10 @@ class Line<L extends Line<L>> {
      * @param {Vertex} a The line's first point.
      * @param {Vertex} b The line's second point.
      **/
-    constructor(a:Vertex,b:Vertex) { 
-       	this.a = a;
-	this.b = b;
+    constructor(a:Vertex,b:Vertex) {
+	super(a,b,(a:Vertex,b:Vertex)=>new Line(a,b));
+       	//this.a = a;
+	//this.b = b;
     }
 
     /**
@@ -65,9 +62,9 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    length():number {
-	return Math.sqrt( Math.pow(this.b.x-this.a.x,2) + Math.pow(this.b.y-this.a.y,2) );
-    };
+    //length():number {
+//	return Math.sqrt( Math.pow(this.b.x-this.a.x,2) + Math.pow(this.b.y-this.a.y,2) );
+  //  };
 
 
     /**
@@ -79,9 +76,10 @@ class Line<L extends Line<L>> {
      * @memberof Line
      * @return {Line} this (for chaining)
      **/
-    setLength( length:number ):Line<L> {
-	return this.scale( length/this.length() );
-    };
+ //   setLength( length:number ):Line {
+//	return this.scale( length/this.length() );
+  //  };
+    
     
     /**
      * Substract the given vertex from this line's end points.
@@ -92,15 +90,15 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    sub( amount:Vertex ):Line<L> {
-	this.a.sub( amount );
-	this.b.sub( amount );
-	return this;
-    };
+  //  sub( amount:Vertex ):Line {
+//	this.a.sub( amount );
+//	this.b.sub( amount );
+//	return this;
+  //  };
 
 
     /**
-     * Add the given vertex from this line's end points.
+     * Add the given vertex to this line's end points.
      *
      * @method add
      * @param {Vertex} amount The amount (x,y) to add.
@@ -108,11 +106,11 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    add( amount:Vertex ):Line<L> {
-	this.a.add( amount );
-	this.b.add( amount );
-	return this;
-    };
+//    add( amount:Vertex ):Line {
+//	this.a.add( amount );
+//	this.b.add( amount );
+//	return this;
+  //  };
 
     
     /**
@@ -123,11 +121,11 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    normalize():Line<L> {
-	this.b.set( this.a.x + (this.b.x-this.a.x)/this.length(),
-		    this.a.y + (this.b.y-this.a.y)/this.length() );
-	return this;
-    }; 
+ //   normalize():Line {
+//	this.b.set( this.a.x + (this.b.x-this.a.x)/this.length(),
+//		    this.a.y + (this.b.y-this.a.y)/this.length() );
+//	return this;
+  //  }; 
 
 
     /**
@@ -139,11 +137,11 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    scale( factor:number ):Line<L> {
-	this.b.set( this.a.x + (this.b.x-this.a.x)*factor,
-		    this.a.y + (this.b.y-this.a.y)*factor );
-	return this;
-    };
+    //scale( factor:number ):Line {
+//	this.b.set( this.a.x + (this.b.x-this.a.x)*factor,
+//		    this.a.y + (this.b.y-this.a.y)*factor );
+//	return this;
+  //  };
 
 
     /**
@@ -155,12 +153,12 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    moveTo( newA:Vertex ):Line<L> {
-	let diff = this.a.difference( newA );
-	this.a.add( diff );
-	this.b.add( diff );
-	return this;
-    };
+ //   moveTo( newA:Vertex ):Line {
+//	let diff = this.a.difference( newA );
+//	this.a.add( diff );
+//	this.b.add( diff );
+//	return this;
+  //  };
 
     
     /**
@@ -172,16 +170,16 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    angle( line:Line<L> ):number {
-	if( typeof line == 'undefined' )
-	    line = new Line<L>( new Vertex(0,0), new Vertex(100,0) );
-	// Compute the angle from x axis and the return the difference :)
-	var v0 = this.b.clone().sub( this.a );
-	var v1 = line.b.clone().sub( line.a );
-	// Thank you, Javascript, for this second atan function. No additional math is needed here!
-	// The result might be negative, but isn't it usually nicer to determine angles in positive values only?
-	return Math.atan2( v1.x, v1.y ) - Math.atan2( v0.x, v0.y );
-    };
+    //angle( line:Line ):number {
+//	if( typeof line == 'undefined' )
+//	    line = new Line( new Vertex(0,0), new Vertex(100,0) );
+//	// Compute the angle from x axis and the return the difference :)
+//	var v0 = this.b.clone().sub( this.a );
+//	var v1 = line.b.clone().sub( line.a );
+//	// Thank you, Javascript, for this second atan function. No additional math is needed here!
+//	// The result might be negative, but isn't it usually nicer to determine angles in positive values only?
+//	return Math.atan2( v1.x, v1.y ) - Math.atan2( v0.x, v0.y );
+  //  };
 
     
     /**
@@ -196,10 +194,10 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    vertAt( t:number ):Vertex {
-	return new Vertex( this.a.x + (this.b.x-this.a.x)*t,
-			  this.a.y + (this.b.y-this.a.y)*t );
-    };
+    //vertAt( t:number ):Vertex {
+//	return new Vertex( this.a.x + (this.b.x-this.a.x)*t,
+//			  this.a.y + (this.b.y-this.a.y)*t );
+  //  };
 	    
 
     /**
@@ -211,7 +209,8 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    intersection( line:L ):Vertex {
+    // !!! TO NOT MOVE TO VertTuple
+    intersection( line:Line ):Vertex {
 	var denominator = this.denominator(line);
 	if( denominator == 0 ) 
 	    return null;
@@ -237,10 +236,10 @@ class Line<L extends Line<L>> {
      * @param {Line} line
      * @return {Number}
      **/
-    denominator( line:L ):number {
+    /*denominator( line:Line ):number {
 	// http://jsfiddle.net/justin_c_rounds/Gd2S2/
 	return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
-    };
+    };*/
 
 
     /**
@@ -251,9 +250,9 @@ class Line<L extends Line<L>> {
      * @param {Line} line
      * @return true if both lines are co-linear.
      */
-    colinear( line:L ):boolean {
+    /*colinear( line:Line ):boolean {
 	return Math.abs( this.denominator(line) ) < Vertex.EPSILON;
-    };
+    };*/
 
 
     /**
@@ -267,14 +266,14 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    getClosestT( p:Vertex ):number {
+    /*getClosestT( p:Vertex ):number {
 	var l2 = Line.util.dist2(this.a, this.b);
 	if( l2 === 0 ) return 0; 
 	var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
 	// Wrap to [0,1]?
 	// t = Math.max(0, Math.min(1, t));
 	return t;
-    };
+    };*/
 
 
     /**
@@ -286,7 +285,7 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    pointDistance( p:Vertex ):number {
+    /*pointDistance( p:Vertex ):number {
 	// Taken From:
 	// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
 
@@ -313,21 +312,33 @@ class Line<L extends Line<L>> {
 	//}
 
 	return Math.sqrt( distToSegmentSquared(p, this.a, this.b) );
-    }
+    }*/
 
 
     /**
      * Create a deep clone of this line.
      *
      * @method clone
-     * @return {Line} A copy if this line.
+     * @return {object} A copy if this line as an object.
      * @instance
      * @memberof Line
      **/
-    clone():L {
-	return (new Line( this.a.clone(), this.b.clone() ) as L);
-    };
-    
+    //clone():object {
+//	return this.cloneLine();
+    //};
+
+
+    /**
+     * Create a deep clone of this line.
+     *
+     * @method cloneLine
+     * @return {Line} A type safe clone if this line as as Line.
+     * @instance
+     * @memberof Line
+     **/
+    //cloneLine():Line {
+//	return new Line( this.a.clone(), this.b.clone() );
+    //};    
     
 
     /**
@@ -363,20 +374,19 @@ class Line<L extends Line<L>> {
      * @instance
      * @memberof Line
      **/
-    toString():string {
-	return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
-    };
+    //toString():string {
+//	return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
+  //  };
 
     
     /**
      * @private
      **/
-    static util = {
-	dist2 : function(v:Vertex, w:Vertex) {
-	    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
-	}
-    };
+    //static util = {
+//	dist2 : function(v:Vertex, w:Vertex) {
+//	    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
+//	}
+  //  };
 
-    //_context.Line = Line;
 
 }

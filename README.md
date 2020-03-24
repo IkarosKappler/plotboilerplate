@@ -512,6 +512,8 @@ for this purpose.
  * Add a retina detection; initialize the canvas with double resolution on startup if retina display (optional-flag).
  * Add a test implementation with Hobby-curves (demo?).
  * Remove the BezierPath._roundToDigits(...) function (replace by Number.toFixed).
+ * Refactor the VertTuple.getClosestT function. It still uses local functions!
+ * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
 
 
 ## Todos for future Version 2 (not backwards compatible)

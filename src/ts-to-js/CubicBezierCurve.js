@@ -12,22 +12,17 @@
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2019-03-23 Changed the signatures of getPoint, getPointAt and getTangent (!version 2.0).
  * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
- * @modified 2020-05-06 Added the getSubCurveAt(number,number) function.
- * @modified 2020-05-06 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
- * @modified 2020-05-07 Added the isInstance(any) function.
- * @modified 2020-05-10 Added the reverse() function.
- * @modified 2020-05-10 Fixed the translate(...) function (returning 'this' was missing).
- * @version 2.3.1
+ * @modified 2020-02-06 Added the getSubCurveAt(number,number) function.
+ * @modified 2020-02-06 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
+ * @modified 2020-02-07 Added the isInstance(any) function.
+ * @modified 2020-02-10 Added the reverse() function.
+ * @modified 2020-02-10 Fixed the translate(...) function (returning 'this' was missing).
+ * @modified 2020-03-24 Ported this class from vanilla JS to Typescript.
+ * @version 2.3.2
  *
  * @file CubicBezierCurve
  * @public
  **/
-/* enum eBezierPoint {
-    START_POINT = 0,
-    START_CONTROL_POINT = 1,
-    END_CONTROL_POINT = 2,
-    END_POINT = 3
-} */
 var CubicBezierCurve = /** @class */ (function () {
     /**
      * The constructor.

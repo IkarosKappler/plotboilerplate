@@ -1,6 +1,9 @@
 
 
-# Changelog
+	# Changelog
+	* 2020-03-24
+	* Ported following classes to Typescript: CubicBezierCurve, gup.
+	* Added Vector.cloneVector() and Line.cloneLine() to solve the subclassing and clonable problem.
 * 2020-03-23
   * Ported following classes to Typescript: Vertex, Line, VertexAttr, VertexListeners.	
 * 2020-03-17
