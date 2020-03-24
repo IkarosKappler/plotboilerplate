@@ -33,42 +33,8 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-/*
-function applyMixins(derivedCtor: any, baseCtors: any[]) {
-    baseCtors.forEach(baseCtor => {
-        Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-            Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
-        });
-    });
-}
-
-class Addable<B,P> {
-    addTest(p:P):B {
-    console.log('addTest');
-    }
-}
-
-
-class Cloneable {
-    cloneTest() {
-    console.log('cloneTest');
-    }
-}*/
-// class Vector extends Line {
 var Vector = /** @class */ (function (_super) {
     __extends(Vector, _super);
-    /**
-     * @member {Vertex}
-     * @memberof Vertex
-     * @instance
-     */
-    //a:Vertex;
-    /**
-     * @member {Vertex}
-     * @memberof Vertex
-     * @instance
-     */
-    //b:Vertex;
     /**
      * The constructor.
      *
@@ -80,8 +46,6 @@ var Vector = /** @class */ (function (_super) {
      **/
     function Vector(vertA, vertB) {
         return _super.call(this, vertA, vertB, function (a, b) { return new Vector(a, b); }) || this;
-        //this.a = a;
-        //this.b = b;
     }
     ;
     /**
@@ -126,30 +90,6 @@ var Vector = /** @class */ (function (_super) {
         return this;
     };
     ;
-    /**
-     * Create a deep clone of this Vector.
-     *
-     * @method clone
-     * @override
-     * @return {object} A copy of this vector as an object.
-     * @instance
-     * @memberof Vector
-     **/
-    /*clone():object {
-    return this.cloneVector();
-    };*/
-    /**
-     * Create a deep clone of this Vector.
-     *
-     * @method clone
-     * @override
-     * @return {Vector} A type-safe clone of this vector as a Vector.
-     * @instance
-     * @memberof Vector
-     **/
-    /*cloneVector():Vector {
-    return new Vector( this.a.clone(), this.b.clone() );
-    };*/
     /**
      * Get the intersection if this vector and the specified vector.
      *
@@ -249,13 +189,3 @@ var Vector = /** @class */ (function (_super) {
     };
     return Vector;
 }(VertTuple));
-/*
-interface Vector extends Addable, Cloneable {}
-applyMixins(Vector, [Addable, Cloneable]);
-
-const testV : Vector = new Vector( new Vertex(), new Vertex() );
-testV.addTest();
-testV.cloneTest();
-*/
-var testV = new Vector(new Vertex(1, 2), new Vertex(3, 4));
-console.log('cloned', testV.clone());

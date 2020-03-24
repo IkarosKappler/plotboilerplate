@@ -21,45 +21,8 @@
  * @public
  **/
 
-/*
-function applyMixins(derivedCtor: any, baseCtors: any[]) {
-    baseCtors.forEach(baseCtor => {
-        Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-            Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
-        });
-    });
-}
-
-class Addable<B,P> {
-    addTest(p:P):B {
-	console.log('addTest');
-    }
-}
-
-
-class Cloneable {
-    cloneTest() {
-	console.log('cloneTest');
-    }
-}*/
-
-
-// class Vector extends Line {
 class Vector extends VertTuple<Vector> {  
 
-    /** 
-     * @member {Vertex} 
-     * @memberof Vertex
-     * @instance
-     */
-    //a:Vertex;
-
-    /** 
-     * @member {Vertex} 
-     * @memberof Vertex
-     * @instance
-     */
-    //b:Vertex;
     
     /**
      * The constructor.
@@ -72,8 +35,6 @@ class Vector extends VertTuple<Vector> {
      **/
     constructor( vertA:Vertex, vertB:Vertex ) {
 	super(vertA,vertB,(a:Vertex,b:Vertex)=>new Vector(a,b));
-	//this.a = a;
-	//this.b = b;
     };
 
 
@@ -121,34 +82,6 @@ class Vector extends VertTuple<Vector> {
 	this.b.y = this.a.y-(this.b.y-this.a.y);
 	return this;
     };
-    
-
-    /**
-     * Create a deep clone of this Vector.
-     *
-     * @method clone
-     * @override
-     * @return {object} A copy of this vector as an object.
-     * @instance
-     * @memberof Vector
-     **/
-    /*clone():object {
-	return this.cloneVector();
-    };*/
-
-
-    /**
-     * Create a deep clone of this Vector.
-     *
-     * @method clone
-     * @override
-     * @return {Vector} A type-safe clone of this vector as a Vector.
-     * @instance
-     * @memberof Vector
-     **/
-    /*cloneVector():Vector {
-	return new Vector( this.a.clone(), this.b.clone() );
-    };*/
 
 
     /**
@@ -257,17 +190,3 @@ class Vector extends VertTuple<Vector> {
     }
     
 }
-
-
-/*
-interface Vector extends Addable, Cloneable {}
-applyMixins(Vector, [Addable, Cloneable]);
-
-const testV : Vector = new Vector( new Vertex(), new Vertex() );
-testV.addTest();
-testV.cloneTest();
-*/
-
-
-const testV : Vector = new Vector( new Vertex(1,2), new Vertex(3,4) );
-console.log( 'cloned', testV.clone() );
