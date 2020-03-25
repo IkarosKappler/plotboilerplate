@@ -28,14 +28,39 @@
 class BezierPath {
 
 
+    /** 
+     * @member {Array<Vertex>} 
+     * @memberof BezierPath
+     * @type {Array<Vertex>}
+     * @instance
+     */
     pathPoints:Array<Vertex>;
-    
+
+    /** 
+     * @member {number} 
+     * @memberof BezierPath
+     * @type {number}
+     * @instance
+     */
     totalArcLength:number;
-    
-    // Set this flag to true if you want the first point and
-    // last point of the path to be auto adjusted, too.
+
+    /**
+     * Set this flag to true if you want the first point and
+     * last point of the path to be auto adjusted, too.
+     *
+     * @member {number} 
+     * @memberof BezierPath
+     * @type {number}
+     * @instance
+     */
     adjustCircular:boolean;
-    
+
+    /** 
+     * @member {Array<CubicBezierCurve>} 
+     * @memberof BezierPath
+     * @type {Array<CubicBezierCurve>}
+     * @instance
+     */
     bezierCurves:Array<CubicBezierCurve>;
 
 

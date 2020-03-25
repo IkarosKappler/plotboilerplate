@@ -17,7 +17,7 @@
 (function(_context) {
     "use strict";
 
-    window.initializePB = function() { console.log('init');
+    window.initializePB = function() {
 	if( window.pbInitialized )
 	    return;
 	window.pbInitialized = true;
@@ -201,13 +201,14 @@
 	    new Triangle( new Vertex(hypo*1.5,diameter*1.45), new Vertex(diameter*1.45,hypo*1.5),
 			  new Vertex(diameter*1.6,diameter*1.6) ) 
 	];
-	const setEquilateral = function( triangle ) {
+	var setEquilateral = function( triangle ) {
 	    const vec  = new Vector(triangle.a,triangle.b);
 	    const mid  = vec.vertAt(0.5);
 	    const perp = vec.perp().add( mid ).sub( vec.a );
 	    perp.setLength( vec.length() * Math.sqrt(3) / 2 ); // The height of a equilateral triangle
 	    triangle.c.set( perp.b ); 
 	};
+	// TODO: var adjustCircumCircle = function( triangle ) { };
 	for( var i in triangles ) {
 	    let tri = triangles[i];
 	    tri.c.attr.draggable = tri.c.attr.selectable = false;

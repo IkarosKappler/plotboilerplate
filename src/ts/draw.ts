@@ -27,21 +27,54 @@
  * @modified 2019-12-18 Added the quadraticBezier(...) function (for the sake of approximating Lissajous curves).
  * @modified 2019-12-20 Added the 'lineWidth' param to the polyline(...) function.
  * @modified 2020-01-09 Added the 'lineWidth' param to the ellipse(...) function.
- * @version  1.5.2
+ * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
+ * @version  1.5.3
  **/
 
-(function(_context) {
-    "use strict";
+// Todo: rename this class to Drawutils
+class drawutils {
 
+    /** 
+     * @member {CanvasRenderingContext2D} 
+     * @memberof drawutils
+     * @type {CanvasRenderingContext2D}
+     * @instance
+     */
+    ctx:CanvasRenderingContext2D;
+
+    /** 
+     * @member {Vertex} 
+     * @memberof drawutils
+     * @type {Vertex}
+     * @instance
+     */
+    readonly offset:Vertex;
+
+    /** 
+     * @member {Vertex} 
+     * @memberof drawutils
+     * @type {Vertex}
+     * @instance
+     */
+    readonly scale:Vertex;
+
+    /** 
+     * @member {boolean} 
+     * @memberof drawutils
+     * @type {boolean}
+     * @instance
+     */
+    fillShapes:boolean;
+    
     /**
      * The constructor.
      *
      * @constructor
      * @name drawutils
-     * @param {Context2D} context - The drawing context.
+     * @param {anvasRenderingContext2D} context - The drawing context.
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    _context.drawutils = function( context, fillShapes ) {
+    constructor( context:CanvasRenderingContext2D, fillShapes:boolean ) {
 	this.ctx = context;
 	this.offset = new Vertex( 0, 0 );
 	this.scale = new Vertex( 1, 1 );
@@ -51,7 +84,7 @@
     /**
      * Called before each draw cycle.
      **/
-    _context.drawutils.prototype.beginDrawCycle = function() {
+    beginDrawCycle() {
 	// NOOP
     };
 
@@ -67,7 +100,7 @@
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutils.prototype.line = function( zA, zB, color, lineWidth ) {
+    line( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) {
 	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
@@ -91,13 +124,14 @@
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutils.prototype.arrow = function( zA, zB, color ) {
-	var headlen = 8;   // length of head in pixels
-	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+    arrow( zA:Vertex, zB:Vertex, color:string ) {
+	var headlen:number = 8;   // length of head in pixels
+	// var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+	// var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	
 	this.ctx.save();
 	this.ctx.beginPath();
-	var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+	var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	
 	this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
 	for( var i = 0; i < vertices.length; i++ ) {
@@ -123,7 +157,7 @@
      * @instance
      * @memberof drawutils
      **/
-    _context.drawutils.prototype.image = function( image, position, size ) {
+    image( image:HTMLImageElement, position:Vertex, size:Vertex ) {
 	this.ctx.save();
 	// Note that there is a Safari bug with the 3 or 5 params variant.
 	// Only the 9-param varaint works.
@@ -150,7 +184,8 @@
     // |
     // | @param color A stroke/fill color to use.
     // +-------------------------------
-    _context.drawutils.prototype._fillOrDraw = function( color ) {
+    // TODO: convert this to a STATIC function.
+    _fillOrDraw( color:string ) {
 	if( this.fillShapes ) {
 	    this.ctx.fillStyle = color;
 	    this.ctx.fill();
@@ -175,9 +210,9 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.cubicBezier = function( startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth ) {
+    cubicBezier( startPoint:Vertex, endPoint:Vertex, startControlPoint:Vertex, endControlPoint:Vertex, color:string, lineWidth?:number ) {
 	if( startPoint instanceof CubicBezierCurve ) {
-	    this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, endPoint );
+	    this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth );
 	    return;
 	}
 	// Draw curve
@@ -208,14 +243,13 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.quadraticBezier = function( startPoint, controlPoint, endPoint, color, lineWidth ) {
+    quadraticBezier( startPoint:Vertex, controlPoint:Vertex, endPoint:Vertex, color:string, lineWidth?:number ) {
 	// Draw curve
 	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
 	this.ctx.quadraticCurveTo( this.offset.x+controlPoint.x*this.scale.x, this.offset.y+controlPoint.y*this.scale.y,
 				   this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-	//this.ctx.closePath();
 	this.ctx.lineWidth = lineWidth || 2;
 	this._fillOrDraw( color );
 	this.ctx.restore();
@@ -236,13 +270,13 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.cubicBezierPath = function( path, color ) {
+    cubicBezierPath( path:Array<Vertex>, color:string ) {
 	if( !path || path.length == 0 )
 	    return;
 	// Draw curve
 	this.ctx.save();
 	this.ctx.beginPath();
-	var curve, startPoint, endPoint, startControlPoint, endControlPoint;
+	var curve:any, startPoint:Vertex, endPoint:Vertex, startControlPoint:Vertex, endControlPoint:Vertex;
 	this.ctx.moveTo( this.offset.x+path[0].x*this.scale.x, this.offset.y+path[0].y*this.scale.y );
 	for( var i = 1; i < path.length; i+=3 ) {
 	    startControlPoint = path[i];
@@ -271,7 +305,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.handle = function( startPoint, endPoint ) { 
+    handle( startPoint:Vertex, endPoint:Vertex ) { 
 	// Draw handles
 	// (No need to save and restore here)
 	this.point( startPoint, 'rgb(0,32,192)' );
@@ -285,16 +319,17 @@
      * The colors for this are fixed and cannot be specified.
      *
      * @method cubicBezierCurveHandleLines
-     * @param {BezierCurve} curve - The curve.
+     * @param {CubicBezierCurve} curve - The curve.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.cubicBezierCurveHandleLines = function( curve ) {
+    /* cubicBezierCurveHandleLines( curve:CubicBezierCurve ) {
 	// Draw handle lines
-	// TODO: THIS FUNCTION DOES NOT EXIST
 	this.cubicBezierHandleLines( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
-    };
+	// this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
+	// this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
+    }; */
 
     
     /**
@@ -307,7 +342,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.handleLine = function( startPoint, endPoint ) {
+    handleLine( startPoint:Vertex, endPoint:Vertex ) {
 	// Draw handle lines
 	this.line( startPoint, endPoint, 'rgb(192,192,192)' );	
     };
@@ -324,7 +359,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.dot = function( p, color ) {
+    dot( p:Vertex, color:string ) {
 	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( Math.round(this.offset.x + this.scale.x*p.x), Math.round(this.offset.y + this.scale.y*p.y) );
@@ -345,8 +380,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.point = function( p, color ) {
-	var radius = 3;
+    point( p:Vertex, color:string ) {
+	var radius:number = 3;
 	this.ctx.beginPath();
 	this.ctx.arc( this.offset.x+p.x*this.scale.x, this.offset.y+p.y*this.scale.y, radius, 0, 2 * Math.PI, false );
 	this.ctx.closePath();
@@ -367,7 +402,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.circle = function( center, radius, color ) {
+    circle( center:Vertex, radius:number, color:string ) {
 	this.ctx.beginPath();
 	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radius*this.scale.x, radius*this.scale.y, 0.0, 0.0, Math.PI*2 );
 	this.ctx.closePath();
@@ -388,7 +423,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.ellipse = function( center, radiusX, radiusY, color, lineWidth ) {
+    ellipse( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number ) {
 	this.ctx.beginPath();
 	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radiusX*this.scale.x, radiusY*this.scale.y, 0.0, 0.0, Math.PI*2 );
 	this.ctx.closePath();
@@ -410,7 +445,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.square = function( center, size, color ) {
+    square( center:Vertex, size:number, color:string ) {
 	this.ctx.beginPath();
 	this.ctx.rect( this.offset.x+(center.x-size/2.0)*this.scale.x, this.offset.y+(center.y-size/2.0)*this.scale.y, size*this.scale.x, size*this.scale.y );
 	this.ctx.closePath();
@@ -432,10 +467,10 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.grid = function( center, width, height, sizeX, sizeY, color ) {
+    grid( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {
 	this.ctx.beginPath();
 	// center to right
-	var x = 0;
+	var x : number= 0;
 	while( x < width/2 ) {
 	    this.ctx.moveTo( this.offset.x + (center.x+x)*this.scale.x, this.offset.y - (center.y - height*0.5)*this.scale.y  );
 	    this.ctx.lineTo( this.offset.x + (center.x+x)*this.scale.x, this.offset.y - (center.y + height*0.5)*this.scale.y  );
@@ -447,13 +482,13 @@
 	    this.ctx.lineTo( this.offset.x + (center.x-x)*this.scale.x, this.offset.y - (center.y + height*0.5)*this.scale.y  );
 	    x+=sizeX;
 	}
-	var y = 0;
+	var y : number = 0;
 	while( y < height/2 ) {
 	    this.ctx.moveTo( this.offset.x - (center.x - width*0.5)*this.scale.x, this.offset.y + (center.y+y)*this.scale.y );
 	    this.ctx.lineTo( this.offset.x - (center.x + width*0.5)*this.scale.x, this.offset.y + (center.y+y)*this.scale.y );
 	    y+=sizeY;
 	}
-	var y = sizeY;
+	var y : number = sizeY;
 	while( y < height/2 ) {
 	    this.ctx.moveTo( this.offset.x - (center.x - width*0.5)*this.scale.x, this.offset.y + (center.y-y)*this.scale.y );
 	    this.ctx.lineTo( this.offset.x - (center.x + width*0.5)*this.scale.x, this.offset.y + (center.y-y)*this.scale.y );
@@ -480,10 +515,10 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.raster = function( center, width, height, sizeX, sizeY, color ) {
+    raster( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {
 	this.ctx.save();
 	this.ctx.beginPath();
-	var cx = 0, cy = 0;
+	var cx : number = 0, cy : number = 0;
 	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
 	    cx++;
 	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
@@ -518,7 +553,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.diamondHandle = function( center, size, color ) {
+    diamondHandle( center:Vertex, size:number, color:string ) {
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x + center.x*this.scale.x - size/2.0, this.offset.y + center.y*this.scale.y );
 	this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y - size/2.0 );
@@ -544,7 +579,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.squareHandle = function( center, size, color ) {
+    squareHandle( center:Vertex, size:number, color:string ) {
 	this.ctx.beginPath();
 	this.ctx.rect( this.offset.x+center.x*this.scale.x-size/2.0, this.offset.y+center.y*this.scale.y-size/2.0, size, size );
 	this.ctx.closePath();
@@ -567,8 +602,8 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.circleHandle = function( center, size, color ) {
-	var radius = 3;
+    circleHandle( center:Vertex, size:number, color:string ) {
+	var radius : number = 3;
 	this.ctx.beginPath();
 	this.ctx.arc( this.offset.x+center.x*this.scale.x, this.offset.y+center.y*this.scale.y, radius, 0, 2 * Math.PI, false );
 	this.ctx.closePath();
@@ -589,7 +624,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.crosshair = function( center, radius, color ) {
+    crosshair( center:Vertex, radius:number, color:string ) {
 	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x+center.x*this.scale.x-radius, this.offset.y+center.y*this.scale.y );
@@ -614,7 +649,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.polygon = function( polygon, color ) {
+    polygon( polygon:Polygon, color:string ) {
 	this.polyline( polygon.vertices, polygon.isOpen, color );
     };
 
@@ -631,7 +666,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.polyline = function( vertices, isOpen, color, lineWidth ) {
+    polyline( vertices:Array<Vertex>, isOpen:boolean, color:string, lineWidth?:number ) {
 	if( vertices.length <= 1 )
 	    return;
 	this.ctx.save();
@@ -752,7 +787,7 @@
      * @instance
      * @memberof drawutils
      */
-    _context.drawutils.prototype.label = function( text, x, y, rotation, color ) {
+    label( text:string, x:number, y:number, rotation?:number, color?:string ) {
 	this.ctx.save();
 	this.ctx.translate(x, y);
 	if( typeof rotation != 'undefined' )
@@ -775,10 +810,10 @@
      *
      * @param {string} color - The color to clear with.
      **/
-    _context.drawutils.prototype.clear = function( color ) {
+    clear( color:string ) {
 	this.ctx.fillStyle = color; 
 	this.ctx.fillRect(0,0,this.ctx.canvas.width,this.ctx.canvas.height);
     };
     
-    
-})(window ? window : module.export );
+   
+}

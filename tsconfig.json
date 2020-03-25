@@ -3,5 +3,6 @@
 	"outDir": "./src/ts-to-js"
     },
     "inclue": ["./ts/*"],
-    "exclude": []
+    "exclude": [],
+    "removeComments": false
 }

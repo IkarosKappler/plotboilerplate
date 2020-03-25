@@ -485,5 +485,43 @@ var Vertex = /** @class */ (function () {
      * @private
      **/
     Vertex.EPSILON = 1.0e-6;
+    Vertex.utils = {
+        /**
+         * Generate a four-point arrow head, starting at the vector end minus the
+         * arrow head length.
+         *
+         * The first vertex in the returned array is guaranteed to be the located
+         * at the vector line end minus the arrow head length.
+         *
+         *
+         * Due to performance all params are required.
+         *
+         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+         * scaling different). Arrow heads should not look distored on non-uniform scaling.
+         *
+         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+         * For headlen use 8, it's a good arrow head size.
+         *
+         * Example:
+         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+         *
+         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
+         * @param {Vertex} zB - The end vertex of the vector.
+         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+         * @param {number} scaleX  - The horizontal scaling during draw.
+         * @param {number} scaleY  - the vertical scaling during draw.
+         **/
+        // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
+        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
+            // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+            var vertices = [];
+            vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+            vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
+            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+            return vertices;
+        }
+    };
     return Vertex;
 }());

@@ -514,6 +514,10 @@ for this purpose.
  * Remove the BezierPath._roundToDigits(...) function (replace by Number.toFixed).
  * Refactor the VertTuple.getClosestT function. It still uses local functions!
  * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
+ * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
+ * Add a Circle class (center and radius). The triangle class really needs that.
+ * Add a Bounds class. It is implicitly already used in many places.
+ * Add an interface Drawable.ts and add the to the PlotBoilerplate and to the SVGBuilder.
 
 
 ## Todos for future Version 2 (not backwards compatible)

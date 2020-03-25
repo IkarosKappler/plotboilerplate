@@ -49,7 +49,7 @@ class Polygon {
      * @param {Vertex[]} vertices - An array of 2d vertices that shape the polygon.
      * @param {boolean} isOpen - Indicates if the polygon should be rendered as an open or closed shape.
      **/
-    constructor( vertices:Array<Vertex>|undefined, isOpen:boolean ) {
+    constructor( vertices:Array<Vertex>|undefined, isOpen?:boolean ) {
 	if( typeof vertices == 'undefined' )
 	    vertices = [];
 	this.vertices = vertices;

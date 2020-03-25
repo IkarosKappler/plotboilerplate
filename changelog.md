@@ -1,7 +1,9 @@
 
 
 # Changelog
-  * 2020-03-24
+* 2020-03-25
+  * Ported following classes to Typescript: drawutils, drawutilsgl, Grid, VEllipse, Triangle, SVGBuilder, MouseHandler.
+ * 2020-03-24
   * Ported following classes to Typescript: CubicBezierCurve, BezierPath, Polygon, gup.
   * Added VertTuple<T> to solve the subclassing and clonable problem.
 * 2020-03-23
