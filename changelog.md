@@ -2,7 +2,7 @@
 
 # Changelog
   * 2020-03-24
-  * Ported following classes to Typescript: CubicBezierCurve, Polygon, gup.
+  * Ported following classes to Typescript: CubicBezierCurve, BezierPath, Polygon, gup.
   * Added VertTuple<T> to solve the subclassing and clonable problem.
 * 2020-03-23
   * Ported following classes to Typescript: Vertex, Line, VertexAttr, VertexListeners.
