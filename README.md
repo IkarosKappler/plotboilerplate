@@ -505,7 +505,7 @@ for this purpose.
  * Move the helper function triangle.pointIsInTriangle()...pointIsInTriangle() should be in a utils wrapper somewhere.
  * [Done] Add a demo: Lissajous-Curves (direct and Bézier approximation).
  * Code the leaf venation generator demo.
- * Add thumbnails for the demo preview.
+ * [Done] Add thumbnails for the demo preview.
  * Add a thumbnail generator script for the screenshots (like with imagick).
  * [Done ]Add a screenshot of the pursuit curves to the README.
  * [Done] Restore old entry point (src/entry.js) for webpack.
@@ -516,8 +516,10 @@ for this purpose.
  * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
  * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
  * Add a Circle class (center and radius). The triangle class really needs that.
- * Add a Bounds class. It is implicitly already used in many places.
+ * Add a Bounds class. It is implicitly already used in many places. 
+ * Use the new Bounds class in the RectSelector helper then.
  * Add an interface Drawable.ts and add the to the PlotBoilerplate and to the SVGBuilder.
+ * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
 
 
 ## Todos for future Version 2 (not backwards compatible)
