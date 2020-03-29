@@ -59,7 +59,15 @@ var XMouseEvent = /** @class */ (function (_super) {
     }
     return XMouseEvent;
 }(MouseEvent));
+var XWheelEvent = /** @class */ (function (_super) {
+    __extends(XWheelEvent, _super);
+    function XWheelEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XWheelEvent;
+}(WheelEvent));
 var MouseHandler = /** @class */ (function () {
+    // private wheelHandlers  : Record<string,(e:XWheelEvent)=>void> = {};
     /**
      * The constructor.
      *
@@ -73,6 +81,7 @@ var MouseHandler = /** @class */ (function () {
         this.mousePos = null;
         this.mouseButton = -1;
         this.listeners = {};
+        // private wheelListeners : Record<string,(e:XWheelEvent)=>void> = {};
         this.installed = {};
         this.handlers = {};
         // +----------------------------------------------------------------------

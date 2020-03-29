@@ -497,14 +497,14 @@ class drawutilsgl {
      * Note that the crosshair radius will not be affected by scaling.
      *
      * @method crosshair
-     * @param {Vertex} center - The center of the crosshair.
+     * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    crosshair( center:Vertex, radius:number, color:string ) {
+    crosshair( center:XYCoords, radius:number, color:string ) {
 	// NOT YET IMPLEMENTED	
     };
 
@@ -519,7 +519,7 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    polygon( polygon:Polygon, color:string ) {	
+    polygon( polygon:Polygon, color:string, lineWidth?:number ) {	
 	const vertices : Float32Array = new Float32Array( polygon.vertices.length*3 );
 	for( var i = 0; i < polygon.vertices.length; i++ ) {
 	    vertices[i*3+0] = this._x2rel(polygon.vertices[i].x);

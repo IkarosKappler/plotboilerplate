@@ -53,20 +53,25 @@ interface XMouseParams {
     wasDragged : boolean;
     dragAmount : {x:number,y:number};
 }
-class XMouseEvent extends MouseEvent {
+class XMouseEvent extends MouseEvent implements XEvent {
+    params: XMouseParams;
+}
+class XWheelEvent extends WheelEvent implements XEvent {
     params: XMouseParams;
 }
 
 class MouseHandler {
 
-    private element      : HTMLElement;
-    private mouseDownPos : { x:number, y:number }|undefined = null;
-    private mouseDragPos : { x:number, y:number }|undefined = null;
-    private mousePos     : { x:number, y:number }|undefined = null;
-    private mouseButton  : number = -1;
-    private listeners    : Record<string,(e:XMouseEvent)=>void> = {};
-    private installed    : Record<string,boolean> = {};
-    private handlers     : Record<string,(e:XMouseEvent)=>void> = {};
+    private element        : HTMLElement;
+    private mouseDownPos   : { x:number, y:number }|undefined = null;
+    private mouseDragPos   : { x:number, y:number }|undefined = null;
+    private mousePos       : { x:number, y:number }|undefined = null;
+    private mouseButton    : number = -1;
+    private listeners : Record<string,(e:XMouseEvent)=>void> = {};
+    // private wheelListeners : Record<string,(e:XWheelEvent)=>void> = {};
+    private installed      : Record<string,boolean> = {};
+    private handlers  : Record<string,(e:XMouseEvent)=>void> = {};
+    // private wheelHandlers  : Record<string,(e:XWheelEvent)=>void> = {};
     
     /**
      * The constructor.
@@ -200,7 +205,7 @@ class MouseHandler {
 	this.listeners.click = callback;
 	return this;
     };
-    wheel( callback:(e:XMouseEvent)=>void ) : MouseHandler {
+    wheel( callback:(e:XWheelEvent)=>void ) : MouseHandler {
 	if( this.listeners.wheel ) this.throwAlreadyInstalled('wheel');
 	this.listenFor('wheel');
 	this.listeners.wheel = callback;

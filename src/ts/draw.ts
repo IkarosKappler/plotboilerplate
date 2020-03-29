@@ -617,14 +617,14 @@ class drawutils {
      * Note that the crosshair radius will not be affected by scaling.
      *
      * @method crosshair
-     * @param {Vertex} center - The center of the crosshair.
+     * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    crosshair( center:Vertex, radius:number, color:string ) {
+    crosshair( center:XYCoords, radius:number, color:string ) {
 	this.ctx.save();
 	this.ctx.beginPath();
 	this.ctx.moveTo( this.offset.x+center.x*this.scale.x-radius, this.offset.y+center.y*this.scale.y );
@@ -645,12 +645,13 @@ class drawutils {
      * @method polygon
      * @param {Polygon}  polygon - The polygon to draw.
      * @param {string}   color - The CSS color to draw the polygon with.
+     * @param {string}   lineWidth - The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polygon( polygon:Polygon, color:string ) {
-	this.polyline( polygon.vertices, polygon.isOpen, color );
+    polygon( polygon:Polygon, color:string, lineWidth?:number ) {
+	this.polyline( polygon.vertices, polygon.isOpen, color, lineWidth );
     };
 
 

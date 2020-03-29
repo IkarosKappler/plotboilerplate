@@ -354,7 +354,7 @@ class CubicBezierCurve {
      * @memberof CubicBezierCurve
      * @return {Vertex} 
      **/
-    getPointByIDfunction( id:number ) : Vertex {
+    getPointByID( id:number ) : Vertex {
 	if( id == this.START_POINT ) return this.startPoint;
 	if( id == this.END_POINT ) return this.endPoint;
 	if( id == this.START_CONTROL_POINT ) return this.startControlPoint;

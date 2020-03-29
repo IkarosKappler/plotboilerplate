@@ -549,7 +549,7 @@ var drawutils = /** @class */ (function () {
      * Note that the crosshair radius will not be affected by scaling.
      *
      * @method crosshair
-     * @param {Vertex} center - The center of the crosshair.
+     * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
      * @return {void}
@@ -576,12 +576,13 @@ var drawutils = /** @class */ (function () {
      * @method polygon
      * @param {Polygon}  polygon - The polygon to draw.
      * @param {string}   color - The CSS color to draw the polygon with.
+     * @param {string}   lineWidth - The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.polygon = function (polygon, color) {
-        this.polyline(polygon.vertices, polygon.isOpen, color);
+    drawutils.prototype.polygon = function (polygon, color, lineWidth) {
+        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
     };
     ;
     /**

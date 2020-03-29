@@ -6,7 +6,7 @@ interface XYCoords {
 
 interface XYDimension {
     width : number;
-    height; number;
+    height: number;
 }
 
 /**
@@ -28,9 +28,9 @@ interface Config {
     scaleX?:number; // The initial x-zoom. Default is 1.0.
     scaleY?:number; // The initial y-zoom. Default is 1.0.
     offsetX?: number; // The initial x-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
-    offsetY?: number; // The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
-    rasterGrid:? boolean; // If set to true the background grid will be drawn rastered.
-    rasterAdjustFactor?: boolean; // The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
+    offsetY?: number; // The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values. 
+    rasterGrid?: boolean; // If set to true the background grid will be drawn rastered.
+    rasterAdjustFactor?: number; // The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
     drawOrigin?: boolean; // Draw a crosshair at (0,0).
     autoAdjustOffset?: boolean; //  When set to true then the origin of the XY plane will
                               // be re-adjusted automatically (see the params
@@ -79,7 +79,10 @@ interface DrawSettings {
 }
 
 interface DrawConfig {
-    drawVertices : boolean; 
+    drawVertices : boolean;
+    drawHandleLines : boolean;
+    drawHandlePoints : boolean;
+    drawGrid: boolean;
     bezier : {
 	color : string;
 	lineWidth : number;
@@ -93,3 +96,18 @@ interface DrawConfig {
     vector : DrawSettings;
     image : DrawSettings;
 }
+
+// This is a hotfix for the problem, that the constructor's "name" attribute is not
+// visible in ES6:
+//   >> The 'name' property is part of ES6 that's why you don't see it in lib.d.ts.
+//   >> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
+// ... does this collide with anything?
+interface Function {
+    name: string;
+}
+
+/*
+interface XEvent {
+    params : XMouseParams;
+}
+*/

@@ -251,7 +251,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPointByIDfunction = function (id) {
+    CubicBezierCurve.prototype.getPointByID = function (id) {
         if (id == this.START_POINT)
             return this.startPoint;
         if (id == this.END_POINT)

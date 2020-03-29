@@ -14,6 +14,14 @@
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @version  1.0.3
  **/
+// This is a hotfix for the problem, that the constructor's "name" attribute is not
+// visible in ES6:
+//   >> The 'name' property is part of ES6 that's why you don't see it in lib.d.ts.
+//   >> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
+// ... does this collide with anything?
+//interface Function {
+//    name: string;
+//}
 var SVGBuilder = /** @class */ (function () {
     function SVGBuilder() {
     }

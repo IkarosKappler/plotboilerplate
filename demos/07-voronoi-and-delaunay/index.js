@@ -59,7 +59,7 @@
 		      enableKeys            : true,
 		      enableTouch           : true,
 		      enableMouseWheel      : true,
-		      enableExport          : true
+		      enableSVGExport       : true
 		    }, GUP
 		)
 	    );

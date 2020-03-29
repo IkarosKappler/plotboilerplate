@@ -20,9 +20,9 @@
 //   >> The 'name' property is part of ES6 that's why you don't see it in lib.d.ts.
 //   >> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
 // ... does this collide with anything?
-interface Function {
-    name: string;
-}
+//interface Function {
+//    name: string;
+//}
 
 
 class SVGBuilder {

@@ -29,7 +29,7 @@ class Grid {
      * @memberof Grid
      * @instance
      */
-    size:number;
+    size:Vertex;
 
     
     
@@ -41,7 +41,7 @@ class Grid {
      * @param {Vertex} center - The offset of the grid (default is [0,0]).
      * @param {Vertex} size   - The x- and y-size of the grid.
      **/
-    constructor( center:Vertex, size:number ) {
+    constructor( center:Vertex, size:Vertex ) {
 	this.center = center;
 	this.size = size;
     };

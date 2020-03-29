@@ -30,6 +30,12 @@
  * @file Vertex
  * @public
  **/
+/*
+type XYTuple = {
+    x : number;
+    y : number;
+}
+*/
 var Vertex = /** @class */ (function () {
     /**
      * The constructor for the vertex class.

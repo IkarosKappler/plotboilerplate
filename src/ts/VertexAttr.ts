@@ -22,7 +22,7 @@ interface IVertexAttr {
     draggable : boolean;
     selectable : boolean;
     isSelected : boolean;
-    bezierAutoAdjust? : false;
+    bezierAutoAdjust? : boolean;
     renderTime? : number;
 }
 

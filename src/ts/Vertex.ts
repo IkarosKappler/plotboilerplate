@@ -31,12 +31,14 @@
  * @public
  **/
 
+/* 
 type XYTuple = {
     x : number;
     y : number;
 }
+*/
 
-class Vertex implements XYTuple {
+class Vertex implements XYCoords {
 
     private static readonly ZERO = new Vertex(0,0);
     
@@ -85,7 +87,7 @@ class Vertex implements XYTuple {
      * @param {number} x - The x-coordinate of the new vertex.
      * @param {number} y - The y-coordinate of the new vertex.
      **/
-    constructor( x?:number|XYTuple|undefined, y?:number|undefined ) {
+    constructor( x?:number|XYCoords|undefined, y?:number|undefined ) {
 	/*if( x instanceof Vertex ) {
 	    this.x = x.x;
 	    this.y = x.y;
@@ -97,7 +99,7 @@ class Vertex implements XYTuple {
 	    this.x = x;
 	    this.y = y;
 	} else {
-	    const tuple = (x as XYTuple);
+	    const tuple = (x as XYCoords);
 	    if( typeof tuple.x == "number" && typeof tuple.y == "number" ) {
 		this.x = tuple.x;
 		this.y = tuple.y;
@@ -128,7 +130,7 @@ class Vertex implements XYTuple {
      * @instance
      * @memberof Vertex
      **/
-    set( x:number|XYTuple, y:number|undefined ):Vertex {
+    set( x:number|XYCoords, y?:number|undefined ):Vertex {
 	/* if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
 	    this.x = x.x;
 	    this.y = x.y;
@@ -140,7 +142,7 @@ class Vertex implements XYTuple {
 	    this.x = x;
 	    this.y = y;
 	} else {
-	    const tuple = (x as XYTuple);
+	    const tuple = (x as XYCoords);
 	    if( typeof tuple.x == "number" && typeof tuple.y == "number" ) {
 		this.x = tuple.x;
 		this.y = tuple.y;
@@ -228,7 +230,7 @@ class Vertex implements XYTuple {
      * @instance
      * @memberof Vertex
      **/
-    add( x:number|XYTuple, y?:number ):Vertex {
+    add( x:number|XYCoords, y?:number ):Vertex {
 	/*
 	if( typeof x == 'number' ) {
 	    this.x += x;
@@ -242,7 +244,7 @@ class Vertex implements XYTuple {
 	    this.x += x;
 	    this.y += y;
 	} else {
-	    const tuple = (x as XYTuple);
+	    const tuple = (x as XYCoords);
 	    if( typeof tuple.x == "number" && typeof tuple.y == "number" ) {
 		this.x += tuple.x;
 		this.y += tuple.y;
@@ -287,7 +289,7 @@ class Vertex implements XYTuple {
      * @instance
      * @memberof Vertex
      **/
-    sub( x:number|XYTuple, y?:number ):Vertex {
+    sub( x:number|XYCoords, y?:number ):Vertex {
 	/* if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
 	    this.x -= x.x;
 	    this.y -= x.y;
@@ -299,7 +301,7 @@ class Vertex implements XYTuple {
 	    this.x -= x;
 	    this.y -= y;
 	} else {
-	    const tuple = (x as XYTuple);
+	    const tuple = (x as XYCoords);
 	    if( typeof tuple.x == "number" && typeof tuple.y == "number" ) {
 		this.x -= tuple.x;
 		this.y -= tuple.y;
@@ -325,7 +327,7 @@ class Vertex implements XYTuple {
      * @instance
      * @memberof Vertex
      **/
-    equals( vertex:XYTuple ):boolean {
+    equals( vertex:XYCoords ):boolean {
 	var eqX =  (Math.abs(this.x-vertex.x) < Vertex.EPSILON);
 	var eqY =  (Math.abs(this.y-vertex.y) < Vertex.EPSILON);
 	var result = eqX && eqY;
@@ -355,7 +357,7 @@ class Vertex implements XYTuple {
      * @instance
      * @memberof Vertex
      **/
-    distance( vert:XYTuple ):number {
+    distance( vert:XYCoords ):number {
 	return Math.sqrt( Math.pow(vert.x-this.x,2) + Math.pow(vert.y-this.y,2) );
     };
 
@@ -371,7 +373,7 @@ class Vertex implements XYTuple {
      * @instance
      * @memberof Vertex
      **/
-    difference( vert:Vertex ):Vertex {
+    difference( vert:XYCoords ):Vertex {
 	return new Vertex( vert.x-this.x, vert.y-this.y );
     };
 
@@ -513,7 +515,7 @@ class Vertex implements XYTuple {
      * @param {ViewPort} viewPort - A {min:Vertex, max:Vertex} viewport specifying the bounds.
      * @return A new vertex with a random position.
      **/
-    static randomVertex( viewPort:{min:XYTuple,max:XYTuple} ):Vertex {
+    static randomVertex( viewPort:{min:XYCoords,max:XYCoords} ):Vertex {
 	return new Vertex( viewPort.min.x + Math.random()*(viewPort.max.x-viewPort.min.x),
 			   viewPort.min.y + Math.random()*(viewPort.max.y-viewPort.min.y)
 			 );

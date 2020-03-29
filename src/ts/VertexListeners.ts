@@ -15,11 +15,22 @@
  * @public
  **/
 
+interface VertEventParams extends XMouseParams {
+    vertex : Vertex;
+}
+
+interface VertEvent {
+    // vertex: Vertex;
+    // params : { vertex: Vertex }
+    params : VertEventParams; // XMouseParams;
+    // vertex : Vertex;
+} 
+
 class VertexListeners {
 
-    drag:Array<(e:Event)=>void>;
-    dragStart:Array<(e:Event)=>void>;
-    dragEnd:Array<(e:Event)=>void>;
+    drag:Array<(e:VertEvent)=>void>;
+    dragStart:Array<(e:VertEvent)=>void>;
+    dragEnd:Array<(e:VertEvent)=>void>;
     
     vertex:Vertex;
     
@@ -31,7 +42,7 @@ class VertexListeners {
      * @name VertexListeners
      * @param {Vertex} vertex - The vertex to use these listeners on (just a backward reference).
      **/
-    constructor( vertex ) {
+    constructor( vertex:Vertex ) {
 	this.drag = [];
 	this.dragStart = [];
 	this.dragEnd = [];
@@ -48,7 +59,7 @@ class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    addDragListener( listener:(e:Event)=>void ) {
+    addDragListener( listener:(e:VertEvent)=>void ) {
 	this.drag.push( listener );
 	return this;
     };
@@ -69,7 +80,7 @@ class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    addDragStartListener( listener:(e:Event)=>void ) {
+    addDragStartListener( listener:(e:VertEvent)=>void ) {
 	this.dragStart.push( listener );
 	return this;
     };
@@ -90,7 +101,7 @@ class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    addDragEndListener( listener:(e:Event)=>void ) {
+    addDragEndListener( listener:(e:VertEvent)=>void ) {
 	this.dragEnd.push( listener );
 	return this;
     };
@@ -113,7 +124,7 @@ class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    fireDragEvent( e ) {
+    fireDragEvent( e:VertEvent ) {
 	VertexListeners._fireEvent(this,this.drag,e);
     };
 
@@ -129,7 +140,7 @@ class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    fireDragStartEvent( e ) {
+    fireDragStartEvent( e:VertEvent ) {
 	VertexListeners._fireEvent(this,this.dragStart,e);
     };
 
@@ -145,7 +156,7 @@ class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    fireDragEndEvent( e ) {
+    fireDragEndEvent( e:VertEvent ) {
 	VertexListeners._fireEvent(this,this.dragEnd,e);
     };
 
@@ -154,12 +165,17 @@ class VertexListeners {
     /**
      * @private
      **/
-    private static _fireEvent( _self, listeners, e ) {
-	if( typeof e.params == 'undefined' )
-	    e.params = {};
-	e.params.vertex = _self.vertex;
+    private static _fireEvent( _self:VertexListeners,
+			       listeners:Array<(e:VertEvent)=>void>,
+			       e:VertEvent
+			     ) {
+	const ve : VertEvent = (e as unknown) as VertEvent;
+	if( typeof ve.params == 'undefined' )
+	    ve.params = ({ vertex : _self.vertex } as unknown) as VertEventParams;
+	else
+	    ve.params.vertex = _self.vertex; 
 	for( var i in listeners ) {
-	    listeners[i]( e );
+	    listeners[i]( ve );
 	}
     };
 

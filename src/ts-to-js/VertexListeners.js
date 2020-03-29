@@ -132,11 +132,13 @@ var VertexListeners = /** @class */ (function () {
      * @private
      **/
     VertexListeners._fireEvent = function (_self, listeners, e) {
-        if (typeof e.params == 'undefined')
-            e.params = {};
-        e.params.vertex = _self.vertex;
+        var ve = e;
+        if (typeof ve.params == 'undefined')
+            ve.params = { vertex: _self.vertex };
+        else
+            ve.params.vertex = _self.vertex;
         for (var i in listeners) {
-            listeners[i](e);
+            listeners[i](ve);
         }
     };
     ;

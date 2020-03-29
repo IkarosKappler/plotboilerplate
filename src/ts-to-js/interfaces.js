@@ -1,0 +1,5 @@
+/*
+interface XEvent {
+    params : XMouseParams;
+}
+*/
