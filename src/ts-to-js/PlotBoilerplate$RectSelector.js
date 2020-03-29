@@ -8,7 +8,8 @@
  *
  * @author  Ikaros Kappler
  * @date    2018-12-30
- * @version 1.0.0
+ * @modified 2020-03-28 Ported this vanilla-JS class to Typescript.
+ * @version 1.0.1
  **/
 var PlotBoilerpate$RectSelector = /** @class */ (function () {
     // Todo: rename callback to onRectSelected

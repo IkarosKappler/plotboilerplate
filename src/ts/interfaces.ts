@@ -4,10 +4,22 @@ interface XYCoords {
     y : number;
 }
 
+interface XYDimension {
+    width : number;
+    height; number;
+}
+
+/**
+ * @typedef {Object} Bounds
+ * @property {Vertex} min The upper left position.
+ * @property {Vertex} max The lower right position;.
+ */
 interface Bounds {
     min : XYCoords;
     max : XYCoords;
 }
+
+type Drawable = Vertex | Vector | Triangle | PBImage | VEllipse | Polygon | BezierPath | Line;
 
 interface Config {
     canvas : HTMLElement;         //  Your canvas element in the DOM (required).

@@ -68,12 +68,21 @@ class PlotBoilerplate {
     /** @constant {number} */
     static readonly DEFAULT_TOUCH_TOLERANCE : number =   32;
 
-
+    canvas:HTMLCanvasElement;
     config:Config;
     ctx:CanvasRenderingContext2D|WebGLRenderingContext;
     draw:drawutils|drawutilsgl;
     drawConfig:DrawConfig; // Todo: type
- 
+    grid:Grid; //                 = new Grid( new Vertex(0,0), new Vertex(50,50) );
+    image:HTMLImageElement; //                = null; // An image.
+    //imageBuffer:any; //          = null; // A canvas to read the pixel data from.
+    canvasSize : XYDimension; //          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
+    vertices : Array<Vertex>; //            = [];
+    selectPolygon : Polygon; //       = null;
+    draggedElements : Array<Draggable>; //     = [];
+    drawables : Array<Drawable>; //           = [];
+    console : Console; //             = console;
+    
     /** 
      * A helper function to scale elements (usually the canvas) using CSS.
      *
@@ -310,7 +319,7 @@ class PlotBoilerplate {
 	this.fill.scale.set(this.config.scaleX,this.config.scaleY);
 	this.grid                = new Grid( new Vertex(0,0), new Vertex(50,50) );
 	this.image               = null; // An image.
-	this.imageBuffer         = null; // A canvas to read the pixel data from.
+	// this.imageBuffer         = null; // A canvas to read the pixel data from.
 	this.canvasSize          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
 	this.vertices            = [];
 	this.selectPolygon       = null;
@@ -331,16 +340,17 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	var _saveFile = function() {
-	    var svgCode = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
+	private _saveFile() {
+	    var _self:PlotBoilerplate = this; // Does this work with self?
+	    var svgCode : string = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
 	    // See documentation for FileSaver.js for usage.
 	    //    https://github.com/eligrey/FileSaver.js
-	    var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
+	    var blob:Blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
 	    saveAs(blob, "plot-boilerplate.svg");
 	};
 
 
-	this._setToRetina = function() {
+	private _setToRetina() {
 	    this.config.cssScaleX = this.config.cssScaleY = 0.5;
 	    this.config.canvasWidthFactor = this.config.canvasHeightFactor = 2.0;
 	    //this.config.fullSize = false;
@@ -354,22 +364,17 @@ class PlotBoilerplate {
 	this.hooks = {
 	    saveFile : _saveFile
 	};
-
-	
-	// +---------------------------------------------------------------------------------
-	// | After this line: object members.
-	// +-------------------------------
 	
 	/**
 	 * Set the console for this instance.
 	 *
 	 * @method setConsole
-	 * @param {object} con - The new console object (default is window.console).
+	 * @param {Console} con - The new console object (default is window.console).
 	 * @instance
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.setConsole = function( con ) {
+	setConsole( con:Console ) {
 	    if( typeof con.log != 'function' ) throw "Console object must have a 'log' function.";
 	    if( typeof con.warn != 'function' ) throw "Console object must have a 'warn' function.";
 	    if( typeof con.error != 'function' ) throw "Console object must have a 'error' function.";
@@ -388,7 +393,7 @@ class PlotBoilerplate {
 	 * @return {void}
 	 * @private
 	 **/
-	PlotBoilerplate.prototype.updateCSSscale = function() {
+	updateCSSscale() {
 	    if( this.config.cssUniformScale ) {
 		setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
 	    } else {
@@ -420,10 +425,13 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.add = function( drawable, redraw ) {
+	add( drawable:Drawable|Array<Drawable>,
+	     redraw?:boolean
+	   ) {
 	    if( Array.isArray(drawable) ) {
-		for( var i in drawable )
-		    this.add( drawable[i] );
+		const arr : Array<Drawable> = (drawable as Array<Drawable>);
+		for( var i in arr )
+		    this.add( arr[i] );
 	    } else if( drawable instanceof Vertex ) {
 		this.drawables.push( drawable );
 		this.vertices.push( drawable );
@@ -466,7 +474,7 @@ class PlotBoilerplate {
 		for( var i in drawable.bezierCurves ) {	
 		    // This should be wrapped into the BezierPath implementation.
 		    drawable.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByStartPoint( e.params.vertex );
+			var cindex : number = drawable.locateCurveByStartPoint( e.params.vertex );
 			drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
 			drawable.moveCurvePoint( cindex*1, 
 						 drawable.START_POINT,     
@@ -475,7 +483,7 @@ class PlotBoilerplate {
 			drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByStartControlPoint( e.params.vertex );
+			var cindex : number = drawable.locateCurveByStartControlPoint( e.params.vertex );
 			if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
 			    return;
 			drawable.adjustPredecessorControlPoint( cindex*1, 
@@ -485,7 +493,7 @@ class PlotBoilerplate {
 			drawable.updateArcLengths();
 		    } );
 		    drawable.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
-			var cindex = drawable.locateCurveByEndControlPoint( e.params.vertex );
+			var cindex : number = drawable.locateCurveByEndControlPoint( e.params.vertex );
 			if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
 			    return;
 			drawable.adjustSuccessorControlPoint( cindex*1, 
@@ -498,7 +506,7 @@ class PlotBoilerplate {
 			// Move last control point with the end point (if not circular)
 			drawable.bezierCurves[drawable.bezierCurves.length-1].endPoint.listeners.addDragListener( function(e) {
 			    if( !drawable.adjustCircular ) {
-				var cindex = drawable.locateCurveByEndPoint( e.params.vertex );
+				var cindex : number = drawable.locateCurveByEndPoint( e.params.vertex );
 				drawable.moveCurvePoint( cindex*1, 
 							 drawable.END_CONTROL_POINT,     
 							 { x: e.params.dragAmount.x/2, y : e.params.dragAmount.y/2 }
@@ -547,12 +555,12 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.remove = function( drawable, redraw ) {
+	remove( drawable:Drawable, redraw?:boolean ) {
 	    if( drawable instanceof Vertex )
 		this.removeVertex( drawable, false );
 	    for( var i in this.drawables ) {
 		if( this.drawables[i] === drawable ) {
-		    this.drawables.splice(i,1);
+		    this.drawables.splice(i,1); 
 		    if( redraw )
 			this.redraw();
 		    return;
@@ -571,7 +579,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.removeVertex = function( vert, redraw ) {
+	removeVertex( vert:Vertex, redraw?:boolean ) {
 	    for( var i in this.drawables ) {
 		if( this.vertices[i] === vert ) {
 		    this.vertices.splice(i,1);
@@ -594,19 +602,19 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.drawGrid = function() {
-	    var gScale = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
-			   y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
-	    var gSize = { w : this.grid.size.x*gScale.x, h : this.grid.size.y*gScale.y };
-	    var cs = { w : this.canvasSize.width/2, h : this.canvasSize.height/2 };
-	    var offset = this.draw.offset.clone().inv();
-	    offset.x = (Math.round(offset.x+cs.w)/Math.round(gSize.w))*(gSize.w)/this.draw.scale.x + (((this.draw.offset.x-cs.w)/this.draw.scale.x)%gSize.w);
-	    offset.y = (Math.round(offset.y+cs.h)/Math.round(gSize.h))*(gSize.h)/this.draw.scale.y + (((this.draw.offset.y-cs.h)/this.draw.scale.x)%gSize.h);
+	drawGrid() {
+	    const gScale : XYCoords = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
+					y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
+	    var gSize : XYDimension = { width : this.grid.size.x*gScale.x, height : this.grid.size.y*gScale.y };
+	    var cs : XYDimension = { width : this.canvasSize.width/2, height : this.canvasSize.height/2 };
+	    var offset : Vertex = this.draw.offset.clone().inv();
+	    offset.x = (Math.round(offset.x+cs.width)/Math.round(gSize.width))*(gSize.width)/this.draw.scale.x + (((this.draw.offset.x-cs.w)/this.draw.scale.x)%gSize.width);
+	    offset.y = (Math.round(offset.y+cs.height)/Math.round(gSize.height))*(gSize.height)/this.draw.scale.y + (((this.draw.offset.y-cs.height)/this.draw.scale.x)%gSize.height);
 	    if( this.config.drawGrid ) {
 		if( this.config.rasterGrid )
-		    this.draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.125)' );
+		    this.draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.125)' );
 		else
-		    this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.w, gSize.h, 'rgba(0,128,255,0.095)' );
+		    this.draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.095)' );
 	    }
 	};
 
@@ -622,7 +630,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.drawOrigin = function() {
+	drawOrigin() {
 	    // Add a crosshair to mark the origin
 	    this.draw.crosshair( { x : 0, y : 0 }, 10, '#000000' );
 	};
@@ -631,7 +639,7 @@ class PlotBoilerplate {
 	/**
 	 * This is just a tiny helper function to determine the render color of vertices.
 	 **/
-	function _handleColor( h, color ) {
+	_handleColor( h:Vertex, color:string ) {
 	    return h.attr.draggable ? color : 'rgba(128,128,128,0.5)';
 	}
 
@@ -649,11 +657,11 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.drawDrawables = function( renderTime ) {
+	drawDrawables( renderTime:number ) {
 	    
 	    // Draw drawables
 	    for( var i in this.drawables ) {
-		var d = this.drawables[i];
+		var d : Drawable = this.drawables[i];
 		if( d instanceof BezierPath ) {
 		    for( var c in d.bezierCurves ) {
 			this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth );
@@ -756,7 +764,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.drawSelectPolygon = function() {
+	drawSelectPolygon() {
 	    // Draw select polygon?
 	    if( this.selectPolygon != null && this.selectPolygon.vertices.length > 0 ) {
 		this.draw.polygon( this.selectPolygon, '#888888' );
@@ -779,7 +787,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.drawVertices = function( renderTime ) {
+	drawVertices( renderTime:number ) {
 	    // Draw all vertices as small squares if they were not already drawn by other objects
 	    for( var i in this.vertices ) {
 		if( this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime ) {
@@ -800,8 +808,8 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.redraw = function() {
-	    var renderTime = new Date().getTime();
+	redraw() {
+	    var renderTime : number = new Date().getTime();
 
 	    if( this.config.preClear ) this.config.preClear();
 	    this.clear();
@@ -835,7 +843,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.clear = function() {
+	clear() {
 	    // Note that the image might have an alpha channel. Clear the scene first.
 	    this.draw.clear( this.config.backgroundColor );
 	};
@@ -853,7 +861,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {PlotBoilerplate} this
 	 **/
-	PlotBoilerplate.prototype.clearSelection = function( redraw ) {
+	clearSelection( redraw?:boolean ) {
 	    for( var i in this.vertices ) 
 		this.vertices[i].attr.isSelected = false;
 	    if( redraw )
@@ -870,17 +878,11 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {Bounds} The current viewport.
 	 **/
-	PlotBoilerplate.prototype.viewport = function() {
+	viewport() : Bounds {
 	    return { min : this.transformMousePosition(0,0),
 		     max : this.transformMousePosition(this.canvasSize.width*this.config.cssScaleX,this.canvasSize.height*this.config.cssScaleY)
 		   };
 	};
-	/**
-	 * @typedef {Object} Bounds
-	 * @property {Vertex} min The upper left position.
-	 * @property {Vertex} max The lower right position;.
-	 */
-
 
 	
 	/**
@@ -891,7 +893,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.saveFile = function() {
+	saveFile() {
 	    this.hooks.saveFile();
 	};
 
@@ -902,23 +904,23 @@ class PlotBoilerplate {
 	 *
 	 * Size minus padding minus border.
 	 **/	
-	var getAvailableContainerSpace = function() {
-	    var container = _self.canvas.parentNode;
-	    var canvas = _self.canvas;
+	private getAvailableContainerSpace() : XYDimension {
+	    var container : HTMLElement = _self.canvas.parentNode;
+	    var canvas : HTMLCanvasElement = _self.canvas;
 	    canvas.style.display = 'none';
 	    var
-	    padding = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
-	    border = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-width') ) || 0,
-	    pl = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
-	    pr = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
-	    pt = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
-	    pb = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
-	    bl = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-left-width') ) || border,
-	    br = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
-	    bt = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
-	    bb = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
-	    var w = container.clientWidth; 
-	    var h = container.clientHeight;
+	    padding : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
+	    border : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-width') ) || 0,
+	    pl : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
+	    pr : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
+	    pt : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
+	    pb : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
+	    bl : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-left-width') ) || border,
+	    br : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
+	    bt : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
+	    bb : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
+	    var w : number = container.clientWidth; 
+	    var h : number = container.clientHeight;
 	    // console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
 	    canvas.style.display = 'block';
 	    return { width : (w-pl-pr-bl-br), height : (h-pt-pb-bt-bb) };
@@ -935,8 +937,8 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.resizeCanvas = function() {
-	    var _setSize = function(w,h) {
+	resizeCanvas() {
+	    const _setSize = (w:number,h:number) => {
 		w *= _self.config.canvasWidthFactor;
 		h *= _self.config.canvasHeightFactor;
 		_self.canvas.width      = w; 
@@ -950,8 +952,8 @@ class PlotBoilerplate {
 	    };
 	    if( _self.config.fullSize && !_self.config.fitToParent ) {
 		// Set editor size
-		var width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-		var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+		var width : number  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		var height : number = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 		_self.canvas.style.position = 'absolute';
 		_self.canvas.style.width = width+'px';
 		_self.canvas.style.height = height+'px';
@@ -961,15 +963,15 @@ class PlotBoilerplate {
 	    } else if( _self.config.fitToParent ) {
 		// Set editor size
 		_self.canvas.style.position = 'absolute';
-		var space = getAvailableContainerSpace( _self.canvas.parentNode );
+		const space : XYDimension = getAvailableContainerSpace( _self.canvas.parentNode );
 		_self.canvas.style.width = (_self.config.canvasWidthFactor*space.width)+'px';
 		_self.canvas.style.height = (_self.config.canvasHeightFactor*space.height)+'px';
 		_self.canvas.style.top = null;
 		_self.canvas.style.left = null;
 		_setSize( space.width, space.height );		
 	    } else {
-		_self.canvas.style.width = null; // space.width+'px';
-		_self.canvas.style.height = null; //space.height+'px';
+		_self.canvas.style.width = null;
+		_self.canvas.style.height = null;
                 _setSize( _self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight );
 	    }
 	    
@@ -990,7 +992,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {void}
 	 **/
-	PlotBoilerplate.prototype.selectVerticesInPolygon = function( polygon ) {
+	selectVerticesInPolygon( polygon:Polygon ) {
 	    for( var i in this.vertices ) {
 		if( polygon.containsVert(this.vertices[i]) ) 
 		    this.vertices[i].attr.isSelected = true;
@@ -1012,7 +1014,7 @@ class PlotBoilerplate {
 	 * @private
 	 * @return {Draggable} Or false if none found.
 	 **/
-        var locatePointNear = function( point, tolerance ) {
+        private locatePointNear( point:Vertex, tolerance?:number ) : Draggable|boolean {
             // var tolerance = 7;
 	    if( typeof tolerance == 'undefined' )
 		tolerance = 7;
@@ -1020,7 +1022,7 @@ class PlotBoilerplate {
 	    tolerance /= _self.draw.scale.x;
 	    // Search in vertices
 	    for( var vindex in _self.vertices ) {
-		var vert = _self.vertices[vindex];
+		var vert : Vertex = _self.vertices[vindex];
 		if( (vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance ) {
 		    // { type : 'vertex', vindex : vindex };
 		    return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); 
@@ -1039,16 +1041,16 @@ class PlotBoilerplate {
 	 * @private
 	 * @return {void}
 	 **/
-	function handleClick(x,y) {
-	    var p = locatePointNear( _self.transformMousePosition(x, y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
+	private handleClick(x:number,y:number) {
+	    var p : Draggable = locatePointNear( _self.transformMousePosition(x, y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 	    if( p ) { 
 		if( keyHandler.isDown('shift') ) {
 		    if( p.type == 'bpath' ) {
-			let vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
+			let vert : Vertex = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
 			if( vert.attr.selectable )
 			    vert.attr.isSelected = !vert.attr.isSelected;
 		    } else if( p.type == 'vertex' ) {
-			let vert = _self.vertices[p.vindex];
+			let vert : Vertex = _self.vertices[p.vindex];
 			if( vert.attr.selectable )
 			    vert.attr.isSelected = !vert.attr.isSelected;
 		    }
@@ -1059,8 +1061,8 @@ class PlotBoilerplate {
 		}
 	    }
 	    else if( _self.selectPolygon != null ) {
-		var vert = _self.transformMousePosition( x, y );
-		_self.selectPolygon.vertices.push( vert );
+		const vert : XYCoords = _self.transformMousePosition( x, y );
+		_self.selectPolygon.vertices.push( new Vertex(vert.x,vert.y) );
 		_self.redraw();
 	    }
 	}
@@ -1078,7 +1080,7 @@ class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @return {object} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
 	 **/
-	PlotBoilerplate.prototype.transformMousePosition = function( x, y ) {
+	transformMousePosition( x:number, y:number ) : XYCoords {
 	    return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
 		     y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) };
 	};
@@ -1091,14 +1093,14 @@ class PlotBoilerplate {
 	 * It selects vertices for dragging.
 	 *
 	 * @method mouseDownHandler.
-	 * @param {Event} e - The event to handle
+	 * @param {XMouseEvent} e - The event to handle
 	 * @private
 	 * @return {void}
 	 **/
-	var mouseDownHandler = function(e) {
+	private mouseDownHandler(e:XMouseEvent) {
 	    if( e.which != 1 && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
 		return; // Only react on left mouse or touch events
-	    var p = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
+	    var p : Draggable = locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y), DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 	    if( !p ) return;
 	    // Drag all selected elements?
 	    if( p.type == 'vertex' && _self.vertices[p.vindex].attr.isSelected ) {
@@ -1131,12 +1133,12 @@ class PlotBoilerplate {
 	 * hold down.
 	 *
 	 * @method mouseDownHandler.
-	 * @param {Event} e - The event to handle
+	 * @param {XMouseEvent} e - The event to handle
 	 * @private
 	 * @return {void}
 	 **/
-	var mouseDragHandler = function(e) {
-	    var oldDragAmount = { x : e.params.dragAmount.x, y : e.params.dragAmount.y };
+	private mouseDragHandler(e:XMouseEvent) {
+	    const oldDragAmount : XYCoords = { x : e.params.dragAmount.x, y : e.params.dragAmount.y };
 	    e.params.dragAmount.x /= _self.config.cssScaleX;
 	    e.params.dragAmount.y /= _self.config.cssScaleY;
 	    if( keyHandler.isDown('alt') || keyHandler.isDown('ctrl') || keyHandler.isDown('spacebar') ) {
@@ -1178,17 +1180,17 @@ class PlotBoilerplate {
 	 * It clears the dragging-selection.
 	 *
 	 * @method mouseDownHandler.
-	 * @param {Event} e - The event to handle
+	 * @param {XMouseEvent} e - The event to handle
 	 * @private
 	 * @return {void}
 	 **/
-	var mouseUpHandler = function(e) {
+	private mouseUpHandler(e:XMouseEvent) {
 	    if( e.which != 1 )
 		return; // Only react on left mouse;
 	    if( !e.params.wasDragged )
 		handleClick( e.params.pos.x, e.params.pos.y );
 	    for( var i in _self.draggedElements ) {
-		var p = _self.draggedElements[i];
+		var p : Draggable = _self.draggedElements[i];
 		if( p.type == 'bpath' ) {
 		    _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEndEvent( e );
 		} else if( p.type == 'vertex' ) {
@@ -1207,13 +1209,13 @@ class PlotBoilerplate {
 	 * It performs the zooming.
 	 *
 	 * @method mouseWheelHandler.
-	 * @param {Event} e - The event to handle
+	 * @param {XMouseEvent} e - The event to handle
 	 * @private
 	 * @return {void}
 	 **/
-	var mouseWheelHandler = function(e) {
-	    var zoomStep = 1.25;
-	    let oldPos = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+	private mouseWheelHandler(e:XMouseEvent) {
+	    var zoomStep : number = 1.25;  // Make configurable?
+	    let oldPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
 	    if( e.deltaY < 0 ) {
 		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX*zoomStep;
 		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY*zoomStep;
@@ -1221,10 +1223,10 @@ class PlotBoilerplate {
 		_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = Math.max(_self.config.scaleX/zoomStep,0.01);
 		_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = Math.max(_self.config.scaleY/zoomStep,0.01);
 	    }
-	    let newPos = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+	    let newPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
 	    // Apply relative positioned zoom
-	    let newOffsetX = _self.draw.offset.x + (newPos.x-oldPos.x)*_self.draw.scale.x;
-	    let newOffsetY = _self.draw.offset.y + (newPos.y-oldPos.y)*_self.draw.scale.y;
+	    let newOffsetX : number = _self.draw.offset.x + (newPos.x-oldPos.x)*_self.draw.scale.x;
+	    let newOffsetY : number = _self.draw.offset.y + (newPos.y-oldPos.y)*_self.draw.scale.y;
 	    _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = newOffsetX;
 	    _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = newOffsetY;
 	    
@@ -1256,15 +1258,15 @@ class PlotBoilerplate {
 	    // Install a touch handler on the canvas.
 
 	    // Convert absolute touch positions to relative DOM element position (relative to canvas)
-	    function relPos(pos) {
+	    const relPos(pos:XYCoords) : XYCoords => {
 		return { x : pos.x - _self.canvas.offsetLeft,
 			 y : pos.y - _self.canvas.offsetTop
 		       };
 	    }
 	    // Some private vars to store the current mouse/position/button state.
-	    var touchMovePos = null;
-	    var touchDownPos = null;
-	    var draggedElement = null;
+	    var touchMovePos : Vertex|undefined|null= null;
+	    var touchDownPos : Vertex|undefined|null = null;
+	    var draggedElement : Draggable|undefined|null = null;
 	    new Touchy( this.canvas,
 			{ one : function( hand, finger ) {
 			    touchMovePos = new Vertex( relPos(finger.lastPoint) );
@@ -1272,9 +1274,9 @@ class PlotBoilerplate {
 			    draggedElement = locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 			    if( draggedElement ) {
 				hand.on('move', function (points) {
-				    var rel = relPos( points[0] );
-				    var trans = _self.transformMousePosition( rel.x, rel.y ); 
-				    var diff = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
+				    var rel : XYCoords = relPos( points[0] );
+				    var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
+				    var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
 				    if( draggedElement.type == 'vertex' ) {
 					if( !_self.vertices[draggedElement.vindex].attr.draggable )
 					    return;
@@ -1293,7 +1295,7 @@ class PlotBoilerplate {
 
 	if( this.config.enableKeys ) {
 	    // Install key handler
-	    var keyHandler = new KeyHandler( { trackAll : true } )
+	    var keyHandler : KeyHandler = new KeyHandler( { trackAll : true } )
 		.down('escape',function() {
 		    _self.clearSelection(true);
 		} )
@@ -1332,11 +1334,11 @@ class PlotBoilerplate {
      * @method createGUI
      * @instance
      * @memberof PlotBoilerplate
-     * @return {dat.gui} 
+     * @return {dat.gui.GUI} 
      **/
-    PlotBoilerplate.prototype.createGUI = function() {
-	var gui = new dat.gui.GUI();
-	var _self = this;
+    createGUI() : dat.gui.GUI {
+	var gui : dat.gui.GUI= new dat.gui.GUI();
+	var _self : PlotBoilerplate = this;
 	gui.remember(this.config);
 	var fold0 = gui.addFolder('Editor settings');
 	var fold00 = fold0.addFolder('Canvas size');
@@ -1359,7 +1361,7 @@ class PlotBoilerplate {
 	fold01.add(this.drawConfig, 'drawVertices').onChange( function() { _self.redraw(); } ).title("Draw vertices in general.");
 	
 	var fold0100 = fold01.addFolder('Colors and Lines');
-	var _addDrawConfigElement = function( fold, basePath, conf ) {
+	_addDrawConfigElement( fold, basePath:any, conf:any ) {
 	    for( var i in conf ) {
 		if( typeof conf[i] == 'object' ) {
 		    if( conf[i].hasOwnProperty('color') )
@@ -1411,7 +1413,7 @@ class PlotBoilerplate {
 	 * @param {Object} extension
 	 * @return {Object} base extended by the new attributes.
 	 **/
-	safeMergeByKeys : function( base, extension ) {
+	safeMergeByKeys : ( base:any, extension:any ) {
 	    for( var k in base ) {
 		if( !extension.hasOwnProperty(k) )
 		    continue;
@@ -1455,7 +1457,7 @@ class PlotBoilerplate {
 	 * @param {number} scaleY  - the vertical scaling during draw.
 	 **/
 	// @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
-	buildArrowHead : function( zA, zB, headlen, scaleX, scaleY ) {
+	/* buildArrowHead : function( zA, zB, headlen, scaleX, scaleY ) {
 	    // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
 	    var angle = Math.atan2( (zB.y-zA.y)*scaleY, (zB.x-zA.x)*scaleX );
 	    
@@ -1466,7 +1468,7 @@ class PlotBoilerplate {
 	    vertices.push( new Vertex(zB.x*scaleX-(headlen*1.35)*Math.cos(angle+Math.PI/8), zB.y*scaleY-(headlen*1.35)*Math.sin(angle+Math.PI/8)) );
 
 	    return vertices;
-	} 
+	} */
     };
 
 
@@ -1533,11 +1535,8 @@ class PlotBoilerplate {
 		return fallback;
 	    return obj[key];
 	},
-    };
-    
-    _context.PlotBoilerplate = PlotBoilerplate;
-    
-})(window); 
+    };   
+}
 
 
 
