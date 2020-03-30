@@ -59,7 +59,7 @@
  **/
 
 //import { GUI } from "dat.gui";
-//import { saveAs } from 'file-saver';
+// import { saveAs } from 'file-saver';
 
 
 /**
@@ -105,19 +105,20 @@ class PlotBoilerplate {
     ctx:CanvasRenderingContext2D|WebGLRenderingContext;
     draw:drawutils|drawutilsgl;
     fill:drawutils|drawutilsgl;
-    drawConfig:DrawConfig; // Todo: type
-    grid:Grid; //                 = new Grid( new Vertex(0,0), new Vertex(50,50) );
+    drawConfig:DrawConfig; 
+    grid:Grid;
     image:HTMLImageElement; //                = null; // An image.
     //imageBuffer:any; //          = null; // A canvas to read the pixel data from.
-    canvasSize : XYDimension; //          = { width : DEFAULT_CANVAS_WIDTH, height : DEFAULT_CANVAS_HEIGHT };
-    vertices : Array<Vertex>; //            = [];
-    paths : Array<BezierPath>; // NOT IN USE
-    selectPolygon : Polygon; //       = null;
-    draggedElements : Array<Draggable>; //     = [];
-    drawables : Array<Drawable>; //           = [];
-    console : Console; //             = console;
-    hooks : { saveFile: ()=>void };
+    canvasSize : XYDimension; 
+    vertices : Array<Vertex>; 
+    paths : Array<BezierPath>;
+    selectPolygon : Polygon;
+    draggedElements : Array<Draggable>;
+    drawables : Array<Drawable>;
+    console : Console;
+    hooks : IHooks; //  { saveFile: ()=>void };
     private keyHandler : KeyHandler|undefined;
+
     
     /** 
      * A helper function to scale elements (usually the canvas) using CSS.
@@ -129,13 +130,13 @@ class PlotBoilerplate {
      * @param {number} scaleY The - Y scale factor.
      * @return {void}
      **/ 
-    private static setCSSscale( element:HTMLElement,
+    /* private static setCSSscale( element:HTMLElement,
 				scaleX:number,
 				scaleY:number ) {
 	element.style['transform-origin'] = '0 0';
 	if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
 	else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
-    };
+    }; */
 
 
     /**
@@ -200,7 +201,7 @@ class PlotBoilerplate {
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true). 
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
      */
-    constructor( config:Config ) {
+    constructor( config:PBParams ) {
 	// config = config || {};
 	// This should be in some static block ...
 	VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true, isSelected : false, draggable : true };
@@ -220,51 +221,51 @@ class PlotBoilerplate {
 	 */
 	this.config = {
 	    canvas                : config.canvas,
-	    fullSize              : PlotBoilerplate.fetch.val(config,'fullSize',true), 
-	    fitToParent           : PlotBoilerplate.fetch.bool(config,'fitToParent',true),
-	    scaleX                : PlotBoilerplate.fetch.num(config,'scaleX',1.0), 
-	    scaleY                : PlotBoilerplate.fetch.num(config,'scaleY',1.0),
-	    offsetX               : PlotBoilerplate.fetch.num(config,'offsetX',0.0), 
-	    offsetY               : PlotBoilerplate.fetch.num(config,'offsetY',0.0), 
-	    // drawGrid              : PlotBoilerplate.fetch.bool(config,'drawGrid',true),
-	    rasterGrid            : PlotBoilerplate.fetch.bool(config,'rasterGrid',true),
-	    rasterAdjustFactor    : PlotBoilerplate.fetch.num(config,'rasterAdjustdFactror',2.0),
-	    drawOrigin            : PlotBoilerplate.fetch.bool(config,'drawOrigin',false),
-	    autoAdjustOffset      : PlotBoilerplate.fetch.val(config,'autoAdjustOffset',true),
-	    offsetAdjustXPercent  : PlotBoilerplate.fetch.num(config,'offsetAdjustXPercent',50),
-	    offsetAdjustYPercent  : PlotBoilerplate.fetch.num(config,'offsetAdjustYPercent',50),
+	    fullSize              : PlotBoilerplate.utils.fetch.val(config,'fullSize',true), 
+	    fitToParent           : PlotBoilerplate.utils.fetch.bool(config,'fitToParent',true),
+	    scaleX                : PlotBoilerplate.utils.fetch.num(config,'scaleX',1.0), 
+	    scaleY                : PlotBoilerplate.utils.fetch.num(config,'scaleY',1.0),
+	    offsetX               : PlotBoilerplate.utils.fetch.num(config,'offsetX',0.0), 
+	    offsetY               : PlotBoilerplate.utils.fetch.num(config,'offsetY',0.0), 
+	    // drawGrid              : PlotBoilerplate.utils.fetch.bool(config,'drawGrid',true),
+	    rasterGrid            : PlotBoilerplate.utils.fetch.bool(config,'rasterGrid',true),
+	    rasterAdjustFactor    : PlotBoilerplate.utils.fetch.num(config,'rasterAdjustdFactror',2.0),
+	    drawOrigin            : PlotBoilerplate.utils.fetch.bool(config,'drawOrigin',false),
+	    autoAdjustOffset      : PlotBoilerplate.utils.fetch.val(config,'autoAdjustOffset',true),
+	    offsetAdjustXPercent  : PlotBoilerplate.utils.fetch.num(config,'offsetAdjustXPercent',50),
+	    offsetAdjustYPercent  : PlotBoilerplate.utils.fetch.num(config,'offsetAdjustYPercent',50),
 	    backgroundColor       : config.backgroundColor || '#ffffff',
-	    redrawOnResize        : PlotBoilerplate.fetch.bool(config,'redrawOnResize',true), 
-	    defaultCanvasWidth    : PlotBoilerplate.fetch.num(config,'defaultCanvasWidth',PlotBoilerplate.DEFAULT_CANVAS_WIDTH),
-	    defaultCanvasHeight   : PlotBoilerplate.fetch.num(config,'defaultCanvasHeight',PlotBoilerplate.DEFAULT_CANVAS_HEIGHT),
-	    canvasWidthFactor     : PlotBoilerplate.fetch.num(config,'canvasWidthFactor',1.0),
-	    canvasHeightFactor    : PlotBoilerplate.fetch.num(config,'canvasHeightFactor',1.0),
-	    cssScaleX             : PlotBoilerplate.fetch.num(config,'cssScaleX',1.0),
-	    cssScaleY             : PlotBoilerplate.fetch.num(config,'cssScaleY',1.0),
-	    cssUniformScale       : PlotBoilerplate.fetch.bool(config,'cssUniformScale',true),
+	    redrawOnResize        : PlotBoilerplate.utils.fetch.bool(config,'redrawOnResize',true), 
+	    defaultCanvasWidth    : PlotBoilerplate.utils.fetch.num(config,'defaultCanvasWidth',PlotBoilerplate.DEFAULT_CANVAS_WIDTH),
+	    defaultCanvasHeight   : PlotBoilerplate.utils.fetch.num(config,'defaultCanvasHeight',PlotBoilerplate.DEFAULT_CANVAS_HEIGHT),
+	    canvasWidthFactor     : PlotBoilerplate.utils.fetch.num(config,'canvasWidthFactor',1.0),
+	    canvasHeightFactor    : PlotBoilerplate.utils.fetch.num(config,'canvasHeightFactor',1.0),
+	    cssScaleX             : PlotBoilerplate.utils.fetch.num(config,'cssScaleX',1.0),
+	    cssScaleY             : PlotBoilerplate.utils.fetch.num(config,'cssScaleY',1.0),
+	    cssUniformScale       : PlotBoilerplate.utils.fetch.bool(config,'cssUniformScale',true),
 	    // rebuild               : function() { rebuild(); },
 	    saveFile              : function() { _self.saveFile(); },
 	    setToRetina           : function() { _self._setToRetina(); },
-	    enableSVGExport       : PlotBoilerplate.fetch.bool(config,'enableSVGExport',true),
+	    enableSVGExport       : PlotBoilerplate.utils.fetch.bool(config,'enableSVGExport',true),
 
-	    drawBezierHandleLines : PlotBoilerplate.fetch.bool(config,'drawBezierHandleLines',true),
-	    drawBezierHandlePoints : PlotBoilerplate.fetch.bool(config,'drawBezierHandlePoints',true),
-	    // drawHandleLines       : PlotBoilerplate.fetch.bool(config,'drawHandleLines',true),
-	    // drawHandlePoints      : PlotBoilerplate.fetch.bool(config,'drawHandlePoints',true),
+	    //drawBezierHandleLines : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandleLines',true),
+	    //drawBezierHandlePoints : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandlePoints',true),
+	    // drawHandleLines       : PlotBoilerplate.utils.fetch.bool(config,'drawHandleLines',true),
+	    // drawHandlePoints      : PlotBoilerplate.utils.fetch.bool(config,'drawHandlePoints',true),
 	    
 	    // Listeners/observers
-	    preClear              : PlotBoilerplate.fetch.func(config,'preClear',null),
-	    preDraw               : PlotBoilerplate.fetch.func(config,'preDraw',null),
-	    postDraw              : PlotBoilerplate.fetch.func(config,'postDraw',null),
+	    preClear              : PlotBoilerplate.utils.fetch.func(config,'preClear',null),
+	    preDraw               : PlotBoilerplate.utils.fetch.func(config,'preDraw',null),
+	    postDraw              : PlotBoilerplate.utils.fetch.func(config,'postDraw',null),
 
 	    // Interaction
-	    enableMouse           : PlotBoilerplate.fetch.bool(config,'enableMouse',true),
-	    enableTouch           : PlotBoilerplate.fetch.bool(config,'enableTouch',true),
-	    enableKeys            : PlotBoilerplate.fetch.bool(config,'enableKeys',true),
-	    enableMouseWheel      : PlotBoilerplate.fetch.bool(config,'enableMouseWheel',true),
+	    enableMouse           : PlotBoilerplate.utils.fetch.bool(config,'enableMouse',true),
+	    enableTouch           : PlotBoilerplate.utils.fetch.bool(config,'enableTouch',true),
+	    enableKeys            : PlotBoilerplate.utils.fetch.bool(config,'enableKeys',true),
+	    enableMouseWheel      : PlotBoilerplate.utils.fetch.bool(config,'enableMouseWheel',true),
 
 	    // Experimental (and unfinished)
-	    enableGL              : PlotBoilerplate.fetch.bool(config,'enableGL',false)
+	    enableGL              : PlotBoilerplate.utils.fetch.bool(config,'enableGL',false)
 	}; // END confog
 
 
@@ -279,9 +280,11 @@ class PlotBoilerplate {
 	    drawVertices : true,
 	    //drawHandleLines : true,
 	    //drawHandlePoints: true,
-	    drawHandleLines  : PlotBoilerplate.fetch.bool(config,'drawHandleLines',true),
-	    drawHandlePoints : PlotBoilerplate.fetch.bool(config,'drawHandlePoints',true),
-	    drawGrid : PlotBoilerplate.fetch.bool(config,'drawGrid',true),
+	    drawBezierHandleLines : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandleLines',true),
+	    drawBezierHandlePoints : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandlePoints',true),
+	    drawHandleLines  : PlotBoilerplate.utils.fetch.bool(config,'drawHandleLines',true),
+	    drawHandlePoints : PlotBoilerplate.utils.fetch.bool(config,'drawHandlePoints',true),
+	    drawGrid : PlotBoilerplate.utils.fetch.bool(config,'drawGrid',true),
 	    bezier : {
 		color : '#00a822',
 		lineWidth : 2,
@@ -428,9 +431,9 @@ class PlotBoilerplate {
      **/
     updateCSSscale() {
 	if( this.config.cssUniformScale ) {
-	    PlotBoilerplate.setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
+	    PlotBoilerplate.utils.setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleX );
 	} else {
-	    PlotBoilerplate.setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleY );
+	    PlotBoilerplate.utils.setCSSscale( this.canvas, this.config.cssScaleX, this.config.cssScaleY );
 	}
     };
     
@@ -706,7 +709,7 @@ class PlotBoilerplate {
 		for( var c in d.bezierCurves ) {
 		    this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth );
 
-		    if( this.config.drawBezierHandlePoints && this.drawConfig.drawHandlePoints ) {
+		    if( this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints ) {
 			if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
 			    this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint,'orange') );
 			    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
@@ -726,7 +729,7 @@ class PlotBoilerplate {
 			d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
 		    }
 		    
-		    if( this.config.drawBezierHandleLines && this.drawConfig.drawHandleLines ) {
+		    if( this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines ) {
 			this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
 			this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
 		    }
@@ -1300,52 +1303,57 @@ class PlotBoilerplate {
 	if( this.config.enableMouseWheel ) { 
 	    // Install a mouse handler on the canvas.
 	    new MouseHandler(this.canvas)
-		.wheel( (e:XWheelEvent) => { _self.mouseWheelHandler(e); } )
-	    ;
+		.wheel( (e:XWheelEvent) => { _self.mouseWheelHandler(e); } );
 	} else { _self.console.log('Mouse wheel interaction disabled.'); }
 	
 	if( this.config.enableTouch) { 
 	    // Install a touch handler on the canvas.
-	    
-	    // Convert absolute touch positions to relative DOM element position (relative to canvas)
-	    const relPos = (pos:XYCoords) : XYCoords => {
-		return { x : pos.x - _self.canvas.offsetLeft,
-			 y : pos.y - _self.canvas.offsetTop
-		       };
-	    }
-	    // Some private vars to store the current mouse/position/button state.
-	    var touchMovePos : Vertex|undefined|null= null;
-	    var touchDownPos : Vertex|undefined|null = null;
-	    var draggedElement : Draggable|undefined|null = null;
-	    // TODO
-	    // ERROR, THIS DOES NOT COMPILE WITH TYPESCRIPT.
-	    // WE NEED TO FIND A DIFFERENT TOUCH LIBRARY.
-	    
-	    /* new Touchy( this.canvas,
-			{ one : function( hand, finger ) {
-			    touchMovePos = new Vertex( relPos(finger.lastPoint) );
-			    touchDownPos = new Vertex( relPos(finger.lastPoint) );
-			    draggedElement = _self.locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
-			    if( draggedElement ) {
-				hand.on('move', function (points) { // TODO: type?
-				var rel : XYCoords = relPos( points[0] );
-				    var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
-				    var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
-				    if( draggedElement.typeName == 'vertex' ) {
-					if( !_self.vertices[draggedElement.vindex].attr.draggable )
-					    return;
-					_self.vertices[draggedElement.vindex].add( diff );
-					var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
-					var fakeEvent : VertEvent = ({ params : { dragAmount : diff.clone(), wasDragged : true, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone().add(diff), vertex : draggingVertex}} as unknown) as VertEvent;
-					draggingVertex.listeners.fireDragEvent( fakeEvent );
-					_self.redraw();
-				    }
-				    touchMovePos = new Vertex(rel);
-				} );
+	    if( !window["Touchy"] || typeof window["Touchy"] != "function" ) {
+		console.warn( "Cannot initialize the touch handler. Touchy is missig. Did you include it?" );
+	    } else {
+		// Convert absolute touch positions to relative DOM element position (relative to canvas)
+		const relPos = (pos:XYCoords) : XYCoords => {
+		    return { x : pos.x - _self.canvas.offsetLeft,
+			     y : pos.y - _self.canvas.offsetTop
+			   };
+		}
+		// Some private vars to store the current mouse/position/button state.
+		var touchMovePos : Vertex|undefined|null= null;
+		var touchDownPos : Vertex|undefined|null = null;
+		var draggedElement : Draggable|undefined|null = null;
+		// TODO
+		// ERROR, THIS DOES NOT COMPILE WITH TYPESCRIPT.
+
+		
+		const Touchy : any = (window["Touchy"]);
+		new Touchy( this.canvas,
+			    { one : function( hand, finger ) {
+				touchMovePos = new Vertex( relPos(finger.lastPoint) );
+				touchDownPos = new Vertex( relPos(finger.lastPoint) );
+				draggedElement = _self.locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
+				if( draggedElement ) {
+				    // The Touchy-points also have 'id' and 'time' attributes
+				    // which we are not interested in here.
+				    hand.on('move', (points:Array<XYCoords>) => { 
+					var rel : XYCoords = relPos( points[0] );
+					var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
+					var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
+					if( draggedElement.typeName == 'vertex' ) {
+					    if( !_self.vertices[draggedElement.vindex].attr.draggable )
+						return;
+					    _self.vertices[draggedElement.vindex].add( diff );
+					    var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
+					    var fakeEvent : VertEvent = ({ params : { dragAmount : diff.clone(), wasDragged : true, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone().add(diff), vertex : draggingVertex}} as unknown) as VertEvent;
+					    draggingVertex.listeners.fireDragEvent( fakeEvent );
+					    _self.redraw();
+					}
+					touchMovePos = new Vertex(rel);
+				    } );
+				}
+				
 			    }
-			    
-			}
-			} ); */
+			    } );
+	    } // END else
 	} else { _self.console.log('Touch interaction disabled.'); }
 	
 	if( this.config.enableKeys ) {
@@ -1389,11 +1397,10 @@ class PlotBoilerplate {
 	// This function moved to the helper utils.
 	// We do not want to include the whole dat.GUI package.
 	// TODO: move to demos.
-	console.log(window["utils"]);
 	if( window["utils"] && typeof window["utils"].createGUI == "function" )
 	    return window["utils"].createGUI(this);
 	else
-	    throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an load the dat.GUI library?";
+	    throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
     };
 
     /**
@@ -1426,112 +1433,88 @@ class PlotBoilerplate {
 	    }
 	    return base;
 	},
+	/** 
+	 * A helper function to scale elements (usually the canvas) using CSS.
+	 *
+	 * transform-origin is at (0,0).
+	 *
+	 * @param {HTMLElement} element - The DOM element to scale.
+	 * @param {number} scaleX The - X scale factor.
+	 * @param {number} scaleY The - Y scale factor.
+	 * @return {void}
+	 **/ 
+	setCSSscale : ( element:HTMLElement,
+			scaleX:number,
+			scaleY:number ) : void => {
+	    element.style['transform-origin'] = '0 0';
+	    if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
+	    else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
+	},
+	// A helper for fetching data from objects.
+	fetch : {
+	    /**
+	     * A helper function to the the object property value specified by the given key.
+	     *
+	     * @param {any} object   - The object to get the property's value from. Must not be null.
+	     * @param {string} key      - The key of the object property (the name).
+	     * @param {any}    fallback - A default value if the key does not exist.
+	     **/
+	    val : ( obj:any, key:string, fallback:any ) => {
+		if( !obj.hasOwnProperty(key) )
+		    return fallback;
+		if( typeof obj[key] == 'undefined' )
+		    return fallback;
+		return obj[key];
+	    },
 
-	
-	/**
-	 * Generate a four-point arrow head, starting at the vector end minus the
-	 * arrow head length.
-	 *
-	 * The first vertex in the returned array is guaranteed to be the located
-	 * at the vector line end minus the arrow head length.
-	 *
-	 *
-	 * Due to performance all params are required.
-	 *
-	 * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-	 * scaling different). Arrow heads should not look distored on non-uniform scaling.
-	 *
-	 * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-	 * For headlen use 8, it's a good arrow head size.
-	 *
-	 * Example:
-	 *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-	 *
-	 * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-	 * @param {Vertex} zB - The end vertex of the vector.
-	 * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-	 * @param {number} scaleX  - The horizontal scaling during draw.
-	 * @param {number} scaleY  - the vertical scaling during draw.
-	 **/
-	// @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
-	/* buildArrowHead : function( zA, zB, headlen, scaleX, scaleY ) {
-	// console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
-	var angle = Math.atan2( (zB.y-zA.y)*scaleY, (zB.x-zA.x)*scaleX );
-	
-	var vertices = [];
-	vertices.push( new Vertex(zB.x*scaleX-(headlen)*Math.cos(angle), zB.y*scaleY-(headlen)*Math.sin(angle)) );    
-	vertices.push( new Vertex(zB.x*scaleX-(headlen*1.35)*Math.cos(angle-Math.PI/8), zB.y*scaleY-(headlen*1.35)*Math.sin(angle-Math.PI/8) ) );
-	vertices.push( new Vertex(zB.x*scaleX, zB.y*scaleY) );
-	vertices.push( new Vertex(zB.x*scaleX-(headlen*1.35)*Math.cos(angle+Math.PI/8), zB.y*scaleY-(headlen*1.35)*Math.sin(angle+Math.PI/8)) );
 
-	return vertices;
-	} */
+	    /**
+	     * A helper function to the the object property numeric value specified by the given key.
+	     *
+	     * @param {any} object   - The object to get the property's value from. Must not be null.
+	     * @param {string} key      - The key of the object property (the name).
+	     * @param {any}    fallback - A default value if the key does not exist.
+	     **/
+	    num : ( obj:any, key:string, fallback:number ) => {
+		if( !obj.hasOwnProperty(key) )
+		    return fallback;
+		if( typeof obj[key] !== 'number' )
+		    return fallback;
+		return obj[key];
+	    },
+
+	    /**
+	     * A helper function to the the object property boolean value specified by the given key.
+	     *
+	     * @param {any} object   - The object to get the property's value from. Must not be null.
+	     * @param {string} key      - The key of the object property (the name).
+	     * @param {any}    fallback - A default value if the key does not exist.
+	     **/
+	    bool : ( obj:any, key:string, fallback:boolean ) => {
+		if( !obj.hasOwnProperty(key) )
+		    return fallback;
+		if( typeof obj[key] !== 'boolean' )
+		    return fallback;
+		return obj[key];
+	    },
+
+
+	    /**
+	     * A helper function to the the object property function-value specified by the given key.
+	     *
+	     * @param {any} object   - The object to get the property's value from. Must not be null.
+	     * @param {string} key      - The key of the object property (the name).
+	     * @param {any}    fallback - A default value if the key does not exist.
+	     **/
+	    func : ( obj:any, key:string, fallback:((...args)=>any) ) => {
+		if( !obj.hasOwnProperty(key) )
+		    return fallback;
+		if( typeof obj[key] !== 'function' )
+		    return fallback;
+		return obj[key];
+	    }
+	}  // END fetch
     }; // END utils
-
-    // A helper for fetching data from objects.
-    static fetch = {
-	/**
-	 * A helper function to the the object property value specified by the given key.
-	 *
-	 * @param {any} object   - The object to get the property's value from. Must not be null.
-	 * @param {string} key      - The key of the object property (the name).
-	 * @param {any}    fallback - A default value if the key does not exist.
-	 **/
-	val : ( obj:any, key:string, fallback:any ) => {
-	    if( !obj.hasOwnProperty(key) )
-		return fallback;
-	    if( typeof obj[key] == 'undefined' )
-		return fallback;
-	    return obj[key];
-	},
-
-
-	/**
-	 * A helper function to the the object property numeric value specified by the given key.
-	 *
-	 * @param {any} object   - The object to get the property's value from. Must not be null.
-	 * @param {string} key      - The key of the object property (the name).
-	 * @param {any}    fallback - A default value if the key does not exist.
-	 **/
-	num : ( obj:any, key:string, fallback:number ) => {
-	    if( !obj.hasOwnProperty(key) )
-		return fallback;
-	    if( typeof obj[key] !== 'number' )
-		return fallback;
-	    return obj[key];
-	},
-
-	/**
-	 * A helper function to the the object property boolean value specified by the given key.
-	 *
-	 * @param {any} object   - The object to get the property's value from. Must not be null.
-	 * @param {string} key      - The key of the object property (the name).
-	 * @param {any}    fallback - A default value if the key does not exist.
-	 **/
-	bool : ( obj:any, key:string, fallback:boolean ) => {
-	    if( !obj.hasOwnProperty(key) )
-		return fallback;
-	    if( typeof obj[key] !== 'boolean' )
-		return fallback;
-	    return obj[key];
-	},
-
-
-	/**
-	 * A helper function to the the object property function-value specified by the given key.
-	 *
-	 * @param {any} object   - The object to get the property's value from. Must not be null.
-	 * @param {string} key      - The key of the object property (the name).
-	 * @param {any}    fallback - A default value if the key does not exist.
-	 **/
-	func : ( obj:any, key:string, fallback:((...args)=>any) ) => {
-	    if( !obj.hasOwnProperty(key) )
-		return fallback;
-	    if( typeof obj[key] !== 'function' )
-		return fallback;
-	    return obj[key];
-	}
-    };  // END fetch
 } // END class PlotBoilerplate
 
 
