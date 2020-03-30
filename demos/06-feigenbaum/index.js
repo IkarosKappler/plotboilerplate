@@ -19,7 +19,7 @@
 	'load',
 	function() {
 	    // All config params are optional.
-	     var bp = new PlotBoilerplate(
+	     var pb = new PlotBoilerplate(
 		PlotBoilerplate.utils.safeMergeByKeys(
 		    { canvas                : document.getElementById('my-canvas'),					    
 		      fullSize              : true,
@@ -44,12 +44,12 @@
 		    }, GUP
 		)
 	    );
-	    bp.config.autoCenterOffset = false; // Only once at initialization
-	    bp.config.preDraw = function() {
+	    pb.config.autoCenterOffset = false; // Only once at initialization
+	    pb.config.preDraw = function() {
 		// pre draw
 		// drawPlotLabel();
 	    };
-	    bp.config.postDraw = function() {
+	    pb.config.postDraw = function() {
 		// post draw
 		drawBufferedFeigenbaum();
 	    };
@@ -57,7 +57,7 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
-	    var gui = bp.createGUI();
+	    var gui = pb.createGUI();
 
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
 		plotX0                : 0.2,
@@ -114,14 +114,14 @@
 	    var bufferedFeigenbaum = [];
 	    var plotFeigenbaum = function() {
 		var startTime = new Date();
-		bp.drawGrid();
+		pb.drawGrid();
 		drawPlotLabel();
 		dialog.show( 'Starting ...', 'Calculating', [ { label : 'Cancel', action : function() { console.log('cancel'); timeoutKey = null; dialog.hide(); } }], {} );
 		bufferedFeigenbaum = [];
 		iterativeFeigenbaum( [ Math.min(config.plotStart,config.plotEnd), Math.max(config.plotStart,config.plotEnd) ],
 				     0, // currentX
 				     0, // Start at left canvas border
-				     bp.canvasSize.width, // Stop at right canvas border
+				     pb.canvasSize.width, // Stop at right canvas border
 				     config.plotStep,
 				     config.plotChunkSize,
 				     config.plotIterations,
@@ -141,23 +141,23 @@
 	    // | Draw a label with the current plot settings into the image.
 	    // +-------------------------------
 	    var drawPlotLabel = function() {
-		bp.fill.ctx.font = '6pt Monospace';
+		pb.fill.ctx.font = '6pt Monospace';
 		var label = 'range=['+Math.min(config.plotStart,config.plotEnd)+','+Math.max(config.plotStart,config.plotEnd)+'], normalizeTo=['+config.normalizeToMin+','+config.normalizeToMax+'], plotStep='+config.plotStep+', iterations='+config.plotIterations+', x0='+config.plotX0+', normalize='+config.normalizePlot+', alphaThreshold='+config.alphaThreshold;
-		bp.fill.label(label,
-			      (bp.canvasSize.width-bp.fill.ctx.measureText(label).width)/2, // 15,
+		pb.fill.label(label,
+			      (pb.canvasSize.width-pb.fill.ctx.measureText(label).width)/2, // 15,
 			      10);
 
 		label = 'normalizeToMin=' + config.normalizeToMin;
-		bp.fill.label(label, 15, bp.canvasSize.height - 3 );
+		pb.fill.label(label, 15, pb.canvasSize.height - 3 );
 
 		label = 'normalizeToMax=' + config.normalizeToMax;
-		bp.fill.label(label, 3, 10 );
+		pb.fill.label(label, 3, 10 );
 
 		label = 'plotStart=' + config.plotStart;
-		bp.fill.label(label, 12, bp.canvasSize.height-12, -Math.PI/2 );
+		pb.fill.label(label, 12, pb.canvasSize.height-12, -Math.PI/2 );
 		
 		label = 'plotEnd=' + config.plotEnd;
-		bp.fill.label(label, bp.canvasSize.width-3, bp.canvasSize.height-3, -Math.PI/2 );
+		pb.fill.label(label, pb.canvasSize.width-3, pb.canvasSize.height-3, -Math.PI/2 );
 	    };
 	    drawPlotLabel();
 
@@ -221,7 +221,7 @@
 		if( !config.bufferData )
 		    return;
 		console.log( 'Rendering buffered plot ...' );
-		bp.drawGrid();
+		pb.drawGrid();
 		var record = null;
 		// Note: this for loop times out on really large sample sets!
 		//   --> implement async drawing!
@@ -248,27 +248,27 @@
 		//console.log(data.iterationCount,data.iterationCount);
 		//var color = startColor.clone().interpolate(endColor,iteration/data.iterationCount);
 		//color.a = alpha;
-		bp.draw.dot( { x : x, y : value }, 'rgba(0,127,255,'+alpha+')' );
-		//bp.draw.dot( { x : x, y : value }, color.cssRGBA() );
+		pb.draw.dot( { x : x, y : value }, 'rgba(0,127,255,'+alpha+')' );
+		//pb.draw.dot( { x : x, y : value }, color.cssRGBA() );
 		plotBalancedCollection( x, lambda, data, node.left );
 		plotBalancedCollection( x, lambda, data, node.right );
 	    }
 
 	    function normalizeYValue(value) {
-		return ((value-config.normalizeToMin)/(config.normalizeToMax-config.normalizeToMin)) * (1-bp.canvasSize.height);
+		return ((value-config.normalizeToMin)/(config.normalizeToMax-config.normalizeToMin)) * (1-pb.canvasSize.height);
 	    }
 
 	    // NOT IN USE AS x IS CALCULATED DIRECTLY IN THE PLOT LOOP
 	    //function normalizeXValue(value) {
-	    //	return ((value-config.plotStart)/(config.plotEnd-config.plotStart)) * (1-bp.canvasSize.width);
+	    //	return ((value-config.plotStart)/(config.plotEnd-config.plotStart)) * (1-pb.canvasSize.width);
 	    //}
 
 	    function unNormalizeYValue(value) {
-		return -(config.normalizeToMin + (config.normalizeToMax-config.normalizeToMin)/bp.canvasSize.height * value);
+		return -(config.normalizeToMin + (config.normalizeToMax-config.normalizeToMin)/pb.canvasSize.height * value);
 	    }
 
 	    function unNormalizeXValue(value) {
-		return config.plotStart + (config.plotEnd-config.plotStart)/bp.canvasSize.width * value;
+		return config.plotStart + (config.plotEnd-config.plotStart)/pb.canvasSize.width * value;
 	    }
 
 	    function wrapToArea( bounds ) {
@@ -294,7 +294,7 @@
 	    };
 
 	    function rebuild() {
-		bp.clear();
+		pb.clear();
 		bufferedFeigenbaum = [];
 		plotFeigenbaum();
 	    }
@@ -305,15 +305,15 @@
 	    // +-------------------------------
 	    var rect = document.getElementById('drag-rect');
 	    var rectBounds = { xMin : 0, yMin : 0, xMax : 0, yMax : 0 };
-	    new PlotBoilerplate.RectSelector( bp,
-					      'drag-rect',
-					      { normalizeY : normalizeYValue, unNormalizeX : unNormalizeXValue, unNormalizeY : unNormalizeYValue },
-					      wrapToArea
-					    );
+	    new RectSelector( pb,
+			      'drag-rect',
+			      { normalizeY : normalizeYValue, unNormalizeX : unNormalizeXValue, unNormalizeY : unNormalizeYValue },
+			      wrapToArea
+			    );
 	    
-	    var mouseHandler = new MouseHandler(bp.canvas)
+	    var mouseHandler = new MouseHandler(pb.canvas)
 		.move( function(e) {
-		    var relPos = bp.transformMousePosition( e.params.pos.x, e.params.pos.y );
+		    var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
 		    relPos.x = unNormalizeXValue(relPos.x);
 		    relPos.y = unNormalizeYValue(relPos.y);
 		    var cx = document.getElementById('cx');

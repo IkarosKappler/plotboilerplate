@@ -1,19 +1,28 @@
+/**
+ * A utility class used by PlotBoilerplate. The PlotBoilerplate will
+ * try to use this for the initialization touch event handling.
+ *
+ * Requires the label() polyfill for dat.gui.GUI.
+ * 
+ * @author  Ikaros Kappler
+ * @date    2020-03-30
+ * @version 1.0.0
+ **/
 
 var utils = {
     /**
      * Creates a control GUI (a dat.gui instance) for this 
      * plot boilerplate instance.
      *
+     * Requires the label() polyfill for dat.gui.GUI.
+     * 
      * @method createGUI
-     * @instance
-     * @memberof PlotBoilerplate
+     * @memberof utils
      * @return {dat.gui.GUI} 
      **/
     createGUI : function(pb) {
 	var _self = pb;
 	var gui = new dat.gui.GUI();
-	//var gui : GUI = new GUI();
-	// var _self : PlotBoilerplate = this;
 	gui.remember(pb.config);
 	var fold0 = gui.addFolder('Editor settings');
 	var fold00 = fold0.addFolder('Canvas size');
@@ -62,7 +71,6 @@ var utils = {
 	fold0.add(pb.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();
 	fold0.add(pb.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
 	fold0.addColor(pb.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");
-	// fold0.add(this.config, 'loadImage').name('Load Image').title("Load a background image.");
 
 	if( pb.config.enableSVGExport ) {
 	    var fold1 = gui.addFolder('Export');

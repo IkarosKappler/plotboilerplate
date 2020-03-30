@@ -84,27 +84,6 @@ var Draggable = /** @class */ (function () {
  */
 var PlotBoilerplate = /** @class */ (function () {
     /**
-     * A helper function to scale elements (usually the canvas) using CSS.
-     *
-     * transform-origin is at (0,0).
-     *
-     * @param {HTMLElement} element - The DOM element to scale.
-     * @param {number} scaleX The - X scale factor.
-     * @param {number} scaleY The - Y scale factor.
-     * @return {void}
-     **/
-    /* private static setCSSscale( element:HTMLElement,
-                scaleX:number,
-                scaleY:number ) {
-    element.style['transform-origin'] = '0 0';
-    if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
-    else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
-    }; */
-    /**
-     * Use a special custom attribute set for vertices.
-     **/
-    // VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true, isSelected : false, draggable : true };
-    /**
      * The constructor.
      *
      * @constructor
@@ -292,8 +271,6 @@ var PlotBoilerplate = /** @class */ (function () {
         this.draw.scale.set(this.config.scaleX, this.config.scaleY);
         this.fill.scale.set(this.config.scaleX, this.config.scaleY);
         this.grid = new Grid(new Vertex(0, 0), new Vertex(50, 50));
-        this.image = null; // An image.
-        // this.imageBuffer         = null; // A canvas to read the pixel data from.
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
         this.vertices = [];
         this.selectPolygon = null;
