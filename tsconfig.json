@@ -2,8 +2,8 @@
     "compilerOptions": {
 	"outDir": "./src/ts-to-js"
     },
-    "inclue": ["./ts/*"],
-    "exclude": [],
+    "inclue": ["./src/ts/*"],
+    "exclude": ["./tmp","./src/ts-to-js" ],
     "removeComments": false,
     "allowJs": true
 }

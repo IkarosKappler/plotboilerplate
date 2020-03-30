@@ -58,18 +58,15 @@
  * @public
  **/
 
-// import { GUI } from "dat.gui";
-//const dat = require('dat.gui');
-import { GUI } from "dat.gui";
-import { saveAs } from 'file-saver';
-// import Touchy from "../lib/Touchy-updated.min.js";
-// import * as Touchy from "../lib/Touchy";
+//import { GUI } from "dat.gui";
+//import { saveAs } from 'file-saver';
+
 
 /**
  * A wrapper class for draggable items (mostly vertices).
  * @private
  **/
-/* class Draggable {
+class Draggable {
     static VERTEX:string = 'vertex';
     item:any;
     typeName:string;
@@ -86,7 +83,8 @@ import { saveAs } from 'file-saver';
     };
     isVertex() { return this.typeName == Draggable.VERTEX; };
     setVIndex(vindex:number):Draggable { this.vindex = vindex; return this; };
-} */
+}
+
 
 /**
  * The main class.
@@ -131,7 +129,9 @@ class PlotBoilerplate {
      * @param {number} scaleY The - Y scale factor.
      * @return {void}
      **/ 
-    private static setCSSscale( element:HTMLElement, scaleX:number, scaleY:number ) {
+    private static setCSSscale( element:HTMLElement,
+				scaleX:number,
+				scaleY:number ) {
 	element.style['transform-origin'] = '0 0';
 	if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
 	else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
@@ -200,7 +200,7 @@ class PlotBoilerplate {
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true). 
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
      */
-    PlotBoilerplate( config:Config ) {
+    constructor( config:Config ) {
 	// config = config || {};
 	// This should be in some static block ...
 	VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true, isSelected : false, draggable : true };
@@ -220,51 +220,51 @@ class PlotBoilerplate {
 	 */
 	this.config = {
 	    canvas                : config.canvas,
-	    fullSize              : this.fetch.val(config,'fullSize',true), 
-	    fitToParent           : this.fetch.bool(config,'fitToParent',true),
-	    scaleX                : this.fetch.num(config,'scaleX',1.0), 
-	    scaleY                : this.fetch.num(config,'scaleY',1.0),
-	    offsetX               : this.fetch.num(config,'offsetX',0.0), 
-	    offsetY               : this.fetch.num(config,'offsetY',0.0), 
-	    // drawGrid              : this.fetch.bool(config,'drawGrid',true),
-	    rasterGrid            : this.fetch.bool(config,'rasterGrid',true),
-	    rasterAdjustFactor    : this.fetch.num(config,'rasterAdjustdFactror',2.0),
-	    drawOrigin            : this.fetch.bool(config,'drawOrigin',false),
-	    autoAdjustOffset      : this.fetch.val(config,'autoAdjustOffset',true),
-	    offsetAdjustXPercent  : this.fetch.num(config,'offsetAdjustXPercent',50),
-	    offsetAdjustYPercent  : this.fetch.num(config,'offsetAdjustYPercent',50),
+	    fullSize              : PlotBoilerplate.fetch.val(config,'fullSize',true), 
+	    fitToParent           : PlotBoilerplate.fetch.bool(config,'fitToParent',true),
+	    scaleX                : PlotBoilerplate.fetch.num(config,'scaleX',1.0), 
+	    scaleY                : PlotBoilerplate.fetch.num(config,'scaleY',1.0),
+	    offsetX               : PlotBoilerplate.fetch.num(config,'offsetX',0.0), 
+	    offsetY               : PlotBoilerplate.fetch.num(config,'offsetY',0.0), 
+	    // drawGrid              : PlotBoilerplate.fetch.bool(config,'drawGrid',true),
+	    rasterGrid            : PlotBoilerplate.fetch.bool(config,'rasterGrid',true),
+	    rasterAdjustFactor    : PlotBoilerplate.fetch.num(config,'rasterAdjustdFactror',2.0),
+	    drawOrigin            : PlotBoilerplate.fetch.bool(config,'drawOrigin',false),
+	    autoAdjustOffset      : PlotBoilerplate.fetch.val(config,'autoAdjustOffset',true),
+	    offsetAdjustXPercent  : PlotBoilerplate.fetch.num(config,'offsetAdjustXPercent',50),
+	    offsetAdjustYPercent  : PlotBoilerplate.fetch.num(config,'offsetAdjustYPercent',50),
 	    backgroundColor       : config.backgroundColor || '#ffffff',
-	    redrawOnResize        : this.fetch.bool(config,'redrawOnResize',true), 
-	    defaultCanvasWidth    : this.fetch.num(config,'defaultCanvasWidth',PlotBoilerplate.DEFAULT_CANVAS_WIDTH),
-	    defaultCanvasHeight   : this.fetch.num(config,'defaultCanvasHeight',PlotBoilerplate.DEFAULT_CANVAS_HEIGHT),
-	    canvasWidthFactor     : this.fetch.num(config,'canvasWidthFactor',1.0),
-	    canvasHeightFactor    : this.fetch.num(config,'canvasHeightFactor',1.0),
-	    cssScaleX             : this.fetch.num(config,'cssScaleX',1.0),
-	    cssScaleY             : this.fetch.num(config,'cssScaleY',1.0),
-	    cssUniformScale       : this.fetch.bool(config,'cssUniformScale',true),
+	    redrawOnResize        : PlotBoilerplate.fetch.bool(config,'redrawOnResize',true), 
+	    defaultCanvasWidth    : PlotBoilerplate.fetch.num(config,'defaultCanvasWidth',PlotBoilerplate.DEFAULT_CANVAS_WIDTH),
+	    defaultCanvasHeight   : PlotBoilerplate.fetch.num(config,'defaultCanvasHeight',PlotBoilerplate.DEFAULT_CANVAS_HEIGHT),
+	    canvasWidthFactor     : PlotBoilerplate.fetch.num(config,'canvasWidthFactor',1.0),
+	    canvasHeightFactor    : PlotBoilerplate.fetch.num(config,'canvasHeightFactor',1.0),
+	    cssScaleX             : PlotBoilerplate.fetch.num(config,'cssScaleX',1.0),
+	    cssScaleY             : PlotBoilerplate.fetch.num(config,'cssScaleY',1.0),
+	    cssUniformScale       : PlotBoilerplate.fetch.bool(config,'cssUniformScale',true),
 	    // rebuild               : function() { rebuild(); },
 	    saveFile              : function() { _self.saveFile(); },
 	    setToRetina           : function() { _self._setToRetina(); },
-	    enableSVGExport       : this.fetch.bool(config,'enableSVGExport',true),
+	    enableSVGExport       : PlotBoilerplate.fetch.bool(config,'enableSVGExport',true),
 
-	    drawBezierHandleLines : this.fetch.bool(config,'drawBezierHandleLines',true),
-	    drawBezierHandlePoints : this.fetch.bool(config,'drawBezierHandlePoints',true),
-	    // drawHandleLines       : this.fetch.bool(config,'drawHandleLines',true),
-	    // drawHandlePoints      : this.fetch.bool(config,'drawHandlePoints',true),
+	    drawBezierHandleLines : PlotBoilerplate.fetch.bool(config,'drawBezierHandleLines',true),
+	    drawBezierHandlePoints : PlotBoilerplate.fetch.bool(config,'drawBezierHandlePoints',true),
+	    // drawHandleLines       : PlotBoilerplate.fetch.bool(config,'drawHandleLines',true),
+	    // drawHandlePoints      : PlotBoilerplate.fetch.bool(config,'drawHandlePoints',true),
 	    
 	    // Listeners/observers
-	    preClear              : this.fetch.func(config,'preClear',null),
-	    preDraw               : this.fetch.func(config,'preDraw',null),
-	    postDraw              : this.fetch.func(config,'postDraw',null),
+	    preClear              : PlotBoilerplate.fetch.func(config,'preClear',null),
+	    preDraw               : PlotBoilerplate.fetch.func(config,'preDraw',null),
+	    postDraw              : PlotBoilerplate.fetch.func(config,'postDraw',null),
 
 	    // Interaction
-	    enableMouse           : this.fetch.bool(config,'enableMouse',true),
-	    enableTouch           : this.fetch.bool(config,'enableTouch',true),
-	    enableKeys            : this.fetch.bool(config,'enableKeys',true),
-	    enableMouseWheel      : this.fetch.bool(config,'enableMouseWheel',true),
+	    enableMouse           : PlotBoilerplate.fetch.bool(config,'enableMouse',true),
+	    enableTouch           : PlotBoilerplate.fetch.bool(config,'enableTouch',true),
+	    enableKeys            : PlotBoilerplate.fetch.bool(config,'enableKeys',true),
+	    enableMouseWheel      : PlotBoilerplate.fetch.bool(config,'enableMouseWheel',true),
 
 	    // Experimental (and unfinished)
-	    enableGL              : this.fetch.bool(config,'enableGL',false)
+	    enableGL              : PlotBoilerplate.fetch.bool(config,'enableGL',false)
 	}; // END confog
 
 
@@ -279,9 +279,9 @@ class PlotBoilerplate {
 	    drawVertices : true,
 	    //drawHandleLines : true,
 	    //drawHandlePoints: true,
-	    drawHandleLines  : this.fetch.bool(config,'drawHandleLines',true),
-	    drawHandlePoints : this.fetch.bool(config,'drawHandlePoints',true),
-	    drawGrid : this.fetch.bool(config,'drawGrid',true),
+	    drawHandleLines  : PlotBoilerplate.fetch.bool(config,'drawHandleLines',true),
+	    drawHandlePoints : PlotBoilerplate.fetch.bool(config,'drawHandlePoints',true),
+	    drawGrid : PlotBoilerplate.fetch.bool(config,'drawGrid',true),
 	    bezier : {
 		color : '#00a822',
 		lineWidth : 2,
@@ -382,8 +382,10 @@ class PlotBoilerplate {
 	var svgCode : string = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
 	// See documentation for FileSaver.js for usage.
 	//    https://github.com/eligrey/FileSaver.js
-	var blob:Blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
-	saveAs(blob, "plot-boilerplate.svg");
+	//var blob:Blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
+	//saveAs(blob, "plot-boilerplate.svg");
+	// TODO
+	console.warn("Sorry, the typescript version does not yet saveFile again. Coming back soon.");
     };
 
 
@@ -1289,16 +1291,16 @@ class PlotBoilerplate {
 	if( this.config.enableMouse ) { 
 	    // Install a mouse handler on the canvas.
 	    new MouseHandler(this.canvas)
-		.down( this.mouseDownHandler )
-		.drag( this.mouseDragHandler )
-		.up( this.mouseUpHandler )
+		.down( (e:XMouseEvent) => { _self.mouseDownHandler(e); } )
+		.drag( (e:XMouseEvent) => { _self.mouseDragHandler(e); } )
+		.up( (e:XMouseEvent) => { _self.mouseUpHandler(e); } )
 	    ;
 	} else { _self.console.log('Mouse interaction disabled.'); }
 	
 	if( this.config.enableMouseWheel ) { 
 	    // Install a mouse handler on the canvas.
 	    new MouseHandler(this.canvas)
-		.wheel( this.mouseWheelHandler )
+		.wheel( (e:XWheelEvent) => { _self.mouseWheelHandler(e); } )
 	    ;
 	} else { _self.console.log('Mouse wheel interaction disabled.'); }
 	
@@ -1386,90 +1388,19 @@ class PlotBoilerplate {
     createGUI() : any {
 	// This function moved to the helper utils.
 	// We do not want to include the whole dat.GUI package.
-	if( window["utils"] && typeof window["utils"].creategui == "function" )
-	    return window["utils"].creategui(this);
+	// TODO: move to demos.
+	console.log(window["utils"]);
+	if( window["utils"] && typeof window["utils"].createGUI == "function" )
+	    return window["utils"].createGUI(this);
 	else
 	    throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an load the dat.GUI library?";
     };
 
     /**
-     * Creates a control GUI (a dat.gui instance) for this 
-     * plot boilerplate instance.
-     *
-     * @method createGUI
-     * @instance
-     * @memberof PlotBoilerplate
-     * @return {dat.gui.GUI} 
-     **/
-    /* createGUI() : dat.GUI {
-	var gui : dat.GUI = new dat.GUI();
-	//var gui : GUI = new GUI();
-	var _self : PlotBoilerplate = this;
-	gui.remember(this.config);
-	var fold0 : dat.GUI = gui.addFolder('Editor settings');
-	var fold00 : dat.GUI = fold0.addFolder('Canvas size');
-	fold00.add(this.config, 'fullSize').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fullpage mode.").listen();
-	fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).").listen();
-	fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
-	fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
-	fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.").listen();
-	fold00.add(this.config, 'canvasHeightFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current height.").listen();
-	fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
-	fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
-	fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");
-	fold00.add(this.config, 'setToRetina').name('Set to highres fullsize').title('Set canvas to high-res retina resoultion (x2).');
-	
-	var fold01 = fold0.addFolder('Draw settings');
-	fold01.add(this.config, 'drawBezierHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle points.");
-	fold01.add(this.config, 'drawBezierHandleLines').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle lines.");
-	fold01.add(this.config, 'drawHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw handle points (overrides all other settings).");
-	fold01.add(this.config, 'drawHandleLines').onChange( function() { _self.redraw(); } ).title("Draw handle lines in general (overrides all other settings).");
-	fold01.add(this.drawConfig, 'drawVertices').onChange( function() { _self.redraw(); } ).title("Draw vertices in general.");
-	
-	const fold0100 : GUI = fold01.addFolder('Colors and Lines');
-	const _addDrawConfigElement = ( fold, basePath:any, conf:any ) : void => {
-	    for( var i in conf ) {
-		if( typeof conf[i] == 'object' ) {
-		    if( conf[i].hasOwnProperty('color') )
-			fold.addColor(conf[i], 'color').onChange( function() { _self.redraw(); } ).name(basePath+i+'.color').title(basePath+i+'.color').listen();
-		    if( conf[i].hasOwnProperty('lineWidth') )
-			fold.add(conf[i], 'lineWidth').min(1).max(10).step(1).onChange( function() { _self.redraw(); } ).name(basePath+i+'.lineWidth').title(basePath+i+'.lineWidth').listen();
-		    for( var e in conf[i] ) {
-			if( conf[i].hasOwnProperty(e) && typeof conf[i][e] == 'object' ) { // console.log(e);
-			    _addDrawConfigElement( fold, (basePath!=''?basePath+'.':'')+i+'.'+e, conf[i] );
-			}
-		    }
-		}
-	    }
-	};
-	_addDrawConfigElement(fold0100, '', this.drawConfig);
-	
-	
-	
-	fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
-	fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();
-	fold0.add(this.config, 'offsetX').title("Offset x.").step(10.0).onChange( function() { _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX; _self.redraw(); } ).listen();
-	fold0.add(this.config, 'offsetY').title("Offset y.").step(10.0).onChange( function() { _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY; _self.redraw(); } ).listen();
-	fold0.add(this.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();
-	fold0.add(this.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
-	fold0.addColor(this.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");
-	// fold0.add(this.config, 'loadImage').name('Load Image').title("Load a background image.");
-
-	if( this.config.enableSVGExport ) {
-	    var fold1 = gui.addFolder('Export');
-	    fold1.add(this.config, 'saveFile').name('Save a file').title("Save as SVG.");
-	}
-	
-	return gui;
-    }; */
-
-
-
-    /**
      * A set of helper functions.
      * @private
      **/
-    utils = {
+    static utils = {
 	
 	/** 
 	 * Merge the elements in the 'extension' object into the 'base' object based on
@@ -1538,7 +1469,7 @@ class PlotBoilerplate {
     }; // END utils
 
     // A helper for fetching data from objects.
-    fetch = {
+    static fetch = {
 	/**
 	 * A helper function to the the object property value specified by the given key.
 	 *

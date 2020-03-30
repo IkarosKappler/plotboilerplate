@@ -12,3 +12,5 @@ docs_jekyll/docs_md
 *.lock
 package-lock.json
 .env
+tmp
+test.svg
