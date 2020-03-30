@@ -22,7 +22,7 @@ interface Bounds {
 type Drawable = Vertex | Vector | Triangle | PBImage | VEllipse | Polygon | BezierPath | Line;
 
 interface Config {
-    canvas : HTMLElement;         //  Your canvas element in the DOM (required).
+    canvas : HTMLCanvasElement;   //  Your canvas element in the DOM (required).
     fullSize?: boolean;           // If set to true the canvas will gain full window size.
     fitToParent?: boolean;        // If set to true the canvas will gain the size of its parent container (overrides fullSize).
     scaleX?:number; // The initial x-zoom. Default is 1.0.
@@ -53,7 +53,7 @@ interface Config {
     cssScaleY?: number; // Visually resize the canvas (vertically) using CSS transforms (scale).
     cssUniformScale?: boolean; // CSS scale x and y obtaining aspect ratio.
     backgroundColor?: string; // The backround color.
-    redrawOnResize?; boolean; //  Switch auto-redrawing on resize on/off (some applications
+    redrawOnResize?: boolean; //  Switch auto-redrawing on resize on/off (some applications
                               // might want to prevent automatic redrawing to avoid data loss from the draw buffer).
     drawBezierHandleLines?: boolean; // Indicates if Bézier curve handles should be drawn (used for
                               // editors, no required in pure visualizations).
@@ -70,7 +70,9 @@ interface Config {
     enableMouseWheel?: boolean; // Indicates if the application should handle mouse wheel events for you.
     enableGL?: boolean; // Indicates if the application should use the experimental WebGL features (not recommended).
     enableSVGExport?: boolean; // Indicates if the SVG export should be enabled (default is true). 
-                              // Note that changes from the postDraw hook might not be visible in the export.
+    // Note that changes from the postDraw hook might not be visible in the export.
+    saveFile? : ()=>void;
+    setToRetina? : ()=>void;
 }
 
 interface DrawSettings {
@@ -104,6 +106,19 @@ interface DrawConfig {
 // ... does this collide with anything?
 interface Function {
     name: string;
+}
+
+interface SVGSerializable {
+    /**
+     * Convert this vertex to SVG code.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Vertex
+     **/
+    toSVGString : ( options:{ className?:string } ) => string;
 }
 
 /*

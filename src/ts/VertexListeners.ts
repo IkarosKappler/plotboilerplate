@@ -119,12 +119,12 @@ class VertexListeners {
      * installed drag listeners.
      *
      * @method fireDragEvent
-     * @param {Event} e - The drag event itself to be fired to all installed drag listeners.
+     * @param {VertEvent|XMouseEvent} e - The drag event itself to be fired to all installed drag listeners.
      * @return {void}
      * @instance
      * @memberof VertexListeners
      **/
-    fireDragEvent( e:VertEvent ) {
+    fireDragEvent( e:VertEvent|XMouseEvent ) {
 	VertexListeners._fireEvent(this,this.drag,e);
     };
 
@@ -135,12 +135,12 @@ class VertexListeners {
      * installed drag-start listeners.
      *
      * @method fireDragStartEvent
-     * @param {Event} e - The drag-start event itself to be fired to all installed dragStart listeners.
+     * @param {VertEvent|XMouseEvent} e - The drag-start event itself to be fired to all installed dragStart listeners.
      * @return {void}
      * @instance
      * @memberof VertexListeners
      **/
-    fireDragStartEvent( e:VertEvent ) {
+    fireDragStartEvent( e:VertEvent|XMouseEvent ) {
 	VertexListeners._fireEvent(this,this.dragStart,e);
     };
 
@@ -151,12 +151,12 @@ class VertexListeners {
      * installed drag-end listeners.
      *
      * @method fireDragEndEvent
-     * @param {Event} e - The drag-end event itself to be fired to all installed dragEnd listeners.
+     * @param {VertEvent|XMouseEvent} e - The drag-end event itself to be fired to all installed dragEnd listeners.
      * @return {void}
      * @instance
      * @memberof VertexListeners
      **/
-    fireDragEndEvent( e:VertEvent ) {
+    fireDragEndEvent( e:VertEvent|XMouseEvent ) {
 	VertexListeners._fireEvent(this,this.dragEnd,e);
     };
 
@@ -167,7 +167,7 @@ class VertexListeners {
      **/
     private static _fireEvent( _self:VertexListeners,
 			       listeners:Array<(e:VertEvent)=>void>,
-			       e:VertEvent
+			       e:VertEvent|XMouseEvent
 			     ) {
 	const ve : VertEvent = (e as unknown) as VertEvent;
 	if( typeof ve.params == 'undefined' )

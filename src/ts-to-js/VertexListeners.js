@@ -91,7 +91,7 @@ var VertexListeners = /** @class */ (function () {
      * installed drag listeners.
      *
      * @method fireDragEvent
-     * @param {Event} e - The drag event itself to be fired to all installed drag listeners.
+     * @param {VertEvent|XMouseEvent} e - The drag event itself to be fired to all installed drag listeners.
      * @return {void}
      * @instance
      * @memberof VertexListeners
@@ -105,7 +105,7 @@ var VertexListeners = /** @class */ (function () {
      * installed drag-start listeners.
      *
      * @method fireDragStartEvent
-     * @param {Event} e - The drag-start event itself to be fired to all installed dragStart listeners.
+     * @param {VertEvent|XMouseEvent} e - The drag-start event itself to be fired to all installed dragStart listeners.
      * @return {void}
      * @instance
      * @memberof VertexListeners
@@ -119,7 +119,7 @@ var VertexListeners = /** @class */ (function () {
      * installed drag-end listeners.
      *
      * @method fireDragEndEvent
-     * @param {Event} e - The drag-end event itself to be fired to all installed dragEnd listeners.
+     * @param {VertEvent|XMouseEvent} e - The drag-end event itself to be fired to all installed dragEnd listeners.
      * @return {void}
      * @instance
      * @memberof VertexListeners

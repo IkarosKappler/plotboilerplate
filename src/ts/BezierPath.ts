@@ -25,7 +25,7 @@
  **/
 
 
-class BezierPath {
+class BezierPath implements SVGSerializable {
 
 
     /** 

@@ -21,7 +21,7 @@
 
 
 
-class Polygon {
+class Polygon implements SVGSerializable {
 
     /** 
      * @member {Array<Vertex>} 

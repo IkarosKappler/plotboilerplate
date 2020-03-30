@@ -4,5 +4,6 @@
     },
     "inclue": ["./ts/*"],
     "exclude": [],
-    "removeComments": false
+    "removeComments": false,
+    "allowJs": true
 }

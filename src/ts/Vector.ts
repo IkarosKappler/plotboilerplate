@@ -21,7 +21,7 @@
  * @public
  **/
 
-class Vector extends VertTuple<Vector> {  
+class Vector extends VertTuple<Vector> implements SVGSerializable {  
 
     
     /**

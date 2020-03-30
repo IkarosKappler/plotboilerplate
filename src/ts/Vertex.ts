@@ -38,7 +38,7 @@ type XYTuple = {
 }
 */
 
-class Vertex implements XYCoords {
+class Vertex implements XYCoords, SVGSerializable {
 
     private static readonly ZERO = new Vertex(0,0);
     

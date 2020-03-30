@@ -53,10 +53,10 @@ interface XMouseParams {
     wasDragged : boolean;
     dragAmount : {x:number,y:number};
 }
-class XMouseEvent extends MouseEvent implements XEvent {
+class XMouseEvent extends MouseEvent {
     params: XMouseParams;
 }
-class XWheelEvent extends WheelEvent implements XEvent {
+class XWheelEvent extends WheelEvent {
     params: XMouseParams;
 }
 

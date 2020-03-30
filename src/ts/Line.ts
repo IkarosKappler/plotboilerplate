@@ -25,7 +25,7 @@
  **/
 
 
-class Line extends VertTuple<Line> {
+class Line extends VertTuple<Line> implements SVGSerializable {
 
     /**
      * Creates an instance of Line.

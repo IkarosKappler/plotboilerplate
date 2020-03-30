@@ -59,33 +59,106 @@
  * @public
  **/
 exports.__esModule = true;
-var dat_gui_1 = require("dat.gui");
-var Touchy_updated_min_js_1 = require("../lib/Touchy-updated.min.js");
+var file_saver_1 = require("file-saver");
+// import Touchy from "../lib/Touchy-updated.min.js";
+// import * as Touchy from "../lib/Touchy";
 /**
  * A wrapper class for draggable items (mostly vertices).
  * @private
  **/
-var Draggable = /** @class */ (function () {
-    function Draggable(item, typeName) {
-        this.item = item;
-        this.typeName = typeName;
-        //this.vindex = null;
-        //this.pindex = null;
-        //this.cindex = null;
-    }
-    ;
-    Draggable.prototype.isVertex = function () { return this.type == Draggable.VERTEX; };
-    ;
-    Draggable.prototype.setVIndex = function (vindex) { this.vindex = vindex; return this; };
-    ;
-    Draggable.VERTEX = 'vertex';
-    return Draggable;
-}());
+/* class Draggable {
+    static VERTEX:string = 'vertex';
+    item:any;
+    typeName:string;
+    vindex:number; // Vertex-index
+    pindex:number; // Point-index (on curve)
+    pid:number; // NOT IN USE (same as pindex?)
+    cindex:number; // Curve-index
+    constructor( item:any, typeName:string ) {
+    this.item = item;
+    this.typeName = typeName;
+    //this.vindex = null;
+    //this.pindex = null;
+    //this.cindex = null;
+    };
+    isVertex() { return this.typeName == Draggable.VERTEX; };
+    setVIndex(vindex:number):Draggable { this.vindex = vindex; return this; };
+} */
 /**
  * The main class.
  */
 var PlotBoilerplate = /** @class */ (function () {
     function PlotBoilerplate() {
+        /**
+         * Creates a control GUI (a dat.gui instance) for this
+         * plot boilerplate instance.
+         *
+         * @method createGUI
+         * @instance
+         * @memberof PlotBoilerplate
+         * @return {dat.gui.GUI}
+         **/
+        /* createGUI() : dat.GUI {
+        var gui : dat.GUI = new dat.GUI();
+        //var gui : GUI = new GUI();
+        var _self : PlotBoilerplate = this;
+        gui.remember(this.config);
+        var fold0 : dat.GUI = gui.addFolder('Editor settings');
+        var fold00 : dat.GUI = fold0.addFolder('Canvas size');
+        fold00.add(this.config, 'fullSize').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fullpage mode.").listen();
+        fold00.add(this.config, 'fitToParent').onChange( function() { _self.resizeCanvas(); } ).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).").listen();
+        fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback width.");
+        fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies the fallback height.");
+        fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current width.").listen();
+        fold00.add(this.config, 'canvasHeightFactor').min(0.1).step(0.1).max(10).onChange( function() { _self.resizeCanvas(); } ).title("Specifies a factor for the current height.").listen();
+        fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("Specifies the visual x scale (CSS).").listen();
+        fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); } ).title("Specifies the visual y scale (CSS).").listen();
+        fold00.add(this.config, 'cssUniformScale').onChange( function() { if(_self.config.cssUniformScale) _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); } ).title("CSS uniform scale (x-scale equlsa y-scale).");
+        fold00.add(this.config, 'setToRetina').name('Set to highres fullsize').title('Set canvas to high-res retina resoultion (x2).');
+        
+        var fold01 = fold0.addFolder('Draw settings');
+        fold01.add(this.config, 'drawBezierHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle points.");
+        fold01.add(this.config, 'drawBezierHandleLines').onChange( function() { _self.redraw(); } ).title("Draw Bézier handle lines.");
+        fold01.add(this.config, 'drawHandlePoints').onChange( function() { _self.redraw(); } ).title("Draw handle points (overrides all other settings).");
+        fold01.add(this.config, 'drawHandleLines').onChange( function() { _self.redraw(); } ).title("Draw handle lines in general (overrides all other settings).");
+        fold01.add(this.drawConfig, 'drawVertices').onChange( function() { _self.redraw(); } ).title("Draw vertices in general.");
+        
+        const fold0100 : GUI = fold01.addFolder('Colors and Lines');
+        const _addDrawConfigElement = ( fold, basePath:any, conf:any ) : void => {
+            for( var i in conf ) {
+            if( typeof conf[i] == 'object' ) {
+                if( conf[i].hasOwnProperty('color') )
+                fold.addColor(conf[i], 'color').onChange( function() { _self.redraw(); } ).name(basePath+i+'.color').title(basePath+i+'.color').listen();
+                if( conf[i].hasOwnProperty('lineWidth') )
+                fold.add(conf[i], 'lineWidth').min(1).max(10).step(1).onChange( function() { _self.redraw(); } ).name(basePath+i+'.lineWidth').title(basePath+i+'.lineWidth').listen();
+                for( var e in conf[i] ) {
+                if( conf[i].hasOwnProperty(e) && typeof conf[i][e] == 'object' ) { // console.log(e);
+                    _addDrawConfigElement( fold, (basePath!=''?basePath+'.':'')+i+'.'+e, conf[i] );
+                }
+                }
+            }
+            }
+        };
+        _addDrawConfigElement(fold0100, '', this.drawConfig);
+        
+        
+        
+        fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); } ).listen();
+        fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();
+        fold0.add(this.config, 'offsetX').title("Offset x.").step(10.0).onChange( function() { _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX; _self.redraw(); } ).listen();
+        fold0.add(this.config, 'offsetY').title("Offset y.").step(10.0).onChange( function() { _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY; _self.redraw(); } ).listen();
+        fold0.add(this.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();
+        fold0.add(this.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
+        fold0.addColor(this.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");
+        // fold0.add(this.config, 'loadImage').name('Load Image').title("Load a background image.");
+    
+        if( this.config.enableSVGExport ) {
+            var fold1 = gui.addFolder('Export');
+            fold1.add(this.config, 'saveFile').name('Save a file').title("Save as SVG.");
+        }
+        
+        return gui;
+        }; */
         /**
          * A set of helper functions.
          * @private
@@ -209,7 +282,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @constructor
      * @name PlotBoilerplate
      * @param {object} config={} - The configuration.
-     * @param {HTMLElement} config.canvas - Your canvas element in the DOM (required).
+     * @param {HTMLCanvasElement} config.canvas - Your canvas element in the DOM (required).
      * @param {boolean=} [config.fullSize=true] - If set to true the canvas will gain full window size.
      * @param {boolean=} [config.fitToParent=true] - If set to true the canvas will gain the size of its parent container (overrides fullSize).
      * @param {number=}  [config.scaleX=1.0] - The initial x-zoom. Default is 1.0.
@@ -276,6 +349,7 @@ var PlotBoilerplate = /** @class */ (function () {
          * @instance
          */
         this.config = {
+            canvas: config.canvas,
             fullSize: this.fetch.val(config, 'fullSize', true),
             fitToParent: this.fetch.bool(config, 'fitToParent', true),
             scaleX: this.fetch.num(config, 'scaleX', 1.0),
@@ -304,8 +378,8 @@ var PlotBoilerplate = /** @class */ (function () {
             enableSVGExport: this.fetch.bool(config, 'enableSVGExport', true),
             drawBezierHandleLines: this.fetch.bool(config, 'drawBezierHandleLines', true),
             drawBezierHandlePoints: this.fetch.bool(config, 'drawBezierHandlePoints', true),
-            drawHandleLines: this.fetch.bool(config, 'drawHandleLines', true),
-            drawHandlePoints: this.fetch.bool(config, 'drawHandlePoints', true),
+            // drawHandleLines       : this.fetch.bool(config,'drawHandleLines',true),
+            // drawHandlePoints      : this.fetch.bool(config,'drawHandlePoints',true),
             // Listeners/observers
             preClear: this.fetch.func(config, 'preClear', null),
             preDraw: this.fetch.func(config, 'preDraw', null),
@@ -327,8 +401,10 @@ var PlotBoilerplate = /** @class */ (function () {
          */
         this.drawConfig = {
             drawVertices: true,
-            drawHandleLines: true,
-            drawHandlePoints: true,
+            //drawHandleLines : true,
+            //drawHandlePoints: true,
+            drawHandleLines: this.fetch.bool(config, 'drawHandleLines', true),
+            drawHandlePoints: this.fetch.bool(config, 'drawHandlePoints', true),
             drawGrid: this.fetch.bool(config, 'drawGrid', true),
             bezier: {
                 color: '#00a822',
@@ -428,7 +504,7 @@ var PlotBoilerplate = /** @class */ (function () {
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
         var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
-        saveAs(blob, "plot-boilerplate.svg");
+        file_saver_1.saveAs(blob, "plot-boilerplate.svg");
     };
     ;
     PlotBoilerplate.prototype._setToRetina = function () {
@@ -471,10 +547,10 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.updateCSSscale = function () {
         if (this.config.cssUniformScale) {
-            setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleX);
+            PlotBoilerplate.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleX);
         }
         else {
-            setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleY);
+            PlotBoilerplate.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleY);
         }
     };
     ;
@@ -503,7 +579,8 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.add = function (drawable, redraw) {
         if (Array.isArray(drawable)) {
             var arr = drawable;
-            for (var i in arr)
+            // for( var i in arr )
+            for (var i = 0; i < arr.length; i++)
                 this.add(arr[i]);
         }
         else if (drawable instanceof Vertex) {
@@ -531,7 +608,8 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (drawable instanceof Polygon) {
             this.drawables.push(drawable);
-            for (var i in drawable.vertices)
+            // for( var i in drawable.vertices )
+            for (var i = 0; i < drawable.vertices.length; i++)
                 this.vertices.push(drawable.vertices[i]);
         }
         else if (drawable instanceof Triangle) {
@@ -542,25 +620,28 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (drawable instanceof BezierPath) {
             this.drawables.push(drawable);
-            for (var i in drawable.bezierCurves) {
+            var bezierPath = drawable;
+            // for( var i in bezierPath.bezierCurves ) {
+            for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
                 if (!drawable.adjustCircular && i == 0)
-                    this.vertices.push(drawable.bezierCurves[i].startPoint);
-                this.vertices.push(drawable.bezierCurves[i].endPoint);
-                this.vertices.push(drawable.bezierCurves[i].startControlPoint);
-                this.vertices.push(drawable.bezierCurves[i].endControlPoint);
-                drawable.bezierCurves[i].startControlPoint.attr.selectable = false;
-                drawable.bezierCurves[i].endControlPoint.attr.selectable = false;
+                    this.vertices.push(bezierPath.bezierCurves[i].startPoint);
+                this.vertices.push(bezierPath.bezierCurves[i].endPoint);
+                this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
+                this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
+                bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
+                bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
             }
             // for( var i in drawable.bezierCurves ) {
-            for (var i = 0; i < drawable.bezierCurves.length; i++) {
+            for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
                 // This should be wrapped into the BezierPath implementation.
-                drawable.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
+                bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
                     var cindex = drawable.locateCurveByStartPoint(e.params.vertex);
                     drawable.bezierCurves[cindex].startPoint.addXY(-e.params.dragAmount.x, -e.params.dragAmount.y);
-                    drawable.moveCurvePoint(cindex * 1, drawable.START_POINT, e.params.dragAmount);
+                    drawable.moveCurvePoint(cindex * 1, drawable.START_POINT, new Vertex(e.params.dragAmount) // TODO: change the signature of moveCurvePoint to (,XYCoords...)     
+                    );
                     drawable.updateArcLengths();
                 });
-                drawable.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {
+                bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {
                     var cindex = drawable.locateCurveByStartControlPoint(e.params.vertex);
                     if (!drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust)
                         return;
@@ -569,7 +650,7 @@ var PlotBoilerplate = /** @class */ (function () {
                     );
                     drawable.updateArcLengths();
                 });
-                drawable.bezierCurves[i].endControlPoint.listeners.addDragListener(function (e) {
+                bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener(function (e) {
                     var cindex = drawable.locateCurveByEndControlPoint(e.params.vertex);
                     if (!drawable.bezierCurves[(cindex) % drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust)
                         return;
@@ -578,7 +659,7 @@ var PlotBoilerplate = /** @class */ (function () {
                     );
                     drawable.updateArcLengths();
                 });
-                if (i + 1 > drawable.bezierCurves.length) {
+                if (i + 1 > bezierPath.bezierCurves.length) {
                     // Move last control point with the end point (if not circular)
                     drawable.bezierCurves[drawable.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
                         if (!drawable.adjustCircular) {
@@ -1307,7 +1388,7 @@ var PlotBoilerplate = /** @class */ (function () {
         if (this.config.enableTouch) {
             // Install a touch handler on the canvas.
             // Convert absolute touch positions to relative DOM element position (relative to canvas)
-            var relPos_1 = function (pos) {
+            var relPos = function (pos) {
                 return { x: pos.x - _self.canvas.offsetLeft,
                     y: pos.y - _self.canvas.offsetTop
                 };
@@ -1316,28 +1397,34 @@ var PlotBoilerplate = /** @class */ (function () {
             var touchMovePos = null;
             var touchDownPos = null;
             var draggedElement = null;
-            new Touchy_updated_min_js_1["default"](this.canvas, { one: function (hand, finger) {
-                    touchMovePos = new Vertex(relPos_1(finger.lastPoint));
-                    touchDownPos = new Vertex(relPos_1(finger.lastPoint));
-                    draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
-                    if (draggedElement) {
-                        hand.on('move', function (points) {
-                            var rel = relPos_1(points[0]);
-                            var trans = _self.transformMousePosition(rel.x, rel.y);
-                            var diff = new Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
-                            if (draggedElement.typeName == 'vertex') {
-                                if (!_self.vertices[draggedElement.vindex].attr.draggable)
-                                    return;
-                                _self.vertices[draggedElement.vindex].add(diff);
-                                var fakeEvent = { params: { dragAmount: diff.clone(), wasDragged: true, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone().add(diff) } };
-                                _self.vertices[draggedElement.vindex].listeners.fireDragEvent(fakeEvent);
-                                _self.redraw();
-                            }
-                            touchMovePos = new Vertex(rel);
-                        });
+            // TODO
+            // ERROR, THIS DOES NOT COMPILE WITH TYPESCRIPT.
+            // WE NEED TO FIND A DIFFERENT TOUCH LIBRARY.
+            /* new Touchy( this.canvas,
+                { one : function( hand, finger ) {
+                    touchMovePos = new Vertex( relPos(finger.lastPoint) );
+                    touchDownPos = new Vertex( relPos(finger.lastPoint) );
+                    draggedElement = _self.locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
+                    if( draggedElement ) {
+                    hand.on('move', function (points) { // TODO: type?
+                    var rel : XYCoords = relPos( points[0] );
+                        var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y );
+                        var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
+                        if( draggedElement.typeName == 'vertex' ) {
+                        if( !_self.vertices[draggedElement.vindex].attr.draggable )
+                            return;
+                        _self.vertices[draggedElement.vindex].add( diff );
+                        var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
+                        var fakeEvent : VertEvent = ({ params : { dragAmount : diff.clone(), wasDragged : true, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone().add(diff), vertex : draggingVertex}} as unknown) as VertEvent;
+                        draggingVertex.listeners.fireDragEvent( fakeEvent );
+                        _self.redraw();
+                        }
+                        touchMovePos = new Vertex(rel);
+                    } );
                     }
+                    
                 }
-            });
+                } ); */
         }
         else {
             _self.console.log('Touch interaction disabled.');
@@ -1378,61 +1465,12 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {dat.gui.GUI}
      **/
     PlotBoilerplate.prototype.createGUI = function () {
-        // var gui = new dat.gui.GUI();
-        var gui = new dat_gui_1["default"]();
-        var _self = this;
-        gui.remember(this.config);
-        var fold0 = gui.addFolder('Editor settings');
-        var fold00 = fold0.addFolder('Canvas size');
-        fold00.add(this.config, 'fullSize').onChange(function () { _self.resizeCanvas(); }).title("Toggles the fullpage mode.").listen();
-        fold00.add(this.config, 'fitToParent').onChange(function () { _self.resizeCanvas(); }).title("Toggles the fit-to-parent mode to fit to parent container (overrides fullsize).").listen();
-        fold00.add(this.config, 'defaultCanvasWidth').min(1).step(10).onChange(function () { _self.resizeCanvas(); }).title("Specifies the fallback width.");
-        fold00.add(this.config, 'defaultCanvasHeight').min(1).step(10).onChange(function () { _self.resizeCanvas(); }).title("Specifies the fallback height.");
-        fold00.add(this.config, 'canvasWidthFactor').min(0.1).step(0.1).max(10).onChange(function () { _self.resizeCanvas(); }).title("Specifies a factor for the current width.").listen();
-        fold00.add(this.config, 'canvasHeightFactor').min(0.1).step(0.1).max(10).onChange(function () { _self.resizeCanvas(); }).title("Specifies a factor for the current height.").listen();
-        fold00.add(this.config, 'cssScaleX').min(0.01).step(0.01).max(1.0).onChange(function () { if (_self.config.cssUniformScale)
-            _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); }).title("Specifies the visual x scale (CSS).").listen();
-        fold00.add(this.config, 'cssScaleY').min(0.01).step(0.01).max(1.0).onChange(function () { if (_self.config.cssUniformScale)
-            _self.config.cssScaleX = _self.config.cssScaleY; _self.updateCSSscale(); }).title("Specifies the visual y scale (CSS).").listen();
-        fold00.add(this.config, 'cssUniformScale').onChange(function () { if (_self.config.cssUniformScale)
-            _self.config.cssScaleY = _self.config.cssScaleX; _self.updateCSSscale(); }).title("CSS uniform scale (x-scale equlsa y-scale).");
-        fold00.add(this.config, 'setToRetina').name('Set to highres fullsize').title('Set canvas to high-res retina resoultion (x2).');
-        var fold01 = fold0.addFolder('Draw settings');
-        fold01.add(this.config, 'drawBezierHandlePoints').onChange(function () { _self.redraw(); }).title("Draw Bézier handle points.");
-        fold01.add(this.config, 'drawBezierHandleLines').onChange(function () { _self.redraw(); }).title("Draw Bézier handle lines.");
-        fold01.add(this.config, 'drawHandlePoints').onChange(function () { _self.redraw(); }).title("Draw handle points (overrides all other settings).");
-        fold01.add(this.config, 'drawHandleLines').onChange(function () { _self.redraw(); }).title("Draw handle lines in general (overrides all other settings).");
-        fold01.add(this.drawConfig, 'drawVertices').onChange(function () { _self.redraw(); }).title("Draw vertices in general.");
-        var fold0100 = fold01.addFolder('Colors and Lines');
-        var _addDrawConfigElement = function (fold, basePath, conf) {
-            for (var i in conf) {
-                if (typeof conf[i] == 'object') {
-                    if (conf[i].hasOwnProperty('color'))
-                        fold.addColor(conf[i], 'color').onChange(function () { _self.redraw(); }).name(basePath + i + '.color').title(basePath + i + '.color').listen();
-                    if (conf[i].hasOwnProperty('lineWidth'))
-                        fold.add(conf[i], 'lineWidth').min(1).max(10).step(1).onChange(function () { _self.redraw(); }).name(basePath + i + '.lineWidth').title(basePath + i + '.lineWidth').listen();
-                    for (var e in conf[i]) {
-                        if (conf[i].hasOwnProperty(e) && typeof conf[i][e] == 'object') { // console.log(e);
-                            _addDrawConfigElement(fold, (basePath != '' ? basePath + '.' : '') + i + '.' + e, conf[i]);
-                        }
-                    }
-                }
-            }
-        };
-        _addDrawConfigElement(fold0100, '', this.drawConfig);
-        fold0.add(this.config, 'scaleX').title("Scale x.").min(0.01).max(10.0).step(0.01).onChange(function () { _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX; _self.redraw(); }).listen();
-        fold0.add(this.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange(function () { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); }).listen();
-        fold0.add(this.config, 'offsetX').title("Offset x.").step(10.0).onChange(function () { _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX; _self.redraw(); }).listen();
-        fold0.add(this.config, 'offsetY').title("Offset y.").step(10.0).onChange(function () { _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY; _self.redraw(); }).listen();
-        fold0.add(this.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange(function () { _self.redraw(); }).listen();
-        fold0.add(this.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
-        fold0.addColor(this.config, 'backgroundColor').onChange(function () { _self.redraw(); }).title("Choose a background color.");
-        // fold0.add(this.config, 'loadImage').name('Load Image').title("Load a background image.");
-        if (this.config.enableSVGExport) {
-            var fold1 = gui.addFolder('Export');
-            fold1.add(this.config, 'saveFile').name('Save a file').title("Save as SVG.");
-        }
-        return gui;
+        // This function moved to the helper utils.
+        // We do not want to include the whole dat.GUI package.
+        if (window["utils"] && typeof window["utils"].creategui == "function")
+            return window["utils"].creategui(this);
+        else
+            throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an load the dat.GUI library?";
     };
     ;
     /** @constant {number} */

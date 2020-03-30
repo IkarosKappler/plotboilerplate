@@ -13,7 +13,7 @@
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 
-class VEllipse {
+class VEllipse implements SVGSerializable {
 
     /** 
      * @member {Vertex} 

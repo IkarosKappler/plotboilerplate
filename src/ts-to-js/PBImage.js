@@ -36,5 +36,20 @@ var PBImage = /** @class */ (function () {
         this.lowerRight = lowerRight;
     }
     ;
+    // Implement SVGSerializable
+    /**
+     * Convert this vertex to SVG code.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Vertex
+     **/
+    PBImage.prototype.toSVGString = function (options) {
+        console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
+        return "";
+    };
+    ;
     return PBImage;
 }());

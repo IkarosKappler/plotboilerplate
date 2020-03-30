@@ -33,7 +33,7 @@
  **/
 
 
-class Triangle {
+class Triangle implements SVGSerializable {
     
     /**
      * An epsilon for comparison.

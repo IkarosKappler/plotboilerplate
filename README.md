@@ -540,7 +540,7 @@ for this purpose.
   
 
 
-### Used Libraries
+### Credits
 * dat.gui
 * Color.js
 * FileSaver.js
