@@ -22,7 +22,7 @@ The compressed library has 70kb.
 
 
 ## The HTML file
-For a full example see [main-dist.html](https://github.com/IkarosKappler/plotboilerplate/blob/master/main-dist.html xsmain-dist.html):
+For a full example see [main-dist.html](https://github.com/IkarosKappler/plotboilerplate/blob/master/main-dist.html "main-dist.html") :
 ~~~html
    <canvas id="my-canvas">
       Your browser does not support the canvas tag.

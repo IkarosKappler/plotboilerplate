@@ -1,6 +1,10 @@
 
 
 # Changelog
+  * 2020-03-31
+  * Reconfigured the typescript compiler for es5.
+  * Recondifgued webpack.
+  * Tweaked the main demo for some moved files.
 * 2020-03-30
   * Ported the main class of PlotBoilerplate to Typescript.
   * Moved the RectSelector from the main class to the demo section.
