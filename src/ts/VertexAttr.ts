@@ -18,7 +18,7 @@
  * @public
  **/
 
-interface IVertexAttr {
+export interface IVertexAttr {
     draggable : boolean;
     selectable : boolean;
     isSelected : boolean;
@@ -26,7 +26,7 @@ interface IVertexAttr {
     renderTime? : number;
 }
 
-class VertexAttr implements IVertexAttr {
+export class VertexAttr implements IVertexAttr {
 
     /** 
      * @member {VertexAttr} 

@@ -1,6 +1,9 @@
 
 
-class VertTuple<T extends VertTuple<T>> {
+import { Vertex } from "./Vertex";
+import { XYCoords, SVGSerializable} from "./interfaces";
+
+export class VertTuple<T extends VertTuple<T>> {
 
 
     /** 

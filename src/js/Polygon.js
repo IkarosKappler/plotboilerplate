@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A polygon class.
  *
@@ -18,6 +19,9 @@
  * @file Polygon
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var BezierPath_1 = require("./BezierPath");
+var Vertex_1 = require("./Vertex");
 var Polygon = /** @class */ (function () {
     /**
      * The constructor.
@@ -28,6 +32,10 @@ var Polygon = /** @class */ (function () {
      * @param {boolean} isOpen - Indicates if the polygon should be rendered as an open or closed shape.
      **/
     function Polygon(vertices, isOpen) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Polygon";
         if (typeof vertices == 'undefined')
             vertices = [];
         this.vertices = vertices;
@@ -116,13 +124,13 @@ var Polygon = /** @class */ (function () {
         var qbezier = [];
         var cc0 = this.vertices[0];
         var cc1 = this.vertices[1];
-        var edgeCenter = new Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
+        var edgeCenter = new Vertex_1.Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
         qbezier.push(edgeCenter);
         var limit = this.isOpen ? this.vertices.length : this.vertices.length + 1;
         for (var t = 1; t < limit; t++) {
             cc0 = this.vertices[t % this.vertices.length];
             cc1 = this.vertices[(t + 1) % this.vertices.length];
-            var edgeCenter = new Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
+            var edgeCenter = new Vertex_1.Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
             qbezier.push(cc0);
             qbezier.push(edgeCenter);
             cc0 = cc1;
@@ -172,17 +180,17 @@ var Polygon = /** @class */ (function () {
         var cbezier = [];
         var a = this.vertices[0];
         var b = this.vertices[1];
-        var edgeCenter = new Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
+        var edgeCenter = new Vertex_1.Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
         cbezier.push(edgeCenter);
         var limit = this.isOpen ? this.vertices.length - 1 : this.vertices.length;
         for (var t = 0; t < limit; t++) {
             var a = this.vertices[t % this.vertices.length];
             var b = this.vertices[(t + 1) % this.vertices.length];
             var c = this.vertices[(t + 2) % this.vertices.length];
-            var aCenter = new Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
-            var bCenter = new Vertex(b.x + (c.x - b.x) / 2, b.y + (c.y - b.y) / 2);
-            var a2 = new Vertex(aCenter.x + (b.x - aCenter.x) * threshold, aCenter.y + (b.y - aCenter.y) * threshold);
-            var b0 = new Vertex(bCenter.x + (b.x - bCenter.x) * threshold, bCenter.y + (b.y - bCenter.y) * threshold);
+            var aCenter = new Vertex_1.Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
+            var bCenter = new Vertex_1.Vertex(b.x + (c.x - b.x) / 2, b.y + (c.y - b.y) / 2);
+            var a2 = new Vertex_1.Vertex(aCenter.x + (b.x - aCenter.x) * threshold, aCenter.y + (b.y - aCenter.y) * threshold);
+            var b0 = new Vertex_1.Vertex(bCenter.x + (b.x - bCenter.x) * threshold, bCenter.y + (b.y - bCenter.y) * threshold);
             cbezier.push(a2);
             cbezier.push(b0);
             cbezier.push(bCenter);
@@ -225,7 +233,7 @@ var Polygon = /** @class */ (function () {
         for (var i = 0; i + 3 < qdata.length; i += 3) {
             pathdata.push([qdata[i], qdata[i + 3], qdata[i + 1], qdata[i + 2]]);
         }
-        return BezierPath.fromArray(pathdata);
+        return BezierPath_1.BezierPath.fromArray(pathdata);
     };
     ;
     /**
@@ -265,4 +273,5 @@ var Polygon = /** @class */ (function () {
     ;
     return Polygon;
 }());
+exports.Polygon = Polygon;
 //# sourceMappingURL=Polygon.js.map

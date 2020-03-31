@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A wrapper for image objects.
  *
@@ -14,6 +15,7 @@
  *               and height thei are not suitable for UI dragging interfaces.
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
 var PBImage = /** @class */ (function () {
     /**
      * The constructor.
@@ -25,6 +27,10 @@ var PBImage = /** @class */ (function () {
      * @param {Vertex} lowerRight - The lower right corner.
      **/
     function PBImage(image, upperLeft, lowerRight) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "PBImage";
         /* if( typeof image == 'undefined' )
             throw Error('image must not be null.');
         if( typeof upperLeft == 'undefined' )
@@ -53,4 +59,5 @@ var PBImage = /** @class */ (function () {
     ;
     return PBImage;
 }());
+exports.PBImage = PBImage;
 //# sourceMappingURL=PBImage.js.map

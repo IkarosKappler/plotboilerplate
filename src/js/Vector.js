@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
  *            <br>
@@ -33,6 +34,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+Object.defineProperty(exports, "__esModule", { value: true });
+var VertTuple_1 = require("./VertTuple");
+var Vertex_1 = require("./Vertex");
 var Vector = /** @class */ (function (_super) {
     __extends(Vector, _super);
     /**
@@ -45,7 +49,12 @@ var Vector = /** @class */ (function (_super) {
      * @param {Vertex} vertB - The end vertex of the vector.
      **/
     function Vector(vertA, vertB) {
-        return _super.call(this, vertA, vertB, function (a, b) { return new Vector(a, b); }) || this;
+        var _this = _super.call(this, vertA, vertB, function (a, b) { return new Vector(a, b); }) || this;
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        _this.className = "Vector";
+        return _this;
     }
     ;
     /**
@@ -58,7 +67,7 @@ var Vector = /** @class */ (function (_super) {
         var v = this.clone(); // .sub( this.a );
         v.sub(this.a);
         //return new Vector( new Vertex(), new Vertex(-v.b.y,v.b.x) ).add( this.a );
-        v = new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x));
+        v = new Vector(new Vertex_1.Vertex(), new Vertex_1.Vertex(-v.b.y, v.b.x));
         v.a.add(this.a);
         v.b.add(this.a);
         // v.b.y = -v.b.y; // new Vertex(-v.b.y,v.b.x) ).add( this.a );
@@ -112,7 +121,7 @@ var Vector = /** @class */ (function (_super) {
         // TODO:
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
+        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
     };
     ;
     /**
@@ -180,13 +189,14 @@ var Vector = /** @class */ (function (_super) {
         buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
             var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
             var vertices = [];
-            vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
-            vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX, zB.y * scaleY));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
             return vertices;
         }
     };
     return Vector;
-}(VertTuple));
+}(VertTuple_1.VertTuple));
+exports.Vector = Vector;
 //# sourceMappingURL=Vector.js.map

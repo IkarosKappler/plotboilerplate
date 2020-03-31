@@ -15,18 +15,21 @@
  * @public
  **/
 
-interface VertEventParams extends XMouseParams {
+import { Vertex } from "./Vertex";
+import { XMouseParams, XMouseEvent } from "./MouseHandler";
+
+export interface VertEventParams extends XMouseParams {
     vertex : Vertex;
 }
 
-interface VertEvent {
+export interface VertEvent {
     // vertex: Vertex;
     // params : { vertex: Vertex }
     params : VertEventParams; // XMouseParams;
     // vertex : Vertex;
 } 
 
-class VertexListeners {
+export class VertexListeners {
 
     drag:Array<(e:VertEvent)=>void>;
     dragStart:Array<(e:VertEvent)=>void>;

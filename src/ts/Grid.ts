@@ -15,7 +15,11 @@
  * @public
  **/
 
-class Grid {
+
+import { Vertex } from "./Vertex";
+
+
+export class Grid {
 
     /** 
      * @member {Vertex} 

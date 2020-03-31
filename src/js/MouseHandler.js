@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A simple mouse handler for demos.
  * Use to avoid load massive libraries like jQuery.
@@ -52,6 +53,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+Object.defineProperty(exports, "__esModule", { value: true });
 var XMouseEvent = /** @class */ (function (_super) {
     __extends(XMouseEvent, _super);
     function XMouseEvent() {
@@ -59,6 +61,7 @@ var XMouseEvent = /** @class */ (function (_super) {
     }
     return XMouseEvent;
 }(MouseEvent));
+exports.XMouseEvent = XMouseEvent;
 var XWheelEvent = /** @class */ (function (_super) {
     __extends(XWheelEvent, _super);
     function XWheelEvent() {
@@ -66,6 +69,7 @@ var XWheelEvent = /** @class */ (function (_super) {
     }
     return XWheelEvent;
 }(WheelEvent));
+exports.XWheelEvent = XWheelEvent;
 var MouseHandler = /** @class */ (function () {
     // private wheelHandlers  : Record<string,(e:XWheelEvent)=>void> = {};
     /**
@@ -245,4 +249,5 @@ var MouseHandler = /** @class */ (function () {
     };
     return MouseHandler;
 }());
+exports.MouseHandler = MouseHandler;
 //# sourceMappingURL=MouseHandler.js.map

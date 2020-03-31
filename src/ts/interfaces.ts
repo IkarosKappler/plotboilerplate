@@ -1,10 +1,19 @@
 
-interface XYCoords {
+import { Vertex } from "./Vertex";
+import { Vector } from "./Vector";
+import { Triangle } from "./Triangle";
+import { PBImage } from "./PBImage";
+import { VEllipse } from "./VEllipse";
+import { Polygon } from "./Polygon";
+import { BezierPath } from "./BezierPath";
+import { Line } from "./Line";
+
+export interface XYCoords {
     x : number;
     y : number;
 }
 
-interface XYDimension {
+export interface XYDimension {
     width : number;
     height: number;
 }
@@ -14,14 +23,14 @@ interface XYDimension {
  * @property {Vertex} min The upper left position.
  * @property {Vertex} max The lower right position;.
  */
-interface Bounds {
+export interface Bounds {
     min : XYCoords;
     max : XYCoords;
 }
 
-type Drawable = Vertex | Vector | Triangle | PBImage | VEllipse | Polygon | BezierPath | Line;
+export type Drawable = Vertex | Vector | Triangle | PBImage | VEllipse | Polygon | BezierPath | Line;
 
-interface Config {
+export interface Config {
     canvas : HTMLCanvasElement;   //  Your canvas element in the DOM (required).
     fullSize?: boolean;           // If set to true the canvas will gain full window size.
     fitToParent?: boolean;        // If set to true the canvas will gain the size of its parent container (overrides fullSize).
@@ -72,16 +81,16 @@ interface Config {
     setToRetina? : ()=>void;
 }
 
-interface PBParams extends Config, DrawSettings {
+export interface PBParams extends Config, DrawSettings {
     // No additional attributes
 }
 
-interface DrawSettings {
+export interface DrawSettings {
     color : string;
     lineWidth : number;
 }
 
-interface DrawConfig {
+export interface DrawConfig {
     drawVertices : boolean;
     drawBezierHandleLines?: boolean;   // Indicates if Bézier curve handles should be drawn (used for
                                        // editors, no required in pure visualizations).
@@ -108,11 +117,17 @@ interface DrawConfig {
 //   >> The 'name' property is part of ES6 that's why you don't see it in lib.d.ts.
 //   >> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
 // ... does this collide with anything?
-interface Function {
+export interface Function {
     readonly name: string;
 }
 
-interface SVGSerializable {
+export interface SVGSerializable {
+
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string;
+    
     /**
      * Convert this vertex to SVG code.
      *
@@ -131,6 +146,6 @@ interface XEvent {
 }
 */
 
-interface IHooks {
+export interface IHooks {
     saveFile: ()=>void;
 }

@@ -14,7 +14,8 @@
  *               rather than a drawable object.
  * @public
  **/
-declare class Grid {
+import { Vertex } from "./Vertex";
+export declare class Grid {
     /**
      * @member {Vertex}
      * @memberof Grid

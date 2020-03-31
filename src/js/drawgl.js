@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -10,6 +11,8 @@
  * @modified 2020-03-25 Ported stub to Typescript.
  * @version  0.0.3
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vertex_1 = require("./Vertex");
 var drawutilsgl = /** @class */ (function () {
     /**
      * The constructor.
@@ -21,8 +24,8 @@ var drawutilsgl = /** @class */ (function () {
      **/
     function drawutilsgl(context, fillShapes) {
         this.gl = context;
-        this.offset = new Vertex(0, 0);
-        this.scale = new Vertex(1, 1);
+        this.offset = new Vertex_1.Vertex(0, 0);
+        this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
         this._zindex = 0.0;
         if (context == null || typeof context === 'undefined')
@@ -544,6 +547,7 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.fragCode = "\n    precision highp float;\n\n    void main(void) {\n\tgl_FragColor = vec4(0.0,0.75,1.0,1.0);\n    }";
     return drawutilsgl;
 }());
+exports.drawutilsgl = drawutilsgl;
 /**
  * Some GL helper utils.
  **/

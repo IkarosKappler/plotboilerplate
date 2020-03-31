@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc The VertexAttr is a helper class to wrap together additional attributes
  * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
@@ -17,6 +18,7 @@
  * @file VertexAttr
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
 var VertexAttr = /** @class */ (function () {
     /**
      * The constructor.
@@ -48,4 +50,5 @@ var VertexAttr = /** @class */ (function () {
     };
     return VertexAttr;
 }());
+exports.VertexAttr = VertexAttr;
 //# sourceMappingURL=VertexAttr.js.map

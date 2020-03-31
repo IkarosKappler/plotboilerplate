@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -12,6 +13,7 @@
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
 var VEllipse = /** @class */ (function () {
     /**
      * The constructor.
@@ -22,6 +24,10 @@ var VEllipse = /** @class */ (function () {
      * @name VEllipse
      **/
     function VEllipse(center, axis) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "VEllipse";
         this.center = center;
         this.axis = axis;
     }
@@ -48,4 +54,5 @@ var VEllipse = /** @class */ (function () {
     ;
     return VEllipse;
 }());
+exports.VEllipse = VEllipse;
 //# sourceMappingURL=VEllipse.js.map

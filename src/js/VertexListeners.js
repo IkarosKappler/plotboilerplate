@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc An event listeners wrapper. This is just a set of three listener
  *              queues (drag, dragStart, dragEnd) and their respective firing
@@ -14,6 +15,7 @@
  * @file VertexListeners
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
 var VertexListeners = /** @class */ (function () {
     /**
      * The constructor.
@@ -144,4 +146,5 @@ var VertexListeners = /** @class */ (function () {
     ;
     return VertexListeners;
 }());
+exports.VertexListeners = VertexListeners;
 //# sourceMappingURL=VertexListeners.js.map

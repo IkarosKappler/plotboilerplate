@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A refactored cubic bezier curve class.
  *
@@ -23,6 +24,9 @@
  * @file CubicBezierCurve
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vertex_1 = require("./Vertex");
+var Vector_1 = require("./Vector");
 var CubicBezierCurve = /** @class */ (function () {
     /**
      * The constructor.
@@ -162,7 +166,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @return {void}
      **/
     CubicBezierCurve.prototype.updateArcLengths = function () {
-        var pointA = this.startPoint.clone(), pointB = new Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
+        var pointA = this.startPoint.clone(), pointB = new Vertex_1.Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
         var u = curveStep;
         // Clear segment cache
         this.segmentCache = [];
@@ -281,7 +285,7 @@ var CubicBezierCurve = /** @class */ (function () {
             + this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.x * Math.pow(t, 3);
         var y = this.startPoint.y * Math.pow(1.0 - t, 3) + this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2)
             + this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.y * Math.pow(t, 3);
-        return new Vertex(x, y);
+        return new Vertex_1.Vertex(x, y);
     };
     ;
     /**
@@ -330,7 +334,7 @@ var CubicBezierCurve = /** @class */ (function () {
             c.y * (6 * (t - t2) - 3 * t2) +
             3 * d.y * t2;
         // Note: my implementation does NOT normalize tangent vectors!
-        return new Vertex(tX, tY);
+        return new Vertex_1.Vertex(tX, tY);
     };
     ;
     /**
@@ -346,8 +350,8 @@ var CubicBezierCurve = /** @class */ (function () {
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
     CubicBezierCurve.prototype.getSubCurveAt = function (tStart, tEnd) {
-        var startVec = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        var endVec = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
+        var startVec = new Vector_1.Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
+        var endVec = new Vector_1.Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
         // Tangents are relative. Make absolute.
         startVec.b.add(startVec.a);
         endVec.b.add(endVec.a);
@@ -415,7 +419,7 @@ var CubicBezierCurve = /** @class */ (function () {
      **/
     CubicBezierCurve.prototype.getPerpendicularAt = function (t) {
         var tangentVector = this.getTangentAt(t);
-        return new Vertex(tangentVector.y, -tangentVector.x);
+        return new Vertex_1.Vertex(tangentVector.y, -tangentVector.x);
     };
     ;
     /**
@@ -579,7 +583,7 @@ var CubicBezierCurve = /** @class */ (function () {
             throw "Object member \"startControlPoint\" missing.";
         if (!obj.endControlPoint)
             throw "Object member \"endControlPoint\" missing.";
-        return new CubicBezierCurve(new Vertex(obj.startPoint[0], obj.startPoint[1]), new Vertex(obj.endPoint[0], obj.endPoint[1]), new Vertex(obj.startControlPoint[0], obj.startControlPoint[1]), new Vertex(obj.endControlPoint[0], obj.endControlPoint[1]));
+        return new CubicBezierCurve(new Vertex_1.Vertex(obj.startPoint[0], obj.startPoint[1]), new Vertex_1.Vertex(obj.endPoint[0], obj.endPoint[1]), new Vertex_1.Vertex(obj.startControlPoint[0], obj.startControlPoint[1]), new Vertex_1.Vertex(obj.endControlPoint[0], obj.endControlPoint[1]));
     };
     ;
     /**
@@ -609,4 +613,5 @@ var CubicBezierCurve = /** @class */ (function () {
     CubicBezierCurve.END_POINT = 3;
     return CubicBezierCurve;
 }());
+exports.CubicBezierCurve = CubicBezierCurve;
 //# sourceMappingURL=CubicBezierCurve.js.map

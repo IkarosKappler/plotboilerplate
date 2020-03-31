@@ -23,7 +23,14 @@
  * @file Line
  * @public
  **/
-declare class Line extends VertTuple<Line> implements SVGSerializable {
+import { VertTuple } from "./VertTuple";
+import { Vertex } from "./Vertex";
+import { SVGSerializable } from "./interfaces";
+export declare class Line extends VertTuple<Line> implements SVGSerializable {
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className: string;
     /**
      * Creates an instance of Line.
      *

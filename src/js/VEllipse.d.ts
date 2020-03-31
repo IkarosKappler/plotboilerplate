@@ -12,7 +12,13 @@
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
-declare class VEllipse implements SVGSerializable {
+import { Vertex } from "./Vertex";
+import { SVGSerializable } from "./interfaces";
+export declare class VEllipse implements SVGSerializable {
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className: string;
     /**
      * @member {Vertex}
      * @memberof VEllipse

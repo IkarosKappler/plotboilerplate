@@ -1,4 +1,5 @@
-declare class VertTuple<T extends VertTuple<T>> {
+import { Vertex } from "./Vertex";
+export declare class VertTuple<T extends VertTuple<T>> {
     /**
      * @member {Vertex}
      * @memberof Line

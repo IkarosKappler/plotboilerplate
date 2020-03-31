@@ -40,7 +40,7 @@
  * @version  1.0.9
  **/
 
-interface XMouseParams {
+export interface XMouseParams {
     element : HTMLElement; 
     name : string;
     pos : {x:number,y:number};
@@ -53,14 +53,14 @@ interface XMouseParams {
     wasDragged : boolean;
     dragAmount : {x:number,y:number};
 }
-class XMouseEvent extends MouseEvent {
+export class XMouseEvent extends MouseEvent {
     params: XMouseParams;
 }
-class XWheelEvent extends WheelEvent {
+export class XWheelEvent extends WheelEvent {
     params: XMouseParams;
 }
 
-class MouseHandler {
+export class MouseHandler {
 
     private element        : HTMLElement;
     private mouseDownPos   : { x:number, y:number }|undefined = null;

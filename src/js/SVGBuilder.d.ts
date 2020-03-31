@@ -14,7 +14,9 @@
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @version  1.0.3
  **/
-declare class SVGBuilder {
+import { Vertex } from "./Vertex";
+import { SVGSerializable } from "./interfaces";
+export declare class SVGBuilder {
     constructor();
     /**
      *  Builds the SVG code from the given list of drawables.
@@ -23,11 +25,7 @@ declare class SVGBuilder {
      * @param {object}   options  - { canvasSize, zoom, offset }
      * @return {string}
      **/
-    build(drawables: Array<{
-        toSVGString: (options: {
-            className?: string;
-        }) => string;
-    }>, options: {
+    build(drawables: Array<SVGSerializable>, options: {
         canvasSize: {
             width: number;
             height: number;

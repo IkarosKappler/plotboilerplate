@@ -24,7 +24,12 @@
  * @public
  **/
 
-class CubicBezierCurve {
+import { Vertex } from "./Vertex";
+import { Vector } from "./Vector";
+import { XYCoords, SVGSerializable} from "./interfaces";
+
+
+export class CubicBezierCurve {
 
     /** @constant {number} */
     static readonly START_POINT:number         = 0;

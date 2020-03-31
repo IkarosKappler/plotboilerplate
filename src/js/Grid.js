@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A grid class with vertical and horizontal lines.
  *
@@ -14,6 +15,7 @@
  *               rather than a drawable object.
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
 var Grid = /** @class */ (function () {
     /**
      * The constructor.
@@ -79,4 +81,5 @@ var Grid = /** @class */ (function () {
     };
     return Grid;
 }());
+exports.Grid = Grid;
 //# sourceMappingURL=Grid.js.map

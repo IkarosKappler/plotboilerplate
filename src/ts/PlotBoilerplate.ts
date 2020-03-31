@@ -58,8 +58,23 @@
  * @public
  **/
 
-//import { GUI } from "dat.gui";
-// import { saveAs } from 'file-saver';
+import { drawutils } from "./draw";
+import { drawutilsgl } from "./drawgl";
+import { BezierPath } from "./BezierPath";
+import { CubicBezierCurve } from "./CubicBezierCurve";
+import { Grid } from "./Grid";
+import { Line } from "./Line";
+import { MouseHandler, XMouseEvent, XWheelEvent } from "./MouseHandler";
+import { PBImage } from "./PBImage";
+import { Polygon } from "./Polygon";
+import { SVGBuilder } from "./SVGBuilder";
+import { Triangle } from "./Triangle";
+import { VEllipse } from "./VEllipse";
+import { Vector } from "./Vector";
+import { Vertex } from "./Vertex";
+import { VertexAttr } from "./VertexAttr";
+import { VertEvent } from "./VertexListeners";
+import { Bounds, Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
 
 
 /**
@@ -89,7 +104,7 @@ class Draggable {
 /**
  * The main class.
  */
-class PlotBoilerplate {
+export class PlotBoilerplate {
 
     /** @constant {number} */
     static readonly DEFAULT_CANVAS_WIDTH : number    = 1024;

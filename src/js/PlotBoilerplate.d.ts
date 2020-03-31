@@ -57,6 +57,13 @@
  * @file PlotBoilerplate
  * @public
  **/
+import { drawutils } from "./draw";
+import { drawutilsgl } from "./drawgl";
+import { BezierPath } from "./BezierPath";
+import { Grid } from "./Grid";
+import { Polygon } from "./Polygon";
+import { Vertex } from "./Vertex";
+import { Bounds, Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
 /**
  * A wrapper class for draggable items (mostly vertices).
  * @private
@@ -76,7 +83,7 @@ declare class Draggable {
 /**
  * The main class.
  */
-declare class PlotBoilerplate {
+export declare class PlotBoilerplate {
     /** @constant {number} */
     static readonly DEFAULT_CANVAS_WIDTH: number;
     /** @constant {number} */
@@ -551,3 +558,4 @@ declare class PlotBoilerplate {
         };
     };
 }
+export {};

@@ -10,7 +10,11 @@
  * @modified 2020-03-25 Ported stub to Typescript.
  * @version  0.0.3
  **/
-declare class drawutilsgl {
+import { CubicBezierCurve } from "./CubicBezierCurve";
+import { Polygon } from "./Polygon";
+import { Vertex } from "./Vertex";
+import { XYCoords } from "./interfaces";
+export declare class drawutilsgl {
     private static vertCode;
     private static fragCode;
     gl: WebGLRenderingContext;
@@ -349,14 +353,4 @@ declare class drawutilsgl {
      * @param {string} color - The color to clear with.
      **/
     clear(color: string): void;
-}
-/**
- * Some GL helper utils.
- **/
-declare class GLU {
-    gl: WebGLRenderingContext;
-    constructor(gl: WebGLRenderingContext);
-    bufferData(verts: Float32Array): WebGLBuffer;
-    compileShader(shaderCode: string, shaderType: any): WebGLShader;
-    makeProgram(vertShader: WebGLShader, fragShader: WebGLShader): WebGLProgram;
 }

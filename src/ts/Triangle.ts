@@ -33,7 +33,17 @@
  **/
 
 
-class Triangle implements SVGSerializable {
+import { Polygon } from "./Polygon";
+import { Vertex } from "./Vertex";
+import { XYCoords, SVGSerializable} from "./interfaces";
+
+
+export class Triangle implements SVGSerializable {
+
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string = "Triangle";
     
     /**
      * An epsilon for comparison.

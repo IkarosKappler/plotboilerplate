@@ -15,7 +15,19 @@
  * @public
  **/
 
-class PBImage implements SVGSerializable {
+
+import { Vertex } from "./Vertex";
+import { XYCoords, SVGSerializable} from "./interfaces";
+
+
+export class PBImage implements SVGSerializable {
+
+
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string = "PBImage";
+    
 
     /** 
      * @member {Vertex} 

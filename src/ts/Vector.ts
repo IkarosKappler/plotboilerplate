@@ -21,8 +21,18 @@
  * @public
  **/
 
-class Vector extends VertTuple<Vector> implements SVGSerializable {  
 
+import { VertTuple } from "./VertTuple";
+import { Vertex } from "./Vertex";
+import { XYCoords, SVGSerializable} from "./interfaces";
+
+
+export class Vector extends VertTuple<Vector> implements SVGSerializable {  
+
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string = "Vector";
     
     /**
      * The constructor.

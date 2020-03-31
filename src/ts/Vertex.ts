@@ -32,13 +32,19 @@
  **/
 
 
-//import VertAttr from "./VertAttr";
-//import { XYCoords, SVGSerializable} from "./interfaces";
+import { IVertexAttr, VertexAttr } from "./VertexAttr";
+import { VertexListeners } from "./VertexListeners";
+import { XYCoords, SVGSerializable} from "./interfaces";
 
 
-class Vertex implements XYCoords, SVGSerializable {
+export class Vertex implements XYCoords, SVGSerializable {
 
     private static readonly ZERO = new Vertex(0,0);
+
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string = "Vertex";
     
     /**
      * An epsilon for comparison

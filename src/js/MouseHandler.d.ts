@@ -39,7 +39,7 @@
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @version  1.0.9
  **/
-interface XMouseParams {
+export interface XMouseParams {
     element: HTMLElement;
     name: string;
     pos: {
@@ -64,13 +64,13 @@ interface XMouseParams {
         y: number;
     };
 }
-declare class XMouseEvent extends MouseEvent {
+export declare class XMouseEvent extends MouseEvent {
     params: XMouseParams;
 }
-declare class XWheelEvent extends WheelEvent {
+export declare class XWheelEvent extends WheelEvent {
     params: XMouseParams;
 }
-declare class MouseHandler {
+export declare class MouseHandler {
     private element;
     private mouseDownPos;
     private mouseDragPos;

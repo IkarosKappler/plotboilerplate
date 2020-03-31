@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A wrapper class for basic drawing operations.
  *
@@ -30,6 +31,9 @@
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @version  1.5.3
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var CubicBezierCurve_1 = require("./CubicBezierCurve");
+var Vertex_1 = require("./Vertex");
 // Todo: rename this class to Drawutils
 var drawutils = /** @class */ (function () {
     /**
@@ -42,8 +46,8 @@ var drawutils = /** @class */ (function () {
      **/
     function drawutils(context, fillShapes) {
         this.ctx = context;
-        this.offset = new Vertex(0, 0);
-        this.scale = new Vertex(1, 1);
+        this.offset = new Vertex_1.Vertex(0, 0);
+        this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
     }
     ;
@@ -94,7 +98,7 @@ var drawutils = /** @class */ (function () {
         // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
         this.ctx.save();
         this.ctx.beginPath();
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
+        var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
@@ -166,7 +170,7 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
-        if (startPoint instanceof CubicBezierCurve) {
+        if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
             this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
             return;
         }
@@ -742,4 +746,5 @@ var drawutils = /** @class */ (function () {
     ;
     return drawutils;
 }());
+exports.drawutils = drawutils;
 //# sourceMappingURL=draw.js.map

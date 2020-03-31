@@ -24,9 +24,20 @@
  * @public
  **/
 
+import { Vector } from "./Vector";
+import { VertTuple } from "./VertTuple";
+import { Vertex } from "./Vertex";
+import { XYCoords, SVGSerializable} from "./interfaces";
 
-class Line extends VertTuple<Line> implements SVGSerializable {
+export class Line extends VertTuple<Line> implements SVGSerializable {
 
+
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string = "Line";
+    
+    
     /**
      * Creates an instance of Line.
      *

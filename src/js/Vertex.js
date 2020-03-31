@@ -32,6 +32,8 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var VertexAttr_1 = require("./VertexAttr");
+var VertexListeners_1 = require("./VertexListeners");
 var Vertex = /** @class */ (function () {
     /**
      * The constructor for the vertex class.
@@ -42,6 +44,10 @@ var Vertex = /** @class */ (function () {
      * @param {number} y - The y-coordinate of the new vertex.
      **/
     function Vertex(x, y) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Vertex";
         /*if( x instanceof Vertex ) {
             this.x = x.x;
             this.y = x.y;
@@ -75,8 +81,8 @@ var Vertex = /** @class */ (function () {
                     this.y = NaN;
             }
         }
-        this.attr = new VertexAttr();
-        this.listeners = new VertexListeners(this);
+        this.attr = new VertexAttr_1.VertexAttr();
+        this.listeners = new VertexListeners_1.VertexListeners(this);
     }
     ;
     /**
@@ -527,4 +533,5 @@ var Vertex = /** @class */ (function () {
     };
     return Vertex;
 }());
+exports.Vertex = Vertex;
 //# sourceMappingURL=Vertex.js.map

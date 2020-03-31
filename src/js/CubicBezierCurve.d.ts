@@ -23,7 +23,8 @@
  * @file CubicBezierCurve
  * @public
  **/
-declare class CubicBezierCurve {
+import { Vertex } from "./Vertex";
+export declare class CubicBezierCurve {
     /** @constant {number} */
     static readonly START_POINT: number;
     /** @constant {number} */

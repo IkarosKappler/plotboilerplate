@@ -14,13 +14,15 @@
  * @file VertexListeners
  * @public
  **/
-interface VertEventParams extends XMouseParams {
+import { Vertex } from "./Vertex";
+import { XMouseParams, XMouseEvent } from "./MouseHandler";
+export interface VertEventParams extends XMouseParams {
     vertex: Vertex;
 }
-interface VertEvent {
+export interface VertEvent {
     params: VertEventParams;
 }
-declare class VertexListeners {
+export declare class VertexListeners {
     drag: Array<(e: VertEvent) => void>;
     dragStart: Array<(e: VertEvent) => void>;
     dragEnd: Array<(e: VertEvent) => void>;

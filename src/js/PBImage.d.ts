@@ -14,7 +14,13 @@
  *               and height thei are not suitable for UI dragging interfaces.
  * @public
  **/
-declare class PBImage implements SVGSerializable {
+import { Vertex } from "./Vertex";
+import { SVGSerializable } from "./interfaces";
+export declare class PBImage implements SVGSerializable {
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className: string;
     /**
      * @member {Vertex}
      * @memberof PBImage

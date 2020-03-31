@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A default SVG builder.
  *
@@ -14,14 +15,7 @@
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @version  1.0.3
  **/
-// This is a hotfix for the problem, that the constructor's "name" attribute is not
-// visible in ES6:
-//   >> The 'name' property is part of ES6 that's why you don't see it in lib.d.ts.
-//   >> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
-// ... does this collide with anything?
-//interface Function {
-//    name: string;
-//}
+Object.defineProperty(exports, "__esModule", { value: true });
 var SVGBuilder = /** @class */ (function () {
     function SVGBuilder() {
     }
@@ -33,8 +27,11 @@ var SVGBuilder = /** @class */ (function () {
      * @param {object}   options  - { canvasSize, zoom, offset }
      * @return {string}
      **/
+    //build( drawables:Array<{toSVGString:(options:{className?:string})=>string}>,
+    //	   options:{canvasSize:{width:number,height:number},zoom:Vertex,offset:Vertex}
+    //	 ) {
     SVGBuilder.prototype.build = function (drawables, options) {
-        // options = options || {};
+        // TODO: use SVGSerializable interface here
         var nl = '\n';
         var indent = '  ';
         var buffer = [];
@@ -74,11 +71,11 @@ var SVGBuilder = /** @class */ (function () {
             var d = drawables[i];
             if (typeof d.toSVGString == 'function') {
                 buffer.push(indent + indent);
-                buffer.push(d.toSVGString({ 'className': d.constructor.name }));
+                buffer.push(d.toSVGString({ 'className': d.className }));
                 buffer.push(nl);
             }
             else {
-                console.warn('Unrecognized drawable type has no toSVGString()-function. Ignoring: ' + d.constructor.name);
+                console.warn('Unrecognized drawable type has no toSVGString()-function. Ignoring: ' + d.className);
             }
         }
         buffer.push(indent + '</g>' + nl);
@@ -88,4 +85,5 @@ var SVGBuilder = /** @class */ (function () {
     ;
     return SVGBuilder;
 }());
+exports.SVGBuilder = SVGBuilder;
 //# sourceMappingURL=SVGBuilder.js.map

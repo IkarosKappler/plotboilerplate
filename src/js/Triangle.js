@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -31,6 +32,9 @@
  * @file Triangle
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Polygon_1 = require("./Polygon");
+var Vertex_1 = require("./Vertex");
 var Triangle = /** @class */ (function () {
     /**
      * Used in the bounds() function.
@@ -65,6 +69,10 @@ var Triangle = /** @class */ (function () {
      * @param {Vertex} c - The third vertex of the triangle.
      **/
     function Triangle(a, b, c) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Triangle";
         this.a = a;
         this.b = b;
         this.c = c;
@@ -101,7 +109,7 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      **/
     Triangle.prototype.getCentroid = function () {
-        return new Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
+        return new Vertex_1.Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
     };
     ;
     /**
@@ -208,14 +216,14 @@ var Triangle = /** @class */ (function () {
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
             var bounds = this.bounds();
-            this.center = new Vertex((bounds.xMin + bounds.xMax) / 2, (bounds.yMin + bounds.yMax) / 2);
+            this.center = new Vertex_1.Vertex((bounds.xMin + bounds.xMax) / 2, (bounds.yMin + bounds.yMax) / 2);
             dx = this.center.x - bounds.xMin;
             dy = this.center.y - bounds.yMin;
         }
         else {
             var cx = (D * E - B * F) / G;
             var cy = (A * F - C * E) / G;
-            this.center = new Vertex(cx, cy);
+            this.center = new Vertex_1.Vertex(cx, cy);
             dx = this.center.x - this.a.x;
             dy = this.center.y - this.a.y;
         }
@@ -267,7 +275,7 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      **/
     Triangle.prototype.toPolygon = function () {
-        return new Polygon([this.a, this.b, this.c]);
+        return new Polygon_1.Polygon([this.a, this.b, this.c]);
     };
     ;
     /**
@@ -379,4 +387,5 @@ var Triangle = /** @class */ (function () {
     };
     return Triangle;
 }());
+exports.Triangle = Triangle;
 //# sourceMappingURL=Triangle.js.map

@@ -18,7 +18,14 @@
  * @file Polygon
  * @public
  **/
-declare class Polygon implements SVGSerializable {
+import { BezierPath } from "./BezierPath";
+import { Vertex } from "./Vertex";
+import { SVGSerializable } from "./interfaces";
+export declare class Polygon implements SVGSerializable {
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className: string;
     /**
      * @member {Array<Vertex>}
      * @memberof Polygon

@@ -11,7 +11,14 @@
  * @version  0.0.3
  **/
 
-class drawutilsgl {
+
+import { CubicBezierCurve } from "./CubicBezierCurve";
+import { Polygon } from "./Polygon";
+import { Vertex } from "./Vertex";
+import { XYCoords, SVGSerializable} from "./interfaces";
+
+
+export class drawutilsgl {
     
     // Vertex shader source code
     private static vertCode : string = `

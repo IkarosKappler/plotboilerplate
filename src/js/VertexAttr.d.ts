@@ -17,14 +17,14 @@
  * @file VertexAttr
  * @public
  **/
-interface IVertexAttr {
+export interface IVertexAttr {
     draggable: boolean;
     selectable: boolean;
     isSelected: boolean;
     bezierAutoAdjust?: boolean;
     renderTime?: number;
 }
-declare class VertexAttr implements IVertexAttr {
+export declare class VertexAttr implements IVertexAttr {
     /**
      * @member {VertexAttr}
      * @memberof VertexAttr

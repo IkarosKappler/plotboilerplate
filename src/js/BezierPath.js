@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A refactored BezierPath class.
  *
@@ -23,6 +24,9 @@
  * @file BezierPath
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var CubicBezierCurve_1 = require("./CubicBezierCurve");
+var Vertex_1 = require("./Vertex");
 var BezierPath = /** @class */ (function () {
     /**
      * The constructor.<br>
@@ -37,6 +41,10 @@ var BezierPath = /** @class */ (function () {
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
     function BezierPath(pathPoints) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "BezierPath";
         /** @constant {number} */
         this.START_POINT = 0;
         /** @constant {number} */
@@ -846,8 +854,8 @@ var BezierPath = /** @class */ (function () {
     // !!! TODO: SHOULDNT THIS BE A STATIC FUNCTION ???
     BezierPath.prototype.adjustNeighbourControlPoint = function (mainCurve, neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, updateArcLengths) {
         // Calculate start handle length
-        var mainHandleBounds = new Vertex(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
-        var neighbourHandleBounds = new Vertex(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
+        var mainHandleBounds = new Vertex_1.Vertex(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
+        var neighbourHandleBounds = new Vertex_1.Vertex(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
         var mainHandleLength = Math.sqrt(Math.pow(mainHandleBounds.x, 2) + Math.pow(mainHandleBounds.y, 2));
         var neighbourHandleLength = Math.sqrt(Math.pow(neighbourHandleBounds.x, 2) + Math.pow(neighbourHandleBounds.y, 2));
         if (mainHandleLength <= 0.1)
@@ -1001,16 +1009,16 @@ var BezierPath = /** @class */ (function () {
         for (var i = 0; i < arr.length; i++) {
             // Convert object (or array?) to bezier curve
             var bCurve = null;
-            if (CubicBezierCurve.isInstance(arr[i])) {
+            if (CubicBezierCurve_1.CubicBezierCurve.isInstance(arr[i])) {
                 bCurve = arr[i].clone();
             }
             else if (0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i]) {
                 if (!arr[i][0] || !arr[i][1] || !arr[i][2] || !arr[i][3])
                     throw "Cannot convert path data to BezierPath instance. At least one element is undefined (index=" + i + "): " + arr[i];
-                bCurve = CubicBezierCurve.fromArray(arr[i]);
+                bCurve = CubicBezierCurve_1.CubicBezierCurve.fromArray(arr[i]);
             }
             else {
-                bCurve = CubicBezierCurve.fromObject(arr[i]);
+                bCurve = CubicBezierCurve_1.CubicBezierCurve.fromObject(arr[i]);
             }
             // Set curve start point?
             // (avoid duplicate point instances!)
@@ -1102,11 +1110,11 @@ var BezierPath = /** @class */ (function () {
         var i = 0;
         do {
             if (i == 0)
-                startPoint = new Vertex(pointArray[i], pointArray[i + 1]);
-            startControlPoint = new Vertex(pointArray[i + 2], pointArray[i + 3]);
-            endControlPoint = new Vertex(pointArray[i + 4], pointArray[i + 5]);
-            endPoint = new Vertex(pointArray[i + 6], pointArray[i + 7]);
-            var bCurve = new CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint);
+                startPoint = new Vertex_1.Vertex(pointArray[i], pointArray[i + 1]);
+            startControlPoint = new Vertex_1.Vertex(pointArray[i + 2], pointArray[i + 3]);
+            endControlPoint = new Vertex_1.Vertex(pointArray[i + 4], pointArray[i + 5]);
+            endPoint = new Vertex_1.Vertex(pointArray[i + 6], pointArray[i + 7]);
+            var bCurve = new CubicBezierCurve_1.CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint);
             bezierPath.bezierCurves.push(bCurve);
             startPoint = endPoint;
             i += 6;
@@ -1160,4 +1168,5 @@ var BezierPath = /** @class */ (function () {
     BezierPath.END_POINT = 3;
     return BezierPath;
 }());
+exports.BezierPath = BezierPath;
 //# sourceMappingURL=BezierPath.js.map

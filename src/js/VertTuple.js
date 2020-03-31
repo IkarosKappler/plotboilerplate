@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vertex_1 = require("./Vertex");
 var VertTuple = /** @class */ (function () {
     /**
      * Creates an instance.
@@ -120,7 +123,7 @@ var VertTuple = /** @class */ (function () {
      **/
     VertTuple.prototype.angle = function (line) {
         if (typeof line == 'undefined')
-            line = this.factory(new Vertex(0, 0), new Vertex(100, 0)); // new Line( new Vertex(0,0), new Vertex(100,0) );
+            line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0)); // new Line( new Vertex(0,0), new Vertex(100,0) );
         // Compute the angle from x axis and the return the difference :)
         var v0 = this.b.clone().sub(this.a);
         var v1 = line.b.clone().sub(line.a);
@@ -142,7 +145,7 @@ var VertTuple = /** @class */ (function () {
      * @memberof Line
      **/
     VertTuple.prototype.vertAt = function (t) {
-        return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
+        return new Vertex_1.Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
     };
     ;
     /**
@@ -167,7 +170,7 @@ var VertTuple = /** @class */ (function () {
      * @return true if both lines are co-linear.
      */
     VertTuple.prototype.colinear = function (line) {
-        return Math.abs(this.denominator(line)) < Vertex.EPSILON;
+        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
     };
     ;
     /**
@@ -262,4 +265,5 @@ var VertTuple = /** @class */ (function () {
     };
     return VertTuple;
 }());
+exports.VertTuple = VertTuple;
 //# sourceMappingURL=VertTuple.js.map

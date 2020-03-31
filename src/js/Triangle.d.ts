@@ -31,7 +31,14 @@
  * @file Triangle
  * @public
  **/
-declare class Triangle implements SVGSerializable {
+import { Polygon } from "./Polygon";
+import { Vertex } from "./Vertex";
+import { SVGSerializable } from "./interfaces";
+export declare class Triangle implements SVGSerializable {
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className: string;
     /**
      * An epsilon for comparison.
      * This should be the same epsilon as in Vertex.

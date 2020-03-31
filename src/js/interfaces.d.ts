@@ -1,8 +1,16 @@
-interface XYCoords {
+import { Vertex } from "./Vertex";
+import { Vector } from "./Vector";
+import { Triangle } from "./Triangle";
+import { PBImage } from "./PBImage";
+import { VEllipse } from "./VEllipse";
+import { Polygon } from "./Polygon";
+import { BezierPath } from "./BezierPath";
+import { Line } from "./Line";
+export interface XYCoords {
     x: number;
     y: number;
 }
-interface XYDimension {
+export interface XYDimension {
     width: number;
     height: number;
 }
@@ -11,12 +19,12 @@ interface XYDimension {
  * @property {Vertex} min The upper left position.
  * @property {Vertex} max The lower right position;.
  */
-interface Bounds {
+export interface Bounds {
     min: XYCoords;
     max: XYCoords;
 }
-declare type Drawable = Vertex | Vector | Triangle | PBImage | VEllipse | Polygon | BezierPath | Line;
-interface Config {
+export declare type Drawable = Vertex | Vector | Triangle | PBImage | VEllipse | Polygon | BezierPath | Line;
+export interface Config {
     canvas: HTMLCanvasElement;
     fullSize?: boolean;
     fitToParent?: boolean;
@@ -51,13 +59,13 @@ interface Config {
     saveFile?: () => void;
     setToRetina?: () => void;
 }
-interface PBParams extends Config, DrawSettings {
+export interface PBParams extends Config, DrawSettings {
 }
-interface DrawSettings {
+export interface DrawSettings {
     color: string;
     lineWidth: number;
 }
-interface DrawConfig {
+export interface DrawConfig {
     drawVertices: boolean;
     drawBezierHandleLines?: boolean;
     drawBezierHandlePoints?: boolean;
@@ -77,10 +85,14 @@ interface DrawConfig {
     vector: DrawSettings;
     image: DrawSettings;
 }
-interface Function {
+export interface Function {
     readonly name: string;
 }
-interface SVGSerializable {
+export interface SVGSerializable {
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className: string;
     /**
      * Convert this vertex to SVG code.
      *
@@ -94,6 +106,6 @@ interface SVGSerializable {
         className?: string;
     }) => string;
 }
-interface IHooks {
+export interface IHooks {
     saveFile: () => void;
 }

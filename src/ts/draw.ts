@@ -31,8 +31,14 @@
  * @version  1.5.3
  **/
 
+import { CubicBezierCurve } from "./CubicBezierCurve";
+import { Polygon } from "./Polygon";
+import { Vertex } from "./Vertex";
+import { XYCoords, SVGSerializable} from "./interfaces";
+
+
 // Todo: rename this class to Drawutils
-class drawutils {
+export class drawutils {
 
     /** 
      * @member {CanvasRenderingContext2D} 

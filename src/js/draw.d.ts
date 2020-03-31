@@ -30,7 +30,10 @@
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @version  1.5.3
  **/
-declare class drawutils {
+import { Polygon } from "./Polygon";
+import { Vertex } from "./Vertex";
+import { XYCoords } from "./interfaces";
+export declare class drawutils {
     /**
      * @member {CanvasRenderingContext2D}
      * @memberof drawutils

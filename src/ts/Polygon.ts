@@ -19,10 +19,20 @@
  * @public
  **/
 
+import { BezierPath } from "./BezierPath";
+import { Vertex } from "./Vertex";
+import { XYCoords, SVGSerializable} from "./interfaces";
 
 
-class Polygon implements SVGSerializable {
+export class Polygon implements SVGSerializable {
 
+
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string = "Polygon";
+
+    
     /** 
      * @member {Array<Vertex>} 
      * @memberof Polygon

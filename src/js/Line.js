@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
@@ -36,6 +37,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+Object.defineProperty(exports, "__esModule", { value: true });
+var VertTuple_1 = require("./VertTuple");
+var Vertex_1 = require("./Vertex");
 var Line = /** @class */ (function (_super) {
     __extends(Line, _super);
     /**
@@ -47,7 +51,12 @@ var Line = /** @class */ (function (_super) {
      * @param {Vertex} b The line's second point.
      **/
     function Line(a, b) {
-        return _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
+        var _this = _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        _this.className = "Line";
+        return _this;
     }
     /**
      * Get the intersection if this line and the specified line.
@@ -70,7 +79,7 @@ var Line = /** @class */ (function (_super) {
         a = numerator1 / denominator; // NaN if parallel lines
         b = numerator2 / denominator;
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
+        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
     };
     ;
     /**
@@ -98,5 +107,6 @@ var Line = /** @class */ (function (_super) {
     };
     ;
     return Line;
-}(VertTuple));
+}(VertTuple_1.VertTuple));
+exports.Line = Line;
 //# sourceMappingURL=Line.js.map

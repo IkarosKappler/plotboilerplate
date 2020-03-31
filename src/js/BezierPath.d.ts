@@ -23,7 +23,14 @@
  * @file BezierPath
  * @public
  **/
-declare class BezierPath implements SVGSerializable {
+import { CubicBezierCurve } from "./CubicBezierCurve";
+import { Vertex } from "./Vertex";
+import { SVGSerializable } from "./interfaces";
+export declare class BezierPath implements SVGSerializable {
+    /**
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className: string;
     /**
      * @member {Array<Vertex>}
      * @memberof BezierPath
