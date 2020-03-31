@@ -1,9 +1,14 @@
 {
     "compilerOptions": {
-	"outDir": "./src/ts-to-js"
+	"outDir": "./src/js",
+	"module": "commonjs",
+	"target": "es5",
+	"lib": [ "es2015", "dom" ],
+	"sourceMap": true,
+	"declaration": true
     },
     "inclue": ["./src/ts/*"],
-    "exclude": ["./tmp","./src/ts-to-js" ],
+    "exclude": ["./tmp","./src/js","./src/vanilla"],
     "removeComments": false,
-    "allowJs": true
+    // "allowJs": true,
 }

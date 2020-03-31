@@ -18,6 +18,7 @@
     window.addEventListener(
 	'load',
 	function() {
+	    // console.log( pb ) // typeof PlotBoilerplate );
 	    // All config params are optional.
 	    var pb = new PlotBoilerplate(
 		PlotBoilerplate.utils.safeMergeByKeys(

@@ -1,6 +1,11 @@
 
 
 # Changelog
+* 2020-03-30
+  * Ported the main class of PlotBoilerplate to Typescript.
+  * Moved the RectSelector from the main class to the demo section.
+  * Added a utils wrapper that intializes the GUI (dat.gui.GUI).
+  * Updated the logistic-map demo.
 * 2020-03-28
   * Ported following classes to Typescript: KeyHandler.
 * 2020-03-25

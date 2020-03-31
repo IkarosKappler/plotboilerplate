@@ -520,9 +520,10 @@ for this purpose.
  * Use the new Bounds class in the RectSelector helper then.
  * Add an interface Drawable.ts and add the to the PlotBoilerplate and to the SVGBuilder.
  * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
+ 
 
 
-## Todos for future Version 2 (not backwards compatible)
+### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
  * Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
  * Change BezierPath.getPointAt to .getVertexAt (or .getVertAt or vertAt?).
@@ -530,6 +531,7 @@ for this purpose.
  * Rename BezierPath.adjustCircular to .isCircular, because cirularity does not only affect vertex adjustment.
  * The inverse-functions are called Vertex.inv() but Vector.inverse(). Harmonize this.
  * CubicBezierCurve.getTangentAt(number) and .getTangent(number) return Vertex, why not a Vector?
+ 
 
 
 ## Browsers support
@@ -538,6 +540,7 @@ for this purpose.
 | --------- | --------- | --------- | --------- |
 | IE11 & Edge| latest    | latest    | latest    |
   
+
 
 
 ### Credits

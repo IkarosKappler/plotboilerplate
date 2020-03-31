@@ -31,12 +31,10 @@
  * @public
  **/
 
-/* 
-type XYTuple = {
-    x : number;
-    y : number;
-}
-*/
+
+//import VertAttr from "./VertAttr";
+//import { XYCoords, SVGSerializable} from "./interfaces";
+
 
 class Vertex implements XYCoords, SVGSerializable {
 

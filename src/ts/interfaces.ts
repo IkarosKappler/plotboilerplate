@@ -109,7 +109,7 @@ interface DrawConfig {
 //   >> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
 // ... does this collide with anything?
 interface Function {
-    name: string;
+    readonly name: string;
 }
 
 interface SVGSerializable {
