@@ -9,7 +9,7 @@
  * @version 1.0.0
  **/
 
-var utils = {
+var utils = window.utils = {
     /**
      * Creates a control GUI (a dat.gui instance) for this 
      * plot boilerplate instance.

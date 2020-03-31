@@ -1,30 +1,23 @@
 "use strict";
 /* Imports for webpack */
-Object.defineProperty(exports, "__esModule", { value: true });
-// import './exposeClass.ts';
-// import './extend.js';
-require("./VertexAttr.ts");
-require("./VertexListeners.ts");
-require("./Vertex.ts");
-//const Vertex = require('./Vertex.js').default;
-require("./Grid.ts");
-require("./Line.ts");
-require("./Vector.ts");
-require("./CubicBezierCurve.ts");
-require("./BezierPath.ts");
-require("./Polygon.ts");
-require("./Triangle.ts");
-require("./VEllipse.ts");
-require("./PBImage.ts");
-require("./MouseHandler.ts");
-require("./KeyHandler.ts");
-require("./draw.ts");
-require("./PlotBoilerplate.ts");
-//const PlotBoilerplate = require('./PlotBoilerplate.js').default;
-// import './PlotBoilerplate.RectSelector.js';
-// module.exports = [ Vertex, PlotBoilerplate ];
-//module.exports = PlotBoilerplate; // HelloWorld;
-// export Vertex;
-// const HelloWorld = require('./components/hello-world').default;
-// module.exports = PlotBoilerplate;
-//# sourceMappingURL=entry.js.map
+// Object.defineProperty(exports, "__esModule", { value: true });
+
+window.VertexAttr = require("./VertexAttr.js").VertexAttr;
+window.VertexListeners = require("./VertexListeners.js").VertexListeners;
+window.Vertex = require("./Vertex.js").Vertex;
+
+window.Grid = require("./Grid.js").Grid;
+window.Line = require("./Line.js").Line;
+window.Vector = require("./Vector.js").Vector;
+window.CubicBezierCurve = require("./CubicBezierCurve.js").CubicBezierCurve;
+window.BezierPath = require("./BezierPath.js").BezierPath;
+window.Polygon = require("./Polygon.js").Polygon;
+window.Triangle = require("./Triangle.js").Triangle;
+window.VEllipse = require("./VEllipse.js").VEllipse;
+window.PBImage = require("./PBImage.js").PBImage;
+window.MouseHandler = require("./MouseHandler.js").MouseHandler;
+window.KeyHandler = require("./KeyHandler.js").KeyHandler;
+window.drawutils = require("./draw.js").drawutils;
+window.drawutilsgl = require("./drawgl.js").drawutilsgl;
+window.PlotBoilerplate = require("./PlotBoilerplate.js").PlotBoilerplate;
+

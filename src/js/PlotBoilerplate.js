@@ -63,6 +63,7 @@ var draw_1 = require("./draw");
 var drawgl_1 = require("./drawgl");
 var BezierPath_1 = require("./BezierPath");
 var Grid_1 = require("./Grid");
+var KeyHandler_1 = require("./KeyHandler");
 var Line_1 = require("./Line");
 var MouseHandler_1 = require("./MouseHandler");
 var PBImage_1 = require("./PBImage");
@@ -1260,7 +1261,7 @@ var PlotBoilerplate = /** @class */ (function () {
         if (this.config.enableKeys) {
             // Install key handler
             // var keyHandler : KeyHandler = new KeyHandler( { trackAll : true } )
-            this.keyHandler = new KeyHandler({ trackAll: true })
+            this.keyHandler = new KeyHandler_1.KeyHandler({ trackAll: true })
                 .down('escape', function () {
                 _self.clearSelection(true);
             })

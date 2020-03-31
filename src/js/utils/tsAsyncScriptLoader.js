@@ -15,14 +15,23 @@
 // Prevent plotboilerplate from auto-loading.
 window.pbPreventAutoLoad = true;
 
+// This simulates the 'export' and 'require' directives.
+// There is no other way than to define these global!
+var exports = window.exports = window;
+var require = window.require = function(...args) { console.log(args); return window; };
+
 (function() {
 
     // Start the process when the document is fully loaded.
     window.addEventListener('load', function() {
-	var tsRunner = new TSRunner( function(status) {
-	    console.log(status ? '===> Typescript successfully loaded.' : '===> Error loading typescript.' );
-            loadJSFiles();
-	} );
+	var tsRunner = new TSRunner(
+	    function(status) {
+		console.log(status ? '===> Typescript successfully loaded.' : '===> Error loading typescript.' );
+		loadJSFiles();
+		window.initializePB();
+	    },
+	    true  // concat codes to one single 'file'
+	);
 	tsRunner.processTypescript();
     } );
 
@@ -33,28 +42,30 @@ window.pbPreventAutoLoad = true;
      */
     var loadJSFiles = function() {
 	var jsSources = [
-	    "src/extend.js",
-	    "src/SVGBuilder.js",
-	    // "src/VertexAttr.js",      // already ported to TS 2020-03-23
-	    // "src/VertexListeners.js", // already ported to TS 2020-03-23
-	    // "src/Vertex.js",          // already ported to TS 2020-03-20
-	    "src/Grid.js",
+	    /*
+	    "src/js/extend.js",
+	    "src/js/SVGBuilder.js",
+	    // "src/js/VertexAttr.js",      // already ported to TS 2020-03-23
+	    // "src/js/VertexListeners.js", // already ported to TS 2020-03-23
+	    // "src/js/Vertex.js",          // already ported to TS 2020-03-20
+	    "src/js/Grid.js",
 	    // "src/Line.js",            // already ported to TS 2020-03-20
-	    "src/Vector.js",
-	    "src/CubicBezierCurve.js",
-	    "src/BezierPath.js",
-	    "src/Polygon.js",
-	    "src/Triangle.js",
-	    "src/VEllipse.js",
-	    "src/PBImage.js",
+	    "src/js/Vector.js",
+	    "src/js/CubicBezierCurve.js",
+	    "src/js/BezierPath.js",
+	    "src/js/Polygon.js",
+	    "src/js/Triangle.js",
+	    "src/js/VEllipse.js",
+	    "src/js/PBImage.js",
 	    
-	    "src/MouseHandler.js",
-	    "src/KeyHandler.js",
-	    "src/draw.js",
+	    "src/js/MouseHandler.js",
+	    "src/js/KeyHandler.js",
+	    "src/js/draw.js",
 	    
-	    "src/PlotBoilerplate.js",
+	    "src/js/PlotBoilerplate.js",
 	    // "demos/gup.js"
 	    // "src/index.js"
+	    */
 	];
 	var head = document.getElementsByTagName('head')[0];
 	var scriptsLoaded = 0;

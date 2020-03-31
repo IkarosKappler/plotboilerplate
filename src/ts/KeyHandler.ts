@@ -20,13 +20,13 @@
  * @version  1.0.1
  **/
 
-interface XKeyListener {
+export interface XKeyListener {
     key : string;
     keyCode : number; 
     listener : (event:KeyboardEvent)=>void;
 }
 
-class KeyHandler {
+export class KeyHandler {
 
 
     private element           : HTMLElement | Window;

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html class="fullscreen">
+  <head>
+    <title>2D Plotting Boilerplate – A basic Demo</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A simple demo so start with.">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, curve">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2019-02-20">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="A basic test for PlotBoilerplate.js.">
+    <meta property="og:description" content="A basic test for PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png">
+
+    <!-- Load the typescript compiler/transpiler -->
+    <script src="https://www.int2byte.de/public/typescript-transpile/lib/typescriptService.js"></script>
+    <!-- Load the helper functions library for Typescript -->
+    <script src="https://www.int2byte.de/public/typescript-transpile/lib/tslib.js"></script>
+    
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/Color.js"></script>
+    <script src="../../lib/Touchy.js"></script>
+
+    <script src="../../src/js/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../../src/js/utils/dat.gui.arrowbounce.polyfill.js"></script>
+    <script src="../../src/js/utils/creategui.js"></script>
+    <script src="../../src/js/utils/gup.js"></script>
+    <script src="../../src/js/utils/tsAsyncScriptLoader.js"></script>
+    <script src="../../src/js/utils/ts-runner.js"></script>
+
+    <!-- <script src="../../dist/plotboilerplate.js"></script> -->
+    <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
+
+    <script language="typescript" type="text/typescript" src="../../src/ts/VertTuple.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/VertexAttr.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/VertexListeners.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/Vertex.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/Grid.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/Line.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/Vector.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/CubicBezierCurve.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/BezierPath.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/Polygon.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/Triangle.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/VEllipse.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/PBImage.ts"></script>
+
+    <script language="typescript" type="text/typescript" src="../../src/ts/MouseHandler.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/KeyHandler.ts"></script>
+    <script language="typescript" type="text/typescript" src="../../src/ts/draw.ts"></script>
+
+    <script language="typescript" type="text/typescript" src="../../src/ts/PlotBoilerplate.ts"></script>
+
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="../style.css"> 
+  </head>
+  <body class="fullscreen">
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+
+    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+
+    <div class="info monospace">
+      [<span id="cx">-</span>,<span id="cy">-</span>]
+    </div>
+
+  </body>
+</html>

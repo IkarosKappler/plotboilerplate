@@ -63,6 +63,7 @@ import { drawutilsgl } from "./drawgl";
 import { BezierPath } from "./BezierPath";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Grid } from "./Grid";
+import { KeyHandler, XKeyListener } from "./KeyHandler";
 import { Line } from "./Line";
 import { MouseHandler, XMouseEvent, XWheelEvent } from "./MouseHandler";
 import { PBImage } from "./PBImage";

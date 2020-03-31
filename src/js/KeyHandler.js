@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A generic key handler.
  *
@@ -19,6 +20,7 @@
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @version  1.0.1
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
 var KeyHandler = /** @class */ (function () {
     /**
      * The constructor.
@@ -389,4 +391,5 @@ var KeyHandler = /** @class */ (function () {
     };
     return KeyHandler;
 }());
+exports.KeyHandler = KeyHandler;
 //# sourceMappingURL=KeyHandler.js.map

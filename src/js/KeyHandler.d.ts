@@ -19,12 +19,12 @@
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @version  1.0.1
  **/
-interface XKeyListener {
+export interface XKeyListener {
     key: string;
     keyCode: number;
     listener: (event: KeyboardEvent) => void;
 }
-declare class KeyHandler {
+export declare class KeyHandler {
     private element;
     private downListeners;
     private pressListeners;
