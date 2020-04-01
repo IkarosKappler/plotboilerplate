@@ -11,7 +11,7 @@ cp -R ../screenshots/ .
 ./generate-demo-page.sh
 
 # Use thie docs build script instead
-(cd .. && ./mkdocs.sh)
+(cd .. && ./run-mkdocs.sh)
 
 
 echo "Building markdown page from template and readme ..."

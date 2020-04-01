@@ -4,9 +4,11 @@
 > sudo apt-get install curl python-software-properties
 > curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
 
-## Init and install webpack
+#### Init and install webpack
 > npm init
 > npm install webpack
+Or install frm the package.json
+> npm install
 
 Then create your webpack.config.js file.
 
@@ -16,10 +18,10 @@ Then create your webpack.config.js file.
 See https://doc.esdoc.org/github.com/esdoc/esdoc/manual/index.html
 
 ~~~
-# Move to a your project directory.
+### Move to a your project directory.
 cd your-project/
 
-# Install ESDoc and standard plugin.
+### Install ESDoc and standard plugin.
 npm install --save-dev esdoc esdoc-standard-plugin
 
 # Create a configuration file.
@@ -29,15 +31,34 @@ echo '{
   "plugins": [{"name": "esdoc-standard-plugin"}]
 }' > .esdoc.json
 
-# Run ESDoc.
+### Run ESDoc.
 ./node_modules/.bin/esdoc
 
-# View a documentation
+### View a documentation
 open ./docs/index.html
 ~~~
 
 
 
-### Note
+## Install Jekyll
+cd docs_jekyll
+
+### Option A: Install the bundler the classical way
+sudo gem install bundler
+
+### Option B: Install bundler in your user-dir (if missing permissions for /usr/local)
+export PATH=$HOME/.gem/ruby/2.5.0/bin/:$PATH
+gem install bundler --user-install
+
+### Option C: Ob Ubuntu you can just install the ubuntu package
+sudo apt-get install ruby-bundler
+
+#### Install the required version of bundler
+sudo gem install bundler -v 2.0.1
+#### This will install the dependencies (like jekyll) from the Gemfile
+bundler
+
+
+## Note
 For implementing arcs use
 * SVG-arcto to Canvas-arc transform from [canvg](https://github.com/canvg/canvg "canvg") by Gabe Lerner

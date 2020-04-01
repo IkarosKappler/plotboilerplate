@@ -1,13 +1,33 @@
 ---
 layout: page
+title: Changelog
 ---
 
 
 # Changelog
+  * 2020-03-31
+  * Reconfigured the typescript compiler for es5.
+  * Recondifgued webpack.
+  * Tweaked the main demo for some moved files.
+* 2020-03-30
+  * Ported the main class of PlotBoilerplate to Typescript.
+  * Moved the RectSelector from the main class to the demo section.
+  * Added a utils wrapper that intializes the GUI (dat.gui.GUI).
+  * Updated the logistic-map demo.
+* 2020-03-28
+  * Ported following classes to Typescript: KeyHandler.
+* 2020-03-25
+  * Ported following classes to Typescript: drawutils, drawutilsgl, Grid, VEllipse, Triangle, SVGBuilder, MouseHandler.
+ * 2020-03-24
+  * Ported following classes to Typescript: CubicBezierCurve, BezierPath, Polygon, gup.
+  * Added VertTuple<T> to solve the subclassing and clonable problem.
+* 2020-03-23
+  * Ported following classes to Typescript: Vertex, Line, VertexAttr, VertexListeners.
 * 2020-03-17
   * Added the Triangle.toPolygon() function.
   * Added proper JSDoc tags to the Triangle class.
   * Added a new demo: ported the Morley-Triangle visualization (from an older project).
+  * Fixed an issue in the safeMergeKeys function ('funcion' type was flawed).
 * 2020-03-16
   * Added Triangle.fromArray(Array) function.
   * The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.

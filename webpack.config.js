@@ -2,8 +2,6 @@ const webpack = require('webpack');
 const path = require('path');
 // const GitRevisionPlugin = require("git-revision-webpack-plugin");
 const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
-
-// const WebpackUglifyHarmonyPlugin = require('webpack-uglify-harmony');
 const WebpackUglifyHarmonyPlugin = require('webpack-uglify-harmony-plugin');
 
 module.exports = [
@@ -12,7 +10,8 @@ module.exports = [
 	optimization: {
 	    
 	    minimizer: [
-		// we specify a custom UglifyJsPlugin here to get source maps in production
+		// We specify a custom UglifyJsPlugin here to
+		// get source maps in production.
 		new WebpackUglifyHarmonyPlugin({
 		    cache: true,
 		    parallel: true,

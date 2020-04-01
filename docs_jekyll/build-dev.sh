@@ -12,7 +12,7 @@ cp -R ../screenshots/ .
 ./generate-demo-page.sh
 
 # Use thie docs build script instead
-(cd .. && ./mkdocs.sh)
+(cd .. && ./run-mkdocs.sh)
 
 echo "Building markdown page from template and readme ..."
 echo '---' > index.md
@@ -35,8 +35,14 @@ if [ -f "_tracker.js" ]; then
     echo "/* No tracking code */" > _includes/_tracker.js
 fi
 
+
+# Checking link to local repo ...
+# ./run-createlinks.sh
+
+
 echo "Starting jekyll ..."
 bundle exec jekyll serve
+
 
 # Do not start with 'serve' if you want to compile for production!
 # bundle exec jekyll build

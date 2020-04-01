@@ -1,4 +1,8 @@
 {
+    "source": {
+        "includePattern": "src/js/.+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_|src/js/utils/(.*)"
+    },
     "templates" : {
 		"default" : {
 	    	"layoutFile" : "./docs_jekyll/jsdoc_template/layout.tmpl"

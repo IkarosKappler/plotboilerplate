@@ -33,11 +33,13 @@ exclude: [
   "yarn-error.log",
   "yarn.lock",
   "__partials",
-  "__index.original.html"
+  "__index.original.html",
+  "_site/repo"
 ]
 
 keep_files : [
-  "docs"
+  "docs",
+  "repo"
 ]
 
 # Build settings

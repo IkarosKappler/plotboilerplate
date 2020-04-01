@@ -49,7 +49,6 @@
     "@types/dat.gui": "^0.7.5",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.1.0",
-    "expose-loader": "^0.7.5",
     "file-saver": "^2.0.2",
     "git-revision-webpack-plugin": "^3.0.4",
     "jsdoc": "^3.6.3",
@@ -61,8 +60,6 @@
     "unminified-webpack-plugin": "^2.0.0",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "webpack-concat-plugin": "^3.0.0",
-    "webpack-uglify-harmony": "^1.0.0",
     "webpack-uglify-harmony-plugin": "^1.0.0"
   },
   "dependencies": {}
