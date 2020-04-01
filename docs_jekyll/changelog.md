@@ -5,9 +5,12 @@ title: Changelog
 
 
 # Changelog
-  * 2020-03-31
+* 2020-04-01
+  * Refactored Jekyll config to work with the new paths (post Typescript migration).
+  * Refactored the demos to work with the new paths (post Typescript migration).
+* 2020-03-31
   * Reconfigured the typescript compiler for es5.
-  * Recondifgued webpack.
+  * Reconfigured webpack.
   * Tweaked the main demo for some moved files.
 * 2020-03-30
   * Ported the main class of PlotBoilerplate to Typescript.
