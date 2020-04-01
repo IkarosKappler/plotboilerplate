@@ -9,7 +9,11 @@ while true; do
     esac
 done
 
-echo "Compile ..."
+echo "Compiling Typescript ..."
+npm run compile-typescript
+[ $? -eq 0 ]  || exit 1
+
+echo "Running webpack..."
 npm run webpack
 [ $? -eq 0 ]  || exit 1
 git add dist/plotboilerplate.min.js
@@ -26,7 +30,7 @@ fi
 
 
 echo "Publish ..."
-npm publish
+# npm publish
 
 echo ""
 echo " !!! Don't forget to upload the compiled package to your staging environment !!!"
