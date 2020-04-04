@@ -46,25 +46,25 @@ export declare class Vertex implements XYCoords, SVGSerializable {
      **/
     static readonly EPSILON = 0.000001;
     /**
-     * @member {Vertex}
+     * @member {number}
      * @memberof Vertex
      * @instance
      */
     x: number;
     /**
-     * @member {Vertex}
+     * @member {number}
      * @memberof Vertex
      * @instance
      */
     y: number;
     /**
-     * @member {Vertex}
+     * @member {IVertexAttr}
      * @memberof {Vertex}
      * @instance
      **/
     attr: IVertexAttr;
     /**
-     * @member {Vertex}
+     * @member {VertexListeners}
      * @memberof {Vertex}
      * @instance
      **/

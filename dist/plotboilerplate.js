@@ -6310,9 +6310,6 @@ var Draggable = /** @class */ (function () {
     function Draggable(item, typeName) {
         this.item = item;
         this.typeName = typeName;
-        //this.vindex = null;
-        //this.pindex = null;
-        //this.cindex = null;
     }
     ;
     Draggable.prototype.isVertex = function () { return this.typeName == Draggable.VERTEX; };
@@ -6383,16 +6380,12 @@ var PlotBoilerplate = /** @class */ (function () {
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
      */
     function PlotBoilerplate(config) {
-        // config = config || {};
         // This should be in some static block ...
         VertexAttr_1.VertexAttr.model = { bezierAutoAdjust: false, renderTime: 0, selectable: true, isSelected: false, draggable: true };
         if (typeof config.canvas == 'undefined')
             throw "No canvas specified.";
-        // +---------------------------------------------------------------------------------
-        // | A global config that's attached to the dat.gui control interface.
-        // +-------------------------------
         /**
-         * A config.
+         * A global config that's attached to the dat.gui control interface.
          *
          * @member {Object}
          * @memberof PlotBoilerplate
@@ -6406,7 +6399,6 @@ var PlotBoilerplate = /** @class */ (function () {
             scaleY: PlotBoilerplate.utils.fetch.num(config, 'scaleY', 1.0),
             offsetX: PlotBoilerplate.utils.fetch.num(config, 'offsetX', 0.0),
             offsetY: PlotBoilerplate.utils.fetch.num(config, 'offsetY', 0.0),
-            // drawGrid              : PlotBoilerplate.utils.fetch.bool(config,'drawGrid',true),
             rasterGrid: PlotBoilerplate.utils.fetch.bool(config, 'rasterGrid', true),
             rasterAdjustFactor: PlotBoilerplate.utils.fetch.num(config, 'rasterAdjustdFactror', 2.0),
             drawOrigin: PlotBoilerplate.utils.fetch.bool(config, 'drawOrigin', false),
@@ -6422,14 +6414,9 @@ var PlotBoilerplate = /** @class */ (function () {
             cssScaleX: PlotBoilerplate.utils.fetch.num(config, 'cssScaleX', 1.0),
             cssScaleY: PlotBoilerplate.utils.fetch.num(config, 'cssScaleY', 1.0),
             cssUniformScale: PlotBoilerplate.utils.fetch.bool(config, 'cssUniformScale', true),
-            // rebuild               : function() { rebuild(); },
-            saveFile: function () { _self.saveFile(); },
+            saveFile: function () { _self.hooks.saveFile(_self); },
             setToRetina: function () { _self._setToRetina(); },
             enableSVGExport: PlotBoilerplate.utils.fetch.bool(config, 'enableSVGExport', true),
-            //drawBezierHandleLines : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandleLines',true),
-            //drawBezierHandlePoints : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandlePoints',true),
-            // drawHandleLines       : PlotBoilerplate.utils.fetch.bool(config,'drawHandleLines',true),
-            // drawHandlePoints      : PlotBoilerplate.utils.fetch.bool(config,'drawHandlePoints',true),
             // Listeners/observers
             preClear: PlotBoilerplate.utils.fetch.func(config, 'preClear', null),
             preDraw: PlotBoilerplate.utils.fetch.func(config, 'preDraw', null),
@@ -6451,8 +6438,6 @@ var PlotBoilerplate = /** @class */ (function () {
          */
         this.drawConfig = {
             drawVertices: true,
-            //drawHandleLines : true,
-            //drawHandlePoints: true,
             drawBezierHandleLines: PlotBoilerplate.utils.fetch.bool(config, 'drawBezierHandleLines', true),
             drawBezierHandlePoints: PlotBoilerplate.utils.fetch.bool(config, 'drawBezierHandlePoints', true),
             drawHandleLines: PlotBoilerplate.utils.fetch.bool(config, 'drawHandleLines', true),
@@ -6521,12 +6506,13 @@ var PlotBoilerplate = /** @class */ (function () {
         this.drawables = [];
         this.console = console;
         this.hooks = {
-            saveFile: this._saveFile
+            // This is changable from the outside
+            saveFile: PlotBoilerplate._saveFile
         };
         var _self = this;
         // TODO: this should be placed in the caller and work for 'global', too!
         if (window)
-            window.addEventListener('resize', this.resizeCanvas);
+            window.addEventListener('resize', function () { return _self.resizeCanvas(); });
         this.resizeCanvas();
         this.installInputListeners();
         // Apply the configured CSS scale.
@@ -6548,15 +6534,15 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype._saveFile = function () {
-        var _self = this; // Does this work with self?
-        var svgCode = new SVGBuilder_1.SVGBuilder().build(_self.drawables, { canvasSize: _self.canvasSize, offset: _self.draw.offset, zoom: _self.draw.scale });
+    PlotBoilerplate._saveFile = function (pb) {
+        var svgCode = new SVGBuilder_1.SVGBuilder().build(pb.drawables, { canvasSize: pb.canvasSize, offset: pb.draw.offset, zoom: pb.draw.scale });
+        var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
-        //var blob:Blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
-        //saveAs(blob, "plot-boilerplate.svg");
-        // TODO
-        console.warn("Sorry, the typescript version does not yet saveFile again. Coming back soon.");
+        if (typeof window["saveAs"] != "function")
+            throw "Cannot save file; did you load the ./utils/savefile helper function an the eligrey/SaveFile library?";
+        var saveAs = window["saveAs"];
+        saveAs(blob, "plotboilerplate.svg");
     };
     ;
     PlotBoilerplate.prototype._setToRetina = function () {
@@ -6683,7 +6669,6 @@ var PlotBoilerplate = /** @class */ (function () {
                 bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
                 bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
             }
-            // for( var i in drawable.bezierCurves ) {
             for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
                 // This should be wrapped into the BezierPath implementation.
                 bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
@@ -7088,7 +7073,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.saveFile = function () {
-        this.hooks.saveFile();
+        this.hooks.saveFile(this);
     };
     ;
     /**
@@ -7148,7 +7133,7 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (_self.config.fitToParent) {
             // Set editor size
             _self.canvas.style.position = 'absolute';
-            var space = this.getAvailableContainerSpace(); //  _self.canvas.parentNode );
+            var space = this.getAvailableContainerSpace();
             _self.canvas.style.width = (_self.config.canvasWidthFactor * space.width) + 'px';
             _self.canvas.style.height = (_self.config.canvasHeightFactor * space.height) + 'px';
             _self.canvas.style.top = null;
@@ -7704,11 +7689,7 @@ var SVGBuilder = /** @class */ (function () {
      * @param {object}   options  - { canvasSize, zoom, offset }
      * @return {string}
      **/
-    //build( drawables:Array<{toSVGString:(options:{className?:string})=>string}>,
-    //	   options:{canvasSize:{width:number,height:number},zoom:Vertex,offset:Vertex}
-    //	 ) {
     SVGBuilder.prototype.build = function (drawables, options) {
-        // TODO: use SVGSerializable interface here
         var nl = '\n';
         var indent = '  ';
         var buffer = [];

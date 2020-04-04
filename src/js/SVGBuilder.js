@@ -27,11 +27,7 @@ var SVGBuilder = /** @class */ (function () {
      * @param {object}   options  - { canvasSize, zoom, offset }
      * @return {string}
      **/
-    //build( drawables:Array<{toSVGString:(options:{className?:string})=>string}>,
-    //	   options:{canvasSize:{width:number,height:number},zoom:Vertex,offset:Vertex}
-    //	 ) {
     SVGBuilder.prototype.build = function (drawables, options) {
-        // TODO: use SVGSerializable interface here
         var nl = '\n';
         var indent = '  ';
         var buffer = [];

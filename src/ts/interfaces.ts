@@ -7,6 +7,7 @@ import { VEllipse } from "./VEllipse";
 import { Polygon } from "./Polygon";
 import { BezierPath } from "./BezierPath";
 import { Line } from "./Line";
+import { PlotBoilerplate } from "./PlotBoilerplate";
 
 export interface XYCoords {
     x : number;
@@ -82,7 +83,7 @@ export interface Config {
 }
 
 export interface PBParams extends Config, DrawSettings {
-    // No additional attributes
+    // No additional attributes, just merge two interfaces.
 }
 
 export interface DrawSettings {
@@ -117,9 +118,9 @@ export interface DrawConfig {
 //   >> The 'name' property is part of ES6 that's why you don't see it in lib.d.ts.
 //   >> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
 // ... does this collide with anything?
-export interface Function {
-    readonly name: string;
-}
+//export interface Function {
+//    readonly name: string;
+//}
 
 export interface SVGSerializable {
 
@@ -140,12 +141,6 @@ export interface SVGSerializable {
     toSVGString : ( options:{ className?:string } ) => string;
 }
 
-/*
-interface XEvent {
-    params : XMouseParams;
-}
-*/
-
 export interface IHooks {
-    saveFile: ()=>void;
+    saveFile: (pb:PlotBoilerplate)=>void;
 }

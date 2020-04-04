@@ -19,10 +19,6 @@
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable } from "./interfaces";
 
-interface Function {
-    readonly name: string;
-}
-
 export class SVGBuilder {
 
     constructor() {};
@@ -35,13 +31,9 @@ export class SVGBuilder {
      * @param {object}   options  - { canvasSize, zoom, offset }
      * @return {string}
      **/
-    //build( drawables:Array<{toSVGString:(options:{className?:string})=>string}>,
-    //	   options:{canvasSize:{width:number,height:number},zoom:Vertex,offset:Vertex}
-    //	 ) {
     build( drawables:Array<SVGSerializable>,
 	   options:{canvasSize:{width:number,height:number},zoom:Vertex,offset:Vertex}
 	 ) {
-	// TODO: use SVGSerializable interface here
 	
 	var nl : string = '\n';
 	var indent : string = '  ';
@@ -85,7 +77,7 @@ export class SVGBuilder {
 	buffer.push( '>' + nl );
 	
 	for( var i in drawables ) {
-	    var d = drawables[i];
+	    var d : SVGSerializable = drawables[i];
 	    if( typeof d.toSVGString == 'function' ) {
 		buffer.push( indent + indent );
 		buffer.push( d.toSVGString( { 'className' : d.className } ) );

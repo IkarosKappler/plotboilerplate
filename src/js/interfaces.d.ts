@@ -6,6 +6,7 @@ import { VEllipse } from "./VEllipse";
 import { Polygon } from "./Polygon";
 import { BezierPath } from "./BezierPath";
 import { Line } from "./Line";
+import { PlotBoilerplate } from "./PlotBoilerplate";
 export interface XYCoords {
     x: number;
     y: number;
@@ -85,9 +86,6 @@ export interface DrawConfig {
     vector: DrawSettings;
     image: DrawSettings;
 }
-export interface Function {
-    readonly name: string;
-}
 export interface SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
@@ -107,5 +105,5 @@ export interface SVGSerializable {
     }) => string;
 }
 export interface IHooks {
-    saveFile: () => void;
+    saveFile: (pb: PlotBoilerplate) => void;
 }

@@ -86,16 +86,13 @@ class Draggable {
     static VERTEX:string = 'vertex';
     item:any;
     typeName:string;
-    vindex:number; // Vertex-index
-    pindex:number; // Point-index (on curve)
-    pid:number; // NOT IN USE (same as pindex?)
-    cindex:number; // Curve-index
+    vindex:number;   // Vertex-index
+    pindex:number;   // Point-index (on path)
+    pid:number;      // Point-ID (on curve)
+    cindex:number;   // Curve-index
     constructor( item:any, typeName:string ) {
 	this.item = item;
 	this.typeName = typeName;
-	//this.vindex = null;
-	//this.pindex = null;
-	//this.cindex = null;
     };
     isVertex() { return this.typeName == Draggable.VERTEX; };
     setVIndex(vindex:number):Draggable { this.vindex = vindex; return this; };
@@ -116,22 +113,117 @@ export class PlotBoilerplate {
     /** @constant {number} */
     static readonly DEFAULT_TOUCH_TOLERANCE : number =   32;
 
+    /** 
+     * @member {HTMLCanvasElement} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     canvas:HTMLCanvasElement;
+
+    /** 
+     * @member {Config} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     config:Config;
+
+    /** 
+     * @member {CanvasRenderingContext2D|WebGLRenderingContext} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     ctx:CanvasRenderingContext2D|WebGLRenderingContext;
+
+    /** 
+     * @member {drawutils|drawutilsgl} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     draw:drawutils|drawutilsgl;
+
+    /** 
+     * @member {drawutils|drawutilsgl} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     fill:drawutils|drawutilsgl;
-    drawConfig:DrawConfig; 
+
+    /** 
+     * @member {DrawConfig} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
+    drawConfig:DrawConfig;
+
+    /** 
+     * @member {Grid} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     grid:Grid;
-    // image:HTMLImageElement; //                = null; // An image.
-    canvasSize : XYDimension; 
-    vertices : Array<Vertex>; 
+
+    /** 
+     * @member {XYDimension} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
+    canvasSize : XYDimension;
+
+    /** 
+     * @member {Array<Vertex>} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
+    vertices : Array<Vertex>;
+
+    /** 
+     * @member {Array<BezierPath>} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
+    // TODO: check if this is really still in use.
     paths : Array<BezierPath>;
+
+    /** 
+     * @member {Poylgon} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     selectPolygon : Polygon;
+
+    /** 
+     * @member {Array<Draggable>} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     draggedElements : Array<Draggable>;
+
+    /** 
+     * @member {Array<Drawable>} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     drawables : Array<Drawable>;
+
+    /** 
+     * @member {Console} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     console : Console;
+
+    /** 
+     * @member {IHooks} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     hooks : IHooks;
+
+    /** 
+     * @member {KeyHandler|undefined} 
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     private keyHandler : KeyHandler|undefined;
 
     /** 
@@ -191,18 +283,14 @@ export class PlotBoilerplate {
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
      */
     constructor( config:PBParams ) {
-	// config = config || {};
 	// This should be in some static block ...
 	VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true, isSelected : false, draggable : true };
 	
 	if( typeof config.canvas == 'undefined' )
 	    throw "No canvas specified.";
-	// +---------------------------------------------------------------------------------
-	// | A global config that's attached to the dat.gui control interface.
-	// +-------------------------------
-
+	
 	/** 
-	 * A config.
+	 * A global config that's attached to the dat.gui control interface.
 	 *
 	 * @member {Object} 
 	 * @memberof PlotBoilerplate
@@ -216,7 +304,6 @@ export class PlotBoilerplate {
 	    scaleY                : PlotBoilerplate.utils.fetch.num(config,'scaleY',1.0),
 	    offsetX               : PlotBoilerplate.utils.fetch.num(config,'offsetX',0.0), 
 	    offsetY               : PlotBoilerplate.utils.fetch.num(config,'offsetY',0.0), 
-	    // drawGrid              : PlotBoilerplate.utils.fetch.bool(config,'drawGrid',true),
 	    rasterGrid            : PlotBoilerplate.utils.fetch.bool(config,'rasterGrid',true),
 	    rasterAdjustFactor    : PlotBoilerplate.utils.fetch.num(config,'rasterAdjustdFactror',2.0),
 	    drawOrigin            : PlotBoilerplate.utils.fetch.bool(config,'drawOrigin',false),
@@ -232,16 +319,10 @@ export class PlotBoilerplate {
 	    cssScaleX             : PlotBoilerplate.utils.fetch.num(config,'cssScaleX',1.0),
 	    cssScaleY             : PlotBoilerplate.utils.fetch.num(config,'cssScaleY',1.0),
 	    cssUniformScale       : PlotBoilerplate.utils.fetch.bool(config,'cssUniformScale',true),
-	    // rebuild               : function() { rebuild(); },
-	    saveFile              : function() { _self.saveFile(); },
+	    saveFile              : function() { _self.hooks.saveFile(_self); },
 	    setToRetina           : function() { _self._setToRetina(); },
 	    enableSVGExport       : PlotBoilerplate.utils.fetch.bool(config,'enableSVGExport',true),
 
-	    //drawBezierHandleLines : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandleLines',true),
-	    //drawBezierHandlePoints : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandlePoints',true),
-	    // drawHandleLines       : PlotBoilerplate.utils.fetch.bool(config,'drawHandleLines',true),
-	    // drawHandlePoints      : PlotBoilerplate.utils.fetch.bool(config,'drawHandlePoints',true),
-	    
 	    // Listeners/observers
 	    preClear              : PlotBoilerplate.utils.fetch.func(config,'preClear',null),
 	    preDraw               : PlotBoilerplate.utils.fetch.func(config,'preDraw',null),
@@ -267,8 +348,6 @@ export class PlotBoilerplate {
 	 */
 	this.drawConfig = {
 	    drawVertices : true,
-	    //drawHandleLines : true,
-	    //drawHandlePoints: true,
 	    drawBezierHandleLines : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandleLines',true),
 	    drawBezierHandlePoints : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandlePoints',true),
 	    drawHandleLines  : PlotBoilerplate.utils.fetch.bool(config,'drawHandleLines',true),
@@ -338,12 +417,13 @@ export class PlotBoilerplate {
 	this.drawables           = [];
 	this.console             = console;
 	this.hooks               = {
-	    saveFile : this._saveFile
+	    // This is changable from the outside
+	    saveFile : PlotBoilerplate._saveFile
 	};
 	var _self = this;
 
 	// TODO: this should be placed in the caller and work for 'global', too!
-	if( window ) window.addEventListener( 'resize', this.resizeCanvas );
+	if( window ) window.addEventListener( 'resize', () => _self.resizeCanvas() );
 	this.resizeCanvas();
 
 	this.installInputListeners();
@@ -367,15 +447,16 @@ export class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    private _saveFile() {
-	var _self:PlotBoilerplate = this; // Does this work with self?
-	var svgCode : string = new SVGBuilder().build( _self.drawables, { canvasSize : _self.canvasSize, offset : _self.draw.offset, zoom : _self.draw.scale } );
+    private static _saveFile( pb:PlotBoilerplate ) {
+	var svgCode : string = new SVGBuilder().build( pb.drawables, { canvasSize : pb.canvasSize, offset : pb.draw.offset, zoom : pb.draw.scale } );
+	var blob:Blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
+
 	// See documentation for FileSaver.js for usage.
 	//    https://github.com/eligrey/FileSaver.js
-	//var blob:Blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
-	//saveAs(blob, "plot-boilerplate.svg");
-	// TODO
-	console.warn("Sorry, the typescript version does not yet saveFile again. Coming back soon.");
+	if( typeof window["saveAs"] != "function" )
+	    throw "Cannot save file; did you load the ./utils/savefile helper function an the eligrey/SaveFile library?";
+	const saveAs:any = window["saveAs"];
+	saveAs(blob, "plotboilerplate.svg");   
     };
 
 
@@ -498,7 +579,6 @@ export class PlotBoilerplate {
 		bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
 		bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
 	    }
-	    // for( var i in drawable.bezierCurves ) {
 	    for( var i = 0; i < bezierPath.bezierCurves.length; i++ ) {
 		// This should be wrapped into the BezierPath implementation.
 		bezierPath.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
@@ -924,7 +1004,7 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     saveFile() {
-	this.hooks.saveFile();
+    	this.hooks.saveFile(this);
     };
 
 
@@ -996,7 +1076,7 @@ export class PlotBoilerplate {
 	} else if( _self.config.fitToParent ) {
 	    // Set editor size
 	    _self.canvas.style.position = 'absolute';
-	    const space : XYDimension = this.getAvailableContainerSpace(); //  _self.canvas.parentNode );
+	    const space : XYDimension = this.getAvailableContainerSpace();
 	    _self.canvas.style.width = (_self.config.canvasWidthFactor*space.width)+'px';
 	    _self.canvas.style.height = (_self.config.canvasHeightFactor*space.height)+'px';
 	    _self.canvas.style.top = null;

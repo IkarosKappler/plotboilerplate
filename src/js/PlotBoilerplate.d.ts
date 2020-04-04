@@ -92,21 +92,101 @@ export declare class PlotBoilerplate {
     static readonly DEFAULT_CLICK_TOLERANCE: number;
     /** @constant {number} */
     static readonly DEFAULT_TOUCH_TOLERANCE: number;
+    /**
+     * @member {HTMLCanvasElement}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     canvas: HTMLCanvasElement;
+    /**
+     * @member {Config}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     config: Config;
+    /**
+     * @member {CanvasRenderingContext2D|WebGLRenderingContext}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     ctx: CanvasRenderingContext2D | WebGLRenderingContext;
+    /**
+     * @member {drawutils|drawutilsgl}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     draw: drawutils | drawutilsgl;
+    /**
+     * @member {drawutils|drawutilsgl}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     fill: drawutils | drawutilsgl;
+    /**
+     * @member {DrawConfig}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     drawConfig: DrawConfig;
+    /**
+     * @member {Grid}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     grid: Grid;
+    /**
+     * @member {XYDimension}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     canvasSize: XYDimension;
+    /**
+     * @member {Array<Vertex>}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     vertices: Array<Vertex>;
+    /**
+     * @member {Array<BezierPath>}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     paths: Array<BezierPath>;
+    /**
+     * @member {Poylgon}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     selectPolygon: Polygon;
+    /**
+     * @member {Array<Draggable>}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     draggedElements: Array<Draggable>;
+    /**
+     * @member {Array<Drawable>}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     drawables: Array<Drawable>;
+    /**
+     * @member {Console}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     console: Console;
+    /**
+     * @member {IHooks}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     hooks: IHooks;
+    /**
+     * @member {KeyHandler|undefined}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
     private keyHandler;
     /**
      * The constructor.
@@ -176,7 +256,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    private _saveFile;
+    private static _saveFile;
     private _setToRetina;
     /**
      * Set the console for this instance.

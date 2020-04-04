@@ -7,13 +7,10 @@
 	"lib": [ "es2015", "dom" ],
 	
 	"sourceMap": true,
-	"declaration": true,
+	"declaration": true
 
-	//"esModuleInterop": true,
-	//"allowSyntheticDefaultImports": true
     },
     "inclue": ["./src/ts/*"],
     "exclude": ["./dist", "./tmp","./src/js","./src/vanilla"],
     "removeComments": false
-    // "allowJs": true,
 }
