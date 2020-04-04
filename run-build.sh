@@ -1,7 +1,6 @@
 #!/bin/sh
 
-echo "Compiling Typescript ..."
-npm run compile-typescript
+./run-compile-typescript.sh
 
 [ $? -eq 0 ]  || exit 1
 

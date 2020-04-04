@@ -9,12 +9,8 @@ while true; do
     esac
 done
 
-echo "Compiling Typescript ..."
-npm run compile-typescript
-[ $? -eq 0 ]  || exit 1
+./run-build.sh
 
-echo "Running webpack..."
-npm run webpack
 [ $? -eq 0 ]  || exit 1
 git add dist/plotboilerplate.min.js
 git add dist/plotboilerplate.js
