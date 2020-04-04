@@ -9,6 +9,9 @@ cp -R ../screenshots/ .
 # echo "Generating markdown docs from sources ..."
 # ./renderjsdoc.sh
 
+# Build the JS files
+../build.sh
+
 ./generate-demo-page.sh
 
 # Use thie docs build script instead

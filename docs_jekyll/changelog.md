@@ -5,6 +5,9 @@ title: Changelog
 
 
 # Changelog
+* 2020-04-03
+  * Fixed broken SVG export (after porting to TS).
+  * Fixed broken canvas resizer (after porting to TS).
 * 2020-04-01
   * Refactored Jekyll config to work with the new paths (post Typescript migration).
   * Refactored the demos to work with the new paths (post Typescript migration).
