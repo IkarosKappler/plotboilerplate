@@ -15,3 +15,7 @@ package-lock.json
 tmp
 test.svg
 webpack.config-old.js
+*.ogv
+*.mp4
+*.mov
+screenshots/videos/
