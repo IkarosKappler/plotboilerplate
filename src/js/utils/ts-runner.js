@@ -17,12 +17,12 @@
 (function(_context) {
     
     // Expose the runner to the global context
-    _context.TSRunner = _context.TSRunner || function( onTypescriptsLoaded, concatCodes ) {
+    _context.TSRunner = _context.TSRunner || function( onTypescriptsLoaded, onTypescriptsCompiled, onTypescriptsExecuted, concatCodes ) {
 
 	// Register a pseudo-hidden global callback.
 	// The callback will be appended to the end of the transpiled JS code.
 	var callbackName = 'tsRunner_'+Math.floor(Math.random()*65535)+'_callback';
-	window[callbackName] = onTypescriptsLoaded;
+	window[callbackName] = onTypescriptsExecuted;
 	
 	/**
 	 * Request to load the given resource (specified by 'path', relative or absolute)
@@ -65,21 +65,23 @@
 		try {
 		    let jsCode = window.ts.transpile(tsCodes[i]);
 		    if( !concatCodes ) {
-			/* var scriptNode = document.createElement('script');
-			   scriptNode.setAttribute('id','ts-transpiled-'+i);
-			   scriptNode.innerHTML = jsCode;
-			   head.appendChild(scriptNode);
-			   console.log( jsCode );
-			*/
+			var scriptNode = document.createElement('script');
+			scriptNode.setAttribute('id','ts-transpiled-'+i);
+			scriptNode.innerHTML = jsCode;
+			head.appendChild(scriptNode);
+			console.log( jsCode );
 		    }
 		    jsCodes[i] = jsCode;
 		} catch( e ) {
 		    errorCount++;
 		    console.warn("Failed to transpile code "+i+" ("+pathNames[i]+")");
 		    console.error(e);
+		    onTypescriptsCompiled(false);
 		}
 	    }
 
+	    onTypescriptsCompiled(true);
+	    
 	    if( concatCodes ) {
 		var scriptNode = document.createElement('script');
 		scriptNode.setAttribute('id','ts-transpiled-concat');

@@ -27,6 +27,12 @@ var require = window.require = function(...args) { console.log(args); return win
 	var tsRunner = new TSRunner(
 	    function(status) {
 		console.log(status ? '===> Typescript successfully loaded.' : '===> Error loading typescript.' );
+	    },
+	    function(status) {
+		console.log(status ? '===> Typescript successfully compiled.' : '===> Error compiling typescript.' );
+	    },
+	    function(status) {
+		console.log(status ? '===> Typescript successfully executed.' : '===> Error executing typescript.' );
 		loadJSFiles();
 		window.initializePB();
 	    },

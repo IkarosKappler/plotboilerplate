@@ -475,33 +475,23 @@ export class drawutils {
      */
     grid( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {
 	this.ctx.beginPath();
-	// center to right
-	var x : number= 0;
-	while( x < width/2 ) {
-	    this.ctx.moveTo( this.offset.x + (center.x+x)*this.scale.x, this.offset.y - (center.y - height*0.5)*this.scale.y  );
-	    this.ctx.lineTo( this.offset.x + (center.x+x)*this.scale.x, this.offset.y - (center.y + height*0.5)*this.scale.y  );
-	    x+=sizeX;
+	var yMin : number = -Math.ceil((height*0.5)/sizeY)*sizeY;
+	var yMax : number = height/2;
+	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
+	    this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMin)*this.scale.y );
+	    this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMax)*this.scale.y );
 	}
-	x = sizeX;
-	while( x < width/2 ) {
-	    this.ctx.moveTo( this.offset.x + (center.x-x)*this.scale.x, this.offset.y - (center.y - height*0.5)*this.scale.y  );
-	    this.ctx.lineTo( this.offset.x + (center.x-x)*this.scale.x, this.offset.y - (center.y + height*0.5)*this.scale.y  );
-	    x+=sizeX;
+
+	var xMin : number = -Math.ceil((width*0.5)/sizeX)*sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
+	var xMax : number = width/2; // height/2;
+	for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
+	    this.ctx.moveTo( this.offset.x+(center.x+xMin)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+	    this.ctx.lineTo( this.offset.x+(center.x+xMax)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
 	}
-	var y : number = 0;
-	while( y < height/2 ) {
-	    this.ctx.moveTo( this.offset.x - (center.x - width*0.5)*this.scale.x, this.offset.y + (center.y+y)*this.scale.y );
-	    this.ctx.lineTo( this.offset.x - (center.x + width*0.5)*this.scale.x, this.offset.y + (center.y+y)*this.scale.y );
-	    y+=sizeY;
-	}
-	var y : number = sizeY;
-	while( y < height/2 ) {
-	    this.ctx.moveTo( this.offset.x - (center.x - width*0.5)*this.scale.x, this.offset.y + (center.y-y)*this.scale.y );
-	    this.ctx.lineTo( this.offset.x - (center.x + width*0.5)*this.scale.x, this.offset.y + (center.y-y)*this.scale.y );
-	    y+=sizeY;
-	}
+	this.ctx.strokeStyle = color;
+	this.ctx.lineWidth = 1.0;
+	this.ctx.stroke();
 	this.ctx.closePath();
-	this._fillOrDraw( color );
     };
 
 
@@ -540,7 +530,7 @@ export class drawutils {
 	this.ctx.lineWidth = 1.0; 
 	this.ctx.stroke();
 	this.ctx.closePath();
-	this.ctx.restore();
+	this.ctx.restore(); 
     };
     
 
@@ -608,8 +598,8 @@ export class drawutils {
      * @instance
      * @memberof drawutils
      */
-    circleHandle( center:Vertex, size:number, color:string ) {
-	var radius : number = 3;
+    circleHandle( center:Vertex, radius:number, color:string ) {
+	radius = radius || 3;
 	this.ctx.beginPath();
 	this.ctx.arc( this.offset.x+center.x*this.scale.x, this.offset.y+center.y*this.scale.y, radius, 0, 2 * Math.PI, false );
 	this.ctx.closePath();

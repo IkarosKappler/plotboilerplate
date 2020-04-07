@@ -337,7 +337,7 @@ export declare class drawutils {
      * @instance
      * @memberof drawutils
      */
-    circleHandle(center: Vertex, size: number, color: string): void;
+    circleHandle(center: Vertex, radius: number, color: string): void;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>

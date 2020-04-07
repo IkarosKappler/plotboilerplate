@@ -19,3 +19,4 @@ webpack.config-old.js
 *.mp4
 *.mov
 screenshots/videos/
+resources/

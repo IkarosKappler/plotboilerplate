@@ -409,33 +409,22 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
         this.ctx.beginPath();
-        // center to right
-        var x = 0;
-        while (x < width / 2) {
-            this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y - (center.y - height * 0.5) * this.scale.y);
-            this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y - (center.y + height * 0.5) * this.scale.y);
-            x += sizeX;
+        var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
+        var yMax = height / 2;
+        for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
+            this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + yMin) * this.scale.y);
+            this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + yMax) * this.scale.y);
         }
-        x = sizeX;
-        while (x < width / 2) {
-            this.ctx.moveTo(this.offset.x + (center.x - x) * this.scale.x, this.offset.y - (center.y - height * 0.5) * this.scale.y);
-            this.ctx.lineTo(this.offset.x + (center.x - x) * this.scale.x, this.offset.y - (center.y + height * 0.5) * this.scale.y);
-            x += sizeX;
+        var xMin = -Math.ceil((width * 0.5) / sizeX) * sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
+        var xMax = width / 2; // height/2;
+        for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
+            this.ctx.moveTo(this.offset.x + (center.x + xMin) * this.scale.x - 4, this.offset.y + (center.y + y) * this.scale.y);
+            this.ctx.lineTo(this.offset.x + (center.x + xMax) * this.scale.x + 4, this.offset.y + (center.y + y) * this.scale.y);
         }
-        var y = 0;
-        while (y < height / 2) {
-            this.ctx.moveTo(this.offset.x - (center.x - width * 0.5) * this.scale.x, this.offset.y + (center.y + y) * this.scale.y);
-            this.ctx.lineTo(this.offset.x - (center.x + width * 0.5) * this.scale.x, this.offset.y + (center.y + y) * this.scale.y);
-            y += sizeY;
-        }
-        var y = sizeY;
-        while (y < height / 2) {
-            this.ctx.moveTo(this.offset.x - (center.x - width * 0.5) * this.scale.x, this.offset.y + (center.y - y) * this.scale.y);
-            this.ctx.lineTo(this.offset.x - (center.x + width * 0.5) * this.scale.x, this.offset.y + (center.y - y) * this.scale.y);
-            y += sizeY;
-        }
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 1.0;
+        this.ctx.stroke();
         this.ctx.closePath();
-        this._fillOrDraw(color);
     };
     ;
     /**
@@ -539,8 +528,8 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.circleHandle = function (center, size, color) {
-        var radius = 3;
+    drawutils.prototype.circleHandle = function (center, radius, color) {
+        radius = radius || 3;
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
