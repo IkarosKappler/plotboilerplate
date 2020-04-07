@@ -69,7 +69,7 @@
 		//clear(ctx);
 
 
-		var curves = hobbyPath.generateCurve();
+		var curves = hobbyPath.generateCurve( config.circular );
 		console.log('curves',curves.length );
 		for( var i = 0; i < curves.length; i++ ) {
 		    pb.draw.cubicBezier( curves[i].startPoint,
@@ -79,6 +79,8 @@
 					 'rgba(255,0,0,1)',
 					 5
 				       );
+		    pb.draw.line( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.5)', 2 );
+		    pb.draw.line( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.5)', 2 );
 		}
 		// #endregion
 
@@ -115,6 +117,7 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
+		circular              : false,
 		pointCount            : 5,
 		animate               : false,
 		colors                : {
@@ -197,6 +200,7 @@
 		f0.addColor(config.colors, 'triangle').onChange( function() { pb.redraw(); } ).name('Triangle').title('The triangle color');
 		
 		var f1 = gui.addFolder('Points');
+		f1.add(config, 'circular').onChange( function() { pb.redraw(); } ).name('Circular').title('Close the loop.');
 		f1.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
 		f1.open();
 	    }
