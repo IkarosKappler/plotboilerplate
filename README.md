@@ -520,7 +520,8 @@ for this purpose.
  * Use the new Bounds class in the RectSelector helper then.
  * Add an interface Drawable.ts and add the to the PlotBoilerplate and to the SVGBuilder.
  * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
- * [Broken] Grid with full lines drawn is broken. Lines are drawn outside the viewport when zooming.
+ * [Done] Grid with full lines drawn is broken. Lines are drawn outside the viewport when zooming.
+ * The MouseHandler used outside the PB object does not tell if wasDragged (always false); also the button indicator is empty. And dragAmount.
 
 
 ### Todos for future Version 2

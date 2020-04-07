@@ -51,14 +51,6 @@
 	this.addVertex( this.createRandomVertex() );
     };
 
-    /*
-    CanvasPointList.prototype.addVertex = function( vert ) {
-	this.pointList.push( vert );
-	this.pb.add( vert );
-	if( typeof vertexAdded == 'function' )
-	    vertexAdded(vert);
-    };*/
-
     CanvasPointList.prototype.removeRandomPoint = function() {
 	if( this.pointList.length > 1 ) {
 	    let vert = this.pointList.pop();
