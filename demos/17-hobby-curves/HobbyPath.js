@@ -261,61 +261,98 @@
     // computes four arrays for the x and y coordinates of the first and
     // second controls points for a Hobby curve through the points given
     // by Px and Py, a "closed" curve which returns to its starting point
-    HobbyPath.hobbyClosed = function(Px, Py) {
+    HobbyPath.hobbyClosed = function(Px, Py, circular) {
 	// most of the code here is identical to the open version and thus
 	// doesn't have comments
-	let n = Px.length;
+
+	//let circular = true;
+	//let pathVerts = [];
+	//for( var i = 0; i < Px.length; i++ )
+	//    pathVerts[i] = new Vertex(Px[i], Py[i]);
+
+	// let n = Px.length;
+	let n = Px.length - (circular ? 0 : 1);
 	let D = new Array(n);
 	let dx = new Array(n);
 	let dy = new Array(n);
+	//let dxy = new Array(n); // !!!
 	for (let i = 0; i < n; i++) {
 	    // the "next" point in a modular way
-	    let j = (i + 1) % n;
+	    let j = circular ? ((i + 1) % n) : (i+1);
 	    dx[i] = Px[j]-Px[i];
 	    dy[i] = Py[j]-Py[i];
+	    //dxy[i] = new Vertex( Px[j]-Px[i], Py[j]-Py[i] ); // !!!
 	    D[i] = Math.sqrt(dx[i]*dx[i]+dy[i]*dy[i]);
 	}
-	let gamma = new Array(n);
-	for (let i = 0; i < n; i++) {
+	// let gamma = new Array(n);
+	let gamma = new Array(n + (circular?0:1));
+	//for (let i = 0; i < n; i++) {
+	for (let i = (circular?0:1); i < n; i++) {
 	    // the "previous" point in a modular way
-	    let k = (i + n - 1) % n;
+	    let k = circular ? ((i + n - 1) % n) : (i-1);
 	    let sin = dy[k] / D[k];
 	    let cos = dx[k] / D[k];
 	    let [x, y] = HobbyPath.utils.rotate(dx[i], dy[i], -sin, cos);
 	    gamma[i] = Math.atan2(y, x);
 	}
-	let a = new Array(n);
-	let b = new Array(n);
-	let c = new Array(n);
-	let d = new Array(n);
-	for (let i = 0; i < n; i++) {
+	if( !circular )
+	    gamma[n] = 0;
+	let a = new Array(n + (circular?0:1));
+	let b = new Array(n + (circular?0:1));
+	let c = new Array(n + (circular?0:1));
+	let d = new Array(n + (circular?0:1));
+	 //for (let i = 0; i < n; i++) {
+	for (let i = (circular?0:1); i < n; i++) {
 	    // j is the "next" point, k the "previous" one
-	    let j = (i + 1) % n;
-	    let k = (i + n - 1) % n;
+	    let j = circular ? ((i + 1) % n) : (i+1);
+	    let k = circular ? ((i + n - 1) % n) : (i-1);
 	    // see video for the equations
 	    a[i] = 1 / D[k];
 	    b[i] = (2*D[k]+2*D[i])/(D[k]*D[i]);
 	    c[i] = 1 / D[i];
 	    d[i] = -(2*gamma[i]*D[i]+gamma[j]*D[k])/(D[k]*D[i]);
-	}
+	} 
 	// make matrix tridiagonal in preparation for the "sherman" function
-	let s = a[0];
-	a[0] = 0;
-	let t = c[n-1];
-	c[n-1] = 0;
-	let alpha = HobbyPath.utils.sherman(a, b, c, d, s, t);
-	let beta = new Array(n);
-	for (let i = 0; i < n; i++) {
-	    // "next" point
-	    let j = (i + 1) % n;
-	    beta[i] = -gamma[j]-alpha[j];
+	var alpha;
+	var beta;
+	if( circular ) {
+	    let s = a[0];
+	    a[0] = 0;
+	    let t = c[n-1];
+	    c[n-1] = 0;
+	    alpha = HobbyPath.utils.sherman(a, b, c, d, s, t);
+	    beta = new Array(n);
+	    for (let i = 0; i < n - (circular?0:1); i++) {
+		// "next" point
+		let j = circular ? ((i + 1) % n) : (i+1);
+		beta[i] = -gamma[j]-alpha[j];
+	    }
+	} else {
+	    // see the Jackowski article for the following values; the result
+	    // will be that the curvature at the first point is identical to the
+	    // curvature at the second point (and likewise for the last and
+	    // second-to-last)
+	    b[0] = 2 + omega;
+	    c[0] = 2 * omega + 1;
+	    d[0] = -c[0] * gamma[1];
+	    a[n] = 2 * omega + 1;
+	    b[n] = 2 + omega;
+	    d[n] = 0;
+	    // solve system for the angles called "alpha" in the video
+	    alpha = HobbyPath.utils.thomas(a, b, c, d);
+	    // compute "beta" angles from "alpha" angles
+	    beta = new Array(n);
+	    for (let i = 0; i < n - 1; i++)
+		beta[i] = -gamma[i+1]-alpha[i+1];
+	    // again, see Jackowski article
+	    beta[n-1] = -alpha[n];
 	}
 	let x1 = new Array(n);
 	let y1 = new Array(n);
 	let x2 = new Array(n);
 	let y2 = new Array(n);
 	for (let i = 0; i < n; i++) {
-	    let j = (i + 1) % n;
+	    let j = circular ? ((i + 1) % n) : (i+1);
 	    let a = rho(alpha[i], beta[i]) * D[i] / 3;
 	    let b = rho(beta[i], alpha[i]) * D[i] / 3;
 	    let [x, y] = HobbyPath.utils.normalize.apply(null, HobbyPath.utils.rotateAngle(dx[i], dy[i], alpha[i]));
@@ -355,7 +392,7 @@
 		    new Vertex(this.pointsX[1],this.pointsY[1])
 		) ];
 	    } else {
-		if (!closedLoop) {
+		/* if (!closedLoop) {
 		    // open curve
 		    // x1 and y1 contain the coordinates of the first control
 		    // points, x2 and y2 those of the second
@@ -370,11 +407,11 @@
 			) );
 		    }
 		    return curves;
-		} else {
+		} else { */
 		    // closed curve
 		    // see comments above
-		    let [x1, y1, x2, y2] = HobbyPath.hobbyClosed(this.pointsX, this.pointsY);
-		    for (let i = 0; i < n; i++) {
+		    let [x1, y1, x2, y2] = HobbyPath.hobbyClosed(this.pointsX, this.pointsY, closedLoop);
+		    for (let i = 0; i < n - (closedLoop?0:1); i++) {
 			// if i is n-1, the "next" point is the first one
 			let j = (i+1) % n;
 			d += `C ${x1[i]} ${y1[i]}, ${x2[i]} ${y2[i]}, ${this.pointsX[j]} ${this.pointsY[j]}`;
@@ -386,7 +423,7 @@
 			) );
 		    }
 		    return curves;
-		}
+	//	}
 	    }
 	} else {
 	    return [];
@@ -399,6 +436,11 @@
 	// determined by its sine and cosine
 	rotate : function(x, y, sin, cos) {
 	    return [x*cos - y*sin, x*sin + y*cos];
+	},
+	// rotates a vector [x, y] about an angle; the angle is implicitly
+	// determined by its sine and cosine
+	rotate_B : function(vert, sin, cos) {
+	    return new Vertex( vert.x*cos - vert.y*sin, vert.x*sin + vert.y*cos );
 	},
 	// rotates a vector [x, y] about the angle alpha
 	rotateAngle: function(x, y, alpha) {

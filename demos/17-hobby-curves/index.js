@@ -115,14 +115,10 @@
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 	    } )
 	    .up( function(e) {
-		console.log('up', e.params);
 		if( e.params.wasDragged )
 		    return;
 		var vert = new Vertex( pb.transformMousePosition( e.params.pos.x, e.params.pos.y ) );
 		addVertex(vert);
-	    } )
-	    .click( function(e) {
-		console.log('click', e.params);
 	    } );  
 
 
