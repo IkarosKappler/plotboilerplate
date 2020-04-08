@@ -329,7 +329,7 @@
     }
 
     HobbyPath.prototype.addPoint = function(p) {
-	console.log('addPoint',p);
+	// console.log('addPoint',p);
 	this.vertices.push( p );
 	this.pointsX.push( p.x );
 	this.pointsY.push( p.y );

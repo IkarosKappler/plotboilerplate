@@ -3,7 +3,10 @@
  * A simple mouse handler for demos.
  * Use to avoid load massive libraries like jQuery.
  *
- * Usage:
+ *
+ * Usage
+ * =====
+ * Javascript:
  *   new MouseHandler( document.getElementById('mycanvas') )
  *	    .drag( function(e) {
  *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
@@ -14,7 +17,7 @@
  *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
  *	    } )
  *          .up( function(e) {
- *              console.log( 'Mouse up.' );
+ *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
  *          } )
  *          .down( function(e) {
  *              console.log( 'Mouse down.' );
@@ -23,6 +26,29 @@
  *              console.log( 'Click.' );
  *          } )
  *          .wheel( function(e) {
+ *              console.log( 'Wheel. delta='+e.deltaY );
+ *          } )
+ *
+ * Typescript:
+ *   new MouseHandler( document.getElementById('mycanvas') )
+ *	    .drag( (e:XMouseEvent) => {
+ *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
+ *		if( e.params.leftMouse ) ;
+ *		else if( e.params.rightMouse ) ;
+ *	    } )
+ *	    .move( (e:XMouseEvent) => {
+ *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
+ *	    } )
+ *          .up( (e:XMouseEvent) => {
+ *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
+ *          } )
+ *          .down( (e:XMouseEvent) => {
+ *              console.log( 'Mouse down.' );
+ *          } )
+ *          .click( (e:XMouseEvent) => {
+ *              console.log( 'Click.' );
+ *          } )
+ *          .wheel( (e:XMouseEvent) => {
  *              console.log( 'Wheel. delta='+e.deltaY );
  *          } )
  *
@@ -38,7 +64,11 @@
  * @modified 2018-12-09 Cleaned up some code.
  * @modified 2019-02-10 Cleaned up some more code.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version  1.0.9
+ * @modified 2020-04-08 Fixed the click event (internally fired a 'mouseup' event) (1.0.10)
+ * @modified 2020-04-08 Added the optional 'name' property. (1.0.11)
+ * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even
+ *                      if there is no external drag listener installed (1.1.0).
+ * @version  1.1.0
  **/
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -71,7 +101,6 @@ var XWheelEvent = /** @class */ (function (_super) {
 }(WheelEvent));
 exports.XWheelEvent = XWheelEvent;
 var MouseHandler = /** @class */ (function () {
-    // private wheelHandlers  : Record<string,(e:XWheelEvent)=>void> = {};
     /**
      * The constructor.
      *
@@ -79,18 +108,18 @@ var MouseHandler = /** @class */ (function () {
      *
      * @param {HTMLElement} element
      **/
-    function MouseHandler(element) {
-        this.mouseDownPos = null;
-        this.mouseDragPos = null;
-        this.mousePos = null;
+    function MouseHandler(element, name) {
+        this.mouseDownPos = undefined;
+        this.mouseDragPos = undefined;
+        this.mousePos = undefined;
         this.mouseButton = -1;
         this.listeners = {};
-        // private wheelListeners : Record<string,(e:XWheelEvent)=>void> = {};
         this.installed = {};
         this.handlers = {};
         // +----------------------------------------------------------------------
         // | Some private vars to store the current mouse/position/button state.
         // +-------------------------------------------------
+        this.name = name;
         this.element = element;
         this.mouseDownPos = null;
         this.mouseDragPos = null;
@@ -117,8 +146,8 @@ var MouseHandler = /** @class */ (function () {
         this.handlers['mouseup'] = function (e) {
             if (_self.listeners.mouseup)
                 _self.listeners.mouseup(_self.mkParams(e, 'mouseup'));
-            _self.mouseDragPos = null;
-            _self.mouseDownPos = null;
+            _self.mouseDragPos = undefined;
+            _self.mouseDownPos = undefined;
             _self.mouseButton = -1;
         };
         this.handlers['mousedown'] = function (e) {
@@ -130,12 +159,17 @@ var MouseHandler = /** @class */ (function () {
         };
         this.handlers['click'] = function (e) {
             if (_self.listeners.click)
-                _self.listeners.click(_self.mkParams(e, 'mousedown'));
+                _self.listeners.click(_self.mkParams(e, 'click'));
         };
         this.handlers['wheel'] = function (e) {
             if (_self.listeners.wheel)
                 _self.listeners.wheel(_self.mkParams(e, 'wheel'));
         };
+        this.element.addEventListener('mousemove', this.handlers['mousemove']);
+        this.element.addEventListener('mouseup', this.handlers['mouseup']);
+        this.element.addEventListener('mousedown', this.handlers['mousedown']);
+        this.element.addEventListener('click', this.handlers['click']);
+        this.element.addEventListener('wheel', this.handlers['wheel']);
     }
     // +----------------------------------------------------------------------
     // | Some private vars to store the current mouse/position/button state.
@@ -166,13 +200,15 @@ var MouseHandler = /** @class */ (function () {
     MouseHandler.prototype.listenFor = function (eventName) {
         if (this.installed[eventName])
             return;
-        this.element.addEventListener(eventName, this.handlers[eventName]);
+        // In the new version 1.1.0 has all internal listeners installed by default.
+        // this.element.addEventListener(eventName,this.handlers[eventName]);
         this.installed[eventName] = true;
     };
     MouseHandler.prototype.unlistenFor = function (eventName) {
         if (!this.installed[eventName])
             return;
-        this.element.removeEventListener(eventName, this.handlers[eventName]);
+        // In the new version 1.1.0 has all internal listeners installed by default.
+        // this.element.removeEventListener(eventName,this.handlers[eventName]);
         delete this.installed[eventName];
     };
     // +----------------------------------------------------------------------
@@ -246,6 +282,11 @@ var MouseHandler = /** @class */ (function () {
         this.unlistenFor('moseup');
         this.unlistenFor('click');
         this.unlistenFor('wheel');
+        this.element.removeEventListener('mousemove', this.handlers['mousemove']);
+        this.element.removeEventListener('mouseup', this.handlers['mousedown']);
+        this.element.removeEventListener('mousedown', this.handlers['mousedown']);
+        this.element.removeEventListener('click', this.handlers['click']);
+        this.element.removeEventListener('wheel', this.handlers['wheel']);
     };
     return MouseHandler;
 }());

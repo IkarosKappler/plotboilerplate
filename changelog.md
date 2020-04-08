@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2020-04-08
+  * Fixed the MouseHandler's click event (internally fired a 'mouseup' event).
+  * The new version always installs internal listenrs to track drag events even
+    if there is no external drag listener installed (1.1.0).
 * 2020-04-07 (v1.7.1)
   * Fixed an error in the draw.grid(...) function. Non-rastered grids were not properly drawn on zoom and
     pan comibinations.

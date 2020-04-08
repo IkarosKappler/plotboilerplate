@@ -549,7 +549,9 @@ for this purpose.
 * Color.js
 * FileSaver.js
 * [Touchy.js](https://github.com/jairajs89/Touchy.js "Touchy.js") by [jairajs89](https://github.com/jairajs89 "jairajs89") 
-
+* Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
+* https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf
+* https://github.com/loopspace/jsHobby
 
 
 ## Known bugs
