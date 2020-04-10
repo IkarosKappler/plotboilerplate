@@ -266,9 +266,9 @@
 	// doesn't have comments
 
 	//let circular = true;
-	//let pathVerts = [];
-	//for( var i = 0; i < Px.length; i++ )
-	//    pathVerts[i] = new Vertex(Px[i], Py[i]);
+	let pathVerts = [];
+	for( var i = 0; i < Px.length; i++ )
+	    pathVerts[i] = new Vertex(Px[i], Py[i]);
 
 	// let n = Px.length;
 	let n = Px.length - (circular ? 0 : 1);
@@ -276,7 +276,7 @@
 	let dx = new Array(n);
 	let dy = new Array(n);
 	
-	//let dxy = new Array(n); // !!!
+	let ds = new Array(n); // !!!
 	var succ = function(i) { return circular ? ((i+1)%n) : (i+1) };
 	var pred = function(i) { return circular ? ((i + n - 1) % n) : (i-1) };
 				 	
@@ -285,8 +285,9 @@
 	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
 	    dx[i] = Px[j]-Px[i];
 	    dy[i] = Py[j]-Py[i];
-	    //dxy[i] = new Vertex( Px[j]-Px[i], Py[j]-Py[i] ); // !!!
-	    D[i] = Math.sqrt(dx[i]*dx[i]+dy[i]*dy[i]);
+	    ds[i] = new Vertex( Px[j]-Px[i], Py[j]-Py[i] ); // !!!
+	    // D[i] = Math.sqrt(dx[i]*dx[i]+dy[i]*dy[i]);
+	    D[i] = Math.sqrt(ds[i].x*ds[i].x+ds[i].y*ds[i].y);
 	}
 	// let gamma = new Array(n);
 	let gamma = new Array(n + (circular?0:1));
@@ -294,10 +295,13 @@
 	for (let i = (circular?0:1); i < n; i++) {
 	    // the "previous" point in a modular way
 	    let k = pred(i); // circular ? ((i + n - 1) % n) : (i-1);
-	    let sin = dy[k] / D[k];
-	    let cos = dx[k] / D[k];
-	    let [x, y] = HobbyPath.utils.rotate(dx[i], dy[i], -sin, cos);
-	    gamma[i] = Math.atan2(y, x);
+	    // let sin = dy[k] / D[k];
+	    //let cos = dx[k] / D[k];
+	    let sin = ds[k].y / D[k];
+	    let cos = ds[k].x / D[k];
+	    // let [x, y] = HobbyPath.utils.rotate(dx[i], dy[i], -sin, cos);
+	    let vec = HobbyPath.utils.rotate_V(ds[i], -sin, cos);
+	    gamma[i] = Math.atan2(vec.y, vec.x);
 	}
 	if( !circular )
 	    gamma[n] = 0;
@@ -359,34 +363,23 @@
 	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
 	    let a = rho(alpha[i], beta[i]) * D[i] / 3;
 	    let b = rho(beta[i], alpha[i]) * D[i] / 3;
-	    let [x, y] = HobbyPath.utils.normalize.apply(null, HobbyPath.utils.rotateAngle(dx[i], dy[i], alpha[i]));
+	    /* let [x, y] = HobbyPath.utils.normalize.apply(null, HobbyPath.utils.rotateAngle(dx[i], dy[i], alpha[i]));
 	    x1[i] = Px[i] + a * x;
 	    y1[i] = Py[i] + a * y;
 	    [x, y] = HobbyPath.utils.normalize.apply(null, HobbyPath.utils.rotateAngle(dx[i], dy[i], -beta[i]));
 	    x2[i] = Px[j] - b * x;
 	    y2[i] = Py[j] - b * y;
+	    */
+	    let v = HobbyPath.utils.normalize_V(HobbyPath.utils.rotateAngle_V(ds[i], alpha[i]));
+	    x1[i] = Px[i] + a * v.x;
+	    y1[i] = Py[i] + a * v.y;
+	    v = HobbyPath.utils.normalize_V(HobbyPath.utils.rotateAngle_V(ds[i], -beta[i]));
+	    x2[i] = Px[j] - b * v.x;
+	    y2[i] = Py[j] - b * v.y;
+	    
 	}
 	return [x1, y1, x2, y2];
     }
-/*
-    var computeABCD = function( D, gamma, start, n ) {
-	let a = new Array(n + (circular?0:1));
-	let b = new Array(n + (circular?0:1));
-	let c = new Array(n + (circular?0:1));
-	let d = new Array(n + (circular?0:1));
-	 //for (let i = 0; i < n; i++) {
-	for (let i = (circular?0:1); i < n; i++) {
-	    // j is the "next" point, k the "previous" one
-	    let j = circular ? ((i + 1) % n) : (i+1);
-	    let k = circular ? ((i + n - 1) % n) : (i-1);
-	    // see video for the equations
-	    a[i] = 1 / D[k];
-	    b[i] = (2*D[k]+2*D[i])/(D[k]*D[i]);
-	    c[i] = 1 / D[i];
-	    d[i] = -(2*gamma[i]*D[i]+gamma[j]*D[k])/(D[k]*D[i]);
-	}
-	return { a : a, b : b, c : c, d : d };
-    } */
 
     HobbyPath.prototype.addPoint = function(p) {
 	// console.log('addPoint',p);
@@ -462,12 +455,16 @@
 	},
 	// rotates a vector [x, y] about an angle; the angle is implicitly
 	// determined by its sine and cosine
-	rotate_B : function(vert, sin, cos) {
+	rotate_V : function(vert, sin, cos) {
 	    return new Vertex( vert.x*cos - vert.y*sin, vert.x*sin + vert.y*cos );
 	},
 	// rotates a vector [x, y] about the angle alpha
 	rotateAngle: function(x, y, alpha) {
 	    return HobbyPath.utils.rotate(x, y, Math.sin(alpha), Math.cos(alpha));
+	},
+	// rotates a vector [x, y] about the angle alpha
+	rotateAngle_V: function(vert, alpha) {
+	    return HobbyPath.utils.rotate_V(vert, Math.sin(alpha), Math.cos(alpha));
 	},
 	// returns a normalized version of the vector
 	normalize : function (x, y) {
@@ -476,6 +473,14 @@
 		return [0, 0];
 	    else
 		return [x / n, y / n];
+	},
+	// returns a normalized version of the vector
+	normalize_V : function (vec) {
+	    let n = Math.hypot(vec.x, vec.y);
+	    if (n == 0)
+		return new Vertex(0,0); // [0, 0];
+	    else
+		return new Vertex( vec.x/n, vec.y/n ); // TODO: do in-place // [x / n, y / n];
 	},
 	// Implements the Thomas algorithm for a tridiagonal system with i-th
 	// row a[i]x[i-1] + b[i]x[i] + c[i]x[i+1] = d[i] starting with row
