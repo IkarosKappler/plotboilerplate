@@ -275,10 +275,14 @@
 	let D = new Array(n);
 	let dx = new Array(n);
 	let dy = new Array(n);
+	
 	//let dxy = new Array(n); // !!!
+	var succ = function(i) { return circular ? ((i+1)%n) : (i+1) };
+	var pred = function(i) { return circular ? ((i + n - 1) % n) : (i-1) };
+				 	
 	for (let i = 0; i < n; i++) {
 	    // the "next" point in a modular way
-	    let j = circular ? ((i + 1) % n) : (i+1);
+	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
 	    dx[i] = Px[j]-Px[i];
 	    dy[i] = Py[j]-Py[i];
 	    //dxy[i] = new Vertex( Px[j]-Px[i], Py[j]-Py[i] ); // !!!
@@ -289,7 +293,7 @@
 	//for (let i = 0; i < n; i++) {
 	for (let i = (circular?0:1); i < n; i++) {
 	    // the "previous" point in a modular way
-	    let k = circular ? ((i + n - 1) % n) : (i-1);
+	    let k = pred(i); // circular ? ((i + n - 1) % n) : (i-1);
 	    let sin = dy[k] / D[k];
 	    let cos = dx[k] / D[k];
 	    let [x, y] = HobbyPath.utils.rotate(dx[i], dy[i], -sin, cos);
@@ -304,8 +308,8 @@
 	 //for (let i = 0; i < n; i++) {
 	for (let i = (circular?0:1); i < n; i++) {
 	    // j is the "next" point, k the "previous" one
-	    let j = circular ? ((i + 1) % n) : (i+1);
-	    let k = circular ? ((i + n - 1) % n) : (i-1);
+	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
+	    let k = pred(i); //  circular ? ((i + n - 1) % n) : (i-1);
 	    // see video for the equations
 	    a[i] = 1 / D[k];
 	    b[i] = (2*D[k]+2*D[i])/(D[k]*D[i]);
@@ -324,7 +328,7 @@
 	    beta = new Array(n);
 	    for (let i = 0; i < n - (circular?0:1); i++) {
 		// "next" point
-		let j = circular ? ((i + 1) % n) : (i+1);
+		let j = succ(i); //  circular ? ((i + 1) % n) : (i+1);
 		beta[i] = -gamma[j]-alpha[j];
 	    }
 	} else {
@@ -352,7 +356,7 @@
 	let x2 = new Array(n);
 	let y2 = new Array(n);
 	for (let i = 0; i < n; i++) {
-	    let j = circular ? ((i + 1) % n) : (i+1);
+	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
 	    let a = rho(alpha[i], beta[i]) * D[i] / 3;
 	    let b = rho(beta[i], alpha[i]) * D[i] / 3;
 	    let [x, y] = HobbyPath.utils.normalize.apply(null, HobbyPath.utils.rotateAngle(dx[i], dy[i], alpha[i]));
@@ -364,6 +368,25 @@
 	}
 	return [x1, y1, x2, y2];
     }
+/*
+    var computeABCD = function( D, gamma, start, n ) {
+	let a = new Array(n + (circular?0:1));
+	let b = new Array(n + (circular?0:1));
+	let c = new Array(n + (circular?0:1));
+	let d = new Array(n + (circular?0:1));
+	 //for (let i = 0; i < n; i++) {
+	for (let i = (circular?0:1); i < n; i++) {
+	    // j is the "next" point, k the "previous" one
+	    let j = circular ? ((i + 1) % n) : (i+1);
+	    let k = circular ? ((i + n - 1) % n) : (i-1);
+	    // see video for the equations
+	    a[i] = 1 / D[k];
+	    b[i] = (2*D[k]+2*D[i])/(D[k]*D[i]);
+	    c[i] = 1 / D[i];
+	    d[i] = -(2*gamma[i]*D[i]+gamma[j]*D[k])/(D[k]*D[i]);
+	}
+	return { a : a, b : b, c : c, d : d };
+    } */
 
     HobbyPath.prototype.addPoint = function(p) {
 	// console.log('addPoint',p);
