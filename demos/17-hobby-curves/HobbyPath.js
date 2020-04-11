@@ -261,20 +261,22 @@
     // computes four arrays for the x and y coordinates of the first and
     // second controls points for a Hobby curve through the points given
     // by Px and Py, a "closed" curve which returns to its starting point
-    HobbyPath.hobbyClosed = function(Px, Py, circular) {
+    // HobbyPath.hobbyClosed = function(Px, Py, circular) {
+    HobbyPath.hobbyClosed = function(pathVerts, circular) {
 	// most of the code here is identical to the open version and thus
 	// doesn't have comments
 
 	//let circular = true;
-	let pathVerts = [];
-	for( var i = 0; i < Px.length; i++ )
-	    pathVerts[i] = new Vertex(Px[i], Py[i]);
+	//let pathVerts = [];
+	//for( var i = 0; i < Px.length; i++ )
+	//     pathVerts[i] = new Vertex(Px[i], Py[i]);
 
 	// let n = Px.length;
-	let n = Px.length - (circular ? 0 : 1);
+	// let n = Px.length - (circular ? 0 : 1);
+	let n = pathVerts.length - (circular ? 0 : 1);
 	let D = new Array(n);
-	let dx = new Array(n);
-	let dy = new Array(n);
+	// let dx = new Array(n);
+	// let dy = new Array(n);
 	
 	let ds = new Array(n); // !!!
 	var succ = function(i) { return circular ? ((i+1)%n) : (i+1) };
@@ -283,10 +285,10 @@
 	for (let i = 0; i < n; i++) {
 	    // the "next" point in a modular way
 	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
-	    dx[i] = Px[j]-Px[i];
-	    dy[i] = Py[j]-Py[i];
-	    ds[i] = new Vertex( Px[j]-Px[i], Py[j]-Py[i] ); // !!!
-	    // D[i] = Math.sqrt(dx[i]*dx[i]+dy[i]*dy[i]);
+	    // dx[i] = Px[j]-Px[i];
+	    // dy[i] = Py[j]-Py[i];
+	    // ds[i] = new Vertex( Px[j]-Px[i], Py[j]-Py[i] ); // !!!
+	    ds[i] = pathVerts[j].clone().sub( pathVerts[i] ); //  new Vertex( Px[j]-Px[i], Py[j]-Py[i] );
 	    D[i] = Math.sqrt(ds[i].x*ds[i].x+ds[i].y*ds[i].y);
 	}
 	// let gamma = new Array(n);
@@ -295,11 +297,8 @@
 	for (let i = (circular?0:1); i < n; i++) {
 	    // the "previous" point in a modular way
 	    let k = pred(i); // circular ? ((i + n - 1) % n) : (i-1);
-	    // let sin = dy[k] / D[k];
-	    //let cos = dx[k] / D[k];
 	    let sin = ds[k].y / D[k];
 	    let cos = ds[k].x / D[k];
-	    // let [x, y] = HobbyPath.utils.rotate(dx[i], dy[i], -sin, cos);
 	    let vec = HobbyPath.utils.rotate_V(ds[i], -sin, cos);
 	    gamma[i] = Math.atan2(vec.y, vec.x);
 	}
@@ -361,33 +360,19 @@
 	let y2 = new Array(n);
 	let startControlPoints = new Array(n);
 	let endControlPoints = new Array(n);
-	// let bezierCurves = new Array(n);
 	for (let i = 0; i < n; i++) {
 	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
 	    let a = rho(alpha[i], beta[i]) * D[i] / 3;
 	    let b = rho(beta[i], alpha[i]) * D[i] / 3;
-	    /* let [x, y] = HobbyPath.utils.normalize.apply(null, HobbyPath.utils.rotateAngle(dx[i], dy[i], alpha[i]));
-	    x1[i] = Px[i] + a * x;
-	    y1[i] = Py[i] + a * y;
-	    [x, y] = HobbyPath.utils.normalize.apply(null, HobbyPath.utils.rotateAngle(dx[i], dy[i], -beta[i]));
-	    x2[i] = Px[j] - b * x;
-	    y2[i] = Py[j] - b * y;
-	    */
 	    let v = HobbyPath.utils.normalize_V(HobbyPath.utils.rotateAngle_V(ds[i], alpha[i]));
-	    x1[i] = Px[i] + a * v.x;
-	    y1[i] = Py[i] + a * v.y;
-	    startControlPoints[i] = new Vertex( Px[i] + a * v.x, Py[i] + a * v.y );
+	    startControlPoints[i] = new Vertex( pathVerts[i].x + a * v.x, pathVerts[i].y + a * v.y );
 	    v = HobbyPath.utils.normalize_V(HobbyPath.utils.rotateAngle_V(ds[i], -beta[i]));
-	    x2[i] = Px[j] - b * v.x;
-	    y2[i] = Py[j] - b * v.y;
-	    endControlPoints[i] = new Vertex( Px[j] - b * v.x, Py[j] - b * v.y );
+	    endControlPoints[i] = new Vertex( pathVerts[j].x - b * v.x, pathVerts[j].y - b * v.y );
 	}
-	// return [x1, y1, x2, y2];
 	return { startControlPoints, startControlPoints, endControlPoints, endControlPoints };
     }
 
     HobbyPath.prototype.addPoint = function(p) {
-	// console.log('addPoint',p);
 	this.vertices.push( p );
 	this.pointsX.push( p.x );
 	this.pointsY.push( p.y );
@@ -401,11 +386,8 @@
 	var curves = [];
 	
 	if (n > 1) {
-	    // starting point
-	    //d += `M ${this.pointsX[0]} ${this.pointsY[0]}`;
 	    if (n == 2) {
 		// for two points, just draw a straight line
-		//d += `L ${this.pointsX[1]} ${this.pointsY[1]}`;
 		return [ new CubicBezierCurve(
 		    new Vertex(this.pointsX[0],this.pointsY[0]),
 		    new Vertex(this.pointsX[1],this.pointsY[1]),
@@ -413,49 +395,17 @@
 		    new Vertex(this.pointsX[1],this.pointsY[1])
 		) ];
 	    } else {
-		/* if (!closedLoop) {
-		    // open curve
-		    // x1 and y1 contain the coordinates of the first control
-		    // points, x2 and y2 those of the second
-		    let [x1, y1, x2, y2] = HobbyPath.hobbyOpen(this.pointsX, this.pointsY);
-		    for (let i = 0; i < n - 1; i++) {
-			//d += `C ${x1[i]} ${y1[i]}, ${x2[i]} ${y2[i]}, ${this.pointsX[i+1]} ${this.pointsY[i+1]}`;
-			curves.push( new CubicBezierCurve(
-			    new Vertex(this.pointsX[i],this.pointsY[i]),
-			    new Vertex(this.pointsX[i+1],this.pointsY[i+1]),
-			    new Vertex(x1[i],y1[i]),
-			    new Vertex(x2[i],y2[i])
-			) );
-		    }
-		    return curves;
-		} else { */
-		    // closed curve
-		    // see comments above
-		    /* let [x1, y1, x2, y2] = HobbyPath.hobbyClosed(this.pointsX, this.pointsY, closedLoop);
-		    for (let i = 0; i < n - (closedLoop?0:1); i++) {
-			// if i is n-1, the "next" point is the first one
-			let j = (i+1) % n;
-			d += `C ${x1[i]} ${y1[i]}, ${x2[i]} ${y2[i]}, ${this.pointsX[j]} ${this.pointsY[j]}`;
-			curves.push( new CubicBezierCurve(
-			    new Vertex(this.pointsX[i],this.pointsY[i]),
-			    new Vertex(this.pointsX[j],this.pointsY[j]),
-			    new Vertex(x1[i],y1[i]),
-			    new Vertex(x2[i],y2[i])
-			) );
-		    }
-		    return curves;
-		    */
 
-		let controlPoints = HobbyPath.hobbyClosed(this.pointsX, this.pointsY, closedLoop);
+		// let controlPoints = HobbyPath.hobbyClosed(this.pointsX, this.pointsY, closedLoop);
+		let controlPoints = HobbyPath.hobbyClosed(this.vertices, this.points, closedLoop);
 		for (let i = 0; i < n - (closedLoop?0:1); i++) {
 		    // if i is n-1, the "next" point is the first one
-		    let j = (i+1) % n;
-		    // d += `C ${x1[i]} ${y1[i]}, ${x2[i]} ${y2[i]}, ${this.pointsX[j]} ${this.pointsY[j]}`;
+		    let j = (i+1) % n; // Use a succ function here
 		    curves.push( new CubicBezierCurve(
 			new Vertex(this.pointsX[i],this.pointsY[i]),
 			new Vertex(this.pointsX[j],this.pointsY[j]),
-			controlPoints.startControlPoints[i], // new Vertex(x1[i],y1[i]),
-			controlPoints.endControlPoints[i] // new Vertex(x2[i],y2[i])
+			controlPoints.startControlPoints[i], 
+			controlPoints.endControlPoints[i] 
 		    ) );
 		}
 		return curves;
