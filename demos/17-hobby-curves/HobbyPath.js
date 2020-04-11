@@ -359,6 +359,9 @@
 	let y1 = new Array(n);
 	let x2 = new Array(n);
 	let y2 = new Array(n);
+	let startControlPoints = new Array(n);
+	let endControlPoints = new Array(n);
+	// let bezierCurves = new Array(n);
 	for (let i = 0; i < n; i++) {
 	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
 	    let a = rho(alpha[i], beta[i]) * D[i] / 3;
@@ -373,12 +376,14 @@
 	    let v = HobbyPath.utils.normalize_V(HobbyPath.utils.rotateAngle_V(ds[i], alpha[i]));
 	    x1[i] = Px[i] + a * v.x;
 	    y1[i] = Py[i] + a * v.y;
+	    startControlPoints[i] = new Vertex( Px[i] + a * v.x, Py[i] + a * v.y );
 	    v = HobbyPath.utils.normalize_V(HobbyPath.utils.rotateAngle_V(ds[i], -beta[i]));
 	    x2[i] = Px[j] - b * v.x;
 	    y2[i] = Py[j] - b * v.y;
-	    
+	    endControlPoints[i] = new Vertex( Px[j] - b * v.x, Py[j] - b * v.y );
 	}
-	return [x1, y1, x2, y2];
+	// return [x1, y1, x2, y2];
+	return { startControlPoints, startControlPoints, endControlPoints, endControlPoints };
     }
 
     HobbyPath.prototype.addPoint = function(p) {
@@ -426,7 +431,7 @@
 		} else { */
 		    // closed curve
 		    // see comments above
-		    let [x1, y1, x2, y2] = HobbyPath.hobbyClosed(this.pointsX, this.pointsY, closedLoop);
+		    /* let [x1, y1, x2, y2] = HobbyPath.hobbyClosed(this.pointsX, this.pointsY, closedLoop);
 		    for (let i = 0; i < n - (closedLoop?0:1); i++) {
 			// if i is n-1, the "next" point is the first one
 			let j = (i+1) % n;
@@ -439,6 +444,21 @@
 			) );
 		    }
 		    return curves;
+		    */
+
+		let controlPoints = HobbyPath.hobbyClosed(this.pointsX, this.pointsY, closedLoop);
+		for (let i = 0; i < n - (closedLoop?0:1); i++) {
+		    // if i is n-1, the "next" point is the first one
+		    let j = (i+1) % n;
+		    // d += `C ${x1[i]} ${y1[i]}, ${x2[i]} ${y2[i]}, ${this.pointsX[j]} ${this.pointsY[j]}`;
+		    curves.push( new CubicBezierCurve(
+			new Vertex(this.pointsX[i],this.pointsY[i]),
+			new Vertex(this.pointsX[j],this.pointsY[j]),
+			controlPoints.startControlPoints[i], // new Vertex(x1[i],y1[i]),
+			controlPoints.endControlPoints[i] // new Vertex(x2[i],y2[i])
+		    ) );
+		}
+		return curves;
 	//	}
 	    }
 	} else {
