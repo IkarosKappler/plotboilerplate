@@ -64,8 +64,8 @@
 	// +-------------------------------
 	var drawHobby = function() {
 
-	    hobbyPath = new HobbyPath( pointList.pointList[0] );
-	    for( var i = 1; i < pointList.pointList.length; i++ )
+	    hobbyPath = new HobbyPath(); //  pointList.pointList[0] );
+	    for( var i = 0; i < pointList.pointList.length; i++ )
 		hobbyPath.addPoint( pointList.pointList[i] );
 
 	    // #region FROM hobby.js

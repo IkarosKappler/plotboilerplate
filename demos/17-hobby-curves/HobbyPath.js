@@ -23,14 +23,45 @@
 
 (function() {
     
+    // SVG elements
+    var svgs = [];
+    // SVG namespace
+    var svgNS;
+    // helper SVG point used in mouse event handler
+    var pt;
+    // point radius
+    var R = 5;
+    // distance up to which existing points and mouse clicks are
+    // identified - see `nearPoint`
+    var dist = (R + 3) * (R + 3);
+    // coordinates of current points
+    var pointsX, pointsY;
+    // two lists - points[0] and points[1] - of SVG elements correspoding
+    // to pointsX/pointsY
+    var points;
+    // the two SVG path elements, left (natural) and right (Hobby)
+    var path0, path1;
+    // whether the loop is interpreted as closed (i.e. last point is
+    // connected to first one)
+    //var closedLoop = false;
+    // if not negative, this is the "active" point currently moved by the
+    // mouse; counting starts at 0
+    var active = -1;
+    // if positive, this is the point after which the next one will be
+    // inserted; set by pressing a number key; counting starts at 1
+    var insertAt = 0;
+    // if true, the (gray) right side won't be shown
+    var noHobby = false;
+    // if true, the left side won't be shown
+    var noNatural = false;
     // "curl"
     var omega = 0;
 
-    var HobbyPath = function(startPoint) {
+    var HobbyPath = function() { // startPoint) {
 
 	this.vertices = []; // pointsX and pointsY
 	
-	/* function clearPoints (path) {
+	function clearPoints (path) {
 	    path.insertAt = 0;
 	    path.pointsX = [];
 	    path.pointsY = [];
@@ -39,13 +70,13 @@
 	    path.points[1] = [];
 	    //path.removeAllCircles(svgs[0]);
 	    //path.removeAllCircles(svgs[1]);
-	} */
-	// clearPoints(this);
+	}
+	clearPoints(this);
 	// this.addPoint( startPoint );
 
 
 	// changes the position of the point indexed by "active"
-	/* function newPos (x, y) {
+	function newPos (x, y) {
 	    if (active < 0)
 		return;
 	    for (let i = 0; i < 2; i++)
@@ -56,7 +87,7 @@
 	    pointsX[active] = x;
 	    pointsY[active] = y;
 	    drawPath();
-	}*/ 
+	}
 
 	// the main workhorse function which draws the curve(s) based on the
 	// existing points - it does this by setting up the "d" attributes of
@@ -132,7 +163,7 @@
     // the angles alpha and beta, the return value is the distance between
     // a control point and its neighboring point; to compute sigma(a,b)
     // we'll simply use rho(b,a)
-    /* function rho (a, b) {
+    function rho (a, b) {
 	// see video for formula
 	let sa = Math.sin(a);
 	let sb = Math.sin(b);
@@ -142,7 +173,7 @@
 	let num = 4 + Math.sqrt(8) * (sa - sb/16) * (sb - sa/16) * (ca - cb);
 	let den = 2 + (s5 - 1) * ca + (3 - s5) * cb;
 	return num/den;
-    } */
+    }
 
     // computes four arrays for the x and y coordinates of the first and
     // second controls points for a Hobby curve through the points given
@@ -331,8 +362,8 @@
 	let endControlPoints = new Array(n);
 	for (let i = 0; i < n; i++) {
 	    let j = succ(i); // circular ? ((i + 1) % n) : (i+1);
-	    let a = HobbyPath.utils.rho(alpha[i], beta[i]) * D[i] / 3;
-	    let b = HobbyPath.utils.rho(beta[i], alpha[i]) * D[i] / 3;
+	    let a = rho(alpha[i], beta[i]) * D[i] / 3;
+	    let b = rho(beta[i], alpha[i]) * D[i] / 3;
 	    let v = HobbyPath.utils.normalize_V(HobbyPath.utils.rotateAngle_V(ds[i], alpha[i]));
 	    startControlPoints[i] = new Vertex( pathVerts[i].x + a * v.x, pathVerts[i].y + a * v.y );
 	    v = HobbyPath.utils.normalize_V(HobbyPath.utils.rotateAngle_V(ds[i], -beta[i]));
@@ -343,14 +374,13 @@
 
     HobbyPath.prototype.addPoint = function(p) {
 	this.vertices.push( p );
-	// this.pointsX.push( p.x );
-	// this.pointsY.push( p.y );
+	this.pointsX.push( p.x );
+	this.pointsY.push( p.y );
     };
 
     HobbyPath.prototype.generateCurve = function( closedLoop ) {
 
-	// let n = this.pointsX.length;
-	let n = this.vertices.length;
+	let n = this.pointsX.length;
 	let d = '';
 
 	var curves = [];
@@ -359,10 +389,10 @@
 	    if (n == 2) {
 		// for two points, just draw a straight line
 		return [ new CubicBezierCurve(
-		    this.vertices[0], 
-		    this.vertices[1], 
-		    this.vertices[0], 
-		    this.vertices[1], 
+		    new Vertex(this.pointsX[0],this.pointsY[0]),
+		    new Vertex(this.pointsX[1],this.pointsY[1]),
+		    new Vertex(this.pointsX[0],this.pointsY[0]),
+		    new Vertex(this.pointsX[1],this.pointsY[1])
 		) ];
 	    } else {
 
@@ -370,10 +400,10 @@
 		let controlPoints = HobbyPath.hobbyClosed(this.vertices, this.points, closedLoop);
 		for (let i = 0; i < n - (closedLoop?0:1); i++) {
 		    // if i is n-1, the "next" point is the first one
-		    let j = (i+1) % n; // TODO: Use a succ function here
+		    let j = (i+1) % n; // Use a succ function here
 		    curves.push( new CubicBezierCurve(
-			this.vertices[i],
-			this.vertices[j],
+			new Vertex(this.pointsX[i],this.pointsY[i]),
+			new Vertex(this.pointsX[j],this.pointsY[j]),
 			controlPoints.startControlPoints[i], 
 			controlPoints.endControlPoints[i] 
 		    ) );
@@ -421,21 +451,6 @@
 		return new Vertex(0,0); // [0, 0];
 	    else
 		return new Vertex( vec.x/n, vec.y/n ); // TODO: do in-place // [x / n, y / n];
-	},
-	// the "velocity function" (also called rho in the video); a and b are
-	// the angles alpha and beta, the return value is the distance between
-	// a control point and its neighboring point; to compute sigma(a,b)
-	// we'll simply use rho(b,a)
-	rho : function(a, b) {
-	    // see video for formula
-	    let sa = Math.sin(a);
-	    let sb = Math.sin(b);
-	    let ca = Math.cos(a);
-	    let cb = Math.cos(b);
-	    let s5 = Math.sqrt(5);
-	    let num = 4 + Math.sqrt(8) * (sa - sb/16) * (sb - sa/16) * (ca - cb);
-	    let den = 2 + (s5 - 1) * ca + (3 - s5) * cb;
-	    return num/den;
 	},
 	// Implements the Thomas algorithm for a tridiagonal system with i-th
 	// row a[i]x[i-1] + b[i]x[i] + c[i]x[i+1] = d[i] starting with row
