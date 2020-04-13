@@ -71,7 +71,7 @@
 	    //path.removeAllCircles(svgs[0]);
 	    //path.removeAllCircles(svgs[1]);
 	}
-	clearPoints(this);
+	clearPoints(this); 
 	// this.addPoint( startPoint );
 
 
