@@ -1,10 +1,10 @@
 /**
- * A script for testing vector fields.
+ * A script for testing Hobby curves.
  *
  * @require PlotBoilerplate, MouseHandler, gup, dat.gui
  * 
  * @author   Ikaros Kappler
- * @date     2019-02-03
+ * @date     2019-04-07
  * @version  1.0.0
  **/
 
@@ -46,7 +46,9 @@
 		  backgroundColor       : '#ffffff',
 		  enableMouse           : true,
 		  enableKeys            : true,
-		  enableTouch           : true
+		  enableTouch           : true,
+
+		  enableSVGExport       : false
 		}, GUP
 	    )
 	);
@@ -95,14 +97,11 @@
 	// | Compute and draw the Hobby curve.
 	// +-------------------------------
 	var drawCubicSpline = function() {
-	    // pb.draw.circleHandle( pb.vertices[0], 10, 'rgba(192,192,192,1.0)' );
-	    //pb.draw.polyline( pb.vertices, true, 'rgba(192,192,192,0.5)', 1 );
-
 	    var cubicSplinePath = new CubicSplinePath();
 	    for( var i = 0; i < pointList.pointList.length; i++ )
 		cubicSplinePath.addPoint( pointList.pointList[i] );
 	    
-	    var curves = cubicSplinePath.generateCurve( config.circular ); // , config.omega );
+	    var curves = cubicSplinePath.generateCurve( config.circular );
 	    for( var i = 0; i < curves.length; i++ ) {		
 		pb.draw.cubicBezier( curves[i].startPoint,
 				     curves[i].endPoint, 
@@ -157,11 +156,6 @@
 	    drawHobbyPath         : true,
 	    drawCubicPath         : false,
 	    animate               : false,
-	    colors                : {
-		trisectors : [ 'rgba(0,164,0,0.5)', 'rgba(255,128,0,0.5)', 'rgba(0,96,255,0.5)' ],
-		hexagon : 'rgba(0,164,255,0.7)',
-		triangle : 'rgba(255,128,0,1.0)'
-	    }
 	}, GUP );
 	
 
@@ -207,13 +201,6 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-
-	    var f0 = gui.addFolder('Colors');
-	    f0.addColor(config.colors.trisectors, 0).onChange( function() { pb.redraw(); } ).name('Trisector A').title('The first trisector');
-	    f0.addColor(config.colors.trisectors, 1).onChange( function() { pb.redraw(); } ).name('Trisector B').title('The second trisector');
-	    f0.addColor(config.colors.trisectors, 2).onChange( function() { pb.redraw(); } ).name('Trisector C').title('The third trisector');
-	    f0.addColor(config.colors, 'hexagon').onChange( function() { pb.redraw(); } ).name('Hexagon').title('The hexagon color');
-	    f0.addColor(config.colors, 'triangle').onChange( function() { pb.redraw(); } ).name('Triangle').title('The triangle color');
 	    
 	    var f1 = gui.addFolder('Path');
 	    f1.add(config, 'circular').onChange( function() { pb.redraw(); } ).name('Circular').title('Close the loop.');
