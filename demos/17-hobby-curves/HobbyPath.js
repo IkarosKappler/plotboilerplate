@@ -17,16 +17,22 @@
 
     var HobbyPath = function() {
 	this.vertices = [];
-	this.omega = 0;
     };
 
+    /**
+     * Computes the control point coordinates for a Hobby curve through
+     * the points given.
+     *
+     * @param {boolean}  circular - If true, then the path will be closed.
+     * @param {number=0} omega    - The 'curl' or the path.
+     * @return {object} An object with two members: startControlPoints and endControlPoints (Array<Vertex>).
+     **/
+    HobbyPath.prototype.hobbyControls = function(circular, omega) {
+	// This is a version that works for both, closed and non-closed paths.
 
-    // computes four arrays for the x and y coordinates of the first and
-    // second controls points for a Hobby curve through the points given
-    // by Px and Py, a "closed" curve which returns to its starting point
-    HobbyPath.prototype.hobbyClosed = function(circular) {
-	// most of the code here is identical to the open version and thus
-	// doesn't have comments
+	if( typeof omega == 'undefined' )
+	    omega = 0;
+	
 	let n = this.vertices.length - (circular ? 0 : 1);
 	let D = new Array(n);
 
@@ -85,11 +91,11 @@
 	    // will be that the curvature at the first point is identical to the
 	    // curvature at the second point (and likewise for the last and
 	    // second-to-last)
-	    b[0] = 2 + this.omega;
-	    c[0] = 2 * this.omega + 1;
+	    b[0] = 2 + omega;
+	    c[0] = 2 * omega + 1;
 	    d[0] = -c[0] * gamma[1];
-	    a[n] = 2 * this.omega + 1;
-	    b[n] = 2 + this.omega;
+	    a[n] = 2 * omega + 1;
+	    b[n] = 2 + omega;
 	    d[n] = 0;
 	    // solve system for the angles called "alpha" in the video
 	    alpha = HobbyPath.utils.thomas(a, b, c, d);
@@ -100,10 +106,6 @@
 	    // again, see Jackowski article
 	    beta[n-1] = -alpha[n];
 	}
-	let x1 = new Array(n);
-	let y1 = new Array(n);
-	let x2 = new Array(n);
-	let y2 = new Array(n);
 	let startControlPoints = new Array(n);
 	let endControlPoints = new Array(n);
 	for (let i = 0; i < n; i++) {
@@ -115,15 +117,15 @@
 	    v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], -beta[i]));
 	    endControlPoints[i] = new Vertex( this.vertices[j].x - b * v.x, this.vertices[j].y - b * v.y );
 	}
-	return { startControlPoints, startControlPoints, endControlPoints, endControlPoints };
+	return { startControlPoints : startControlPoints, endControlPoints: endControlPoints };
     }
 
     HobbyPath.prototype.addPoint = function(p) {
 	this.vertices.push( p );
     };
 
-    HobbyPath.prototype.generateCurve = function( closedLoop ) {
-	let n = this.vertices.length; // this.pointsX.length;
+    HobbyPath.prototype.generateCurve = function( circular, omega ) {
+	let n = this.vertices.length;
 	let d = '';
 	var curves = [];	
 	if (n > 1) {
@@ -136,8 +138,8 @@
 		    this.vertices[1] 
 		) ];
 	    } else {
-		let controlPoints = this.hobbyClosed(closedLoop);
-		for (let i = 0; i < n - (closedLoop?0:1); i++) {
+		let controlPoints = this.hobbyControls(circular,omega);
+		for (let i = 0; i < n - (circular?0:1); i++) {
 		    // if i is n-1, the "next" point is the first one
 		    let j = (i+1) % n; // Use a succ function here
 		    curves.push( new CubicBezierCurve(
