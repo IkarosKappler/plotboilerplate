@@ -57,6 +57,11 @@
 	// +-------------------------------
 	var hobbyPath = new HobbyPath();
 
+	var drawAll = function() {
+	    if( config.drawHobbyPath ) drawHobby();
+	    if( config.drawCubicPath ) drawCubicSpline();
+	}
+
 	var drawHandleLine = function( start, end ) {
 	    pb.draw.line( start, end, 'rgba(0,192,64,0.55)', 3 );
 	    var perpA = new Vector(end,start).perp().setLength(12);
@@ -65,7 +70,7 @@
 	};
 	
 	// +---------------------------------------------------------------------------------
-	// | Compute and draw the Morley triangle.
+	// | Compute and draw the Hobby curve.
 	// +-------------------------------
 	var drawHobby = function() {
 	    pb.draw.circleHandle( pb.vertices[0], 10, 'rgba(192,192,192,1.0)' );
@@ -79,6 +84,32 @@
 				     curves[i].endControlPoint, 
 				     'rgba(255,128,0,0.95)',
 				     5
+				   );
+		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint );
+		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint );
+	    }
+	};
+
+
+	// +---------------------------------------------------------------------------------
+	// | Compute and draw the Hobby curve.
+	// +-------------------------------
+	var drawCubicSpline = function() {
+	    // pb.draw.circleHandle( pb.vertices[0], 10, 'rgba(192,192,192,1.0)' );
+	    //pb.draw.polyline( pb.vertices, true, 'rgba(192,192,192,0.5)', 1 );
+
+	    var cubicSplinePath = new CubicSplinePath();
+	    for( var i = 0; i < pointList.pointList.length; i++ )
+		cubicSplinePath.addPoint( pointList.pointList[i] );
+	    
+	    var curves = cubicSplinePath.generateCurve( config.circular ); // , config.omega );
+	    for( var i = 0; i < curves.length; i++ ) {		
+		pb.draw.cubicBezier( curves[i].startPoint,
+				     curves[i].endPoint, 
+				     curves[i].startControlPoint, 
+				     curves[i].endControlPoint, 
+				     'rgba(128,255,0,0.65)',
+				     2
 				   );
 		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint );
 		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint );
@@ -123,6 +154,8 @@
 	    circular              : false,
 	    pointCount            : 4,
 	    omega                 : 0,
+	    drawHobbyPath         : true,
+	    drawCubicPath         : false,
 	    animate               : false,
 	    colors                : {
 		trisectors : [ 'rgba(0,164,0,0.5)', 'rgba(255,128,0,0.5)', 'rgba(0,96,255,0.5)' ],
@@ -185,6 +218,8 @@
 	    var f1 = gui.addFolder('Path');
 	    f1.add(config, 'circular').onChange( function() { pb.redraw(); } ).name('Circular').title('Close the loop.');
 	    f1.add(config, 'omega').min(0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Omega').title("The 'curviness'.");
+	    f1.add(config, 'drawHobbyPath').onChange( function() { pb.redraw(); } ).name('Hobby').title('Draw Hobby Path.');
+	    f1.add(config, 'drawCubicPath').onChange( function() { pb.redraw(); } ).name('Cubic').title('Draw plain cubic Path.');
 	    f1.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
 	    f1.open();
 	}
@@ -192,7 +227,7 @@
 	toggleAnimation();
 	updatePointList();
 
-	pb.config.preDraw = drawHobby;
+	pb.config.preDraw = drawAll;
 	pb.redraw();
 
     }
