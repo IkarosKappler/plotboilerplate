@@ -30,28 +30,32 @@
 		    // open curve
 		    // x1 and y1 contain the coordinates of the first control
 		    // points, x2 and y2 those of the second
-		    let [x1, x2] = naturalControlsOpen(xs);
-		    let [y1, y2] = naturalControlsOpen(ys);
+		    //let [x1, x2] = naturalControlsOpen(xs);
+		    //let [y1, y2] = naturalControlsOpen(ys);
+		    let controlsX = naturalControlsOpen(xs);
+		    let controlsY = naturalControlsOpen(ys);
 		    for (let i = 1; i < n; i++) {
 			// add Bézier segment - two control points and next node
 			curves.push( new CubicBezierCurve( this.vertices[i-1],
 							   this.vertices[i],
-							   new Vertex(x1[i-1], y1[i-1]),
-							   new Vertex(x2[i-1], y2[i-1])
+							   new Vertex(controlsX.start[i-1], controlsY.start[i-1]), // x1[i-1], y1[i-1]), // new Vertex(x1[i-1], y1[i-1]),
+							   new Vertex(controlsX.end[i-1], controlsY.end[i-1])  // new Vertex(x2[i-1], y2[i-1])
 							 ) )
 		    }
 		} else {
 		    // closed curve, i.e. endpoints are connected
 		    // see comments for open curve
-		    let [x1, x2] = naturalControlsClosed(xs);
-		    let [y1, y2] = naturalControlsClosed(ys);
+		    //let [x1, x2] = naturalControlsClosed(xs);
+		    //let [y1, y2] = naturalControlsClosed(ys);
+		    let controlsX = naturalControlsClosed(xs);
+		    let controlsY = naturalControlsClosed(ys);
 		    for (let i = 0; i < n; i++) {
 			// if i is n-1, the "next" point is the first one
 			let j = (i+1) % n;
 			curves.push( new CubicBezierCurve( this.vertices[i],
 							   this.vertices[j],
-							   new Vertex(x1[i], y1[i]),
-							   new Vertex(x2[i], y2[i])
+							   new Vertex(controlsX.start[i], controlsY.start[i]), // new Vertex(x1[i], y1[i]),
+							   new Vertex(controlsX.end[i], controlsY.end[i])  // new Vertex(x2[i], y2[i])
 							 ) )
 		    }
 		}
@@ -91,7 +95,7 @@
 	for (let i = 0; i < n-1; i++)
 	    x2[i] = 2*K[i+1] - x1[i+1];
 	x2[n-1] = 2*K[0] - x1[0];
-	return [x1, x2];
+	return { start : x1, end : x2 }; // [x1, x2];
     }
 
 
@@ -124,10 +128,11 @@
 	let x1 = HobbyPath.utils.thomas(a, b, c, d);
 	// compute second controls points from first
 	let x2 = new Array(n);
-	for (let i = 0; i < n-1; i++)
+	for (let i = 0; i < n-1; i++) {
 	    x2[i] = 2*K[i+1] - x1[i+1];
+	}
 	x2[n-1] = (K[n] + x1[n-1]) / 2;
-	return [x1, x2];
+	return { start : x1, end : x2 }; // [x1, x2];
     }
 
     // computes two arrays for the first and second controls points for a
