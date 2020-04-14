@@ -12,7 +12,7 @@
     
     CubicSplinePath.prototype.generateCurve = function( circular ) {
 
-	cirular = true;
+	// cirular = true;
 
 	var xs = [];
 	var ys = [];
@@ -61,6 +61,11 @@
 			// if i is n-1, the "next" point is the first one
 			let j = (i+1) % n;
 			// d += `C ${x1[i]} ${y1[i]}, ${x2[i]} ${y2[i]}, ${pointsX[j]} ${pointsY[j]}`;
+			curves.push( new CubicBezierCurve( this.vertices[i],
+							   this.vertices[j],
+							   new Vertex(x1[i], y1[i]),
+							   new Vertex(x2[i], y2[i])
+							 ) )
 		    }
 		}
 	    }
