@@ -39,8 +39,8 @@
 		    // points, x2 and y2 those of the second
 		    //let [x1, x2] = naturalOpen(pointsX);
 		    //let [y1, y2] = naturalOpen(pointsY);
-		    let [x1, x2] = naturalControls(xs,circular);
-		    let [y1, y2] = naturalControls(ys,circular);
+		    let [x1, x2] = naturalControlsOpen(xs);
+		    let [y1, y2] = naturalControlsOpen(ys);
 		    for (let i = 1; i < n; i++) {
 			// add BĂŠzier segment - two control points and next node
 			// d += `C ${x1[i-1]} ${y1[i-1]}, ${x2[i-1]} ${y2[i-1]}, ${pointsX[i]} ${pointsY[i]}`;
@@ -55,8 +55,8 @@
 		    // see comments for open curve
 		    //let [x1, x2] = naturalClosed(pointsX);
 		    //let [y1, y2] = naturalClosed(pointsY);
-		    let [x1, x2] = naturalControls(xs,circular);
-		    let [y1, y2] = naturalControls(ys,circular);
+		    let [x1, x2] = naturalControlsClosed(xs);
+		    let [y1, y2] = naturalControlsClosed(ys);
 		    for (let i = 0; i < n; i++) {
 			// if i is n-1, the "next" point is the first one
 			let j = (i+1) % n;
@@ -76,7 +76,7 @@
     };
 
 
-    function naturalControls (K) {
+    function naturalControlsClosed(K) {
 	let n = K.length;
 	// a, b, and c are the diagonals of the tridiagonal matrix, d is the
 	// right side
@@ -113,7 +113,7 @@
     // natural cubic spline through the points in K, an "open" curve where
     // the curve doesn't return to the starting point; the function works
     // with one coordinate at a time, i.e. it has to be called twice
-    function naturalOpen (K) {
+    function naturalControlsOpen(K) {
 	let n = K.length - 1;
 	// a, b, and c are the diagonals of the tridiagonal matrix, d is the
 	// right side
@@ -135,7 +135,7 @@
 	    d[i] = 4*K[i] + 2*K[i+1];
 	}
 	// solve the system to get the first control points
-	let x1 = thomas(a, b, c, d);
+	let x1 = HobbyPath.utils.thomas(a, b, c, d);
 	// compute second controls points from first
 	let x2 = new Array(n);
 	for (let i = 0; i < n-1; i++)
@@ -148,7 +148,7 @@
     // natural cubic spline through the points in K, a "closed" curve
     // which returns to its starting point; the function works with one
     // coordinate at a time, i.e. it has to be called twice
-    function naturalClosed (K) {
+    /* function naturalClosed (K) {
 	let n = K.length;
 	// a, b, and c are the diagonals of the tridiagonal matrix, d is the
 	// right side
@@ -178,7 +178,7 @@
 	    x2[i] = 2*K[i+1] - x1[i+1];
 	x2[n-1] = 2*K[0] - x1[0];
 	return [x1, x2];
-    }
+    } */
 
     window.CubicSplinePath = CubicSplinePath;
 
