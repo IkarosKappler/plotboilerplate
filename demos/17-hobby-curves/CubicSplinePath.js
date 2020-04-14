@@ -11,39 +11,29 @@
 
     
     CubicSplinePath.prototype.generateCurve = function( circular ) {
-
-	// cirular = true;
-
 	var xs = [];
 	var ys = [];
 	for( var i = 0; i < this.vertices.length; i++ ) {
 	    xs.push( this.vertices[i].x );
 	    ys.push( this.vertices[i].y );
 	}
-
 	var curves = [];
 	
 	let d = '';
-	let n = this.vertices.length; // pointsX.length;
-	// first the natural spline
+	let n = this.vertices.length; 
 	if (n > 1) {
-	    // starting point
-	    // d += `M ${pointsX[0]} ${pointsY[0]}`;
 	    if (n == 2) {
 		// for two points, just draw a straight line
-		// d += `L ${pointsX[1]} ${pointsY[1]}`;
+		curves.push( new CubicBezierCurve( this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1] ) );
 	    } else {
-		if (!circular ) { // closedLoop) {
+		if (!circular ) {
 		    // open curve
 		    // x1 and y1 contain the coordinates of the first control
 		    // points, x2 and y2 those of the second
-		    //let [x1, x2] = naturalOpen(pointsX);
-		    //let [y1, y2] = naturalOpen(pointsY);
 		    let [x1, x2] = naturalControlsOpen(xs);
 		    let [y1, y2] = naturalControlsOpen(ys);
 		    for (let i = 1; i < n; i++) {
-			// add BĂŠzier segment - two control points and next node
-			// d += `C ${x1[i-1]} ${y1[i-1]}, ${x2[i-1]} ${y2[i-1]}, ${pointsX[i]} ${pointsY[i]}`;
+			// add Bézier segment - two control points and next node
 			curves.push( new CubicBezierCurve( this.vertices[i-1],
 							   this.vertices[i],
 							   new Vertex(x1[i-1], y1[i-1]),
@@ -53,14 +43,11 @@
 		} else {
 		    // closed curve, i.e. endpoints are connected
 		    // see comments for open curve
-		    //let [x1, x2] = naturalClosed(pointsX);
-		    //let [y1, y2] = naturalClosed(pointsY);
 		    let [x1, x2] = naturalControlsClosed(xs);
 		    let [y1, y2] = naturalControlsClosed(ys);
 		    for (let i = 0; i < n; i++) {
 			// if i is n-1, the "next" point is the first one
 			let j = (i+1) % n;
-			// d += `C ${x1[i]} ${y1[i]}, ${x2[i]} ${y2[i]}, ${pointsX[j]} ${pointsY[j]}`;
 			curves.push( new CubicBezierCurve( this.vertices[i],
 							   this.vertices[j],
 							   new Vertex(x1[i], y1[i]),
@@ -70,7 +57,6 @@
 		}
 	    }
 	}
-	// setAttributes(path0, [["d", d]]);
 
 	return curves;
     };
