@@ -552,6 +552,7 @@ for this purpose.
 * Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
 * https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf
 * https://github.com/loopspace/jsHobby
+* https://codepen.io/osublake/pen/BowJed Blake Bowen's Catmull-Rom demo
 
 
 ## Known bugs
