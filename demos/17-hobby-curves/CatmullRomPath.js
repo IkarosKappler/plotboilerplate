@@ -3,6 +3,9 @@
  *
  * This demo implementation was inspired by this Codepen by Blake Bowen
  * https://codepen.io/osublake/pen/BowJed
+ *
+ * @date 2020-04-15
+ * Converted to a class by Ikaros Kappler
  **/
 
 (function() {
@@ -18,8 +21,11 @@
     };
 
     /**
+     * Generate the path (an array of curves) from the vertices.
      *
-     * @param {number=2} tension
+     * @param {boolean} circular
+     * @param {number=1} tension
+     * @return {Array<CubicBezierCurve>}
      */
     CatmullRomPath.prototype.generateCurve = function( circular, tension ) {
 	if( typeof tension == 'undefined' )
