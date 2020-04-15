@@ -220,6 +220,9 @@
 	    pointList.addVertex(vert);
 	    hobbyPath.addPoint(vert);
 	    config.pointCount++;
+	    if( animator ) animator.stop();
+	    animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
+	    toggleAnimation();
 	    pb.redraw();
 	};
 
