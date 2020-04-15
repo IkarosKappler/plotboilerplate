@@ -9,7 +9,10 @@
 	this.vertices.push( p );
     };
 
-    
+
+    /**
+     * @param {boolean} circular
+     **/
     CubicSplinePath.prototype.generateCurve = function( circular ) {
 	var xs = [];
 	var ys = [];

@@ -60,15 +60,16 @@
 	var hobbyPath = new HobbyPath();
 
 	var drawAll = function() {
-	    if( config.drawHobbyPath ) drawHobby();
-	    if( config.drawCubicPath ) drawCubicSpline();
+	    if( config.drawHobbyPath )      drawHobby();
+	    if( config.drawCubicPath )      drawCubicSpline();
+	    if( config.drawCatmullRomPath ) drawCatmullRomSpline();
 	}
 
-	var drawHandleLine = function( start, end ) {
-	    pb.draw.line( start, end, 'rgba(0,192,64,0.55)', 3 );
+	var drawHandleLine = function( start, end, color ) {
+	    pb.draw.line( start, end, color, 3 );
 	    var perpA = new Vector(end,start).perp().setLength(12);
 	    var perpB = perpA.clone().inv();
-	    pb.draw.line( perpA.b, perpB.b, 'rgba(0,192,64,0.65)', 1 );
+	    pb.draw.line( perpA.b, perpB.b, color, 1 );
 	};
 	
 	// +---------------------------------------------------------------------------------
@@ -78,7 +79,7 @@
 	    pb.draw.circleHandle( pb.vertices[0], 10, 'rgba(192,192,192,1.0)' );
 	    pb.draw.polyline( pb.vertices, true, 'rgba(192,192,192,0.5)', 1 );
 
-	    var curves = hobbyPath.generateCurve( config.circular, config.omega );
+	    var curves = hobbyPath.generateCurve( config.circular, config.hobbyOmega );
 	    for( var i = 0; i < curves.length; i++ ) {		
 		pb.draw.cubicBezier( curves[i].startPoint,
 				     curves[i].endPoint, 
@@ -87,8 +88,8 @@
 				     'rgba(255,128,0,0.95)',
 				     5
 				   );
-		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint );
-		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint );
+		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
+		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
 	    }
 	};
 
@@ -110,8 +111,32 @@
 				     'rgba(128,255,0,0.65)',
 				     2
 				   );
-		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint );
-		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint );
+		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
+		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
+	    }
+	};
+
+
+	// +---------------------------------------------------------------------------------
+	// | Compute and draw the Hobby curve.
+	// +-------------------------------
+	var drawCatmullRomSpline = function() {
+	    var catmullRomPath = new CatmullRomPath();
+	    for( var i = 0; i < pointList.pointList.length; i++ )
+		catmullRomPath.addPoint( pointList.pointList[i] );
+
+	    var tension = 1.0;
+	    var curves = catmullRomPath.generateCurve( config.catmullTension );
+	    for( var i = 0; i < curves.length; i++ ) {		
+		pb.draw.cubicBezier( curves[i].startPoint,
+				     curves[i].endPoint, 
+				     curves[i].startControlPoint, 
+				     curves[i].endControlPoint, 
+				     'rgba(128,0,255,0.65)',
+				     2
+				   );
+		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
+		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
 	    }
 	};
 	
@@ -152,9 +177,11 @@
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
 	    circular              : false,
 	    pointCount            : 4,
-	    omega                 : 0,
 	    drawHobbyPath         : true,
+	    hobbyOmega            : 0,
 	    drawCubicPath         : false,
+	    drawCatmullRomPath    : false,
+	    catmullTension        : 1.0,
 	    animate               : false,
 	}, GUP );
 	
@@ -204,9 +231,11 @@
 	    
 	    var f1 = gui.addFolder('Path');
 	    f1.add(config, 'circular').onChange( function() { pb.redraw(); } ).name('Circular').title('Close the loop.');
-	    f1.add(config, 'omega').min(0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Omega').title("The 'curviness'.");
 	    f1.add(config, 'drawHobbyPath').onChange( function() { pb.redraw(); } ).name('Hobby').title('Draw Hobby Path.');
+	    f1.add(config, 'hobbyOmega').min(0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Omega (Hobby)').title("The 'curviness'.");
 	    f1.add(config, 'drawCubicPath').onChange( function() { pb.redraw(); } ).name('Cubic').title('Draw plain cubic Path.');
+	    f1.add(config, 'drawCatmullRomPath').onChange( function() { pb.redraw(); } ).name('Catmull-Rom').title('Draw Catmull-Rom Path.');
+	    f1.add(config, 'catmullTension').min(0).max(5.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Tension (Catmull-Rom)').title("The 'curviness'.")
 	    f1.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
 	    f1.open();
 	}
