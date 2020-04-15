@@ -126,7 +126,7 @@
 		catmullRomPath.addPoint( pointList.pointList[i] );
 
 	    var tension = 1.0;
-	    var curves = catmullRomPath.generateCurve( config.catmullTension );
+	    var curves = catmullRomPath.generateCurve( config.circular, config.catmullTension );
 	    for( var i = 0; i < curves.length; i++ ) {		
 		pb.draw.cubicBezier( curves[i].startPoint,
 				     curves[i].endPoint, 
