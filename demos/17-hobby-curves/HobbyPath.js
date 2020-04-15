@@ -75,9 +75,11 @@
 	var alpha;
 	var beta;
 	if( circular ) {
-	    let s = a[0];
+	    // let s = a[0];
+	    let s = a[0]*omega; // Use omega here?
 	    a[0] = 0;
-	    let t = c[n-1];
+	    //let t = c[n-1];
+	    let t = c[n-1]*omega; // Use omega here?
 	    c[n-1] = 0;
 	    alpha = HobbyPath.utils.sherman(a, b, c, d, s, t);
 	    beta = new Array(n);
