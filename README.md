@@ -10,7 +10,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (desktop and mobile)
 
 
-The compressed library has 70kb.
+The compressed library has 82kb.
 
 
 ## Install the package via npm
@@ -178,6 +178,13 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/16-morley-trisectors/index.html" title="See the demo">See the demo</a>
 
 
+### Hobby Curve
+
+![Hobby Curves](screenshots/screenshot-20200414-1-Hobby-cubic.png "Hobby Curves")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/17-hobby-curves/index.html" title="See the demo">See the demo</a>
+
+
 
 ## Initialization parameters
 
@@ -215,6 +222,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 | `enableTouch`| _boolean_ | `true` | Indicates if the application should handle touch events for you. |
 | `enableKeys`| _boolean_ | `true` | Indicates if the application should handle key events for you. |
 | `enableMouseWheel`| _boolean_ | `true` | Indicates if the application should handle mouse wheelevents for you. |
+| `enableSVGExport`| _boolean_ |  `true` | Indicates if the SVG export should be enabled (default is true). |    
 | `enableGL`| _boolean_ | `false` | [Experimental] Indicates if the application should use the experimental WebGL features. |
 
 
@@ -286,12 +294,12 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
   // float
   //   Visually resize the canvas using CSS transforms (scale).
-  cssScaleX	       	: 1.0,
-  cssScaleY	       	: 1.0,
+  cssScaleX	       	        : 1.0,
+  cssScaleY	       	        : 1.0,
 
   // boolean
   //   If set to true only cssScaleX applies for both dimensions.
-  cssUniformScale         : true,
+  cssUniformScale               : true,
 
   // string
   //   A background color (CSS string) for the canvas.
@@ -341,11 +349,14 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
   // boolean
   //   Indicates if the application should handle mouse wheelevents for you.
-  enableMouseWheel            : true,
+  enableMouseWheel              : true,
+
+  // Indicates if the SVG export should be enabled (default is true). 
+  enableSVGExport               : true,
 
   // boolean
   //   Indicates if the application should use the experimental WebGL features.
-  enableGL                    : false
+  enableGL                      : false
  } );
 ~~~					  
 

@@ -4,7 +4,17 @@ layout: page
 
 
 # Changelog
-* 2020-04-03
+* 2020-04-08
+  * Fixed the MouseHandler's click event (internally fired a 'mouseup' event).
+  * The new version always installs internal listenrs to track drag events even
+    if there is no external drag listener installed (1.1.0).
+* 2020-04-07 (v1.7.1)
+  * Fixed an error in the draw.grid(...) function. Non-rastered grids were not properly drawn on zoom and
+    pan comibinations.
+* 2020-04-06
+  * Fixed the radius error in the drawutils.circleHandle function. The radius parameter had no effect and circle
+    handles were always rendered with radius 3.
+* 2020-04-03 (v1.7.0)
   * Fixed broken SVG export (after porting to TS).
   * Fixed broken canvas resizer (after porting to TS).
 * 2020-04-01
