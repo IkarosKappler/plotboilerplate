@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-04-17
+date: 2020-04-28
 ---
 
 <div class="full-width">
@@ -93,6 +93,11 @@ date: 2020-04-17
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/17-hobby-curves/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200414-0-Hobby-and-cubic-spline-path.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/18-relative-neighbourhood-graph/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200427-relative-neighbour-graph-urquhart.png');"></div>
    </a>
 </div>
 </div>
