@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-04-27
+  * Added the Urquhart graph demo.
 * 2020-04-08
   * Fixed the MouseHandler's click event (internally fired a 'mouseup' event).
   * The new version always installs internal listenrs to track drag events even
