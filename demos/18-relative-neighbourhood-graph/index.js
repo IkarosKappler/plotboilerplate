@@ -1,7 +1,7 @@
 /**
- * A script for testing Relative Neighbourhood Graphs.
+ * A script for testing Urquhart (or Relative Neighbourhood) Graphs.
  *
- * @require PlotBoilerplate, MouseHandler, gup, dat.gui
+ * @require PlotBoilerplate, MouseHandler, gup, dat.gui, Delaunay, delaunay2urquhart
  * 
  * @author   Ikaros Kappler
  * @date     2019-04-27
@@ -61,10 +61,8 @@
 	var triangles;
 	var urquhartEdges;
 	var drawAll = function() {
-	    triangulate();
-	    // console.log( triangles );
-
-	    delaunay2urquhart();
+	    triangles = triangulate();
+	    urquhartEdges = delaunay2urquhart(triangles, pointList.pointList);
 
 	    if( config.drawDelaunay ) {
 		for( var t in triangles ) {
@@ -80,94 +78,14 @@
 	    }
 	}
 
-	var trySetMatrix = function( matrix, i, j, value ) {
-	    if( typeof matrix[i] == 'undefined' )
-		matrix[i] = {};
-	    if( typeof matrix[j] == 'undefined' )
-		matrix[j] = {};
-	    if( typeof matrix[i][j] == 'undefined' || value == false ) {
-		matrix[i][j] = value;
-		matrix[j][i] = value;
-	    }
-	};
 
-	var delaunay2urquhart = function( delaunayTriangles ) {
-	    // Step 0: clean up old stuff
-	    urquhartEdges = [];
-	    
-	    // Step 1/3: initialize the matrix.
-	
-	    // Set matrix[i][j]=false (symmetric) if there was an edge (i,j) in the delaunay
-	    // triangulation and it was deleted by the urquhart algorithm.
-	    // Otherwise set true. Non-edge pairs are kept undefined.
-	    var matrix = {};
-	    var n = pointList.pointList.length;
-	    for( var i = 0; i < n; i++ ) {
-		matrix[i] = {};
-	    }
-
-	    // Step 2/3: fill the matrix with egdes to be deleted (false) and edges to be kept (true).
-	    for( var t in triangles ) {
-		var tri = triangles[t];
-		// Set the two non-longest edges (if not deleted before)
-		var a = tri.a;
-		var b = tri.b;
-		var c = tri.c;
-
-		var ab = a.distance(b);
-		var bc = b.distance(c);
-		var ca = c.distance(a);
-		if( ab > bc && ab > ca ) {
-		    // ab is longest
-		    trySetMatrix( matrix, a.attr.pointListIndex, b.attr.pointListIndex, false );
-		    trySetMatrix( matrix, b.attr.pointListIndex, c.attr.pointListIndex, true );
-		    trySetMatrix( matrix, c.attr.pointListIndex, a.attr.pointListIndex, true );
-		} else if( bc > ab && bc > ca ) {
-		    // bc is longest
-		    trySetMatrix( matrix, a.attr.pointListIndex, b.attr.pointListIndex, true );
-		    trySetMatrix( matrix, b.attr.pointListIndex, c.attr.pointListIndex, false );
-		    trySetMatrix( matrix, c.attr.pointListIndex, a.attr.pointListIndex, true );
-		} else {
-		    // ca is longest
-		    trySetMatrix( matrix, a.attr.pointListIndex, b.attr.pointListIndex, true );
-		    trySetMatrix( matrix, b.attr.pointListIndex, c.attr.pointListIndex, true );
-		    trySetMatrix( matrix, c.attr.pointListIndex, a.attr.pointListIndex, false );
-		}
-	    }
-	    // console.log( matrix );
-
-	    // Step 3/3: build a list of edges
-	    for( var a = 0; a < n; a++ ) {
-		for( var b = 0; b < a; b++ ) {
-		    if( matrix[a][b] === true )
-			urquhartEdges.push( { a : pointList.pointList[a], b : pointList.pointList[b] } );
-		}
-	    }
-	    
-	};
-
-
-	/**
-	 * Make the triangulation (Delaunay).
-	 */
+	// +---------------------------------------------------------------------------------
+	// | Make the triangulation (Delaunay).
+	// +-------------------------------
 	var triangulate = function() {
 	    var delau = new Delaunay( pointList.pointList, {} );
-	    triangles  = delau.triangulate();
+	    return delau.triangulate();
 	};
-
-
-	/**
-	 * Convert the triangle set to the Voronoi diagram.
-	 */
-	var makeVoronoiDiagram = function() {
-	    var voronoiBuilder = new delaunay2voronoi(pointList.pointList,triangles);
-	    voronoiDiagram = voronoiBuilder.build();
-	    // The voronoi builde might have some 'failedTriangleSets' defined; this implies
-	    // that some vertices are located really close (or be event the same).
-	    // Let's ignore those here. Look at the 07-voronoi demo for details.
-	};
-
-
 	
 
 	// +---------------------------------------------------------------------------------
@@ -208,12 +126,18 @@
 	}, GUP );
 	
 
+	// +---------------------------------------------------------------------------------
+	// | Call when the number of desired points changed in config.pointCount.
+	// +-------------------------------
 	var updatePointList = function() {
 	    pointList.updatePointCount(config.pointCount,false); // No full cover
 	    animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
 	};
 
 
+	// +---------------------------------------------------------------------------------
+	// | Manually add a vertex to the point list (like on click).
+	// +-------------------------------
 	var addVertex = function(vert) {
 	    pointList.addVertex(vert);
 	    config.pointCount++;
@@ -225,7 +149,9 @@
 	};
 
 
-
+	// +---------------------------------------------------------------------------------
+	// | Some animation stuff.
+	// +-------------------------------
 	var animator = null;
 	function renderAnimation() {
 	    if( config.animate )
@@ -254,7 +180,6 @@
 	    gui.add(config, 'pointCount').onChange( function() { updatePointList(); } ).name("Point count").title("Point count");
 	    gui.add(config, 'drawDelaunay').onChange( function() { pb.redraw(); } ).name('Draw Delaunay triangulation').title('Draw the underlying Delaunay triangulation.');
 	    gui.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
-	    // f1.open();
 	}
 
 	toggleAnimation();
