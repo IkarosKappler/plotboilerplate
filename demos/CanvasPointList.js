@@ -4,6 +4,7 @@
  * @require Vertex
  *
  * @date 2020-01-13
+ * @modified 2020-05-04 Fixed a bug in removeRandomPoint: did not terminate if pointCount == 1.
  **/
 
 
@@ -52,7 +53,7 @@
     };
 
     CanvasPointList.prototype.removeRandomPoint = function() {
-	if( this.pointList.length > 1 ) {
+	if( this.pointList.length >= 1 ) {
 	    let vert = this.pointList.pop();
 	    this.pb.remove( vert );
 	}

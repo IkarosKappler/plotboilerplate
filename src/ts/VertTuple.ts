@@ -1,4 +1,11 @@
-
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requires Vertex 
+ *
+ * @author Ikaros Kappler
+ * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
+ */
 
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
@@ -8,14 +15,14 @@ export class VertTuple<T extends VertTuple<T>> {
 
     /** 
      * @member {Vertex} 
-     * @memberof Line
+     * @memberof VertTuple
      * @instance
      */
     a:Vertex;
 
     /** 
      * @member {Vertex} 
-     * @memberof Line
+     * @memberof VertTuple
      * @instance
      */
     b:Vertex;
@@ -27,7 +34,7 @@ export class VertTuple<T extends VertTuple<T>> {
      * Creates an instance.
      *
      * @constructor
-     * @name Line
+     * @name VertTuple
      * @param {Vertex} a The tuple's first point.
      * @param {Vertex} b The tuple's second point.
      **/
@@ -43,7 +50,7 @@ export class VertTuple<T extends VertTuple<T>> {
      *
      * @method length
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     length():number {
 	return Math.sqrt( Math.pow(this.b.x-this.a.x,2) + Math.pow(this.b.y-this.a.y,2) );
@@ -56,8 +63,8 @@ export class VertTuple<T extends VertTuple<T>> {
      *
      * @method setLength
      * @param {number} length - The desired length.
-     * @memberof Line
-     * @return {Line} this (for chaining)
+     * @memberof VertTuple
+     * @return {T} this (for chaining)
      **/
     setLength( length:number ):VertTuple<T> {
 	return this.scale( length/this.length() );
@@ -69,9 +76,9 @@ export class VertTuple<T extends VertTuple<T>> {
      *
      * @method sub
      * @param {Vertex} amount The amount (x,y) to substract.
-     * @return {Line} this
+     * @return {VertTuple} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     sub( amount:Vertex ):VertTuple<T> {
 	this.a.sub( amount );
@@ -87,7 +94,7 @@ export class VertTuple<T extends VertTuple<T>> {
      * @param {Vertex} amount The amount (x,y) to add.
      * @return {Line} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     add( amount:Vertex ):VertTuple<T> {
 	this.a.add( amount );
@@ -100,9 +107,9 @@ export class VertTuple<T extends VertTuple<T>> {
      * Normalize this line (set to length 1).
      *
      * @method normalize
-     * @return {Line} this
+     * @return {VertTuple} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     normalize():VertTuple<T> {
 	this.b.set( this.a.x + (this.b.x-this.a.x)/this.length(),
@@ -116,9 +123,9 @@ export class VertTuple<T extends VertTuple<T>> {
      *
      * @method scale
      * @param {number} factor The factor for scaling (1.0 means no scale).
-     * @return {Line} this
+     * @return {VertTuple} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     scale( factor:number ):VertTuple<T> {
 	this.b.set( this.a.x + (this.b.x-this.a.x)*factor,
@@ -132,9 +139,9 @@ export class VertTuple<T extends VertTuple<T>> {
      *
      * @method moveTo
      * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
-     * @return {Line} this
+     * @return {VertTuple} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     moveTo( newA:Vertex ):VertTuple<T> {
 	let diff = this.a.difference( newA );
@@ -148,10 +155,10 @@ export class VertTuple<T extends VertTuple<T>> {
      * Get the angle between this and the passed line (in radians).
      *
      * @method angle
-     * @param {Line} [line] - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
+     * @param {VertTuple} [line] - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
      * @return {number} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     angle( line:VertTuple<any> ):number {
 	if( typeof line == 'undefined' )
@@ -175,7 +182,7 @@ export class VertTuple<T extends VertTuple<T>> {
      * @param {number} t The position scalar.
      * @return {Vertex} The vertex a position t. 
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     vertAt( t:number ):Vertex {
 	return new Vertex( this.a.x + (this.b.x-this.a.x)*t,
@@ -188,7 +195,10 @@ export class VertTuple<T extends VertTuple<T>> {
      * 
      * If the denominator is zero (or close to zero) both line are co-linear.
      *
-     * @param {Line} line
+     * @method denominator
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
      * @return {Number}
      **/
     denominator( line:VertTuple<T> ):number {
@@ -202,7 +212,10 @@ export class VertTuple<T extends VertTuple<T>> {
      *
      * The constant Vertex.EPSILON is used for tolerance.
      *
-     * @param {Line} line
+     * @method colinear
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
      * @return true if both lines are co-linear.
      */
     colinear( line:VertTuple<T> ):boolean {
@@ -219,7 +232,7 @@ export class VertTuple<T extends VertTuple<T>> {
      * @param {Vertex} p The point (vertex) to measre the distance to.
      * @return {number} The line position t of minimal distance to p.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     getClosestT( p:Vertex ):number {
 	var l2 = VertTuple.vtutils.dist2(this.a, this.b);
@@ -232,41 +245,37 @@ export class VertTuple<T extends VertTuple<T>> {
 
 
     /**
+     * Get the closest point on this line to the specified point.
+     *
+     * @method getClosestPoint
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {Vertex} The point on the line that is closest to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    getClosestPoint( p:Vertex ):Vertex {
+	var t : number = this.getClosestT(p);
+	return this.vertAt(t);
+    };
+
+
+    /**
      * The the minimal distance between this line and the specified point.
      *
      * @method pointDistance
      * @param {Vertex} p The point (vertex) to measre the distance to.
      * @return {number} The absolute minimal distance.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     pointDistance( p:Vertex ):number {
 	// Taken From:
 	// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
 
-	function dist2(v, w) {
-	    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
-	}
-
-	// p - point
-	// v - start point of segment
-	// w - end point of segment
-	function distToSegmentSquared (p, v, w) {
-	    //var l2 = dist2(v, w);
-	    //if( l2 === 0 ) return dist2(p, v);
-	    //var t = ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
-	    //t = Math.max(0, Math.min(1, t));
-	    return dist2(p, this.vertAt(this.getClosestLineT(p))); // dist2(p, [ v[0] + t * (w[0] - v[0]), v[1] + t * (w[1] - v[1]) ]);
-	}
-
-	// p - point
-	// v - start point of segment
-	// w - end point of segment
-	//function distToSegment (p, v, w) {
-	//    return Math.sqrt(distToSegmentSquared(p, v, w));
+	//function dist2(v, w) {
+	//    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
 	//}
-
-	return Math.sqrt( distToSegmentSquared(p, this.a, this.b) );
+	return Math.sqrt( VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))) );
     };
 
 
@@ -277,7 +286,7 @@ export class VertTuple<T extends VertTuple<T>> {
      * @method cloneLine
      * @return {T} A type safe clone if this instance.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/ 
     clone():T {
 	return this.factory(this.a.clone(),this.b.clone());
@@ -290,7 +299,7 @@ export class VertTuple<T extends VertTuple<T>> {
      * @method totring
      * @return {string} The string representing this line.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     toString():string {
 	return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
@@ -304,15 +313,5 @@ export class VertTuple<T extends VertTuple<T>> {
 	dist2 : function(v:Vertex, w:Vertex) {
 	    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
 	}
-	//distToSegmentSquared (p, v, w) {
-	//    return VertTuple.utils.dist2(p, this.vertAt(this.getClosestLineT(p)));
-	//}
     };
-   
-
-
-    //static private utils {
-
-    //}
-
 }

@@ -1078,6 +1078,7 @@ var PlotBoilerplate = /** @class */ (function () {
         var oldDragAmount = { x: e.params.dragAmount.x, y: e.params.dragAmount.y };
         e.params.dragAmount.x /= _self.config.cssScaleX;
         e.params.dragAmount.y /= _self.config.cssScaleY;
+        // console.log('alt down?', this.keyHandler.isDown('alt'), 'ctrl down?', this.keyHandler.isDown('ctrl'), 'space down?', this.keyHandler.isDown('spacebar') );
         if (this.keyHandler.isDown('alt') || this.keyHandler.isDown('ctrl') || this.keyHandler.isDown('spacebar')) {
             _self.draw.offset.add(e.params.dragAmount);
             _self.fill.offset.set(_self.draw.offset);

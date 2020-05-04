@@ -1,14 +1,22 @@
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requires Vertex
+ *
+ * @author Ikaros Kappler
+ * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
+ */
 import { Vertex } from "./Vertex";
 export declare class VertTuple<T extends VertTuple<T>> {
     /**
      * @member {Vertex}
-     * @memberof Line
+     * @memberof VertTuple
      * @instance
      */
     a: Vertex;
     /**
      * @member {Vertex}
-     * @memberof Line
+     * @memberof VertTuple
      * @instance
      */
     b: Vertex;
@@ -17,7 +25,7 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * Creates an instance.
      *
      * @constructor
-     * @name Line
+     * @name VertTuple
      * @param {Vertex} a The tuple's first point.
      * @param {Vertex} b The tuple's second point.
      **/
@@ -27,7 +35,7 @@ export declare class VertTuple<T extends VertTuple<T>> {
      *
      * @method length
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     length(): number;
     /**
@@ -36,8 +44,8 @@ export declare class VertTuple<T extends VertTuple<T>> {
      *
      * @method setLength
      * @param {number} length - The desired length.
-     * @memberof Line
-     * @return {Line} this (for chaining)
+     * @memberof VertTuple
+     * @return {T} this (for chaining)
      **/
     setLength(length: number): VertTuple<T>;
     /**
@@ -45,9 +53,9 @@ export declare class VertTuple<T extends VertTuple<T>> {
      *
      * @method sub
      * @param {Vertex} amount The amount (x,y) to substract.
-     * @return {Line} this
+     * @return {VertTuple} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     sub(amount: Vertex): VertTuple<T>;
     /**
@@ -57,16 +65,16 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @param {Vertex} amount The amount (x,y) to add.
      * @return {Line} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     add(amount: Vertex): VertTuple<T>;
     /**
      * Normalize this line (set to length 1).
      *
      * @method normalize
-     * @return {Line} this
+     * @return {VertTuple} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     normalize(): VertTuple<T>;
     /**
@@ -74,9 +82,9 @@ export declare class VertTuple<T extends VertTuple<T>> {
      *
      * @method scale
      * @param {number} factor The factor for scaling (1.0 means no scale).
-     * @return {Line} this
+     * @return {VertTuple} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     scale(factor: number): VertTuple<T>;
     /**
@@ -84,19 +92,19 @@ export declare class VertTuple<T extends VertTuple<T>> {
      *
      * @method moveTo
      * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
-     * @return {Line} this
+     * @return {VertTuple} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     moveTo(newA: Vertex): VertTuple<T>;
     /**
      * Get the angle between this and the passed line (in radians).
      *
      * @method angle
-     * @param {Line} [line] - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
+     * @param {VertTuple} [line] - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
      * @return {number} this
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     angle(line: VertTuple<any>): number;
     /**
@@ -109,7 +117,7 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @param {number} t The position scalar.
      * @return {Vertex} The vertex a position t.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     vertAt(t: number): Vertex;
     /**
@@ -117,7 +125,10 @@ export declare class VertTuple<T extends VertTuple<T>> {
      *
      * If the denominator is zero (or close to zero) both line are co-linear.
      *
-     * @param {Line} line
+     * @method denominator
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
      * @return {Number}
      **/
     denominator(line: VertTuple<T>): number;
@@ -126,7 +137,10 @@ export declare class VertTuple<T extends VertTuple<T>> {
      *
      * The constant Vertex.EPSILON is used for tolerance.
      *
-     * @param {Line} line
+     * @method colinear
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
      * @return true if both lines are co-linear.
      */
     colinear(line: VertTuple<T>): boolean;
@@ -139,9 +153,19 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @param {Vertex} p The point (vertex) to measre the distance to.
      * @return {number} The line position t of minimal distance to p.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     getClosestT(p: Vertex): number;
+    /**
+     * Get the closest point on this line to the specified point.
+     *
+     * @method getClosestPoint
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {Vertex} The point on the line that is closest to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    getClosestPoint(p: Vertex): Vertex;
     /**
      * The the minimal distance between this line and the specified point.
      *
@@ -149,7 +173,7 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @param {Vertex} p The point (vertex) to measre the distance to.
      * @return {number} The absolute minimal distance.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     pointDistance(p: Vertex): number;
     /**
@@ -158,7 +182,7 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @method cloneLine
      * @return {T} A type safe clone if this instance.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     clone(): T;
     /**
@@ -167,7 +191,7 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @method totring
      * @return {string} The string representing this line.
      * @instance
-     * @memberof Line
+     * @memberof VertTuple
      **/
     toString(): string;
     /**
