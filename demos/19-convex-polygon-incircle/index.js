@@ -1,14 +1,14 @@
 /**
  * A script for testing Urquhart (or Relative Neighbourhood) Graphs.
  *
- * @require PlotBoilerplate, MouseHandler, gup, dat.gui, Delaunay, delaunay2urquhart
+ * @requires PlotBoilerplate, MouseHandler, gup, dat.gui, convexHull
  *
  * https://observablehq.com/@mbostock/convex-polygon-incircle
  * https://observablehq.com/@mbostock/circle-tangent-to-three-lines
  *
  * 
  * @author   Ikaros Kappler
- * @date     2019-04-27
+ * @date     2019-05-04
  * @version  1.0.0
  **/
 
@@ -60,120 +60,185 @@
 	
 
 	var drawAll = function() {
-	    var convexHull = getConvexHull( pointList.pointList );
-	    var n = convexHull.length;
-	    // console.log( 'convexHull', convexHull );
+	    var convexHull = new Polygon( getConvexHull( pointList.pointList ),
+					  false  // isOpen=false
+					);
+
 	    if( config.drawConvexHull )
-		drawConvexHull( convexHull );
+		pb.draw.polyline( convexHull.vertices, false, 'rgba(0,192,255,1.0)', 2 );
 
-	    // Draw all inner bisectors
-	    for( var i = 1; i <= n; i++ ) {
-		var a = i-1;
-		var b = i%n;
-		var c = (i+1)%n;
-		var d = (i+2)%n;
-		var lineA = new Line( convexHull[a], convexHull[b] );
-		var lineB = new Line( convexHull[b], convexHull[c] );
-		var lineC = new Line( convexHull[c], convexHull[d] );
-		//var bisector = bisectAngle( convexHull[i%n], convexHull[(i+1)%n], convexHull[ i-1 ] );
-		var bisector = bisectAngle( convexHull[b], convexHull[a], convexHull[c] );
-		//console.log( 'bisector', bisector );
-		pb.draw.line( bisector.a, bisector.b.scale(2.0,bisector.a), 'rgba(255,128,0,0.5)', 1 );
-
-		var bisector2 = bisectAngle( convexHull[(i+1)%n], convexHull[(i+2)%n], convexHull[i%n] );
-		var bisector2 = bisectAngle( convexHull[c], convexHull[b], convexHull[d] );
-		//pb.draw.line( bisector2.a, bisector2.b.scale(2.0,bisector2.a), 'rgba(255,128,0,0.5)', 1 );
-
-		var intersection = bisector.intersection( bisector2 );
-		pb.draw.circle( intersection, 5, 'rgba(255,0,0,1.0)', 2 );
-
-		// Find the closest points on one of the polygon lines (all have same distance by construction)
-		var circleIntersA = lineA.getClosestPoint( intersection );
-		var circleIntersB = lineB.getClosestPoint( intersection );
-		var circleIntersC = lineC.getClosestPoint( intersection );
-		pb.draw.circle( circleIntersA, 5, 'rgba(0,192,0,1.0)', 2 );
-		pb.draw.circle( circleIntersB, 5, 'rgba(0,192,0,1.0)', 2 );
-		pb.draw.circle( circleIntersC, 5, 'rgba(0,192,0,1.0)', 2 );
-
-		// { center: Vertex, radius: number }
-		var circle = new Triangle(circleIntersA, circleIntersB, circleIntersC).getCircumcircle();
-		if( i == 1 ) {
-		    console.log( 'circle', circle );
-		    pb.draw.line( intersection, circleIntersA, 'rgba(192,192,192,0.5)', 1 );
-		    pb.draw.line( intersection, circleIntersB, 'rgba(192,192,192,0.5)', 1 );
-		    pb.draw.line( intersection, circleIntersC, 'rgba(192,192,192,0.5)', 1 );
-		    // Check if circle intersects some other lines
-		    var intersectingLineIndices = findCircleIntersections( convexHull, new Circle(circle.center, circle.radius) );
-		    var circleIsTooLarge = intersectingLineIndices.length > 3;
-		    pb.draw.circle( intersection, circle.radius, circleIsTooLarge ? 'rgba(255,0,0,0.5)' : 'rgba(192,192,192,0.5)', 1 );
-		}
-	    }
+	    drawInnerBisectors( convexHull );
 
 	    // Try all possibilies of triple-pairs
+	    /* var bestCircle = undefined;
+	    var bestTriangle = undefined;
 	    for( var a = 0; a < n; a++ ) {
-		for( var b = 0; b < n; b++ ) {
-		    for( var c = 0; c < n; c++ ) {
-			
+		for( var b = a+1; b < n; b++ ) {
+		    for( var c = b+1; c < n; c++ ) {
+			// As these lines are part of the convex hull, we know that
+			//  * line a preceeds line b and
+			//  * line b preceeds line c :)
+			var lineA = new Line( convexHull.vertices[a], convexHull.vertices[(a+1)%n] );
+			var lineB = new Line( convexHull.vertices[b], convexHull.vertices[(b+1)%n] );
+			var lineC = new Line( convexHull.vertices[c], convexHull.vertices[(c+1)%n] );
+
+			// Find intersections by expanding the lines
+			var vertB = lineA.intersection(lineB);
+			var vertC = lineB.intersection(lineC);
+
+			// An object: { center: Vertex, radius: number }
+			var triangle = getTangentTriangle4( lineA.a, vertB, vertC, lineC.b );
+			// Workaround. There will be a future version where the 'getCircumCircle()' functions
+			// returns a real Circle instance.
+			var _circle = triangle.getCircumcircle();
+			var circle = new Circle( _circle.center, _circle.radius );
+
+			// Count the number of intersections with the convex hull:
+			// If there are exactly three, we have found an in-lying circle.
+			//  * Check if this one is better (bigger) than the old one.
+			//  * Also check if the circle is located inside the polygon;
+			//    The construction can, in some cases, produce an out-lying circle.
+			if( !convexHull.containsVert(circle.center) )
+			    continue;
+			var circleIntersections = findCircleIntersections( convexHull, circle );
+			if( circleIntersections.length == 3 && (bestCircle == undefined || bestCircle.radius < circle.radius) ) {
+			    bestCircle = circle;
+			    bestTriangle = triangle;
+			}
+		    }
+		}
+	    } */
+	    var result = convexPolygonIncircle( convexHull );
+	    var circle = result.circle;
+	    var triangle = result.triangle;
+	    // Now we should have found the best inlying circle (and the corresponding triangle).
+	    pb.draw.circle( circle.center, circle.radius, 'rgba(255,192,0,1.0)', 2 );
+	    pb.draw.circle( circle.center, 5, 'rgba(255,0,0,1.0)', 2 );
+	    pb.draw.circle( triangle.a, 5, 'rgba(0,192,0,1.0)', 2 );
+	    pb.draw.circle( triangle.b, 5, 'rgba(0,192,0,1.0)', 2 );
+	    pb.draw.circle( triangle.c, 5, 'rgba(0,192,0,1.0)', 2 );
+	};
+	
+
+	/**
+	 * Draw all inner bisector lines.
+	 *
+	 * @param {Polygon} convexHull
+	 */
+	var drawInnerBisectors = function( convexHull ) {
+	    var n = convexHull.vertices.length;
+	    for( var i = 1; i <= convexHull.vertices.length; i++ ) {
+		var bisector = nsectAngle( convexHull.vertices[i%n], convexHull.vertices[(i-1)%n], convexHull.vertices[(i+1)%n], 2 )[0];
+		pb.draw.line( bisector.a, bisector.b.scale(2.0,bisector.a), 'rgba(255,128,0,0.25)', 1 );
+	    }
+	};
+
+
+	/**
+	 * Compute the max sized inlying circle in the given convex (!) polygon - also called the
+	 * convex-polygon incircle.
+	 *
+	 * The function will return an object with either: the circle, and the triangle that defines
+	 * the three tangent points where the circle touches the polygon.
+	 *
+	 * @param {Polygon} convexHull - The actual convex polygon.
+	 * @return { circle: circle, tringle: triangle }
+	 */
+	var convexPolygonIncircle = function( convexHull ) {
+	    var n = convexHull.vertices.length;
+	    var bestCircle = undefined;
+	    var bestTriangle = undefined;
+	    for( var a = 0; a < n; a++ ) {
+		for( var b = a+1; b < n; b++ ) {
+		    for( var c = b+1; c < n; c++ ) {
+			// As these lines are part of the convex hull, we know that
+			//  * line a preceeds line b and
+			//  * line b preceeds line c :)
+			var lineA = new Line( convexHull.vertices[a], convexHull.vertices[(a+1)%n] );
+			var lineB = new Line( convexHull.vertices[b], convexHull.vertices[(b+1)%n] );
+			var lineC = new Line( convexHull.vertices[c], convexHull.vertices[(c+1)%n] );
+
+			// Find intersections by expanding the lines
+			var vertB = lineA.intersection(lineB);
+			var vertC = lineB.intersection(lineC);
+
+			// An object: { center: Vertex, radius: number }
+			var triangle = getTangentTriangle4( lineA.a, vertB, vertC, lineC.b );
+			// Workaround. There will be a future version where the 'getCircumCircle()' functions
+			// returns a real Circle instance.
+			var _circle = triangle.getCircumcircle();
+			var circle = new Circle( _circle.center, _circle.radius );
+
+			// Count the number of intersections with the convex hull:
+			// If there are exactly three, we have found an in-lying circle.
+			//  * Check if this one is better (bigger) than the old one.
+			//  * Also check if the circle is located inside the polygon;
+			//    The construction can, in some cases, produce an out-lying circle.
+			if( !convexHull.containsVert(circle.center) )
+			    continue;
+			var circleIntersections = findCircleIntersections( convexHull, circle );
+			if( circleIntersections.length == 3 && (bestCircle == undefined || bestCircle.radius < circle.radius) ) {
+			    bestCircle = circle;
+			    bestTriangle = triangle;
+			}
 		    }
 		}
 	    }
+	    return { circle : bestCircle, triangle : bestTriangle };
 	};
 
-	var drawConvexHull = function( convexHull ) {
-	    var n = convexHull.length;
-	    var a, b;
-	    for( var i = 0; i < n; i++ ) {
-		a = convexHull[i];
-		b = convexHull[(i+1)%n];
-		pb.draw.line( a, b, i<3 ? 'rgba(0,192,255,1.0)' : 'rgba(0,255,192,1.0)', 2.0 );
-		if( i == 0 )
-		    pb.draw.circle( a, 8, 'rgba(192,192,192,0.75)', 1.0 );
-	    }
+	
+	/**
+	 * This function computes the three points for the inner maximum circle 
+	 * lying tangential to the three subsequential lines (given by four points).
+	 *
+	 * Compute the circle from that triangle by using Triangle.getCircumcircle().
+	 *
+	 * Not all three lines should be parallel, otherwise the circle might have infinite radius.
+	 *
+	 * LineA = [vertA, vertB]
+	 * LineB = [vertB, vertC]
+	 * LineC = [vertC, vertD]
+	 *
+	 * @param {Vertex} vertA - The first point of the three connected lines.
+	 * @param {Vertex} vertB - The second point of the three connected lines.
+	 * @param {Vertex} vertC - The third point of the three connected lines.
+	 * @param {Vertex} vertD - The fourth point of the three connected lines.
+	 * @return {Triangle}
+	 */
+	var getTangentTriangle4 = function( vertA, vertB, vertC, vertD ) {
+	    var lineA = new Line(vertA,vertB);
+	    var lineB = new Line(vertB,vertC);
+	    var lineC = new Line(vertC,vertD);
+
+	    var bisector1 = nsectAngle( vertB, vertA, vertC, 2 )[0]; // bisector of first triangle
+	    var bisector2 = nsectAngle( vertC, vertB, vertD, 2 )[0]; // bisector of second triangle
+	    var intersection = bisector1.intersection( bisector2 );
+
+	    // Find the closest points on one of the polygon lines (all have same distance by construction)
+	    var circleIntersA = lineA.getClosestPoint( intersection );
+	    var circleIntersB = lineB.getClosestPoint( intersection );
+	    var circleIntersC = lineC.getClosestPoint( intersection );
+
+	    var triangle = new Triangle(circleIntersA, circleIntersB, circleIntersC);
+
+	    // Unfortunately the returned Circle is just a wrapper, not a real class instance.
+	    // The Triangle class does not yet know the Circle class.
+	    return triangle; 
 	};
 
-
-	// circle : { center : Vertex, radius : number }
+	
 	var findCircleIntersections = function( convexHull, circle ) {
 	    var result = [];
-	    for( var i = 0; i < convexHull.length; i++ ) {
-		var line = new Line( convexHull[i], convexHull[(i+1)%convexHull.length] );
-		if( circle.lineDistance(line) <= 0 ) {
+	    for( var i = 0; i < convexHull.vertices.length; i++ ) {
+		var line = new Line( convexHull.vertices[i], convexHull.vertices[(i+1)%convexHull.vertices.length] );
+		// Use an epsilon here because circle coordinates can be kind of unprecise in the detail.
+		if( circle.lineDistance(line) < 0.1 ) {
 		    result.push( i );
 		}
 	    }
 	    return result;
 	};
-
-	// +---------------------------------------------------------------------------------
-	// | Compute the bisection of the angle in point A.
-	// +-------------------------------
-	var bisectAngle = function( pA, pB, pC ) {
-	    var result = {};
-	    result.triangle    = new Triangle( pA, pB, pC );
-	    result.lineAB      = new Line( pA, pB );
-	    result.lineAC      = new Line( pA, pC );
-	    // Compute the slope (theta) of line AB and line AC
-	    result.thetaAB     = result.lineAB.angle();
-	    result.thetaAC     = result.lineAC.angle();
-	    // Compute the difference; this is the angle between AB and AC
-	    result.insideAngle = result.lineAB.angle( result.lineAC );
-	    // We want the inner angles of the triangle, not the outer angle;
-	    //   which one is which depends on the triangle 'direction'
-	    result.clockwise   = result.triangle.determinant() > 0;
-	    
-	    // For convenience convert the angle [-PI,PI] to [0,2*PI]
-	    if( result.insideAngle < 0 )
-		result.insideAngle = 2*Math.PI + result.insideAngle;
-	    if( !result.clockwise )
-		result.insideAngle = (2*Math.PI - result.insideAngle) * (-1);  
-
-	    // Scale the rotated lines to the max leg length (looks better)
-	    var lineLength  = Math.max( result.lineAB.length(), result.lineAC.length() );
-	    var scaleFactor = lineLength/result.lineAB.length();
-
-	    return new Line( pA.clone(), pB.clone().rotate((-result.insideAngle/2.0), pA) ).scale(scaleFactor);   // inner sector line
-	};
-
 
 	// +---------------------------------------------------------------------------------
 	// | Let a poinst list manager do the randomization of the three points.
@@ -187,7 +252,7 @@
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
 	// +-------------------------------
-	new MouseHandler(pb.canvas,'hobby-demo')
+	new MouseHandler(pb.canvas,'convexhull-demo')
 	    .move( function(e) {
 		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
 		var cx = document.getElementById('cx');
@@ -207,7 +272,7 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    pointCount            : 12,
+	    pointCount            : 6,
 	    drawConvexHull        : true,
 	    animate               : false,
 	}, GUP );
@@ -264,7 +329,7 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-	    gui.add(config, 'pointCount').min(3).max(96).onChange( function() { updatePointList(); } ).name("Point count").title("Point count");
+	    gui.add(config, 'pointCount').min(3).max(96).step(1).onChange( function() { updatePointList(); } ).name("Point count").title("Point count");
 	    gui.add(config, 'drawConvexHull').onChange( function() { pb.redraw(); } ).name('Draw Convex Hull').title('Draw the Convex Hull.');
 	    gui.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
 	}

@@ -32,6 +32,7 @@
      *   will be max inner distance and it will be negative.
      *
      * @param {Line} line - The line to measure the distance to.
+     * @return {number} The minimal distance from the outline of this circle to the given line.
      */
     Circle.prototype.lineDistance = function( line ) {
 	var closestPointOnLine = line.getClosestPoint( this.center );

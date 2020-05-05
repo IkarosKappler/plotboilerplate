@@ -28,7 +28,8 @@
  * @modified 2019-12-20 Added the 'lineWidth' param to the polyline(...) function.
  * @modified 2020-01-09 Added the 'lineWidth' param to the ellipse(...) function.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version  1.5.3
+ * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
+ * @version  1.5.4
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -225,11 +226,12 @@ export declare class drawutils {
      * @param {Vertex} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
+     * @param {number} lineWidth - The line width (optional, default=1).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    circle(center: Vertex, radius: number, color: string): void;
+    circle(center: Vertex, radius: number, color: string, lineWidth?: number): void;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *

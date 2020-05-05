@@ -3578,7 +3578,7 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.getClosestPoint = function (p) {
+    VertTuple.prototype.getClosestPoint = function (p, constrain) {
         var t = this.getClosestT(p);
         return this.vertAt(t);
     };
@@ -4905,7 +4905,8 @@ exports.KeyHandler = KeyHandler;
  * @modified 2019-12-20 Added the 'lineWidth' param to the polyline(...) function.
  * @modified 2020-01-09 Added the 'lineWidth' param to the ellipse(...) function.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version  1.5.3
+ * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
+ * @version  1.5.4
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var CubicBezierCurve_1 = __webpack_require__(3);
@@ -5217,14 +5218,16 @@ var drawutils = /** @class */ (function () {
      * @param {Vertex} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
+     * @param {number} lineWidth - The line width (optional, default=1).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.circle = function (center, radius, color) {
+    drawutils.prototype.circle = function (center, radius, color, lineWidth) {
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
         this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
     ;

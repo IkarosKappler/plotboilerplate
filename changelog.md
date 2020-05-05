@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-05-05
+  * Added the 'lineWidth' param to the circle(...) function.
+  * Finished the circle-in-convex-polygog demo.
 * 2020-05-04
   * Added a stub for the circle-in-convex-polygon demo.
   * Fixed a serious bug in the VertTuple.pointDistance function.
