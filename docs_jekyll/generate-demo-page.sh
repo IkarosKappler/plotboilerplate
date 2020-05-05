@@ -39,13 +39,16 @@ function mkDemoPage() {
 
 		baseName=$(basename $d);
 		echo "baseName=$baseName"
-		# href="{{ my_page.url | prepend: site.baseurl }}"
-		echo "<div class=\"demo-box\">" >> $outFile
-		echo "   <a class=\"no-decoration\" href=\"{{ '/repo/demos/$baseName/index.html' | prepend: site.url }}\">" >> $outFile
-		echo "      <div style=\"background-image: url('$imgSrc');\"></div>" >> $outFile
-		echo "   </a>" >> $outFile
-		echo "</div>" >> $outFile
-		
+		if [[ $baseName == _* ]]; then
+		    echo "Ignoring underscore directory $d"
+		else
+		    # href="{{ my_page.url | prepend: site.baseurl }}"
+		    echo "<div class=\"demo-box\">" >> $outFile
+		    echo "   <a class=\"no-decoration\" href=\"{{ '/repo/demos/$baseName/index.html' | prepend: site.url }}\">" >> $outFile
+		    echo "      <div style=\"background-image: url('$imgSrc');\"></div>" >> $outFile
+		    echo "   </a>" >> $outFile
+		    echo "</div>" >> $outFile
+		fi
 		
 	    fi
 	fi

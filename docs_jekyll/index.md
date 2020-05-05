@@ -189,6 +189,19 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/17-hobby-curves/index.html" title="See the demo">See the demo</a>
 
 
+### Urquhart graph / Relative Neighbourhood graph
+
+![Urquhart graph](screenshots/screenshot-20200427-relative-neighbour-graph-urquhart.png "Urquhart graph")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/18-relative-neighbourhood-graph/index.html" title="See the demo">See the demo</a>
+
+
+### Convex Polygon Incircle
+
+![Convex Polygon Incircle](screenshots/screenshot-20200506-convex-polygon-incircle.png "Convex Polygon Incircle")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/19-convex-polygon-incircle/index.html" title="See the demo">See the demo</a>
+
 
 ## Initialization parameters
 
