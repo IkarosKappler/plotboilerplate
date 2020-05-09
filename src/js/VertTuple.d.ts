@@ -165,7 +165,7 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @instance
      * @memberof VertTuple
      **/
-    getClosestPoint(p: Vertex, constrain: boolean): Vertex;
+    getClosestPoint(p: Vertex): Vertex;
     /**
      * The the minimal distance between this line and the specified point.
      *

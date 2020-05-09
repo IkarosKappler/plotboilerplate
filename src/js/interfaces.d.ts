@@ -3,6 +3,7 @@ import { Vector } from "./Vector";
 import { Triangle } from "./Triangle";
 import { PBImage } from "./PBImage";
 import { VEllipse } from "./VEllipse";
+import { Circle } from "./Circle";
 import { Polygon } from "./Polygon";
 import { BezierPath } from "./BezierPath";
 import { Line } from "./Line";
@@ -24,7 +25,7 @@ export interface Bounds {
     min: XYCoords;
     max: XYCoords;
 }
-export declare type Drawable = Vertex | Vector | Triangle | PBImage | VEllipse | Polygon | BezierPath | Line;
+export declare type Drawable = Vertex | Vector | Triangle | Circle | PBImage | VEllipse | Polygon | BezierPath | Line;
 export interface Config {
     canvas: HTMLCanvasElement;
     fullSize?: boolean;
@@ -81,6 +82,7 @@ export interface DrawConfig {
     polygon: DrawSettings;
     triangle: DrawSettings;
     ellipse: DrawSettings;
+    circle: DrawSettings;
     vertex: DrawSettings;
     line: DrawSettings;
     vector: DrawSettings;

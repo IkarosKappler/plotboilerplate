@@ -26,13 +26,15 @@
  * @modified  2020-03-17 Added the Triangle.toPolygon() function.
  * @modified  2020-03-17 Added proper JSDoc comments.
  * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version   2.2.2
+ * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
+ * @version   2.2.3
  *
  * @file Triangle
  * @public
  **/
 
 
+import { Circle } from "./Circle";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
@@ -77,34 +79,6 @@ export class Triangle implements SVGSerializable {
     private center:Vertex;
     private radius_squared:number;
     private radius:number;
-    
-
-    /**
-     * Used in the bounds() function.
-     *
-     * @private
-     **/
-    //function max3( a, b, c ) { return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c; }
-   // function min3( a, b, c ) { return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c; }
-
-    
-    /**
-     * Used by the containsPoint() function.
-     *
-     * @private
-     **/
-    /* function pointIsInTriangle( px, py, p0x, p0y, p1x, p1y, p2x, p2y ) {
-	//
-	// Point-in-Triangle test found at
-	//   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-	//
-	var area = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
-
-	var s = 1/(2*area)*(p0y*p2x - p0x*p2y + (p2y - p0y)*px + (p0x - p2x)*py);
-	var t = 1/(2*area)*(p0x*p1y - p0y*p1x + (p0y - p1y)*px + (p1x - p0x)*py);
-
-	return s > 0 && t > 0 && (1-s-t) > 0;
-    }; */
     
 
     /**
@@ -201,7 +175,8 @@ export class Triangle implements SVGSerializable {
     getCircumcircle() : { center:Vertex, radius:number } {
 	if( !this.center || !this.radius ) 
 	    this.calcCircumcircle();
-	return { center : this.center.clone(), radius : this.radius };
+	// return { center : this.center.clone(), radius : this.radius };
+	return new Circle( this.center, this.radius );
     };
 
 

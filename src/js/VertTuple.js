@@ -217,7 +217,7 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.getClosestPoint = function (p, constrain) {
+    VertTuple.prototype.getClosestPoint = function (p) {
         var t = this.getClosestT(p);
         return this.vertAt(t);
     };

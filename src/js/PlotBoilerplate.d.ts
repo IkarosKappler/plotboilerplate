@@ -52,7 +52,8 @@
  * @modified 2020-02-06 Fixed a drag-amount bug in the move handling of end points of Bezier paths (control points was not properly moved when non circular).
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
- * @version  1.7.2
+ * @modified 2020-05-09 Included the Cirlcle class.
+ * @version  1.7.3
  *
  * @file PlotBoilerplate
  * @public
@@ -289,6 +290,7 @@ export declare class PlotBoilerplate {
      *  * a Line
      *  * a Vector
      *  * a VEllipse
+     *  * a Circle
      *  * a Polygon
      *  * a Triangle
      *  * a BezierPath
@@ -312,6 +314,7 @@ export declare class PlotBoilerplate {
      *  * a Line
      *  * a Vector
      *  * a VEllipse
+     *  * a Circle
      *  * a Polygon
      *  * a BezierPath
      *  * a BPImage

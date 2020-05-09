@@ -53,7 +53,8 @@
  * @modified 2020-02-06 Fixed a drag-amount bug in the move handling of end points of Bezier paths (control points was not properly moved when non circular).
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
- * @version  1.7.2
+ * @modified 2020-05-09 Included the Cirlcle class.
+ * @version  1.7.3
  *
  * @file PlotBoilerplate
  * @public
@@ -62,6 +63,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var draw_1 = require("./draw");
 var drawgl_1 = require("./drawgl");
 var BezierPath_1 = require("./BezierPath");
+var Circle_1 = require("./Circle");
 var Grid_1 = require("./Grid");
 var KeyHandler_1 = require("./KeyHandler");
 var Line_1 = require("./Line");
@@ -235,6 +237,10 @@ var PlotBoilerplate = /** @class */ (function () {
                 color: '#2222a8',
                 lineWidth: 1
             },
+            circle: {
+                color: '#22a8a8',
+                lineWidth: 2
+            },
             vertex: {
                 color: '#a8a8a8',
                 lineWidth: 1
@@ -373,6 +379,7 @@ var PlotBoilerplate = /** @class */ (function () {
      *  * a Line
      *  * a Vector
      *  * a VEllipse
+     *  * a Circle
      *  * a Polygon
      *  * a Triangle
      *  * a BezierPath
@@ -415,6 +422,10 @@ var PlotBoilerplate = /** @class */ (function () {
             drawable.center.listeners.addDragListener(function (e) {
                 drawable.axis.add(e.params.dragAmount);
             });
+        }
+        else if (drawable instanceof Circle_1.Circle) {
+            this.vertices.push(drawable.center);
+            this.drawables.push(drawable);
         }
         else if (drawable instanceof Polygon_1.Polygon) {
             this.drawables.push(drawable);
@@ -506,6 +517,7 @@ var PlotBoilerplate = /** @class */ (function () {
      *  * a Line
      *  * a Vector
      *  * a VEllipse
+     *  * a Circle
      *  * a Polygon
      *  * a BezierPath
      *  * a BPImage
@@ -632,8 +644,8 @@ var PlotBoilerplate = /** @class */ (function () {
                             this.draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, 'orange'));
                             d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
                         }
-                        this.draw.circleHandle(d.bezierCurves[c].startControlPoint, 7, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
-                        this.draw.circleHandle(d.bezierCurves[c].endControlPoint, 7, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
+                        this.draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
+                        this.draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
                         d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
                         d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                     }
@@ -672,6 +684,9 @@ var PlotBoilerplate = /** @class */ (function () {
                     d.axis.attr.renderTime = renderTime;
                 }
             }
+            else if (d instanceof Circle_1.Circle) {
+                this.draw.circle(d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth);
+            }
             else if (d instanceof Vertex_1.Vertex) {
                 if (this.drawConfig.drawVertices &&
                     (!d.attr.selectable || !d.attr.draggable)) {
@@ -690,7 +705,7 @@ var PlotBoilerplate = /** @class */ (function () {
             else if (d instanceof Vector_1.Vector) {
                 this.draw.arrow(d.a, d.b, this.drawConfig.vector.color); // , this.drawConfig.vector.lineWidth );
                 if (this.drawConfig.drawHandlePoints && d.b.attr.selectable) {
-                    this.draw.circleHandle(d.b, 7, '#a8a8a8');
+                    this.draw.circleHandle(d.b, 3, '#a8a8a8');
                 }
                 else {
                     d.b.attr.renderTime = renderTime;
@@ -705,7 +720,7 @@ var PlotBoilerplate = /** @class */ (function () {
                     this.draw.line(d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth);
                 this.fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
                 if (this.drawConfig.drawHandlePoints) {
-                    this.draw.circleHandle(d.lowerRight, 7, this.drawConfig.image.color);
+                    this.draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                     d.lowerRight.attr.renderTime = renderTime;
                 }
             }

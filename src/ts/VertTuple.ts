@@ -253,7 +253,7 @@ export class VertTuple<T extends VertTuple<T>> {
      * @instance
      * @memberof VertTuple
      **/
-    getClosestPoint( p:Vertex, constrain:boolean ):Vertex {
+    getClosestPoint( p:Vertex ):Vertex {
 	var t : number = this.getClosestT(p);
 	return this.vertAt(t);
     };

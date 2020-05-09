@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 17);
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -3578,7 +3578,7 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.getClosestPoint = function (p, constrain) {
+    VertTuple.prototype.getClosestPoint = function (p) {
         var t = this.getClosestT(p);
         return this.vertAt(t);
     };
@@ -3672,39 +3672,17 @@ exports.VertTuple = VertTuple;
  * @modified  2020-03-17 Added the Triangle.toPolygon() function.
  * @modified  2020-03-17 Added proper JSDoc comments.
  * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version   2.2.2
+ * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
+ * @version   2.2.3
  *
  * @file Triangle
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Circle_1 = __webpack_require__(11);
 var Polygon_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
 var Triangle = /** @class */ (function () {
-    /**
-     * Used in the bounds() function.
-     *
-     * @private
-     **/
-    //function max3( a, b, c ) { return ( a >= b && a >= c ) ? a : ( b >= a && b >= c ) ? b : c; }
-    // function min3( a, b, c ) { return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c; }
-    /**
-     * Used by the containsPoint() function.
-     *
-     * @private
-     **/
-    /* function pointIsInTriangle( px, py, p0x, p0y, p1x, p1y, p2x, p2y ) {
-    //
-    // Point-in-Triangle test found at
-    //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-    //
-    var area = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
-
-    var s = 1/(2*area)*(p0y*p2x - p0x*p2y + (p2y - p0y)*px + (p0x - p2x)*py);
-    var t = 1/(2*area)*(p0x*p1y - p0y*p1x + (p0y - p1y)*px + (p1x - p0x)*py);
-
-    return s > 0 && t > 0 && (1-s-t) > 0;
-    }; */
     /**
      * The constructor.
      *
@@ -3792,7 +3770,8 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.getCircumcircle = function () {
         if (!this.center || !this.radius)
             this.calcCircumcircle();
-        return { center: this.center.clone(), radius: this.radius };
+        // return { center : this.center.clone(), radius : this.radius };
+        return new Circle_1.Circle(this.center, this.radius);
     };
     ;
     /**
@@ -4042,6 +4021,83 @@ exports.Triangle = Triangle;
 "use strict";
 
 /**
+ * @classdesc A simple circle: center point and radius.
+ *
+ * @requires Vertex, SVGSerializale
+ *
+ * @author   Ikaros Kappler
+ * @version  1.0.1
+ * @date     2020-05-04
+ * @modified 2020-05-09 Ported to typescript.
+ *
+ * @file Circle
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Circle = /** @class */ (function () {
+    /**
+     * Create a new circle with given center point and radius.
+     *
+     * @constructor
+     * @param {Vertex} center - The center point of the circle.
+     * @param {number} radius - The radius of the circle.
+     */
+    function Circle(center, radius) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Circle";
+        this.center = center;
+        this.radius = radius;
+    }
+    ;
+    /**
+     * Calculate the distance from this circle to the given line.
+     *
+     * * If the line does not intersect this ciecle then the returned
+     *   value will be the minimal distance.
+     * * If the line goes through this circle then the returned value
+     *   will be max inner distance and it will be negative.
+     *
+     * @param {Line} line - The line to measure the distance to.
+     * @return {number} The minimal distance from the outline of this circle to the given line.
+     */
+    Circle.prototype.lineDistance = function (line) {
+        var closestPointOnLine = line.getClosestPoint(this.center);
+        return closestPointOnLine.distance(this.center) - this.radius;
+    };
+    ;
+    /**
+      * Create an SVG representation of this circle.
+      *
+      * @param {object} options { className?:string }
+      * @return string The SVG string
+      */
+    Circle.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<circle');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' cx="' + this.center.x + '"');
+        buffer.push(' cy="' + this.center.y + '"');
+        buffer.push(' r="' + this.radius + '"');
+        buffer.push(' />');
+        return buffer.join('');
+    };
+    ;
+    return Circle;
+}()); // END class
+exports.Circle = Circle;
+//# sourceMappingURL=Circle.js.map
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
  * @requires Vertex
@@ -4100,7 +4156,7 @@ exports.VEllipse = VEllipse;
 //# sourceMappingURL=VEllipse.js.map
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4169,7 +4225,7 @@ exports.PBImage = PBImage;
 //# sourceMappingURL=PBImage.js.map
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4469,7 +4525,7 @@ exports.MouseHandler = MouseHandler;
 //# sourceMappingURL=MouseHandler.js.map
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4870,7 +4926,7 @@ exports.KeyHandler = KeyHandler;
 //# sourceMappingURL=KeyHandler.js.map
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5618,7 +5674,7 @@ exports.drawutils = drawutils;
 //# sourceMappingURL=draw.js.map
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6234,7 +6290,7 @@ var GLU = /** @class */ (function () {
 //# sourceMappingURL=drawgl.js.map
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6253,18 +6309,18 @@ window.CubicBezierCurve = __webpack_require__(3).CubicBezierCurve;
 window.BezierPath = __webpack_require__(4).BezierPath;
 window.Polygon = __webpack_require__(5).Polygon;
 window.Triangle = __webpack_require__(10).Triangle;
-window.VEllipse = __webpack_require__(11).VEllipse;
-window.PBImage = __webpack_require__(12).PBImage;
-window.MouseHandler = __webpack_require__(13).MouseHandler;
-window.KeyHandler = __webpack_require__(14).KeyHandler;
-window.drawutils = __webpack_require__(15).drawutils;
-window.drawutilsgl = __webpack_require__(16).drawutilsgl;
-window.PlotBoilerplate = __webpack_require__(18).PlotBoilerplate;
+window.VEllipse = __webpack_require__(12).VEllipse;
+window.PBImage = __webpack_require__(13).PBImage;
+window.MouseHandler = __webpack_require__(14).MouseHandler;
+window.KeyHandler = __webpack_require__(15).KeyHandler;
+window.drawutils = __webpack_require__(16).drawutils;
+window.drawutilsgl = __webpack_require__(17).drawutilsgl;
+window.PlotBoilerplate = __webpack_require__(19).PlotBoilerplate;
 
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6323,24 +6379,26 @@ window.PlotBoilerplate = __webpack_require__(18).PlotBoilerplate;
  * @modified 2020-02-06 Fixed a drag-amount bug in the move handling of end points of Bezier paths (control points was not properly moved when non circular).
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
- * @version  1.7.2
+ * @modified 2020-05-09 Included the Cirlcle class.
+ * @version  1.7.3
  *
  * @file PlotBoilerplate
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var draw_1 = __webpack_require__(15);
-var drawgl_1 = __webpack_require__(16);
+var draw_1 = __webpack_require__(16);
+var drawgl_1 = __webpack_require__(17);
 var BezierPath_1 = __webpack_require__(4);
+var Circle_1 = __webpack_require__(11);
 var Grid_1 = __webpack_require__(7);
-var KeyHandler_1 = __webpack_require__(14);
+var KeyHandler_1 = __webpack_require__(15);
 var Line_1 = __webpack_require__(8);
-var MouseHandler_1 = __webpack_require__(13);
-var PBImage_1 = __webpack_require__(12);
+var MouseHandler_1 = __webpack_require__(14);
+var PBImage_1 = __webpack_require__(13);
 var Polygon_1 = __webpack_require__(5);
-var SVGBuilder_1 = __webpack_require__(19);
+var SVGBuilder_1 = __webpack_require__(20);
 var Triangle_1 = __webpack_require__(10);
-var VEllipse_1 = __webpack_require__(11);
+var VEllipse_1 = __webpack_require__(12);
 var Vector_1 = __webpack_require__(2);
 var Vertex_1 = __webpack_require__(0);
 var VertexAttr_1 = __webpack_require__(1);
@@ -6505,6 +6563,10 @@ var PlotBoilerplate = /** @class */ (function () {
                 color: '#2222a8',
                 lineWidth: 1
             },
+            circle: {
+                color: '#22a8a8',
+                lineWidth: 2
+            },
             vertex: {
                 color: '#a8a8a8',
                 lineWidth: 1
@@ -6643,6 +6705,7 @@ var PlotBoilerplate = /** @class */ (function () {
      *  * a Line
      *  * a Vector
      *  * a VEllipse
+     *  * a Circle
      *  * a Polygon
      *  * a Triangle
      *  * a BezierPath
@@ -6685,6 +6748,10 @@ var PlotBoilerplate = /** @class */ (function () {
             drawable.center.listeners.addDragListener(function (e) {
                 drawable.axis.add(e.params.dragAmount);
             });
+        }
+        else if (drawable instanceof Circle_1.Circle) {
+            this.vertices.push(drawable.center);
+            this.drawables.push(drawable);
         }
         else if (drawable instanceof Polygon_1.Polygon) {
             this.drawables.push(drawable);
@@ -6776,6 +6843,7 @@ var PlotBoilerplate = /** @class */ (function () {
      *  * a Line
      *  * a Vector
      *  * a VEllipse
+     *  * a Circle
      *  * a Polygon
      *  * a BezierPath
      *  * a BPImage
@@ -6902,8 +6970,8 @@ var PlotBoilerplate = /** @class */ (function () {
                             this.draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, 'orange'));
                             d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
                         }
-                        this.draw.circleHandle(d.bezierCurves[c].startControlPoint, 7, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
-                        this.draw.circleHandle(d.bezierCurves[c].endControlPoint, 7, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
+                        this.draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
+                        this.draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
                         d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
                         d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                     }
@@ -6942,6 +7010,9 @@ var PlotBoilerplate = /** @class */ (function () {
                     d.axis.attr.renderTime = renderTime;
                 }
             }
+            else if (d instanceof Circle_1.Circle) {
+                this.draw.circle(d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth);
+            }
             else if (d instanceof Vertex_1.Vertex) {
                 if (this.drawConfig.drawVertices &&
                     (!d.attr.selectable || !d.attr.draggable)) {
@@ -6960,7 +7031,7 @@ var PlotBoilerplate = /** @class */ (function () {
             else if (d instanceof Vector_1.Vector) {
                 this.draw.arrow(d.a, d.b, this.drawConfig.vector.color); // , this.drawConfig.vector.lineWidth );
                 if (this.drawConfig.drawHandlePoints && d.b.attr.selectable) {
-                    this.draw.circleHandle(d.b, 7, '#a8a8a8');
+                    this.draw.circleHandle(d.b, 3, '#a8a8a8');
                 }
                 else {
                     d.b.attr.renderTime = renderTime;
@@ -6975,7 +7046,7 @@ var PlotBoilerplate = /** @class */ (function () {
                     this.draw.line(d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth);
                 this.fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
                 if (this.drawConfig.drawHandlePoints) {
-                    this.draw.circleHandle(d.lowerRight, 7, this.drawConfig.image.color);
+                    this.draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                     d.lowerRight.attr.renderTime = renderTime;
                 }
             }
@@ -7699,7 +7770,7 @@ exports.PlotBoilerplate = PlotBoilerplate;
 //# sourceMappingURL=PlotBoilerplate.js.map
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

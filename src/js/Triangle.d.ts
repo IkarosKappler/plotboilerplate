@@ -26,7 +26,8 @@
  * @modified  2020-03-17 Added the Triangle.toPolygon() function.
  * @modified  2020-03-17 Added proper JSDoc comments.
  * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version   2.2.2
+ * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
+ * @version   2.2.3
  *
  * @file Triangle
  * @public
@@ -67,16 +68,6 @@ export declare class Triangle implements SVGSerializable {
     private center;
     private radius_squared;
     private radius;
-    /**
-     * Used in the bounds() function.
-     *
-     * @private
-     **/
-    /**
-     * Used by the containsPoint() function.
-     *
-     * @private
-     **/
     /**
      * The constructor.
      *

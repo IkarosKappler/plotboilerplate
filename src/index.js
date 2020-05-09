@@ -154,13 +154,19 @@
 	pb.add( polygon, false );
 
 	// +---------------------------------------------------------------------------------
-	// | Add two circles.
+	// | Add an ellipse, intitially drawn as circle.
 	// +-------------------------------
-	var circle1 = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
-	pb.add( circle1, false );
-	var circle2 = new VEllipse( new Vertex(0,0), new Vertex(diameter,diameter) );
-	pb.add( circle2, false );
+	var ellipse = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
+	pb.add( ellipse, false );
 
+	// +---------------------------------------------------------------------------------
+	// | Add a circle.
+	// +-------------------------------
+	var circle = new Circle( new Vertex(0,0), diameter );
+	pb.add( circle, false );
+
+	
+	
 	// +---------------------------------------------------------------------------------
 	// | Add a circular connected bezier path.
 	// +-------------------------------
