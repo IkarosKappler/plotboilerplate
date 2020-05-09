@@ -519,7 +519,6 @@ for this purpose.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
- * [Done] Add a proper webpack entry point file (like index.js or entry.js?).
  * Add typescript and define an interface for drawables (Drawable.ts?).
  * Add a vertex attribute: visible. (to hide vertices).
  * Add control button: reset zoom.
@@ -528,28 +527,20 @@ for this purpose.
  * Add a demo that draws a proper mathematical xy-grid.
  * Switching browser tabs back and forth sometimes locks the Ctrl-Key. Check that.
  * [NPM/Bash] Add a pre-publish check if there are unstaged changes.
- * [Done] Add params as table.
  * [Solved] The intersection points in the line-point-distance demo are draggable. Why?
- * Move the helper function triangle.pointIsInTriangle()...pointIsInTriangle() should be in a utils wrapper somewhere.
- * [Done] Add a demo: Lissajous-Curves (direct and Bézier approximation).
  * Code the leaf venation generator demo.
- * [Done] Add thumbnails for the demo preview.
  * Add a thumbnail generator script for the screenshots (like with imagick).
- * [Done ]Add a screenshot of the pursuit curves to the README.
- * [Done] Restore old entry point (src/entry.js) for webpack.
  * Add a retina detection; initialize the canvas with double resolution on startup if retina display (optional-flag).
  * Add a test implementation with Hobby-curves (demo?).
  * Remove the BezierPath._roundToDigits(...) function (replace by Number.toFixed).
  * Refactor the VertTuple.getClosestT function. It still uses local functions!
  * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
  * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
- * Add a Circle class (center and radius). The triangle class really needs that.
- * Add a Bounds class. It is implicitly already used in many places. 
  * Use the new Bounds class in the RectSelector helper then.
- * Add an interface Drawable.ts and add the to the PlotBoilerplate and to the SVGBuilder.
  * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
- * [Done] Grid with full lines drawn is broken. Lines are drawn outside the viewport when zooming.
- * The MouseHandler used outside the PB object does not tell if wasDragged (always false); also the button indicator is empty. And dragAmount.
+ * The Triangle class still uses a custom bounds object. Use the new interface 'Bounds'; needs some refactoring.
+ * Circle lineWidth params also affects circular handles.
+ * Jekyll does not compile when there is no _tracker.js file present.
 
 
 ### Todos for future Version 2

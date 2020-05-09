@@ -4,6 +4,8 @@ layout: page
 
 
 # Changelog
+* 2020-05-09
+  * Included the Circle class from the demos into the plot-boilerlplate core repertoire.
 * 2020-05-05
   * Added the 'lineWidth' param to the circle(...) function.
   * Finished the circle-in-convex-polygog demo.

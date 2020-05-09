@@ -536,6 +536,7 @@ for this purpose.
  * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
  * The Triangle class still uses a custom bounds object. Use the new interface 'Bounds'; needs some refactoring.
  * Circle lineWidth params also affects circular handles.
+ * Jekyll does not compile when there is no _tracker.js file present.
 
 
 ### Todos for future Version 2
