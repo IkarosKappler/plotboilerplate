@@ -572,7 +572,8 @@ for this purpose.
 * https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf
 * https://github.com/loopspace/jsHobby
 * https://codepen.io/osublake/pen/BowJed Blake Bowen's Catmull-Rom demo
-
+* mbostock https://github.com/mbostock for the great convex-polygon-incircle implementation https://observablehq.com/@mbostock/convex-polygon-incircle
+* and for https://observablehq.com/@mbostock/circle-tangent-to-three-lines
 
 ## Known bugs
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
