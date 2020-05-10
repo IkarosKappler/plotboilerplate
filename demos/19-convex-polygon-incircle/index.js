@@ -69,45 +69,6 @@
 
 	    drawInnerBisectors( convexHull );
 
-	    // Try all possibilies of triple-pairs
-	    /* var bestCircle = undefined;
-	    var bestTriangle = undefined;
-	    for( var a = 0; a < n; a++ ) {
-		for( var b = a+1; b < n; b++ ) {
-		    for( var c = b+1; c < n; c++ ) {
-			// As these lines are part of the convex hull, we know that
-			//  * line a preceeds line b and
-			//  * line b preceeds line c :)
-			var lineA = new Line( convexHull.vertices[a], convexHull.vertices[(a+1)%n] );
-			var lineB = new Line( convexHull.vertices[b], convexHull.vertices[(b+1)%n] );
-			var lineC = new Line( convexHull.vertices[c], convexHull.vertices[(c+1)%n] );
-
-			// Find intersections by expanding the lines
-			var vertB = lineA.intersection(lineB);
-			var vertC = lineB.intersection(lineC);
-
-			// An object: { center: Vertex, radius: number }
-			var triangle = getTangentTriangle4( lineA.a, vertB, vertC, lineC.b );
-			// Workaround. There will be a future version where the 'getCircumCircle()' functions
-			// returns a real Circle instance.
-			var _circle = triangle.getCircumcircle();
-			var circle = new Circle( _circle.center, _circle.radius );
-
-			// Count the number of intersections with the convex hull:
-			// If there are exactly three, we have found an in-lying circle.
-			//  * Check if this one is better (bigger) than the old one.
-			//  * Also check if the circle is located inside the polygon;
-			//    The construction can, in some cases, produce an out-lying circle.
-			if( !convexHull.containsVert(circle.center) )
-			    continue;
-			var circleIntersections = findCircleIntersections( convexHull, circle );
-			if( circleIntersections.length == 3 && (bestCircle == undefined || bestCircle.radius < circle.radius) ) {
-			    bestCircle = circle;
-			    bestTriangle = triangle;
-			}
-		    }
-		}
-	    } */
 	    var result = convexPolygonIncircle( convexHull );
 	    var circle = result.circle;
 	    var triangle = result.triangle;
