@@ -12,8 +12,7 @@ done
 ./run-build.sh
 
 [ $? -eq 0 ]  || exit 1
-git add dist/plotboilerplate.min.js
-git add dist/plotboilerplate.js
+git add -u
 git commit -m "Automatic commit."
 
 
