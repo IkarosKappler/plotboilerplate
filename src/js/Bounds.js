@@ -18,7 +18,7 @@ var Bounds = /** @class */ (function () {
      * The constructor.
      *
      * @constructor
-     * @name Grid
+     * @name Bounds
      * @param {XYCoords} min - The min values (x,y) as a XYCoord tuple.
      * @param {XYCoords} max - The max values (x,y) as a XYCoord tuple.
      **/

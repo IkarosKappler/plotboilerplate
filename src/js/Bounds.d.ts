@@ -17,31 +17,35 @@ export declare class Bounds implements IBounds, XYDimension {
      * @member {XYCoords}
      * @memberof Bounds
      * @instance
+     * @public
      */
     min: XYCoords;
     /**
      * @member {XYCoords}
      * @memberof Bounds
      * @instance
+     * @public
      */
     max: XYCoords;
     /**
      * @member {number}
      * @memberof Bounds
      * @instance
+     * @public
      */
     width: number;
     /**
      * @member {number}
      * @memberof Bounds
      * @instance
+     * @public
      */
     height: number;
     /**
      * The constructor.
      *
      * @constructor
-     * @name Grid
+     * @name Bounds
      * @param {XYCoords} min - The min values (x,y) as a XYCoord tuple.
      * @param {XYCoords} max - The max values (x,y) as a XYCoord tuple.
      **/

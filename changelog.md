@@ -6,6 +6,8 @@
   * Renamed interface Bounds to IBounds.
   * Fixed a bug in the Triangle.getCircumcircle function (center was not cloned).
   * Updated all demos with the new Circle class.
+  * Removed the BezierPath._roundToDigits helper function. Using Number.toFixed instead.
+  * Added proper JSDoc class specifications to Bounds, Triangle and Circle.
 * 2020-05-09
   * Included the Circle class from the demos into the plot-boilerlplate core repertoire.
 * 2020-05-05

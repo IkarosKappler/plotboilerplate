@@ -14,7 +14,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (desktop and mobile)
 
 
-The compressed library has 82kb.
+The compressed library has 83kb.
 
 
 ## Install the package via npm
@@ -519,19 +519,15 @@ for this purpose.
  * Add Images to the SVGBuiler.
  * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
- * Add typescript and define an interface for drawables (Drawable.ts?).
  * Add a vertex attribute: visible. (to hide vertices).
  * Add control button: reset zoom.
  * Add control button: reset to origin.
  * [Partially done] Add control button: set to retina resolution (size factors and css scale).
  * Add a demo that draws a proper mathematical xy-grid.
  * Switching browser tabs back and forth sometimes locks the Ctrl-Key. Check that.
- * [NPM/Bash] Add a pre-publish check if there are unstaged changes.
- * [Solved] The intersection points in the line-point-distance demo are draggable. Why?
- * Code the leaf venation generator demo.
+ * Extend the leaf venation generator demo.
  * Add a thumbnail generator script for the screenshots (like with imagick).
  * Add a retina detection; initialize the canvas with double resolution on startup if retina display (optional-flag).
- * Add a test implementation with Hobby-curves (demo?).
  * Remove the BezierPath._roundToDigits(...) function (replace by Number.toFixed).
  * Refactor the VertTuple.getClosestT function. It still uses local functions!
  * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!

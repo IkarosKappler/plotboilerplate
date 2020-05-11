@@ -514,16 +514,4 @@ export declare class BezierPath implements SVGSerializable {
      * @return {BezierPath} The bezier path instance retrieved from the string.
      **/
     static fromReducedListRepresentation(listJSON: string): BezierPath;
-    /**
-     * A helper function.
-     *
-     * @method _roundToDigits
-     * @param {number} number -
-     * @param {number} digits -
-     * @param {boolean} enforceInvisibleDigits -
-     * @private
-     * @memberof BezierPath
-     * @return {string}
-     **/
-    static _roundToDigits(num: number, digits: number, enforceInvisibleDigits: boolean): string;
 }

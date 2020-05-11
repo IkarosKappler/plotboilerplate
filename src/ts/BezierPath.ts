@@ -1239,27 +1239,27 @@ export class BezierPath implements SVGSerializable {
 	for( var i = 0; i < this.bezierCurves.length; i++ ) {
 	    
 	    var curve = this.bezierCurves[i];
-	    buffer.push( BezierPath._roundToDigits(curve.getStartPoint().x,digits,false) );
+	    buffer.push( curve.getStartPoint().x.toFixed(digits) );
 	    buffer.push( "," );
-	    buffer.push( BezierPath._roundToDigits(curve.getStartPoint().y,digits,false) );
+	    buffer.push( curve.getStartPoint().y.toFixed(digits) );
 	    buffer.push( "," );
 
-	    buffer.push( BezierPath._roundToDigits(curve.getStartControlPoint().x,digits,false) );
+	    buffer.push( curve.getStartControlPoint().x.toFixed(digits) );
 	    buffer.push( "," );
-	    buffer.push( BezierPath._roundToDigits(curve.getStartControlPoint().y,digits,false) );
+	    buffer.push( curve.getStartControlPoint().y.toFixed(digits) );
 	    buffer.push( "," );
 	    
-	    buffer.push( BezierPath._roundToDigits(curve.getEndControlPoint().x,digits,false) );
+	    buffer.push( curve.getEndControlPoint().x.toFixed(digits) );
 	    buffer.push( "," );
-	    buffer.push( BezierPath._roundToDigits(curve.getEndControlPoint().y,digits,false) );
+	    buffer.push( curve.getEndControlPoint().y.toFixed(digits) );
 	    buffer.push( "," );		
 
 	}
 	if( this.bezierCurves.length != 0 ) {
 	    var curve = this.bezierCurves[ this.bezierCurves.length-1 ];
-	    buffer.push( BezierPath._roundToDigits(curve.getEndPoint().x,digits,false) );
+	    buffer.push( curve.getEndPoint().x.toFixed(digits) );
 	    buffer.push( "," );
-	    buffer.push( BezierPath._roundToDigits(curve.getEndPoint().y,digits,false) );
+	    buffer.push( curve.getEndPoint().y.toFixed(digits) );
 	}
 	buffer.push( "]" ); // array end
 	
@@ -1327,38 +1327,4 @@ export class BezierPath implements SVGSerializable {
 	return bezierPath;
     };
 
-
-    /**
-     * A helper function.
-     *
-     * @method _roundToDigits
-     * @param {number} number - 
-     * @param {number} digits -
-     * @param {boolean} enforceInvisibleDigits -
-     * @private
-     * @memberof BezierPath
-     * @return {string}
-     **/
-    // !!! TODO: isn't Number.toFixed(...) doing this job???
-    static _roundToDigits( num:number, digits:number, enforceInvisibleDigits:boolean ) : string {
-	if( digits <= 0 )
-	    return Math.round(num).toString(); 
-
-	var magnitude : number = Math.pow( 10, digits ); // This could be LARGE :/
-	num = Math.round( num * magnitude );
-	var result : string = "" + (num  /  magnitude);
-	var index : number = result.lastIndexOf(".");
-	if( index == -1 ) {
-	    index = result.length;
-	}
-	if( enforceInvisibleDigits ) {
-	    var digitsAfterPoint : number = result.length - index - 1;
-	    //var digitsMissing : number    = enforceInvisibleDigits - digitsAfterPoint;
-	    var digitsMissing : number    = digits - digitsAfterPoint;
-	    while( digitsMissing-- > 0 )
-		result += "&nbsp;";
-	}
-	
-	return result;
-    };
 }

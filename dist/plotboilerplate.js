@@ -2590,24 +2590,24 @@ var BezierPath = /** @class */ (function () {
         buffer.push("["); // array begin
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
-            buffer.push(BezierPath._roundToDigits(curve.getStartPoint().x, digits, false));
+            buffer.push(curve.getStartPoint().x.toFixed(digits));
             buffer.push(",");
-            buffer.push(BezierPath._roundToDigits(curve.getStartPoint().y, digits, false));
+            buffer.push(curve.getStartPoint().y.toFixed(digits));
             buffer.push(",");
-            buffer.push(BezierPath._roundToDigits(curve.getStartControlPoint().x, digits, false));
+            buffer.push(curve.getStartControlPoint().x.toFixed(digits));
             buffer.push(",");
-            buffer.push(BezierPath._roundToDigits(curve.getStartControlPoint().y, digits, false));
+            buffer.push(curve.getStartControlPoint().y.toFixed(digits));
             buffer.push(",");
-            buffer.push(BezierPath._roundToDigits(curve.getEndControlPoint().x, digits, false));
+            buffer.push(curve.getEndControlPoint().x.toFixed(digits));
             buffer.push(",");
-            buffer.push(BezierPath._roundToDigits(curve.getEndControlPoint().y, digits, false));
+            buffer.push(curve.getEndControlPoint().y.toFixed(digits));
             buffer.push(",");
         }
         if (this.bezierCurves.length != 0) {
             var curve = this.bezierCurves[this.bezierCurves.length - 1];
-            buffer.push(BezierPath._roundToDigits(curve.getEndPoint().x, digits, false));
+            buffer.push(curve.getEndPoint().x.toFixed(digits));
             buffer.push(",");
-            buffer.push(BezierPath._roundToDigits(curve.getEndPoint().y, digits, false));
+            buffer.push(curve.getEndPoint().y.toFixed(digits));
         }
         buffer.push("]"); // array end
         return buffer.join(""); // Convert to string, with empty separator.
@@ -2656,38 +2656,6 @@ var BezierPath = /** @class */ (function () {
         } while (i + 2 < pointArray.length);
         bezierPath.updateArcLengths();
         return bezierPath;
-    };
-    ;
-    /**
-     * A helper function.
-     *
-     * @method _roundToDigits
-     * @param {number} number -
-     * @param {number} digits -
-     * @param {boolean} enforceInvisibleDigits -
-     * @private
-     * @memberof BezierPath
-     * @return {string}
-     **/
-    // !!! TODO: isn't Number.toFixed(...) doing this job???
-    BezierPath._roundToDigits = function (num, digits, enforceInvisibleDigits) {
-        if (digits <= 0)
-            return Math.round(num).toString();
-        var magnitude = Math.pow(10, digits); // This could be LARGE :/
-        num = Math.round(num * magnitude);
-        var result = "" + (num / magnitude);
-        var index = result.lastIndexOf(".");
-        if (index == -1) {
-            index = result.length;
-        }
-        if (enforceInvisibleDigits) {
-            var digitsAfterPoint = result.length - index - 1;
-            //var digitsMissing : number    = enforceInvisibleDigits - digitsAfterPoint;
-            var digitsMissing = digits - digitsAfterPoint;
-            while (digitsMissing-- > 0)
-                result += "&nbsp;";
-        }
-        return result;
     };
     ;
     // +---------------------------------------------------------------------------------
@@ -3735,15 +3703,8 @@ exports.VertTuple = VertTuple;
  * The class was written for a Delaunay trinagulation demo so it might
  * contain some strange and unexpected functions.
  *
- * @requires Vertex, Polygon
+ * @requires Vertex, Polygon, SVGSerializale
  *
- * Inspired by Delaunay at Travellermap
- *   http://www.travellermap.com/tmp/delaunay.htm
- *
- * Todo:
- *   + Add and use a proper Bounds class.
- *   + Add and use a proper Circle class.
- *   + Think about the importance of storing the circumcircle data in the Triangle.
  *
  * @author    Ikaros Kappler
  * @date_init 2012-10-17 (Wrote a first version of this in that year).
@@ -3761,6 +3722,7 @@ exports.VertTuple = VertTuple;
  * @version   2.2.3
  *
  * @file Triangle
+ * @fileoverview A simple triangle class: three vertices.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -3773,6 +3735,7 @@ var Triangle = /** @class */ (function () {
      * The constructor.
      *
      * @constructor
+     * @name Triangle
      * @param {Vertex} a - The first vertex of the triangle.
      * @param {Vertex} b - The second vertex of the triangle.
      * @param {Vertex} c - The third vertex of the triangle.
@@ -3965,17 +3928,11 @@ var Triangle = /** @class */ (function () {
      * Get the rectangular bounds for this triangle.
      *
      * @method bounds
-     * @return {Object} - { xMin:float, xMax:float, yMin:float, yMax:float, width:float, height:float }
+     * @return {Bounds} - The min/max bounds of this triangle.
      * @instance
      * @memberof Triangle
      */
-    // bounds() : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } {
     Triangle.prototype.bounds = function () {
-        //const minx : number = Triangle.utils.min3( this.a.x, this.b.x, this.c.x );
-        //const miny : number = Triangle.utils.min3( this.a.y, this.b.y, this.c.y );
-        //const maxx : number = Triangle.utils.max3( this.a.x, this.b.x, this.c.x );
-        //const maxy : number = Triangle.utils.max3( this.a.y, this.b.y, this.c.y );
-        // return { xMin : minx, yMin : miny, xMax : maxx, yMax : maxy, width : maxx-minx, height : maxy-miny };
         return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
     };
     ;
@@ -4130,7 +4087,7 @@ var Bounds = /** @class */ (function () {
      * The constructor.
      *
      * @constructor
-     * @name Grid
+     * @name Bounds
      * @param {XYCoords} min - The min values (x,y) as a XYCoord tuple.
      * @param {XYCoords} max - The max values (x,y) as a XYCoord tuple.
      **/
@@ -5689,8 +5646,8 @@ var drawutils = /** @class */ (function () {
      * @param {string} text - The text to draw.
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
-     * @param {number=} rotation - The (aoptional) rotation in radians.
-     * @param {string=black} color - The color to render the text with.
+     * @param {number=} rotation - The (optional) rotation in radians (default=0).
+     * @param {string=} color - The color to render the text with (default=black).
      * @return {void}
      * @instance
      * @memberof drawutils

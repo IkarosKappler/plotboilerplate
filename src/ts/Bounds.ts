@@ -12,10 +12,7 @@
  * @public
  **/
 
-
-//import { Vertex } from "./Vertex";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
-
 
 export class Bounds implements IBounds, XYDimension {
 
@@ -23,6 +20,7 @@ export class Bounds implements IBounds, XYDimension {
      * @member {XYCoords} 
      * @memberof Bounds
      * @instance
+     * @public
      */
     min:XYCoords;
 
@@ -30,6 +28,7 @@ export class Bounds implements IBounds, XYDimension {
      * @member {XYCoords} 
      * @memberof Bounds
      * @instance
+     * @public
      */
     max:XYCoords;
 
@@ -37,6 +36,7 @@ export class Bounds implements IBounds, XYDimension {
      * @member {number} 
      * @memberof Bounds
      * @instance
+     * @public
      */
     width:number;
 
@@ -44,6 +44,7 @@ export class Bounds implements IBounds, XYDimension {
      * @member {number} 
      * @memberof Bounds
      * @instance
+     * @public
      */
     height:number;
 
@@ -53,7 +54,7 @@ export class Bounds implements IBounds, XYDimension {
      * The constructor.
      *
      * @constructor
-     * @name Grid
+     * @name Bounds
      * @param {XYCoords} min - The min values (x,y) as a XYCoord tuple.
      * @param {XYCoords} max - The max values (x,y) as a XYCoord tuple.
      **/

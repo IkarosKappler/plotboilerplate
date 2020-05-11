@@ -5,15 +5,8 @@
  * The class was written for a Delaunay trinagulation demo so it might
  * contain some strange and unexpected functions.
  *
- * @requires Vertex, Polygon
+ * @requires Vertex, Polygon, SVGSerializale
  *
- * Inspired by Delaunay at Travellermap
- *   http://www.travellermap.com/tmp/delaunay.htm
- *
- * Todo:
- *   + Add and use a proper Bounds class.
- *   + Add and use a proper Circle class.
- *   + Think about the importance of storing the circumcircle data in the Triangle.
  *
  * @author    Ikaros Kappler
  * @date_init 2012-10-17 (Wrote a first version of this in that year).
@@ -31,6 +24,7 @@
  * @version   2.2.3
  *
  * @file Triangle
+ * @fileoverview A simple triangle class: three vertices.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -43,6 +37,7 @@ var Triangle = /** @class */ (function () {
      * The constructor.
      *
      * @constructor
+     * @name Triangle
      * @param {Vertex} a - The first vertex of the triangle.
      * @param {Vertex} b - The second vertex of the triangle.
      * @param {Vertex} c - The third vertex of the triangle.
@@ -235,17 +230,11 @@ var Triangle = /** @class */ (function () {
      * Get the rectangular bounds for this triangle.
      *
      * @method bounds
-     * @return {Object} - { xMin:float, xMax:float, yMin:float, yMax:float, width:float, height:float }
+     * @return {Bounds} - The min/max bounds of this triangle.
      * @instance
      * @memberof Triangle
      */
-    // bounds() : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } {
     Triangle.prototype.bounds = function () {
-        //const minx : number = Triangle.utils.min3( this.a.x, this.b.x, this.c.x );
-        //const miny : number = Triangle.utils.min3( this.a.y, this.b.y, this.c.y );
-        //const maxx : number = Triangle.utils.max3( this.a.x, this.b.x, this.c.x );
-        //const maxy : number = Triangle.utils.max3( this.a.y, this.b.y, this.c.y );
-        // return { xMin : minx, yMin : miny, xMax : maxx, yMax : maxy, width : maxx-minx, height : maxy-miny };
         return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
     };
     ;

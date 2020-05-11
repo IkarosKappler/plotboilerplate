@@ -4,15 +4,8 @@
  * The class was written for a Delaunay trinagulation demo so it might
  * contain some strange and unexpected functions.
  *
- * @requires Vertex, Polygon
+ * @requires Vertex, Polygon, SVGSerializale
  *
- * Inspired by Delaunay at Travellermap
- *   http://www.travellermap.com/tmp/delaunay.htm
- *
- * Todo:
- *   + Add and use a proper Bounds class.
- *   + Add and use a proper Circle class.
- *   + Think about the importance of storing the circumcircle data in the Triangle.
  *
  * @author    Ikaros Kappler
  * @date_init 2012-10-17 (Wrote a first version of this in that year).
@@ -30,6 +23,7 @@
  * @version   2.2.3
  *
  * @file Triangle
+ * @fileoverview A simple triangle class: three vertices.
  * @public
  **/
 import { Bounds } from "./Bounds";
@@ -50,29 +44,48 @@ export declare class Triangle implements SVGSerializable {
     static readonly EPSILON: number;
     /**
      * @member {Vertex}
-     * @memberof VEllipse
+     * @memberof Triangle
      * @instance
      */
     a: Vertex;
     /**
      * @member {Vertex}
-     * @memberof VEllipse
+     * @memberof Triangle
      * @instance
      */
     b: Vertex;
     /**
      * @member {Vertex}
-     * @memberof VEllipse
+     * @memberof Triangle
      * @instance
      */
     c: Vertex;
+    /**
+     * @member {Vertex}
+     * @memberof Triangle
+     * @instance
+     * @private
+     */
     private center;
+    /**
+     * @member {number}
+     * @memberof Triangle
+     * @instance
+     * @private
+     */
     private radius_squared;
+    /**
+     * @member {number}
+     * @memberof Triangle
+     * @instance
+     * @private
+     */
     private radius;
     /**
      * The constructor.
      *
      * @constructor
+     * @name Triangle
      * @param {Vertex} a - The first vertex of the triangle.
      * @param {Vertex} b - The second vertex of the triangle.
      * @param {Vertex} c - The third vertex of the triangle.
@@ -185,7 +198,7 @@ export declare class Triangle implements SVGSerializable {
      * Get the rectangular bounds for this triangle.
      *
      * @method bounds
-     * @return {Object} - { xMin:float, xMax:float, yMin:float, yMax:float, width:float, height:float }
+     * @return {Bounds} - The min/max bounds of this triangle.
      * @instance
      * @memberof Triangle
      */
