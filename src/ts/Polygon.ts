@@ -86,7 +86,7 @@ export class Polygon implements SVGSerializable {
 	for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
             let xi : number = this.vertices[i].x, yi : number = this.vertices[i].y;
             let xj : number = this.vertices[j].x, yj : number = this.vertices[j].y;
-
+    
             var intersect : boolean = ((yi > vert.y) != (yj > vert.y))
 		&& (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
             if (intersect) inside = !inside;
