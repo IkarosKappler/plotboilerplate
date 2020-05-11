@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -3764,6 +3764,7 @@ exports.VertTuple = VertTuple;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds_1 = __webpack_require__(12);
 var Circle_1 = __webpack_require__(6);
 var Polygon_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
@@ -3855,7 +3856,6 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.getCircumcircle = function () {
         if (!this.center || !this.radius)
             this.calcCircumcircle();
-        // return { center : this.center.clone(), radius : this.radius };
         return new Circle_1.Circle(this.center.clone(), this.radius);
     };
     ;
@@ -3924,10 +3924,14 @@ var Triangle = /** @class */ (function () {
         var dx, dy;
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
+            // const bounds : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } = this.bounds();
             var bounds = this.bounds();
-            this.center = new Vertex_1.Vertex((bounds.xMin + bounds.xMax) / 2, (bounds.yMin + bounds.yMax) / 2);
-            dx = this.center.x - bounds.xMin;
-            dy = this.center.y - bounds.yMin;
+            // this.center = new Vertex( ( bounds.xMin + bounds.xMax ) / 2, ( bounds.yMin + bounds.yMax ) / 2 );
+            this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+            //dx = this.center.x - bounds.xMin;
+            //dy = this.center.y - bounds.yMin;
+            dx = this.center.x - bounds.min.x;
+            dy = this.center.y - bounds.min.y;
         }
         else {
             var cx = (D * E - B * F) / G;
@@ -3965,12 +3969,14 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
+    // bounds() : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } {
     Triangle.prototype.bounds = function () {
-        var minx = Triangle.utils.min3(this.a.x, this.b.x, this.c.x);
-        var miny = Triangle.utils.min3(this.a.y, this.b.y, this.c.y);
-        var maxx = Triangle.utils.max3(this.a.x, this.b.x, this.c.x);
-        var maxy = Triangle.utils.max3(this.a.y, this.b.y, this.c.y);
-        return { xMin: minx, yMin: miny, xMax: maxx, yMax: maxy, width: maxx - minx, height: maxy - miny };
+        //const minx : number = Triangle.utils.min3( this.a.x, this.b.x, this.c.x );
+        //const miny : number = Triangle.utils.min3( this.a.y, this.b.y, this.c.y );
+        //const maxx : number = Triangle.utils.max3( this.a.x, this.b.x, this.c.x );
+        //const maxy : number = Triangle.utils.max3( this.a.y, this.b.y, this.c.y );
+        // return { xMin : minx, yMin : miny, xMax : maxx, yMax : maxy, width : maxx-minx, height : maxy-miny };
+        return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
     };
     ;
     /**
@@ -4106,6 +4112,47 @@ exports.Triangle = Triangle;
 "use strict";
 
 /**
+ * @classdesc A bounds class with min and max values.
+ *
+ * @requires XYCoords, Vertex, IBounds
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-05-11
+ * @version  1.0.0
+ *
+ * @file Bopunds
+ * @fileoverview A simple bounds class implementing IBounds.
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Grid
+     * @param {XYCoords} min - The min values (x,y) as a XYCoord tuple.
+     * @param {XYCoords} max - The max values (x,y) as a XYCoord tuple.
+     **/
+    function Bounds(min, max) {
+        this.min = min;
+        this.max = max;
+        this.width = max.x - min.x;
+        this.height = max.y - min.y;
+    }
+    ;
+    return Bounds;
+}()); // END class bounds
+exports.Bounds = Bounds;
+//# sourceMappingURL=Bounds.js.map
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
  * @requires Vertex
@@ -4164,7 +4211,7 @@ exports.VEllipse = VEllipse;
 //# sourceMappingURL=VEllipse.js.map
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4233,7 +4280,7 @@ exports.PBImage = PBImage;
 //# sourceMappingURL=PBImage.js.map
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4533,7 +4580,7 @@ exports.MouseHandler = MouseHandler;
 //# sourceMappingURL=MouseHandler.js.map
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4934,7 +4981,7 @@ exports.KeyHandler = KeyHandler;
 //# sourceMappingURL=KeyHandler.js.map
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5682,7 +5729,7 @@ exports.drawutils = drawutils;
 //# sourceMappingURL=draw.js.map
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6298,7 +6345,7 @@ var GLU = /** @class */ (function () {
 //# sourceMappingURL=drawgl.js.map
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6317,19 +6364,19 @@ window.CubicBezierCurve = __webpack_require__(3).CubicBezierCurve;
 window.BezierPath = __webpack_require__(4).BezierPath;
 window.Polygon = __webpack_require__(5).Polygon;
 window.Triangle = __webpack_require__(11).Triangle;
-window.VEllipse = __webpack_require__(12).VEllipse;
+window.VEllipse = __webpack_require__(13).VEllipse;
 window.Circle = __webpack_require__(6).Circle;
-window.PBImage = __webpack_require__(13).PBImage;
-window.MouseHandler = __webpack_require__(14).MouseHandler;
-window.KeyHandler = __webpack_require__(15).KeyHandler;
-window.drawutils = __webpack_require__(16).drawutils;
-window.drawutilsgl = __webpack_require__(17).drawutilsgl;
-window.PlotBoilerplate = __webpack_require__(19).PlotBoilerplate;
+window.PBImage = __webpack_require__(14).PBImage;
+window.MouseHandler = __webpack_require__(15).MouseHandler;
+window.KeyHandler = __webpack_require__(16).KeyHandler;
+window.drawutils = __webpack_require__(17).drawutils;
+window.drawutilsgl = __webpack_require__(18).drawutilsgl;
+window.PlotBoilerplate = __webpack_require__(20).PlotBoilerplate;
 
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6395,19 +6442,20 @@ window.PlotBoilerplate = __webpack_require__(19).PlotBoilerplate;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var draw_1 = __webpack_require__(16);
-var drawgl_1 = __webpack_require__(17);
+var draw_1 = __webpack_require__(17);
+var drawgl_1 = __webpack_require__(18);
 var BezierPath_1 = __webpack_require__(4);
+var Bounds_1 = __webpack_require__(12);
 var Circle_1 = __webpack_require__(6);
 var Grid_1 = __webpack_require__(8);
-var KeyHandler_1 = __webpack_require__(15);
+var KeyHandler_1 = __webpack_require__(16);
 var Line_1 = __webpack_require__(9);
-var MouseHandler_1 = __webpack_require__(14);
-var PBImage_1 = __webpack_require__(13);
+var MouseHandler_1 = __webpack_require__(15);
+var PBImage_1 = __webpack_require__(14);
 var Polygon_1 = __webpack_require__(5);
-var SVGBuilder_1 = __webpack_require__(20);
+var SVGBuilder_1 = __webpack_require__(21);
 var Triangle_1 = __webpack_require__(11);
-var VEllipse_1 = __webpack_require__(12);
+var VEllipse_1 = __webpack_require__(13);
 var Vector_1 = __webpack_require__(2);
 var Vertex_1 = __webpack_require__(0);
 var VertexAttr_1 = __webpack_require__(1);
@@ -7181,9 +7229,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {Bounds} The current viewport.
      **/
     PlotBoilerplate.prototype.viewport = function () {
-        return { min: this.transformMousePosition(0, 0),
-            max: this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY)
-        };
+        return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY));
     };
     ;
     /**
@@ -7779,7 +7825,7 @@ exports.PlotBoilerplate = PlotBoilerplate;
 //# sourceMappingURL=PlotBoilerplate.js.map
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

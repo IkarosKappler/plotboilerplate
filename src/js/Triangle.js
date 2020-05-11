@@ -34,6 +34,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds_1 = require("./Bounds");
 var Circle_1 = require("./Circle");
 var Polygon_1 = require("./Polygon");
 var Vertex_1 = require("./Vertex");
@@ -125,7 +126,6 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.getCircumcircle = function () {
         if (!this.center || !this.radius)
             this.calcCircumcircle();
-        // return { center : this.center.clone(), radius : this.radius };
         return new Circle_1.Circle(this.center.clone(), this.radius);
     };
     ;
@@ -194,10 +194,14 @@ var Triangle = /** @class */ (function () {
         var dx, dy;
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
+            // const bounds : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } = this.bounds();
             var bounds = this.bounds();
-            this.center = new Vertex_1.Vertex((bounds.xMin + bounds.xMax) / 2, (bounds.yMin + bounds.yMax) / 2);
-            dx = this.center.x - bounds.xMin;
-            dy = this.center.y - bounds.yMin;
+            // this.center = new Vertex( ( bounds.xMin + bounds.xMax ) / 2, ( bounds.yMin + bounds.yMax ) / 2 );
+            this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+            //dx = this.center.x - bounds.xMin;
+            //dy = this.center.y - bounds.yMin;
+            dx = this.center.x - bounds.min.x;
+            dy = this.center.y - bounds.min.y;
         }
         else {
             var cx = (D * E - B * F) / G;
@@ -235,12 +239,14 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
+    // bounds() : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } {
     Triangle.prototype.bounds = function () {
-        var minx = Triangle.utils.min3(this.a.x, this.b.x, this.c.x);
-        var miny = Triangle.utils.min3(this.a.y, this.b.y, this.c.y);
-        var maxx = Triangle.utils.max3(this.a.x, this.b.x, this.c.x);
-        var maxy = Triangle.utils.max3(this.a.y, this.b.y, this.c.y);
-        return { xMin: minx, yMin: miny, xMax: maxx, yMax: maxy, width: maxx - minx, height: maxy - miny };
+        //const minx : number = Triangle.utils.min3( this.a.x, this.b.x, this.c.x );
+        //const miny : number = Triangle.utils.min3( this.a.y, this.b.y, this.c.y );
+        //const maxx : number = Triangle.utils.max3( this.a.x, this.b.x, this.c.x );
+        //const maxy : number = Triangle.utils.max3( this.a.y, this.b.y, this.c.y );
+        // return { xMin : minx, yMin : miny, xMax : maxx, yMax : maxy, width : maxx-minx, height : maxy-miny };
+        return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
     };
     ;
     /**

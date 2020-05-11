@@ -1,6 +1,11 @@
 
 
 # Changelog
+* 2020-05-11
+  * Added new class Bounds (implementing IBounds and XYDimension).
+  * Renamed interface Bounds to IBounds.
+  * Fixed a bug in the Triangle.getCircumcircle function (center was not cloned).
+  * Updated all demos with the new Circle class.
 * 2020-05-09
   * Included the Circle class from the demos into the plot-boilerlplate core repertoire.
 * 2020-05-05

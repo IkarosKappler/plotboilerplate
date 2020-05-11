@@ -63,6 +63,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var draw_1 = require("./draw");
 var drawgl_1 = require("./drawgl");
 var BezierPath_1 = require("./BezierPath");
+var Bounds_1 = require("./Bounds");
 var Circle_1 = require("./Circle");
 var Grid_1 = require("./Grid");
 var KeyHandler_1 = require("./KeyHandler");
@@ -846,9 +847,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {Bounds} The current viewport.
      **/
     PlotBoilerplate.prototype.viewport = function () {
-        return { min: this.transformMousePosition(0, 0),
-            max: this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY)
-        };
+        return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY));
     };
     ;
     /**

@@ -62,6 +62,7 @@
 import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
 import { BezierPath } from "./BezierPath";
+import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Grid } from "./Grid";
@@ -77,7 +78,7 @@ import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
 import { VertEvent } from "./VertexListeners";
-import { Bounds, Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
+import { IBounds, Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
 
 
 /**
@@ -1001,10 +1002,10 @@ export class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {Bounds} The current viewport.
      **/
-    viewport() : Bounds {
-	return { min : this.transformMousePosition(0,0),
-		 max : this.transformMousePosition(this.canvasSize.width*this.config.cssScaleX,this.canvasSize.height*this.config.cssScaleY)
-	       };
+    viewport() : IBounds {
+	return new Bounds( this.transformMousePosition(0,0),
+			   this.transformMousePosition(this.canvasSize.width*this.config.cssScaleX,this.canvasSize.height*this.config.cssScaleY)
+			 );
     };
 
     

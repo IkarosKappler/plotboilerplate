@@ -21,7 +21,7 @@ export interface XYDimension {
  * @property {Vertex} min The upper left position.
  * @property {Vertex} max The lower right position;.
  */
-export interface Bounds {
+export interface IBounds {
     min: XYCoords;
     max: XYCoords;
 }

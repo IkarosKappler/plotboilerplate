@@ -34,6 +34,7 @@
  **/
 
 
+import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -251,11 +252,15 @@ export class Triangle implements SVGSerializable {
 	
 	if( Math.abs(G) < Triangle.EPSILON ) {
 	    // Collinear - find extremes and use the midpoint
-	    const bounds : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } = this.bounds();
-	    this.center = new Vertex( ( bounds.xMin + bounds.xMax ) / 2, ( bounds.yMin + bounds.yMax ) / 2 );
+	    // const bounds : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } = this.bounds();
+	    const bounds : Bounds = this.bounds();
+	    // this.center = new Vertex( ( bounds.xMin + bounds.xMax ) / 2, ( bounds.yMin + bounds.yMax ) / 2 );
+	    this.center = new Vertex( ( bounds.min.x + bounds.max.x ) / 2, ( bounds.min.y + bounds.max.y ) / 2 );
 
-	    dx = this.center.x - bounds.xMin;
-	    dy = this.center.y - bounds.yMin;
+	    //dx = this.center.x - bounds.xMin;
+	    //dy = this.center.y - bounds.yMin;
+	    dx = this.center.x - bounds.min.x;
+	    dy = this.center.y - bounds.min.y;
 	} else {
 	    const cx : number = (D*E - B*F) / G; 
 	    const cy : number = (A*F - C*E) / G;
@@ -299,12 +304,18 @@ export class Triangle implements SVGSerializable {
      * @instance
      * @memberof Triangle
      */
-    bounds() : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } {
-	const minx : number = Triangle.utils.min3( this.a.x, this.b.x, this.c.x );
-	const miny : number = Triangle.utils.min3( this.a.y, this.b.y, this.c.y );
-	const maxx : number = Triangle.utils.max3( this.a.x, this.b.x, this.c.x );
-	const maxy : number = Triangle.utils.max3( this.a.y, this.b.y, this.c.y );
-	return { xMin : minx, yMin : miny, xMax : maxx, yMax : maxy, width : maxx-minx, height : maxy-miny };
+    // bounds() : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } {
+    bounds() : Bounds {
+	//const minx : number = Triangle.utils.min3( this.a.x, this.b.x, this.c.x );
+	//const miny : number = Triangle.utils.min3( this.a.y, this.b.y, this.c.y );
+	//const maxx : number = Triangle.utils.max3( this.a.x, this.b.x, this.c.x );
+	//const maxy : number = Triangle.utils.max3( this.a.y, this.b.y, this.c.y );
+	// return { xMin : minx, yMin : miny, xMax : maxx, yMax : maxy, width : maxx-minx, height : maxy-miny };
+	return new Bounds( new Vertex( Triangle.utils.min3( this.a.x, this.b.x, this.c.x ),
+				       Triangle.utils.min3( this.a.y, this.b.y, this.c.y ) ),
+			   new Vertex( Triangle.utils.max3( this.a.x, this.b.x, this.c.x ),
+				       Triangle.utils.max3( this.a.y, this.b.y, this.c.y ) )
+			 );
     };
 
 

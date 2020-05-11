@@ -1,7 +1,10 @@
 /**
- * A script for testing Urquhart (or Relative Neighbourhood) Graphs.
+ * A script for constructing max incircles for any convex polygon.
  *
- * @requires PlotBoilerplate, MouseHandler, gup, dat.gui, convexHull
+ * To assure 'convexness' for a random vertex sets we are using the convex hull 
+ * of all points here.
+ *
+ * @requires PlotBoilerplate, MouseHandler, gup, dat.gui, convexHull, nSectAngle
  *
  * https://observablehq.com/@mbostock/convex-polygon-incircle
  * https://observablehq.com/@mbostock/circle-tangent-to-three-lines

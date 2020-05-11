@@ -32,6 +32,7 @@
  * @file Triangle
  * @public
  **/
+import { Bounds } from "./Bounds";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
@@ -188,14 +189,7 @@ export declare class Triangle implements SVGSerializable {
      * @instance
      * @memberof Triangle
      */
-    bounds(): {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-        width: number;
-        height: number;
-    };
+    bounds(): Bounds;
     /**
      * Convert this triangle to a polygon instance.
      *
