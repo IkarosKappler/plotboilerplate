@@ -2,7 +2,7 @@
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
- * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, Triangle, drawutils, drawutilsgl
+ * @requires Vertex, Line, Vector, Polygon, PBImage, VEllipse, Circle, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, Triangle, drawutils, drawutilsgl
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23

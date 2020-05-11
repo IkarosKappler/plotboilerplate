@@ -126,7 +126,7 @@ var Triangle = /** @class */ (function () {
         if (!this.center || !this.radius)
             this.calcCircumcircle();
         // return { center : this.center.clone(), radius : this.radius };
-        return new Circle_1.Circle(this.center, this.radius);
+        return new Circle_1.Circle(this.center.clone(), this.radius);
     };
     ;
     /**

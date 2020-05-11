@@ -134,7 +134,7 @@ return /******/ (function(modules) { // webpackBootstrap
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var VertexAttr_1 = __webpack_require__(1);
-var VertexListeners_1 = __webpack_require__(6);
+var VertexListeners_1 = __webpack_require__(7);
 var Vertex = /** @class */ (function () {
     /**
      * The constructor for the vertex class.
@@ -739,7 +739,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var VertTuple_1 = __webpack_require__(9);
+var VertTuple_1 = __webpack_require__(10);
 var Vertex_1 = __webpack_require__(0);
 var Vector = /** @class */ (function (_super) {
     __extends(Vector, _super);
@@ -2996,6 +2996,91 @@ exports.Polygon = Polygon;
 "use strict";
 
 /**
+ * @classdesc A simple circle: center point and radius.
+ *
+ * @requires Vertex, SVGSerializale
+ *
+ * @author   Ikaros Kappler
+ * @version  1.0.1
+ * @date     2020-05-04
+ * @modified 2020-05-09 Ported to typescript.
+ *
+ * @file Circle
+ * @fileoverview A simple circle class: center point and radius.
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Circle = /** @class */ (function () {
+    /**
+     * Create a new circle with given center point and radius.
+     *
+     * @constructor
+     * @name Circle
+     * @param {Vertex} center - The center point of the circle.
+     * @param {number} radius - The radius of the circle.
+     */
+    function Circle(center, radius) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Circle";
+        this.center = center;
+        this.radius = radius;
+    }
+    ;
+    /**
+     * Calculate the distance from this circle to the given line.
+     *
+     * * If the line does not intersect this ciecle then the returned
+     *   value will be the minimal distance.
+     * * If the line goes through this circle then the returned value
+     *   will be max inner distance and it will be negative.
+     *
+     * @method lineDistance
+     * @param {Line} line - The line to measure the distance to.
+     * @return {number} The minimal distance from the outline of this circle to the given line.
+     * @instance
+     * @memberof Circle
+     */
+    Circle.prototype.lineDistance = function (line) {
+        var closestPointOnLine = line.getClosestPoint(this.center);
+        return closestPointOnLine.distance(this.center) - this.radius;
+    };
+    ;
+    /**
+      * Create an SVG representation of this circle.
+      *
+      * @method toSVGString
+      * @param {object=} options - An optional set of options, like 'className'.
+      * @return {string} A string representing the SVG code for this vertex.
+      * @instance
+      * @memberof Circle
+      */
+    Circle.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<circle');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' cx="' + this.center.x + '"');
+        buffer.push(' cy="' + this.center.y + '"');
+        buffer.push(' r="' + this.radius + '"');
+        buffer.push(' />');
+        return buffer.join('');
+    };
+    ;
+    return Circle;
+}()); // END class
+exports.Circle = Circle;
+//# sourceMappingURL=Circle.js.map
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
  * @classdesc An event listeners wrapper. This is just a set of three listener
  *              queues (drag, dragStart, dragEnd) and their respective firing
  *              functions.
@@ -3146,7 +3231,7 @@ exports.VertexListeners = VertexListeners;
 //# sourceMappingURL=VertexListeners.js.map
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3237,7 +3322,7 @@ exports.Grid = Grid;
 //# sourceMappingURL=Grid.js.map
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3281,7 +3366,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var VertTuple_1 = __webpack_require__(9);
+var VertTuple_1 = __webpack_require__(10);
 var Vertex_1 = __webpack_require__(0);
 var Line = /** @class */ (function (_super) {
     __extends(Line, _super);
@@ -3355,7 +3440,7 @@ exports.Line = Line;
 //# sourceMappingURL=Line.js.map
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3639,7 +3724,7 @@ exports.VertTuple = VertTuple;
 //# sourceMappingURL=VertTuple.js.map
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3679,7 +3764,7 @@ exports.VertTuple = VertTuple;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var Circle_1 = __webpack_require__(11);
+var Circle_1 = __webpack_require__(6);
 var Polygon_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
 var Triangle = /** @class */ (function () {
@@ -3771,7 +3856,7 @@ var Triangle = /** @class */ (function () {
         if (!this.center || !this.radius)
             this.calcCircumcircle();
         // return { center : this.center.clone(), radius : this.radius };
-        return new Circle_1.Circle(this.center, this.radius);
+        return new Circle_1.Circle(this.center.clone(), this.radius);
     };
     ;
     /**
@@ -4015,83 +4100,6 @@ exports.Triangle = Triangle;
 //# sourceMappingURL=Triangle.js.map
 
 /***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A simple circle: center point and radius.
- *
- * @requires Vertex, SVGSerializale
- *
- * @author   Ikaros Kappler
- * @version  1.0.1
- * @date     2020-05-04
- * @modified 2020-05-09 Ported to typescript.
- *
- * @file Circle
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Circle = /** @class */ (function () {
-    /**
-     * Create a new circle with given center point and radius.
-     *
-     * @constructor
-     * @param {Vertex} center - The center point of the circle.
-     * @param {number} radius - The radius of the circle.
-     */
-    function Circle(center, radius) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Circle";
-        this.center = center;
-        this.radius = radius;
-    }
-    ;
-    /**
-     * Calculate the distance from this circle to the given line.
-     *
-     * * If the line does not intersect this ciecle then the returned
-     *   value will be the minimal distance.
-     * * If the line goes through this circle then the returned value
-     *   will be max inner distance and it will be negative.
-     *
-     * @param {Line} line - The line to measure the distance to.
-     * @return {number} The minimal distance from the outline of this circle to the given line.
-     */
-    Circle.prototype.lineDistance = function (line) {
-        var closestPointOnLine = line.getClosestPoint(this.center);
-        return closestPointOnLine.distance(this.center) - this.radius;
-    };
-    ;
-    /**
-      * Create an SVG representation of this circle.
-      *
-      * @param {object} options { className?:string }
-      * @return string The SVG string
-      */
-    Circle.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<circle');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' cx="' + this.center.x + '"');
-        buffer.push(' cy="' + this.center.y + '"');
-        buffer.push(' r="' + this.radius + '"');
-        buffer.push(' />');
-        return buffer.join('');
-    };
-    ;
-    return Circle;
-}()); // END class
-exports.Circle = Circle;
-//# sourceMappingURL=Circle.js.map
-
-/***/ }),
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4164,7 +4172,7 @@ exports.VEllipse = VEllipse;
 /**
  * @classdesc A wrapper for image objects.
  *
- * @requires Vertex
+ * @requires Vertex, SVGSerializable
  *
  * @author   Ikaros Kappler
  * @date     2019-01-30
@@ -4212,7 +4220,7 @@ var PBImage = /** @class */ (function () {
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} A string representing the SVG code for this vertex.
      * @instance
-     * @memberof Vertex
+     * @memberof PBImage
      **/
     PBImage.prototype.toSVGString = function (options) {
         console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
@@ -6299,17 +6307,18 @@ var GLU = /** @class */ (function () {
 // Object.defineProperty(exports, "__esModule", { value: true });
 
 window.VertexAttr = __webpack_require__(1).VertexAttr;
-window.VertexListeners = __webpack_require__(6).VertexListeners;
+window.VertexListeners = __webpack_require__(7).VertexListeners;
 window.Vertex = __webpack_require__(0).Vertex;
 
-window.Grid = __webpack_require__(7).Grid;
-window.Line = __webpack_require__(8).Line;
+window.Grid = __webpack_require__(8).Grid;
+window.Line = __webpack_require__(9).Line;
 window.Vector = __webpack_require__(2).Vector;
 window.CubicBezierCurve = __webpack_require__(3).CubicBezierCurve;
 window.BezierPath = __webpack_require__(4).BezierPath;
 window.Polygon = __webpack_require__(5).Polygon;
-window.Triangle = __webpack_require__(10).Triangle;
+window.Triangle = __webpack_require__(11).Triangle;
 window.VEllipse = __webpack_require__(12).VEllipse;
+window.Circle = __webpack_require__(6).Circle;
 window.PBImage = __webpack_require__(13).PBImage;
 window.MouseHandler = __webpack_require__(14).MouseHandler;
 window.KeyHandler = __webpack_require__(15).KeyHandler;
@@ -6328,7 +6337,7 @@ window.PlotBoilerplate = __webpack_require__(19).PlotBoilerplate;
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
- * @requires Vertex, Line, Vector, Polygon, PBImage, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, Triangle, drawutils, drawutilsgl
+ * @requires Vertex, Line, Vector, Polygon, PBImage, VEllipse, Circle, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, Triangle, drawutils, drawutilsgl
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23
@@ -6389,15 +6398,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var draw_1 = __webpack_require__(16);
 var drawgl_1 = __webpack_require__(17);
 var BezierPath_1 = __webpack_require__(4);
-var Circle_1 = __webpack_require__(11);
-var Grid_1 = __webpack_require__(7);
+var Circle_1 = __webpack_require__(6);
+var Grid_1 = __webpack_require__(8);
 var KeyHandler_1 = __webpack_require__(15);
-var Line_1 = __webpack_require__(8);
+var Line_1 = __webpack_require__(9);
 var MouseHandler_1 = __webpack_require__(14);
 var PBImage_1 = __webpack_require__(13);
 var Polygon_1 = __webpack_require__(5);
 var SVGBuilder_1 = __webpack_require__(20);
-var Triangle_1 = __webpack_require__(10);
+var Triangle_1 = __webpack_require__(11);
 var VEllipse_1 = __webpack_require__(12);
 var Vector_1 = __webpack_require__(2);
 var Vertex_1 = __webpack_require__(0);

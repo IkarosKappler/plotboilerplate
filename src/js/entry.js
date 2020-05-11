@@ -14,6 +14,7 @@ window.BezierPath = require("./BezierPath.js").BezierPath;
 window.Polygon = require("./Polygon.js").Polygon;
 window.Triangle = require("./Triangle.js").Triangle;
 window.VEllipse = require("./VEllipse.js").VEllipse;
+window.Circle = require("./Circle.js").Circle;
 window.PBImage = require("./PBImage.js").PBImage;
 window.MouseHandler = require("./MouseHandler.js").MouseHandler;
 window.KeyHandler = require("./KeyHandler.js").KeyHandler;

@@ -1,7 +1,7 @@
 /**
  * @classdesc A wrapper for image objects.
  *
- * @requires Vertex
+ * @requires Vertex, SVGSerializable
  *
  * @author   Ikaros Kappler
  * @date     2019-01-30
@@ -56,7 +56,7 @@ export declare class PBImage implements SVGSerializable {
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} A string representing the SVG code for this vertex.
      * @instance
-     * @memberof Vertex
+     * @memberof PBImage
      **/
     toSVGString(options: {
         className?: string;

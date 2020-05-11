@@ -175,8 +175,7 @@ export class Triangle implements SVGSerializable {
     getCircumcircle() : { center:Vertex, radius:number } {
 	if( !this.center || !this.radius ) 
 	    this.calcCircumcircle();
-	// return { center : this.center.clone(), radius : this.radius };
-	return new Circle( this.center, this.radius );
+	return new Circle( this.center.clone(), this.radius );
     };
 
 

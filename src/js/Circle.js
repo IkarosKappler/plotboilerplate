@@ -10,6 +10,7 @@
  * @modified 2020-05-09 Ported to typescript.
  *
  * @file Circle
+ * @fileoverview A simple circle class: center point and radius.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -18,6 +19,7 @@ var Circle = /** @class */ (function () {
      * Create a new circle with given center point and radius.
      *
      * @constructor
+     * @name Circle
      * @param {Vertex} center - The center point of the circle.
      * @param {number} radius - The radius of the circle.
      */
@@ -38,8 +40,11 @@ var Circle = /** @class */ (function () {
      * * If the line goes through this circle then the returned value
      *   will be max inner distance and it will be negative.
      *
+     * @method lineDistance
      * @param {Line} line - The line to measure the distance to.
      * @return {number} The minimal distance from the outline of this circle to the given line.
+     * @instance
+     * @memberof Circle
      */
     Circle.prototype.lineDistance = function (line) {
         var closestPointOnLine = line.getClosestPoint(this.center);
@@ -49,8 +54,11 @@ var Circle = /** @class */ (function () {
     /**
       * Create an SVG representation of this circle.
       *
-      * @param {object} options { className?:string }
-      * @return string The SVG string
+      * @method toSVGString
+      * @param {object=} options - An optional set of options, like 'className'.
+      * @return {string} A string representing the SVG code for this vertex.
+      * @instance
+      * @memberof Circle
       */
     Circle.prototype.toSVGString = function (options) {
         options = options || {};
