@@ -267,21 +267,14 @@ export class Triangle implements SVGSerializable {
 	
 	if( Math.abs(G) < Triangle.EPSILON ) {
 	    // Collinear - find extremes and use the midpoint
-	    // const bounds : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } = this.bounds();
 	    const bounds : Bounds = this.bounds();
-	    // this.center = new Vertex( ( bounds.xMin + bounds.xMax ) / 2, ( bounds.yMin + bounds.yMax ) / 2 );
 	    this.center = new Vertex( ( bounds.min.x + bounds.max.x ) / 2, ( bounds.min.y + bounds.max.y ) / 2 );
-
-	    //dx = this.center.x - bounds.xMin;
-	    //dy = this.center.y - bounds.yMin;
 	    dx = this.center.x - bounds.min.x;
 	    dy = this.center.y - bounds.min.y;
 	} else {
 	    const cx : number = (D*E - B*F) / G; 
 	    const cy : number = (A*F - C*E) / G;
-
 	    this.center = new Vertex( cx, cy );
-
 	    dx = this.center.x - this.a.x;
 	    dy = this.center.y - this.a.y;
 	}

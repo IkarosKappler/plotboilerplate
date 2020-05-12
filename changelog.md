@@ -1,14 +1,18 @@
 
 
 # Changelog
-* 2020-05-11
+* 2020-05-12
+  * Fixed the annoying [Ctrl]-pressed bug; the reason was the missing key-up evend after [Ctrl]+[t].
+    This was browser-specific.
+* 2020-05-11 (v1.7.5)
+  * PlotBoilerplat.viewport() now return a proper Bounds instance.
   * Added new class Bounds (implementing IBounds and XYDimension).
   * Renamed interface Bounds to IBounds.
   * Fixed a bug in the Triangle.getCircumcircle function (center was not cloned).
   * Updated all demos with the new Circle class.
   * Removed the BezierPath._roundToDigits helper function. Using Number.toFixed instead.
   * Added proper JSDoc class specifications to Bounds, Triangle and Circle.
-* 2020-05-09
+* 2020-05-09 (v1.7.4)
   * Included the Circle class from the demos into the plot-boilerlplate core repertoire.
 * 2020-05-05
   * Added the 'lineWidth' param to the circle(...) function.

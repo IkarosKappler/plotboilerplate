@@ -59,10 +59,6 @@ export class KeyHandler {
 	// keep track of the key status no matter if there are any listeners
 	// on the key or not.
 	this.trackAllKeys = options.trackAll || false;
-	// For later retrieval
-	// this._keyDownListener = null;
-	// this._keyPressListener = null;
-	// this._keyUpListener = null;
 	// Install the listeners
 	this.installListeners();
     };
