@@ -1,11 +1,10 @@
 ---
 layout: page
-title: Changelog
 ---
 
 
 # Changelog
-* 2020-05-12
+* 2020-05-12 (v1.7.6)
   * Fixed the annoying [Ctrl]-pressed bug; the reason was the missing key-up evend after [Ctrl]+[t].
     This was browser-specific.
   * Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
