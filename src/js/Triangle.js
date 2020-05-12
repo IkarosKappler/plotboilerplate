@@ -189,12 +189,8 @@ var Triangle = /** @class */ (function () {
         var dx, dy;
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
-            // const bounds : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } = this.bounds();
             var bounds = this.bounds();
-            // this.center = new Vertex( ( bounds.xMin + bounds.xMax ) / 2, ( bounds.yMin + bounds.yMax ) / 2 );
             this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
-            //dx = this.center.x - bounds.xMin;
-            //dy = this.center.y - bounds.yMin;
             dx = this.center.x - bounds.min.x;
             dy = this.center.y - bounds.min.y;
         }

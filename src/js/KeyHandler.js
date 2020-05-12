@@ -73,7 +73,6 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      */
     KeyHandler.prototype.fireDownEvent = function (e, handler) {
-        console.log('fireDownEvent', e.keyCode, e);
         if (handler.fireEvent(e, handler.downListeners) || handler.trackAllKeys) {
             // Down event has listeners. Update key state.
             handler.keyStates[e.keyCode] = 'down';
@@ -88,7 +87,6 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      */
     KeyHandler.prototype.firePressEvent = function (e, handler) {
-        console.log('firePressEvent', e.keyCode, e);
         handler.fireEvent(e, handler.pressListeners);
     };
     ;
@@ -100,7 +98,6 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      */
     KeyHandler.prototype.fireUpEvent = function (e, handler) {
-        console.log('fireUpEvent', e.keyCode, e);
         if (handler.fireEvent(e, handler.upListeners) || handler.trackAllKeys) {
             // Up event has listeners. Clear key state.
             delete handler.keyStates[e.keyCode];

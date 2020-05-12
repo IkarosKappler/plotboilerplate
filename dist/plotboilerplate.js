@@ -3887,12 +3887,8 @@ var Triangle = /** @class */ (function () {
         var dx, dy;
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
-            // const bounds : { xMin:number, xMax:number, yMin:number, yMax:number, width:number, height:number } = this.bounds();
             var bounds = this.bounds();
-            // this.center = new Vertex( ( bounds.xMin + bounds.xMax ) / 2, ( bounds.yMin + bounds.yMax ) / 2 );
             this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
-            //dx = this.center.x - bounds.xMin;
-            //dy = this.center.y - bounds.yMin;
             dx = this.center.x - bounds.min.x;
             dy = this.center.y - bounds.min.y;
         }
@@ -4616,7 +4612,6 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      */
     KeyHandler.prototype.fireDownEvent = function (e, handler) {
-        console.log('fireDownEvent', e.keyCode, e);
         if (handler.fireEvent(e, handler.downListeners) || handler.trackAllKeys) {
             // Down event has listeners. Update key state.
             handler.keyStates[e.keyCode] = 'down';
@@ -4631,7 +4626,6 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      */
     KeyHandler.prototype.firePressEvent = function (e, handler) {
-        console.log('firePressEvent', e.keyCode, e);
         handler.fireEvent(e, handler.pressListeners);
     };
     ;
@@ -4643,7 +4637,6 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      */
     KeyHandler.prototype.fireUpEvent = function (e, handler) {
-        console.log('fireUpEvent', e.keyCode, e);
         if (handler.fireEvent(e, handler.upListeners) || handler.trackAllKeys) {
             // Up event has listeners. Clear key state.
             delete handler.keyStates[e.keyCode];
@@ -7430,8 +7423,14 @@ var PlotBoilerplate = /** @class */ (function () {
         var oldDragAmount = { x: e.params.dragAmount.x, y: e.params.dragAmount.y };
         e.params.dragAmount.x /= _self.config.cssScaleX;
         e.params.dragAmount.y /= _self.config.cssScaleY;
-        // console.log('alt down?', this.keyHandler.isDown('alt'), 'ctrl down?', this.keyHandler.isDown('ctrl'), 'space down?', this.keyHandler.isDown('spacebar') );
-        if (this.keyHandler.isDown('alt') || this.keyHandler.isDown('ctrl') || this.keyHandler.isDown('spacebar')) {
+        // Important note to: this.keyHandler.isDown('ctrl')
+        //    We should not use this for any input.
+        //    Reason: most browsers use [Ctrl]+[t] to create new browser tabs.
+        //            If so, the key-up event for [Ctrl] will be fired in the _new tab_,
+        //            not this one. So this tab will never receive any [Ctrl-down] events
+        //            until next keypress; the implication is, that [Ctrl] would still
+        //            considered to be pressed which is not true.
+        if (this.keyHandler.isDown('alt') || this.keyHandler.isDown('spacebar')) {
             _self.draw.offset.add(e.params.dragAmount);
             _self.fill.offset.set(_self.draw.offset);
             _self.config.offsetX = _self.draw.offset.x;
@@ -7615,7 +7614,10 @@ var PlotBoilerplate = /** @class */ (function () {
                 _self.selectPolygon = null;
                 _self.redraw();
             })
-                .down('e', function () { _self.console.log('e was hit. shift is pressed?', this.keyHandler.isDown('shift')); });
+                .down('e', function () {
+                // Just for testing.
+                // _self.console.log('e was hit. shift is pressed?',this.keyHandler.isDown('shift'));
+            });
         } // END IF enableKeys?
         else {
             _self.console.log('Keyboard interaction disabled.');
