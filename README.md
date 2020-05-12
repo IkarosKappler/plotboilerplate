@@ -527,6 +527,8 @@ for this purpose.
  * Circle lineWidth params also affects circular handles.
  * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
    See ctx.setLineDash(...).
+ * Add the nsectAngle from the demos to the library; add to te Triangle class? Create a global utils class?
+   Then add Triangle.computeIncircle() to the Triangle class.
 
 
 ### Todos for future Version 2

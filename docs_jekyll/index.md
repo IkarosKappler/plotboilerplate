@@ -456,7 +456,7 @@ The Vertex class has basic drag event support:
 ## Usage
  * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment for clicked bézier path point
- * [ALT or CTRL or SPACE] + [Mousedown] + [Drag] : Pan the area
+ * [ALT or SPACE] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
  * [Mousewheel-down] : Zoom out
 
@@ -508,35 +508,29 @@ for this purpose.
  * Include Touchy.js as a package dependency.
  * Include FileSaver.js as a package dependency.
  * Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
- * Make strokes configurable (color, width, style).
  * Make Bézier Curves dividable (by double click?).
  * Implement snap-to-grid.
  * Make ellipses rotatable.
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
- * The PlotBoilerplate.viewport() function already returns a bounding box (min:{Vertex},max:{Vertex}).
  * Add arcs?
  * Add image flipping.
  * Add Images to the SVGBuiler.
- * Move the helper function PlotBoilerplate.utils.buildArrowHead to the Vector class. It belongs there.
  * Add image/svg support (adding SVG images).
  * Add a vertex attribute: visible. (to hide vertices).
  * Add control button: reset zoom.
  * Add control button: reset to origin.
  * [Partially done] Add control button: set to retina resolution (size factors and css scale).
  * Add a demo that draws a proper mathematical xy-grid.
- * Switching browser tabs back and forth sometimes locks the Ctrl-Key. Check that.
  * Extend the leaf venation generator demo.
  * Add a thumbnail generator script for the screenshots (like with imagick).
  * Add a retina detection; initialize the canvas with double resolution on startup if retina display (optional-flag).
- * Remove the BezierPath._roundToDigits(...) function (replace by Number.toFixed).
- * Refactor the VertTuple.getClosestT function. It still uses local functions!
  * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
  * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
- * Use the new Bounds class in the RectSelector helper then.
+ * Use the new Bounds class in the RectSelector helper.
  * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
- * The Triangle class still uses a custom bounds object. Use the new interface 'Bounds'; needs some refactoring.
  * Circle lineWidth params also affects circular handles.
- * Jekyll does not compile when there is no _tracker.js file present.
+ * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
+   See ctx.setLineDash(...).
 
 
 ### Todos for future Version 2
