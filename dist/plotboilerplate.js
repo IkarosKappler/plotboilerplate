@@ -4966,7 +4966,8 @@ exports.KeyHandler = KeyHandler;
  * @modified 2020-01-09 Added the 'lineWidth' param to the ellipse(...) function.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
- * @version  1.5.4
+ * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
+ * @version  1.5.5
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var CubicBezierCurve_1 = __webpack_require__(3);
@@ -5247,6 +5248,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
         this.ctx.lineTo(Math.round(this.offset.x + this.scale.x * p.x + 1), Math.round(this.offset.y + this.scale.y * p.y + 1));
         this.ctx.closePath();
+        this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
         this.ctx.restore();
     };
@@ -5266,6 +5268,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
+        this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
     ;
@@ -5321,14 +5324,16 @@ var drawutils = /** @class */ (function () {
      * @param {Vertex} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
+     * @param {number} lineWidth - The line with to use (optional, default is 1).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.square = function (center, size, color) {
+    drawutils.prototype.square = function (center, size, color, lineWidth) {
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
         this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
     ;
@@ -5427,6 +5432,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + size / 2.0, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y + size / 2.0);
         this.ctx.closePath();
+        this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
     ;
@@ -5449,6 +5455,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y - size / 2.0, size, size);
         this.ctx.closePath();
+        this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
     ;
@@ -5472,6 +5479,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
+        this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
     ;

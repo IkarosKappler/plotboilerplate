@@ -29,7 +29,8 @@
  * @modified 2020-01-09 Added the 'lineWidth' param to the ellipse(...) function.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
- * @version  1.5.4
+ * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
+ * @version  1.5.5
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -255,11 +256,12 @@ export declare class drawutils {
      * @param {Vertex} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
+     * @param {number} lineWidth - The line with to use (optional, default is 1).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    square(center: Vertex, size: number, color: string): void;
+    square(center: Vertex, size: number, color: string, lineWidth?: number): void;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *

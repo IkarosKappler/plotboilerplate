@@ -4,6 +4,7 @@
 * 2020-05-12
   * Fixed the annoying [Ctrl]-pressed bug; the reason was the missing key-up evend after [Ctrl]+[t].
     This was browser-specific.
+  * Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
 * 2020-05-11 (v1.7.5)
   * PlotBoilerplat.viewport() now return a proper Bounds instance.
   * Added new class Bounds (implementing IBounds and XYDimension).
