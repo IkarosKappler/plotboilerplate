@@ -1,6 +1,5 @@
 "use strict";
 /* Imports for webpack */
-// Object.defineProperty(exports, "__esModule", { value: true });
 
 window.VertexAttr = require("./VertexAttr.js").VertexAttr;
 window.VertexListeners = require("./VertexListeners.js").VertexListeners;
@@ -20,5 +19,6 @@ window.MouseHandler = require("./MouseHandler.js").MouseHandler;
 window.KeyHandler = require("./KeyHandler.js").KeyHandler;
 window.drawutils = require("./draw.js").drawutils;
 window.drawutilsgl = require("./drawgl.js").drawutilsgl;
+window.geomutils = require("./geomutils.js").geomutils;
 window.PlotBoilerplate = require("./PlotBoilerplate.js").PlotBoilerplate;
 

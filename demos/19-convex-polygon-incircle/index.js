@@ -89,7 +89,7 @@
 	var drawInnerBisectors = function( convexHull ) {
 	    var n = convexHull.vertices.length;
 	    for( var i = 1; i <= convexHull.vertices.length; i++ ) {
-		var bisector = nsectAngle( convexHull.vertices[i%n], convexHull.vertices[(i-1)%n], convexHull.vertices[(i+1)%n], 2 )[0];
+		var bisector = geomutils.nsectAngle( convexHull.vertices[i%n], convexHull.vertices[(i-1)%n], convexHull.vertices[(i+1)%n], 2 )[0];
 		pb.draw.line( bisector.a, bisector.b.scale(2.0,bisector.a), 'rgba(255,128,0,0.25)', 1 );
 	    }
 	};

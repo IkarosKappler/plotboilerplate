@@ -1,6 +1,8 @@
 /**
  * Compute a max incircle for the given polygon.
  *
+ * @requires Circle, Line, Vertex, Triangle, nsectAngle
+ *
  * https://observablehq.com/@mbostock/convex-polygon-incircle
  * https://observablehq.com/@mbostock/circle-tangent-to-three-lines
  */
@@ -92,8 +94,8 @@
 	var lineB = new Line(vertB,vertC);
 	var lineC = new Line(vertC,vertD);
 
-	var bisector1 = nsectAngle( vertB, vertA, vertC, 2 )[0]; // bisector of first triangle
-	var bisector2 = nsectAngle( vertC, vertB, vertD, 2 )[0]; // bisector of second triangle
+	var bisector1 = geomutils.nsectAngle( vertB, vertA, vertC, 2 )[0]; // bisector of first triangle
+	var bisector2 = geomutils.nsectAngle( vertC, vertB, vertD, 2 )[0]; // bisector of second triangle
 	var intersection = bisector1.intersection( bisector2 );
 
 	// Find the closest points on one of the polygon lines (all have same distance by construction)

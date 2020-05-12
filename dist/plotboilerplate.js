@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 20);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -133,8 +133,8 @@ return /******/ (function(modules) { // webpackBootstrap
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var VertexAttr_1 = __webpack_require__(1);
-var VertexListeners_1 = __webpack_require__(7);
+var VertexAttr_1 = __webpack_require__(2);
+var VertexListeners_1 = __webpack_require__(9);
 var Vertex = /** @class */ (function () {
     /**
      * The constructor for the vertex class.
@@ -644,6 +644,124 @@ exports.Vertex = Vertex;
 "use strict";
 
 /**
+ * @classdesc A line consists of two vertices a and b.<br>
+ * <br>
+ * This is some refactored code from my 'Morley Triangle' test<br>
+ *   https://github.com/IkarosKappler/morleys-trisector-theorem
+ *
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2016-03-12
+ * @modified 2018-12-05 Refactored the code from the morley-triangle script.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
+ * @modified 2019-09-02 Added the Line.add( Vertex ) function.
+ * @modified 2019-09-02 Added the Line.denominator( Line ) function.
+ * @modified 2019-09-02 Added the Line.colinear( Line ) function.
+ * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
+ * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
+ * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @version  2.1.2
+ *
+ * @file Line
+ * @public
+ **/
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var VertTuple_1 = __webpack_require__(11);
+var Vertex_1 = __webpack_require__(0);
+var Line = /** @class */ (function (_super) {
+    __extends(Line, _super);
+    /**
+     * Creates an instance of Line.
+     *
+     * @constructor
+     * @name Line
+     * @param {Vertex} a The line's first point.
+     * @param {Vertex} b The line's second point.
+     **/
+    function Line(a, b) {
+        var _this = _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        _this.className = "Line";
+        return _this;
+    }
+    /**
+     * Get the intersection if this line and the specified line.
+     *
+     * @method intersection
+     * @param {Line} line The second line.
+     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @instance
+     * @memberof Line
+     **/
+    // !!! DO NOT MOVE TO VertTuple
+    Line.prototype.intersection = function (line) {
+        var denominator = this.denominator(line);
+        if (denominator == 0)
+            return null;
+        var a = this.a.y - line.a.y;
+        var b = this.a.x - line.a.x;
+        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
+        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+        a = numerator1 / denominator; // NaN if parallel lines
+        b = numerator2 / denominator;
+        // if we cast these lines infinitely in both directions, they intersect here:
+        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
+    };
+    ;
+    /**
+     * Create an SVG representation of this line.
+     *
+     * @method toSVGString
+     * @param {options} p - A set of options, like the 'classname' to use
+     *                      for the line object.
+     * @return {string} The SVG string representing this line.
+     * @instance
+     * @memberof Line
+     **/
+    Line.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<line');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' x1="' + this.a.x + '"');
+        buffer.push(' y1="' + this.a.y + '"');
+        buffer.push(' x2="' + this.b.x + '"');
+        buffer.push(' y2="' + this.b.y + '"');
+        buffer.push(' />');
+        return buffer.join('');
+    };
+    ;
+    return Line;
+}(VertTuple_1.VertTuple));
+exports.Line = Line;
+//# sourceMappingURL=Line.js.map
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
  * @classdesc The VertexAttr is a helper class to wrap together additional attributes
  * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
  * <br>
@@ -698,7 +816,7 @@ exports.VertexAttr = VertexAttr;
 //# sourceMappingURL=VertexAttr.js.map
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -739,7 +857,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var VertTuple_1 = __webpack_require__(10);
+var VertTuple_1 = __webpack_require__(11);
 var Vertex_1 = __webpack_require__(0);
 var Vector = /** @class */ (function (_super) {
     __extends(Vector, _super);
@@ -906,7 +1024,7 @@ exports.Vector = Vector;
 //# sourceMappingURL=Vector.js.map
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -938,7 +1056,7 @@ exports.Vector = Vector;
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var Vertex_1 = __webpack_require__(0);
-var Vector_1 = __webpack_require__(2);
+var Vector_1 = __webpack_require__(3);
 var CubicBezierCurve = /** @class */ (function () {
     /**
      * The constructor.
@@ -1529,7 +1647,7 @@ exports.CubicBezierCurve = CubicBezierCurve;
 //# sourceMappingURL=CubicBezierCurve.js.map
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1560,7 +1678,7 @@ exports.CubicBezierCurve = CubicBezierCurve;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var CubicBezierCurve_1 = __webpack_require__(3);
+var CubicBezierCurve_1 = __webpack_require__(4);
 var Vertex_1 = __webpack_require__(0);
 var BezierPath = /** @class */ (function () {
     /**
@@ -2675,7 +2793,7 @@ exports.BezierPath = BezierPath;
 //# sourceMappingURL=BezierPath.js.map
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2701,7 +2819,7 @@ exports.BezierPath = BezierPath;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var BezierPath_1 = __webpack_require__(4);
+var BezierPath_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
 var Polygon = /** @class */ (function () {
     /**
@@ -2958,741 +3076,7 @@ exports.Polygon = Polygon;
 //# sourceMappingURL=Polygon.js.map
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A simple circle: center point and radius.
- *
- * @requires Vertex, SVGSerializale
- *
- * @author   Ikaros Kappler
- * @version  1.0.1
- * @date     2020-05-04
- * @modified 2020-05-09 Ported to typescript.
- *
- * @file Circle
- * @fileoverview A simple circle class: center point and radius.
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Circle = /** @class */ (function () {
-    /**
-     * Create a new circle with given center point and radius.
-     *
-     * @constructor
-     * @name Circle
-     * @param {Vertex} center - The center point of the circle.
-     * @param {number} radius - The radius of the circle.
-     */
-    function Circle(center, radius) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Circle";
-        this.center = center;
-        this.radius = radius;
-    }
-    ;
-    /**
-     * Calculate the distance from this circle to the given line.
-     *
-     * * If the line does not intersect this ciecle then the returned
-     *   value will be the minimal distance.
-     * * If the line goes through this circle then the returned value
-     *   will be max inner distance and it will be negative.
-     *
-     * @method lineDistance
-     * @param {Line} line - The line to measure the distance to.
-     * @return {number} The minimal distance from the outline of this circle to the given line.
-     * @instance
-     * @memberof Circle
-     */
-    Circle.prototype.lineDistance = function (line) {
-        var closestPointOnLine = line.getClosestPoint(this.center);
-        return closestPointOnLine.distance(this.center) - this.radius;
-    };
-    ;
-    /**
-      * Create an SVG representation of this circle.
-      *
-      * @method toSVGString
-      * @param {object=} options - An optional set of options, like 'className'.
-      * @return {string} A string representing the SVG code for this vertex.
-      * @instance
-      * @memberof Circle
-      */
-    Circle.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<circle');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' cx="' + this.center.x + '"');
-        buffer.push(' cy="' + this.center.y + '"');
-        buffer.push(' r="' + this.radius + '"');
-        buffer.push(' />');
-        return buffer.join('');
-    };
-    ;
-    return Circle;
-}()); // END class
-exports.Circle = Circle;
-//# sourceMappingURL=Circle.js.map
-
-/***/ }),
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc An event listeners wrapper. This is just a set of three listener
- *              queues (drag, dragStart, dragEnd) and their respective firing
- *              functions.
- *
- * @author   Ikaros Kappler
- * @date     2018-08-27
- * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.0.4
- *
- * @file VertexListeners
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var VertexListeners = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name VertexListeners
-     * @param {Vertex} vertex - The vertex to use these listeners on (just a backward reference).
-     **/
-    function VertexListeners(vertex) {
-        this.drag = [];
-        this.dragStart = [];
-        this.dragEnd = [];
-        this.vertex = vertex;
-    }
-    ;
-    /**
-     * Add a drag listener.
-     *
-     * @method addDragListener
-     * @param {VertexListeners~dragListener} listener - The drag listener to add (a callback).
-     * @return {void}
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.addDragListener = function (listener) {
-        this.drag.push(listener);
-        return this;
-    };
-    ;
-    /**
-     * The drag listener is a function with a single drag event param.
-     * @callback VertexListeners~dragListener
-     * @param {Event} e - The (extended) drag event.
-     */
-    /**
-     * Add a dragStart listener.
-     *
-     * @method addDragListener
-     * @param {VertexListeners~dragStartListener} listener - The drag-start listener to add (a callback).
-     * @return {void}
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.addDragStartListener = function (listener) {
-        this.dragStart.push(listener);
-        return this;
-    };
-    ;
-    /**
-     * The drag-start listener is a function with a single drag event param.
-     * @callback VertexListeners~dragStartListener
-     * @param {Event} e - The (extended) drag event.
-     */
-    /**
-     * Add a dragEnd listener.
-     *
-     * @method addDragListener
-     * @param {VertexListeners~dragEndListener} listener - The drag-end listener to add (a callback).
-     * @return {void}
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.addDragEndListener = function (listener) {
-        this.dragEnd.push(listener);
-        return this;
-    };
-    ;
-    /**
-     * The drag-end listener is a function with a single drag event param.
-     * @callback VertexListeners~dragEndListener
-     * @param {Event} e - The (extended) drag event.
-     */
-    /**
-     * Fire a drag event with the given event instance to all
-     * installed drag listeners.
-     *
-     * @method fireDragEvent
-     * @param {VertEvent|XMouseEvent} e - The drag event itself to be fired to all installed drag listeners.
-     * @return {void}
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.fireDragEvent = function (e) {
-        VertexListeners._fireEvent(this, this.drag, e);
-    };
-    ;
-    /**
-     * Fire a dragStart event with the given event instance to all
-     * installed drag-start listeners.
-     *
-     * @method fireDragStartEvent
-     * @param {VertEvent|XMouseEvent} e - The drag-start event itself to be fired to all installed dragStart listeners.
-     * @return {void}
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.fireDragStartEvent = function (e) {
-        VertexListeners._fireEvent(this, this.dragStart, e);
-    };
-    ;
-    /**
-     * Fire a dragEnd event with the given event instance to all
-     * installed drag-end listeners.
-     *
-     * @method fireDragEndEvent
-     * @param {VertEvent|XMouseEvent} e - The drag-end event itself to be fired to all installed dragEnd listeners.
-     * @return {void}
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.fireDragEndEvent = function (e) {
-        VertexListeners._fireEvent(this, this.dragEnd, e);
-    };
-    ;
-    /**
-     * @private
-     **/
-    VertexListeners._fireEvent = function (_self, listeners, e) {
-        var ve = e;
-        if (typeof ve.params == 'undefined')
-            ve.params = { vertex: _self.vertex };
-        else
-            ve.params.vertex = _self.vertex;
-        for (var i in listeners) {
-            listeners[i](ve);
-        }
-    };
-    ;
-    return VertexListeners;
-}());
-exports.VertexListeners = VertexListeners;
-//# sourceMappingURL=VertexListeners.js.map
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A grid class with vertical and horizontal lines.
- *
- * @requires Vertex
- *
- * @author   Ikaros Kappler
- * @date     2018-11-28
- * @modified 2018-12-09 Added the utils: baseLog(Number,Number) and mapRasterScale(Number,Number).
- * @version  1.0.1
- *
- * @file Grid
- * @fileoverview Note that the PlotBoilerplate already has a Grid instance member. The Grid is not meant
- *               to be added to the canvas as a drawable as it encapsulates more an abstract concept of the canvas
- *               rather than a drawable object.
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Grid = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Grid
-     * @param {Vertex} center - The offset of the grid (default is [0,0]).
-     * @param {Vertex} size   - The x- and y-size of the grid.
-     **/
-    function Grid(center, size) {
-        this.center = center;
-        this.size = size;
-    }
-    ;
-    /**
-     * @memberof Grid
-     **/
-    Grid.utils = {
-        /**
-         * Calculate the logarithm of the given number (num) to a given base.<br>
-         * <br>
-         * This function returns the number l with<br>
-         *  <pre>num == Math.pow(base,l)</pre>
-         *
-         * @member baseLog
-         * @function
-         * @memberof Grid
-         * @inner
-         * @param {number} base - The base to calculate the logarithm to.
-         * @param {number} num  - The number to calculate the logarithm for.
-         * @return {number} <pre>log(base)/log(num)</pre>
-         **/
-        baseLog: function (base, num) { return Math.log(base) / Math.log(num); },
-        /**
-         * Calculate the raster scale for a given logarithmic mapping.<br>
-         * <br>
-         * Example (with adjustFactor=2):<br>
-         * <pre>
-         * If scale is 4.33, then the mapping is 1/2 (because 2^2 <= 4.33 <= 2^3)<br>
-         * If scale is 0.33, then the mapping is 2 because (2^(1/2) >= 0.33 >= 2^(1/4)
-         * </pre>
-         *
-         * @member mapRasterScale
-         * @function
-         * @memberof Grid
-         * @inner
-         * @param {number} adjustFactor The base for the logarithmic raster scaling when zoomed.
-         * @param {number} scale        The currently used scale factor.
-         * @return {number}
-         **/
-        mapRasterScale: function (adjustFactor, scale) {
-            var gf = 1.0;
-            if (scale >= 1) {
-                gf = Math.abs(Math.floor(1 / Grid.utils.baseLog(adjustFactor, scale)));
-                gf = 1 / Math.pow(adjustFactor, gf);
-            }
-            else {
-                gf = Math.abs(Math.floor(Grid.utils.baseLog(1 / adjustFactor, 1 / (scale + 1))));
-                //gf = Math.pow( adjustFactor, gf );
-            }
-            return gf;
-        }
-    };
-    return Grid;
-}());
-exports.Grid = Grid;
-//# sourceMappingURL=Grid.js.map
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A line consists of two vertices a and b.<br>
- * <br>
- * This is some refactored code from my 'Morley Triangle' test<br>
- *   https://github.com/IkarosKappler/morleys-trisector-theorem
- *
- * @requires Vertex
- *
- * @author   Ikaros Kappler
- * @date     2016-03-12
- * @modified 2018-12-05 Refactored the code from the morley-triangle script.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
- * @modified 2019-09-02 Added the Line.add( Vertex ) function.
- * @modified 2019-09-02 Added the Line.denominator( Line ) function.
- * @modified 2019-09-02 Added the Line.colinear( Line ) function.
- * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
- * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
- * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  2.1.2
- *
- * @file Line
- * @public
- **/
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var VertTuple_1 = __webpack_require__(10);
-var Vertex_1 = __webpack_require__(0);
-var Line = /** @class */ (function (_super) {
-    __extends(Line, _super);
-    /**
-     * Creates an instance of Line.
-     *
-     * @constructor
-     * @name Line
-     * @param {Vertex} a The line's first point.
-     * @param {Vertex} b The line's second point.
-     **/
-    function Line(a, b) {
-        var _this = _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        _this.className = "Line";
-        return _this;
-    }
-    /**
-     * Get the intersection if this line and the specified line.
-     *
-     * @method intersection
-     * @param {Line} line The second line.
-     * @return {Vertex} The intersection (may lie outside the end-points).
-     * @instance
-     * @memberof Line
-     **/
-    // !!! DO NOT MOVE TO VertTuple
-    Line.prototype.intersection = function (line) {
-        var denominator = this.denominator(line);
-        if (denominator == 0)
-            return null;
-        var a = this.a.y - line.a.y;
-        var b = this.a.x - line.a.x;
-        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
-        a = numerator1 / denominator; // NaN if parallel lines
-        b = numerator2 / denominator;
-        // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
-    };
-    ;
-    /**
-     * Create an SVG representation of this line.
-     *
-     * @method toSVGString
-     * @param {options} p - A set of options, like the 'classname' to use
-     *                      for the line object.
-     * @return {string} The SVG string representing this line.
-     * @instance
-     * @memberof Line
-     **/
-    Line.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<line');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' x1="' + this.a.x + '"');
-        buffer.push(' y1="' + this.a.y + '"');
-        buffer.push(' x2="' + this.b.x + '"');
-        buffer.push(' y2="' + this.b.y + '"');
-        buffer.push(' />');
-        return buffer.join('');
-    };
-    ;
-    return Line;
-}(VertTuple_1.VertTuple));
-exports.Line = Line;
-//# sourceMappingURL=Line.js.map
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
- * @abstract
- * @requires Vertex
- *
- * @author Ikaros Kappler
- * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
- */
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vertex_1 = __webpack_require__(0);
-var VertTuple = /** @class */ (function () {
-    /**
-     * Creates an instance.
-     *
-     * @constructor
-     * @name VertTuple
-     * @param {Vertex} a The tuple's first point.
-     * @param {Vertex} b The tuple's second point.
-     **/
-    function VertTuple(a, b, factory) {
-        this.a = a;
-        this.b = b;
-        this.factory = factory;
-    }
-    /**
-     * Get the length of this line.
-     *
-     * @method length
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.length = function () {
-        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
-    };
-    ;
-    /**
-     * Set the length of this vector to the given amount. This only works if this
-     * vector is not a null vector.
-     *
-     * @method setLength
-     * @param {number} length - The desired length.
-     * @memberof VertTuple
-     * @return {T} this (for chaining)
-     **/
-    VertTuple.prototype.setLength = function (length) {
-        return this.scale(length / this.length());
-    };
-    ;
-    /**
-     * Substract the given vertex from this line's end points.
-     *
-     * @method sub
-     * @param {Vertex} amount The amount (x,y) to substract.
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.sub = function (amount) {
-        this.a.sub(amount);
-        this.b.sub(amount);
-        return this;
-    };
-    ;
-    /**
-     * Add the given vertex to this line's end points.
-     *
-     * @method add
-     * @param {Vertex} amount The amount (x,y) to add.
-     * @return {Line} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.add = function (amount) {
-        this.a.add(amount);
-        this.b.add(amount);
-        return this;
-    };
-    ;
-    /**
-     * Normalize this line (set to length 1).
-     *
-     * @method normalize
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.normalize = function () {
-        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
-        return this;
-    };
-    ;
-    /**
-     * Scale this line by the given factor.
-     *
-     * @method scale
-     * @param {number} factor The factor for scaling (1.0 means no scale).
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.scale = function (factor) {
-        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
-        return this;
-    };
-    ;
-    /**
-     * Move this line to a new location.
-     *
-     * @method moveTo
-     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.moveTo = function (newA) {
-        var diff = this.a.difference(newA);
-        this.a.add(diff);
-        this.b.add(diff);
-        return this;
-    };
-    ;
-    /**
-     * Get the angle between this and the passed line (in radians).
-     *
-     * @method angle
-     * @param {VertTuple} [line] - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
-     * @return {number} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.angle = function (line) {
-        if (typeof line == 'undefined')
-            line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0)); // new Line( new Vertex(0,0), new Vertex(100,0) );
-        // Compute the angle from x axis and the return the difference :)
-        var v0 = this.b.clone().sub(this.a);
-        var v1 = line.b.clone().sub(line.a);
-        // Thank you, Javascript, for this second atan function. No additional math is needed here!
-        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
-        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
-    };
-    ;
-    /**
-     * Get line point at position t in [0 ... 1]:<br>
-     * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
-     * <br>
-     * The counterpart of this function is Line.getClosestT(Vertex).
-     *
-     * @method vertAt
-     * @param {number} t The position scalar.
-     * @return {Vertex} The vertex a position t.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.vertAt = function (t) {
-        return new Vertex_1.Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
-    };
-    ;
-    /**
-     * Get the denominator of this and the given line.
-     *
-     * If the denominator is zero (or close to zero) both line are co-linear.
-     *
-     * @method denominator
-     * @param {VertTuple} line
-     * @instance
-     * @memberof VertTuple
-     * @return {Number}
-     **/
-    VertTuple.prototype.denominator = function (line) {
-        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
-        return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
-    };
-    ;
-    /**
-     * Checks if this and the given line are co-linear.
-     *
-     * The constant Vertex.EPSILON is used for tolerance.
-     *
-     * @method colinear
-     * @param {VertTuple} line
-     * @instance
-     * @memberof VertTuple
-     * @return true if both lines are co-linear.
-     */
-    VertTuple.prototype.colinear = function (line) {
-        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
-    };
-    ;
-    /**
-     * Get the closest position T from this line to the specified point.
-     *
-     * The counterpart for this function is Line.vertAt(Number).
-     *
-     * @method getClosestT
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {number} The line position t of minimal distance to p.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.getClosestT = function (p) {
-        var l2 = VertTuple.vtutils.dist2(this.a, this.b);
-        if (l2 === 0)
-            return 0;
-        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
-        // Wrap to [0,1]?
-        // t = Math.max(0, Math.min(1, t));
-        return t;
-    };
-    ;
-    /**
-     * Get the closest point on this line to the specified point.
-     *
-     * @method getClosestPoint
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {Vertex} The point on the line that is closest to p.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.getClosestPoint = function (p) {
-        var t = this.getClosestT(p);
-        return this.vertAt(t);
-    };
-    ;
-    /**
-     * The the minimal distance between this line and the specified point.
-     *
-     * @method pointDistance
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {number} The absolute minimal distance.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.pointDistance = function (p) {
-        // Taken From:
-        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-        //function dist2(v, w) {
-        //    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
-        //}
-        return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
-    };
-    ;
-    /**
-     * Create a deep clone of this instance.
-     *
-     * @method cloneLine
-     * @return {T} A type safe clone if this instance.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.clone = function () {
-        return this.factory(this.a.clone(), this.b.clone());
-    };
-    ;
-    /**
-     * Create a string representation of this line.
-     *
-     * @method totring
-     * @return {string} The string representing this line.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.toString = function () {
-        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
-    };
-    ;
-    /**
-     * @private
-     **/
-    VertTuple.vtutils = {
-        dist2: function (v, w) {
-            return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
-        }
-    };
-    return VertTuple;
-}());
-exports.VertTuple = VertTuple;
-//# sourceMappingURL=VertTuple.js.map
-
-/***/ }),
-/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3719,7 +3103,10 @@ exports.VertTuple = VertTuple;
  * @modified  2020-03-17 Added proper JSDoc comments.
  * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
- * @version   2.2.3
+ * @modified  2020-05-12 Added getIncircularTriangle() function.
+ * @modified  2020-05-12 Added getIncircle() function.
+ * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
+ * @version   2.2.4
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -3727,9 +3114,11 @@ exports.VertTuple = VertTuple;
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var Bounds_1 = __webpack_require__(12);
-var Circle_1 = __webpack_require__(6);
-var Polygon_1 = __webpack_require__(5);
+var Circle_1 = __webpack_require__(8);
+var Line_1 = __webpack_require__(1);
+var Polygon_1 = __webpack_require__(6);
 var Vertex_1 = __webpack_require__(0);
+var geomutils_1 = __webpack_require__(13);
 var Triangle = /** @class */ (function () {
     /**
      * The constructor.
@@ -3975,6 +3364,37 @@ var Triangle = /** @class */ (function () {
     };
     ;
     /**
+     * Get that inner triangle which defines the maximal incircle.
+     *
+     * @return {Triangle} The triangle of those points in this triangle that define the incircle.
+     */
+    Triangle.prototype.getIncircularTriangle = function () {
+        var lineA = new Line_1.Line(this.a, this.b);
+        var lineB = new Line_1.Line(this.b, this.c);
+        var lineC = new Line_1.Line(this.c, this.a);
+        var bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
+        var bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        var intersection = bisector1.intersection(bisector2);
+        // Find the closest points on one of the polygon lines (all have same distance by construction)
+        var circleIntersA = lineA.getClosestPoint(intersection);
+        var circleIntersB = lineB.getClosestPoint(intersection);
+        var circleIntersC = lineC.getClosestPoint(intersection);
+        return new Triangle(circleIntersA, circleIntersB, circleIntersC);
+    };
+    ;
+    /**
+     * Get the incircle of this triangle. That is the circle that touches each side
+     * of this triangle in exactly one point.
+     *
+     * Note this just calls getIncircularTriangle().getCircumcircle()
+     *
+     * @return {Circle} The incircle of this triangle.
+     */
+    Triangle.prototype.getIncircle = function () {
+        return this.getIncircularTriangle().getCircumcircle();
+    };
+    ;
+    /**
      * Converts this triangle into a human-readable string.
      *
      * @method toString
@@ -4059,6 +3479,625 @@ exports.Triangle = Triangle;
 //# sourceMappingURL=Triangle.js.map
 
 /***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * @classdesc A simple circle: center point and radius.
+ *
+ * @requires Vertex, SVGSerializale
+ *
+ * @author   Ikaros Kappler
+ * @version  1.0.1
+ * @date     2020-05-04
+ * @modified 2020-05-09 Ported to typescript.
+ *
+ * @file Circle
+ * @fileoverview A simple circle class: center point and radius.
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Circle = /** @class */ (function () {
+    /**
+     * Create a new circle with given center point and radius.
+     *
+     * @constructor
+     * @name Circle
+     * @param {Vertex} center - The center point of the circle.
+     * @param {number} radius - The radius of the circle.
+     */
+    function Circle(center, radius) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Circle";
+        this.center = center;
+        this.radius = radius;
+    }
+    ;
+    /**
+     * Calculate the distance from this circle to the given line.
+     *
+     * * If the line does not intersect this ciecle then the returned
+     *   value will be the minimal distance.
+     * * If the line goes through this circle then the returned value
+     *   will be max inner distance and it will be negative.
+     *
+     * @method lineDistance
+     * @param {Line} line - The line to measure the distance to.
+     * @return {number} The minimal distance from the outline of this circle to the given line.
+     * @instance
+     * @memberof Circle
+     */
+    Circle.prototype.lineDistance = function (line) {
+        var closestPointOnLine = line.getClosestPoint(this.center);
+        return closestPointOnLine.distance(this.center) - this.radius;
+    };
+    ;
+    /**
+      * Create an SVG representation of this circle.
+      *
+      * @method toSVGString
+      * @param {object=} options - An optional set of options, like 'className'.
+      * @return {string} A string representing the SVG code for this vertex.
+      * @instance
+      * @memberof Circle
+      */
+    Circle.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<circle');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' cx="' + this.center.x + '"');
+        buffer.push(' cy="' + this.center.y + '"');
+        buffer.push(' r="' + this.radius + '"');
+        buffer.push(' />');
+        return buffer.join('');
+    };
+    ;
+    return Circle;
+}()); // END class
+exports.Circle = Circle;
+//# sourceMappingURL=Circle.js.map
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * @classdesc An event listeners wrapper. This is just a set of three listener
+ *              queues (drag, dragStart, dragEnd) and their respective firing
+ *              functions.
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-08-27
+ * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @version  1.0.4
+ *
+ * @file VertexListeners
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var VertexListeners = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name VertexListeners
+     * @param {Vertex} vertex - The vertex to use these listeners on (just a backward reference).
+     **/
+    function VertexListeners(vertex) {
+        this.drag = [];
+        this.dragStart = [];
+        this.dragEnd = [];
+        this.vertex = vertex;
+    }
+    ;
+    /**
+     * Add a drag listener.
+     *
+     * @method addDragListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to add (a callback).
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.addDragListener = function (listener) {
+        this.drag.push(listener);
+        return this;
+    };
+    ;
+    /**
+     * The drag listener is a function with a single drag event param.
+     * @callback VertexListeners~dragListener
+     * @param {Event} e - The (extended) drag event.
+     */
+    /**
+     * Add a dragStart listener.
+     *
+     * @method addDragListener
+     * @param {VertexListeners~dragStartListener} listener - The drag-start listener to add (a callback).
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.addDragStartListener = function (listener) {
+        this.dragStart.push(listener);
+        return this;
+    };
+    ;
+    /**
+     * The drag-start listener is a function with a single drag event param.
+     * @callback VertexListeners~dragStartListener
+     * @param {Event} e - The (extended) drag event.
+     */
+    /**
+     * Add a dragEnd listener.
+     *
+     * @method addDragListener
+     * @param {VertexListeners~dragEndListener} listener - The drag-end listener to add (a callback).
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.addDragEndListener = function (listener) {
+        this.dragEnd.push(listener);
+        return this;
+    };
+    ;
+    /**
+     * The drag-end listener is a function with a single drag event param.
+     * @callback VertexListeners~dragEndListener
+     * @param {Event} e - The (extended) drag event.
+     */
+    /**
+     * Fire a drag event with the given event instance to all
+     * installed drag listeners.
+     *
+     * @method fireDragEvent
+     * @param {VertEvent|XMouseEvent} e - The drag event itself to be fired to all installed drag listeners.
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.fireDragEvent = function (e) {
+        VertexListeners._fireEvent(this, this.drag, e);
+    };
+    ;
+    /**
+     * Fire a dragStart event with the given event instance to all
+     * installed drag-start listeners.
+     *
+     * @method fireDragStartEvent
+     * @param {VertEvent|XMouseEvent} e - The drag-start event itself to be fired to all installed dragStart listeners.
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.fireDragStartEvent = function (e) {
+        VertexListeners._fireEvent(this, this.dragStart, e);
+    };
+    ;
+    /**
+     * Fire a dragEnd event with the given event instance to all
+     * installed drag-end listeners.
+     *
+     * @method fireDragEndEvent
+     * @param {VertEvent|XMouseEvent} e - The drag-end event itself to be fired to all installed dragEnd listeners.
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.fireDragEndEvent = function (e) {
+        VertexListeners._fireEvent(this, this.dragEnd, e);
+    };
+    ;
+    /**
+     * @private
+     **/
+    VertexListeners._fireEvent = function (_self, listeners, e) {
+        var ve = e;
+        if (typeof ve.params == 'undefined')
+            ve.params = { vertex: _self.vertex };
+        else
+            ve.params.vertex = _self.vertex;
+        for (var i in listeners) {
+            listeners[i](ve);
+        }
+    };
+    ;
+    return VertexListeners;
+}());
+exports.VertexListeners = VertexListeners;
+//# sourceMappingURL=VertexListeners.js.map
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * @classdesc A grid class with vertical and horizontal lines.
+ *
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-11-28
+ * @modified 2018-12-09 Added the utils: baseLog(Number,Number) and mapRasterScale(Number,Number).
+ * @version  1.0.1
+ *
+ * @file Grid
+ * @fileoverview Note that the PlotBoilerplate already has a Grid instance member. The Grid is not meant
+ *               to be added to the canvas as a drawable as it encapsulates more an abstract concept of the canvas
+ *               rather than a drawable object.
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Grid = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Grid
+     * @param {Vertex} center - The offset of the grid (default is [0,0]).
+     * @param {Vertex} size   - The x- and y-size of the grid.
+     **/
+    function Grid(center, size) {
+        this.center = center;
+        this.size = size;
+    }
+    ;
+    /**
+     * @memberof Grid
+     **/
+    Grid.utils = {
+        /**
+         * Calculate the logarithm of the given number (num) to a given base.<br>
+         * <br>
+         * This function returns the number l with<br>
+         *  <pre>num == Math.pow(base,l)</pre>
+         *
+         * @member baseLog
+         * @function
+         * @memberof Grid
+         * @inner
+         * @param {number} base - The base to calculate the logarithm to.
+         * @param {number} num  - The number to calculate the logarithm for.
+         * @return {number} <pre>log(base)/log(num)</pre>
+         **/
+        baseLog: function (base, num) { return Math.log(base) / Math.log(num); },
+        /**
+         * Calculate the raster scale for a given logarithmic mapping.<br>
+         * <br>
+         * Example (with adjustFactor=2):<br>
+         * <pre>
+         * If scale is 4.33, then the mapping is 1/2 (because 2^2 <= 4.33 <= 2^3)<br>
+         * If scale is 0.33, then the mapping is 2 because (2^(1/2) >= 0.33 >= 2^(1/4)
+         * </pre>
+         *
+         * @member mapRasterScale
+         * @function
+         * @memberof Grid
+         * @inner
+         * @param {number} adjustFactor The base for the logarithmic raster scaling when zoomed.
+         * @param {number} scale        The currently used scale factor.
+         * @return {number}
+         **/
+        mapRasterScale: function (adjustFactor, scale) {
+            var gf = 1.0;
+            if (scale >= 1) {
+                gf = Math.abs(Math.floor(1 / Grid.utils.baseLog(adjustFactor, scale)));
+                gf = 1 / Math.pow(adjustFactor, gf);
+            }
+            else {
+                gf = Math.abs(Math.floor(Grid.utils.baseLog(1 / adjustFactor, 1 / (scale + 1))));
+                //gf = Math.pow( adjustFactor, gf );
+            }
+            return gf;
+        }
+    };
+    return Grid;
+}());
+exports.Grid = Grid;
+//# sourceMappingURL=Grid.js.map
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requires Vertex
+ *
+ * @author Ikaros Kappler
+ * @date   2020-03-24
+ * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
+ * @modofied 2020-05-12 The angle(line) param was still not optional. Changed that.
+ * @version 1.0.1
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+var Vertex_1 = __webpack_require__(0);
+var VertTuple = /** @class */ (function () {
+    /**
+     * Creates an instance.
+     *
+     * @constructor
+     * @name VertTuple
+     * @param {Vertex} a The tuple's first point.
+     * @param {Vertex} b The tuple's second point.
+     **/
+    function VertTuple(a, b, factory) {
+        this.a = a;
+        this.b = b;
+        this.factory = factory;
+    }
+    /**
+     * Get the length of this line.
+     *
+     * @method length
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.length = function () {
+        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
+    };
+    ;
+    /**
+     * Set the length of this vector to the given amount. This only works if this
+     * vector is not a null vector.
+     *
+     * @method setLength
+     * @param {number} length - The desired length.
+     * @memberof VertTuple
+     * @return {T} this (for chaining)
+     **/
+    VertTuple.prototype.setLength = function (length) {
+        return this.scale(length / this.length());
+    };
+    ;
+    /**
+     * Substract the given vertex from this line's end points.
+     *
+     * @method sub
+     * @param {Vertex} amount The amount (x,y) to substract.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.sub = function (amount) {
+        this.a.sub(amount);
+        this.b.sub(amount);
+        return this;
+    };
+    ;
+    /**
+     * Add the given vertex to this line's end points.
+     *
+     * @method add
+     * @param {Vertex} amount The amount (x,y) to add.
+     * @return {Line} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.add = function (amount) {
+        this.a.add(amount);
+        this.b.add(amount);
+        return this;
+    };
+    ;
+    /**
+     * Normalize this line (set to length 1).
+     *
+     * @method normalize
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.normalize = function () {
+        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
+        return this;
+    };
+    ;
+    /**
+     * Scale this line by the given factor.
+     *
+     * @method scale
+     * @param {number} factor The factor for scaling (1.0 means no scale).
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.scale = function (factor) {
+        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
+        return this;
+    };
+    ;
+    /**
+     * Move this line to a new location.
+     *
+     * @method moveTo
+     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.moveTo = function (newA) {
+        var diff = this.a.difference(newA);
+        this.a.add(diff);
+        this.b.add(diff);
+        return this;
+    };
+    ;
+    /**
+     * Get the angle between this and the passed line (in radians).
+     *
+     * @method angle
+     * @param {VertTuple} line - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
+     * @return {number} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.angle = function (line) {
+        if (typeof line == 'undefined')
+            line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0));
+        // Compute the angle from x axis and the return the difference :)
+        var v0 = this.b.clone().sub(this.a);
+        var v1 = line.b.clone().sub(line.a);
+        // Thank you, Javascript, for this second atan function. No additional math is needed here!
+        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
+        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
+    };
+    ;
+    /**
+     * Get line point at position t in [0 ... 1]:<br>
+     * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
+     * <br>
+     * The counterpart of this function is Line.getClosestT(Vertex).
+     *
+     * @method vertAt
+     * @param {number} t The position scalar.
+     * @return {Vertex} The vertex a position t.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.vertAt = function (t) {
+        return new Vertex_1.Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
+    };
+    ;
+    /**
+     * Get the denominator of this and the given line.
+     *
+     * If the denominator is zero (or close to zero) both line are co-linear.
+     *
+     * @method denominator
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
+     * @return {Number}
+     **/
+    VertTuple.prototype.denominator = function (line) {
+        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
+        return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
+    };
+    ;
+    /**
+     * Checks if this and the given line are co-linear.
+     *
+     * The constant Vertex.EPSILON is used for tolerance.
+     *
+     * @method colinear
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
+     * @return true if both lines are co-linear.
+     */
+    VertTuple.prototype.colinear = function (line) {
+        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
+    };
+    ;
+    /**
+     * Get the closest position T from this line to the specified point.
+     *
+     * The counterpart for this function is Line.vertAt(Number).
+     *
+     * @method getClosestT
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {number} The line position t of minimal distance to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.getClosestT = function (p) {
+        var l2 = VertTuple.vtutils.dist2(this.a, this.b);
+        if (l2 === 0)
+            return 0;
+        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
+        // Wrap to [0,1]?
+        // t = Math.max(0, Math.min(1, t));
+        return t;
+    };
+    ;
+    /**
+     * Get the closest point on this line to the specified point.
+     *
+     * @method getClosestPoint
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {Vertex} The point on the line that is closest to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.getClosestPoint = function (p) {
+        var t = this.getClosestT(p);
+        return this.vertAt(t);
+    };
+    ;
+    /**
+     * The the minimal distance between this line and the specified point.
+     *
+     * @method pointDistance
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {number} The absolute minimal distance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.pointDistance = function (p) {
+        // Taken From:
+        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+        //function dist2(v, w) {
+        //    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
+        //}
+        return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
+    };
+    ;
+    /**
+     * Create a deep clone of this instance.
+     *
+     * @method cloneLine
+     * @return {T} A type safe clone if this instance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.clone = function () {
+        return this.factory(this.a.clone(), this.b.clone());
+    };
+    ;
+    /**
+     * Create a string representation of this line.
+     *
+     * @method totring
+     * @return {string} The string representing this line.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.toString = function () {
+        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
+    };
+    ;
+    /**
+     * @private
+     **/
+    VertTuple.vtutils = {
+        dist2: function (v, w) {
+            return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+        }
+    };
+    return VertTuple;
+}());
+exports.VertTuple = VertTuple;
+//# sourceMappingURL=VertTuple.js.map
+
+/***/ }),
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4101,6 +4140,57 @@ exports.Bounds = Bounds;
 
 /***/ }),
 /* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Line_1 = __webpack_require__(1);
+var Triangle_1 = __webpack_require__(7);
+exports.geomutils = {
+    /**
+     * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
+     *
+     * @param {Vertex} pA - The first triangle point.
+     * @param {Vertex} pB - The second triangle point.
+     * @param {Vertex} pC - The third triangle point.
+     * @param {number} n - The number of desired angle sections (example: 2 means the angle will be divided into two sections,
+     *                      means an returned array with length 1, the middle line).
+     *
+     * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
+     */
+    nsectAngle: function (pA, pB, pC, n) {
+        var triangle = new Triangle_1.Triangle(pA, pB, pC);
+        var lineAB = new Line_1.Line(pA, pB);
+        var lineAC = new Line_1.Line(pA, pC);
+        // Compute the slope (theta) of line AB and line AC
+        var thetaAB = lineAB.angle();
+        var thetaAC = lineAC.angle();
+        // Compute the difference; this is the angle between AB and AC
+        var insideAngle = lineAB.angle(lineAC);
+        // We want the inner angles of the triangle, not the outer angle;
+        //   which one is which depends on the triangle 'direction'
+        var clockwise = triangle.determinant() > 0;
+        // For convenience convert the angle [-PI,PI] to [0,2*PI]
+        if (insideAngle < 0)
+            insideAngle = 2 * Math.PI + insideAngle;
+        if (!clockwise)
+            insideAngle = (2 * Math.PI - insideAngle) * (-1);
+        // Scale the rotated lines to the max leg length (looks better)
+        var lineLength = Math.max(lineAB.length(), lineAC.length());
+        var scaleFactor = lineLength / lineAB.length();
+        var result = [];
+        for (var i = 1; i < n; i++) {
+            // Compute the i-th inner sector line
+            result.push(new Line_1.Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
+        }
+        return result;
+    }
+};
+//# sourceMappingURL=geomutils.js.map
+
+/***/ }),
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4164,7 +4254,7 @@ exports.VEllipse = VEllipse;
 //# sourceMappingURL=VEllipse.js.map
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4233,7 +4323,7 @@ exports.PBImage = PBImage;
 //# sourceMappingURL=PBImage.js.map
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4533,7 +4623,7 @@ exports.MouseHandler = MouseHandler;
 //# sourceMappingURL=MouseHandler.js.map
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4930,7 +5020,7 @@ exports.KeyHandler = KeyHandler;
 //# sourceMappingURL=KeyHandler.js.map
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4970,7 +5060,7 @@ exports.KeyHandler = KeyHandler;
  * @version  1.5.5
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var CubicBezierCurve_1 = __webpack_require__(3);
+var CubicBezierCurve_1 = __webpack_require__(4);
 var Vertex_1 = __webpack_require__(0);
 // Todo: rename this class to Drawutils
 var drawutils = /** @class */ (function () {
@@ -5686,7 +5776,7 @@ exports.drawutils = drawutils;
 //# sourceMappingURL=draw.js.map
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6302,38 +6392,38 @@ var GLU = /** @class */ (function () {
 //# sourceMappingURL=drawgl.js.map
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 /* Imports for webpack */
-// Object.defineProperty(exports, "__esModule", { value: true });
 
-window.VertexAttr = __webpack_require__(1).VertexAttr;
-window.VertexListeners = __webpack_require__(7).VertexListeners;
+window.VertexAttr = __webpack_require__(2).VertexAttr;
+window.VertexListeners = __webpack_require__(9).VertexListeners;
 window.Vertex = __webpack_require__(0).Vertex;
 
-window.Grid = __webpack_require__(8).Grid;
-window.Line = __webpack_require__(9).Line;
-window.Vector = __webpack_require__(2).Vector;
-window.CubicBezierCurve = __webpack_require__(3).CubicBezierCurve;
-window.BezierPath = __webpack_require__(4).BezierPath;
-window.Polygon = __webpack_require__(5).Polygon;
-window.Triangle = __webpack_require__(11).Triangle;
-window.VEllipse = __webpack_require__(13).VEllipse;
-window.Circle = __webpack_require__(6).Circle;
-window.PBImage = __webpack_require__(14).PBImage;
-window.MouseHandler = __webpack_require__(15).MouseHandler;
-window.KeyHandler = __webpack_require__(16).KeyHandler;
-window.drawutils = __webpack_require__(17).drawutils;
-window.drawutilsgl = __webpack_require__(18).drawutilsgl;
-window.PlotBoilerplate = __webpack_require__(20).PlotBoilerplate;
+window.Grid = __webpack_require__(10).Grid;
+window.Line = __webpack_require__(1).Line;
+window.Vector = __webpack_require__(3).Vector;
+window.CubicBezierCurve = __webpack_require__(4).CubicBezierCurve;
+window.BezierPath = __webpack_require__(5).BezierPath;
+window.Polygon = __webpack_require__(6).Polygon;
+window.Triangle = __webpack_require__(7).Triangle;
+window.VEllipse = __webpack_require__(14).VEllipse;
+window.Circle = __webpack_require__(8).Circle;
+window.PBImage = __webpack_require__(15).PBImage;
+window.MouseHandler = __webpack_require__(16).MouseHandler;
+window.KeyHandler = __webpack_require__(17).KeyHandler;
+window.drawutils = __webpack_require__(18).drawutils;
+window.drawutilsgl = __webpack_require__(19).drawutilsgl;
+window.geomutils = __webpack_require__(13).geomutils;
+window.PlotBoilerplate = __webpack_require__(21).PlotBoilerplate;
 
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6399,23 +6489,23 @@ window.PlotBoilerplate = __webpack_require__(20).PlotBoilerplate;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var draw_1 = __webpack_require__(17);
-var drawgl_1 = __webpack_require__(18);
-var BezierPath_1 = __webpack_require__(4);
+var draw_1 = __webpack_require__(18);
+var drawgl_1 = __webpack_require__(19);
+var BezierPath_1 = __webpack_require__(5);
 var Bounds_1 = __webpack_require__(12);
-var Circle_1 = __webpack_require__(6);
-var Grid_1 = __webpack_require__(8);
-var KeyHandler_1 = __webpack_require__(16);
-var Line_1 = __webpack_require__(9);
-var MouseHandler_1 = __webpack_require__(15);
-var PBImage_1 = __webpack_require__(14);
-var Polygon_1 = __webpack_require__(5);
-var SVGBuilder_1 = __webpack_require__(21);
-var Triangle_1 = __webpack_require__(11);
-var VEllipse_1 = __webpack_require__(13);
-var Vector_1 = __webpack_require__(2);
+var Circle_1 = __webpack_require__(8);
+var Grid_1 = __webpack_require__(10);
+var KeyHandler_1 = __webpack_require__(17);
+var Line_1 = __webpack_require__(1);
+var MouseHandler_1 = __webpack_require__(16);
+var PBImage_1 = __webpack_require__(15);
+var Polygon_1 = __webpack_require__(6);
+var SVGBuilder_1 = __webpack_require__(22);
+var Triangle_1 = __webpack_require__(7);
+var VEllipse_1 = __webpack_require__(14);
+var Vector_1 = __webpack_require__(3);
 var Vertex_1 = __webpack_require__(0);
-var VertexAttr_1 = __webpack_require__(1);
+var VertexAttr_1 = __webpack_require__(2);
 /**
  * A wrapper class for draggable items (mostly vertices).
  * @private
@@ -7773,25 +7863,10 @@ var PlotBoilerplate = /** @class */ (function () {
     return PlotBoilerplate;
 }()); // END class PlotBoilerplate
 exports.PlotBoilerplate = PlotBoilerplate;
-// const test : PlotBoilerplate = new PlotBoilerplate( ({} as unknown) as Config );
-//exposeClass(PlotBoilerplate);
-//getGlobal()["PlotBoilerplate"] = PlotBoilerplate;
-// NOT WORKING
-// console.log( "exposeClass", classObject.constructor.name );
-/* ((_context:any) => {
-    // console.log( "exposeClass", classObject, classObject.constructor );
-    // const exposeClass : string = "TEST";
-    console.log('Expose plotboilerplate');
-    _context.PlotBoilerplate = PlotBoilerplate;
-})(typeof window !== 'undefined' ? window : this);
-*/
-// ((window || globalThis) as any)["PlotBoilerplate"] = PlotBoilerplate;
-// console.log('test');
-// (window as any).PlotBoilerplate = PlotBoilerplate;
 //# sourceMappingURL=PlotBoilerplate.js.map
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

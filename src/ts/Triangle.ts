@@ -20,7 +20,10 @@
  * @modified  2020-03-17 Added proper JSDoc comments.
  * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
- * @version   2.2.3
+ * @modified  2020-05-12 Added getIncircularTriangle() function.
+ * @modified  2020-05-12 Added getIncircle() function.
+ * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
+ * @version   2.2.4
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -30,8 +33,10 @@
 
 import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
+import { Line } from "./Line";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
+import { geomutils } from "./geomutils";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
 
@@ -188,7 +193,7 @@ export class Triangle implements SVGSerializable {
      * @instance
      * @memberof Triangle
      */
-    getCircumcircle() : { center:Vertex, radius:number } {
+    getCircumcircle() : Circle {
 	if( !this.center || !this.radius ) 
 	    this.calcCircumcircle();
 	return new Circle( this.center.clone(), this.radius );
@@ -365,6 +370,41 @@ export class Triangle implements SVGSerializable {
 	return Triangle.utils.pointIsInTriangle( p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y );
     };
 
+
+    /**
+     * Get that inner triangle which defines the maximal incircle.
+     *
+     * @return {Triangle} The triangle of those points in this triangle that define the incircle.
+     */
+    getIncircularTriangle() : Triangle {
+	const lineA = new Line( this.a, this.b);
+	const lineB = new Line( this.b, this.c);
+	const lineC = new Line( this.c, this.a);
+
+	const bisector1 = geomutils.nsectAngle( this.b, this.a, this.c, 2 )[0]; // bisector of first angle (in b)
+	const bisector2 = geomutils.nsectAngle( this.c, this.b, this.a, 2 )[0]; // bisector of second angle (in c)
+	const intersection = bisector1.intersection( bisector2 );
+
+	// Find the closest points on one of the polygon lines (all have same distance by construction)
+	const circleIntersA = lineA.getClosestPoint( intersection );
+	const circleIntersB = lineB.getClosestPoint( intersection );
+	const circleIntersC = lineC.getClosestPoint( intersection );
+
+	return new Triangle(circleIntersA, circleIntersB, circleIntersC);
+    };
+
+    
+    /**
+     * Get the incircle of this triangle. That is the circle that touches each side
+     * of this triangle in exactly one point.
+     *
+     * Note this just calls getIncircularTriangle().getCircumcircle()
+     *
+     * @return {Circle} The incircle of this triangle.
+     */
+    getIncircle() : Circle {
+	return this.getIncircularTriangle().getCircumcircle();
+    };
 
     
     /**

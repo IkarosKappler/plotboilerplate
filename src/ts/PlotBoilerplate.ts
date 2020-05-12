@@ -1609,23 +1609,3 @@ export class PlotBoilerplate {
 } // END class PlotBoilerplate
 
 
-// const test : PlotBoilerplate = new PlotBoilerplate( ({} as unknown) as Config );
-
-
-//exposeClass(PlotBoilerplate);
-//getGlobal()["PlotBoilerplate"] = PlotBoilerplate;
-
-
-// NOT WORKING
-// console.log( "exposeClass", classObject.constructor.name );
-/* ((_context:any) => {
-    // console.log( "exposeClass", classObject, classObject.constructor );
-    // const exposeClass : string = "TEST";
-    console.log('Expose plotboilerplate');
-    _context.PlotBoilerplate = PlotBoilerplate;
-})(typeof window !== 'undefined' ? window : this);
-*/
-
-// ((window || globalThis) as any)["PlotBoilerplate"] = PlotBoilerplate;
-// console.log('test');
-// (window as any).PlotBoilerplate = PlotBoilerplate;

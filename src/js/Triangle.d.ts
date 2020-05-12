@@ -20,13 +20,17 @@
  * @modified  2020-03-17 Added proper JSDoc comments.
  * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
- * @version   2.2.3
+ * @modified  2020-05-12 Added getIncircularTriangle() function.
+ * @modified  2020-05-12 Added getIncircle() function.
+ * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
+ * @version   2.2.4
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
  * @public
  **/
 import { Bounds } from "./Bounds";
+import { Circle } from "./Circle";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
@@ -140,10 +144,7 @@ export declare class Triangle implements SVGSerializable {
      * @instance
      * @memberof Triangle
      */
-    getCircumcircle(): {
-        center: Vertex;
-        radius: number;
-    };
+    getCircumcircle(): Circle;
     /**
      * Check if this triangle and the passed triangle share an
      * adjacent edge.
@@ -235,6 +236,21 @@ export declare class Triangle implements SVGSerializable {
      * @memberof Triangle
      */
     containsPoint(p: Vertex): boolean;
+    /**
+     * Get that inner triangle which defines the maximal incircle.
+     *
+     * @return {Triangle} The triangle of those points in this triangle that define the incircle.
+     */
+    getIncircularTriangle(): Triangle;
+    /**
+     * Get the incircle of this triangle. That is the circle that touches each side
+     * of this triangle in exactly one point.
+     *
+     * Note this just calls getIncircularTriangle().getCircumcircle()
+     *
+     * @return {Circle} The incircle of this triangle.
+     */
+    getIncircle(): Circle;
     /**
      * Converts this triangle into a human-readable string.
      *

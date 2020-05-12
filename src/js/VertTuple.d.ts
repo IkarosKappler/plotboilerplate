@@ -4,7 +4,10 @@
  * @requires Vertex
  *
  * @author Ikaros Kappler
+ * @date   2020-03-24
  * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
+ * @modofied 2020-05-12 The angle(line) param was still not optional. Changed that.
+ * @version 1.0.1
  */
 import { Vertex } from "./Vertex";
 export declare class VertTuple<T extends VertTuple<T>> {
@@ -101,12 +104,12 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * Get the angle between this and the passed line (in radians).
      *
      * @method angle
-     * @param {VertTuple} [line] - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
+     * @param {VertTuple} line - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
      * @return {number} this
      * @instance
      * @memberof VertTuple
      **/
-    angle(line: VertTuple<any>): number;
+    angle(line?: VertTuple<any>): number;
     /**
      * Get line point at position t in [0 ... 1]:<br>
      * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>

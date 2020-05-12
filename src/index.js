@@ -272,6 +272,13 @@
 	    window.requestAnimationFrame( animate );
 	}
 	animate(0);
+
+	pb.config.postDraw = function() {
+	    for( var i in triangles ) {
+		var circle = triangles[i].getIncircle();
+		pb.fill.circle( circle.center, circle.radius, 'rgba(192,192,192,0.33)',1.0 );
+	    }
+	};
 	
     }; // End initializePB
 

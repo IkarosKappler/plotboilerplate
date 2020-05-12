@@ -1,6 +1,11 @@
 
 
 # Changelog
+* 2020-05-12
+	* The VertTuple.angle(line) param was still not optional. Changed that.
+	* Added the geomutils helper. First helper function: nsectAngle. (moved this from the demos).
+	* Added Triangle.getIncircularTriangle().
+	* Added Triangle.getIncircle().
 * 2020-05-12 (v1.7.6)
   * Fixed the annoying [Ctrl]-pressed bug; the reason was the missing key-up evend after [Ctrl]+[t].
     This was browser-specific.
