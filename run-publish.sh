@@ -1,7 +1,7 @@
 #!/bin/bash
 
 while true; do
-    read -p "Do you really want to publish the new version? Did you run webpack? Did you run Jekyll? (y/n)? " yn
+    read -p "Do you really want to publish the new version? webpack and jekyll will be run again in this process. (y/n)? " yn
     case $yn in
         [Yy]* ) echo "Failsafe."; break;;
         [Nn]* ) break;; #exit;;
