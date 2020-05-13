@@ -1232,7 +1232,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 var touchDownPos = null;
                 var draggedElement = null;
                 // TODO
-                // ERROR, THIS DOES NOT COMPILE WITH TYPESCRIPT.
+                // ERROR, THIS DOES NOT COMPILE PROPERLY WITH TYPESCRIPT.
                 var Touchy = (window["Touchy"]);
                 new Touchy(this.canvas, { one: function (hand, finger) {
                         touchMovePos = new Vertex_1.Vertex(relPos_1(finger.lastPoint));

@@ -205,6 +205,8 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ## Initialization parameters
 
+<div class="table-wrapper" markdown="block">
+
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `canvas`| _HTMLCanvasElement_ | `null` | The canvas (must not be null). |
@@ -242,6 +244,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 | `enableSVGExport`| _boolean_ |  `true` | Indicates if the SVG export should be enabled (default is true). |    
 | `enableGL`| _boolean_ | `false` | [Experimental] Indicates if the application should use the experimental WebGL features. |
 
+</div>
 
 
 #### Example
@@ -438,6 +441,8 @@ The Vertex class has basic drag event support:
  }
 ~~~
 
+<div class="table-wrapper" markdown="block">
+
 | Name | Type | Example value | Description |
 |---|---|---|---|
 | `element`| _HTMLCanvasElement_ | `[HTMLCanvasElement]` | The canvas that fired the event. |
@@ -451,6 +456,8 @@ The Vertex class has basic drag event support:
 | `draggedFrom`| _position_ | `{ x : 10, y : -5 }` | The most recent drag position (position before current drag step). |
 | `wasDragged`| _boolean_ | `true` | True if this is a drag event (nothing else available at the moment). |
 | `dragAmount`| _position_ | `{ x : 100, y : 34 }` | The x-y-amount of the current drag step. This is the difference between the recent drag step and the actual drag position. |
+
+</div>
 
 
 ## Usage
@@ -561,11 +568,11 @@ for this purpose.
 * FileSaver.js
 * [Touchy.js](https://github.com/jairajs89/Touchy.js "Touchy.js") by [jairajs89](https://github.com/jairajs89 "jairajs89") 
 * Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
-* https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf
-* https://github.com/loopspace/jsHobby
-* https://codepen.io/osublake/pen/BowJed Blake Bowen's Catmull-Rom demo
-* mbostock https://github.com/mbostock for the great convex-polygon-incircle implementation https://observablehq.com/@mbostock/convex-polygon-incircle
-* and for https://observablehq.com/@mbostock/circle-tangent-to-three-lines
+* [hobby.pdf](https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf "hobby.pdf")
+* [jsHobby](https://github.com/loopspace/jsHobby "jsHobby")
+* [Blake Bowen's Catmull-Rom demo](https://codepen.io/osublake/pen/BowJed "Blake Bowen's Catmull-Rom demo")
+* [mbostock](https://github.com/mbostock "mbostok") for the great [convex-polygon-incircle implementation](https://observablehq.com/@mbostock/convex-polygon-incircle "convex-polygon-incircle implementation")
+* and for [circle-tangent-to-three-lines](https://observablehq.com/@mbostock/circle-tangent-to-three-lines "circle-tangent-to-three-lines")
 
 ## Known bugs
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.

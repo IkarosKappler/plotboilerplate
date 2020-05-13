@@ -375,3 +375,10 @@ tr > th:last-child { border-right: 1px solid #ddd; }
 .disabled {
     color: #454545;
 }
+
+
+// Use a scrollable wrapper for tables to avoid that table break the body's max width.
+.table-wrapper {
+    width: 100%;
+    overflow-x: scroll;
+}

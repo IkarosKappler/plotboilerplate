@@ -1410,7 +1410,7 @@ export class PlotBoilerplate {
 		var touchDownPos : Vertex|undefined|null = null;
 		var draggedElement : Draggable|undefined|null = null;
 		// TODO
-		// ERROR, THIS DOES NOT COMPILE WITH TYPESCRIPT.
+		// ERROR, THIS DOES NOT COMPILE PROPERLY WITH TYPESCRIPT.
 
 		
 		const Touchy : any = (window["Touchy"]);
