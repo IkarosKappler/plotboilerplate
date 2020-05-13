@@ -540,6 +540,14 @@ for this purpose.
  * Circle lineWidth params also affects circular handles.
  * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
    See ctx.setLineDash(...).
+ * Write a basic demo for the Vertex class.
+ * Write a basic demo for the Line class.
+ * Write a basic demo for the Vector class.
+ * Write a basic demo for the Triangle class.
+ * Write a basic demo for the Circle class.
+ * Write a basic demo for the VEllipse class.
+ * Write a basic demo for the CubicBezierCurve class.
+ * Write a basic demo for the PBImage class.
 
 
 ### Todos for future Version 2
