@@ -23,8 +23,17 @@ echo 'layout: home' >> index.md
 echo 'date: 2019-03-11' >> index.md
 echo '---' >> index.md
 cat ../README.md >> index.md
+echo '## Basics' >> index.md
+echo '[How to use the basic classes](basics.html "How to use the basic classes")' >> index.md
 echo '## Changelog' >> index.md
 echo '[View changelog](changelog.html "View changelog")' >> index.md
+
+echo "Building the basics file ..."
+echo '---' > basics.md
+echo 'layout: page' >> basics.md
+echo 'title: Basics' >> basics.md
+echo '---' >> basics.md
+cat ../basics.md >> basics.md
 
 echo "Building the changelog file ..."
 echo '---' > changelog.md

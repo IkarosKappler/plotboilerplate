@@ -10,7 +10,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (desktop and mobile)
 
 
-The compressed library has 83kb.
+The compressed library has 84kb.
 
 
 ## Install the package via npm
@@ -67,6 +67,8 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 	pb.redraw();
    } );
 ~~~
+
+
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
 ![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
@@ -534,8 +536,6 @@ for this purpose.
  * Circle lineWidth params also affects circular handles.
  * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
    See ctx.setLineDash(...).
- * Add the nsectAngle from the demos to the library; add to te Triangle class? Create a global utils class?
-   Then add Triangle.computeIncircle() to the Triangle class.
 
 
 ### Todos for future Version 2

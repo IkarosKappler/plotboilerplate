@@ -41,6 +41,8 @@ function mkDemoPage() {
 		echo "baseName=$baseName"
 		if [[ $baseName == _* ]]; then
 		    echo "Ignoring underscore directory $d"
+		elif [[ $baseName == basic-* ]]; then
+		    echo "Ignoring the 'basics' directory $d"
 		else
 		    # href="{{ my_page.url | prepend: site.baseurl }}"
 		    echo "<div class=\"demo-box\">" >> $outFile
