@@ -85,6 +85,10 @@ title: Basics
    ];
    var path = BezierPath.fromArray( pathPoints );
    pb.add( path );
+
+   // Useful hint: if you want to keep your bezier paths smooth
+   //              then you should set their point attributes to bezierAutoAdjust=true
+   path.bezierCurves[1].startPoint.attr.bezierAutoAdjust = true;
 ~~~
 [Demo](https://plotboilerplate.io/repo/demos/basic-BezierPath/ "Demo")
 

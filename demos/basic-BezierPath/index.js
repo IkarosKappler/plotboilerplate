@@ -1,10 +1,10 @@
 /**
- * A script for demonstrating the line-point-distance.
+ * A script for demonstrating the basic usage of the BezierPath class.
  *
- * @require PlotBoilerplate, MouseHandler, gup, dat.gui, 
+ * @requires PlotBoilerplate, gup, dat.gui, 
  * 
  * @author   Ikaros Kappler
- * @date     2019-02-06
+ * @date     2020-05-12
  * @version  1.0.0
  **/
 
@@ -42,6 +42,9 @@
 	    var path = BezierPath.fromArray( pathPoints );
 	    pb.add( path );
 
+	    // Useful hint: if you want to keep your bezier paths smooth
+	    //              then you should set their point attributes to bezierAutoAdjust=true
+	    path.bezierCurves[1].startPoint.attr.bezierAutoAdjust = true;
 	} );
     
 })(window); 
