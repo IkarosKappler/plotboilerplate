@@ -548,7 +548,8 @@ for this purpose.
  * Write a basic demo for the VEllipse class.
  * Write a basic demo for the CubicBezierCurve class.
  * Write a basic demo for the PBImage class.
-
+ * On non-circular Bézier paths the end control point does not move with the end point when dragged. See the basic
+   Bézier path demo.
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.

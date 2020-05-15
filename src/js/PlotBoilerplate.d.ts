@@ -639,6 +639,16 @@ export declare class PlotBoilerplate {
              **/
             func: (obj: any, key: string, fallback: (...args: any[]) => any) => any;
         };
+        /**
+         * Installs vertex listeners to the path's vertices so that controlpoints
+         * move with their path points when dragged.
+         *
+         * Bézier path points with attr.bezierAutoAdjust==true will have their
+         * two control points audo-updated if moved, too (keep path connections smooth).
+         *
+         * @param {BezierPath} bezierPath - The path to use auto-adjustment for.
+         **/
+        enableBezierPathAutoAdjust: (bezierPath: BezierPath) => void;
     };
 }
 export {};

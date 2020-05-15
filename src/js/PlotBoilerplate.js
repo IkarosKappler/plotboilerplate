@@ -453,44 +453,54 @@ var PlotBoilerplate = /** @class */ (function () {
                 bezierPath.bezierCurves[i].startControlPoint.attr.selectable = false;
                 bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
             }
-            for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
-                // This should be wrapped into the BezierPath implementation.
-                bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
-                    var cindex = drawable.locateCurveByStartPoint(e.params.vertex);
-                    drawable.bezierCurves[cindex].startPoint.addXY(-e.params.dragAmount.x, -e.params.dragAmount.y);
-                    drawable.moveCurvePoint(cindex * 1, drawable.START_POINT, new Vertex_1.Vertex(e.params.dragAmount) // TODO: change the signature of moveCurvePoint to (,XYCoords...)     
-                    );
-                    drawable.updateArcLengths();
-                });
-                bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {
-                    var cindex = drawable.locateCurveByStartControlPoint(e.params.vertex);
-                    if (!drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust)
-                        return;
-                    drawable.adjustPredecessorControlPoint(cindex * 1, true, // obtain handle length?
-                    false // update arc lengths
-                    );
-                    drawable.updateArcLengths();
-                });
-                bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener(function (e) {
-                    var cindex = drawable.locateCurveByEndControlPoint(e.params.vertex);
-                    if (!drawable.bezierCurves[(cindex) % drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust)
-                        return;
-                    drawable.adjustSuccessorControlPoint(cindex * 1, true, // obtain handle length?
-                    false // update arc lengths
-                    );
-                    drawable.updateArcLengths();
-                });
-                if (i + 1 > bezierPath.bezierCurves.length) {
-                    // Move last control point with the end point (if not circular)
-                    drawable.bezierCurves[drawable.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
-                        if (!drawable.adjustCircular) {
-                            var cindex = drawable.locateCurveByEndPoint(e.params.vertex);
-                            drawable.moveCurvePoint(cindex * 1, drawable.END_CONTROL_POINT, new Vertex_1.Vertex({ x: e.params.dragAmount.x / 2, y: e.params.dragAmount.y / 2 }));
-                        }
-                        drawable.updateArcLengths();
-                    });
+            PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
+            /*
+            for( var i = 0; i < bezierPath.bezierCurves.length; i++ ) {
+            // This should be wrapped into the BezierPath implementation.
+            bezierPath.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
+                var cindex : number = drawable.locateCurveByStartPoint( e.params.vertex );
+                drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
+                drawable.moveCurvePoint( cindex*1,
+                             drawable.START_POINT,
+                             new Vertex(e.params.dragAmount) // TODO: change the signature of moveCurvePoint to (,XYCoords...)
+                           );
+                drawable.updateArcLengths();
+            } );
+            bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
+                var cindex : number = drawable.locateCurveByStartControlPoint( e.params.vertex );
+                if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
+                return;
+                drawable.adjustPredecessorControlPoint( cindex*1,
+                                    true,      // obtain handle length?
+                                    false      // update arc lengths
+                                  );
+                drawable.updateArcLengths();
+            } );
+            bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
+                var cindex : number = drawable.locateCurveByEndControlPoint( e.params.vertex );
+                if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
+                return;
+                drawable.adjustSuccessorControlPoint( cindex*1,
+                                  true,        // obtain handle length?
+                                  false        // update arc lengths
+                                );
+                drawable.updateArcLengths();
+            } );
+            if( i+1 > bezierPath.bezierCurves.length ) {
+                // Move last control point with the end point (if not circular)
+                drawable.bezierCurves[drawable.bezierCurves.length-1].endPoint.listeners.addDragListener( function(e) {
+                if( !drawable.adjustCircular ) {
+                    var cindex : number = drawable.locateCurveByEndPoint( e.params.vertex );
+                    drawable.moveCurvePoint( cindex*1,
+                                 drawable.END_CONTROL_POINT,
+                                 new Vertex( { x: e.params.dragAmount.x/2, y : e.params.dragAmount.y/2 } )
+                               );
                 }
+                drawable.updateArcLengths();
+                } );
+            }
             } // END for
+            */
         }
         else if (drawable instanceof PBImage_1.PBImage) {
             this.vertices.push(drawable.upperLeft);
@@ -1292,7 +1302,6 @@ var PlotBoilerplate = /** @class */ (function () {
             _self.console.log('Keyboard interaction disabled.');
         }
     };
-    // }; // END construcor 'PlotBoilerplate'
     /**
      * Creates a control GUI (a dat.gui instance) for this
      * plot boilerplate instance.
@@ -1429,7 +1438,56 @@ var PlotBoilerplate = /** @class */ (function () {
                     return fallback;
                 return obj[key];
             }
-        } // END fetch
+        },
+        /**
+         * Installs vertex listeners to the path's vertices so that controlpoints
+         * move with their path points when dragged.
+         *
+         * Bézier path points with attr.bezierAutoAdjust==true will have their
+         * two control points audo-updated if moved, too (keep path connections smooth).
+         *
+         * @param {BezierPath} bezierPath - The path to use auto-adjustment for.
+         **/
+        enableBezierPathAutoAdjust: function (bezierPath) {
+            for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
+                // This should be wrapped into the BezierPath implementation.
+                bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
+                    var cindex = bezierPath.locateCurveByStartPoint(e.params.vertex);
+                    bezierPath.bezierCurves[cindex].startPoint.addXY(-e.params.dragAmount.x, -e.params.dragAmount.y);
+                    bezierPath.moveCurvePoint(cindex * 1, bezierPath.START_POINT, new Vertex_1.Vertex(e.params.dragAmount) // TODO: change the signature of moveCurvePoint to (,XYCoords...)     
+                    );
+                    bezierPath.updateArcLengths();
+                });
+                bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {
+                    var cindex = bezierPath.locateCurveByStartControlPoint(e.params.vertex);
+                    if (!bezierPath.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust)
+                        return;
+                    bezierPath.adjustPredecessorControlPoint(cindex * 1, true, // obtain handle length?
+                    false // update arc lengths
+                    );
+                    bezierPath.updateArcLengths();
+                });
+                bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener(function (e) {
+                    var cindex = bezierPath.locateCurveByEndControlPoint(e.params.vertex);
+                    if (!bezierPath.bezierCurves[cindex % bezierPath.bezierCurves.length].endPoint.attr.bezierAutoAdjust)
+                        return;
+                    bezierPath.adjustSuccessorControlPoint(cindex * 1, true, // obtain handle length?
+                    false // update arc lengths
+                    );
+                    bezierPath.updateArcLengths();
+                });
+                if (i + 1 == bezierPath.bezierCurves.length) { // && !bezierPath.adjustCircular ) { 
+                    // Move last control point with the end point (if not circular)
+                    bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
+                        if (!bezierPath.adjustCircular) {
+                            var cindex = bezierPath.locateCurveByEndPoint(e.params.vertex);
+                            bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex_1.Vertex({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
+                        }
+                        bezierPath.updateArcLengths();
+                    });
+                }
+            } // END for
+        }
     }; // END utils
     return PlotBoilerplate;
 }()); // END class PlotBoilerplate
