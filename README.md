@@ -547,6 +547,7 @@ for this purpose.
  * On non-circular Bézier paths the end control point does not move with the end point when dragged. See the basic
    Bézier path demo.
  * Add function Triangle.getIncenter(); the class already uses the incenter for computing the circumcircle.
+ * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
