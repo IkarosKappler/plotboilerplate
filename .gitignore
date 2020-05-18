@@ -23,5 +23,6 @@ webpack.config-old.js
 *.mp4
 *.mov
 screenshots/videos/
+screenshots/screenshots-fullcolor/
 resources/
 demos/17-hobby-curves/hobby-weitz.js
