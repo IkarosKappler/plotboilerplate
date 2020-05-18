@@ -12,5 +12,6 @@
  * @date 2020-04-01
  **/
 
-var exports = window.export = [];
+//var exports = window.export = [];
+var exports = window.export = window; // [];
 var require = window.require = function(...args) { return window; };

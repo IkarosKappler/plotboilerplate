@@ -24,7 +24,8 @@
  * @modified  2020-05-12 Added getIncircularTriangle() function.
  * @modified  2020-05-12 Added getIncircle() function.
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
- * @version   2.2.4
+ * @modified  2020-06-18 Added the getIncenter function.
+ * @version   2.3.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -310,6 +311,20 @@ var Triangle = /** @class */ (function () {
      */
     Triangle.prototype.getIncircle = function () {
         return this.getIncircularTriangle().getCircumcircle();
+    };
+    ;
+    /**
+     * Get the incenter of this triangle (which is the center of the circumcircle).
+     *
+     * Note: due to performance reasonst the incenter is buffered inside the triangle because
+     *       computing it is relatively expensive. If a, b or c have changed you should call the
+     *       calcCircumcircle() function first, otherwise you might get wrong results.
+     * @return Vertex The incenter of this triangle.
+     **/
+    Triangle.prototype.getIncenter = function () {
+        if (!this.center || !this.radius)
+            this.calcCircumcircle();
+        return this.center.clone();
     };
     ;
     /**

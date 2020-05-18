@@ -149,6 +149,7 @@
 		drawCircumCircles     : false,
 		drawCubicCurves       : false,
 		fillVoronoiCells      : true,
+		drawVoronoiIncircles  : false,
 		voronoiOutlineColor   : 'rgba(0,168,40, 1.0)',
 		voronoiCellColor      : 'rgba(0,128,192, 0.5)',
 		voronoiCubicThreshold : 1.0,
@@ -225,7 +226,6 @@
 		// Draw voronoi diagram?
 		if( config.makeVoronoiDiagram )
 		    drawVoronoiDiagram();
-
 	    };
 
 	    
@@ -245,17 +245,26 @@
 	    var drawVoronoiDiagram = function() {
 		for( var v in voronoiDiagram ) {
 		    var cell = voronoiDiagram[v];
-		    var polygon = new Polygon(cell.toPathArray(),cell.isOpen());
+		    var polygon = cell.toPolygon();
 		    polygon.scale( config.voronoiCellScale, cell.sharedVertex );
 		    pb.draw.polygon( polygon, config.voronoiOutlineColor ); 
 
-		    if( config.drawCubicCurves && !cell.isOpen() && cell.triangles.length >= 3 ) {
-			var cbezier = polygon.toCubicBezierData( config.voronoiCubicThreshold );
-			if( config.fillVoronoiCells )
-			    pb.fill.cubicBezierPath( cbezier, config.voronoiCellColor );
-			else
-			    pb.draw.cubicBezierPath( cbezier, config.voronoiCellColor );
-		    }
+		    if( !cell.isOpen() && cell.triangles.length >= 3 ) {
+			if( config.drawCubicCurves ) {
+			    var cbezier = polygon.toCubicBezierData( config.voronoiCubicThreshold );
+			    if( config.fillVoronoiCells ) 
+				pb.fill.cubicBezierPath( cbezier, config.voronoiCellColor );
+			    else 
+				pb.draw.cubicBezierPath( cbezier, config.voronoiCellColor );
+			}
+			if( config.drawVoronoiIncircles  ) {
+			    var result = convexPolygonIncircle( polygon ); 
+			    var circle = result.circle;
+			    var triangle = result.triangle;
+			    // Now we should have found the best inlying circle (and the corresponding triangle).
+			    pb.draw.circle( circle.center, circle.radius, 'rgba(255,192,0,1.0)', 2 );
+			}
+		    } // END cell is not open
 		}
 	    };
 
@@ -270,24 +279,29 @@
 		}
 	    };
 
-	    /**
-	     * Draw the voronoi cells as quadratic bezier curves.
-	     */
-	    /* var drawCubicBezierVoronoi = function() {
-		for( var c in voronoiDiagram ) {
-		    var cell = voronoiDiagram[c];
-		    if( cell.isOpen() || cell.triangles.length < 3 )
+
+	    var drawVoronoiIncircles = function() {
+		for( var v in voronoiDiagram ) {
+		    var cell = voronoiDiagram[v];
+
+		    // The polygon-in-convex-polygon algorithm can only applied to
+		    // closed (finite cells)
+		    if( cell.isOpen() )
 			continue;
-		    
-		    var cbezier = new Polygon(cell.toPathArray(),cell.isOpen()).toCubicBezierData( config.voronoiCellThreshold );
-		    if( config.fillVoronoiCells )
-			pb.fill.cubicBezierPath( cbezier, config.voronoiCellColor );
-		    else
-			pb.draw.cubicBezierPath( cbezier, config.voronoiCellColor );
-		}
-		
-	    }; // END drawCubicBezierVoronoi
-	    */
+
+		    // console.
+		    var result = convexPolygonIncircle( cell.toPolygon() );
+		    var circle = result.circle;
+		    var triangle = result.triangle;
+		    // Now we should have found the best inlying circle (and the corresponding triangle).
+		    pb.draw.circle( circle.center, circle.radius, 'rgba(255,192,0,1.0)', 2 );
+		    //pb.draw.circle( circle.center, 5, 'rgba(255,0,0,1.0)', 1 );
+		    //pb.draw.circle( triangle.a, 5, 'rgba(0,192,0,1.0)', 1 );
+		    //pb.draw.circle( triangle.b, 5, 'rgba(0,192,0,1.0)', 1 );
+		    //pb.draw.circle( triangle.c, 5, 'rgba(0,192,0,1.0)', 1 );
+
+		} // END for
+	    };
 	    
 	    
 	    /**

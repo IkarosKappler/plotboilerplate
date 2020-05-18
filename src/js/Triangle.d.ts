@@ -23,7 +23,8 @@
  * @modified  2020-05-12 Added getIncircularTriangle() function.
  * @modified  2020-05-12 Added getIncircle() function.
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
- * @version   2.2.4
+ * @modified  2020-06-18 Added the getIncenter function.
+ * @version   2.3.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -251,6 +252,15 @@ export declare class Triangle implements SVGSerializable {
      * @return {Circle} The incircle of this triangle.
      */
     getIncircle(): Circle;
+    /**
+     * Get the incenter of this triangle (which is the center of the circumcircle).
+     *
+     * Note: due to performance reasonst the incenter is buffered inside the triangle because
+     *       computing it is relatively expensive. If a, b or c have changed you should call the
+     *       calcCircumcircle() function first, otherwise you might get wrong results.
+     * @return Vertex The incenter of this triangle.
+     **/
+    getIncenter(): Vertex;
     /**
      * Converts this triangle into a human-readable string.
      *

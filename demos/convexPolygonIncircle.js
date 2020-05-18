@@ -1,7 +1,7 @@
 /**
  * Compute a max incircle for the given polygon.
  *
- * @requires Circle, Line, Vertex, Triangle, nsectAngle
+ * @requires Circle, Line, Vertex, Triangle, nsectAngle, geomutils.
  *
  * https://observablehq.com/@mbostock/convex-polygon-incircle
  * https://observablehq.com/@mbostock/circle-tangent-to-three-lines
