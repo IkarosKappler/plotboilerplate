@@ -149,11 +149,12 @@
 		drawCircumCircles     : false,
 		drawCubicCurves       : false,
 		fillVoronoiCells      : true,
-		drawVoronoiIncircles  : false,
 		voronoiOutlineColor   : 'rgba(0,168,40, 1.0)',
 		voronoiCellColor      : 'rgba(0,128,192, 0.5)',
 		voronoiCubicThreshold : 1.0,
 		voronoiCellScale      : 0.8,
+		drawVoronoiIncircles  : false,
+		drawVoronoiOutlines   : true,
 		pointCount            : 25,
 		rebuild               : function() { rebuild(); },
 		randomize             : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuild(); },
@@ -247,7 +248,8 @@
 		    var cell = voronoiDiagram[v];
 		    var polygon = cell.toPolygon();
 		    polygon.scale( config.voronoiCellScale, cell.sharedVertex );
-		    pb.draw.polygon( polygon, config.voronoiOutlineColor ); 
+		    if( config.drawVoronoiOutlines )
+			pb.draw.polygon( polygon, config.voronoiOutlineColor ); 
 
 		    if( !cell.isOpen() && cell.triangles.length >= 3 ) {
 			if( config.drawCubicCurves ) {
@@ -261,7 +263,8 @@
 			    var result = convexPolygonIncircle( polygon ); 
 			    var circle = result.circle;
 			    var triangle = result.triangle;
-			    // Now we should have found the best inlying circle (and the corresponding triangle).
+			    // Here we should have found the best inlying circle (and the corresponding triangle)
+			    // inside the Voronoi cell.
 			    pb.draw.circle( circle.center, circle.radius, 'rgba(255,192,0,1.0)', 2 );
 			}
 		    } // END cell is not open
@@ -277,30 +280,6 @@
 		    var cc = triangles[t].getCircumcircle();
 		    pb.draw.circle( cc.center, cc.radius, '#e86800' );
 		}
-	    };
-
-
-	    var drawVoronoiIncircles = function() {
-		for( var v in voronoiDiagram ) {
-		    var cell = voronoiDiagram[v];
-
-		    // The polygon-in-convex-polygon algorithm can only applied to
-		    // closed (finite cells)
-		    if( cell.isOpen() )
-			continue;
-
-		    // console.
-		    var result = convexPolygonIncircle( cell.toPolygon() );
-		    var circle = result.circle;
-		    var triangle = result.triangle;
-		    // Now we should have found the best inlying circle (and the corresponding triangle).
-		    pb.draw.circle( circle.center, circle.radius, 'rgba(255,192,0,1.0)', 2 );
-		    //pb.draw.circle( circle.center, 5, 'rgba(255,0,0,1.0)', 1 );
-		    //pb.draw.circle( triangle.a, 5, 'rgba(0,192,0,1.0)', 1 );
-		    //pb.draw.circle( triangle.b, 5, 'rgba(0,192,0,1.0)', 1 );
-		    //pb.draw.circle( triangle.c, 5, 'rgba(0,192,0,1.0)', 1 );
-
-		} // END for
 	    };
 	    
 	    
@@ -479,6 +458,8 @@
 		f2.add(config, 'makeVoronoiDiagram').onChange( rebuild ).title("Make voronoi diagram from the triangle set.");
 		f2.addColor(config, 'voronoiOutlineColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi outline color.");
 		f2.add(config, 'drawCubicCurves').onChange( rebuild ).title("If checked the Voronoi's cubic curves will be drawn.");
+		f2.add(config, 'drawVoronoiOutlines').onChange( rebuild ).title("If checked the Voronoi cells' outlines will be drawn.");
+		f2.add(config, 'drawVoronoiIncircles').onChange( rebuild ).title("If checked the Voronoi cells' incircles will be drawn.");
 		f2.add(config, 'fillVoronoiCells').onChange( rebuild ).title("If checked the Voronoi cells will be filled.");
 		f2.addColor(config, 'voronoiCellColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi cell color.");
 		f2.add(config, 'voronoiCubicThreshold').min(0.0).max(1.0).onChange( function() { pb.redraw() } ).title("(Experimental) Specifiy the cubic or cell coefficients.");
