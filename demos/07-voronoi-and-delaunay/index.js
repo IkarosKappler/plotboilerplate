@@ -15,7 +15,9 @@
  * @modified 2018-05-04 Drawing voronoi cells by their paths now, not the triangles' circumcenters.
  * @modified 2019-04-24 Refactored the whole code and added an animator.
  * @modified 2019-10-25 Using draw.polygon(...) to draw Voronoi cells now. Added configurable colors.
- * @version  2.0.1
+ * @modified 2020-05-18 Replaced new Polygon(cell.toPathArray(),...) by cell.toPolygon().
+ * @modified 2020-05-18 Added convex-polygon-incircles to Voronoi cells.
+ * @version  2.1.0
  **/
 
 

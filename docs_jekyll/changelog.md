@@ -1,12 +1,17 @@
 ---
 layout: page
+title: Changelog
 ---
 
 
 # Changelog
-* 2020-05-15
+* 2020-05-18
+  * Added the Triangle.getIncenter() function.
+  * Added VoronoiCell.toPolygon() in the demos.
+  * Added proper JSDoc tags to the VoronoiCell class.
+* 2020-05-15 (v1.7.8)
   * Moved the bezier-autoadjust handling to a private helper function. Fixed the auto-update of last control point.
-* 2020-05-12
+* 2020-05-12 (v1.7.7)
   * The VertTuple.angle(line) param was still not optional. Changed that.
   * Added the geomutils helper. First helper function: nsectAngle. (moved this from the demos).
   * Added Triangle.getIncircularTriangle().
