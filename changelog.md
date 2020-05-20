@@ -1,6 +1,8 @@
 
 
 # Changelog
+  * 2020-05-20
+  * Created a script for the minmal npm package.
 * 2020-05-18
   * Added the Triangle.getIncenter() function.
   * Added VoronoiCell.toPolygon() in the demos.

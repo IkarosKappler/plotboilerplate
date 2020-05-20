@@ -23,10 +23,7 @@ export interface VertEventParams extends XMouseParams {
 }
 
 export interface VertEvent {
-    // vertex: Vertex;
-    // params : { vertex: Vertex }
-    params : VertEventParams; // XMouseParams;
-    // vertex : Vertex;
+    params : VertEventParams;
 } 
 
 export class VertexListeners {
@@ -58,12 +55,13 @@ export class VertexListeners {
      *
      * @method addDragListener
      * @param {VertexListeners~dragListener} listener - The drag listener to add (a callback).
-     * @return {void}
+     * @return {VertexListeners} this (for chaining)
      * @instance
      * @memberof VertexListeners
      **/
     addDragListener( listener:(e:VertEvent)=>void ) {
-	this.drag.push( listener );
+	// this.drag.push( listener );
+	VertexListeners._addListener( this.drag, listener );
 	return this;
     };
     /**
@@ -73,18 +71,34 @@ export class VertexListeners {
      */
     
 
+    /**
+     * Remove a drag listener.
+     *
+     * @method removeDragListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    removeDragListener( listener:(e:VertEvent)=>void ) {
+	// this.drag.push( listener );
+	this.drag = VertexListeners._removeListener( this.drag, listener );
+	return this;
+    };
+    
     
     /**
      * Add a dragStart listener.
      *
      * @method addDragListener
      * @param {VertexListeners~dragStartListener} listener - The drag-start listener to add (a callback).
-     * @return {void}
+     * @return {VertexListeners} this (for chaining)
      * @instance
      * @memberof VertexListeners
      **/
     addDragStartListener( listener:(e:VertEvent)=>void ) {
-	this.dragStart.push( listener );
+	//this.dragStart.push( listener );
+	VertexListeners._addListener( this.dragStart, listener );
 	return this;
     };
     /**
@@ -93,6 +107,21 @@ export class VertexListeners {
      * @param {Event} e - The (extended) drag event.
      */
 
+
+    /**
+     * Remove a dragStart listener.
+     *
+     * @method addDragStartListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    removeDragStartListener( listener:(e:VertEvent)=>void ) {
+	// this.drag.push( listener );
+	this.dragStart= VertexListeners._removeListener( this.dragStart, listener );
+	return this;
+    };
     
  
     /**
@@ -100,12 +129,13 @@ export class VertexListeners {
      *
      * @method addDragListener
      * @param {VertexListeners~dragEndListener} listener - The drag-end listener to add (a callback).
-     * @return {void}
+     * @return {VertexListeners} this (for chaining)
      * @instance
      * @memberof VertexListeners
      **/
     addDragEndListener( listener:(e:VertEvent)=>void ) {
-	this.dragEnd.push( listener );
+	// this.dragEnd.push( listener );
+	VertexListeners._addListener( this.dragEnd, listener );
 	return this;
     };
     /**
@@ -114,7 +144,21 @@ export class VertexListeners {
      * @param {Event} e - The (extended) drag event.
      */
 
-    
+
+    /**
+     * Remove a dragEnd listener.
+     *
+     * @method addDragEndListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    removeDragEndListener( listener:(e:VertEvent)=>void ) {
+	// this.drag.push( listener );
+	this.dragEnd = VertexListeners._removeListener( this.dragEnd, listener );
+	return this;
+    };
 
  
     /**
@@ -171,7 +215,7 @@ export class VertexListeners {
     private static _fireEvent( _self:VertexListeners,
 			       listeners:Array<(e:VertEvent)=>void>,
 			       e:VertEvent|XMouseEvent
-			     ) {
+			     ) : void {
 	const ve : VertEvent = (e as unknown) as VertEvent;
 	if( typeof ve.params == 'undefined' )
 	    ve.params = ({ vertex : _self.vertex } as unknown) as VertEventParams;
@@ -182,4 +226,30 @@ export class VertexListeners {
 	}
     };
 
+    /**
+     * @private
+     */
+    private static _addListener( listeners:Array<(e:VertEvent)=>void>,
+				 newListener:(e:VertEvent)=>void
+			       ) : boolean {
+	for( var i in listeners ) {
+	    if( listeners[i] == newListener )
+		return false;
+	}
+	listeners.push( newListener );
+	return true;
+    };
+
+    /**
+     * @private
+     */
+    private static _removeListener( listeners:Array<(e:VertEvent)=>void>,
+				    oldListener:(e:VertEvent)=>void
+			       ) : Array<(e:VertEvent)=>void> {
+	for( var i = 0; i < listeners.length; i++ ) {
+	    if( listeners[i] == oldListener )
+		return listeners.splice( i, 1 );
+	}
+	return listeners;
+    };
 }

@@ -11,6 +11,6 @@
 
     },
     "inclue": ["./src/ts/*"],
-    "exclude": ["./dist", "./tmp","./src/js","./src/vanilla"],
+    "exclude": ["./dist", "./tmp","./src/js","./src/vanilla", "npm-package"],
     "removeComments": false
 }

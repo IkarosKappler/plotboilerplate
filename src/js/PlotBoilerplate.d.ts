@@ -318,6 +318,7 @@ export declare class PlotBoilerplate {
      *  * a Polygon
      *  * a BezierPath
      *  * a BPImage
+     *  * a Triangle
      * </pre>
      *
      * @param {Object} drawable - The drawable (of one of the allowed class instance) to remove.
@@ -649,6 +650,15 @@ export declare class PlotBoilerplate {
          * @param {BezierPath} bezierPath - The path to use auto-adjustment for.
          **/
         enableBezierPathAutoAdjust: (bezierPath: BezierPath) => void;
+        /**
+         * Removes vertex listeners from the path's vertices. This needs to be called
+         * when BezierPaths are removed from the canvas.
+         *
+         * Sorry, this is not yet implemented.
+         *
+         * @param {BezierPath} bezierPath - The path to use un-auto-adjustment for.
+         **/
+        disableBezierPathAutoAdjust: (bezierPath: BezierPath) => void;
     };
 }
 export {};

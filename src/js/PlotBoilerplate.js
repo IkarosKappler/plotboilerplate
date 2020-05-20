@@ -454,53 +454,6 @@ var PlotBoilerplate = /** @class */ (function () {
                 bezierPath.bezierCurves[i].endControlPoint.attr.selectable = false;
             }
             PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
-            /*
-            for( var i = 0; i < bezierPath.bezierCurves.length; i++ ) {
-            // This should be wrapped into the BezierPath implementation.
-            bezierPath.bezierCurves[i].startPoint.listeners.addDragListener( function(e) {
-                var cindex : number = drawable.locateCurveByStartPoint( e.params.vertex );
-                drawable.bezierCurves[cindex].startPoint.addXY( -e.params.dragAmount.x, -e.params.dragAmount.y );
-                drawable.moveCurvePoint( cindex*1,
-                             drawable.START_POINT,
-                             new Vertex(e.params.dragAmount) // TODO: change the signature of moveCurvePoint to (,XYCoords...)
-                           );
-                drawable.updateArcLengths();
-            } );
-            bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener( function(e) {
-                var cindex : number = drawable.locateCurveByStartControlPoint( e.params.vertex );
-                if( !drawable.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust )
-                return;
-                drawable.adjustPredecessorControlPoint( cindex*1,
-                                    true,      // obtain handle length?
-                                    false      // update arc lengths
-                                  );
-                drawable.updateArcLengths();
-            } );
-            bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener( function(e) {
-                var cindex : number = drawable.locateCurveByEndControlPoint( e.params.vertex );
-                if( !drawable.bezierCurves[(cindex)%drawable.bezierCurves.length].endPoint.attr.bezierAutoAdjust )
-                return;
-                drawable.adjustSuccessorControlPoint( cindex*1,
-                                  true,        // obtain handle length?
-                                  false        // update arc lengths
-                                );
-                drawable.updateArcLengths();
-            } );
-            if( i+1 > bezierPath.bezierCurves.length ) {
-                // Move last control point with the end point (if not circular)
-                drawable.bezierCurves[drawable.bezierCurves.length-1].endPoint.listeners.addDragListener( function(e) {
-                if( !drawable.adjustCircular ) {
-                    var cindex : number = drawable.locateCurveByEndPoint( e.params.vertex );
-                    drawable.moveCurvePoint( cindex*1,
-                                 drawable.END_CONTROL_POINT,
-                                 new Vertex( { x: e.params.dragAmount.x/2, y : e.params.dragAmount.y/2 } )
-                               );
-                }
-                drawable.updateArcLengths();
-                } );
-            }
-            } // END for
-            */
         }
         else if (drawable instanceof PBImage_1.PBImage) {
             this.vertices.push(drawable.upperLeft);
@@ -532,6 +485,7 @@ var PlotBoilerplate = /** @class */ (function () {
      *  * a Polygon
      *  * a BezierPath
      *  * a BPImage
+     *  * a Triangle
      * </pre>
      *
      * @param {Object} drawable - The drawable (of one of the allowed class instance) to remove.
@@ -544,10 +498,12 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.remove = function (drawable, redraw) {
         if (drawable instanceof Vertex_1.Vertex)
             this.removeVertex(drawable, false);
-        // for( var i in this.drawables ) {
         for (var i = 0; i < this.drawables.length; i++) {
             if (this.drawables[i] === drawable) {
                 this.drawables.splice(i, 1);
+                // Check if some listeners need to be removed
+                if (drawable instanceof BezierPath_1.BezierPath)
+                    PlotBoilerplate.utils.disableBezierPathAutoAdjust(drawable);
                 if (redraw)
                     this.redraw();
                 return;
@@ -1487,6 +1443,24 @@ var PlotBoilerplate = /** @class */ (function () {
                     });
                 }
             } // END for
+        },
+        /**
+         * Removes vertex listeners from the path's vertices. This needs to be called
+         * when BezierPaths are removed from the canvas.
+         *
+         * Sorry, this is not yet implemented.
+         *
+         * @param {BezierPath} bezierPath - The path to use un-auto-adjustment for.
+         **/
+        disableBezierPathAutoAdjust: function (bezierPath) {
+            // How to determine which listeners are mine???
+            /*
+              for( var i = 0; i < bezierPath.bezierCurves.length; i++ ) {
+            // Just try to remove listeners from all vertices on the Bézier path.
+            // No matter if there are not listeners installed for some reason.
+            bezierPath.bezierCurves[i].startPoint.listeners.removeDragListener( );
+            }
+            */
         }
     }; // END utils
     return PlotBoilerplate;

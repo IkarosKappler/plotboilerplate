@@ -40,7 +40,7 @@ export declare class VertexListeners {
      *
      * @method addDragListener
      * @param {VertexListeners~dragListener} listener - The drag listener to add (a callback).
-     * @return {void}
+     * @return {VertexListeners} this (for chaining)
      * @instance
      * @memberof VertexListeners
      **/
@@ -51,11 +51,21 @@ export declare class VertexListeners {
      * @param {Event} e - The (extended) drag event.
      */
     /**
+     * Remove a drag listener.
+     *
+     * @method removeDragListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    removeDragListener(listener: (e: VertEvent) => void): this;
+    /**
      * Add a dragStart listener.
      *
      * @method addDragListener
      * @param {VertexListeners~dragStartListener} listener - The drag-start listener to add (a callback).
-     * @return {void}
+     * @return {VertexListeners} this (for chaining)
      * @instance
      * @memberof VertexListeners
      **/
@@ -66,11 +76,21 @@ export declare class VertexListeners {
      * @param {Event} e - The (extended) drag event.
      */
     /**
+     * Remove a dragStart listener.
+     *
+     * @method addDragStartListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    removeDragStartListener(listener: (e: VertEvent) => void): this;
+    /**
      * Add a dragEnd listener.
      *
      * @method addDragListener
      * @param {VertexListeners~dragEndListener} listener - The drag-end listener to add (a callback).
-     * @return {void}
+     * @return {VertexListeners} this (for chaining)
      * @instance
      * @memberof VertexListeners
      **/
@@ -80,6 +100,16 @@ export declare class VertexListeners {
      * @callback VertexListeners~dragEndListener
      * @param {Event} e - The (extended) drag event.
      */
+    /**
+     * Remove a dragEnd listener.
+     *
+     * @method addDragEndListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    removeDragEndListener(listener: (e: VertEvent) => void): this;
     /**
      * Fire a drag event with the given event instance to all
      * installed drag listeners.
@@ -117,4 +147,12 @@ export declare class VertexListeners {
      * @private
      **/
     private static _fireEvent;
+    /**
+     * @private
+     */
+    private static _addListener;
+    /**
+     * @private
+     */
+    private static _removeListener;
 }
