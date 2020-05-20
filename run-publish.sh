@@ -93,7 +93,7 @@ fi
 
 
 echo "Creating the npm package"
-$(run-mk-npm-package)
+./run-mk-npm-package.sh
 [ $? -eq 0 ]  || exit 1
 
 
