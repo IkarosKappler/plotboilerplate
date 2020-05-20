@@ -18,6 +18,20 @@ while true; do
     esac
 done
 
+echo "Retrieving latest published version number"
+# PUBLIC_VERSION="1.7.9"
+PUBLIC_VERSION=$(npm view plotboilerplate version)
+LOCAL_VERSION=$(./run-get-package-version.sh)
+echo "PUBLIC_VERSION: $PUBLIC_VERSION"
+echo "LOCAL_VERSION: $LOCAL_VERSION"
+if [ "$PUBLIC_VERSION" == "$LOCAL_VERSION" ]; then
+    echo -e "${_RED}Cannot publish version. Local and public version are equal.${_NC}"
+    exit 1
+elif [ "$PUBLIC_VERSION" \> "$LOCAL_VERSION" ]; then
+    echo -e "${_RED}Cannot publish version. Local version is lower than public version.${_NC}"
+    exit 1
+fi
+
 ./run-build.sh
 
 [ $? -eq 0 ]  || exit 1
@@ -35,7 +49,7 @@ fi
 
 
 echo "Creating the npm package"
-./run-mk-npm-package.sh
+$(run-mk-npm-package)
 [ $? -eq 0 ]  || exit 1
 
 
@@ -43,7 +57,13 @@ echo "${_YELLOW}Exiting here ... TEST only${_NC}"
 exit 2
 
 echo "Publish ..."
-npm publish
+cd "./npm-package" && npm publish
 
-echo ""
-echo "${_GREEN} !!! Don't forget to upload the compiled package to your staging environment !!!${_NC}"
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "Ooops, something failed."
+else
+    echo ""
+    echo -e "${_GREEN} !!! Don't forget to upload the compiled package to your staging environment !!! ${_NC}"
+fi
+    
