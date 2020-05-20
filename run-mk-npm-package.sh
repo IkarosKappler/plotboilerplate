@@ -15,26 +15,26 @@ TARGET_DIR="./npm-package/"
 # Copy all required files to the target package
 # (I do not want to publish my whole compiler setup to npmjs, only the production files)
 if [ ! -d "$TARGET_DIR" ]; then
-    echo "${_PURPLE} *** Creating target directory '$TARGET_DIR'${_NC}"
+    echo -e "${_PURPLE} *** Creating target directory '$TARGET_DIR'${_NC}"
     mkdir "$TARGET_DIR"
 else
-    echo "${_PURPLE} *** Target directory '$TARGET_DIR' already exists, no need to create it.${_NC}"
+    echo -e "${_PURPLE} *** Target directory '$TARGET_DIR' already exists, no need to create it.${_NC}"
 fi;
 
 
 # Check git repository
 if [ ! -d "$TARGET_DIR/.git" ]; then
-    echo "${_PURPLE} *** Creating git repository"
+    echo -e "${_PURPLE} *** Creating git repository"
     cd "$TARGET_DIR" && git init && cd ..
     [ $? -eq 0 ]  || exit 1
-    echo "${_PURPLE} *** Creating .gitignore file${_NC}"
+    echo -e "${_PURPLE} *** Creating .gitignore file${_NC}"
     echo "*~" >> "$TARGET_DIR/.gitignore"
 else
-    echo "${_PURPLE} *** git repository already exists, no need to create it.${_NC}"
+    echo -e "${_PURPLE} *** git repository already exists, no need to create it.${_NC}"
 fi
 
 
-echo "${_PURPLE} *** Copying files for minimal package ... ${_NC}"
+echo -e "${_PURPLE} *** Copying files for minimal package ... ${_NC}"
 # (no docs, no demos, no jekyll, no config files, no screenshots)
 cp README.md "$TARGET_DIR/"REAME.md
 cp changelog.md "$TARGET_DIR/"changelog.md
@@ -49,10 +49,10 @@ cp example-image.png "$TARGET_DIR/"example-image.png
 cp license.txt "$TARGET_DIR/"license.txt
 
 BUILDDATE=$(date)
-echo "$BUILDDATE" >> "$TARGET_DIR/builddate"
+echo -e "$BUILDDATE" >> "$TARGET_DIR/builddate"
 
 
-echo "${_PURPLE} *** Commiting the files to the new package${_NC}"
+echo -e "${_PURPLE} *** Commiting the files to the new package${_NC}"
 cd "$TARGET_DIR/" && git add * && git commit -m "Auto-commit $BUILDDATE"
 
 
