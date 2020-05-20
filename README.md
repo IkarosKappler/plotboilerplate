@@ -71,7 +71,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
-![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
 
 
