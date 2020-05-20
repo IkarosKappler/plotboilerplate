@@ -102,7 +102,7 @@ echo "Creating the npm package"
 # exit 2
 
 echo "Publish ..."
-cd "./npm-package" && npm publish
+$(cd "./npm-package" && npm publish)
 
 if [ $? -eq 0 ]; then
     echo ""

@@ -28,7 +28,8 @@ if [ ! -d "$TARGET_DIR/.git" ]; then
     cd "$TARGET_DIR" && git init && cd ..
     [ $? -eq 0 ]  || exit 1
     echo -e "${_PURPLE} *** Creating .gitignore file${_NC}"
-    echo "*~" >> "$TARGET_DIR/.gitignore"
+    echo "*~" > "$TARGET_DIR/.gitignore"
+    echo "_*" >> "$TARGET_DIR/.gitignore"
 else
     echo -e "${_PURPLE} *** git repository already exists, no need to create it.${_NC}"
 fi
@@ -36,7 +37,7 @@ fi
 
 echo -e "${_PURPLE} *** Copying files for minimal package ... ${_NC}"
 # (no docs, no demos, no jekyll, no config files, no screenshots)
-cp README.md "$TARGET_DIR/"REAME.md
+cp README.md "$TARGET_DIR/"README.md
 cp changelog.md "$TARGET_DIR/"changelog.md
 cp basics.md "$TARGET_DIR/"basics.md
 cp package.json "$TARGET_DIR/"package.json
@@ -53,6 +54,6 @@ echo -e "$BUILDDATE" >> "$TARGET_DIR/builddate"
 
 
 echo -e "${_PURPLE} *** Commiting the files to the new package${_NC}"
-cd "$TARGET_DIR/" && git add * && git commit -m "Auto-commit $BUILDDATE"
+cd "$TARGET_DIR/" && git add .gitignore * && git commit -m "Auto-commit $BUILDDATE"
 
 
