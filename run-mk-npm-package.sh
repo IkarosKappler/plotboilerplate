@@ -1,31 +1,40 @@
 #!/bin/bash
 
+# Define some colors
+_RED='\033[0;31m'
+_GREEN='\033[0;32m'
+_PURPLE='\033[0;35m'
+_GREY="\033[0;37m"
+_YELLOW="\033[0;33m"
+_NC='\033[0m'
+
+
 TARGET_DIR="./npm-package/"
 
 
 # Copy all required files to the target package
 # (I do not want to publish my whole compiler setup to npmjs, only the production files)
 if [ ! -d "$TARGET_DIR" ]; then
-    echo " *** Creating target directory '$TARGET_DIR'"
+    echo "${_PURPLE} *** Creating target directory '$TARGET_DIR'${_NC}"
     mkdir "$TARGET_DIR"
 else
-    echo " *** Target directory '$TARGET_DIR' already exists, no need to create it."
+    echo "${_PURPLE} *** Target directory '$TARGET_DIR' already exists, no need to create it.${_NC}"
 fi;
 
 
 # Check git repository
 if [ ! -d "$TARGET_DIR/.git" ]; then
-    echo " *** Creating git repository"
+    echo "${_PURPLE} *** Creating git repository"
     cd "$TARGET_DIR" && git init && cd ..
     [ $? -eq 0 ]  || exit 1
-    echo "Creating .gitignore file"
+    echo "${_PURPLE} *** Creating .gitignore file${_NC}"
     echo "*~" >> "$TARGET_DIR/.gitignore"
 else
-    echo " *** git repository already exists, no need to create it."
+    echo "${_PURPLE} *** git repository already exists, no need to create it.${_NC}"
 fi
 
 
-echo "Copying files for minimal package ... "
+echo "${_PURPLE} *** Copying files for minimal package ... ${_NC}"
 # (no docs, no demos, no jekyll, no config files, no screenshots)
 cp README.md "$TARGET_DIR/"REAME.md
 cp changelog.md "$TARGET_DIR/"changelog.md
@@ -43,7 +52,7 @@ BUILDDATE=$(date)
 echo "$BUILDDATE" >> "$TARGET_DIR/builddate"
 
 
-echo " *** Commiting the files to the new package"
+echo "${_PURPLE} *** Commiting the files to the new package${_NC}"
 cd "$TARGET_DIR/" && git add * && git commit -m "Auto-commit $BUILDDATE"
 
 
