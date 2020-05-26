@@ -46,8 +46,8 @@ export declare class Bounds implements IBounds, XYDimension {
      *
      * @constructor
      * @name Bounds
-     * @param {XYCoords} min - The min values (x,y) as a XYCoord tuple.
-     * @param {XYCoords} max - The max values (x,y) as a XYCoord tuple.
+     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
+     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
     constructor(min: XYCoords, max: XYCoords);
 }

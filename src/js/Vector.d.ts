@@ -54,7 +54,7 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
      **/
     inverse(): Vector;
     /**
-     * This function computes the inverse of the vector, which means a stays untouched.
+     * This function computes the inverse of the vector, which means 'a' stays untouched.
      *
      * @return {Vector} this for chaining.
      **/

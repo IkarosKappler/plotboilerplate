@@ -1,17 +1,19 @@
 /**
  * @classdesc A simple circle: center point and radius.
  *
- * @requires Vertex, SVGSerializale
+ * @requires Line, Vector, VertTuple, Vertex, SVGSerializale
  *
  * @author   Ikaros Kappler
  * @version  1.0.1
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
+ * @modified 2020-05-25 Added the vertAt and tangentAt functions.
  *
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
  * @public
  **/
+import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
@@ -57,6 +59,22 @@ export declare class Circle implements SVGSerializable {
      */
     lineDistance(line: VertTuple<any>): number;
     /**
+     * Get the vertex on the this circle for the given angle.
+     *
+     * @param {number} angle - The angle (in radians) to use.
+     * @retrn {Vertex} Te the vertex (point) at the given angle.
+     **/
+    vertAt(angle: number): Vertex;
+    /**
+     * Get a tangent line of this circle for a given angle.
+     *
+     * Point a of the returned line is located on the circle, the length equals the radius.
+     *
+     * @param {number} angle - The angle (in radians) to use.
+     * @return {Line} The tangent line.
+     **/
+    tangentAt(angle: number): Vector;
+    /**
       * Create an SVG representation of this circle.
       *
       * @method toSVGString
@@ -68,4 +86,7 @@ export declare class Circle implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     }): string;
+    static circleUtils: {
+        vertAt: (angle: any, radius: any) => Vertex;
+    };
 }

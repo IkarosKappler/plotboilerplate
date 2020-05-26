@@ -19,8 +19,8 @@ var Bounds = /** @class */ (function () {
      *
      * @constructor
      * @name Bounds
-     * @param {XYCoords} min - The min values (x,y) as a XYCoord tuple.
-     * @param {XYCoords} max - The max values (x,y) as a XYCoord tuple.
+     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
+     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
     function Bounds(min, max) {
         this.min = min;

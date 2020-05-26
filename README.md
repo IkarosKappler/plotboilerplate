@@ -548,6 +548,7 @@ for this purpose.
    Bézier path demo.
  * [DONE] Add function Triangle.getIncenter(); the class already uses the incenter for computing the circumcircle.
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
+ * Add a Typescript demo (how to import the script).
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.

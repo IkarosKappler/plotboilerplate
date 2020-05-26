@@ -963,7 +963,7 @@ export class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {Bounds} The current viewport.
      **/
-    viewport() : IBounds {
+    viewport() : Bounds {
 	return new Bounds( this.transformMousePosition(0,0),
 			   this.transformMousePosition(this.canvasSize.width*this.config.cssScaleX,this.canvasSize.height*this.config.cssScaleY)
 			 );

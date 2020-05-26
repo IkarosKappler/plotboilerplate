@@ -61,10 +61,11 @@
 import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
 import { BezierPath } from "./BezierPath";
+import { Bounds } from "./Bounds";
 import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { IBounds, Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
+import { Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
 /**
  * A wrapper class for draggable items (mostly vertices).
  * @private
@@ -452,7 +453,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {Bounds} The current viewport.
      **/
-    viewport(): IBounds;
+    viewport(): Bounds;
     /**
      * Trigger the saveFile.hook.
      *

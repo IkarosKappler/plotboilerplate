@@ -125,15 +125,16 @@ return /******/ (function(modules) { // webpackBootstrap
  * @modified 2019-11-07 Added toSVGString(object) function.
  * @modified 2019-11-18 Added the rotate(number,Vertex) function.
  * @modified 2019-11-21 Fixed a bug in the rotate(...) function (elements were moved).
- * @modified 2020-05-06 Added functions invX() and invY().
+ * @modified 2020-03-06 Added functions invX() and invY().
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  2.3.1
+ * @modified 2020-05-26 Added functions addX(number) and addY(number).
+ * @version  2.4.0
  *
  * @file Vertex
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var VertexAttr_1 = __webpack_require__(2);
+var VertexAttr_1 = __webpack_require__(3);
 var VertexListeners_1 = __webpack_require__(9);
 var Vertex = /** @class */ (function () {
     /**
@@ -345,6 +346,34 @@ var Vertex = /** @class */ (function () {
      **/
     Vertex.prototype.addXY = function (amountX, amountY) {
         this.x += amountX;
+        this.y += amountY;
+        return this;
+    };
+    ;
+    /**
+     * Add the passed amounts to the x-component of this vertex.
+     *
+     * @method addX
+     * @param {number} x - The amount to add to x.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.addX = function (amountX) {
+        this.x += amountX;
+        return this;
+    };
+    ;
+    /**
+     * Add the passed amounts to the y-component of this vertex.
+     *
+     * @method addY
+     * @param {number} y - The amount to add to y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.addY = function (amountY) {
         this.y += amountY;
         return this;
     };
@@ -762,66 +791,6 @@ exports.Line = Line;
 "use strict";
 
 /**
- * @classdesc The VertexAttr is a helper class to wrap together additional attributes
- * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
- * <br>
- * This is some sort of 'userData' object, but the constructor uses a global model
- * to obtain a (configurable) default attribute set to all instances.<br>
- *
- * @author   Ikaros Kappler
- * @date     2018-08-26
- * @modified 2018-11-17 Added the 'isSelected' attribute.
- * @modified 2018-11-27 Added the global model for instantiating with custom attributes.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2020-02-29 Added the 'selectable' attribute.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.1.1
- *
- * @file VertexAttr
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var VertexAttr = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * Attributes will be initialized as defined in the model object
-     * which serves as a singleton.
-     *
-     * @constructor
-     * @name VertexAttr
-     **/
-    function VertexAttr() {
-        this.draggable = true;
-        this.selectable = true;
-        this.isSelected = false;
-        for (var key in VertexAttr.model)
-            this[key] = VertexAttr.model[key];
-    }
-    ;
-    /**
-     * This is the global attribute model. Set these object on the initialization
-     * of your app to gain all VertexAttr instances have these attributes.
-     *
-     * @type {object}
-     **/
-    VertexAttr.model = {
-        draggable: true,
-        selectable: true,
-        isSelected: false
-    };
-    return VertexAttr;
-}());
-exports.VertexAttr = VertexAttr;
-//# sourceMappingURL=VertexAttr.js.map
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
  *            <br>
  *            Vectors are drawn with an arrow at their end point.<br>
@@ -886,13 +855,11 @@ var Vector = /** @class */ (function (_super) {
      * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
      **/
     Vector.prototype.perp = function () {
-        var v = this.clone(); // .sub( this.a );
+        var v = this.clone();
         v.sub(this.a);
-        //return new Vector( new Vertex(), new Vertex(-v.b.y,v.b.x) ).add( this.a );
         v = new Vector(new Vertex_1.Vertex(), new Vertex_1.Vertex(-v.b.y, v.b.x));
         v.a.add(this.a);
         v.b.add(this.a);
-        // v.b.y = -v.b.y; // new Vertex(-v.b.y,v.b.x) ).add( this.a );
         return v;
     };
     ;
@@ -911,7 +878,7 @@ var Vector = /** @class */ (function (_super) {
     };
     ;
     /**
-     * This function computes the inverse of the vector, which means a stays untouched.
+     * This function computes the inverse of the vector, which means 'a' stays untouched.
      *
      * @return {Vector} this for chaining.
      **/
@@ -1024,6 +991,66 @@ exports.Vector = Vector;
 //# sourceMappingURL=Vector.js.map
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * @classdesc The VertexAttr is a helper class to wrap together additional attributes
+ * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
+ * <br>
+ * This is some sort of 'userData' object, but the constructor uses a global model
+ * to obtain a (configurable) default attribute set to all instances.<br>
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-08-26
+ * @modified 2018-11-17 Added the 'isSelected' attribute.
+ * @modified 2018-11-27 Added the global model for instantiating with custom attributes.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2020-02-29 Added the 'selectable' attribute.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @version  1.1.1
+ *
+ * @file VertexAttr
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var VertexAttr = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * Attributes will be initialized as defined in the model object
+     * which serves as a singleton.
+     *
+     * @constructor
+     * @name VertexAttr
+     **/
+    function VertexAttr() {
+        this.draggable = true;
+        this.selectable = true;
+        this.isSelected = false;
+        for (var key in VertexAttr.model)
+            this[key] = VertexAttr.model[key];
+    }
+    ;
+    /**
+     * This is the global attribute model. Set these object on the initialization
+     * of your app to gain all VertexAttr instances have these attributes.
+     *
+     * @type {object}
+     **/
+    VertexAttr.model = {
+        draggable: true,
+        selectable: true,
+        isSelected: false
+    };
+    return VertexAttr;
+}());
+exports.VertexAttr = VertexAttr;
+//# sourceMappingURL=VertexAttr.js.map
+
+/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1056,7 +1083,7 @@ exports.Vector = Vector;
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var Vertex_1 = __webpack_require__(0);
-var Vector_1 = __webpack_require__(3);
+var Vector_1 = __webpack_require__(2);
 var CubicBezierCurve = /** @class */ (function () {
     /**
      * The constructor.
@@ -3502,18 +3529,21 @@ exports.Triangle = Triangle;
 /**
  * @classdesc A simple circle: center point and radius.
  *
- * @requires Vertex, SVGSerializale
+ * @requires Line, Vector, VertTuple, Vertex, SVGSerializale
  *
  * @author   Ikaros Kappler
  * @version  1.0.1
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
+ * @modified 2020-05-25 Added the vertAt and tangentAt functions.
  *
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Vector_1 = __webpack_require__(2);
+var Vertex_1 = __webpack_require__(0);
 var Circle = /** @class */ (function () {
     /**
      * Create a new circle with given center point and radius.
@@ -3552,6 +3582,31 @@ var Circle = /** @class */ (function () {
     };
     ;
     /**
+     * Get the vertex on the this circle for the given angle.
+     *
+     * @param {number} angle - The angle (in radians) to use.
+     * @retrn {Vertex} Te the vertex (point) at the given angle.
+     **/
+    Circle.prototype.vertAt = function (angle) {
+        // Find the point on the circle respective the angle. Then move relative to center.
+        return Circle.circleUtils.vertAt(angle, this.radius).add(this.center);
+    };
+    ;
+    /**
+     * Get a tangent line of this circle for a given angle.
+     *
+     * Point a of the returned line is located on the circle, the length equals the radius.
+     *
+     * @param {number} angle - The angle (in radians) to use.
+     * @return {Line} The tangent line.
+     **/
+    Circle.prototype.tangentAt = function (angle) {
+        var pointA = Circle.circleUtils.vertAt(angle, this.radius);
+        // Construct the perpendicular of the line in point a. Then move relative to center.
+        return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
+    };
+    ;
+    /**
       * Create an SVG representation of this circle.
       *
       * @method toSVGString
@@ -3573,6 +3628,11 @@ var Circle = /** @class */ (function () {
         return buffer.join('');
     };
     ;
+    Circle.circleUtils = {
+        vertAt: function (angle, radius) {
+            return new Vertex_1.Vertex(Math.sin(angle) * radius, Math.cos(angle) * radius);
+        }
+    };
     return Circle;
 }()); // END class
 exports.Circle = Circle;
@@ -4209,8 +4269,8 @@ var Bounds = /** @class */ (function () {
      *
      * @constructor
      * @name Bounds
-     * @param {XYCoords} min - The min values (x,y) as a XYCoord tuple.
-     * @param {XYCoords} max - The max values (x,y) as a XYCoord tuple.
+     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
+     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
     function Bounds(min, max) {
         this.min = min;
@@ -6485,13 +6545,13 @@ var GLU = /** @class */ (function () {
 
 /* Imports for webpack */
 
-window.VertexAttr = __webpack_require__(2).VertexAttr;
+window.VertexAttr = __webpack_require__(3).VertexAttr;
 window.VertexListeners = __webpack_require__(9).VertexListeners;
 window.Vertex = __webpack_require__(0).Vertex;
 
 window.Grid = __webpack_require__(10).Grid;
 window.Line = __webpack_require__(1).Line;
-window.Vector = __webpack_require__(3).Vector;
+window.Vector = __webpack_require__(2).Vector;
 window.CubicBezierCurve = __webpack_require__(4).CubicBezierCurve;
 window.BezierPath = __webpack_require__(5).BezierPath;
 window.Polygon = __webpack_require__(6).Polygon;
@@ -6589,9 +6649,9 @@ var Polygon_1 = __webpack_require__(6);
 var SVGBuilder_1 = __webpack_require__(22);
 var Triangle_1 = __webpack_require__(7);
 var VEllipse_1 = __webpack_require__(14);
-var Vector_1 = __webpack_require__(3);
+var Vector_1 = __webpack_require__(2);
 var Vertex_1 = __webpack_require__(0);
-var VertexAttr_1 = __webpack_require__(2);
+var VertexAttr_1 = __webpack_require__(3);
 /**
  * A wrapper class for draggable items (mostly vertices).
  * @private

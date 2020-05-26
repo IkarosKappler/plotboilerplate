@@ -64,13 +64,11 @@ var Vector = /** @class */ (function (_super) {
      * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
      **/
     Vector.prototype.perp = function () {
-        var v = this.clone(); // .sub( this.a );
+        var v = this.clone();
         v.sub(this.a);
-        //return new Vector( new Vertex(), new Vertex(-v.b.y,v.b.x) ).add( this.a );
         v = new Vector(new Vertex_1.Vertex(), new Vertex_1.Vertex(-v.b.y, v.b.x));
         v.a.add(this.a);
         v.b.add(this.a);
-        // v.b.y = -v.b.y; // new Vertex(-v.b.y,v.b.x) ).add( this.a );
         return v;
     };
     ;
@@ -89,7 +87,7 @@ var Vector = /** @class */ (function (_super) {
     };
     ;
     /**
-     * This function computes the inverse of the vector, which means a stays untouched.
+     * This function computes the inverse of the vector, which means 'a' stays untouched.
      *
      * @return {Vector} this for chaining.
      **/

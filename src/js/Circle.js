@@ -2,18 +2,21 @@
 /**
  * @classdesc A simple circle: center point and radius.
  *
- * @requires Vertex, SVGSerializale
+ * @requires Line, Vector, VertTuple, Vertex, SVGSerializale
  *
  * @author   Ikaros Kappler
  * @version  1.0.1
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
+ * @modified 2020-05-25 Added the vertAt and tangentAt functions.
  *
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Vector_1 = require("./Vector");
+var Vertex_1 = require("./Vertex");
 var Circle = /** @class */ (function () {
     /**
      * Create a new circle with given center point and radius.
@@ -52,6 +55,31 @@ var Circle = /** @class */ (function () {
     };
     ;
     /**
+     * Get the vertex on the this circle for the given angle.
+     *
+     * @param {number} angle - The angle (in radians) to use.
+     * @retrn {Vertex} Te the vertex (point) at the given angle.
+     **/
+    Circle.prototype.vertAt = function (angle) {
+        // Find the point on the circle respective the angle. Then move relative to center.
+        return Circle.circleUtils.vertAt(angle, this.radius).add(this.center);
+    };
+    ;
+    /**
+     * Get a tangent line of this circle for a given angle.
+     *
+     * Point a of the returned line is located on the circle, the length equals the radius.
+     *
+     * @param {number} angle - The angle (in radians) to use.
+     * @return {Line} The tangent line.
+     **/
+    Circle.prototype.tangentAt = function (angle) {
+        var pointA = Circle.circleUtils.vertAt(angle, this.radius);
+        // Construct the perpendicular of the line in point a. Then move relative to center.
+        return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
+    };
+    ;
+    /**
       * Create an SVG representation of this circle.
       *
       * @method toSVGString
@@ -73,6 +101,11 @@ var Circle = /** @class */ (function () {
         return buffer.join('');
     };
     ;
+    Circle.circleUtils = {
+        vertAt: function (angle, radius) {
+            return new Vertex_1.Vertex(Math.sin(angle) * radius, Math.cos(angle) * radius);
+        }
+    };
     return Circle;
 }()); // END class
 exports.Circle = Circle;

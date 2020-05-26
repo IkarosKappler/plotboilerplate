@@ -1,12 +1,13 @@
 /**
  * @classdesc A simple circle: center point and radius.
  *
- * @requires Vertex, SVGSerializale
+ * @requires Line, Vector, VertTuple, Vertex, SVGSerializale
  *
  * @author   Ikaros Kappler
  * @version  1.0.1
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
+ * @modified 2020-05-25 Added the vertAt and tangentAt functions.
  * 
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
@@ -14,6 +15,7 @@
  **/
 
 
+import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
@@ -68,8 +70,34 @@ export class Circle implements SVGSerializable {
      * @memberof Circle
      */
     lineDistance( line:VertTuple<any> ) : number {
-	var closestPointOnLine = line.getClosestPoint( this.center );
+	const closestPointOnLine : Vertex = line.getClosestPoint( this.center );
 	return closestPointOnLine.distance( this.center ) - this.radius;
+    };
+
+    /**
+     * Get the vertex on the this circle for the given angle.
+     *
+     * @param {number} angle - The angle (in radians) to use.
+     * @retrn {Vertex} Te the vertex (point) at the given angle.
+     **/
+    vertAt( angle: number ) : Vertex {
+	// Find the point on the circle respective the angle. Then move relative to center.
+	return Circle.circleUtils.vertAt( angle, this.radius ).add( this.center );
+    };
+    
+
+    /**
+     * Get a tangent line of this circle for a given angle.
+     *
+     * Point a of the returned line is located on the circle, the length equals the radius.
+     *
+     * @param {number} angle - The angle (in radians) to use.
+     * @return {Line} The tangent line.
+     **/
+    tangentAt( angle: number ) : Vector {
+	const pointA : Vertex = Circle.circleUtils.vertAt( angle, this.radius );
+	// Construct the perpendicular of the line in point a. Then move relative to center.
+	return (new Vector( pointA, new Vertex(0,0) ).add( this.center ) as Vector).perp() as Vector;
     };
 
    /**
@@ -92,6 +120,13 @@ export class Circle implements SVGSerializable {
 	buffer.push( ' r="' + this.radius + '"' );
 	buffer.push( ' />' );
 	return buffer.join('');
+    };
+
+    static circleUtils = {
+	vertAt : function(angle,radius) {
+	    return new Vertex( Math.sin(angle) * radius,
+			       Math.cos(angle) * radius );
+	}
     };
     
 } // END class

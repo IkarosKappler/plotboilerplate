@@ -24,9 +24,10 @@
  * @modified 2019-11-07 Added toSVGString(object) function.
  * @modified 2019-11-18 Added the rotate(number,Vertex) function.
  * @modified 2019-11-21 Fixed a bug in the rotate(...) function (elements were moved).
- * @modified 2020-05-06 Added functions invX() and invY().
+ * @modified 2020-03-06 Added functions invX() and invY().
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  2.3.1
+ * @modified 2020-05-26 Added functions addX(number) and addY(number).
+ * @version  2.4.0
  *
  * @file Vertex
  * @public
@@ -244,6 +245,34 @@ var Vertex = /** @class */ (function () {
      **/
     Vertex.prototype.addXY = function (amountX, amountY) {
         this.x += amountX;
+        this.y += amountY;
+        return this;
+    };
+    ;
+    /**
+     * Add the passed amounts to the x-component of this vertex.
+     *
+     * @method addX
+     * @param {number} x - The amount to add to x.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.addX = function (amountX) {
+        this.x += amountX;
+        return this;
+    };
+    ;
+    /**
+     * Add the passed amounts to the y-component of this vertex.
+     *
+     * @method addY
+     * @param {number} y - The amount to add to y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.addY = function (amountY) {
         this.y += amountY;
         return this;
     };

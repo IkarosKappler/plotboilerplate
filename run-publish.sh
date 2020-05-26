@@ -14,7 +14,7 @@ while true; do
     read -p "webpack and jekyll will be run again in this process. (y/n)? " yn
     case $yn in
         [Yy]* ) echo "Failsafe."; break;;
-        [Nn]* ) break;; #exit;;
+        [Nn]* ) break;; # exit;;
         * ) echo "Please answer yes or no.";;
     esac
 done
@@ -102,7 +102,7 @@ echo "Creating the npm package"
 # exit 2
 
 echo "Publish ..."
-$(cd "./npm-package" && npm publish)
+cd npm-package && npm publish
 
 if [ $? -eq 0 ]; then
     echo ""

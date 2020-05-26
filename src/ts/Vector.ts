@@ -56,13 +56,11 @@ export class Vector extends VertTuple<Vector> implements SVGSerializable {
      * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
      **/
     perp():Vector {
-	var v : Vector = this.clone(); // .sub( this.a );
+	var v : Vector = this.clone();
 	v.sub( this.a );
-	//return new Vector( new Vertex(), new Vertex(-v.b.y,v.b.x) ).add( this.a );
 	v = new Vector( new Vertex(), new Vertex(-v.b.y,v.b.x) );
 	v.a.add( this.a );
 	v.b.add( this.a );
-	// v.b.y = -v.b.y; // new Vertex(-v.b.y,v.b.x) ).add( this.a );
 	return v;
     };
 
@@ -83,7 +81,7 @@ export class Vector extends VertTuple<Vector> implements SVGSerializable {
     
 
     /**
-     * This function computes the inverse of the vector, which means a stays untouched.
+     * This function computes the inverse of the vector, which means 'a' stays untouched.
      *
      * @return {Vector} this for chaining.
      **/

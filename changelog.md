@@ -1,7 +1,12 @@
 
 
 # Changelog
-  * 2020-05-20
+* 2020-05-26 (my father's 74s birthday)
+  * Added functions Vertex.addX(number) and Vertex.addY(number).
+* 2020-05-25
+  * Added the Circle.vertAt and the Circle.tangentAt functions.
+  * Added the basics for the gradient-pattern demo.
+* 2020-05-20
   * Created a script for the minmal npm package.
 * 2020-05-18
   * Added the Triangle.getIncenter() function.
