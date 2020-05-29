@@ -68,6 +68,29 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
    } );
 ~~~
 
+With Typescript:
+~~~typescript
+   import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
+
+   window.addEventListener( 'load', () => {
+    
+       const vertA : Vertex = new Vertex( 100,-100);
+       const vertB : Vertex = new Vertex(-100, 100);
+       console.log( vertA, vertB );
+
+       const line : Line = new Line( vertA, vertB );
+    
+       const pb : PlotBoilerplate = new PlotBoilerplate( {
+   	   canvas     : document.getElementById('my-canvas'),
+	   fullSize   : true
+       } );
+    
+       pb.add( line );
+
+   } );
+~~~
+A full working demo repository about the ![Usage with Typescript](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
+
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 

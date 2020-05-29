@@ -56,12 +56,14 @@
 
 	var DEG_TO_RAD = Math.PI/180.0;
 	
-	var circleRadiusPct = 0.025;
+	// var circleRadiusPct = 0.025;
 	var drawAll = function() {
-	    // { ..., width, height }
+	    // Bounds: { ..., width, height }
 	    var viewport = pb.viewport();
-	    var circleRadius = viewport.width*circleRadiusPct;
+	    var circleRadius = viewport.width * (config.cellRadiusPct/100.0);
 	    var circleDiameter = circleRadius*2.0;
+	    // var outerHexagonDiameter = Math.sqrt( 5.0 * circleRadius * circleRadius / 4.0 ) * 1.035; // Scale up a bit :)
+	    var outerHexagonDiameter = Math.sqrt( 4.0 * circleRadius * circleRadius / 3.0 );
 	    var startXY = pb.transformMousePosition( circleRadius, circleRadius );
 	    var endXY = pb.transformMousePosition( viewport.width-circleRadius, viewport.height-circleRadius );
 
@@ -73,35 +75,39 @@
 	    var yOdd = false;
 	    for( var y = startXY.y; y < endXY.y; y+=circleOffset.y ) {
 		var yPct = 0.5-y/viewHeight;
-		for( var x = startXY.x+(yOdd ? 0 : circleOffset.x/2.0); x < endXY.x; x+=circleOffset.x ) {		    
+		for( var x = startXY.x+(yOdd ? 0 : circleOffset.x/2.0); x < endXY.x; x+=circleOffset.x ) {
+		    var xPct = 0.5-x/viewWidth;
 		    var circle = new Circle( new Vertex(x,y), circleRadius );
 		    // pb.draw.circle( circle.center, circle.radius, 'rgba(192,192,192,0.5)' );
 		    // Make Bézier path (array of points)
-		    var bPathPoints = circle2bezier( circle, 12, x/viewWidth, yPct );
-		    var outerNGonPoints = makeNGon( circle.center, circle.radius, 6, 0.0 );
-		    pb.draw.polyline( outerNGonPoints, false, 'rgba(128,128,128,0.5)', 1 );
-		    pb.draw.cubicBezierPath( bPathPoints, 'rgb(0,128,192)', 2 );
+		    var bPathPoints = circle2bezier( circle, 12, config.xOffset, config.yOffset, xPct, yPct, DEG_TO_RAD*config.startAngle );
+		    // Make a hexagon that outscribes the circle
+		    var outerNGonPoints = makeNGon( circle.center, outerHexagonDiameter, 6, Math.PI/6.0 );
+		    pb.fill.polyline( outerNGonPoints, false, 'rgba(128,128,128,0.5)', 1 );
+		    pb.fill.cubicBezierPath( bPathPoints, 'rgb(0,128,192)', 2 );
 		}
 		yOdd = !yOdd;
 	    }
 	};
 	
 
-	var circle2bezier = function( circle, pointCount, xPct, yPct ) {
+	var circle2bezier = function( circle, pointCount, xOffset, yOffset, xPct, yPct, startAngle ) {
 	    // Approximate circle with n Bézier curves:
 	    // https://stackoverflow.com/questions/1734745/how-to-create-circle-with-b%C3%A9zier-curves
 	    //   (4/3)*tan(pi/(2n))
 	    var bPathPoints = [];
 	    var lastTangent = null;
 	    for( var i = 0; i <= pointCount; i++ ) {
-		var tangent = circle.tangentAt( config.startAngle*DEG_TO_RAD + i*Math.PI*2/pointCount );
+		var tangent = circle.tangentAt( startAngle + i*Math.PI*2/pointCount );
 		tangent.setLength( 4.0/3.0 * Math.tan( Math.PI/(2*pointCount) )* circle.radius );
 		// pb.draw.line( tangent.a, tangent.b, 'rgb(0,192,192)' );
 		// pb.draw.circleHandle( tangent.a, 5, 'rgb(0,192,192)' );
 
 		if( i%2 ) {
-		    tangent.a.scale( yPct, circle.center );
-		    tangent.b.scale( yPct, circle.center );
+		    //tangent.a.scale( 1-xPct*yPct, circle.center );
+		    //tangent.b.scale( 1+xPct*yPct, circle.center );
+		    tangent.a.scale( xOffset-xPct*yPct, circle.center );
+		    tangent.b.scale( yOffset+xPct*yPct, circle.center );
 		};
 
 		if( !lastTangent ) {
@@ -137,15 +143,6 @@
 
 
 	// +---------------------------------------------------------------------------------
-	// | Let a poinst list manager do the randomization of the three points.
-	// +-------------------------------
-	/*var pointList = new CanvasPointList( pb, function(newVert) { newVert.attr.pointListIndex = pointList.pointList.length-1; } );
-	// Keep a safe border to the left/right and top/bottom (0.1 each)
-	pointList.verticalFillRatio = 0.8;
-	pointList.horizontalFillRatio = 0.8;
-	*/
-
-	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
 	// +-------------------------------
 	new MouseHandler(pb.canvas,'convexhull-demo')
@@ -157,10 +154,9 @@
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 	    } )
 	    .up( function(e) {
-		if( e.params.wasDragged )
-		    return;
-		var vert = new Vertex( pb.transformMousePosition( e.params.pos.x, e.params.pos.y ) );
-		// addVertex(vert);
+		//if( e.params.wasDragged )
+		//    return;
+		//var vert = new Vertex( pb.transformMousePosition( e.params.pos.x, e.params.pos.y ) );
 	    } );  
 
 
@@ -170,7 +166,10 @@
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
 	    pointCount            : 6,
 	    startAngle            : 45.0, // Math.PI/2.0,
-	    animate               : false,
+	    cellRadiusPct         : 2.5,   // %
+	    xOffset               : 1.0,
+	    yOffset               : 1.0
+	    // animate               : false,
 	}, GUP );
 	
 
@@ -181,20 +180,6 @@
 	    //pointList.updatePointCount(config.pointCount,false); // No full cover
 	    //animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
 	};
-
-
-	// +---------------------------------------------------------------------------------
-	// | Manually add a vertex to the point list (like on click).
-	// +-------------------------------
-	/*var addVertex = function(vert) {
-	    pointList.addVertex(vert);
-	    config.pointCount++;
-	    if( animator ) animator.stop();
-	    animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
-	    toggleAnimation();
-	    pb.redraw(); 
-	    
-	}; */
 
 
 	// +---------------------------------------------------------------------------------
@@ -225,9 +210,10 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-	    // gui.add(config, 'pointCount').min(3).max(96).step(1).onChange( function() { updatePointList(); } ).name("Point count").title("Point count");
-	    gui.add(config, 'startAngle').min(0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("The circle patterns' start angle.").title("The circle patterns' start angle.");
-	    gui.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
+	    gui.add(config, 'startAngle').min(0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("Start angle").title("The circle patterns' start angle.");
+	    gui.add(config, 'cellRadiusPct').min(0.5).max(10).step(0.1).onChange( function() { pb.redraw(); } ).name("Cell size %").title("The cell radis");
+	    gui.add(config, 'xOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("X offset").title("The x-axis offset.");
+	    gui.add(config, 'yOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("Y offset").title("The y-axis offset.")
 	}
 
 	toggleAnimation();
