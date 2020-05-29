@@ -44,7 +44,7 @@
 		  autoAdjustOffset      : true,
 		  offsetAdjustXPercent  : 50,
 		  offsetAdjustYPercent  : 50,
-		  backgroundColor       : '#ffffff',
+		  backgroundColor       : '#e0e0e0',
 		  enableMouse           : true,
 		  enableKeys            : true,
 		  enableTouch           : true,
@@ -72,6 +72,7 @@
 	    var circleOffset = { x : circleDiameter,
 				 y : Math.sqrt( 3*circleRadius*circleRadius )
 			       };
+
 	    var yOdd = false;
 	    for( var y = startXY.y; y < endXY.y; y+=circleOffset.y ) {
 		var yPct = 0.5-y/viewHeight;
@@ -82,8 +83,8 @@
 		    // Make Bézier path (array of points)
 		    var bPathPoints = circle2bezier( circle, 12, config.xOffset, config.yOffset, xPct, yPct, DEG_TO_RAD*config.startAngle );
 		    // Make a hexagon that outscribes the circle
-		    var outerNGonPoints = makeNGon( circle.center, outerHexagonDiameter, 6, Math.PI/6.0 );
-		    pb.fill.polyline( outerNGonPoints, false, 'rgba(128,128,128,0.5)', 1 );
+		    // var outerNGonPoints = makeNGon( circle.center, outerHexagonDiameter, 6, Math.PI/6.0 );
+		    // pb.fill.polyline( outerNGonPoints, false, 'rgba(128,128,128,0.5)', 1 );
 		    pb.fill.cubicBezierPath( bPathPoints, 'rgb(0,128,192)', 2 );
 		}
 		yOdd = !yOdd;
