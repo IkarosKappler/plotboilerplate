@@ -81,7 +81,10 @@
 		    var circle = new Circle( new Vertex(x,y), circleRadius );
 		    // pb.draw.circle( circle.center, circle.radius, 'rgba(192,192,192,0.5)' );
 		    // Make Bézier path (array of points)
-		    var bPathPoints = circle2bezier( circle, 12, config.xOffset, config.yOffset, xPct, yPct, DEG_TO_RAD*config.startAngle );
+		    var angle = DEG_TO_RAD*config.startAngle;
+		    angle += xPct*config.xAngle*DEG_TO_RAD;
+		    angle += yPct*config.yAngle*DEG_TO_RAD;
+		    var bPathPoints = circle2bezier( circle, 12, config.xOffset, config.yOffset, xPct, yPct, angle );
 		    // Make a hexagon that outscribes the circle
 		    // var outerNGonPoints = makeNGon( circle.center, outerHexagonDiameter, 6, Math.PI/6.0 );
 		    // pb.fill.polyline( outerNGonPoints, false, 'rgba(128,128,128,0.5)', 1 );
@@ -169,7 +172,9 @@
 	    startAngle            : 45.0, // Math.PI/2.0,
 	    cellRadiusPct         : 2.5,   // %
 	    xOffset               : 1.0,
-	    yOffset               : 1.0
+	    yOffset               : 1.0,
+	    xAngle                : 0.0,
+	    yAngle                : 0.0
 	    // animate               : false,
 	}, GUP );
 	
@@ -214,7 +219,9 @@
 	    gui.add(config, 'startAngle').min(0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("Start angle").title("The circle patterns' start angle.");
 	    gui.add(config, 'cellRadiusPct').min(0.5).max(10).step(0.1).onChange( function() { pb.redraw(); } ).name("Cell size %").title("The cell radis");
 	    gui.add(config, 'xOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("X offset").title("The x-axis offset.");
-	    gui.add(config, 'yOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("Y offset").title("The y-axis offset.")
+	    gui.add(config, 'yOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("Y offset").title("The y-axis offset.");
+	    gui.add(config, 'xAngle').min(0.0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("X angle").title("The x-angle.");
+	    gui.add(config, 'yAngle').min(0.0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("Y angle").title("The y-axis angle.");
 	}
 
 	toggleAnimation();
