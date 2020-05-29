@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-05-19
+date: 2020-05-29
 ---
 
 <div class="full-width">
@@ -103,6 +103,11 @@ date: 2020-05-19
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/19-convex-polygon-incircle/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200506-convex-polygon-incircle.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/20-parquet-deformation/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200526-0-parquet-deformations.png');"></div>
    </a>
 </div>
 </div>

@@ -226,6 +226,14 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/19-convex-polygon-incircle/index.html" title="See the demo">See the demo</a>
 
 
+### Pattern Gradient
+
+![Pattern Gradient](https://plotboilerplate.io/repo/screenshots/screenshot-20200526-0-parquet-deformations.png "Pattern Gradient")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/20-parquet-deformation/index.html" title="See the demo">See the demo</a>
+
+
+
 ## Initialization parameters
 
 <div class="table-wrapper" markdown="block">

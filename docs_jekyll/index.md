@@ -73,21 +73,46 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ~~~
 
 
+### Typescript
+~~~typescript
+   // Usage with Typescript could look like this
+   import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
+
+   window.addEventListener( 'load', () => {
+    
+       const vertA : Vertex = new Vertex( 100,-100);
+       const vertB : Vertex = new Vertex(-100, 100);
+       console.log( vertA, vertB );
+
+       const line : Line = new Line( vertA, vertB );
+    
+       const pb : PlotBoilerplate = new PlotBoilerplate( {
+   	   canvas     : document.getElementById('my-canvas'),
+	   fullSize   : true
+       } );
+    
+       pb.add( line );
+
+   } );
+~~~
+A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
+
+
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
-![Simple Demo](screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
 
 
 
 ## Examples and screenshots
-![Current demo](screenshots/preview-image-large.png "Current demo")
+![Current demo](https://plotboilerplate.io/repo/screenshots/preview-image-large.png "Current demo")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/main-dist.html" title="See the demo">See the demo</a>
 
 ### Feigenbaum bifurcation (logistic map)
-![Plotting the Feigenbaum bifurcation](screenshots/screenshot-20181212_3_feigenbaum.png "Plotting the Feigenbaum bifurcation")
-![Plotting the Feigenbaum bifurcation](screenshots/screenshot-20190223_0_feigenbaum.png "Plotting the Feigenbaum bifurcation")
+![Plotting the Feigenbaum bifurcation](https://plotboilerplate.io/repo/screenshots/screenshot-20181212_3_feigenbaum.png "Plotting the Feigenbaum bifurcation")
+![Plotting the Feigenbaum bifurcation](https://plotboilerplate.io/repo/screenshots/screenshot-20190223_0_feigenbaum.png "Plotting the Feigenbaum bifurcation")
 
 [For a detailed description of this plot see my Feigenbaum-plot mini-project](https://github.com/IkarosKappler/feigenbaum-plot "Feigenbaum bifurcation diagram")
 
@@ -98,109 +123,109 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
 ### Perpendiducular point-to-line-distance demo
 
-![Perpendiducular point-to-line distance](screenshots/screenshot-20190220_2_line-to-point.png "Perpendiducular point-to-line distance")
+![Perpendiducular point-to-line distance](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_2_line-to-point.png "Perpendiducular point-to-line distance")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html" title="See the demo">See the demo</a>
 
 
 ### Random-scripture demo
 
-![Random-scripture demo](screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
+![Random-scripture demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/03-random-scripture/index.html" title="See the demo">See the demo</a>
 
 
 ### Vector field test 
 
-![Vectorfield test](screenshots/screenshot-20190428_0_vector_field_changes.png "Vectorfield test demo")
+![Vectorfield test](https://plotboilerplate.io/repo/screenshots/screenshot-20190428_0_vector_field_changes.png "Vectorfield test demo")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/04-vectorfield/index.html" title="See the demo">See the demo</a>
 
 
 ### Simple circumcircles of walking triangles animation
 
-![Circumcircle animation](screenshots/screenshot-20190415_1_circumcircles.png "Circumcircles (of walking triangles) animation")
+![Circumcircle animation](https://plotboilerplate.io/repo/screenshots/screenshot-20190415_1_circumcircles.png "Circumcircles (of walking triangles) animation")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/05-circumcircle-animation/index.html" title="See the demo">See the demo</a>
 
 
 ### Interactive Delaunay triangulation and Voronoi diagram
 
-![Delaunay and Voronoi](screenshots/screenshot-20190416_0_voronoi_delaunay.png "Delaunay triangulation and Voronoi diagrams")
-![Voronoi Bézier Cells](screenshots/screenshot-20190417_0_voronoi_bezier_cells.png "Voronoi Bézier Cells")
-![Voronoi Bézier Cells with scaling](screenshots/screenshot-20191025_1_voronoi_with_scaling.png "Voronoi Bézier with scaling")
+![Delaunay and Voronoi](https://plotboilerplate.io/repo/screenshots/screenshot-20190416_0_voronoi_delaunay.png "Delaunay triangulation and Voronoi diagrams")
+![Voronoi Bézier Cells](https://plotboilerplate.io/repo/screenshots/screenshot-20190417_0_voronoi_bezier_cells.png "Voronoi Bézier Cells")
+![Voronoi Bézier Cells with scaling](https://plotboilerplate.io/repo/screenshots/screenshot-20191025_1_voronoi_with_scaling.png "Voronoi Bézier with scaling")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/07-voronoi-and-delaunay/index.html" title="See the demo">See the demo</a>
 
 
 ### Walking triangle demo
 
-![Walking Triangles, Demo A](screenshots/screenshot-20190911_0_walking_triangles.png "Walking triangles, demo a")
-![Walking Triangles, Demo B](screenshots/screenshot-20190911_1_walking_triangles.png "Walking triangles, demo b")
-![Walking Triangles, Demo C](screenshots/screenshot-20190911_2_walking_triangles.png "Walking triangles, demo c")
+![Walking Triangles, Demo A](https://plotboilerplate.io/repo/screenshots/screenshot-20190911_0_walking_triangles.png "Walking triangles, demo a")
+![Walking Triangles, Demo B](https://plotboilerplate.io/repo/screenshots/screenshot-20190911_1_walking_triangles.png "Walking triangles, demo b")
+![Walking Triangles, Demo C](https://plotboilerplate.io/repo/screenshots/screenshot-20190911_2_walking_triangles.png "Walking triangles, demo c")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/08-walking-triangles/index.html" title="See the demo">See the demo</a>
 
 
 ### Simple tweening animation using the GSAP library
 
-![Simple Tweening Animation](screenshots/screenshot-20191218-tweenmax-bezier-animation.png "Simple Tweening Animation")
+![Simple Tweening Animation](https://plotboilerplate.io/repo/screenshots/screenshot-20191218-tweenmax-bezier-animation.png "Simple Tweening Animation")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/10-bezier-animation-gsap/index.html" title="See the demo">See the demo</a>
 
 
 ### Perpendiculars of a Bézier path
 
-![Perpendiculars of a Bézier path](screenshots/screenshot-20191218-bezier-perpendiculars.png "Perpendiculars of a Bézier path")
+![Perpendiculars of a Bézier path](https://plotboilerplate.io/repo/screenshots/screenshot-20191218-bezier-perpendiculars.png "Perpendiculars of a Bézier path")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
 
 
 ### Tracing a cubic Bézier spline (finding the tangent values for each vertex)
 
-![Tracing a cubic Bézier spline](screenshots/screenshot-20191218-tracing-bsplines.png "Tracing a cubic Bézier spline")
+![Tracing a cubic Bézier spline](https://plotboilerplate.io/repo/screenshots/screenshot-20191218-tracing-bsplines.png "Tracing a cubic Bézier spline")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/12-trace-bspline/index.html" title="See the demo">See the demo</a>
 
 
 ### Drawing pursuit curves (each point following one other point)
 
-![Drawing pursuit curves (each point following one other point)](screenshots/screenshot-2020014-pursuit-curves.png "Drawing pursuit curves")
+![Drawing pursuit curves (each point following one other point)](https://plotboilerplate.io/repo/screenshots/screenshot-2020014-pursuit-curves.png "Drawing pursuit curves")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/14-pursuit-curves/index.html" title="See the demo">See the demo</a>
 
 
 ### Drawing leaf venations (approach inspired by bleeptrack, see [Operation Mindfuck](https://media.ccc.de/v/36c3-66-operation-mindfuck-vol-3#t=2524 "Operation Mindfuck @ 36c3"))
 
-![Drawing leaf venations (venation patterns in a leaf shape)](screenshots/screenshot-20200317-leaf-venation-test.png "Drawing leaf venations")
+![Drawing leaf venations (venation patterns in a leaf shape)](https://plotboilerplate.io/repo/screenshots/screenshot-20200317-leaf-venation-test.png "Drawing leaf venations")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/15-leaf-venation-patterns/index.html" title="See the demo">See the demo</a>
 
 
 ### Morley triangle
 
-![Presenting the Morley triangle theorem](screenshots/screenshot-20200317-morley-triangle.png "The Morley trisector triangle")
+![Presenting the Morley triangle theorem](https://plotboilerplate.io/repo/screenshots/screenshot-20200317-morley-triangle.png "The Morley trisector triangle")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/16-morley-trisectors/index.html" title="See the demo">See the demo</a>
 
 
 ### Hobby Curve
 
-![Hobby Curves](screenshots/screenshot-20200414-1-Hobby-cubic.png "Hobby Curves")
+![Hobby Curves](https://plotboilerplate.io/repo/screenshots/screenshot-20200414-1-Hobby-cubic.png "Hobby Curves")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/17-hobby-curves/index.html" title="See the demo">See the demo</a>
 
 
 ### Urquhart graph / Relative Neighbourhood graph
 
-![Urquhart graph](screenshots/screenshot-20200427-relative-neighbour-graph-urquhart.png "Urquhart graph")
+![Urquhart graph](https://plotboilerplate.io/repo/screenshots/screenshot-20200427-relative-neighbour-graph-urquhart.png "Urquhart graph")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/18-relative-neighbourhood-graph/index.html" title="See the demo">See the demo</a>
 
 
 ### Convex Polygon Incircle
 
-![Convex Polygon Incircle](screenshots/screenshot-20200506-convex-polygon-incircle.png "Convex Polygon Incircle")
+![Convex Polygon Incircle](https://plotboilerplate.io/repo/screenshots/screenshot-20200506-convex-polygon-incircle.png "Convex Polygon Incircle")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/19-convex-polygon-incircle/index.html" title="See the demo">See the demo</a>
 
@@ -550,8 +575,9 @@ for this purpose.
  * Write a basic demo for the PBImage class.
  * On non-circular Bézier paths the end control point does not move with the end point when dragged. See the basic
    Bézier path demo.
- * Add function Triangle.getIncenter(); the class already uses the incenter for computing the circumcircle.
+ * [DONE] Add function Triangle.getIncenter(); the class already uses the incenter for computing the circumcircle.
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
+ * Add a Typescript demo (how to import the script).
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
