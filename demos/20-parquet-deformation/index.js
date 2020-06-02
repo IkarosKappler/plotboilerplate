@@ -62,16 +62,22 @@
 	    var viewport = pb.viewport();
 	    var circleRadius = viewport.width * (config.cellRadiusPct/100.0);
 	    var circleDiameter = circleRadius*2.0;
-	    // var outerHexagonDiameter = Math.sqrt( 5.0 * circleRadius * circleRadius / 4.0 ) * 1.035; // Scale up a bit :)
-	    var outerHexagonDiameter = Math.sqrt( 4.0 * circleRadius * circleRadius / 3.0 );
+	    var circlePointCount = config.starPointCount*2;
+	    // This would be the outscribing circle radius for the plane-fitting hexagon.
+	    var outerHexagonRadius = Math.sqrt( 4.0 * circleRadius * circleRadius / 3.0 );
+	    // Get the start- and end-positions to use for the plane.
 	    var startXY = pb.transformMousePosition( circleRadius, circleRadius );
 	    var endXY = pb.transformMousePosition( viewport.width-circleRadius, viewport.height-circleRadius );
 
 	    var viewWidth = endXY.x - startXY.x;
 	    var viewHeight = endXY.y - startXY.y;
-	    var circleOffset = { x : circleDiameter,
-				 y : Math.sqrt( 3*circleRadius*circleRadius )
-			       };
+	    // For plane-filling circles/hexagon we need some offsets for even/odd rows.
+	    var circleOffset = {
+		// Row-filling circle-diameters
+		x : circleDiameter,
+		// Column-filling hexagonal offsets
+		y : Math.sqrt( 3*circleRadius*circleRadius )
+	    };
 
 	    var yOdd = false;
 	    for( var y = startXY.y; y < endXY.y; y+=circleOffset.y ) {
@@ -79,59 +85,38 @@
 		for( var x = startXY.x+(yOdd ? 0 : circleOffset.x/2.0); x < endXY.x; x+=circleOffset.x ) {
 		    var xPct = 0.5-x/viewWidth;
 		    var circle = new Circle( new Vertex(x,y), circleRadius );
-		    // pb.draw.circle( circle.center, circle.radius, 'rgba(192,192,192,0.5)' );
 		    // Make Bézier path (array of points)
 		    var angle = DEG_TO_RAD*config.startAngle;
 		    angle += xPct*config.xAngle*DEG_TO_RAD;
 		    angle += yPct*config.yAngle*DEG_TO_RAD;
-		    var bPathPoints = circle2bezier( circle, 12, config.xOffset, config.yOffset, xPct, yPct, angle );
-		    // Make a hexagon that outscribes the circle
-		    // var outerNGonPoints = makeNGon( circle.center, outerHexagonDiameter, 6, Math.PI/6.0 );
+		    // [p, c, c, p, c, c, p ..., c, c, p, c]
+		    var bPathPoints =
+			circle2bezier(
+			    circle,
+			    circlePointCount,
+			    angle,
+			    function(tangentVector,i) {
+				if( i%2 ) {
+				    tangentVector.a.scale( config.xOffset-xPct*yPct, circle.center );
+				    tangentVector.b.scale( config.yOffset+xPct*yPct, circle.center );
+				};
+			    }
+			);
+		    // Make a hexagon that outscribes the circle?
+		    // var outerNGonPoints = makeNGon( circle.center, outerHexagonRadius, 6, Math.PI/6.0 );
 		    // pb.fill.polyline( outerNGonPoints, false, 'rgba(128,128,128,0.5)', 1 );
-		    pb.fill.cubicBezierPath( bPathPoints, 'rgb(0,128,192)', 2 );
+
+		    if( config.fillShape )
+			pb.fill.cubicBezierPath( bPathPoints, 'rgb(0,128,192)', 2 );
+		    else
+			pb.draw.cubicBezierPath( bPathPoints, 'rgb(0,128,192)', 2 );
 		}
 		yOdd = !yOdd;
 	    }
 	};
 	
 
-	var circle2bezier = function( circle, pointCount, xOffset, yOffset, xPct, yPct, startAngle ) {
-	    // Approximate circle with n Bézier curves:
-	    // https://stackoverflow.com/questions/1734745/how-to-create-circle-with-b%C3%A9zier-curves
-	    //   (4/3)*tan(pi/(2n))
-	    var bPathPoints = [];
-	    var lastTangent = null;
-	    for( var i = 0; i <= pointCount; i++ ) {
-		var tangent = circle.tangentAt( startAngle + i*Math.PI*2/pointCount );
-		tangent.setLength( 4.0/3.0 * Math.tan( Math.PI/(2*pointCount) )* circle.radius );
-		// pb.draw.line( tangent.a, tangent.b, 'rgb(0,192,192)' );
-		// pb.draw.circleHandle( tangent.a, 5, 'rgb(0,192,192)' );
-
-		if( i%2 ) {
-		    //tangent.a.scale( 1-xPct*yPct, circle.center );
-		    //tangent.b.scale( 1+xPct*yPct, circle.center );
-		    tangent.a.scale( xOffset-xPct*yPct, circle.center );
-		    tangent.b.scale( yOffset+xPct*yPct, circle.center );
-		};
-
-		if( !lastTangent ) {
-		    // lastTangent.inv();
-		    // curvePoints.push( [ lastTangent.a, tangent.a, lastTangent.b, tangent.b  ] );
-		    bPathPoints.push( tangent.a );
-		} else {
-		    bPathPoints.push( lastTangent.b );
-		    var tmp = tangent.clone().inv();
-		    bPathPoints.push( tmp.b );
-		    bPathPoints.push( tmp.a );
-		}
-		
-		lastTangent = tangent;
-	    }
-
-	    // console.log( curvePoints );
-	    //var path = BezierPath.fromArray( curvePoints );
-	    return bPathPoints;
-	};
+	
 
 	var makeNGon = function( center, radius, pointCount, startAngle ) {
 	    var points = [];
@@ -156,11 +141,6 @@
 		var cy = document.getElementById('cy');
 		if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-	    } )
-	    .up( function(e) {
-		//if( e.params.wasDragged )
-		//    return;
-		//var vert = new Vertex( pb.transformMousePosition( e.params.pos.x, e.params.pos.y ) );
 	    } );  
 
 
@@ -170,46 +150,14 @@
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
 	    pointCount            : 6,
 	    startAngle            : 45.0, // Math.PI/2.0,
-	    cellRadiusPct         : 2.5,   // %
+	    cellRadiusPct         : 2.5,  // %
 	    xOffset               : 1.0,
 	    yOffset               : 1.0,
 	    xAngle                : 0.0,
-	    yAngle                : 0.0
-	    // animate               : false,
+	    yAngle                : 0.0,
+	    starPointCount        : 6,    // will be doubled
+	    fillShape             : true
 	}, GUP );
-	
-
-	// +---------------------------------------------------------------------------------
-	// | Call when the number of desired points changed in config.pointCount.
-	// +-------------------------------
-	var updatePointList = function() {
-	    //pointList.updatePointCount(config.pointCount,false); // No full cover
-	    //animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
-	};
-
-
-	// +---------------------------------------------------------------------------------
-	// | Some animation stuff.
-	// +-------------------------------
-	var animator = null;
-	function renderAnimation() {
-	    if( config.animate )
-		window.requestAnimationFrame( renderAnimation );
-	    else // Animation stopped
-		; 
-	};
-	
-	function toggleAnimation() {
-	    if( config.animate ) {
-		if( animator )
-		    animator.start();
-		renderAnimation();
-	    } else {
-		if( animator )
-		    animator.stop();
-		pb.redraw();
-	    }
-	};
 
 	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
@@ -222,10 +170,9 @@
 	    gui.add(config, 'yOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("Y offset").title("The y-axis offset.");
 	    gui.add(config, 'xAngle').min(0.0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("X angle").title("The x-angle.");
 	    gui.add(config, 'yAngle').min(0.0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("Y angle").title("The y-axis angle.");
+	    gui.add(config, 'starPointCount').min(3).max(24).step(1).onChange( function() { pb.redraw(); } ).name("Point count").title("The star's point count.");
+	    gui.add(config, 'fillShape').onChange( function() { pb.redraw(); } ).name("Fill shape").title("Fill the shape or draw the outline only?");
 	}
-
-	toggleAnimation();
-	//updatePointList();
 
 	pb.config.postDraw = drawAll;
 	pb.redraw();
