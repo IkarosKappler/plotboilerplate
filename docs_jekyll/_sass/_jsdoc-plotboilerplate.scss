@@ -56,7 +56,6 @@ section
     background-color: #fff;
     padding: 12px 24px;
     border-bottom: 1px solid #ccc;
-    /* margin-right: 30px; */
 }
 
 .variation {
@@ -73,21 +72,20 @@ section
 nav.jsdoc
 {
     display: block;
-    float: right;
+    float: left;
     margin-top: 28px;
     width: 30%;
     box-sizing: border-box;
-    /* border-left: 1px solid #ccc; */
     padding-left: 16px;
 }
 
 /* Source code should display with full width */
 #main[data-type=source], nav[data-type=source] {
     width : 100%;
+    float: right;
 }
 
 nav.jsdoc ul {
-    /* font-family: 'Lucida Grande', 'Lucida Sans Unicode', arial, sans-serif; */
     font-size: 100%;
     line-height: 17px;
     padding: 0;
@@ -382,3 +380,5 @@ tr > th:last-child { border-right: 1px solid #ddd; }
     width: 100%;
     overflow-x: scroll;
 }
+
+

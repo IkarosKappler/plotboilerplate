@@ -56,6 +56,7 @@
  * @version  1.7.3
  *
  * @file PlotBoilerplate
+ * @fileoverview The main class.
  * @public
  **/
 import { drawutils } from "./draw";
@@ -65,26 +66,7 @@ import { Bounds } from "./Bounds";
 import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
-/**
- * A wrapper class for draggable items (mostly vertices).
- * @private
- **/
-declare class Draggable {
-    static VERTEX: string;
-    item: any;
-    typeName: string;
-    vindex: number;
-    pindex: number;
-    pid: number;
-    cindex: number;
-    constructor(item: any, typeName: string);
-    isVertex(): boolean;
-    setVIndex(vindex: number): Draggable;
-}
-/**
- * The main class.
- */
+import { IDraggable, Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
 export declare class PlotBoilerplate {
     /** @constant {number} */
     static readonly DEFAULT_CANVAS_WIDTH: number;
@@ -94,6 +76,23 @@ export declare class PlotBoilerplate {
     static readonly DEFAULT_CLICK_TOLERANCE: number;
     /** @constant {number} */
     static readonly DEFAULT_TOUCH_TOLERANCE: number;
+    /**
+     * A wrapper class for draggable items (mostly vertices).
+     * @private
+     **/
+    static Draggable: {
+        new (item: any, typeName: string): {
+            item: any;
+            typeName: string;
+            vindex: number;
+            pindex: number;
+            pid: number;
+            cindex: number;
+            isVertex(): boolean;
+            setVIndex(vindex: number): IDraggable;
+        };
+        VERTEX: string;
+    };
     /**
      * @member {HTMLCanvasElement}
      * @memberof PlotBoilerplate
@@ -161,11 +160,11 @@ export declare class PlotBoilerplate {
      */
     selectPolygon: Polygon;
     /**
-     * @member {Array<Draggable>}
+     * @member {Array<IDraggable>}
      * @memberof PlotBoilerplate
      * @instance
      */
-    draggedElements: Array<Draggable>;
+    draggedElements: Array<IDraggable>;
     /**
      * @member {Array<Drawable>}
      * @memberof PlotBoilerplate
@@ -195,6 +194,7 @@ export declare class PlotBoilerplate {
      *
      * @constructor
      * @name PlotBoilerplate
+     * @public
      * @param {object} config={} - The configuration.
      * @param {HTMLCanvasElement} config.canvas - Your canvas element in the DOM (required).
      * @param {boolean=} [config.fullSize=true] - If set to true the canvas will gain full window size.
@@ -501,7 +501,7 @@ export declare class PlotBoilerplate {
      * @param {Vertex} point - The polygonal selection area.
      * @param {number=} [tolerance=7] - The tolerance to use identtifying vertices.
      * @private
-     * @return {Draggable} Or false if none found.
+     * @return {IDraggable} Or false if none found.
      **/
     private locatePointNear;
     /**
@@ -662,4 +662,3 @@ export declare class PlotBoilerplate {
         disableBezierPathAutoAdjust: (bezierPath: BezierPath) => void;
     };
 }
-export {};

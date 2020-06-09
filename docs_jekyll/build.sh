@@ -49,6 +49,10 @@ else
 fi
 
 
+# Copying the favicon
+cp ../favicon.ico _site/
+
+
 echo "Starting jekyll ..."
 # bundle exec jekyll serve
 

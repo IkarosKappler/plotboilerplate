@@ -1,9 +1,12 @@
 ---
 layout: page
+title: Changelog
 ---
 
 
 # Changelog
+* 2020-06-09
+  * Defined new private interface IDraggable and move the Draggable class into the main class.
 * 2020-05-26 (my father's 74s birthday)
   * Added functions Vertex.addX(number) and Vertex.addY(number).
 * 2020-05-25

@@ -109,3 +109,18 @@ export interface SVGSerializable {
 export interface IHooks {
     saveFile: (pb: PlotBoilerplate) => void;
 }
+/**
+ * A wrapper class/interface for draggable items (mostly vertices).
+ * @private
+ **/
+export interface IDraggable {
+    item: any;
+    typeName: string;
+    vindex: number;
+    pindex: number;
+    pid: number;
+    cindex: number;
+    isVertex(): boolean;
+    setVIndex(vindex: number): IDraggable;
+}
+export declare const DRAGGABLE_VERTEX: string;

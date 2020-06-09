@@ -57,6 +57,7 @@
  * @version  1.7.3
  *
  * @file PlotBoilerplate
+ * @fileoverview The main class.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -77,32 +78,14 @@ var VEllipse_1 = require("./VEllipse");
 var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");
 var VertexAttr_1 = require("./VertexAttr");
-/**
- * A wrapper class for draggable items (mostly vertices).
- * @private
- **/
-var Draggable = /** @class */ (function () {
-    function Draggable(item, typeName) {
-        this.item = item;
-        this.typeName = typeName;
-    }
-    ;
-    Draggable.prototype.isVertex = function () { return this.typeName == Draggable.VERTEX; };
-    ;
-    Draggable.prototype.setVIndex = function (vindex) { this.vindex = vindex; return this; };
-    ;
-    Draggable.VERTEX = 'vertex';
-    return Draggable;
-}());
-/**
- * The main class.
- */
+var interfaces_1 = require("./interfaces");
 var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
      *
      * @constructor
      * @name PlotBoilerplate
+     * @public
      * @param {object} config={} - The configuration.
      * @param {HTMLCanvasElement} config.canvas - Your canvas element in the DOM (required).
      * @param {boolean=} [config.fullSize=true] - If set to true the canvas will gain full window size.
@@ -928,7 +911,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @param {Vertex} point - The polygonal selection area.
      * @param {number=} [tolerance=7] - The tolerance to use identtifying vertices.
      * @private
-     * @return {Draggable} Or false if none found.
+     * @return {IDraggable} Or false if none found.
      **/
     PlotBoilerplate.prototype.locatePointNear = function (point, tolerance) {
         var _self = this;
@@ -943,7 +926,7 @@ var PlotBoilerplate = /** @class */ (function () {
             var vert = _self.vertices[vindex];
             if ((vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance) {
                 // { type : 'vertex', vindex : vindex };
-                return new Draggable(vert, Draggable.VERTEX).setVIndex(vindex);
+                return new PlotBoilerplate.Draggable(vert, interfaces_1.DRAGGABLE_VERTEX).setVIndex(vindex);
             }
         }
         return null;
@@ -1024,7 +1007,7 @@ var PlotBoilerplate = /** @class */ (function () {
             // for( var i in _self.vertices ) {
             for (var i = 0; i < _self.vertices.length; i++) {
                 if (_self.vertices[i].attr.isSelected) {
-                    _self.draggedElements.push(new Draggable(_self.vertices[i], Draggable.VERTEX).setVIndex(i));
+                    _self.draggedElements.push(new PlotBoilerplate.Draggable(_self.vertices[i], interfaces_1.DRAGGABLE_VERTEX).setVIndex(i));
                     _self.vertices[i].listeners.fireDragStartEvent(e);
                 }
             }
@@ -1277,6 +1260,7 @@ var PlotBoilerplate = /** @class */ (function () {
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
     };
     ;
+    var _a;
     /** @constant {number} */
     PlotBoilerplate.DEFAULT_CANVAS_WIDTH = 1024;
     /** @constant {number} */
@@ -1285,6 +1269,24 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.DEFAULT_CLICK_TOLERANCE = 8;
     /** @constant {number} */
     PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE = 32;
+    /**
+     * A wrapper class for draggable items (mostly vertices).
+     * @private
+     **/
+    PlotBoilerplate.Draggable = (_a = /** @class */ (function () {
+            function class_1(item, typeName) {
+                this.item = item;
+                this.typeName = typeName;
+            }
+            ;
+            class_1.prototype.isVertex = function () { return this.typeName == PlotBoilerplate.Draggable.VERTEX; };
+            ;
+            class_1.prototype.setVIndex = function (vindex) { this.vindex = vindex; return this; };
+            ;
+            return class_1;
+        }()),
+        _a.VERTEX = 'vertex',
+        _a);
     /**
      * A set of helper functions.
      * @private

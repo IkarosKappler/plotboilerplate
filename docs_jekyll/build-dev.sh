@@ -14,7 +14,7 @@ cp -R ../screenshots/ .
 
 ./generate-demo-page.sh
 
-# Use thie docs build script instead
+# Use this docs build script instead
 (cd .. && ./run-mkdocs.sh)
 
 echo "Building markdown page from template and readme ..."
@@ -49,9 +49,8 @@ echo "/* No tracking code */" > _includes/_tracker.js
 # fi
 
 
-# Checking link to local repo ...
-# ./run-createlinks.sh
-
+# Copying the favicon
+cp ../favicon.ico _site/
 
 echo "Starting jekyll ..."
 bundle exec jekyll serve

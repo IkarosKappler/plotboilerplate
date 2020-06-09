@@ -56,6 +56,7 @@
  * @version  1.7.3
  *
  * @file PlotBoilerplate
+ * @fileoverview The main class.
  * @public
  **/
 
@@ -78,33 +79,9 @@ import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
 import { VertEvent } from "./VertexListeners";
-import { IBounds, Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
+import { IBounds, IDraggable, DRAGGABLE_VERTEX, Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
 
 
-/**
- * A wrapper class for draggable items (mostly vertices).
- * @private
- **/
-class Draggable {
-    static VERTEX:string = 'vertex';
-    item:any;
-    typeName:string;
-    vindex:number;   // Vertex-index
-    pindex:number;   // Point-index (on path)
-    pid:number;      // Point-ID (on curve)
-    cindex:number;   // Curve-index
-    constructor( item:any, typeName:string ) {
-	this.item = item;
-	this.typeName = typeName;
-    };
-    isVertex() { return this.typeName == Draggable.VERTEX; };
-    setVIndex(vindex:number):Draggable { this.vindex = vindex; return this; };
-}
-
-
-/**
- * The main class.
- */
 export class PlotBoilerplate {
 
     /** @constant {number} */
@@ -116,6 +93,28 @@ export class PlotBoilerplate {
     /** @constant {number} */
     static readonly DEFAULT_TOUCH_TOLERANCE : number =   32;
 
+
+    /**
+     * A wrapper class for draggable items (mostly vertices).
+     * @private
+     **/
+    static Draggable = class {
+	static VERTEX:string = 'vertex';
+	item:any;
+	typeName:string;
+	vindex:number;   // Vertex-index
+	pindex:number;   // Point-index (on path)
+	pid:number;      // Point-ID (on curve)
+	cindex:number;   // Curve-index
+	constructor( item:any, typeName:string ) {
+	    this.item = item;
+	    this.typeName = typeName;
+	};
+	isVertex() { return this.typeName == PlotBoilerplate.Draggable.VERTEX; };
+	setVIndex(vindex:number):IDraggable { this.vindex = vindex; return this; };
+    }
+    
+    
     /** 
      * @member {HTMLCanvasElement} 
      * @memberof PlotBoilerplate
@@ -195,11 +194,11 @@ export class PlotBoilerplate {
     selectPolygon : Polygon;
 
     /** 
-     * @member {Array<Draggable>} 
+     * @member {Array<IDraggable>} 
      * @memberof PlotBoilerplate
      * @instance
      */
-    draggedElements : Array<Draggable>;
+    draggedElements : Array<IDraggable>;
 
     /** 
      * @member {Array<Drawable>} 
@@ -234,6 +233,7 @@ export class PlotBoilerplate {
      *
      * @constructor
      * @name PlotBoilerplate
+     * @public
      * @param {object} config={} - The configuration.
      * @param {HTMLCanvasElement} config.canvas - Your canvas element in the DOM (required).
      * @param {boolean=} [config.fullSize=true] - If set to true the canvas will gain full window size.
@@ -1097,9 +1097,9 @@ export class PlotBoilerplate {
      * @param {Vertex} point - The polygonal selection area.
      * @param {number=} [tolerance=7] - The tolerance to use identtifying vertices.
      * @private
-     * @return {Draggable} Or false if none found.
+     * @return {IDraggable} Or false if none found.
      **/
-    private locatePointNear( point:XYCoords, tolerance?:number ) : Draggable|null {
+    private locatePointNear( point:XYCoords, tolerance?:number ) : IDraggable|null {
 	const _self : PlotBoilerplate = this;
 	// var tolerance = 7;
 	if( typeof tolerance == 'undefined' )
@@ -1112,7 +1112,7 @@ export class PlotBoilerplate {
 	    var vert : Vertex = _self.vertices[vindex];
 	    if( (vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance ) {
 		// { type : 'vertex', vindex : vindex };
-		return new Draggable( vert, Draggable.VERTEX ).setVIndex(vindex); 
+		return new PlotBoilerplate.Draggable( vert, DRAGGABLE_VERTEX ).setVIndex(vindex); 
 	    }
 	} 
 	return null;
@@ -1130,7 +1130,7 @@ export class PlotBoilerplate {
      **/
     private handleClick(x:number,y:number) {
 	const _self : PlotBoilerplate = this;
-	var p : Draggable = this.locatePointNear( _self.transformMousePosition(x, y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
+	var p : IDraggable = this.locatePointNear( _self.transformMousePosition(x, y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 	if( p ) { 
 	    if( this.keyHandler && this.keyHandler.isDown('shift') ) {
 		if( p.typeName == 'bpath' ) {
@@ -1189,7 +1189,7 @@ export class PlotBoilerplate {
 	const _self = this;
 	if( e.which != 1 ) // && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
 	    return; // Only react on left mouse or touch events
-	var p : Draggable = _self.locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y),
+	var p : IDraggable = _self.locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y),
 						   PlotBoilerplate.DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 	if( !p ) return;
 	// Drag all selected elements?
@@ -1198,7 +1198,7 @@ export class PlotBoilerplate {
 	    // for( var i in _self.vertices ) {
 	    for( var i = 0; i < _self.vertices.length; i++ ) {
 		if( _self.vertices[i].attr.isSelected ) {
-		    _self.draggedElements.push( new Draggable( _self.vertices[i], Draggable.VERTEX ).setVIndex(i) );
+		    _self.draggedElements.push( new PlotBoilerplate.Draggable( _self.vertices[i], DRAGGABLE_VERTEX ).setVIndex(i) );
 		    _self.vertices[i].listeners.fireDragStartEvent( e );
 		}
 	    }
@@ -1290,7 +1290,7 @@ export class PlotBoilerplate {
 	if( !e.params.wasDragged )
 	    _self.handleClick( e.params.pos.x, e.params.pos.y );
 	for( var i in _self.draggedElements ) {
-	    var p : Draggable = _self.draggedElements[i];
+	    var p : IDraggable = _self.draggedElements[i];
 	    if( p.typeName == 'bpath' ) {
 		_self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEndEvent( e );
 	    } else if( p.typeName == 'vertex' ) {
@@ -1369,7 +1369,7 @@ export class PlotBoilerplate {
 		// Some private vars to store the current mouse/position/button state.
 		var touchMovePos : Vertex|undefined|null= null;
 		var touchDownPos : Vertex|undefined|null = null;
-		var draggedElement : Draggable|undefined|null = null;
+		var draggedElement : IDraggable|undefined|null = null;
 		// TODO
 		// ERROR, THIS DOES NOT COMPILE PROPERLY WITH TYPESCRIPT.
 
@@ -1645,5 +1645,3 @@ export class PlotBoilerplate {
 	
     }; // END utils
 } // END class PlotBoilerplate
-
-

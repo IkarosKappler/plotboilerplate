@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-05-29
+date: 2020-06-09
 ---
 
 <div class="full-width">
@@ -106,8 +106,13 @@ date: 2020-05-29
    </a>
 </div>
 <div class="demo-box">
-   <a class="no-decoration" href="{{ '/repo/demos/20-parquet-deformation/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200526-0-parquet-deformations.png');"></div>
+   <a class="no-decoration" href="{{ '/repo/demos/20-pattern-gradient/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200526-0-pattern-gradient.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/21-parquet-deformation/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-na.png');"></div>
    </a>
 </div>
 </div>

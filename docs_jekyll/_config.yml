@@ -39,7 +39,8 @@ exclude: [
 
 keep_files : [
   "docs",
-  "repo"
+  "repo",
+  "favicon.ico"
 ]
 
 # Build settings

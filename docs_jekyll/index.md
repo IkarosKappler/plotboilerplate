@@ -73,6 +73,11 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ~~~
 
 
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
+
+![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+
+
 ### Typescript
 ~~~typescript
    // Usage with Typescript could look like this
@@ -80,11 +85,11 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 
    window.addEventListener( 'load', () => {
     
-       const vertA : Vertex = new Vertex( 100,-100);
-       const vertB : Vertex = new Vertex(-100, 100);
-       console.log( vertA, vertB );
+       const pointA : Vertex = new Vertex( 100,-100);
+       const pointB : Vertex = new Vertex(-100, 100);
+       console.log( pointA, pointB );
 
-       const line : Line = new Line( vertA, vertB );
+       const line : Line = new Line( pointA, pointB );
     
        const pb : PlotBoilerplate = new PlotBoilerplate( {
    	   canvas     : document.getElementById('my-canvas'),
@@ -96,11 +101,6 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
    } );
 ~~~
 A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
-
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
-
-![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
 
 
@@ -228,6 +228,14 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 ![Convex Polygon Incircle](https://plotboilerplate.io/repo/screenshots/screenshot-20200506-convex-polygon-incircle.png "Convex Polygon Incircle")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/19-convex-polygon-incircle/index.html" title="See the demo">See the demo</a>
+
+
+### Pattern Gradient
+
+![Pattern Gradient](https://plotboilerplate.io/repo/screenshots/screenshot-20200526-0-parquet-deformations.png "Pattern Gradient")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/20-parquet-deformation/index.html" title="See the demo">See the demo</a>
+
 
 
 ## Initialization parameters
@@ -518,7 +526,7 @@ from the sources code files in ./src/*.
 
 
 
-## [In development] Compile Typescripts
+## Compile Typescript
 
 The package is compiled with npm typescript. See the tsconfig.json file.
 
