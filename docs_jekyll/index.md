@@ -73,9 +73,10 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ~~~
 
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
-
 ![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+
+Screenshot | <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
+
 
 
 ### Typescript
@@ -495,7 +496,7 @@ The Vertex class has basic drag event support:
 </div>
 
 
-## Usage
+## Mouse and Keyboard interaction
  * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment for clicked bézier path point
  * [ALT or SPACE] + [Mousedown] + [Drag] : Pan the area
@@ -506,19 +507,19 @@ The Vertex class has basic drag event support:
 
 ## Minimize the package
 
-The package is minimized with webpack. See the webpack.config.js file.
+The package is minimized with webpack. See the `webpack.config.js` file.
 
 ### Install webpack
-This will install the npm-webpack package with the required dependencies
-for you from the package.json file.
+This will install the `npm-webpack` package with the required dependencies
+for you from the `package.json` file.
 ~~~bash
  $ npm install
 ~~~
 
 
 ### Run webpack
-This will generate the ./dist/plotboilerplate.min.js file for you
-from the sources code files in ./src/*.
+This will generate the `./dist/plotboilerplate.min.js` file for you
+from the sources code files in `./src/js/*`.
 ~~~bash
  $ npm run webpack
 ~~~
@@ -528,7 +529,7 @@ from the sources code files in ./src/*.
 
 ## Compile Typescript
 
-The package is compiled with npm typescript. See the tsconfig.json file.
+The package is compiled with npm typescript. See the `tsconfig.json` file.
 
 ### Run the typescript compiler
 This is not yet finished; the old vanilla-JS files will soon be dropped and replaced
@@ -573,19 +574,7 @@ for this purpose.
  * Circle lineWidth params also affects circular handles.
  * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
    See ctx.setLineDash(...).
- * Write a basic demo for the Vertex class.
- * Write a basic demo for the Line class.
- * Write a basic demo for the Vector class.
- * Write a basic demo for the Triangle class.
- * Write a basic demo for the Circle class.
- * Write a basic demo for the VEllipse class.
- * Write a basic demo for the CubicBezierCurve class.
- * Write a basic demo for the PBImage class.
- * On non-circular Bézier paths the end control point does not move with the end point when dragged. See the basic
-   Bézier path demo.
- * [DONE] Add function Triangle.getIncenter(); the class already uses the incenter for computing the circumcircle.
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
- * Add a Typescript demo (how to import the script).
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.

@@ -291,10 +291,11 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      * It is the default hook for saving files and can be overwritten.
      *
-     * @method saveFile
+     * @method _saveFile
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
+     * @private
      **/
     PlotBoilerplate._saveFile = function (pb) {
         var svgCode = new SVGBuilder_1.SVGBuilder().build(pb.drawables, { canvasSize: pb.canvasSize, offset: pb.draw.offset, zoom: pb.draw.scale });
@@ -307,6 +308,15 @@ var PlotBoilerplate = /** @class */ (function () {
         saveAs(blob, "plotboilerplate.svg");
     };
     ;
+    /**
+     * This function sets the canvas resolution to factor 2.0 for retina displays.
+     *
+     * @method _setToRetina
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {void}
+     * @private
+     **/
     PlotBoilerplate.prototype._setToRetina = function () {
         this.config.cssScaleX = this.config.cssScaleY = 0.5;
         this.config.canvasWidthFactor = this.config.canvasHeightFactor = 2.0;

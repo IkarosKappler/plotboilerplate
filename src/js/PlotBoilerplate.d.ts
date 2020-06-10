@@ -253,12 +253,22 @@ export declare class PlotBoilerplate {
      *
      * It is the default hook for saving files and can be overwritten.
      *
-     * @method saveFile
+     * @method _saveFile
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
+     * @private
      **/
     private static _saveFile;
+    /**
+     * This function sets the canvas resolution to factor 2.0 for retina displays.
+     *
+     * @method _setToRetina
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {void}
+     * @private
+     **/
     private _setToRetina;
     /**
      * Set the console for this instance.
