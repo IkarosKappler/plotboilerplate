@@ -515,7 +515,7 @@ for you from the package.json file.
 
 ### Run webpack
 This will generate the ./dist/plotboilerplate.min.js file for you
-from the sources code files in ./src/js/*.
+from the sources code files in `./src/js/*`.
 ~~~bash
  $ npm run webpack
 ~~~
