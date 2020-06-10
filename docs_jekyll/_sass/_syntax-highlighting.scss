@@ -69,3 +69,8 @@
     .vi    { color: #008080 } // Name.Variable.Instance
     .il    { color: #099 } // Literal.Number.Integer.Long
 }
+
+/* Highlight inline code */
+code.highlighter-rouge {
+    background: #f0f0f8;
+}
