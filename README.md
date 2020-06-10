@@ -69,9 +69,11 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ~~~
 
 
+Screenshot:
+![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
-![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
 
 ### Typescript
@@ -514,7 +516,7 @@ for you from the package.json file.
 
 ### Run webpack
 This will generate the ./dist/plotboilerplate.min.js file for you
-from the sources code files in ./src/*.
+from the sources code files in ./src/js/*.
 ~~~bash
  $ npm run webpack
 ~~~
