@@ -69,12 +69,14 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ~~~
 
 
-See [API Documentation](https://plotboilerplate.io/docs/PlotBoilerplate.html "API Documentation") for details.
-
-
 ![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
 Screenshot | <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
+
+
+
+#### API
+See [API Documentation](https://plotboilerplate.io/docs/PlotBoilerplate.html "API Documentation") for details.
 
 
 
