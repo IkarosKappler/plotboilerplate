@@ -6653,7 +6653,6 @@ var VEllipse_1 = __webpack_require__(14);
 var Vector_1 = __webpack_require__(2);
 var Vertex_1 = __webpack_require__(0);
 var VertexAttr_1 = __webpack_require__(3);
-var interfaces_1 = __webpack_require__(23);
 var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
@@ -7511,7 +7510,7 @@ var PlotBoilerplate = /** @class */ (function () {
             var vert = _self.vertices[vindex];
             if ((vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance) {
                 // { type : 'vertex', vindex : vindex };
-                return new PlotBoilerplate.Draggable(vert, interfaces_1.DRAGGABLE_VERTEX).setVIndex(vindex);
+                return new PlotBoilerplate.Draggable(vert, PlotBoilerplate.Draggable.VERTEX).setVIndex(vindex);
             }
         }
         return null;
@@ -7592,7 +7591,7 @@ var PlotBoilerplate = /** @class */ (function () {
             // for( var i in _self.vertices ) {
             for (var i = 0; i < _self.vertices.length; i++) {
                 if (_self.vertices[i].attr.isSelected) {
-                    _self.draggedElements.push(new PlotBoilerplate.Draggable(_self.vertices[i], interfaces_1.DRAGGABLE_VERTEX).setVIndex(i));
+                    _self.draggedElements.push(new PlotBoilerplate.Draggable(_self.vertices[i], PlotBoilerplate.Draggable.VERTEX).setVIndex(i));
                     _self.vertices[i].listeners.fireDragStartEvent(e);
                 }
             }
@@ -8145,16 +8144,6 @@ var SVGBuilder = /** @class */ (function () {
 }());
 exports.SVGBuilder = SVGBuilder;
 //# sourceMappingURL=SVGBuilder.js.map
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DRAGGABLE_VERTEX = 'vertex';
-//# sourceMappingURL=interfaces.js.map
 
 /***/ })
 /******/ ]);

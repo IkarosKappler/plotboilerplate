@@ -78,7 +78,6 @@ var VEllipse_1 = require("./VEllipse");
 var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");
 var VertexAttr_1 = require("./VertexAttr");
-var interfaces_1 = require("./interfaces");
 var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
@@ -936,7 +935,7 @@ var PlotBoilerplate = /** @class */ (function () {
             var vert = _self.vertices[vindex];
             if ((vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance) {
                 // { type : 'vertex', vindex : vindex };
-                return new PlotBoilerplate.Draggable(vert, interfaces_1.DRAGGABLE_VERTEX).setVIndex(vindex);
+                return new PlotBoilerplate.Draggable(vert, PlotBoilerplate.Draggable.VERTEX).setVIndex(vindex);
             }
         }
         return null;
@@ -1017,7 +1016,7 @@ var PlotBoilerplate = /** @class */ (function () {
             // for( var i in _self.vertices ) {
             for (var i = 0; i < _self.vertices.length; i++) {
                 if (_self.vertices[i].attr.isSelected) {
-                    _self.draggedElements.push(new PlotBoilerplate.Draggable(_self.vertices[i], interfaces_1.DRAGGABLE_VERTEX).setVIndex(i));
+                    _self.draggedElements.push(new PlotBoilerplate.Draggable(_self.vertices[i], PlotBoilerplate.Draggable.VERTEX).setVIndex(i));
                     _self.vertices[i].listeners.fireDragStartEvent(e);
                 }
             }

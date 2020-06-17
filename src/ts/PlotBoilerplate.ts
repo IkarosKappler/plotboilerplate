@@ -79,7 +79,7 @@ import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
 import { VertEvent } from "./VertexListeners";
-import { IBounds, IDraggable, DRAGGABLE_VERTEX, Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
+import { IBounds, IDraggable, /*DRAGGABLE_VERTEX,*/ Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
 
 
 export class PlotBoilerplate {
@@ -1109,7 +1109,7 @@ export class PlotBoilerplate {
      * @private
      * @return {IDraggable} Or false if none found.
      **/
-    private locatePointNear( point:XYCoords, tolerance?:number ) : IDraggable|null {
+    private locatePointNear( point:XYCoords, tolerance?:number ) : IDraggable|null { 
 	const _self : PlotBoilerplate = this;
 	// var tolerance = 7;
 	if( typeof tolerance == 'undefined' )
@@ -1122,7 +1122,7 @@ export class PlotBoilerplate {
 	    var vert : Vertex = _self.vertices[vindex];
 	    if( (vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance ) {
 		// { type : 'vertex', vindex : vindex };
-		return new PlotBoilerplate.Draggable( vert, DRAGGABLE_VERTEX ).setVIndex(vindex); 
+		return new PlotBoilerplate.Draggable( vert, PlotBoilerplate.Draggable.VERTEX ).setVIndex(vindex); 
 	    }
 	} 
 	return null;
@@ -1208,7 +1208,7 @@ export class PlotBoilerplate {
 	    // for( var i in _self.vertices ) {
 	    for( var i = 0; i < _self.vertices.length; i++ ) {
 		if( _self.vertices[i].attr.isSelected ) {
-		    _self.draggedElements.push( new PlotBoilerplate.Draggable( _self.vertices[i], DRAGGABLE_VERTEX ).setVIndex(i) );
+		    _self.draggedElements.push( new PlotBoilerplate.Draggable( _self.vertices[i], PlotBoilerplate.Draggable.VERTEX ).setVIndex(i) );
 		    _self.vertices[i].listeners.fireDragStartEvent( e );
 		}
 	    }
@@ -1256,13 +1256,13 @@ export class PlotBoilerplate {
 	    _self.config.offsetX = _self.draw.offset.x;
 	    _self.config.offsetY = _self.draw.offset.y;
 	    _self.redraw();
-	} else {
+	} else { 
 	    // Convert drag amount by scaling
 	    // Warning: this possibly invalidates the dragEvent for other listeners!
 	    //          Rethink the solution when other features are added.
 	    e.params.dragAmount.x /= _self.draw.scale.x;
 	    e.params.dragAmount.y /= _self.draw.scale.y;		
-	    for( var i in _self.draggedElements ) {
+	    for( var i in _self.draggedElements ) { 
 		var p = _self.draggedElements[i];
 		if( p.typeName == 'bpath' ) {
 		    _self.paths[p.pindex].moveCurvePoint( p.cindex, p.pid, new Vertex(e.params.dragAmount.x, e.params.dragAmount.y ) );

@@ -66,7 +66,7 @@ import { Bounds } from "./Bounds";
 import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { IDraggable, Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
+import { IDraggable, /*DRAGGABLE_VERTEX,*/ Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
 export declare class PlotBoilerplate {
     /** @constant {number} */
     static readonly DEFAULT_CANVAS_WIDTH: number;

@@ -123,4 +123,3 @@ export interface IDraggable {
     isVertex(): boolean;
     setVIndex(vindex: number): IDraggable;
 }
-export declare const DRAGGABLE_VERTEX: string;

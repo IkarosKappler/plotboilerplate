@@ -162,4 +162,4 @@ export interface IDraggable {
     setVIndex(vindex:number):IDraggable;
 }
 
-export const DRAGGABLE_VERTEX:string = 'vertex';
+// export const DRAGGABLE_VERTEX:string = 'vertex';

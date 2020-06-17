@@ -1,4 +1,4 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DRAGGABLE_VERTEX = 'vertex';
+// export const DRAGGABLE_VERTEX:string = 'vertex';
 //# sourceMappingURL=interfaces.js.map
