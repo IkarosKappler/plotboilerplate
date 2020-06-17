@@ -79,6 +79,11 @@ Screenshot | <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos
 
 
 
+#### API
+See [API Documentation](https://plotboilerplate.io/docs/PlotBoilerplate.html "API Documentation") for details.
+
+
+
 ### Typescript
 ~~~typescript
    // Usage with Typescript could look like this
@@ -444,11 +449,11 @@ The Vertex class has basic drag event support:
   name : string,
 
   // The current drag position.
-  pos : { x : Number, y : Number },
+  pos : { x : number, y : number },
 
   // A mouse button indicator (if mouse event).
   //    0=left, 1=middle, 2=right
-  button : Number,
+  button : number,
 
   // A flag indicating if event comes from left mouse button.
   leftButton : boolean,
@@ -461,11 +466,11 @@ The Vertex class has basic drag event support:
 
   // A mouse-down-position: position where the dragging
   //   started. This will not change during one drag process.
-  mouseDownPos : { x : Number, y : Number },
+  mouseDownPos : { x : number, y : number },
 
   // The most recent drag position (position before
   //   current drag step).
-  draggedFrom : { x : Number, y : Number },
+  draggedFrom : { x : number, y : number },
 
   // True if this is a drag event (nothing else available the moment).
   wasDragged : boolean,
@@ -473,7 +478,7 @@ The Vertex class has basic drag event support:
   // The x-y-amount of the current drag step.
   //   This is the difference between the recent drag step
   //   and the actual drag position.
-  dragAmount : { x : Number, y : Number }
+  dragAmount : { x : number, y : number }
  }
 ~~~
 
