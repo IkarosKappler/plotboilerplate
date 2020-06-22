@@ -30,7 +30,8 @@
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
  * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
- * @version  1.5.5
+ * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
+ * @version  1.5.6
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

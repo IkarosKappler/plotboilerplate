@@ -5203,7 +5203,8 @@ exports.KeyHandler = KeyHandler;
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
  * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
- * @version  1.5.5
+ * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
+ * @version  1.5.6
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var CubicBezierCurve_1 = __webpack_require__(4);
@@ -5912,6 +5913,7 @@ var drawutils = /** @class */ (function () {
      * @param {string} color - The color to clear with.
      **/
     drawutils.prototype.clear = function (color) {
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.fillStyle = color;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     };
@@ -6629,7 +6631,8 @@ window.PlotBoilerplate = __webpack_require__(21).PlotBoilerplate;
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
  * @modified 2020-05-09 Included the Cirlcle class.
- * @version  1.7.3
+ * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
+ * @version  1.8.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -6732,6 +6735,8 @@ var PlotBoilerplate = /** @class */ (function () {
             offsetX: PlotBoilerplate.utils.fetch.num(config, 'offsetX', 0.0),
             offsetY: PlotBoilerplate.utils.fetch.num(config, 'offsetY', 0.0),
             rasterGrid: PlotBoilerplate.utils.fetch.bool(config, 'rasterGrid', true),
+            rasterScaleX: PlotBoilerplate.utils.fetch.num(config, 'rasterScaleX', 1.0),
+            rasterScaleY: PlotBoilerplate.utils.fetch.num(config, 'rasterScaleY', 1.0),
             rasterAdjustFactor: PlotBoilerplate.utils.fetch.num(config, 'rasterAdjustdFactror', 2.0),
             drawOrigin: PlotBoilerplate.utils.fetch.bool(config, 'drawOrigin', false),
             autoAdjustOffset: PlotBoilerplate.utils.fetch.val(config, 'autoAdjustOffset', true),
@@ -7112,8 +7117,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.drawGrid = function () {
-        var gScale = { x: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x),
-            y: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) };
+        var gScale = { x: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX,
+            y: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) * this.config.rasterScaleY };
         var gSize = { width: this.grid.size.x * gScale.x, height: this.grid.size.y * gScale.y };
         var cs = { width: this.canvasSize.width / 2, height: this.canvasSize.height / 2 };
         var offset = this.draw.offset.clone().inv();
@@ -7347,7 +7352,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.clear = function () {
-        // Note that the image might have an alpha channel. Clear the scene first.
+        // Note that elements might have an alpha channel. Clear the scene first.
         this.draw.clear(this.config.backgroundColor);
     };
     ;

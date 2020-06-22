@@ -41,6 +41,8 @@ export interface Config {
     offsetX?: number;             // The initial x-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
     offsetY?: number;             // The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values. 
     rasterGrid?: boolean;         // If set to true the background grid will be drawn rastered.
+    rasterScaleX?: number;        // Define the default horizontal raster scale (default=1.0).
+    rasterScaleY?: number;        // Define the default vertical raster scale (default=1.0).
     rasterAdjustFactor?: number;  // The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
     drawOrigin?: boolean;         // Draw a crosshair at (0,0).
     autoAdjustOffset?: boolean;   //  When set to true then the origin of the XY plane will
@@ -161,5 +163,3 @@ export interface IDraggable {
     isVertex():boolean;
     setVIndex(vindex:number):IDraggable;
 }
-
-// export const DRAGGABLE_VERTEX:string = 'vertex';

@@ -1,11 +1,14 @@
 
 
 # Changelog
+* 2020-06-22 (1.8.0)
+  * Added the rasterScaleX and rasterScaleY config params.
+  * Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
 * 2020-06-09
   * Defined new private interface IDraggable and move the Draggable class into the main class.
   * Refactored the JSDoc layout template for larger screens.
   * Fixed the problem of undocumented main class (no docs in HTML were generated).
-* 2020-05-26 (my father's 74s birthday)
+* 2020-05-26 (pap's 74s birthday)
   * Added functions Vertex.addX(number) and Vertex.addY(number).
 * 2020-05-25
   * Added the Circle.vertAt and the Circle.tangentAt functions.

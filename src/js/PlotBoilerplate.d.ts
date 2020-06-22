@@ -53,7 +53,8 @@
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
  * @modified 2020-05-09 Included the Cirlcle class.
- * @version  1.7.3
+ * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
+ * @version  1.8.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -66,7 +67,7 @@ import { Bounds } from "./Bounds";
 import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { IDraggable, /*DRAGGABLE_VERTEX,*/ Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
+import { IDraggable, Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
 export declare class PlotBoilerplate {
     /** @constant {number} */
     static readonly DEFAULT_CANVAS_WIDTH: number;

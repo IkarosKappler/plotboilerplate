@@ -35,6 +35,8 @@ export interface Config {
     offsetX?: number;
     offsetY?: number;
     rasterGrid?: boolean;
+    rasterScaleX?: number;
+    rasterScaleY?: number;
     rasterAdjustFactor?: number;
     drawOrigin?: boolean;
     autoAdjustOffset?: boolean;

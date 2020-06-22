@@ -53,7 +53,8 @@
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
  * @modified 2020-05-09 Included the Cirlcle class.
- * @version  1.7.3
+ * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
+ * @version  1.8.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -79,7 +80,7 @@ import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
 import { VertEvent } from "./VertexListeners";
-import { IBounds, IDraggable, /*DRAGGABLE_VERTEX,*/ Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
+import { IBounds, IDraggable, Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
 
 
 export class PlotBoilerplate {
@@ -308,6 +309,8 @@ export class PlotBoilerplate {
 	    offsetX               : PlotBoilerplate.utils.fetch.num(config,'offsetX',0.0), 
 	    offsetY               : PlotBoilerplate.utils.fetch.num(config,'offsetY',0.0), 
 	    rasterGrid            : PlotBoilerplate.utils.fetch.bool(config,'rasterGrid',true),
+	    rasterScaleX          : PlotBoilerplate.utils.fetch.num(config,'rasterScaleX',1.0),
+	    rasterScaleY          : PlotBoilerplate.utils.fetch.num(config,'rasterScaleY',1.0),
 	    rasterAdjustFactor    : PlotBoilerplate.utils.fetch.num(config,'rasterAdjustdFactror',2.0),
 	    drawOrigin            : PlotBoilerplate.utils.fetch.bool(config,'drawOrigin',false),
 	    autoAdjustOffset      : PlotBoilerplate.utils.fetch.val(config,'autoAdjustOffset',true),
@@ -440,7 +443,6 @@ export class PlotBoilerplate {
 	this.redraw();
 	// Gain focus
 	this.canvas.focus();
-	
     }; // END constructor
     
     /**
@@ -696,8 +698,8 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     drawGrid() {
-	const gScale : XYCoords = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x),
-				    y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y) };
+	const gScale : XYCoords = { x : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.x)*this.config.rasterScaleX,
+				    y : Grid.utils.mapRasterScale(this.config.rasterAdjustFactor,this.draw.scale.y)*this.config.rasterScaleY };
 	var gSize : XYDimension = { width : this.grid.size.x*gScale.x, height : this.grid.size.y*gScale.y };
 	var cs : XYDimension = { width : this.canvasSize.width/2, height : this.canvasSize.height/2 };
 	var offset : Vertex = this.draw.offset.clone().inv();
@@ -939,7 +941,7 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     clear() {
-	// Note that the image might have an alpha channel. Clear the scene first.
+	// Note that elements might have an alpha channel. Clear the scene first.
 	this.draw.clear( this.config.backgroundColor );
     };
 
