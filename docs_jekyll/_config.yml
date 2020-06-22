@@ -50,3 +50,4 @@ markdown_ext: md
 
 kramdown:
    tables: true
+
