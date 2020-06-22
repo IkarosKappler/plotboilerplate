@@ -575,7 +575,10 @@ for this purpose.
  * Circle lineWidth params also affects circular handles.
  * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
    See ctx.setLineDash(...).
+ * Add an internal mapping to remember vertices and their installed listeners (for removing them later).
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
+ * Port all demos from vanilla JS to TypeScript.
+ 
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.

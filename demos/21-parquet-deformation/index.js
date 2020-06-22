@@ -70,7 +70,7 @@
 	var type = TYPE_HEXAGON;
 
 	var HexTile = function( center, radius ) {
-	    this.vertices = makePolyNGon( center, radius, 6, 4, Math.PI/6.0 );
+	    this.vertices = makePolyNGon( center, radius*1, 6, 4, Math.PI/6.0 );
 	    // For plane-filling circles/hexagon we need some offsets for even/odd rows.
 	    this.offset = {
 		// Row-filling circle-diameters
@@ -80,14 +80,14 @@
 	    }
 	};
 	var QuadTile = function( center, radius ) {
-	    this.vertices = makePolyNGon( center, radius, 4, 6, Math.PI/4.0 );
+	    this.vertices = makePolyNGon( center, radius*1, 4, 6, Math.PI/4.0 );
 	    this.offset = {
 		x : radius*2,
 		y : radius*2
 	    };
 	};
 	var TriTile = function( center, radius, down ) {
-	    this.vertices = makePolyNGon( center, radius, 3, 8, Math.PI/2.0);
+	    this.vertices = makePolyNGon( center, radius*1, 3, 8, Math.PI/2.0);
 	    this.offset = {
 		x : radius*2,
 		y : radius*2
@@ -173,15 +173,35 @@
 	};
 	
 
+	/**
+	 * The lineShape must be aligned on the x-axis and must not be empty.
+	 **/
 	var mapPolyLine = function( polyverts, lineShape ) {
 	    var result = [];
+	    var shapeVec = new Vector(lineShape[0], lineShape[lineShape.length-1]);
+	    var shapeLen = shapeVec.length();
 	    var n = polyverts.length;
 	    for( var v = 0; v < n; v++ ) {
-		var start = polyverts[v];
-		var end   = polyverts[(v+1)%n];
+		var start = polyverts[ v ];
+		var end   = polyverts[ (v+1)%n ];
+		var vec = new Vector(start,end);
 		result.push( start );
 		// Map mid points from shape into segment between [start,end] line
-		
+		// (if line is too short just add start point)
+		if( vec.length() > 1.0 ) {
+		    var perp = vec.clone().perp();
+		    for( var i = 0; i < lineShape.length; i++ ) {
+			var shapeVert = lineShape[i];
+			var xPct = (shapeVert.x-shapeVec.a.x)/shapeLen;
+			var yPct = shapeVert.y/shapeLen; // y is orientated on the x-axis
+			var vert = vec.vertAt( xPct );
+			// result.push( vert );
+			// pb.draw.circle( vert, 3 );
+			var tmpPerp = vec.clone().moveTo( vert ).perp();
+			var perpVert = tmpPerp.vertAt( yPct );
+			result.push( perpVert );
+		    }
+		}
 	    }
 	    return result; //polyverts;
 	};
