@@ -240,7 +240,14 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 
 ![Pattern Gradient](https://plotboilerplate.io/repo/screenshots/screenshot-20200526-0-parquet-deformations.png "Pattern Gradient")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/20-parquet-deformation/index.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/20-pattern-gradient/index.html" title="See the demo">See the demo</a>
+
+
+### Pattern Gradient, Variant
+
+![Pattern Gradient, Variant](https://plotboilerplate.io/repo/screenshots/screenshot-20200622-0-parquet-transformation.png "Pattern Gradient, Variant")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/21-parquet-deformation/index.html" title="See the demo">See the demo</a>
 
 
 
@@ -258,6 +265,8 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 | `offsetX`| _number_ | `0.0` | The initial offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values. |
 | `offsetY`| _number_ | `0.0`| The initial offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values. |
 | `drawGrid`| _boolean_ | `true` |  Specifies if the raster should be drawn. |
+| `rasterScaleX` | _number_ | `1.0` | Define the default horizontal raster scale. |
+| `rasterScaleY` | _number_ | `1.0` | Define the default vertical raster scale. |
 | `rasterGrid`| _boolean_ | `true` | If set to true the background grid will be drawn rastered. |
 | `rasterAdjustFactor`| _number_ | `2.0` | The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step). |
 | `drawOrigin`| _boolean_ | `false` | Draw a crosshair at (0,0). |

@@ -129,15 +129,16 @@
 	    var vertices = [];
 	    var vert;
 	    // Find index in shape gradient array
-	    var gradientIndex = Math.min( gradient.length-1,
-					  Math.floor( (1-ratio) * gradient.length )
+	    var n = gradient.length-1;
+	    var gradientIndex = Math.min( n,
+					  Math.floor( (1-ratio) * n )
 					);
 	    var fromTile = gradient[gradientIndex];
 	    var toTile = 
 		gradientIndex+1 >= gradient.length
 		? gradient[gradientIndex]
 		: gradient[gradientIndex+1];
-	    var relativeRatio = ( (1-ratio) - gradientIndex/gradient.length) * gradient.length;
+	    var relativeRatio = ( (1-ratio) - gradientIndex/(gradient.length-1)) * n;
 	    for( var i = 0; i < fromTile.vertices.length; i++ ) {
 		vert = fromTile.vertices[i]
 		    .clone()
