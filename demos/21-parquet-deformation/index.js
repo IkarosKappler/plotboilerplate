@@ -59,15 +59,15 @@
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
 	    cellRadiusPct         : 2.5,  // %
-	    globalRatio           : 0.0,
 	    shapeRadiusFactor     : 1.0,
-	    segmentCount          : 4
+	    segmentCount          : 4,
+
+	    gradientType          : "TSH"
 	}, GUP );
 
 	var miniCanvas = new MiniCanvas( document.getElementById('mini-canvas'),
 					 config.segmentCount+1,
-					 function(v) {
-					     //console.log('onVertexChange',v);
+					 function(v) { // Drag listener
 					     pb.redraw();
 					 }
 				       );
@@ -103,6 +103,23 @@
 		y : radius*2
 	    };
 	};
+
+	var getSelectedGradient = function(baseCellRadius) {
+	    var type = config.gradientType.split("");
+	    console.log( type );
+	    var result = [];
+	    for( var i = 0; i < type.length; i++ ) {
+		console.log( type[i] );
+		switch( type[i] ) {
+		case "H" : result.push( new HexTile( new Vertex(0,0), baseCellRadius ) ); break;
+		case "S" : result.push( new QuadTile( new Vertex(0,0), baseCellRadius ) ); break;
+		case "T" : result.push( new TriTile( new Vertex(0,0), baseCellRadius ) ); break;
+		}
+	    }
+	    console.log( result );
+	    return result;
+	};
+	
 	/**
 	 * @param {Array} gradient - An array of n HexTile, QuadTile or TriTile settings.
 	 * @param {number} ratio
@@ -113,14 +130,14 @@
 	    var vert;
 	    // Find index in shape gradient array
 	    var gradientIndex = Math.min( gradient.length-1,
-					  Math.floor( ratio * gradient.length )
+					  Math.floor( (1-ratio) * gradient.length )
 					);
 	    var fromTile = gradient[gradientIndex];
-	    var toTile =
+	    var toTile = 
 		gradientIndex+1 >= gradient.length
 		? gradient[gradientIndex]
 		: gradient[gradientIndex+1];
-	    var relativeRatio = (ratio - gradientIndex/gradient.length) * gradient.length;
+	    var relativeRatio = ( (1-ratio) - gradientIndex/gradient.length) * gradient.length;
 	    for( var i = 0; i < fromTile.vertices.length; i++ ) {
 		vert = fromTile.vertices[i]
 		    .clone()
@@ -135,6 +152,7 @@
 	};
 	
 	var drawAll = function() {
+	    console.log('gradientType', config.gradientType );
 
 	    // Bounds: { ..., width, height }
 	    var viewport = pb.viewport();
@@ -142,11 +160,7 @@
 	    // This would be the outscribing circle radius for the plane-fitting hexagon.
 	    var outerHexagonRadius = Math.sqrt( 4.0 * baseCellRadius * baseCellRadius / 3.0 );
 
-	    var tileGradient = [
-		new HexTile( new Vertex(0,0), baseCellRadius ),
-		new QuadTile( new Vertex(0,0), baseCellRadius ),
-		new TriTile( new Vertex(0,0), baseCellRadius )
-	    ];
+	    var tileGradient = getSelectedGradient(baseCellRadius);
 	    
 	    // Get the start- and end-positions to use for the plane.
 	    var startXY = pb.transformMousePosition( baseCellRadius, baseCellRadius );
@@ -253,19 +267,20 @@
 	// | Initialize dat.gui
 	// +-------------------------------
         {
+	    var SHAPE_GRADIENTS = {
+		"△"   :"T",
+		"□"  :"S",
+		"⬡" :"H",
+		"△□"  :"TS",
+		"△⬡" :"TH",
+		"△□⬡" :"TSH",
+		"△⬡"  :"TH"
+	    };
 	    var gui = pb.createGUI();
-	    gui.add(config, 'globalRatio').min(0).max(100).step(0.1).onChange( function() { pb.redraw(); } ).name("ratio").title("The global ratio.");
 	    gui.add(config, 'cellRadiusPct').min(0.5).max(10).step(0.1).onChange( function() { pb.redraw(); } ).name("Cell size %").title("The cell radius");
 	    gui.add(config, 'shapeRadiusFactor').min(0.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("Shape factor").title("The shape factor inside the cell.");
 	    gui.add(config, 'segmentCount').min(1).max(10).step(1).onChange( function() { miniCanvas.setVertCount(config.segmentCount+1); pb.redraw(); } ).name("#segments").title("The segment count for each interpolated linear edge.");
-	    /*gui.add(config, 'startAngle').min(0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("Start angle").title("The circle patterns' start angle.");
-	    
-	    gui.add(config, 'xOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("X offset").title("The x-axis offset.");
-	    gui.add(config, 'yOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("Y offset").title("The y-axis offset.");
-	    gui.add(config, 'xAngle').min(0.0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("X angle").title("The x-angle.");
-	    gui.add(config, 'yAngle').min(0.0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("Y angle").title("The y-axis angle.");
-	    gui.add(config, 'starPointCount').min(3).max(24).step(1).onChange( function() { pb.redraw(); } ).name("Point count").title("The star's point count.");
-	    gui.add(config, 'fillShape').onChange( function() { pb.redraw(); } ).name("Fill shape").title("Fill the shape or draw the outline only?");*/
+	    gui.add(config, 'gradientType', SHAPE_GRADIENTS).onChange( function() { pb.redraw(); } ).name("Gradient type").title("Which shape gradient to use?");   
 	}
 
 	pb.config.postDraw = drawAll;

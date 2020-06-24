@@ -35,17 +35,8 @@
 	    this.pb.remove( this.polyLine[i] );
 	    this.polyLine[i].listeners.removeDragListener( this.onVertexChange );
 	}
-	// Add new vertices
-	/* this.polyLine = [];
-	for( var i = 0; i < n; i++ ) {
-	    var vert = new Vertex( bounds.width*paddingFrac + ((bounds.width-2*paddingFrac)/n)*i - bounds.width/2.0,
-				   0.0 ) 
-	    this.polyLine.push( vert );
-	    vert.attr.draggable = i > 0 && i+1 < n;
-	    this.pb.add( vert );
-	    vert.listeners.addDragListener( this.onVertexChange );
-	    }*/
 
+	// Add new polyline vertices to pb and add listeners
 	this.polyLine = polyLineUtils.interpolate( this.polyLine, n );
 	for( var i = 0; i < this.polyLine.length; i++ ) {
 	    var vert = this.polyLine[i];

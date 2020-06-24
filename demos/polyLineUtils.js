@@ -36,7 +36,7 @@ var polyLineUtils = {
 	}
 	// Interpolate on linear segment
 	var t = (u-accu) / p[i].distance( p[i+1] );
-	return new Vertex( p[i].x + (p[i+1].x-p[i].x)*t );
+	return new Vertex( p[i].x + (p[i+1].x-p[i].x)*t, p[i].y + (p[i+1].y-p[i].y)*t );
     },
 
     /**
