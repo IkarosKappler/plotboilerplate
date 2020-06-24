@@ -236,7 +236,14 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 
 ![Pattern Gradient](https://plotboilerplate.io/repo/screenshots/screenshot-20200526-0-parquet-deformations.png "Pattern Gradient")
 
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/20-parquet-deformation/index.html" title="See the demo">See the demo</a>
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/20-pattern-gradient/index.html" title="See the demo">See the demo</a>
+
+
+### Pattern Gradient, Variant
+
+![Pattern Gradient, Variant](https://plotboilerplate.io/repo/screenshots/screenshot-20200622-0-parquet-transformation.png "Pattern Gradient, Variant")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/21-parquet-deformation/index.html" title="See the demo">See the demo</a>
 
 
 
