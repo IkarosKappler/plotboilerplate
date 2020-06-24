@@ -1,10 +1,14 @@
 #!/bin/bash
 
 
-# Load up .env
-set -o allexport
-[[ -f .env ]] && source .env
-set +o allexport
+if [[ -z "$user" && -z "$server" && -z "$destination" ]]; then
+    echo "No env vars found. Loading up .env file ..."
+    set -o allexport
+    [[ -f .env ]] && source .env
+    set +o allexport
+else
+    echo "Env vars found."
+fi
 
 
 while true; do
@@ -12,7 +16,7 @@ while true; do
     case $yn in
         [Yy]* ) cd docs_jekyll; bash build.sh; cd ..; break;;
         [Nn]* ) break;; #exit;;
-        * ) echo "Please answer yes or no.";;
+        * ) echo "Please answer y or n.";;
     esac
 done
 

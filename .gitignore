@@ -16,6 +16,7 @@ docs_jekyll/docs_md
 *.lock
 package-lock.json
 .env
+.env-testing
 tmp
 test.svg
 webpack.config-old.js
