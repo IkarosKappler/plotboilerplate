@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-06-22
+date: 2020-06-24
 ---
 
 <div class="full-width">
@@ -112,7 +112,7 @@ date: 2020-06-22
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/21-parquet-deformation/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-na.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200622-0-parquet-transformation.png');"></div>
    </a>
 </div>
 </div>
