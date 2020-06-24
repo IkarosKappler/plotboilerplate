@@ -169,7 +169,7 @@
 	    var viewWidth = endXY.x - startXY.x;
 	    var viewHeight = endXY.y - startXY.y;
 	    
-	    var offset = tileGradient[0].offset;
+	    var offset = tileGradient[tileGradient.length-1].offset;
 
 	    var yOdd = false;
 	    var yRow = 0;
