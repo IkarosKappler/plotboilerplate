@@ -54,8 +54,18 @@
 	    )
 	);
 
+	// +---------------------------------------------------------------------------------
+	// | A global config that's attached to the dat.gui control interface.
+	// +-------------------------------
+	var config = PlotBoilerplate.utils.safeMergeByKeys( {
+	    cellRadiusPct         : 2.5,  // %
+	    globalRatio           : 0.0,
+	    shapeRadiusFactor     : 1.0,
+	    segmentCount          : 4
+	}, GUP );
+
 	var miniCanvas = new MiniCanvas( document.getElementById('mini-canvas'),
-					 5,
+					 config.segmentCount+1,
 					 function(v) {
 					     //console.log('onVertexChange',v);
 					     pb.redraw();
@@ -70,7 +80,7 @@
 	var type = TYPE_HEXAGON;
 
 	var HexTile = function( center, radius ) {
-	    this.vertices = makePolyNGon( center, radius*1, 6, 4, Math.PI/6.0 );
+	    this.vertices = makePolyNGon( center, radius*config.shapeRadiusFactor, 6, 4, Math.PI/6.0 );
 	    // For plane-filling circles/hexagon we need some offsets for even/odd rows.
 	    this.offset = {
 		// Row-filling circle-diameters
@@ -80,14 +90,14 @@
 	    }
 	};
 	var QuadTile = function( center, radius ) {
-	    this.vertices = makePolyNGon( center, radius*1, 4, 6, Math.PI/4.0 );
+	    this.vertices = makePolyNGon( center, radius*config.shapeRadiusFactor, 4, 6, Math.PI/4.0 );
 	    this.offset = {
 		x : radius*2,
 		y : radius*2
 	    };
 	};
 	var TriTile = function( center, radius, down ) {
-	    this.vertices = makePolyNGon( center, radius*1, 3, 8, Math.PI/2.0);
+	    this.vertices = makePolyNGon( center, radius*config.shapeRadiusFactor, 3, 8, Math.PI/2.0);
 	    this.offset = {
 		x : radius*2,
 		y : radius*2
@@ -101,7 +111,7 @@
 	var morphFromTo = function( gradient, ratio, offset, row, column ) {
 	    var vertices = [];
 	    var vert;
-	    // Find index in array
+	    // Find index in shape gradient array
 	    var gradientIndex = Math.min( gradient.length-1,
 					  Math.floor( ratio * gradient.length )
 					);
@@ -124,11 +134,8 @@
 	    return vertices;
 	};
 	
-	var cellRadiusPct = 0.025;
 	var drawAll = function() {
 
-	    // var tileFactory = makeHexaTileFactory( baseRadius );
-	    
 	    // Bounds: { ..., width, height }
 	    var viewport = pb.viewport();
 	    var baseCellRadius = viewport.width * (config.cellRadiusPct/100.0);
@@ -158,7 +165,6 @@
 		for( var x = startXY.x+(yOdd ? 0 : offset.x/2.0); x < endXY.x; x+=offset.x ) {
 		    var xPct = 0.5-x/viewWidth;
 		    var center = new Vertex(x,y);
-		    // console.log( center );
 		 
 		    // Make a hexagon that outscribes the circle?
 		    // var outerNGonPoints = makeNGon( circle.center, outerHexagonRadius, 6, Math.PI/6.0 );
@@ -175,6 +181,9 @@
 
 	/**
 	 * The lineShape must be aligned on the x-axis and must not be empty.
+	 *
+	 * @param {Vertex[]} polyVerts
+	 * @param {Vertex[]} lineShape
 	 **/
 	var mapPolyLine = function( polyverts, lineShape ) {
 	    var result = [];
@@ -241,28 +250,14 @@
 
 
 	// +---------------------------------------------------------------------------------
-	// | A global config that's attached to the dat.gui control interface.
-	// +-------------------------------
-	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    /* pointCount            : 6,
-	    startAngle            : 45.0, // Math.PI/2.0,
-	    xOffset               : 1.0,
-	    yOffset               : 1.0,
-	    xAngle                : 0.0,
-	    yAngle                : 0.0,
-	    starPointCount        : 6,    // will be doubled
-	    fillShape             : true */
-	    cellRadiusPct         : 2.5,  // %
-	    globalRatio           : 0.0
-	}, GUP );
-
-	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
 	    gui.add(config, 'globalRatio').min(0).max(100).step(0.1).onChange( function() { pb.redraw(); } ).name("ratio").title("The global ratio.");
-	    gui.add(config, 'cellRadiusPct').min(0.5).max(10).step(0.1).onChange( function() { pb.redraw(); } ).name("Cell size %").title("The cell radis");
+	    gui.add(config, 'cellRadiusPct').min(0.5).max(10).step(0.1).onChange( function() { pb.redraw(); } ).name("Cell size %").title("The cell radius");
+	    gui.add(config, 'shapeRadiusFactor').min(0.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("Shape factor").title("The shape factor inside the cell.");
+	    gui.add(config, 'segmentCount').min(1).max(10).step(1).onChange( function() { miniCanvas.setVertCount(config.segmentCount+1); pb.redraw(); } ).name("#segments").title("The segment count for each interpolated linear edge.");
 	    /*gui.add(config, 'startAngle').min(0).max(360).step(1.0).onChange( function() { pb.redraw(); } ).name("Start angle").title("The circle patterns' start angle.");
 	    
 	    gui.add(config, 'xOffset').min(-2.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("X offset").title("The x-axis offset.");

@@ -15,6 +15,15 @@
 	    // console.log('postdraw', _self.polyLine);
 	    _self.pb.draw.polyline( _self.polyLine, 'rgb(0,128,192)', 1.0 );
 	};
+
+	// Initialize single line for later interpolation
+	var bounds = this.pb.viewport();
+	var paddingFrac = 0.1;
+	this.polyLine = [
+	    new Vertex( -bounds.width*(1.0-paddingFrac)*0.5, 0 ),
+	    new Vertex(  bounds.width*(1.0-paddingFrac)*0.5, 0 )
+	];
+    
 	this.setVertCount( vertCount );
     };
 
@@ -27,7 +36,7 @@
 	    this.polyLine[i].listeners.removeDragListener( this.onVertexChange );
 	}
 	// Add new vertices
-	this.polyLine = [];
+	/* this.polyLine = [];
 	for( var i = 0; i < n; i++ ) {
 	    var vert = new Vertex( bounds.width*paddingFrac + ((bounds.width-2*paddingFrac)/n)*i - bounds.width/2.0,
 				   0.0 ) 
@@ -35,7 +44,16 @@
 	    vert.attr.draggable = i > 0 && i+1 < n;
 	    this.pb.add( vert );
 	    vert.listeners.addDragListener( this.onVertexChange );
+	    }*/
+
+	this.polyLine = polyLineUtils.interpolate( this.polyLine, n );
+	for( var i = 0; i < this.polyLine.length; i++ ) {
+	    var vert = this.polyLine[i];
+	    vert.attr.draggable = i > 0 && i+1 < n;
+	    this.pb.add( vert );
+	    vert.listeners.addDragListener( this.onVertexChange );
 	}
+	
 	this.pb.redraw();
     };
 
