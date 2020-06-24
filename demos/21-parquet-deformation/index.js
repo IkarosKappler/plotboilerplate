@@ -177,7 +177,7 @@
 	    for( var y = startXY.y; y < endXY.y; y+=offset.y ) {
 		var yPct = 0.5-y/viewHeight;
 		var xColumn = 0;
-		for( var x = startXY.x+(yOdd ? 0 : offset.x/2.0); x < endXY.x; x+=offset.x ) {
+		for( var x = startXY.x+(yOdd ? offset.x/2.0 : 0); x < endXY.x; x+=offset.x ) {
 		    var xPct = 0.5-x/viewWidth;
 		    var center = new Vertex(x,y);
 		 
