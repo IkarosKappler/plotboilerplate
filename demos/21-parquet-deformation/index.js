@@ -73,9 +73,10 @@
 	    
 	    segmentCount             : 4,
 
-	    gradientType             : "TSH"  // Triangle-Square-Hexagon
+	    gradientType             : "TH"  // Triangle-Quad-Hexagon
 	}, GUP );
 
+	// The mini canvas is used to draw a linear segmentation, later used for each straight line.
 	var miniCanvas = new MiniCanvas( document.getElementById('mini-canvas'),
 					 config.segmentCount+1,
 					 function(v) { // Drag listener
@@ -85,11 +86,7 @@
 
 	var DEG_TO_RAD = Math.PI/180.0;
 	
-	var TYPE_HEXAGON  = "hexagon";
-	var TYPE_TRIANGLE = "triangle";
-	var TYPE_SQUARE   = "square";
-	var type = TYPE_HEXAGON;
-
+	// Define three types of base tiles (used as templates)
 	var HexTile = function( center, radius ) {
 	    this.vertices = makePolyNGon( center, radius*config.shapeRadiusFactor, 6, 4, Math.PI/6.0 );
 	    // For plane-filling circles/hexagon we need some offsets for even/odd rows.
@@ -115,21 +112,28 @@
 	    };
 	};
 
+	
+	/**
+	 * Get the selected shape gradient.
+	 *
+	 * @param {number} baseCellRadius - The cell radius to use for the gradient.
+	 * @return {Array<HexTile|QuadTile|TriTile>} - An array of tile templates.
+	 **/
 	var getSelectedGradient = function(baseCellRadius) {
 	    var type = config.gradientType.split("");
-	    console.log( type );
 	    var result = [];
 	    for( var i = 0; i < type.length; i++ ) {
 		console.log( type[i] );
 		switch( type[i] ) {
 		case "H" : result.push( new HexTile( new Vertex(0,0), baseCellRadius ) ); break;
-		case "S" : result.push( new QuadTile( new Vertex(0,0), baseCellRadius ) ); break;
+		case "Q" : result.push( new QuadTile( new Vertex(0,0), baseCellRadius ) ); break;
 		case "T" : result.push( new TriTile( new Vertex(0,0), baseCellRadius ) ); break;
 		}
 	    }
-	    console.log( result );
+	    // console.log( result );
 	    return result;
 	};
+
 	
 	/**
 	 * @param {Array<HexTile|QuadTile|TriTile>} gradient - An array of n HexTile, QuadTile or TriTile settings.
@@ -149,9 +153,10 @@
 		gradientIndex+1 >= gradient.length
 		? gradient[gradientIndex]
 		: gradient[gradientIndex+1];
-	    var relativeRatio = ( (1-ratio) - gradientIndex/(gradient.length-1)) * n;
+	    
+	    var relativeRatio = ( (1-ratio) - gradientIndex/(gradient.length>1 ? gradient.length-1 : 1)) * n;
 	    var hRotation = { start : config.horizontalStartRotation * DEG_TO_RAD, end : config.horizontalEndRotation * DEG_TO_RAD };
-	    var vRotation = { start : config.verticalStartRotation * DEG_TO_RAD, end : config.verticalEndRotation * DEG_TO_RAD };
+	    var vRotation = { start : config.verticalStartRotation * DEG_TO_RAD,   end : config.verticalEndRotation * DEG_TO_RAD   };
 	    for( var i = 0; i < fromTile.vertices.length; i++ ) {
 		vert = fromTile.vertices[i]
 		    .clone()
@@ -162,7 +167,7 @@
 		    .add( offset )
 		    .rotate( (hRotation.end - (hRotation.end-hRotation.start)*xPct) +
 			     (vRotation.end - (vRotation.end-vRotation.start)*yPct), 
-			     offset )
+			     offset ) 
 		    .scale( (2.0 - (2-(config.horizontalEndScale) - ((2-config.horizontalEndScale)-(2-config.horizontalStartScale))*xPct)) *
 			    (2.0 - (2-(config.verticalEndScale) - ((2-config.verticalEndScale)-(2-config.verticalStartScale))*yPct)),
 			    offset )
@@ -173,19 +178,16 @@
 	};
 	
 	var drawAll = function() {
-	    // console.log('gradientType', config.gradientType );
-
 	    // Bounds: { ..., width, height }
-	    var viewport = pb.viewport();
-	    var baseCellRadius = viewport.width * (config.cellRadiusPct/100.0);
+	    var viewport           = pb.viewport();
+	    var baseCellRadius     = viewport.width * (config.cellRadiusPct/100.0);
 	    // This would be the outscribing circle radius for the plane-fitting hexagon.
 	    var outerHexagonRadius = Math.sqrt( 4.0 * baseCellRadius * baseCellRadius / 3.0 );
-
-	    var tileGradient = getSelectedGradient(baseCellRadius);
+	    var tileGradient       = getSelectedGradient(baseCellRadius);
 	    
 	    // Get the start- and end-positions to use for the plane.
 	    var startXY = pb.transformMousePosition( baseCellRadius, baseCellRadius );
-	    var endXY = pb.transformMousePosition( viewport.width-baseCellRadius, viewport.height-baseCellRadius );
+	    var endXY   = pb.transformMousePosition( viewport.width-baseCellRadius, viewport.height-baseCellRadius );
 
 	    var viewWidth = endXY.x - startXY.x;
 	    var viewHeight = endXY.y - startXY.y;
@@ -239,15 +241,13 @@
 			var xPct = (shapeVert.x-shapeVec.a.x)/shapeLen;
 			var yPct = shapeVert.y/shapeLen; // y is orientated on the x-axis
 			var vert = vec.vertAt( xPct );
-			// result.push( vert );
-			// pb.draw.circle( vert, 3 );
 			var tmpPerp = vec.clone().moveTo( vert ).perp();
 			var perpVert = tmpPerp.vertAt( yPct );
 			result.push( perpVert );
 		    }
 		}
 	    }
-	    return result; //polyverts;
+	    return result; 
 	};
 	
 	
@@ -290,12 +290,12 @@
         {
 	    var SHAPE_GRADIENTS = {
 		"△"   :"T",
-		"□"  :"S",
+		"□"  :"Q",
 		"⬡" :"H",
-		"△□"  :"TS",
-		"△⬡" :"TH",
-		"△□⬡" :"TSH",
-		"△⬡"  :"TH"
+		"△□"  :"TQ",
+		"△⬡"  :"TH",
+		"△□"  :"TQ",
+		"△□⬡" :"TQH"
 	    };
 	    var gui = pb.createGUI();
 	    gui.add(config, 'cellRadiusPct').min(0.5).max(10).step(0.1).onChange( function() { pb.redraw(); } ).name("Cell size %").title("The cell radius");
