@@ -43,10 +43,19 @@
 		      backgroundColor       : '#ffffff',
 		      enableMouse           : true,
 		      enableKeys            : true,
-		      enableTouch           : true
+		      enableTouch           : true,
+		      enableSVGExport       : false
 		    }, GUP
 		)
 	    );
+
+	    
+	    // +---------------------------------------------------------------------------------
+	    // | A global config that's attached to the dat.gui control interface.
+	    // +-------------------------------
+	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
+		segmentCount   : 100
+	    }, GUP );
 
 	    var dildoGeneration = new DildoGeneration('dildo-canvas');
 
@@ -59,7 +68,7 @@
 	    };
 
 	    var rebuild = function() {
-		dildoGeneration.rebuild( outline );
+		dildoGeneration.rebuild( { outline : outline, segmentCount : config.segmentCount } );
 	    };
 	    
 	    var outline = BezierPath.fromJSON( DEFAULT_BEZIER_JSON );
@@ -94,16 +103,7 @@
 		    var cy = document.getElementById('cy');
 		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-		} );
-
-
-	    // +---------------------------------------------------------------------------------
-	    // | A global config that's attached to the dat.gui control interface.
-	    // +-------------------------------
-	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		pointCount   : 3
-	    }, GUP );
-	    
+		} );	    
 
 
 	    // +---------------------------------------------------------------------------------
@@ -111,18 +111,7 @@
 	    // +-------------------------------
             {
 		var gui = pb.createGUI();
-
-		/* var f0 = gui.addFolder('Colors');
-		f0.addColor(config.colors.trisectors, 0).onChange( function() { pb.redraw(); } ).name('Trisector A').title('The first trisector');
-		f0.addColor(config.colors.trisectors, 1).onChange( function() { pb.redraw(); } ).name('Trisector B').title('The second trisector');
-		f0.addColor(config.colors.trisectors, 2).onChange( function() { pb.redraw(); } ).name('Trisector C').title('The third trisector');
-		f0.addColor(config.colors, 'hexagon').onChange( function() { pb.redraw(); } ).name('Hexagon').title('The hexagon color');
-		f0.addColor(config.colors, 'triangle').onChange( function() { pb.redraw(); } ).name('Triangle').title('The triangle color');
-		
-		var f1 = gui.addFolder('Points');
-		f1.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
-		f1.open();
-		*/
+		gui.add(config, "segmentCount").min(3).max(100).onChange( function() { rebuild() } ).name('#segments').title('The number of segments');
 	    }
 
 	    pb.config.preDraw = preDraw;

@@ -16,12 +16,27 @@
 	// this.camera.position.x = -50;
 	// this.camera.position.y = -50;
 
-	this.light = new THREE.AmbientLight( 0x0000ff, 0.5 ); //, 100.5 ); // , 600, 100 );
-	var pointLight = new THREE.PointLight( 0xffffff, 700, 200 );
-	pointLight.position.x = 100;
-	this.scene.add( pointLight );
-	this.light.position.set( 250, 250, 50 );
-	this.scene.add( this.light );
+	/* this.pointLightA = new THREE.PointLight( 0xffffff, 700, 200 );
+	this.pointLightA.position.x = 100;
+	this.scene.add( this.pointLightA );
+
+	this.pointLightB = new THREE.PointLight( 0xffffff, 700, 200 );
+	this.pointLightB.position.x = -100;
+	this.scene.add( this.pointLightB ); */
+
+	this.ambientLightA = new THREE.AmbientLight( 0x0000ff ); //, 100.5 ); // , 600, 100 );
+	this.ambientLightA.position.set( 350, 350, 50 );
+	this.scene.add( this.ambientLightA );
+	
+	this.directionalLightA = new THREE.DirectionalLight(0xffffff,1);
+	// this.ambientLight.target.set( 0, 0, 0 );
+	this.directionalLightA.position.set( 350, 350, 50 );
+	this.scene.add( this.directionalLightA );
+
+	this.directionalLightB = new THREE.DirectionalLight(0xffffff,1);
+	// this.ambientLight.target.set( 0, 0, 0 );
+	this.directionalLightB.position.set( -350, -350, -50 );
+	this.scene.add( this.directionalLightB );
 
 	this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas,
 						   preserveDrawingBuffer: true,   // This is required to take screen shots
@@ -42,7 +57,7 @@
 		console.log('animate');
 	    requestAnimationFrame( animate );
 	    _self.controls.update();
-	    _self.light.position.set( -_self.camera.position.x, -_self.camera.position.y, -_self.camera.position.z );
+	    // _self.ambientLightA.position.set( _self.camera.position.y, _self.camera.position.x, _self.camera.position.z );
 	    _self.renderer.render( _self.scene, _self.camera );
 	    i++;
 	}
@@ -64,9 +79,10 @@
     };
 
     /**
-     * @param {BezierPath} outline
+     * @param {BezierPath} options.outline
+     * @param {number}     options.segmentCount
      **/
-    DildoGeneration.prototype.rebuild = function( outline ) {
+    DildoGeneration.prototype.rebuild = function( options ) {
 	if( this.lathe != null ) {
 	    // Remove old object.
 	    //  A better way would be to update the lathe in-place. Possible?
@@ -80,30 +96,16 @@
 	//    https://threejs.org/docs/#api/en/geometries/LatheGeometry
 	
 	var points = [];
-	for( var i = 0; i <= 100; i++ ) {
-	    var vert = outline.getPointAt( i/100 );
+	for( var i = 0; i <= options.segmentCount; i++ ) {
+	    var vert = options.outline.getPointAt( i/options.segmentCount );
 	    points.push( new THREE.Vector2( -vert.x, -vert.y ) );
 	}
 	var geometry = new THREE.LatheGeometry( points, 12, Math.PI*2 );
-	// var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-	// var material = new THREE.MeshBasicMaterial({ color: 0x999999, wireframe: false, transparent: false, opacity: 0.85 } );
-	var material = new THREE.MeshPhongMaterial({ color: 0xffff00, wireframe : false, flatShading: false, depthTest : true, opacity : 1.0, side : THREE.DoubleSide, visible : true, /* emissive : 0x0, reflectivity : 1.0, refractionRatio : 0.89, shinyness: 50 */ } )
-	/* var material = new THREE.MeshPhongMaterial( 
-	    { color: 0x151D28, // 0x151D28, //0x2D303D, 
-	      ambient: 0x996633, // 0xffffff, // 0x996633, // should generally match color
-	      specular: 0x888888, // 0x050505,
-	      shininess: 50, //100,
-	      //emissive: 0x101010, // 0x000000, 
-	      wireframe: false, // wireFrame, 
-	      shading: THREE.LambertShading // THREE.FlatShading 
-	    } 
-	); */
+
+	var material = new THREE.MeshPhongMaterial({ color: 0xffff00, wireframe : false, flatShading: false, depthTest : true, opacity : 1.0, side : THREE.DoubleSide, visible : true, emissive : 0x0, reflectivity : 1.0, refractionRatio : 0.89, specular: 0x888888, /*, shading : THREE.LambertShading */ } )
 	this.lathe = new THREE.Mesh( geometry, material );
-	// lathe.rotation.x = Math.PI;
 	this.lathe.position.y = -100;
 	this.camera.lookAt( new THREE.Vector3(20,0,150) );
-	this.lathe.name = "my-dildo";
-	// console.log( 'rebuilt', lathe );
 	this.scene.add( this.lathe );
     };
     
