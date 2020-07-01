@@ -58,11 +58,22 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    cellRadiusPct         : 2.5,  // %
-	    shapeRadiusFactor     : 1.0,
-	    segmentCount          : 4,
+	    cellRadiusPct            : 2.5,  // %
+	    shapeRadiusFactor        : 1.0,  // Scale inside the cell
+	    
+	    horizontalStartScale     : 1.0,
+	    horizontalEndScale       : 1.0,
+	    verticalStartScale       : 1.0,
+	    verticalEndScale         : 1.0,
 
-	    gradientType          : "TSH"
+	    horizontalStartRotation  : 0.0,
+	    horizontalEndRotation    : 0.0,
+	    verticalStartRotation    : 0.0,
+	    verticalEndRotation      : 0.0,
+	    
+	    segmentCount             : 4,
+
+	    gradientType             : "TSH"  // Triangle-Square-Hexagon
 	}, GUP );
 
 	var miniCanvas = new MiniCanvas( document.getElementById('mini-canvas'),
@@ -121,11 +132,11 @@
 	};
 	
 	/**
-	 * @param {Array} gradient - An array of n HexTile, QuadTile or TriTile settings.
+	 * @param {Array<HexTile|QuadTile|TriTile>} gradient - An array of n HexTile, QuadTile or TriTile settings.
 	 * @param {number} ratio
-	 * @param {Vertex} offset
+	 * @param {Vertex} offset - The cell's center.
 	 **/
-	var morphFromTo = function( gradient, ratio, offset, row, column ) {
+	var morphFromTo = function( gradient, ratio, offset, row, column, xPct, yPct ) {
 	    var vertices = [];
 	    var vert;
 	    // Find index in shape gradient array
@@ -139,6 +150,8 @@
 		? gradient[gradientIndex]
 		: gradient[gradientIndex+1];
 	    var relativeRatio = ( (1-ratio) - gradientIndex/(gradient.length-1)) * n;
+	    var hRotation = { start : config.horizontalStartRotation * DEG_TO_RAD, end : config.horizontalEndRotation * DEG_TO_RAD };
+	    var vRotation = { start : config.verticalStartRotation * DEG_TO_RAD, end : config.verticalEndRotation * DEG_TO_RAD };
 	    for( var i = 0; i < fromTile.vertices.length; i++ ) {
 		vert = fromTile.vertices[i]
 		    .clone()
@@ -146,14 +159,21 @@
 			  .difference(toTile.vertices[i])
 			  .multiplyScalar(relativeRatio)
 			)
-		    .add( offset );
+		    .add( offset )
+		    .rotate( (hRotation.end - (hRotation.end-hRotation.start)*xPct) +
+			     (vRotation.end - (vRotation.end-vRotation.start)*yPct), 
+			     offset )
+		    .scale( (2.0 - (2-(config.horizontalEndScale) - ((2-config.horizontalEndScale)-(2-config.horizontalStartScale))*xPct)) *
+			    (2.0 - (2-(config.verticalEndScale) - ((2-config.verticalEndScale)-(2-config.verticalStartScale))*yPct)),
+			    offset )
+		;
 		vertices.push( vert );
 	    }
 	    return vertices;
 	};
 	
 	var drawAll = function() {
-	    console.log('gradientType', config.gradientType );
+	    // console.log('gradientType', config.gradientType );
 
 	    // Bounds: { ..., width, height }
 	    var viewport = pb.viewport();
@@ -184,7 +204,7 @@
 		    // Make a hexagon that outscribes the circle?
 		    // var outerNGonPoints = makeNGon( circle.center, outerHexagonRadius, 6, Math.PI/6.0 );
 		    // var polyverts = morphFromTo( tileGradient, config.globalRatio/100.0, center );
-		    var polyverts = morphFromTo( tileGradient, xPct*yPct, center, yRow, xColumn );
+		    var polyverts = morphFromTo( tileGradient, xPct*yPct, center, yRow, xColumn, xPct, yPct );
 		    // pb.draw.polyline( polyverts, false, 'rgba(232,128,0,1.0)', 2 );
 		    pb.draw.polyline( mapPolyLine( polyverts, miniCanvas.getPolyLine() ), false, 'rgba(232,128,0,1.0)', 2 );
 
@@ -281,7 +301,18 @@
 	    gui.add(config, 'cellRadiusPct').min(0.5).max(10).step(0.1).onChange( function() { pb.redraw(); } ).name("Cell size %").title("The cell radius");
 	    gui.add(config, 'shapeRadiusFactor').min(0.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("Shape factor").title("The shape factor inside the cell.");
 	    gui.add(config, 'segmentCount').min(1).max(10).step(1).onChange( function() { miniCanvas.setVertCount(config.segmentCount+1); pb.redraw(); } ).name("#segments").title("The segment count for each interpolated linear edge.");
-	    gui.add(config, 'gradientType', SHAPE_GRADIENTS).onChange( function() { pb.redraw(); } ).name("Gradient type").title("Which shape gradient to use?");   
+	    gui.add(config, 'gradientType', SHAPE_GRADIENTS).onChange( function() { pb.redraw(); } ).name("Gradient type").title("Which shape gradient to use?");
+	    var scaleFolder = gui.addFolder("Scale ...");
+	    scaleFolder.add(config, 'horizontalStartScale').min(0.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("HScale start").title("Horizontal start scale");
+	    scaleFolder.add(config, 'horizontalEndScale').min(0.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("HScale end").title("Horizontal end scale");
+	    scaleFolder.add(config, 'verticalStartScale').min(0.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("VScale start").title("Vertical start scale");
+	    scaleFolder.add(config, 'verticalEndScale').min(0.0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name("VScale end").title("Vertical end scale");
+
+	    var rotateFolder = gui.addFolder("Rotate ...");
+	    rotateFolder.add(config, 'horizontalStartRotation').min(0.0).max(360.0).step(0.01).onChange( function() { pb.redraw(); } ).name("HRotate start").title("Horizontal start rotation");
+	    rotateFolder.add(config, 'horizontalEndRotation').min(0.0).max(360.0).step(0.01).onChange( function() { pb.redraw(); } ).name("HRotate end").title("Horizontal end rotation");
+	    rotateFolder.add(config, 'verticalStartRotation').min(0.0).max(360.0).step(0.01).onChange( function() { pb.redraw(); } ).name("VRotate start").title("Vertical start rotation");
+	    rotateFolder.add(config, 'verticalEndRotation').min(0.0).max(360.0).step(0.01).onChange( function() { pb.redraw(); } ).name("VRotate end").title("Vertical end rotation");
 	}
 
 	pb.config.postDraw = drawAll;
