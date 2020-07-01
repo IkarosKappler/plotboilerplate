@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2020-07-01 (1.8.1)
+  * Tweaked the pattern gradient demo (rotation and scale).
+  * Prepared a new demo: with THREE.js.
+  * Changed the scope of BezierPath.fromJSON (is now static, was an instance method before).
 * 2020-06-22 (1.8.0)
   * Added the rasterScaleX and rasterScaleY config params.
   * Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.

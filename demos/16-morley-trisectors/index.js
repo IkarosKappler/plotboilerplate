@@ -1,5 +1,5 @@
 /**
- * A script for testing vector fields.
+ * A script for testing the morley triangle.
  *
  * @require PlotBoilerplate, MouseHandler, gup, dat.gui
  * 

@@ -95,6 +95,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @param {number=}  [config.offsetX=1.0] - The initial x-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
      * @param {number=}  [config.offsetY=1.0] - The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
      * @param {boolean=} [config.rasterGrid=true] - If set to true the background grid will be drawn rastered.
+     * @param {boolean=} [config.rasterScaleX=1.0] - Define the default horizontal raster scale (default=1.0).
+     * @param {boolean=} [config.rasterScaleY=1.0] - Define the default vertical raster scale (default=1.0).
      * @param {number=}  [config.rasterAdjustFactor=1.0] - The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
      * @param {boolean=} [config.drawOrigin=false] - Draw a crosshair at (0,0).
      * @param {boolean=} [config.autoAdjustOffset=true] -  When set to true then the origin of the XY plane will

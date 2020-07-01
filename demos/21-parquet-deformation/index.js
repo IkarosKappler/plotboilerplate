@@ -123,7 +123,6 @@
 	    var type = config.gradientType.split("");
 	    var result = [];
 	    for( var i = 0; i < type.length; i++ ) {
-		console.log( type[i] );
 		switch( type[i] ) {
 		case "H" : result.push( new HexTile( new Vertex(0,0), baseCellRadius ) ); break;
 		case "Q" : result.push( new QuadTile( new Vertex(0,0), baseCellRadius ) ); break;

@@ -978,11 +978,11 @@ var BezierPath = /** @class */ (function () {
      * @method fromJSON
      * @param {string} jsonString - The string with the JSON data.
      * @throw An error if the string is not JSON or does not contain a bezier path object.
-     * @instance
+     * @static
      * @memberof BezierPath
      * @return {BezierPath} The parsed bezier path instance.
      **/
-    BezierPath.prototype.fromJSON = function (jsonString) {
+    BezierPath.fromJSON = function (jsonString) {
         var obj = JSON.parse(jsonString);
         return BezierPath.fromArray(obj);
     };
@@ -993,7 +993,7 @@ var BezierPath = /** @class */ (function () {
      * @method fromArray
      * @param {Vertex[][]} arr - A two-dimensional array containing the bezier path vertices.
      * @throw An error if the array does not contain proper bezier path data.
-     * @instance
+     * @static
      * @memberof BezierPath
      * @return {BezierPath} The bezier path instance retrieved from the array data.
      **/
