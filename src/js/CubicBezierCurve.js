@@ -19,12 +19,14 @@
  * @modified 2020-02-10 Added the reverse() function.
  * @modified 2020-02-10 Fixed the translate(...) function (returning 'this' was missing).
  * @modified 2020-03-24 Ported this class from vanilla JS to Typescript.
- * @version 2.3.2
+ * @modified 2020-06-03 Added the getBounds() function.
+ * @version 2.4.0
  *
  * @file CubicBezierCurve
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds_1 = require("./Bounds");
 var Vertex_1 = require("./Vertex");
 var Vector_1 = require("./Vector");
 var CubicBezierCurve = /** @class */ (function () {
@@ -188,6 +190,28 @@ var CubicBezierCurve = /** @class */ (function () {
             t += curveStep;
         }
         this.arcLength = newLength;
+    };
+    ;
+    /**
+     * Get the bounds of this bezier curve.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @return {Bounds} The bounds of this curve.
+     **/
+    CubicBezierCurve.prototype.getBounds = function () {
+        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        var v;
+        for (var i = 0; i < this.segmentCache.length; i++) {
+            v = this.segmentCache[i];
+            min.x = Math.min(min.x, v.x);
+            min.y = Math.min(min.y, v.y);
+            max.x = Math.max(max.x, v.x);
+            max.y = Math.max(max.y, v.y);
+        }
+        return new Bounds_1.Bounds(min, max);
     };
     ;
     /**

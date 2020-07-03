@@ -54,7 +54,8 @@
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
  * @modified 2020-05-09 Included the Cirlcle class.
  * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
- * @version  1.8.0
+ * @modified 2020-07-03 Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
+ * @version  1.8.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

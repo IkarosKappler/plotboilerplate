@@ -1,7 +1,7 @@
 /**
  * @classdesc A refactored BezierPath class.
  *
- * @require Vertex, CubicBezierCurve
+ * @require Bounds, Vertex, CubicBezierCurve, XYCoords, SVGSerializable
  *
  * @author Ikaros Kappler
  * @date 2013-08-19
@@ -18,11 +18,14 @@
  * @modified 2020-02-06 Added function locateCurveByEndPoint( Vertex ).
  * @modified 2020-02-11 Added 'return this' to the scale(Vertex,number) and to the translate(Vertex) function.
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
- * @version 2.1.2
+ * @modified 2020-06-03 Made the private helper function _locateUIndex to a private function.
+ * @modified 2020-06-03 Added the getBounds() function.
+ * @version 2.2.0
  *
  * @file BezierPath
  * @public
  **/
+import { Bounds } from "./Bounds";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
@@ -338,11 +341,7 @@ export declare class BezierPath implements SVGSerializable {
      * - {number} uPart - the absolute curve length sum (length from the beginning to u, should equal u itself).
      * - {number} uBefore - the absolute curve length for all segments _before_ the matched curve (usually uBefore <= uPart).
      **/
-    static _locateUIndex(path: BezierPath, u: number): {
-        i: number;
-        uPart: number;
-        uBefore: number;
-    };
+    private static _locateUIndex;
     /**
      * Get a specific sub path from this path. The start and end position are specified by
      * ratio number in [0..1].
@@ -421,7 +420,16 @@ export declare class BezierPath implements SVGSerializable {
      * @memberof BezierPath
      * @return {void}
      **/
-    adjustNeighbourControlPoint(mainCurve: CubicBezierCurve, neighbourCurve: CubicBezierCurve, mainPoint: Vertex, mainControlPoint: Vertex, neighbourPoint: Vertex, neighbourControlPoint: Vertex, obtainHandleLengths: boolean, updateArcLengths: boolean): void;
+    private static adjustNeighbourControlPoint;
+    /**
+     * Get the bounds of this Bézier path.
+     *
+     * Note the the curves' underlyung segment buffers are used to determine the bounds. The more
+     * elements the segment buffers have, the more precise the returned bounds will be.
+     *
+     * @return {Bounds} The bounds of this Bézier path.
+     **/
+    getBounds(): Bounds;
     /**
      * Clone this BezierPath (deep clone).
      *

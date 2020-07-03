@@ -13,28 +13,16 @@
 	this.scene = new THREE.Scene();
 	this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 	this.camera.position.z = 500;
-	// this.camera.position.x = -50;
-	// this.camera.position.y = -50;
 
-	/* this.pointLightA = new THREE.PointLight( 0xffffff, 700, 200 );
-	this.pointLightA.position.x = 100;
-	this.scene.add( this.pointLightA );
-
-	this.pointLightB = new THREE.PointLight( 0xffffff, 700, 200 );
-	this.pointLightB.position.x = -100;
-	this.scene.add( this.pointLightB ); */
-
-	this.ambientLightA = new THREE.AmbientLight( 0x0000ff ); //, 100.5 ); // , 600, 100 );
+	this.ambientLightA = new THREE.AmbientLight( 0x0000ff ); 
 	this.ambientLightA.position.set( 350, 350, 50 );
 	this.scene.add( this.ambientLightA );
 	
 	this.directionalLightA = new THREE.DirectionalLight(0xffffff,1);
-	// this.ambientLight.target.set( 0, 0, 0 );
 	this.directionalLightA.position.set( 350, 350, 50 );
 	this.scene.add( this.directionalLightA );
 
 	this.directionalLightB = new THREE.DirectionalLight(0xffffff,1);
-	// this.ambientLight.target.set( 0, 0, 0 );
 	this.directionalLightB.position.set( -350, -350, -50 );
 	this.scene.add( this.directionalLightB );
 
@@ -96,9 +84,10 @@
 	//    https://threejs.org/docs/#api/en/geometries/LatheGeometry
 	
 	var points = [];
+	var outlineBounds = options.outline.getBounds();
 	for( var i = 0; i <= options.segmentCount; i++ ) {
 	    var vert = options.outline.getPointAt( i/options.segmentCount );
-	    points.push( new THREE.Vector2( -vert.x, -vert.y ) );
+	    points.push( new THREE.Vector2( -vert.x+(outlineBounds.max.x) , -vert.y ) );
 	}
 	var geometry = new THREE.LatheGeometry( points, 12, Math.PI*2 );
 

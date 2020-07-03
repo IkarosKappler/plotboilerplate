@@ -18,11 +18,13 @@
  * @modified 2020-02-10 Added the reverse() function.
  * @modified 2020-02-10 Fixed the translate(...) function (returning 'this' was missing).
  * @modified 2020-03-24 Ported this class from vanilla JS to Typescript.
- * @version 2.3.2
+ * @modified 2020-06-03 Added the getBounds() function.
+ * @version 2.4.0
  *
  * @file CubicBezierCurve
  * @public
  **/
+import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
 export declare class CubicBezierCurve {
     /** @constant {number} */
@@ -163,6 +165,15 @@ export declare class CubicBezierCurve {
      * @return {void}
      **/
     updateArcLengths(): void;
+    /**
+     * Get the bounds of this bezier curve.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @return {Bounds} The bounds of this curve.
+     **/
+    getBounds(): Bounds;
     /**
      * Get the start point of the curve.<br>
      * <br>

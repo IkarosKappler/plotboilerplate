@@ -87,7 +87,10 @@
 	    // | Draw some stuff before rendering?
 	    // +-------------------------------
 	    var preDraw = function() {
-		
+		// console.log('pre draw');
+		var pathBounds = outline.getBounds();
+		// console.log( pathBounds );
+		pb.draw.rect( pathBounds.min, pathBounds.width, pathBounds.height, 'rgba(0,0,0,0.5)', 1 );
 	
 	    };
 	    

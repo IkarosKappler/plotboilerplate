@@ -2,7 +2,7 @@
 /**
  * @classdesc A refactored BezierPath class.
  *
- * @require Vertex, CubicBezierCurve
+ * @require Bounds, Vertex, CubicBezierCurve, XYCoords, SVGSerializable
  *
  * @author Ikaros Kappler
  * @date 2013-08-19
@@ -19,12 +19,15 @@
  * @modified 2020-02-06 Added function locateCurveByEndPoint( Vertex ).
  * @modified 2020-02-11 Added 'return this' to the scale(Vertex,number) and to the translate(Vertex) function.
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
- * @version 2.1.2
+ * @modified 2020-06-03 Made the private helper function _locateUIndex to a private function.
+ * @modified 2020-06-03 Added the getBounds() function.
+ * @version 2.2.0
  *
  * @file BezierPath
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds_1 = require("./Bounds");
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Vertex_1 = require("./Vertex");
 var BezierPath = /** @class */ (function () {
@@ -803,7 +806,7 @@ var BezierPath = /** @class */ (function () {
             return; // false;
         var mainCurve = this.getCurveAt(curveIndex);
         var neighbourCurve = this.getCurveAt(curveIndex - 1 < 0 ? this.getCurveCount() + (curveIndex - 1) : curveIndex - 1);
-        /* return ? */ this.adjustNeighbourControlPoint(mainCurve, neighbourCurve, mainCurve.getStartPoint(), // the reference point
+        BezierPath.adjustNeighbourControlPoint(mainCurve, neighbourCurve, mainCurve.getStartPoint(), // the reference point
         mainCurve.getStartControlPoint(), // the dragged control point
         neighbourCurve.getEndPoint(), // the neighbour's point
         neighbourCurve.getEndControlPoint(), // the neighbour's control point to adjust
@@ -827,7 +830,7 @@ var BezierPath = /** @class */ (function () {
             return; //  false; 
         var mainCurve = this.getCurveAt(curveIndex);
         var neighbourCurve = this.getCurveAt((curveIndex + 1) % this.getCurveCount());
-        return this.adjustNeighbourControlPoint(mainCurve, neighbourCurve, mainCurve.getEndPoint(), // the reference point
+        /* return */ BezierPath.adjustNeighbourControlPoint(mainCurve, neighbourCurve, mainCurve.getEndPoint(), // the reference point
         mainCurve.getEndControlPoint(), // the dragged control point
         neighbourCurve.getStartPoint(), // the neighbour's point
         neighbourCurve.getStartControlPoint(), // the neighbour's control point to adjust
@@ -852,7 +855,7 @@ var BezierPath = /** @class */ (function () {
      * @return {void}
      **/
     // !!! TODO: SHOULDNT THIS BE A STATIC FUNCTION ???
-    BezierPath.prototype.adjustNeighbourControlPoint = function (mainCurve, neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, updateArcLengths) {
+    BezierPath.adjustNeighbourControlPoint = function (mainCurve, neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, updateArcLengths) {
         // Calculate start handle length
         var mainHandleBounds = new Vertex_1.Vertex(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
         var neighbourHandleBounds = new Vertex_1.Vertex(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
@@ -865,11 +868,31 @@ var BezierPath = /** @class */ (function () {
             neighbourControlPoint.set(neighbourPoint.x - mainHandleBounds.x * (neighbourHandleLength / mainHandleLength), neighbourPoint.y - mainHandleBounds.y * (neighbourHandleLength / mainHandleLength));
         }
         else {
-            neighbourControlPoint.set(neighbourPoint.x - mainHandleBounds.x, // * (neighbourHandleLength/mainHandleLength),
-            neighbourPoint.y - mainHandleBounds.y // * (neighbourHandleLength/mainHandleLength)
-            );
+            neighbourControlPoint.set(neighbourPoint.x - mainHandleBounds.x, neighbourPoint.y - mainHandleBounds.y);
         }
         neighbourCurve.updateArcLengths();
+    };
+    ;
+    /**
+     * Get the bounds of this Bézier path.
+     *
+     * Note the the curves' underlyung segment buffers are used to determine the bounds. The more
+     * elements the segment buffers have, the more precise the returned bounds will be.
+     *
+     * @return {Bounds} The bounds of this Bézier path.
+     **/
+    BezierPath.prototype.getBounds = function () {
+        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        var b;
+        for (var i = 0; i < this.bezierCurves.length; i++) {
+            b = this.bezierCurves[i].getBounds();
+            min.x = Math.min(min.x, b.min.x);
+            min.y = Math.min(min.y, b.min.y);
+            max.x = Math.max(max.x, b.max.x);
+            max.y = Math.max(max.y, b.max.y);
+        }
+        return new Bounds_1.Bounds(min, max);
     };
     ;
     /**

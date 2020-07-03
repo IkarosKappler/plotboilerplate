@@ -117,6 +117,16 @@ export declare class drawutils {
      * @memberof drawutils
      **/
     image(image: HTMLImageElement, position: Vertex, size: Vertex): void;
+    /**
+     * Draw a rectangle.
+     *
+     * @param {Vertex} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    rect(position: Vertex, width: number, height: number, color: string, lineWidth?: number): void;
     _fillOrDraw(color: string): void;
     /**
      * Draw the given (cubic) bézier curve.

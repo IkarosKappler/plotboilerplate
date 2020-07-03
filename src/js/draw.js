@@ -135,6 +135,28 @@ var drawutils = /** @class */ (function () {
         this.ctx.restore();
     };
     ;
+    /**
+     * Draw a rectangle.
+     *
+     * @param {Vertex} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    drawutils.prototype.rect = function (position, width, height, color, lineWidth) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
+        this.ctx.lineTo(this.offset.x + position.x * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
+        this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    };
+    ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
     // | intended to be used from the outside.

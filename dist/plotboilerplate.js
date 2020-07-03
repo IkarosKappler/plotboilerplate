@@ -134,8 +134,8 @@ return /******/ (function(modules) { // webpackBootstrap
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var VertexAttr_1 = __webpack_require__(3);
-var VertexListeners_1 = __webpack_require__(9);
+var VertexAttr_1 = __webpack_require__(4);
+var VertexListeners_1 = __webpack_require__(10);
 var Vertex = /** @class */ (function () {
     /**
      * The constructor for the vertex class.
@@ -711,7 +711,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var VertTuple_1 = __webpack_require__(11);
+var VertTuple_1 = __webpack_require__(12);
 var Vertex_1 = __webpack_require__(0);
 var Line = /** @class */ (function (_super) {
     __extends(Line, _super);
@@ -826,7 +826,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var VertTuple_1 = __webpack_require__(11);
+var VertTuple_1 = __webpack_require__(12);
 var Vertex_1 = __webpack_require__(0);
 var Vector = /** @class */ (function (_super) {
     __extends(Vector, _super);
@@ -997,6 +997,47 @@ exports.Vector = Vector;
 "use strict";
 
 /**
+ * @classdesc A bounds class with min and max values.
+ *
+ * @requires XYCoords, Vertex, IBounds
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-05-11
+ * @version  1.0.0
+ *
+ * @file Bopunds
+ * @fileoverview A simple bounds class implementing IBounds.
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Bounds
+     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
+     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
+     **/
+    function Bounds(min, max) {
+        this.min = min;
+        this.max = max;
+        this.width = max.x - min.x;
+        this.height = max.y - min.y;
+    }
+    ;
+    return Bounds;
+}()); // END class bounds
+exports.Bounds = Bounds;
+//# sourceMappingURL=Bounds.js.map
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
  * @classdesc The VertexAttr is a helper class to wrap together additional attributes
  * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
  * <br>
@@ -1051,7 +1092,7 @@ exports.VertexAttr = VertexAttr;
 //# sourceMappingURL=VertexAttr.js.map
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1076,12 +1117,14 @@ exports.VertexAttr = VertexAttr;
  * @modified 2020-02-10 Added the reverse() function.
  * @modified 2020-02-10 Fixed the translate(...) function (returning 'this' was missing).
  * @modified 2020-03-24 Ported this class from vanilla JS to Typescript.
- * @version 2.3.2
+ * @modified 2020-06-03 Added the getBounds() function.
+ * @version 2.4.0
  *
  * @file CubicBezierCurve
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds_1 = __webpack_require__(3);
 var Vertex_1 = __webpack_require__(0);
 var Vector_1 = __webpack_require__(2);
 var CubicBezierCurve = /** @class */ (function () {
@@ -1245,6 +1288,28 @@ var CubicBezierCurve = /** @class */ (function () {
             t += curveStep;
         }
         this.arcLength = newLength;
+    };
+    ;
+    /**
+     * Get the bounds of this bezier curve.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @return {Bounds} The bounds of this curve.
+     **/
+    CubicBezierCurve.prototype.getBounds = function () {
+        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        var v;
+        for (var i = 0; i < this.segmentCache.length; i++) {
+            v = this.segmentCache[i];
+            min.x = Math.min(min.x, v.x);
+            min.y = Math.min(min.y, v.y);
+            max.x = Math.max(max.x, v.x);
+            max.y = Math.max(max.y, v.y);
+        }
+        return new Bounds_1.Bounds(min, max);
     };
     ;
     /**
@@ -1674,7 +1739,7 @@ exports.CubicBezierCurve = CubicBezierCurve;
 //# sourceMappingURL=CubicBezierCurve.js.map
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1682,7 +1747,7 @@ exports.CubicBezierCurve = CubicBezierCurve;
 /**
  * @classdesc A refactored BezierPath class.
  *
- * @require Vertex, CubicBezierCurve
+ * @require Bounds, Vertex, CubicBezierCurve, XYCoords, SVGSerializable
  *
  * @author Ikaros Kappler
  * @date 2013-08-19
@@ -1699,13 +1764,16 @@ exports.CubicBezierCurve = CubicBezierCurve;
  * @modified 2020-02-06 Added function locateCurveByEndPoint( Vertex ).
  * @modified 2020-02-11 Added 'return this' to the scale(Vertex,number) and to the translate(Vertex) function.
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
- * @version 2.1.2
+ * @modified 2020-06-03 Made the private helper function _locateUIndex to a private function.
+ * @modified 2020-06-03 Added the getBounds() function.
+ * @version 2.2.0
  *
  * @file BezierPath
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var CubicBezierCurve_1 = __webpack_require__(4);
+var Bounds_1 = __webpack_require__(3);
+var CubicBezierCurve_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
 var BezierPath = /** @class */ (function () {
     /**
@@ -2483,7 +2551,7 @@ var BezierPath = /** @class */ (function () {
             return; // false;
         var mainCurve = this.getCurveAt(curveIndex);
         var neighbourCurve = this.getCurveAt(curveIndex - 1 < 0 ? this.getCurveCount() + (curveIndex - 1) : curveIndex - 1);
-        /* return ? */ this.adjustNeighbourControlPoint(mainCurve, neighbourCurve, mainCurve.getStartPoint(), // the reference point
+        BezierPath.adjustNeighbourControlPoint(mainCurve, neighbourCurve, mainCurve.getStartPoint(), // the reference point
         mainCurve.getStartControlPoint(), // the dragged control point
         neighbourCurve.getEndPoint(), // the neighbour's point
         neighbourCurve.getEndControlPoint(), // the neighbour's control point to adjust
@@ -2507,7 +2575,7 @@ var BezierPath = /** @class */ (function () {
             return; //  false; 
         var mainCurve = this.getCurveAt(curveIndex);
         var neighbourCurve = this.getCurveAt((curveIndex + 1) % this.getCurveCount());
-        return this.adjustNeighbourControlPoint(mainCurve, neighbourCurve, mainCurve.getEndPoint(), // the reference point
+        /* return */ BezierPath.adjustNeighbourControlPoint(mainCurve, neighbourCurve, mainCurve.getEndPoint(), // the reference point
         mainCurve.getEndControlPoint(), // the dragged control point
         neighbourCurve.getStartPoint(), // the neighbour's point
         neighbourCurve.getStartControlPoint(), // the neighbour's control point to adjust
@@ -2532,7 +2600,7 @@ var BezierPath = /** @class */ (function () {
      * @return {void}
      **/
     // !!! TODO: SHOULDNT THIS BE A STATIC FUNCTION ???
-    BezierPath.prototype.adjustNeighbourControlPoint = function (mainCurve, neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, updateArcLengths) {
+    BezierPath.adjustNeighbourControlPoint = function (mainCurve, neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, updateArcLengths) {
         // Calculate start handle length
         var mainHandleBounds = new Vertex_1.Vertex(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
         var neighbourHandleBounds = new Vertex_1.Vertex(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
@@ -2545,11 +2613,31 @@ var BezierPath = /** @class */ (function () {
             neighbourControlPoint.set(neighbourPoint.x - mainHandleBounds.x * (neighbourHandleLength / mainHandleLength), neighbourPoint.y - mainHandleBounds.y * (neighbourHandleLength / mainHandleLength));
         }
         else {
-            neighbourControlPoint.set(neighbourPoint.x - mainHandleBounds.x, // * (neighbourHandleLength/mainHandleLength),
-            neighbourPoint.y - mainHandleBounds.y // * (neighbourHandleLength/mainHandleLength)
-            );
+            neighbourControlPoint.set(neighbourPoint.x - mainHandleBounds.x, neighbourPoint.y - mainHandleBounds.y);
         }
         neighbourCurve.updateArcLengths();
+    };
+    ;
+    /**
+     * Get the bounds of this Bézier path.
+     *
+     * Note the the curves' underlyung segment buffers are used to determine the bounds. The more
+     * elements the segment buffers have, the more precise the returned bounds will be.
+     *
+     * @return {Bounds} The bounds of this Bézier path.
+     **/
+    BezierPath.prototype.getBounds = function () {
+        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        var b;
+        for (var i = 0; i < this.bezierCurves.length; i++) {
+            b = this.bezierCurves[i].getBounds();
+            min.x = Math.min(min.x, b.min.x);
+            min.y = Math.min(min.y, b.min.y);
+            max.x = Math.max(max.x, b.max.x);
+            max.y = Math.max(max.y, b.max.y);
+        }
+        return new Bounds_1.Bounds(min, max);
     };
     ;
     /**
@@ -2820,7 +2908,7 @@ exports.BezierPath = BezierPath;
 //# sourceMappingURL=BezierPath.js.map
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2846,7 +2934,7 @@ exports.BezierPath = BezierPath;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var BezierPath_1 = __webpack_require__(5);
+var BezierPath_1 = __webpack_require__(6);
 var Vertex_1 = __webpack_require__(0);
 var Polygon = /** @class */ (function () {
     /**
@@ -3103,7 +3191,7 @@ exports.Polygon = Polygon;
 //# sourceMappingURL=Polygon.js.map
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3141,10 +3229,10 @@ exports.Polygon = Polygon;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds_1 = __webpack_require__(12);
-var Circle_1 = __webpack_require__(8);
+var Bounds_1 = __webpack_require__(3);
+var Circle_1 = __webpack_require__(9);
 var Line_1 = __webpack_require__(1);
-var Polygon_1 = __webpack_require__(6);
+var Polygon_1 = __webpack_require__(7);
 var Vertex_1 = __webpack_require__(0);
 var geomutils_1 = __webpack_require__(13);
 var Triangle = /** @class */ (function () {
@@ -3521,7 +3609,7 @@ exports.Triangle = Triangle;
 //# sourceMappingURL=Triangle.js.map
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3639,7 +3727,7 @@ exports.Circle = Circle;
 //# sourceMappingURL=Circle.js.map
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3866,7 +3954,7 @@ exports.VertexListeners = VertexListeners;
 //# sourceMappingURL=VertexListeners.js.map
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3957,7 +4045,7 @@ exports.Grid = Grid;
 //# sourceMappingURL=Grid.js.map
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4244,47 +4332,6 @@ exports.VertTuple = VertTuple;
 //# sourceMappingURL=VertTuple.js.map
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A bounds class with min and max values.
- *
- * @requires XYCoords, Vertex, IBounds
- *
- * @author   Ikaros Kappler
- * @date     2020-05-11
- * @version  1.0.0
- *
- * @file Bopunds
- * @fileoverview A simple bounds class implementing IBounds.
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Bounds
-     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
-     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
-     **/
-    function Bounds(min, max) {
-        this.min = min;
-        this.max = max;
-        this.width = max.x - min.x;
-        this.height = max.y - min.y;
-    }
-    ;
-    return Bounds;
-}()); // END class bounds
-exports.Bounds = Bounds;
-//# sourceMappingURL=Bounds.js.map
-
-/***/ }),
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4292,7 +4339,7 @@ exports.Bounds = Bounds;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Line_1 = __webpack_require__(1);
-var Triangle_1 = __webpack_require__(7);
+var Triangle_1 = __webpack_require__(8);
 exports.geomutils = {
     /**
      * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
@@ -5207,7 +5254,7 @@ exports.KeyHandler = KeyHandler;
  * @version  1.5.6
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var CubicBezierCurve_1 = __webpack_require__(4);
+var CubicBezierCurve_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
 // Todo: rename this class to Drawutils
 var drawutils = /** @class */ (function () {
@@ -5304,6 +5351,28 @@ var drawutils = /** @class */ (function () {
         this.ctx.drawImage(image, 0, 0, image.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
         image.naturalHeight - 1, // To avoid errors substract 1 here.
         this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw a rectangle.
+     *
+     * @param {Vertex} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    drawutils.prototype.rect = function (position, width, height, color, lineWidth) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
+        this.ctx.lineTo(this.offset.x + position.x * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
+        this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
         this.ctx.restore();
     };
     ;
@@ -6547,19 +6616,19 @@ var GLU = /** @class */ (function () {
 
 /* Imports for webpack */
 
-window.VertexAttr = __webpack_require__(3).VertexAttr;
-window.VertexListeners = __webpack_require__(9).VertexListeners;
+window.VertexAttr = __webpack_require__(4).VertexAttr;
+window.VertexListeners = __webpack_require__(10).VertexListeners;
 window.Vertex = __webpack_require__(0).Vertex;
 
-window.Grid = __webpack_require__(10).Grid;
+window.Grid = __webpack_require__(11).Grid;
 window.Line = __webpack_require__(1).Line;
 window.Vector = __webpack_require__(2).Vector;
-window.CubicBezierCurve = __webpack_require__(4).CubicBezierCurve;
-window.BezierPath = __webpack_require__(5).BezierPath;
-window.Polygon = __webpack_require__(6).Polygon;
-window.Triangle = __webpack_require__(7).Triangle;
+window.CubicBezierCurve = __webpack_require__(5).CubicBezierCurve;
+window.BezierPath = __webpack_require__(6).BezierPath;
+window.Polygon = __webpack_require__(7).Polygon;
+window.Triangle = __webpack_require__(8).Triangle;
 window.VEllipse = __webpack_require__(14).VEllipse;
-window.Circle = __webpack_require__(8).Circle;
+window.Circle = __webpack_require__(9).Circle;
 window.PBImage = __webpack_require__(15).PBImage;
 window.MouseHandler = __webpack_require__(16).MouseHandler;
 window.KeyHandler = __webpack_require__(17).KeyHandler;
@@ -6632,7 +6701,8 @@ window.PlotBoilerplate = __webpack_require__(21).PlotBoilerplate;
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
  * @modified 2020-05-09 Included the Cirlcle class.
  * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
- * @version  1.8.0
+ * @modified 2020-07-03 Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
+ * @version  1.8.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -6641,21 +6711,21 @@ window.PlotBoilerplate = __webpack_require__(21).PlotBoilerplate;
 Object.defineProperty(exports, "__esModule", { value: true });
 var draw_1 = __webpack_require__(18);
 var drawgl_1 = __webpack_require__(19);
-var BezierPath_1 = __webpack_require__(5);
-var Bounds_1 = __webpack_require__(12);
-var Circle_1 = __webpack_require__(8);
-var Grid_1 = __webpack_require__(10);
+var BezierPath_1 = __webpack_require__(6);
+var Bounds_1 = __webpack_require__(3);
+var Circle_1 = __webpack_require__(9);
+var Grid_1 = __webpack_require__(11);
 var KeyHandler_1 = __webpack_require__(17);
 var Line_1 = __webpack_require__(1);
 var MouseHandler_1 = __webpack_require__(16);
 var PBImage_1 = __webpack_require__(15);
-var Polygon_1 = __webpack_require__(6);
+var Polygon_1 = __webpack_require__(7);
 var SVGBuilder_1 = __webpack_require__(22);
-var Triangle_1 = __webpack_require__(7);
+var Triangle_1 = __webpack_require__(8);
 var VEllipse_1 = __webpack_require__(14);
 var Vector_1 = __webpack_require__(2);
 var Vertex_1 = __webpack_require__(0);
-var VertexAttr_1 = __webpack_require__(3);
+var VertexAttr_1 = __webpack_require__(4);
 var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
@@ -7486,7 +7556,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.selectVerticesInPolygon = function (polygon) {
         for (var i in this.vertices) {
-            if (polygon.containsVert(this.vertices[i]))
+            if (this.vertices[i].attr.selectable && polygon.containsVert(this.vertices[i]))
                 this.vertices[i].attr.isSelected = true;
         }
     };
