@@ -29,7 +29,7 @@ echo "Uploading to $server ..."
 # rsync -avH ./docs_jekyll/_site/*  -e ssh user@server:/your/destination/path
 # rsync -avH ./docs_jekyll/_site/*  -e ssh $user@$server:$destination
 # rsync -avH ./demos_with_tracker/* -e ssh $user@$server:"$destination/repo/demos/"
-rsync -avH ./demos                -e ssh $user@$server:"$destination/demos/"
+rsync -avH ./demos                -e ssh $user@$server:"$destination/"
 rsync -avH ./dist                 -e ssh $user@$server:"$destination/"
 rsync -avH ./lib                  -e ssh $user@$server:"$destination/"
 rsync -avH ./screenshots          -e ssh $user@$server:"$destination/"
