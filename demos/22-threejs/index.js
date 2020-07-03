@@ -87,11 +87,19 @@
 	    // | Draw some stuff before rendering?
 	    // +-------------------------------
 	    var preDraw = function() {
-		// console.log('pre draw');
+		// Draw bounds
 		var pathBounds = outline.getBounds();
-		// console.log( pathBounds );
 		pb.draw.rect( pathBounds.min, pathBounds.width, pathBounds.height, 'rgba(0,0,0,0.5)', 1 );
-	
+
+		// Fill inner area
+		var polyline = [ new Vertex( pathBounds.max.x, pathBounds.min.y ),
+				 new Vertex( pathBounds.max.x, pathBounds.max.y ),
+				 new Vertex( pathBounds.min.x, pathBounds.max.y ) ];
+		var pathSteps = 50;
+		for( var i = 0; i < pathSteps; i++ ) {
+		    polyline.push( outline.getPointAt(i/pathSteps) );
+		}
+		pb.fill.polyline( polyline, false, 'rgba(0,0,0,0.25)' );
 	    };
 	    
 

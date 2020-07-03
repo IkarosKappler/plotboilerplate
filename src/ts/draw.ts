@@ -198,6 +198,7 @@ export class drawutils {
 	this.ctx.lineTo( this.offset.x+(position.x+width)*this.scale.x, this.offset.y+position.y*this.scale.y );
 	this.ctx.lineTo( this.offset.x+(position.x+width)*this.scale.x, this.offset.y+(position.y+height)*this.scale.y );
 	this.ctx.lineTo( this.offset.x+position.x*this.scale.x, this.offset.y+(position.y+height)*this.scale.y );
+	// this.ctx.lineTo( this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y );
 	this.ctx.closePath();
 	this.ctx.lineWidth = lineWidth || 1;
 	this._fillOrDraw( color );

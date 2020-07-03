@@ -14,7 +14,7 @@
 	this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 	this.camera.position.z = 500;
 
-	this.ambientLightA = new THREE.AmbientLight( 0x0000ff ); 
+	this.ambientLightA = new THREE.AmbientLight( 0x0088ff ); 
 	this.ambientLightA.position.set( 350, 350, 50 );
 	this.scene.add( this.ambientLightA );
 	
@@ -91,7 +91,7 @@
 	}
 	var geometry = new THREE.LatheGeometry( points, 12, Math.PI*2 );
 
-	var material = new THREE.MeshPhongMaterial({ color: 0xffff00, wireframe : false, flatShading: false, depthTest : true, opacity : 1.0, side : THREE.DoubleSide, visible : true, emissive : 0x0, reflectivity : 1.0, refractionRatio : 0.89, specular: 0x888888, /*, shading : THREE.LambertShading */ } )
+	var material = new THREE.MeshPhongMaterial({ color: 0x3838ff, wireframe : false, flatShading: false, depthTest : true, opacity : 1.0, side : THREE.DoubleSide, visible : true, emissive : 0x0, reflectivity : 1.0, refractionRatio : 0.89, specular: 0x888888, /*, shading : THREE.LambertShading */ } )
 	this.lathe = new THREE.Mesh( geometry, material );
 	this.lathe.position.y = -100;
 	this.camera.lookAt( new THREE.Vector3(20,0,150) );
