@@ -67,8 +67,19 @@
 		rebuild();
 	    };
 
+	    // Delay the build a bit
+	    var buildId = null;
 	    var rebuild = function() {
-		dildoGeneration.rebuild( { outline : outline, segmentCount : config.segmentCount } );
+		var buildId = new Date().getTime();
+		window.setTimeout( (function(bId) {
+		    return function() {
+			// console.log( bId, buildId );
+			if( bId == buildId )
+			    dildoGeneration.rebuild( { outline : outline, segmentCount : config.segmentCount } );
+		    };
+		})(buildId), 50 );
+						 
+
 	    };
 	    
 	    var outline = BezierPath.fromJSON( DEFAULT_BEZIER_JSON );
