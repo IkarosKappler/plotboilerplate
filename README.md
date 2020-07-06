@@ -10,7 +10,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (desktop and mobile)
 
 
-The compressed library has 84kb.
+The compressed library has 87kb.
 
 
 ## Install the package via npm
@@ -613,7 +613,7 @@ for this purpose.
 * dat.gui
 * Color.js
 * FileSaver.js
-* [Touchy.js](https://github.com/jairajs89/Touchy.js "Touchy.js") by [jairajs89](https://github.com/jairajs89 "jairajs89") 
+* [AllyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
 * Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
 * [hobby.pdf](https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf "hobby.pdf")
 * [jsHobby](https://github.com/loopspace/jsHobby "jsHobby")

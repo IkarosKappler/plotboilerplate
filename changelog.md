@@ -1,13 +1,14 @@
 
 
 # Changelog
+* 2020-07-06
+  * Added AlloyFinger support (will replace Touchy.js).
 * 2020-07-03
   * Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
   * Added the CubicBezierPath.getBounds() function.
   * BezierPath: Made the private helper functions _locateUIndex, adjustPredecessorControlPoint,
      adjustSuccessorControlPoint to a private function.
   * Added the BezierPath.getBounds() function.
-  * 
 * 2020-07-01 (1.8.1)
   * Tweaked the pattern gradient demo (rotation and scale).
   * Prepared a new demo: with THREE.js.

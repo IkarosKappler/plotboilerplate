@@ -54,13 +54,16 @@
  * @modified 2020-03-29 Fixed the enableSVGExport flag (read enableEport before).
  * @modified 2020-05-09 Included the Cirlcle class.
  * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
- * @modified 2020-07-03 Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
+ * @modified 2020-06-03 Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
+ * @modified 2020-06-06 Replacing Touchy.js by AlloyFinger.js
  * @version  1.8.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
  * @public
  **/
+
+import { AlloyFinger } from "alloyfinger";
 
 import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
@@ -595,7 +598,6 @@ export class PlotBoilerplate {
 	} else if( drawable instanceof BezierPath ) {
 	    this.drawables.push( drawable );
 	    const bezierPath:BezierPath = (drawable as BezierPath);
-	    // for( var i in bezierPath.bezierCurves ) {
 	    for( var i = 0; i < bezierPath.bezierCurves.length; i++ ) {
 		if( !drawable.adjustCircular && i == 0 )
 		    this.vertices.push( bezierPath.bezierCurves[i].startPoint );
@@ -610,12 +612,13 @@ export class PlotBoilerplate {
 	    this.vertices.push( drawable.upperLeft );
 	    this.vertices.push( drawable.lowerRight );
 	    this.drawables.push( drawable );
-	    drawable.upperLeft.listeners.addDragListener( (e:VertEvent) => { // TODO dragevent???
+	    // Todo: think about a IDragEvent interface
+	    drawable.upperLeft.listeners.addDragListener( (e:VertEvent) => { 
 		drawable.lowerRight.add( e.params.dragAmount );
 	    } );
 	    drawable.lowerRight.attr.selectable = false
 	} else {
-	    throw "Cannot add drawable of unrecognized type."; // : " + drawable.constructor.name;
+	    throw "Cannot add drawable of unrecognized type: " + (typeof drawable) + ".";
 	}
 
 	// This is a workaround for backwards compatibility when the 'redraw' param was not yet present.
@@ -1023,7 +1026,6 @@ export class PlotBoilerplate {
 	bb : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
 	var w : number = container.clientWidth; 
 	var h : number = container.clientHeight;
-	// console.log( 'w', w, 'h', h, 'border', border, 'padding', padding, pl, pr, pt, pb, bl, br, bt, bb );
 	canvas.style.display = 'block';
 	return { width : (w-pl-pr-bl-br), height : (h-pt-pb-bt-bb) };
     }; 
@@ -1256,10 +1258,11 @@ export class PlotBoilerplate {
 	//            until next keypress; the implication is, that [Ctrl] would still
 	//            considered to be pressed which is not true.
 	if( this.keyHandler.isDown('alt') || this.keyHandler.isDown('spacebar') ) {
-	    _self.draw.offset.add( e.params.dragAmount );
+	    /* _self.draw.offset.add( e.params.dragAmount );
 	    _self.fill.offset.set( _self.draw.offset );
 	    _self.config.offsetX = _self.draw.offset.x;
-	    _self.config.offsetY = _self.draw.offset.y;
+	    _self.config.offsetY = _self.draw.offset.y; */
+	    _self.setOffset( _self.draw.offset.clone().add( e.params.dragAmount ) );
 	    _self.redraw();
 	} else { 
 	    // Convert drag amount by scaling
@@ -1333,24 +1336,63 @@ export class PlotBoilerplate {
 	// CHANGED replaced _self by this
 	const _self : PlotBoilerplate = this;
 	const we : WheelEvent = ((e as unknown) as WheelEvent);
-	let oldPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+	// let oldPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+	// let newPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
 	if( we.deltaY < 0 ) {
-	    _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX*zoomStep;
-	    _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY*zoomStep;
+	    //_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX*zoomStep;
+	    //_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY*zoomStep;
+	    _self.setZoom( _self.config.scaleX*zoomStep, _self.config.scaleY*zoomStep, new Vertex(e.params.pos.x, e.params.pos.y) ); // new Vertex(newOffsetX, newOffsetY) );
 	} else if( we.deltaY > 0 ) {
-	    _self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = Math.max(_self.config.scaleX/zoomStep,0.01);
-	    _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = Math.max(_self.config.scaleY/zoomStep,0.01);
+	    //_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = Math.max(_self.config.scaleX/zoomStep,0.01);
+	    // _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = Math.max(_self.config.scaleY/zoomStep,0.01);
+	    _self.setZoom( _self.config.scaleX/zoomStep, _self.config.scaleY/zoomStep, new Vertex(e.params.pos.x, e.params.pos.y) ); // new Vertex(newOffsetx, newOffsetY) );
 	}
-	let newPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+	/* let newPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
 	// Apply relative positioned zoom
 	let newOffsetX : number = _self.draw.offset.x + (newPos.x-oldPos.x)*_self.draw.scale.x;
 	let newOffsetY : number = _self.draw.offset.y + (newPos.y-oldPos.y)*_self.draw.scale.y;
 	_self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = newOffsetX;
 	_self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = newOffsetY;
+	*/
 	
 	e.preventDefault();
 	_self.redraw();
     };
+
+    /*
+    private getZoomX() : number {
+	this.draw.scale.x;
+    };
+
+    private getZoomY() : number {
+	this.draw.scale.y;
+    };
+    // TODO: test and doc
+    // combination with touch libraries?
+    private applyZoom(zoomFactorX, zoomFactorY) {
+    this.draw.scale.x = this.fill.scale.x = this.config.scaleX = Math.max(this.config.scaleX*zoomFactorX,0.01);
+    this.draw.scale.y = this.fill.scale.y = this.config.scaleY = Math.max(this.config.scaleY*zoomFactorY,0.01);
+    }
+    */
+
+    private setOffset( newOffset : Vertex ) {
+	this.draw.offset.set( newOffset ); // add( e.params.dragAmount );
+	this.fill.offset.set( newOffset ); // _self.draw.offset );
+	this.config.offsetX = newOffset.x; // _self.draw.offset.x;
+	this.config.offsetY = newOffset.y; // _self.draw.offset.y;
+    };
+
+    private setZoom(zoomFactorX : number, zoomFactorY : number, interactionPos : Vertex ) {
+	// const oldPos = newPos;
+	let oldPos : XYCoords = this.transformMousePosition(interactionPos.x, interactionPos.y);
+	this.draw.scale.x = this.fill.scale.x = this.config.scaleX = Math.max(zoomFactorX,0.01);
+	this.draw.scale.y = this.fill.scale.y = this.config.scaleY = Math.max(zoomFactorY,0.01);
+	let newPos : XYCoords = this.transformMousePosition(interactionPos.x, interactionPos.y);
+	let newOffsetX : number = this.draw.offset.x + (newPos.x-oldPos.x)*this.draw.scale.x;
+	let newOffsetY : number = this.draw.offset.y + (newPos.y-oldPos.y)*this.draw.scale.y;
+	this.draw.offset.x = this.fill.offset.x = this.config.offsetX = newOffsetX;
+	this.draw.offset.y = this.fill.offset.y = this.config.offsetY = newOffsetY;
+    }
 
 
     private installInputListeners() {
@@ -1372,23 +1414,19 @@ export class PlotBoilerplate {
 	
 	if( this.config.enableTouch) { 
 	    // Install a touch handler on the canvas.
-	    if( !window["Touchy"] || typeof window["Touchy"] != "function" ) {
-		console.warn( "Cannot initialize the touch handler. Touchy is missig. Did you include it?" );
-	    } else {
+	    const relPos = (pos:XYCoords) : XYCoords => {
+		return { x : pos.x - _self.canvas.offsetLeft,
+			 y : pos.y - _self.canvas.offsetTop
+		       };
+	    }
+	    
+	    if( window["Touchy"] && typeof window["Touchy"] == "function" ) {
 		// Convert absolute touch positions to relative DOM element position (relative to canvas)
-		const relPos = (pos:XYCoords) : XYCoords => {
-		    return { x : pos.x - _self.canvas.offsetLeft,
-			     y : pos.y - _self.canvas.offsetTop
-			   };
-		}
 		// Some private vars to store the current mouse/position/button state.
 		var touchMovePos : Vertex|undefined|null= null;
 		var touchDownPos : Vertex|undefined|null = null;
 		var draggedElement : IDraggable|undefined|null = null;
-		// TODO
-		// ERROR, THIS DOES NOT COMPILE PROPERLY WITH TYPESCRIPT.
 
-		
 		const Touchy : any = (window["Touchy"]);
 		new Touchy( this.canvas,
 			    { one : function( hand, finger ) {
@@ -1417,12 +1455,123 @@ export class PlotBoilerplate {
 				
 			    }
 			    } );
-	    } // END else
+	    } else if( window["AlloyFinger"] && typeof window["AlloyFinger"] == "function" ) {
+		console.log('Alloy finger found.');
+
+		// Do not include AlloyFinger itself to the library
+		// (17kb, but we want to keep this lib as tiny as possible).
+		const AF : AlloyFinger = window["AlloyFinger"] as AlloyFinger;
+		var touchMovePos : Vertex|undefined|null= null;
+		var touchDownPos : Vertex|undefined|null = null;
+		var draggedElement : IDraggable|undefined|null = null;
+		var multiTouchStartScale : Vertex|undefined|null = null;
+		var af = new AF( this.canvas, {
+		    touchStart: function (e) {
+			//console.log('touchStart',e);
+
+			if( e.touches.length == 1 ) {
+			    touchMovePos = new Vertex( relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ) );
+			    touchDownPos = new Vertex( relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ) );
+			    draggedElement = _self.locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
+			}
+		    },
+		    touchMove: function (e) {
+			// console.log('touchMove',e);
+			// updateStatus( "#touches: " + e.touches.length + ", dX=" + e.deltaX + ", dY=" + e.deltaY );
+			if( e.touches.length == 1 && draggedElement ) {
+			    e.preventDefault();
+			    e.stopPropagation();
+			    // The Touchy-points also have 'id' and 'time' attributes
+			    // which we are not interested in here.
+			    // hand.on('move', (points:Array<XYCoords>) => { 
+			    var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
+			    var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
+			    var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
+			    if( draggedElement.typeName == 'vertex' ) {
+				if( !_self.vertices[draggedElement.vindex].attr.draggable )
+				    return;
+				_self.vertices[draggedElement.vindex].add( diff );
+				var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
+				var fakeEvent : VertEvent = ({ params : { dragAmount : diff.clone(), wasDragged : true, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone().add(diff), vertex : draggingVertex}} as unknown) as VertEvent;
+				draggingVertex.listeners.fireDragEvent( fakeEvent );
+				_self.redraw();
+			    }
+			    touchMovePos = new Vertex(rel);
+			    // } );
+			} else if( e.touches.length == 2 ) {
+			    // If at least two fingers touch and move, then change the draw offset (panning).
+			    e.preventDefault();
+			    e.stopPropagation();
+			    _self.setOffset( _self.draw.offset.clone().addXY( e.deltaX, e.deltaY ) ); // Apply zoom?
+			    _self.redraw();
+			}
+		    },
+		    touchEnd:  function (e) {
+			//console.log('touchEnd',e);
+			touchMovePos = null;
+			touchDownPos = null;
+			draggedElement = null;
+			multiTouchStartScale = null;
+		    },
+		    touchCancel: function (e) {
+			//console.log('touchCancel',e);
+			touchMovePos = null;
+			touchDownPos = null;
+			draggedElement = null;
+			multiTouchStartScale = null;
+		    },
+		    multipointStart: function (e) {
+			console.log('multipointStart',e);
+			multiTouchStartScale = _self.draw.scale.clone();
+			// updateStatus( "" );
+		    },
+		    multipointEnd: function (e) {
+			//console.log('multipointEnd',e);
+			multiTouchStartScale = null;
+		    },
+		    /* tap: function (e) {
+			//console.log('tap',e);
+		    },
+		    doubleTap: function (e) {
+			//console.log('doubleTap',e);
+		    },
+		    longTap: function (e) {
+			//console.log('longTap',e);
+		    },
+		    singleTap: function (e) {
+			//console.log('singleTap',e);
+		    },
+		    rotate: function (e) {
+			//console.log(e.angle);
+		    }, */
+		    pinch: function (e) {
+			const fingerA : Vertex = new Vertex( e.touches.item(0).clientX, e.touches.item(0).clientY );
+			const fingerB : Vertex = new Vertex( e.touches.item(1).clientX, e.touches.item(1).clientY );
+			const center : Vertex = new Line( fingerA, fingerB ).vertAt( 0.5 );
+			// updateStatus("Zoom: " + e.zoom + ", " + fingerA + ", " + fingerB);
+			// console.log(e.zoom);
+			// window.alert(e.zoom);
+			// this.zoom(e.zoom);
+			_self.setZoom( multiTouchStartScale.x*e.zoom, multiTouchStartScale.y*e.zoom, center );
+			_self.redraw();
+		    }
+		    /* pressMove: function (e) {
+			//console.log(e.deltaX);
+			//console.log(e.deltaY);
+		    },
+		    swipe: function (e) {
+			//console.log("swipe" + e.direction);
+		    } */
+		});
+
+		
+	    } else {
+		console.warn( "Cannot initialize the touch handler. Touchy and AlloyFinger are missig. Did you include at least one of them?" );
+	    }// END 
 	} else { _self.console.log('Touch interaction disabled.'); }
 	
 	if( this.config.enableKeys ) {
 	    // Install key handler
-	    // var keyHandler : KeyHandler = new KeyHandler( { trackAll : true } )
 	    this.keyHandler = new KeyHandler( { trackAll : true } )
 		.down('escape',function() {
 		    _self.clearSelection(true);
