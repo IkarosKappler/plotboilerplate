@@ -587,6 +587,7 @@ for this purpose.
  * Add an internal mapping to remember vertices and their installed listeners (for removing them later).
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
  * Port all demos from vanilla JS to TypeScript.
+ * Remove the Touchy.js integration soon.
  
 
 ### Todos for future Version 2

@@ -1164,38 +1164,39 @@ var PlotBoilerplate = /** @class */ (function () {
         _self.redraw();
     };
     ;
-    /*
-    private getZoomX() : number {
-    this.draw.scale.x;
-    };
-
-    private getZoomY() : number {
-    this.draw.scale.y;
-    };
-    // TODO: test and doc
-    // combination with touch libraries?
-    private applyZoom(zoomFactorX, zoomFactorY) {
-    this.draw.scale.x = this.fill.scale.x = this.config.scaleX = Math.max(this.config.scaleX*zoomFactorX,0.01);
-    this.draw.scale.y = this.fill.scale.y = this.config.scaleY = Math.max(this.config.scaleY*zoomFactorY,0.01);
-    }
-    */
+    /**
+     * Set the new draw offset.
+     *
+     * Note: the function will not trigger any redraws.
+     *
+     * @param {Vertex} newOffset - The new draw offset to use.
+     **/
     PlotBoilerplate.prototype.setOffset = function (newOffset) {
-        this.draw.offset.set(newOffset); // add( e.params.dragAmount );
-        this.fill.offset.set(newOffset); // _self.draw.offset );
-        this.config.offsetX = newOffset.x; // _self.draw.offset.x;
-        this.config.offsetY = newOffset.y; // _self.draw.offset.y;
+        this.draw.offset.set(newOffset);
+        this.fill.offset.set(newOffset);
+        this.config.offsetX = newOffset.x;
+        this.config.offsetY = newOffset.y;
     };
     ;
+    /**
+    * Set a new zoom value (and re-adjust the draw offset).
+    *
+    * Note: the function will not trigger any redraws.
+    *
+    * @param {number} zoomFactorX - The new horizontal zoom value.
+    * @param {number} zoomFactorY - The new vertical zoom value.
+    * @param {Vertex} interactionPos - The position of mouse/touch interaction.
+    **/
     PlotBoilerplate.prototype.setZoom = function (zoomFactorX, zoomFactorY, interactionPos) {
-        // const oldPos = newPos;
         var oldPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
         this.draw.scale.x = this.fill.scale.x = this.config.scaleX = Math.max(zoomFactorX, 0.01);
         this.draw.scale.y = this.fill.scale.y = this.config.scaleY = Math.max(zoomFactorY, 0.01);
         var newPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
         var newOffsetX = this.draw.offset.x + (newPos.x - oldPos.x) * this.draw.scale.x;
         var newOffsetY = this.draw.offset.y + (newPos.y - oldPos.y) * this.draw.scale.y;
-        this.draw.offset.x = this.fill.offset.x = this.config.offsetX = newOffsetX;
-        this.draw.offset.y = this.fill.offset.y = this.config.offsetY = newOffsetY;
+        //this.draw.offset.x = this.fill.offset.x = this.config.offsetX = newOffsetX;
+        //this.draw.offset.y = this.fill.offset.y = this.config.offsetY = newOffsetY;
+        this.setOffset({ x: newOffsetX, y: newOffsetY });
     };
     PlotBoilerplate.prototype.installInputListeners = function () {
         var _self = this;
@@ -1224,7 +1225,85 @@ var PlotBoilerplate = /** @class */ (function () {
                     y: pos.y - _self.canvas.offsetTop
                 };
             };
-            if (window["Touchy"] && typeof window["Touchy"] == "function") {
+            if (window["AlloyFinger"] && typeof window["AlloyFinger"] == "function") {
+                // console.log('Alloy finger found.');
+                try {
+                    // Do not include AlloyFinger itself to the library
+                    // (17kb, but we want to keep this lib as tiny as possible).
+                    var AF = window["AlloyFinger"];
+                    var touchMovePos = null;
+                    var touchDownPos = null;
+                    var draggedElement = null;
+                    var multiTouchStartScale = null;
+                    var af = new AF(this.canvas, {
+                        touchStart: function (e) {
+                            if (e.touches.length == 1) {
+                                touchMovePos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
+                                touchDownPos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
+                                draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
+                            }
+                        },
+                        touchMove: function (e) {
+                            if (e.touches.length == 1 && draggedElement) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                var rel = relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }); //  points[0] );
+                                var trans = _self.transformMousePosition(rel.x, rel.y);
+                                var diff = new Vertex_1.Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
+                                if (draggedElement.typeName == 'vertex') {
+                                    if (!_self.vertices[draggedElement.vindex].attr.draggable)
+                                        return;
+                                    _self.vertices[draggedElement.vindex].add(diff);
+                                    var draggingVertex = _self.vertices[draggedElement.vindex];
+                                    var fakeEvent = { params: { dragAmount: diff.clone(), wasDragged: true, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone().add(diff), vertex: draggingVertex } };
+                                    draggingVertex.listeners.fireDragEvent(fakeEvent);
+                                    _self.redraw();
+                                }
+                                touchMovePos = new Vertex_1.Vertex(rel);
+                            }
+                            else if (e.touches.length == 2) {
+                                // If at least two fingers touch and move, then change the draw offset (panning).
+                                e.preventDefault();
+                                e.stopPropagation();
+                                _self.setOffset(_self.draw.offset.clone().addXY(e.deltaX, e.deltaY)); // Apply zoom?
+                                _self.redraw();
+                            }
+                        },
+                        touchEnd: function (e) {
+                            touchMovePos = null;
+                            touchDownPos = null;
+                            draggedElement = null;
+                            multiTouchStartScale = null;
+                        },
+                        touchCancel: function (e) {
+                            touchMovePos = null;
+                            touchDownPos = null;
+                            draggedElement = null;
+                            multiTouchStartScale = null;
+                        },
+                        multipointStart: function (e) {
+                            multiTouchStartScale = _self.draw.scale.clone();
+                        },
+                        multipointEnd: function (e) {
+                            multiTouchStartScale = null;
+                        },
+                        pinch: function (e) {
+                            var fingerA = new Vertex_1.Vertex(e.touches.item(0).clientX, e.touches.item(0).clientY);
+                            var fingerB = new Vertex_1.Vertex(e.touches.item(1).clientX, e.touches.item(1).clientY);
+                            var center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
+                            _self.setZoom(multiTouchStartScale.x * e.zoom, multiTouchStartScale.y * e.zoom, center);
+                            _self.redraw();
+                        }
+                    });
+                }
+                catch (e) {
+                    console.error("Failed to initialize AlloyFinger!");
+                    console.error(e);
+                }
+                ;
+            }
+            else if (window["Touchy"] && typeof window["Touchy"] == "function") {
+                console.warn('(Deprecation) Found Touchy which support will stop soon. Please use AlloyFinger instead.');
                 // Convert absolute touch positions to relative DOM element position (relative to canvas)
                 // Some private vars to store the current mouse/position/button state.
                 var touchMovePos = null;
@@ -1257,117 +1336,9 @@ var PlotBoilerplate = /** @class */ (function () {
                     }
                 });
             }
-            else if (window["AlloyFinger"] && typeof window["AlloyFinger"] == "function") {
-                console.log('Alloy finger found.');
-                // Do not include AlloyFinger itself to the library
-                // (17kb, but we want to keep this lib as tiny as possible).
-                var AF = window["AlloyFinger"];
-                var touchMovePos = null;
-                var touchDownPos = null;
-                var draggedElement = null;
-                var multiTouchStartScale = null;
-                var af = new AF(this.canvas, {
-                    touchStart: function (e) {
-                        //console.log('touchStart',e);
-                        if (e.touches.length == 1) {
-                            touchMovePos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
-                            touchDownPos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
-                            draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
-                        }
-                    },
-                    touchMove: function (e) {
-                        // console.log('touchMove',e);
-                        // updateStatus( "#touches: " + e.touches.length + ", dX=" + e.deltaX + ", dY=" + e.deltaY );
-                        if (e.touches.length == 1 && draggedElement) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            // The Touchy-points also have 'id' and 'time' attributes
-                            // which we are not interested in here.
-                            // hand.on('move', (points:Array<XYCoords>) => { 
-                            var rel = relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }); //  points[0] );
-                            var trans = _self.transformMousePosition(rel.x, rel.y);
-                            var diff = new Vertex_1.Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
-                            if (draggedElement.typeName == 'vertex') {
-                                if (!_self.vertices[draggedElement.vindex].attr.draggable)
-                                    return;
-                                _self.vertices[draggedElement.vindex].add(diff);
-                                var draggingVertex = _self.vertices[draggedElement.vindex];
-                                var fakeEvent = { params: { dragAmount: diff.clone(), wasDragged: true, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone().add(diff), vertex: draggingVertex } };
-                                draggingVertex.listeners.fireDragEvent(fakeEvent);
-                                _self.redraw();
-                            }
-                            touchMovePos = new Vertex_1.Vertex(rel);
-                            // } );
-                        }
-                        else if (e.touches.length == 2) {
-                            // If at least two fingers touch and move, then change the draw offset (panning).
-                            e.preventDefault();
-                            e.stopPropagation();
-                            _self.setOffset(_self.draw.offset.clone().addXY(e.deltaX, e.deltaY)); // Apply zoom?
-                            _self.redraw();
-                        }
-                    },
-                    touchEnd: function (e) {
-                        //console.log('touchEnd',e);
-                        touchMovePos = null;
-                        touchDownPos = null;
-                        draggedElement = null;
-                        multiTouchStartScale = null;
-                    },
-                    touchCancel: function (e) {
-                        //console.log('touchCancel',e);
-                        touchMovePos = null;
-                        touchDownPos = null;
-                        draggedElement = null;
-                        multiTouchStartScale = null;
-                    },
-                    multipointStart: function (e) {
-                        console.log('multipointStart', e);
-                        multiTouchStartScale = _self.draw.scale.clone();
-                        // updateStatus( "" );
-                    },
-                    multipointEnd: function (e) {
-                        //console.log('multipointEnd',e);
-                        multiTouchStartScale = null;
-                    },
-                    /* tap: function (e) {
-                    //console.log('tap',e);
-                    },
-                    doubleTap: function (e) {
-                    //console.log('doubleTap',e);
-                    },
-                    longTap: function (e) {
-                    //console.log('longTap',e);
-                    },
-                    singleTap: function (e) {
-                    //console.log('singleTap',e);
-                    },
-                    rotate: function (e) {
-                    //console.log(e.angle);
-                    }, */
-                    pinch: function (e) {
-                        var fingerA = new Vertex_1.Vertex(e.touches.item(0).clientX, e.touches.item(0).clientY);
-                        var fingerB = new Vertex_1.Vertex(e.touches.item(1).clientX, e.touches.item(1).clientY);
-                        var center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
-                        // updateStatus("Zoom: " + e.zoom + ", " + fingerA + ", " + fingerB);
-                        // console.log(e.zoom);
-                        // window.alert(e.zoom);
-                        // this.zoom(e.zoom);
-                        _self.setZoom(multiTouchStartScale.x * e.zoom, multiTouchStartScale.y * e.zoom, center);
-                        _self.redraw();
-                    }
-                    /* pressMove: function (e) {
-                    //console.log(e.deltaX);
-                    //console.log(e.deltaY);
-                    },
-                    swipe: function (e) {
-                    //console.log("swipe" + e.direction);
-                    } */
-                });
-            }
             else {
                 console.warn("Cannot initialize the touch handler. Touchy and AlloyFinger are missig. Did you include at least one of them?");
-            } // END 
+            }
         }
         else {
             _self.console.log('Touch interaction disabled.');

@@ -586,7 +586,23 @@ export declare class PlotBoilerplate {
      * @return {void}
      **/
     private mouseWheelHandler;
+    /**
+     * Set the new draw offset.
+     *
+     * Note: the function will not trigger any redraws.
+     *
+     * @param {Vertex} newOffset - The new draw offset to use.
+     **/
     private setOffset;
+    /**
+    * Set a new zoom value (and re-adjust the draw offset).
+    *
+    * Note: the function will not trigger any redraws.
+    *
+    * @param {number} zoomFactorX - The new horizontal zoom value.
+    * @param {number} zoomFactorY - The new vertical zoom value.
+    * @param {Vertex} interactionPos - The position of mouse/touch interaction.
+    **/
     private setZoom;
     private installInputListeners;
     /**
