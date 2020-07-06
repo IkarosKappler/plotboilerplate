@@ -506,12 +506,15 @@ The Vertex class has basic drag event support:
 </div>
 
 
-## Mouse and Keyboard interaction
+## Mouse, Keyboard and Touch interaction
  * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment for clicked bézier path point
  * [ALT or SPACE] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
  * [Mousewheel-down] : Zoom out
+ * Touch & move (1 finger): Move item
+ * Touch & move (2 fingers): Pan the area
+ * Touch & pinch: Zoom in/out
 
 
 
