@@ -19,13 +19,15 @@
  * @modified 2020-02-10 Fixed the translate(...) function (returning 'this' was missing).
  * @modified 2020-03-24 Ported this class from vanilla JS to Typescript.
  * @modified 2020-06-03 Added the getBounds() function.
- * @version 2.4.0
+ * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
+ * @version 2.4.1
  *
  * @file CubicBezierCurve
  * @public
  **/
 import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
+import { XYCoords } from "./interfaces";
 export declare class CubicBezierCurve {
     /** @constant {number} */
     static readonly START_POINT: number;
@@ -108,14 +110,14 @@ export declare class CubicBezierCurve {
      *
      * @method moveCurvePoint
      * @param {number} pointID - The numeric identicator of the point to move. Use one of the four eBezierPoint constants.
-     * @param {Vertex} moveAmount - The amount to move the specified point by.
+     * @param {XYCoords} moveAmount - The amount to move the specified point by.
      * @param {boolean} moveControlPoint - Move the control points along with their path point (if specified point is a path point).
      * @param {boolean} updateArcLengths - Specifiy if the internal arc segment buffer should be updated.
      * @instance
      * @memberof CubicBezierCurve
      * @return {void}
      **/
-    moveCurvePoint(pointID: number, moveAmount: Vertex, moveControlPoint: boolean, updateArcLengths: boolean): void;
+    moveCurvePoint(pointID: number, moveAmount: XYCoords, moveControlPoint: boolean, updateArcLengths: boolean): void;
     /**
      * Translate the whole curve by the given {x,y} amount: moves all four points.
      *

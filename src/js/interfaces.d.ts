@@ -62,6 +62,7 @@ export interface Config {
     enableSVGExport?: boolean;
     saveFile?: () => void;
     setToRetina?: () => void;
+    autoDetectRetina?: boolean;
 }
 export interface PBParams extends Config, DrawSettings {
 }

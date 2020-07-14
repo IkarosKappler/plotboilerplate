@@ -20,7 +20,8 @@
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-06-03 Made the private helper function _locateUIndex to a private function.
  * @modified 2020-06-03 Added the getBounds() function.
- * @version 2.2.0
+ * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
+ * @version 2.2.1
  *
  * @file BezierPath
  * @public
@@ -866,12 +867,12 @@ export class BezierPath implements SVGSerializable {
      * @param {number} curveIndex - The curve index to move a point from.
      * @param {number} pointID - One of the curve's four point IDs (START_POINT, 
      *                           START_CONTROL_POINT, END_CONTRO_POINT or END_POINT).
-     * @param {Vertex} moveAmount - The amount to move the addressed vertex by.
+     * @param {XYCoords} moveAmount - The amount to move the addressed vertex by.
      * @instance
      * @memberof BezierPath
      * @return {void}
      **/
-    moveCurvePoint( curveIndex:number, pointID:number, moveAmount:Vertex ) : void {
+    moveCurvePoint( curveIndex:number, pointID:number, moveAmount:XYCoords ) : void {
 	var bCurve : CubicBezierCurve = this.getCurveAt( curveIndex );
 	bCurve.moveCurvePoint( pointID,
 			       moveAmount,
@@ -887,8 +888,8 @@ export class BezierPath implements SVGSerializable {
 	    var predecessor = this.getCurveAt( curveIndex-1<0 ? this.bezierCurves.length+(curveIndex-1) : curveIndex-1 );
 	    predecessor.moveCurvePoint( this.END_CONTROL_POINT, 
 					moveAmount,
-					true,                    // move control point, too
-					false                    // updateArcLengths
+					true,           // move control point, too
+					false           // updateArcLengths
 				      );
 
 	} else if( pointID == this.END_POINT && (curveIndex+1 < this.bezierCurves.length || this.adjustCircular) ) {
@@ -896,23 +897,23 @@ export class BezierPath implements SVGSerializable {
 	    var successor : CubicBezierCurve = this.getCurveAt( (curveIndex+1)%this.bezierCurves.length );
 	    successor.moveCurvePoint( this.START_CONTROL_POINT, 
 				      moveAmount, 
-				      true,                  // move control point, too
-				      false                  // updateArcLengths
+				      true,             // move control point, too
+				      false             // updateArcLengths
 				    );
 	   
 	    
 	} else if( pointID == this.START_CONTROL_POINT && curveIndex > 0 ) {
 	    
 	    this.adjustPredecessorControlPoint( curveIndex, 
-						true,            // obtain handle length?
-						false            // update arc lengths
+						true,   // obtain handle length?
+						false   // update arc lengths
 					      );
 	    
 	} else if( pointID == this.END_CONTROL_POINT && curveIndex+1 < this.getCurveCount() ) {
 	    
 	    this.adjustSuccessorControlPoint( curveIndex, 
-					      true,            // obtain handle length?
-					      false            // update arc lengths
+					      true,     // obtain handle length?
+					      false     // update arc lengths
 					    );
 	    
 	}

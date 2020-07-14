@@ -81,8 +81,10 @@ export interface Config {
     enableGL?: boolean;           // Indicates if the application should use the experimental WebGL features (not recommended).
     enableSVGExport?: boolean;    // Indicates if the SVG export should be enabled (default is true). 
     // Note that changes from the postDraw hook might not be visible in the export.
-    saveFile? : ()=>void;
-    setToRetina? : ()=>void;
+    saveFile? : ()=>void;         // When called the save-file dialog will be triggered.
+    setToRetina? : ()=>void;      // When called the resolution will be set to retina.
+
+    autoDetectRetina? : boolean;  // When set to true (default) the canvas will try to use the display's pixel ratio.
 }
 
 export interface PBParams extends Config, DrawSettings {

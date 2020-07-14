@@ -56,12 +56,13 @@
  * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
  * @modified 2020-06-03 Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
  * @modified 2020-06-06 Replacing Touchy.js by AlloyFinger.js
- * @version  1.8.1
+ * @version  1.8.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
  * @public
  **/
+import { GUI } from "dat.gui";
 import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
 import { BezierPath } from "./BezierPath";
@@ -231,6 +232,7 @@ export declare class PlotBoilerplate {
      * @param {number=}  [config.cssScaleX=1.0] - Visually resize the canvas (horizontally) using CSS transforms (scale).
      * @param {number=}  [config.cssScaleY=1.0] - Visually resize the canvas (vertically) using CSS transforms (scale).
      * @param {boolan=}  [config.cssUniformScale=true] - CSS scale x and y obtaining aspect ratio.
+     * @param {boolean=} [config.autoDetectRetina=true] - When set to true (default) the canvas will try to use the display's pixel ratio.
      * @param {string=}  [config.backgroundColor=#ffffff] - The backround color.
      * @param {boolean=} [config.redrawOnResize=true] - Switch auto-redrawing on resize on/off (some applications
      *                         might want to prevent automatic redrawing to avoid data loss from the draw buffer).
@@ -296,7 +298,7 @@ export declare class PlotBoilerplate {
      * @return {void}
      * @private
      **/
-    updateCSSscale(): void;
+    private updateCSSscale;
     /**
      * Add a drawable object.<br>
      * <br>
@@ -614,7 +616,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {dat.gui.GUI}
      **/
-    createGUI(): any;
+    createGUI(): GUI;
     /**
      * A set of helper functions.
      * @private
@@ -628,7 +630,7 @@ export declare class PlotBoilerplate {
          * @param {Object} extension
          * @return {Object} base extended by the new attributes.
          **/
-        safeMergeByKeys: (base: any, extension: any) => any;
+        safeMergeByKeys: (base: Object, extension: Object) => Object;
         /**
          * A helper function to scale elements (usually the canvas) using CSS.
          *
@@ -652,25 +654,28 @@ export declare class PlotBoilerplate {
             /**
              * A helper function to the the object property numeric value specified by the given key.
              *
-             * @param {any} object   - The object to get the property's value from. Must not be null.
+             * @param {any}    object   - The object to get the property's value from. Must not be null.
              * @param {string} key      - The key of the object property (the name).
-             * @param {any}    fallback - A default value if the key does not exist.
+             * @param {number} fallback - A default value if the key does not exist.
+             * @return {number}
              **/
             num: (obj: any, key: string, fallback: number) => any;
             /**
              * A helper function to the the object property boolean value specified by the given key.
              *
-             * @param {any} object   - The object to get the property's value from. Must not be null.
-             * @param {string} key      - The key of the object property (the name).
-             * @param {any}    fallback - A default value if the key does not exist.
+             * @param {any}     object   - The object to get the property's value from. Must not be null.
+             * @param {string}  key      - The key of the object property (the name).
+             * @param {boolean} fallback - A default value if the key does not exist.
+             * @return {boolean}
              **/
             bool: (obj: any, key: string, fallback: boolean) => any;
             /**
              * A helper function to the the object property function-value specified by the given key.
              *
-             * @param {any} object   - The object to get the property's value from. Must not be null.
-             * @param {string} key      - The key of the object property (the name).
-             * @param {any}    fallback - A default value if the key does not exist.
+             * @param {any}      object   - The object to get the property's value from. Must not be null.
+             * @param {string}   key      - The key of the object property (the name).
+             * @param {function} fallback - A default value if the key does not exist.
+             * @return {function}
              **/
             func: (obj: any, key: string, fallback: (...args: any[]) => any) => any;
         };

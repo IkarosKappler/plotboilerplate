@@ -276,6 +276,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 | `cssScaleX`| _number_ | `1.0` | Visually resize the canvas using CSS transforms (scale x). |
 | `cssScaleY`| _number_ | `1.0` | Visually resize the canvas using CSS transforms (scale y). |
 | `cssUniformScale`| _boolean_ | `1.0` |  If set to true only cssScaleX applies for both dimensions. |
+| `autoDetectRetina` | _boolean_ | `true` | When set to true (default) the canvas will try to use the display's pixel ratio. |
 | `backgroundColor`| _string_ | `#ffffff` | A background color (CSS string) for the canvas. |
 | `redrawOnResize`| _boolean_ | `true` | Switch auto-redrawing on resize on/off (some applications might want to prevent automatic redrawing to avoid data loss from the drae buffer).|
 | `drawBezierHandleLines`| _boolean_ | `true` | Indicates if Bézier curve handle points should be drawn. |
@@ -366,6 +367,10 @@ A full working demo repository about the [Usage with Typescript is here](https:/
   // boolean
   //   If set to true only cssScaleX applies for both dimensions.
   cssUniformScale               : true,
+
+  // boolean
+  //   When set to true (default) the canvas will try to use the display's pixel ratio.
+  autoDetectRetina              : true,
 
   // string
   //   A background color (CSS string) for the canvas.

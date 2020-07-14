@@ -200,15 +200,6 @@ var Vertex = /** @class */ (function () {
      * @memberof Vertex
      **/
     Vertex.prototype.add = function (x, y) {
-        /*
-        if( typeof x == 'number' ) {
-            this.x += x;
-            if( typeof y == 'number' )
-            this.y += y;
-        } else {
-            this.x += x.x;
-            this.y += x.y;
-            }*/
         if (typeof x == 'number' && typeof y == 'number') {
             this.x += x;
             this.y += y;

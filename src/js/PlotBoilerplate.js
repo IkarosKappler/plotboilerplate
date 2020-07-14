@@ -57,7 +57,7 @@
  * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
  * @modified 2020-06-03 Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
  * @modified 2020-06-06 Replacing Touchy.js by AlloyFinger.js
- * @version  1.8.1
+ * @version  1.8.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -121,6 +121,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @param {number=}  [config.cssScaleX=1.0] - Visually resize the canvas (horizontally) using CSS transforms (scale).
      * @param {number=}  [config.cssScaleY=1.0] - Visually resize the canvas (vertically) using CSS transforms (scale).
      * @param {boolan=}  [config.cssUniformScale=true] - CSS scale x and y obtaining aspect ratio.
+     * @param {boolean=} [config.autoDetectRetina=true] - When set to true (default) the canvas will try to use the display's pixel ratio.
      * @param {string=}  [config.backgroundColor=#ffffff] - The backround color.
      * @param {boolean=} [config.redrawOnResize=true] - Switch auto-redrawing on resize on/off (some applications
      *                         might want to prevent automatic redrawing to avoid data loss from the draw buffer).
@@ -180,6 +181,7 @@ var PlotBoilerplate = /** @class */ (function () {
             cssUniformScale: PlotBoilerplate.utils.fetch.bool(config, 'cssUniformScale', true),
             saveFile: function () { _self.hooks.saveFile(_self); },
             setToRetina: function () { _self._setToRetina(); },
+            autoDetectRetina: PlotBoilerplate.utils.fetch.bool(config, 'autoDetectRetina', true),
             enableSVGExport: PlotBoilerplate.utils.fetch.bool(config, 'enableSVGExport', true),
             // Listeners/observers
             preClear: PlotBoilerplate.utils.fetch.func(config, 'preClear', null),
@@ -278,10 +280,13 @@ var PlotBoilerplate = /** @class */ (function () {
             saveFile: PlotBoilerplate._saveFile
         };
         var _self = this;
-        // TODO: this should be placed in the caller and work for 'global', too!
+        // TODO: this should be placed in the caller and work for modules/global, too!
         if (window)
             window.addEventListener('resize', function () { return _self.resizeCanvas(); });
         this.resizeCanvas();
+        if (config.autoDetectRetina) {
+            this._setToRetina();
+        }
         this.installInputListeners();
         // Apply the configured CSS scale.
         this.updateCSSscale();
@@ -310,8 +315,8 @@ var PlotBoilerplate = /** @class */ (function () {
         //    https://github.com/eligrey/FileSaver.js
         if (typeof window["saveAs"] != "function")
             throw "Cannot save file; did you load the ./utils/savefile helper function an the eligrey/SaveFile library?";
-        var saveAs = window["saveAs"];
-        saveAs(blob, "plotboilerplate.svg");
+        var _saveAs = window["saveAs"];
+        _saveAs(blob, "plotboilerplate.svg");
     };
     ;
     /**
@@ -324,11 +329,15 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      **/
     PlotBoilerplate.prototype._setToRetina = function () {
-        this.config.cssScaleX = this.config.cssScaleY = 0.5;
-        this.config.canvasWidthFactor = this.config.canvasHeightFactor = 2.0;
-        //this.config.fullSize = false;
-        this.config.fitToParent = false;
+        this.config.autoDetectRetina = true;
+        var pixelRatio = window.devicePixelRatio || 1;
+        this.config.cssScaleX = this.config.cssScaleY = 1.0 / pixelRatio; // 0.5;
+        this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio; // 2.0;
+        // this.config.fullSize = false;
+        // this.config.fitToParent = false;
+        //console.log( 'pixelRatio', pixelRatio );
         this.resizeCanvas();
+        this.updateCSSscale();
     };
     ;
     /**
@@ -544,8 +553,10 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.drawGrid = function () {
-        var gScale = { x: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX,
-            y: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) * this.config.rasterScaleY };
+        var gScale = {
+            x: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX / this.config.cssScaleX,
+            y: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) * this.config.rasterScaleY / this.config.cssScaleY
+        };
         var gSize = { width: this.grid.size.x * gScale.x, height: this.grid.size.y * gScale.y };
         var cs = { width: this.canvasSize.width / 2, height: this.canvasSize.height / 2 };
         var offset = this.draw.offset.clone().inv();
@@ -874,8 +885,8 @@ var PlotBoilerplate = /** @class */ (function () {
             var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             _self.canvas.style.position = 'absolute';
-            _self.canvas.style.width = width + 'px';
-            _self.canvas.style.height = height + 'px';
+            _self.canvas.style.width = (_self.config.canvasWidthFactor * width) + 'px';
+            _self.canvas.style.height = (_self.config.canvasWidthFactor * height) + 'px';
             _self.canvas.style.top = '0px';
             _self.canvas.style.left = '0px';
             _setSize(width, height);
@@ -884,6 +895,7 @@ var PlotBoilerplate = /** @class */ (function () {
             // Set editor size
             _self.canvas.style.position = 'absolute';
             var space = this.getAvailableContainerSpace();
+            // window.alert( space.width + " " + space.height );
             _self.canvas.style.width = (_self.config.canvasWidthFactor * space.width) + 'px';
             _self.canvas.style.height = (_self.config.canvasHeightFactor * space.height) + 'px';
             _self.canvas.style.top = null;
@@ -1064,10 +1076,6 @@ var PlotBoilerplate = /** @class */ (function () {
         //            until next keypress; the implication is, that [Ctrl] would still
         //            considered to be pressed which is not true.
         if (this.keyHandler.isDown('alt') || this.keyHandler.isDown('spacebar')) {
-            /* _self.draw.offset.add( e.params.dragAmount );
-            _self.fill.offset.set( _self.draw.offset );
-            _self.config.offsetX = _self.draw.offset.x;
-            _self.config.offsetY = _self.draw.offset.y; */
             _self.setOffset(_self.draw.offset.clone().add(e.params.dragAmount));
             _self.redraw();
         }
@@ -1141,25 +1149,12 @@ var PlotBoilerplate = /** @class */ (function () {
         // CHANGED replaced _self by this
         var _self = this;
         var we = e;
-        // let oldPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
-        // let newPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
         if (we.deltaY < 0) {
-            //_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = _self.config.scaleX*zoomStep;
-            //_self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = _self.config.scaleY*zoomStep;
-            _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex_1.Vertex(e.params.pos.x, e.params.pos.y)); // new Vertex(newOffsetX, newOffsetY) );
+            _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex_1.Vertex(e.params.pos.x, e.params.pos.y));
         }
         else if (we.deltaY > 0) {
-            //_self.draw.scale.x = _self.fill.scale.x = _self.config.scaleX = Math.max(_self.config.scaleX/zoomStep,0.01);
-            // _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY = Math.max(_self.config.scaleY/zoomStep,0.01);
-            _self.setZoom(_self.config.scaleX / zoomStep, _self.config.scaleY / zoomStep, new Vertex_1.Vertex(e.params.pos.x, e.params.pos.y)); // new Vertex(newOffsetx, newOffsetY) );
+            _self.setZoom(_self.config.scaleX / zoomStep, _self.config.scaleY / zoomStep, new Vertex_1.Vertex(e.params.pos.x, e.params.pos.y));
         }
-        /* let newPos : XYCoords = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
-        // Apply relative positioned zoom
-        let newOffsetX : number = _self.draw.offset.x + (newPos.x-oldPos.x)*_self.draw.scale.x;
-        let newOffsetY : number = _self.draw.offset.y + (newPos.y-oldPos.y)*_self.draw.scale.y;
-        _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = newOffsetX;
-        _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = newOffsetY;
-        */
         e.preventDefault();
         _self.redraw();
     };
@@ -1194,8 +1189,6 @@ var PlotBoilerplate = /** @class */ (function () {
         var newPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
         var newOffsetX = this.draw.offset.x + (newPos.x - oldPos.x) * this.draw.scale.x;
         var newOffsetY = this.draw.offset.y + (newPos.y - oldPos.y) * this.draw.scale.y;
-        //this.draw.offset.x = this.fill.offset.x = this.config.offsetX = newOffsetX;
-        //this.draw.offset.y = this.fill.offset.y = this.config.offsetY = newOffsetY;
         this.setOffset({ x: newOffsetX, y: newOffsetY });
     };
     PlotBoilerplate.prototype.installInputListeners = function () {
@@ -1235,6 +1228,12 @@ var PlotBoilerplate = /** @class */ (function () {
                     var touchDownPos = null;
                     var draggedElement = null;
                     var multiTouchStartScale = null;
+                    var clearTouch = function () {
+                        touchMovePos = null;
+                        touchDownPos = null;
+                        draggedElement = null;
+                        multiTouchStartScale = null;
+                    };
                     var af = new AF(this.canvas, {
                         touchStart: function (e) {
                             if (e.touches.length == 1) {
@@ -1270,16 +1269,10 @@ var PlotBoilerplate = /** @class */ (function () {
                             }
                         },
                         touchEnd: function (e) {
-                            touchMovePos = null;
-                            touchDownPos = null;
-                            draggedElement = null;
-                            multiTouchStartScale = null;
+                            clearTouch();
                         },
                         touchCancel: function (e) {
-                            touchMovePos = null;
-                            touchDownPos = null;
-                            draggedElement = null;
-                            multiTouchStartScale = null;
+                            clearTouch();
                         },
                         multipointStart: function (e) {
                             multiTouchStartScale = _self.draw.scale.clone();
@@ -1288,6 +1281,7 @@ var PlotBoilerplate = /** @class */ (function () {
                             multiTouchStartScale = null;
                         },
                         pinch: function (e) {
+                            // For pinching there must be at least two touch items
                             var fingerA = new Vertex_1.Vertex(e.touches.item(0).clientX, e.touches.item(0).clientY);
                             var fingerB = new Vertex_1.Vertex(e.touches.item(1).clientX, e.touches.item(1).clientY);
                             var center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
@@ -1360,10 +1354,6 @@ var PlotBoilerplate = /** @class */ (function () {
                 _self.selectVerticesInPolygon(_self.selectPolygon);
                 _self.selectPolygon = null;
                 _self.redraw();
-            })
-                .down('e', function () {
-                // Just for testing.
-                // _self.console.log('e was hit. shift is pressed?',this.keyHandler.isDown('shift'));
             });
         } // END IF enableKeys?
         else {
@@ -1433,13 +1423,13 @@ var PlotBoilerplate = /** @class */ (function () {
             for (var k in base) {
                 if (!extension.hasOwnProperty(k))
                     continue;
-                var type = typeof base[k];
+                var typ = typeof base[k];
                 try {
-                    if (type == 'boolean')
+                    if (typ == 'boolean')
                         base[k] = !!JSON.parse(extension[k]);
-                    else if (type == 'number')
+                    else if (typ == 'number')
                         base[k] = JSON.parse(extension[k]) * 1;
-                    else if (type == 'function' && typeof extension[k] == 'function')
+                    else if (typ == 'function' && typeof extension[k] == 'function')
                         base[k] = extension[k];
                     else
                         base[k] = extension[k];
@@ -1486,9 +1476,10 @@ var PlotBoilerplate = /** @class */ (function () {
             /**
              * A helper function to the the object property numeric value specified by the given key.
              *
-             * @param {any} object   - The object to get the property's value from. Must not be null.
+             * @param {any}    object   - The object to get the property's value from. Must not be null.
              * @param {string} key      - The key of the object property (the name).
-             * @param {any}    fallback - A default value if the key does not exist.
+             * @param {number} fallback - A default value if the key does not exist.
+             * @return {number}
              **/
             num: function (obj, key, fallback) {
                 if (!obj.hasOwnProperty(key))
@@ -1500,9 +1491,10 @@ var PlotBoilerplate = /** @class */ (function () {
             /**
              * A helper function to the the object property boolean value specified by the given key.
              *
-             * @param {any} object   - The object to get the property's value from. Must not be null.
-             * @param {string} key      - The key of the object property (the name).
-             * @param {any}    fallback - A default value if the key does not exist.
+             * @param {any}     object   - The object to get the property's value from. Must not be null.
+             * @param {string}  key      - The key of the object property (the name).
+             * @param {boolean} fallback - A default value if the key does not exist.
+             * @return {boolean}
              **/
             bool: function (obj, key, fallback) {
                 if (!obj.hasOwnProperty(key))
@@ -1514,9 +1506,10 @@ var PlotBoilerplate = /** @class */ (function () {
             /**
              * A helper function to the the object property function-value specified by the given key.
              *
-             * @param {any} object   - The object to get the property's value from. Must not be null.
-             * @param {string} key      - The key of the object property (the name).
-             * @param {any}    fallback - A default value if the key does not exist.
+             * @param {any}      object   - The object to get the property's value from. Must not be null.
+             * @param {string}   key      - The key of the object property (the name).
+             * @param {function} fallback - A default value if the key does not exist.
+             * @return {function}
              **/
             func: function (obj, key, fallback) {
                 if (!obj.hasOwnProperty(key))
@@ -1541,8 +1534,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
                     var cindex = bezierPath.locateCurveByStartPoint(e.params.vertex);
                     bezierPath.bezierCurves[cindex].startPoint.addXY(-e.params.dragAmount.x, -e.params.dragAmount.y);
-                    bezierPath.moveCurvePoint(cindex * 1, bezierPath.START_POINT, new Vertex_1.Vertex(e.params.dragAmount) // TODO: change the signature of moveCurvePoint to (,XYCoords...)     
-                    );
+                    bezierPath.moveCurvePoint(cindex * 1, bezierPath.START_POINT, e.params.dragAmount);
                     bezierPath.updateArcLengths();
                 });
                 bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {

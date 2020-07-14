@@ -20,7 +20,8 @@
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-06-03 Made the private helper function _locateUIndex to a private function.
  * @modified 2020-06-03 Added the getBounds() function.
- * @version 2.2.0
+ * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
+ * @version 2.2.1
  *
  * @file BezierPath
  * @public
@@ -28,7 +29,7 @@
 import { Bounds } from "./Bounds";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
-import { SVGSerializable } from "./interfaces";
+import { XYCoords, SVGSerializable } from "./interfaces";
 export declare class BezierPath implements SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
@@ -371,12 +372,12 @@ export declare class BezierPath implements SVGSerializable {
      * @param {number} curveIndex - The curve index to move a point from.
      * @param {number} pointID - One of the curve's four point IDs (START_POINT,
      *                           START_CONTROL_POINT, END_CONTRO_POINT or END_POINT).
-     * @param {Vertex} moveAmount - The amount to move the addressed vertex by.
+     * @param {XYCoords} moveAmount - The amount to move the addressed vertex by.
      * @instance
      * @memberof BezierPath
      * @return {void}
      **/
-    moveCurvePoint(curveIndex: number, pointID: number, moveAmount: Vertex): void;
+    moveCurvePoint(curveIndex: number, pointID: number, moveAmount: XYCoords): void;
     /**
      * This helper function adjusts the given point's predecessor's control point.
      *

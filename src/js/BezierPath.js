@@ -21,7 +21,8 @@
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-06-03 Made the private helper function _locateUIndex to a private function.
  * @modified 2020-06-03 Added the getBounds() function.
- * @version 2.2.0
+ * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
+ * @version 2.2.1
  *
  * @file BezierPath
  * @public
@@ -748,7 +749,7 @@ var BezierPath = /** @class */ (function () {
      * @param {number} curveIndex - The curve index to move a point from.
      * @param {number} pointID - One of the curve's four point IDs (START_POINT,
      *                           START_CONTROL_POINT, END_CONTRO_POINT or END_POINT).
-     * @param {Vertex} moveAmount - The amount to move the addressed vertex by.
+     * @param {XYCoords} moveAmount - The amount to move the addressed vertex by.
      * @instance
      * @memberof BezierPath
      * @return {void}

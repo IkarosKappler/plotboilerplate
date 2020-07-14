@@ -46,6 +46,7 @@
 		  autoAdjustOffset      : true,
 		  offsetAdjustXPercent  : 50,
 		  offsetAdjustYPercent  : 50,
+		  autoDetectRetina      : false,
 		  backgroundColor       : '#ffffff',
 		  enableMouse           : true,
 		  enableTouch           : true,
