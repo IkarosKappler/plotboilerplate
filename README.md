@@ -621,8 +621,8 @@ for this purpose.
 ### Credits
 * dat.gui
 * Color.js
-* FileSaver.js
-* [AllyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
+* [FileSaver.js](https://www.npmjs.com/package/file-saver "FileSaver.js")
+* [AlloyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
 * Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
 * [hobby.pdf](https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf "hobby.pdf")
 * [jsHobby](https://github.com/loopspace/jsHobby "jsHobby")
