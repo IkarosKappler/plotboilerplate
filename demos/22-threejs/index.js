@@ -137,8 +137,8 @@
 	    // +-------------------------------
             {
 		var gui = pb.createGUI();
-		gui.add(config, "outlineSegmentCount").min(3).max(100).onChange( function() { rebuild() } ).name('#outline').title('The number of segments on the outline.');
-		gui.add(config, "shapeSegmentCount").min(3).max(100).onChange( function() { rebuild() } ).name('#shape').title('The number of segments on the shape.');
+		gui.add(config, "outlineSegmentCount").min(3).max(512).onChange( function() { rebuild() } ).name('#outline').title('The number of segments on the outline.');
+		gui.add(config, "shapeSegmentCount").min(3).max(256).onChange( function() { rebuild() } ).name('#shape').title('The number of segments on the shape.');
 	    }
 
 	    pb.config.preDraw = preDraw;
