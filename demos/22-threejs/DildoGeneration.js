@@ -80,9 +80,9 @@
 	    this.lathe = undefined;
 	}
 
+	/*
 	// Compare with lathe example
 	//    https://threejs.org/docs/#api/en/geometries/LatheGeometry
-	
 	var points = [];
 	var outlineBounds = options.outline.getBounds();
 	for( var i = 0; i <= options.segmentCount; i++ ) {
@@ -90,14 +90,39 @@
 	    points.push( new THREE.Vector2( -vert.x+(outlineBounds.max.x) , -vert.y ) );
 	}
 	var geometry = new THREE.LatheGeometry( points, 12, Math.PI*2 );
+	*/
 
-	var material = new THREE.MeshPhongMaterial({ color: 0x3838ff, wireframe : false, flatShading: false, depthTest : true, opacity : 1.0, side : THREE.DoubleSide, visible : true, emissive : 0x0, reflectivity : 1.0, refractionRatio : 0.89, specular: 0x888888, /*, shading : THREE.LambertShading */ } )
-	this.lathe = new THREE.Mesh( geometry, material );
+	var baseShape = mkCircularPolygon( 100.0, options.shapeSegmentCount );
+	var geometry = new DildoGeometry( { baseShape : baseShape,
+					    outline : options.outline,
+					    outlineSegmentCount : options.outlineSegmentCount,
+					  } );
+
+	var material = new THREE.MeshPhongMaterial({ color: 0x3838ff, wireframe : false, flatShading: false, depthTest : true, opacity : 1.0, side : THREE.DoubleSide, visible : true, emissive : 0x0, reflectivity : 1.0, refractionRatio : 0.89, specular: 0x888888, /*, shading : THREE.LambertShading */ } );
+	var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
+	bufferedGeometry.computeVertexNormals();
+	//bufferedGeometry.normalize();
+	this.lathe = new THREE.Mesh(
+	    bufferedGeometry , // geometry,
+	    material
+	);
 	this.lathe.position.y = -100;
+	this.lathe.rotation.x = Math.PI;
 	this.camera.lookAt( new THREE.Vector3(20,0,150) );
 	this.scene.add( this.lathe );
     };
-    
+
+    var mkCircularPolygon = function( radius, pointCount ) {
+	var vertices = [];
+	var phi;
+	for( var i = 0; i < pointCount; i++ ) {
+	    phi = Math.PI*2*(i/pointCount);
+	    vertices.push( new Vertex( Math.cos(phi)*radius,
+				       Math.sin(phi)*radius )
+			 );
+	}
+	return new Polygon( vertices, false );
+    };
 
     window.DildoGeneration = DildoGeneration;
 })();

@@ -14,7 +14,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (desktop and mobile)
 
 
-The compressed library has 84kb.
+The compressed library has 87kb.
 
 
 ## Install the package via npm
@@ -510,12 +510,15 @@ The Vertex class has basic drag event support:
 </div>
 
 
-## Mouse and Keyboard interaction
+## Mouse, Keyboard and Touch interaction
  * [SHIFT] + [Click] : Select/Deselect vertex
  * [Y] + [Click]: Toggle Bézier auto-adjustment for clicked bézier path point
  * [ALT or SPACE] + [Mousedown] + [Drag] : Pan the area
  * [Mousewheel-up] : Zoom in
  * [Mousewheel-down] : Zoom out
+ * Touch & move (1 finger): Move item
+ * Touch & move (2 fingers): Pan the area
+ * Touch & pinch: Zoom in/out
 
 
 
@@ -591,6 +594,7 @@ for this purpose.
  * Add an internal mapping to remember vertices and their installed listeners (for removing them later).
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
  * Port all demos from vanilla JS to TypeScript.
+ * Remove the Touchy.js integration soon.
  
 
 ### Todos for future Version 2
@@ -617,7 +621,7 @@ for this purpose.
 * dat.gui
 * Color.js
 * FileSaver.js
-* [Touchy.js](https://github.com/jairajs89/Touchy.js "Touchy.js") by [jairajs89](https://github.com/jairajs89 "jairajs89") 
+* [AllyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
 * Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
 * [hobby.pdf](https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf "hobby.pdf")
 * [jsHobby](https://github.com/loopspace/jsHobby "jsHobby")

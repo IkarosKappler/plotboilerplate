@@ -4,6 +4,20 @@ layout: page
 
 
 # Changelog
+* 2020-07-06
+  * Added AlloyFinger support (will replace Touchy.js).
+  * Following new touch actions are now possible: panning (two fingers), zoominng (two fingers).
+* 2020-07-03
+  * Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
+  * Added the CubicBezierPath.getBounds() function.
+  * BezierPath: Made the private helper functions _locateUIndex, adjustPredecessorControlPoint,
+     adjustSuccessorControlPoint to a private function.
+  * Added the BezierPath.getBounds() function.
+  * Added draw.rect(Vertex,number,number) function.
+* 2020-07-01 (1.8.1)
+  * Tweaked the pattern gradient demo (rotation and scale).
+  * Prepared a new demo: with THREE.js.
+  * Changed the scope of BezierPath.fromJSON (is now static, was an instance method before).
 * 2020-06-22 (1.8.0)
   * Added the rasterScaleX and rasterScaleY config params.
   * Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.

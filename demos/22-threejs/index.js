@@ -21,7 +21,7 @@
 	    // All config params are optional.
 	    var pb = new PlotBoilerplate(
 		PlotBoilerplate.utils.safeMergeByKeys(
-		    { canvas                : document.getElementById('my-canvas'),					    
+		    { canvas                : document.getElementById('my-canvas'),
 		      fullSize              : true,
 		      fitToParent           : true,
 		      scaleX                : 1.0,
@@ -54,7 +54,8 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		segmentCount   : 100
+		outlineSegmentCount   : 128,
+		shapeSegmentCount     : 64
 	    }, GUP );
 
 	    var dildoGeneration = new DildoGeneration('dildo-canvas');
@@ -73,9 +74,12 @@
 		var buildId = new Date().getTime();
 		window.setTimeout( (function(bId) {
 		    return function() {
-			// console.log( bId, buildId );
-			if( bId == buildId )
-			    dildoGeneration.rebuild( { outline : outline, segmentCount : config.segmentCount } );
+			if( bId == buildId ) {
+			    dildoGeneration.rebuild( { outline : outline,
+						       shapeSegmentCount : config.shapeSegmentCount,
+						       outlineSegmentCount : config.outlineSegmentCount
+						     } );
+			}
 		    };
 		})(buildId), 50 );
 						 
@@ -133,7 +137,8 @@
 	    // +-------------------------------
             {
 		var gui = pb.createGUI();
-		gui.add(config, "segmentCount").min(3).max(100).onChange( function() { rebuild() } ).name('#segments').title('The number of segments');
+		gui.add(config, "outlineSegmentCount").min(3).max(100).onChange( function() { rebuild() } ).name('#outline').title('The number of segments on the outline.');
+		gui.add(config, "shapeSegmentCount").min(3).max(100).onChange( function() { rebuild() } ).name('#shape').title('The number of segments on the shape.');
 	    }
 
 	    pb.config.preDraw = preDraw;
