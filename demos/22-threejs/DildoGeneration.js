@@ -33,7 +33,8 @@
 	this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
 	this.controls.update();
 
-	this.lathe = null;
+	// Cache all geometries for later removal
+	this.geometries = [];
 
 	var _self = this;
 	window.addEventListener( 'resize', function() { _self.resizeCanvas(); } );
@@ -71,26 +72,7 @@
      * @param {number}     options.segmentCount
      **/
     DildoGeneration.prototype.rebuild = function( options ) {
-	if( this.lathe != null ) {
-	    // Remove old object.
-	    //  A better way would be to update the lathe in-place. Possible?
-	    this.scene.remove( this.lathe );
-	    this.lathe.geometry.dispose();
-	    this.lathe.material.dispose();
-	    this.lathe = undefined;
-	}
-
-	/*
-	// Compare with lathe example
-	//    https://threejs.org/docs/#api/en/geometries/LatheGeometry
-	var points = [];
-	var outlineBounds = options.outline.getBounds();
-	for( var i = 0; i <= options.segmentCount; i++ ) {
-	    var vert = options.outline.getPointAt( i/options.segmentCount );
-	    points.push( new THREE.Vector2( -vert.x+(outlineBounds.max.x) , -vert.y ) );
-	}
-	var geometry = new THREE.LatheGeometry( points, 12, Math.PI*2 );
-	*/
+	this.removeCachedGeometries();
 
 	var baseShape = mkCircularPolygon( 100.0, options.shapeSegmentCount );
 	var geometry = new DildoGeometry( { baseShape : baseShape,
@@ -101,15 +83,35 @@
 	var material = new THREE.MeshPhongMaterial({ color: 0x3838ff, wireframe : false, flatShading: false, depthTest : true, opacity : 1.0, side : THREE.DoubleSide, visible : true, emissive : 0x0, reflectivity : 1.0, refractionRatio : 0.89, specular: 0x888888, /*, shading : THREE.LambertShading */ } );
 	var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
 	bufferedGeometry.computeVertexNormals();
-	//bufferedGeometry.normalize();
-	this.lathe = new THREE.Mesh(
-	    bufferedGeometry , // geometry,
+	var latheMesh = new THREE.Mesh(
+	    bufferedGeometry,
 	    material
 	);
-	this.lathe.position.y = -100;
-	this.lathe.rotation.x = Math.PI;
+	latheMesh.position.y = -100;
+	latheMesh.rotation.x = Math.PI;
 	this.camera.lookAt( new THREE.Vector3(20,0,150) );
-	this.scene.add( this.lathe );
+	this.scene.add( latheMesh );
+	this.geometries.push( latheMesh );
+
+	if( options.showNormals ) {
+	    var vnHelper = new VertexNormalsHelper( latheMesh, options.normalsLength, 0x00ff00, 1 );
+	    this.scene.add( vnHelper );
+	    this.geometries.push( vnHelper );
+	}
+    };
+
+    DildoGeneration.prototype.removeCachedGeometries = function() {
+	for( var i = 0; i < this.geometries.length; i++ ) {
+	    var old = this.geometries[i];
+	    // Remove old object.
+	    //  A better way would be to update the lathe in-place. Possible?
+	    this.scene.remove( old );
+	    if( typeof old.dispose == "function" )
+		old.dispose();
+	    if( typeof old.material != "undefined" && typeof old.material.dispose == "function" )
+		old.material.dispose();
+	}
+	this.cachedGeometries = [];
     };
 
     var mkCircularPolygon = function( radius, pointCount ) {
