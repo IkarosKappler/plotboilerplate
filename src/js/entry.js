@@ -5,6 +5,7 @@ window.VertexAttr = require("./VertexAttr.js").VertexAttr;
 window.VertexListeners = require("./VertexListeners.js").VertexListeners;
 window.Vertex = require("./Vertex.js").Vertex;
 
+window.Bounds = require("./Bounds.js").Bounds;
 window.Grid = require("./Grid.js").Grid;
 window.Line = require("./Line.js").Line;
 window.Vector = require("./Vector.js").Vector;

@@ -268,7 +268,8 @@ export declare class PlotBoilerplate {
      **/
     private static _saveFile;
     /**
-     * This function sets the canvas resolution to factor 2.0 for retina displays.
+     * This function sets the canvas resolution to factor 2.0 (or the preferred pixel ratio of your device) for retina displays.
+     * Please not that in non-GL mode this might result in very slow rendering as the canvas buffer size may increase.
      *
      * @method _setToRetina
      * @instance
@@ -277,6 +278,13 @@ export declare class PlotBoilerplate {
      * @private
      **/
     private _setToRetina;
+    /**
+     * Set the current zoom and draw offset to fit the given bounds.
+     *
+     * This method currently restores the aspect zoom ratio.
+     *
+     **/
+    fitToView(bounds: Bounds): void;
     /**
      * Set the console for this instance.
      *

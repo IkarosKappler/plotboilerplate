@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-07-15
+  * Included the Bounds class into the bundle.
+  * Added the PlotBoilerplate.fitToBounds(Bounds) function to make zooming onto particular areas easier.
 * 2020-07-14
   * Changed the CubicBezierCurve.moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
   * Changed the BezierPath.moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.

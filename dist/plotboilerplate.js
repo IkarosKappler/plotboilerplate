@@ -664,6 +664,47 @@ exports.Vertex = Vertex;
 "use strict";
 
 /**
+ * @classdesc A bounds class with min and max values.
+ *
+ * @requires XYCoords, Vertex, IBounds
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-05-11
+ * @version  1.0.0
+ *
+ * @file Bopunds
+ * @fileoverview A simple bounds class implementing IBounds.
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Bounds
+     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
+     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
+     **/
+    function Bounds(min, max) {
+        this.min = min;
+        this.max = max;
+        this.width = max.x - min.x;
+        this.height = max.y - min.y;
+    }
+    ;
+    return Bounds;
+}()); // END class bounds
+exports.Bounds = Bounds;
+//# sourceMappingURL=Bounds.js.map
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
  * This is some refactored code from my 'Morley Triangle' test<br>
@@ -776,7 +817,7 @@ exports.Line = Line;
 //# sourceMappingURL=Line.js.map
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -982,47 +1023,6 @@ exports.Vector = Vector;
 //# sourceMappingURL=Vector.js.map
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A bounds class with min and max values.
- *
- * @requires XYCoords, Vertex, IBounds
- *
- * @author   Ikaros Kappler
- * @date     2020-05-11
- * @version  1.0.0
- *
- * @file Bopunds
- * @fileoverview A simple bounds class implementing IBounds.
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Bounds
-     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
-     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
-     **/
-    function Bounds(min, max) {
-        this.min = min;
-        this.max = max;
-        this.width = max.x - min.x;
-        this.height = max.y - min.y;
-    }
-    ;
-    return Bounds;
-}()); // END class bounds
-exports.Bounds = Bounds;
-//# sourceMappingURL=Bounds.js.map
-
-/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1116,9 +1116,9 @@ exports.VertexAttr = VertexAttr;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds_1 = __webpack_require__(3);
+var Bounds_1 = __webpack_require__(1);
 var Vertex_1 = __webpack_require__(0);
-var Vector_1 = __webpack_require__(2);
+var Vector_1 = __webpack_require__(3);
 var CubicBezierCurve = /** @class */ (function () {
     /**
      * The constructor.
@@ -1765,7 +1765,7 @@ exports.CubicBezierCurve = CubicBezierCurve;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds_1 = __webpack_require__(3);
+var Bounds_1 = __webpack_require__(1);
 var CubicBezierCurve_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
 var BezierPath = /** @class */ (function () {
@@ -3222,9 +3222,9 @@ exports.Polygon = Polygon;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds_1 = __webpack_require__(3);
+var Bounds_1 = __webpack_require__(1);
 var Circle_1 = __webpack_require__(9);
-var Line_1 = __webpack_require__(1);
+var Line_1 = __webpack_require__(2);
 var Polygon_1 = __webpack_require__(7);
 var Vertex_1 = __webpack_require__(0);
 var geomutils_1 = __webpack_require__(13);
@@ -3623,7 +3623,7 @@ exports.Triangle = Triangle;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var Vector_1 = __webpack_require__(2);
+var Vector_1 = __webpack_require__(3);
 var Vertex_1 = __webpack_require__(0);
 var Circle = /** @class */ (function () {
     /**
@@ -4331,7 +4331,7 @@ exports.VertTuple = VertTuple;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Line_1 = __webpack_require__(1);
+var Line_1 = __webpack_require__(2);
 var Triangle_1 = __webpack_require__(8);
 exports.geomutils = {
     /**
@@ -6614,9 +6614,10 @@ window.VertexAttr = __webpack_require__(4).VertexAttr;
 window.VertexListeners = __webpack_require__(10).VertexListeners;
 window.Vertex = __webpack_require__(0).Vertex;
 
+window.Bounds = __webpack_require__(1).Bounds;
 window.Grid = __webpack_require__(11).Grid;
-window.Line = __webpack_require__(1).Line;
-window.Vector = __webpack_require__(2).Vector;
+window.Line = __webpack_require__(2).Line;
+window.Vector = __webpack_require__(3).Vector;
 window.CubicBezierCurve = __webpack_require__(5).CubicBezierCurve;
 window.BezierPath = __webpack_require__(6).BezierPath;
 window.Polygon = __webpack_require__(7).Polygon;
@@ -6707,18 +6708,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var draw_1 = __webpack_require__(18);
 var drawgl_1 = __webpack_require__(19);
 var BezierPath_1 = __webpack_require__(6);
-var Bounds_1 = __webpack_require__(3);
+var Bounds_1 = __webpack_require__(1);
 var Circle_1 = __webpack_require__(9);
 var Grid_1 = __webpack_require__(11);
 var KeyHandler_1 = __webpack_require__(17);
-var Line_1 = __webpack_require__(1);
+var Line_1 = __webpack_require__(2);
 var MouseHandler_1 = __webpack_require__(16);
 var PBImage_1 = __webpack_require__(15);
 var Polygon_1 = __webpack_require__(7);
 var SVGBuilder_1 = __webpack_require__(22);
 var Triangle_1 = __webpack_require__(8);
 var VEllipse_1 = __webpack_require__(14);
-var Vector_1 = __webpack_require__(2);
+var Vector_1 = __webpack_require__(3);
 var Vertex_1 = __webpack_require__(0);
 var VertexAttr_1 = __webpack_require__(4);
 var PlotBoilerplate = /** @class */ (function () {
@@ -6960,7 +6961,8 @@ var PlotBoilerplate = /** @class */ (function () {
     };
     ;
     /**
-     * This function sets the canvas resolution to factor 2.0 for retina displays.
+     * This function sets the canvas resolution to factor 2.0 (or the preferred pixel ratio of your device) for retina displays.
+     * Please not that in non-GL mode this might result in very slow rendering as the canvas buffer size may increase.
      *
      * @method _setToRetina
      * @instance
@@ -6978,6 +6980,40 @@ var PlotBoilerplate = /** @class */ (function () {
         //console.log( 'pixelRatio', pixelRatio );
         this.resizeCanvas();
         this.updateCSSscale();
+    };
+    ;
+    /**
+     * Set the current zoom and draw offset to fit the given bounds.
+     *
+     * This method currently restores the aspect zoom ratio.
+     *
+     **/
+    PlotBoilerplate.prototype.fitToView = function (bounds) {
+        //const viewport:Bounds = this.viewport();
+        var canvasCenter = new Vertex_1.Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
+        var canvasRatio = this.canvasSize.width / this.canvasSize.height;
+        var ratio = bounds.width / bounds.height;
+        // Find the new draw offset
+        // const center:Vertex = new Vertex( bounds.max.x - bounds.width/2.0, bounds.max.y - bounds.height/2.0 );
+        var center = new Vertex_1.Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
+            .inv()
+            .addXY(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
+        //center.addXY( this.canvasSize.width/2.0, this.canvasSize.height/2.0 );
+        // But keep the old center of bounds
+        //this.setOffset( center.clone().inv().addXY( this.canvasSize.width/2.0, this.canvasSize.height/2.0 ) );
+        this.setOffset(center);
+        if (canvasRatio < ratio) {
+            var newUniformZoom = this.canvasSize.width / bounds.width;
+            this.setZoom(newUniformZoom, newUniformZoom, canvasCenter);
+            // this.setZoom( viewport.height/bounds.height, viewport.height/bounds.height, center );
+            //this.setZoom( viewport.width/bounds.width, viewport.width/bounds.width, center );
+        }
+        else {
+            var newUniformZoom = this.canvasSize.height / bounds.height;
+            this.setZoom(newUniformZoom, newUniformZoom, canvasCenter);
+            // this.setZoom( this.canvasSize.width/bounds.width, this.canvasSize.width/bounds.width, center );
+        }
+        this.redraw();
     };
     ;
     /**

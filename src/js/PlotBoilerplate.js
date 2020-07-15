@@ -320,7 +320,8 @@ var PlotBoilerplate = /** @class */ (function () {
     };
     ;
     /**
-     * This function sets the canvas resolution to factor 2.0 for retina displays.
+     * This function sets the canvas resolution to factor 2.0 (or the preferred pixel ratio of your device) for retina displays.
+     * Please not that in non-GL mode this might result in very slow rendering as the canvas buffer size may increase.
      *
      * @method _setToRetina
      * @instance
@@ -338,6 +339,40 @@ var PlotBoilerplate = /** @class */ (function () {
         //console.log( 'pixelRatio', pixelRatio );
         this.resizeCanvas();
         this.updateCSSscale();
+    };
+    ;
+    /**
+     * Set the current zoom and draw offset to fit the given bounds.
+     *
+     * This method currently restores the aspect zoom ratio.
+     *
+     **/
+    PlotBoilerplate.prototype.fitToView = function (bounds) {
+        //const viewport:Bounds = this.viewport();
+        var canvasCenter = new Vertex_1.Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
+        var canvasRatio = this.canvasSize.width / this.canvasSize.height;
+        var ratio = bounds.width / bounds.height;
+        // Find the new draw offset
+        // const center:Vertex = new Vertex( bounds.max.x - bounds.width/2.0, bounds.max.y - bounds.height/2.0 );
+        var center = new Vertex_1.Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
+            .inv()
+            .addXY(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
+        //center.addXY( this.canvasSize.width/2.0, this.canvasSize.height/2.0 );
+        // But keep the old center of bounds
+        //this.setOffset( center.clone().inv().addXY( this.canvasSize.width/2.0, this.canvasSize.height/2.0 ) );
+        this.setOffset(center);
+        if (canvasRatio < ratio) {
+            var newUniformZoom = this.canvasSize.width / bounds.width;
+            this.setZoom(newUniformZoom, newUniformZoom, canvasCenter);
+            // this.setZoom( viewport.height/bounds.height, viewport.height/bounds.height, center );
+            //this.setZoom( viewport.width/bounds.width, viewport.width/bounds.width, center );
+        }
+        else {
+            var newUniformZoom = this.canvasSize.height / bounds.height;
+            this.setZoom(newUniformZoom, newUniformZoom, canvasCenter);
+            // this.setZoom( this.canvasSize.width/bounds.width, this.canvasSize.width/bounds.width, center );
+        }
+        this.redraw();
     };
     ;
     /**

@@ -1,7 +1,7 @@
 /**
  * A script for testing the lib with three.js.
  *
- * @require PlotBoilerplate, MouseHandler, gup, dat.gui, three.js
+ * @require PlotBoilerplate, Bounds, MouseHandler, gup, dat.gui, three.js
  * 
  * @author   Ikaros Kappler
  * @date     2019-07-01
@@ -128,6 +128,12 @@
 		} );	    
 
 
+	    var scaleBounds = function( bounds, scaleFactor ) {
+		var center = new Vertex( bounds.min.x + bounds.width/2.0, bounds.min.y + bounds.height/2.0 );
+		return new Bounds( new Vertex(bounds.min).scale( scaleFactor, center ),
+				   new Vertex(bounds.max).scale( scaleFactor, center ) );
+	    };
+
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
@@ -141,6 +147,7 @@
 
 	    pb.config.preDraw = preDraw;
 	    pb.add( outline ); // This will trigger the initial postDraw/draw/redraw call
+	    pb.fitToView( scaleBounds(outline.getBounds(),1.6) );
 	    rebuild();
 	    
 	} );
