@@ -101,7 +101,7 @@
 	      refractionRatio : 0.89,
 	      specular: 0x888888,
 	      /*, shading : THREE.LambertShading */
-	      map : null // useTextureImage && options.textureImage
+	      map : null //  useTextureImage && options.textureImage
 	    } );
 	var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
 	bufferedGeometry.computeVertexNormals();
