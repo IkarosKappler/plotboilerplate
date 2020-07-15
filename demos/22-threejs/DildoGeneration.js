@@ -70,17 +70,39 @@
     /**
      * @param {BezierPath} options.outline
      * @param {number}     options.segmentCount
+     * @param {number}     outlineSegmentCount (>= 2).
+     * @param {boolean?}   useTextureImage
+     * @param {Image?}     textureImage
      **/
     DildoGeneration.prototype.rebuild = function( options ) {
 	this.removeCachedGeometries();
 
 	var baseShape = mkCircularPolygon( 100.0, options.shapeSegmentCount );
-	var geometry = new DildoGeometry( { baseShape : baseShape,
+	var geometry = new DildoGeometry( Object.assign( { baseShape : baseShape }, options ) );
+/* 
+					  { baseShape : baseShape,
 					    outline : options.outline,
 					    outlineSegmentCount : options.outlineSegmentCount,
-					  } );
+					  } ); */
 
-	var material = new THREE.MeshPhongMaterial({ color: 0x3838ff, wireframe : false, flatShading: false, depthTest : true, opacity : 1.0, side : THREE.DoubleSide, visible : true, emissive : 0x0, reflectivity : 1.0, refractionRatio : 0.89, specular: 0x888888, /*, shading : THREE.LambertShading */ } );
+	var useTextureImage     = options.useTextureImage && typeof options.textureImage != "undefined" && options.textureImage.complete && options.textureImage.naturalWidth !== false;
+	console.log( useTextureImage ); // options, options.textureImage, typeof options.textureImage );
+	
+	var material = new THREE.MeshPhongMaterial(
+	    { color: 0x3838ff,
+	      wireframe : false,
+	      flatShading: false,
+	      depthTest : true,
+	      opacity : 1.0,
+	      side : THREE.DoubleSide,
+	      visible : true,
+	      emissive : 0x0,
+	      reflectivity : 1.0,
+	      refractionRatio : 0.89,
+	      specular: 0x888888,
+	      /*, shading : THREE.LambertShading */
+	      map : null // useTextureImage && options.textureImage
+	    } );
 	var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
 	bufferedGeometry.computeVertexNormals();
 	var latheMesh = new THREE.Mesh(

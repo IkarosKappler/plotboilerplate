@@ -49,6 +49,9 @@
 		)
 	    );
 
+	    var textureImage = new Image();
+	    textureImage.onload = function() { console.log('Texture loaded.'); rebuild() };
+	    
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | A global config that's attached to the dat.gui control interface.
@@ -57,7 +60,9 @@
 		outlineSegmentCount   : 128,
 		shapeSegmentCount     : 64,
 		showNormals           : false,
-		normalsLength         : 10.0
+		normalsLength         : 10.0,
+		useTextureImage       : true,
+		textureImage          : textureImage
 	    }, GUP );
 
 	    var dildoGeneration = new DildoGeneration('dildo-canvas');
@@ -128,6 +133,9 @@
 		} );	    
 
 
+	    // +---------------------------------------------------------------------------------
+	    // | Scale a given Bounds instance to a new size (from its center).
+	    // +-------------------------------
 	    var scaleBounds = function( bounds, scaleFactor ) {
 		var center = new Vertex( bounds.min.x + bounds.width/2.0, bounds.min.y + bounds.height/2.0 );
 		return new Bounds( new Vertex(bounds.min).scale( scaleFactor, center ),
@@ -143,12 +151,15 @@
 		gui.add(config, "shapeSegmentCount").min(3).max(256).onChange( function() { rebuild() } ).name('#shape').title('The number of segments on the shape.');
 		gui.add(config, "showNormals").onChange( function() { rebuild() } ).name('Normals').title('Show the vertex normals.');
 		gui.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('Normals length').title('The length of rendered normals.');
+		gui.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('Use texture').title('Use a texture image.');
 	    }
 
 	    pb.config.preDraw = preDraw;
 	    pb.add( outline ); // This will trigger the initial postDraw/draw/redraw call
 	    pb.fitToView( scaleBounds(outline.getBounds(),1.6) );
 	    rebuild();
+
+	    textureImage.src = 'wood.png';
 	    
 	} );
     
