@@ -27,7 +27,7 @@ export interface IBounds {
 }
 export declare type Drawable = Vertex | Vector | Triangle | Circle | PBImage | VEllipse | Polygon | BezierPath | Line;
 export interface Config {
-    canvas: HTMLCanvasElement;
+    canvas: HTMLCanvasElement | string;
     fullSize?: boolean;
     fitToParent?: boolean;
     scaleX?: number;

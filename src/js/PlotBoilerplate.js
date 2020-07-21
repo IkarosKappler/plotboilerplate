@@ -253,9 +253,10 @@ var PlotBoilerplate = /** @class */ (function () {
         // +---------------------------------------------------------------------------------
         // | Object members.
         // +-------------------------------
-        this.canvas = typeof config.canvas == 'string' ? document.getElementById(config.canvas) : config.canvas;
+        this.canvas = typeof config.canvas == 'string' ? document.querySelector(config.canvas) : config.canvas;
         if (this.config.enableGL) {
             this.ctx = this.canvas.getContext('webgl'); // webgl-experimental?
+            console.log(drawgl_1.drawutilsgl);
             this.draw = new drawgl_1.drawutilsgl(this.ctx, false);
             // PROBLEM: same instance of fill and draw when using WebGL. Shader program cannot be duplicated on the same context
             this.fill = this.draw.copyInstance(true);
@@ -1455,22 +1456,28 @@ var PlotBoilerplate = /** @class */ (function () {
          * @return {Object} base extended by the new attributes.
          **/
         safeMergeByKeys: function (base, extension) {
-            for (var k in base) {
+            for (var k in extension) {
                 if (!extension.hasOwnProperty(k))
                     continue;
-                var typ = typeof base[k];
-                try {
-                    if (typ == 'boolean')
-                        base[k] = !!JSON.parse(extension[k]);
-                    else if (typ == 'number')
-                        base[k] = JSON.parse(extension[k]) * 1;
-                    else if (typ == 'function' && typeof extension[k] == 'function')
-                        base[k] = extension[k];
-                    else
-                        base[k] = extension[k];
+                console.log(k, extension[k]);
+                if (base.hasOwnProperty(k)) {
+                    var typ = typeof base[k];
+                    try {
+                        if (typ == 'boolean')
+                            base[k] = !!JSON.parse(extension[k]);
+                        else if (typ == 'number')
+                            base[k] = JSON.parse(extension[k]) * 1;
+                        else if (typ == 'function' && typeof extension[k] == 'function')
+                            base[k] = extension[k];
+                        else
+                            base[k] = extension[k];
+                    }
+                    catch (e) {
+                        console.error('error in key ', k, extension[k], e);
+                    }
                 }
-                catch (e) {
-                    console.error('error in key ', k, extension[k], e);
+                else {
+                    base[k] = extension[k];
                 }
             }
             return base;
@@ -1519,9 +1526,16 @@ var PlotBoilerplate = /** @class */ (function () {
             num: function (obj, key, fallback) {
                 if (!obj.hasOwnProperty(key))
                     return fallback;
-                if (typeof obj[key] !== 'number')
-                    return fallback;
-                return obj[key];
+                if (typeof obj[key] === 'number')
+                    return obj[key];
+                else {
+                    try {
+                        return JSON.parse(obj[key]) * 1;
+                    }
+                    catch (e) {
+                        return fallback;
+                    }
+                }
             },
             /**
              * A helper function to the the object property boolean value specified by the given key.
@@ -1534,9 +1548,16 @@ var PlotBoilerplate = /** @class */ (function () {
             bool: function (obj, key, fallback) {
                 if (!obj.hasOwnProperty(key))
                     return fallback;
-                if (typeof obj[key] !== 'boolean')
-                    return fallback;
-                return obj[key];
+                if (typeof obj[key] == 'boolean')
+                    return obj[key];
+                else {
+                    try {
+                        return !!JSON.parse(obj[key]);
+                    }
+                    catch (e) {
+                        return fallback;
+                    }
+                }
             },
             /**
              * A helper function to the the object property function-value specified by the given key.

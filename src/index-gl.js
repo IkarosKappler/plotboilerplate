@@ -86,25 +86,6 @@
 		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 		} );
-	    // +---------------------------------------------------------------------------------
-	    // | Add a touch listener to track the touch position.
-	    // +-------------------------------
-	    new Touchy( pb.canvas,
-			{ one : function( hand, finger ) {
-			    var relPos = pb.transformMousePosition( finger.lastPoint.x, finger.lastPoint.y ); 
-			    var cx = document.getElementById('cx');
-			    var cy = document.getElementById('cy');
-			    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
-			    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-			    
-			    hand.on('move', function (points) {
-				relPos = pb.transformMousePosition( points[0].x, points[0].y ); 
-				if( cx ) cx.innerHTML = relPos.x.toFixed(2);
-				if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-			    } );
-			}
-			}
-		      );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add some elements to draw (demo).

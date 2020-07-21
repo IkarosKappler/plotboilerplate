@@ -171,6 +171,8 @@ export class drawutilsgl {
 	//currentRotation[0] = Math.sin(radians);
 	//currentRotation[1] = Math.cos(radians);
 	this.gl.uniform2fv( uRotationVector, currentRotation );
+
+	this.gl.lineWidth(5);
 	
 	// Draw the line
 	this.gl.drawArrays(this.gl.LINES, 0, vertices.length/3);

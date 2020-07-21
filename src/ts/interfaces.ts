@@ -33,7 +33,7 @@ export interface IBounds {
 export type Drawable = Vertex | Vector | Triangle | Circle | PBImage | VEllipse | Polygon | BezierPath | Line;
 
 export interface Config {
-    canvas : HTMLCanvasElement;   //  Your canvas element in the DOM (required).
+    canvas : HTMLCanvasElement | string;   //  Your canvas element in the DOM (required).
     fullSize?: boolean;           // If set to true the canvas will gain full window size.
     fitToParent?: boolean;        // If set to true the canvas will gain the size of its parent container (overrides fullSize).
     scaleX?:number;               // The initial x-zoom. Default is 1.0.

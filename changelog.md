@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-07-21
+  * Changed the safeMargeByKeys function: all keys, from source and destination, will be used now.
+  * Changed the fetch.bool and fetch.number function: they will try a JSON.parse now on type mismatch (and use the fallback on failure of that).
 * 2020-07-15
   * Included the Bounds class into the bundle.
   * Added the PlotBoilerplate.fitToBounds(Bounds) function to make zooming onto particular areas easier.

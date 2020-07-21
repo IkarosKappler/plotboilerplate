@@ -257,7 +257,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `canvas`| _HTMLCanvasElement_ | `null` | The canvas (must not be null). |
+| `canvas`| _HTMLCanvasElement_ \| _string_ | `null` | The canvas (must not be null). |
 | `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
@@ -280,6 +280,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 | `cssScaleX`| _number_ | `1.0` | Visually resize the canvas using CSS transforms (scale x). |
 | `cssScaleY`| _number_ | `1.0` | Visually resize the canvas using CSS transforms (scale y). |
 | `cssUniformScale`| _boolean_ | `1.0` |  If set to true only cssScaleX applies for both dimensions. |
+| `autoDetectRetina` | _boolean_ | `true` | When set to true (default) the canvas will try to use the display's pixel ratio. |
 | `backgroundColor`| _string_ | `#ffffff` | A background color (CSS string) for the canvas. |
 | `redrawOnResize`| _boolean_ | `true` | Switch auto-redrawing on resize on/off (some applications might want to prevent automatic redrawing to avoid data loss from the drae buffer).|
 | `drawBezierHandleLines`| _boolean_ | `true` | Indicates if Bézier curve handle points should be drawn. |
@@ -300,7 +301,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 #### Example
 ~~~javascript
  var pb = new PlotBoilerplate( {
-  // HTMLElement
+  // HTMLElement | string
   //   Your canvas element in the DOM (required).
   canvas			: document.getElementById('my-canvas'),
 
@@ -370,6 +371,10 @@ A full working demo repository about the [Usage with Typescript is here](https:/
   // boolean
   //   If set to true only cssScaleX applies for both dimensions.
   cssUniformScale               : true,
+
+  // boolean
+  //   When set to true (default) the canvas will try to use the display's pixel ratio.
+  autoDetectRetina              : true,
 
   // string
   //   A background color (CSS string) for the canvas.
@@ -595,6 +600,7 @@ for this purpose.
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
  * Port all demos from vanilla JS to TypeScript.
  * Remove the Touchy.js integration soon.
+ * Add a TouchHandler (such as the MouseHandler)? Add this to the main demo to keep track of touch positions?
  
 
 ### Todos for future Version 2
@@ -620,8 +626,8 @@ for this purpose.
 ### Credits
 * dat.gui
 * Color.js
-* FileSaver.js
-* [AllyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
+* [FileSaver.js](https://www.npmjs.com/package/file-saver "FileSaver.js")
+* [AlloyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
 * Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
 * [hobby.pdf](https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf "hobby.pdf")
 * [jsHobby](https://github.com/loopspace/jsHobby "jsHobby")

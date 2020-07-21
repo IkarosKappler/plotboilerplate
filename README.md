@@ -253,7 +253,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `canvas`| _HTMLCanvasElement_ | `null` | The canvas (must not be null). |
+| `canvas`| _HTMLCanvasElement_ \| _string_ | `null` | The canvas or its query selector string (required). |
 | `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
@@ -297,7 +297,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 #### Example
 ~~~javascript
  var pb = new PlotBoilerplate( {
-  // HTMLElement
+  // HTMLElement | string
   //   Your canvas element in the DOM (required).
   canvas			: document.getElementById('my-canvas'),
 
@@ -596,6 +596,7 @@ for this purpose.
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
  * Port all demos from vanilla JS to TypeScript.
  * Remove the Touchy.js integration soon.
+ * Add a TouchHandler (such as the MouseHandler)? Add this to the main demo to keep track of touch positions?
  
 
 ### Todos for future Version 2

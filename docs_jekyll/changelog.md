@@ -1,9 +1,17 @@
 ---
 layout: page
+title: Changelog
 ---
 
 
 # Changelog
+* 2020-07-15
+  * Included the Bounds class into the bundle.
+  * Added the PlotBoilerplate.fitToBounds(Bounds) function to make zooming onto particular areas easier.
+* 2020-07-14
+  * Changed the CubicBezierCurve.moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
+  * Changed the BezierPath.moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
+  * Added the autoDetectRetina param to PlotBoilerplate.
 * 2020-07-06
   * Added AlloyFinger support (will replace Touchy.js).
   * Following new touch actions are now possible: panning (two fingers), zoominng (two fingers).

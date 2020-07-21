@@ -415,7 +415,7 @@ export class PlotBoilerplate {
 	// +---------------------------------------------------------------------------------
 	// | Object members.
 	// +-------------------------------
-	this.canvas              = typeof config.canvas == 'string' ? (document.getElementById(config.canvas) as HTMLCanvasElement) : config.canvas;
+	this.canvas              = typeof config.canvas == 'string' ? (document.querySelector(config.canvas) as HTMLCanvasElement) : config.canvas;
 	if( this.config.enableGL ) {
 	    this.ctx                 = this.canvas.getContext( 'webgl' ); // webgl-experimental?
 	    this.draw                = new drawutilsgl(this.ctx,false);
@@ -1630,17 +1630,22 @@ export class PlotBoilerplate {
 	 * @return {Object} base extended by the new attributes.
 	 **/
 	safeMergeByKeys : ( base:Object, extension:Object ) : Object => {
-	    for( var k in base ) {
+	    for( var k in extension ) {
 		if( !extension.hasOwnProperty(k) )
 		    continue;
-		var typ = typeof base[k];
-		try {
-		    if( typ == 'boolean' ) base[k] = !!JSON.parse(extension[k]);
-		    else if( typ == 'number' ) base[k] = JSON.parse(extension[k])*1;
-		    else if( typ == 'function' && typeof extension[k] == 'function' ) base[k] = extension[k] ;
-		    else base[k] = extension[k];
-		} catch( e ) {
-		    console.error( 'error in key ', k, extension[k], e );
+		console.log(k, extension[k]);
+		if( base.hasOwnProperty(k) ) {
+		    var typ = typeof base[k];
+		    try {
+			if( typ == 'boolean' ) base[k] = !!JSON.parse(extension[k]);
+			else if( typ == 'number' ) base[k] = JSON.parse(extension[k])*1;
+			else if( typ == 'function' && typeof extension[k] == 'function' ) base[k] = extension[k] ;
+			else base[k] = extension[k];
+		    } catch( e ) {
+			console.error( 'error in key ', k, extension[k], e );
+		    }
+		} else {
+		    base[k] = extension[k];
 		}
 	    }
 	    return base;
@@ -1693,9 +1698,15 @@ export class PlotBoilerplate {
 	    num : ( obj:any, key:string, fallback:number ) => {
 		if( !obj.hasOwnProperty(key) )
 		    return fallback;
-		if( typeof obj[key] !== 'number' )
-		    return fallback;
-		return obj[key];
+		if( typeof obj[key] === 'number' )
+		    return obj[key];
+		else {
+		    try {
+			return JSON.parse(obj[key])*1;
+		    } catch( e ) {
+			return fallback;
+		    }
+		}
 	    },
 
 	    /**
@@ -1709,9 +1720,15 @@ export class PlotBoilerplate {
 	    bool : ( obj:any, key:string, fallback:boolean ) => {
 		if( !obj.hasOwnProperty(key) )
 		    return fallback;
-		if( typeof obj[key] !== 'boolean' )
-		    return fallback;
-		return obj[key];
+		if( typeof obj[key] == 'boolean' )
+		    return obj[key];
+		else {
+		    try {
+			return !!JSON.parse(obj[key]);
+		    } catch( e ) {
+			return fallback;
+		    }
+		}
 	    },
 
 
