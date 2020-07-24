@@ -21,7 +21,8 @@
  * @modified 2020-06-03 Made the private helper function _locateUIndex to a private function.
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
- * @version 2.2.1
+ * @modified 2020-07-24 Added the getClosestT(Vertex) function.
+ * @version 2.2.2
  *
  * @file BezierPath
  * @public
@@ -262,6 +263,13 @@ export declare class BezierPath implements SVGSerializable {
      * @return {void}
      **/
     rotate(angle: number, center: Vertex): void;
+    /**
+     * Get the 't' position on this curve with the minimal distance to point p.
+     *
+     * @param {Vertex} p - The point to find the closest curve point for.
+     * @return {number} A value t with 0.0 <= t <= 1.0.
+     **/
+    getClosestT(p: Vertex): number;
     /**
      * Get the point on the bézier path at the given relative path location.
      *

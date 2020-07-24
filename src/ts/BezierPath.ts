@@ -21,7 +21,8 @@
  * @modified 2020-06-03 Made the private helper function _locateUIndex to a private function.
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
- * @version 2.2.1
+ * @modified 2020-07-24 Added the getClosestT(Vertex) function.
+ * @version 2.2.2
  *
  * @file BezierPath
  * @public
@@ -618,6 +619,39 @@ export class BezierPath implements SVGSerializable {
 	if( this.bezierCurves.length > 0 && !this.adjustCircular ) {
 	    this.bezierCurves[ this.bezierCurves.length-1 ].getEndPoint().rotate( angle, center );
 	}
+    };
+
+
+    /**
+     * Get the 't' position on this curve with the minimal distance to point p.
+     *
+     * @param {Vertex} p - The point to find the closest curve point for.
+     * @return {number} A value t with 0.0 <= t <= 1.0.
+     **/
+    getClosestT( p:Vertex ) : number {
+	// Find the spline to extract the value from
+	// var i : number = 0;
+	var uTemp : number = 0.0;
+	var minIndex : number = -1;
+	var minDist : number = 0.0;
+	var dist : number = 0.0;
+	var curveT : number = 0.0;
+	var uMin : number = 0.0;
+	var u : number = 0.0;
+	for( var i = 0; i < this.bezierCurves.length; i++ ) {
+
+	    curveT = this.bezierCurves[i].getClosestT( p );
+	    dist = this.bezierCurves[i].getPointAt(curveT).distance( p );
+	    if( minIndex == -1 || dist < minDist ) {
+		minIndex = i;
+		minDist = dist;
+		uMin = u + curveT * this.bezierCurves[i].getLength();
+	    }
+	    
+	    u += this.bezierCurves[i].getLength();	     
+	}
+	
+	return Math.max(0.0, Math.min(1.0, uMin / this.totalArcLength) );
     };
 
     

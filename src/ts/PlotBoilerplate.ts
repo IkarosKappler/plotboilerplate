@@ -1476,6 +1476,11 @@ export class PlotBoilerplate {
 				touchMovePos = new Vertex( relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ) );
 				touchDownPos = new Vertex( relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ) );
 				draggedElement = _self.locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
+				if( draggedElement && draggedElement.typeName == 'vertex' ) {
+				    var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
+				    var fakeEvent : VertEvent = ({ params : { dragAmount : { x: 0, y : 0 }, wasDragged : false, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone(), vertex : draggingVertex}} as unknown) as VertEvent;
+				    draggingVertex.listeners.fireDragStartEvent( fakeEvent );
+				}
 			    }
 			},
 			touchMove: function (e) {
@@ -1504,6 +1509,12 @@ export class PlotBoilerplate {
 			    }
 			},
 			touchEnd:  function (e) {
+			    // Note: e.touches.length is 0 here
+			    if( draggedElement && draggedElement.typeName == 'vertex' ) {
+				var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
+				var fakeEvent : VertEvent = ({ params : { dragAmount : { x: 0, y : 0 }, wasDragged : false, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone(), vertex : draggingVertex}} as unknown) as VertEvent;
+				draggingVertex.listeners.fireDragEndEvent( fakeEvent );
+			    }
 			    clearTouch();
 			},
 			touchCancel: function (e) {

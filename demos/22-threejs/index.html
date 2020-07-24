@@ -34,6 +34,7 @@
     <script src="STLExporter.js"></script>
     <script src="VertexNormalsHelper.js"></script>
 
+    <script src="../DoubleclickHandler.js"></script>
     <script src="defaults.js"></script>
     <script src="DildoGeneration.js"></script>
     <script src="DildoGeometry.js"></script>
@@ -45,12 +46,12 @@
   <body class="fullscreen">
     <div class="w-50 left">
       <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+      <div class="info monospace">
+	[<span id="cx">-</span>,<span id="cy">-</span>]
+      </div>
     </div>
     <div class="w-50 right">
       <canvas id="dildo-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
-    </div>
-    <div class="info monospace">
-      [<span id="cx">-</span>,<span id="cy">-</span>]
     </div>
 
   </body>
@@ -62,6 +63,7 @@
        width : 50%;
     }
     .left {
+       position : relative;
        float : left;
     }
     .right {

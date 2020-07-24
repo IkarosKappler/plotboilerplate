@@ -49,8 +49,12 @@
 		)
 	    );
 
+	    
 	    var textureImage = new Image();
-	    textureImage.onload = function() { console.log('Texture loaded.'); rebuild() };
+	    textureImage.onload = function() {
+		console.log('Texture loaded.');
+		rebuild()
+	    };
 	    
 	    
 	    // +---------------------------------------------------------------------------------
@@ -67,12 +71,11 @@
 
 	    var dildoGeneration = new DildoGeneration('dildo-canvas');
 
-	    var dragListener = function( dragEvent ) {
-		// Uhm, well, some curve point moved.
-		rebuild();
-	    };
-
-	    // Delay the build a bit
+	    
+	    // +---------------------------------------------------------------------------------
+	    // | Delay the build a bit. And cancel stale builds.
+	    // | This avoids too many rebuilds (pretty expensive) on mouse drag events.
+	    // +-------------------------------
 	    var buildId = null;
 	    var rebuild = function() {
 		var buildId = new Date().getTime();
@@ -83,11 +86,30 @@
 			}
 		    };
 		})(buildId), 50 );
-						 
+	    };
 
+	    var handleDoubleclick = function( position ) {
+		// Find the closest point on the bezier path
+		
 	    };
 	    
+	    new DoubleclickHandler( pb, handleDoubleclick );
+
+	    
+	    // +---------------------------------------------------------------------------------
+	    // | Create the outline: a Bézier path.
+	    // +-------------------------------
 	    var outline = BezierPath.fromJSON( DEFAULT_BEZIER_JSON );
+
+	    
+	    // +---------------------------------------------------------------------------------
+	    // | Each outline vertex requires a drag (end) listener. Wee need this to update
+	    // | the 3d mesh on changes.
+	    // +-------------------------------
+	    var dragListener = function( dragEvent ) {
+		// Uhm, well, some curve point moved.
+		rebuild();
+	    };
 	    for( var i = 0; i < outline.bezierCurves.length; i++ ) {
 		var curve = outline.bezierCurves[i];
 		curve.startPoint.listeners.addDragEndListener( dragListener );

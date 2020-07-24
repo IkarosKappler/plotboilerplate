@@ -10,7 +10,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (desktop and mobile)
 
 
-The compressed library has 87kb.
+The compressed library has 89kb.
 
 
 ## Install the package via npm
@@ -244,6 +244,14 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 ![Pattern Gradient, Variant](https://plotboilerplate.io/repo/screenshots/screenshot-20200622-0-parquet-transformation.png "Pattern Gradient, Variant")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/21-parquet-deformation/index.html" title="See the demo">See the demo</a>
+
+
+### Distance between point and Bézier curve
+
+![Point-Bézier-Distance](https://plotboilerplate.io/repo/screenshots/screenshot-from-20200724-0-bezier-point-distance.png "Point-Bézier-Distance")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/23-bezier-point-distance/index.html" title="See the demo">See the demo</a>
+
 
 
 
@@ -597,6 +605,7 @@ for this purpose.
  * Port all demos from vanilla JS to TypeScript.
  * Remove the Touchy.js integration soon.
  * Add a TouchHandler (such as the MouseHandler)? Add this to the main demo to keep track of touch positions?
+ * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
  
 
 ### Todos for future Version 2

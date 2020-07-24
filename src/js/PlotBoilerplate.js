@@ -256,7 +256,6 @@ var PlotBoilerplate = /** @class */ (function () {
         this.canvas = typeof config.canvas == 'string' ? document.querySelector(config.canvas) : config.canvas;
         if (this.config.enableGL) {
             this.ctx = this.canvas.getContext('webgl'); // webgl-experimental?
-            console.log(drawgl_1.drawutilsgl);
             this.draw = new drawgl_1.drawutilsgl(this.ctx, false);
             // PROBLEM: same instance of fill and draw when using WebGL. Shader program cannot be duplicated on the same context
             this.fill = this.draw.copyInstance(true);
@@ -1276,6 +1275,11 @@ var PlotBoilerplate = /** @class */ (function () {
                                 touchMovePos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
                                 touchDownPos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
+                                if (draggedElement && draggedElement.typeName == 'vertex') {
+                                    var draggingVertex = _self.vertices[draggedElement.vindex];
+                                    var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
+                                    draggingVertex.listeners.fireDragStartEvent(fakeEvent);
+                                }
                             }
                         },
                         touchMove: function (e) {
@@ -1305,6 +1309,12 @@ var PlotBoilerplate = /** @class */ (function () {
                             }
                         },
                         touchEnd: function (e) {
+                            // Note: e.touches.length is 0 here
+                            if (draggedElement && draggedElement.typeName == 'vertex') {
+                                var draggingVertex = _self.vertices[draggedElement.vindex];
+                                var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
+                                draggingVertex.listeners.fireDragEndEvent(fakeEvent);
+                            }
                             clearTouch();
                         },
                         touchCancel: function (e) {

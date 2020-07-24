@@ -21,7 +21,8 @@
  * @modified 2020-03-24 Ported this class from vanilla JS to Typescript.
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
- * @version 2.4.1
+ * @modified 2020-07-24 Added the getClosestT function and the helper function locateIntervalByDistance(...).
+ * @version 2.4.2
  *
  * @file CubicBezierCurve
  * @public
@@ -191,6 +192,64 @@ var CubicBezierCurve = /** @class */ (function () {
             t += curveStep;
         }
         this.arcLength = newLength;
+    };
+    ;
+    /**
+     * Get a 't' (relative position on curve) with the closest distance to point 'p'.
+     *
+     * The returned number is 0.0 <= t <= 1.0. Use the getPointAt(t) function to retrieve the actual curve point.
+     *
+     * This function uses a recursive approach by cutting the curve into several linear segments.
+     *
+     * @param {Vertex} p - The point to find the closest position ('t' on the curve).
+     * @return {number}
+     **/
+    CubicBezierCurve.prototype.getClosestT = function (p) {
+        // We would like to have an error that's not larger than 1.0.
+        var desiredEpsilon = 1.0;
+        var t = 0.0;
+        var result = { t: 0, tPrev: 0.0, tNext: 1.0 };
+        var iteration = 0;
+        do {
+            result = this.locateIntervalByDistance(p, result.tPrev, result.tNext, this.curveIntervals);
+            iteration++;
+            // Be sure: stop after 4 iterations
+        } while (iteration < 4 && this.getPointAt(result.tPrev).distance(this.getPointAt(result.tNext)) > desiredEpsilon);
+        return result.t;
+    };
+    ;
+    /**
+     * This helper function locates the 't' on a fixed step interval with the minimal distance
+     * between the curve (at 't') and the given point.
+     *
+     * Furthermore you must specify a sub curve (start 't' and end 't') you want to search on.
+     * Using tStart=0.0 and tEnd=1.0 will search on the full curve.
+     *
+     * @param {Vertex} p - The point to find the closest curve point for.
+     * @param {number} tStart - The start position (start 't' of the sub curve). Should be >= 0.0.
+     * @param {number} tEnd - The end position (end 't' of the sub curve). Should be <= 1.0.
+     * @param {number} stepCount - The number of steps to check within the interval.
+     *
+     * @return {object} - An object with t, tPrev and tNext (numbers).
+     **/
+    CubicBezierCurve.prototype.locateIntervalByDistance = function (p, tStart, tEnd, stepCount) {
+        var minIndex = -1;
+        var minDist = 0;
+        var t = 0.0;
+        var tDiff = tEnd - tStart;
+        for (var i = 0; i <= stepCount; i++) {
+            t = tStart + tDiff * (i / stepCount);
+            var vert = this.getPointAt(t);
+            var dist = vert.distance(p);
+            if (minIndex == -1 || dist < minDist) {
+                minIndex = i;
+                minDist = dist;
+            }
+        }
+        return { t: tStart + tDiff * (minIndex / stepCount),
+            tPrev: tStart + tDiff * (Math.max(0, minIndex - 1) / stepCount),
+            tNext: tStart + tDiff * (Math.min(stepCount, minIndex + 1) / stepCount)
+        };
     };
     ;
     /**
