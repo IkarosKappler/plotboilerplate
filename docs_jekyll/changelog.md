@@ -1,10 +1,18 @@
 ---
 layout: page
-title: Changelog
 ---
 
 
 # Changelog
+* 2020-07-24 (1.8.2)
+  * Fixed an error in the touch handlers 'tap start' function (nullpointerexception if empty area was tapped).
+  * Added CubicBezierPath.getClosestT(Vertex) function.
+  * Added BezierPath.getClosestT(Vertex) function.
+* 2020-07-22
+  * Fixed missing dragStart and dragEnd events in touch mode (after switching from Touchy to AlloyFinger).
+* 2020-07-21
+  * Changed the safeMargeByKeys function: all keys, from source and destination, will be used now.
+  * Changed the fetch.bool and fetch.number function: they will try a JSON.parse now on type mismatch (and use the fallback on failure of that).
 * 2020-07-15
   * Included the Bounds class into the bundle.
   * Added the PlotBoilerplate.fitToBounds(Bounds) function to make zooming onto particular areas easier.

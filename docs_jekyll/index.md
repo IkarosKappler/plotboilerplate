@@ -14,7 +14,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (desktop and mobile)
 
 
-The compressed library has 87kb.
+The compressed library has 89kb.
 
 
 ## Install the package via npm
@@ -250,6 +250,14 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/21-parquet-deformation/index.html" title="See the demo">See the demo</a>
 
 
+### Distance between point and Bézier curve
+
+![Point-Bézier-Distance](https://plotboilerplate.io/repo/screenshots/screenshot-from-20200724-0-bezier-point-distance.png "Point-Bézier-Distance")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/23-bezier-point-distance/index.html" title="See the demo">See the demo</a>
+
+
+
 
 ## Initialization parameters
 
@@ -257,7 +265,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `canvas`| _HTMLCanvasElement_ \| _string_ | `null` | The canvas (must not be null). |
+| `canvas`| _HTMLCanvasElement_ \| _string_ | `null` | The canvas or its query selector string (required). |
 | `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
@@ -601,6 +609,7 @@ for this purpose.
  * Port all demos from vanilla JS to TypeScript.
  * Remove the Touchy.js integration soon.
  * Add a TouchHandler (such as the MouseHandler)? Add this to the main demo to keep track of touch positions?
+ * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
  
 
 ### Todos for future Version 2

@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-07-21
+date: 2020-07-24
 ---
 
 <div class="full-width">
@@ -118,6 +118,11 @@ date: 2020-07-21
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/22-threejs/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200703-0-threejs.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/23-bezier-point-distance/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20191218-bezier-perpendiculars.png');"></div>
    </a>
 </div>
 </div>
