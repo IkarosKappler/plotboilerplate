@@ -55,8 +55,10 @@
  * @modified 2020-05-09 Included the Cirlcle class.
  * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
  * @modified 2020-06-03 Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
- * @modified 2020-06-06 Replacing Touchy.js by AlloyFinger.js
- * @version  1.8.2
+ * @modified 2020-07-06 Replacing Touchy.js by AlloyFinger.js
+ * @modified 2020-07-27 Added the getVertexNear(XYCoords,number) function
+ * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
+ * @version  1.9.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -699,16 +701,50 @@ export class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    remove( drawable:Drawable, redraw?:boolean ) {
+    remove( drawable:Drawable, redraw?:boolean, removeWithVertices?:boolean ) {
 	if( drawable instanceof Vertex )
 	    this.removeVertex( drawable, false );
 	for( var i = 0; i < this.drawables.length; i++ ) {
 	    if( this.drawables[i] === drawable ) {
 		this.drawables.splice(i,1);
 
-		// Check if some listeners need to be removed
-		if( drawable instanceof BezierPath )
-		    PlotBoilerplate.utils.disableBezierPathAutoAdjust( drawable );
+		if( removeWithVertices ) {
+		    // Check if some listeners need to be removed
+		    if( drawable instanceof Line ) {
+			// Add some lines
+			this.removeVertex( drawable.a, false );
+			this.removeVertex( drawable.b, false );
+		    } else if( drawable instanceof Vector ) {
+			this.removeVertex( drawable.a, false );
+			this.removeVertex( drawable.b, false );
+		    } else if( drawable instanceof VEllipse ) {
+			this.removeVertex( drawable.center, false );
+			this.removeVertex( drawable.axis, false );
+		    } else if( drawable instanceof Circle ) {
+			this.removeVertex( drawable.center, false );
+		    } else if( drawable instanceof Polygon ) {
+			// for( var i in drawable.vertices )
+			for( var i = 0; i < drawable.vertices.length; i++ )
+			    this.removeVertex( drawable.vertices[i], false );
+		    } else if( drawable instanceof Triangle ) {
+			this.removeVertex( drawable.a, false );
+			this.removeVertex( drawable.b, false );
+			this.removeVertex( drawable.c, false );
+		    } else if( drawable instanceof BezierPath ) {
+			PlotBoilerplate.utils.disableBezierPathAutoAdjust( drawable );
+			for( var i = 0; i < drawable.bezierCurves.length; i++ ) {
+			    this.removeVertex( drawable.bezierCurves[i].startPoint, false );
+			    this.removeVertex( drawable.bezierCurves[i].startControlPoint, false );
+			    this.removeVertex( drawable.bezierCurves[i].endControlPoint, false );
+			    //if( i+1 == drawable.bezierCurves.length ) {
+				this.removeVertex( drawable.bezierCurves[i].endPoint, false );
+			    //}
+			}
+		    } else if( drawable instanceof PBImage ) {
+			this.removeVertex( drawable.upperLeft, false );
+			this.removeVertex( drawable.lowerRight, false );
+		    }
+		} // END removeWithVertices
 		
 		if( redraw )
 		    this.redraw();
@@ -728,7 +764,7 @@ export class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    removeVertex( vert:Vertex, redraw?:boolean ) {
+    removeVertex( vert:Vertex, redraw?:boolean ) : void {
 	// for( var i in this.drawables ) {
 	for( var i = 0; i < this.vertices.length; i++ ) {
 	    if( this.vertices[i] === vert ) {
@@ -738,6 +774,18 @@ export class PlotBoilerplate {
 		return;
 	    }
 	}
+    };
+
+    /**
+     * Find the vertex near the given position.
+     **/
+    getVertexNear( position:XYCoords, tolerance:number ) : Vertex|undefined {
+	var p : IDraggable|undefined = this.locatePointNear( position, // this.transformMousePosition(position.x, position.y),
+							     tolerance/Math.min(this.config.cssScaleX,this.config.cssScaleY) );
+	console.log(p);
+	if( p && p.typeName == "vertex" )
+	    return this.vertices[p.vindex];
+	return undefined;
     };
     
 
@@ -1541,44 +1589,10 @@ export class PlotBoilerplate {
 		};
 
 	    } else if( window["Touchy"] && typeof window["Touchy"] == "function" ) {
-		console.warn('(Deprecation) Found Touchy which support will stop soon. Please use AlloyFinger instead.');
+		console.error('[Deprecation] Found Touchy which is not supported any more. Please use AlloyFinger instead.');
 		// Convert absolute touch positions to relative DOM element position (relative to canvas)
-		// Some private vars to store the current mouse/position/button state.
-		var touchMovePos : Vertex|undefined|null= null;
-		var touchDownPos : Vertex|undefined|null = null;
-		var draggedElement : IDraggable|undefined|null = null;
-
-		const Touchy : any = (window["Touchy"]);
-		new Touchy( this.canvas,
-			    { one : function( hand, finger ) {
-				touchMovePos = new Vertex( relPos(finger.lastPoint) );
-				touchDownPos = new Vertex( relPos(finger.lastPoint) );
-				draggedElement = _self.locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
-				if( draggedElement ) {
-				    // The Touchy-points also have 'id' and 'time' attributes
-				    // which we are not interested in here.
-				    hand.on('move', (points:Array<XYCoords>) => { 
-					const rel : XYCoords = relPos( points[0] );
-					const trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
-					const diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
-					if( draggedElement.typeName == 'vertex' ) {
-					    if( !_self.vertices[draggedElement.vindex].attr.draggable )
-						return;
-					    _self.vertices[draggedElement.vindex].add( diff );
-					    const draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
-					    const fakeEvent : VertEvent = ({ params : { dragAmount : diff.clone(), wasDragged : true, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone().add(diff), vertex : draggingVertex}} as unknown) as VertEvent;
-					    draggingVertex.listeners.fireDragEvent( fakeEvent );
-					    _self.redraw();
-					}
-					touchMovePos = new Vertex(rel);
-				    } );
-				}
-				
-			    }
-			    } );
-		
 	    } else {
-		console.warn( "Cannot initialize the touch handler. Touchy and AlloyFinger are missig. Did you include at least one of them?" );
+		console.warn( "Cannot initialize the touch handler. AlloyFinger is missig. Did you include it?" );
 	    }
 	} else { _self.console.log('Touch interaction disabled.'); }
 	

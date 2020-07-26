@@ -52,6 +52,7 @@
 	    );
 
 	    var line = new Line( new Vertex(0,0), new Vertex(0,0) );
+	    var t = 0.0;
 
 	    pb.config.postDraw = function() {
 		pb.draw.line( line.a, line.b, 'rgb(255,192,0)', 2 );
@@ -67,7 +68,7 @@
 	    }, GUP );
 	    
 
-	    var step = 0.003;
+	    // var step = 0.003;
 	    
 
 	    
@@ -79,15 +80,21 @@
 				   Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
 				 );
 	    };
+	    
 
-	    // +---------------------------------------------------------------------------------
-	    // | Add some elements to draw (demo).
-	    // +-------------------------------
-	    var diameter = Math.min(pb.canvasSize.width,pb.canvasSize.height)/2.5;
-	    var radius   = diameter*0.5;
-	    var hypo     = Math.sqrt( radius*radius*2 );
-
-	
+	    var addPath = function( path ) {
+		for( var i = 0; i < path.bezierCurves.length; i++ ) {
+		    var curve = path.bezierCurves[i];
+		    if( i > 0 )
+			curve.startPoint.attr.bezierAutoAdjust = true;
+		    path.adjustPredecessorControlPoint( i,     
+							true,  // obtainHandleLength
+							false   // updateArcLength  (we will do this after the loop)
+						      );
+		}
+		path.updateArcLengths();
+		pb.add( path );
+	    }
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add a circular bezier path.
@@ -97,20 +104,8 @@
 	    for( var i = 0; i < numCurves; i++ ) {
 		bpath[i] = [ randomVertex(), randomVertex(), randomVertex(), randomVertex() ];
 	    }
-	    
 	    var path = BezierPath.fromArray( bpath );
-	    for( var i = 0; i < path.bezierCurves.length; i++ ) {
-		var curve = path.bezierCurves[i];
-		if( i > 0 )
-		    curve.startPoint.attr.bezierAutoAdjust = true;
-		path.adjustPredecessorControlPoint( i,     
-						    true,  // obtainHandleLength
-						    false   // updateArcLength  (we will do this after the loop)
-						  );
-	    }
-	    path.updateArcLengths();
-	    pb.add( path );
-
+	    addPath( path );
 	    
 	    // On each mouse move:
 	    // find the closest curve point to the mouse position.
@@ -119,13 +114,50 @@
 						       e.clientY - pb.canvas.offsetTop );
 		line.b.x = point.x;
 		line.b.y = point.y;
-		var t = path.getClosestT( point );
+		t = path.getClosestT( point );
 		var closestPoint = path.getPointAt( t );
 		line.a.x = closestPoint.x;
 		line.a.y = closestPoint.y;
 		pb.redraw();
 	    } );
 
+	    new MouseHandler(pb.canvas)
+		.up( function(e) {
+		    if( e.params.wasDragged )
+			return;
+		    console.log('Clicked', e.params.wasDragged);
+		    var vertex = pb.getVertexNear( pb.transformMousePosition(e.params.pos.x,e.params.pos.y),
+						   PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
+						 );
+		    console.log( 'Vertex', vertex );
+		    if( vertex )
+			return;
+		    // Check if there is already a path point at the given split position
+		    var pathPoint = pb.getVertexNear( path.getPointAt(t), 6.0 );
+		    console.log( "pathPoint", pathPoint );
+		    if( pathPoint ) {
+			for( var i = 0; i < path.bezierCurves.length; i++ ) {
+			    if( path.bezierCurves[i].startPoint.distance(pathPoint) <= 6.0 || path.bezierCurves[i].endPoint.distance(pathPoint) <= 6.0 ) {
+				console.log("There is already a path point near this position.");
+				return;
+			    }
+			}
+		    }
+		    console.log('Inserting vertex at', t );
+		    // path.insertVertexAt( t );
+		    var leftPath = path.getSubPathAt( 0.0, t );
+		    var rightPath = path.getSubPathAt( t, 1.0 );
+		    var newCurves = [];
+		    for( var i = 0; i < leftPath.bezierCurves.length; i++ ) {
+			newCurves.push( leftPath.bezierCurves[i] );		
+		    }
+		    for( var i = 0; i < rightPath.bezierCurves.length; i++ ) {
+			newCurves.push( rightPath.bezierCurves[i] );		
+		    }
+		    pb.remove( path );
+		    path = BezierPath.fromArray( newCurves );
+		    addPath( path );
+		});
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui

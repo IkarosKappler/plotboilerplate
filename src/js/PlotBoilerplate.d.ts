@@ -55,8 +55,10 @@
  * @modified 2020-05-09 Included the Cirlcle class.
  * @modified 2020-06-22 Added the rasterScaleX and rasterScaleY config params.
  * @modified 2020-06-03 Fixed the selectedVerticesOnPolyon(Polygon) function: non-selectable vertices were selected too, before.
- * @modified 2020-06-06 Replacing Touchy.js by AlloyFinger.js
- * @version  1.8.2
+ * @modified 2020-07-06 Replacing Touchy.js by AlloyFinger.js
+ * @modified 2020-07-27 Added the getVertexNear(XYCoords,number) function
+ * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
+ * @version  1.9.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -354,7 +356,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    remove(drawable: Drawable, redraw?: boolean): void;
+    remove(drawable: Drawable, redraw?: boolean, removeWithVertices?: boolean): void;
     /**
      * Remove a vertex from the vertex list.<br>
      *
@@ -366,6 +368,10 @@ export declare class PlotBoilerplate {
      * @return {void}
      **/
     removeVertex(vert: Vertex, redraw?: boolean): void;
+    /**
+     * Find the vertex near the given position.
+     **/
+    getVertexNear(position: XYCoords, tolerance: number): Vertex | undefined;
     /**
      * Draw the grid with the current config settings.<br>
      *

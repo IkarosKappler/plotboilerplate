@@ -450,6 +450,17 @@ var BezierPath = /** @class */ (function () {
     return true;
     };
     */
+    /*
+    insertVertexAt( t:number ) : void {
+    console.log('Inserting vertex at', t );
+    // Find the curve index
+    var u : number = 0;
+    var curveIndex : number = -1;
+    var localT : number = 0.0;
+    for( var i = 0; curveIndex == -1 && i < this.bezierCurves.length; i++ ) {
+        
+    }
+    }; */
     /**
      * Move the whole bezier path by the given (x,y)-amount.
      *
