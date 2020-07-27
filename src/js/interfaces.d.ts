@@ -87,6 +87,7 @@ export interface DrawConfig {
     ellipse: DrawSettings;
     circle: DrawSettings;
     vertex: DrawSettings;
+    selectedVertex: DrawSettings;
     line: DrawSettings;
     vector: DrawSettings;
     image: DrawSettings;

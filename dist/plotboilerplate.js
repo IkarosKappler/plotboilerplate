@@ -4933,7 +4933,8 @@ exports.MouseHandler = MouseHandler;
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @version  1.0.1
+ * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
+ * @version  1.0.2
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var KeyHandler = /** @class */ (function () {
@@ -5111,7 +5112,7 @@ var KeyHandler = /** @class */ (function () {
     KeyHandler.KEY_CODES = {
         'break': 3,
         'backspace': 8,
-        'delete': 8,
+        // 'delete'	 : 8, // alternate: 46
         'tab': 9,
         'clear': 12,
         'enter': 13,
@@ -5140,7 +5141,7 @@ var KeyHandler = /** @class */ (function () {
         'execute': 43,
         'printscreen': 44,
         'insert': 45,
-        // 'delete'	 : 46,
+        'delete': 46,
         'help': 47,
         '0': 48,
         '1': 49,
@@ -6982,6 +6983,10 @@ var PlotBoilerplate = /** @class */ (function () {
                 color: '#a8a8a8',
                 lineWidth: 1
             },
+            selectedVertex: {
+                color: '#c08000',
+                lineWidth: 2
+            },
             line: {
                 color: '#a844a8',
                 lineWidth: 1
@@ -7427,7 +7432,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * This is just a tiny helper function to determine the render color of vertices.
      **/
     PlotBoilerplate.prototype._handleColor = function (h, color) {
-        return h.attr.draggable ? color : 'rgba(128,128,128,0.5)';
+        return h.attr.isSelected ? this.drawConfig.selectedVertex.color : (h.attr.draggable ? color : 'rgba(128,128,128,0.5)');
     };
     /**
      * Draw all drawables.
@@ -7451,11 +7456,11 @@ var PlotBoilerplate = /** @class */ (function () {
                     this.draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                     if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                         if (!d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
-                            this.draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, 'orange'));
+                            this.draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.vertex.color));
                             d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
                         }
                         if (!d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
-                            this.draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, 'orange'));
+                            this.draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.vertex.color));
                             d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
                         }
                         this.draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
@@ -7580,7 +7585,7 @@ var PlotBoilerplate = /** @class */ (function () {
         // Draw all vertices as small squares if they were not already drawn by other objects
         for (var i in this.vertices) {
             if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime) {
-                this.draw.squareHandle(this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : this._handleColor(this.vertices[i], 'rgb(0,128,192)'));
+                this.draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], 'rgb(0,128,192)'));
             }
         }
     };

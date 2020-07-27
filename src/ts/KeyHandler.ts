@@ -17,7 +17,8 @@
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @version  1.0.1
+ * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
+ * @version  1.0.2
  **/
 
 export interface XKeyListener {
@@ -144,7 +145,7 @@ export class KeyHandler {
     private static KEY_CODES: Record<string,number> = {
 	'break'          : 3, // alternate: 19
 	'backspace'      : 8,
-	'delete'	 : 8, // alternate: 46
+	// 'delete'	 : 8, // alternate: 46
 	'tab'	         : 9,
 	'clear'	         : 12,
 	'enter'	         : 13,
@@ -173,7 +174,7 @@ export class KeyHandler {
 	'execute'	 : 43,
 	'printscreen'	 : 44,
 	'insert'	 : 45,
-	// 'delete'	 : 46,
+	'delete'	 : 46, // alternate: 8
 	'help'	         : 47,
 	'0'              : 48,
 	'1'              : 49,

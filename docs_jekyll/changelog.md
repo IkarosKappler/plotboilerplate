@@ -4,6 +4,12 @@ layout: page
 
 
 # Changelog
+* 2020-07-28
+  * Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
+  * Added Bézier curve splitting to the bezier-point-distance demo.
+* 2020-07-27
+  * Added the getVertexNear(XYCoords,number) function.
+  * Extended the remove(Drawable) function: vertices are now removed, too.
 * 2020-07-24 (1.8.2)
   * Fixed an error in the touch handlers 'tap start' function (nullpointerexception if empty area was tapped).
   * Added CubicBezierPath.getClosestT(Vertex) function.

@@ -17,7 +17,8 @@
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @version  1.0.1
+ * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
+ * @version  1.0.2
  **/
 export interface XKeyListener {
     key: string;

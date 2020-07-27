@@ -400,6 +400,10 @@ export class PlotBoilerplate {
 		color : '#a8a8a8',
 		lineWidth : 1
 	    },
+	    selectedVertex : {
+		color : '#c08000',
+		lineWidth : 2
+	    },
 	    line : {
 		color : '#a844a8',
 		lineWidth : 1
@@ -846,7 +850,7 @@ export class PlotBoilerplate {
      * This is just a tiny helper function to determine the render color of vertices.
      **/
     _handleColor( h:Vertex, color:string ) {
-	return h.attr.draggable ? color : 'rgba(128,128,128,0.5)';
+	return h.attr.isSelected ? this.drawConfig.selectedVertex.color : (h.attr.draggable ? color : 'rgba(128,128,128,0.5)');
     }
 
 
@@ -874,11 +878,11 @@ export class PlotBoilerplate {
 
 		    if( this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints ) {
 			if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
-			    this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint,'orange') );
+			    this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint,this.drawConfig.vertex.color) );
 			    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
 			}
 			if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
-			    this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7,  this._handleColor(d.bezierCurves[c].endPoint,'orange') );
+			    this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint,this.drawConfig.vertex.color) );
 			    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
 			}
 			this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint,'#008888') );
@@ -999,7 +1003,7 @@ export class PlotBoilerplate {
 	// Draw all vertices as small squares if they were not already drawn by other objects
 	for( var i in this.vertices ) {
 	    if( this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime ) {
-		this.draw.squareHandle( this.vertices[i], 5, this.vertices[i].attr.isSelected ? 'rgba(192,128,0)' : this._handleColor(this.vertices[i],'rgb(0,128,192)') );
+		this.draw.squareHandle( this.vertices[i], 5, this._handleColor(this.vertices[i],'rgb(0,128,192)') );
 	    }
 	}
     };

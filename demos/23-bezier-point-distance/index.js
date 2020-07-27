@@ -55,6 +55,7 @@
 	    var t = 0.0;
 
 	    pb.config.postDraw = function() {
+		// Draw the line connecting the mouse position with the closest curve point.
 		pb.draw.line( line.a, line.b, 'rgb(255,192,0)', 2 );
 		pb.fill.circleHandle( line.a, 3.0, 'rgb(255,192,0)' );
 	    };
@@ -64,13 +65,9 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		animate               : false
+		// animate               : false
 	    }, GUP );
 	    
-
-	    // var step = 0.003;
-	    
-
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Create a random vertex inside the canvas viewport.
@@ -82,6 +79,9 @@
 	    };
 	    
 
+	    // +---------------------------------------------------------------------------------
+	    // | A helper function for properly adding paths to the canvas.
+	    // +-------------------------------
 	    var addPath = function( path ) {
 		for( var i = 0; i < path.bezierCurves.length; i++ ) {
 		    var curve = path.bezierCurves[i];
@@ -102,6 +102,10 @@
 	    var numCurves = 3;
 	    var bpath = [];	    
 	    for( var i = 0; i < numCurves; i++ ) {
+		// 0: startPoint
+		// 1: endPoint
+		// 2: startControlPoint
+		// 3: endControlPoint
 		bpath[i] = [ randomVertex(), randomVertex(), randomVertex(), randomVertex() ];
 	    }
 	    var path = BezierPath.fromArray( bpath );
@@ -109,7 +113,7 @@
 	    
 	    // On each mouse move:
 	    // find the closest curve point to the mouse position.
-	    pb.canvas.addEventListener('mousemove', function(e) {
+	    /* pb.canvas.addEventListener('mousemove', function(e) {
 		var point = pb.transformMousePosition( e.clientX - pb.canvas.offsetLeft,
 						       e.clientY - pb.canvas.offsetTop );
 		line.b.x = point.x;
@@ -119,7 +123,7 @@
 		line.a.x = closestPoint.x;
 		line.a.y = closestPoint.y;
 		pb.redraw();
-	    } );
+	    } ); */
 
 	    new MouseHandler(pb.canvas)
 		.up( function(e) {
@@ -157,7 +161,57 @@
 		    pb.remove( path, false, true ); // Remove with vertices
 		    path = BezierPath.fromArray( newCurves );
 		    addPath( path );
-		});
+		})
+		.move( function(e) {
+		    // console.log('moved');
+		    var point = pb.transformMousePosition( e.params.pos.x, // e.clientX - pb.canvas.offsetLeft,
+							   e.params.pos.y ); // e.clientY - pb.canvas.offsetTop );
+		    line.b.x = point.x;
+		    line.b.y = point.y;
+		    t = path.getClosestT( point );
+		    var closestPoint = path.getPointAt( t );
+		    line.a.x = closestPoint.x;
+		    line.a.y = closestPoint.y;
+		    pb.redraw();
+		} );
+
+	    new KeyHandler( { trackAll : true } )
+		.down('delete',function() {
+		    console.log('delete');
+		    var newCurves = [ ];
+		    // Find first non-selected path point
+		    var curveIndex = 0;
+		    while( curveIndex < path.bezierCurves.length && path.bezierCurves[curveIndex].startPoint.attr.isSelected ) {
+			curveIndex++;
+		    }
+		    var curStart = path.bezierCurves[curveIndex].startPoint;
+		    var curStartControl = path.bezierCurves[curveIndex].startControlPoint;
+		    for( var i = curveIndex+1; i < path.bezierCurves.length; i++ ) {
+			if( !path.bezierCurves[i].startPoint.attr.isSelected ) {
+			    newCurves.push( [ curStart.clone(),
+					      path.bezierCurves[i].startPoint.clone(),
+					      curStartControl.clone(),
+					      path.bezierCurves[i].startControlPoint.clone() ] );
+			    curStart = path.bezierCurves[i].startPoint;
+			    curStartControl = path.bezierCurves[i].startControlPoint;
+			}
+		    }
+		    // Add last curve?
+		    var lastIndex = path.bezierCurves.length-1;
+		    if( !path.bezierCurves[lastIndex].endPoint.attr.isSelected ) {
+			newCurves.push( [ curStart.clone(),
+					  path.bezierCurves[lastIndex].endPoint.clone(),
+					  curStartControl.clone(),
+					  path.bezierCurves[lastIndex].endControlPoint.clone() ] );
+		    }
+
+		    // Do not remove the whole path
+		    if( newCurves.length != 0 ) {
+			pb.remove( path, false, true ); // Remove with vertices
+			path = BezierPath.fromArray( newCurves );
+			addPath( path );
+		    }
+		} );
 
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui

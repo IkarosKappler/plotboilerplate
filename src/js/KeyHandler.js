@@ -18,7 +18,8 @@
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @version  1.0.1
+ * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
+ * @version  1.0.2
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var KeyHandler = /** @class */ (function () {
@@ -196,7 +197,7 @@ var KeyHandler = /** @class */ (function () {
     KeyHandler.KEY_CODES = {
         'break': 3,
         'backspace': 8,
-        'delete': 8,
+        // 'delete'	 : 8, // alternate: 46
         'tab': 9,
         'clear': 12,
         'enter': 13,
@@ -225,7 +226,7 @@ var KeyHandler = /** @class */ (function () {
         'execute': 43,
         'printscreen': 44,
         'insert': 45,
-        // 'delete'	 : 46,
+        'delete': 46,
         'help': 47,
         '0': 48,
         '1': 49,
