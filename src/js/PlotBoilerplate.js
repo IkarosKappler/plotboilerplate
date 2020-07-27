@@ -59,6 +59,7 @@
  * @modified 2020-07-06 Replacing Touchy.js by AlloyFinger.js
  * @modified 2020-07-27 Added the getVertexNear(XYCoords,number) function
  * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
+ * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
  * @version  1.9.0
  *
  * @file PlotBoilerplate
@@ -580,9 +581,9 @@ var PlotBoilerplate = /** @class */ (function () {
                             this.removeVertex(drawable.bezierCurves[i].startPoint, false);
                             this.removeVertex(drawable.bezierCurves[i].startControlPoint, false);
                             this.removeVertex(drawable.bezierCurves[i].endControlPoint, false);
-                            //if( i+1 == drawable.bezierCurves.length ) {
-                            this.removeVertex(drawable.bezierCurves[i].endPoint, false);
-                            //}
+                            if (i + 1 == drawable.bezierCurves.length) {
+                                this.removeVertex(drawable.bezierCurves[i].endPoint, false);
+                            }
                         }
                     }
                     else if (drawable instanceof PBImage_1.PBImage) {
@@ -608,7 +609,6 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.removeVertex = function (vert, redraw) {
-        // for( var i in this.drawables ) {
         for (var i = 0; i < this.vertices.length; i++) {
             if (this.vertices[i] === vert) {
                 this.vertices.splice(i, 1);
@@ -621,11 +621,16 @@ var PlotBoilerplate = /** @class */ (function () {
     ;
     /**
      * Find the vertex near the given position.
+     *
+     * The position is the absolute vertex position, not the x-y-coordinates on the canvas.
+     *
+     * @param {XYCoords} position - The position of the vertex to search for.
+     * @param {number} pixelTolerance - A radius around the position to include into the search.
+     *                                  Note that the tolerance will be scaled up/down when zoomed.
+     * @return The vertex near the given position or undefined if none was found there.
      **/
-    PlotBoilerplate.prototype.getVertexNear = function (position, tolerance) {
-        var p = this.locatePointNear(position, // this.transformMousePosition(position.x, position.y),
-        tolerance / Math.min(this.config.cssScaleX, this.config.cssScaleY));
-        console.log(p);
+    PlotBoilerplate.prototype.getVertexNear = function (pixelPosition, pixelTolerance) {
+        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min(this.config.cssScaleX, this.config.cssScaleY));
         if (p && p.typeName == "vertex")
             return this.vertices[p.vindex];
         return undefined;
@@ -1094,13 +1099,26 @@ var PlotBoilerplate = /** @class */ (function () {
      * @param {number} y - The y position relative to the canvas.
      * @instance
      * @memberof PlotBoilerplate
-     * @return {object} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
+     * @return {XYCoords} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
      **/
     PlotBoilerplate.prototype.transformMousePosition = function (x, y) {
         return { x: (x / this.config.cssScaleX - this.config.offsetX) / (this.config.scaleX),
             y: (y / this.config.cssScaleY - this.config.offsetY) / (this.config.scaleY) };
     };
     ;
+    /**
+     * Revert a transformed mouse position back to canvas coordinates.
+     *
+     * This is the inverse function of `transformMousePosition`.
+     *
+     * @param {number} x - The x component of the position to revert.
+     * @param {number} y - The y component of the position to revert.
+     * @return {XYCoords} The canvas coordinates for the given position.
+     **/
+    PlotBoilerplate.prototype.revertMousePosition = function (x, y) {
+        return { x: x / this.config.cssScaleX + this.config.offsetX,
+            y: y / this.config.cssScaleY + this.config.offsetY };
+    };
     /**
      * (Helper) The mouse-down handler.
      *

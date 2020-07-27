@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-07-28
+  * Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
+  * Added Bézier curve splitting to the bezier-point-distance demo.
 * 2020-07-27
   * Added the getVertexNear(XYCoords,number) function.
   * Extended the remove(Drawable) function: vertices are now removed, too.

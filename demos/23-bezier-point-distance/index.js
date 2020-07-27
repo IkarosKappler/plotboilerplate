@@ -126,25 +126,25 @@
 		    if( e.params.wasDragged )
 			return;
 		    console.log('Clicked', e.params.wasDragged);
-		    var vertex = pb.getVertexNear( pb.transformMousePosition(e.params.pos.x,e.params.pos.y),
+		    var vertex = pb.getVertexNear( e.params.pos, // pb.transformMousePosition(e.params.pos.x,e.params.pos.y),
 						   PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
 						 );
 		    console.log( 'Vertex', vertex );
 		    if( vertex )
 			return;
 		    // Check if there is already a path point at the given split position
-		    var pathPoint = pb.getVertexNear( path.getPointAt(t), 6.0 );
-		    console.log( "pathPoint", pathPoint );
-		    if( pathPoint ) {
+		    var pathPoint = path.getPointAt(t)
+		    var pointNear = pb.getVertexNear( pb.revertMousePosition(pathPoint.x,pathPoint.y), 6.0 );
+		    console.log( "pathPoint", pathPoint, pointNear );
+		    if( pointNear ) {
 			for( var i = 0; i < path.bezierCurves.length; i++ ) {
-			    if( path.bezierCurves[i].startPoint.distance(pathPoint) <= 6.0 || path.bezierCurves[i].endPoint.distance(pathPoint) <= 6.0 ) {
+			    if( path.bezierCurves[i].startPoint.distance(pointNear) <= 6.0 || path.bezierCurves[i].endPoint.distance(pointNear) <= 6.0 ) {
 				console.log("There is already a path point near this position.");
 				return;
 			    }
 			}
 		    }
 		    console.log('Inserting vertex at', t );
-		    // path.insertVertexAt( t );
 		    var leftPath = path.getSubPathAt( 0.0, t );
 		    var rightPath = path.getSubPathAt( t, 1.0 );
 		    var newCurves = [];
@@ -154,7 +154,7 @@
 		    for( var i = 0; i < rightPath.bezierCurves.length; i++ ) {
 			newCurves.push( rightPath.bezierCurves[i] );		
 		    }
-		    pb.remove( path );
+		    pb.remove( path, false, true ); // Remove with vertices
 		    path = BezierPath.fromArray( newCurves );
 		    addPath( path );
 		});

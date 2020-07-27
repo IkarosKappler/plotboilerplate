@@ -58,6 +58,7 @@
  * @modified 2020-07-06 Replacing Touchy.js by AlloyFinger.js
  * @modified 2020-07-27 Added the getVertexNear(XYCoords,number) function
  * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
+ * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
  * @version  1.9.0
  *
  * @file PlotBoilerplate
@@ -370,8 +371,15 @@ export declare class PlotBoilerplate {
     removeVertex(vert: Vertex, redraw?: boolean): void;
     /**
      * Find the vertex near the given position.
+     *
+     * The position is the absolute vertex position, not the x-y-coordinates on the canvas.
+     *
+     * @param {XYCoords} position - The position of the vertex to search for.
+     * @param {number} pixelTolerance - A radius around the position to include into the search.
+     *                                  Note that the tolerance will be scaled up/down when zoomed.
+     * @return The vertex near the given position or undefined if none was found there.
      **/
-    getVertexNear(position: XYCoords, tolerance: number): Vertex | undefined;
+    getVertexNear(pixelPosition: XYCoords, pixelTolerance: number): Vertex | undefined;
     /**
      * Draw the grid with the current config settings.<br>
      *
@@ -554,9 +562,19 @@ export declare class PlotBoilerplate {
      * @param {number} y - The y position relative to the canvas.
      * @instance
      * @memberof PlotBoilerplate
-     * @return {object} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
+     * @return {XYCoords} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
      **/
     transformMousePosition(x: number, y: number): XYCoords;
+    /**
+     * Revert a transformed mouse position back to canvas coordinates.
+     *
+     * This is the inverse function of `transformMousePosition`.
+     *
+     * @param {number} x - The x component of the position to revert.
+     * @param {number} y - The y component of the position to revert.
+     * @return {XYCoords} The canvas coordinates for the given position.
+     **/
+    revertMousePosition(x: number, y: number): XYCoords;
     /**
      * (Helper) The mouse-down handler.
      *
