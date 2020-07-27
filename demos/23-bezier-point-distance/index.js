@@ -111,19 +111,6 @@
 	    var path = BezierPath.fromArray( bpath );
 	    addPath( path );
 	    
-	    // On each mouse move:
-	    // find the closest curve point to the mouse position.
-	    /* pb.canvas.addEventListener('mousemove', function(e) {
-		var point = pb.transformMousePosition( e.clientX - pb.canvas.offsetLeft,
-						       e.clientY - pb.canvas.offsetTop );
-		line.b.x = point.x;
-		line.b.y = point.y;
-		t = path.getClosestT( point );
-		var closestPoint = path.getPointAt( t );
-		line.a.x = closestPoint.x;
-		line.a.y = closestPoint.y;
-		pb.redraw();
-	    } ); */
 
 	    new MouseHandler(pb.canvas)
 		.up( function(e) {
@@ -184,27 +171,19 @@
 		    while( curveIndex < path.bezierCurves.length && path.bezierCurves[curveIndex].startPoint.attr.isSelected ) {
 			curveIndex++;
 		    }
+		    // Only keep those curves that have no selected path point (=delete selected)
 		    var curStart = path.bezierCurves[curveIndex].startPoint;
 		    var curStartControl = path.bezierCurves[curveIndex].startControlPoint;
-		    for( var i = curveIndex+1; i < path.bezierCurves.length; i++ ) {
-			if( !path.bezierCurves[i].startPoint.attr.isSelected ) {
+		    for( var i = curveIndex; i < path.bezierCurves.length; i++ ) {
+			if( !path.bezierCurves[i].endPoint.attr.isSelected ) {
 			    newCurves.push( [ curStart.clone(),
-					      path.bezierCurves[i].startPoint.clone(),
+					      path.bezierCurves[i].endPoint.clone(),
 					      curStartControl.clone(),
-					      path.bezierCurves[i].startControlPoint.clone() ] );
-			    curStart = path.bezierCurves[i].startPoint;
-			    curStartControl = path.bezierCurves[i].startControlPoint;
+					      path.bezierCurves[i].endControlPoint.clone() ] );
+			    curStart = path.bezierCurves[i].endPoint;
+			    curStartControl = path.bezierCurves[i].endControlPoint;
 			}
 		    }
-		    // Add last curve?
-		    var lastIndex = path.bezierCurves.length-1;
-		    if( !path.bezierCurves[lastIndex].endPoint.attr.isSelected ) {
-			newCurves.push( [ curStart.clone(),
-					  path.bezierCurves[lastIndex].endPoint.clone(),
-					  curStartControl.clone(),
-					  path.bezierCurves[lastIndex].endControlPoint.clone() ] );
-		    }
-
 		    // Do not remove the whole path
 		    if( newCurves.length != 0 ) {
 			pb.remove( path, false, true ); // Remove with vertices
@@ -218,9 +197,6 @@
 	    // +-------------------------------
             {
 		var gui = pb.createGUI();
-		//var f0 = gui.addFolder('Points');
-		//f0.open();
-
 	    }
 	    
 	} );
