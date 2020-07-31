@@ -3,6 +3,14 @@
  *
  * @require PlotBoilerplate, KeyHandler, MouseHandler, AlloyFinger
  *
+ * TODO: 
+ *  * implement removal of whole paths.
+ *  * it seems the drag listener removal on vertices does not work properly.
+ *  * add options like pathAutoAdjust=true|false.
+ *  * does not work with empty path arrays yet (errors).
+ *  * add function to add more paths.
+ *  * removing vertices on one curve also alters the other?!!
+ *
  * @author  Ikaros Kappler
  * @date    2020-07-31
  * @version 1.0.0
@@ -10,47 +18,77 @@
 
 (function(_context) {
 
-    var BezierPathInteractionHelper = function( pb, path, moveCallback) {
+    /**
+     * Pre: all paths must have been added to the PlotBoilerplate's drawable buffer (use the add(Drawable) function).
+     *
+     * The move callback accepts four params:
+     *   * The point on the closest curve (Vertex)
+     *   * The mouse or touch position (Vertex)
+     *   * The curve position (float t)
+     *   * The curve index on the array (integer)
+     *  
+     *
+     * @param {PlotBoilerplate} pb
+     * @param {Array<BezierPath>} paths
+     * @param {function(Vertex,Vertex,number,number)} moveCallback
+     **/
+    var BezierPathInteractionHelper = function( pb, paths, moveCallback) {
 	this.pb = pb;
-	this.path = path;
-	this.moveCallback = moveCallback; // function(Vertex,Vertex,number)
+	// Array<BezierPath>
+	this.paths = paths;
+	this.moveCallback = moveCallback; // function(Vertex,Vertex,number,number)
 
+	this.currentPathIndex = -1;
 	this.currentT = 0.0;
 	this.currentA = new Vertex(0,0); // Position on the curve
 	this.currentB = new Vertex(0,0); // mouse/touch position
-	this.installListeners();
+
+	for( var i = 0; i < paths.length; i++ ) {
+	    BezierPathInteractionHelper.setPathAutoAdjust( paths[i] );
+	}
+	
+	this._installMouseListener();
+	this._installTouchListener();
+	this._installKeyListener();
     };
 
-    BezierPathInteractionHelper.prototype.handleDelete = function () {
-	var path = this.path;
-	console.log('delete');
-	var newCurves = [ ];
-	// Find first non-selected path point
-	var curveIndex = 0;
-	while( curveIndex < path.bezierCurves.length && path.bezierCurves[curveIndex].startPoint.attr.isSelected ) {
-	    curveIndex++;
-	}
-	// Only keep those curves that have no selected path point (=delete selected)
-	var curStart = path.bezierCurves[curveIndex].startPoint;
-	var curStartControl = path.bezierCurves[curveIndex].startControlPoint;
-	for( var i = curveIndex; i < path.bezierCurves.length; i++ ) {
-	    if( !path.bezierCurves[i].endPoint.attr.isSelected ) {
-		newCurves.push( [ curStart.clone(),
-				  path.bezierCurves[i].endPoint.clone(),
-				  curStartControl.clone(),
-				  path.bezierCurves[i].endControlPoint.clone() ] );
-		curStart = path.bezierCurves[i].endPoint;
-		curStartControl = path.bezierCurves[i].endControlPoint;
+    BezierPathInteractionHelper.prototype._handleDelete = function () {
+
+	// Check all path points (on all paths) for deletion.
+	// Note: whole paths are not meant to be removed this way.
+	for( var p = 0; p < this.paths.length; p++ ) {
+	    // console.log('delete',p);
+	    var path = this.paths[p];
+	    var newCurves = [];
+	    // Find first non-selected path point
+	    var curveIndex = 0;
+	    while( curveIndex < path.bezierCurves.length && path.bezierCurves[curveIndex].startPoint.attr.isSelected ) {
+		curveIndex++;
 	    }
-	}
-	// Do not remove the whole path
-	if( newCurves.length != 0 ) {
-	    this.pb.remove( path, false, true ); // Remove with vertices
-	    path = BezierPath.fromArray( newCurves );
-	    // addPath( path );
-	    // TODO: set auto-adjustment to curves
-	    BezierPathInteractionHelper.setPathAutoAdjust( path );
-	    this.pb.add( path );
+	    // Only keep those curves that have no selected path point (=delete selected)
+	    var curStart = path.bezierCurves[curveIndex].startPoint;
+	    var curStartControl = path.bezierCurves[curveIndex].startControlPoint;
+	    for( var i = curveIndex; i < path.bezierCurves.length; i++ ) {
+		if( !path.bezierCurves[i].endPoint.attr.isSelected ) {
+		    newCurves.push( [ curStart.clone(),
+				      path.bezierCurves[i].endPoint.clone(),
+				      curStartControl.clone(),
+				      path.bezierCurves[i].endControlPoint.clone() ] );
+		    curStart = path.bezierCurves[i].endPoint;
+		    curStartControl = path.bezierCurves[i].endControlPoint;
+		}
+	    }
+	    // Do not remove the whole path
+	    if( newCurves.length != 0 ) {
+		this.pb.remove( path, false, true ); // Remove with vertices
+		this._removeDefaultPathListeners( path );
+		path = BezierPath.fromArray( newCurves );
+		BezierPathInteractionHelper.setPathAutoAdjust( path );
+		this.paths[ p ] = path;
+		this.pb.add( path );
+		// Replace path inside the array with the new path
+		// this._addDefaultPathListeners( path );
+	    }
 	}
     };
 
@@ -58,35 +96,32 @@
 	var point = this.pb.transformMousePosition( posX, 
 						    posY );
 	this.currentB.set( point );
-	this.updateMinDistance();
-	this.moveCallback( this.currentA, this.currentB, this.currentT );
+	this._updateMinDistance();
+	this.moveCallback( this.currentA, this.currentB, this.currentT, this.currentPathIndex );
 	this.pb.redraw();
     };
 
-    BezierPathInteractionHelper.prototype.installListeners = function() {
-
-	var _self = this;
-	var path = _self.path;
-	
+    BezierPathInteractionHelper.prototype._installTouchListener = function() {
+	var _self = this;	
 	new AlloyFinger( this.pb.canvas, {
 	    touchMove: function (e) {
 		if( pb.getDraggedElementCount() == 0 && e.touches.length > 0 ) {
-		    // handleMoveEvent( e.touches[0].clientX, e.touches[0].clientY );
-		    /* var point = _self.pb.transformMousePosition( e.touches[0].clientX, // posX, 
-		       e.touches[0].clientY ); // posY );
-		       _self.currentB.set( point );
-		       _self.moveCallback( _self.currentA, _self.currentB, _self.currentT ); */
 		    console.log('touchmove');
 		    _self.handleMoveEvent( e.touches[0].clientX, e.touches[0].clientY );
 		}
 	    }
 	} );
+    };
+
+    BezierPathInteractionHelper.prototype._installMouseListener = function() {
+	var _self = this;
 	new MouseHandler(this.pb.canvas)
 	    .up( function(e) {
 		if( e.params.wasDragged )
 		    return;
+		var path = _self.paths[ _self.currentPathIndex ];
 		console.log('Clicked', e.params.wasDragged);
-		var vertex = _self.pb.getVertexNear( e.params.pos, // pb.transformMousePosition(e.params.pos.x,e.params.pos.y),
+		var vertex = _self.pb.getVertexNear( e.params.pos,
 						     PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
 						   );
 		console.log( 'Vertex', vertex );
@@ -104,7 +139,8 @@
 			}
 		    }
 		}
-		console.log('Inserting vertex at', _self.currentT );
+		
+		//console.log('Inserting vertex at', _self.currentT );
 		var leftPath = path.getSubPathAt( 0.0, _self.currentT );
 		var rightPath = path.getSubPathAt( _self.currentT, 1.0 );
 		var newCurves = [];
@@ -115,12 +151,13 @@
 		    newCurves.push( rightPath.bezierCurves[i] );		
 		}
 		_self.pb.remove( path, false, true ); // Remove with vertices
+		_self._removeDefaultPathListeners( path );
 		path = BezierPath.fromArray( newCurves );
-		// addPath( path );
-		// TODO: add auto adjustment (2)
 		BezierPathInteractionHelper.setPathAutoAdjust( path );
-		_self.path = path;
+		// _self.path = path;
+		_self.paths[ _self.currentPathIndex ] = path;
 		_self.pb.add( path );
+		// _self._addDefaultPathListeners( path );
 	    })
 	    .move( function(e) {
 		// console.log('moved');
@@ -129,50 +166,66 @@
 		
 	    } );
 
+    };
+
+    BezierPathInteractionHelper.prototype._installKeyListener = function() {
+	var _self = this;
 	new KeyHandler( { trackAll : true } )
 	    .down('delete',function() {
-		_self.handleDelete();
+		_self._handleDelete();
 	    } );
 
-	// Install listeners to BézierPath, too!
-	_self._addDefaultPathListeners( path );
+	// Install listeners to Bézier paths, too?
+	//for( var i = 0; i < _self.paths.length; i++ ) {
+	    // _self._addDefaultPathListeners( _self.paths[i] );
+	//}
     };
 
     BezierPathInteractionHelper.prototype._addDefaultPathListeners = function( path ) {
 	for( var i = 0; i < path.bezierCurves.length; i++ ) {
 	    var curve = path.bezierCurves[i];
-	    curve.startPoint.listeners.addDragListener( this.updateMinDistance );
-	    curve.startControlPoint.listeners.addDragListener( this.updateMinDistance );
-	    curve.endControlPoint.listeners.addDragListener( this.updateMinDistance );
+	    curve.startPoint.listeners.addDragListener( this._updateMinDistance );
+	    curve.startControlPoint.listeners.addDragListener( this._updateMinDistance );
+	    curve.endControlPoint.listeners.addDragListener( this._updateMinDistance );
 	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
-		curve.endPoint.listeners.addDragListener( this.updateMinDistance );
+		curve.endPoint.listeners.addDragListener( this._updateMinDistance );
 	}
     };
 
     BezierPathInteractionHelper.prototype._removeDefaultPathListeners = function( path ) {
 	for( var i = 0; i < path.bezierCurves.length; i++ ) {
 	    var curve = path.bezierCurves[i];
-	    curve.startPoint.listeners.removeDragListener( _self.updateMinDistance );
-	    curve.startControlPoint.listeners.removeragListener( _self.updateMinDistance );
-	    curve.endControlPoint.listeners.removeDragListener( _self.updateMinDistance );
+	    curve.startPoint.listeners.removeDragListener( this._updateMinDistance );
+	    curve.startControlPoint.listeners.removeDragListener( this._updateMinDistance );
+	    curve.endControlPoint.listeners.removeDragListener( this._updateMinDistance );
 	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
-		curve.endPoint.listeners.removeDragListener( _self.updateMinDistance );
+		curve.endPoint.listeners.removeDragListener( this._updateMinDistance );
 	}
     };
 
     // +---------------------------------------------------------------------------------
     // | Update the min distance from point `line.b` to the curve. And redraw.
     // +-------------------------------
-    BezierPathInteractionHelper.prototype.updateMinDistance = function() {
-	var path = this.path;
-	this.currentT = path.getClosestT( this.currentB );
-	var closestPoint = path.getPointAt( this.currentT );
-	/* line.a.x = closestPoint.x;
-	   line.a.y = closestPoint.y; */
+    BezierPathInteractionHelper.prototype._updateMinDistance = function() {
+	var pathIndex = -1;
+	var minDist = Number.MAX_VALUE;
+	var closestPoint = null;
+	var closestT = 0.0;
+	for( var i = 0; i < this.paths.length; i++ ) {
+	    var path = this.paths[i];
+	    var t = path.getClosestT( this.currentB );
+	    var point = path.getPointAt( t );
+	    var dist = point.distance( this.currentB );
+	    if( dist < minDist ) {
+		pathIndex = i;
+		minDist = dist;
+		closestT = t;
+		closestPoint = point;
+	    }
+	}
+	this.currentT = closestT;
+	this.currentPathIndex = pathIndex;
 	this.currentA.set( closestPoint );
-	// this.pb.redraw();
-	// this.moveCallback( this.currentA, this.currentB, this.currentT );
-	// this.pb.redraw();
     };
 
     // @static

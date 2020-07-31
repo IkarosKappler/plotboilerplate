@@ -82,8 +82,8 @@
 	    // +---------------------------------------------------------------------------------
 	    // | A helper function for properly adding paths to the canvas.
 	    // +-------------------------------
-	    var addPath = function( path ) {
-		/* for( var i = 0; i < path.bezierCurves.length; i++ ) {
+	    /*var addPath = function( path ) {
+		for( var i = 0; i < path.bezierCurves.length; i++ ) {
 		    var curve = path.bezierCurves[i];
 		    path.adjustPredecessorControlPoint( i,     
 							true,  // obtainHandleLength
@@ -100,10 +100,10 @@
 		    if( i+1 == path.bezierCurves.length )
 			curve.endPoint.listeners.addDragListener( updateMinDistance ); 
 		} 
-		path.updateArcLengths(); */
+		path.updateArcLengths(); 
 		BezierPathInteractionHelper.setPathAutoAdjust( path );
 		pb.add( path );
-	    }
+	    } */
 
 	    
 	    // +---------------------------------------------------------------------------------
@@ -130,29 +130,32 @@
 	    }; */
 
 	    // +---------------------------------------------------------------------------------
-	    // | Add a circular bezier path.
+	    // | Add some bezier paths.
 	    // +-------------------------------
-	    var numCurves = 3;
-	    var bpath = [];	    
-	    for( var i = 0; i < numCurves; i++ ) {
-		// 0: startPoint
-		// 1: endPoint
-		// 2: startControlPoint
-		// 3: endControlPoint
-		bpath[i] = [ randomVertex(), randomVertex(), randomVertex(), randomVertex() ];
+	    var paths = [];
+	    var numPaths = 2;
+	    for( var p = 0; p < numPaths; p++ ) {
+		var numCurves = 3;
+		var bpath = [];	    
+		for( var i = 0; i < numCurves; i++ ) {
+		    // 0: startPoint
+		    // 1: endPoint
+		    // 2: startControlPoint
+		    // 3: endControlPoint
+		    bpath[i] = [ randomVertex(), randomVertex(), randomVertex(), randomVertex() ];
+		}
+		var path = BezierPath.fromArray( bpath );
+		// addPath( path );
+		paths.push( path );
 	    }
-	    var path = BezierPath.fromArray( bpath );
-	    addPath( path );
+	    pb.add( paths );
 
 	    var i = 0;
-	    new BezierPathInteractionHelper( pb, path, function(a,b,_t) {
+	    new BezierPathInteractionHelper( pb, paths, function(newA,newB,newT,_pathIndex) {
 		// console.log('min dist changed');
-		t = _t;
-		line.a.set( a );
-		line.b.set( b );
-		if( i == 3 )
-		    throw "ERROR";
-		// updateMinDistance();
+		t = newT;
+		line.a.set( newA );
+		line.b.set( newB );
 	    } );
 	    
 	    // var draggedVertex 
