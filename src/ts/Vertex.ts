@@ -136,13 +136,6 @@ export class Vertex implements XYCoords, SVGSerializable {
      * @memberof Vertex
      **/
     set( x:number|XYCoords, y?:number|undefined ):Vertex {
-	/* if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
-	    this.x = x.x;
-	    this.y = x.y;
-	} else {
-	    this.x = x;
-	    this.y = y;
-	    }*/
 	if( typeof x == 'number' && typeof y == 'number' ) {
 	    this.x = x;
 	    this.y = y;
