@@ -60,6 +60,7 @@
  * @modified 2020-07-27 Added the getVertexNear(XYCoords,number) function
  * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
  * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
+ * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
  * @version  1.9.0
  *
  * @file PlotBoilerplate
@@ -1099,14 +1100,30 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      * This is the inverse function of `transformMousePosition`.
      *
+     * @method revertMousePosition
      * @param {number} x - The x component of the position to revert.
      * @param {number} y - The y component of the position to revert.
+     * @instance
+     * @memberof PlotBoilerplate
      * @return {XYCoords} The canvas coordinates for the given position.
      **/
     PlotBoilerplate.prototype.revertMousePosition = function (x, y) {
         return { x: x / this.config.cssScaleX + this.config.offsetX,
             y: y / this.config.cssScaleY + this.config.offsetY };
     };
+    ;
+    /**
+     * Determine if any elements are currently being dragged (on mouse move or touch move).
+     *
+     * @method getDraggedElementCount
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {number} The number of elements that are currently being dragged.
+     **/
+    PlotBoilerplate.prototype.getDraggedElementCount = function () {
+        return this.draggedElements.length;
+    };
+    ;
     /**
      * (Helper) The mouse-down handler.
      *
@@ -1315,7 +1332,6 @@ var PlotBoilerplate = /** @class */ (function () {
                 };
             };
             if (window["AlloyFinger"] && typeof window["AlloyFinger"] == "function") {
-                // console.log('Alloy finger found.');
                 try {
                     // Do not include AlloyFinger itself to the library
                     // (17kb, but we want to keep this lib as tiny as possible).
@@ -1324,11 +1340,12 @@ var PlotBoilerplate = /** @class */ (function () {
                     var touchDownPos = null;
                     var draggedElement = null;
                     var multiTouchStartScale = null;
-                    var clearTouch = function () {
+                    var clearTouch_1 = function () {
                         touchMovePos = null;
                         touchDownPos = null;
                         draggedElement = null;
                         multiTouchStartScale = null;
+                        _self.draggedElements = [];
                     };
                     var af = new AF(this.canvas, {
                         touchStart: function (e) {
@@ -1339,6 +1356,7 @@ var PlotBoilerplate = /** @class */ (function () {
                                 if (draggedElement && draggedElement.typeName == 'vertex') {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
                                     var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
+                                    _self.draggedElements = [draggedElement];
                                     draggingVertex.listeners.fireDragStartEvent(fakeEvent);
                                 }
                             }
@@ -1376,10 +1394,10 @@ var PlotBoilerplate = /** @class */ (function () {
                                 var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
                                 draggingVertex.listeners.fireDragEndEvent(fakeEvent);
                             }
-                            clearTouch();
+                            clearTouch_1();
                         },
                         touchCancel: function (e) {
-                            clearTouch();
+                            clearTouch_1();
                         },
                         multipointStart: function (e) {
                             multiTouchStartScale = _self.draw.scale.clone();

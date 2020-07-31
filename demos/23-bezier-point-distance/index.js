@@ -85,16 +85,48 @@
 	    var addPath = function( path ) {
 		for( var i = 0; i < path.bezierCurves.length; i++ ) {
 		    var curve = path.bezierCurves[i];
-		    if( i > 0 )
-			curve.startPoint.attr.bezierAutoAdjust = true;
 		    path.adjustPredecessorControlPoint( i,     
 							true,  // obtainHandleLength
 							false   // updateArcLength  (we will do this after the loop)
 						      );
+		    if( i > 0 )
+			curve.startPoint.attr.bezierAutoAdjust = true;
+
+		    // Add listeners to the curve points to re-calculate the min distance
+		    // on changes.
+		    curve.startPoint.listeners.addDragListener( updateMinDistance );
+		    curve.startControlPoint.listeners.addDragListener( updateMinDistance );
+		    curve.endControlPoint.listeners.addDragListener( updateMinDistance );
+		    if( i+1 == path.bezierCurves.length )
+			curve.endPoint.listeners.addDragListener( updateMinDistance );
 		}
 		path.updateArcLengths();
 		pb.add( path );
 	    }
+
+	    
+	    // +---------------------------------------------------------------------------------
+	    // | Handle any move event (mouse or touch) if there are no dragged elements involved.
+	    // +-------------------------------
+	    var handleMoveEvent = function(posX,posY) {
+		var point = pb.transformMousePosition( posX, 
+						       posY );
+		line.b.x = point.x;
+		line.b.y = point.y;
+		updateMinDistance();
+	    };
+
+	    
+	    // +---------------------------------------------------------------------------------
+	    // | Update the min distance from point `line.b` to the curve. And redraw.
+	    // +-------------------------------
+	    var updateMinDistance = function() {
+		t = path.getClosestT( line.b ); // point );
+		var closestPoint = path.getPointAt( t );
+		line.a.x = closestPoint.x;
+		line.a.y = closestPoint.y;
+		pb.redraw();
+	    };
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add a circular bezier path.
@@ -110,8 +142,15 @@
 	    }
 	    var path = BezierPath.fromArray( bpath );
 	    addPath( path );
-	    
 
+	    // var draggedVertex 
+	    new AlloyFinger( pb.canvas, {
+		touchMove: function (e) {
+		    if( pb.getDraggedElementCount() == 0 && e.touches.length > 0 ) {
+			handleMoveEvent( e.touches[0].clientX, e.touches[0].clientY );
+		    }
+		}
+	    } );
 	    new MouseHandler(pb.canvas)
 		.up( function(e) {
 		    if( e.params.wasDragged )
@@ -151,15 +190,8 @@
 		})
 		.move( function(e) {
 		    // console.log('moved');
-		    var point = pb.transformMousePosition( e.params.pos.x, // e.clientX - pb.canvas.offsetLeft,
-							   e.params.pos.y ); // e.clientY - pb.canvas.offsetTop );
-		    line.b.x = point.x;
-		    line.b.y = point.y;
-		    t = path.getClosestT( point );
-		    var closestPoint = path.getPointAt( t );
-		    line.a.x = closestPoint.x;
-		    line.a.y = closestPoint.y;
-		    pb.redraw();
+		    if( pb.getDraggedElementCount() == 0 )
+			handleMoveEvent( e.params.pos.x, e.params.pos.y );
 		} );
 
 	    new KeyHandler( { trackAll : true } )

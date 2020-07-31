@@ -59,6 +59,7 @@
  * @modified 2020-07-27 Added the getVertexNear(XYCoords,number) function
  * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
  * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
+ * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
  * @version  1.9.0
  *
  * @file PlotBoilerplate
@@ -1292,15 +1293,30 @@ export class PlotBoilerplate {
      *
      * This is the inverse function of `transformMousePosition`.
      *
+     * @method revertMousePosition
      * @param {number} x - The x component of the position to revert.
      * @param {number} y - The y component of the position to revert.
+     * @instance
+     * @memberof PlotBoilerplate
      * @return {XYCoords} The canvas coordinates for the given position.
      **/
     revertMousePosition( x:number, y:number ) : XYCoords {
 	return { x : x / this.config.cssScaleX + this.config.offsetX,
 		 y : y / this.config.cssScaleY + this.config.offsetY };
-    }
+    };
 
+
+    /**
+     * Determine if any elements are currently being dragged (on mouse move or touch move).
+     *
+     * @method getDraggedElementCount
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {number} The number of elements that are currently being dragged.
+     **/
+    getDraggedElementCount() : number {
+	return this.draggedElements.length;
+    };
 
 
     /**
@@ -1512,9 +1528,7 @@ export class PlotBoilerplate {
 		       };
 	    }
 	    
-	    if( window["AlloyFinger"] && typeof window["AlloyFinger"] == "function" ) {
-		// console.log('Alloy finger found.');
-		
+	    if( window["AlloyFinger"] && typeof window["AlloyFinger"] == "function" ) {		
 		try {
 		    // Do not include AlloyFinger itself to the library
 		    // (17kb, but we want to keep this lib as tiny as possible).
@@ -1523,11 +1537,12 @@ export class PlotBoilerplate {
 		    var touchDownPos : Vertex|undefined|null = null;
 		    var draggedElement : IDraggable|undefined|null = null;
 		    var multiTouchStartScale : Vertex|undefined|null = null;
-		    var clearTouch = () => {
+		    const clearTouch = () => {
 			touchMovePos = null;
 			touchDownPos = null;
 			draggedElement = null;
 			multiTouchStartScale = null;
+			_self.draggedElements = [];
 		    };
 		    var af = new AF( this.canvas, {
 			touchStart: function (e) {
@@ -1538,6 +1553,7 @@ export class PlotBoilerplate {
 				if( draggedElement && draggedElement.typeName == 'vertex' ) {
 				    var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
 				    var fakeEvent : VertEvent = ({ params : { dragAmount : { x: 0, y : 0 }, wasDragged : false, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone(), vertex : draggingVertex}} as unknown) as VertEvent;
+				    _self.draggedElements = [ draggedElement ];
 				    draggingVertex.listeners.fireDragStartEvent( fakeEvent );
 				}
 			    }

@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-07-31
+  * Added PlotBoilerplate.getDraggedElementCount().
 * 2020-07-28
   * Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
   * Added Bézier curve splitting to the bezier-point-distance demo.

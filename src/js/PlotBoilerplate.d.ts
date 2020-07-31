@@ -59,6 +59,7 @@
  * @modified 2020-07-27 Added the getVertexNear(XYCoords,number) function
  * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
  * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
+ * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
  * @version  1.9.0
  *
  * @file PlotBoilerplate
@@ -570,11 +571,23 @@ export declare class PlotBoilerplate {
      *
      * This is the inverse function of `transformMousePosition`.
      *
+     * @method revertMousePosition
      * @param {number} x - The x component of the position to revert.
      * @param {number} y - The y component of the position to revert.
+     * @instance
+     * @memberof PlotBoilerplate
      * @return {XYCoords} The canvas coordinates for the given position.
      **/
     revertMousePosition(x: number, y: number): XYCoords;
+    /**
+     * Determine if any elements are currently being dragged (on mouse move or touch move).
+     *
+     * @method getDraggedElementCount
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {number} The number of elements that are currently being dragged.
+     **/
+    getDraggedElementCount(): number;
     /**
      * (Helper) The mouse-down handler.
      *
