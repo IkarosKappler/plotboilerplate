@@ -151,12 +151,27 @@
 	    pb.add( paths );
 
 	    var i = 0;
-	    new BezierPathInteractionHelper( pb, paths, function(newA,newB,newT,_pathIndex) {
-		// console.log('min dist changed');
-		t = newT;
-		line.a.set( newA );
-		line.b.set( newB );
-	    } );
+	    new BezierPathInteractionHelper(
+		pb,
+		paths,
+		{
+		    onPointerMoved : function(pathIndex,newA,newB,newT) {
+			// console.log('[pathIndex='+pathIndex+'] min dist changed', t);
+			t = newT;
+			line.a.set( newA );
+			line.b.set( newB );
+		    },
+		    onVertexInserted : function(pathIndex,insertAfterIndex,newPath,oldPath) {
+			console.log('[pathIndex='+pathIndex+'] Vertex inserted after '+ insertAfterIndex );
+		    },
+		    onVerticesDeleted : function(pathIndex,deletedVertIndices,newPath,oldPath) {
+			console.log('[pathIndex='+pathIndex+'] vertices deleted', deletedVertIndices );
+		    },
+		    onPathDeleted : function(pathIndex,oldPath) {
+			console.log('[pathIndex='+pathIndex+'] path deleted' );
+		    }
+		}
+	    );
 	    
 	    // var draggedVertex 
 	    /* new AlloyFinger( pb.canvas, {
