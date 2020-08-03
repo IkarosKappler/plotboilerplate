@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-08-03 (1.8.3)
+  * Tweaked the BezierPathInteractionHelper.
+  * Added proper JSDoc tags to the MouseHandler and the KeyHandler.
 * 2020-07-31
   * Added PlotBoilerplate.getDraggedElementCount().
 * 2020-07-28
