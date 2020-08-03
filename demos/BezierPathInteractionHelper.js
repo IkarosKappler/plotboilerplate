@@ -113,7 +113,11 @@
     /**
      * Remove the path at the given index.
      *
+     * @method removePathAt
+     * @instance
+     * @memberof BezierPathInteractionHelper
      * @param {number} pathIndex - The index of the path (must be inside bounds, see `this.paths` array).
+     * @return {void}
      **/
     BezierPathInteractionHelper.prototype.removePathAt = function( pathIndex ) {
 	var path = this.paths[ pathIndex ];
@@ -121,6 +125,22 @@
 	this._removeDefaultPathListeners( path );
 	this.pb.remove( path, false, true ); // Remove with vertices
 	this.onPathRemoved(pathIndex,path);
+    };
+
+
+    /**
+     * Update the inner status by running the distance calculation again with the current settings.
+     *
+     * Call this if any of the properties changed (like maxDetecDistance).
+     *
+     * @method update
+     * @instance
+     * @memberof BezierPathInteractionHelper
+     * @return {void}
+     **/
+    BezierPathInteractionHelper.prototype.update = function() {
+	// Just re-run the calculation with the recent mouse/touch position
+	this._handleMoveEvent( this.currentB.x, this.currentB.y );
     };
 
 

@@ -97,13 +97,6 @@ var Vertex = /** @class */ (function () {
      * @memberof Vertex
      **/
     Vertex.prototype.set = function (x, y) {
-        /* if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
-            this.x = x.x;
-            this.y = x.y;
-        } else {
-            this.x = x;
-            this.y = y;
-            }*/
         if (typeof x == 'number' && typeof y == 'number') {
             this.x = x;
             this.y = y;

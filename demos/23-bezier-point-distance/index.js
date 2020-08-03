@@ -69,6 +69,7 @@
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
 		// additional attributes here
+		maxDetectDistance : 32.0
 	    }, GUP );
 	    
 	    
@@ -104,7 +105,7 @@
 	    pb.add( paths );
 
 	    var i = 0;
-	    new BezierPathInteractionHelper(
+	    var helper = new BezierPathInteractionHelper(
 		pb,
 		paths,
 		{
@@ -136,6 +137,7 @@
 	    // +-------------------------------
             {
 		var gui = pb.createGUI();
+		gui.add( config, 'maxDetectDistance' ).min(0.0).max(1920.0/2.0).step(4.0).onChange( function() { helper.maxDetectDistance = config.maxDetectDistance; helper.update(); } ).name('maxDetectDistance').title('The max detect distance');
 	    }
 	    
 	} );
