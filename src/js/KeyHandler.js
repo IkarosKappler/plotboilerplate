@@ -1,6 +1,6 @@
 "use strict";
 /**
- * A generic key handler.
+ * @classdesc A generic key handler.
  *
  * Example
  * =======
@@ -20,12 +20,18 @@
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
  * @version  1.0.2
+ *
+ * @file KeyHandler
+ * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var KeyHandler = /** @class */ (function () {
     /**
      * The constructor.
      *
+     * @constructor
+     * @instance
+     * @memberof KeyHandler
      * @param options.element (optional) The HTML element to listen on; if null then 'window' will be used.
      * @param options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
     **/

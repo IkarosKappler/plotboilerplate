@@ -198,13 +198,6 @@ var Vertex = /** @class */ (function () {
      * @memberof Vertex
      **/
     Vertex.prototype.set = function (x, y) {
-        /* if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
-            this.x = x.x;
-            this.y = x.y;
-        } else {
-            this.x = x;
-            this.y = y;
-            }*/
         if (typeof x == 'number' && typeof y == 'number') {
             this.x = x;
             this.y = y;
@@ -4615,9 +4608,8 @@ exports.PBImage = PBImage;
 "use strict";
 
 /**
- * A simple mouse handler for demos.
+ * @classdesc A simple mouse handler for demos.
  * Use to avoid load massive libraries like jQuery.
- *
  *
  * Usage
  * =====
@@ -4684,6 +4676,9 @@ exports.PBImage = PBImage;
  * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even
  *                      if there is no external drag listener installed (1.1.0).
  * @version  1.1.0
+ *
+ * @file MouseHandler
+ * @public
  **/
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -4699,28 +4694,15 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var XMouseEvent = /** @class */ (function (_super) {
-    __extends(XMouseEvent, _super);
-    function XMouseEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XMouseEvent;
-}(MouseEvent));
-exports.XMouseEvent = XMouseEvent;
-var XWheelEvent = /** @class */ (function (_super) {
-    __extends(XWheelEvent, _super);
-    function XWheelEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XWheelEvent;
-}(WheelEvent));
-exports.XWheelEvent = XWheelEvent;
 var MouseHandler = /** @class */ (function () {
     /**
      * The constructor.
      *
      * Pass the DOM element you want to receive mouse events from.
      *
+     * @constructor
+     * @instance
+     * @memberof MouseHandler
      * @param {HTMLElement} element
      **/
     function MouseHandler(element, name) {
@@ -4906,6 +4888,22 @@ var MouseHandler = /** @class */ (function () {
     return MouseHandler;
 }());
 exports.MouseHandler = MouseHandler;
+var XMouseEvent = /** @class */ (function (_super) {
+    __extends(XMouseEvent, _super);
+    function XMouseEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XMouseEvent;
+}(MouseEvent));
+exports.XMouseEvent = XMouseEvent;
+var XWheelEvent = /** @class */ (function (_super) {
+    __extends(XWheelEvent, _super);
+    function XWheelEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XWheelEvent;
+}(WheelEvent));
+exports.XWheelEvent = XWheelEvent;
 //# sourceMappingURL=MouseHandler.js.map
 
 /***/ }),
@@ -4915,7 +4913,7 @@ exports.MouseHandler = MouseHandler;
 "use strict";
 
 /**
- * A generic key handler.
+ * @classdesc A generic key handler.
  *
  * Example
  * =======
@@ -4935,12 +4933,18 @@ exports.MouseHandler = MouseHandler;
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
  * @version  1.0.2
+ *
+ * @file KeyHandler
+ * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var KeyHandler = /** @class */ (function () {
     /**
      * The constructor.
      *
+     * @constructor
+     * @instance
+     * @memberof KeyHandler
      * @param options.element (optional) The HTML element to listen on; if null then 'window' will be used.
      * @param options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
     **/

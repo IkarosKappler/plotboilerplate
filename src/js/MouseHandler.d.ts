@@ -1,7 +1,6 @@
 /**
- * A simple mouse handler for demos.
+ * @classdesc A simple mouse handler for demos.
  * Use to avoid load massive libraries like jQuery.
- *
  *
  * Usage
  * =====
@@ -68,7 +67,44 @@
  * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even
  *                      if there is no external drag listener installed (1.1.0).
  * @version  1.1.0
+ *
+ * @file MouseHandler
+ * @public
  **/
+export declare class MouseHandler {
+    private name;
+    private element;
+    private mouseDownPos;
+    private mouseDragPos;
+    private mousePos;
+    private mouseButton;
+    private listeners;
+    private installed;
+    private handlers;
+    /**
+     * The constructor.
+     *
+     * Pass the DOM element you want to receive mouse events from.
+     *
+     * @constructor
+     * @instance
+     * @memberof MouseHandler
+     * @param {HTMLElement} element
+     **/
+    constructor(element: HTMLElement, name?: string);
+    private relPos;
+    private mkParams;
+    private listenFor;
+    private unlistenFor;
+    drag(callback: (e: XMouseEvent) => void): MouseHandler;
+    move(callback: (e: XMouseEvent) => void): MouseHandler;
+    up(callback: (e: XMouseEvent) => void): MouseHandler;
+    down(callback: (e: XMouseEvent) => void): MouseHandler;
+    click(callback: (e: XMouseEvent) => void): MouseHandler;
+    wheel(callback: (e: XWheelEvent) => void): MouseHandler;
+    private throwAlreadyInstalled;
+    destroy(): void;
+}
 export interface XMouseParams {
     element: HTMLElement;
     name: string;
@@ -99,35 +135,4 @@ export declare class XMouseEvent extends MouseEvent {
 }
 export declare class XWheelEvent extends WheelEvent {
     params: XMouseParams;
-}
-export declare class MouseHandler {
-    private name;
-    private element;
-    private mouseDownPos;
-    private mouseDragPos;
-    private mousePos;
-    private mouseButton;
-    private listeners;
-    private installed;
-    private handlers;
-    /**
-     * The constructor.
-     *
-     * Pass the DOM element you want to receive mouse events from.
-     *
-     * @param {HTMLElement} element
-     **/
-    constructor(element: HTMLElement, name?: string);
-    private relPos;
-    private mkParams;
-    private listenFor;
-    private unlistenFor;
-    drag(callback: (e: XMouseEvent) => void): MouseHandler;
-    move(callback: (e: XMouseEvent) => void): MouseHandler;
-    up(callback: (e: XMouseEvent) => void): MouseHandler;
-    down(callback: (e: XMouseEvent) => void): MouseHandler;
-    click(callback: (e: XMouseEvent) => void): MouseHandler;
-    wheel(callback: (e: XWheelEvent) => void): MouseHandler;
-    private throwAlreadyInstalled;
-    destroy(): void;
 }

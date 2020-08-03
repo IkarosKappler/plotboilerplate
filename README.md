@@ -605,7 +605,7 @@ for this purpose.
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
  * Port all demos from vanilla JS to TypeScript.
  * Remove the Touchy.js integration soon.
- * Add a TouchHandler (such as the MouseHandler)? Add this to the main demo to keep track of touch positions?
+ * Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
  * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
  
 

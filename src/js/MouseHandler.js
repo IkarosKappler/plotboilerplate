@@ -1,8 +1,7 @@
 "use strict";
 /**
- * A simple mouse handler for demos.
+ * @classdesc A simple mouse handler for demos.
  * Use to avoid load massive libraries like jQuery.
- *
  *
  * Usage
  * =====
@@ -69,6 +68,9 @@
  * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even
  *                      if there is no external drag listener installed (1.1.0).
  * @version  1.1.0
+ *
+ * @file MouseHandler
+ * @public
  **/
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
@@ -84,28 +86,15 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var XMouseEvent = /** @class */ (function (_super) {
-    __extends(XMouseEvent, _super);
-    function XMouseEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XMouseEvent;
-}(MouseEvent));
-exports.XMouseEvent = XMouseEvent;
-var XWheelEvent = /** @class */ (function (_super) {
-    __extends(XWheelEvent, _super);
-    function XWheelEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XWheelEvent;
-}(WheelEvent));
-exports.XWheelEvent = XWheelEvent;
 var MouseHandler = /** @class */ (function () {
     /**
      * The constructor.
      *
      * Pass the DOM element you want to receive mouse events from.
      *
+     * @constructor
+     * @instance
+     * @memberof MouseHandler
      * @param {HTMLElement} element
      **/
     function MouseHandler(element, name) {
@@ -291,4 +280,20 @@ var MouseHandler = /** @class */ (function () {
     return MouseHandler;
 }());
 exports.MouseHandler = MouseHandler;
+var XMouseEvent = /** @class */ (function (_super) {
+    __extends(XMouseEvent, _super);
+    function XMouseEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XMouseEvent;
+}(MouseEvent));
+exports.XMouseEvent = XMouseEvent;
+var XWheelEvent = /** @class */ (function (_super) {
+    __extends(XWheelEvent, _super);
+    function XWheelEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XWheelEvent;
+}(WheelEvent));
+exports.XWheelEvent = XWheelEvent;
 //# sourceMappingURL=MouseHandler.js.map

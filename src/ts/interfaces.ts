@@ -166,3 +166,6 @@ export interface IDraggable {
     isVertex():boolean;
     setVIndex(vindex:number):IDraggable;
 }
+
+
+

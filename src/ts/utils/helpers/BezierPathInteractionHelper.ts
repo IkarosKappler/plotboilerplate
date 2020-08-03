@@ -1,16 +1,26 @@
 /**
- * A helper for adding vertices to and remove vertices from Bézier paths.
- *
+ * @classdesc A helper for adding vertices to and remove vertices from Bézier paths.
  * By default the 'delete' key is used to remove vertices or paths.
  *
- *
- * @require PlotBoilerplate, KeyHandler, MouseHandler, AlloyFinger
+ * @requires AlloyFinger
+ * @requires BezierPath
+ * @requires CubicBezierPath 
+ * @requires KeyHandler
+ * @requires MouseHandler
+ * @requires PlotBoilerplate
+ * @requires VertEvent
+ * @requires Vertex
+ * @requires XMouseEvent
+ * @requires XYCoords
  *
  *
  * @author   Ikaros Kappler
  * @date     2020-07-31
  * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
  * @version  1.0.0
+ *
+ * @file BezierPathInteractionHelper
+ * @public
  **/
 
 import { AlloyFinger } from "alloyfinger";

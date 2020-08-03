@@ -1,17 +1,27 @@
 "use strict";
 /**
- * A helper for adding vertices to and remove vertices from Bézier paths.
- *
+ * @classdesc A helper for adding vertices to and remove vertices from Bézier paths.
  * By default the 'delete' key is used to remove vertices or paths.
  *
- *
- * @require PlotBoilerplate, KeyHandler, MouseHandler, AlloyFinger
+ * @requires AlloyFinger
+ * @requires BezierPath
+ * @requires CubicBezierPath
+ * @requires KeyHandler
+ * @requires MouseHandler
+ * @requires PlotBoilerplate
+ * @requires VertEvent
+ * @requires Vertex
+ * @requires XMouseEvent
+ * @requires XYCoords
  *
  *
  * @author   Ikaros Kappler
  * @date     2020-07-31
  * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
  * @version  1.0.0
+ *
+ * @file BezierPathInteractionHelper
+ * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var alloyfinger_1 = require("alloyfinger");
@@ -466,6 +476,16 @@ var BezierPathInteractionHelper = /** @class */ (function () {
         path.updateArcLengths();
     };
     ;
+    /**
+     * A helper function to add drag listeners to all vertices of the given path.
+     *
+     * @static
+     * @method addPathVertexDragListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to add vertex listeners to.
+     * @param {function} vertexDragListener - The drag listeners to add to each path vertex.
+     * @return void
+     **/
     BezierPathInteractionHelper.addPathVertexDragListeners = function (path, vertexDragListener) {
         for (var i = 0; i < path.bezierCurves.length; i++) {
             var curve = path.bezierCurves[i];
@@ -477,6 +497,16 @@ var BezierPathInteractionHelper = /** @class */ (function () {
         }
     };
     ;
+    /**
+     * A helper function to remove drag listeners to all vertices of the given path.
+     *
+     * @static
+     * @method removePathVertexDragListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to remove vertex listeners from.
+     * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
+     * @return void
+     **/
     BezierPathInteractionHelper.removePathVertexDragListeners = function (path, vertexDragListener) {
         for (var i = 0; i < path.bezierCurves.length; i++) {
             var curve = path.bezierCurves[i];

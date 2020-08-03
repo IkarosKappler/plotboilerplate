@@ -1,7 +1,6 @@
 /**
- * A simple mouse handler for demos. 
+ * @classdesc A simple mouse handler for demos. 
  * Use to avoid load massive libraries like jQuery.
- *
  *
  * Usage
  * =====
@@ -68,27 +67,11 @@
  * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even 
  *                      if there is no external drag listener installed (1.1.0).
  * @version  1.1.0
+ *
+ * @file MouseHandler
+ * @public
  **/
 
-export interface XMouseParams {
-    element      : HTMLElement; 
-    name         : string;
-    pos          : {x:number,y:number};
-    button       : number;
-    leftButton   : boolean;
-    middleButton : boolean;
-    rightButton  : boolean;
-    mouseDownPos : {x:number,y:number}; 
-    draggedFrom  : {x:number,y:number};
-    wasDragged   : boolean;
-    dragAmount   : {x:number,y:number};
-}
-export class XMouseEvent extends MouseEvent {
-    params: XMouseParams;
-}
-export class XWheelEvent extends WheelEvent {
-    params: XMouseParams;
-}
 
 export class MouseHandler {
 
@@ -107,6 +90,9 @@ export class MouseHandler {
      *
      * Pass the DOM element you want to receive mouse events from.
      *
+     * @constructor
+     * @instance
+     * @memberof MouseHandler
      * @param {HTMLElement} element
      **/
     constructor( element:HTMLElement, name?:string ) {
@@ -272,4 +258,25 @@ export class MouseHandler {
 	this.element.removeEventListener('click',this.handlers['click']);
 	this.element.removeEventListener('wheel',this.handlers['wheel']);
     }
+}
+
+
+export interface XMouseParams {
+    element      : HTMLElement; 
+    name         : string;
+    pos          : {x:number,y:number};
+    button       : number;
+    leftButton   : boolean;
+    middleButton : boolean;
+    rightButton  : boolean;
+    mouseDownPos : {x:number,y:number}; 
+    draggedFrom  : {x:number,y:number};
+    wasDragged   : boolean;
+    dragAmount   : {x:number,y:number};
+}
+export class XMouseEvent extends MouseEvent {
+    params: XMouseParams;
+}
+export class XWheelEvent extends WheelEvent {
+    params: XMouseParams;
 }
