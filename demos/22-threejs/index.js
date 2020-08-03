@@ -49,6 +49,10 @@
 		)
 	    );
 
+
+	    var bezierDistanceT = 0.0;
+	    var bezierDistanceLine = null;
+	    
 	    
 	    var textureImage = new Image();
 	    textureImage.onload = function() {
@@ -82,18 +86,14 @@
 		window.setTimeout( (function(bId) {
 		    return function() {
 			if( bId == buildId ) {
+			    // console.log('rebuild', outline );
 			    dildoGeneration.rebuild( Object.assign( { outline : outline }, config ) );
 			}
 		    };
 		})(buildId), 50 );
 	    };
-
-	    var handleDoubleclick = function( position ) {
-		// Find the closest point on the bezier path
-		
-	    };
 	    
-	    new DoubleclickHandler( pb, handleDoubleclick );
+	    // new DoubleclickHandler( pb, handleDoubleclick );
 
 	    
 	    // +---------------------------------------------------------------------------------
@@ -110,6 +110,7 @@
 		// Uhm, well, some curve point moved.
 		rebuild();
 	    };
+	    /*
 	    for( var i = 0; i < outline.bezierCurves.length; i++ ) {
 		var curve = outline.bezierCurves[i];
 		curve.startPoint.listeners.addDragEndListener( dragListener );
@@ -119,7 +120,14 @@
 		    curve.startPoint.attr.bezierAutoAdjust = true;
 		if( i+1 == outline.bezierCurves.length )
 		    curve.endPoint.listeners.addDragEndListener( dragListener );
-	    }
+		    } */
+	    var addPathListeners = function( path ) {
+		BezierPathInteractionHelper.addPathVertexDragListeners( path, dragListener );
+	    };
+	    var removePathListeners = function( path ) {
+		BezierPathInteractionHelper.removePathVertexDragListeners( path, dragListener );
+	    };
+	    addPathListeners( outline );
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Draw some stuff before rendering?
@@ -138,6 +146,13 @@
 		    polyline.push( outline.getPointAt(i/pathSteps) );
 		}
 		pb.fill.polyline( polyline, false, 'rgba(0,0,0,0.25)' );
+	    };
+
+	    var postDraw = function() {
+		if( bezierDistanceLine != null ) {
+		    pb.draw.line( bezierDistanceLine.a, bezierDistanceLine.b, 'rgb(255,192,0)', 2 );
+		    pb.fill.circleHandle( bezierDistanceLine.a, 3.0, 'rgb(255,192,0)' );
+		}
 	    };
 	    
 
@@ -164,6 +179,47 @@
 				   new Vertex(bounds.max).scale( scaleFactor, center ) );
 	    };
 
+
+	    pb.add( outline ); // This will trigger the first initial postDraw/draw/redraw call
+	    
+	    
+	    // +---------------------------------------------------------------------------------
+	    // | Install a Bézier interaction helper.
+	    // +-------------------------------
+	    var helper = new BezierPathInteractionHelper(
+		pb,
+		[outline],
+		{
+		    maxDetectDistance : 32.0,
+		    autoAdjustPaths : true,
+		    allowPathRemoval : false, // It is not alowed to remove the outline path
+		    onPointerMoved : function(pathIndex,newA,newB,newT) {
+			if( pathIndex == -1 ) {
+			    bezierDistanceLine = null;
+			} else {
+			    bezierDistanceLine = new Line( newA, newB );
+			    bezierDistanceT = newT;
+			}
+		    },
+		    onVertexInserted : function(pathIndex,insertAfterIndex,newPath,oldPath) {
+			console.log('[pathIndex='+pathIndex+'] Vertex inserted after '+ insertAfterIndex );
+			console.log('oldPath', oldPath, 'newPath', newPath );
+			removePathListeners( outline );
+			outline = newPath;
+			addPathListeners( outline );
+			rebuild();
+		    },
+		    onVerticesDeleted : function(pathIndex,deletedVertIndices,newPath,oldPath) {
+			console.log('[pathIndex='+pathIndex+'] vertices deleted', deletedVertIndices );
+			removePathListeners( outline );
+			outline = newPath;
+			addPathListeners( outline );
+			rebuild();
+		    }
+		}
+	    );
+	    
+
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
 	    // +-------------------------------
@@ -177,7 +233,7 @@
 	    }
 
 	    pb.config.preDraw = preDraw;
-	    pb.add( outline ); // This will trigger the initial postDraw/draw/redraw call
+	    pb.config.postDraw = postDraw;
 	    pb.fitToView( scaleBounds(outline.getBounds(),1.6) );
 	    rebuild();
 

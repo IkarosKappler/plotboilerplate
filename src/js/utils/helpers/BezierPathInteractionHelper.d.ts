@@ -1,6 +1,20 @@
+/**
+ * A helper for adding vertices to and remove vertices from Bézier paths.
+ *
+ * By default the 'delete' key is used to remove vertices or paths.
+ *
+ *
+ * @require PlotBoilerplate, KeyHandler, MouseHandler, AlloyFinger
+ *
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-07-31
+ * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
+ * @version  1.0.0
+ **/
 import { BezierPath } from "../../BezierPath";
-import { KeyHandler } from "../../KeyHandler";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
+import { VertEvent } from "../../VertexListeners";
 export declare class BezierPathInteractionHelper {
     /**
      * @member {PlotBoilerplate}
@@ -89,18 +103,20 @@ export declare class BezierPathInteractionHelper {
      * @return {void}
      **/
     update(): void;
-    _locatePath(path: BezierPath): number;
-    _handleDelete(): void;
-    _handleSingleVertexDelete(): Array<number>;
-    _handleDeleteOnPath(pathIndex: number): boolean;
-    _replacePathAt(pathIndex: number, newPath: BezierPath): void;
-    _handleMoveEvent(posX: number, posY: number): void;
-    _clearMoveEvent(): void;
-    _installTouchListener(): void;
-    _installMouseListener(): void;
-    _installKeyListener(): KeyHandler;
-    _addDefaultPathListeners(path: BezierPath): void;
-    _removeDefaultPathListeners(path: BezierPath): void;
-    _updateMinDistance(): void;
+    private _locatePath;
+    private _handleDelete;
+    private _handleSingleVertexDelete;
+    private _handleDeleteOnPath;
+    private _replacePathAt;
+    private _handleMoveEvent;
+    private _clearMoveEvent;
+    private _installTouchListener;
+    private _installMouseListener;
+    private _installKeyListener;
+    private _addDefaultPathListeners;
+    private _removeDefaultPathListeners;
+    private _updateMinDistance;
     static setPathAutoAdjust(path: BezierPath): void;
+    static addPathVertexDragListeners(path: BezierPath, vertexDragListener: (e: VertEvent) => void): void;
+    static removePathVertexDragListeners(path: BezierPath, vertexDragListener: (e: VertEvent) => void): void;
 }

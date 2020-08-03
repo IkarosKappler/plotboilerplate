@@ -86,7 +86,7 @@
 					  } ); */
 
 	var useTextureImage     = options.useTextureImage && typeof options.textureImage != "undefined" && options.textureImage.complete && options.textureImage.naturalWidth !== false;
-	console.log( useTextureImage ); // options, options.textureImage, typeof options.textureImage );
+	// console.log( useTextureImage ); // options, options.textureImage, typeof options.textureImage );
 	
 	var material = new THREE.MeshPhongMaterial(
 	    { color: 0x3838ff,

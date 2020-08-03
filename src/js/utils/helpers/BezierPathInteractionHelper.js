@@ -1,4 +1,18 @@
 "use strict";
+/**
+ * A helper for adding vertices to and remove vertices from Bézier paths.
+ *
+ * By default the 'delete' key is used to remove vertices or paths.
+ *
+ *
+ * @require PlotBoilerplate, KeyHandler, MouseHandler, AlloyFinger
+ *
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-07-31
+ * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
+ * @version  1.0.0
+ **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var alloyfinger_1 = require("alloyfinger");
 var BezierPath_1 = require("../../BezierPath");
@@ -379,14 +393,15 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     // | @param {BezierPath} path - The path to add vertex listeners to.
     // +-------------------------------
     BezierPathInteractionHelper.prototype._addDefaultPathListeners = function (path) {
-        for (var i = 0; i < path.bezierCurves.length; i++) {
-            var curve = path.bezierCurves[i];
-            curve.startPoint.listeners.addDragListener(this._updateMinDistance);
-            curve.startControlPoint.listeners.addDragListener(this._updateMinDistance);
-            curve.endControlPoint.listeners.addDragListener(this._updateMinDistance);
-            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
-                curve.endPoint.listeners.addDragListener(this._updateMinDistance);
-        }
+        /* for( var i = 0; i < path.bezierCurves.length; i++ ) {
+            const curve:CubicBezierCurve = path.bezierCurves[i];
+            curve.startPoint.listeners.addDragListener( this._updateMinDistance );
+            curve.startControlPoint.listeners.addDragListener( this._updateMinDistance );
+            curve.endControlPoint.listeners.addDragListener( this._updateMinDistance );
+            if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+            curve.endPoint.listeners.addDragListener( this._updateMinDistance );
+            } */
+        BezierPathInteractionHelper.addPathVertexDragListeners(path, this._updateMinDistance);
     };
     ;
     // +---------------------------------------------------------------------------------
@@ -395,14 +410,15 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     // | @param {BezierPath} path - The path to remove vertex listeners from.
     // +-------------------------------
     BezierPathInteractionHelper.prototype._removeDefaultPathListeners = function (path) {
-        for (var i = 0; i < path.bezierCurves.length; i++) {
-            var curve = path.bezierCurves[i];
-            curve.startPoint.listeners.removeDragListener(this._updateMinDistance);
-            curve.startControlPoint.listeners.removeDragListener(this._updateMinDistance);
-            curve.endControlPoint.listeners.removeDragListener(this._updateMinDistance);
-            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
-                curve.endPoint.listeners.removeDragListener(this._updateMinDistance);
-        }
+        /* for( var i = 0; i < path.bezierCurves.length; i++ ) {
+            const curve:CubicBezierCurve = path.bezierCurves[i];
+            curve.startPoint.listeners.removeDragListener( this._updateMinDistance );
+            curve.startControlPoint.listeners.removeDragListener( this._updateMinDistance );
+            curve.endControlPoint.listeners.removeDragListener( this._updateMinDistance );
+            if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+            curve.endPoint.listeners.removeDragListener( this._updateMinDistance );
+        } */
+        BezierPathInteractionHelper.removePathVertexDragListeners(path, this._updateMinDistance);
     };
     ;
     // +---------------------------------------------------------------------------------
@@ -448,6 +464,28 @@ var BezierPathInteractionHelper = /** @class */ (function () {
                 curve.startPoint.attr.bezierAutoAdjust = true;
         }
         path.updateArcLengths();
+    };
+    ;
+    BezierPathInteractionHelper.addPathVertexDragListeners = function (path, vertexDragListener) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            var curve = path.bezierCurves[i];
+            curve.startPoint.listeners.addDragListener(vertexDragListener);
+            curve.startControlPoint.listeners.addDragListener(vertexDragListener);
+            curve.endControlPoint.listeners.addDragListener(vertexDragListener);
+            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
+                curve.endPoint.listeners.addDragListener(vertexDragListener);
+        }
+    };
+    ;
+    BezierPathInteractionHelper.removePathVertexDragListeners = function (path, vertexDragListener) {
+        for (var i = 0; i < path.bezierCurves.length; i++) {
+            var curve = path.bezierCurves[i];
+            curve.startPoint.listeners.removeDragListener(vertexDragListener);
+            curve.startControlPoint.listeners.removeDragListener(vertexDragListener);
+            curve.endControlPoint.listeners.removeDragListener(vertexDragListener);
+            if (i + 1 == path.bezierCurves.length && !path.adjustCircular)
+                curve.endPoint.listeners.removeDragListener(vertexDragListener);
+        }
     };
     ;
     return BezierPathInteractionHelper;

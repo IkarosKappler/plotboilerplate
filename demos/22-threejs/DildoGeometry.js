@@ -134,7 +134,7 @@
 
 	this.uvsNeedUpdate = true;
 
-	console.log( 'vertices: ', this.vertices.length, ', faces: ', this.faces.length, ' faceUVs', this.faceVertexUvs[0].length );
+	// console.log( 'vertices: ', this.vertices.length, ', faces: ', this.faces.length, ' faceUVs', this.faceVertexUvs[0].length );
     };
 
     

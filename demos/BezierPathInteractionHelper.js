@@ -1,4 +1,8 @@
 /**
+ * DEPREACTION
+ * THIS CODE IS DEPRECATED AND SHOULD NOT BE USED ANY MORE. IT WILL BE REMOVED IN A FUTURE VERSION.
+ * PLEASE USE ./src/js/utils/helpers/BezierPathInteractionHelper.js INSTEAD.
+ *
  * A helper for adding vertices to and remove vertices from Bézier paths.
  *
  * By default the 'delete' key is used to remove vertices or paths.
@@ -7,6 +11,7 @@
  * @require PlotBoilerplate, KeyHandler, MouseHandler, AlloyFinger
  *
  *
+ * @deprecated
  * @author  Ikaros Kappler
  * @date    2020-07-31
  * @version 1.0.0

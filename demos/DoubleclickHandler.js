@@ -1,6 +1,8 @@
 /**
  * A simple double click / tap handler.
  *
+ * NOTE: THIS CLASS IS CURRENTLY NOT IN USE.
+ *
  * @require AlloyFinger
  *
  * @author  Ikaros Kappler
