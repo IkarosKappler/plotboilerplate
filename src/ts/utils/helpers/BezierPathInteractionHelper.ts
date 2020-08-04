@@ -363,7 +363,8 @@ export class BezierPathInteractionHelper {
 	this._updateMinDistance();
 	// Always fire even if nothing visually changed?
 	// console.log( this.currentDistance, this.maxDetectDistance, this.mouseIsOver );
-	if( this.currentDistance <= this.maxDetectDistance && this.mouseIsOver ) {
+	if( (this.currentDistance <= this.maxDetectDistance && this.mouseIsOver)
+	    && this.pb.getDraggedElementCount() == 0 ) {
 	    this.onPointerMoved( this.currentPathIndex, this.currentA, this.currentB, this.currentT );
 	} else {
 	    this.onPointerMoved( -1, null, null, 0.0 );
@@ -419,11 +420,9 @@ export class BezierPathInteractionHelper {
 		if( _self._keyHandler.isDown('shift') )
 		    return;
 		const path:BezierPath = _self.paths[ _self.currentPathIndex ];
-		// console.log('Clicked', e.params.wasDragged);
 		const vertex:Vertex = _self.pb.getVertexNear( e.params.pos,
 							      PlotBoilerplate.DEFAULT_CLICK_TOLERANCE
 							    );
-		// console.log( 'Vertex', vertex );
 		if( vertex )
 		    return;
 		// Check if there is already a path point at the given split position
@@ -492,14 +491,6 @@ export class BezierPathInteractionHelper {
     // | @param {BezierPath} path - The path to add vertex listeners to.
     // +-------------------------------
     private _addDefaultPathListeners( path:BezierPath ) : void {
-	/* for( var i = 0; i < path.bezierCurves.length; i++ ) {
-	    const curve:CubicBezierCurve = path.bezierCurves[i];
-	    curve.startPoint.listeners.addDragListener( this._updateMinDistance );
-	    curve.startControlPoint.listeners.addDragListener( this._updateMinDistance );
-	    curve.endControlPoint.listeners.addDragListener( this._updateMinDistance );
-	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
-		curve.endPoint.listeners.addDragListener( this._updateMinDistance );
-		} */
 	BezierPathInteractionHelper.addPathVertexDragListeners( path, this._updateMinDistance );
     }; 
 
@@ -509,14 +500,6 @@ export class BezierPathInteractionHelper {
     // | @param {BezierPath} path - The path to remove vertex listeners from.
     // +-------------------------------
     private _removeDefaultPathListeners( path:BezierPath ) : void {
-	/* for( var i = 0; i < path.bezierCurves.length; i++ ) {
-	    const curve:CubicBezierCurve = path.bezierCurves[i];
-	    curve.startPoint.listeners.removeDragListener( this._updateMinDistance );
-	    curve.startControlPoint.listeners.removeDragListener( this._updateMinDistance );
-	    curve.endControlPoint.listeners.removeDragListener( this._updateMinDistance );
-	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
-		curve.endPoint.listeners.removeDragListener( this._updateMinDistance ); 
-	} */
 	BezierPathInteractionHelper.removePathVertexDragListeners( path, this._updateMinDistance );
     };
 

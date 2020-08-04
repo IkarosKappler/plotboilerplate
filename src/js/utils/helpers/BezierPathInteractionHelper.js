@@ -283,7 +283,8 @@ var BezierPathInteractionHelper = /** @class */ (function () {
         this._updateMinDistance();
         // Always fire even if nothing visually changed?
         // console.log( this.currentDistance, this.maxDetectDistance, this.mouseIsOver );
-        if (this.currentDistance <= this.maxDetectDistance && this.mouseIsOver) {
+        if ((this.currentDistance <= this.maxDetectDistance && this.mouseIsOver)
+            && this.pb.getDraggedElementCount() == 0) {
             this.onPointerMoved(this.currentPathIndex, this.currentA, this.currentB, this.currentT);
         }
         else {

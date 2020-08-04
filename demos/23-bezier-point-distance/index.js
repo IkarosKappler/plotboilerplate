@@ -113,6 +113,7 @@
 		    autoAdjustPaths : true,
 		    allowPathRemoval : true,
 		    onPointerMoved : function(pathIndex,newA,newB,newT) {
+			// console.log('[pathIndex='+pathIndex+'] moved' );
 			if( pathIndex == -1 ) {
 			    line = null;
 			} else {
