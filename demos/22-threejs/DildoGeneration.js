@@ -77,14 +77,9 @@
     DildoGeneration.prototype.rebuild = function( options ) {
 	this.removeCachedGeometries();
 
-	var baseShape = mkCircularPolygon( 100.0, options.shapeSegmentCount );
+	var baseRadius = options.outline.getBounds().width;
+	var baseShape = mkCircularPolygon( baseRadius, options.shapeSegmentCount );
 	var geometry = new DildoGeometry( Object.assign( { baseShape : baseShape }, options ) );
-/* 
-					  { baseShape : baseShape,
-					    outline : options.outline,
-					    outlineSegmentCount : options.outlineSegmentCount,
-					  } ); */
-
 	var useTextureImage     = options.useTextureImage && typeof options.textureImage != "undefined" && options.textureImage.complete && options.textureImage.naturalWidth !== false;
 	// console.log( useTextureImage ); // options, options.textureImage, typeof options.textureImage );
 	
