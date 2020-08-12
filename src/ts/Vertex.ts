@@ -93,10 +93,6 @@ export class Vertex implements XYCoords, SVGSerializable {
      * @param {number} y - The y-coordinate of the new vertex.
      **/
     constructor( x?:number|XYCoords|undefined, y?:number|undefined ) {
-	/*if( x instanceof Vertex ) {
-	    this.x = x.x;
-	    this.y = x.y;
-	    } */
 	if( typeof x == 'undefined' ) {
 	    this.x = 0;
 	    this.y = 0;

@@ -575,10 +575,7 @@ for this purpose.
  * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
  * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
  * Replace all color params: replace type string by color. (tinycolor?)
- * Include Touchy.js as a package dependency.
- * Include FileSaver.js as a package dependency.
  * Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
- * Make Bézier Curves dividable (by double click?).
  * Implement snap-to-grid.
  * Make ellipses rotatable.
  * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
@@ -587,8 +584,6 @@ for this purpose.
  * Add Images to the SVGBuiler.
  * Add image/svg support (adding SVG images).
  * Add a vertex attribute: visible. (to hide vertices).
- * Add control button: reset zoom.
- * Add control button: reset to origin.
  * [Partially done] Add control button: set to retina resolution (size factors and css scale).
  * Add a demo that draws a proper mathematical xy-grid.
  * Extend the leaf venation generator demo.
@@ -598,13 +593,11 @@ for this purpose.
  * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
  * Use the new Bounds class in the RectSelector helper.
  * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
- * Circle lineWidth params also affects circular handles.
  * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
    See ctx.setLineDash(...).
  * Add an internal mapping to remember vertices and their installed listeners (for removing them later).
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
  * Port all demos from vanilla JS to TypeScript.
- * Remove the Touchy.js integration soon.
  * Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
  * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
  

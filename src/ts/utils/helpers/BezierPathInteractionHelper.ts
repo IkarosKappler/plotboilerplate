@@ -17,7 +17,8 @@
  * @author   Ikaros Kappler
  * @date     2020-07-31
  * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
- * @version  1.0.0
+ * @modified 2020-08-12 Added a distance check before handling the click/tap event.
+ * @version  1.0.1
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -63,7 +64,7 @@ interface HelperOptions {
 export class BezierPathInteractionHelper {
 
     /**
-     * @member {PlotBoilerplate}
+     * @member {PlotBoilerplate} pb
      * @memberof BezierPathInteractionHelper
      * @type {PlotBoilerplate}
      * @instance
@@ -106,6 +107,8 @@ export class BezierPathInteractionHelper {
      *   * The curve index on the array (integer)
      *  
      *
+     * @constructor
+     * @name BezierPathInteractionHelper
      * @param {PlotBoilerplate} pb
      * @param {Array<BezierPath>} paths
      * @param {boolean} options.autoAdjustPaths - If true then inner path points will be auto-adjusted to keep the curve smooth.
@@ -119,9 +122,7 @@ export class BezierPathInteractionHelper {
     constructor( pb:PlotBoilerplate, paths:Array<BezierPath>, options:any ) {
 	options = options || {};
 	this.pb = pb;
-	// Array<BezierPath>
 	this.paths = [];
-	// function(Vertex,Vertex,number,number
 	this.onPointerMoved = options.onPointerMoved || function(i,a,b,t) { };
 	this.onVertexInserted = options.onVertexInserted || function(i,j,n,o) { };
 	this.onVerticesDeleted = options.onVerticesDeleted || function(i,r,n,o) { },
@@ -136,7 +137,7 @@ export class BezierPathInteractionHelper {
 	this.currentDistance = Number.MAX_VALUE;
 	this.currentT = 0.0;
 	this.currentA = new Vertex(0,0); // Position on the curve
-	this.currentB = new Vertex(0,0); // mouse/touch position
+	this.currentB = new Vertex(0,0); // Mouse/Touch position
 
 	// Rebuild the array to avoid outside manipulations.
 	for( var i = 0; i < paths.length; i++ ) {
@@ -147,7 +148,7 @@ export class BezierPathInteractionHelper {
 	this._installTouchListener();
 	this._keyHandler = this._installKeyListener();
 
-	// Paths might have changed
+	// Paths might have changed by auto-adjustment.
 	if( this.autoAdjustPaths )
 	    pb.redraw();
 	
@@ -418,6 +419,8 @@ export class BezierPathInteractionHelper {
 		if( e.params.wasDragged )
 		    return;
 		if( _self._keyHandler.isDown('shift') )
+		    return;
+		if( _self.currentDistance > _self.maxDetectDistance || !_self.mouseIsOver )
 		    return;
 		const path:BezierPath = _self.paths[ _self.currentPathIndex ];
 		const vertex:Vertex = _self.pb.getVertexNear( e.params.pos,

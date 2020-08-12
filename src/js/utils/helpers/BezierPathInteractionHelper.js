@@ -18,7 +18,8 @@
  * @author   Ikaros Kappler
  * @date     2020-07-31
  * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
- * @version  1.0.0
+ * @modified 2020-08-12 Added a distance check before handling the click/tap event.
+ * @version  1.0.1
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -42,6 +43,8 @@ var BezierPathInteractionHelper = /** @class */ (function () {
      *   * The curve index on the array (integer)
      *
      *
+     * @constructor
+     * @name BezierPathInteractionHelper
      * @param {PlotBoilerplate} pb
      * @param {Array<BezierPath>} paths
      * @param {boolean} options.autoAdjustPaths - If true then inner path points will be auto-adjusted to keep the curve smooth.
@@ -55,9 +58,7 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     function BezierPathInteractionHelper(pb, paths, options) {
         options = options || {};
         this.pb = pb;
-        // Array<BezierPath>
         this.paths = [];
-        // function(Vertex,Vertex,number,number
         this.onPointerMoved = options.onPointerMoved || function (i, a, b, t) { };
         this.onVertexInserted = options.onVertexInserted || function (i, j, n, o) { };
         this.onVerticesDeleted = options.onVerticesDeleted || function (i, r, n, o) { },
@@ -70,7 +71,7 @@ var BezierPathInteractionHelper = /** @class */ (function () {
         this.currentDistance = Number.MAX_VALUE;
         this.currentT = 0.0;
         this.currentA = new Vertex_1.Vertex(0, 0); // Position on the curve
-        this.currentB = new Vertex_1.Vertex(0, 0); // mouse/touch position
+        this.currentB = new Vertex_1.Vertex(0, 0); // Mouse/Touch position
         // Rebuild the array to avoid outside manipulations.
         for (var i = 0; i < paths.length; i++) {
             this.addPath(paths[i]);
@@ -78,7 +79,7 @@ var BezierPathInteractionHelper = /** @class */ (function () {
         this._installMouseListener();
         this._installTouchListener();
         this._keyHandler = this._installKeyListener();
-        // Paths might have changed
+        // Paths might have changed by auto-adjustment.
         if (this.autoAdjustPaths)
             pb.redraw();
     }
@@ -337,10 +338,10 @@ var BezierPathInteractionHelper = /** @class */ (function () {
                 return;
             if (_self._keyHandler.isDown('shift'))
                 return;
+            if (_self.currentDistance > _self.maxDetectDistance || !_self.mouseIsOver)
+                return;
             var path = _self.paths[_self.currentPathIndex];
-            // console.log('Clicked', e.params.wasDragged);
             var vertex = _self.pb.getVertexNear(e.params.pos, PlotBoilerplate_1.PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
-            // console.log( 'Vertex', vertex );
             if (vertex)
                 return;
             // Check if there is already a path point at the given split position
@@ -404,14 +405,6 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     // | @param {BezierPath} path - The path to add vertex listeners to.
     // +-------------------------------
     BezierPathInteractionHelper.prototype._addDefaultPathListeners = function (path) {
-        /* for( var i = 0; i < path.bezierCurves.length; i++ ) {
-            const curve:CubicBezierCurve = path.bezierCurves[i];
-            curve.startPoint.listeners.addDragListener( this._updateMinDistance );
-            curve.startControlPoint.listeners.addDragListener( this._updateMinDistance );
-            curve.endControlPoint.listeners.addDragListener( this._updateMinDistance );
-            if( i+1 == path.bezierCurves.length && !path.adjustCircular )
-            curve.endPoint.listeners.addDragListener( this._updateMinDistance );
-            } */
         BezierPathInteractionHelper.addPathVertexDragListeners(path, this._updateMinDistance);
     };
     ;
@@ -421,14 +414,6 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     // | @param {BezierPath} path - The path to remove vertex listeners from.
     // +-------------------------------
     BezierPathInteractionHelper.prototype._removeDefaultPathListeners = function (path) {
-        /* for( var i = 0; i < path.bezierCurves.length; i++ ) {
-            const curve:CubicBezierCurve = path.bezierCurves[i];
-            curve.startPoint.listeners.removeDragListener( this._updateMinDistance );
-            curve.startControlPoint.listeners.removeDragListener( this._updateMinDistance );
-            curve.endControlPoint.listeners.removeDragListener( this._updateMinDistance );
-            if( i+1 == path.bezierCurves.length && !path.adjustCircular )
-            curve.endPoint.listeners.removeDragListener( this._updateMinDistance );
-        } */
         BezierPathInteractionHelper.removePathVertexDragListeners(path, this._updateMinDistance);
     };
     ;

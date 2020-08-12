@@ -17,7 +17,8 @@
  * @author   Ikaros Kappler
  * @date     2020-07-31
  * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
- * @version  1.0.0
+ * @modified 2020-08-12 Added a distance check before handling the click/tap event.
+ * @version  1.0.1
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -27,7 +28,7 @@ import { PlotBoilerplate } from "../../PlotBoilerplate";
 import { VertEvent } from "../../VertexListeners";
 export declare class BezierPathInteractionHelper {
     /**
-     * @member {PlotBoilerplate}
+     * @member {PlotBoilerplate} pb
      * @memberof BezierPathInteractionHelper
      * @type {PlotBoilerplate}
      * @instance
@@ -58,6 +59,8 @@ export declare class BezierPathInteractionHelper {
      *   * The curve index on the array (integer)
      *
      *
+     * @constructor
+     * @name BezierPathInteractionHelper
      * @param {PlotBoilerplate} pb
      * @param {Array<BezierPath>} paths
      * @param {boolean} options.autoAdjustPaths - If true then inner path points will be auto-adjusted to keep the curve smooth.

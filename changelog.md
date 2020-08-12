@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-08-12
+  * BezierPathInteractionHelper: Added a distance check before handling the click/tap event.
+  * Ported the VoronoiCell helper class (see demos) from vanilla JS to TypeScript.
 * 2020-08-03 (1.8.3)
   * Tweaked the BezierPathInteractionHelper.
   * Added proper JSDoc tags to the MouseHandler and the KeyHandler.

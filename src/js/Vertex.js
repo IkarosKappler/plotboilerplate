@@ -49,10 +49,6 @@ var Vertex = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Vertex";
-        /*if( x instanceof Vertex ) {
-            this.x = x.x;
-            this.y = x.y;
-            } */
         if (typeof x == 'undefined') {
             this.x = 0;
             this.y = 0;

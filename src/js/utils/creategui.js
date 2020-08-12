@@ -23,6 +23,21 @@ var utils = window.utils = window.utils || {};
  * @return {dat.gui.GUI} 
  **/
 window.utils.createGUI = function(pb) {
+
+    var dummy = {
+	resetOffset : function() {
+	    var viewport = pb.viewport();
+	    pb.setOffset( { x: (viewport.width/2.0)*pb.draw.scale.x,
+			    y: (viewport.height/2.0)*pb.draw.scale.y
+			  } );
+	    pb.redraw();
+	},
+	resetScale : function() {
+	    pb.setZoom( 1.0, 1.0, new Vertex(0,0) );
+	    pb.redraw();
+	}
+    };
+    
     var _self = pb;
     var gui = new dat.gui.GUI();
     gui.remember(pb.config);
@@ -73,6 +88,8 @@ window.utils.createGUI = function(pb) {
     fold0.add(pb.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();
     fold0.add(pb.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
     fold0.addColor(pb.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");
+    fold0.add(dummy, 'resetOffset').title("Reset the draw offset to (0,0).");
+    fold0.add(dummy, 'resetScale').title("Reset the draw scale to (1.,1.).");
 
     if( pb.config.enableSVGExport ) {
 	var fold1 = gui.addFolder('Export');
