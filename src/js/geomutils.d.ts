@@ -1,5 +1,8 @@
 import { Line } from "./Line";
 import { Vertex } from "./Vertex";
+/**
+ * @global
+ **/
 export declare const geomutils: {
     /**
      * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.

@@ -2,6 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Line_1 = require("./Line");
 var Triangle_1 = require("./Triangle");
+/**
+ * @global
+ **/
 exports.geomutils = {
     /**
      * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.

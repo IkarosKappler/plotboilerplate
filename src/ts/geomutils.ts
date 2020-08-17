@@ -3,6 +3,9 @@ import { Line } from "./Line";
 import { Triangle } from "./Triangle";
 import { Vertex } from "./Vertex";
 
+/**
+ * @global
+ **/
 export const geomutils = {
 
     /**

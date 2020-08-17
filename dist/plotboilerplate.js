@@ -4422,6 +4422,9 @@ exports.VertTuple = VertTuple;
 Object.defineProperty(exports, "__esModule", { value: true });
 var Line_1 = __webpack_require__(2);
 var Triangle_1 = __webpack_require__(8);
+/**
+ * @global
+ **/
 exports.geomutils = {
     /**
      * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.

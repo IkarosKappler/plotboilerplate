@@ -3,6 +3,7 @@
 # Changelog
 * 2020-08-17
   * Ported the convexHull algorithm to TypeScript.
+  * Ported the convexPolygonIncircle algorithm to TypeScript.
 * 2020-08-12
   * BezierPathInteractionHelper: Added a distance check before handling the click/tap event.
   * Ported the VoronoiCell helper class (see demos) from vanilla JS to TypeScript.
