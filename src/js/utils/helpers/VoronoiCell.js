@@ -3,6 +3,7 @@
  * @classdesc A simple voronoi cell (part of a voronoi diagram), stored as an array of
  * adjacent triangles.
  *
+ * @requires Line
  * @requires Triangle
  * @requires Polygon
  * @requires Vertex
