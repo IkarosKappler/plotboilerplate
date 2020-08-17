@@ -14,7 +14,8 @@
  * @modified 2019-12-09 Removed an unnecesary if-condition from the _calculateOpenEdgePoint(...) helper function.
  * @modified 2020-05-18 Added function VoronoiCell.toPolygon().
  * @modified 2020-08-12 Ported this class from vanilla JS to TypeScript.
- * @version  1.1.1
+ * @modified 2020-08-17 Added some missing type declarations.
+ * @version  1.1.2
  *
  * @file VoronoiCell
  * @public
@@ -105,7 +106,7 @@ export class VoronoiCell {
     toPathSVGString() : string {
 	if( this.triangles.length == 0 )
 	    return "";	
-	var arr: Array<Vertex>= this.toPathArray();
+	const arr: Array<Vertex>= this.toPathArray();
 	return arr.map( (vert:Vertex) => { return ''+vert.x+','+vert.y; } ).join(' '); 
     };
 
@@ -161,7 +162,7 @@ export class VoronoiCell {
      * @memberof VoronoiCell
      * @return {Vertex}
      **/
-    private static _calcOpenEdgePoint( tri, neigh, sharedVertex ) : Vertex {
+    private static _calcOpenEdgePoint( tri:Triangle, neigh:Triangle, sharedVertex:Vertex ) : Vertex {
 	const center : Vertex = tri.getCircumcircle().center;
 	// Find non-adjacent edge (=outer edge)
 	const edgePoint : Vertex = VoronoiCell._findOuterEdgePoint( tri, neigh, sharedVertex );
