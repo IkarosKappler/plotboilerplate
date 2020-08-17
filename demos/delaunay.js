@@ -5,6 +5,9 @@
  * License: Public Domain
  *          Original C++ code by Joshua Bell
  *
+ * @deprecated DEPRECATED. PLEASE USE THE COMPILED CLASS FROM
+ *                     ../../src/js/utils/algorithms/deulaunay.js
+ *
  * @modified_by Ikaros Kappler
  * @date_init   2012-10-17
  * @date        2017-07-31

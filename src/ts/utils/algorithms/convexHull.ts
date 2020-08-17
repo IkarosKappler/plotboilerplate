@@ -56,6 +56,7 @@ const comparison = (a:XYCoords, b:XYCoords) : number => {
     return a.x == b.x ? a.y - b.y : a.x - b.x;
 };
 
+
 /**
  * Calculate the cross product of the three coordinates, interpreted as vectors.
  * 
