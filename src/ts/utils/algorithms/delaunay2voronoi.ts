@@ -22,11 +22,10 @@ export class delaunay2voronoi {
     private pointList: Array<Vertex>;
     private triangles: Array<Triangle>;
     
-    constructor( pointList, triangles ) {
+    constructor( pointList:Array<Vertex>, triangles:Array<Triangle> ) {
 
 	this.failedTriangleSets = [];
 	this.hasErrors          = false;
-	// let _self               = this;
 
 	this.pointList = pointList;
 	this.triangles = triangles;
@@ -35,18 +34,18 @@ export class delaunay2voronoi {
     // +---------------------------------------------------------------------------------
     // | Convert the triangle set to the Voronoi diagram.
     // +-------------------------------
-    build() {
-	var voronoiDiagram = [];	    
+    build() : Array<VoronoiCell> {
+	const voronoiDiagram : Array<VoronoiCell>= [];	    
 	for( var p in this.pointList ) {
-	    var point = this.pointList[p];
+	    var point : Vertex = this.pointList[p];
 	    // Find adjacent triangles for first point
-	    var adjacentSubset = []; 
+	    var adjacentSubset : Array<Triangle> = []; 
 	    for( var t in this.triangles ) {
 		if( this.triangles[t].a.equals(point) || this.triangles[t].b.equals(point) || this.triangles[t].c.equals(point) ) 
 		    adjacentSubset.push( this.triangles[t] );
 		
 	    }
-	    var path = this.subsetToPath(adjacentSubset);
+	    var path : Array<Triangle> = this.subsetToPath(adjacentSubset);
 	    if( path ) // There may be errors
 		voronoiDiagram.push( new VoronoiCell(path,point) ); 
 	}
@@ -63,19 +62,21 @@ export class delaunay2voronoi {
     // | The function has a failsafe recursive call for the case the first
     // | element in the array is inside the path (no border element).
     // +-------------------------------
-    subsetToPath( triangleSet, startPosition?, tryOnce? ) {
+    private subsetToPath( triangleSet: Array<Triangle>,
+			  startPosition?:number,
+			  tryOnce?:boolean ) : Array<Triangle> {
 	if( triangleSet.length == 0 )
 	    return [];
 
 	if( typeof startPosition === 'undefined' )
 	    startPosition = 0;
 	
-	var t       = startPosition;
-	var result  = [ triangleSet[t] ];
-	var visited = [ t ];
-	var i = 0;
+	let t : number = startPosition;
+	const result : Array<Triangle> = [ triangleSet[t] ];
+	const visited : Array<number> = [ t ];
+	let i : number = 0;
 	while( result.length < triangleSet.length && i < triangleSet.length ) {
-	    var u = (startPosition+i)%triangleSet.length;
+	    let u : number = (startPosition+i)%triangleSet.length;
 	    if( t != u && visited.indexOf(u) == -1 && triangleSet[t].isAdjacent(triangleSet[u]) ) {
 		result.push(triangleSet[u]);
 		visited.push(u);
@@ -93,7 +94,8 @@ export class delaunay2voronoi {
 		// Possibility A (try to fix this): split the triangle set into two arrays and restart with each.
 		// Possibility B (no fix for this): throw an error and terminate.
 		// Possibility C (temp solution): Store the error for later reporting and continue.
-		this.failedTriangleSets.push( triangleSet );
+		// this.failedTriangleSets.push( triangleSet );
+		this.failedTriangleSets = triangleSet;
 		this.hasErrors = true;
 		// throw "Error: this triangle set is not connected: " + JSON.stringify(triangleSet);
 		return null;

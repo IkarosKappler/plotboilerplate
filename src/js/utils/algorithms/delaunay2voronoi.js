@@ -16,7 +16,6 @@ var delaunay2voronoi = /** @class */ (function () {
     function delaunay2voronoi(pointList, triangles) {
         this.failedTriangleSets = [];
         this.hasErrors = false;
-        // let _self               = this;
         this.pointList = pointList;
         this.triangles = triangles;
     }
@@ -79,7 +78,8 @@ var delaunay2voronoi = /** @class */ (function () {
                 // Possibility A (try to fix this): split the triangle set into two arrays and restart with each.
                 // Possibility B (no fix for this): throw an error and terminate.
                 // Possibility C (temp solution): Store the error for later reporting and continue.
-                this.failedTriangleSets.push(triangleSet);
+                // this.failedTriangleSets.push( triangleSet );
+                this.failedTriangleSets = triangleSet;
                 this.hasErrors = true;
                 // throw "Error: this triangle set is not connected: " + JSON.stringify(triangleSet);
                 return null;

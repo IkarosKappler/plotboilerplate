@@ -10,12 +10,14 @@
  * @version  1.0.2
  **/
 import { Triangle } from "../../Triangle";
+import { Vertex } from "../../Vertex";
+import { VoronoiCell } from "../datastructures/VoronoiCell";
 export declare class delaunay2voronoi {
     failedTriangleSets: Array<Triangle>;
     hasErrors: boolean;
     private pointList;
     private triangles;
-    constructor(pointList: any, triangles: any);
-    build(): any[];
-    subsetToPath(triangleSet: any, startPosition?: any, tryOnce?: any): any;
+    constructor(pointList: Array<Vertex>, triangles: Array<Triangle>);
+    build(): Array<VoronoiCell>;
+    private subsetToPath;
 }
