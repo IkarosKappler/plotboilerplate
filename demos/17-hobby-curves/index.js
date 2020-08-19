@@ -72,7 +72,7 @@
 	// +-------------------------------
 	var drawHobby = function() {
 	    var hobbyPath = new HobbyPath( pointList.pointList );
-	    pb.draw.circleHandle( pb.vertices[0], 10, 'rgba(192,192,192,1.0)' );
+	    // pb.draw.circleHandle( pb.vertices[0], 10, 'rgba(192,192,192,1.0)' );
 	    if( config.drawLinearPath ) 
 		pb.draw.polyline( pb.vertices, !config.circular, 'rgba(192,192,192,0.5)', 1 );
 
@@ -182,13 +182,14 @@
 	    drawLinearPath        : false,
 	    drawTangents          : true,
 	    animate               : false,
-	    animateCirular        : true
+	    animateCirular        : true,
+	    drawVertices          : true
 	}, GUP );
 	
 
 	var updatePointList = function() {
 	    pointList.updatePointCount(config.pointCount,false); // No full cover
-	    animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
+	    animator = new SinoidVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
 	};
 
 
@@ -218,9 +219,15 @@
 	    // hobbyPath.addPoint(vert);
 	    config.pointCount++;
 	    if( animator ) animator.stop();
-	    animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
+	    animator = new SinoidVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
 	    toggleAnimation();
 	    pb.redraw();
+	};
+
+	var updateDrawVertices = function() {
+	    for( var i in pb.vertices ) {
+		pb.vertices[i].attr.visible = config.drawVertices;
+	    }
 	};
 
 	// +---------------------------------------------------------------------------------
@@ -239,11 +246,14 @@
 	    f1.add(config, 'drawLinearPath').onChange( function() { pb.redraw(); } ).name('Draw linear path').title("Toggle drawaing of the linear path.");
 	    f1.add(config, 'drawTangents').onChange( function() { pb.redraw(); } ).name('Draw Tangents').title("Toggle drawaing of the tangents.");
 	    f1.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
+	    f1.add(config, 'animateCirular').onChange( function() { toggleAnimation(); } ).name('Cirular animation').title('Animate points in a circular manner.');
+	    f1.add(config, 'drawVertices').onChange( function() { updateDrawVertices(); pb.redraw(); } ).name('drawVertices').title('Toggle visibility of points on/off.');
 	    f1.open();
 	}
 
-	toggleAnimation();
 	updatePointList();
+	updateDrawVertices();
+	toggleAnimation();
 
 	pb.config.preDraw = drawAll;
 	pb.redraw();

@@ -24,30 +24,38 @@ export interface IVertexAttr {
     isSelected : boolean;
     bezierAutoAdjust? : boolean;
     renderTime? : number;
+    visible: boolean;
 }
 
 export class VertexAttr implements IVertexAttr {
 
     /** 
-     * @member {VertexAttr} 
+     * @member {boolean} 
      * @memberof VertexAttr
      * @instance
      */
     draggable:boolean;
 
     /** 
-     * @member {VertexAttr} 
+     * @member {boolean} 
      * @memberof VertexAttr
      * @instance
      */
     selectable:boolean;
 
     /** 
-     * @member {VertexAttr} 
+     * @member {boolean} 
      * @memberof VertexAttr
      * @instance
      */
     isSelected:boolean;
+
+    /** 
+     * @member {boolean} 
+     * @memberof VertexAttr
+     * @instance
+     */
+    visible:boolean;
     
     
     /**
@@ -63,6 +71,7 @@ export class VertexAttr implements IVertexAttr {
 	this.draggable = true;
 	this.selectable = true;
 	this.isSelected = false;
+	this.visible = true;
 
 	for( var key in VertexAttr.model ) 
 	    this[key] = VertexAttr.model[key];
@@ -78,6 +87,7 @@ export class VertexAttr implements IVertexAttr {
     static model:IVertexAttr = {
 	draggable : true,
 	selectable: true,
-	isSelected : false
+	isSelected : false,
+	visible : true
     };    
 }

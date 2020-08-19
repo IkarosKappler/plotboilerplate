@@ -1051,6 +1051,7 @@ var VertexAttr = /** @class */ (function () {
         this.draggable = true;
         this.selectable = true;
         this.isSelected = false;
+        this.visible = true;
         for (var key in VertexAttr.model)
             this[key] = VertexAttr.model[key];
     }
@@ -1064,7 +1065,8 @@ var VertexAttr = /** @class */ (function () {
     VertexAttr.model = {
         draggable: true,
         selectable: true,
-        isSelected: false
+        isSelected: false,
+        visible: true
     };
     return VertexAttr;
 }());
@@ -6807,7 +6809,8 @@ window.PlotBoilerplate = __webpack_require__(21).PlotBoilerplate;
  * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
  * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
  * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
- * @version  1.9.0
+ * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
+ * @version  1.9.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -6894,7 +6897,13 @@ var PlotBoilerplate = /** @class */ (function () {
      */
     function PlotBoilerplate(config) {
         // This should be in some static block ...
-        VertexAttr_1.VertexAttr.model = { bezierAutoAdjust: false, renderTime: 0, selectable: true, isSelected: false, draggable: true };
+        VertexAttr_1.VertexAttr.model = { bezierAutoAdjust: false,
+            renderTime: 0,
+            selectable: true,
+            isSelected: false,
+            draggable: true,
+            visible: true
+        };
         if (typeof config.canvas == 'undefined')
             throw "No canvas specified.";
         /**
@@ -7436,7 +7445,6 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.drawDrawables = function (renderTime) {
-        // Draw drawables
         for (var i in this.drawables) {
             var d = this.drawables[i];
             if (d instanceof BezierPath_1.BezierPath) {
@@ -7444,15 +7452,19 @@ var PlotBoilerplate = /** @class */ (function () {
                     this.draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                     if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                         if (!d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
-                            this.draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.vertex.color));
+                            if (d.bezierCurves[c].startPoint.attr.visible)
+                                this.draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.vertex.color));
                             d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
                         }
                         if (!d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
-                            this.draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.vertex.color));
+                            if (d.bezierCurves[c].endPoint.attr.visible)
+                                this.draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.vertex.color));
                             d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
                         }
-                        this.draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
-                        this.draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
+                        if (d.bezierCurves[c].startControlPoint.attr.visible)
+                            this.draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
+                        if (d.bezierCurves[c].endControlPoint.attr.visible)
+                            this.draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
                         d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
                         d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                     }
@@ -7471,8 +7483,9 @@ var PlotBoilerplate = /** @class */ (function () {
             else if (d instanceof Polygon_1.Polygon) {
                 this.draw.polygon(d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth);
                 if (!this.drawConfig.drawHandlePoints) {
-                    for (var i in d.vertices)
+                    for (var i in d.vertices) {
                         d.vertices[i].attr.renderTime = renderTime;
+                    }
                 }
             }
             else if (d instanceof Triangle_1.Triangle) {
@@ -7496,7 +7509,7 @@ var PlotBoilerplate = /** @class */ (function () {
             }
             else if (d instanceof Vertex_1.Vertex) {
                 if (this.drawConfig.drawVertices &&
-                    (!d.attr.selectable || !d.attr.draggable)) {
+                    (!d.attr.selectable || !d.attr.draggable) && d.attr.visible) {
                     // Draw as special point (grey)
                     this.draw.circleHandle(d, 7, this.drawConfig.vertex.color);
                     d.attr.renderTime = renderTime;
@@ -7511,7 +7524,7 @@ var PlotBoilerplate = /** @class */ (function () {
             }
             else if (d instanceof Vector_1.Vector) {
                 this.draw.arrow(d.a, d.b, this.drawConfig.vector.color); // , this.drawConfig.vector.lineWidth );
-                if (this.drawConfig.drawHandlePoints && d.b.attr.selectable) {
+                if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
                     this.draw.circleHandle(d.b, 3, '#a8a8a8');
                 }
                 else {
@@ -7572,7 +7585,7 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.drawVertices = function (renderTime) {
         // Draw all vertices as small squares if they were not already drawn by other objects
         for (var i in this.vertices) {
-            if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime) {
+            if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible) {
                 this.draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], 'rgb(0,128,192)'));
             }
         }
@@ -8264,7 +8277,6 @@ var PlotBoilerplate = /** @class */ (function () {
             for (var k in extension) {
                 if (!extension.hasOwnProperty(k))
                     continue;
-                console.log(k, extension[k]);
                 if (base.hasOwnProperty(k)) {
                     var typ = typeof base[k];
                     try {

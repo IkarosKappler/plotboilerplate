@@ -5,6 +5,8 @@
   * Ported the HobbyPath class from vanilla JS to TypeScript.
   * Ported the CatmullRomPath class from vanilla JS to TypeScript.
   * Ported the CubicSplinePath class from vanilla JS to TypeScript.
+  * Added the VertexAttr.visible attribute to toggle on/off the rendering of particular vertices.
+  * Added the VertexAnimator.Sinoid to the demos (see Hobby Curve).
 * 2020-08-17
   * Ported the convexHull algorithm to TypeScript.
   * Ported the convexPolygonIncircle algorithm to TypeScript.

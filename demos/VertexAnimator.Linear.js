@@ -1,5 +1,5 @@
 /**
- * Animate a set of vertices: make them bounce around by random normalized
+ * @classdesc Animate a set of vertices: make them bounce around by random normalized
  * velocities and let them reflect at the viewport bounds.
  *
  * Note that this class not not very robust towards to vertex array modifications. Please
@@ -11,6 +11,9 @@
  * @date 2019-04-24
  * @modified 2019-10-31 Renamed from VertexAnimator to LinearVertexAnimator.
  * @version 1.0.1
+ *
+ * @file VertexAnimator.Sinoid.js
+ * @public
  **/
 
 

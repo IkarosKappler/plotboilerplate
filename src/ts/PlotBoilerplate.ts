@@ -60,7 +60,8 @@
  * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
  * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
  * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
- * @version  1.9.0
+ * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
+ * @version  1.9.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -301,7 +302,13 @@ export class PlotBoilerplate {
      */
     constructor( config:PBParams ) {
 	// This should be in some static block ...
-	VertexAttr.model = { bezierAutoAdjust : false, renderTime : 0, selectable : true, isSelected : false, draggable : true };
+	VertexAttr.model = { bezierAutoAdjust : false,
+			     renderTime : 0,
+			     selectable : true,
+			     isSelected : false,
+			     draggable : true,
+			     visible : true
+			   };
 	
 	if( typeof config.canvas == 'undefined' )
 	    throw "No canvas specified.";
@@ -856,8 +863,6 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     drawDrawables( renderTime:number ) {
-	
-	// Draw drawables
 	for( var i in this.drawables ) {
 	    var d : Drawable = this.drawables[i];
 	    if( d instanceof BezierPath ) {
@@ -866,15 +871,19 @@ export class PlotBoilerplate {
 
 		    if( this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints ) {
 			if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
-			    this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint,this.drawConfig.vertex.color) );
+			    if( d.bezierCurves[c].startPoint.attr.visible )
+				this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint,this.drawConfig.vertex.color) );
 			    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
 			}
 			if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
-			    this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint,this.drawConfig.vertex.color) );
+			    if( d.bezierCurves[c].endPoint.attr.visible )
+				this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint,this.drawConfig.vertex.color) );
 			    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
 			}
-			this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint,'#008888') );
-			this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint,'#008888') );
+			if( d.bezierCurves[c].startControlPoint.attr.visible )
+			    this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint,'#008888') );
+			if( d.bezierCurves[c].endControlPoint.attr.visible )
+			    this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint,'#008888') );
 			d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
 			d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
 		    } else {
@@ -893,8 +902,9 @@ export class PlotBoilerplate {
 	    } else if( d instanceof Polygon ) {
 		this.draw.polygon( d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth );
 		if( !this.drawConfig.drawHandlePoints ) {
-		    for( var i in d.vertices )
+		    for( var i in d.vertices ) {
 			d.vertices[i].attr.renderTime = renderTime;
+		    }
 		}
 	    } else if( d instanceof Triangle ) {
 		this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth );
@@ -914,7 +924,7 @@ export class PlotBoilerplate {
 		this.draw.circle( d.center, d.radius, this.drawConfig.circle.color,  this.drawConfig.circle.lineWidth );
 	    } else if( d instanceof Vertex ) {
 		if( this.drawConfig.drawVertices &&
-		    (!d.attr.selectable || !d.attr.draggable) ) {
+		    (!d.attr.selectable || !d.attr.draggable) && d.attr.visible ) {
 		    // Draw as special point (grey)
 		    this.draw.circleHandle( d, 7, this.drawConfig.vertex.color );
 		    d.attr.renderTime = renderTime;
@@ -927,7 +937,7 @@ export class PlotBoilerplate {
 		    d.b.attr.renderTime = renderTime;
 	    } else if( d instanceof Vector ) {
 		this.draw.arrow( d.a, d.b, this.drawConfig.vector.color ); // , this.drawConfig.vector.lineWidth );
-		if( this.drawConfig.drawHandlePoints && d.b.attr.selectable ) {
+		if( this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible ) {
 		    this.draw.circleHandle( d.b, 3, '#a8a8a8' );
 		} else {
 		    d.b.attr.renderTime = renderTime;	
@@ -990,7 +1000,7 @@ export class PlotBoilerplate {
     drawVertices( renderTime:number ) {
 	// Draw all vertices as small squares if they were not already drawn by other objects
 	for( var i in this.vertices ) {
-	    if( this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime ) {
+	    if( this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible ) {
 		this.draw.squareHandle( this.vertices[i], 5, this._handleColor(this.vertices[i],'rgb(0,128,192)') );
 	    }
 	}
@@ -1685,7 +1695,6 @@ export class PlotBoilerplate {
 	    for( var k in extension ) {
 		if( !extension.hasOwnProperty(k) )
 		    continue;
-		console.log(k, extension[k]);
 		if( base.hasOwnProperty(k) ) {
 		    var typ = typeof base[k];
 		    try {

@@ -23,26 +23,33 @@ export interface IVertexAttr {
     isSelected: boolean;
     bezierAutoAdjust?: boolean;
     renderTime?: number;
+    visible: boolean;
 }
 export declare class VertexAttr implements IVertexAttr {
     /**
-     * @member {VertexAttr}
+     * @member {boolean}
      * @memberof VertexAttr
      * @instance
      */
     draggable: boolean;
     /**
-     * @member {VertexAttr}
+     * @member {boolean}
      * @memberof VertexAttr
      * @instance
      */
     selectable: boolean;
     /**
-     * @member {VertexAttr}
+     * @member {boolean}
      * @memberof VertexAttr
      * @instance
      */
     isSelected: boolean;
+    /**
+     * @member {boolean}
+     * @memberof VertexAttr
+     * @instance
+     */
+    visible: boolean;
     /**
      * The constructor.
      *

@@ -60,7 +60,8 @@
  * @modified 2020-07-27 Extended the remove(Drawable) function: vertices are now removed, too.
  * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
  * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
- * @version  1.9.0
+ * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
+ * @version  1.9.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

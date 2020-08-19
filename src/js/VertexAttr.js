@@ -33,6 +33,7 @@ var VertexAttr = /** @class */ (function () {
         this.draggable = true;
         this.selectable = true;
         this.isSelected = false;
+        this.visible = true;
         for (var key in VertexAttr.model)
             this[key] = VertexAttr.model[key];
     }
@@ -46,7 +47,8 @@ var VertexAttr = /** @class */ (function () {
     VertexAttr.model = {
         draggable: true,
         selectable: true,
-        isSelected: false
+        isSelected: false,
+        visible: true
     };
     return VertexAttr;
 }());
