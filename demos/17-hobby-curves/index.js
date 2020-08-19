@@ -53,11 +53,6 @@
 	    )
 	);
 
-	
-	// +---------------------------------------------------------------------------------
-	// | This is the triangle instance we will work on.
-	// +-------------------------------
-	var hobbyPath = new HobbyPath();
 
 	var drawAll = function() {
 	    if( config.drawHobbyPath )      drawHobby();
@@ -76,8 +71,10 @@
 	// | Compute and draw the Hobby curve.
 	// +-------------------------------
 	var drawHobby = function() {
+	    var hobbyPath = new HobbyPath( pointList.pointList );
 	    pb.draw.circleHandle( pb.vertices[0], 10, 'rgba(192,192,192,1.0)' );
-	    pb.draw.polyline( pb.vertices, true, 'rgba(192,192,192,0.5)', 1 );
+	    if( config.drawLinearPath ) 
+		pb.draw.polyline( pb.vertices, !config.circular, 'rgba(192,192,192,0.5)', 1 );
 
 	    var curves = hobbyPath.generateCurve( config.circular, config.hobbyOmega );
 	    for( var i = 0; i < curves.length; i++ ) {		
@@ -88,8 +85,10 @@
 				     'rgba(255,128,0,0.95)',
 				     5
 				   );
-		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
-		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
+		if( config.drawTangents ) {
+		    drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
+		    drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
+		}
 	    }
 	};
 
@@ -98,10 +97,7 @@
 	// | Compute and draw the Hobby curve.
 	// +-------------------------------
 	var drawCubicSpline = function() {
-	    var cubicSplinePath = new CubicSplinePath();
-	    for( var i = 0; i < pointList.pointList.length; i++ )
-		cubicSplinePath.addPoint( pointList.pointList[i] );
-	    
+	    var cubicSplinePath = new CubicSplinePath( pointList.pointList );
 	    var curves = cubicSplinePath.generateCurve( config.circular );
 	    for( var i = 0; i < curves.length; i++ ) {		
 		pb.draw.cubicBezier( curves[i].startPoint,
@@ -111,8 +107,10 @@
 				     'rgba(128,255,0,0.65)',
 				     2
 				   );
-		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
-		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
+		if( config.drawTangents ) {
+		    drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
+		    drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
+		}
 	    }
 	};
 
@@ -121,10 +119,7 @@
 	// | Compute and draw the Hobby curve.
 	// +-------------------------------
 	var drawCatmullRomSpline = function() {
-	    var catmullRomPath = new CatmullRomPath();
-	    for( var i = 0; i < pointList.pointList.length; i++ )
-		catmullRomPath.addPoint( pointList.pointList[i] );
-
+	    var catmullRomPath = new CatmullRomPath( pointList.pointList );
 	    var tension = 1.0;
 	    var curves = catmullRomPath.generateCurve( config.circular, config.catmullTension );
 	    for( var i = 0; i < curves.length; i++ ) {		
@@ -135,8 +130,10 @@
 				     'rgba(128,0,255,0.65)',
 				     2
 				   );
-		drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
-		drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
+		if( config.drawTangents ) {
+		    drawHandleLine( curves[i].startPoint, curves[i].startControlPoint, 'rgba(0,192,64,0.55)' );
+		    drawHandleLine( curves[i].endPoint, curves[i].endControlPoint, 'rgba(0,192,64,0.55)' );
+		}
 	    }
 	};
 	
@@ -182,16 +179,16 @@
 	    drawCubicPath         : false,
 	    drawCatmullRomPath    : false,
 	    catmullTension        : 1.0,
+	    drawLinearPath        : false,
+	    drawTangents          : true,
 	    animate               : false,
+	    animateCirular        : true
 	}, GUP );
 	
 
 	var updatePointList = function() {
 	    pointList.updatePointCount(config.pointCount,false); // No full cover
 	    animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
-	    hobbyPath = new HobbyPath();
-	    for( var i = 0; i < pointList.pointList.length; i++ )
-		hobbyPath.addPoint( pointList.pointList[i] );
 	};
 
 
@@ -218,7 +215,7 @@
 
 	var addVertex = function(vert) {
 	    pointList.addVertex(vert);
-	    hobbyPath.addPoint(vert);
+	    // hobbyPath.addPoint(vert);
 	    config.pointCount++;
 	    if( animator ) animator.stop();
 	    animator = new LinearVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
@@ -238,7 +235,9 @@
 	    f1.add(config, 'hobbyOmega').min(0).max(2.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Omega (Hobby)').title("The 'curviness'.");
 	    f1.add(config, 'drawCubicPath').onChange( function() { pb.redraw(); } ).name('Cubic').title('Draw plain cubic Path.');
 	    f1.add(config, 'drawCatmullRomPath').onChange( function() { pb.redraw(); } ).name('Catmull-Rom').title('Draw Catmull-Rom Path.');
-	    f1.add(config, 'catmullTension').min(0).max(5.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Tension (Catmull-Rom)').title("The 'curviness'.")
+	    f1.add(config, 'catmullTension').min(0).max(5.0).step(0.01).onChange( function() { pb.redraw(); } ).name('Tension (Catmull-Rom)').title("The 'curviness'.");
+	    f1.add(config, 'drawLinearPath').onChange( function() { pb.redraw(); } ).name('Draw linear path').title("Toggle drawaing of the linear path.");
+	    f1.add(config, 'drawTangents').onChange( function() { pb.redraw(); } ).name('Draw Tangents').title("Toggle drawaing of the tangents.");
 	    f1.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
 	    f1.open();
 	}
