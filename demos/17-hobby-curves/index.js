@@ -182,7 +182,6 @@
 	    drawLinearPath        : false,
 	    drawTangents          : true,
 	    animate               : false,
-	    animateCirular        : true,
 	    drawVertices          : true
 	}, GUP );
 	
@@ -246,7 +245,7 @@
 	    f1.add(config, 'drawLinearPath').onChange( function() { pb.redraw(); } ).name('Draw linear path').title("Toggle drawaing of the linear path.");
 	    f1.add(config, 'drawTangents').onChange( function() { pb.redraw(); } ).name('Draw Tangents').title("Toggle drawaing of the tangents.");
 	    f1.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
-	    f1.add(config, 'animateCirular').onChange( function() { toggleAnimation(); } ).name('Cirular animation').title('Animate points in a circular manner.');
+	    // f1.add(config, 'animateCirular').onChange( function() { toggleAnimation(); } ).name('Cirular animation').title('Animate points in a circular manner.');
 	    f1.add(config, 'drawVertices').onChange( function() { updateDrawVertices(); pb.redraw(); } ).name('drawVertices').title('Toggle visibility of points on/off.');
 	    f1.open();
 	}
