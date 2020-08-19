@@ -39,9 +39,11 @@
 
 	var vertexTimeOffsets = [];
 	var vertexRadiusFactors = [];
+	var vertexSpeedFactors = [];
 	for( var i = 0; i < vertices.length; i++ ) {
 	    vertexTimeOffsets.push( Math.random() );
 	    vertexRadiusFactors.push( Math.random() );
+	    vertexSpeedFactors.push( 0.5 + Math.random() );
 	}
 	
 	function animateVert( vert, index, count, time, viewport ) {
@@ -50,7 +52,7 @@
 
 	    
 	    angle = TWOPI*(index/count) + time/10000;
-	    radius = -1.0-s(angle+time/1000 + vertexTimeOffsets[index]*10); // +c(angle+time/100000);
+	    radius = -1.0-s((angle+time/1000) * vertexSpeedFactors[index] + vertexTimeOffsets[index]*10); // +c(angle+time/100000);
 	    radius = minRadius + (maxRadius-minRadius)*radius * vertexRadiusFactors[index];
 	    // Add some noise
 	    // radius += s((angle*20))*11;

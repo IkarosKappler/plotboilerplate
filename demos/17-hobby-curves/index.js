@@ -214,8 +214,8 @@
 	};
 
 	var addVertex = function(vert) {
+	    vert.attr.visible = config.drawVertices;
 	    pointList.addVertex(vert);
-	    // hobbyPath.addPoint(vert);
 	    config.pointCount++;
 	    if( animator ) animator.stop();
 	    animator = new SinoidVertexAnimator( pointList.pointList, pb.viewport(), function() { pb.redraw(); } );
