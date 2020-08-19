@@ -33,8 +33,8 @@ export class HobbyPath {
 
     /**
      * @member {Array<Vertex>} vertices
-     * @memberof VoronoiCell
-     * @type {Array<Triangle>}
+     * @memberof HobbyPath
+     * @type {Array<Vertex>}
      * @instance
      **/
     private vertices : Array<Vertex>;
@@ -57,8 +57,51 @@ export class HobbyPath {
      * @instance
      * @param {Vertex} p - The vertex (point) to add.
      **/
-    addPoint(p:Vertex) : void {
+    addPoint(p: Vertex) : void {
 	this.vertices.push( p );
+    };
+
+
+    /**
+     * Generate a sequence of cubic Bézier curves from the point set.
+     *
+     * @name generateCurve
+     * @memberof HobbyPath
+     * @instance
+     * @param {boolean=} circular - Specify if the path should be closed.
+     * @param {number=0} omega - (default=0) An optional tension parameter.
+     * @return Array<CubicBezierCurve>
+     **/
+    generateCurve( circular?:boolean, omega?:number ) : Array<CubicBezierCurve> {
+	let n : number = this.vertices.length;
+	// let d = '';	
+	if (n > 1) {
+	    if (n == 2) {
+		// for two points, just draw a straight line
+		return [ new CubicBezierCurve(
+		    this.vertices[0],
+		    this.vertices[1],
+		    this.vertices[0],
+		    this.vertices[1] 
+		) ];
+	    } else {
+		const curves : Array<CubicBezierCurve> = [];
+		let controlPoints = this.hobbyControls(circular,omega);
+		for (let i = 0; i < n - (circular?0:1); i++) {
+		    // if i is n-1, the "next" point is the first one
+		    let j : number = (i+1) % n; // Use a succ function here?
+		    curves.push( new CubicBezierCurve(
+			this.vertices[i],
+			this.vertices[j],
+			controlPoints.startControlPoints[i], 
+			controlPoints.endControlPoints[i] 
+		    ) );
+		}
+		return curves;
+	    }
+	} else {
+	    return [];
+	}	
     };
     
 
@@ -167,38 +210,6 @@ export class HobbyPath {
 		 endControlPoints: endControlPoints
 	       };
     }
-
-    generateCurve( circular?:boolean, omega?:number ) : Array<CubicBezierCurve> {
-	let n : number = this.vertices.length;
-	// let d = '';	
-	if (n > 1) {
-	    if (n == 2) {
-		// for two points, just draw a straight line
-		return [ new CubicBezierCurve(
-		    this.vertices[0],
-		    this.vertices[1],
-		    this.vertices[0],
-		    this.vertices[1] 
-		) ];
-	    } else {
-		const curves : Array<CubicBezierCurve> = [];
-		let controlPoints = this.hobbyControls(circular,omega);
-		for (let i = 0; i < n - (circular?0:1); i++) {
-		    // if i is n-1, the "next" point is the first one
-		    let j : number = (i+1) % n; // Use a succ function here?
-		    curves.push( new CubicBezierCurve(
-			this.vertices[i],
-			this.vertices[j],
-			controlPoints.startControlPoints[i], 
-			controlPoints.endControlPoints[i] 
-		    ) );
-		}
-		return curves;
-	    }
-	} else {
-	    return [];
-	}	
-    };
 
     static utils = {
 	// rotates a vector [x, y] about an angle; the angle is implicitly

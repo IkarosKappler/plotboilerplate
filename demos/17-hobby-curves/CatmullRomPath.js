@@ -1,4 +1,7 @@
 /**
+ * @deprecated THIS IMPLEMENTATION IS DEPRECATED, PLEASE USE THE COMPILED
+ *             CLASS FROM ../../src/js/utils/algorithms/CatmullRomPath.js
+ * 
  * For comparison I wanted to add a Catmull-Rom path.
  *
  * This demo implementation was inspired by this Codepen by Blake Bowen

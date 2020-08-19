@@ -48,6 +48,40 @@ var HobbyPath = /** @class */ (function () {
     };
     ;
     /**
+     * Generate a sequence of cubic Bézier curves from the point set.
+     *
+     * @name generateCurve
+     * @memberof HobbyPath
+     * @instance
+     * @param {boolean=} circular - Specify if the path should be closed.
+     * @param {number=0} omega - (default=0) An optional tension parameter.
+     * @return Array<CubicBezierCurve>
+     **/
+    HobbyPath.prototype.generateCurve = function (circular, omega) {
+        var n = this.vertices.length;
+        // let d = '';	
+        if (n > 1) {
+            if (n == 2) {
+                // for two points, just draw a straight line
+                return [new CubicBezierCurve_1.CubicBezierCurve(this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1])];
+            }
+            else {
+                var curves = [];
+                var controlPoints = this.hobbyControls(circular, omega);
+                for (var i = 0; i < n - (circular ? 0 : 1); i++) {
+                    // if i is n-1, the "next" point is the first one
+                    var j = (i + 1) % n; // Use a succ function here?
+                    curves.push(new CubicBezierCurve_1.CubicBezierCurve(this.vertices[i], this.vertices[j], controlPoints.startControlPoints[i], controlPoints.endControlPoints[i]));
+                }
+                return curves;
+            }
+        }
+        else {
+            return [];
+        }
+    };
+    ;
+    /**
      * Computes the control point coordinates for a Hobby curve through
      * the points given.
      *
@@ -149,30 +183,6 @@ var HobbyPath = /** @class */ (function () {
             endControlPoints: endControlPoints
         };
     };
-    HobbyPath.prototype.generateCurve = function (circular, omega) {
-        var n = this.vertices.length;
-        // let d = '';	
-        if (n > 1) {
-            if (n == 2) {
-                // for two points, just draw a straight line
-                return [new CubicBezierCurve_1.CubicBezierCurve(this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1])];
-            }
-            else {
-                var curves = [];
-                var controlPoints = this.hobbyControls(circular, omega);
-                for (var i = 0; i < n - (circular ? 0 : 1); i++) {
-                    // if i is n-1, the "next" point is the first one
-                    var j = (i + 1) % n; // Use a succ function here?
-                    curves.push(new CubicBezierCurve_1.CubicBezierCurve(this.vertices[i], this.vertices[j], controlPoints.startControlPoints[i], controlPoints.endControlPoints[i]));
-                }
-                return curves;
-            }
-        }
-        else {
-            return [];
-        }
-    };
-    ;
     HobbyPath.utils = {
         // rotates a vector [x, y] about an angle; the angle is implicitly
         // determined by its sine and cosine

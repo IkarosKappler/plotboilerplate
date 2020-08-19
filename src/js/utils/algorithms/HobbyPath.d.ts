@@ -25,8 +25,8 @@ import { Vertex } from "../../Vertex";
 export declare class HobbyPath {
     /**
      * @member {Array<Vertex>} vertices
-     * @memberof VoronoiCell
-     * @type {Array<Triangle>}
+     * @memberof HobbyPath
+     * @type {Array<Vertex>}
      * @instance
      **/
     private vertices;
@@ -46,6 +46,17 @@ export declare class HobbyPath {
      **/
     addPoint(p: Vertex): void;
     /**
+     * Generate a sequence of cubic Bézier curves from the point set.
+     *
+     * @name generateCurve
+     * @memberof HobbyPath
+     * @instance
+     * @param {boolean=} circular - Specify if the path should be closed.
+     * @param {number=0} omega - (default=0) An optional tension parameter.
+     * @return Array<CubicBezierCurve>
+     **/
+    generateCurve(circular?: boolean, omega?: number): Array<CubicBezierCurve>;
+    /**
      * Computes the control point coordinates for a Hobby curve through
      * the points given.
      *
@@ -57,7 +68,6 @@ export declare class HobbyPath {
      * @return {IControlPoints} An object with two members: startControlPoints and endControlPoints (Array<Vertex>).
      **/
     private hobbyControls;
-    generateCurve(circular?: boolean, omega?: number): Array<CubicBezierCurve>;
     static utils: {
         rotate: (vert: Vertex, sin: number, cos: number) => Vertex;
         rotateAngle: (vert: Vertex, alpha: number) => Vertex;
