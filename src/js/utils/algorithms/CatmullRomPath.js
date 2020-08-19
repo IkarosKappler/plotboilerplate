@@ -8,10 +8,13 @@
  * This demo implementation was inspired by this Codepen by Blake Bowen
  * https://codepen.io/osublake/pen/BowJed
  *
- * @date 2020-04-15
- * @author Converted to a class by Ikaros Kappler
+ * @date     2020-04-15
+ * @author   Converted to a class by Ikaros Kappler
  * @modified 2020-08-19 Ported this class from vanilla JS to TypeScript.
- * @version 1.0.1
+ * @version  1.0.1
+ *
+ * @file CatmullRomPath
+ * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var CubicBezierCurve_1 = require("../../CubicBezierCurve");

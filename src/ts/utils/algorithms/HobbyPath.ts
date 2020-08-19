@@ -73,8 +73,7 @@ export class HobbyPath {
      * @return Array<CubicBezierCurve>
      **/
     generateCurve( circular?:boolean, omega?:number ) : Array<CubicBezierCurve> {
-	let n : number = this.vertices.length;
-	// let d = '';	
+	let n : number = this.vertices.length;	
 	if (n > 1) {
 	    if (n == 2) {
 		// for two points, just draw a straight line

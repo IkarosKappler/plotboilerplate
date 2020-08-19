@@ -1,4 +1,7 @@
-
+/**
+ * @deprecated THIS IMPLEMENTATION IS DEPRECATED, PLEASE USE THE COMPILED
+ *             CLASS IN ../../src/js/utils/algorithms/CubicSplinePath.js
+ **/
 (function() {
 
     var CubicSplinePath = function() {

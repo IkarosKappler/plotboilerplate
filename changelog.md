@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2020-08-19
+  * Ported the HobbyPath class from vanilla JS to TypeScript.
+  * Ported the CatmullRomPath class from vanilla JS to TypeScript.
+  * Ported the CubicSplinePath class from vanilla JS to TypeScript.
 * 2020-08-17
   * Ported the convexHull algorithm to TypeScript.
   * Ported the convexPolygonIncircle algorithm to TypeScript.

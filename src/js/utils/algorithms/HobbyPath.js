@@ -59,7 +59,6 @@ var HobbyPath = /** @class */ (function () {
      **/
     HobbyPath.prototype.generateCurve = function (circular, omega) {
         var n = this.vertices.length;
-        // let d = '';	
         if (n > 1) {
             if (n == 2) {
                 // for two points, just draw a straight line
