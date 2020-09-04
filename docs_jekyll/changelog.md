@@ -4,6 +4,19 @@ layout: page
 
 
 # Changelog
+* 2020-08-19
+  * Ported the HobbyPath class from vanilla JS to TypeScript.
+  * Ported the CatmullRomPath class from vanilla JS to TypeScript.
+  * Ported the CubicSplinePath class from vanilla JS to TypeScript.
+  * Added the VertexAttr.visible attribute to toggle on/off the rendering of particular vertices.
+  * Added the VertexAnimator.Sinoid to the demos (see Hobby Curve).
+* 2020-08-17
+  * Ported the convexHull algorithm to TypeScript.
+  * Ported the convexPolygonIncircle algorithm to TypeScript.
+  * Ported the Delaunay algorithm to TypeScript.
+* 2020-08-12
+  * BezierPathInteractionHelper: Added a distance check before handling the click/tap event.
+  * Ported the VoronoiCell helper class (see demos) from vanilla JS to TypeScript.
 * 2020-08-03 (1.8.3)
   * Tweaked the BezierPathInteractionHelper.
   * Added proper JSDoc tags to the MouseHandler and the KeyHandler.

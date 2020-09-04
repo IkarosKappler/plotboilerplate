@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate - Minimal Bézier to point distance demo</title>
+    <title>2D Plotting Boilerplate – Intersection points of two circles (radical line)</title>
     <meta charset="UTF-8">
     <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, triangle, line, distance, minimal">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, circle intersection, radical line, algorithm">
     <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2020-07-24">
-    
+    <meta name="date" content="2020-09-04">
+
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Demo for the minimal distance between a Bézier path and a random point with PlotBoilerplate.">
-    <meta property="og:description" content="Demo for the minimal distance between a Bézier path and a random point with PlotBoilerplate.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20200724-0-bezier-point-distance.png">
+    <meta property="og:title" content="Demonstrating the intersection points of two circles (radical line) with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demonstrating the intersection points of two circles (radical line) with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20200904-circle-intersection-radical-line.png">
 
-    <script src="../../lib/humane.min.js"></script>
 
     <script src="../../lib/dat.gui.min.js"></script>
     <script src="../../lib/FileSaver.min.js"></script>
@@ -31,6 +30,7 @@
     <script src="../../src/js/utils/module.js"></script>
 
     <!-- For development -->
+    <!--
     <script src="../../src/js/VertexAttr.js"></script>
     <script src="../../src/js/VertexListeners.js"></script>
     <script src="../../src/js/VertTuple.js"></script>
@@ -52,30 +52,30 @@
     <script src="../../src/js/geomutils.js"></script>
     <script src="../../src/js/SVGBuilder.js"></script>
     <script src="../../src/js/PlotBoilerplate.js"></script>
+    -->
     <!-- END for development -->
 
     <!-- For production -->
-    <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
+    <script src="../../dist/plotboilerplate.min.js"></script>
     <!-- END For production -->
-    <!-- <script src="../BezierPathInteractionHelper.js"></script> -->
-    <script src="../../src/js/utils/helpers/BezierPathInteractionHelper.js"></script>
-    
-    <script src="index.js"></script>
-    
-    <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
-    <link rel="stylesheet" href="../../style.css"> 
-  </head>
-  <body>
-    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
 
+    <!-- <script src="../convexHull.js"></script> -->
+    <!-- <script src="../../src/js/utils/algorithms/convexHull.js"></script> -->
+    <!-- <script src="../nsectAngle.js"></script> -->
+    <!-- <script src="../convexPolygonIncircle.js"></script> -->
+    <!-- <script src="../../src/js/utils/algorithms/convexPolygonIncircle.js"></script> -->
+
+    <!-- <script src="../CanvasPointList.js"></script> -->
+    <!-- <script src="../VertexAnimator.Linear.js"></script> -->
+
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="../style.css"> 
+  </head>
+  <body class="fullscreen">
+    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>      
     <div class="info monospace">
       [<span id="cx">-</span>,<span id="cy">-</span>]
     </div>
 
-    <div id="dialog-wrapper" class="overlay-wrapper">
-      <div class="overlay-blanket">
-	<div class="overlay-content">Test</div>
-      </div>
-    </div>
   </body>
 </html>
