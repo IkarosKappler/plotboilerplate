@@ -2,9 +2,9 @@
  * A script for finding the intersection points of two circles (the 'radical line').
  *
  * Based on the C++ implementation by Robert King
- * https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
+ *    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
  * and the 'Circles and spheres' article by Paul Bourke.
- * http://paulbourke.net/geometry/circlesphere/
+ *    http://paulbourke.net/geometry/circlesphere/
  *
  * @require PlotBoilerplate
  * @require MouseHandler
@@ -178,41 +178,16 @@
 	}, GUP );
 	
 
-	// +---------------------------------------------------------------------------------
-	// | Some animation stuff.
-	// +-------------------------------
-	/*var animator = null;
-	function renderAnimation() {
-	    if( config.animate )
-		window.requestAnimationFrame( renderAnimation );
-	    else // Animation stopped
-		; 
-	};
-	
-	function toggleAnimation() {
-	    if( config.animate ) {
-		if( animator )
-		    animator.start();
-		renderAnimation();
-	    } else {
-		if( animator )
-		    animator.stop();
-		pb.redraw();
-	    }
-	};*/ 
 
 	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-	    gui.add(config, 'pointCount').min(3).max(96).step(1).onChange( function() { updatePointList(); } ).name("Point count").title("Point count");
+	    /* gui.add(config, 'pointCount').min(3).max(96).step(1).onChange( function() { updatePointList(); } ).name("Point count").title("Point count");
 	    gui.add(config, 'drawConvexHull').onChange( function() { pb.redraw(); } ).name('Draw Convex Hull').title('Draw the Convex Hull.');
-	    gui.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.');
+	    gui.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.'); */
 	}
-
-	//toggleAnimation();
-	//updatePointList();
 
 	pb.config.preDraw = drawAll;
 	pb.redraw();
