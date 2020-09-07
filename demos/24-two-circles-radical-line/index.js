@@ -71,6 +71,9 @@
 			     );
 	};
 
+	var circles = [];
+	var circleSegments = [];
+	/* 
 	var centerA = randomVertex();
 	var centerB = randomVertex();
 	var circleA = new Circle( centerA, centerA.distance(centerB)*Math.random()*1.5 );
@@ -78,6 +81,36 @@
 	var radiusPointA = new Vertex( centerA.clone().addXY(circleA.radius*Math.sin(Math.PI/4),circleA.radius*Math.cos(Math.PI/4)) );
 	var radiusPointB = new Vertex( centerB.clone().addXY(circleB.radius*Math.sin(Math.PI/4),circleB.radius*Math.cos(Math.PI/4)) );
 
+	*/
+
+	var CircleHandler = function( circle, radiusPoint ) {
+	    circle.center.listeners.addDragListener( function(e) {
+		radiusPoint.add( e.params.dragAmount );
+		pb.redraw();
+	    } );
+	    radiusPoint.listeners.addDragListener( function(e) {
+		circle.radius = center.distance( radiusPoint );
+		pb.redraw();
+	    } );
+	};
+	
+	for( var i = 0; i < 2; i++ ) {
+	    var center = randomVertex();
+	    var circle = new Circle( center,
+				     i==0
+				     ? Math.abs(randomVertex().x)
+				     : circles[i-1].center.distance(center)*Math.random()*1.2
+				   );
+	    circles[i] = circle;
+	    circleSegments[i] = [ Math.PI*2.0 ];
+	    var radiusPoint = new Vertex( center.clone().addXY(circle.radius*Math.sin(Math.PI/4),circle.radius*Math.cos(Math.PI/4)) );
+	    pb.add( circle.center );
+	    pb.add( radiusPoint );
+
+	    new CircleHandler( circle, radiusPoint );
+	}
+
+		 /*
 	pb.add( circleA.center );
 	pb.add( circleB.center );
 	pb.add( radiusPointA );
@@ -99,27 +132,32 @@
 	    circleB.radius = centerB.distance( radiusPointB );
 	    pb.redraw();
 	} );
+		 */
 
 	var drawAll = function() {
-	    var radLine = circleA.circleIntersection( circleB );	    
+	    if( circles.length == 0 ) return;
+	    
+	    var radLine = circles[0].circleIntersection( circles[1] );
 	    if( config.alwaysDrawFullCircles || radLine == null ) {
-		pb.draw.circle( circleA.center, circleA.radius, 'rgba(34,168,168,0.5)', 1.0 );
-		pb.draw.circle( circleB.center, circleB.radius, 'rgba(34,168,168,0.5)', 1.0 );
+		pb.draw.circle( circles[0].center, circles[0].radius, 'rgba(34,168,168,0.5)', 1.0 );
+		pb.draw.circle( circles[1].center, circles[1].radius, 'rgba(34,168,168,0.5)', 1.0 );
 	    }
 
 	    if( radLine !== null ) {
-		if( config.drawRadicalLine )
+		if( config.drawRadicalLine ) {
 		    pb.draw.line( radLine.a, radLine.b, 'rgba(34,168,168,0.5)', 1.0 );
+		}
 		if( config.drawIntersectionPoints ) {
 		    pb.draw.diamondHandle( radLine.a, 9, 'rgba(0,192,0,1.0)' );
 		    pb.draw.diamondHandle( radLine.b, 9, 'rgba(0,192,0,1.0)' );
 		}
 		if( config.drawCircleSections ) {
-		    drawCircleSection( circleA, radLine );
-		    drawCircleSection( circleB, new Line(radLine.b,radLine.a) );
+		    drawCircleSection( circles[0], radLine );
+		    drawCircleSection( circles[1], new Line(radLine.b,radLine.a) );
 		}
 	    }
 	};
+
 
 	var drawCircleSection = function( circle, radLine ) {
 	    // Get angle sections in the circles

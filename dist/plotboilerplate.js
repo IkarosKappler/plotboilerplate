@@ -3797,7 +3797,12 @@ var Circle = /** @class */ (function () {
      * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
      **/
     Circle.prototype.circleIntersection = function (circle) {
+        // Circles do not intersect at all?
         if (this.center.distance(circle.center) > this.radius + circle.radius) {
+            return null;
+        }
+        // One circle is fully inside the other?
+        if (this.center.distance(circle.center) < Math.abs(this.radius - circle.radius)) {
             return null;
         }
         // Based on the C++ implementation by Robert King
