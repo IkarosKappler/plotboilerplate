@@ -133,8 +133,9 @@ var VertTuple = /** @class */ (function () {
      * @memberof VertTuple
      **/
     VertTuple.prototype.angle = function (line) {
-        if (typeof line == 'undefined')
+        if (line == null || typeof line == 'undefined') {
             line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0));
+        }
         // Compute the angle from x axis and the return the difference :)
         var v0 = this.b.clone().sub(this.a);
         var v1 = line.b.clone().sub(line.a);

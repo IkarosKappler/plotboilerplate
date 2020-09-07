@@ -8,6 +8,8 @@
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
  * @modified 2020-05-25 Added the vertAt and tangentAt functions.
+ * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
+ * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  * 
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
@@ -15,6 +17,7 @@
  **/
 
 
+import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
@@ -77,8 +80,11 @@ export class Circle implements SVGSerializable {
     /**
      * Get the vertex on the this circle for the given angle.
      *
+     * @method vertAt
      * @param {number} angle - The angle (in radians) to use.
-     * @retrn {Vertex} Te the vertex (point) at the given angle.
+     * @return {Vertex} The vertex (point) at the given angle.
+     * @instance
+     * @memberof Circle
      **/
     vertAt( angle: number ) : Vertex {
 	// Find the point on the circle respective the angle. Then move relative to center.
@@ -91,13 +97,64 @@ export class Circle implements SVGSerializable {
      *
      * Point a of the returned line is located on the circle, the length equals the radius.
      *
+     * @method tangentAt
+     * @instance
      * @param {number} angle - The angle (in radians) to use.
      * @return {Line} The tangent line.
+     * @memberof Circle
      **/
     tangentAt( angle: number ) : Vector {
 	const pointA : Vertex = Circle.circleUtils.vertAt( angle, this.radius );
 	// Construct the perpendicular of the line in point a. Then move relative to center.
 	return (new Vector( pointA, new Vertex(0,0) ).add( this.center ) as Vector).perp() as Vector;
+    };
+
+    /**
+     * Calculate the intersection points (if exists) with the given circle.
+     *
+     * @method circleIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Circle} circle 
+     * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
+     **/
+    circleIntersection( circle:Circle) : Line | null { 
+	if( this.center.distance(circle.center) > this.radius+circle.radius ) {
+	    return null;
+	}
+	// Based on the C++ implementation by Robert King
+	//    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
+	// and the 'Circles and spheres' article by Paul Bourke.
+	//    http://paulbourke.net/geometry/circlesphere/
+	//
+	// This is the original C++ implementation:
+	//
+	// pair<Point, Point> intersections(Circle c) {
+        //    Point P0(x, y);
+        //    Point P1(c.x, c.y);
+        //    float d, a, h;
+        //    d = P0.distance(P1);
+        //    a = (r*r - c.r*c.r + d*d)/(2*d);
+        //    h = sqrt(r*r - a*a);
+        //    Point P2 = P1.sub(P0).scale(a/d).add(P0);
+        //    float x3, y3, x4, y4;
+        //    x3 = P2.x + h*(P1.y - P0.y)/d;
+        //    y3 = P2.y - h*(P1.x - P0.x)/d;
+        //    x4 = P2.x - h*(P1.y - P0.y)/d;
+        //    y4 = P2.y + h*(P1.x - P0.x)/d;
+        //    return pair<Point, Point>(Point(x3, y3), Point(x4, y4));
+        // } 
+	var p0 = this.center;
+	var p1 = circle.center;
+	var d = p0.distance(p1);
+	var a = (this.radius*this.radius - circle.radius*circle.radius + d*d)/(2*d);
+	var h = Math.sqrt( this.radius*this.radius - a*a );
+	var p2 = p1.clone().scale(a/d,p0); 
+	var x3 = p2.x + h*(p1.y - p0.y)/d;
+	var y3 = p2.y - h*(p1.x - p0.x)/d;
+        var x4 = p2.x - h*(p1.y - p0.y)/d;
+        var y4 = p2.y + h*(p1.x - p0.x)/d;
+	return new Line( new Vertex(x3,y3), new Vertex(x4,y4) );
     };
 
    /**
@@ -124,8 +181,10 @@ export class Circle implements SVGSerializable {
 
     static circleUtils = {
 	vertAt : function(angle,radius) {
-	    return new Vertex( Math.sin(angle) * radius,
-			       Math.cos(angle) * radius );
+	    /* return new Vertex( Math.sin(angle) * radius,
+			       Math.cos(angle) * radius ); */
+	    return new Vertex( Math.cos(angle) * radius,
+			       Math.sin(angle) * radius );
 	}
     };
     

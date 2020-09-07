@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2020-09-07
+  * Added the Circle.circleIntersection(Circle) function.
+  * Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) according to the assumed circle math. Please re-check your code if you already used this function.
+  * Added the drawutils.circleArc(...) function to draw sections of circles.
 * 2020-08-19
   * Ported the HobbyPath class from vanilla JS to TypeScript.
   * Ported the CatmullRomPath class from vanilla JS to TypeScript.

@@ -295,6 +295,23 @@ var drawutilsgl = /** @class */ (function () {
     };
     ;
     /**
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse

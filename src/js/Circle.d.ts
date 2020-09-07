@@ -8,11 +8,14 @@
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
  * @modified 2020-05-25 Added the vertAt and tangentAt functions.
+ * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
+ * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  *
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
  * @public
  **/
+import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
@@ -61,8 +64,11 @@ export declare class Circle implements SVGSerializable {
     /**
      * Get the vertex on the this circle for the given angle.
      *
+     * @method vertAt
      * @param {number} angle - The angle (in radians) to use.
-     * @retrn {Vertex} Te the vertex (point) at the given angle.
+     * @return {Vertex} The vertex (point) at the given angle.
+     * @instance
+     * @memberof Circle
      **/
     vertAt(angle: number): Vertex;
     /**
@@ -70,10 +76,23 @@ export declare class Circle implements SVGSerializable {
      *
      * Point a of the returned line is located on the circle, the length equals the radius.
      *
+     * @method tangentAt
+     * @instance
      * @param {number} angle - The angle (in radians) to use.
      * @return {Line} The tangent line.
+     * @memberof Circle
      **/
     tangentAt(angle: number): Vector;
+    /**
+     * Calculate the intersection points (if exists) with the given circle.
+     *
+     * @method circleIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Circle} circle
+     * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
+     **/
+    circleIntersection(circle: Circle): Line | null;
     /**
       * Create an SVG representation of this circle.
       *

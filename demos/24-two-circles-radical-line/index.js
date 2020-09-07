@@ -78,8 +78,8 @@
 	var radiusPointA = new Vertex( centerA.clone().addXY(circleA.radius*Math.sin(Math.PI/4),circleA.radius*Math.cos(Math.PI/4)) );
 	var radiusPointB = new Vertex( centerB.clone().addXY(circleB.radius*Math.sin(Math.PI/4),circleB.radius*Math.cos(Math.PI/4)) );
 
-	pb.add( circleA );
-	pb.add( circleB );
+	pb.add( circleA.center );
+	pb.add( circleB.center );
 	pb.add( radiusPointA );
 	pb.add( radiusPointB );
 
@@ -100,58 +100,39 @@
 	    pb.redraw();
 	} );
 
-	var calcRadicalLine = function( circleA, circleB ) {
-	    if( circleA.center.distance(circleB.center) > circleA.radius+circleB.radius ) {
-		return null;
-	    }
-	    /*
-	    pair<Point, Point> intersections(Circle c) {
-            Point P0(x, y);
-            Point P1(c.x, c.y);
-            float d, a, h;
-            d = P0.distance(P1);
-            a = (r*r - c.r*c.r + d*d)/(2*d);
-            h = sqrt(r*r - a*a);
-            Point P2 = P1.sub(P0).scale(a/d).add(P0);
-            float x3, y3, x4, y4;
-            x3 = P2.x + h*(P1.y - P0.y)/d;
-            y3 = P2.y - h*(P1.x - P0.x)/d;
-            x4 = P2.x - h*(P1.y - P0.y)/d;
-            y4 = P2.y + h*(P1.x - P0.x)/d;
-
-            return pair<Point, Point>(Point(x3, y3), Point(x4, y4));
-        } */
-	    // Point P0(x, y);
-            // Point P1(c.x, c.y);
-	    var p0 = circleA.center.clone();
-	    var p1 = circleB.center.clone();
-            // float d, a, h;
-            // d = P0.distance(P1);
-            // a = (r*r - c.r*c.r + d*d)/(2*d);
-            // h = sqrt(r*r - a*a);
-	    var d = p0.distance(p1);
-	    var a = (circleA.radius*circleA.radius - circleB.radius*circleB.radius + d*d)/(2*d);
-	    var h = Math.sqrt( circleA.radius*circleA.radius - a*a );
-            //Point P2 = P1.sub(P0).scale(a/d).add(P0);
-	    var p2 = p1.clone().sub(p0).scale(a/d).add(p0); // Todo: This can be expressed as a scaling from p0
-            //float x3, y3, x4, y4;
-            //x3 = P2.x + h*(P1.y - P0.y)/d;
-            //y3 = P2.y - h*(P1.x - P0.x)/d;
-            //x4 = P2.x - h*(P1.y - P0.y)/d;
-            //y4 = P2.y + h*(P1.x - P0.x)/d;
-	    var x3 = p2.x + h*(p1.y - p0.y)/d;
-	    var y3 = p2.y - h*(p1.x - p0.x)/d;
-            var x4 = p2.x - h*(p1.y - p0.y)/d;
-            var y4 = p2.y + h*(p1.x - p0.x)/d;
-	    
-            // return pair<Point, Point>(Point(x3, y3), Point(x4, y4));
-	    return new Line( new Vertex(x3,y3), new Vertex(x4,y4) );
-	};
-	
 	var drawAll = function() {
-	    var radLine = calcRadicalLine( circleA, circleB );
-	    if( radLine !== null )
-		pb.draw.line( radLine.a, radLine.b, 'rgba(0,128,192,1.0)', 2.0 );
+	    var radLine = circleA.circleIntersection( circleB );	    
+	    if( config.alwaysDrawFullCircles || radLine == null ) {
+		pb.draw.circle( circleA.center, circleA.radius, 'rgba(34,168,168,0.5)', 1.0 );
+		pb.draw.circle( circleB.center, circleB.radius, 'rgba(34,168,168,0.5)', 1.0 );
+	    }
+
+	    if( radLine !== null ) {
+		if( config.drawRadicalLine )
+		    pb.draw.line( radLine.a, radLine.b, 'rgba(34,168,168,0.5)', 1.0 );
+		if( config.drawIntersectionPoints ) {
+		    pb.draw.diamondHandle( radLine.a, 9, 'rgba(0,192,0,1.0)' );
+		    pb.draw.diamondHandle( radLine.b, 9, 'rgba(0,192,0,1.0)' );
+		}
+		if( config.drawCircleSections ) {
+		    drawCircleSection( circleA, radLine );
+		    drawCircleSection( circleB, new Line(radLine.b,radLine.a) );
+		}
+	    }
+	};
+
+	var drawCircleSection = function( circle, radLine ) {
+	    // Get angle sections in the circles
+	    var lineAa = new Line( circle.center, radLine.a );
+	    var lineAb = new Line( circle.center, radLine.b );
+
+	    var anglea = lineAa.angle();
+	    var angleb = lineAb.angle();
+
+	    var pointa = circle.vertAt(anglea);
+	    var pointb = circle.vertAt(angleb);
+
+	    pb.draw.circleArc( circle.center, circle.radius, angleb, anglea, 'rgba(34,168,168,1.0)', 2.0 );
 	};
 	
 
@@ -172,9 +153,10 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    pointCount            : 6,
-	    drawConvexHull        : true,
-	    animate               : false,
+	    alwaysDrawFullCircles  : false,
+	    drawCircleSections     : true,
+	    drawRadicalLine        : true,
+	    drawIntersectionPoints : false
 	}, GUP );
 	
 
@@ -184,9 +166,10 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-	    /* gui.add(config, 'pointCount').min(3).max(96).step(1).onChange( function() { updatePointList(); } ).name("Point count").title("Point count");
-	    gui.add(config, 'drawConvexHull').onChange( function() { pb.redraw(); } ).name('Draw Convex Hull').title('Draw the Convex Hull.');
-	    gui.add(config, 'animate').onChange( function() { toggleAnimation(); } ).name('Animate points').title('Animate points.'); */
+	    gui.add(config, 'alwaysDrawFullCircles').onChange( function() { pb.redraw(); } ).name("alwaysDrawFullCircles").title("Always draw full circles?");
+	    gui.add(config, 'drawCircleSections').onChange( function() { pb.redraw(); } ).name("drawCircleSections").title("Draw the circle sections separately?");
+	    gui.add(config, 'drawRadicalLine').onChange( function() { pb.redraw(); } ).name("drawRadicalLine").title("Draw the radical line?");
+	    gui.add(config, 'drawIntersectionPoints').onChange( function() { pb.redraw(); } ).name("drawIntersectionPoints").title("Draw the intersection points?");
 	}
 
 	pb.config.preDraw = drawAll;

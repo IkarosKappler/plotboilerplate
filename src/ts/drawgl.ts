@@ -366,6 +366,24 @@ export class drawutilsgl {
 
 
     /**
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    circleArc( center:Vertex, radius:number, startAngle:number, endAngle:number, color:string, lineWidth?:number ) {
+	// NOT YET IMPLEMENTED
+    };
+
+
+    /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse

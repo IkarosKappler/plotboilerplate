@@ -3708,12 +3708,15 @@ exports.Triangle = Triangle;
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
  * @modified 2020-05-25 Added the vertAt and tangentAt functions.
+ * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
+ * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  *
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Line_1 = __webpack_require__(2);
 var Vector_1 = __webpack_require__(3);
 var Vertex_1 = __webpack_require__(0);
 var Circle = /** @class */ (function () {
@@ -3756,8 +3759,11 @@ var Circle = /** @class */ (function () {
     /**
      * Get the vertex on the this circle for the given angle.
      *
+     * @method vertAt
      * @param {number} angle - The angle (in radians) to use.
-     * @retrn {Vertex} Te the vertex (point) at the given angle.
+     * @return {Vertex} The vertex (point) at the given angle.
+     * @instance
+     * @memberof Circle
      **/
     Circle.prototype.vertAt = function (angle) {
         // Find the point on the circle respective the angle. Then move relative to center.
@@ -3769,13 +3775,64 @@ var Circle = /** @class */ (function () {
      *
      * Point a of the returned line is located on the circle, the length equals the radius.
      *
+     * @method tangentAt
+     * @instance
      * @param {number} angle - The angle (in radians) to use.
      * @return {Line} The tangent line.
+     * @memberof Circle
      **/
     Circle.prototype.tangentAt = function (angle) {
         var pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
         return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
+    };
+    ;
+    /**
+     * Calculate the intersection points (if exists) with the given circle.
+     *
+     * @method circleIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Circle} circle
+     * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
+     **/
+    Circle.prototype.circleIntersection = function (circle) {
+        if (this.center.distance(circle.center) > this.radius + circle.radius) {
+            return null;
+        }
+        // Based on the C++ implementation by Robert King
+        //    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
+        // and the 'Circles and spheres' article by Paul Bourke.
+        //    http://paulbourke.net/geometry/circlesphere/
+        //
+        // This is the original C++ implementation:
+        //
+        // pair<Point, Point> intersections(Circle c) {
+        //    Point P0(x, y);
+        //    Point P1(c.x, c.y);
+        //    float d, a, h;
+        //    d = P0.distance(P1);
+        //    a = (r*r - c.r*c.r + d*d)/(2*d);
+        //    h = sqrt(r*r - a*a);
+        //    Point P2 = P1.sub(P0).scale(a/d).add(P0);
+        //    float x3, y3, x4, y4;
+        //    x3 = P2.x + h*(P1.y - P0.y)/d;
+        //    y3 = P2.y - h*(P1.x - P0.x)/d;
+        //    x4 = P2.x - h*(P1.y - P0.y)/d;
+        //    y4 = P2.y + h*(P1.x - P0.x)/d;
+        //    return pair<Point, Point>(Point(x3, y3), Point(x4, y4));
+        // } 
+        var p0 = this.center;
+        var p1 = circle.center;
+        var d = p0.distance(p1);
+        var a = (this.radius * this.radius - circle.radius * circle.radius + d * d) / (2 * d);
+        var h = Math.sqrt(this.radius * this.radius - a * a);
+        var p2 = p1.clone().scale(a / d, p0);
+        var x3 = p2.x + h * (p1.y - p0.y) / d;
+        var y3 = p2.y - h * (p1.x - p0.x) / d;
+        var x4 = p2.x - h * (p1.y - p0.y) / d;
+        var y4 = p2.y + h * (p1.x - p0.x) / d;
+        return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
     };
     ;
     /**
@@ -3802,7 +3859,9 @@ var Circle = /** @class */ (function () {
     ;
     Circle.circleUtils = {
         vertAt: function (angle, radius) {
-            return new Vertex_1.Vertex(Math.sin(angle) * radius, Math.cos(angle) * radius);
+            /* return new Vertex( Math.sin(angle) * radius,
+                       Math.cos(angle) * radius ); */
+            return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
         }
     };
     return Circle;
@@ -4268,8 +4327,9 @@ var VertTuple = /** @class */ (function () {
      * @memberof VertTuple
      **/
     VertTuple.prototype.angle = function (line) {
-        if (typeof line == 'undefined')
+        if (line == null || typeof line == 'undefined') {
             line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0));
+        }
         // Compute the angle from x axis and the return the difference :)
         var v0 = this.b.clone().sub(this.a);
         var v1 = line.b.clone().sub(line.a);
@@ -5350,7 +5410,8 @@ exports.KeyHandler = KeyHandler;
  * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
  * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
  * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
- * @version  1.5.6
+ * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
+ * @version  1.6.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var CubicBezierCurve_1 = __webpack_require__(5);
@@ -5701,6 +5762,27 @@ var drawutils = /** @class */ (function () {
     };
     ;
     /**
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
+        this.ctx.beginPath();
+        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
+        this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
@@ -5819,7 +5901,7 @@ var drawutils = /** @class */ (function () {
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
      * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
      * as even shaped diamonds.
      *
@@ -5845,7 +5927,7 @@ var drawutils = /** @class */ (function () {
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
      * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
      * as even shaped squares.
      *
@@ -5868,7 +5950,7 @@ var drawutils = /** @class */ (function () {
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
      * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
      * as even shaped circles.
      *
@@ -6390,6 +6472,23 @@ var drawutilsgl = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilsgl.prototype.circle = function (center, radius, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;

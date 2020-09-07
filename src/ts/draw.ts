@@ -31,7 +31,8 @@
  * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
  * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
  * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
- * @version  1.5.6
+ * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
+ * @version  1.6.0
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -446,6 +447,28 @@ export class drawutils {
 	this._fillOrDraw( color );
     };
 
+    
+    /**
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    circleArc( center:Vertex, radius:number, startAngle:number, endAngle:number, color:string, lineWidth?:number ) {
+	this.ctx.beginPath();
+	this.ctx.ellipse( this.offset.x+center.x*this.scale.x, this.offset.y+center.y*this.scale.y, radius*this.scale.x, radius*this.scale.y, 0.0, startAngle, endAngle, false );
+	this.ctx.closePath();
+	this.ctx.lineWidth = lineWidth || 1;
+	this._fillOrDraw( color );
+    };
+
 
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
@@ -570,7 +593,7 @@ export class drawutils {
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
      * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
      * as even shaped diamonds.
      *
@@ -597,7 +620,7 @@ export class drawutils {
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
      * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
      * as even shaped squares.
      *
@@ -621,7 +644,7 @@ export class drawutils {
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
      * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
      * as even shaped circles.
      *
