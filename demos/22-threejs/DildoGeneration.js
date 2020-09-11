@@ -1,7 +1,8 @@
 /**
- * @author  Ikaros Kappler
- * @date    2020-07-01
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2020-07-01
+ * @modified 2020-09-11 Added proper texture loading.
+ * @version  1.0.1
  **/
 
 (function() {
@@ -10,11 +11,13 @@
 	this.canvas = document.getElementById( canvasId );
 	this.parent = this.canvas.parentElement;
 
+	this.textureStore = new Map(); // string->texture
+
 	this.scene = new THREE.Scene();
 	this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 	this.camera.position.z = 500;
 
-	this.ambientLightA = new THREE.AmbientLight( 0x0088ff ); 
+	this.ambientLightA = new THREE.AmbientLight( 0xffffff ); // 0x0088ff ); 
 	this.ambientLightA.position.set( 350, 350, 50 );
 	this.scene.add( this.ambientLightA );
 	
@@ -40,6 +43,7 @@
 	window.addEventListener( 'resize', function() { _self.resizeCanvas(); } );
 	this.resizeCanvas();
 
+
 	var i = 0;
 	function animate() {
 	    if( i % 100 == 0 )
@@ -52,7 +56,7 @@
 	}
 	animate();
     };
-
+    
     DildoGeneration.prototype.resizeCanvas = function() {
 	let width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -72,7 +76,7 @@
      * @param {number}     options.segmentCount
      * @param {number}     outlineSegmentCount (>= 2).
      * @param {boolean?}   useTextureImage
-     * @param {Image?}     textureImage
+     * @param {string?}    textureImagePath
      **/
     DildoGeneration.prototype.rebuild = function( options ) {
 	this.removeCachedGeometries();
@@ -80,10 +84,25 @@
 	var baseRadius = options.outline.getBounds().width;
 	var baseShape = mkCircularPolygon( baseRadius, options.shapeSegmentCount );
 	var geometry = new DildoGeometry( Object.assign( { baseShape : baseShape }, options ) );
-	var useTextureImage     = options.useTextureImage && typeof options.textureImage != "undefined" && options.textureImage.complete && options.textureImage.naturalWidth !== false;
-	// console.log( useTextureImage ); // options, options.textureImage, typeof options.textureImage );
-	
-	var material = new THREE.MeshPhongMaterial(
+	var useTextureImage     = options.useTextureImage && typeof options.textureImagePath != "undefined";
+
+	var material = useTextureImage ?
+	    new THREE.MeshLambertMaterial( {
+		color: 0xffffff,
+		wireframe : false,
+		flatShading: false,
+		depthTest : true,
+		opacity : 1.0,
+		side : THREE.DoubleSide,
+		visible : true,
+		emissive : 0x0,
+		reflectivity : 1.0,
+		refractionRatio : 0.89,
+		// shading : THREE.LambertShading,
+		map : this.loadTextureImage(options.textureImagePath)
+	    } )
+	    :
+	    new THREE.MeshPhongMaterial(
 	    { color: 0x3838ff,
 	      wireframe : false,
 	      flatShading: false,
@@ -95,8 +114,8 @@
 	      reflectivity : 1.0,
 	      refractionRatio : 0.89,
 	      specular: 0x888888,
-	      /*, shading : THREE.LambertShading */
-	      map : null //  useTextureImage && options.textureImage
+	      // shading : THREE.LambertShading,
+	      map : null
 	    } );
 	var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
 	bufferedGeometry.computeVertexNormals();
@@ -129,6 +148,16 @@
 		old.material.dispose();
 	}
 	this.cachedGeometries = [];
+    };
+
+    DildoGeneration.prototype.loadTextureImage = function( path ) {
+	var texture = this.textureStore.get(path);
+	if( !texture ) {
+	    var loader = new THREE.TextureLoader();
+	    var texture = loader.load(path);
+	    this.textureStore.set(path,texture);
+	}
+	return texture;
     };
 
     var mkCircularPolygon = function( radius, pointCount ) {

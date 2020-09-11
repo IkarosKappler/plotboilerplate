@@ -637,6 +637,8 @@ for this purpose.
 * [Blake Bowen's Catmull-Rom demo](https://codepen.io/osublake/pen/BowJed "Blake Bowen's Catmull-Rom demo")
 * [mbostock](https://github.com/mbostock "mbostok") for the great [convex-polygon-incircle implementation](https://observablehq.com/@mbostock/convex-polygon-incircle "convex-polygon-incircle implementation")
 * and for [circle-tangent-to-three-lines](https://observablehq.com/@mbostock/circle-tangent-to-three-lines "circle-tangent-to-three-lines")
+* [Circle Intersection in C++ by Robert King](https://stackoverflow.com/questions/3349125/circle-circle-intersection-points "Circle Intersection in C++ by Robert King")
+* [The 'Circles and spheres' article by Paul Bourke](http://paulbourke.net/geometry/circlesphere/ "the 'Circles and spheres' article by Paul Bourke")
 
 ## Known bugs
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.

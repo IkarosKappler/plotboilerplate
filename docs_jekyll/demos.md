@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-08-19
+date: 2020-09-07
 ---
 
 <div class="full-width">
@@ -122,7 +122,12 @@ date: 2020-08-19
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/23-bezier-point-distance/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-from-20200724-0-bezier-point-distance.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200724-0-bezier-point-distance.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/24-two-circles-radical-line/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200907-circle-intersection-radical-line.png');"></div>
    </a>
 </div>
 </div>

@@ -54,13 +54,6 @@
 	    var bezierDistanceLine = null;
 	    
 	    
-	    var textureImage = new Image();
-	    textureImage.onload = function() {
-		console.log('Texture loaded.');
-		rebuild()
-	    };
-	    
-	    
 	    // +---------------------------------------------------------------------------------
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
@@ -70,7 +63,7 @@
 		showNormals           : false,
 		normalsLength         : 10.0,
 		useTextureImage       : true,
-		textureImage          : textureImage
+		textureImagePath      : 'wood.png'
 	    }, GUP );
 
 	    var dildoGeneration = new DildoGeneration('dildo-canvas');
@@ -110,17 +103,6 @@
 		// Uhm, well, some curve point moved.
 		rebuild();
 	    };
-	    /*
-	    for( var i = 0; i < outline.bezierCurves.length; i++ ) {
-		var curve = outline.bezierCurves[i];
-		curve.startPoint.listeners.addDragEndListener( dragListener );
-		curve.startControlPoint.listeners.addDragEndListener( dragListener );
-		curve.endControlPoint.listeners.addDragEndListener( dragListener );
-		if( i > 0 )
-		    curve.startPoint.attr.bezierAutoAdjust = true;
-		if( i+1 == outline.bezierCurves.length )
-		    curve.endPoint.listeners.addDragEndListener( dragListener );
-		    } */
 	    var addPathListeners = function( path ) {
 		BezierPathInteractionHelper.addPathVertexDragListeners( path, dragListener );
 	    };
@@ -236,8 +218,6 @@
 	    pb.config.postDraw = postDraw;
 	    pb.fitToView( scaleBounds(outline.getBounds(),1.6) );
 	    rebuild();
-
-	    textureImage.src = 'wood.png';
 	    
 	} );
     

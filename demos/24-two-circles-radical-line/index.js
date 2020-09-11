@@ -89,7 +89,7 @@
 		pb.redraw();
 	    } );
 	    radiusPoint.listeners.addDragListener( function(e) {
-		circle.radius = center.distance( radiusPoint );
+		circle.radius = circle.center.distance( radiusPoint );
 		pb.redraw();
 	    } );
 	};
