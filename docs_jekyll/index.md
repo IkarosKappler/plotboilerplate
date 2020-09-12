@@ -604,7 +604,7 @@ for this purpose.
  * Port all demos from vanilla JS to TypeScript.
  * Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
  * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
- 
+ * IMPORTANT: replace Touchy by AlloyFinger also in the public main page. 
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
