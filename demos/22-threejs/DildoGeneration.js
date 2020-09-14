@@ -160,6 +160,21 @@
 	return texture;
     };
 
+    /**
+     * Generate an STL string.
+     *
+     * @param {function} options.onComplete
+     **/
+    DildoGeneration.prototype.generateSTL = function(options) {
+	var exporter = new THREE.STLExporter();
+	var stlData = exporter.parse( this.geometries[0] );
+	if( typeof options.onComplete === "function" ) {
+	    options.onComplete( stlData );
+	} else {
+	    console.warn("STL data was generated but no 'onComplete' callback was defined.");
+	}
+    };
+
     var mkCircularPolygon = function( radius, pointCount ) {
 	var vertices = [];
 	var phi;

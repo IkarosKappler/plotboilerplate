@@ -1,7 +1,12 @@
 /**
  * A script for testing the lib with three.js.
  *
- * @require PlotBoilerplate, Bounds, MouseHandler, gup, dat.gui, three.js
+ * @requires PlotBoilerplate
+ * @requires Bounds
+ * @requires MouseHandler
+ * @requires gup
+ * @requires dat.gui
+ * @requires three.js
  * 
  * @author   Ikaros Kappler
  * @date     2019-07-01
@@ -63,10 +68,42 @@
 		showNormals           : false,
 		normalsLength         : 10.0,
 		useTextureImage       : true,
-		textureImagePath      : 'wood.png'
+		textureImagePath      : 'wood.png',
+		exportSTL             : function() { exportSTL(); }
 	    }, GUP );
 
 	    var dildoGeneration = new DildoGeneration('dildo-canvas');
+	    var modal = new Modal();
+
+	    // +---------------------------------------------------------------------------------
+	    // | Delay the build a bit. And cancel stale builds.
+	    // | This avoids too many rebuilds (pretty expensive) on mouse drag events.
+	    // +-------------------------------
+	    var exportSTL = function() {
+		function saveFile( data, filename ) {
+		    saveAs( new Blob( [ data ], { type: 'application/sla' } ), filename );
+		}
+		modal.setTitle( "Export STL" );
+		modal.setFooter( "" );
+		modal.setActions( [ { label : 'Cancel', action : function() { modal.close(); console.log('canceled'); } } ] );
+		modal.setBody( "Loading ..." ); 
+		modal.open();
+		try {
+		    dildoGeneration.generateSTL( {
+			onComplete : function(stlData) {
+			    window.setTimeout( function() {
+				modal.setBody( "File ready." ); 
+				modal.setActions( [ Modal.ACTION_CLOSE ] );
+				saveFile(stlData,'dildomodel.stl');
+			    }, 500 );
+			    // modal.close();
+			}
+		    } );
+		} catch( e ) {
+		    modal.setBody( "Error: " + e ); 
+		    modal.setActions( [ Modal.ACTION_CLOSE ] );
+		}
+	    };
 
 	    
 	    // +---------------------------------------------------------------------------------
@@ -130,6 +167,9 @@
 		pb.fill.polyline( polyline, false, 'rgba(0,0,0,0.25)' );
 	    };
 
+	    // +---------------------------------------------------------------------------------
+	    // | Draw the split-indicator (if split position ready).
+	    // +-------------------------------
 	    var postDraw = function() {
 		if( bezierDistanceLine != null ) {
 		    pb.draw.line( bezierDistanceLine.a, bezierDistanceLine.b, 'rgb(255,192,0)', 2 );
@@ -207,11 +247,17 @@
 	    // +-------------------------------
             {
 		var gui = pb.createGUI();
-		gui.add(config, "outlineSegmentCount").min(3).max(512).onChange( function() { rebuild() } ).name('#outline').title('The number of segments on the outline.');
-		gui.add(config, "shapeSegmentCount").min(3).max(256).onChange( function() { rebuild() } ).name('#shape').title('The number of segments on the shape.');
-		gui.add(config, "showNormals").onChange( function() { rebuild() } ).name('Normals').title('Show the vertex normals.');
-		gui.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('Normals length').title('The length of rendered normals.');
-		gui.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('Use texture').title('Use a texture image.');
+		var fold0 = gui.addFolder("Mesh");
+		fold0.add(config, "outlineSegmentCount").min(3).max(512).onChange( function() { rebuild() } ).name('outlineSegmentCount').title('The number of segments on the outline.');
+		fold0.add(config, "shapeSegmentCount").min(3).max(256).onChange( function() { rebuild() } ).name('shapeSegmentCount').title('The number of segments on the shape.');
+		fold0.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
+		fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
+		fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image.');
+
+		var fold1 = gui.addFolder("Export");
+		fold1.add(config, "exportSTL").name('STL').title('Export an STL file.');
+
+		fold0.open();
 	    }
 
 	    pb.config.preDraw = preDraw;
