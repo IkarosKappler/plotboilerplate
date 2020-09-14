@@ -87,6 +87,10 @@
     float: left;
 }
 
+.modal-footer .modal-actions {
+    display: flex;
+}
+
 .modal-footer .modal-actions button {
     display: block;
     /* font-size: 1.17em; */

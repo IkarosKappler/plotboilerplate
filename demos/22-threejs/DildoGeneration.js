@@ -77,19 +77,22 @@
      * @param {number}     outlineSegmentCount (>= 2).
      * @param {boolean?}   useTextureImage
      * @param {string?}    textureImagePath
+     * @param {boolean?}   wireframe
      **/
     DildoGeneration.prototype.rebuild = function( options ) {
 	this.removeCachedGeometries();
 
-	var baseRadius = options.outline.getBounds().width;
-	var baseShape = mkCircularPolygon( baseRadius, options.shapeSegmentCount );
-	var geometry = new DildoGeometry( Object.assign( { baseShape : baseShape }, options ) );
-	var useTextureImage     = options.useTextureImage && typeof options.textureImagePath != "undefined";
+	var baseRadius       = options.outline.getBounds().width;
+	var baseShape        = mkCircularPolygon( baseRadius, options.shapeSegmentCount );
+	var geometry         = new DildoGeometry( Object.assign( { baseShape : baseShape }, options ) );
+	var useTextureImage  = options.useTextureImage && typeof options.textureImagePath != "undefined";
+	var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
+	var wireframe        = typeof options.wireframe != "undefined" ? options.wireframe : null;
 
 	var material = useTextureImage ?
 	    new THREE.MeshLambertMaterial( {
 		color: 0xffffff,
-		wireframe : false,
+		wireframe : wireframe,
 		flatShading: false,
 		depthTest : true,
 		opacity : 1.0,
@@ -104,7 +107,7 @@
 	    :
 	    new THREE.MeshPhongMaterial(
 	    { color: 0x3838ff,
-	      wireframe : false,
+	      wireframe : wireframe,
 	      flatShading: false,
 	      depthTest : true,
 	      opacity : 1.0,

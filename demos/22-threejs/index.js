@@ -69,15 +69,17 @@
 		normalsLength         : 10.0,
 		useTextureImage       : true,
 		textureImagePath      : 'wood.png',
-		exportSTL             : function() { exportSTL(); }
+		wireframe             : false,
+		exportSTL             : function() { exportSTL(); },
+		showPathJSON          : function() { showPathJSON(); },
+		insertPathJSON        : function() { insertPathJSON(); },
 	    }, GUP );
 
 	    var dildoGeneration = new DildoGeneration('dildo-canvas');
 	    var modal = new Modal();
 
 	    // +---------------------------------------------------------------------------------
-	    // | Delay the build a bit. And cancel stale builds.
-	    // | This avoids too many rebuilds (pretty expensive) on mouse drag events.
+	    // | Export the model as an STL file.
 	    // +-------------------------------
 	    var exportSTL = function() {
 		function saveFile( data, filename ) {
@@ -105,6 +107,40 @@
 		}
 	    };
 
+
+	    var showPathJSON = function() {
+		modal.setTitle( "Show Path JSON" );
+		modal.setFooter( "" );
+		modal.setActions( [ Modal.ACTION_CLOSE ] );
+		modal.setBody( outline.toJSON(true) ); 
+		modal.open();
+	    };
+
+
+	    var insertPathJSON = function() {
+		var textarea = document.createElement('textarea');
+		textarea.style.width = "100%";
+		textarea.style.height = "50vh";
+		textarea.innerHTML = outline.toJSON(true);
+		modal.setTitle( "Insert Path JSON" );
+		modal.setFooter( "" );
+		modal.setActions( [ Modal.ACTION_CANCEL, { label : "Load JSON", action : function() { loadPathJSON(textarea.value); modal.close(); } }] );
+		modal.setBody( textarea ); 
+		modal.open();
+	    };
+
+	    var loadPathJSON = function( jsonData ) {
+		var newOutline = BezierPath.fromJSON( jsonData );
+		// pb.remove( outline );
+		// TODO: add a removeVertices() function to PB
+		// pb.vertices = [];
+		// outline = newOutline;
+		// addPathListeners( outline );
+		// pb.add( newOutline );
+		setPathInstance( newOutline );
+		rebuild();
+	    };
+
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Delay the build a bit. And cancel stale builds.
@@ -127,12 +163,6 @@
 
 	    
 	    // +---------------------------------------------------------------------------------
-	    // | Create the outline: a Bézier path.
-	    // +-------------------------------
-	    var outline = BezierPath.fromJSON( DEFAULT_BEZIER_JSON );
-
-	    
-	    // +---------------------------------------------------------------------------------
 	    // | Each outline vertex requires a drag (end) listener. Wee need this to update
 	    // | the 3d mesh on changes.
 	    // +-------------------------------
@@ -146,7 +176,6 @@
 	    var removePathListeners = function( path ) {
 		BezierPathInteractionHelper.removePathVertexDragListeners( path, dragListener );
 	    };
-	    addPathListeners( outline );
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Draw some stuff before rendering?
@@ -202,44 +231,61 @@
 	    };
 
 
-	    pb.add( outline ); // This will trigger the first initial postDraw/draw/redraw call
-	    
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | Install a Bézier interaction helper.
-	    // +-------------------------------
-	    var helper = new BezierPathInteractionHelper(
-		pb,
-		[outline],
-		{
-		    maxDetectDistance : 32.0,
-		    autoAdjustPaths : true,
-		    allowPathRemoval : false, // It is not alowed to remove the outline path
-		    onPointerMoved : function(pathIndex,newA,newB,newT) {
-			if( pathIndex == -1 ) {
-			    bezierDistanceLine = null;
-			} else {
-			    bezierDistanceLine = new Line( newA, newB );
-			    bezierDistanceT = newT;
-			}
-		    },
-		    onVertexInserted : function(pathIndex,insertAfterIndex,newPath,oldPath) {
-			console.log('[pathIndex='+pathIndex+'] Vertex inserted after '+ insertAfterIndex );
-			console.log('oldPath', oldPath, 'newPath', newPath );
-			removePathListeners( outline );
-			outline = newPath;
-			addPathListeners( outline );
-			rebuild();
-		    },
-		    onVerticesDeleted : function(pathIndex,deletedVertIndices,newPath,oldPath) {
-			console.log('[pathIndex='+pathIndex+'] vertices deleted', deletedVertIndices );
-			removePathListeners( outline );
-			outline = newPath;
-			addPathListeners( outline );
-			rebuild();
-		    }
+	    var setPathInstance = function( newOutline ) {
+		if( typeof outline != "undefined" ) {
+		    pb.remove( outline );
+		    // TODO: add a removeVertices() function to PB
+		    pb.vertices = [];
 		}
-	    );
+		outline = newOutline;	
+		addPathListeners( outline );
+		pb.add( newOutline );
+		
+		// +---------------------------------------------------------------------------------
+		// | Install a Bézier interaction helper.
+		// +-------------------------------
+		var helper = new BezierPathInteractionHelper(
+		    pb,
+		    [outline],
+		    {
+			maxDetectDistance : 32.0,
+			autoAdjustPaths : true,
+			allowPathRemoval : false, // It is not alowed to remove the outline path
+			onPointerMoved : function(pathIndex,newA,newB,newT) {
+			    if( pathIndex == -1 ) {
+				bezierDistanceLine = null;
+			    } else {
+				bezierDistanceLine = new Line( newA, newB );
+				bezierDistanceT = newT;
+			    }
+			},
+			onVertexInserted : function(pathIndex,insertAfterIndex,newPath,oldPath) {
+			    console.log('[pathIndex='+pathIndex+'] Vertex inserted after '+ insertAfterIndex );
+			    console.log('oldPath', oldPath, 'newPath', newPath );
+			    removePathListeners( outline );
+			    outline = newPath;
+			    addPathListeners( outline );
+			    rebuild();
+			},
+			onVerticesDeleted : function(pathIndex,deletedVertIndices,newPath,oldPath) {
+			    console.log('[pathIndex='+pathIndex+'] vertices deleted', deletedVertIndices );
+			    removePathListeners( outline );
+			    outline = newPath;
+			    addPathListeners( outline );
+			    rebuild();
+			}
+		    }
+		);
+	    }; // END setPathInstance
+
+
+	    // +---------------------------------------------------------------------------------
+	    // | Create the outline: a Bézier path.
+	    // +-------------------------------
+	    var outline = null;
+	    // This will trigger the first initial postDraw/draw/redraw call
+	    setPathInstance( BezierPath.fromJSON( DEFAULT_BEZIER_JSON ) );
+
 	    
 
 	    // +---------------------------------------------------------------------------------
@@ -253,9 +299,14 @@
 		fold0.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
 		fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
 		fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image.');
+		fold0.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model.');
 
 		var fold1 = gui.addFolder("Export");
 		fold1.add(config, "exportSTL").name('STL').title('Export an STL file.');
+		fold1.add(config, "showPathJSON").name('Show Path JSON ...').title('Show the path data.');
+
+		var fold2 = gui.addFolder("Import");
+		fold2.add(config, "insertPathJSON").name('Insert Path JSON ...').title('Insert path data as JSON.');
 
 		fold0.open();
 	    }

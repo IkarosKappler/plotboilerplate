@@ -46,7 +46,12 @@
     };
 
     Modal.prototype.setBody = function( bodyContent ) {
-	this.modalElements.modal.body.content.innerHTML = bodyContent;
+	if( isDOMNode(bodyContent) ) {
+	    removeChildNodes( this.modalElements.modal.body.content );
+	    this.modalElements.modal.body.content.append( bodyContent );
+	} else {
+	    this.modalElements.modal.body.content.innerHTML = bodyContent;
+	}
     };
 
     Modal.prototype.setFooter = function( title ) {
@@ -59,10 +64,7 @@
 
     Modal.prototype.setActions = function( actions ) {
 	var _self = this;
-	// Remove all current actions
-	while( this.modalElements.modal.footer.actions.firstChild ) {
-	    this.modalElements.modal.footer.actions.removeChild( this.modalElements.modal.footer.actions.lastChild );
-	}
+	removeChildNodes( this.modalElements.modal.footer.actions );
 	if( Array.isArray(actions) ) {
 	    for( var i in actions ) {
 		var a = actions[i];
@@ -165,6 +167,29 @@
 		}
 	    }
 	};
+    };
+
+    // https://stackoverflow.com/questions/384286/how-do-you-check-if-a-javascript-object-is-a-dom-object
+    function isDOMNode(obj) {
+	try {
+	    //Using W3 DOM2 (works for FF, Opera and Chrome)
+	    return obj instanceof HTMLElement;
+	}
+	catch(e){
+	    //Browsers not supporting W3 DOM2 don't have HTMLElement and
+	    //an exception is thrown and we end up here. Testing some
+	    //properties that all elements have (works on IE7)
+	    return (typeof obj==="object") &&
+		(obj.nodeType===1) && (typeof obj.style === "object") &&
+		(typeof obj.ownerDocument ==="object");
+	}
+    }
+
+    var removeChildNodes = function( node ) {
+	// Remove all current actions
+	while( node.firstChild ) {
+	    node.removeChild( node.lastChild );
+	}
     };
 
     Modal.ACTION_CLOSE  = { label : "Close",  action : "close" };
