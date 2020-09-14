@@ -11,13 +11,14 @@
 	this.canvas = document.getElementById( canvasId );
 	this.parent = this.canvas.parentElement;
 
-	this.textureStore = new Map(); // string->texture
+	// Map<string,texture>
+	this.textureStore = new Map();
 
 	this.scene = new THREE.Scene();
 	this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 	this.camera.position.z = 500;
 
-	this.ambientLightA = new THREE.AmbientLight( 0xffffff ); // 0x0088ff ); 
+	this.ambientLightA = new THREE.AmbientLight( 0xffffff ); 
 	this.ambientLightA.position.set( 350, 350, 50 );
 	this.scene.add( this.ambientLightA );
 	
@@ -31,7 +32,7 @@
 
 	this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas,
 						   preserveDrawingBuffer: true,   // This is required to take screen shots
-						   antialias: false
+						   antialias: true // false
 						 } );
 	this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
 	this.controls.update();
@@ -46,11 +47,8 @@
 
 	var i = 0;
 	function animate() {
-	    if( i % 100 == 0 )
-		console.log('animate');
 	    requestAnimationFrame( animate );
 	    _self.controls.update();
-	    // _self.ambientLightA.position.set( _self.camera.position.y, _self.camera.position.x, _self.camera.position.z );
 	    _self.renderer.render( _self.scene, _self.camera );
 	    i++;
 	}
