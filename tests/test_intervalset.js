@@ -32,6 +32,14 @@ window.addEventListener(
 	set.removeInterval( 99, 100 );
 	echo( set.toString() );
 
+	echo( "Remove 99,101 (beyond the end) ..." );
+	set.removeInterval( 99, 101 );
+	echo( set.toString() );
+
+	echo( "Remove -1,1 (before the start) ..." );
+	set.removeInterval( -1,1 );
+	echo( set.toString() );
+
 	echo( "Remove 0,1 (the start) ..." );
 	set.removeInterval( 0, 1 );
 	echo( set.toString() );

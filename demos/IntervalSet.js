@@ -40,9 +40,20 @@
     };
 	
     IntervalSet.prototype.removeInterval = function( start, end ) {
+	if( this.intervals.length == 0 )
+	    return;
+	// Wrap into bounds if values are beyond limits
+	if( end > this.intervals[this.intervals.length-1][1] )
+	    end = this.intervals[this.intervals.length-1][1];
+	if( start < this.intervals[0][0] ) 
+	    start = this.intervals[0][0];
+	if( start == end )
+	    return;
 	var startIndex = this._locateInterval( start );
 	var endIndex = this._locateInterval( end );
+	
 	var startInside = this._isIn(start,startIndex);
+	console.log( this.intervals, endIndex );
 	var endInside = this._isIn(end,endIndex);
 	var startIsMin = this._isMin(start,startIndex);
 	var startIsMax = this._isMax(start,startIndex);
