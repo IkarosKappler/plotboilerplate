@@ -11,6 +11,7 @@ window.addEventListener(
 
 	echo("Creating new interval set ...");
 	var set = new IntervalSet( 0, 100 );
+	echo( set.toString() );
 	
 	echo( "Remove 20,30 ..." );
 	set.removeInterval( 20, 30 );
@@ -24,6 +25,14 @@ window.addEventListener(
 	set.removeInterval( 40, 50 );
 	echo( set.toString() );
 
+	echo( "Remove 60,70 ..." );
+	set.removeInterval( 60, 70 );
+	echo( set.toString() );
+
+	echo( "Remove 80,90 ..." );
+	set.removeInterval( 80, 90 );
+	echo( set.toString() );
+
 	echo( "Remove 19,31 ..." );
 	set.removeInterval( 19, 31 );
 	echo( set.toString() );
@@ -32,15 +41,15 @@ window.addEventListener(
 	set.removeInterval( 99, 100 );
 	echo( set.toString() );
 
-	echo( "Remove 99,101 (beyond the end) ..." );
-	set.removeInterval( 99, 101 );
+	echo( "Remove 98,101 (beyond the end) ..." );
+	set.removeInterval( 98, 101 );
 	echo( set.toString() );
 
-	echo( "Remove -1,1 (before the start) ..." );
+	echo( "Remove -1,0 (before the start) ..." );
 	set.removeInterval( -1,1 );
 	echo( set.toString() );
 
-	echo( "Remove 0,1 (the start) ..." );
+	echo( "Remove -1,1 (the start) ..." );
 	set.removeInterval( 0, 1 );
 	echo( set.toString() );
 
@@ -48,12 +57,20 @@ window.addEventListener(
 	set.removeInterval( 31,40 );
 	echo( set.toString() );
 
-	echo( "Remove 1,19 (left sub interval) ..." );
-	set.removeInterval( 1,19 );
+	echo( "Remove 0,20 (around left sub interval) ..." );
+	set.removeInterval( 0,20 );
 	echo( set.toString() );
 
-	echo( "Remove 50,99 (right sub interval) ..." );
-	set.removeInterval( 50,99 );
+	echo( "Remove 70,99 (right two sub intervals) ..." );
+	set.removeInterval( 70,99 );
+	echo( set.toString() );
+
+	echo( "Remove 51,59 (interval fully inside sub interval) ..." );
+	set.removeInterval( 51,59 );
+	echo( set.toString() );
+
+	echo( "Remove 49,60 (multipe sub intervals) ..." );
+	set.removeInterval( 49,60 );
 	echo( set.toString() );
     }
 );

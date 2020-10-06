@@ -59,23 +59,31 @@
 	var startIsMax = this._isMax(start,startIndex);
 	var endIsMin = this._isMin(end,endIndex);
 	var endIsMax = this._isMax(end,endIndex);
-	var startIsExtreme = this._isExtreme(start,startIndex);
-	var endIsExtreme = this._isExtreme(end,endIndex);
-	console.log( "startIndex", startIndex, "endIndex", endIndex, "startInside", startInside, "endInside", endInside, startIsExtreme, endIsExtreme );
-	
+	// var startIsExtreme = this._isExtreme(start,startIndex);
+	// var endIsExtreme = this._isExtreme(end,endIndex);
+	console.log( "start", start, "end", end, "startIndex", startIndex, "endIndex", endIndex, "startInside", startInside, "endInside", endInside, "startIsMin", startIsMin, "startIsMax", startIsMax, "endIsMin", endIsMin, "endIsMax", endIsMax ); //, "startIsExtreme", startIsExtreme, "endIsExtreme", endIsExtreme );
+
 	if( startInside && endInside && !startIsMax && !endIsMin ) {
 	    if( startIndex == endIndex && startIsMin && endIsMax ) {
 		this.intervals.splice( startIndex,
-				       endIndex-startIndex+ ( 1 ) // ,
+				       endIndex-startIndex+1 // ,
 				       // [this.intervals[startIndex][0], start],
 				       // [end, this.intervals[endIndex][1]]
 				     );
 	    } else if( endIsMax && endIndex+1 == this.intervals.length ) {
-		this.intervals.splice( startIndex,
-				       endIndex-startIndex+ ( 1 ),
-				       [this.intervals[startIndex][0], start] // ,
-				       // [end, this.intervals[endIndex][1]]
-				     );
+		if( startIsMin ) {
+		    this.intervals.splice( startIndex,
+					   endIndex-startIndex+1 //,
+					   // [this.intervals[startIndex][0], start] // ,
+					   // [end, this.intervals[endIndex][1]]
+					 );
+		} else {
+		    this.intervals.splice( startIndex,
+					   endIndex-startIndex+1,
+					   [this.intervals[startIndex][0], start] // ,
+					   // [end, this.intervals[endIndex][1]]
+					 );
+		}
 	    } else if( startIsMin && startIndex == 0 ) {
 		this.intervals.splice( startIndex,
 				       endIndex-startIndex+ ( 1 ),
@@ -90,17 +98,45 @@
 				     );
 	    }
 	} else if( startInside && (!endInside || endIsMin) ) {
-	    this.intervals.splice( startIndex,
-				   endIndex-startIndex, // + (endIsExtreme ? 1 : 0),
-				   [this.intervals[startIndex][0], start] //,
-				   // [end, this.intervals[endIndex][1]]
-				 );
+	    if( startIndex == endIndex ) {
+		this.intervals.splice( startIndex,
+				       1 // endIndex-startIndex, // + (endIsExtreme ? 1 : 0),
+				       // [this.intervals[startIndex][0], start] //,
+				       // [end, this.intervals[endIndex][1]]
+				     );
+	    } else if( startIsMin ) {
+		this.intervals.splice( startIndex,
+				       endIndex-startIndex // + (endIsExtreme ? 1 : 0),
+				       // [this.intervals[startIndex][0], start] //,
+				       // [end, this.intervals[endIndex][1]]
+				     );
+	    } else { console.log('X', startIndex, endIndex-startIndex); 
+		this.intervals.splice( startIndex,
+				       endIndex-startIndex, //, // + (endIsExtreme ? 1 : 0),
+				       [this.intervals[startIndex][0], start] //,
+				       // [end, this.intervals[endIndex][1]]
+				     );
+	    }
 	} else if( (!startInside || startIsMax) && endInside ) {
-	    this.intervals.splice( startIndex,
-				   endIndex-startIndex, // + (startIsExtreme ? 1 : 0),
-				   //[this.intervals[startIndex][0], start] //,
-				   [end, this.intervals[endIndex][1]]
-				 );
+	    if( startIndex == endIndex ) {
+		this.intervals.splice( startIndex,
+				       1 // endIndex-startIndex //, // + (startIsExtreme ? 1 : 0),
+				       // [this.intervals[startIndex][0], start] //,
+				       // [end, this.intervals[endIndex][1]]
+				     );
+	    } else if( endIsMax ) {
+		this.intervals.splice( startIndex,
+				       endIndex-startIndex // + (endIsExtreme ? 1 : 0),
+				       // [this.intervals[startIndex][0], start] //,
+				       // [end, this.intervals[endIndex][1]]
+				     );
+	    } else {
+		this.intervals.splice( startIndex,
+				       endIndex-startIndex, // + (startIsExtreme ? 1 : 0),
+				       //[this.intervals[startIndex][0], start] //,
+				       [end, this.intervals[endIndex][1]]
+				     );
+	    }
 	} else if( (!startInside || startIsMax) && (!endInside || endIsMin)  ) {
 	    this.intervals.splice( startIndex,
 				   endIndex-startIndex // ,
