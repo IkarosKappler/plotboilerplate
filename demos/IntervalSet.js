@@ -24,6 +24,7 @@
     };
 
     IntervalSet.prototype._isIn = function( value, index ) {
+	//console.log( index );
 	return this.intervals[index][0] <= value && this.intervals[index][1] >= value;	
     };
 
@@ -38,8 +39,47 @@
     IntervalSet.prototype._isMax = function( value, index ) {
 	return this.intervals[index][1] == value;
     };
-	
-    IntervalSet.prototype.removeInterval = function( start, end ) {
+
+    IntervalSet.prototype.intersect = function( start, end ) {
+	if( start <= end ) {
+	    for( var i = 0; i < this.intervals.length; ) {
+		if( this.intervals[i][0] >= end || this.intervals[i][1] <= start ) {
+		    // Current interval is fully outside range.
+		    // REMOVE
+		    this.intervals.splice( i, 1 );
+		} else if( this.intervals[i][0] >= start && this.intervals[i][1] <= end ) {
+		    // Current interval is fully inside.
+		    // KEEP
+		    i++;
+		} else if( this.intervals[i][0] <= start && this.intervals[i][1] >= end ) {
+		    // Desired range lies inside current interval.
+		    // CUT OFF LEFT AND RIGHT.
+		    this.intervals.splice( i, 1, [start,end] );
+		    i++;
+		} else if( this.intervals[i][0] <= start && this.intervals[i][1] < end ) {
+		    // Right end is inside range.
+		    // CUT OFF LEFT.
+		    this.intervals[i][0] = start;
+		    i++;
+		} else if( this.intervals[i][0] > start && this.intervals[i][1] >= end ) {
+		    // LEFT end is inside range.
+		    // CUT OFF RIGHT.
+		    this.intervals[i][1] = end;
+		    i++;
+		} else {
+		    // ELSE???
+		    console.lod( "ELSE???" );
+		    i++;
+		}
+	    }
+	} else {
+	    // this.intersect( end, start );
+	    this.intersect( end, this.end );
+	    this.intersect( this.start, start );
+	}
+    };
+    
+    IntervalSet.prototype._removeInterval = function( start, end ) {
 	if( this.intervals.length == 0 )
 	    return;
 	// Wrap into bounds if values are beyond limits
@@ -51,9 +91,13 @@
 	    return;
 	var startIndex = this._locateInterval( start );
 	var endIndex = this._locateInterval( end );
+	if( startIndex == -1 || endIndex == -1 ) {
+	    console.log( "ERR? start", start, "end", end, "startIndex", startIndex, "endIndex", endIndex ); // , "startInside", startInside, "endInside", endInside, "startIsMin", startIsMin, "startIsMax", startIsMax, "endIsMin", endIsMin, "endIsMax", endIsMax ); //, "startIsExtreme", startIsExtreme, "endIsExtreme", endIsExtreme );
+	    return
+	}
 	
 	var startInside = this._isIn(start,startIndex);
-	console.log( this.intervals, endIndex );
+	// console.log( this.intervals, endIndex );
 	var endInside = this._isIn(end,endIndex);
 	var startIsMin = this._isMin(start,startIndex);
 	var startIsMax = this._isMax(start,startIndex);
@@ -61,7 +105,7 @@
 	var endIsMax = this._isMax(end,endIndex);
 	// var startIsExtreme = this._isExtreme(start,startIndex);
 	// var endIsExtreme = this._isExtreme(end,endIndex);
-	console.log( "start", start, "end", end, "startIndex", startIndex, "endIndex", endIndex, "startInside", startInside, "endInside", endInside, "startIsMin", startIsMin, "startIsMax", startIsMax, "endIsMin", endIsMin, "endIsMax", endIsMax ); //, "startIsExtreme", startIsExtreme, "endIsExtreme", endIsExtreme );
+	// console.log( "start", start, "end", end, "startIndex", startIndex, "endIndex", endIndex, "startInside", startInside, "endInside", endInside, "startIsMin", startIsMin, "startIsMax", startIsMax, "endIsMin", endIsMin, "endIsMax", endIsMax ); //, "startIsExtreme", startIsExtreme, "endIsExtreme", endIsExtreme );
 
 	if( startInside && endInside && !startIsMax && !endIsMin ) {
 	    if( startIndex == endIndex && startIsMin && endIsMax ) {

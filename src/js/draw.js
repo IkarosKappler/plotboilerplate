@@ -33,7 +33,8 @@
  * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
  * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
  * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
- * @version  1.6.0
+ * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
+ * @version  1.6.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
@@ -399,7 +400,7 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
-        this.ctx.closePath();
+        // this.ctx.closePath();
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
