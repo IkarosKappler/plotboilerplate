@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="fullscreen">
+  <head>
+    <title>2D Plotting Boilerplate – Intersection points of two circles (radical line)</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, circle intersection, radical line, algorithm">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2020-09-04">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Demonstrating the intersection points of two circles (radical line) with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demonstrating the intersection points of two circles (radical line) with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20200907-circle-intersection-radical-line.png">
+
+
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/Color.js"></script>
+    <script src="../../lib/alloy_finger.js"></script>
+
+    <script src="../../src/js/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../../src/js/utils/dat.gui.arrowbounce.polyfill.js"></script>
+    <script src="../../src/js/utils/creategui.js"></script>
+    <script src="../../src/js/utils/gup.js"></script>
+    <script src="../../src/js/utils/module.js"></script>
+
+    <!-- For development -->
+    <!--
+    <script src="../../src/js/VertexAttr.js"></script>
+    <script src="../../src/js/VertexListeners.js"></script>
+    <script src="../../src/js/VertTuple.js"></script>
+    <script src="../../src/js/Vertex.js"></script>
+    <script src="../../src/js/Bounds.js"></script>
+    <script src="../../src/js/Grid.js"></script>
+    <script src="../../src/js/Line.js"></script>
+    <script src="../../src/js/Vector.js"></script>
+    <script src="../../src/js/CubicBezierCurve.js"></script>
+    <script src="../../src/js/BezierPath.js"></script>
+    <script src="../../src/js/Polygon.js"></script>
+    <script src="../../src/js/Triangle.js"></script>
+    <script src="../../src/js/VEllipse.js"></script>
+    <script src="../../src/js/Circle.js"></script>
+    <script src="../../src/js/PBImage.js"></script>
+    <script src="../../src/js/MouseHandler.js"></script>
+    <script src="../../src/js/KeyHandler.js"></script>
+    <script src="../../src/js/draw.js"></script>
+    <script src="../../src/js/geomutils.js"></script>
+    <script src="../../src/js/SVGBuilder.js"></script>
+    <script src="../../src/js/PlotBoilerplate.js"></script>
+    -->
+    <!-- END for development -->
+
+    <!-- For production -->
+    <script src="../../dist/plotboilerplate.min.js"></script>
+    <!-- END For production -->
+
+    <!-- <script src="../convexHull.js"></script> -->
+    <!-- <script src="../../src/js/utils/algorithms/convexHull.js"></script> -->
+    <!-- <script src="../nsectAngle.js"></script> -->
+    <!-- <script src="../convexPolygonIncircle.js"></script> -->
+    <!-- <script src="../../src/js/utils/algorithms/convexPolygonIncircle.js"></script> -->
+    <script src="../IntervalSet.js"></script>
+    <!-- <script src="../CanvasPointList.js"></script> -->
+    <!-- <script src="../VertexAnimator.Linear.js"></script> -->
+
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="../style.css"> 
+  </head>
+  <body class="fullscreen">
+    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>      
+    <div class="info monospace">
+      [<span id="cx">-</span>,<span id="cy">-</span>]
+    </div>
+
+  </body>
+</html>
