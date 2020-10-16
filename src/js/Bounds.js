@@ -13,7 +13,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Bounds = void 0;
 var Bounds = /** @class */ (function () {
     /**
      * The constructor.

@@ -15,5 +15,5 @@ export declare const geomutils: {
      *
      * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
      */
-    nsectAngle(pA: Vertex, pB: Vertex, pC: Vertex, n: number): Array<Line>;
+    nsectAngle(pA: Vertex, pB: Vertex, pC: Vertex, n: number): Line[];
 };

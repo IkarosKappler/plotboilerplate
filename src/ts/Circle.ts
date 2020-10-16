@@ -4,12 +4,13 @@
  * @requires Line, Vector, VertTuple, Vertex, SVGSerializale
  *
  * @author   Ikaros Kappler
- * @version  1.0.1
+ * @version  1.1.0
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
  * @modified 2020-05-25 Added the vertAt and tangentAt functions.
  * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
  * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
+ * @modified 2020-10-16 Added the containsCircle(...) function.
  * 
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
@@ -55,6 +56,11 @@ export class Circle implements SVGSerializable {
     constructor( center:Vertex, radius:number ) {
 	this.center = center;
 	this.radius = radius;
+    };
+
+
+    containsCircle( circle:Circle ) : boolean {
+	return this.center.distance(circle.center) + circle.radius < this.radius;
     };
 
 

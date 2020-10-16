@@ -14,7 +14,6 @@
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VEllipse = void 0;
 var VEllipse = /** @class */ (function () {
     /**
      * The constructor.

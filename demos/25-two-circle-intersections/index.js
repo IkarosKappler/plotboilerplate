@@ -109,7 +109,7 @@
 	    // var radLine = circles[0].circleIntersection( circles[1] );
 	    for( var i = 0; i < circles.length; i++ ) {
 		if( true || config.alwaysDrawFullCircles ) {
-		    pb.draw.circle( circles[i].center, circles[i].radius, 'rgba(34,168,168,0.5)', 1.0 );
+		    pb.draw.circle( circles[i].center, circles[i].radius, 'rgba(34,168,168,0.333)', 1.0 );
 		    // pb.draw.circle( circles[1].center, circles[1].radius, 'rgba(34,168,168,0.5)', 1.0 );
 		}
 		// var intervalSet = new IntervalSet( 0, Math.PI*2 ); 
@@ -123,17 +123,19 @@
 		    if( radLine !== null ) {
 			handleCircleSection( circles[i], radLine, intervalSet, i, j );
 			if( config.drawRadicalLine ) {
-			    pb.draw.line( radLine.a, radLine.b, 'rgba(34,168,168,0.5)', 1.0 );
+			    pb.draw.line( radLine.a, radLine.b, 'rgba(34,168,168,0.333)', 1.0 );
 			}
 			if( config.drawIntersectionPoints ) {
 			    pb.draw.diamondHandle( radLine.a, 9, 'rgba(0,192,0,1.0)' );
 			    pb.draw.diamondHandle( radLine.b, 9, 'rgba(0,192,0,1.0)' );
 			}
+		    } else if( circles[j].containsCircle(circles[i]) ) {
+			intervalSet.clear();
 		    }
 		}
 		drawCircleSections( circles[i], intervalSet );
 		pb.draw.text( ''+i, circles[i].center.x, circles[i].center.y );
-		console.log( intervalSet );
+		// console.log( intervalSet );
 	    }
 	};
 
@@ -146,7 +148,7 @@
 	    var anglea = lineAa.angle() * R2D; //  % (Math.PI);
 	    var angleb = lineAb.angle() * R2D; // % (Math.PI);
 
-	    console.log( index, indexWith, "before, anglea", anglea, "angleb", angleb );
+	    // console.log( index, indexWith, "before, anglea", anglea, "angleb", angleb );
 	    if( anglea < 0 ) anglea = Math.PI*2*R2D + anglea;
 	    if( angleb < 0 ) angleb = Math.PI*2*R2D + angleb;
 
@@ -154,12 +156,13 @@
 	    var pointb = circle.vertAt(angleb * D2R);
 
 	    // pb.draw.circleArc( circle.center, circle.radius, angleb, anglea, 'rgba(34,168,168,1.0)', 2.0 );
-	    pb.draw.line( circle.center, pointa, 1.0, 'rgba(0,192,192,0.5)' );
-	    pb.draw.line( circle.center, pointb, 1.0, 'rgba(0,192,192,0.5)' );
-	    console.log( index, indexWith, "anglea", anglea, "angleb", angleb );
+	    pb.draw.line( circle.center, pointa, 1.0, 'rgba(0,192,192,0.25)' );
+	    pb.draw.line( circle.center, pointb, 1.0, 'rgba(0,192,192,0.25)' );
+	    // console.log( index, indexWith, "anglea", anglea, "angleb", angleb, intervalSet.toString() );
 	    // intervalSet.removeInterval( anglea, angleb );
 	    // intervalSet.intersect( angleb+Math.PI, anglea+Math.PI );
 	    intervalSet.intersect( angleb, anglea );
+	    // console.log( index, indexWith, "after intersection", intervalSet.toString() );
 	};
 
 	var drawCircleSections = function( circle, intervalSet ) {

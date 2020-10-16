@@ -51,8 +51,8 @@ export declare class CubicSplinePath {
      **/
     generateCurve(circular?: boolean): Array<CubicBezierCurve>;
     static utils: {
-        naturalControlsClosed: (coords: Array<number>) => IControlCoords;
-        naturalControlsOpen: (coords: Array<number>) => IControlCoords;
+        naturalControlsClosed: (coords: number[]) => IControlCoords;
+        naturalControlsOpen: (coords: number[]) => IControlCoords;
     };
 }
 export {};

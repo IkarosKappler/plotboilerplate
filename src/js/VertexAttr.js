@@ -19,7 +19,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VertexAttr = void 0;
 var VertexAttr = /** @class */ (function () {
     /**
      * The constructor.

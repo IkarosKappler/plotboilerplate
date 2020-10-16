@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.geomutils = void 0;
 var Line_1 = require("./Line");
 var Triangle_1 = require("./Triangle");
 /**

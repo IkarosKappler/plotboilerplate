@@ -22,7 +22,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VoronoiCell = void 0;
 var Line_1 = require("../../Line");
 var Polygon_1 = require("../../Polygon");
 var Vertex_1 = require("../../Vertex");

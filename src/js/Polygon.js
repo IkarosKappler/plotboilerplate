@@ -20,7 +20,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Polygon = void 0;
 var BezierPath_1 = require("./BezierPath");
 var Vertex_1 = require("./Vertex");
 var Polygon = /** @class */ (function () {

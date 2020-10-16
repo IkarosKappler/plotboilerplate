@@ -19,7 +19,6 @@
  * @public
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convexPolygonIncircle = void 0;
 var Circle_1 = require("../../Circle");
 var geomutils_1 = require("../../geomutils");
 var Line_1 = require("../../Line");

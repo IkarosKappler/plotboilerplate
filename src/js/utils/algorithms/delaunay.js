@@ -13,7 +13,6 @@
  * @version     2.0.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Delaunay = void 0;
 var Triangle_1 = require("../../Triangle");
 var Vertex_1 = require("../../Vertex");
 var Line_1 = require("../../Line");

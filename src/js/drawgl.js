@@ -13,7 +13,6 @@
  * @version  0.0.4
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.drawutilsgl = void 0;
 var Vertex_1 = require("./Vertex");
 var drawutilsgl = /** @class */ (function () {
     /**

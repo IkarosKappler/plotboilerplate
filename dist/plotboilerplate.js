@@ -134,7 +134,6 @@ return /******/ (function(modules) { // webpackBootstrap
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Vertex = void 0;
 var VertexAttr_1 = __webpack_require__(4);
 var VertexListeners_1 = __webpack_require__(10);
 var Vertex = /** @class */ (function () {
@@ -667,7 +666,6 @@ exports.Vertex = Vertex;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Bounds = void 0;
 var Bounds = /** @class */ (function () {
     /**
      * The constructor.
@@ -734,7 +732,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Line = void 0;
 var VertTuple_1 = __webpack_require__(12);
 var Vertex_1 = __webpack_require__(0);
 var Line = /** @class */ (function (_super) {
@@ -850,7 +847,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Vector = void 0;
 var VertTuple_1 = __webpack_require__(12);
 var Vertex_1 = __webpack_require__(0);
 var Vector = /** @class */ (function (_super) {
@@ -1041,7 +1037,6 @@ exports.Vector = Vector;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VertexAttr = void 0;
 var VertexAttr = /** @class */ (function () {
     /**
      * The constructor.
@@ -1113,7 +1108,6 @@ exports.VertexAttr = VertexAttr;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CubicBezierCurve = void 0;
 var Bounds_1 = __webpack_require__(1);
 var Vertex_1 = __webpack_require__(0);
 var Vector_1 = __webpack_require__(3);
@@ -1822,7 +1816,6 @@ exports.CubicBezierCurve = CubicBezierCurve;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BezierPath = void 0;
 var Bounds_1 = __webpack_require__(1);
 var CubicBezierCurve_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
@@ -3025,7 +3018,6 @@ exports.BezierPath = BezierPath;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Polygon = void 0;
 var BezierPath_1 = __webpack_require__(6);
 var Vertex_1 = __webpack_require__(0);
 var Polygon = /** @class */ (function () {
@@ -3321,7 +3313,6 @@ exports.Polygon = Polygon;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Triangle = void 0;
 var Bounds_1 = __webpack_require__(1);
 var Circle_1 = __webpack_require__(9);
 var Line_1 = __webpack_require__(2);
@@ -3713,19 +3704,19 @@ exports.Triangle = Triangle;
  * @requires Line, Vector, VertTuple, Vertex, SVGSerializale
  *
  * @author   Ikaros Kappler
- * @version  1.0.1
+ * @version  1.1.0
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
  * @modified 2020-05-25 Added the vertAt and tangentAt functions.
  * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
  * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
+ * @modified 2020-10-16 Added the containsCircle(...) function.
  *
  * @file Circle
  * @fileoverview A simple circle class: center point and radius.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Circle = void 0;
 var Line_1 = __webpack_require__(2);
 var Vector_1 = __webpack_require__(3);
 var Vertex_1 = __webpack_require__(0);
@@ -3746,6 +3737,10 @@ var Circle = /** @class */ (function () {
         this.center = center;
         this.radius = radius;
     }
+    ;
+    Circle.prototype.containsCircle = function (circle) {
+        return this.center.distance(circle.center) + circle.radius < this.radius;
+    };
     ;
     /**
      * Calculate the distance from this circle to the given line.
@@ -3907,7 +3902,6 @@ exports.Circle = Circle;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VertexListeners = void 0;
 var VertexListeners = /** @class */ (function () {
     /**
      * The constructor.
@@ -4135,7 +4129,6 @@ exports.VertexListeners = VertexListeners;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Grid = void 0;
 var Grid = /** @class */ (function () {
     /**
      * The constructor.
@@ -4222,7 +4215,6 @@ exports.Grid = Grid;
  * @version 1.0.1
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VertTuple = void 0;
 var Vertex_1 = __webpack_require__(0);
 var VertTuple = /** @class */ (function () {
     /**
@@ -4500,7 +4492,6 @@ exports.VertTuple = VertTuple;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.geomutils = void 0;
 var Line_1 = __webpack_require__(2);
 var Triangle_1 = __webpack_require__(8);
 /**
@@ -4569,7 +4560,6 @@ exports.geomutils = {
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VEllipse = void 0;
 var VEllipse = /** @class */ (function () {
     /**
      * The constructor.
@@ -4636,7 +4626,6 @@ exports.VEllipse = VEllipse;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PBImage = void 0;
 var PBImage = /** @class */ (function () {
     /**
      * The constructor.
@@ -4776,7 +4765,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.XWheelEvent = exports.XMouseEvent = exports.MouseHandler = void 0;
 var MouseHandler = /** @class */ (function () {
     /**
      * The constructor.
@@ -5021,7 +5009,6 @@ exports.XWheelEvent = XWheelEvent;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeyHandler = void 0;
 var KeyHandler = /** @class */ (function () {
     /**
      * The constructor.
@@ -5439,7 +5426,6 @@ exports.KeyHandler = KeyHandler;
  * @version  1.7.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.drawutils = void 0;
 var CubicBezierCurve_1 = __webpack_require__(5);
 var Vertex_1 = __webpack_require__(0);
 // Todo: rename this class to Drawutils
@@ -6237,7 +6223,6 @@ exports.drawutils = drawutils;
  * @version  0.0.4
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.drawutilsgl = void 0;
 var Vertex_1 = __webpack_require__(0);
 var drawutilsgl = /** @class */ (function () {
     /**
@@ -6965,7 +6950,6 @@ window.PlotBoilerplate = __webpack_require__(21).PlotBoilerplate;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PlotBoilerplate = void 0;
 var draw_1 = __webpack_require__(18);
 var drawgl_1 = __webpack_require__(19);
 var BezierPath_1 = __webpack_require__(6);
@@ -8636,7 +8620,6 @@ exports.PlotBoilerplate = PlotBoilerplate;
  * @version  1.0.3
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SVGBuilder = void 0;
 var SVGBuilder = /** @class */ (function () {
     function SVGBuilder() {
     }

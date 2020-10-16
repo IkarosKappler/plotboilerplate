@@ -5,13 +5,27 @@
 (function() {
 
     // start and end are inclusive
-    var Interval = function( start, end ) {
+    var CircularInterval = function( start, end, circularStart, circularEnd ) {
 	this.start = start;
 	this.end = end;
+	this.cStart = circularStart;
+	this.cEnd = circularEnd;
     };
 
-    Interval.prototype.toString = function() {
-	return '['+this.start+','+this.end+']';
+    CircularInterval.prototype.toString = function() {
+	return '['+this.start+','+this.end+', ('+this.cStart+','+this.cEnd+')]';
+    };
+
+    CircularInterval.prototype.intersect = function( start, end ) {
+	var circleLen = this.cEnd - this.cStart;
+	// var paramLen = end - start;
+	start = (start-this.circleStart) % (circleLen);
+	end = (end-this.circleStart) % circleLen;
+	if( start <= this.start && end >= this.end ) {
+	    // NOOP (this intervall is full inside given bounds)
+	} else {
+
+	}
     };
 
     var IntervalSet = function( start, end, isCircular ) {
@@ -31,6 +45,10 @@
 		return i;
 	}
 	return -1;
+    };
+
+    IntervalSet.prototype.clear = function() {
+	this.intervals = [];
     };
 
     IntervalSet.prototype._isIn = function( value, index ) {
@@ -61,47 +79,16 @@
 	    this.intersect( start, this.end );
 	} else { // if( start <= end ) { */
 	for( var i = 0; i < this.intervals.length; ) {
-	    // if( start <= end ) {
-	    //console.log('start <= end', start, end);
-	    if( start <= end && (this.intervals[i][0] >= end || this.intervals[i][1] <= start) ) {
-		// Current interval is fully outside range.
-		// REMOVE
-		this.intervals.splice( i, 1 );
-	    } else if( start > end && (this.intervals[i][0] >= end && this.intervals[i][1] <= start) ) {
-		// Current interval is fully outside range.
-		// REMOVE
-		this.intervals.splice( i, 1 );
-	    } else if( this.intervals[i][0] >= start && this.intervals[i][1] <= end ) {
-		// Current interval is fully inside.
-		// KEEP
-		i++;
-	    } else if( this.intervals[i][0] <= start && this.intervals[i][1] >= end ) {
-		// Desired range lies inside current interval.
-		// CUT OFF LEFT AND RIGHT.
-		this.intervals.splice( i, 1, [start,end] );
-		i++;
-	    } else if( this.intervals[i][0] <= start && this.intervals[i][1] < end ) {
-		// Right end is inside range.
-		// CUT OFF LEFT.
-		this.intervals[i][0] = start;
-		i++;
-	    } else if( this.intervals[i][0] > start && this.intervals[i][1] >= end ) {
-		// LEFT end is inside range.
-		// CUT OFF RIGHT.
-		this.intervals[i][1] = end;
-		i++;
-	    } else {
-		// ELSE???
-		console.log( "ELSE???" );
-		i++;
-	    }
-	    /* } else {
-		console.log('start > end', start, end);
-		// start > end
-		if( this.intervals[i][0] >= end && this.intervals[i][1] <= start ) {
+	    if( start <= end ) {
+		//console.log('start <= end', start, end);
+		if( (this.intervals[i][0] >= end || this.intervals[i][1] <= start) ) {
 		    // Current interval is fully outside range.
 		    // REMOVE
 		    this.intervals.splice( i, 1 );
+		    // } else if( start > end && (this.intervals[i][0] >= end && this.intervals[i][1] <= start) ) {
+		    // Current interval is fully outside range.
+		    // REMOVE
+		    // this.intervals.splice( i, 1 );
 		} else if( this.intervals[i][0] >= start && this.intervals[i][1] <= end ) {
 		    // Current interval is fully inside.
 		    // KEEP
@@ -126,7 +113,38 @@
 		    console.log( "ELSE???" );
 		    i++;
 		}
-	    } */
+	    } else {
+		// console.log('start > end', start, end);
+		// start > end
+		if( this.intervals[i][0] >= end && this.intervals[i][1] <= start ) {
+		    // Current interval is fully outside range.
+		    // REMOVE
+		    this.intervals.splice( i, 1 );
+		} else if( this.intervals[i][0] >= start ) {
+		    // Full inside (right range).
+		    // Keep.
+		    i++;
+		} else if( this.intervals[i][1] <= end ) {
+		    // Full inside (left range).
+		    // Keep.
+		    i++;
+		} else if( this.intervals[i][0] >= end && this.intervals[i][1] > start ) {
+		    // Right part inside.
+		    // Cut off left part.
+		    this.intervals.splice( i, 1, [start,this.intervals[i][1]] );
+		    i++;
+		} else if( this.intervals[i][0] <= end && this.intervals[i][1] < start ) {
+		    // Left part inside.
+		    // Cut off right part.
+		    this.intervals.splice( i, 1, [this.intervals[i][0],end] );
+		    i++;
+		} else if( this.intervals[i][0] <= end && this.intervals[i][1] >= start ) {
+		    // Start and end inside, inner part is not.
+		    // Cut into two.
+		    this.intervals.splice( i, 1, [this.intervals[i][0],end], [start,this.intervals[i][1]] );
+		    i+=2;
+		}
+	    } 
 	}
 	/*} /* else {
 	    // this.intersect( end, start );
@@ -253,5 +271,5 @@
     };
 
     window.IntervalSet = IntervalSet;
-    window.Interval = Interval;
+    window.CircularInterval = CircularInterval;
 })();

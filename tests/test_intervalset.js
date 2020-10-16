@@ -9,6 +9,15 @@ window.addEventListener(
     'load',
     function() {
 
+	echo("Creating new cirular interval ...");
+	var intv = new CircularInterval( 0, 100, 0, 100 );
+	echo( intv.toString() );
+
+	echo("Intrerscting with [0,20] ...");
+	intv.intersect( 0, 20 );
+	echo( intv.toString() );
+	
+	/*
 	echo("Creating new interval set ...");
 	var set = new IntervalSet( 0, 100 );
 	echo( set.toString() );
@@ -72,6 +81,8 @@ window.addEventListener(
 	echo( "Remove 49,60 (multipe sub intervals) ..." );
 	set.removeInterval( 49,60 );
 	echo( set.toString() );
+
+	*/
     }
 );
 

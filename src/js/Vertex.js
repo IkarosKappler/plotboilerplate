@@ -33,7 +33,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Vertex = void 0;
 var VertexAttr_1 = require("./VertexAttr");
 var VertexListeners_1 = require("./VertexListeners");
 var Vertex = /** @class */ (function () {

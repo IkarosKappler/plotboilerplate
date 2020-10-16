@@ -28,7 +28,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CubicBezierCurve = void 0;
 var Bounds_1 = require("./Bounds");
 var Vertex_1 = require("./Vertex");
 var Vector_1 = require("./Vector");

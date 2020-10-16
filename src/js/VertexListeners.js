@@ -16,7 +16,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VertexListeners = void 0;
 var VertexListeners = /** @class */ (function () {
     /**
      * The constructor.

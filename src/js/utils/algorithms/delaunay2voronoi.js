@@ -11,7 +11,6 @@
  * @version  1.0.2
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.delaunay2voronoi = void 0;
 var VoronoiCell_1 = require("../datastructures/VoronoiCell");
 var delaunay2voronoi = /** @class */ (function () {
     function delaunay2voronoi(pointList, triangles) {

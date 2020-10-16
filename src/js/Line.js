@@ -38,7 +38,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Line = void 0;
 var VertTuple_1 = require("./VertTuple");
 var Vertex_1 = require("./Vertex");
 var Line = /** @class */ (function (_super) {

@@ -16,7 +16,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PBImage = void 0;
 var PBImage = /** @class */ (function () {
     /**
      * The constructor.

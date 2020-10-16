@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-10-16
+  * Added the Circle.containsCircle(...) function.
 * 2020-10-15
   * Re-added the draw.text() function.
 * 2020-10-06

@@ -69,7 +69,6 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PlotBoilerplate = void 0;
 var draw_1 = require("./draw");
 var drawgl_1 = require("./drawgl");
 var BezierPath_1 = require("./BezierPath");
