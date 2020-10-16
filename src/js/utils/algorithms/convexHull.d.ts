@@ -20,4 +20,4 @@ import { XYCoords } from "../../interfaces";
  * @param {Array<XYCoords>} points - The points on the 2D plane to find the convex hull for.
  * @return {Array<XYCoords>} A ordered array of points defining the convex hull.
  **/
-export declare const getConvexHull: (points: XYCoords[]) => XYCoords[];
+export declare const getConvexHull: (points: Array<XYCoords>) => Array<XYCoords>;

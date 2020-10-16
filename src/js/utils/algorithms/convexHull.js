@@ -15,6 +15,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getConvexHull = void 0;
 /**
  * @global
  * @name convexHull

@@ -25,6 +25,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.KeyHandler = void 0;
 var KeyHandler = /** @class */ (function () {
     /**
      * The constructor.

@@ -9,9 +9,11 @@
  * @date     2019-09-18
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2020-03-25 Ported stub to Typescript.
- * @version  0.0.3
+ * @modified 2020-10-15 Re-added the text() function.
+ * @version  0.0.4
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.drawutilsgl = void 0;
 var Vertex_1 = require("./Vertex");
 var drawutilsgl = /** @class */ (function () {
     /**
@@ -517,6 +519,10 @@ var drawutilsgl = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilsgl.prototype.polyline = function (vertices, isOpen, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    drawutilsgl.prototype.text = function (text, x, y, options) {
         // NOT YET IMPLEMENTED
     };
     ;

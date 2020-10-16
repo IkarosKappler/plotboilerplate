@@ -73,7 +73,7 @@ export declare class HobbyPath {
         rotateAngle: (vert: Vertex, alpha: number) => Vertex;
         normalize: (vec: Vertex) => Vertex;
         rho: (a: number, b: number) => number;
-        thomas: (a: number[], b: number[], c: number[], d: number[]) => number[];
-        sherman: (a: number[], b: number[], c: number[], d: number[], s: number, t: number) => number[];
+        thomas: (a: Array<number>, b: Array<number>, c: Array<number>, d: Array<number>) => Array<number>;
+        sherman: (a: Array<number>, b: Array<number>, c: Array<number>, d: Array<number>, s: number, t: number) => Array<number>;
     };
 }

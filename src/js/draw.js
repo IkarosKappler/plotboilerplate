@@ -34,9 +34,11 @@
  * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
  * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
- * @version  1.6.1
+ * @modified 2020-10-15 Re-added the text() function.
+ * @version  1.7.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.drawutils = void 0;
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Vertex_1 = require("./Vertex");
 // Todo: rename this class to Drawutils
@@ -748,6 +750,23 @@ var drawutils = /** @class */ (function () {
     //this.ctx.restore();
     };
     */
+    drawutils.prototype.text = function (text, x, y, options) {
+        options = options || {};
+        this.ctx.save();
+        x = this.offset.x + x * this.scale.x;
+        y = this.offset.y + y * this.scale.y;
+        var color = options.color || 'black';
+        if (this.fillShapes) {
+            this.ctx.fillStyle = color;
+            this.ctx.fillText(text, x, y);
+        }
+        else {
+            this.ctx.strokeStyle = color;
+            this.ctx.strokeText(text, x, y);
+        }
+        this.ctx.restore();
+    };
+    ;
     /**
      * Draw a non-scaling text label at the given position.
      *

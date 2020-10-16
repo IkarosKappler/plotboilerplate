@@ -16,6 +16,7 @@
  * @version  1.0.3
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SVGBuilder = void 0;
 var SVGBuilder = /** @class */ (function () {
     function SVGBuilder() {
     }

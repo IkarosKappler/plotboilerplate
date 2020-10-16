@@ -33,7 +33,8 @@
  * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
  * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
- * @version  1.6.1
+ * @modified 2020-10-15 Re-added the text() function.
+ * @version  1.7.0
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -826,6 +827,22 @@ export class drawutils {
 	//this.ctx.restore();
     };
     */
+
+    text( text:string, x:number, y:number, options?:{color?:string}) {
+	options = options || {};
+	this.ctx.save();
+	x = this.offset.x+x*this.scale.x;
+	y = this.offset.y+y*this.scale.y;
+	const color:string = options.color || 'black';
+	if( this.fillShapes ) {
+	    this.ctx.fillStyle = color;
+	    this.ctx.fillText( text, x, y );
+	} else {
+	    this.ctx.strokeStyle = color;
+	    this.ctx.strokeText( text, x, y );
+	}
+	this.ctx.restore();
+    };
     
 
 

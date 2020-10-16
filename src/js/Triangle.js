@@ -32,6 +32,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Triangle = void 0;
 var Bounds_1 = require("./Bounds");
 var Circle_1 = require("./Circle");
 var Line_1 = require("./Line");

@@ -8,7 +8,8 @@
  * @date     2019-09-18
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2020-03-25 Ported stub to Typescript.
- * @version  0.0.3
+ * @modified 2020-10-15 Re-added the text() function.
+ * @version  0.0.4
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
@@ -345,6 +346,9 @@ export declare class drawutilsgl {
      * @memberof drawutils
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string): void;
+    text(text: string, x: number, y: number, options?: {
+        color?: string;
+    }): void;
     /**
      * Draw a non-scaling text label at the given position.
      *

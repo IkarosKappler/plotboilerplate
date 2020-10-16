@@ -17,6 +17,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CatmullRomPath = void 0;
 var CubicBezierCurve_1 = require("../../CubicBezierCurve");
 var Vertex_1 = require("../../Vertex");
 var CatmullRomPath = /** @class */ (function () {
