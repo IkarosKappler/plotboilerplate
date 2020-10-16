@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-10-15
+  * Re-added the draw.text() function.
 * 2020-10-06
   * Removed the .closePath() instruction from the draw.circleArc function.
 * 2020-09-07
