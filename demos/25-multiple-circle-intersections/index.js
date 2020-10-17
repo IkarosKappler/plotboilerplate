@@ -72,19 +72,6 @@
 	};
 
 	var circles = [];
-
-/*
-	var CircleHandler = function( circle, radiusPoint ) {
-	    circle.center.listeners.addDragListener( function(e) {
-		radiusPoint.add( e.params.dragAmount );
-		pb.redraw();
-	    } );
-	    radiusPoint.listeners.addDragListener( function(e) {
-		circle.radius = circle.center.distance( radiusPoint );
-		pb.redraw();
-	    } );
-	};
-*/
 	
 	for( var i = 0; i < 7; i++ ) {
 	    var center = randomVertex();
@@ -115,7 +102,7 @@
 		    var radLine = circles[i].circleIntersection( circles[j] );
 		    if( radLine !== null ) {
 			handleCircleSection( circles[i], radLine, intervalSet, i, j );
-			if( config.drawRadicalLine ) {
+			if( config.drawRadicalLines ) {
 			    pb.draw.line( radLine.a, radLine.b, 'rgba(34,168,168,0.333)', 1.0 );
 			}
 		    } else if( circles[j].containsCircle(circles[i]) ) {
