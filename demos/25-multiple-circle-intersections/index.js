@@ -88,7 +88,7 @@
 	    } );
 	};
 	
-	for( var i = 0; i < 3; i++ ) {
+	for( var i = 0; i < 7; i++ ) {
 	    var center = randomVertex();
 	    var circle = new Circle( center,
 				     i==0
@@ -105,16 +105,14 @@
 
 	var drawAll = function() {
 	    if( circles.length == 0 ) return;
-	    
-	    // var radLine = circles[0].circleIntersection( circles[1] );
+
 	    for( var i = 0; i < circles.length; i++ ) {
-		if( true || config.alwaysDrawFullCircles ) {
+		if( config.alwaysDrawFullCircles ) {
 		    pb.draw.circle( circles[i].center, circles[i].radius, 'rgba(34,168,168,0.333)', 1.0 );
-		    // pb.draw.circle( circles[1].center, circles[1].radius, 'rgba(34,168,168,0.5)', 1.0 );
 		}
 		// var intervalSet = new IntervalSet( 0, Math.PI*2 ); 
 		// var intervalSet = new IntervalSet( -Math.PI, Math.PI );
-		var intervalSet = new IntervalSet( 0, 2*Math.PI*R2D, true );
+		var intervalSet = new CircularIntervalSet( 0, 2*Math.PI*R2D );
 		// var intervalSet = new IntervalSet( -Math.PI*R2D, Math.PI*R2D, true );
 		for( var j = 0; j < circles.length; j++ ) {
 		    if( i == j )
@@ -125,17 +123,14 @@
 			if( config.drawRadicalLine ) {
 			    pb.draw.line( radLine.a, radLine.b, 'rgba(34,168,168,0.333)', 1.0 );
 			}
-			if( config.drawIntersectionPoints ) {
-			    pb.draw.diamondHandle( radLine.a, 9, 'rgba(0,192,0,1.0)' );
-			    pb.draw.diamondHandle( radLine.b, 9, 'rgba(0,192,0,1.0)' );
-			}
 		    } else if( circles[j].containsCircle(circles[i]) ) {
 			intervalSet.clear();
 		    }
 		}
 		drawCircleSections( circles[i], intervalSet );
-		pb.draw.text( ''+i, circles[i].center.x, circles[i].center.y );
-		// console.log( intervalSet );
+		if( config.drawCircleNumbers ) {
+		    pb.draw.text( ''+i, circles[i].center.x, circles[i].center.y );
+		}
 	    }
 	};
 
@@ -145,31 +140,25 @@
 	    var lineAa = new Line( circle.center, radLine.a );
 	    var lineAb = new Line( circle.center, radLine.b );
 
-	    var anglea = lineAa.angle() * R2D; //  % (Math.PI);
-	    var angleb = lineAb.angle() * R2D; // % (Math.PI);
+	    var anglea = lineAa.angle() * R2D;
+	    var angleb = lineAb.angle() * R2D;
 
 	    // console.log( index, indexWith, "before, anglea", anglea, "angleb", angleb );
 	    if( anglea < 0 ) anglea = Math.PI*2*R2D + anglea;
 	    if( angleb < 0 ) angleb = Math.PI*2*R2D + angleb;
 
-	    var pointa = circle.vertAt(anglea * D2R);
-	    var pointb = circle.vertAt(angleb * D2R);
-
-	    // pb.draw.circleArc( circle.center, circle.radius, angleb, anglea, 'rgba(34,168,168,1.0)', 2.0 );
-	    pb.draw.line( circle.center, pointa, 1.0, 'rgba(0,192,192,0.25)' );
-	    pb.draw.line( circle.center, pointb, 1.0, 'rgba(0,192,192,0.25)' );
-	    // console.log( index, indexWith, "anglea", anglea, "angleb", angleb, intervalSet.toString() );
-	    // intervalSet.removeInterval( anglea, angleb );
-	    // intervalSet.intersect( angleb+Math.PI, anglea+Math.PI );
+	    if( config.drawCircleSections ) {
+		var pointa = circle.vertAt(anglea * D2R);
+		var pointb = circle.vertAt(angleb * D2R);
+		pb.draw.line( circle.center, pointa, 1.0, 'rgba(0,192,192,0.25)' );
+		pb.draw.line( circle.center, pointb, 1.0, 'rgba(0,192,192,0.25)' );
+	    }
 	    intervalSet.intersect( angleb, anglea );
-	    // console.log( index, indexWith, "after intersection", intervalSet.toString() );
 	};
 
 	var drawCircleSections = function( circle, intervalSet ) {
 	    for( var i = 0; i < intervalSet.intervals.length; i++ ) {
 		var interval = intervalSet.intervals[i];
-		// pb.draw.circleArc( circle.center, circle.radius, interval[1]-Math.PI, interval[0]-Math.PI, 'rgba(34,168,168,1.0)', 2.0 );
-		//pb.draw.circleArc( circle.center, circle.radius, interval[1]*D2R, interval[0]*D2R, 'rgba(34,168,168,1.0)', 2.0 );
 		pb.draw.circleArc( circle.center, circle.radius, interval[0]*D2R, interval[1]*D2R, 'rgba(34,168,168,1.0)', 2.0 );
 	    }
 	};
@@ -192,10 +181,10 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    alwaysDrawFullCircles  : false,
-	    drawCircleSections     : true,
-	    drawRadicalLine        : true,
-	    drawIntersectionPoints : false
+	    alwaysDrawFullCircles  : true,
+	    drawCircleSections     : false,
+	    drawRadicalLines       : false,
+	    drawCircleNumbers      : false
 	}, GUP );
 	
 
@@ -207,8 +196,8 @@
 	    var gui = pb.createGUI();
 	    gui.add(config, 'alwaysDrawFullCircles').onChange( function() { pb.redraw(); } ).name("alwaysDrawFullCircles").title("Always draw full circles?");
 	    gui.add(config, 'drawCircleSections').onChange( function() { pb.redraw(); } ).name("drawCircleSections").title("Draw the circle sections separately?");
-	    gui.add(config, 'drawRadicalLine').onChange( function() { pb.redraw(); } ).name("drawRadicalLine").title("Draw the radical line?");
-	    gui.add(config, 'drawIntersectionPoints').onChange( function() { pb.redraw(); } ).name("drawIntersectionPoints").title("Draw the intersection points?");
+	    gui.add(config, 'drawRadicalLines').onChange( function() { pb.redraw(); } ).name("drawRadicalLines").title("Draw the radical lines?");
+	    gui.add(config, 'drawCircleNumbers').onChange( function() { pb.redraw(); } ).name("drawCircleNumbers").title("Draw circle numbers?");
 	}
 
 	pb.config.preDraw = drawAll;
