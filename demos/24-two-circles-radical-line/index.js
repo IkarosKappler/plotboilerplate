@@ -72,27 +72,7 @@
 	};
 
 	var circles = [];
-	var circleSegments = [];
-	/* 
-	var centerA = randomVertex();
-	var centerB = randomVertex();
-	var circleA = new Circle( centerA, centerA.distance(centerB)*Math.random()*1.5 );
-	var circleB = new Circle( centerB, centerA.distance(centerB)*Math.random()*1.5 );
-	var radiusPointA = new Vertex( centerA.clone().addXY(circleA.radius*Math.sin(Math.PI/4),circleA.radius*Math.cos(Math.PI/4)) );
-	var radiusPointB = new Vertex( centerB.clone().addXY(circleB.radius*Math.sin(Math.PI/4),circleB.radius*Math.cos(Math.PI/4)) );
-
-	*/
-
-	var CircleHandler = function( circle, radiusPoint ) {
-	    circle.center.listeners.addDragListener( function(e) {
-		radiusPoint.add( e.params.dragAmount );
-		pb.redraw();
-	    } );
-	    radiusPoint.listeners.addDragListener( function(e) {
-		circle.radius = circle.center.distance( radiusPoint );
-		pb.redraw();
-	    } );
-	};
+	var circleSegments = [];	
 	
 	for( var i = 0; i < 2; i++ ) {
 	    var center = randomVertex();
@@ -107,32 +87,8 @@
 	    pb.add( circle.center );
 	    pb.add( radiusPoint );
 
-	    new CircleHandler( circle, radiusPoint );
+	    new CircleHelper( circle, radiusPoint, pb );
 	}
-
-		 /*
-	pb.add( circleA.center );
-	pb.add( circleB.center );
-	pb.add( radiusPointA );
-	pb.add( radiusPointB );
-
-	centerA.listeners.addDragListener( function(e) {
-	    radiusPointA.add( e.params.dragAmount );
-	    pb.redraw();
-	} );
-	centerB.listeners.addDragListener( function(e) {
-	    radiusPointB.add( e.params.dragAmount );
-	    pb.redraw();
-	} );
-	radiusPointA.listeners.addDragListener( function(e) {
-	    circleA.radius = centerA.distance( radiusPointA );
-	    pb.redraw();
-	} );
-	radiusPointB.listeners.addDragListener( function(e) {
-	    circleB.radius = centerB.distance( radiusPointB );
-	    pb.redraw();
-	} );
-		 */
 
 	var drawAll = function() {
 	    if( circles.length == 0 ) return;

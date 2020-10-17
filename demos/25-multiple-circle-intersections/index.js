@@ -71,12 +71,9 @@
 			     );
 	};
 
-	var R2D = 180/Math.PI;
-	var D2R = Math.PI/180;
-
 	var circles = [];
 
-
+/*
 	var CircleHandler = function( circle, radiusPoint ) {
 	    circle.center.listeners.addDragListener( function(e) {
 		radiusPoint.add( e.params.dragAmount );
@@ -87,6 +84,7 @@
 		pb.redraw();
 	    } );
 	};
+*/
 	
 	for( var i = 0; i < 7; i++ ) {
 	    var center = randomVertex();
@@ -100,7 +98,7 @@
 	    pb.add( circle.center );
 	    pb.add( radiusPoint );
 
-	    new CircleHandler( circle, radiusPoint );
+	    new CircleHelper( circle, radiusPoint, pb );
 	}
 
 	var drawAll = function() {
@@ -110,10 +108,7 @@
 		if( config.alwaysDrawFullCircles ) {
 		    pb.draw.circle( circles[i].center, circles[i].radius, 'rgba(34,168,168,0.333)', 1.0 );
 		}
-		// var intervalSet = new IntervalSet( 0, Math.PI*2 ); 
-		// var intervalSet = new IntervalSet( -Math.PI, Math.PI );
-		var intervalSet = new CircularIntervalSet( 0, 2*Math.PI*R2D );
-		// var intervalSet = new IntervalSet( -Math.PI*R2D, Math.PI*R2D, true );
+		var intervalSet = new CircularIntervalSet( 0, 2*Math.PI );
 		for( var j = 0; j < circles.length; j++ ) {
 		    if( i == j )
 			continue;
@@ -140,16 +135,15 @@
 	    var lineAa = new Line( circle.center, radLine.a );
 	    var lineAb = new Line( circle.center, radLine.b );
 
-	    var anglea = lineAa.angle() * R2D;
-	    var angleb = lineAb.angle() * R2D;
+	    var anglea = lineAa.angle();
+	    var angleb = lineAb.angle();
 
-	    // console.log( index, indexWith, "before, anglea", anglea, "angleb", angleb );
-	    if( anglea < 0 ) anglea = Math.PI*2*R2D + anglea;
-	    if( angleb < 0 ) angleb = Math.PI*2*R2D + angleb;
+	    if( anglea < 0 ) anglea = Math.PI*2 + anglea;
+	    if( angleb < 0 ) angleb = Math.PI*2 + angleb;
 
 	    if( config.drawCircleSections ) {
-		var pointa = circle.vertAt(anglea * D2R);
-		var pointb = circle.vertAt(angleb * D2R);
+		var pointa = circle.vertAt(anglea);
+		var pointb = circle.vertAt(angleb);
 		pb.draw.line( circle.center, pointa, 1.0, 'rgba(0,192,192,0.25)' );
 		pb.draw.line( circle.center, pointb, 1.0, 'rgba(0,192,192,0.25)' );
 	    }
@@ -159,7 +153,7 @@
 	var drawCircleSections = function( circle, intervalSet ) {
 	    for( var i = 0; i < intervalSet.intervals.length; i++ ) {
 		var interval = intervalSet.intervals[i];
-		pb.draw.circleArc( circle.center, circle.radius, interval[0]*D2R, interval[1]*D2R, 'rgba(34,168,168,1.0)', 2.0 );
+		pb.draw.circleArc( circle.center, circle.radius, interval[0], interval[1], 'rgba(34,168,168,1.0)', 2.0 );
 	    }
 	};
 	
