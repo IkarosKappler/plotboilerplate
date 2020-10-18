@@ -111,7 +111,7 @@
 		}
 		drawCircleSections( circles[i], intervalSet );
 		if( config.drawCircleNumbers ) {
-		    pb.draw.text( ''+i, circles[i].center.x, circles[i].center.y );
+		    pb.fill.text( ''+i, circles[i].center.x, circles[i].center.y );
 		}
 	    }
 	};
