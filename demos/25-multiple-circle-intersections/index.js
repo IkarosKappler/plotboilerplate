@@ -97,7 +97,7 @@
 		    // Scale down
 		    var scaledCircles = [];
 		    for( var i = 0; i < visibleCircles.length; i++ ) {
-			var scaledCircle = new Circle( visibleCircles[i].center, visibleCircles[i].radius-25 );
+			var scaledCircle = new Circle( visibleCircles[i].center, visibleCircles[i].radius - config.nestedCircleStep );
 			if( scaledCircle.radius > 0 ) 
 			    scaledCircles.push( scaledCircle );
 		    }
@@ -200,7 +200,8 @@
 	    drawRadicalLines       : false,
 	    drawCircleNumbers      : false,
 	    sectionDrawPct         : 100, // [0..100]
-	    drawNestedCircles      : true
+	    drawNestedCircles      : true,
+	    nestedCircleStep       : 25
 	}, GUP );
 	
 
@@ -215,6 +216,7 @@
 	    gui.add(config, 'drawRadicalLines').onChange( function() { pb.redraw(); } ).name("drawRadicalLines").title("Draw the radical lines?");
 	    gui.add(config, 'drawCircleNumbers').onChange( function() { pb.redraw(); } ).name("drawCircleNumbers").title("Draw circle numbers?");
 	    gui.add(config, 'sectionDrawPct').min(0).max(100).step(1).onChange( function() { pb.redraw(); } ).name("sectionDrawPct").title("How much to draw?");
+	    gui.add(config, 'nestedCircleStep').min(2).max(100).step(1).onChange( function() { pb.redraw(); } ).name("nestedCircleStep").title("Distance of nested circles.");
 	}
 
 	pb.config.preDraw = drawAll;
