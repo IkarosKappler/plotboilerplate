@@ -125,6 +125,8 @@
 	    var anglea = lineAa.angle();
 	    var angleb = lineAb.angle();
 
+	    // Map angles to [0 ... 2*PI]
+	    // (the angle() function might return negative angles in [-PI .. 0 .. PI])
 	    if( anglea < 0 ) anglea = Math.PI*2 + anglea;
 	    if( angleb < 0 ) angleb = Math.PI*2 + angleb;
 
@@ -140,7 +142,8 @@
 	var drawCircleSections = function( circle, intervalSet ) {
 	    for( var i = 0; i < intervalSet.intervals.length; i++ ) {
 		var interval = intervalSet.intervals[i];
-		pb.draw.circleArc( circle.center, circle.radius, interval[0], interval[1], 'rgba(34,168,168,1.0)', 2.0 );
+		// pb.draw.circleArc( circle.center, circle.radius, interval[0], interval[1], 'rgba(34,168,168,1.0)', 2.0 );
+		pb.draw.circleArc( circle.center, circle.radius, interval[0], interval[0]+(interval[1]-interval[0])*(config.sectionDrawPct/100), 'rgba(34,168,168,1.0)', 2.0 );
 	    }
 	};
 	
@@ -165,7 +168,8 @@
 	    alwaysDrawFullCircles  : true,
 	    drawCircleSections     : false,
 	    drawRadicalLines       : false,
-	    drawCircleNumbers      : false
+	    drawCircleNumbers      : false,
+	    sectionDrawPct         : 100 // [0..100]
 	}, GUP );
 	
 
@@ -179,6 +183,7 @@
 	    gui.add(config, 'drawCircleSections').onChange( function() { pb.redraw(); } ).name("drawCircleSections").title("Draw the circle sections separately?");
 	    gui.add(config, 'drawRadicalLines').onChange( function() { pb.redraw(); } ).name("drawRadicalLines").title("Draw the radical lines?");
 	    gui.add(config, 'drawCircleNumbers').onChange( function() { pb.redraw(); } ).name("drawCircleNumbers").title("Draw circle numbers?");
+	    gui.add(config, 'sectionDrawPct').min(0).max(100).step(1).onChange( function() { pb.redraw(); } ).name("sectionDrawPct").title("How much to draw?");
 	}
 
 	pb.config.preDraw = drawAll;
