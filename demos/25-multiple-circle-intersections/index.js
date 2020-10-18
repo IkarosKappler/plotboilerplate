@@ -90,7 +90,24 @@
 
 	var drawAll = function() {
 	    if( circles.length == 0 ) return;
+	    var visibleCircles = drawCircleSet( circles );
+	    if( config.drawNestedCircles ) {
+		// Scale down visible circles
+		while( visibleCircles.length > 0 ) {
+		    // Scale down
+		    var scaledCircles = [];
+		    for( var i = 0; i < visibleCircles.length; i++ ) {
+			var scaledCircle = new Circle( visibleCircles[i].center, visibleCircles[i].radius-25 );
+			if( scaledCircle.radius > 0 ) 
+			    scaledCircles.push( scaledCircle );
+		    }
+		    visibleCircles = drawCircleSet( scaledCircles );
+		}
+	    }
+	};
 
+	var drawCircleSet = function( circles ) {
+	    var clearedCircleIndices = [];
 	    for( var i = 0; i < circles.length; i++ ) {
 		if( config.alwaysDrawFullCircles ) {
 		    pb.draw.circle( circles[i].center, circles[i].radius, 'rgba(34,168,168,0.333)', 1.0 );
@@ -107,6 +124,7 @@
 			}
 		    } else if( circles[j].containsCircle(circles[i]) ) {
 			intervalSet.clear();
+			clearedCircleIndices.push( i );
 		    }
 		}
 		drawCircleSections( circles[i], intervalSet );
@@ -114,6 +132,13 @@
 		    pb.fill.text( ''+i, circles[i].center.x, circles[i].center.y );
 		}
 	    }
+
+	    var affectedCircles = [];
+	    for( var i = 0; i < circles.length; i++ ) {
+		if( !clearedCircleIndices.includes(i) )
+		    affectedCircles.push( circles[i] );
+	    }
+	    return affectedCircles;
 	};
 
 
@@ -143,7 +168,12 @@
 	    for( var i = 0; i < intervalSet.intervals.length; i++ ) {
 		var interval = intervalSet.intervals[i];
 		// pb.draw.circleArc( circle.center, circle.radius, interval[0], interval[1], 'rgba(34,168,168,1.0)', 2.0 );
-		pb.draw.circleArc( circle.center, circle.radius, interval[0], interval[0]+(interval[1]-interval[0])*(config.sectionDrawPct/100), 'rgba(34,168,168,1.0)', 2.0 );
+		pb.draw.circleArc( circle.center,
+				   circle.radius,
+				   interval[0],
+				   interval[0]+(interval[1]-interval[0])*(config.sectionDrawPct/100),
+				   'rgba(34,168,168,1.0)',
+				   2.0 );
 	    }
 	};
 	
@@ -169,7 +199,8 @@
 	    drawCircleSections     : false,
 	    drawRadicalLines       : false,
 	    drawCircleNumbers      : false,
-	    sectionDrawPct         : 100 // [0..100]
+	    sectionDrawPct         : 100, // [0..100]
+	    drawNestedCircles      : true
 	}, GUP );
 	
 
