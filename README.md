@@ -10,7 +10,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (desktop and mobile)
 
 
-The compressed library has 89kb.
+The compressed library has 91kb.
 
 
 ## Install the package via npm
@@ -72,6 +72,7 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
 ![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
 Screenshot
+
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
 
@@ -247,11 +248,32 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/21-parquet-deformation/index.html" title="See the demo">See the demo</a>
 
 
+### Remember the [`Extrusion Generator`](https://github.com/IkarosKappler/extrusiongen "Extrusion Generator")? Here's a refactored one
+
+![Extrusion Generator](https://plotboilerplate.io/repo/screenshots/screenshot-20201019-threejs-highres.png "Extrusion Generator")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/22-threejs/index.html" title="See the demo">See the demo</a>
+
+
 ### Distance between point and Bézier curve
 
 ![Point-Bézier-Distance](https://plotboilerplate.io/repo/screenshots/screenshot-from-20200724-0-bezier-point-distance.png "Point-Bézier-Distance")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/23-bezier-point-distance/index.html" title="See the demo">See the demo</a>
+
+
+### Intersection of two circles (radical line)
+
+![Two-circle-radical-line](https://plotboilerplate.io/repo/screenshots/screenshot-20200907-circle-intersection-radical-line.png "Two-circle-radical-line")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/24-two-circles-radical-line/index.html" title="See the demo">See the demo</a>
+
+
+### Multiple circle intersections and their outlines
+
+![Multiple-circle-intersections](https://plotboilerplate.io/repo/screenshots/screenshot-20201018-multiple-circle-intersections.png "Two-circle-radical-line")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/25-multiple-circle-intersections/index.html" title="See the demo">See the demo</a>
 
 
 

@@ -1,11 +1,14 @@
+"use strict";
 /**
- * A circular interval set.
+ * @classdesc A circular interval set.
  *
  * @author   Ikaros Kappler
  * @date     2020-10-02
  * @modified 2020-10-18 Ported to Typescript from vanilla JS.
  * @version  1.0.0
+ * @name CircularIntervalSet
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
 var CircularIntervalSet = /** @class */ (function () {
     /**
      * Create a new CircularIntervalSet with the given lower and upperBound (start and end).
@@ -140,4 +143,5 @@ var CircularIntervalSet = /** @class */ (function () {
     ;
     return CircularIntervalSet;
 }());
+exports.CircularIntervalSet = CircularIntervalSet;
 //# sourceMappingURL=CircularIntervalSet.js.map

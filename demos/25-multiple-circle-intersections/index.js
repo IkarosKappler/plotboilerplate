@@ -90,7 +90,7 @@
 
 	var drawAll = function() {
 	    if( circles.length == 0 ) return;
-	    var visibleCircles = drawCircleSet( circles );
+	    var visibleCircles = drawCircleSet( circles, config.drawRadicalLines );
 	    if( config.drawNestedCircles ) {
 		// Scale down visible circles
 		while( visibleCircles.length > 0 ) {
@@ -101,33 +101,30 @@
 			if( scaledCircle.radius > 0 ) 
 			    scaledCircles.push( scaledCircle );
 		    }
-		    visibleCircles = drawCircleSet( scaledCircles );
+		    visibleCircles = drawCircleSet( scaledCircles, false );
 		}
 	    }
 	};
 
-	var drawCircleSet = function( circles ) {
-	    var clearedCircleIndices = [];
+	var drawCircleSet = function( circles, drawRadicalLines ) {
+	    // Find intersections, radical lines and interval 
+	    var innerCircleIndices   = CircleIntersections.findInnerCircles( circles ); 
+	    var radicalLines         = CircleIntersections.findRadicalLines( circles );
+	    var intervalSets         = CircleIntersections.findOuterCircleIntervals( circles, radicalLines );
 	    for( var i = 0; i < circles.length; i++ ) {
 		if( config.alwaysDrawFullCircles ) {
 		    pb.draw.circle( circles[i].center, circles[i].radius, 'rgba(34,168,168,0.333)', 1.0 );
 		}
-		var intervalSet = new CircularIntervalSet( 0, 2*Math.PI );
-		for( var j = 0; j < circles.length; j++ ) {
-		    if( i == j )
-			continue;
-		    var radLine = circles[i].circleIntersection( circles[j] );
-		    if( radLine !== null ) {
-			handleCircleSection( circles[i], radLine, intervalSet, i, j );
-			if( config.drawRadicalLines ) {
-			    pb.draw.line( radLine.a, radLine.b, 'rgba(34,168,168,0.333)', 1.0 );
-			}
-		    } else if( circles[j].containsCircle(circles[i]) ) {
-			intervalSet.clear();
-			clearedCircleIndices.push( i );
+		if( drawRadicalLines ) {
+		    for( var j = 0; j < circles.length; j++ ) {
+			if( radicalLines[i][j] ) //!= null )
+			    pb.draw.line( radicalLines[i][j].a, radicalLines[i][j].b, 'rgba(34,168,168,0.333)', 1.0 );
 		    }
 		}
-		drawCircleSections( circles[i], intervalSet );
+		if( config.drawCircleSections ) {
+		    drawCircleSections( circles[i], radicalLines[i] );
+		}
+		drawCircleIntervals( circles[i], intervalSets[i] );
 		if( config.drawCircleNumbers ) {
 		    pb.fill.text( ''+i, circles[i].center.x, circles[i].center.y );
 		}
@@ -135,45 +132,40 @@
 
 	    var affectedCircles = [];
 	    for( var i = 0; i < circles.length; i++ ) {
-		if( !clearedCircleIndices.includes(i) )
+		if( !innerCircleIndices.includes(i) )
 		    affectedCircles.push( circles[i] );
 	    }
 	    return affectedCircles;
 	};
+	
 
-
-	var handleCircleSection = function( circle, radLine, intervalSet, index, indexWith ) {
-	    // Get angle sections in the circles
-	    var lineAa = new Line( circle.center, radLine.a );
-	    var lineAb = new Line( circle.center, radLine.b );
-
-	    var anglea = lineAa.angle();
-	    var angleb = lineAb.angle();
-
-	    // Map angles to [0 ... 2*PI]
-	    // (the angle() function might return negative angles in [-PI .. 0 .. PI])
-	    if( anglea < 0 ) anglea = Math.PI*2 + anglea;
-	    if( angleb < 0 ) angleb = Math.PI*2 + angleb;
-
-	    if( config.drawCircleSections ) {
-		var pointa = circle.vertAt(anglea);
-		var pointb = circle.vertAt(angleb);
-		pb.draw.line( circle.center, pointa, 1.0, 'rgba(0,192,192,0.25)' );
-		pb.draw.line( circle.center, pointb, 1.0, 'rgba(0,192,192,0.25)' );
+	var drawCircleSections = function( circle, radicalLines ) {
+	    for( var r = 0; r < radicalLines.length; r++ ) {
+		if( radicalLines[r] == null )
+		    continue;
+		pb.draw.line( circle.center, radicalLines[r].a, 1.0, 'rgba(0,192,192,0.25)' );
+		pb.draw.line( circle.center, radicalLines[r].b, 1.0, 'rgba(0,192,192,0.25)' );
 	    }
-	    intervalSet.intersect( angleb, anglea );
 	};
-
-	var drawCircleSections = function( circle, intervalSet ) {
+	
+	var drawCircleIntervals = function( circle, intervalSet ) {
 	    for( var i = 0; i < intervalSet.intervals.length; i++ ) {
 		var interval = intervalSet.intervals[i];
-		// pb.draw.circleArc( circle.center, circle.radius, interval[0], interval[1], 'rgba(34,168,168,1.0)', 2.0 );
-		pb.draw.circleArc( circle.center,
-				   circle.radius,
-				   interval[0],
-				   interval[0]+(interval[1]-interval[0])*(config.sectionDrawPct/100),
-				   'rgba(34,168,168,1.0)',
-				   2.0 );
+		if( config.fillNestedCircles ) {
+		    pb.fill.circleArc( circle.center,
+				       circle.radius,
+				       interval[0],
+				       interval[0]+(interval[1]-interval[0])*(config.sectionDrawPct/100),
+				       'rgba(34,168,168,1.0)',
+				       config.lineWidth );
+		} else {
+		    pb.draw.circleArc( circle.center,
+				       circle.radius,
+				       interval[0],
+				       interval[0]+(interval[1]-interval[0])*(config.sectionDrawPct/100),
+				       'rgba(34,168,168,1.0)',
+				       config.lineWidth );
+		}
 	    }
 	};
 	
@@ -197,11 +189,13 @@
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
 	    alwaysDrawFullCircles  : true,
 	    drawCircleSections     : false,
+	    lineWidth : 2.0,
 	    drawRadicalLines       : false,
 	    drawCircleNumbers      : false,
 	    sectionDrawPct         : 100, // [0..100]
 	    drawNestedCircles      : true,
-	    nestedCircleStep       : 25
+	    nestedCircleStep       : 25,
+	    fillNestedCircles      : false
 	}, GUP );
 	
 
@@ -211,12 +205,15 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
+	    gui.add(config, 'lineWidth').min(1).max(100).step(1).onChange( function() { pb.redraw(); } ).name("lineWidth").title("The line width of circle sections.");
 	    gui.add(config, 'alwaysDrawFullCircles').onChange( function() { pb.redraw(); } ).name("alwaysDrawFullCircles").title("Always draw full circles?");
 	    gui.add(config, 'drawCircleSections').onChange( function() { pb.redraw(); } ).name("drawCircleSections").title("Draw the circle sections separately?");
 	    gui.add(config, 'drawRadicalLines').onChange( function() { pb.redraw(); } ).name("drawRadicalLines").title("Draw the radical lines?");
 	    gui.add(config, 'drawCircleNumbers').onChange( function() { pb.redraw(); } ).name("drawCircleNumbers").title("Draw circle numbers?");
 	    gui.add(config, 'sectionDrawPct').min(0).max(100).step(1).onChange( function() { pb.redraw(); } ).name("sectionDrawPct").title("How much to draw?");
+	    gui.add(config, 'drawNestedCircles').onChange( function() { pb.redraw(); } ).name("drawNestedCircles").title("Draw nested (inner) circles?");
 	    gui.add(config, 'nestedCircleStep').min(2).max(100).step(1).onChange( function() { pb.redraw(); } ).name("nestedCircleStep").title("Distance of nested circles.");
+	    gui.add(config, 'fillNestedCircles').onChange( function() { pb.redraw(); } ).name("fillNestedCircles").title("Fill circles?");
 	}
 
 	pb.config.preDraw = drawAll;

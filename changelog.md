@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2020-10-19
+  * Added CircleIntersections algorithm and demo 25.
+* 2020-10-18
+  * Added CircularIntervalset datastructure.
 * 2020-10-16
   * Added the Circle.containsCircle(...) function.
 * 2020-10-15

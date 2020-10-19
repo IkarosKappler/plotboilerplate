@@ -4,6 +4,16 @@ layout: page
 
 
 # Changelog
+* 2020-10-19
+  * Added CircleIntersections algorithm and demo 25.
+* 2020-10-18
+  * Added CircularIntervalset datastructure.
+* 2020-10-16
+  * Added the Circle.containsCircle(...) function.
+* 2020-10-15
+  * Re-added the draw.text() function.
+* 2020-10-06
+  * Removed the .closePath() instruction from the draw.circleArc function.
 * 2020-09-07
   * Added the Circle.circleIntersection(Circle) function.
   * Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) according to the assumed circle math. Please re-check your code if you already used this function.

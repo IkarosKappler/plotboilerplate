@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-09-14
+date: 2020-10-19
 ---
 
 <div class="full-width">
@@ -117,7 +117,7 @@ date: 2020-09-14
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/22-threejs/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200703-0-threejs.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20201019-threejs-highres.png');"></div>
    </a>
 </div>
 <div class="demo-box">
@@ -128,6 +128,11 @@ date: 2020-09-14
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/24-two-circles-radical-line/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200907-circle-intersection-radical-line.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/25-multiple-circle-intersections/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20201018-multiple-circle-intersections.png');"></div>
    </a>
 </div>
 </div>

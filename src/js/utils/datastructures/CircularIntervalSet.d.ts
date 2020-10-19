@@ -1,12 +1,13 @@
 /**
- * A circular interval set.
+ * @classdesc A circular interval set.
  *
  * @author   Ikaros Kappler
  * @date     2020-10-02
  * @modified 2020-10-18 Ported to Typescript from vanilla JS.
  * @version  1.0.0
+ * @name CircularIntervalSet
  **/
-declare class CircularIntervalSet {
+export declare class CircularIntervalSet {
     /**
      * @member {number} start
      * @memberof CircularIntervalSet

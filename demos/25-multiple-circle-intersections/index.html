@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate – Intersection points of two circles (radical line)</title>
+    <title>2D Plotting Boilerplate – Intersection paths of multiple circles</title>
     <meta charset="UTF-8">
     <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, circle intersection, radical line, algorithm">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, outline, hull, circle intersection, algorithm">
     <meta name="author" content="Ikaros Kappler">
     <meta name="date" content="2020-09-04">
 
@@ -13,9 +13,9 @@
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Demonstrating the intersection points of two circles (radical line) with PlotBoilerplate.js.">
-    <meta property="og:description" content="Demonstrating the intersection points of two circles (radical line) with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20200907-circle-intersection-radical-line.png">
+    <meta property="og:title" content="Demonstrating the intersection points of multiple circles and their outer intersection path with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demonstrating the intersection points of multiple circles and their outer intersection path with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20201018-multiple-circle-intersections.png">
 
 
     <script src="../../lib/dat.gui.min.js"></script>
@@ -57,13 +57,11 @@
 
     <script src="../../src/js/utils/helpers/CircleHelper.js"></script>
     <script src="../../src/js/utils/datastructures/CircularIntervalSet.js"></script>
+    <script src="../../src/js/utils/algorithms/CircleIntersections.js"></script>
 
     <!-- For production -->
     <script src="../../dist/plotboilerplate.min.js"></script>
     <!-- END For production -->
-
-    <!-- <script src="../CircleHelper.js"></script> -->    
-    <!-- <script src="../CircularIntervalSet.js"></script> -->
 
     <script src="index.js"></script>
     <link rel="stylesheet" href="../style.css"> 
