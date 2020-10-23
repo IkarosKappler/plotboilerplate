@@ -4,7 +4,8 @@
  * @author   Ikaros Kappler
  * @date     2020-10-02
  * @modified 2020-10-18 Ported to Typescript from vanilla JS.
- * @version  1.0.0
+ * @modified 2020-10-22 Added the removeAt funcion.
+ * @version  1.0.1
  * @name CircularIntervalSet
  **/
 
@@ -68,6 +69,23 @@ export class CircularIntervalSet {
     };
 
 
+    /**
+     * Remove the interval at given index.
+     *
+     * @param {number} index
+     * @method removeAt
+     * @instance
+     * @memberof CircularIntervalSet
+     * @return {void}
+     **/
+    // Todo: remove? (not in use any more?)
+    removeAt(index:number) : void {
+	if( index < 0 || index >= this.intervals.length )
+	    return;
+	this.intervals.splice( index, 1 );
+    };
+
+    
     /**
      * Intersect all sub intervalls with the given range (must be inside bounds).
      *

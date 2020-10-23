@@ -7,11 +7,11 @@ For plotting visual 2D data with Javascript and HTML canvas (in 2d-context).
 
 This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
- * adding elements like vertices, lines, vectors, triangles, curves, polygons, ellipses, images
+ * adding elements like [vertices](https://plotboilerplate.io/docs/Vertex.html "Vertex class"), [lines](https://plotboilerplate.io/docs/Line.html "Line class"), [vectors](https://plotboilerplate.io/docs/Vector.html "Vector class"), [triangles](https://plotboilerplate.io/docs/Triangle.html "Triangle class"), [curves](https://plotboilerplate.io/docs/CubicBezierCurve.html "CubicBezierCurve class"), [circles](https://plotboilerplate.io/docs/Circle.html "Circle class"), [polygons](https://plotboilerplate.io/docs/Polygon.html "Polygon class"), [ellipses](https://plotboilerplate.io/docs/VEllipse.html "VEllipse class"), [images](https://plotboilerplate.io/docs/PBImage.html "PBImage class")
  * cofiguration of the canvas behavior (fullsize, interaction, raster)
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
- * touch interaction for dragging vertices (desktop and mobile)
+ * touch interaction for dragging vertices (mobile deviced; zoom, pan, drag)
 
 
 The compressed library has 91kb.

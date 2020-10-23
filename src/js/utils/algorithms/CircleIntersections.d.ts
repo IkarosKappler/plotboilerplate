@@ -17,19 +17,25 @@
  **/
 import { Circle } from "../../Circle";
 import { Line } from "../../Line";
+import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
+declare type Interval = [number, number];
+export declare type Matrix<T> = Array<Array<T>>;
 export declare class CircleIntersections {
     /**
-     * Get the radical lines of all circle intersections.
+     * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect.
      *
-     * The returned two-dimensional array has exactly as much entries as the passed circle array.
+     * Note that this matrix is symmetrical: if circles (i,j) intersect with line (A,B), then also circles (j,i) intersect
+     * with line (B,A).
      *
-     * @method findRadicalLines
+     * The returned two-dimensional matrix (array) has exactly as many entries as the passed circle array.
+     *
+     * @method buildRadicalLineMatrix
      * @static
      * @memberof CircleIntersections
      * @param {Array<Circle>} circles - The circles to find intersections for.
-     * @return {Array<Array<Line>>}
+     * @return {Array<Array<Line>>} A 2d-matrix containing the radical lines where circles intersect.
      **/
-    static findRadicalLines(circles: Array<Circle>): Line[][];
+    static buildRadicalLineMatrix(circles: Array<Circle>): Matrix<Line>;
     /**
      * Find all circles (indices) which are completely located inside another circle.
      *
@@ -51,10 +57,24 @@ export declare class CircleIntersections {
      * @static
      * @memberof CircleIntersections
      * @param {Array<Circle>} circles - The circles to find intersections for.
-     * @param {Array<Line>} radicalLines
+     * @param {Array<Line>} intersectionMatrix
      * @return {Array<number>}
      **/
-    static findOuterCircleIntervals(circles: any, radicalLines: any): any[];
+    static findOuterCircleIntervals(circles: Array<Circle>, intersectionMatrix: Matrix<Line>): Array<CircularIntervalSet>;
+    /**
+     * Calculate all circles intervals, dermined by the given circles and their radical lines.
+     *
+     * The returned array contains IntervalSets - one for each circle - indicating the remaining circle sections.
+     *
+     * @method
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<Line>} intersectionMatrix
+     * @return {Array<number>}
+     **/
+    static convertRadicalLinesToAngles(circles: Array<Circle>, radicalLineMatrix: Matrix<Line>): Matrix<Interval>;
+    private static radicalLineToAngle;
     /**
      * This is a helper fuction used by `findCircleIntervals`.
      *
@@ -70,4 +90,7 @@ export declare class CircleIntersections {
      * @return {void}
      **/
     private static handleCircleInterval;
+    static arrayFill<T extends any>(count: number, initialValue: T): Array<T>;
+    static matrixFill<T extends any>(countA: number, countB: number, initialValue: T): Matrix<T>;
 }
+export {};
