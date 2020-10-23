@@ -122,6 +122,13 @@
 	    var intervalSets         = CircleIntersections.findOuterCircleIntervals( circles, radicalLineMatrix );
 	    // Todo: put into separate file
 	    var usedMatrixRecords    = CircleIntersections.matrixFill( circles.length, circles.length, false );
+	    var maxSetLength = 0;
+	    var totalIntervalCount = 0;
+	    for( var i = 0; i < intervalSets.length; i++ ) {
+		totalIntervalCount += intervalSets[i].intervals.length;
+		maxSetLength = Math.max( maxSetLength, intervalSets[i].intervals.length );
+	    }
+	    var usedIntervalSetRecords = CircleIntersections.matrixFill( intervalSets.length, maxSetLength, false );
 	    console.log("drawCircleSet", "radicalLineMatrix", radicalLineMatrix );
 	    console.log("drawCircleSet", "angleMatrix", angleMatrix );
 	    for( var i = 0; i < circles.length; i++ ) {
@@ -145,8 +152,8 @@
 
 	    console.log( "Draw paths" );
 	    var path = null;
-	    while( (path = findPartitions(circles,radicalLineMatrix,angleMatrix,usedMatrixRecords,intervalSets)) != null && path.length > 0 ) {
-		drawConnectedPath(circles,path);
+	    while( (path = findPartitions(circles,radicalLineMatrix,angleMatrix,usedMatrixRecords,usedIntervalSetRecords,intervalSets)) != null && path.length > 0 ) {
+		drawConnectedPath(circles,path,intervalSets);
 	    }
 	    //drawCircleIntervals( circles, radicalLines, intervalSets );
 
@@ -175,7 +182,7 @@
 	    return null;
 	};
 
-	var randomInterval = function( angleMatrix, usedMatrixRecords ) { // intervalSets ) {
+	var _randomInterval = function( angleMatrix, usedMatrixRecords ) { // intervalSets ) {
 	    /* var i = 0;
 	    while( i < intervalSets.length && intervalSets[i].intervals.length == 0 ) {
 		// console.log( i, "intervalSets["+i+"].intervals.length=", intervalSets[i].intervals.length, 'i++' );
@@ -193,7 +200,66 @@
 	    return null; 
 	};
 
-	var findPartitions = function( circles, intersectionMatrix, angleMatrix, usedMatrixRecords, intervalSets ) {
+	var randomInterval = function( intervalSets, usedIntervalSetRecords ) { 
+	    /* var i = 0;
+	    while( i < intervalSets.length && intervalSets[i].intervals.length == 0 ) {
+		// console.log( i, "intervalSets["+i+"].intervals.length=", intervalSets[i].intervals.length, 'i++' );
+		i++;
+	    }
+	    return i < intervalSets.length ? { i : i, j : 0 } : null; */
+	    // var i = 0;
+	    /* for( var i = 0; i < angleMatrix.length; i++ ) {
+		for( var j = 0; j < angleMatrix[i].length; j++ ) {
+		    // console.log( i, "intervalSets["+i+"].intervals.length=", intervalSets[i].intervals.length, 'i++' );
+		    if( angleMatrix[i][j] != null && !usedMatrixRecords[i][j] )
+			return { i : i, j : j };
+		}
+		} */
+	    for( var i = 0; i < intervalSets.length; i++ ) {
+		for( var j = 0; j < intervalSets[i].intervals.length; j++ ) {
+		    if( !usedIntervalSetRecords[i][j] ) {
+			return { i : i, j : j };
+		    }
+		}
+	    }
+	    return null; 
+	};
+
+	var findAdjacentInterval = function( circles, intLocation, intervalSets, usedIntervalSetRecords ) {
+	    var curInterval = intervalSets[ intLocation.i ].intervals[ intLocation.j ];
+	    if( !curInterval ) {
+		console.log('curInterval is null!', intLocation.i, intLocation.j, intervalSets );
+	    }
+	    var curEndPoint = circles[ intLocation.i ].vertAt( curInterval[1] );
+	    for( var i = 0; i < intervalSets.length; i++ ) {
+		for( var j = 0; j < intervalSets[i].intervals.length; j++ ) {
+		    if( usedIntervalSetRecords[i][j] ) {
+			continue;
+		    }
+		    var interval = intervalSets[i].intervals[j];
+		    var startPoint = circles[i].vertAt( interval[0] );
+		    if( curEndPoint.distance(startPoint) < 0.1 )
+			return { i : i, j : j };
+		}
+	    }
+	    return null;
+	};
+
+	var findPartitions = function( circles, intersectionMatrix, angleMatrix, usedMatrixRecords, usedIntervalSetRecords, intervalSets, totalIntervalCount ) {
+
+	    var intLocation = randomInterval( intervalSets, usedIntervalSetRecords );
+	    var count = 0;
+	    var path = [];
+	    while( intLocation != null ) {
+		path.push( intLocation );
+		count++;
+		usedIntervalSetRecords[ intLocation.i ][ intLocation.j ] = true;
+		intLocation = findAdjacentInterval( circles, intLocation, intervalSets, usedIntervalSetRecords );
+	    };
+	    return path.length == 0 ? null : path;
+	};
+	
+	var _findPartitions = function( circles, intersectionMatrix, angleMatrix, usedMatrixRecords, usedIntervalSetRecords, intervalSets ) {
 	    // Find first non-empty interval set
 	    // { i, j }
 	    var intLocation = randomInterval( angleMatrix, usedMatrixRecords ); // intervalSets );
@@ -244,7 +310,32 @@
 	    }
 	};
 
-	var drawConnectedPath = function( circles, path ) {
+	var drawConnectedPath = function( circles, path, intervalSets ) {
+	    console.log( "drawConnectedPath", JSON.stringify(path) );
+	    var randomColor = 'rgb('+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+')';
+	    pb.draw.ctx.save();
+	    pb.draw.ctx.beginPath();
+	    for( var i = 0; i < path.length; i++ ) {
+		var circleIndex = path[i].i;
+		var circle = circles[ circleIndex ];
+		var center = circle.center;
+		var radius = circle.radius;
+		// var interval = path[i].interval;
+		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ]; //path[i].interval;
+		pb.draw.ctx.ellipse( pb.draw.offset.x+center.x*pb.draw.scale.x,
+				     pb.draw.offset.y+center.y*pb.draw.scale.y,
+				     radius*pb.draw.scale.x,
+				     radius*pb.draw.scale.y,
+				     0.0,
+				     interval[0], // startAngle,
+				     interval[1], // endAngle,
+				     false );
+	    }
+	    pb.draw.ctx.lineWidth = 1;
+	    pb.draw._fillOrDraw( randomColor ); // 'rgba(192,128,0,1.0)' );
+	};
+	
+	var _drawConnectedPath = function( circles, path ) {
 	    console.log( "drawConnectedPath", JSON.stringify(path) );
 	    var randomColor = 'rgb('+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+')';
 	    pb.draw.ctx.save();
@@ -255,13 +346,6 @@
 		var center = circle.center;
 		var radius = circle.radius;
 		var interval = path[i].interval;
-		/* var radicalLine = intersectionMatrix[ intLocation.i ][ intLocation.j ];
-		var lineAa = new Line( circle.center, radicalLine.a );
-		var lineAb = new Line( circle.center, radicalLine.b );
-
-		var anglea = lineAa.angle();
-		var angleb = lineAb.angle(); */
-
 		pb.draw.ctx.ellipse( pb.draw.offset.x+center.x*pb.draw.scale.x,
 				     pb.draw.offset.y+center.y*pb.draw.scale.y,
 				     radius*pb.draw.scale.x,
