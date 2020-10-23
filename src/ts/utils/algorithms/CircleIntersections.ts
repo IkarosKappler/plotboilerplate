@@ -16,24 +16,17 @@
  * @name CircleIntersections
  **/
 
+import { arrayFill } from "./arrayFill";
 import { Circle } from "../../Circle";
 import { Line } from "../../Line";
 import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
-
-type Interval = [ number, number ];
-
-/*
-export interface ICircleIntersecion {
-    line : Line;
-    interval : Interval;
-}; */
-
-export type Matrix<T> = Array<Array<T>>;
+import { Interval, IndexPair, Matrix } from "../datastructures/interfaces";
 
 export class CircleIntersections {
 
     /**
-     * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect.
+     * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect; 
+     * conatins null at (i,j) otherwise.
      *
      * Note that this matrix is symmetrical: if circles (i,j) intersect with line (A,B), then also circles (j,i) intersect
      * with line (B,A).
@@ -50,7 +43,7 @@ export class CircleIntersections {
 	var radicalLines:Array<Array<Line>> = [];
 	for( var i = 0; i < circles.length; i++ ) {
 	    if( !radicalLines[i] )
-		radicalLines[i] = CircleIntersections.arrayFill( circles.length, null ); // Array<Line>( circles.length );
+		radicalLines[i] = arrayFill<Line>( circles.length, null ); // Array<Line>( circles.length );
 	    for( var j = 0; j < circles.length; j++ ) {
 		if( i == j )
 		    continue;
@@ -60,7 +53,7 @@ export class CircleIntersections {
 		// Build symmetrical matrix
 		if( radicalLines[i][j] ) {
 		    if( !radicalLines[j] )
-			radicalLines[j] = Array<Line>( circles.length );
+			radicalLines[j] = arrayFill<Line>( circles.length, null ); // Array<Line>( circles.length );
 		    // Use reverse line
 		    radicalLines[j][i] = new Line( radicalLines[i][j].b, radicalLines[i][j].a );
 		}
@@ -81,8 +74,8 @@ export class CircleIntersections {
      * @param {Array<Circle>} circles - The circles to find intersections for.
      * @return {Array<number>}
      **/
-    static findInnerCircles( circles ) {
-	var innerCircleIndices = [];
+    static findInnerCircles( circles ) : Array<number> {
+	const innerCircleIndices : Array<number> = [];
 	for( var i = 0; i < circles.length; i++ ) {
 	    for( var j = 0; j < circles.length; j++ ) {
 		if( i == j )
@@ -97,7 +90,8 @@ export class CircleIntersections {
 
     
     /**
-     * Calculate all circles intervals, dermined by the given circles and their radical lines.
+     * Calculate all outer circle intervals (sections that belong to the outermost line), dermined by the given 
+     * circles and their radical lines.
      *
      * The returned array contains IntervalSets - one for each circle - indicating the remaining circle sections.
      *
@@ -116,6 +110,7 @@ export class CircleIntersections {
 		if( i == j )
 		    continue;
 		if( intersectionMatrix[i][j] !== null ) {
+		    // const interval : Interval = CircleIntersections.radicalLineToInterval( circle, radicalLine );
 		    CircleIntersections.handleCircleInterval( circles[i], intersectionMatrix[i][j], intervalSets[i] );
 		} else if( circles[j].containsCircle(circles[i]) ) {
 		    intervalSets[i].clear();
@@ -124,58 +119,71 @@ export class CircleIntersections {
 	}
 	return intervalSets;
     };
-
-
+    
+    
     /**
-     * Calculate all circles intervals, dermined by the given circles and their radical lines.
+     * Calculate the next connected partition from the given set of circles and outer path intervals. The function
+     * will pick a random unused circle interval and detect all adjacent intervals until a closed partition
+     * was found.
      *
-     * The returned array contains IntervalSets - one for each circle - indicating the remaining circle sections.
+     * If an interval (circle section) was already visited will be stored in the `usedIntervalSetRecords` matrix (thus
+     * is must be large enough to map all sections).
      *
-     * @method 
+     * The returned array contains IndexPairs (i,j) - one for each circle i - indicating the used circle section j.
+     *
+     * @method findOuterPartition
      * @static
      * @memberof CircleIntersections
      * @param {Array<Circle>} circles - The circles to find intersections for.
-     * @param {Array<Line>} intersectionMatrix
-     * @return {Array<number>}
+     * @param {Array<CircularIntervalSet>} intervalSets - The circle intervals that form the intersection outline.
+     * @param {Matrix<boolean>} usedIntervals - A matrix for remembering which circle intervals were always used.
+     * @return {Array<Indexpair>|null} The next partition or `null` if no more can be found.
      **/
-    static convertRadicalLinesToAngles( circles:Array<Circle>, radicalLineMatrix: Matrix<Line> ) : Matrix<Interval> {
-	const angleMatrix : Matrix<Interval> = Array( circles.length );
-	for( var i = 0; i < circles.length; i++ ) {
-	    angleMatrix[i] = CircleIntersections.arrayFill( circles.length, null );
-	    for( var j = 0; j < circles.length; j++ ) {
-		if( i == j )
-		    continue;
-		if( radicalLineMatrix[i][j] ) {
-		    // CircleIntersections.handleCircleInterval( circles[i], radicalLineMatrix[i][j], intervalSets[i] );#
-		    const interval : Interval = CircleIntersections.radicalLineToAngle( circles[i], radicalLineMatrix[i][j] );
-		    angleMatrix[i][j] = interval;
-		}
-	    }
-	}
-	return angleMatrix;
-    };
-
-
-    private static radicalLineToAngle( circle:Circle, radicalLine:Line ) : Interval {
-	// Get angle sections in the circles
-	var lineAa = new Line( circle.center, radicalLine.a );
-	var lineAb = new Line( circle.center, radicalLine.b );
-
-	var anglea = lineAa.angle();
-	var angleb = lineAb.angle();
-
-	// Map angles to [0 ... 2*PI]
-	// (the angle() function might return negative angles in [-PI .. 0 .. PI])
-	if( anglea < 0 ) anglea = Math.PI*2 + anglea;
-	if( angleb < 0 ) angleb = Math.PI*2 + angleb;
-
-	// intervalSet.intersect( angleb, anglea );
-	return [anglea, angleb];
+    static findOuterPartition( circles:Array<Circle>,
+			       intervalSets:Array<CircularIntervalSet>,
+			       usedIntervals:Matrix<boolean>
+			     ) : Array<IndexPair>|null {
+	let intLocation : IndexPair = CircleIntersections.randomUnusedInterval( intervalSets, usedIntervals );
+	const path : Array<IndexPair> = [];
+	while( intLocation != null ) {
+	    path.push( intLocation );
+	    usedIntervals[ intLocation.i ][ intLocation.j ] = true;
+	    intLocation = CircleIntersections.findAdjacentInterval( circles, intLocation, intervalSets, usedIntervals, 0.001 );
+	};
+	return path.length == 0 ? null : path;
     };
     
 
     /**
-     * This is a helper fuction used by `findCircleIntervals`.
+     * Convert a radical line (belonging to a circle) into an interval: start angle and end angle.
+     *
+     * @method radicalLineToInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Circle} circle - The circle itself.
+     * @param {Line} radicaLine - The radical line to convert (must have two intersection points on the circle).
+     * @return {Interval} The interval `[startAngle,endAngle]` determined by the radical line.
+     **/
+    private static radicalLineToInterval( circle:Circle, radicalLine:Line ) : Interval {
+	// Get angle sections in the circles
+	const lineA : Line = new Line( circle.center, radicalLine.a );
+	const lineB : Line = new Line( circle.center, radicalLine.b );
+
+	let angleA : number = lineA.angle();
+	let angleB : number = lineB.angle();
+
+	// Map angles to [0 ... 2*PI]
+	// (the angle() function might return negative angles in [-PI .. 0 .. PI])
+	if( angleA < 0 ) angleA = Math.PI*2 + angleA;
+	if( angleB < 0 ) angleB = Math.PI*2 + angleB;
+
+	return [angleA, angleB];
+    };
+    
+
+    /**
+     * This is a helper fuction used by `findOuterCircleIntervals`.
      *
      * It applies the passed radical line by intersecting the remaining circle sections with the new section.
      *
@@ -188,28 +196,72 @@ export class CircleIntersections {
      * @param {CircularIntervalSet} intervalSet - The CircularIntervalSet to use (must have left and right border: 0 and 2*PI).
      * @return {void}
      **/
-    // TODO delete this method (only used once and only two lines)
-    private static handleCircleInterval( circle, radicalLine, intervalSet ) {
-	// Get angle sections in the circles
-	/*
-	var lineAa = new Line( circle.center, radicalLine.a );
-	var lineAb = new Line( circle.center, radicalLine.b );
-
-	var anglea = lineAa.angle();
-	var angleb = lineAb.angle();
-
-	// Map angles to [0 ... 2*PI]
-	// (the angle() function might return negative angles in [-PI .. 0 .. PI])
-	if( anglea < 0 ) anglea = Math.PI*2 + anglea;
-	if( angleb < 0 ) angleb = Math.PI*2 + angleb;
-	*/
-
-	const interval : Interval = CircleIntersections.radicalLineToAngle( circle, radicalLine );
-
-	// intervalSet.intersect( angleb, anglea );
+    private static handleCircleInterval( circle, radicalLine, intervalSet ) : void {
+	const interval : Interval = CircleIntersections.radicalLineToInterval( circle, radicalLine );
 	intervalSet.intersect( interval[1], interval[0] );
     };
+    
 
+    /**
+     * Pick a random unused circle interval. This function is used by the `findOuterPartition` function, which
+     * starts the detection with any random section.
+     *
+     * @method randomUnusedInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Array<CircularIntervalSet>} intervalSets - An array of all available interval sets/intervals.
+     * @param {Matrix<boolean>} usedIntervals - A matrix indicating which intervals have already been used/visited by the algorithm
+     * @return {IndexPair|null}
+     **/
+    private static randomUnusedInterval( intervalSets:Array<CircularIntervalSet>,
+					 usedIntervals:Matrix<boolean> ) : IndexPair|null {
+	for( var i = 0; i < intervalSets.length; i++ ) {
+	    for( var j = 0; j < intervalSets[i].intervals.length; j++ ) {
+		if( !usedIntervals[i][j] ) {
+		    return { i : i, j : j };
+		}
+	    }
+	}
+	return null; 
+    };
+
+
+    /**
+     * Find the next adjacent circle interval for the given interval.
+     * starts the detection with any random section.
+     *
+     * @method randomUnusedInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Array<CircularIntervalSet>} intervalSets - An array of all available interval sets/intervals.
+     * @param {Matrix<boolean>} usedIntervals - A matrix indicating which intervals have already been used/visited by the algorithm
+     * @return {IndexPair|null}
+     **/
+    private static findAdjacentInterval( circles:Array<Circle>,
+					 intLocation:IndexPair,
+					 intervalSets:Array<CircularIntervalSet>,
+					 usedIntervalSetRecords:Matrix<boolean>,
+					 epsilon:number
+				       ) {
+	var curInterval = intervalSets[ intLocation.i ].intervals[ intLocation.j ];
+	var curEndPoint = circles[ intLocation.i ].vertAt( curInterval[1] );
+	for( var i = 0; i < intervalSets.length; i++ ) {
+	    for( var j = 0; j < intervalSets[i].intervals.length; j++ ) {
+		if( usedIntervalSetRecords[i][j] ) {
+		    continue;
+		}
+		var interval = intervalSets[i].intervals[j];
+		var startPoint = circles[i].vertAt( interval[0] );
+		if( curEndPoint.distance(startPoint) < epsilon )
+		    return { i : i, j : j };
+	    }
+	}
+	return null;
+    };
+
+    /* 
     public static arrayFill<T extends any>( count:number, initialValue:T ) : Array<T> {
 	const arr : Array<T> = Array<T>( count );
 	for( var i = 0; i < count; i++ )
@@ -223,6 +275,6 @@ export class CircleIntersections {
 	    arr[i] = CircleIntersections.arrayFill( countB, initialValue );
 	}
 	return arr;
-    };
-
+    }; */
+     
 };

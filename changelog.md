@@ -1,6 +1,11 @@
 
 
 # Changelog
+* 2020-10-23
+  * Added the fillArray and fillMatrix helper function (like in lodash).
+  * Added the `Matrix`, `Interval` and `IndexPair` interfaces to the typescript definitions.
+  * Ported the `Color` library from vanilla JS to Typescript.
+  * Ported the `WebColors` selection from vanilla to TypeScript.
 * 2020-10-19
   * Added CircleIntersections algorithm and demo 25.
 * 2020-10-18

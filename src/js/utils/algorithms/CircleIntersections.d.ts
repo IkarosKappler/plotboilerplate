@@ -18,11 +18,11 @@
 import { Circle } from "../../Circle";
 import { Line } from "../../Line";
 import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
-declare type Interval = [number, number];
-export declare type Matrix<T> = Array<Array<T>>;
+import { IndexPair, Matrix } from "../datastructures/interfaces";
 export declare class CircleIntersections {
     /**
-     * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect.
+     * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect;
+     * conatins null at (i,j) otherwise.
      *
      * Note that this matrix is symmetrical: if circles (i,j) intersect with line (A,B), then also circles (j,i) intersect
      * with line (B,A).
@@ -47,9 +47,10 @@ export declare class CircleIntersections {
      * @param {Array<Circle>} circles - The circles to find intersections for.
      * @return {Array<number>}
      **/
-    static findInnerCircles(circles: any): any[];
+    static findInnerCircles(circles: any): Array<number>;
     /**
-     * Calculate all circles intervals, dermined by the given circles and their radical lines.
+     * Calculate all outer circle intervals (sections that belong to the outermost line), dermined by the given
+     * circles and their radical lines.
      *
      * The returned array contains IntervalSets - one for each circle - indicating the remaining circle sections.
      *
@@ -62,21 +63,38 @@ export declare class CircleIntersections {
      **/
     static findOuterCircleIntervals(circles: Array<Circle>, intersectionMatrix: Matrix<Line>): Array<CircularIntervalSet>;
     /**
-     * Calculate all circles intervals, dermined by the given circles and their radical lines.
+     * Calculate the next connected partition from the given set of circles and outer path intervals. The function
+     * will pick a random unused circle interval and detect all adjacent intervals until a closed partition
+     * was found.
      *
-     * The returned array contains IntervalSets - one for each circle - indicating the remaining circle sections.
+     * If an interval (circle section) was already visited will be stored in the `usedIntervalSetRecords` matrix (thus
+     * is must be large enough to map all sections).
      *
-     * @method
+     * The returned array contains IndexPairs (i,j) - one for each circle i - indicating the used circle section j.
+     *
+     * @method findOuterPartition
      * @static
      * @memberof CircleIntersections
      * @param {Array<Circle>} circles - The circles to find intersections for.
-     * @param {Array<Line>} intersectionMatrix
-     * @return {Array<number>}
+     * @param {Array<CircularIntervalSet>} intervalSets - The circle intervals that form the intersection outline.
+     * @param {Matrix<boolean>} usedIntervals - A matrix for remembering which circle intervals were always used.
+     * @return {Array<Indexpair>|null} The next partition or `null` if no more can be found.
      **/
-    static convertRadicalLinesToAngles(circles: Array<Circle>, radicalLineMatrix: Matrix<Line>): Matrix<Interval>;
-    private static radicalLineToAngle;
+    static findOuterPartition(circles: Array<Circle>, intervalSets: Array<CircularIntervalSet>, usedIntervals: Matrix<boolean>): Array<IndexPair> | null;
     /**
-     * This is a helper fuction used by `findCircleIntervals`.
+     * Convert a radical line (belonging to a circle) into an interval: start angle and end angle.
+     *
+     * @method radicalLineToInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Circle} circle - The circle itself.
+     * @param {Line} radicaLine - The radical line to convert (must have two intersection points on the circle).
+     * @return {Interval} The interval `[startAngle,endAngle]` determined by the radical line.
+     **/
+    private static radicalLineToInterval;
+    /**
+     * This is a helper fuction used by `findOuterCircleIntervals`.
      *
      * It applies the passed radical line by intersecting the remaining circle sections with the new section.
      *
@@ -90,7 +108,30 @@ export declare class CircleIntersections {
      * @return {void}
      **/
     private static handleCircleInterval;
-    static arrayFill<T extends any>(count: number, initialValue: T): Array<T>;
-    static matrixFill<T extends any>(countA: number, countB: number, initialValue: T): Matrix<T>;
+    /**
+     * Pick a random unused circle interval. This function is used by the `findOuterPartition` function, which
+     * starts the detection with any random section.
+     *
+     * @method randomUnusedInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Array<CircularIntervalSet>} intervalSets - An array of all available interval sets/intervals.
+     * @param {Matrix<boolean>} usedIntervals - A matrix indicating which intervals have already been used/visited by the algorithm
+     * @return {IndexPair|null}
+     **/
+    private static randomUnusedInterval;
+    /**
+     * Find the next adjacent circle interval for the given interval.
+     * starts the detection with any random section.
+     *
+     * @method randomUnusedInterval
+     * @static
+     * @private
+     * @memberof CircleIntersections
+     * @param {Array<CircularIntervalSet>} intervalSets - An array of all available interval sets/intervals.
+     * @param {Matrix<boolean>} usedIntervals - A matrix indicating which intervals have already been used/visited by the algorithm
+     * @return {IndexPair|null}
+     **/
+    private static findAdjacentInterval;
 }
-export {};
