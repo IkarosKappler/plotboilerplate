@@ -17,6 +17,7 @@
  **/
 
 import { arrayFill } from "./arrayFill";
+import { matrixFill } from "./matrixFill";
 import { Circle } from "../../Circle";
 import { Line } from "../../Line";
 import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
@@ -24,6 +25,38 @@ import { Interval, IndexPair, Matrix } from "../datastructures/interfaces";
 
 export class CircleIntersections {
 
+    /**
+     * Find all connected outer path partitions.
+     *
+     * @method findOuterPartitions
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
+     * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
+     **/
+    static findOuterPartitions( circles:Array<Circle>,
+				intervalSets:Array<CircularIntervalSet>
+			      ) : Array<Array<IndexPair>> {
+
+	// For tracking which interval we already used for detecting the partition
+	// we need a matrix; find the maximal interval length.
+	let maxSetLength : number = 0;
+	for( var i = 0; i < intervalSets.length; i++ ) {
+	    maxSetLength = Math.max( maxSetLength, intervalSets[i].intervals.length );
+	}
+	const usedIntervals : Matrix<boolean> = matrixFill<boolean>( intervalSets.length, maxSetLength, false );
+	
+	// Draw connected paths?
+	var path : Array<IndexPair>|null = null;
+	var pathList : Array<Array<IndexPair>> = [];
+	while( (path = CircleIntersections.findOuterPartition(circles,intervalSets,usedIntervals)) != null ) {
+	    pathList.push( path );
+	}
+
+	return pathList;
+    };
+    
     /**
      * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect; 
      * conatins null at (i,j) otherwise.

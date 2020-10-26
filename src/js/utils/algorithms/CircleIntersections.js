@@ -18,11 +18,39 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var arrayFill_1 = require("./arrayFill");
+var matrixFill_1 = require("./matrixFill");
 var Line_1 = require("../../Line");
 var CircularIntervalSet_1 = require("../datastructures/CircularIntervalSet");
 var CircleIntersections = /** @class */ (function () {
     function CircleIntersections() {
     }
+    /**
+     * Find all connected outer path partitions.
+     *
+     * @method findOuterPartitions
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
+     * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
+     **/
+    CircleIntersections.findOuterPartitions = function (circles, intervalSets) {
+        // For tracking which interval we already used for detecting the partition
+        // we need a matrix; find the maximal interval length.
+        var maxSetLength = 0;
+        for (var i = 0; i < intervalSets.length; i++) {
+            maxSetLength = Math.max(maxSetLength, intervalSets[i].intervals.length);
+        }
+        var usedIntervals = matrixFill_1.matrixFill(intervalSets.length, maxSetLength, false);
+        // Draw connected paths?
+        var path = null;
+        var pathList = [];
+        while ((path = CircleIntersections.findOuterPartition(circles, intervalSets, usedIntervals)) != null) {
+            pathList.push(path);
+        }
+        return pathList;
+    };
+    ;
     /**
      * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect;
      * conatins null at (i,j) otherwise.

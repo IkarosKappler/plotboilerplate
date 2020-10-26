@@ -1,7 +1,7 @@
 /**
- * A set of 'beautiful' web colors (I know, beauty is in the eye of the beholder).
+ * A set of beautiful web colors (I know, beauty is in the eye of the beholder).
  *
- * I found this color chart with 11 colors and found them somewhat nice
+ * I found this color chart with 11 colors and think it is somewhat nice
  *    https://www.pinterest.com/pin/229965124706497134/
  *
  * @requires Color
@@ -16,7 +16,7 @@ import { Color } from "./datastructures/Color";
 
 // This is the original order (like in the image).
 // But if you want to get clearly distinct 'random' colors in a web app, then
-// the order below is better mixed.
+// the mix below is better.
 /* 
 export const WebColors = [
     Color.makeRGB(255,67,55),  // Red

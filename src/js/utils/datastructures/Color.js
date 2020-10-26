@@ -1,25 +1,19 @@
 "use strict";
-// Found at
-//    https://gist.github.com/neolitec/1344610
-// Thanks to neolitec
-//
-// @modified 2018-xx-xx Added a clone() function.
-// @modified 2018-xx-xx Allowing leading '#' in the makeHEX() function.
-// @modified 2018-11-28 Fixed the checkHEX() function to accept 000000.
-// @modified 2019-11-18 Added a generic parse(string) function that detects the format.
-// @modified 2020-01-09 Fixed a bug in the parse(string) function. Hex colors with only three elements were considered faulty.
-// @modified 2020-10-23 TS
+/**
+ *   Found at
+ *    https://gist.github.com/neolitec/1344610
+ * Thanks to neolitec
+ *
+ * @modified 2018-xx-xx Added a clone() function.
+ * @modified 2018-xx-xx Allowing leading '#' in the makeHEX() function.
+ * @modified 2018-11-28 Fixed the checkHEX() function to accept 000000.
+ * @modified 2019-11-18 Added a generic parse(string) function that detects the format.
+ * @modified 2020-01-09 Fixed a bug in the parse(string) function. Hex colors with only three elements were considered faulty.
+ * @modified 2020-10-23 Ported to Typescript.
+ **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var Color = /** @class */ (function () {
     function Color() {
-        // Added by Ika 2018-12-30
-        this.interpolate = function (c, t) {
-            this.r += (c.r - c.r) * t;
-            this.g += (c.g - c.g) * t;
-            this.b += (c.b - c.b) * t;
-            this.a += (c.a - c.a) * t;
-            return this;
-        };
         this.r = this.g = this.b = 0;
         this.h = this.s = this.l = 0;
         this.a = 1;
@@ -227,6 +221,15 @@ var Color = /** @class */ (function () {
         return Color.makeRGB(this.r, this.g, this.b, this.a);
     };
     ;
+    // Added by Ika 2018-12-30
+    Color.prototype.interpolate = function (c, t) {
+        this.r += (c.r - c.r) * t;
+        this.g += (c.g - c.g) * t;
+        this.b += (c.b - c.b) * t;
+        this.a += (c.a - c.a) * t;
+        return this;
+    };
+    ;
     Color.Sanitizer = {
         RGB: function () {
             var args = [];
@@ -377,8 +380,4 @@ var Color = /** @class */ (function () {
 }());
 exports.Color = Color;
 ; // END class
-// Test parser
-// Color.parse('rgba(28,192,255,0.5)');
-// Color.parse('rgb(28,192,255)');
-// Color.parse('Xrgb(28,192,255)'); // Should throw exception
 //# sourceMappingURL=Color.js.map

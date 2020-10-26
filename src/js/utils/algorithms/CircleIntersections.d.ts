@@ -21,6 +21,17 @@ import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
 import { IndexPair, Matrix } from "../datastructures/interfaces";
 export declare class CircleIntersections {
     /**
+     * Find all connected outer path partitions.
+     *
+     * @method findOuterPartitions
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
+     * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
+     **/
+    static findOuterPartitions(circles: Array<Circle>, intervalSets: Array<CircularIntervalSet>): Array<Array<IndexPair>>;
+    /**
      * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect;
      * conatins null at (i,j) otherwise.
      *

@@ -62,10 +62,15 @@
 	    )
 	);
 
+	
+	// +---------------------------------------------------------------------------------
+	// | Pick a color from the WebColors array.
+	// +-------------------------------
 	var randomWebColor = function(index) {
 	    return WebColors[ index % WebColors.length ].cssRGB();
 	};
 
+	
 	// +---------------------------------------------------------------------------------
 	// | Create a random vertex inside the canvas viewport.
 	// +-------------------------------
@@ -122,17 +127,10 @@
 	    // Find intersections, radical lines and interval 
 	    var innerCircleIndices   = CircleIntersections.findInnerCircles( circles ); 
 	    var radicalLineMatrix    = CircleIntersections.buildRadicalLineMatrix( circles );
-	    // var angleMatrix          = CircleIntersections.convertRadicalLinesToAngles( circles, radicalLineMatrix );
 	    var intervalSets         = CircleIntersections.findOuterCircleIntervals( circles, radicalLineMatrix );
-	    // Todo: put into separate file
-	    // var usedMatrixRecords    = CircleIntersections.matrixFill( circles.length, circles.length, false );
-	    var maxSetLength = 0;
-	    // var totalIntervalCount = 0;
-	    for( var i = 0; i < intervalSets.length; i++ ) {
-		// totalIntervalCount += intervalSets[i].intervals.length;
-		maxSetLength = Math.max( maxSetLength, intervalSets[i].intervals.length );
-	    }
-	    var usedIntervalSetRecords = matrixFill( intervalSets.length, maxSetLength, false );
+	    var pathList             = CircleIntersections.findOuterPartitions( circles, intervalSets );
+
+	    // Draw what is required to be drawn
 	    for( var i = 0; i < circles.length; i++ ) {
 		if( config.alwaysDrawFullCircles ) {
 		    pb.draw.circle( circles[i].center, circles[i].radius, 'rgba(34,168,168,0.333)', 1.0 );
@@ -146,20 +144,20 @@
 		if( config.drawCircleSections ) {
 		    drawCircleSections( circles[i], radicalLineMatrix[i] );
 		}
-		drawOpenCircleIntervals( circles[i], intervalSets[i] );
+		if( config.sectionDrawPct != 100 ) {
+		    drawOpenCircleIntervals( circles[i], intervalSets[i] );
+		}
 		if( config.drawCircleNumbers ) {
 		    pb.fill.text( ''+i, circles[i].center.x, circles[i].center.y );
 		}
 	    }
 
 	    // Draw connected paths?
-	    var path = null;
-	    var pathNumber = 0;
-	    while( (path = CircleIntersections.findOuterPartition(circles,intervalSets,usedIntervalSetRecords)) != null && path.length > 0 ) {
-		drawConnectedPath(circles,path,intervalSets,pathNumber);
-		pathNumber++;
+	    if( config.sectionDrawPct == 100 ) {
+		for( var i = 0; i < pathList.length; i++ ) {
+		    drawConnectedPath( circles, pathList[i], intervalSets, i );
+		}
 	    }
-	    //drawCircleIntervals( circles, radicalLines, intervalSets );
 
 	    var affectedCircles = [];
 	    for( var i = 0; i < circles.length; i++ ) {
@@ -168,78 +166,6 @@
 	    }
 	    return affectedCircles;
 	};
-
-	/* 
-	var findMatrixRecordByStart = function( radicalLineMatrix, _angleMatrix, usedMatrixRecords, point, epsilon ) {
-	    for( var i = 0; i < radicalLineMatrix.length; i++ ) {
-		for( var j = 0; j < radicalLineMatrix[i].length; j++ ) {
-		    if( i == j )
-			continue;
-		    if( !radicalLineMatrix[i][j] )
-			continue;
-		    // console.log( "findMatrixRecordByStart", i, j, point, radicalLineMatrix[i][j], radicalLineMatrix[i][j] ? radicalLineMatrix[i][j].a.distance(point) : "na" );
-		    if( usedMatrixRecords[i][j] )
-			continue;
-		    if( radicalLineMatrix[i][j].a.distance(point) <= epsilon )
-			return { i : i, j : j };
-		}	
-	    }
-	    return null;
-	}; */
-
-	/* var _randomInterval = function( angleMatrix, usedMatrixRecords ) { 
-	    for( var i = 0; i < angleMatrix.length; i++ ) {
-		for( var j = 0; j < angleMatrix[i].length; j++ ) {
-		    // console.log( i, "intervalSets["+i+"].intervals.length=", intervalSets[i].intervals.length, 'i++' );
-		    if( angleMatrix[i][j] != null && !usedMatrixRecords[i][j] )
-			return { i : i, j : j };
-		}
-	    }
-	    return null; 
-	}; */
-
-	/* var randomUnusedInterval = function( intervalSets, usedIntervalSetRecords ) { 
-	    for( var i = 0; i < intervalSets.length; i++ ) {
-		for( var j = 0; j < intervalSets[i].intervals.length; j++ ) {
-		    if( !usedIntervalSetRecords[i][j] ) {
-			return { i : i, j : j };
-		    }
-		}
-	    }
-	    return null; 
-	}; */
-
-	/* 
-	var findAdjacentInterval = function( circles, intLocation, intervalSets, usedIntervalSetRecords, epsilon ) {
-	    var curInterval = intervalSets[ intLocation.i ].intervals[ intLocation.j ];
-	    var curEndPoint = circles[ intLocation.i ].vertAt( curInterval[1] );
-	    for( var i = 0; i < intervalSets.length; i++ ) {
-		for( var j = 0; j < intervalSets[i].intervals.length; j++ ) {
-		    if( usedIntervalSetRecords[i][j] ) {
-			continue;
-		    }
-		    var interval = intervalSets[i].intervals[j];
-		    var startPoint = circles[i].vertAt( interval[0] );
-		    if( curEndPoint.distance(startPoint) < epsilon )
-			return { i : i, j : j };
-		}
-	    }
-	    return null;
-	}; */
-
-	/* var findPartitions = function( circles, intervalSets, usedIntervalSetRecords ) {
-
-	    var intLocation = CircleIntersections.randomUnusedInterval( intervalSets, usedIntervalSetRecords );
-	    var count = 0;
-	    var path = [];
-	    while( intLocation != null ) {
-		path.push( intLocation );
-		count++;
-		usedIntervalSetRecords[ intLocation.i ][ intLocation.j ] = true;
-		intLocation = CircleIntersections.findAdjacentInterval( circles, intLocation, intervalSets, usedIntervalSetRecords, 0.001 );
-	    };
-	    return path.length == 0 ? null : path;
-	}; */	
 
 	// +---------------------------------------------------------------------------------
 	// | Draw the inner angles of intersecions.
@@ -253,11 +179,13 @@
 	    }
 	};
 
+	
+	// +---------------------------------------------------------------------------------
+	// | This is kind of a hack to draw connected arc paths (which is currently not directly
+	// | supported by the `draw` library).
+	// +-------------------------------
 	var drawConnectedPath = function( circles, path, intervalSets, pathNumber ) {
-	    // console.log( "drawConnectedPath", JSON.stringify(path) );
-	    // var randomColor = 'rgb('+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+','+Math.floor(Math.random()*255)+')';
 	    var randomColor = randomWebColor( pathNumber );
-	    console.log('randomColor', randomColor);
 	    pb.draw.ctx.save();
 	    pb.draw.ctx.beginPath();
 	    for( var i = 0; i < path.length; i++ ) {
@@ -277,6 +205,7 @@
 	    }
 	    pb.draw.ctx.closePath();
 	    pb.draw.ctx.lineWidth = config.lineWidth;
+	    pb.draw.ctx.lineJoin = "round"; // "bevel" || "round" || "miter"
 	    pb.draw._fillOrDraw( randomColor ); // 'rgba(192,128,0,1.0)' );
 	};
 
