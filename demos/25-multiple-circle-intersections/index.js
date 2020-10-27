@@ -104,7 +104,8 @@
 	// +-------------------------------
 	var drawAll = function() {
 	    if( circles.length == 0 ) return;
-	    var visibleCircles = drawCircleSet( circles, config.drawRadicalLines );
+	    var iteration = 0;
+	    var visibleCircles = drawCircleSet( circles, config.drawRadicalLines, iteration++ );
 	    if( config.drawNestedCircles ) {
 		// Scale down visible circles
 		while( visibleCircles.length > 0 ) {
@@ -115,7 +116,8 @@
 			if( scaledCircle.radius > 0 ) 
 			    scaledCircles.push( scaledCircle );
 		    }
-		    visibleCircles = drawCircleSet( scaledCircles, false );
+		    visibleCircles = drawCircleSet( scaledCircles, false, iteration++ );
+		    iteration++;
 		}
 	    }
 	};
@@ -123,7 +125,7 @@
 	// +---------------------------------------------------------------------------------
 	// | Draw the intersection outline(s) for the given circles.
 	// +-------------------------------
-	var drawCircleSet = function( circles, drawRadicalLines ) {
+	var drawCircleSet = function( circles, drawRadicalLines, iteration ) {
 	    // Find intersections, radical lines and interval 
 	    var innerCircleIndices   = CircleIntersections.findInnerCircles( circles ); 
 	    var radicalLineMatrix    = CircleIntersections.buildRadicalLineMatrix( circles );
@@ -155,7 +157,7 @@
 	    // Draw connected paths?
 	    if( config.sectionDrawPct == 100 ) {
 		for( var i = 0; i < pathList.length; i++ ) {
-		    drawConnectedPath( circles, pathList[i], intervalSets, i );
+		    drawConnectedPath( circles, pathList[i], intervalSets, iteration, i );
 		}
 	    }
 
@@ -184,29 +186,30 @@
 	// | This is kind of a hack to draw connected arc paths (which is currently not directly
 	// | supported by the `draw` library).
 	// +-------------------------------
-	var drawConnectedPath = function( circles, path, intervalSets, pathNumber ) {
-	    var randomColor = randomWebColor( pathNumber );
-	    pb.draw.ctx.save();
-	    pb.draw.ctx.beginPath();
+	var drawConnectedPath = function( circles, path, intervalSets, iteration, pathNumber ) {
+	    var randomColor = randomWebColor( iteration + pathNumber );
+	    var draw = config.fillNestedCircles ? pb.fill : pb.draw;
+	    draw.ctx.save();
+	    draw.ctx.beginPath();
 	    for( var i = 0; i < path.length; i++ ) {
 		var circleIndex = path[i].i;
 		var circle = circles[ circleIndex ];
 		var center = circle.center;
 		var radius = circle.radius;
 		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
-		pb.draw.ctx.ellipse( pb.draw.offset.x+center.x*pb.draw.scale.x,
-				     pb.draw.offset.y+center.y*pb.draw.scale.y,
-				     radius*pb.draw.scale.x,
-				     radius*pb.draw.scale.y,
+		pb.draw.ctx.ellipse( draw.offset.x+center.x*draw.scale.x,
+				     draw.offset.y+center.y*draw.scale.y,
+				     radius*draw.scale.x,
+				     radius*draw.scale.y,
 				     0.0,
 				     interval[0], // startAngle,
 				     interval[1], // endAngle,
 				     false );
 	    }
-	    pb.draw.ctx.closePath();
-	    pb.draw.ctx.lineWidth = config.lineWidth;
-	    pb.draw.ctx.lineJoin = "round"; // "bevel" || "round" || "miter"
-	    pb.draw._fillOrDraw( randomColor ); // 'rgba(192,128,0,1.0)' );
+	    draw.ctx.closePath();
+	    draw.ctx.lineWidth = config.lineWidth;
+	    draw.ctx.lineJoin = "round"; // "bevel" || "round" || "miter"
+	    draw._fillOrDraw( randomColor ); // 'rgba(192,128,0,1.0)' );
 	};
 
 	// +---------------------------------------------------------------------------------
@@ -254,9 +257,9 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    alwaysDrawFullCircles  : true,
+	    alwaysDrawFullCircles  : false,
 	    drawCircleSections     : false,
-	    lineWidth              : 2.0,
+	    lineWidth              : 3.0,
 	    drawRadicalLines       : false,
 	    drawCircleNumbers      : false,
 	    sectionDrawPct         : 100, // [0..100]

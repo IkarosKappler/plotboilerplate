@@ -597,6 +597,7 @@ for this purpose.
 
 
 ## Todos
+ * Add a method to draw connected paths (different types of path segments: linear, curve, arc, ...). Useful for the circle intersections demo.
  * Use a sorted map in the line-point-distance demo.
  * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
  * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
