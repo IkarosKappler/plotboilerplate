@@ -625,6 +625,8 @@ for this purpose.
  * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
  * IMPORTANT: replace Touchy by AlloyFinger also in the public main page.
  * Add a removeVertices() function (and use it in the threejs demo).
+ * https://github.com/nilzona/path2d-polyfill
+ * Implement 'S' and 's' and 'T' and 't' in the draw.svgPath(...) function.
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
@@ -659,6 +661,8 @@ for this purpose.
 * and for [circle-tangent-to-three-lines](https://observablehq.com/@mbostock/circle-tangent-to-three-lines "circle-tangent-to-three-lines")
 * [Circle Intersection in C++ by Robert King](https://stackoverflow.com/questions/3349125/circle-circle-intersection-points "Circle Intersection in C++ by Robert King")
 * [The 'Circles and spheres' article by Paul Bourke](http://paulbourke.net/geometry/circlesphere/ "the 'Circles and spheres' article by Paul Bourke")
+* [shamansir/draw_svg.js](https://gist.github.com/shamansir/6294f8cfdd555a9d1b9e182007dd0c2f "shamansir/draw_svg.js")
+
 
 ## Known bugs
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.

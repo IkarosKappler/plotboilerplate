@@ -35,7 +35,8 @@
  * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
  * @modified 2020-10-15 Re-added the text() function.
- * @version  1.7.0
+ * @modified 2020-10-28 Added the path(Path2D) function.
+ * @version  1.8.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
@@ -666,89 +667,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.restore();
     };
     ;
-    // THIS FUNCTION IS CURRENTLY NOT IN USE, AS SVG TO CANVAS ARC CONVERSION IS UN-NECESSARY COMPLICATED.
-    // BUT IT IS WORKING.
-    // Found in an old version of
-    //    https://github.com/canvg/canvg
-    /*
-    _context.drawutils.prototype.arcto = function(lastX,lastY,rx,ry,xAxisRotation,largeArcFlag,sweepFlag,x,y, color)
-    {
-    lastX = this.offset.x + this.scale.x*lastX;
-    lastY = this.offset.y + this.scale.y*lastY;
-    x = this.offset.x + this.scale.x*x;
-    y = this.offset.y + this.scale.y*y;
-    rx *= this.scale.x;
-    ry *= this.scale.y;
-    //--------------------
-    // rx, ry, xAxisRotation, largeArcFlag, sweepFlag, x, y
-    // are the 6 data items in the SVG path declaration following the A
-    //
-    // lastX and lastY are the previous point on the path before the arc
-    //--------------------
-    // useful functions
-    var m   = function (   v) {return Math.sqrt (Math.pow (v[0],2) + Math.pow (v[1],2))};
-    var r   = function (u, v) {return ( u[0]*v[0] + u[1]*v[1]) / (m(u) * m(v))};
-    var ang = function (u, v) {return ((u[0]*v[1] < u[1]*v[0])? -1 : 1) * Math.acos (r (u,v))};
-    //--------------------
-
-    var currpX =  Math.cos (xAxisRotation) * (lastX - x) / 2.0 + Math.sin (xAxisRotation) * (lastY - y) / 2.0 ;
-    var currpY = -Math.sin (xAxisRotation) * (lastX - x) / 2.0 + Math.cos (xAxisRotation) * (lastY - y) / 2.0 ;
-
-    var l = Math.pow (currpX,2) / Math.pow (rx,2) + Math.pow (currpY,2) / Math.pow (ry,2);
-    if (l > 1) {rx *= Math.sqrt (l); ry *= Math.sqrt (l)};
-    var s = ((largeArcFlag == sweepFlag)? -1 : 1) * Math.sqrt
-    (( (Math.pow (rx,2) * Math.pow (ry    ,2)) - (Math.pow (rx,2) * Math.pow (currpY,2)) - (Math.pow (ry,2) * Math.pow (currpX,2)))
-     / (Math.pow (rx,2) * Math.pow (currpY,2) +   Math.pow (ry,2) * Math.pow (currpX,2)));
-    if (isNaN (s)) s = 0 ;
-
-    var cppX = s *  rx * currpY / ry ;
-    var cppY = s * -ry * currpX / rx ;
-    var centpX = (lastX + x) / 2.0 + Math.cos (xAxisRotation) * cppX - Math.sin (xAxisRotation) * cppY ;
-    var centpY = (lastY + y) / 2.0 + Math.sin (xAxisRotation) * cppX + Math.cos (xAxisRotation) * cppY ;
-
-    var ang1 = ang ([1,0], [(currpX-cppX)/rx,(currpY-cppY)/ry]);
-    var a = [(  currpX-cppX)/rx,(currpY-cppY)/ry];
-    var b = [(-currpX-cppX)/rx,(-currpY-cppY)/ry];
-    var angd = ang (a,b);
-    if (r (a,b) <= -1) angd = Math.PI;
-    if (r (a,b) >=  1) angd = 0;
-
-    var rad = (rx > ry)? rx : ry;
-    var sx  = (rx > ry)? 1 : rx / ry;
-    var sy  = (rx > ry)? ry / rx : 1;
-
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.moveTo( lastX, lastY );
-    this.ctx.translate (centpX,centpY);
-    this.ctx.rotate (xAxisRotation);
-    this.ctx.scale (sx, sy);
-    this.ctx.arc (0, 0, rad, ang1, ang1 + angd, 1 - sweepFlag);
-    this.ctx.scale (1/sx, 1/sy);
-    this.ctx.rotate (-xAxisRotation);
-    this.ctx.translate (-centpX, -centpY);
-    this._fillOrDraw( color );
-    this.ctx.restore();
-    };
-    */
-    // THIS FUNCTION IS CURRENTLY NOT IN USE
-    /*
-    _context.drawutils.prototype.text = function( text, x, y, options ) {
-    options = options || {};
-    //this.ctx.save();
-    x = this.offset.x+x*this.scale.x;
-    y = this.offset.y+y*this.scale.y;
-    var color = options.color || 'black';
-    if( this.fillShapes ) {
-        this.ctx.fillStyle = color;
-        this.ctx.fillText( text, x, y );
-    } else {
-        this.ctx.strokeStyle = color;
-        this.ctx.strokeText( text, x, y );
-    }
-    //this.ctx.restore();
-    };
-    */
     drawutils.prototype.text = function (text, x, y, options) {
         options = options || {};
         this.ctx.save();

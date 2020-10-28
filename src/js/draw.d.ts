@@ -34,7 +34,8 @@
  * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
  * @modified 2020-10-15 Re-added the text() function.
- * @version  1.7.0
+ * @modified 2020-10-28 Added the path(Path2D) function.
+ * @version  1.8.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

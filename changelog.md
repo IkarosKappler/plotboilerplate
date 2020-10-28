@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-10-27
+  * Added the draw.svgPath(...) function.
 * 2020-10-23
   * Added the fillArray and fillMatrix helper function (like in lodash).
   * Added the `Matrix`, `Interval` and `IndexPair` interfaces to the typescript definitions.

@@ -12,4 +12,5 @@
  * @modified 2020-10-23 Ported to Typescript.
  **/
 import { Color } from "./datastructures/Color";
-export declare const WebColors: Color[];
+export declare const WebColors: Array<Color>;
+export declare const shuffleWebColors: (order: number[]) => Color[];

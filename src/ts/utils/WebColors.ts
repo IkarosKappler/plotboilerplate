@@ -17,8 +17,7 @@ import { Color } from "./datastructures/Color";
 // This is the original order (like in the image).
 // But if you want to get clearly distinct 'random' colors in a web app, then
 // the mix below is better.
-/* 
-export const WebColors = [
+export const WebColors : Array<Color> = [
     Color.makeRGB(255,67,55),  // Red
     Color.makeRGB(232,31,100), // Pink
     Color.makeRGB(156,39,175), // Purple
@@ -31,8 +30,8 @@ export const WebColors = [
     Color.makeRGB(77,175,82),  // Green
     Color.makeRGB(141,195,67)  // Light Green
 ];
-*/
 
+/*
 export const WebColors = [
     Color.makeRGB(1,150,137),  // Teal
     Color.makeRGB(255,67,55),  // Red
@@ -46,3 +45,12 @@ export const WebColors = [
     Color.makeRGB(3,189,214),  // Cyan
     Color.makeRGB(35,151,245)  // Blue
 ];
+*/
+
+export const shuffleWebColors = ( order: Array<number> ) => {
+    const result : Array<Color> = Array( order.length );
+    for( var i = 0; i < order.length; i++ ) {
+	result[i] = WebColors[ order[i] % WebColors.length ];
+    }
+    return result;
+};

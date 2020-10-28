@@ -1,0 +1,187 @@
+    /* 
+    svgPath( pathData:Array<string|number>,
+	     options?:{color?:string, lineWidth?:number, lineJoin?:"round"|"bevel"|"miter", miterLimi?:number} ) {
+	if( pathData.length == 0 )
+	    return;
+
+	// const num( value:string|number ) : number {
+	//     return Number(value)
+	// };
+	
+	// Inspired by:
+	//    https://gist.github.com/shamansir/6294f8cfdd555a9d1b9e182007dd0c2f
+	// TODO: implement 'S' and 's' and 'T' and 't'.
+	this.ctx.save();
+	this.ctx.beginPath();
+	let lastPos : [number,number] = [ 0, 0 ];
+	let pointOne : [number,number], pointTwo : [number,number], center : [number,number];
+	let radiusX : number; let radiusY : number;
+	let i : number = 0;
+	// let cmd : string|number = ""; // commandList[0];
+	// commandList.forEach( (command) => {
+	while( i < pathData.length ) {
+	    let cmd : string|number = pathData[i]; 
+	    if ((cmd === 'z') || (cmd === 'Z')) {
+		lastPos = [ 0, 0 ];
+		this.ctx.closePath();
+		i++;
+	    } else if (cmd === 'm') {
+		// `moveto x y` (relative)
+		// lastPos = [ lastPos[0] + command.values[0], lastPos[1] + command.values[1] ];
+		lastPos = [ lastPos[0] + Number(pathData[i+1]), lastPos[1] + Number(pathData[i+2]) ];
+		this.ctx.moveTo(lastPos[0], lastPos[1]);
+		i+=3;
+	    } else if (cmd === 'l') {
+		// `lineto x y` (relative)
+		// lastPos = [ lastPos[0] + command.values[0], lastPos[1] + command.values[1] ];
+		lastPos = [ lastPos[0] + Number(pathData[i+1]), lastPos[1] + Number(pathData[i+2]) ];
+		this.ctx.lineTo(lastPos[0], lastPos[1]);
+		i+=3;
+	    } else if (cmd === 'h') {
+		// `horizontalto x` (relative)
+		// lastPos = [ lastPos[0] + command.values[0], lastPos[1] ];
+		lastPos = [ lastPos[0] + Number(pathData[i+1]), lastPos[1] ];
+		this.ctx.lineTo(lastPos[0], lastPos[1]);
+		i+=2;
+	    } else if (cmd === 'v') {
+		// `verticalto y` (relative)
+		// lastPos = [ lastPos[0], lastPos[1] + command.values[0] ];
+		lastPos = [ lastPos[0], lastPos[1] + Number(pathData[i+1]) ];
+		this.ctx.lineTo(lastPos[0], lastPos[1]);
+		i+=2;
+	    } else if (cmd === 'q') {
+		// `quadraticbeziercurveto x1 y1 x y` (relative)
+		pointOne = [ lastPos[0] + Number(pathData[i+1]),
+			     lastPos[1] + Number(pathData[i+2]) ];
+		lastPos  = [ lastPos[0] + Number(pathData[i+3]),
+			     lastPos[1] + Number(pathData[i+4]) ];
+		this.ctx.quadraticCurveTo(
+                    pointOne[0], pointOne[1],
+                    lastPos[0], lastPos[1]);
+		i+=5;
+	    } else if (cmd === 'c') {
+		// `cubicbeziercurveto x1 y1 x2 y2 x y` (relative)
+		// pointOne = [ lastPos[0] + command.values[0],
+		// 	     lastPos[1] + command.values[1] ];
+		// pointTwo = [ lastPos[0] + command.values[2],
+		// 	     lastPos[1] + command.values[3] ];
+		// lastPos  = [ lastPos[0] + command.values[4],
+		// 	     lastPos[1] + command.values[5] ];
+		pointOne = [ lastPos[0] + Number(pathData[i+1]),
+			     lastPos[1] + Number(pathData[i+2]) ];
+		pointTwo = [ lastPos[0] + Number(pathData[i+3]),
+			     lastPos[1] + Number(pathData[i+4]) ];
+		lastPos  = [ lastPos[0] + Number(pathData[i+5]),
+			     lastPos[1] + Number(pathData[i+6]) ];
+		this.ctx.bezierCurveTo(
+                    pointOne[0], pointOne[1],
+                    pointTwo[0], pointTwo[1],
+                    lastPos[0], lastPos[1]);
+		i+=7;
+	    } else if (cmd === 'a') {
+		// `ellipticalarc rx ry x-axis-rotation large-arc-flag sweep-flag x y` (relative)
+		// radiusX = Number(pathData[i+1]);
+		// radiusY = Number(pathData[i+1]);
+		// 
+		// center = [ Number(pathData[i+6]), Number(pathData[i+7]) ];
+		// this.ctx.ellipse( draw.offset.x+center.x*draw.scale.x,
+		// 		  draw.offset.y+center.y*draw.scale.y,
+		// 		  radiusX*draw.scale.x,
+		// 		  radiusY*draw.scale.y,
+		// 		  PlotBoilerplate.utils.fetch.bool(), // 0.0,
+		// 		  interval[0], // startAngle,
+		// 		  interval[1], // endAngle,
+		// 		  false ); 
+		this.arcto( lastPos[0], lastPos[1],
+			    Number(pathData[i+1]), Number(pathData[i+2]), // rx, ry
+			    Number(pathData[i+3]), // x-axis-rotaion
+			    PlotBoilerplate.utils.fetch.bool(pathData[i+4]), // large-arc-flag
+			    PlotBoilerplate.utils.fetch.bool(pathData[i+5]), // sweep-flag
+			    Number(pathData[i+6]), Number(pathData[i+7]) // x, y
+			  );
+		i+=8;
+	    } else if (cmd === 'M') {
+		// `moveto x y` (absolute)
+		// lastPos = [ command.values[0], command.values[1] ];
+		lastPos = [ Number(pathData[i+1]), Number(pathData[i+2]) ];
+		this.ctx.moveTo(lastPos[0], lastPos[1]);
+		i+=3;
+	    } else if (cmd === 'L') {
+		// `lineto x y` (absolute)
+		// lastPos = [ command.values[0], lastPos[1] ]; // ERR??!!
+		lastPos = [ Number(pathData[i+1]), Number(pathData[i+2]) ];
+		this.ctx.lineTo(lastPos[0], lastPos[1]);
+		i+=3;
+	    } else if (cmd === 'H') {
+		// `horizontalto x` (absolute)
+		// lastPos = [ command.values[0], lastPos[1] ];
+		lastPos = [ Number(pathData[i+1]), lastPos[1] ];
+		this.ctx.lineTo(lastPos[0], lastPos[1]);
+		i+=2;
+	    } else if (cmd === 'V') {
+		// `verticalto y` (absolute)
+		// lastPos = [ lastPos[0], command.values[0] ];
+		lastPos = [ lastPos[0], Number(pathData[i+1]) ];
+		this.ctx.lineTo(lastPos[0], lastPos[1]);
+		i+=2;
+	    } else if (cmd === 'Q') {
+		// `quadraticbeziercurveto x1 y1 x y` (absolute)
+		pointOne = [ Number(pathData[i+1]),
+			     Number(pathData[i+2]) ];
+		lastPos  = [ Number(pathData[i+3]),
+			     Number(pathData[i+4]) ];
+		this.ctx.quadraticCurveTo(
+                    pointOne[0], pointOne[1],
+                    lastPos[0], lastPos[1]);
+		i+=5;
+	    } else if (cmd === 'C') {
+		// `cubicbeziercurveto x1 y1 x2 y2 x y` (absolute)
+		// pointOne = [ command.values[0],
+		// 	     command.values[1] ];
+		// pointTwo = [ command.values[2],
+		//	     command.values[3] ];
+		// lastPos  = [ command.values[4],
+		// 	     command.values[5] ];
+		pointOne = [ Number(pathData[i+1]),
+			     Number(pathData[i+2]) ];
+		pointTwo = [ Number(pathData[i+3]),
+			     Number(pathData[i+4]) ];
+		lastPos  = [ Number(pathData[i+5]),
+			     Number(pathData[i+6]) ];
+		this.ctx.bezierCurveTo(
+                    pointOne[0], pointOne[1],
+                    pointTwo[0], pointTwo[1],
+                    lastPos[0], lastPos[1]);
+		i+=7;
+	    } else if (cmd === 'A') {
+		// `ellipticalarc rx ry x-axis-rotation large-arc-flag sweep-flag x y` (absolute)
+		// radiusX = Number(pathData[i+1]);
+		// radiusY = Number(pathData[i+1]);
+		//
+		// center = [ Number(pathData[i+6]), Number(pathData[i+7]) ];
+		// this.ctx.ellipse( draw.offset.x+center.x*draw.scale.x,
+		// 		  draw.offset.y+center.y*draw.scale.y,
+		// 		  radiusX*draw.scale.x,
+		// 		  radiusY*draw.scale.y,
+		// 		  PlotBoilerplate.utils.fetch.bool(), // 0.0,
+		// 		  interval[0], // startAngle,
+		// 		  interval[1], // endAngle,
+		// 		  false ); 
+		center = [ Number(pathData[i+6]), Number(pathData[i+7]) ];
+		this.arcto( lastPos[0], lastPos[1],
+			    Number(pathData[i+1]), Number(pathData[i+2]), // rx, ry
+			    Number(pathData[i+3]), // x-axis-rotaion
+			    PlotBoilerplate.utils.fetch.bool(pathData[i+4]), // large-arc-flag
+			    PlotBoilerplate.utils.fetch.bool(pathData[i+5]), // sweep-flag
+			    lastPoint[0] + center[0], // x
+			    lastPoint[1] + center[1]  // y
+			  );
+		const lastPosVert : Vertex = Circle.circleUtils.vertAt();
+		i+=8;
+	    } 
+	    // ctx.stroke();
+	    this._fillOrDraw( options.color );
+	    this.ctx.restore();
+	} // END while
+    }; // END svgPath
+*/

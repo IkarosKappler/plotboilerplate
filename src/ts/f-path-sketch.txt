@@ -1,0 +1,82 @@
+ /* 
+    path( pathData:Array<string|number>,
+	     options?:{color?:string, lineWidth?:number, lineJoin?:"round"|"bevel"|"miter", miterLimi?:number} ) {
+	// path:Path2D,
+
+	const d : Array<string|number> = [];
+	let i : number = 0;
+	while( i < pathData.length ) {
+	    let cmd : string|number = pathData[i];
+	    d.push( cmd );
+	    if ((cmd === 'z') || (cmd === 'Z')) {
+		// No arguments
+		i++;
+	    } else if (cmd === 'm' || cmd === 'M' || cmd === 'l' || cmd === 'L' || cmd === 't' || cmd === 'T' ) {
+		// m `moveto x y` (relative)
+		// M `moveto x y` (absolute)
+		// l `lineto x y` (relative)
+		// L `lineto x y` (absolute)
+		// t `shorthandquadraticcurve x y` (relative)
+		// T `shorthandquadraticcurve x y` (absolute)
+		d.push( this.offset.x + Number(pathData[i+1])*this.scale.x );
+		d.push( this.offset.y + Number(pathData[i+2])*this.scale.y );
+		i+=3;
+	    } else if (cmd === 'h' || cmd === 'H' ) {
+		// h `horizontalto x` (relative)
+		// H `horizontalto x` (absolute)
+		d.push( this.offset.x + Number(pathData[i+1])*this.scale.x );
+		i+=2;
+	    } else if (cmd === 'v' || cmd === 'V' ) {
+		// v `verticalto y` (relative)
+		// V `verticalto y` (absolute)
+		d.push( this.offset.y + Number(pathData[i+1])*this.scale.y );
+		i+=2;
+	    } else if (cmd === 'q' || cmd === 'Q' || cmd === 's' || cmd === 'S' ) {
+		// q `quadraticbeziercurveto x1 y1 x y` (relative)
+		// Q `quadraticbeziercurveto x1 y1 x y` (absolute)
+		// s `shorthandcurveto x2 y2 x y` (relative)
+		// S `shorthandcurveto x2 y2 x y` (absolute)
+		d.push( this.offset.x + Number(pathData[i+1])*this.scale.x );
+		d.push( this.offset.y + Number(pathData[i+2])*this.scale.y );
+		d.push( this.offset.x + Number(pathData[i+3])*this.scale.x );
+		d.push( this.offset.y + Number(pathData[i+4])*this.scale.y );
+		i+=5;
+	    } else if (cmd === 'c' || cmd === 'C' ) {
+		// c `cubicbeziercurveto x1 y1 x2 y2 x y` (relative)
+		// C `cubicbeziercurveto x1 y1 x2 y2 x y` (absolute)
+		d.push( this.offset.x + Number(pathData[i+1])*this.scale.x );
+		d.push( this.offset.y + Number(pathData[i+2])*this.scale.y );
+		d.push( this.offset.x + Number(pathData[i+3])*this.scale.x );
+		d.push( this.offset.y + Number(pathData[i+4])*this.scale.y );
+		d.push( this.offset.x + Number(pathData[i+5])*this.scale.x );
+		d.push( this.offset.y + Number(pathData[i+6])*this.scale.y );
+		i+=7;
+	    } else if (cmd === 'a' || cmd === 'A' ) {
+		// `ellipticarc rx ry x-axis-rotation large-arc-flag sweep-flag x y` (relative)
+		d.push( this.offset.x + Number(pathData[i+1])*this.scale.x );
+		d.push( this.offset.y + Number(pathData[i+2])*this.scale.y );
+		d.push( pathData[i+3] ); // x-axis-rotation
+		d.push( pathData[i+4] ); // large-arc-flag
+		d.push( pathData[i+5] ); // sweep-flag
+		d.push( this.offset.x + Number(pathData[i+6])*this.scale.x );
+		d.push( this.offset.y + Number(pathData[i+7])*this.scale.y );
+		i+=8;
+	    } else {
+		// Skip unknown command
+		i++;
+	    }
+	} // END while
+	
+	const path = new Path2D( d.join(" ") );
+	this.ctx.save();
+	this.ctx.beginPath();
+	if( this.fillShapes ) {
+	    this.ctx.fill( path );
+	} else {
+	    this.ctx.stroke( path ); 
+	}
+	// Close path?
+	// this.ctx.closePath();
+	this.ctx.restore();
+    };
+*/

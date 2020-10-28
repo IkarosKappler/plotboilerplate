@@ -39,6 +39,7 @@
 		  scaleX                : 1.0,
 		  scaleY                : 1.0,
 		  rasterGrid            : true,
+		  drawGrid              : false,
 		  drawOrigin            : false,
 		  rasterAdjustFactor    : 2.0,
 		  redrawOnResize        : true,
@@ -67,7 +68,12 @@
 	// | Pick a color from the WebColors array.
 	// +-------------------------------
 	var randomWebColor = function(index) {
-	    return WebColors[ index % WebColors.length ].cssRGB();
+	    switch( config.colorSet ) {
+	    case "Malachite" : return WebColorsMalachite[ index % WebColorsMalachite.length ].cssRGB();
+	    case "Mixed": return WebColorsContrast[ index % WebColorsContrast.length ].cssRGB();
+	    case "Mixed":
+	    default: return WebColors[ index % WebColors.length ].cssRGB();
+	    }
 	};
 
 	
@@ -208,8 +214,8 @@
 	    }
 	    draw.ctx.closePath();
 	    draw.ctx.lineWidth = config.lineWidth;
-	    draw.ctx.lineJoin = "round"; // "bevel" || "round" || "miter"
-	    draw._fillOrDraw( randomColor ); // 'rgba(192,128,0,1.0)' );
+	    draw.ctx.lineJoin = config.lineJoin;
+	    draw._fillOrDraw( randomColor );
 	};
 
 	// +---------------------------------------------------------------------------------
@@ -260,12 +266,14 @@
 	    alwaysDrawFullCircles  : false,
 	    drawCircleSections     : false,
 	    lineWidth              : 3.0,
+	    lineJoin               : "round",  // [ "bevel", "round", "miter" ]
 	    drawRadicalLines       : false,
 	    drawCircleNumbers      : false,
 	    sectionDrawPct         : 100, // [0..100]
 	    drawNestedCircles      : true,
 	    nestedCircleStep       : 25,
-	    fillNestedCircles      : false
+	    fillNestedCircles      : false,
+	    colorSet               : "WebColors" // [ "WebColors", "Mixed", "Malachite" ]
 	}, GUP );
 	
 
@@ -276,6 +284,7 @@
         {
 	    var gui = pb.createGUI();
 	    gui.add(config, 'lineWidth').min(1).max(100).step(1).onChange( function() { pb.redraw(); } ).name("lineWidth").title("The line width of circle sections.");
+	    gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
 	    gui.add(config, 'alwaysDrawFullCircles').onChange( function() { pb.redraw(); } ).name("alwaysDrawFullCircles").title("Always draw full circles?");
 	    gui.add(config, 'drawCircleSections').onChange( function() { pb.redraw(); } ).name("drawCircleSections").title("Draw the circle sections separately?");
 	    gui.add(config, 'drawRadicalLines').onChange( function() { pb.redraw(); } ).name("drawRadicalLines").title("Draw the radical lines?");
@@ -284,6 +293,7 @@
 	    gui.add(config, 'drawNestedCircles').onChange( function() { pb.redraw(); } ).name("drawNestedCircles").title("Draw nested (inner) circles?");
 	    gui.add(config, 'nestedCircleStep').min(2).max(100).step(1).onChange( function() { pb.redraw(); } ).name("nestedCircleStep").title("Distance of nested circles.");
 	    gui.add(config, 'fillNestedCircles').onChange( function() { pb.redraw(); } ).name("fillNestedCircles").title("Fill circles?");
+	    gui.add(config, 'colorSet', [ "WebColors", "Mixed", "Malachite" ] ).onChange( function() { pb.redraw(); } ).name("colorSet").title("Which color set to use.");
 	}
 
 	pb.config.preDraw = drawAll;
