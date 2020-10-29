@@ -90,7 +90,7 @@
 	// | Initialize n random circles and store them in the array.
 	// +-------------------------------
 	var circles = [];
-	for( var i = 0; i < 7; i++ ) {
+	for( var i = 0; i < 3; i++ ) {
 	    var center = randomVertex();
 	    var circle = new Circle( center,
 				     i==0
@@ -191,10 +191,23 @@
 	// +---------------------------------------------------------------------------------
 	// | This is kind of a hack to draw connected arc paths (which is currently not directly
 	// | supported by the `draw` library).
+	// |
+	// | pre: circles.length > 0
 	// +-------------------------------
 	var drawConnectedPath = function( circles, path, intervalSets, iteration, pathNumber ) {
 	    var randomColor = randomWebColor( iteration + pathNumber );
 	    var draw = config.fillNestedCircles ? pb.fill : pb.draw;
+
+	    if( config.drawAsSVGArcs ) 
+		drawConnectedPathAsSVGArcs( circles, path, intervalSets, iteration, pathNumber );
+	    else
+		drawConnectedPathAsEllipses( circles, path, intervalSets, iteration, pathNumber );
+	};
+	
+	var drawConnectedPathAsEllipses = function( circles, path, intervalSets, iteration, pathNumber ) {
+	    var randomColor = randomWebColor( iteration + pathNumber );
+	    var draw = config.fillNestedCircles ? pb.fill : pb.draw;
+
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
 	    for( var i = 0; i < path.length; i++ ) {
@@ -215,7 +228,74 @@
 	    draw.ctx.closePath();
 	    draw.ctx.lineWidth = config.lineWidth;
 	    draw.ctx.lineJoin = config.lineJoin;
-	    draw._fillOrDraw( randomColor );
+	    draw._fillOrDraw( randomColor ); 
+	};
+
+	var drawConnectedPathAsSVGArcs = function( circles, path, intervalSets, iteration, pathNumber ) {
+	    var randomColor = randomWebColor( iteration + pathNumber );
+	    // console.log( randomColor );
+	    var draw = config.fillNestedCircles ? pb.fill : pb.draw;
+
+	    function polarToCartesianRad(centerX, centerY, radius, angleInRadians) {
+		//var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+		return {
+		    x: centerX + (radius * Math.cos(angleInRadians)),
+		    y: centerY + (radius * Math.sin(angleInRadians))
+		};
+	    }
+	    function describeArc( x, y, radius, startAngle, endAngle, retainMoveCommand ){
+		if( Math.PI*2-Math.abs(startAngle-endAngle) < 0.001 ) {
+		    return describeArc( x, y, radius, startAngle, endAngle/2, false ).concat(
+			describeArc( x, y, radius, endAngle/2, endAngle, true )
+		    );
+		}
+		var start = polarToCartesianRad(x, y, radius, endAngle);
+		var end = polarToCartesianRad(x, y, radius, startAngle);
+		var largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+		var d = [];
+		if( !retainMoveCommand ) {
+		    d.push( "M", start.x, start.y );
+		}
+		d.push( "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y );
+		return d;       
+	    }
+
+	    var R2D = 180/Math.PI;
+
+	    var svgData = [];
+	    var offs = draw.offset;
+	    var scal = draw.scale;
+	    for( var i = 0; i < path.length; i++ ) {
+		var circleIndex = path[i].i;
+		var circle = circles[ circleIndex ];
+		var center = circle.center;
+		var radius = circle.radius;
+		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
+	
+		svgData = svgData.concat(
+		    describeArc( offs.x + center.x * scal.x,
+				 offs.y + center.y * scal.y,
+				 radius  * (scal.x), // scal.y??
+				 interval[0],
+				 interval[1]
+			       ) );
+	    }
+			      
+	    // console.log( svgData );
+	    draw.ctx.save();
+	    draw.ctx.beginPath();
+	    draw.ctx.lineWidth = config.lineWidth;
+	    draw.ctx.lineJoin = config.lineJoin;
+	    if( config.fillNestedCircles ) {
+		draw.ctx.fillStyle = randomColor;
+		draw.ctx.fill( new Path2D(svgData.join(" ")) );
+	    } else {
+		draw.ctx.strokeStyle = randomColor;
+		draw.ctx.stroke( new Path2D(svgData.join(" ")) );
+	    }
+	    // draw.ctx.closePath();
+	    //draw._fillOrDraw( randomColor );
+	    draw.ctx.restore();    
 	};
 
 	// +---------------------------------------------------------------------------------
@@ -267,6 +347,7 @@
 	    drawCircleSections     : false,
 	    lineWidth              : 3.0,
 	    lineJoin               : "round",  // [ "bevel", "round", "miter" ]
+	    drawAsSVGArcs          : false,
 	    drawRadicalLines       : false,
 	    drawCircleNumbers      : false,
 	    sectionDrawPct         : 100, // [0..100]
@@ -287,6 +368,7 @@
 	    gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
 	    gui.add(config, 'alwaysDrawFullCircles').onChange( function() { pb.redraw(); } ).name("alwaysDrawFullCircles").title("Always draw full circles?");
 	    gui.add(config, 'drawCircleSections').onChange( function() { pb.redraw(); } ).name("drawCircleSections").title("Draw the circle sections separately?");
+	    gui.add(config, 'drawAsSVGArcs').onChange( function() { pb.redraw(); } ).name("drawAsSVGArcs").title("Draw the circle sections using SVG arcs instead of canvas ellipses?");
 	    gui.add(config, 'drawRadicalLines').onChange( function() { pb.redraw(); } ).name("drawRadicalLines").title("Draw the radical lines?");
 	    gui.add(config, 'drawCircleNumbers').onChange( function() { pb.redraw(); } ).name("drawCircleNumbers").title("Draw circle numbers?");
 	    gui.add(config, 'sectionDrawPct').min(0).max(100).step(1).onChange( function() { pb.redraw(); } ).name("sectionDrawPct").title("How much to draw?");

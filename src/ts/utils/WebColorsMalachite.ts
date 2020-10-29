@@ -3,7 +3,7 @@ import { Color } from "./datastructures/Color";
 
 // A mix of green shades
 export const WebColorsMalachite : Array<Color> = [
-    Color.makeRGB(0,21,6),  // dark 
+    Color.makeRGB(0,21,6),
     Color.makeRGB(0,30,12),
     Color.makeRGB(0,52,28),
     Color.makeRGB(0,81,47),
