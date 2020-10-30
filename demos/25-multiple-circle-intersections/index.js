@@ -1,10 +1,17 @@
 /**
  * A script for finding the intersection points of two circles (the 'radical line').
  *
+ * The intersection outline can be drawn/filled in two ways:
+ *  + canvas.ellipse(...)
+ *  + SVG path (arc command)
+ *
  * Based on the C++ implementation by Robert King
  *    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
  * and the 'Circles and spheres' article by Paul Bourke.
  *    http://paulbourke.net/geometry/circlesphere/
+ *
+ * Is actual implementation of the circle intersection algorithm is located at 
+ * ./src/ts/utils/algoriths/CircleIntersections.ts
  *
  * @requires PlotBoilerplate
  * @requires MouseHandler
@@ -192,22 +199,31 @@
 	// | This is kind of a hack to draw connected arc paths (which is currently not directly
 	// | supported by the `draw` library).
 	// |
+	// | The function switches between canvas.ellipse draw or SVG path draw.
+	// |
 	// | pre: circles.length > 0
 	// +-------------------------------
 	var drawConnectedPath = function( circles, path, intervalSets, iteration, pathNumber ) {
-	    var randomColor = randomWebColor( iteration + pathNumber );
+	    var color = randomWebColor( iteration + pathNumber );
 	    var draw = config.fillNestedCircles ? pb.fill : pb.draw;
 
 	    if( config.drawAsSVGArcs ) 
-		drawConnectedPathAsSVGArcs( circles, path, intervalSets, iteration, pathNumber );
+		drawConnectedPathAsSVGArcs( circles, path, intervalSets, color, draw );
 	    else
-		drawConnectedPathAsEllipses( circles, path, intervalSets, iteration, pathNumber );
+		drawConnectedPathAsEllipses( circles, path, intervalSets, color, draw );
 	};
-	
-	var drawConnectedPathAsEllipses = function( circles, path, intervalSets, iteration, pathNumber ) {
-	    var randomColor = randomWebColor( iteration + pathNumber );
-	    var draw = config.fillNestedCircles ? pb.fill : pb.draw;
 
+
+	// +---------------------------------------------------------------------------------
+	// | Draw the given path as ellipses (using canvs.ellipse function).
+	// |
+	// | @param {Cirle[]} circles
+	// | @param {IndexPair[]} path
+	// | @param {CircularIntervalSet[]} intervalSets
+	// | @param {string} color
+	// | @param {drawutils} draw
+	// +-------------------------------
+	var drawConnectedPathAsEllipses = function( circles, path, intervalSets, color, draw ) {
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
 	    for( var i = 0; i < path.length; i++ ) {
@@ -228,58 +244,49 @@
 	    draw.ctx.closePath();
 	    draw.ctx.lineWidth = config.lineWidth;
 	    draw.ctx.lineJoin = config.lineJoin;
-	    draw._fillOrDraw( randomColor ); 
+	    draw._fillOrDraw( color ); 
 	};
 
-	var drawConnectedPathAsSVGArcs = function( circles, path, intervalSets, iteration, pathNumber ) {
-	    var randomColor = randomWebColor( iteration + pathNumber );
-	    // console.log( randomColor );
-	    var draw = config.fillNestedCircles ? pb.fill : pb.draw;
-
-	    function polarToCartesianRad(centerX, centerY, radius, angleInRadians) {
-		//var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-		return {
-		    x: centerX + (radius * Math.cos(angleInRadians)),
-		    y: centerY + (radius * Math.sin(angleInRadians))
-		};
-	    }
-	    function describeArc( x, y, radius, startAngle, endAngle, retainMoveCommand ){
-		if( Math.PI*2-Math.abs(startAngle-endAngle) < 0.001 ) {
-		    return describeArc( x, y, radius, startAngle, endAngle/2, false ).concat(
-			describeArc( x, y, radius, endAngle/2, endAngle, true )
-		    );
-		}
-		var start = polarToCartesianRad(x, y, radius, endAngle);
-		var end = polarToCartesianRad(x, y, radius, startAngle);
-		var largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
-		var d = [];
-		if( !retainMoveCommand ) {
-		    d.push( "M", start.x, start.y );
-		}
-		d.push( "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y );
-		return d;       
-	    }
-
-	    var R2D = 180/Math.PI;
-
-	    var svgData = [];
+	// +---------------------------------------------------------------------------------
+	// | Draw the given path as ellipses (using canvs.ellipse function).
+	// |
+	// | @param {Cirle[]} circles
+	// | @param {IndexPair[]} path
+	// | @param {CircularIntervalSet[]} intervalSets
+	// | @param {string} color
+	// | @param {drawutils} draw
+	// +-------------------------------
+	var drawConnectedPathAsSVGArcs = function( circles, path, intervalSets, color, draw ) {
+	    // Build the SVG path data 
+	    // https://www.w3.org/TR/SVG/paths.html
+	    
 	    var offs = draw.offset;
 	    var scal = draw.scale;
+	    var svgData = [];
+	    var lastArc = null;
+	    
 	    for( var i = 0; i < path.length; i++ ) {
 		var circleIndex = path[i].i;
 		var circle = circles[ circleIndex ];
 		var center = circle.center;
 		var radius = circle.radius;
 		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
-	
-		svgData = svgData.concat(
-		    describeArc( offs.x + center.x * scal.x,
-				 offs.y + center.y * scal.y,
-				 radius  * (scal.x), // scal.y??
-				 interval[0],
-				 interval[1]
-			       ) );
+
+		if( i == 0 ) {
+		    // At the beginning add the inital position
+		    var startPoint = circle.vertAt( interval[0] );
+		    svgData.push( "M", offs.x + scal.x * startPoint.x, offs.y + scal.y * startPoint.y );
+		}
+		lastArc = describeArc( offs.x + center.x * scal.x,
+				       offs.y + center.y * scal.y,
+				       radius  * (scal.x), // scal.y??
+				       interval[0],
+				       interval[1]
+				     );
+		svgData = svgData.concat( lastArc );
 	    }
+	    // Close the path
+	    svgData.push( "Z" );
 			      
 	    // console.log( svgData );
 	    draw.ctx.save();
@@ -287,17 +294,56 @@
 	    draw.ctx.lineWidth = config.lineWidth;
 	    draw.ctx.lineJoin = config.lineJoin;
 	    if( config.fillNestedCircles ) {
-		draw.ctx.fillStyle = randomColor;
+		draw.ctx.fillStyle = color;
 		draw.ctx.fill( new Path2D(svgData.join(" ")) );
 	    } else {
-		draw.ctx.strokeStyle = randomColor;
+		draw.ctx.strokeStyle = color;
 		draw.ctx.stroke( new Path2D(svgData.join(" ")) );
 	    }
-	    // draw.ctx.closePath();
-	    //draw._fillOrDraw( randomColor );
 	    draw.ctx.restore();    
 	};
 
+	// +---------------------------------------------------------------------------------
+	// | Helper function to convert polar circle coordinates to cartesian coordinates.
+	// | Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+	// |
+	// | TODO: generalize for ellipses (two radii).
+	// |
+	// | @param {number} angle - The angle in radians.
+	// +-------------------------------
+	function polarToCartesian( centerX, centerY, radius, angle ) {
+	    return {
+		x: centerX + (radius * Math.cos(angle)),
+		y: centerY + (radius * Math.sin(angle))
+	    };
+	}
+
+	// +---------------------------------------------------------------------------------
+	// | Helper function to convert a circle section as SVG arc params (for the `d` attribute).
+	// |
+	// | TODO: generalize for ellipses (two radii).
+	// |
+	// | @rerturn [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
+	// +-------------------------------
+	function describeArc( x, y, radius, startAngle, endAngle ) {
+	    var end = polarToCartesian(x, y, radius, endAngle);
+	    var start = polarToCartesian(x, y, radius, startAngle);
+
+	    // Split full circles into two halves.
+	    // Some browsers have problems to render full circles (described by start==end).
+	    if( Math.PI*2-Math.abs(startAngle-endAngle) < 0.001 ) {
+		var firstHalf = describeArc( x, y, radius, startAngle, startAngle+(endAngle-startAngle)/2 );
+		var firstEndPoint = new Vertex( firstHalf[firstHalf.length-2], firstHalf[firstHalf.length-1] );
+		var secondHalf = describeArc( x, y, radius, startAngle+(endAngle-startAngle)/2, endAngle );
+		return firstHalf.concat( secondHalf );
+	    }
+	    
+	    var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
+	    var sweepFlag = 1;
+	    return ["A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y ];
+	}
+
+	
 	// +---------------------------------------------------------------------------------
 	// | Draw the outer circle sectors of intersections (as separate segments).
 	// |
@@ -346,11 +392,11 @@
 	    alwaysDrawFullCircles  : false,
 	    drawCircleSections     : false,
 	    lineWidth              : 3.0,
-	    lineJoin               : "round",  // [ "bevel", "round", "miter" ]
+	    lineJoin               : "round",    // [ "bevel", "round", "miter" ]
 	    drawAsSVGArcs          : false,
 	    drawRadicalLines       : false,
 	    drawCircleNumbers      : false,
-	    sectionDrawPct         : 100, // [0..100]
+	    sectionDrawPct         : 100,        // [0..100]
 	    drawNestedCircles      : true,
 	    nestedCircleStep       : 25,
 	    fillNestedCircles      : false,
