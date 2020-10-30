@@ -26,7 +26,8 @@
  * @modified 2020-03-06 Added functions invX() and invY().
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-05-26 Added functions addX(number) and addY(number).
- * @version  2.4.0
+ * @modifeid 2020-10-30 Change the warnings in `sub(...)` and `add(...)` into real errors.
+ * @version  2.4.1
  *
  * @file Vertex
  * @public

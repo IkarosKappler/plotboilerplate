@@ -14,7 +14,8 @@
  * @modified 2019-11-07 Added toCubicBezierPath(number) function.
  * @modified 2019-11-22 Added the rotate(number,Vertex) function.
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
- * @version 1.1.1
+ * @modified 2020-10-30 Added the `addVert` function.
+ * @version 1.2.0
  *
  * @file Polygon
  * @public
@@ -43,13 +44,25 @@ var Polygon = /** @class */ (function () {
     }
     ;
     /**
+     * Add a vertex to the end of the `vertices` array.
+     *
+     * @method addVert
+     * @param {Vertex} vert - The vertex to add.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.addVertex = function (vert) {
+        this.vertices.push(vert);
+    };
+    ;
+    /**
      * Check if the given vertex is inside this polygon.<br>
      * <br>
      * Ray-casting algorithm found at<br>
      *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
      *
      * @method containsVert
-     * @param {Vertex} vert - The vertex to check.The new x-component.
+     * @param {Vertex} vert - The vertex to check. The new x-component.
      * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
      * @instance
      * @memberof Polygon

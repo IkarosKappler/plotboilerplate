@@ -12,5 +12,16 @@
  * @modified 2020-10-23 Ported to Typescript.
  **/
 import { Color } from "./datastructures/Color";
+export declare const Red: Color;
+export declare const Pink: Color;
+export declare const Purple: Color;
+export declare const DeepPurple: Color;
+export declare const Indigo: Color;
+export declare const Blue: Color;
+export declare const LightBlue: Color;
+export declare const Cyan: Color;
+export declare const Teal: Color;
+export declare const Green: Color;
+export declare const LightGreen: Color;
 export declare const WebColors: Array<Color>;
 export declare const shuffleWebColors: (order: number[]) => Color[];

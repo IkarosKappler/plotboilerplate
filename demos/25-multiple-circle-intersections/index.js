@@ -375,7 +375,7 @@
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
 	// +-------------------------------
-	new MouseHandler(pb.canvas,'convexhull-demo')
+	new MouseHandler(pb.canvas,'circle-intersection-demo')
 	    .move( function(e) {
 		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
 		var cx = document.getElementById('cx');

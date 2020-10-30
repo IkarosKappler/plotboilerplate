@@ -26,7 +26,8 @@
  * @modified 2020-03-06 Added functions invX() and invY().
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-05-26 Added functions addX(number) and addY(number).
- * @version  2.4.0
+ * @modifeid 2020-10-30 Change the warnings in `sub(...)` and `add(...)` into real errors.
+ * @version  2.4.1
  *
  * @file Vertex
  * @public
@@ -235,9 +236,9 @@ export class Vertex implements XYCoords, SVGSerializable {
 		this.y += tuple.y;
 	    } else {
 		if( typeof x == 'number' ) this.x += x;
-		else console.warn(`Cannot add ${typeof x} to numeric x component!`);
+		else throw `Cannot add ${typeof x} to numeric x component!`;
 		if( typeof y == 'number' ) this.y += y;
-		else console.warn(`Cannot add ${typeof y} to numeric y component!`);
+		else throw `Cannot add ${typeof y} to numeric y component!`;
 	    }
 	}
 	return this;
@@ -305,13 +306,6 @@ export class Vertex implements XYCoords, SVGSerializable {
      * @memberof Vertex
      **/
     sub( x:number|XYCoords, y?:number ):Vertex {
-	/* if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
-	    this.x -= x.x;
-	    this.y -= x.y;
-	} else {
-	    this.x -= x;
-	    this.y -= y;
-	    } */
 	if( typeof x == 'number' && typeof y == 'number' ) {
 	    this.x -= x;
 	    this.y -= y;
@@ -322,9 +316,9 @@ export class Vertex implements XYCoords, SVGSerializable {
 		this.y -= tuple.y;
 	    } else {
 		if( typeof x == 'number' ) this.x -= x;
-		else console.warn(`Cannot add ${typeof x} to numeric x component!`);
+		else throw `Cannot add ${typeof x} to numeric x component!`;
 		if( typeof y == 'number' ) this.y -= y;
-		else console.warn(`Cannot add ${typeof y} to numeric y component!`);
+		else throw `Cannot add ${typeof y} to numeric y component!`;
 	    }
 	}
 	return this;

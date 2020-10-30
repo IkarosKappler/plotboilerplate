@@ -14,37 +14,45 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var Color_1 = require("./datastructures/Color");
-// This is the original order (like in the image).
-// But if you want to get clearly distinct 'random' colors in a web app, then
-// the mix below is better.
-exports.WebColors = [
-    Color_1.Color.makeRGB(255, 67, 55),
-    Color_1.Color.makeRGB(232, 31, 100),
-    Color_1.Color.makeRGB(156, 39, 175),
-    Color_1.Color.makeRGB(103, 59, 184),
-    Color_1.Color.makeRGB(64, 81, 181),
-    Color_1.Color.makeRGB(35, 151, 245),
-    Color_1.Color.makeRGB(6, 170, 245),
-    Color_1.Color.makeRGB(3, 189, 214),
-    Color_1.Color.makeRGB(1, 150, 137),
-    Color_1.Color.makeRGB(77, 175, 82),
-    Color_1.Color.makeRGB(141, 195, 67) // Light Green
-];
+exports.Red = Color_1.Color.makeRGB(255, 67, 55);
+exports.Pink = Color_1.Color.makeRGB(232, 31, 100);
+exports.Purple = Color_1.Color.makeRGB(156, 39, 175);
+exports.DeepPurple = Color_1.Color.makeRGB(103, 59, 184);
+exports.Indigo = Color_1.Color.makeRGB(64, 81, 181);
+exports.Blue = Color_1.Color.makeRGB(35, 151, 245);
+exports.LightBlue = Color_1.Color.makeRGB(6, 170, 245);
+exports.Cyan = Color_1.Color.makeRGB(3, 189, 214);
+exports.Teal = Color_1.Color.makeRGB(1, 150, 137);
+exports.Green = Color_1.Color.makeRGB(77, 175, 82);
+exports.LightGreen = Color_1.Color.makeRGB(141, 195, 67);
 /*
-export const WebColors = [
-    Color.makeRGB(1,150,137),  // Teal
+export const WebColors : Array<Color> = [
     Color.makeRGB(255,67,55),  // Red
-    Color.makeRGB(6,170,245),  // Light Blue
-    Color.makeRGB(64,81,181),  // Indigo
     Color.makeRGB(232,31,100), // Pink
-    Color.makeRGB(77,175,82),  // Green
     Color.makeRGB(156,39,175), // Purple
-    Color.makeRGB(141,195,67), // Light Green
     Color.makeRGB(103,59,184), // Deep Purple
+    Color.makeRGB(64,81,181),  // Indigo
+    Color.makeRGB(35,151,245), // Blue
+    Color.makeRGB(6,170,245),  // Light Blue
     Color.makeRGB(3,189,214),  // Cyan
-    Color.makeRGB(35,151,245)  // Blue
+    Color.makeRGB(1,150,137),  // Teal
+    Color.makeRGB(77,175,82),  // Green
+    Color.makeRGB(141,195,67)  // Light Green
 ];
 */
+exports.WebColors = [
+    exports.Red,
+    exports.Pink,
+    exports.Purple,
+    exports.DeepPurple,
+    exports.Indigo,
+    exports.Blue,
+    exports.LightBlue,
+    exports.Cyan,
+    exports.Teal,
+    exports.Green,
+    exports.LightGreen
+];
 exports.shuffleWebColors = function (order) {
     var result = Array(order.length);
     for (var i = 0; i < order.length; i++) {

@@ -7,16 +7,27 @@
  * @requires Color
  *
  * @author   Ikaros Kappler
- * @version  1.0.0
+ * @version  1.0.1
  * @date     2018-11-10
  * @modified 2020-10-23 Ported to Typescript.
+ * @modified 2020-10-30 Exporting each color under its name globally.
  **/
 
 import { Color } from "./datastructures/Color";
 
-// This is the original order (like in the image).
-// But if you want to get clearly distinct 'random' colors in a web app, then
-// the mix below is better.
+export const Red : Color = Color.makeRGB(255,67,55);
+export const Pink : Color = Color.makeRGB(232,31,100);
+export const Purple : Color = Color.makeRGB(156,39,175);
+export const DeepPurple : Color = Color.makeRGB(103,59,184);
+export const Indigo : Color = Color.makeRGB(64,81,181);
+export const Blue : Color = Color.makeRGB(35,151,245);
+export const LightBlue : Color = Color.makeRGB(6,170,245);
+export const Cyan : Color = Color.makeRGB(3,189,214);
+export const Teal : Color = Color.makeRGB(1,150,137);
+export const Green : Color = Color.makeRGB(77,175,82);
+export const LightGreen : Color = Color.makeRGB(141,195,67);
+
+/*
 export const WebColors : Array<Color> = [
     Color.makeRGB(255,67,55),  // Red
     Color.makeRGB(232,31,100), // Pink
@@ -30,22 +41,22 @@ export const WebColors : Array<Color> = [
     Color.makeRGB(77,175,82),  // Green
     Color.makeRGB(141,195,67)  // Light Green
 ];
-
-/*
-export const WebColors = [
-    Color.makeRGB(1,150,137),  // Teal
-    Color.makeRGB(255,67,55),  // Red
-    Color.makeRGB(6,170,245),  // Light Blue
-    Color.makeRGB(64,81,181),  // Indigo
-    Color.makeRGB(232,31,100), // Pink
-    Color.makeRGB(77,175,82),  // Green
-    Color.makeRGB(156,39,175), // Purple
-    Color.makeRGB(141,195,67), // Light Green
-    Color.makeRGB(103,59,184), // Deep Purple
-    Color.makeRGB(3,189,214),  // Cyan
-    Color.makeRGB(35,151,245)  // Blue
-];
 */
+
+export const WebColors : Array<Color> = [
+    Red,
+    Pink,
+    Purple,
+    DeepPurple,
+    Indigo,
+    Blue,
+    LightBlue,
+    Cyan,
+    Teal,
+    Green,
+    LightGreen
+];
+
 
 export const shuffleWebColors = ( order: Array<number> ) => {
     const result : Array<Color> = Array( order.length );
