@@ -25,7 +25,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-var alloyfinger_1 = require("alloyfinger");
+var alloyfinger_1 = require("alloyfinger"); // node_modules
 var BezierPath_1 = require("../../BezierPath");
 var KeyHandler_1 = require("../../KeyHandler");
 var MouseHandler_1 = require("../../MouseHandler");

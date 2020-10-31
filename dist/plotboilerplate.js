@@ -128,7 +128,8 @@ return /******/ (function(modules) { // webpackBootstrap
  * @modified 2020-03-06 Added functions invX() and invY().
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-05-26 Added functions addX(number) and addY(number).
- * @version  2.4.0
+ * @modifeid 2020-10-30 Change the warnings in `sub(...)` and `add(...)` into real errors.
+ * @version  2.4.1
  *
  * @file Vertex
  * @public
@@ -304,11 +305,11 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == 'number')
                     this.x += x;
                 else
-                    console.warn("Cannot add " + typeof x + " to numeric x component!");
+                    throw "Cannot add " + typeof x + " to numeric x component!";
                 if (typeof y == 'number')
                     this.y += y;
                 else
-                    console.warn("Cannot add " + typeof y + " to numeric y component!");
+                    throw "Cannot add " + typeof y + " to numeric y component!";
             }
         }
         return this;
@@ -372,13 +373,6 @@ var Vertex = /** @class */ (function () {
      * @memberof Vertex
      **/
     Vertex.prototype.sub = function (x, y) {
-        /* if( typeof x == 'object' && typeof x.x == 'number' && typeof x.y == 'number' ) {
-            this.x -= x.x;
-            this.y -= x.y;
-        } else {
-            this.x -= x;
-            this.y -= y;
-            } */
         if (typeof x == 'number' && typeof y == 'number') {
             this.x -= x;
             this.y -= y;
@@ -393,11 +387,11 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == 'number')
                     this.x -= x;
                 else
-                    console.warn("Cannot add " + typeof x + " to numeric x component!");
+                    throw "Cannot add " + typeof x + " to numeric x component!";
                 if (typeof y == 'number')
                     this.y -= y;
                 else
-                    console.warn("Cannot add " + typeof y + " to numeric y component!");
+                    throw "Cannot add " + typeof y + " to numeric y component!";
             }
         }
         return this;
@@ -659,13 +653,15 @@ exports.Vertex = Vertex;
  *
  * @author   Ikaros Kappler
  * @date     2020-05-11
- * @version  1.0.0
+ * @modified 2020-10-30 Added the static computeFromVertices function.
+ * @version  1.1.0
  *
  * @file Bopunds
  * @fileoverview A simple bounds class implementing IBounds.
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+var Vertex_1 = __webpack_require__(0);
 var Bounds = /** @class */ (function () {
     /**
      * The constructor.
@@ -681,6 +677,35 @@ var Bounds = /** @class */ (function () {
         this.width = max.x - min.x;
         this.height = max.y - min.y;
     }
+    ;
+    /**
+     * Compute the minimal bounding box for a given set of vertices.
+     *
+     * An empty vertex array will return an empty bounding box located at (0,0).
+     *
+     * @static
+     * @method computeFromVertices
+     * @memberof Bounds
+     * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
+     * @return The minimal Bounds for the given vertices.
+     **/
+    Bounds.computeFromVertices = function (vertices) {
+        if (vertices.length == 0)
+            return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
+        var xMin = vertices[0].x;
+        var xMax = vertices[0].x;
+        var yMin = vertices[0].y;
+        var yMax = vertices[0].y;
+        var vert;
+        for (var i in vertices) {
+            vert = vertices[i];
+            xMin = Math.min(xMin, vert.x);
+            xMax = Math.max(xMax, vert.x);
+            yMin = Math.min(yMin, vert.y);
+            yMax = Math.max(yMax, vert.y);
+        }
+        return new Bounds(new Vertex_1.Vertex(xMin, xMax), new Vertex_1.Vertex(yMin, yMax));
+    };
     ;
     return Bounds;
 }()); // END class bounds
@@ -3012,7 +3037,9 @@ exports.BezierPath = BezierPath;
  * @modified 2019-11-07 Added toCubicBezierPath(number) function.
  * @modified 2019-11-22 Added the rotate(number,Vertex) function.
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
- * @version 1.1.1
+ * @modified 2020-10-30 Added the `addVertex` function.
+ * @modified 2020-10-31 Added thet `getVertexAt` function.
+ * @version 1.3.0
  *
  * @file Polygon
  * @public
@@ -3041,13 +3068,40 @@ var Polygon = /** @class */ (function () {
     }
     ;
     /**
+     * Add a vertex to the end of the `vertices` array.
+     *
+     * @method addVert
+     * @param {Vertex} vert - The vertex to add.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.addVertex = function (vert) {
+        this.vertices.push(vert);
+    };
+    ;
+    /**
+     * Get the polygon vertex at the given position (index).
+     *
+     * The index may exceed the total vertex count, and will be wrapped around then (modulo).
+     *
+     * @metho getVertexAt
+     * @param {number} index - The index of the desired vertex.
+     * @instance
+     * @memberof Polygon
+     * @return {Vertex} At the given index.
+     **/
+    Polygon.prototype.getVertexAt = function (index) {
+        return this.vertices[index % this.vertices.length];
+    };
+    ;
+    /**
      * Check if the given vertex is inside this polygon.<br>
      * <br>
      * Ray-casting algorithm found at<br>
      *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
      *
      * @method containsVert
-     * @param {Vertex} vert - The vertex to check.The new x-component.
+     * @param {Vertex} vert - The vertex to check. The new x-component.
      * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
      * @instance
      * @memberof Polygon

@@ -13,8 +13,9 @@
  * @modified 2019-11-07 Added toCubicBezierPath(number) function.
  * @modified 2019-11-22 Added the rotate(number,Vertex) function.
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-10-30 Added the `addVert` function.
- * @version 1.2.0
+ * @modified 2020-10-30 Added the `addVertex` function.
+ * @modified 2020-10-31 Added thet `getVertexAt` function.
+ * @version 1.3.0
  *
  * @file Polygon
  * @public
@@ -59,6 +60,18 @@ export declare class Polygon implements SVGSerializable {
      * @memberof Polygon
      **/
     addVertex(vert: Vertex): void;
+    /**
+     * Get the polygon vertex at the given position (index).
+     *
+     * The index may exceed the total vertex count, and will be wrapped around then (modulo).
+     *
+     * @metho getVertexAt
+     * @param {number} index - The index of the desired vertex.
+     * @instance
+     * @memberof Polygon
+     * @return {Vertex} At the given index.
+     **/
+    getVertexAt(index: number): Vertex;
     /**
      * Check if the given vertex is inside this polygon.<br>
      * <br>

@@ -24,7 +24,7 @@
  * @public
  **/
 
-import { AlloyFinger } from "alloyfinger";
+import { AlloyFinger } from "alloyfinger"; // node_modules
 import { BezierPath } from "../../BezierPath";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { KeyHandler } from "../../KeyHandler";

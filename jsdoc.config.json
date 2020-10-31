@@ -1,7 +1,7 @@
 {
     "source": {
         "includePattern": "src/js/.+\\.js(doc|x)?$",
-        "excludePattern": "(^|\\/|\\\\)_|src/js/utils/(.*)"
+        "excludePattern": "(^|\\/|\\\\)_|src/js/exclude/(.*)"
     },
     "templates" : {
 	"default" : {

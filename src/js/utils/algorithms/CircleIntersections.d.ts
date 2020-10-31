@@ -13,7 +13,8 @@
  * @author   Ikaros Kappler
  * @date     2020-10-05
  * @version  1.0.0
- * @name CircleIntersections
+ * @file CircleIntersections
+ * @public
  **/
 import { Circle } from "../../Circle";
 import { Line } from "../../Line";

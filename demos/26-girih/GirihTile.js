@@ -1,4 +1,5 @@
 /**
+ * @class
  * @classdesc This is a general Tile superclass. All other tile classes extends this one.
  *
  * @requires Bounds
@@ -17,14 +18,14 @@
 
 /**
  * @constructor
- * @abstract
- * @param {number} size     - The edge size (usually IKRS.Girih.DEFAULT_EDGE_LENGTH).
+ * @abstract class
  * @param {Vertex} position - The position of the tile.
+ * @param {number} size     - The edge size (usually IKRS.Girih.DEFAULT_EDGE_LENGTH).
  * @param {number} angle    - The rotation angle.
  * @param {string} tileType - One of GirihTile.TILE_TYPE_*.
  **/
-var GirihTile = function( size, 
-			  position, 
+var GirihTile = function( position,
+			  size, 
 			  angle, 
 			  tileType
 			) {
@@ -103,9 +104,7 @@ GirihTile.prototype.getOuterTilePolygonAt = function( index ) {
 GirihTile.prototype.getTranslatedVertex = function( index ) {
     // Rotate around the absolut center!
     // (the position is applied later)
-    //var vertex = this.polygon.getVertexAt( index ); // this.getVertexAt( index );
-    //return vertex.clone().rotate( IKRS.Point2.ZERO_POINT, this.angle ).add( this.position );    
-    return this._translateVertex( this.vertices[index % this.vertices.length ] );
+    return this.translateVertex( this.vertices[index % this.vertices.length ] );
 };
 
 /**
@@ -119,15 +118,10 @@ GirihTile.prototype.getTranslatedVertex = function( index ) {
  *
  * So this function always returns a point for any index.
  **/
-GirihTile.prototype.getVertexAt = function( index ) {
-    /*
-    if( index < 0 ) 
-	return this.vertices[ this.vertices.length - (Math.abs(index)%this.vertices.length) ];
-    else
-	return this.vertices[ index % this.vertices.length ];
-    */
+// THIS IS NOW PART OF THE POLYGON CLASS
+/* GirihTile.prototype.getVertexAt = function( index ) {
     return this.vertices[ index % this.vertices.length ];
-}
+} */
 
 /**
  * This function checks if the passed point is within this tile's polygon.
@@ -305,11 +299,11 @@ GirihTile.prototype.computeBounds = function() {
     return Bounds.computeFromVertices( this.vertices );
 };
 
-GirihTile.prototype._translateVertex = function( vertex ) {
+GirihTile.prototype.translateVertex = function( vertex ) {
     return vertex.clone().rotate( this.angle, new Vertex(0,0) ).add( this.position );   
 };
 
-GirihTile.prototype._addVertex = function( vertex ) {
+GirihTile.prototype.addVertex = function( vertex ) {
     this.vertices.push( vertex );
 };
 

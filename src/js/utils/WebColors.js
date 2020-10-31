@@ -8,9 +8,10 @@
  * @requires Color
  *
  * @author   Ikaros Kappler
- * @version  1.0.0
+ * @version  1.0.1
  * @date     2018-11-10
  * @modified 2020-10-23 Ported to Typescript.
+ * @modified 2020-10-30 Exporting each color under its name globally.
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var Color_1 = require("./datastructures/Color");

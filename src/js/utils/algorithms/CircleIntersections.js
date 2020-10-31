@@ -14,7 +14,8 @@
  * @author   Ikaros Kappler
  * @date     2020-10-05
  * @version  1.0.0
- * @name CircleIntersections
+ * @file CircleIntersections
+ * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var arrayFill_1 = require("./arrayFill");

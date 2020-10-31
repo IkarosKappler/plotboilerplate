@@ -34,8 +34,8 @@
 		  scaleX                : 1.0,
 		  scaleY                : 1.0,
 		  rasterGrid            : true,
-		  drawGrid              : false,
-		  drawOrigin            : false,
+		  drawGrid              : true,
+		  drawOrigin            : true,
 		  rasterAdjustFactor    : 2.0,
 		  redrawOnResize        : true,
 		  defaultCanvasWidth    : 1024,
@@ -84,16 +84,33 @@
 	var tiles = [];
 	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
 	// Todo for all tiles: `position` should be first param
-	var decagon = new GirihDecagon( new Vertex(0,0), 0.0, edgeLength );
+	var decagon = new GirihDecagon( new Vertex(-100,-100), edgeLength, 0.0 );
 	tiles.push( decagon );
+
+	var pentagon = new GirihPentagon( new Vertex(23,-60), edgeLength, 0.0 );
+	tiles.push( pentagon );
+
+	var hexagon = new GirihHexagon( new Vertex(100,150), edgeLength, 0.0 );
+	tiles.push( hexagon );
 
 	// +---------------------------------------------------------------------------------
 	// | This is the actual render function.
 	// +-------------------------------
 	var drawAll = function() {
-	    
+	    // Draw all tiles
 	    for( var i in tiles ) {
-		pb.draw.polygon( tiles[i], false ); // Polygon is not open
+		var tile = tiles[i];
+		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
+		// Draw all inner polygons
+		for( var j = 0; j < tile.innerTilePolygons.length; j++ ) {
+		    pb.draw.polygon( tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0 );
+		}
+		// Draw all outer polygons
+		for( var j = 0; j < tile.outerTilePolygons.length; j++ ) {
+		    pb.draw.polygon( tile.outerTilePolygons[j], Teal.cssRGB(), 1.0 );
+		}
+		// Draw a crosshair at the center
+		pb.draw.crosshair( tile.position, 7, 'rgba(0,192,192,0.5)' );
 	    }
 
 	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
@@ -103,7 +120,6 @@
 				   ); 
 		pb.draw.line( edge.a, edge.b, Red.cssRGB(), 2.0 );
 	    }
-	    
 	};
 
 	
@@ -120,26 +136,23 @@
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 
 		// Find Girih edge nearby ...
+		var oldHoverTileIndex = hoverTileIndex;
+		var oldHoverEdgeIndex = hoverEdgeIndex;
 		hoverTileIndex = -1;
 		hoverEdgeIndex = -1;
 		for( var i in tiles ) {
 		    var tile = tiles[i];
-		    var edgeIndex = tile.locateEdgeAtPoint( relPos, edgeLength/2 ); // location, tolerance
-		    // console.log( "edgeIndex", edgeIndex );
+		    var tmpPos = tile.position.clone().add( relPos );
+		    var edgeIndex = tile.locateEdgeAtPoint( tmpPos, edgeLength/2 );
 
 		    if( edgeIndex != -1 ) {
 			// highlight edge
-			/* var edge = new Line( tile.vertices[ edgeIndex ],
-					     tile.vertices[ (edgeIndex+1) % tile.vertices.length ]
-					   ); 
-			console.log( edge ); */
-			// pb.draw.line( edge.a, edge.b, 'rgba(255,128,0,1.0)', 2.0 );
 			hoverTileIndex = i;
 			hoverEdgeIndex = edgeIndex;
-
-			pb.redraw();
 		    }
 		}
+		if( oldHoverTileIndex != hoverTileIndex || oldHoverEdgeIndex != hoverEdgeIndex )
+		    pb.redraw();
 	    } );  
 
 

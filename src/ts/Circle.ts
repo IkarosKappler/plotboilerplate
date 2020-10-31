@@ -124,7 +124,7 @@ export class Circle implements SVGSerializable {
      * @param {Circle} circle 
      * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
      **/
-    circleIntersection( circle:Circle) : Line | null {
+    circleIntersection( circle:Circle ) : Line | null {
 	// Circles do not intersect at all?
 	if( this.center.distance(circle.center) > this.radius+circle.radius ) {
 	    return null;

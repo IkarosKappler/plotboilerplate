@@ -7,9 +7,10 @@
  * @requires Color
  *
  * @author   Ikaros Kappler
- * @version  1.0.0
+ * @version  1.0.1
  * @date     2018-11-10
  * @modified 2020-10-23 Ported to Typescript.
+ * @modified 2020-10-30 Exporting each color under its name globally.
  **/
 import { Color } from "./datastructures/Color";
 export declare const Red: Color;

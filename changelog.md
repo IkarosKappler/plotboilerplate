@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-10-31
+  * Including utils in the docs now.
+  * Added thet `Polygon.getVertexAt` function.
 * 2020-10-30
   * Added the static Bounds.computeFromVertices(Vertex[]) function.
   * Added the `Polygon.addVert` function.

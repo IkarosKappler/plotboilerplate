@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-10-30
+date: 2020-10-31
 ---
 
 <div class="full-width">
@@ -132,7 +132,12 @@ date: 2020-10-30
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/25-multiple-circle-intersections/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20201018-multiple-circle-intersections.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20201029-0-multiple-circle-intersections-rainbow.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/26-girih/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/na.png');"></div>
    </a>
 </div>
 </div>

@@ -275,7 +275,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 
 ### Multiple circle intersections and their outlines
 
-![Multiple-circle-intersections](https://plotboilerplate.io/repo/screenshots/screenshot-20201018-multiple-circle-intersections.png "Two-circle-radical-line")
+![Multiple-circle-intersections](https://plotboilerplate.io/repo/screenshots/screenshot-20201029-0-multiple-circle-intersections-rainbow.png "Two-circle-radical-line")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/25-multiple-circle-intersections/index.html" title="See the demo">See the demo</a>
 
@@ -627,10 +627,14 @@ for this purpose.
  * Port all demos from vanilla JS to TypeScript.
  * Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
  * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
- * IMPORTANT: replace Touchy by AlloyFinger also in the public main page.
  * Add a removeVertices() function (and use it in the threejs demo).
  * https://github.com/nilzona/path2d-polyfill
- * Implement 'S' and 's' and 'T' and 't' in the draw.svgPath(...) function.
+ * Implement a drawutils.svgPath(Array). Implement 'S' and 's' and 'T' and 't' in that draw.svgPath(...) function?
+ * Add two new classes EllipticSection and CircleSection.
+ * Extend the SVGBuilder with these new two classes then.
+ * Extend the demo 25 (multiple circle intersection): add SVG export.
+ * Research about categories for JSDoc (algorithms, datastructures, helpers). Think about a different generator or template.
+ 
 
 ### Todos for future Version 2
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
