@@ -41,6 +41,7 @@ var GirihHexagon = function( position, size, angle ) {
 		   144.0,
 		   144.0,
 		   72.0
+		   // 144.0
 		 ];
     
     var theta = 0.0;
@@ -58,7 +59,6 @@ var GirihHexagon = function( position, size, angle ) {
     }
 
     // Center and move to desired position    
-    // var bounds = Bounds.computeFromVertices( this.vertices );
     var move   = new Vertex( (oppositePoint.x - startPoint.x)/2.0, 
 			     (oppositePoint.y - startPoint.y)/2.0
 			   );

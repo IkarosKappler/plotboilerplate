@@ -84,14 +84,23 @@
 	var tiles = [];
 	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
 	// Todo for all tiles: `position` should be first param
-	var decagon = new GirihDecagon( new Vertex(-100,-100), edgeLength, 0.0 );
+	var decagon = new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 );
 	tiles.push( decagon );
 
-	var pentagon = new GirihPentagon( new Vertex(23,-60), edgeLength, 0.0 );
+	var pentagon = new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 );
 	tiles.push( pentagon );
 
-	var hexagon = new GirihHexagon( new Vertex(100,150), edgeLength, 0.0 );
+	var hexagon = new GirihHexagon( new Vertex(26,-1), edgeLength, 0.0 );
 	tiles.push( hexagon );
+
+	var bowtie = new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 );
+	tiles.push( bowtie );
+
+	var rhombus = new GirihRhombus( new Vertex(-68,-128), edgeLength, 0.0 );
+	tiles.push( rhombus );
+
+	var penrose = new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true );
+	tiles.push( penrose );
 
 	// +---------------------------------------------------------------------------------
 	// | This is the actual render function.

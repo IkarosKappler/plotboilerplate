@@ -68,7 +68,10 @@ var Polygon = /** @class */ (function () {
      * @return {Vertex} At the given index.
      **/
     Polygon.prototype.getVertexAt = function (index) {
-        return this.vertices[index % this.vertices.length];
+        if (index < 0)
+            return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
+        else
+            return this.vertices[index % this.vertices.length];
     };
     ;
     /**

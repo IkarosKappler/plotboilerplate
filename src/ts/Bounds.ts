@@ -95,8 +95,7 @@ export class Bounds implements IBounds, XYDimension {
 	    yMin = Math.min( yMin, vert.y );
 	    yMax = Math.max( yMax, vert.y );
 	}
-
-	return new Bounds( new Vertex(xMin, xMax), new Vertex(yMin, yMax) );
+	return new Bounds( new Vertex(xMin, yMin), new Vertex(xMax, yMax) );
     };
 
 } // END class bounds

@@ -704,7 +704,8 @@ var Bounds = /** @class */ (function () {
             yMin = Math.min(yMin, vert.y);
             yMax = Math.max(yMax, vert.y);
         }
-        return new Bounds(new Vertex_1.Vertex(xMin, xMax), new Vertex_1.Vertex(yMin, yMax));
+        // console.log( 'b', yMin, yMax, yMax-yMin );
+        return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
     };
     ;
     return Bounds;
@@ -3091,7 +3092,10 @@ var Polygon = /** @class */ (function () {
      * @return {Vertex} At the given index.
      **/
     Polygon.prototype.getVertexAt = function (index) {
-        return this.vertices[index % this.vertices.length];
+        if (index < 0)
+            return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
+        else
+            return this.vertices[index % this.vertices.length];
     };
     ;
     /**

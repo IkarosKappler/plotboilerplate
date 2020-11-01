@@ -57,7 +57,8 @@ var Bounds = /** @class */ (function () {
             yMin = Math.min(yMin, vert.y);
             yMax = Math.max(yMax, vert.y);
         }
-        return new Bounds(new Vertex_1.Vertex(xMin, xMax), new Vertex_1.Vertex(yMin, yMax));
+        // console.log( 'b', yMin, yMax, yMax-yMin );
+        return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
     };
     ;
     return Bounds;

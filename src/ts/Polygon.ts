@@ -94,7 +94,10 @@ export class Polygon implements SVGSerializable {
      * @return {Vertex} At the given index.
      **/
     getVertexAt( index:number ) : Vertex {
-	return this.vertices[ index % this.vertices.length ];
+	if( index < 0 ) 
+	    return this.vertices[ this.vertices.length - (Math.abs(index)%this.vertices.length) ];
+	else
+	    return this.vertices[ index % this.vertices.length ];
     };
 
 
