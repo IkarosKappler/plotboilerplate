@@ -90,13 +90,13 @@
 	var pentagon = new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 );
 	tiles.push( pentagon );
 
-	var hexagon = new GirihHexagon( new Vertex(26,-1), edgeLength, 0.0 );
+	var hexagon = new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 );
 	tiles.push( hexagon );
 
 	var bowtie = new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 );
 	tiles.push( bowtie );
 
-	var rhombus = new GirihRhombus( new Vertex(-68,-128), edgeLength, 0.0 );
+	var rhombus = new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 );
 	tiles.push( rhombus );
 
 	var penrose = new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true );
@@ -119,7 +119,8 @@
 		    pb.draw.polygon( tile.outerTilePolygons[j], Teal.cssRGB(), 1.0 );
 		}
 		// Draw a crosshair at the center
-		pb.draw.crosshair( tile.position, 7, 'rgba(0,192,192,0.5)' );
+		// pb.draw.crosshair( tile.position, 7, 'rgba(0,192,192,0.5)' );
+		drawFancyCrosshair( tile.position, hoverTileIndex == i );
 	    }
 
 	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
@@ -128,6 +129,32 @@
 				     tile.vertices[ (hoverEdgeIndex+1) % tile.vertices.length ]
 				   ); 
 		pb.draw.line( edge.a, edge.b, Red.cssRGB(), 2.0 );
+	    }
+	};
+
+	
+	var drawFancyCrosshair = function( position, isHighlighted ) {
+	    var color = isHighlighted ? 'rgba(192,0,0,0.5)' : 'rgba(0,192,192,0.5)';
+	    var crossRadius = 2;
+	    var arcRadius = 3;
+	    var s = Math.sin(Math.PI/4)*crossRadius;
+	    var c = Math.cos(Math.PI/4)*crossRadius;
+	    pb.draw.line( new Vertex( position.x + c,
+				      position.y + s ),
+			  new Vertex( position.x - c,
+				      position.y - s ),
+			  color );
+	    pb.draw.line( new Vertex( position.x + c,
+				      position.y - s ),
+			  new Vertex( position.x - c,
+				      position.y + s ),
+			  color );
+	    for( var i = 0; i < 4; i++ ) {
+		pb.draw.circleArc( position,
+				   arcRadius,
+				   Math.PI/2 * (i+1) + Math.PI*2*0.2,
+				   Math.PI/2 * (i+1) + Math.PI*2*0.3,
+				   color, 1.0 );
 	    }
 	};
 

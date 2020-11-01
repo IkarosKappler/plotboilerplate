@@ -17,6 +17,7 @@
  * @requires MouseHandler
  * @requires gup
  * @requires dat.gui
+ * @requires path2d-polyfill (IE only)
  *
  * 
  * @author   Ikaros Kappler
@@ -96,8 +97,9 @@
 	// +---------------------------------------------------------------------------------
 	// | Initialize n random circles and store them in the array.
 	// +-------------------------------
+	var numCircles = Math.max( 1, PlotBoilerplate.utils.fetch.num(GUP,'numCircles',7) );
 	var circles = [];
-	for( var i = 0; i < 7; i++ ) {
+	for( var i = 0; i < numCircles; i++ ) {
 	    var center = randomVertex();
 	    var circle = new Circle( center,
 				     i==0

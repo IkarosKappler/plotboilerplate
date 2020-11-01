@@ -1679,7 +1679,6 @@ export class PlotBoilerplate {
 
     /**
      * A set of helper functions.
-     * @private
      **/
     static utils = {
 	
