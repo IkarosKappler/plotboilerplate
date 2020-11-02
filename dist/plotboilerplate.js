@@ -1,1815 +1,18 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define("pb", [], factory);
-	else if(typeof exports === 'object')
-		exports["pb"] = factory();
-	else
-		root["pb"] = factory();
-})(window, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 20);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
 
-"use strict";
+/***/ "./src/js/BezierPath.js":
+/*!******************************!*\
+  !*** ./src/js/BezierPath.js ***!
+  \******************************/
+/*! flagged exports */
+/*! export BezierPath [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-/**
- * @classdesc A vertex is a pair of two numbers.<br>
- * <br>
- * It is used to identify a 2-dimensional point on the x-y-plane.
- *
- * @requires VertexAttr
- *
- * @author   Ikaros Kappler
- * @date     2012-10-17
- * @modified 2018-04-03 Refactored the code of october 2012 into a new class.
- * @modified 2018-04-28 Added some documentation.
- * @modified 2018-08-16 Added the set() function.
- * @modified 2018-08-26 Added VertexAttr.
- * @modified 2018-10-31 Extended the constructor by object{x,y}.
- * @modified 2018-11-19 Extended the set(number,number) function to set(Vertex).
- * @modified 2018-11-28 Added 'this' to the VertexAttr constructor.
- * @modified 2018-12-05 Added the sub(...) function. Changed the signature of the add() function! add(Vertex) and add(number,number) are now possible.
- * @modified 2018-12-21 (It's winter solstice) Added the inv()-function.
- * @modified 2019-01-30 Added the setX(Number) and setY(Number) functions.
- * @modified 2019-02-19 Added the difference(Vertex) function.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-04-24 Added the randomVertex(ViewPort) function.
- * @modified 2019-11-07 Added toSVGString(object) function.
- * @modified 2019-11-18 Added the rotate(number,Vertex) function.
- * @modified 2019-11-21 Fixed a bug in the rotate(...) function (elements were moved).
- * @modified 2020-03-06 Added functions invX() and invY().
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @modified 2020-05-26 Added functions addX(number) and addY(number).
- * @modifeid 2020-10-30 Change the warnings in `sub(...)` and `add(...)` into real errors.
- * @version  2.4.1
- *
- * @file Vertex
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var VertexAttr_1 = __webpack_require__(4);
-var VertexListeners_1 = __webpack_require__(10);
-var Vertex = /** @class */ (function () {
-    /**
-     * The constructor for the vertex class.
-     *
-     * @constructor
-     * @name Vertex
-     * @param {number} x - The x-coordinate of the new vertex.
-     * @param {number} y - The y-coordinate of the new vertex.
-     **/
-    function Vertex(x, y) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Vertex";
-        if (typeof x == 'undefined') {
-            this.x = 0;
-            this.y = 0;
-        }
-        else if (typeof x == 'number' && typeof y == 'number') {
-            this.x = x;
-            this.y = y;
-        }
-        else {
-            var tuple = x;
-            if (typeof tuple.x == "number" && typeof tuple.y == "number") {
-                this.x = tuple.x;
-                this.y = tuple.y;
-            }
-            else {
-                if (typeof x == 'number')
-                    this.x = x;
-                else if (typeof x == 'undefined')
-                    this.x = 0;
-                else
-                    this.x = NaN;
-                if (typeof y == 'number')
-                    this.y = y;
-                else if (typeof y == 'undefined')
-                    this.y = 0;
-                else
-                    this.y = NaN;
-            }
-        }
-        this.attr = new VertexAttr_1.VertexAttr();
-        this.listeners = new VertexListeners_1.VertexListeners(this);
-    }
-    ;
-    /**
-     * Set the x- and y- component of this vertex.
-     *
-     * @method set
-     * @param {number} x - The new x-component.
-     * @param {number} y - The new y-component.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.set = function (x, y) {
-        if (typeof x == 'number' && typeof y == 'number') {
-            this.x = x;
-            this.y = y;
-        }
-        else {
-            var tuple = x;
-            if (typeof tuple.x == "number" && typeof tuple.y == "number") {
-                this.x = tuple.x;
-                this.y = tuple.y;
-            }
-            else {
-                if (typeof x == 'number')
-                    this.x = x;
-                else if (typeof x == 'undefined')
-                    this.x = 0;
-                else
-                    this.x = NaN;
-                if (typeof y == 'number')
-                    this.y = y;
-                else if (typeof y == 'undefined')
-                    this.y = 0;
-                else
-                    this.y = NaN;
-            }
-        }
-        return this;
-    };
-    ;
-    /**
-     * Set the x-component of this vertex.
-     *
-     * @method setX
-     * @param {number} x - The new x-component.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.setX = function (x) {
-        this.x = x;
-        return this;
-    };
-    ;
-    /**
-     * Set the y-component of this vertex.
-     *
-     * @method setY
-     * @param {number} y - The new y-component.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.setY = function (y) {
-        this.y = y;
-        return this;
-    };
-    ;
-    /**
-     * Set the x-component if this vertex to the inverse of its value.
-     *
-     * @method invX
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.invX = function () {
-        this.x = -this.x;
-        return this;
-    };
-    ;
-    /**
-     * Set the y-component if this vertex to the inverse of its value.
-     *
-     * @method invy
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.invY = function () {
-        this.y = -this.y;
-        return this;
-    };
-    ;
-    /**
-     * Add the passed amount to x- and y- component of this vertex.<br>
-     * <br>
-     * This function works with add( {number}, {number} ) and
-     * add( {Vertex} ), as well.
-     *
-     * @method add
-     * @param {(number|Vertex)} x - The amount to add to x (or a vertex itself).
-     * @param {number=} y - The amount to add to y.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.add = function (x, y) {
-        if (typeof x == 'number' && typeof y == 'number') {
-            this.x += x;
-            this.y += y;
-        }
-        else {
-            var tuple = x;
-            if (typeof tuple.x == "number" && typeof tuple.y == "number") {
-                this.x += tuple.x;
-                this.y += tuple.y;
-            }
-            else {
-                if (typeof x == 'number')
-                    this.x += x;
-                else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
-                if (typeof y == 'number')
-                    this.y += y;
-                else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
-            }
-        }
-        return this;
-    };
-    ;
-    /**
-     * Add the passed amounts to the x- and y- components of this vertex.
-     *
-     * @method addXY
-     * @param {number} x - The amount to add to x.
-     * @param {number} y - The amount to add to y.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.addXY = function (amountX, amountY) {
-        this.x += amountX;
-        this.y += amountY;
-        return this;
-    };
-    ;
-    /**
-     * Add the passed amounts to the x-component of this vertex.
-     *
-     * @method addX
-     * @param {number} x - The amount to add to x.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.addX = function (amountX) {
-        this.x += amountX;
-        return this;
-    };
-    ;
-    /**
-     * Add the passed amounts to the y-component of this vertex.
-     *
-     * @method addY
-     * @param {number} y - The amount to add to y.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.addY = function (amountY) {
-        this.y += amountY;
-        return this;
-    };
-    ;
-    /**
-     * Substract the passed amount from x- and y- component of this vertex.<br>
-     * <br>
-     * This function works with sub( {number}, {number} ) and
-     * sub( {Vertex} ), as well.
-     *
-     * @method sub
-     * @param {(number|Vertex)} x - The amount to substract from x (or a vertex itself).
-     * @param {number=} y - The amount to substract from y.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.sub = function (x, y) {
-        if (typeof x == 'number' && typeof y == 'number') {
-            this.x -= x;
-            this.y -= y;
-        }
-        else {
-            var tuple = x;
-            if (typeof tuple.x == "number" && typeof tuple.y == "number") {
-                this.x -= tuple.x;
-                this.y -= tuple.y;
-            }
-            else {
-                if (typeof x == 'number')
-                    this.x -= x;
-                else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
-                if (typeof y == 'number')
-                    this.y -= y;
-                else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
-            }
-        }
-        return this;
-    };
-    ;
-    /**
-     * Check if this vertex equals the passed one.
-     * <br>
-     * This function uses an internal epsilon as tolerance.
-     *
-     * @method equals
-     * @param {Vertex} vertex - The vertex to compare this with.
-     * @return {boolean}
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.equals = function (vertex) {
-        var eqX = (Math.abs(this.x - vertex.x) < Vertex.EPSILON);
-        var eqY = (Math.abs(this.y - vertex.y) < Vertex.EPSILON);
-        var result = eqX && eqY;
-        return result;
-    };
-    ;
-    /**
-     * Create a copy of this vertex.
-     *
-     * @method clone
-     * @return {Vertex} A new vertex, an exact copy of this.
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.clone = function () {
-        return new Vertex(this.x, this.y);
-    };
-    ;
-    /**
-     * Get the distance to the passed point (in euclidean metric)
-     *
-     * @method distance
-     * @param {Vertex} vert - The vertex to measure the distance to.
-     * @return {number}
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.distance = function (vert) {
-        return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
-    };
-    ;
-    /**
-     * Get the difference to the passed point.<br>
-     * <br>
-     * The difference is (vert.x-this.x, vert.y-this.y).
-     *
-     * @method difference
-     * @param {Vertex} vert - The vertex to measure the x-y-difference to.
-     * @return {Vertex} A new vertex.
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.difference = function (vert) {
-        return new Vertex(vert.x - this.x, vert.y - this.y);
-    };
-    ;
-    /**
-     * This is a vector-like behavior and 'scales' this vertex
-     * towards/from a given center.
-     *
-     * @method scale
-     * @param {number} factor - The factor to 'scale' this vertex; 1.0 means no change.
-     * @param {Vertex=} center - The origin of scaling; default is (0,0).
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.scale = function (factor, center) {
-        if (!center || typeof center === "undefined")
-            center = new Vertex(0, 0);
-        this.x = center.x + (this.x - center.x) * factor;
-        this.y = center.y + (this.y - center.y) * factor;
-        return this;
-    };
-    ;
-    /**
-     * This is a vector-like behavior and 'rotates' this vertex
-     * around given center.
-     *
-     * @method rotate
-     * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
-     * @param {Vertex=} center - The center of rotation; default is (0,0).
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.rotate = function (angle, center) {
-        if (!center || typeof center === "undefined")
-            center = new Vertex(0, 0);
-        this.sub(center);
-        angle += Math.atan2(this.y, this.x);
-        var len = this.distance(Vertex.ZERO); // {x:0,y:0});
-        var lenX = this.x;
-        var lenY = this.y;
-        this.x = len * Math.cos(angle);
-        this.y = len * Math.sin(angle);
-        this.add(center);
-        return this;
-    };
-    ;
-    /**
-     * Multiply both components of this vertex with the given scalar.<br>
-     * <br>
-     * Note: as in<br>
-     *    https://threejs.org/docs/#api/math/Vector2.multiplyScalar
-     *
-     * @method multiplyScalar
-     * @param {number} scalar - The scale factor; 1.0 means no change.
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.multiplyScalar = function (scalar) {
-        this.x *= scalar;
-        this.y *= scalar;
-        return this;
-    };
-    ;
-    /**
-     * Round the two components x and y of this vertex.
-     *
-     * @method round
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.round = function () {
-        this.x = Math.round(this.x);
-        this.y = Math.round(this.y);
-        return this;
-    };
-    ;
-    /**
-     * Change this vertex (x,y) to its inverse (-x,-y).
-     *
-     * @method inv
-     * @return {Vertex} this
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.inv = function () {
-        this.x = -this.x;
-        this.y = -this.y;
-        return this;
-    };
-    ;
-    /**
-     * Get a string representation of this vertex.
-     *
-     * @method toString
-     * @return {string} The string representation of this vertex.
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.toString = function () {
-        return '(' + this.x + ',' + this.y + ')';
-    };
-    ;
-    /**
-     * Convert this vertex to SVG code.
-     *
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof Vertex
-     **/
-    Vertex.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<circle');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' cx="' + this.x + '"');
-        buffer.push(' cy="' + this.y + '"');
-        buffer.push(' r="2"');
-        buffer.push(' />');
-        return buffer.join('');
-    };
-    ;
-    // END Vertex
-    /**
-     * Create a new random vertex inside the given viewport.
-     *
-     * @param {ViewPort} viewPort - A {min:Vertex, max:Vertex} viewport specifying the bounds.
-     * @return A new vertex with a random position.
-     **/
-    Vertex.randomVertex = function (viewPort) {
-        return new Vertex(viewPort.min.x + Math.random() * (viewPort.max.x - viewPort.min.x), viewPort.min.y + Math.random() * (viewPort.max.y - viewPort.min.y));
-    };
-    ;
-    Vertex.ZERO = new Vertex(0, 0);
-    /**
-     * An epsilon for comparison
-     *
-     * @private
-     **/
-    Vertex.EPSILON = 1.0e-6;
-    Vertex.utils = {
-        /**
-         * Generate a four-point arrow head, starting at the vector end minus the
-         * arrow head length.
-         *
-         * The first vertex in the returned array is guaranteed to be the located
-         * at the vector line end minus the arrow head length.
-         *
-         *
-         * Due to performance all params are required.
-         *
-         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-         * scaling different). Arrow heads should not look distored on non-uniform scaling.
-         *
-         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-         * For headlen use 8, it's a good arrow head size.
-         *
-         * Example:
-         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-         *
-         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-         * @param {Vertex} zB - The end vertex of the vector.
-         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-         * @param {number} scaleX  - The horizontal scaling during draw.
-         * @param {number} scaleY  - the vertical scaling during draw.
-         **/
-        // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
-        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
-            // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
-            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-            var vertices = [];
-            vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
-            vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
-            return vertices;
-        }
-    };
-    return Vertex;
-}());
-exports.Vertex = Vertex;
-//# sourceMappingURL=Vertex.js.map
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A bounds class with min and max values.
- *
- * @requires XYCoords, Vertex, IBounds
- *
- * @author   Ikaros Kappler
- * @date     2020-05-11
- * @modified 2020-10-30 Added the static computeFromVertices function.
- * @version  1.1.0
- *
- * @file Bopunds
- * @fileoverview A simple bounds class implementing IBounds.
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vertex_1 = __webpack_require__(0);
-var Bounds = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Bounds
-     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
-     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
-     **/
-    function Bounds(min, max) {
-        this.min = min;
-        this.max = max;
-        this.width = max.x - min.x;
-        this.height = max.y - min.y;
-    }
-    ;
-    /**
-     * Compute the minimal bounding box for a given set of vertices.
-     *
-     * An empty vertex array will return an empty bounding box located at (0,0).
-     *
-     * @static
-     * @method computeFromVertices
-     * @memberof Bounds
-     * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
-     * @return The minimal Bounds for the given vertices.
-     **/
-    Bounds.computeFromVertices = function (vertices) {
-        if (vertices.length == 0)
-            return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
-        var xMin = vertices[0].x;
-        var xMax = vertices[0].x;
-        var yMin = vertices[0].y;
-        var yMax = vertices[0].y;
-        var vert;
-        for (var i in vertices) {
-            vert = vertices[i];
-            xMin = Math.min(xMin, vert.x);
-            xMax = Math.max(xMax, vert.x);
-            yMin = Math.min(yMin, vert.y);
-            yMax = Math.max(yMax, vert.y);
-        }
-        return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
-    };
-    ;
-    return Bounds;
-}()); // END class bounds
-exports.Bounds = Bounds;
-//# sourceMappingURL=Bounds.js.map
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A line consists of two vertices a and b.<br>
- * <br>
- * This is some refactored code from my 'Morley Triangle' test<br>
- *   https://github.com/IkarosKappler/morleys-trisector-theorem
- *
- * @requires Vertex
- *
- * @author   Ikaros Kappler
- * @date     2016-03-12
- * @modified 2018-12-05 Refactored the code from the morley-triangle script.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
- * @modified 2019-09-02 Added the Line.add( Vertex ) function.
- * @modified 2019-09-02 Added the Line.denominator( Line ) function.
- * @modified 2019-09-02 Added the Line.colinear( Line ) function.
- * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
- * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
- * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  2.1.2
- *
- * @file Line
- * @public
- **/
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var VertTuple_1 = __webpack_require__(12);
-var Vertex_1 = __webpack_require__(0);
-var Line = /** @class */ (function (_super) {
-    __extends(Line, _super);
-    /**
-     * Creates an instance of Line.
-     *
-     * @constructor
-     * @name Line
-     * @param {Vertex} a The line's first point.
-     * @param {Vertex} b The line's second point.
-     **/
-    function Line(a, b) {
-        var _this = _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        _this.className = "Line";
-        return _this;
-    }
-    /**
-     * Get the intersection if this line and the specified line.
-     *
-     * @method intersection
-     * @param {Line} line The second line.
-     * @return {Vertex} The intersection (may lie outside the end-points).
-     * @instance
-     * @memberof Line
-     **/
-    // !!! DO NOT MOVE TO VertTuple
-    Line.prototype.intersection = function (line) {
-        var denominator = this.denominator(line);
-        if (denominator == 0)
-            return null;
-        var a = this.a.y - line.a.y;
-        var b = this.a.x - line.a.x;
-        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
-        a = numerator1 / denominator; // NaN if parallel lines
-        b = numerator2 / denominator;
-        // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
-    };
-    ;
-    /**
-     * Create an SVG representation of this line.
-     *
-     * @method toSVGString
-     * @param {options} p - A set of options, like the 'classname' to use
-     *                      for the line object.
-     * @return {string} The SVG string representing this line.
-     * @instance
-     * @memberof Line
-     **/
-    Line.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<line');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' x1="' + this.a.x + '"');
-        buffer.push(' y1="' + this.a.y + '"');
-        buffer.push(' x2="' + this.b.x + '"');
-        buffer.push(' y2="' + this.b.y + '"');
-        buffer.push(' />');
-        return buffer.join('');
-    };
-    ;
-    return Line;
-}(VertTuple_1.VertTuple));
-exports.Line = Line;
-//# sourceMappingURL=Line.js.map
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
- *            <br>
- *            Vectors are drawn with an arrow at their end point.<br>
- *            <b>The Vector class extends the Line class.</b>
- *
- * @requires Vertex, Line
- *
- * @author   Ikaros Kappler
- * @date     2019-01-30
- * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
- * @modified 2019-09-02 Added the Vector.perp() function.
- * @modified 2019-09-02 Added the Vector.inverse() function.
- * @modified 2019-12-04 Added the Vector.inv() function.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.2.1
- *
- * @file Vector
- * @public
- **/
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var VertTuple_1 = __webpack_require__(12);
-var Vertex_1 = __webpack_require__(0);
-var Vector = /** @class */ (function (_super) {
-    __extends(Vector, _super);
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Vector
-     * @extends Line
-     * @param {Vertex} vertA - The start vertex of the vector.
-     * @param {Vertex} vertB - The end vertex of the vector.
-     **/
-    function Vector(vertA, vertB) {
-        var _this = _super.call(this, vertA, vertB, function (a, b) { return new Vector(a, b); }) || this;
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        _this.className = "Vector";
-        return _this;
-    }
-    ;
-    /**
-     * Get the perpendicular of this vector which is located at a.
-     *
-     * @param {Number} t The position on the vector.
-     * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
-     **/
-    Vector.prototype.perp = function () {
-        var v = this.clone();
-        v.sub(this.a);
-        v = new Vector(new Vertex_1.Vertex(), new Vertex_1.Vertex(-v.b.y, v.b.x));
-        v.a.add(this.a);
-        v.b.add(this.a);
-        return v;
-    };
-    ;
-    /**
-     * The inverse of a vector is a vector witht the same magnitude but oppose direction.
-     *
-     * Please not that the origin of this vector changes here: a->b becomes b->a.
-     *
-     * @return {Vector}
-     **/
-    Vector.prototype.inverse = function () {
-        var tmp = this.a;
-        this.a = this.b;
-        this.b = tmp;
-        return this;
-    };
-    ;
-    /**
-     * This function computes the inverse of the vector, which means 'a' stays untouched.
-     *
-     * @return {Vector} this for chaining.
-     **/
-    Vector.prototype.inv = function () {
-        this.b.x = this.a.x - (this.b.x - this.a.x);
-        this.b.y = this.a.y - (this.b.y - this.a.y);
-        return this;
-    };
-    ;
-    /**
-     * Get the intersection if this vector and the specified vector.
-     *
-     * @method intersection
-     * @param {Vector} line The second vector.
-     * @return {Vertex} The intersection (may lie outside the end-points).
-     * @instance
-     * @memberof Line
-     **/
-    Vector.prototype.intersection = function (line) {
-        var denominator = this.denominator(line);
-        if (denominator == 0)
-            return null;
-        var a = this.a.y - line.a.y;
-        var b = this.a.x - line.a.x;
-        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
-        a = numerator1 / denominator; // NaN if parallel lines
-        b = numerator2 / denominator;
-        // TODO:
-        // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
-        // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
-    };
-    ;
-    /**
-     * Create an SVG representation of this line.
-     *
-     * @method toSVGString
-     * @override
-     * @param {object=} options - A set of options, like 'className'.
-     * @return {string} The SVG string representation.
-     * @instance
-     * @memberof Vector
-     **/
-    Vector.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        var vertices = Vector.utils.buildArrowHead(this.a, this.b, 8, 1.0, 1.0);
-        buffer.push('<g');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push('>');
-        buffer.push('   <line');
-        buffer.push(' x1="' + this.a.x + '"');
-        buffer.push(' y1="' + this.a.y + '"');
-        buffer.push(' x2="' + vertices[0].x + '"');
-        buffer.push(' y2="' + vertices[0].y + '"');
-        buffer.push(' />');
-        // Add arrow head
-        buffer.push('   <polygon points="');
-        for (var i = 0; i < vertices.length; i++) {
-            if (i > 0)
-                buffer.push(' ');
-            buffer.push('' + vertices[i].x + ',' + vertices[i].y);
-        }
-        buffer.push('"/>');
-        buffer.push('</g>');
-        return buffer.join('');
-    };
-    ;
-    Vector.utils = {
-        /**
-         * Generate a four-point arrow head, starting at the vector end minus the
-         * arrow head length.
-         *
-         * The first vertex in the returned array is guaranteed to be the located
-         * at the vector line end minus the arrow head length.
-         *
-         *
-         * Due to performance all params are required.
-         *
-         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-         * scaling different). Arrow heads should not look distored on non-uniform scaling.
-         *
-         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-         * For headlen use 8, it's a good arrow head size.
-         *
-         * Example:
-         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-         *
-         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-         * @param {Vertex} zB - The end vertex of the vector.
-         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-         * @param {number} scaleX  - The horizontal scaling during draw.
-         * @param {number} scaleY  - the vertical scaling during draw.
-         **/
-        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
-            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-            var vertices = [];
-            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
-            vertices.push(new Vertex_1.Vertex(zB.x * scaleX, zB.y * scaleY));
-            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
-            return vertices;
-        }
-    };
-    return Vector;
-}(VertTuple_1.VertTuple));
-exports.Vector = Vector;
-//# sourceMappingURL=Vector.js.map
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc The VertexAttr is a helper class to wrap together additional attributes
- * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
- * <br>
- * This is some sort of 'userData' object, but the constructor uses a global model
- * to obtain a (configurable) default attribute set to all instances.<br>
- *
- * @author   Ikaros Kappler
- * @date     2018-08-26
- * @modified 2018-11-17 Added the 'isSelected' attribute.
- * @modified 2018-11-27 Added the global model for instantiating with custom attributes.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2020-02-29 Added the 'selectable' attribute.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.1.1
- *
- * @file VertexAttr
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var VertexAttr = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * Attributes will be initialized as defined in the model object
-     * which serves as a singleton.
-     *
-     * @constructor
-     * @name VertexAttr
-     **/
-    function VertexAttr() {
-        this.draggable = true;
-        this.selectable = true;
-        this.isSelected = false;
-        this.visible = true;
-        for (var key in VertexAttr.model)
-            this[key] = VertexAttr.model[key];
-    }
-    ;
-    /**
-     * This is the global attribute model. Set these object on the initialization
-     * of your app to gain all VertexAttr instances have these attributes.
-     *
-     * @type {object}
-     **/
-    VertexAttr.model = {
-        draggable: true,
-        selectable: true,
-        isSelected: false,
-        visible: true
-    };
-    return VertexAttr;
-}());
-exports.VertexAttr = VertexAttr;
-//# sourceMappingURL=VertexAttr.js.map
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A refactored cubic bezier curve class.
- *
- * @requires Vertex, Vector
- *
- * @author   Ikaros Kappler
- * @date     2013-08-15
- * @modified 2018-08-16 Added a closure. Removed the wrapper class 'IKRS'. Replaced class THREE.Vector2 by Vertex class.
- * @modified 2018-11-19 Added the fromArray(Array) function.
- * @modified 2018-11-28 Added the locateCurveByPoint(Vertex) function.
- * @modified 2018-12-04 Added the toSVGPathData() function.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-03-23 Changed the signatures of getPoint, getPointAt and getTangent (!version 2.0).
- * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
- * @modified 2020-02-06 Added the getSubCurveAt(number,number) function.
- * @modified 2020-02-06 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
- * @modified 2020-02-07 Added the isInstance(any) function.
- * @modified 2020-02-10 Added the reverse() function.
- * @modified 2020-02-10 Fixed the translate(...) function (returning 'this' was missing).
- * @modified 2020-03-24 Ported this class from vanilla JS to Typescript.
- * @modified 2020-06-03 Added the getBounds() function.
- * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
- * @modified 2020-07-24 Added the getClosestT function and the helper function locateIntervalByDistance(...).
- * @version 2.4.2
- *
- * @file CubicBezierCurve
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds_1 = __webpack_require__(1);
-var Vertex_1 = __webpack_require__(0);
-var Vector_1 = __webpack_require__(3);
-var CubicBezierCurve = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name CubicBezierCurve
-     * @param {Vertex} startPoint - The Bézier curve's start point.
-     * @param {Vertex} endPoint   - The Bézier curve's end point.
-     * @param {Vertex} startControlPoint - The Bézier curve's start control point.
-     * @param {Vertex} endControlPoint   - The Bézier curve's end control point.
-     **/
-    function CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint) {
-        /** @constant {number} */
-        this.START_POINT = CubicBezierCurve.START_POINT;
-        /** @constant {number} */
-        this.START_CONTROL_POINT = CubicBezierCurve.START_CONTROL_POINT;
-        /** @constant {number} */
-        this.END_CONTROL_POINT = CubicBezierCurve.END_CONTROL_POINT;
-        /** @constant {number} */
-        this.END_POINT = CubicBezierCurve.END_POINT;
-        this.startPoint = startPoint;
-        this.startControlPoint = startControlPoint;
-        this.endPoint = endPoint;
-        this.endControlPoint = endControlPoint;
-        this.curveIntervals = 30;
-        // An array of vertices
-        this.segmentCache = [];
-        // An array of floats
-        this.segmentLengths = [];
-        // float
-        this.arcLength = null;
-        this.updateArcLengths();
-    }
-    ;
-    /**
-     * Move the given curve point (the start point, end point or one of the two
-     * control points).
-     *
-     * @method moveCurvePoint
-     * @param {number} pointID - The numeric identicator of the point to move. Use one of the four eBezierPoint constants.
-     * @param {XYCoords} moveAmount - The amount to move the specified point by.
-     * @param {boolean} moveControlPoint - Move the control points along with their path point (if specified point is a path point).
-     * @param {boolean} updateArcLengths - Specifiy if the internal arc segment buffer should be updated.
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {void}
-     **/
-    CubicBezierCurve.prototype.moveCurvePoint = function (pointID, moveAmount, moveControlPoint, updateArcLengths) {
-        if (pointID == this.START_POINT) {
-            this.getStartPoint().add(moveAmount);
-            if (moveControlPoint)
-                this.getStartControlPoint().add(moveAmount);
-        }
-        else if (pointID == this.START_CONTROL_POINT) {
-            this.getStartControlPoint().add(moveAmount);
-        }
-        else if (pointID == this.END_CONTROL_POINT) {
-            this.getEndControlPoint().add(moveAmount);
-        }
-        else if (pointID == this.END_POINT) {
-            this.getEndPoint().add(moveAmount);
-            if (moveControlPoint)
-                this.getEndControlPoint().add(moveAmount);
-        }
-        else {
-            console.log("[CubicBezierCurve.moveCurvePoint] pointID '" + pointID + "' invalid.");
-        }
-        if (updateArcLengths)
-            this.updateArcLengths();
-    };
-    ;
-    /**
-     * Translate the whole curve by the given {x,y} amount: moves all four points.
-     *
-     * @method translate
-     * @param {Vertex} amount - The amount to translate this curve by.
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {CubicBezierCurve} this (for chaining).
-     **/
-    CubicBezierCurve.prototype.translate = function (amount) {
-        this.startPoint.add(amount);
-        this.startControlPoint.add(amount);
-        this.endControlPoint.add(amount);
-        this.endPoint.add(amount);
-        return this;
-    };
-    ;
-    /**
-     * Reverse this curve, means swapping start- and end-point and swapping
-     * start-control- and end-control-point.
-     *
-     * @method reverse
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {CubicBezierCurve} this (for chaining).
-     **/
-    CubicBezierCurve.prototype.reverse = function () {
-        var tmp = this.startPoint;
-        this.startPoint = this.endPoint;
-        this.endPoint = tmp;
-        tmp = this.startControlPoint;
-        this.startControlPoint = this.endControlPoint;
-        this.endControlPoint = tmp;
-        return this;
-    };
-    ;
-    /**
-     * Get the total curve length.<br>
-     * <br>
-     * As not all Bézier curved have a closed formula to calculate their lengths, this
-     * implementation uses a segment buffer (with a length of 30 segments). So the
-     * returned length is taken from the arc segment buffer.<br>
-     * <br>
-     * Note that if the curve points were changed and the segment buffer was not
-     * updated this function might return wrong (old) values.
-     *
-     * @method getLength
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {number} >= 0
-     **/
-    CubicBezierCurve.prototype.getLength = function () {
-        return this.arcLength;
-    };
-    ;
-    /**
-     * Uptate the internal arc segment buffer and their lengths.<br>
-     * <br>
-     * All class functions update the buffer automatically; if any
-     * curve point is changed by other reasons you should call this
-     * function to keep actual values in the buffer.
-     *
-     * @method updateArcLengths
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {void}
-     **/
-    CubicBezierCurve.prototype.updateArcLengths = function () {
-        var pointA = this.startPoint.clone(), pointB = new Vertex_1.Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
-        var u = curveStep;
-        // Clear segment cache
-        this.segmentCache = [];
-        // Push start point into buffer
-        this.segmentCache.push(this.startPoint);
-        this.segmentLengths = [];
-        var newLength = 0.0;
-        var t = 0.0;
-        var tmpLength;
-        while (t <= 1.0) {
-            pointB = this.getPointAt(t);
-            // Store point into cache
-            this.segmentCache.push(pointB);
-            // Calculate segment length
-            tmpLength = pointA.distance(pointB);
-            this.segmentLengths.push(tmpLength);
-            newLength += tmpLength;
-            pointA = pointB;
-            t += curveStep;
-        }
-        this.arcLength = newLength;
-    };
-    ;
-    /**
-     * Get a 't' (relative position on curve) with the closest distance to point 'p'.
-     *
-     * The returned number is 0.0 <= t <= 1.0. Use the getPointAt(t) function to retrieve the actual curve point.
-     *
-     * This function uses a recursive approach by cutting the curve into several linear segments.
-     *
-     * @param {Vertex} p - The point to find the closest position ('t' on the curve).
-     * @return {number}
-     **/
-    CubicBezierCurve.prototype.getClosestT = function (p) {
-        // We would like to have an error that's not larger than 1.0.
-        var desiredEpsilon = 1.0;
-        var t = 0.0;
-        var result = { t: 0, tPrev: 0.0, tNext: 1.0 };
-        var iteration = 0;
-        do {
-            result = this.locateIntervalByDistance(p, result.tPrev, result.tNext, this.curveIntervals);
-            iteration++;
-            // Be sure: stop after 4 iterations
-        } while (iteration < 4 && this.getPointAt(result.tPrev).distance(this.getPointAt(result.tNext)) > desiredEpsilon);
-        return result.t;
-    };
-    ;
-    /**
-     * This helper function locates the 't' on a fixed step interval with the minimal distance
-     * between the curve (at 't') and the given point.
-     *
-     * Furthermore you must specify a sub curve (start 't' and end 't') you want to search on.
-     * Using tStart=0.0 and tEnd=1.0 will search on the full curve.
-     *
-     * @param {Vertex} p - The point to find the closest curve point for.
-     * @param {number} tStart - The start position (start 't' of the sub curve). Should be >= 0.0.
-     * @param {number} tEnd - The end position (end 't' of the sub curve). Should be <= 1.0.
-     * @param {number} stepCount - The number of steps to check within the interval.
-     *
-     * @return {object} - An object with t, tPrev and tNext (numbers).
-     **/
-    CubicBezierCurve.prototype.locateIntervalByDistance = function (p, tStart, tEnd, stepCount) {
-        var minIndex = -1;
-        var minDist = 0;
-        var t = 0.0;
-        var tDiff = tEnd - tStart;
-        for (var i = 0; i <= stepCount; i++) {
-            t = tStart + tDiff * (i / stepCount);
-            var vert = this.getPointAt(t);
-            var dist = vert.distance(p);
-            if (minIndex == -1 || dist < minDist) {
-                minIndex = i;
-                minDist = dist;
-            }
-        }
-        return { t: tStart + tDiff * (minIndex / stepCount),
-            tPrev: tStart + tDiff * (Math.max(0, minIndex - 1) / stepCount),
-            tNext: tStart + tDiff * (Math.min(stepCount, minIndex + 1) / stepCount)
-        };
-    };
-    ;
-    /**
-     * Get the bounds of this bezier curve.
-     *
-     * The bounds are approximated by the underlying segment buffer; the more segment there are,
-     * the more accurate will be the returned bounds.
-     *
-     * @return {Bounds} The bounds of this curve.
-     **/
-    CubicBezierCurve.prototype.getBounds = function () {
-        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-        var v;
-        for (var i = 0; i < this.segmentCache.length; i++) {
-            v = this.segmentCache[i];
-            min.x = Math.min(min.x, v.x);
-            min.y = Math.min(min.y, v.y);
-            max.x = Math.max(max.x, v.x);
-            max.y = Math.max(max.y, v.y);
-        }
-        return new Bounds_1.Bounds(min, max);
-    };
-    ;
-    /**
-     * Get the start point of the curve.<br>
-     * <br>
-     * This function just returns this.startPoint.
-     *
-     * @method getStartPoint
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex} this.startPoint
-     **/
-    CubicBezierCurve.prototype.getStartPoint = function () {
-        return this.startPoint;
-    };
-    ;
-    /**
-     * Get the end point of the curve.<br>
-     * <br>
-     * This function just returns this.endPoint.
-     *
-     * @method getEndPoint
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex} this.endPoint
-     **/
-    CubicBezierCurve.prototype.getEndPoint = function () {
-        return this.endPoint;
-    };
-    ;
-    /**
-     * Get the start control point of the curve.<br>
-     * <br>
-     * This function just returns this.startControlPoint.
-     *
-     * @method getStartControlPoint
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex} this.startControlPoint
-     **/
-    CubicBezierCurve.prototype.getStartControlPoint = function () {
-        return this.startControlPoint;
-    };
-    ;
-    /**
-     * Get the end control point of the curve.<br>
-     * <br>
-     * This function just returns this.endControlPoint.
-     *
-     * @method getEndControlPoint
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex} this.endControlPoint
-     **/
-    CubicBezierCurve.prototype.getEndControlPoint = function () {
-        return this.endControlPoint;
-    };
-    ;
-    /**
-     * Get one of the four curve points specified by the passt point ID.
-     *
-     * @method getEndControlPoint
-     * @param {number} id - One of START_POINT, START_CONTROL_POINT, END_CONTROL_POINT or END_POINT.
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex}
-     **/
-    CubicBezierCurve.prototype.getPointByID = function (id) {
-        if (id == this.START_POINT)
-            return this.startPoint;
-        if (id == this.END_POINT)
-            return this.endPoint;
-        if (id == this.START_CONTROL_POINT)
-            return this.startControlPoint;
-        if (id == this.END_CONTROL_POINT)
-            return this.endControlPoint;
-        throw new Error("Invalid point ID '" + id + "'.");
-    };
-    ;
-    /**
-     * Get the curve point at a given position t, where t is in [0,1].<br>
-     * <br>
-     * @see Line.pointAt
-     *
-     * @method getPointAt
-     * @param {number} t - The position on the curve in [0,1] (0 means at
-     *                     start point, 1 means at end point, other values address points in bertween).
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex}
-     **/
-    CubicBezierCurve.prototype.getPointAt = function (t) {
-        // Perform some powerful math magic
-        var x = this.startPoint.x * Math.pow(1.0 - t, 3) + this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2)
-            + this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.x * Math.pow(t, 3);
-        var y = this.startPoint.y * Math.pow(1.0 - t, 3) + this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2)
-            + this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.y * Math.pow(t, 3);
-        return new Vertex_1.Vertex(x, y);
-    };
-    ;
-    /**
-     * Get the curve point at a given position u, where u is in [0,arcLength].<br>
-     * <br>
-     * @see CubicBezierCurve.getPointAt
-     *
-     * @method getPoint
-     * @param {number} u - The position on the curve in [0,arcLength] (0 means at
-     *                     start point, arcLength means at end point, other values address points in bertween).
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex}
-     **/
-    CubicBezierCurve.prototype.getPoint = function (u) {
-        return this.getPointAt(u / this.arcLength);
-    };
-    ;
-    /**
-     * Get the curve tangent vector at a given absolute curve position t in [0,1].<br>
-     * <br>
-     * Note that the returned tangent vector (end point) is not normalized and relative to (0,0).
-     *
-     * @method getTangent
-     * @param {number} t - The position on the curve in [0,1].
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex}
-     **/
-    CubicBezierCurve.prototype.getTangentAt = function (t) {
-        var a = this.getStartPoint();
-        var b = this.getStartControlPoint();
-        var c = this.getEndControlPoint();
-        var d = this.getEndPoint();
-        // This is the shortened one
-        var t2 = t * t;
-        var t3 = t * t2;
-        // (1 - t)^2 = (1-t)*(1-t) = 1 - t - t + t^2 = 1 - 2*t + t^2
-        var nt2 = 1 - 2 * t + t2;
-        var tX = -3 * a.x * nt2 +
-            b.x * (3 * nt2 - 6 * (t - t2)) +
-            c.x * (6 * (t - t2) - 3 * t2) +
-            3 * d.x * t2;
-        var tY = -3 * a.y * nt2 +
-            b.y * (3 * nt2 - 6 * (t - t2)) +
-            c.y * (6 * (t - t2) - 3 * t2) +
-            3 * d.y * t2;
-        // Note: my implementation does NOT normalize tangent vectors!
-        return new Vertex_1.Vertex(tX, tY);
-    };
-    ;
-    /**
-     * Get a sub curve at the given start end end offsets (values between 0.0 and 1.0).
-     *
-     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
-     *
-     * @method getSubCurveAt
-     * @param {number} tStart – The start offset of the desired sub curve (must be in [0..1]).
-     * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {CubicBezierCurve} The sub curve as a new curve.
-     **/
-    CubicBezierCurve.prototype.getSubCurveAt = function (tStart, tEnd) {
-        var startVec = new Vector_1.Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        var endVec = new Vector_1.Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
-        // Tangents are relative. Make absolute.
-        startVec.b.add(startVec.a);
-        endVec.b.add(endVec.a);
-        // This 'splits' the curve at the given point at t.
-        startVec.scale(0.33333333 * (tEnd - tStart));
-        endVec.scale(0.33333333 * (tEnd - tStart));
-        // Draw the bezier curve
-        // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
-        return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
-    };
-    ;
-    /**
-     * Convert a relative curve position u to the absolute curve position t.
-     *
-     * @method convertU2t
-     * @param {number} u - The relative position on the curve in [0,arcLength].
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {number}
-     **/
-    CubicBezierCurve.prototype.convertU2T = function (u) {
-        return Math.max(0.0, Math.min(1.0, (u / this.arcLength)));
-    };
-    ;
-    /**
-     * Get the curve tangent vector at a given relative position u in [0,arcLength].<br>
-     * <br>
-     * Note that the returned tangent vector (end point) is not normalized.
-     *
-     * @method getTangent
-     * @param {number} u - The position on the curve in [0,arcLength].
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex}
-     **/
-    CubicBezierCurve.prototype.getTangent = function (u) {
-        return this.getTangentAt(this.convertU2T(u));
-    };
-    ;
-    /**
-     * Get the curve perpendicular at a given relative position u in [0,arcLength] as a vector.<br>
-     * <br>
-     * Note that the returned vector (end point) is not normalized.
-     *
-     * @method getPerpendicular
-     * @param {number} u - The relative position on the curve in [0,arcLength].
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex}
-     **/
-    CubicBezierCurve.prototype.getPerpendicular = function (u) {
-        return this.getPerpendicularAt(this.convertU2T(u));
-    };
-    ;
-    /**
-     * Get the curve perpendicular at a given absolute position t in [0,1] as a vector.<br>
-     * <br>
-     * Note that the returned vector (end point) is not normalized.
-     *
-     * @method getPerpendicularAt
-     * @param {number} u - The absolute position on the curve in [0,1].
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {Vertex}
-     **/
-    CubicBezierCurve.prototype.getPerpendicularAt = function (t) {
-        var tangentVector = this.getTangentAt(t);
-        return new Vertex_1.Vertex(tangentVector.y, -tangentVector.x);
-    };
-    ;
-    /**
-     * Clone this Bézier curve (deep clone).
-     *
-     * @method clone
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {CubicBezierCurve}
-     **/
-    CubicBezierCurve.prototype.clone = function () {
-        return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
-    };
-    ;
-    /**
-     * Check if this and the specified curve are equal.<br>
-     * <br>
-     * All four points need to be equal for this, the Vertex.equals function is used.<br>
-     * <br>
-     * Please note that this function is not type safe (comparison with any object will fail).
-     *
-     * @method clone
-     * @param {CubicBezierCurve} curve - The curve to compare with.
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {boolean}
-     **/
-    CubicBezierCurve.prototype.equals = function (curve) {
-        // Note: in the earlier vanilla-JS version this was callable with plain objects.
-        //       Let's see if this restricted version works out.
-        if (!curve)
-            return false;
-        if (!curve.startPoint ||
-            !curve.endPoint ||
-            !curve.startControlPoint ||
-            !curve.endControlPoint)
-            return false;
-        return this.startPoint.equals(curve.startPoint)
-            && this.endPoint.equals(curve.endPoint)
-            && this.startControlPoint.equals(curve.startControlPoint)
-            && this.endControlPoint.equals(curve.endControlPoint);
-    };
-    ;
-    /**
-     * Quick check for class instance.
-     * Is there a better way?
-     *
-     * @method isInstance
-     * @param {any} obj - Check if the passed object/value is an instance of CubicBezierCurve.
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {boolean}
-     **/
-    CubicBezierCurve.isInstance = function (obj) {
-        // Note: check this again
-        /* OLD VANILLA JS IMPLEMENTATION */
-        /* if( typeof obj != "object" )
-            return false;
-        function hasXY(v) {
-            return typeof v != "undefined" && typeof v.x == "number" && typeof v.y == "number";
-        }
-        return typeof obj.startPoint == "object" && hasXY(obj.startPoint)
-            && typeof obj.endPoint == "object" && hasXY(obj.endPoint)
-            && typeof obj.startControlPoint == "object" && hasXY(obj.startControlPoint)
-            && typeof obj.endControlPoint == "object" && hasXY(obj.endControlPoint);
-        */
-        return obj instanceof CubicBezierCurve;
-    };
-    ;
-    /**
-     * Create an SVG path data representation of this bézier curve.
-     *
-     * Path data string format is:<br>
-     *  <pre>'M x0 y1 C dx0 dy1 dx1 dy1 x1 x2'</pre><br>
-     * or in other words<br>
-     *   <pre>'M startoint.x startPoint.y C startControlPoint.x startControlPoint.y endControlPoint.x endControlPoint.y endPoint.x endPoint.y'</pre>
-     *
-     * @method toSVGPathData
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {string}  The SVG path data string.
-     **/
-    CubicBezierCurve.prototype.toSVGPathData = function () {
-        var buffer = [];
-        buffer.push('M ');
-        buffer.push(this.startPoint.x.toString());
-        buffer.push(' ');
-        buffer.push(this.startPoint.y.toString());
-        buffer.push(' C ');
-        buffer.push(this.startControlPoint.x.toString());
-        buffer.push(' ');
-        buffer.push(this.startControlPoint.y.toString());
-        buffer.push(' ');
-        buffer.push(this.endControlPoint.x.toString());
-        buffer.push(' ');
-        buffer.push(this.endControlPoint.y.toString());
-        buffer.push(' ');
-        buffer.push(this.endPoint.x.toString());
-        buffer.push(' ');
-        buffer.push(this.endPoint.y.toString());
-        return buffer.join('');
-    };
-    ;
-    /**
-     * Convert this curve to a JSON string.
-     *
-     * @method toJSON
-     * @param {boolean=} [prettyFormat=false] - If set to true the function will add line breaks.
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {string} The JSON data.
-     **/
-    CubicBezierCurve.prototype.toJSON = function (prettyFormat) {
-        var jsonString = "{ " + // begin object
-            (prettyFormat ? "\n\t" : "") +
-            "\"startPoint\" : [" + this.getStartPoint().x + "," + this.getStartPoint().y + "], " +
-            (prettyFormat ? "\n\t" : "") +
-            "\"endPoint\" : [" + this.getEndPoint().x + "," + this.getEndPoint().y + "], " +
-            (prettyFormat ? "\n\t" : "") +
-            "\"startControlPoint\": [" + this.getStartControlPoint().x + "," + this.getStartControlPoint().y + "], " +
-            (prettyFormat ? "\n\t" : "") +
-            "\"endControlPoint\" : [" + this.getEndControlPoint().x + "," + this.getEndControlPoint().y + "]" +
-            (prettyFormat ? "\n\t" : "") +
-            " }"; // end object
-        return jsonString;
-    };
-    ;
-    /**
-     * Parse a Bézier curve from the given JSON string.
-     *
-     * @method fromJSON
-     * @param {string} jsonString - The JSON data to parse.
-     * @memberof CubicBezierCurve
-     * @static
-     * @throws An exception if the JSON string is malformed.
-     * @return {CubicBezierCurve}
-     **/
-    CubicBezierCurve.fromJSON = function (jsonString) {
-        var obj = JSON.parse(jsonString);
-        return CubicBezierCurve.fromObject(obj);
-    };
-    ;
-    /**
-     * Try to convert the passed object to a CubicBezierCurve.
-     *
-     * @method fromObject
-     * @param {object} obj - The object to convert.
-     * @memberof CubicBezierCurve
-     * @static
-     * @throws An exception if the passed object is malformed.
-     * @return {CubicBezierCurve}
-     **/
-    CubicBezierCurve.fromObject = function (obj) {
-        if (typeof obj !== "object")
-            throw "Can only build from object.";
-        if (!obj.startPoint)
-            throw "Object member \"startPoint\" missing.";
-        if (!obj.endPoint)
-            throw "Object member \"endPoint\" missing.";
-        if (!obj.startControlPoint)
-            throw "Object member \"startControlPoint\" missing.";
-        if (!obj.endControlPoint)
-            throw "Object member \"endControlPoint\" missing.";
-        return new CubicBezierCurve(new Vertex_1.Vertex(obj.startPoint[0], obj.startPoint[1]), new Vertex_1.Vertex(obj.endPoint[0], obj.endPoint[1]), new Vertex_1.Vertex(obj.startControlPoint[0], obj.startControlPoint[1]), new Vertex_1.Vertex(obj.endControlPoint[0], obj.endControlPoint[1]));
-    };
-    ;
-    /**
-     * Convert a 4-element array of vertices to a cubic bézier curve.
-     *
-     * @method fromArray
-     * @param {Vertex[]} arr -  [ startVertex, endVertex, startControlVertex, endControlVertex ]
-     * @memberof CubicBezierCurve
-     * @throws An exception if the passed array is malformed.
-     * @return {CubicBezierCurve}
-     **/
-    CubicBezierCurve.fromArray = function (arr) {
-        if (!Array.isArray(arr))
-            throw "Can only build from object.";
-        if (arr.length != 4)
-            throw "Can only build from array with four elements.";
-        return new CubicBezierCurve(arr[0], arr[1], arr[2], arr[3]);
-    };
-    ;
-    /** @constant {number} */
-    CubicBezierCurve.START_POINT = 0;
-    /** @constant {number} */
-    CubicBezierCurve.START_CONTROL_POINT = 1;
-    /** @constant {number} */
-    CubicBezierCurve.END_CONTROL_POINT = 2;
-    /** @constant {number} */
-    CubicBezierCurve.END_POINT = 3;
-    return CubicBezierCurve;
-}());
-exports.CubicBezierCurve = CubicBezierCurve;
-//# sourceMappingURL=CubicBezierCurve.js.map
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 
 /**
  * @classdesc A refactored BezierPath class.
@@ -1840,10 +43,10 @@ exports.CubicBezierCurve = CubicBezierCurve;
  * @file BezierPath
  * @public
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds_1 = __webpack_require__(1);
-var CubicBezierCurve_1 = __webpack_require__(5);
-var Vertex_1 = __webpack_require__(0);
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "./src/js/CubicBezierCurve.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 var BezierPath = /** @class */ (function () {
     /**
      * The constructor.<br>
@@ -3017,743 +1220,98 @@ exports.BezierPath = BezierPath;
 //# sourceMappingURL=BezierPath.js.map
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+/***/ "./src/js/Bounds.js":
+/*!**************************!*\
+  !*** ./src/js/Bounds.js ***!
+  \**************************/
+/*! flagged exports */
+/*! export Bounds [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
 
 /**
- * @classdesc A polygon class.
+ * @classdesc A bounds class with min and max values.
  *
- * @requires Vertex
+ * @requires XYCoords, Vertex, IBounds
  *
  * @author   Ikaros Kappler
- * @date     2018-04-14
- * @modified 2018-11-17 Added the containsVert function.
- * @modified 2018-12-04 Added the toSVGString function.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-10-25 Added the scale function.
- * @modified 2019-11-06 JSDoc update.
- * @modified 2019-11-07 Added toCubicBezierPath(number) function.
- * @modified 2019-11-22 Added the rotate(number,Vertex) function.
- * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-10-30 Added the `addVertex` function.
- * @modified 2020-10-31 Added thet `getVertexAt` function.
- * @version 1.3.0
+ * @date     2020-05-11
+ * @modified 2020-10-30 Added the static computeFromVertices function.
+ * @version  1.1.0
  *
- * @file Polygon
+ * @file Bopunds
+ * @fileoverview A simple bounds class implementing IBounds.
  * @public
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var BezierPath_1 = __webpack_require__(6);
-var Vertex_1 = __webpack_require__(0);
-var Polygon = /** @class */ (function () {
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Bounds = /** @class */ (function () {
     /**
      * The constructor.
      *
      * @constructor
-     * @name Polygon
-     * @param {Vertex[]} vertices - An array of 2d vertices that shape the polygon.
-     * @param {boolean} isOpen - Indicates if the polygon should be rendered as an open or closed shape.
+     * @name Bounds
+     * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
+     * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
-    function Polygon(vertices, isOpen) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Polygon";
-        if (typeof vertices == 'undefined')
-            vertices = [];
-        this.vertices = vertices;
-        this.isOpen = isOpen;
+    function Bounds(min, max) {
+        this.min = min;
+        this.max = max;
+        this.width = max.x - min.x;
+        this.height = max.y - min.y;
     }
     ;
     /**
-     * Add a vertex to the end of the `vertices` array.
+     * Compute the minimal bounding box for a given set of vertices.
      *
-     * @method addVert
-     * @param {Vertex} vert - The vertex to add.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.addVertex = function (vert) {
-        this.vertices.push(vert);
-    };
-    ;
-    /**
-     * Get the polygon vertex at the given position (index).
+     * An empty vertex array will return an empty bounding box located at (0,0).
      *
-     * The index may exceed the total vertex count, and will be wrapped around then (modulo).
-     *
-     * @metho getVertexAt
-     * @param {number} index - The index of the desired vertex.
-     * @instance
-     * @memberof Polygon
-     * @return {Vertex} At the given index.
-     **/
-    Polygon.prototype.getVertexAt = function (index) {
-        if (index < 0)
-            return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
-        else
-            return this.vertices[index % this.vertices.length];
-    };
-    ;
-    /**
-     * Check if the given vertex is inside this polygon.<br>
-     * <br>
-     * Ray-casting algorithm found at<br>
-     *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
-     *
-     * @method containsVert
-     * @param {Vertex} vert - The vertex to check. The new x-component.
-     * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.containsVert = function (vert) {
-        //    // ray-casting algorithm based on
-        //    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-        var inside = false;
-        for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
-            var xi = this.vertices[i].x, yi = this.vertices[i].y;
-            var xj = this.vertices[j].x, yj = this.vertices[j].y;
-            var intersect = ((yi > vert.y) != (yj > vert.y))
-                && (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
-            if (intersect)
-                inside = !inside;
-        }
-        return inside;
-    };
-    ;
-    /**
-     * Scale the polygon relative to the given center.
-     *
-     * @method scale
-     * @param {number} factor - The scale factor.
-     * @param {Vertex} center - The center of scaling.
-     * @return {Polygon} this, for chaining.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.scale = function (factor, center) {
-        for (var i in this.vertices) {
-            if (typeof this.vertices[i].scale == 'function')
-                this.vertices[i].scale(factor, center);
-            else
-                console.log('There seems to be a null vertex!', this.vertices[i]);
-        }
-        return this;
-    };
-    ;
-    /**
-     * Rotatee the polygon around the given center.
-     *
-     * @method rotate
-     * @param {number} angle  - The rotation angle.
-     * @param {Vertex} center - The center of rotation.
-     * @return {Polygon} this, for chaining.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.rotate = function (angle, center) {
-        for (var i in this.vertices) {
-            this.vertices[i].rotate(angle, center);
-        }
-        return this;
-    };
-    ;
-    /**
-     * Convert this polygon to a sequence of quadratic Bézier curves.<br>
-     * <br>
-     * The first vertex in the returned array is the start point.<br>
-     * The following sequence are pairs of control-point-and-end-point:
-     * <pre>startPoint, controlPoint0, pathPoint1, controlPoint1, pathPoint2, controlPoint2, ..., endPoint</pre>
-     *
-     * @method toQuadraticBezierData
-     * @return {Vertex[]}  An array of 2d vertices that shape the quadratic Bézier curve.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.toQuadraticBezierData = function () {
-        if (this.vertices.length < 3)
-            return [];
-        var qbezier = [];
-        var cc0 = this.vertices[0];
-        var cc1 = this.vertices[1];
-        var edgeCenter = new Vertex_1.Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
-        qbezier.push(edgeCenter);
-        var limit = this.isOpen ? this.vertices.length : this.vertices.length + 1;
-        for (var t = 1; t < limit; t++) {
-            cc0 = this.vertices[t % this.vertices.length];
-            cc1 = this.vertices[(t + 1) % this.vertices.length];
-            var edgeCenter = new Vertex_1.Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
-            qbezier.push(cc0);
-            qbezier.push(edgeCenter);
-            cc0 = cc1;
-        }
-        return qbezier;
-    };
-    ;
-    /**
-     * Convert this polygon to a quadratic bezier curve, represented as an SVG data string.
-     *
-     * @method toQuadraticBezierSVGString
-     * @return {string} The 'd' part for an SVG 'path' element.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.toQuadraticBezierSVGString = function () {
-        var qdata = this.toQuadraticBezierData();
-        if (qdata.length == 0)
-            return "";
-        var buffer = ['M ' + qdata[0].x + ' ' + qdata[0].y];
-        for (var i = 1; i < qdata.length; i += 2) {
-            buffer.push('Q ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y);
-        }
-        return buffer.join(' ');
-    };
-    ;
-    /**
-     * Convert this polygon to a sequence of cubic Bézier curves.<br>
-     * <br>
-     * The first vertex in the returned array is the start point.<br>
-     * The following sequence are triplets of (first-control-point, secnond-control-point, end-point):<br>
-     * <pre>startPoint, controlPoint0_0, controlPoint1_1, pathPoint1, controlPoint1_0, controlPoint1_1, ..., endPoint</pre>
-     *
-     * @method toCubicBezierData
-     * @param {number=} threshold - An optional threshold (default=1.0) how strong the curve segments
-     *                              should over-/under-drive. Should be between 0.0 and 1.0 for best
-     *                              results but other values are allowed.
-     * @return {Vertex[]}  An array of 2d vertices that shape the cubic Bézier curve.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.toCubicBezierData = function (threshold) {
-        if (typeof threshold == 'undefined')
-            threshold = 1.0;
-        if (this.vertices.length < 3)
-            return [];
-        var cbezier = [];
-        var a = this.vertices[0];
-        var b = this.vertices[1];
-        var edgeCenter = new Vertex_1.Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
-        cbezier.push(edgeCenter);
-        var limit = this.isOpen ? this.vertices.length - 1 : this.vertices.length;
-        for (var t = 0; t < limit; t++) {
-            var a = this.vertices[t % this.vertices.length];
-            var b = this.vertices[(t + 1) % this.vertices.length];
-            var c = this.vertices[(t + 2) % this.vertices.length];
-            var aCenter = new Vertex_1.Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
-            var bCenter = new Vertex_1.Vertex(b.x + (c.x - b.x) / 2, b.y + (c.y - b.y) / 2);
-            var a2 = new Vertex_1.Vertex(aCenter.x + (b.x - aCenter.x) * threshold, aCenter.y + (b.y - aCenter.y) * threshold);
-            var b0 = new Vertex_1.Vertex(bCenter.x + (b.x - bCenter.x) * threshold, bCenter.y + (b.y - bCenter.y) * threshold);
-            cbezier.push(a2);
-            cbezier.push(b0);
-            cbezier.push(bCenter);
-        }
-        return cbezier;
-    };
-    ;
-    /**
-     * Convert this polygon to a cubic bezier curve, represented as an SVG data string.
-     *
-     * @method toCubicBezierSVGString
-     * @return {string} The 'd' part for an SVG 'path' element.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.toCubicBezierSVGString = function (threshold) {
-        var qdata = this.toCubicBezierData(threshold);
-        if (qdata.length == 0)
-            return "";
-        var buffer = ['M ' + qdata[0].x + ' ' + qdata[0].y];
-        for (var i = 1; i < qdata.length; i += 3) {
-            buffer.push('C ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y + ', ' + qdata[i + 2].x + ' ' + qdata[i + 2].y);
-        }
-        return buffer.join(' ');
-    };
-    ;
-    /**
-     * Convert this polygon to a cubic bezier path instance.
-     *
-     * @method toCubicBezierPath
-     * @param {number} threshold - The threshold, usually from 0.0 to 1.0.
-     * @return {BezierPath}      - A bezier path instance.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.toCubicBezierPath = function (threshold) {
-        var qdata = this.toCubicBezierData(threshold);
-        // Conver the linear path vertices to a two-dimensional path array
-        var pathdata = [];
-        for (var i = 0; i + 3 < qdata.length; i += 3) {
-            pathdata.push([qdata[i], qdata[i + 3], qdata[i + 1], qdata[i + 2]]);
-        }
-        return BezierPath_1.BezierPath.fromArray(pathdata);
-    };
-    ;
-    /**
-     * Create an SVG representation of this polygon.
-     *
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} The SVG string.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<path');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' d="');
-        if (this.vertices.length > 0) {
-            buffer.push('M ');
-            buffer.push(this.vertices[0].x.toString());
-            buffer.push(' ');
-            buffer.push(this.vertices[0].y.toString());
-            for (var i = 1; i < this.vertices.length; i++) {
-                buffer.push(' L ');
-                buffer.push(this.vertices[i].x.toString());
-                buffer.push(' ');
-                buffer.push(this.vertices[i].y.toString());
-            }
-            if (!this.isOpen) {
-                buffer.push(' Z');
-            }
-        }
-        buffer.push('" />');
-        return buffer.join('');
-    };
-    ;
-    return Polygon;
-}());
-exports.Polygon = Polygon;
-//# sourceMappingURL=Polygon.js.map
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A triangle class for triangulations.
- *
- * The class was written for a Delaunay trinagulation demo so it might
- * contain some strange and unexpected functions.
- *
- * @requires Vertex, Polygon, SVGSerializale
- *
- *
- * @author    Ikaros Kappler
- * @date_init 2012-10-17 (Wrote a first version of this in that year).
- * @date      2018-04-03 (Refactored the code into a new class).
- * @modified  2018-04-28 Added some documentation.
- * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
- * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
- * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
- * @modified  2019-12-09 Fixed the determinant() function. The calculation was just wrong.
- * @modified  2020-03-16 (Corona times) Added the 'fromArray' function.
- * @modified  2020-03-17 Added the Triangle.toPolygon() function.
- * @modified  2020-03-17 Added proper JSDoc comments.
- * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
- * @modified  2020-05-12 Added getIncircularTriangle() function.
- * @modified  2020-05-12 Added getIncircle() function.
- * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
- * @modified  2020-06-18 Added the getIncenter function.
- * @version   2.3.0
- *
- * @file Triangle
- * @fileoverview A simple triangle class: three vertices.
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Bounds_1 = __webpack_require__(1);
-var Circle_1 = __webpack_require__(9);
-var Line_1 = __webpack_require__(2);
-var Polygon_1 = __webpack_require__(7);
-var Vertex_1 = __webpack_require__(0);
-var geomutils_1 = __webpack_require__(13);
-var Triangle = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name Triangle
-     * @param {Vertex} a - The first vertex of the triangle.
-     * @param {Vertex} b - The second vertex of the triangle.
-     * @param {Vertex} c - The third vertex of the triangle.
-     **/
-    function Triangle(a, b, c) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Triangle";
-        this.a = a;
-        this.b = b;
-        this.c = c;
-        this.calcCircumcircle();
-    }
-    /**
-     * Create a new triangle from the given array of vertices.
-     *
-     * The array must have at least three vertices, otherwise an error will be raised.
-     * This function will not create copies of the vertices.
-     *
-     * @method fromArray
      * @static
-     * @param {Array<Vertex>} arr - The required array with at least three vertices.
-     * @memberof Vertex
-     * @return {Triangle}
+     * @method computeFromVertices
+     * @memberof Bounds
+     * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
+     * @return The minimal Bounds for the given vertices.
      **/
-    Triangle.fromArray = function (arr) {
-        //if( !Array.isArray(arr) )
-        //    throw new Exception("Cannot create triangle fromArray from non-array.");
-        if (arr.length < 3)
-            throw "Cannot create triangle from array with less than three vertices (" + arr.length + ")";
-        return new Triangle(arr[0], arr[1], arr[2]);
-    };
-    ;
-    /**
-     * Get the centroid of this triangle.
-     *
-     * The centroid is the average midpoint for each side.
-     *
-     * @method getCentroid
-     * @return {Vertex} The centroid
-     * @instance
-     * @memberof Triangle
-     **/
-    Triangle.prototype.getCentroid = function () {
-        return new Vertex_1.Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
-    };
-    ;
-    /**
-     * Scale the triangle towards its centroid.
-     *
-     * @method scaleToCentroid
-     * @param {number} - The scale factor to use. That can be any scalar.
-     * @return {Triangle} this (for chaining)
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.scaleToCentroid = function (factor) {
-        var centroid = this.getCentroid();
-        this.a.scale(factor, centroid);
-        this.b.scale(factor, centroid);
-        this.c.scale(factor, centroid);
-        return this;
-    };
-    ;
-    /**
-     * Get the circumcircle of this triangle.
-     *
-     * The circumcircle is that unique circle on which all three
-     * vertices of this triangle are located on.
-     *
-     * Please note that for performance reasons any changes to vertices will not reflect in changes
-     * of the circumcircle (center or radius). Please call the calcCirumcircle() function
-     * after triangle vertex changes.
-     *
-     * @method getCircumcircle
-     * @return {Object} - { center:Vertex, radius:float }
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.getCircumcircle = function () {
-        if (!this.center || !this.radius)
-            this.calcCircumcircle();
-        return new Circle_1.Circle(this.center.clone(), this.radius);
-    };
-    ;
-    /**
-     * Check if this triangle and the passed triangle share an
-     * adjacent edge.
-     *
-     * For edge-checking Vertex.equals is used which uses an
-     * an epsilon for comparison.
-     *
-     * @method isAdjacent
-     * @param {Triangle} tri - The second triangle to check adjacency with.
-     * @return {boolean} - True if this and the passed triangle have at least one common edge.
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.isAdjacent = function (tri) {
-        var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
-        var b = this.b.equals(tri.a) || this.b.equals(tri.b) || this.b.equals(tri.c);
-        var c = this.c.equals(tri.a) || this.c.equals(tri.b) || this.c.equals(tri.c);
-        return (a && b) || (a && c) || (b && c);
-    };
-    ;
-    /**
-     * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of
-     * the passed two.
-     *
-     * @method getThirdVertex
-     * @param {Vertex} vert1 - The first vertex.
-     * @param {Vertex} vert2 - The second vertex.
-     * @return {Vertex} - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.getThirdVertex = function (vert1, vert2) {
-        if (this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1))
-            return this.c;
-        if (this.b.equals(vert1) && this.c.equals(vert2) || this.b.equals(vert2) && this.c.equals(vert1))
-            return this.a;
-        //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
-        return this.b;
-    };
-    ;
-    /**
-     * Re-compute the circumcircle of this triangle (if the vertices
-     * have changed).
-     *
-     * The circumcenter and radius are stored in this.center and
-     * this.radius. There is a third result: radius_squared (for internal computations).
-     *
-     * @method calcCircumcircle
-     * @return void
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.calcCircumcircle = function () {
-        // From
-        //    http://www.exaflop.org/docs/cgafaq/cga1.html
-        var A = this.b.x - this.a.x;
-        var B = this.b.y - this.a.y;
-        var C = this.c.x - this.a.x;
-        var D = this.c.y - this.a.y;
-        var E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
-        var F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
-        var G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
-        var dx, dy;
-        if (Math.abs(G) < Triangle.EPSILON) {
-            // Collinear - find extremes and use the midpoint
-            var bounds = this.bounds();
-            this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
-            dx = this.center.x - bounds.min.x;
-            dy = this.center.y - bounds.min.y;
+    Bounds.computeFromVertices = function (vertices) {
+        if (vertices.length == 0)
+            return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
+        var xMin = vertices[0].x;
+        var xMax = vertices[0].x;
+        var yMin = vertices[0].y;
+        var yMax = vertices[0].y;
+        var vert;
+        for (var i in vertices) {
+            vert = vertices[i];
+            xMin = Math.min(xMin, vert.x);
+            xMax = Math.max(xMax, vert.x);
+            yMin = Math.min(yMin, vert.y);
+            yMax = Math.max(yMax, vert.y);
         }
-        else {
-            var cx = (D * E - B * F) / G;
-            var cy = (A * F - C * E) / G;
-            this.center = new Vertex_1.Vertex(cx, cy);
-            dx = this.center.x - this.a.x;
-            dy = this.center.y - this.a.y;
-        }
-        this.radius_squared = dx * dx + dy * dy;
-        this.radius = Math.sqrt(this.radius_squared);
-    };
-    ; // END calcCircumcircle
-    /**
-     * Check if the passed vertex is inside this triangle's
-     * circumcircle.
-     *
-     * @method inCircumcircle
-     * @param {Vertex} v - The vertex to check.
-     * @return {boolean}
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.inCircumcircle = function (v) {
-        var dx = this.center.x - v.x;
-        var dy = this.center.y - v.y;
-        var dist_squared = dx * dx + dy * dy;
-        return (dist_squared <= this.radius_squared);
+        return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
     };
     ;
-    /**
-     * Get the rectangular bounds for this triangle.
-     *
-     * @method bounds
-     * @return {Bounds} - The min/max bounds of this triangle.
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.bounds = function () {
-        return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
-    };
-    ;
-    /**
-     * Convert this triangle to a polygon instance.
-     *
-     * Plase note that this conversion does not perform a deep clone.
-     *
-     * @method toPolygon
-     * @return {Polygon} A new polygon representing this triangle.
-     * @instance
-     * @memberof Triangle
-     **/
-    Triangle.prototype.toPolygon = function () {
-        return new Polygon_1.Polygon([this.a, this.b, this.c]);
-    };
-    ;
-    /**
-     * Get the determinant of this triangle.
-     *
-     * @method determinant
-     * @return {number} - The determinant (float).
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.determinant = function () {
-        // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
-        return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
-    };
-    ;
-    /**
-     * Checks if the passed vertex (p) is inside this triangle.
-     *
-     * Note: matrix determinants rock.
-     *
-     * @method containsPoint
-     * @param {Vertex} p - The vertex to check.
-     * @return {boolean}
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.containsPoint = function (p) {
-        return Triangle.utils.pointIsInTriangle(p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y);
-    };
-    ;
-    /**
-     * Get that inner triangle which defines the maximal incircle.
-     *
-     * @return {Triangle} The triangle of those points in this triangle that define the incircle.
-     */
-    Triangle.prototype.getIncircularTriangle = function () {
-        var lineA = new Line_1.Line(this.a, this.b);
-        var lineB = new Line_1.Line(this.b, this.c);
-        var lineC = new Line_1.Line(this.c, this.a);
-        var bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
-        var bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
-        var intersection = bisector1.intersection(bisector2);
-        // Find the closest points on one of the polygon lines (all have same distance by construction)
-        var circleIntersA = lineA.getClosestPoint(intersection);
-        var circleIntersB = lineB.getClosestPoint(intersection);
-        var circleIntersC = lineC.getClosestPoint(intersection);
-        return new Triangle(circleIntersA, circleIntersB, circleIntersC);
-    };
-    ;
-    /**
-     * Get the incircle of this triangle. That is the circle that touches each side
-     * of this triangle in exactly one point.
-     *
-     * Note this just calls getIncircularTriangle().getCircumcircle()
-     *
-     * @return {Circle} The incircle of this triangle.
-     */
-    Triangle.prototype.getIncircle = function () {
-        return this.getIncircularTriangle().getCircumcircle();
-    };
-    ;
-    /**
-     * Get the incenter of this triangle (which is the center of the circumcircle).
-     *
-     * Note: due to performance reasonst the incenter is buffered inside the triangle because
-     *       computing it is relatively expensive. If a, b or c have changed you should call the
-     *       calcCircumcircle() function first, otherwise you might get wrong results.
-     * @return Vertex The incenter of this triangle.
-     **/
-    Triangle.prototype.getIncenter = function () {
-        if (!this.center || !this.radius)
-            this.calcCircumcircle();
-        return this.center.clone();
-    };
-    ;
-    /**
-     * Converts this triangle into a human-readable string.
-     *
-     * @method toString
-     * @return {string}
-     * @instance
-     * @memberof Triangle
-     */
-    Triangle.prototype.toString = function () {
-        return '{ a : ' + this.a.toString() + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
-    };
-    ;
-    /**
-     * Create an SVG representation of this triangle.
-     *
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} The SVG string.
-     * @instance
-     * @memberof Triangle
-     **/
-    Triangle.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<path');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' d="');
-        var vertices = [this.a, this.b, this.c];
-        if (vertices.length > 0) {
-            buffer.push('M ');
-            buffer.push(vertices[0].x);
-            buffer.push(' ');
-            buffer.push(vertices[0].y);
-            for (var i = 1; i < vertices.length; i++) {
-                buffer.push(' L ');
-                buffer.push(vertices[i].x);
-                buffer.push(' ');
-                buffer.push(vertices[i].y);
-            }
-            //if( !this.isOpen ) {
-            buffer.push(' Z');
-            //}
-        }
-        buffer.push('" />');
-        return buffer.join('');
-    };
-    ;
-    /**
-     * An epsilon for comparison.
-     * This should be the same epsilon as in Vertex.
-     *
-     * @private
-     **/
-    Triangle.EPSILON = 1.0e-6;
-    Triangle.utils = {
-        // Used in the bounds() function.
-        max3: function (a, b, c) {
-            return (a >= b && a >= c) ? a : (b >= a && b >= c) ? b : c;
-        },
-        min3: function (a, b, c) {
-            return (a <= b && a <= c) ? a : (b <= a && b <= c) ? b : c;
-        },
-        /**
-         * Used by the containsPoint() function.
-         *
-         * @private
-         **/
-        pointIsInTriangle: function (px, py, p0x, p0y, p1x, p1y, p2x, p2y) {
-            //
-            // Point-in-Triangle test found at
-            //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-            //
-            var area = 1 / 2 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
-            var s = 1 / (2 * area) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
-            var t = 1 / (2 * area) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
-            return s > 0 && t > 0 && (1 - s - t) > 0;
-        }
-    };
-    return Triangle;
-}());
-exports.Triangle = Triangle;
-//# sourceMappingURL=Triangle.js.map
+    return Bounds;
+}()); // END class bounds
+exports.Bounds = Bounds;
+//# sourceMappingURL=Bounds.js.map
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+/***/ "./src/js/Circle.js":
+/*!**************************!*\
+  !*** ./src/js/Circle.js ***!
+  \**************************/
+/*! flagged exports */
+/*! export Circle [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
 
 /**
  * @classdesc A simple circle: center point and radius.
@@ -3773,10 +1331,10 @@ exports.Triangle = Triangle;
  * @fileoverview A simple circle class: center point and radius.
  * @public
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Line_1 = __webpack_require__(2);
-var Vector_1 = __webpack_require__(3);
-var Vertex_1 = __webpack_require__(0);
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
+var Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 var Circle = /** @class */ (function () {
     /**
      * Create a new circle with given center point and radius.
@@ -3937,237 +1495,733 @@ exports.Circle = Circle;
 //# sourceMappingURL=Circle.js.map
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+/***/ "./src/js/CubicBezierCurve.js":
+/*!************************************!*\
+  !*** ./src/js/CubicBezierCurve.js ***!
+  \************************************/
+/*! flagged exports */
+/*! export CubicBezierCurve [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
 
 /**
- * @classdesc An event listeners wrapper. This is just a set of three listener
- *              queues (drag, dragStart, dragEnd) and their respective firing
- *              functions.
+ * @classdesc A refactored cubic bezier curve class.
+ *
+ * @requires Vertex, Vector
  *
  * @author   Ikaros Kappler
- * @date     2018-08-27
- * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
+ * @date     2013-08-15
+ * @modified 2018-08-16 Added a closure. Removed the wrapper class 'IKRS'. Replaced class THREE.Vector2 by Vertex class.
+ * @modified 2018-11-19 Added the fromArray(Array) function.
+ * @modified 2018-11-28 Added the locateCurveByPoint(Vertex) function.
+ * @modified 2018-12-04 Added the toSVGPathData() function.
  * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.0.4
+ * @modified 2019-03-23 Changed the signatures of getPoint, getPointAt and getTangent (!version 2.0).
+ * @modified 2019-12-02 Fixed the updateArcLength function. It used the wrong pointAt function (was renamed before).
+ * @modified 2020-02-06 Added the getSubCurveAt(number,number) function.
+ * @modified 2020-02-06 Fixed a serious bug in the arc lenght calculation (length was never reset, urgh).
+ * @modified 2020-02-07 Added the isInstance(any) function.
+ * @modified 2020-02-10 Added the reverse() function.
+ * @modified 2020-02-10 Fixed the translate(...) function (returning 'this' was missing).
+ * @modified 2020-03-24 Ported this class from vanilla JS to Typescript.
+ * @modified 2020-06-03 Added the getBounds() function.
+ * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
+ * @modified 2020-07-24 Added the getClosestT function and the helper function locateIntervalByDistance(...).
+ * @version 2.4.2
  *
- * @file VertexListeners
+ * @file CubicBezierCurve
  * @public
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var VertexListeners = /** @class */ (function () {
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
+var CubicBezierCurve = /** @class */ (function () {
     /**
      * The constructor.
      *
      * @constructor
-     * @name VertexListeners
-     * @param {Vertex} vertex - The vertex to use these listeners on (just a backward reference).
+     * @name CubicBezierCurve
+     * @param {Vertex} startPoint - The Bézier curve's start point.
+     * @param {Vertex} endPoint   - The Bézier curve's end point.
+     * @param {Vertex} startControlPoint - The Bézier curve's start control point.
+     * @param {Vertex} endControlPoint   - The Bézier curve's end control point.
      **/
-    function VertexListeners(vertex) {
-        this.drag = [];
-        this.dragStart = [];
-        this.dragEnd = [];
-        this.vertex = vertex;
+    function CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint) {
+        /** @constant {number} */
+        this.START_POINT = CubicBezierCurve.START_POINT;
+        /** @constant {number} */
+        this.START_CONTROL_POINT = CubicBezierCurve.START_CONTROL_POINT;
+        /** @constant {number} */
+        this.END_CONTROL_POINT = CubicBezierCurve.END_CONTROL_POINT;
+        /** @constant {number} */
+        this.END_POINT = CubicBezierCurve.END_POINT;
+        this.startPoint = startPoint;
+        this.startControlPoint = startControlPoint;
+        this.endPoint = endPoint;
+        this.endControlPoint = endControlPoint;
+        this.curveIntervals = 30;
+        // An array of vertices
+        this.segmentCache = [];
+        // An array of floats
+        this.segmentLengths = [];
+        // float
+        this.arcLength = null;
+        this.updateArcLengths();
     }
     ;
     /**
-     * Add a drag listener.
+     * Move the given curve point (the start point, end point or one of the two
+     * control points).
      *
-     * @method addDragListener
-     * @param {VertexListeners~dragListener} listener - The drag listener to add (a callback).
-     * @return {VertexListeners} this (for chaining)
+     * @method moveCurvePoint
+     * @param {number} pointID - The numeric identicator of the point to move. Use one of the four eBezierPoint constants.
+     * @param {XYCoords} moveAmount - The amount to move the specified point by.
+     * @param {boolean} moveControlPoint - Move the control points along with their path point (if specified point is a path point).
+     * @param {boolean} updateArcLengths - Specifiy if the internal arc segment buffer should be updated.
      * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.addDragListener = function (listener) {
-        // this.drag.push( listener );
-        VertexListeners._addListener(this.drag, listener);
-        return this;
-    };
-    ;
-    /**
-     * The drag listener is a function with a single drag event param.
-     * @callback VertexListeners~dragListener
-     * @param {Event} e - The (extended) drag event.
-     */
-    /**
-     * Remove a drag listener.
-     *
-     * @method removeDragListener
-     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
-     * @return {VertexListeners} this (for chaining)
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.removeDragListener = function (listener) {
-        // this.drag.push( listener );
-        this.drag = VertexListeners._removeListener(this.drag, listener);
-        return this;
-    };
-    ;
-    /**
-     * Add a dragStart listener.
-     *
-     * @method addDragListener
-     * @param {VertexListeners~dragStartListener} listener - The drag-start listener to add (a callback).
-     * @return {VertexListeners} this (for chaining)
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.addDragStartListener = function (listener) {
-        //this.dragStart.push( listener );
-        VertexListeners._addListener(this.dragStart, listener);
-        return this;
-    };
-    ;
-    /**
-     * The drag-start listener is a function with a single drag event param.
-     * @callback VertexListeners~dragStartListener
-     * @param {Event} e - The (extended) drag event.
-     */
-    /**
-     * Remove a dragStart listener.
-     *
-     * @method addDragStartListener
-     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
-     * @return {VertexListeners} this (for chaining)
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.removeDragStartListener = function (listener) {
-        // this.drag.push( listener );
-        this.dragStart = VertexListeners._removeListener(this.dragStart, listener);
-        return this;
-    };
-    ;
-    /**
-     * Add a dragEnd listener.
-     *
-     * @method addDragListener
-     * @param {VertexListeners~dragEndListener} listener - The drag-end listener to add (a callback).
-     * @return {VertexListeners} this (for chaining)
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.addDragEndListener = function (listener) {
-        // this.dragEnd.push( listener );
-        VertexListeners._addListener(this.dragEnd, listener);
-        return this;
-    };
-    ;
-    /**
-     * The drag-end listener is a function with a single drag event param.
-     * @callback VertexListeners~dragEndListener
-     * @param {Event} e - The (extended) drag event.
-     */
-    /**
-     * Remove a dragEnd listener.
-     *
-     * @method addDragEndListener
-     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
-     * @return {VertexListeners} this (for chaining)
-     * @instance
-     * @memberof VertexListeners
-     **/
-    VertexListeners.prototype.removeDragEndListener = function (listener) {
-        // this.drag.push( listener );
-        this.dragEnd = VertexListeners._removeListener(this.dragEnd, listener);
-        return this;
-    };
-    ;
-    /**
-     * Fire a drag event with the given event instance to all
-     * installed drag listeners.
-     *
-     * @method fireDragEvent
-     * @param {VertEvent|XMouseEvent} e - The drag event itself to be fired to all installed drag listeners.
+     * @memberof CubicBezierCurve
      * @return {void}
-     * @instance
-     * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireDragEvent = function (e) {
-        VertexListeners._fireEvent(this, this.drag, e);
+    CubicBezierCurve.prototype.moveCurvePoint = function (pointID, moveAmount, moveControlPoint, updateArcLengths) {
+        if (pointID == this.START_POINT) {
+            this.getStartPoint().add(moveAmount);
+            if (moveControlPoint)
+                this.getStartControlPoint().add(moveAmount);
+        }
+        else if (pointID == this.START_CONTROL_POINT) {
+            this.getStartControlPoint().add(moveAmount);
+        }
+        else if (pointID == this.END_CONTROL_POINT) {
+            this.getEndControlPoint().add(moveAmount);
+        }
+        else if (pointID == this.END_POINT) {
+            this.getEndPoint().add(moveAmount);
+            if (moveControlPoint)
+                this.getEndControlPoint().add(moveAmount);
+        }
+        else {
+            console.log("[CubicBezierCurve.moveCurvePoint] pointID '" + pointID + "' invalid.");
+        }
+        if (updateArcLengths)
+            this.updateArcLengths();
     };
     ;
     /**
-     * Fire a dragStart event with the given event instance to all
-     * installed drag-start listeners.
+     * Translate the whole curve by the given {x,y} amount: moves all four points.
      *
-     * @method fireDragStartEvent
-     * @param {VertEvent|XMouseEvent} e - The drag-start event itself to be fired to all installed dragStart listeners.
-     * @return {void}
+     * @method translate
+     * @param {Vertex} amount - The amount to translate this curve by.
      * @instance
-     * @memberof VertexListeners
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} this (for chaining).
      **/
-    VertexListeners.prototype.fireDragStartEvent = function (e) {
-        VertexListeners._fireEvent(this, this.dragStart, e);
+    CubicBezierCurve.prototype.translate = function (amount) {
+        this.startPoint.add(amount);
+        this.startControlPoint.add(amount);
+        this.endControlPoint.add(amount);
+        this.endPoint.add(amount);
+        return this;
     };
     ;
     /**
-     * Fire a dragEnd event with the given event instance to all
-     * installed drag-end listeners.
+     * Reverse this curve, means swapping start- and end-point and swapping
+     * start-control- and end-control-point.
      *
-     * @method fireDragEndEvent
-     * @param {VertEvent|XMouseEvent} e - The drag-end event itself to be fired to all installed dragEnd listeners.
-     * @return {void}
+     * @method reverse
      * @instance
-     * @memberof VertexListeners
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} this (for chaining).
      **/
-    VertexListeners.prototype.fireDragEndEvent = function (e) {
-        VertexListeners._fireEvent(this, this.dragEnd, e);
+    CubicBezierCurve.prototype.reverse = function () {
+        var tmp = this.startPoint;
+        this.startPoint = this.endPoint;
+        this.endPoint = tmp;
+        tmp = this.startControlPoint;
+        this.startControlPoint = this.endControlPoint;
+        this.endControlPoint = tmp;
+        return this;
     };
     ;
     /**
-     * @private
+     * Get the total curve length.<br>
+     * <br>
+     * As not all Bézier curved have a closed formula to calculate their lengths, this
+     * implementation uses a segment buffer (with a length of 30 segments). So the
+     * returned length is taken from the arc segment buffer.<br>
+     * <br>
+     * Note that if the curve points were changed and the segment buffer was not
+     * updated this function might return wrong (old) values.
+     *
+     * @method getLength
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {number} >= 0
      **/
-    VertexListeners._fireEvent = function (_self, listeners, e) {
-        var ve = e;
-        if (typeof ve.params == 'undefined')
-            ve.params = { vertex: _self.vertex };
-        else
-            ve.params.vertex = _self.vertex;
-        for (var i in listeners) {
-            listeners[i](ve);
-        }
+    CubicBezierCurve.prototype.getLength = function () {
+        return this.arcLength;
     };
     ;
     /**
-     * @private
-     */
-    VertexListeners._addListener = function (listeners, newListener) {
-        for (var i in listeners) {
-            if (listeners[i] == newListener)
-                return false;
+     * Uptate the internal arc segment buffer and their lengths.<br>
+     * <br>
+     * All class functions update the buffer automatically; if any
+     * curve point is changed by other reasons you should call this
+     * function to keep actual values in the buffer.
+     *
+     * @method updateArcLengths
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {void}
+     **/
+    CubicBezierCurve.prototype.updateArcLengths = function () {
+        var pointA = this.startPoint.clone(), pointB = new Vertex_1.Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
+        var u = curveStep;
+        // Clear segment cache
+        this.segmentCache = [];
+        // Push start point into buffer
+        this.segmentCache.push(this.startPoint);
+        this.segmentLengths = [];
+        var newLength = 0.0;
+        var t = 0.0;
+        var tmpLength;
+        while (t <= 1.0) {
+            pointB = this.getPointAt(t);
+            // Store point into cache
+            this.segmentCache.push(pointB);
+            // Calculate segment length
+            tmpLength = pointA.distance(pointB);
+            this.segmentLengths.push(tmpLength);
+            newLength += tmpLength;
+            pointA = pointB;
+            t += curveStep;
         }
-        listeners.push(newListener);
-        return true;
+        this.arcLength = newLength;
     };
     ;
     /**
-     * @private
-     */
-    VertexListeners._removeListener = function (listeners, oldListener) {
-        for (var i = 0; i < listeners.length; i++) {
-            if (listeners[i] == oldListener)
-                return listeners.splice(i, 1);
-        }
-        return listeners;
+     * Get a 't' (relative position on curve) with the closest distance to point 'p'.
+     *
+     * The returned number is 0.0 <= t <= 1.0. Use the getPointAt(t) function to retrieve the actual curve point.
+     *
+     * This function uses a recursive approach by cutting the curve into several linear segments.
+     *
+     * @param {Vertex} p - The point to find the closest position ('t' on the curve).
+     * @return {number}
+     **/
+    CubicBezierCurve.prototype.getClosestT = function (p) {
+        // We would like to have an error that's not larger than 1.0.
+        var desiredEpsilon = 1.0;
+        var t = 0.0;
+        var result = { t: 0, tPrev: 0.0, tNext: 1.0 };
+        var iteration = 0;
+        do {
+            result = this.locateIntervalByDistance(p, result.tPrev, result.tNext, this.curveIntervals);
+            iteration++;
+            // Be sure: stop after 4 iterations
+        } while (iteration < 4 && this.getPointAt(result.tPrev).distance(this.getPointAt(result.tNext)) > desiredEpsilon);
+        return result.t;
     };
     ;
-    return VertexListeners;
+    /**
+     * This helper function locates the 't' on a fixed step interval with the minimal distance
+     * between the curve (at 't') and the given point.
+     *
+     * Furthermore you must specify a sub curve (start 't' and end 't') you want to search on.
+     * Using tStart=0.0 and tEnd=1.0 will search on the full curve.
+     *
+     * @param {Vertex} p - The point to find the closest curve point for.
+     * @param {number} tStart - The start position (start 't' of the sub curve). Should be >= 0.0.
+     * @param {number} tEnd - The end position (end 't' of the sub curve). Should be <= 1.0.
+     * @param {number} stepCount - The number of steps to check within the interval.
+     *
+     * @return {object} - An object with t, tPrev and tNext (numbers).
+     **/
+    CubicBezierCurve.prototype.locateIntervalByDistance = function (p, tStart, tEnd, stepCount) {
+        var minIndex = -1;
+        var minDist = 0;
+        var t = 0.0;
+        var tDiff = tEnd - tStart;
+        for (var i = 0; i <= stepCount; i++) {
+            t = tStart + tDiff * (i / stepCount);
+            var vert = this.getPointAt(t);
+            var dist = vert.distance(p);
+            if (minIndex == -1 || dist < minDist) {
+                minIndex = i;
+                minDist = dist;
+            }
+        }
+        return { t: tStart + tDiff * (minIndex / stepCount),
+            tPrev: tStart + tDiff * (Math.max(0, minIndex - 1) / stepCount),
+            tNext: tStart + tDiff * (Math.min(stepCount, minIndex + 1) / stepCount)
+        };
+    };
+    ;
+    /**
+     * Get the bounds of this bezier curve.
+     *
+     * The bounds are approximated by the underlying segment buffer; the more segment there are,
+     * the more accurate will be the returned bounds.
+     *
+     * @return {Bounds} The bounds of this curve.
+     **/
+    CubicBezierCurve.prototype.getBounds = function () {
+        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        var v;
+        for (var i = 0; i < this.segmentCache.length; i++) {
+            v = this.segmentCache[i];
+            min.x = Math.min(min.x, v.x);
+            min.y = Math.min(min.y, v.y);
+            max.x = Math.max(max.x, v.x);
+            max.y = Math.max(max.y, v.y);
+        }
+        return new Bounds_1.Bounds(min, max);
+    };
+    ;
+    /**
+     * Get the start point of the curve.<br>
+     * <br>
+     * This function just returns this.startPoint.
+     *
+     * @method getStartPoint
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex} this.startPoint
+     **/
+    CubicBezierCurve.prototype.getStartPoint = function () {
+        return this.startPoint;
+    };
+    ;
+    /**
+     * Get the end point of the curve.<br>
+     * <br>
+     * This function just returns this.endPoint.
+     *
+     * @method getEndPoint
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex} this.endPoint
+     **/
+    CubicBezierCurve.prototype.getEndPoint = function () {
+        return this.endPoint;
+    };
+    ;
+    /**
+     * Get the start control point of the curve.<br>
+     * <br>
+     * This function just returns this.startControlPoint.
+     *
+     * @method getStartControlPoint
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex} this.startControlPoint
+     **/
+    CubicBezierCurve.prototype.getStartControlPoint = function () {
+        return this.startControlPoint;
+    };
+    ;
+    /**
+     * Get the end control point of the curve.<br>
+     * <br>
+     * This function just returns this.endControlPoint.
+     *
+     * @method getEndControlPoint
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex} this.endControlPoint
+     **/
+    CubicBezierCurve.prototype.getEndControlPoint = function () {
+        return this.endControlPoint;
+    };
+    ;
+    /**
+     * Get one of the four curve points specified by the passt point ID.
+     *
+     * @method getEndControlPoint
+     * @param {number} id - One of START_POINT, START_CONTROL_POINT, END_CONTROL_POINT or END_POINT.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex}
+     **/
+    CubicBezierCurve.prototype.getPointByID = function (id) {
+        if (id == this.START_POINT)
+            return this.startPoint;
+        if (id == this.END_POINT)
+            return this.endPoint;
+        if (id == this.START_CONTROL_POINT)
+            return this.startControlPoint;
+        if (id == this.END_CONTROL_POINT)
+            return this.endControlPoint;
+        throw new Error("Invalid point ID '" + id + "'.");
+    };
+    ;
+    /**
+     * Get the curve point at a given position t, where t is in [0,1].<br>
+     * <br>
+     * @see Line.pointAt
+     *
+     * @method getPointAt
+     * @param {number} t - The position on the curve in [0,1] (0 means at
+     *                     start point, 1 means at end point, other values address points in bertween).
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex}
+     **/
+    CubicBezierCurve.prototype.getPointAt = function (t) {
+        // Perform some powerful math magic
+        var x = this.startPoint.x * Math.pow(1.0 - t, 3) + this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2)
+            + this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.x * Math.pow(t, 3);
+        var y = this.startPoint.y * Math.pow(1.0 - t, 3) + this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2)
+            + this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.y * Math.pow(t, 3);
+        return new Vertex_1.Vertex(x, y);
+    };
+    ;
+    /**
+     * Get the curve point at a given position u, where u is in [0,arcLength].<br>
+     * <br>
+     * @see CubicBezierCurve.getPointAt
+     *
+     * @method getPoint
+     * @param {number} u - The position on the curve in [0,arcLength] (0 means at
+     *                     start point, arcLength means at end point, other values address points in bertween).
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex}
+     **/
+    CubicBezierCurve.prototype.getPoint = function (u) {
+        return this.getPointAt(u / this.arcLength);
+    };
+    ;
+    /**
+     * Get the curve tangent vector at a given absolute curve position t in [0,1].<br>
+     * <br>
+     * Note that the returned tangent vector (end point) is not normalized and relative to (0,0).
+     *
+     * @method getTangent
+     * @param {number} t - The position on the curve in [0,1].
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex}
+     **/
+    CubicBezierCurve.prototype.getTangentAt = function (t) {
+        var a = this.getStartPoint();
+        var b = this.getStartControlPoint();
+        var c = this.getEndControlPoint();
+        var d = this.getEndPoint();
+        // This is the shortened one
+        var t2 = t * t;
+        var t3 = t * t2;
+        // (1 - t)^2 = (1-t)*(1-t) = 1 - t - t + t^2 = 1 - 2*t + t^2
+        var nt2 = 1 - 2 * t + t2;
+        var tX = -3 * a.x * nt2 +
+            b.x * (3 * nt2 - 6 * (t - t2)) +
+            c.x * (6 * (t - t2) - 3 * t2) +
+            3 * d.x * t2;
+        var tY = -3 * a.y * nt2 +
+            b.y * (3 * nt2 - 6 * (t - t2)) +
+            c.y * (6 * (t - t2) - 3 * t2) +
+            3 * d.y * t2;
+        // Note: my implementation does NOT normalize tangent vectors!
+        return new Vertex_1.Vertex(tX, tY);
+    };
+    ;
+    /**
+     * Get a sub curve at the given start end end offsets (values between 0.0 and 1.0).
+     *
+     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+     *
+     * @method getSubCurveAt
+     * @param {number} tStart – The start offset of the desired sub curve (must be in [0..1]).
+     * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} The sub curve as a new curve.
+     **/
+    CubicBezierCurve.prototype.getSubCurveAt = function (tStart, tEnd) {
+        var startVec = new Vector_1.Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
+        var endVec = new Vector_1.Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
+        // Tangents are relative. Make absolute.
+        startVec.b.add(startVec.a);
+        endVec.b.add(endVec.a);
+        // This 'splits' the curve at the given point at t.
+        startVec.scale(0.33333333 * (tEnd - tStart));
+        endVec.scale(0.33333333 * (tEnd - tStart));
+        // Draw the bezier curve
+        // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
+        return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+    };
+    ;
+    /**
+     * Convert a relative curve position u to the absolute curve position t.
+     *
+     * @method convertU2t
+     * @param {number} u - The relative position on the curve in [0,arcLength].
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {number}
+     **/
+    CubicBezierCurve.prototype.convertU2T = function (u) {
+        return Math.max(0.0, Math.min(1.0, (u / this.arcLength)));
+    };
+    ;
+    /**
+     * Get the curve tangent vector at a given relative position u in [0,arcLength].<br>
+     * <br>
+     * Note that the returned tangent vector (end point) is not normalized.
+     *
+     * @method getTangent
+     * @param {number} u - The position on the curve in [0,arcLength].
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex}
+     **/
+    CubicBezierCurve.prototype.getTangent = function (u) {
+        return this.getTangentAt(this.convertU2T(u));
+    };
+    ;
+    /**
+     * Get the curve perpendicular at a given relative position u in [0,arcLength] as a vector.<br>
+     * <br>
+     * Note that the returned vector (end point) is not normalized.
+     *
+     * @method getPerpendicular
+     * @param {number} u - The relative position on the curve in [0,arcLength].
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex}
+     **/
+    CubicBezierCurve.prototype.getPerpendicular = function (u) {
+        return this.getPerpendicularAt(this.convertU2T(u));
+    };
+    ;
+    /**
+     * Get the curve perpendicular at a given absolute position t in [0,1] as a vector.<br>
+     * <br>
+     * Note that the returned vector (end point) is not normalized.
+     *
+     * @method getPerpendicularAt
+     * @param {number} u - The absolute position on the curve in [0,1].
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {Vertex}
+     **/
+    CubicBezierCurve.prototype.getPerpendicularAt = function (t) {
+        var tangentVector = this.getTangentAt(t);
+        return new Vertex_1.Vertex(tangentVector.y, -tangentVector.x);
+    };
+    ;
+    /**
+     * Clone this Bézier curve (deep clone).
+     *
+     * @method clone
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve}
+     **/
+    CubicBezierCurve.prototype.clone = function () {
+        return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
+    };
+    ;
+    /**
+     * Check if this and the specified curve are equal.<br>
+     * <br>
+     * All four points need to be equal for this, the Vertex.equals function is used.<br>
+     * <br>
+     * Please note that this function is not type safe (comparison with any object will fail).
+     *
+     * @method clone
+     * @param {CubicBezierCurve} curve - The curve to compare with.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {boolean}
+     **/
+    CubicBezierCurve.prototype.equals = function (curve) {
+        // Note: in the earlier vanilla-JS version this was callable with plain objects.
+        //       Let's see if this restricted version works out.
+        if (!curve)
+            return false;
+        if (!curve.startPoint ||
+            !curve.endPoint ||
+            !curve.startControlPoint ||
+            !curve.endControlPoint)
+            return false;
+        return this.startPoint.equals(curve.startPoint)
+            && this.endPoint.equals(curve.endPoint)
+            && this.startControlPoint.equals(curve.startControlPoint)
+            && this.endControlPoint.equals(curve.endControlPoint);
+    };
+    ;
+    /**
+     * Quick check for class instance.
+     * Is there a better way?
+     *
+     * @method isInstance
+     * @param {any} obj - Check if the passed object/value is an instance of CubicBezierCurve.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {boolean}
+     **/
+    CubicBezierCurve.isInstance = function (obj) {
+        // Note: check this again
+        /* OLD VANILLA JS IMPLEMENTATION */
+        /* if( typeof obj != "object" )
+            return false;
+        function hasXY(v) {
+            return typeof v != "undefined" && typeof v.x == "number" && typeof v.y == "number";
+        }
+        return typeof obj.startPoint == "object" && hasXY(obj.startPoint)
+            && typeof obj.endPoint == "object" && hasXY(obj.endPoint)
+            && typeof obj.startControlPoint == "object" && hasXY(obj.startControlPoint)
+            && typeof obj.endControlPoint == "object" && hasXY(obj.endControlPoint);
+        */
+        return obj instanceof CubicBezierCurve;
+    };
+    ;
+    /**
+     * Create an SVG path data representation of this bézier curve.
+     *
+     * Path data string format is:<br>
+     *  <pre>'M x0 y1 C dx0 dy1 dx1 dy1 x1 x2'</pre><br>
+     * or in other words<br>
+     *   <pre>'M startoint.x startPoint.y C startControlPoint.x startControlPoint.y endControlPoint.x endControlPoint.y endPoint.x endPoint.y'</pre>
+     *
+     * @method toSVGPathData
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {string}  The SVG path data string.
+     **/
+    CubicBezierCurve.prototype.toSVGPathData = function () {
+        var buffer = [];
+        buffer.push('M ');
+        buffer.push(this.startPoint.x.toString());
+        buffer.push(' ');
+        buffer.push(this.startPoint.y.toString());
+        buffer.push(' C ');
+        buffer.push(this.startControlPoint.x.toString());
+        buffer.push(' ');
+        buffer.push(this.startControlPoint.y.toString());
+        buffer.push(' ');
+        buffer.push(this.endControlPoint.x.toString());
+        buffer.push(' ');
+        buffer.push(this.endControlPoint.y.toString());
+        buffer.push(' ');
+        buffer.push(this.endPoint.x.toString());
+        buffer.push(' ');
+        buffer.push(this.endPoint.y.toString());
+        return buffer.join('');
+    };
+    ;
+    /**
+     * Convert this curve to a JSON string.
+     *
+     * @method toJSON
+     * @param {boolean=} [prettyFormat=false] - If set to true the function will add line breaks.
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {string} The JSON data.
+     **/
+    CubicBezierCurve.prototype.toJSON = function (prettyFormat) {
+        var jsonString = "{ " + // begin object
+            (prettyFormat ? "\n\t" : "") +
+            "\"startPoint\" : [" + this.getStartPoint().x + "," + this.getStartPoint().y + "], " +
+            (prettyFormat ? "\n\t" : "") +
+            "\"endPoint\" : [" + this.getEndPoint().x + "," + this.getEndPoint().y + "], " +
+            (prettyFormat ? "\n\t" : "") +
+            "\"startControlPoint\": [" + this.getStartControlPoint().x + "," + this.getStartControlPoint().y + "], " +
+            (prettyFormat ? "\n\t" : "") +
+            "\"endControlPoint\" : [" + this.getEndControlPoint().x + "," + this.getEndControlPoint().y + "]" +
+            (prettyFormat ? "\n\t" : "") +
+            " }"; // end object
+        return jsonString;
+    };
+    ;
+    /**
+     * Parse a Bézier curve from the given JSON string.
+     *
+     * @method fromJSON
+     * @param {string} jsonString - The JSON data to parse.
+     * @memberof CubicBezierCurve
+     * @static
+     * @throws An exception if the JSON string is malformed.
+     * @return {CubicBezierCurve}
+     **/
+    CubicBezierCurve.fromJSON = function (jsonString) {
+        var obj = JSON.parse(jsonString);
+        return CubicBezierCurve.fromObject(obj);
+    };
+    ;
+    /**
+     * Try to convert the passed object to a CubicBezierCurve.
+     *
+     * @method fromObject
+     * @param {object} obj - The object to convert.
+     * @memberof CubicBezierCurve
+     * @static
+     * @throws An exception if the passed object is malformed.
+     * @return {CubicBezierCurve}
+     **/
+    CubicBezierCurve.fromObject = function (obj) {
+        if (typeof obj !== "object")
+            throw "Can only build from object.";
+        if (!obj.startPoint)
+            throw "Object member \"startPoint\" missing.";
+        if (!obj.endPoint)
+            throw "Object member \"endPoint\" missing.";
+        if (!obj.startControlPoint)
+            throw "Object member \"startControlPoint\" missing.";
+        if (!obj.endControlPoint)
+            throw "Object member \"endControlPoint\" missing.";
+        return new CubicBezierCurve(new Vertex_1.Vertex(obj.startPoint[0], obj.startPoint[1]), new Vertex_1.Vertex(obj.endPoint[0], obj.endPoint[1]), new Vertex_1.Vertex(obj.startControlPoint[0], obj.startControlPoint[1]), new Vertex_1.Vertex(obj.endControlPoint[0], obj.endControlPoint[1]));
+    };
+    ;
+    /**
+     * Convert a 4-element array of vertices to a cubic bézier curve.
+     *
+     * @method fromArray
+     * @param {Vertex[]} arr -  [ startVertex, endVertex, startControlVertex, endControlVertex ]
+     * @memberof CubicBezierCurve
+     * @throws An exception if the passed array is malformed.
+     * @return {CubicBezierCurve}
+     **/
+    CubicBezierCurve.fromArray = function (arr) {
+        if (!Array.isArray(arr))
+            throw "Can only build from object.";
+        if (arr.length != 4)
+            throw "Can only build from array with four elements.";
+        return new CubicBezierCurve(arr[0], arr[1], arr[2], arr[3]);
+    };
+    ;
+    /** @constant {number} */
+    CubicBezierCurve.START_POINT = 0;
+    /** @constant {number} */
+    CubicBezierCurve.START_CONTROL_POINT = 1;
+    /** @constant {number} */
+    CubicBezierCurve.END_CONTROL_POINT = 2;
+    /** @constant {number} */
+    CubicBezierCurve.END_POINT = 3;
+    return CubicBezierCurve;
 }());
-exports.VertexListeners = VertexListeners;
-//# sourceMappingURL=VertexListeners.js.map
+exports.CubicBezierCurve = CubicBezierCurve;
+//# sourceMappingURL=CubicBezierCurve.js.map
 
 /***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+/***/ "./src/js/Grid.js":
+/*!************************!*\
+  !*** ./src/js/Grid.js ***!
+  \************************/
+/*! flagged exports */
+/*! export Grid [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
 
 /**
  * @classdesc A grid class with vertical and horizontal lines.
@@ -4185,7 +2239,7 @@ exports.VertexListeners = VertexListeners;
  *               rather than a drawable object.
  * @public
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 var Grid = /** @class */ (function () {
     /**
      * The constructor.
@@ -4255,790 +2309,18 @@ exports.Grid = Grid;
 //# sourceMappingURL=Grid.js.map
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+/***/ "./src/js/KeyHandler.js":
+/*!******************************!*\
+  !*** ./src/js/KeyHandler.js ***!
+  \******************************/
+/*! flagged exports */
+/*! export KeyHandler [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
 
-/**
- * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
- * @abstract
- * @requires Vertex
- *
- * @author Ikaros Kappler
- * @date   2020-03-24
- * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
- * @modofied 2020-05-12 The angle(line) param was still not optional. Changed that.
- * @version 1.0.1
- */
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vertex_1 = __webpack_require__(0);
-var VertTuple = /** @class */ (function () {
-    /**
-     * Creates an instance.
-     *
-     * @constructor
-     * @name VertTuple
-     * @param {Vertex} a The tuple's first point.
-     * @param {Vertex} b The tuple's second point.
-     **/
-    function VertTuple(a, b, factory) {
-        this.a = a;
-        this.b = b;
-        this.factory = factory;
-    }
-    /**
-     * Get the length of this line.
-     *
-     * @method length
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.length = function () {
-        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
-    };
-    ;
-    /**
-     * Set the length of this vector to the given amount. This only works if this
-     * vector is not a null vector.
-     *
-     * @method setLength
-     * @param {number} length - The desired length.
-     * @memberof VertTuple
-     * @return {T} this (for chaining)
-     **/
-    VertTuple.prototype.setLength = function (length) {
-        return this.scale(length / this.length());
-    };
-    ;
-    /**
-     * Substract the given vertex from this line's end points.
-     *
-     * @method sub
-     * @param {Vertex} amount The amount (x,y) to substract.
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.sub = function (amount) {
-        this.a.sub(amount);
-        this.b.sub(amount);
-        return this;
-    };
-    ;
-    /**
-     * Add the given vertex to this line's end points.
-     *
-     * @method add
-     * @param {Vertex} amount The amount (x,y) to add.
-     * @return {Line} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.add = function (amount) {
-        this.a.add(amount);
-        this.b.add(amount);
-        return this;
-    };
-    ;
-    /**
-     * Normalize this line (set to length 1).
-     *
-     * @method normalize
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.normalize = function () {
-        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
-        return this;
-    };
-    ;
-    /**
-     * Scale this line by the given factor.
-     *
-     * @method scale
-     * @param {number} factor The factor for scaling (1.0 means no scale).
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.scale = function (factor) {
-        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
-        return this;
-    };
-    ;
-    /**
-     * Move this line to a new location.
-     *
-     * @method moveTo
-     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.moveTo = function (newA) {
-        var diff = this.a.difference(newA);
-        this.a.add(diff);
-        this.b.add(diff);
-        return this;
-    };
-    ;
-    /**
-     * Get the angle between this and the passed line (in radians).
-     *
-     * @method angle
-     * @param {VertTuple} line - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
-     * @return {number} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.angle = function (line) {
-        if (line == null || typeof line == 'undefined') {
-            line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0));
-        }
-        // Compute the angle from x axis and the return the difference :)
-        var v0 = this.b.clone().sub(this.a);
-        var v1 = line.b.clone().sub(line.a);
-        // Thank you, Javascript, for this second atan function. No additional math is needed here!
-        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
-        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
-    };
-    ;
-    /**
-     * Get line point at position t in [0 ... 1]:<br>
-     * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
-     * <br>
-     * The counterpart of this function is Line.getClosestT(Vertex).
-     *
-     * @method vertAt
-     * @param {number} t The position scalar.
-     * @return {Vertex} The vertex a position t.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.vertAt = function (t) {
-        return new Vertex_1.Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
-    };
-    ;
-    /**
-     * Get the denominator of this and the given line.
-     *
-     * If the denominator is zero (or close to zero) both line are co-linear.
-     *
-     * @method denominator
-     * @param {VertTuple} line
-     * @instance
-     * @memberof VertTuple
-     * @return {Number}
-     **/
-    VertTuple.prototype.denominator = function (line) {
-        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
-        return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
-    };
-    ;
-    /**
-     * Checks if this and the given line are co-linear.
-     *
-     * The constant Vertex.EPSILON is used for tolerance.
-     *
-     * @method colinear
-     * @param {VertTuple} line
-     * @instance
-     * @memberof VertTuple
-     * @return true if both lines are co-linear.
-     */
-    VertTuple.prototype.colinear = function (line) {
-        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
-    };
-    ;
-    /**
-     * Get the closest position T from this line to the specified point.
-     *
-     * The counterpart for this function is Line.vertAt(Number).
-     *
-     * @method getClosestT
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {number} The line position t of minimal distance to p.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.getClosestT = function (p) {
-        var l2 = VertTuple.vtutils.dist2(this.a, this.b);
-        if (l2 === 0)
-            return 0;
-        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
-        // Wrap to [0,1]?
-        // t = Math.max(0, Math.min(1, t));
-        return t;
-    };
-    ;
-    /**
-     * Get the closest point on this line to the specified point.
-     *
-     * @method getClosestPoint
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {Vertex} The point on the line that is closest to p.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.getClosestPoint = function (p) {
-        var t = this.getClosestT(p);
-        return this.vertAt(t);
-    };
-    ;
-    /**
-     * The the minimal distance between this line and the specified point.
-     *
-     * @method pointDistance
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {number} The absolute minimal distance.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.pointDistance = function (p) {
-        // Taken From:
-        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-        //function dist2(v, w) {
-        //    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
-        //}
-        return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
-    };
-    ;
-    /**
-     * Create a deep clone of this instance.
-     *
-     * @method cloneLine
-     * @return {T} A type safe clone if this instance.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.clone = function () {
-        return this.factory(this.a.clone(), this.b.clone());
-    };
-    ;
-    /**
-     * Create a string representation of this line.
-     *
-     * @method totring
-     * @return {string} The string representing this line.
-     * @instance
-     * @memberof VertTuple
-     **/
-    VertTuple.prototype.toString = function () {
-        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
-    };
-    ;
-    /**
-     * @private
-     **/
-    VertTuple.vtutils = {
-        dist2: function (v, w) {
-            return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
-        }
-    };
-    return VertTuple;
-}());
-exports.VertTuple = VertTuple;
-//# sourceMappingURL=VertTuple.js.map
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Line_1 = __webpack_require__(2);
-var Triangle_1 = __webpack_require__(8);
-/**
- * @global
- **/
-exports.geomutils = {
-    /**
-     * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
-     *
-     * @param {Vertex} pA - The first triangle point.
-     * @param {Vertex} pB - The second triangle point.
-     * @param {Vertex} pC - The third triangle point.
-     * @param {number} n - The number of desired angle sections (example: 2 means the angle will be divided into two sections,
-     *                      means an returned array with length 1, the middle line).
-     *
-     * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
-     */
-    nsectAngle: function (pA, pB, pC, n) {
-        var triangle = new Triangle_1.Triangle(pA, pB, pC);
-        var lineAB = new Line_1.Line(pA, pB);
-        var lineAC = new Line_1.Line(pA, pC);
-        // Compute the slope (theta) of line AB and line AC
-        var thetaAB = lineAB.angle();
-        var thetaAC = lineAC.angle();
-        // Compute the difference; this is the angle between AB and AC
-        var insideAngle = lineAB.angle(lineAC);
-        // We want the inner angles of the triangle, not the outer angle;
-        //   which one is which depends on the triangle 'direction'
-        var clockwise = triangle.determinant() > 0;
-        // For convenience convert the angle [-PI,PI] to [0,2*PI]
-        if (insideAngle < 0)
-            insideAngle = 2 * Math.PI + insideAngle;
-        if (!clockwise)
-            insideAngle = (2 * Math.PI - insideAngle) * (-1);
-        // Scale the rotated lines to the max leg length (looks better)
-        var lineLength = Math.max(lineAB.length(), lineAC.length());
-        var scaleFactor = lineLength / lineAB.length();
-        var result = [];
-        for (var i = 1; i < n; i++) {
-            // Compute the i-th inner sector line
-            result.push(new Line_1.Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
-        }
-        return result;
-    }
-};
-//# sourceMappingURL=geomutils.js.map
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
- *
- * @requires Vertex
- *
- * @author   Ikaros Kappler
- * @date     2018-11-28
- * @modified 2018-12-04 Added the toSVGString function.
- * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version  1.0.1
- *
- * @file VEllipse
- * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var VEllipse = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @param {Vertex} center The ellipses center.
-     * @param {Vertex} axis The x- and y-axis.
-     * @name VEllipse
-     **/
-    function VEllipse(center, axis) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "VEllipse";
-        this.center = center;
-        this.axis = axis;
-    }
-    ;
-    /**
-     * Create an SVG representation of this ellipse.
-     *
-     * @param {object} options { className?:string }
-     * @return string The SVG string
-     */
-    VEllipse.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<ellipse');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' cx="' + this.center.x + '"');
-        buffer.push(' cy="' + this.center.y + '"');
-        buffer.push(' rx="' + this.axis.x + '"');
-        buffer.push(' ry="' + this.axis.y + '"');
-        buffer.push(' />');
-        return buffer.join('');
-    };
-    ;
-    return VEllipse;
-}());
-exports.VEllipse = VEllipse;
-//# sourceMappingURL=VEllipse.js.map
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A wrapper for image objects.
- *
- * @requires Vertex, SVGSerializable
- *
- * @author   Ikaros Kappler
- * @date     2019-01-30
- * @modified 2019-03-23 Added JSDoc tags.
- * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version 1.0.2
- *
- * @file PBImage
- * @fileoverview As native Image objects have only a position and with
- *               and height thei are not suitable for UI dragging interfaces.
- * @public
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var PBImage = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name PBImage
-     * @param {Image} image - The actual image.
-     * @param {Vertex} upperLeft - The upper left corner.
-     * @param {Vertex} lowerRight - The lower right corner.
-     **/
-    function PBImage(image, upperLeft, lowerRight) {
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "PBImage";
-        /* if( typeof image == 'undefined' )
-            throw Error('image must not be null.');
-        if( typeof upperLeft == 'undefined' )
-            throw Error('upperLeft must not be null.');
-        if( typeof lowerRight == 'undefined' )
-            throw Error('lowerRight must not be null.'); */
-        this.image = image;
-        this.upperLeft = upperLeft;
-        this.lowerRight = lowerRight;
-    }
-    ;
-    // Implement SVGSerializable
-    /**
-     * Convert this vertex to SVG code.
-     *
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof PBImage
-     **/
-    PBImage.prototype.toSVGString = function (options) {
-        console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
-        return "";
-    };
-    ;
-    return PBImage;
-}());
-exports.PBImage = PBImage;
-//# sourceMappingURL=PBImage.js.map
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @classdesc A simple mouse handler for demos.
- * Use to avoid load massive libraries like jQuery.
- *
- * Usage
- * =====
- * Javascript:
- *   new MouseHandler( document.getElementById('mycanvas') )
- *	    .drag( function(e) {
- *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
- *		if( e.params.leftMouse ) ;
- *		else if( e.params.rightMouse ) ;
- *	    } )
- *	    .move( function(e) {
- *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
- *	    } )
- *          .up( function(e) {
- *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
- *          } )
- *          .down( function(e) {
- *              console.log( 'Mouse down.' );
- *          } )
- *          .click( function(e) {
- *              console.log( 'Click.' );
- *          } )
- *          .wheel( function(e) {
- *              console.log( 'Wheel. delta='+e.deltaY );
- *          } )
- *
- * Typescript:
- *   new MouseHandler( document.getElementById('mycanvas') )
- *	    .drag( (e:XMouseEvent) => {
- *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
- *		if( e.params.leftMouse ) ;
- *		else if( e.params.rightMouse ) ;
- *	    } )
- *	    .move( (e:XMouseEvent) => {
- *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
- *	    } )
- *          .up( (e:XMouseEvent) => {
- *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
- *          } )
- *          .down( (e:XMouseEvent) => {
- *              console.log( 'Mouse down.' );
- *          } )
- *          .click( (e:XMouseEvent) => {
- *              console.log( 'Click.' );
- *          } )
- *          .wheel( (e:XMouseEvent) => {
- *              console.log( 'Wheel. delta='+e.deltaY );
- *          } )
- *
- *
- * @author   Ikaros Kappler
- * @date     2018-03-19
- * @modified 2018-04-28 Added the param 'wasDragged'.
- * @modified 2018-08-16 Added the param 'dragAmount'.
- * @modified 2018-08-27 Added the param 'element'.
- * @modified 2018-11-11 Changed the scope from a simple global var to a member of window/_context.
- * @modified 2018-11-19 Renamed the 'mousedown' function to 'down' and the 'mouseup' function to 'up'.
- * @modified 2018-11-28 Added the 'wheel' listener.
- * @modified 2018-12-09 Cleaned up some code.
- * @modified 2019-02-10 Cleaned up some more code.
- * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-04-08 Fixed the click event (internally fired a 'mouseup' event) (1.0.10)
- * @modified 2020-04-08 Added the optional 'name' property. (1.0.11)
- * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even
- *                      if there is no external drag listener installed (1.1.0).
- * @version  1.1.0
- *
- * @file MouseHandler
- * @public
- **/
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var MouseHandler = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * Pass the DOM element you want to receive mouse events from.
-     *
-     * @constructor
-     * @instance
-     * @memberof MouseHandler
-     * @param {HTMLElement} element
-     **/
-    function MouseHandler(element, name) {
-        this.mouseDownPos = undefined;
-        this.mouseDragPos = undefined;
-        this.mousePos = undefined;
-        this.mouseButton = -1;
-        this.listeners = {};
-        this.installed = {};
-        this.handlers = {};
-        // +----------------------------------------------------------------------
-        // | Some private vars to store the current mouse/position/button state.
-        // +-------------------------------------------------
-        this.name = name;
-        this.element = element;
-        this.mouseDownPos = null;
-        this.mouseDragPos = null;
-        this.mousePos = null;
-        this.mouseButton = -1;
-        this.listeners = {};
-        this.installed = {};
-        this.handlers = {};
-        // +----------------------------------------------------------------------
-        // | Define the internal event handlers.
-        // |
-        // | They will dispatch the modified event (relative mouse position,
-        // | drag offset, ...) to the callbacks.
-        // +-------------------------------------------------
-        var _self = this;
-        this.handlers['mousemove'] = function (e) {
-            if (_self.listeners.mousemove)
-                _self.listeners.mousemove(_self.mkParams(e, 'mousemove'));
-            if (_self.mouseDragPos && _self.listeners.drag)
-                _self.listeners.drag(_self.mkParams(e, 'drag'));
-            if (_self.mouseDownPos)
-                _self.mouseDragPos = _self.relPos(e);
-        };
-        this.handlers['mouseup'] = function (e) {
-            if (_self.listeners.mouseup)
-                _self.listeners.mouseup(_self.mkParams(e, 'mouseup'));
-            _self.mouseDragPos = undefined;
-            _self.mouseDownPos = undefined;
-            _self.mouseButton = -1;
-        };
-        this.handlers['mousedown'] = function (e) {
-            _self.mouseDragPos = _self.relPos(e);
-            _self.mouseDownPos = _self.relPos(e);
-            _self.mouseButton = e.button;
-            if (_self.listeners.mousedown)
-                _self.listeners.mousedown(_self.mkParams(e, 'mousedown'));
-        };
-        this.handlers['click'] = function (e) {
-            if (_self.listeners.click)
-                _self.listeners.click(_self.mkParams(e, 'click'));
-        };
-        this.handlers['wheel'] = function (e) {
-            if (_self.listeners.wheel)
-                _self.listeners.wheel(_self.mkParams(e, 'wheel'));
-        };
-        this.element.addEventListener('mousemove', this.handlers['mousemove']);
-        this.element.addEventListener('mouseup', this.handlers['mouseup']);
-        this.element.addEventListener('mousedown', this.handlers['mousedown']);
-        this.element.addEventListener('click', this.handlers['click']);
-        this.element.addEventListener('wheel', this.handlers['wheel']);
-    }
-    // +----------------------------------------------------------------------
-    // | Some private vars to store the current mouse/position/button state.
-    // +-------------------------------------------------
-    MouseHandler.prototype.relPos = function (e) {
-        return { x: e.offsetX,
-            y: e.offsetY // e.pageY - e.target.offsetTop
-        };
-    };
-    MouseHandler.prototype.mkParams = function (e, eventName) {
-        var rel = this.relPos(e);
-        var xEvent = e;
-        xEvent.params = {
-            element: this.element,
-            name: eventName,
-            pos: rel,
-            button: this.mouseButton,
-            leftButton: this.mouseButton == 0,
-            middleButton: this.mouseButton == 1,
-            rightButton: this.mouseButton == 2,
-            mouseDownPos: this.mouseDownPos,
-            draggedFrom: this.mouseDragPos,
-            wasDragged: (this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y)),
-            dragAmount: (this.mouseDownPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 })
-        };
-        return xEvent;
-    };
-    MouseHandler.prototype.listenFor = function (eventName) {
-        if (this.installed[eventName])
-            return;
-        // In the new version 1.1.0 has all internal listeners installed by default.
-        // this.element.addEventListener(eventName,this.handlers[eventName]);
-        this.installed[eventName] = true;
-    };
-    MouseHandler.prototype.unlistenFor = function (eventName) {
-        if (!this.installed[eventName])
-            return;
-        // In the new version 1.1.0 has all internal listeners installed by default.
-        // this.element.removeEventListener(eventName,this.handlers[eventName]);
-        delete this.installed[eventName];
-    };
-    // +----------------------------------------------------------------------
-    // | The installer functions.
-    // |
-    // | Pass your callbacks here.
-    // | Note: they support chaining.
-    // +-------------------------------------------------
-    MouseHandler.prototype.drag = function (callback) {
-        if (this.listeners.drag)
-            this.throwAlreadyInstalled('drag');
-        this.listeners.drag = callback;
-        this.listenFor('mousedown');
-        this.listenFor('mousemove');
-        this.listenFor('mouseup');
-        //listeners.drag = callback;
-        return this;
-    };
-    ;
-    MouseHandler.prototype.move = function (callback) {
-        if (this.listeners.mousemove)
-            this.throwAlreadyInstalled('mousemove');
-        this.listenFor('mousemove');
-        this.listeners.mousemove = callback;
-        return this;
-    };
-    ;
-    MouseHandler.prototype.up = function (callback) {
-        if (this.listeners.mouseup)
-            this.throwAlreadyInstalled('mouseup');
-        this.listenFor('mouseup');
-        this.listeners.mouseup = callback;
-        return this;
-    };
-    ;
-    MouseHandler.prototype.down = function (callback) {
-        if (this.listeners.mousedown)
-            this.throwAlreadyInstalled('mousedown');
-        this.listenFor('mousedown');
-        this.listeners.mousedown = callback;
-        return this;
-    };
-    ;
-    MouseHandler.prototype.click = function (callback) {
-        if (this.listeners.click)
-            this.throwAlreadyInstalled('click');
-        this.listenFor('click');
-        this.listeners.click = callback;
-        return this;
-    };
-    ;
-    MouseHandler.prototype.wheel = function (callback) {
-        if (this.listeners.wheel)
-            this.throwAlreadyInstalled('wheel');
-        this.listenFor('wheel');
-        this.listeners.wheel = callback;
-        return this;
-    };
-    ;
-    MouseHandler.prototype.throwAlreadyInstalled = function (name) {
-        throw "This MouseHandler already has a '" + name + "' callback. To keep the code simple there is only room for one.";
-    };
-    // +----------------------------------------------------------------------
-    // | Call this when your work is done.
-    // |
-    // | The function will un-install all event listeners.
-    // +-------------------------------------------------
-    MouseHandler.prototype.destroy = function () {
-        this.unlistenFor('mousedown');
-        this.unlistenFor('mousemove');
-        this.unlistenFor('moseup');
-        this.unlistenFor('click');
-        this.unlistenFor('wheel');
-        this.element.removeEventListener('mousemove', this.handlers['mousemove']);
-        this.element.removeEventListener('mouseup', this.handlers['mousedown']);
-        this.element.removeEventListener('mousedown', this.handlers['mousedown']);
-        this.element.removeEventListener('click', this.handlers['click']);
-        this.element.removeEventListener('wheel', this.handlers['wheel']);
-    };
-    return MouseHandler;
-}());
-exports.MouseHandler = MouseHandler;
-var XMouseEvent = /** @class */ (function (_super) {
-    __extends(XMouseEvent, _super);
-    function XMouseEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XMouseEvent;
-}(MouseEvent));
-exports.XMouseEvent = XMouseEvent;
-var XWheelEvent = /** @class */ (function (_super) {
-    __extends(XWheelEvent, _super);
-    function XWheelEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XWheelEvent;
-}(WheelEvent));
-exports.XWheelEvent = XWheelEvent;
-//# sourceMappingURL=MouseHandler.js.map
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 
 /**
  * @classdesc A generic key handler.
@@ -5065,7 +2347,7 @@ exports.XWheelEvent = XWheelEvent;
  * @file KeyHandler
  * @public
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 var KeyHandler = /** @class */ (function () {
     /**
      * The constructor.
@@ -5439,1421 +2721,530 @@ exports.KeyHandler = KeyHandler;
 //# sourceMappingURL=KeyHandler.js.map
 
 /***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+/***/ "./src/js/Line.js":
+/*!************************!*\
+  !*** ./src/js/Line.js ***!
+  \************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
+/*! CommonJS bailout: this is used directly at 27:17-21 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
 
 /**
- * A wrapper class for basic drawing operations.
+ * @classdesc A line consists of two vertices a and b.<br>
+ * <br>
+ * This is some refactored code from my 'Morley Triangle' test<br>
+ *   https://github.com/IkarosKappler/morleys-trisector-theorem
  *
- * @require Vertex
+ * @requires Vertex
  *
  * @author   Ikaros Kappler
- * @date     2018-04-22
- * @modified 2018-08-16 Added the curve() function to draw cubic bézier curves.
- * @modified 2018-10-23 Recognizing the offset param in the circle() function.
- * @modified 2018-11-27 Added the diamondHandle() function.
- * @modified 2018-11-28 Added the grid() function and the ellipse() function.
- * @modified 2018-11-30 Renamed the text() function to label() as it is not scaling.
- * @modified 2018-12-06 Added a test function for drawing arc in SVG style.
- * @modified 2018-12-09 Added the dot(Vertex,color) function (copied from Feigenbaum-plot-script).
- * @modified 2019-01-30 Added the arrow(Vertex,Vertex,color) function for drawing arrow heads.
- * @modified 2019-01-30 Added the image(Image,Vertex,Vertex) function for drawing images.
- * @modified 2019-04-27 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
- * @modified 2019-04-28 Added Math.round to the dot() drawing parameters to really draw a singlt dot.
- * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
- * @modified 2019-10-03 Added the beginDrawCycle hook.
- * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
- * @modified 2019-11-18 Added the polyline function.
- * @modified 2019-11-22 Added a second workaround for th drawImage bug in Safari.
- * @modified 2019-12-07 Added the 'lineWidth' param to the line(...) function.
- * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
- * @modified 2019-12-11 Added the 'color' param to the label(...) function.
- * @modified 2019-12-18 Added the quadraticBezier(...) function (for the sake of approximating Lissajous curves).
- * @modified 2019-12-20 Added the 'lineWidth' param to the polyline(...) function.
- * @modified 2020-01-09 Added the 'lineWidth' param to the ellipse(...) function.
- * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
- * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
- * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
- * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
- * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
- * @modified 2020-10-15 Re-added the text() function.
- * @modified 2020-10-28 Added the path(Path2D) function.
- * @version  1.8.0
+ * @date     2016-03-12
+ * @modified 2018-12-05 Refactored the code from the morley-triangle script.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
+ * @modified 2019-09-02 Added the Line.add( Vertex ) function.
+ * @modified 2019-09-02 Added the Line.denominator( Line ) function.
+ * @modified 2019-09-02 Added the Line.colinear( Line ) function.
+ * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
+ * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
+ * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @version  2.1.2
+ *
+ * @file Line
+ * @public
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var CubicBezierCurve_1 = __webpack_require__(5);
-var Vertex_1 = __webpack_require__(0);
-// Todo: rename this class to Drawutils
-var drawutils = /** @class */ (function () {
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "./src/js/VertTuple.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Line = /** @class */ (function (_super) {
+    __extends(Line, _super);
     /**
-     * The constructor.
+     * Creates an instance of Line.
      *
      * @constructor
-     * @name drawutils
-     * @param {anvasRenderingContext2D} context - The drawing context.
-     * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
+     * @name Line
+     * @param {Vertex} a The line's first point.
+     * @param {Vertex} b The line's second point.
      **/
-    function drawutils(context, fillShapes) {
-        this.ctx = context;
-        this.offset = new Vertex_1.Vertex(0, 0);
-        this.scale = new Vertex_1.Vertex(1, 1);
-        this.fillShapes = fillShapes;
+    function Line(a, b) {
+        var _this = _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        _this.className = "Line";
+        return _this;
     }
-    ;
     /**
-     * Called before each draw cycle.
+     * Get the intersection if this line and the specified line.
+     *
+     * @method intersection
+     * @param {Line} line The second line.
+     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @instance
+     * @memberof Line
      **/
-    drawutils.prototype.beginDrawCycle = function () {
-        // NOOP
-    };
-    ;
-    /**
-     * Draw the line between the given two points with the specified (CSS-) color.
-     *
-     * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
-     * @param {string} color - Any valid CSS color string.
-     * @param {number|string} lineWidth? - [optional] The line's width.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     **/
-    drawutils.prototype.line = function (zA, zB, color, lineWidth) {
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-        this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
-        this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = lineWidth || 1;
-        this.ctx.stroke();
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
-     *
-     * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
-     * @param {string} color - Any valid CSS color string.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     **/
-    drawutils.prototype.arrow = function (zA, zB, color) {
-        var headlen = 8; // length of head in pixels
-        // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-        // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-        this.ctx.save();
-        this.ctx.beginPath();
-        var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
-        this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-        for (var i = 0; i < vertices.length; i++) {
-            this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
-        }
-        this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
-        this.ctx.lineWidth = 1;
-        this._fillOrDraw(color);
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw an image at the given position with the given size.<br>
-     * <br>
-     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
-     *
-     * @method image
-     * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     **/
-    drawutils.prototype.image = function (image, position, size) {
-        this.ctx.save();
-        // Note that there is a Safari bug with the 3 or 5 params variant.
-        // Only the 9-param varaint works.
-        this.ctx.drawImage(image, 0, 0, image.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
-        image.naturalHeight - 1, // To avoid errors substract 1 here.
-        this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw a rectangle.
-     *
-     * @param {Vertex} position - The upper left corner of the rectangle.
-     * @param {number} width - The width of the rectangle.
-     * @param {number} height - The height of the rectangle.
-     * @param {string} color - The color to use.
-     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
-     **/
-    drawutils.prototype.rect = function (position, width, height, color, lineWidth) {
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
-        this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
-        this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
-        this.ctx.lineTo(this.offset.x + position.x * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
-        // this.ctx.lineTo( this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y );
-        this.ctx.closePath();
-        this.ctx.lineWidth = lineWidth || 1;
-        this._fillOrDraw(color);
-        this.ctx.restore();
-    };
-    ;
-    // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff. It is not
-    // | intended to be used from the outside.
-    // |
-    // | When in draw mode it draws the current shape.
-    // | When in fill mode it fills the current shape.
-    // |
-    // | This function is usually only called internally.
-    // |
-    // | @param color A stroke/fill color to use.
-    // +-------------------------------
-    // TODO: convert this to a STATIC function.
-    drawutils.prototype._fillOrDraw = function (color) {
-        if (this.fillShapes) {
-            this.ctx.fillStyle = color;
-            this.ctx.fill();
-        }
-        else {
-            this.ctx.strokeStyle = color;
-            this.ctx.stroke();
-        }
-    };
-    ;
-    /**
-     * Draw the given (cubic) bézier curve.
-     *
-     * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
-     * @param {string} color - The CSS color to draw the curve with.
-     * @param {number|string} lineWidth - (optional) The line width to use.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
-        if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
-            this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
-            return;
-        }
-        // Draw curve
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
-        this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
-        //this.ctx.closePath();
-        this.ctx.lineWidth = lineWidth || 2;
-        this._fillOrDraw(color);
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw the given (quadratic) bézier curve.
-     *
-     * @method quadraticBezier
-     * @param {Vertex} startPoint   - The start point of the cubic Bézier curve
-     * @param {Vertex} controlPoint - The control point the cubic Bézier curve.
-     * @param {Vertex} endPoint     - The end control point the cubic Bézier curve.
-     * @param {string} color        - The CSS color to draw the curve with.
-     * @param {number|string} lineWidth - (optional) The line width to use.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.quadraticBezier = function (startPoint, controlPoint, endPoint, color, lineWidth) {
-        // Draw curve
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
-        this.ctx.quadraticCurveTo(this.offset.x + controlPoint.x * this.scale.x, this.offset.y + controlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
-        this.ctx.lineWidth = lineWidth || 2;
-        this._fillOrDraw(color);
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw the given (cubic) Bézier path.
-     *
-     * The given path must be an array with n*3+1 vertices, where n is the number of
-     * curves in the path:
-     * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
-     *
-     * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
-     * @param {string} color - The CSS colot to draw the path with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.cubicBezierPath = function (path, color) {
-        if (!path || path.length == 0)
-            return;
-        // Draw curve
-        this.ctx.save();
-        this.ctx.beginPath();
-        var curve, startPoint, endPoint, startControlPoint, endControlPoint;
-        this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
-        for (var i = 1; i < path.length; i += 3) {
-            startControlPoint = path[i];
-            endControlPoint = path[i + 1];
-            endPoint = path[i + 2];
-            this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
-        }
-        this.ctx.closePath();
-        this.ctx.lineWidth = 1;
-        this._fillOrDraw(color);
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw the given handle and handle point (used to draw interactive Bézier curves).
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method handle
-     * @param {Vertex} startPoint - The start of the handle.
-     * @param {Vertex} endPoint - The end point of the handle.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.handle = function (startPoint, endPoint) {
-        // Draw handles
-        // (No need to save and restore here)
-        this.point(startPoint, 'rgb(0,32,192)');
-        this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
-    };
-    ;
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    /* cubicBezierCurveHandleLines( curve:CubicBezierCurve ) {
-    // Draw handle lines
-    this.cubicBezierHandleLines( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
-    // this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
-    // this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
-    }; */
-    /**
-     * Draw a handle line (with a light grey).
-     *
-     * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.handleLine = function (startPoint, endPoint) {
-        // Draw handle lines
-        this.line(startPoint, endPoint, 'rgb(192,192,192)');
-    };
-    ;
-    /**
-     * Draw a 1x1 dot with the specified (CSS-) color.
-     *
-     * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
-     * @param {string} color - The CSS color to draw the dot with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.dot = function (p, color) {
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
-        this.ctx.lineTo(Math.round(this.offset.x + this.scale.x * p.x + 1), Math.round(this.offset.y + this.scale.y * p.y + 1));
-        this.ctx.closePath();
-        this.ctx.lineWidth = 1;
-        this._fillOrDraw(color);
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw the given point with the specified (CSS-) color and radius 3.
-     *
-     * @method point
-     * @param {Vertex} p - The position to draw the point at.
-     * @param {string} color - The CSS color to draw the point with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.point = function (p, color) {
-        var radius = 3;
-        this.ctx.beginPath();
-        this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
-        this.ctx.closePath();
-        this.ctx.lineWidth = 1;
-        this._fillOrDraw(color);
-    };
-    ;
-    /**
-     * Draw a circle with the specified (CSS-) color and radius.<br>
-     * <br>
-     * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
-     *
-     * @method circle
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {string} color - The CSS color to draw the circle with.
-     * @param {number} lineWidth - The line width (optional, default=1).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.circle = function (center, radius, color, lineWidth) {
-        this.ctx.beginPath();
-        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
-        this.ctx.closePath();
-        this.ctx.lineWidth = lineWidth || 1;
-        this._fillOrDraw(color);
-    };
-    ;
-    /**
-     * Draw a circular arc (section of a circle) with the given CSS color.
-     *
-     * @method circleArc
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {number} startAngle - The angle to start at.
-     * @param {number} endAngle - The angle to end at.
-     * @param {string} color - The CSS color to draw the circle with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
-        this.ctx.beginPath();
-        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
-        // this.ctx.closePath();
-        this.ctx.lineWidth = lineWidth || 1;
-        this._fillOrDraw(color);
-    };
-    ;
-    /**
-     * Draw an ellipse with the specified (CSS-) color and thw two radii.
-     *
-     * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
-     * @param {number} radiusX - The radius of the ellipse.
-     * @param {number} radiusY - The radius of the ellipse.
-     * @param {string} color - The CSS color to draw the ellipse with.
-     * @param {number} lineWidth=1 - An optional line width param (default is 1).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
-        this.ctx.beginPath();
-        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, 0.0, 0.0, Math.PI * 2);
-        this.ctx.closePath();
-        this.ctx.lineWidth = lineWidth || 1;
-        this._fillOrDraw(color);
-    };
-    ;
-    /**
-     * Draw square at the given center, size and with the specified (CSS-) color.<br>
-     * <br>
-     * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
-     *
-     * @method square
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
-     * @param {string} color - The CSS color to draw the square with.
-     * @param {number} lineWidth - The line with to use (optional, default is 1).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.square = function (center, size, color, lineWidth) {
-        this.ctx.beginPath();
-        this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
-        this.ctx.closePath();
-        this.ctx.lineWidth = lineWidth || 1;
-        this._fillOrDraw(color);
-    };
-    ;
-    /**
-     * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
-     *
-     * @method grid
-     * @param {Vertex} center - The center of the grid.
-     * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
-     * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
-     * @param {number} sizeX - The horizontal grid size.
-     * @param {number} sizeY - The vertical grid size.
-     * @param {string} color - The CSS color to draw the grid with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
-        this.ctx.beginPath();
-        var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
-        var yMax = height / 2;
-        for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
-            this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + yMin) * this.scale.y);
-            this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + yMax) * this.scale.y);
-        }
-        var xMin = -Math.ceil((width * 0.5) / sizeX) * sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
-        var xMax = width / 2; // height/2;
-        for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
-            this.ctx.moveTo(this.offset.x + (center.x + xMin) * this.scale.x - 4, this.offset.y + (center.y + y) * this.scale.y);
-            this.ctx.lineTo(this.offset.x + (center.x + xMax) * this.scale.x + 4, this.offset.y + (center.y + y) * this.scale.y);
-        }
-        this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = 1.0;
-        this.ctx.stroke();
-        this.ctx.closePath();
-    };
-    ;
-    /**
-     * Draw a raster of crosshairs in the given grid.<br>
-     *
-     * This works analogue to the grid() function
-     *
-     * @method raster
-     * @param {Vertex} center - The center of the raster.
-     * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
-     * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
-     * @param {number} sizeX - The horizontal raster size.
-     * @param {number} sizeY - The vertical raster size.
-     * @param {string} color - The CSS color to draw the raster with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
-        this.ctx.save();
-        this.ctx.beginPath();
-        var cx = 0, cy = 0;
-        for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
-            cx++;
-            for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
-                if (cx == 1)
-                    cy++;
-                // Draw a crosshair
-                this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x - 4, this.offset.y + (center.y + y) * this.scale.y);
-                this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x + 4, this.offset.y + (center.y + y) * this.scale.y);
-                this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + y) * this.scale.y - 4);
-                this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + y) * this.scale.y + 4);
-            }
-        }
-        this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = 1.0;
-        this.ctx.stroke();
-        this.ctx.closePath();
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw a diamond handle (square rotated by 45°) with the given CSS color.
-     *
-     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
-     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
-     * as even shaped diamonds.
-     *
-     * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
-     * @param {string} color - The CSS color to draw the diamond with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.diamondHandle = function (center, size, color) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y);
-        this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - size / 2.0);
-        this.ctx.lineTo(this.offset.x + center.x * this.scale.x + size / 2.0, this.offset.y + center.y * this.scale.y);
-        this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y + size / 2.0);
-        this.ctx.closePath();
-        this.ctx.lineWidth = 1;
-        this._fillOrDraw(color);
-    };
-    ;
-    /**
-     * Draw a square handle with the given CSS color.<br>
-     * <br>
-     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
-     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
-     * as even shaped squares.
-     *
-     * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
-     * @param {string} color - The CSS color to draw the square with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.squareHandle = function (center, size, color) {
-        this.ctx.beginPath();
-        this.ctx.rect(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y - size / 2.0, size, size);
-        this.ctx.closePath();
-        this.ctx.lineWidth = 1;
-        this._fillOrDraw(color);
-    };
-    ;
-    /**
-     * Draw a circle handle with the given CSS color.<br>
-     * <br>
-     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
-     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
-     * as even shaped circles.
-     *
-     * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {string} color - The CSS color to draw the circle with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.circleHandle = function (center, radius, color) {
-        radius = radius || 3;
-        this.ctx.beginPath();
-        this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
-        this.ctx.closePath();
-        this.ctx.lineWidth = 1;
-        this._fillOrDraw(color);
-    };
-    ;
-    /**
-     * Draw a crosshair with given radius and color at the given position.<br>
-     * <br>
-     * Note that the crosshair radius will not be affected by scaling.
-     *
-     * @method crosshair
-     * @param {XYCoords} center - The center of the crosshair.
-     * @param {number} radius - The radius of the crosshair.
-     * @param {string} color - The CSS color to draw the crosshair with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.crosshair = function (center, radius, color) {
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
-        this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y);
-        this.ctx.moveTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - radius);
-        this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y + radius);
-        this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = 0.5;
-        this.ctx.stroke();
-        this.ctx.closePath();
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw a polygon.
-     *
-     * @method polygon
-     * @param {Polygon}  polygon - The polygon to draw.
-     * @param {string}   color - The CSS color to draw the polygon with.
-     * @param {string}   lineWidth - The line width to use.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.polygon = function (polygon, color, lineWidth) {
-        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
-    };
-    ;
-    /**
-     * Draw a polygon line (alternative function to the polygon).
-     *
-     * @method polyline
-     * @param {Vertex[]} vertices   - The polygon vertices to draw.
-     * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
-     * @param {string}   color      - The CSS color to draw the polygon with.
-     * @param {number}   lineWidth  - The line width (default is 1.0);
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
-        if (vertices.length <= 1)
-            return;
-        this.ctx.save();
-        this.ctx.beginPath();
-        this.ctx.lineWidth = lineWidth || 1.0;
-        this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
-        for (var i = 0; i < vertices.length; i++) {
-            this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
-        }
-        if (!isOpen && vertices.length > 2)
-            this.ctx.closePath();
-        this._fillOrDraw(color);
-        this.ctx.setLineDash([]);
-        this.ctx.restore();
-    };
-    ;
-    drawutils.prototype.text = function (text, x, y, options) {
-        options = options || {};
-        this.ctx.save();
-        x = this.offset.x + x * this.scale.x;
-        y = this.offset.y + y * this.scale.y;
-        var color = options.color || 'black';
-        if (this.fillShapes) {
-            this.ctx.fillStyle = color;
-            this.ctx.fillText(text, x, y);
-        }
-        else {
-            this.ctx.strokeStyle = color;
-            this.ctx.strokeText(text, x, y);
-        }
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Draw a non-scaling text label at the given position.
-     *
-     * Note that these are absolute label positions, they are not affected by offset or scale.
-     *
-     * @method label
-     * @param {string} text - The text to draw.
-     * @param {number} x - The x-position to draw the text at.
-     * @param {number} y - The y-position to draw the text at.
-     * @param {number=} rotation - The (optional) rotation in radians (default=0).
-     * @param {string=} color - The color to render the text with (default=black).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutils.prototype.label = function (text, x, y, rotation, color) {
-        this.ctx.save();
-        this.ctx.translate(x, y);
-        if (typeof rotation != 'undefined')
-            this.ctx.rotate(rotation);
-        this.ctx.fillStyle = color || 'black';
-        if (this.fillShapes) {
-            this.ctx.fillText(text, 0, 0);
-        }
-        else {
-            this.ctx.strokeText(text, 0, 0);
-        }
-        this.ctx.restore();
-    };
-    ;
-    /**
-     * Due to gl compatibility there is a generic 'clear' function required
-     * to avoid accessing the context object itself directly.
-     *
-     * This function just fills the whole canvas with a single color.
-     *
-     * @param {string} color - The color to clear with.
-     **/
-    drawutils.prototype.clear = function (color) {
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    };
-    ;
-    return drawutils;
-}());
-exports.drawutils = drawutils;
-//# sourceMappingURL=draw.js.map
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * A wrapper class for basic drawing operations. This is the WebGL
- * implementation whih sould work with shaders.
- *
- * @require Vertex
- *
- * @author   Ikaros Kappler
- * @date     2019-09-18
- * @modified 2019-10-03 Added the beginDrawCycle hook.
- * @modified 2020-03-25 Ported stub to Typescript.
- * @modified 2020-10-15 Re-added the text() function.
- * @version  0.0.4
- **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var Vertex_1 = __webpack_require__(0);
-var drawutilsgl = /** @class */ (function () {
-    /**
-     * The constructor.
-     *
-     * @constructor
-     * @name drawutils
-     * @param {WebGLRenderingContext} context - The drawing context.
-     * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
-     **/
-    function drawutilsgl(context, fillShapes) {
-        this.gl = context;
-        this.offset = new Vertex_1.Vertex(0, 0);
-        this.scale = new Vertex_1.Vertex(1, 1);
-        this.fillShapes = fillShapes;
-        this._zindex = 0.0;
-        if (context == null || typeof context === 'undefined')
-            return;
-        this.glutils = new GLU(context);
-        // PROBLEM: CANNOT USE MULTIPLE SHADER PROGRAM INSTANCES ON THE SAME CONTEXT!
-        // SOLUTION: USE SHARED SHADER PROGRAM!!! ... somehow ...
-        // This needs to be considered in the overlying component; both draw-instances need to
-        // share their gl context.
-        // That's what the copyInstace(boolean) method is good for.
-        this._vertShader = this.glutils.compileShader(drawutilsgl.vertCode, this.gl.VERTEX_SHADER);
-        this._fragShader = this.glutils.compileShader(drawutilsgl.fragCode, this.gl.FRAGMENT_SHADER);
-        this._program = this.glutils.makeProgram(this._vertShader, this._fragShader);
-        // Create an empty buffer object
-        this.vertex_buffer = this.gl.createBuffer();
-        // Bind appropriate array buffer to it
-        // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
-        console.log('gl initialized');
-    }
-    ;
-    /**
-     * Called before each draw cycle.
-     **/
-    drawutilsgl.prototype.beginDrawCycle = function () {
-        this._zindex = 0.0;
-    };
-    ;
-    /**
-     * Creates a 'shallow' (non deep) copy of this instance. This implies
-     * that under the hood the same gl context and gl program will be used.
-     */
-    drawutilsgl.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilsgl(null, fillShapes);
-        copy.gl = this.gl;
-        copy.glutils = this.glutils;
-        copy._vertShader = this._vertShader;
-        copy._fragShader = this._fragShader;
-        copy._program = this._program;
-        return copy;
-    };
-    ;
-    drawutilsgl.prototype._x2rel = function (x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; };
-    ;
-    drawutilsgl.prototype._y2rel = function (y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; };
-    ;
-    /**
-     * Draw the line between the given two points with the specified (CSS-) color.
-     *
-     * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
-     * @param {string} color - Any valid CSS color string.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     **/
-    drawutilsgl.prototype.line = function (zA, zB, color) {
-        var vertices = new Float32Array(6);
-        vertices[0] = this._x2rel(zA.x);
-        vertices[1] = this._y2rel(zA.y);
-        vertices[2] = this._zindex;
-        vertices[3] = this._x2rel(zB.x);
-        vertices[4] = this._y2rel(zB.y);
-        vertices[5] = this._zindex;
-        this._zindex += 0.001;
-        // Create an empty buffer object
-        // const vertex_buffer = this.gl.createBuffer();
-        // Bind appropriate array buffer to it
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
-        // Pass the vertex data to the buffer
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
-        // Bind vertex buffer object
-        // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
-        // Get the attribute location
-        var coord = this.gl.getAttribLocation(this._program, "position");
-        // Point an attribute to the currently bound VBO
-        this.gl.vertexAttribPointer(coord, 3, this.gl.FLOAT, false, 0, 0);
-        // Enable the attribute
-        this.gl.enableVertexAttribArray(coord);
-        // Unbind the buffer?
-        //this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-        // Set the view port
-        this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
-        var uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
-        // let radians = currentAngle * Math.PI / 180.0;
-        var currentRotation = [0.0, 1.0];
-        //currentRotation[0] = Math.sin(radians);
-        //currentRotation[1] = Math.cos(radians);
-        this.gl.uniform2fv(uRotationVector, currentRotation);
-        this.gl.lineWidth(5);
-        // Draw the line
-        this.gl.drawArrays(this.gl.LINES, 0, vertices.length / 3);
-        // POINTS, LINE_STRIP, LINE_LOOP, LINES,
-        // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
-    };
-    ;
-    /**
-     * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
-     *
-     * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
-     * @param {string} color - Any valid CSS color string.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     **/
-    drawutilsgl.prototype.arrow = function (zA, zB, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw an image at the given position with the given size.<br>
-     * <br>
-     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
-     *
-     * @method image
-     * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     **/
-    drawutilsgl.prototype.image = function (image, position, size) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff. It is not
-    // | intended to be used from the outside.
-    // |
-    // | When in draw mode it draws the current shape.
-    // | When in fill mode it fills the current shape.
-    // |
-    // | This function is usually only called internally.
-    // |
-    // | @param color A stroke/fill color to use.
-    // +-------------------------------
-    drawutilsgl.prototype._fillOrDraw = function (color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw the given (cubic) bézier curve.
-     *
-     * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
-     * @param {string} color - The CSS color to draw the curve with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw the given (cubic) Bézier path.
-     *
-     * The given path must be an array with n*3+1 vertices, where n is the number of
-     * curves in the path:
-     * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
-     *
-     * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
-     * @param {string} color - The CSS colot to draw the path with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.cubicBezierPath = function (path, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw the given handle and handle point (used to draw interactive Bézier curves).
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method handle
-     * @param {Vertex} startPoint - The start of the handle.
-     * @param {Vertex} endPoint - The end point of the handle.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.handle = function (startPoint, endPoint) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.cubicBezierCurveHandleLines = function (curve) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a handle line (with a light grey).
-     *
-     * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.handleLine = function (startPoint, endPoint) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a 1x1 dot with the specified (CSS-) color.
-     *
-     * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
-     * @param {string} color - The CSS color to draw the dot with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.dot = function (p, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw the given point with the specified (CSS-) color and radius 3.
-     *
-     * @method point
-     * @param {Vertex} p - The position to draw the point at.
-     * @param {string} color - The CSS color to draw the point with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.point = function (p, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a circle with the specified (CSS-) color and radius.<br>
-     * <br>
-     * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
-     *
-     * @method circle
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {string} color - The CSS color to draw the circle with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.circle = function (center, radius, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a circular arc (section of a circle) with the given CSS color.
-     *
-     * @method circleArc
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {number} startAngle - The angle to start at.
-     * @param {number} endAngle - The angle to end at.
-     * @param {string} color - The CSS color to draw the circle with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw an ellipse with the specified (CSS-) color and thw two radii.
-     *
-     * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
-     * @param {number} radiusX - The radius of the ellipse.
-     * @param {number} radiusY - The radius of the ellipse.
-     * @param {string} color - The CSS color to draw the ellipse with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.ellipse = function (center, radiusX, radiusY, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw square at the given center, size and with the specified (CSS-) color.<br>
-     * <br>
-     * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
-     *
-     * @method square
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
-     * @param {string} color - The CSS color to draw the square with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.square = function (center, size, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
-     *
-     * @method grid
-     * @param {Vertex} center - The center of the grid.
-     * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
-     * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
-     * @param {number} sizeX - The horizontal grid size.
-     * @param {number} sizeY - The vertical grid size.
-     * @param {string} color - The CSS color to draw the grid with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a raster of crosshairs in the given grid.<br>
-     *
-     * This works analogue to the grid() function
-     *
-     * @method raster
-     * @param {Vertex} center - The center of the raster.
-     * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
-     * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
-     * @param {number} sizeX - The horizontal raster size.
-     * @param {number} sizeY - The vertical raster size.
-     * @param {string} color - The CSS color to draw the raster with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a diamond handle (square rotated by 45°) with the given CSS color.
-     *
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
-     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
-     * as even shaped diamonds.
-     *
-     * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
-     * @param {string} color - The CSS color to draw the diamond with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.diamondHandle = function (center, size, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a square handle with the given CSS color.<br>
-     * <br>
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
-     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
-     * as even shaped squares.
-     *
-     * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
-     * @param {string} color - The CSS color to draw the square with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.squareHandle = function (center, size, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a circle handle with the given CSS color.<br>
-     * <br>
-     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
-     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
-     * as even shaped circles.
-     *
-     * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {string} color - The CSS color to draw the circle with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.circleHandle = function (center, size, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a crosshair with given radius and color at the given position.<br>
-     * <br>
-     * Note that the crosshair radius will not be affected by scaling.
-     *
-     * @method crosshair
-     * @param {XYCoords} center - The center of the crosshair.
-     * @param {number} radius - The radius of the crosshair.
-     * @param {string} color - The CSS color to draw the crosshair with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.crosshair = function (center, radius, color) {
-        // NOT YET IMPLEMENTED	
-    };
-    ;
-    /**
-     * Draw a polygon.
-     *
-     * @method polygon
-     * @param {Polygon} polygon - The polygon to draw.
-     * @param {string} color - The CSS color to draw the polygon with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.polygon = function (polygon, color, lineWidth) {
-        var vertices = new Float32Array(polygon.vertices.length * 3);
-        for (var i = 0; i < polygon.vertices.length; i++) {
-            vertices[i * 3 + 0] = this._x2rel(polygon.vertices[i].x);
-            vertices[i * 3 + 1] = this._y2rel(polygon.vertices[i].y);
-            vertices[i * 3 + 2] = this._zindex;
-        }
-        this._zindex += 0.001;
-        //console.log( vertices );
-        // Create an empty buffer object
-        // const vertex_buffer = this.gl.createBuffer();
-        // Bind appropriate array buffer to it
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
-        // Pass the vertex data to the buffer
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
-        // Bind vertex buffer object
-        // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
-        // Get the attribute location
-        var coord = this.gl.getAttribLocation(this._program, "position");
-        // Point an attribute to the currently bound VBO
-        this.gl.vertexAttribPointer(coord, 3, this.gl.FLOAT, false, 0, 0);
-        // Enable the attribute
-        this.gl.enableVertexAttribArray(coord);
-        // Unbind the buffer?
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-        // Set the view port
-        this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
-        var uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
-        // let radians = currentAngle * Math.PI / 180.0;
-        var currentRotation = [0.0, 1.0];
-        //currentRotation[0] = Math.sin(radians);
-        //currentRotation[1] = Math.cos(radians);
-        this.gl.uniform2fv(uRotationVector, currentRotation);
-        // Draw the polygon
-        this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, vertices.length / 3);
-        // POINTS, LINE_STRIP, LINE_LOOP, LINES,
-        // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
-    };
-    ;
-    /**
-     * Draw a polygon line (alternative function to the polygon).
-     *
-     * @method polyline
-     * @param {Vertex[]} vertices - The polygon vertices to draw.
-     * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
-     * @param {string}   color    - The CSS color to draw the polygon with.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.polyline = function (vertices, isOpen, color) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    drawutilsgl.prototype.text = function (text, x, y, options) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw a non-scaling text label at the given position.
-     *
-     * @method label
-     * @param {string} text - The text to draw.
-     * @param {number} x - The x-position to draw the text at.
-     * @param {number} y - The y-position to draw the text at.
-     * @param {number=} rotation - The (aoptional) rotation in radians.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    // +---------------------------------------------------------------------------------
-    // | Draw a non-scaling text label at the given position.
-    // +-------------------------------
-    drawutilsgl.prototype.label = function (text, x, y, rotation) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Due to gl compatibility there is a generic 'clear' function required
-     * to avoid accessing the context object itself directly.
-     *
-     * This function just fills the whole canvas with a single color.
-     *
-     * @param {string} color - The color to clear with.
-     **/
-    drawutilsgl.prototype.clear = function (color) {
-        // NOT YET IMPLEMENTED
-        // if( typeof color == 'string' )
-        // color = Color.parse(color); // Color class does not yet exist in TS
-        // Clear the canvas
-        this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
-        // Enable the depth test
-        this.gl.enable(this.gl.DEPTH_TEST);
-        // Clear the color and depth buffer
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    };
-    ;
-    // Vertex shader source code
-    drawutilsgl.vertCode = "\n    precision mediump float;\n\n    attribute vec3 position;\n\n    uniform vec2 uRotationVector;\n\n    void main(void) {\n\tvec2 rotatedPosition = vec2(\n\t    position.x * uRotationVector.y +\n\t\tposition.y * uRotationVector.x,\n\t    position.y * uRotationVector.y -\n\t\tposition.x * uRotationVector.x\n\t);\n\n\tgl_Position = vec4(rotatedPosition, position.z, 1.0);\n    }";
-    // Fragment shader source code
-    drawutilsgl.fragCode = "\n    precision highp float;\n\n    void main(void) {\n\tgl_FragColor = vec4(0.0,0.75,1.0,1.0);\n    }";
-    return drawutilsgl;
-}());
-exports.drawutilsgl = drawutilsgl;
-/**
- * Some GL helper utils.
- **/
-var GLU = /** @class */ (function () {
-    function GLU(gl) {
-        this.gl = gl;
-    }
-    ;
-    GLU.prototype.bufferData = function (verts) {
-        // Create an empty buffer object
-        var vbuffer = this.gl.createBuffer();
-        // Bind appropriate array buffer to it
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbuffer);
-        // Pass the vertex data to the buffer
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, verts, this.gl.STATIC_DRAW);
-        // Unbind the buffer
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-        return vbuffer;
-    };
-    ;
-    /*=================== Shaders ====================*/
-    GLU.prototype.compileShader = function (shaderCode, shaderType) {
-        // Create a vertex shader object
-        var shader = this.gl.createShader(shaderType);
-        // Attach vertex shader source code
-        this.gl.shaderSource(shader, shaderCode);
-        // Compile the vertex shader
-        this.gl.compileShader(shader);
-        var vertStatus = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
-        if (!vertStatus) {
-            console.warn("Error in shader:" + this.gl.getShaderInfoLog(shader));
-            this.gl.deleteShader(shader);
+    // !!! DO NOT MOVE TO VertTuple
+    Line.prototype.intersection = function (line) {
+        var denominator = this.denominator(line);
+        if (denominator == 0)
             return null;
-        }
-        return shader;
+        var a = this.a.y - line.a.y;
+        var b = this.a.x - line.a.x;
+        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
+        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+        a = numerator1 / denominator; // NaN if parallel lines
+        b = numerator2 / denominator;
+        // if we cast these lines infinitely in both directions, they intersect here:
+        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
     };
     ;
-    GLU.prototype.makeProgram = function (vertShader, fragShader) {
-        // Create a shader program object to store
-        // the combined shader program
-        var program = this.gl.createProgram();
-        // Attach a vertex shader
-        this.gl.attachShader(program, vertShader);
-        // Attach a fragment shader
-        this.gl.attachShader(program, fragShader);
-        // Link both the programs
-        this.gl.linkProgram(program);
-        // Use the combined shader program object
-        this.gl.useProgram(program);
-        /*======= Do some cleanup ======*/
-        this.gl.detachShader(program, vertShader);
-        this.gl.detachShader(program, fragShader);
-        this.gl.deleteShader(vertShader);
-        this.gl.deleteShader(fragShader);
-        return program;
+    /**
+     * Create an SVG representation of this line.
+     *
+     * @method toSVGString
+     * @param {options} p - A set of options, like the 'classname' to use
+     *                      for the line object.
+     * @return {string} The SVG string representing this line.
+     * @instance
+     * @memberof Line
+     **/
+    Line.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<line');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' x1="' + this.a.x + '"');
+        buffer.push(' y1="' + this.a.y + '"');
+        buffer.push(' x2="' + this.b.x + '"');
+        buffer.push(' y2="' + this.b.y + '"');
+        buffer.push(' />');
+        return buffer.join('');
     };
     ;
-    return GLU;
+    return Line;
+}(VertTuple_1.VertTuple));
+exports.Line = Line;
+//# sourceMappingURL=Line.js.map
+
+/***/ }),
+
+/***/ "./src/js/MouseHandler.js":
+/*!********************************!*\
+  !*** ./src/js/MouseHandler.js ***!
+  \********************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: top-level-this-exports, __webpack_exports__ */
+/*! CommonJS bailout: this is used directly at 75:17-21 */
+/***/ (function(__unused_webpack_module, exports) {
+
+
+/**
+ * @classdesc A simple mouse handler for demos.
+ * Use to avoid load massive libraries like jQuery.
+ *
+ * Usage
+ * =====
+ * Javascript:
+ *   new MouseHandler( document.getElementById('mycanvas') )
+ *	    .drag( function(e) {
+ *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
+ *		if( e.params.leftMouse ) ;
+ *		else if( e.params.rightMouse ) ;
+ *	    } )
+ *	    .move( function(e) {
+ *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
+ *	    } )
+ *          .up( function(e) {
+ *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
+ *          } )
+ *          .down( function(e) {
+ *              console.log( 'Mouse down.' );
+ *          } )
+ *          .click( function(e) {
+ *              console.log( 'Click.' );
+ *          } )
+ *          .wheel( function(e) {
+ *              console.log( 'Wheel. delta='+e.deltaY );
+ *          } )
+ *
+ * Typescript:
+ *   new MouseHandler( document.getElementById('mycanvas') )
+ *	    .drag( (e:XMouseEvent) => {
+ *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
+ *		if( e.params.leftMouse ) ;
+ *		else if( e.params.rightMouse ) ;
+ *	    } )
+ *	    .move( (e:XMouseEvent) => {
+ *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
+ *	    } )
+ *          .up( (e:XMouseEvent) => {
+ *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
+ *          } )
+ *          .down( (e:XMouseEvent) => {
+ *              console.log( 'Mouse down.' );
+ *          } )
+ *          .click( (e:XMouseEvent) => {
+ *              console.log( 'Click.' );
+ *          } )
+ *          .wheel( (e:XMouseEvent) => {
+ *              console.log( 'Wheel. delta='+e.deltaY );
+ *          } )
+ *
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-03-19
+ * @modified 2018-04-28 Added the param 'wasDragged'.
+ * @modified 2018-08-16 Added the param 'dragAmount'.
+ * @modified 2018-08-27 Added the param 'element'.
+ * @modified 2018-11-11 Changed the scope from a simple global var to a member of window/_context.
+ * @modified 2018-11-19 Renamed the 'mousedown' function to 'down' and the 'mouseup' function to 'up'.
+ * @modified 2018-11-28 Added the 'wheel' listener.
+ * @modified 2018-12-09 Cleaned up some code.
+ * @modified 2019-02-10 Cleaned up some more code.
+ * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
+ * @modified 2020-04-08 Fixed the click event (internally fired a 'mouseup' event) (1.0.10)
+ * @modified 2020-04-08 Added the optional 'name' property. (1.0.11)
+ * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even
+ *                      if there is no external drag listener installed (1.1.0).
+ * @version  1.1.0
+ *
+ * @file MouseHandler
+ * @public
+ **/
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var MouseHandler = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * Pass the DOM element you want to receive mouse events from.
+     *
+     * @constructor
+     * @instance
+     * @memberof MouseHandler
+     * @param {HTMLElement} element
+     **/
+    function MouseHandler(element, name) {
+        this.mouseDownPos = undefined;
+        this.mouseDragPos = undefined;
+        this.mousePos = undefined;
+        this.mouseButton = -1;
+        this.listeners = {};
+        this.installed = {};
+        this.handlers = {};
+        // +----------------------------------------------------------------------
+        // | Some private vars to store the current mouse/position/button state.
+        // +-------------------------------------------------
+        this.name = name;
+        this.element = element;
+        this.mouseDownPos = null;
+        this.mouseDragPos = null;
+        this.mousePos = null;
+        this.mouseButton = -1;
+        this.listeners = {};
+        this.installed = {};
+        this.handlers = {};
+        // +----------------------------------------------------------------------
+        // | Define the internal event handlers.
+        // |
+        // | They will dispatch the modified event (relative mouse position,
+        // | drag offset, ...) to the callbacks.
+        // +-------------------------------------------------
+        var _self = this;
+        this.handlers['mousemove'] = function (e) {
+            if (_self.listeners.mousemove)
+                _self.listeners.mousemove(_self.mkParams(e, 'mousemove'));
+            if (_self.mouseDragPos && _self.listeners.drag)
+                _self.listeners.drag(_self.mkParams(e, 'drag'));
+            if (_self.mouseDownPos)
+                _self.mouseDragPos = _self.relPos(e);
+        };
+        this.handlers['mouseup'] = function (e) {
+            if (_self.listeners.mouseup)
+                _self.listeners.mouseup(_self.mkParams(e, 'mouseup'));
+            _self.mouseDragPos = undefined;
+            _self.mouseDownPos = undefined;
+            _self.mouseButton = -1;
+        };
+        this.handlers['mousedown'] = function (e) {
+            _self.mouseDragPos = _self.relPos(e);
+            _self.mouseDownPos = _self.relPos(e);
+            _self.mouseButton = e.button;
+            if (_self.listeners.mousedown)
+                _self.listeners.mousedown(_self.mkParams(e, 'mousedown'));
+        };
+        this.handlers['click'] = function (e) {
+            if (_self.listeners.click)
+                _self.listeners.click(_self.mkParams(e, 'click'));
+        };
+        this.handlers['wheel'] = function (e) {
+            if (_self.listeners.wheel)
+                _self.listeners.wheel(_self.mkParams(e, 'wheel'));
+        };
+        this.element.addEventListener('mousemove', this.handlers['mousemove']);
+        this.element.addEventListener('mouseup', this.handlers['mouseup']);
+        this.element.addEventListener('mousedown', this.handlers['mousedown']);
+        this.element.addEventListener('click', this.handlers['click']);
+        this.element.addEventListener('wheel', this.handlers['wheel']);
+    }
+    // +----------------------------------------------------------------------
+    // | Some private vars to store the current mouse/position/button state.
+    // +-------------------------------------------------
+    MouseHandler.prototype.relPos = function (e) {
+        return { x: e.offsetX,
+            y: e.offsetY // e.pageY - e.target.offsetTop
+        };
+    };
+    MouseHandler.prototype.mkParams = function (e, eventName) {
+        var rel = this.relPos(e);
+        var xEvent = e;
+        xEvent.params = {
+            element: this.element,
+            name: eventName,
+            pos: rel,
+            button: this.mouseButton,
+            leftButton: this.mouseButton == 0,
+            middleButton: this.mouseButton == 1,
+            rightButton: this.mouseButton == 2,
+            mouseDownPos: this.mouseDownPos,
+            draggedFrom: this.mouseDragPos,
+            wasDragged: (this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y)),
+            dragAmount: (this.mouseDownPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 })
+        };
+        return xEvent;
+    };
+    MouseHandler.prototype.listenFor = function (eventName) {
+        if (this.installed[eventName])
+            return;
+        // In the new version 1.1.0 has all internal listeners installed by default.
+        // this.element.addEventListener(eventName,this.handlers[eventName]);
+        this.installed[eventName] = true;
+    };
+    MouseHandler.prototype.unlistenFor = function (eventName) {
+        if (!this.installed[eventName])
+            return;
+        // In the new version 1.1.0 has all internal listeners installed by default.
+        // this.element.removeEventListener(eventName,this.handlers[eventName]);
+        delete this.installed[eventName];
+    };
+    // +----------------------------------------------------------------------
+    // | The installer functions.
+    // |
+    // | Pass your callbacks here.
+    // | Note: they support chaining.
+    // +-------------------------------------------------
+    MouseHandler.prototype.drag = function (callback) {
+        if (this.listeners.drag)
+            this.throwAlreadyInstalled('drag');
+        this.listeners.drag = callback;
+        this.listenFor('mousedown');
+        this.listenFor('mousemove');
+        this.listenFor('mouseup');
+        //listeners.drag = callback;
+        return this;
+    };
+    ;
+    MouseHandler.prototype.move = function (callback) {
+        if (this.listeners.mousemove)
+            this.throwAlreadyInstalled('mousemove');
+        this.listenFor('mousemove');
+        this.listeners.mousemove = callback;
+        return this;
+    };
+    ;
+    MouseHandler.prototype.up = function (callback) {
+        if (this.listeners.mouseup)
+            this.throwAlreadyInstalled('mouseup');
+        this.listenFor('mouseup');
+        this.listeners.mouseup = callback;
+        return this;
+    };
+    ;
+    MouseHandler.prototype.down = function (callback) {
+        if (this.listeners.mousedown)
+            this.throwAlreadyInstalled('mousedown');
+        this.listenFor('mousedown');
+        this.listeners.mousedown = callback;
+        return this;
+    };
+    ;
+    MouseHandler.prototype.click = function (callback) {
+        if (this.listeners.click)
+            this.throwAlreadyInstalled('click');
+        this.listenFor('click');
+        this.listeners.click = callback;
+        return this;
+    };
+    ;
+    MouseHandler.prototype.wheel = function (callback) {
+        if (this.listeners.wheel)
+            this.throwAlreadyInstalled('wheel');
+        this.listenFor('wheel');
+        this.listeners.wheel = callback;
+        return this;
+    };
+    ;
+    MouseHandler.prototype.throwAlreadyInstalled = function (name) {
+        throw "This MouseHandler already has a '" + name + "' callback. To keep the code simple there is only room for one.";
+    };
+    // +----------------------------------------------------------------------
+    // | Call this when your work is done.
+    // |
+    // | The function will un-install all event listeners.
+    // +-------------------------------------------------
+    MouseHandler.prototype.destroy = function () {
+        this.unlistenFor('mousedown');
+        this.unlistenFor('mousemove');
+        this.unlistenFor('moseup');
+        this.unlistenFor('click');
+        this.unlistenFor('wheel');
+        this.element.removeEventListener('mousemove', this.handlers['mousemove']);
+        this.element.removeEventListener('mouseup', this.handlers['mousedown']);
+        this.element.removeEventListener('mousedown', this.handlers['mousedown']);
+        this.element.removeEventListener('click', this.handlers['click']);
+        this.element.removeEventListener('wheel', this.handlers['wheel']);
+    };
+    return MouseHandler;
 }());
-//# sourceMappingURL=drawgl.js.map
+exports.MouseHandler = MouseHandler;
+var XMouseEvent = /** @class */ (function (_super) {
+    __extends(XMouseEvent, _super);
+    function XMouseEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XMouseEvent;
+}(MouseEvent));
+exports.XMouseEvent = XMouseEvent;
+var XWheelEvent = /** @class */ (function (_super) {
+    __extends(XWheelEvent, _super);
+    function XWheelEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XWheelEvent;
+}(WheelEvent));
+exports.XWheelEvent = XWheelEvent;
+//# sourceMappingURL=MouseHandler.js.map
 
 /***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-/* Imports for webpack */
-
-window.VertexAttr = __webpack_require__(4).VertexAttr;
-window.VertexListeners = __webpack_require__(10).VertexListeners;
-window.Vertex = __webpack_require__(0).Vertex;
-
-window.Bounds = __webpack_require__(1).Bounds;
-window.Grid = __webpack_require__(11).Grid;
-window.Line = __webpack_require__(2).Line;
-window.Vector = __webpack_require__(3).Vector;
-window.CubicBezierCurve = __webpack_require__(5).CubicBezierCurve;
-window.BezierPath = __webpack_require__(6).BezierPath;
-window.Polygon = __webpack_require__(7).Polygon;
-window.Triangle = __webpack_require__(8).Triangle;
-window.VEllipse = __webpack_require__(14).VEllipse;
-window.Circle = __webpack_require__(9).Circle;
-window.PBImage = __webpack_require__(15).PBImage;
-window.MouseHandler = __webpack_require__(16).MouseHandler;
-window.KeyHandler = __webpack_require__(17).KeyHandler;
-window.drawutils = __webpack_require__(18).drawutils;
-window.drawutilsgl = __webpack_require__(19).drawutilsgl;
-window.geomutils = __webpack_require__(13).geomutils;
-window.PlotBoilerplate = __webpack_require__(21).PlotBoilerplate;
+/***/ "./src/js/PBImage.js":
+/*!***************************!*\
+  !*** ./src/js/PBImage.js ***!
+  \***************************/
+/*! flagged exports */
+/*! export PBImage [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
 
 
+/**
+ * @classdesc A wrapper for image objects.
+ *
+ * @requires Vertex, SVGSerializable
+ *
+ * @author   Ikaros Kappler
+ * @date     2019-01-30
+ * @modified 2019-03-23 Added JSDoc tags.
+ * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
+ * @version 1.0.2
+ *
+ * @file PBImage
+ * @fileoverview As native Image objects have only a position and with
+ *               and height thei are not suitable for UI dragging interfaces.
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var PBImage = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name PBImage
+     * @param {Image} image - The actual image.
+     * @param {Vertex} upperLeft - The upper left corner.
+     * @param {Vertex} lowerRight - The lower right corner.
+     **/
+    function PBImage(image, upperLeft, lowerRight) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "PBImage";
+        /* if( typeof image == 'undefined' )
+            throw Error('image must not be null.');
+        if( typeof upperLeft == 'undefined' )
+            throw Error('upperLeft must not be null.');
+        if( typeof lowerRight == 'undefined' )
+            throw Error('lowerRight must not be null.'); */
+        this.image = image;
+        this.upperLeft = upperLeft;
+        this.lowerRight = lowerRight;
+    }
+    ;
+    // Implement SVGSerializable
+    /**
+     * Convert this vertex to SVG code.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof PBImage
+     **/
+    PBImage.prototype.toSVGString = function (options) {
+        console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
+        return "";
+    };
+    ;
+    return PBImage;
+}());
+exports.PBImage = PBImage;
+//# sourceMappingURL=PBImage.js.map
 
 /***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+/***/ "./src/js/PlotBoilerplate.js":
+/*!***********************************!*\
+  !*** ./src/js/PlotBoilerplate.js ***!
+  \***********************************/
+/*! flagged exports */
+/*! export PlotBoilerplate [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
 
 /**
  * @classdesc The main class of the PlotBoilerplate.
@@ -6924,24 +3315,24 @@ window.PlotBoilerplate = __webpack_require__(21).PlotBoilerplate;
  * @fileoverview The main class.
  * @public
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
-var draw_1 = __webpack_require__(18);
-var drawgl_1 = __webpack_require__(19);
-var BezierPath_1 = __webpack_require__(6);
-var Bounds_1 = __webpack_require__(1);
-var Circle_1 = __webpack_require__(9);
-var Grid_1 = __webpack_require__(11);
-var KeyHandler_1 = __webpack_require__(17);
-var Line_1 = __webpack_require__(2);
-var MouseHandler_1 = __webpack_require__(16);
-var PBImage_1 = __webpack_require__(15);
-var Polygon_1 = __webpack_require__(7);
-var SVGBuilder_1 = __webpack_require__(22);
-var Triangle_1 = __webpack_require__(8);
-var VEllipse_1 = __webpack_require__(14);
-var Vector_1 = __webpack_require__(3);
-var Vertex_1 = __webpack_require__(0);
-var VertexAttr_1 = __webpack_require__(4);
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var draw_1 = __webpack_require__(/*! ./draw */ "./src/js/draw.js");
+var drawgl_1 = __webpack_require__(/*! ./drawgl */ "./src/js/drawgl.js");
+var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "./src/js/BezierPath.js");
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+var Circle_1 = __webpack_require__(/*! ./Circle */ "./src/js/Circle.js");
+var Grid_1 = __webpack_require__(/*! ./Grid */ "./src/js/Grid.js");
+var KeyHandler_1 = __webpack_require__(/*! ./KeyHandler */ "./src/js/KeyHandler.js");
+var Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
+var MouseHandler_1 = __webpack_require__(/*! ./MouseHandler */ "./src/js/MouseHandler.js");
+var PBImage_1 = __webpack_require__(/*! ./PBImage */ "./src/js/PBImage.js");
+var Polygon_1 = __webpack_require__(/*! ./Polygon */ "./src/js/Polygon.js");
+var SVGBuilder_1 = __webpack_require__(/*! ./SVGBuilder */ "./src/js/SVGBuilder.js");
+var Triangle_1 = __webpack_require__(/*! ./Triangle */ "./src/js/Triangle.js");
+var VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "./src/js/VEllipse.js");
+var Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "./src/js/VertexAttr.js");
 var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
@@ -8572,10 +4963,341 @@ exports.PlotBoilerplate = PlotBoilerplate;
 //# sourceMappingURL=PlotBoilerplate.js.map
 
 /***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+/***/ "./src/js/Polygon.js":
+/*!***************************!*\
+  !*** ./src/js/Polygon.js ***!
+  \***************************/
+/*! flagged exports */
+/*! export Polygon [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+/**
+ * @classdesc A polygon class.
+ *
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-04-14
+ * @modified 2018-11-17 Added the containsVert function.
+ * @modified 2018-12-04 Added the toSVGString function.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-10-25 Added the scale function.
+ * @modified 2019-11-06 JSDoc update.
+ * @modified 2019-11-07 Added toCubicBezierPath(number) function.
+ * @modified 2019-11-22 Added the rotate(number,Vertex) function.
+ * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
+ * @modified 2020-10-30 Added the `addVertex` function.
+ * @modified 2020-10-31 Added thet `getVertexAt` function.
+ * @version 1.3.0
+ *
+ * @file Polygon
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "./src/js/BezierPath.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Polygon = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Polygon
+     * @param {Vertex[]} vertices - An array of 2d vertices that shape the polygon.
+     * @param {boolean} isOpen - Indicates if the polygon should be rendered as an open or closed shape.
+     **/
+    function Polygon(vertices, isOpen) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Polygon";
+        if (typeof vertices == 'undefined')
+            vertices = [];
+        this.vertices = vertices;
+        this.isOpen = isOpen;
+    }
+    ;
+    /**
+     * Add a vertex to the end of the `vertices` array.
+     *
+     * @method addVert
+     * @param {Vertex} vert - The vertex to add.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.addVertex = function (vert) {
+        this.vertices.push(vert);
+    };
+    ;
+    /**
+     * Get the polygon vertex at the given position (index).
+     *
+     * The index may exceed the total vertex count, and will be wrapped around then (modulo).
+     *
+     * @metho getVertexAt
+     * @param {number} index - The index of the desired vertex.
+     * @instance
+     * @memberof Polygon
+     * @return {Vertex} At the given index.
+     **/
+    Polygon.prototype.getVertexAt = function (index) {
+        if (index < 0)
+            return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
+        else
+            return this.vertices[index % this.vertices.length];
+    };
+    ;
+    /**
+     * Check if the given vertex is inside this polygon.<br>
+     * <br>
+     * Ray-casting algorithm found at<br>
+     *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
+     *
+     * @method containsVert
+     * @param {Vertex} vert - The vertex to check. The new x-component.
+     * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.containsVert = function (vert) {
+        //    // ray-casting algorithm based on
+        //    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+        var inside = false;
+        for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
+            var xi = this.vertices[i].x, yi = this.vertices[i].y;
+            var xj = this.vertices[j].x, yj = this.vertices[j].y;
+            var intersect = ((yi > vert.y) != (yj > vert.y))
+                && (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
+            if (intersect)
+                inside = !inside;
+        }
+        return inside;
+    };
+    ;
+    /**
+     * Scale the polygon relative to the given center.
+     *
+     * @method scale
+     * @param {number} factor - The scale factor.
+     * @param {Vertex} center - The center of scaling.
+     * @return {Polygon} this, for chaining.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.scale = function (factor, center) {
+        for (var i in this.vertices) {
+            if (typeof this.vertices[i].scale == 'function')
+                this.vertices[i].scale(factor, center);
+            else
+                console.log('There seems to be a null vertex!', this.vertices[i]);
+        }
+        return this;
+    };
+    ;
+    /**
+     * Rotatee the polygon around the given center.
+     *
+     * @method rotate
+     * @param {number} angle  - The rotation angle.
+     * @param {Vertex} center - The center of rotation.
+     * @return {Polygon} this, for chaining.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.rotate = function (angle, center) {
+        for (var i in this.vertices) {
+            this.vertices[i].rotate(angle, center);
+        }
+        return this;
+    };
+    ;
+    /**
+     * Convert this polygon to a sequence of quadratic Bézier curves.<br>
+     * <br>
+     * The first vertex in the returned array is the start point.<br>
+     * The following sequence are pairs of control-point-and-end-point:
+     * <pre>startPoint, controlPoint0, pathPoint1, controlPoint1, pathPoint2, controlPoint2, ..., endPoint</pre>
+     *
+     * @method toQuadraticBezierData
+     * @return {Vertex[]}  An array of 2d vertices that shape the quadratic Bézier curve.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.toQuadraticBezierData = function () {
+        if (this.vertices.length < 3)
+            return [];
+        var qbezier = [];
+        var cc0 = this.vertices[0];
+        var cc1 = this.vertices[1];
+        var edgeCenter = new Vertex_1.Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
+        qbezier.push(edgeCenter);
+        var limit = this.isOpen ? this.vertices.length : this.vertices.length + 1;
+        for (var t = 1; t < limit; t++) {
+            cc0 = this.vertices[t % this.vertices.length];
+            cc1 = this.vertices[(t + 1) % this.vertices.length];
+            var edgeCenter = new Vertex_1.Vertex(cc0.x + (cc1.x - cc0.x) / 2, cc0.y + (cc1.y - cc0.y) / 2);
+            qbezier.push(cc0);
+            qbezier.push(edgeCenter);
+            cc0 = cc1;
+        }
+        return qbezier;
+    };
+    ;
+    /**
+     * Convert this polygon to a quadratic bezier curve, represented as an SVG data string.
+     *
+     * @method toQuadraticBezierSVGString
+     * @return {string} The 'd' part for an SVG 'path' element.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.toQuadraticBezierSVGString = function () {
+        var qdata = this.toQuadraticBezierData();
+        if (qdata.length == 0)
+            return "";
+        var buffer = ['M ' + qdata[0].x + ' ' + qdata[0].y];
+        for (var i = 1; i < qdata.length; i += 2) {
+            buffer.push('Q ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y);
+        }
+        return buffer.join(' ');
+    };
+    ;
+    /**
+     * Convert this polygon to a sequence of cubic Bézier curves.<br>
+     * <br>
+     * The first vertex in the returned array is the start point.<br>
+     * The following sequence are triplets of (first-control-point, secnond-control-point, end-point):<br>
+     * <pre>startPoint, controlPoint0_0, controlPoint1_1, pathPoint1, controlPoint1_0, controlPoint1_1, ..., endPoint</pre>
+     *
+     * @method toCubicBezierData
+     * @param {number=} threshold - An optional threshold (default=1.0) how strong the curve segments
+     *                              should over-/under-drive. Should be between 0.0 and 1.0 for best
+     *                              results but other values are allowed.
+     * @return {Vertex[]}  An array of 2d vertices that shape the cubic Bézier curve.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.toCubicBezierData = function (threshold) {
+        if (typeof threshold == 'undefined')
+            threshold = 1.0;
+        if (this.vertices.length < 3)
+            return [];
+        var cbezier = [];
+        var a = this.vertices[0];
+        var b = this.vertices[1];
+        var edgeCenter = new Vertex_1.Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
+        cbezier.push(edgeCenter);
+        var limit = this.isOpen ? this.vertices.length - 1 : this.vertices.length;
+        for (var t = 0; t < limit; t++) {
+            var a = this.vertices[t % this.vertices.length];
+            var b = this.vertices[(t + 1) % this.vertices.length];
+            var c = this.vertices[(t + 2) % this.vertices.length];
+            var aCenter = new Vertex_1.Vertex(a.x + (b.x - a.x) / 2, a.y + (b.y - a.y) / 2);
+            var bCenter = new Vertex_1.Vertex(b.x + (c.x - b.x) / 2, b.y + (c.y - b.y) / 2);
+            var a2 = new Vertex_1.Vertex(aCenter.x + (b.x - aCenter.x) * threshold, aCenter.y + (b.y - aCenter.y) * threshold);
+            var b0 = new Vertex_1.Vertex(bCenter.x + (b.x - bCenter.x) * threshold, bCenter.y + (b.y - bCenter.y) * threshold);
+            cbezier.push(a2);
+            cbezier.push(b0);
+            cbezier.push(bCenter);
+        }
+        return cbezier;
+    };
+    ;
+    /**
+     * Convert this polygon to a cubic bezier curve, represented as an SVG data string.
+     *
+     * @method toCubicBezierSVGString
+     * @return {string} The 'd' part for an SVG 'path' element.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.toCubicBezierSVGString = function (threshold) {
+        var qdata = this.toCubicBezierData(threshold);
+        if (qdata.length == 0)
+            return "";
+        var buffer = ['M ' + qdata[0].x + ' ' + qdata[0].y];
+        for (var i = 1; i < qdata.length; i += 3) {
+            buffer.push('C ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y + ', ' + qdata[i + 2].x + ' ' + qdata[i + 2].y);
+        }
+        return buffer.join(' ');
+    };
+    ;
+    /**
+     * Convert this polygon to a cubic bezier path instance.
+     *
+     * @method toCubicBezierPath
+     * @param {number} threshold - The threshold, usually from 0.0 to 1.0.
+     * @return {BezierPath}      - A bezier path instance.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.toCubicBezierPath = function (threshold) {
+        var qdata = this.toCubicBezierData(threshold);
+        // Conver the linear path vertices to a two-dimensional path array
+        var pathdata = [];
+        for (var i = 0; i + 3 < qdata.length; i += 3) {
+            pathdata.push([qdata[i], qdata[i + 3], qdata[i + 1], qdata[i + 2]]);
+        }
+        return BezierPath_1.BezierPath.fromArray(pathdata);
+    };
+    ;
+    /**
+     * Create an SVG representation of this polygon.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} The SVG string.
+     * @instance
+     * @memberof Polygon
+     **/
+    Polygon.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<path');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' d="');
+        if (this.vertices.length > 0) {
+            buffer.push('M ');
+            buffer.push(this.vertices[0].x.toString());
+            buffer.push(' ');
+            buffer.push(this.vertices[0].y.toString());
+            for (var i = 1; i < this.vertices.length; i++) {
+                buffer.push(' L ');
+                buffer.push(this.vertices[i].x.toString());
+                buffer.push(' ');
+                buffer.push(this.vertices[i].y.toString());
+            }
+            if (!this.isOpen) {
+                buffer.push(' Z');
+            }
+        }
+        buffer.push('" />');
+        return buffer.join('');
+    };
+    ;
+    return Polygon;
+}());
+exports.Polygon = Polygon;
+//# sourceMappingURL=Polygon.js.map
+
+/***/ }),
+
+/***/ "./src/js/SVGBuilder.js":
+/*!******************************!*\
+  !*** ./src/js/SVGBuilder.js ***!
+  \******************************/
+/*! flagged exports */
+/*! export SVGBuilder [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
 
 /**
  * A default SVG builder.
@@ -8593,7 +5315,7 @@ exports.PlotBoilerplate = PlotBoilerplate;
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @version  1.0.3
  **/
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 var SVGBuilder = /** @class */ (function () {
     function SVGBuilder() {
     }
@@ -8662,6 +5384,3390 @@ var SVGBuilder = /** @class */ (function () {
 exports.SVGBuilder = SVGBuilder;
 //# sourceMappingURL=SVGBuilder.js.map
 
+/***/ }),
+
+/***/ "./src/js/Triangle.js":
+/*!****************************!*\
+  !*** ./src/js/Triangle.js ***!
+  \****************************/
+/*! flagged exports */
+/*! export Triangle [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+/**
+ * @classdesc A triangle class for triangulations.
+ *
+ * The class was written for a Delaunay trinagulation demo so it might
+ * contain some strange and unexpected functions.
+ *
+ * @requires Vertex, Polygon, SVGSerializale
+ *
+ *
+ * @author    Ikaros Kappler
+ * @date_init 2012-10-17 (Wrote a first version of this in that year).
+ * @date      2018-04-03 (Refactored the code into a new class).
+ * @modified  2018-04-28 Added some documentation.
+ * @modified  2019-09-11 Added the scaleToCentroid(Number) function (used by the walking triangle demo).
+ * @modified  2019-09-12 Added beautiful JSDoc compliable comments.
+ * @modified  2019-11-07 Added to toSVG(options) function to make Triangles renderable as SVG.
+ * @modified  2019-12-09 Fixed the determinant() function. The calculation was just wrong.
+ * @modified  2020-03-16 (Corona times) Added the 'fromArray' function.
+ * @modified  2020-03-17 Added the Triangle.toPolygon() function.
+ * @modified  2020-03-17 Added proper JSDoc comments.
+ * @modified  2020-03-25 Ported this class from vanilla-JS to Typescript.
+ * @modified  2020-05-09 Added the new Circle class (ported to Typescript from the demos).
+ * @modified  2020-05-12 Added getIncircularTriangle() function.
+ * @modified  2020-05-12 Added getIncircle() function.
+ * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
+ * @modified  2020-06-18 Added the getIncenter function.
+ * @version   2.3.0
+ *
+ * @file Triangle
+ * @fileoverview A simple triangle class: three vertices.
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+var Circle_1 = __webpack_require__(/*! ./Circle */ "./src/js/Circle.js");
+var Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
+var Polygon_1 = __webpack_require__(/*! ./Polygon */ "./src/js/Polygon.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var geomutils_1 = __webpack_require__(/*! ./geomutils */ "./src/js/geomutils.js");
+var Triangle = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Triangle
+     * @param {Vertex} a - The first vertex of the triangle.
+     * @param {Vertex} b - The second vertex of the triangle.
+     * @param {Vertex} c - The third vertex of the triangle.
+     **/
+    function Triangle(a, b, c) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Triangle";
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.calcCircumcircle();
+    }
+    /**
+     * Create a new triangle from the given array of vertices.
+     *
+     * The array must have at least three vertices, otherwise an error will be raised.
+     * This function will not create copies of the vertices.
+     *
+     * @method fromArray
+     * @static
+     * @param {Array<Vertex>} arr - The required array with at least three vertices.
+     * @memberof Vertex
+     * @return {Triangle}
+     **/
+    Triangle.fromArray = function (arr) {
+        //if( !Array.isArray(arr) )
+        //    throw new Exception("Cannot create triangle fromArray from non-array.");
+        if (arr.length < 3)
+            throw "Cannot create triangle from array with less than three vertices (" + arr.length + ")";
+        return new Triangle(arr[0], arr[1], arr[2]);
+    };
+    ;
+    /**
+     * Get the centroid of this triangle.
+     *
+     * The centroid is the average midpoint for each side.
+     *
+     * @method getCentroid
+     * @return {Vertex} The centroid
+     * @instance
+     * @memberof Triangle
+     **/
+    Triangle.prototype.getCentroid = function () {
+        return new Vertex_1.Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
+    };
+    ;
+    /**
+     * Scale the triangle towards its centroid.
+     *
+     * @method scaleToCentroid
+     * @param {number} - The scale factor to use. That can be any scalar.
+     * @return {Triangle} this (for chaining)
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.scaleToCentroid = function (factor) {
+        var centroid = this.getCentroid();
+        this.a.scale(factor, centroid);
+        this.b.scale(factor, centroid);
+        this.c.scale(factor, centroid);
+        return this;
+    };
+    ;
+    /**
+     * Get the circumcircle of this triangle.
+     *
+     * The circumcircle is that unique circle on which all three
+     * vertices of this triangle are located on.
+     *
+     * Please note that for performance reasons any changes to vertices will not reflect in changes
+     * of the circumcircle (center or radius). Please call the calcCirumcircle() function
+     * after triangle vertex changes.
+     *
+     * @method getCircumcircle
+     * @return {Object} - { center:Vertex, radius:float }
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.getCircumcircle = function () {
+        if (!this.center || !this.radius)
+            this.calcCircumcircle();
+        return new Circle_1.Circle(this.center.clone(), this.radius);
+    };
+    ;
+    /**
+     * Check if this triangle and the passed triangle share an
+     * adjacent edge.
+     *
+     * For edge-checking Vertex.equals is used which uses an
+     * an epsilon for comparison.
+     *
+     * @method isAdjacent
+     * @param {Triangle} tri - The second triangle to check adjacency with.
+     * @return {boolean} - True if this and the passed triangle have at least one common edge.
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.isAdjacent = function (tri) {
+        var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
+        var b = this.b.equals(tri.a) || this.b.equals(tri.b) || this.b.equals(tri.c);
+        var c = this.c.equals(tri.a) || this.c.equals(tri.b) || this.c.equals(tri.c);
+        return (a && b) || (a && c) || (b && c);
+    };
+    ;
+    /**
+     * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of
+     * the passed two.
+     *
+     * @method getThirdVertex
+     * @param {Vertex} vert1 - The first vertex.
+     * @param {Vertex} vert2 - The second vertex.
+     * @return {Vertex} - The third vertex of this triangle that makes up the whole triangle with vert1 and vert2.
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.getThirdVertex = function (vert1, vert2) {
+        if (this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1))
+            return this.c;
+        if (this.b.equals(vert1) && this.c.equals(vert2) || this.b.equals(vert2) && this.c.equals(vert1))
+            return this.a;
+        //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
+        return this.b;
+    };
+    ;
+    /**
+     * Re-compute the circumcircle of this triangle (if the vertices
+     * have changed).
+     *
+     * The circumcenter and radius are stored in this.center and
+     * this.radius. There is a third result: radius_squared (for internal computations).
+     *
+     * @method calcCircumcircle
+     * @return void
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.calcCircumcircle = function () {
+        // From
+        //    http://www.exaflop.org/docs/cgafaq/cga1.html
+        var A = this.b.x - this.a.x;
+        var B = this.b.y - this.a.y;
+        var C = this.c.x - this.a.x;
+        var D = this.c.y - this.a.y;
+        var E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
+        var F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
+        var G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
+        var dx, dy;
+        if (Math.abs(G) < Triangle.EPSILON) {
+            // Collinear - find extremes and use the midpoint
+            var bounds = this.bounds();
+            this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+            dx = this.center.x - bounds.min.x;
+            dy = this.center.y - bounds.min.y;
+        }
+        else {
+            var cx = (D * E - B * F) / G;
+            var cy = (A * F - C * E) / G;
+            this.center = new Vertex_1.Vertex(cx, cy);
+            dx = this.center.x - this.a.x;
+            dy = this.center.y - this.a.y;
+        }
+        this.radius_squared = dx * dx + dy * dy;
+        this.radius = Math.sqrt(this.radius_squared);
+    };
+    ; // END calcCircumcircle
+    /**
+     * Check if the passed vertex is inside this triangle's
+     * circumcircle.
+     *
+     * @method inCircumcircle
+     * @param {Vertex} v - The vertex to check.
+     * @return {boolean}
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.inCircumcircle = function (v) {
+        var dx = this.center.x - v.x;
+        var dy = this.center.y - v.y;
+        var dist_squared = dx * dx + dy * dy;
+        return (dist_squared <= this.radius_squared);
+    };
+    ;
+    /**
+     * Get the rectangular bounds for this triangle.
+     *
+     * @method bounds
+     * @return {Bounds} - The min/max bounds of this triangle.
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.bounds = function () {
+        return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
+    };
+    ;
+    /**
+     * Convert this triangle to a polygon instance.
+     *
+     * Plase note that this conversion does not perform a deep clone.
+     *
+     * @method toPolygon
+     * @return {Polygon} A new polygon representing this triangle.
+     * @instance
+     * @memberof Triangle
+     **/
+    Triangle.prototype.toPolygon = function () {
+        return new Polygon_1.Polygon([this.a, this.b, this.c]);
+    };
+    ;
+    /**
+     * Get the determinant of this triangle.
+     *
+     * @method determinant
+     * @return {number} - The determinant (float).
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.determinant = function () {
+        // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
+        return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
+    };
+    ;
+    /**
+     * Checks if the passed vertex (p) is inside this triangle.
+     *
+     * Note: matrix determinants rock.
+     *
+     * @method containsPoint
+     * @param {Vertex} p - The vertex to check.
+     * @return {boolean}
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.containsPoint = function (p) {
+        return Triangle.utils.pointIsInTriangle(p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y);
+    };
+    ;
+    /**
+     * Get that inner triangle which defines the maximal incircle.
+     *
+     * @return {Triangle} The triangle of those points in this triangle that define the incircle.
+     */
+    Triangle.prototype.getIncircularTriangle = function () {
+        var lineA = new Line_1.Line(this.a, this.b);
+        var lineB = new Line_1.Line(this.b, this.c);
+        var lineC = new Line_1.Line(this.c, this.a);
+        var bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
+        var bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        var intersection = bisector1.intersection(bisector2);
+        // Find the closest points on one of the polygon lines (all have same distance by construction)
+        var circleIntersA = lineA.getClosestPoint(intersection);
+        var circleIntersB = lineB.getClosestPoint(intersection);
+        var circleIntersC = lineC.getClosestPoint(intersection);
+        return new Triangle(circleIntersA, circleIntersB, circleIntersC);
+    };
+    ;
+    /**
+     * Get the incircle of this triangle. That is the circle that touches each side
+     * of this triangle in exactly one point.
+     *
+     * Note this just calls getIncircularTriangle().getCircumcircle()
+     *
+     * @return {Circle} The incircle of this triangle.
+     */
+    Triangle.prototype.getIncircle = function () {
+        return this.getIncircularTriangle().getCircumcircle();
+    };
+    ;
+    /**
+     * Get the incenter of this triangle (which is the center of the circumcircle).
+     *
+     * Note: due to performance reasonst the incenter is buffered inside the triangle because
+     *       computing it is relatively expensive. If a, b or c have changed you should call the
+     *       calcCircumcircle() function first, otherwise you might get wrong results.
+     * @return Vertex The incenter of this triangle.
+     **/
+    Triangle.prototype.getIncenter = function () {
+        if (!this.center || !this.radius)
+            this.calcCircumcircle();
+        return this.center.clone();
+    };
+    ;
+    /**
+     * Converts this triangle into a human-readable string.
+     *
+     * @method toString
+     * @return {string}
+     * @instance
+     * @memberof Triangle
+     */
+    Triangle.prototype.toString = function () {
+        return '{ a : ' + this.a.toString() + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
+    };
+    ;
+    /**
+     * Create an SVG representation of this triangle.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} The SVG string.
+     * @instance
+     * @memberof Triangle
+     **/
+    Triangle.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<path');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' d="');
+        var vertices = [this.a, this.b, this.c];
+        if (vertices.length > 0) {
+            buffer.push('M ');
+            buffer.push(vertices[0].x);
+            buffer.push(' ');
+            buffer.push(vertices[0].y);
+            for (var i = 1; i < vertices.length; i++) {
+                buffer.push(' L ');
+                buffer.push(vertices[i].x);
+                buffer.push(' ');
+                buffer.push(vertices[i].y);
+            }
+            //if( !this.isOpen ) {
+            buffer.push(' Z');
+            //}
+        }
+        buffer.push('" />');
+        return buffer.join('');
+    };
+    ;
+    /**
+     * An epsilon for comparison.
+     * This should be the same epsilon as in Vertex.
+     *
+     * @private
+     **/
+    Triangle.EPSILON = 1.0e-6;
+    Triangle.utils = {
+        // Used in the bounds() function.
+        max3: function (a, b, c) {
+            return (a >= b && a >= c) ? a : (b >= a && b >= c) ? b : c;
+        },
+        min3: function (a, b, c) {
+            return (a <= b && a <= c) ? a : (b <= a && b <= c) ? b : c;
+        },
+        /**
+         * Used by the containsPoint() function.
+         *
+         * @private
+         **/
+        pointIsInTriangle: function (px, py, p0x, p0y, p1x, p1y, p2x, p2y) {
+            //
+            // Point-in-Triangle test found at
+            //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
+            //
+            var area = 1 / 2 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
+            var s = 1 / (2 * area) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
+            var t = 1 / (2 * area) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
+            return s > 0 && t > 0 && (1 - s - t) > 0;
+        }
+    };
+    return Triangle;
+}());
+exports.Triangle = Triangle;
+//# sourceMappingURL=Triangle.js.map
+
+/***/ }),
+
+/***/ "./src/js/VEllipse.js":
+/*!****************************!*\
+  !*** ./src/js/VEllipse.js ***!
+  \****************************/
+/*! flagged exports */
+/*! export VEllipse [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/**
+ * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
+ *
+ * @requires Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-11-28
+ * @modified 2018-12-04 Added the toSVGString function.
+ * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
+ * @version  1.0.1
+ *
+ * @file VEllipse
+ * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var VEllipse = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @param {Vertex} center The ellipses center.
+     * @param {Vertex} axis The x- and y-axis.
+     * @name VEllipse
+     **/
+    function VEllipse(center, axis) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "VEllipse";
+        this.center = center;
+        this.axis = axis;
+    }
+    ;
+    /**
+     * Create an SVG representation of this ellipse.
+     *
+     * @param {object} options { className?:string }
+     * @return string The SVG string
+     */
+    VEllipse.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<ellipse');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' cx="' + this.center.x + '"');
+        buffer.push(' cy="' + this.center.y + '"');
+        buffer.push(' rx="' + this.axis.x + '"');
+        buffer.push(' ry="' + this.axis.y + '"');
+        buffer.push(' />');
+        return buffer.join('');
+    };
+    ;
+    return VEllipse;
+}());
+exports.VEllipse = VEllipse;
+//# sourceMappingURL=VEllipse.js.map
+
+/***/ }),
+
+/***/ "./src/js/Vector.js":
+/*!**************************!*\
+  !*** ./src/js/Vector.js ***!
+  \**************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
+/*! CommonJS bailout: this is used directly at 24:17-21 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+/**
+ * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
+ *            <br>
+ *            Vectors are drawn with an arrow at their end point.<br>
+ *            <b>The Vector class extends the Line class.</b>
+ *
+ * @requires Vertex, Line
+ *
+ * @author   Ikaros Kappler
+ * @date     2019-01-30
+ * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-04-19 Added the clone function (overriding Line.clone()).
+ * @modified 2019-09-02 Added the Vector.perp() function.
+ * @modified 2019-09-02 Added the Vector.inverse() function.
+ * @modified 2019-12-04 Added the Vector.inv() function.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @version  1.2.1
+ *
+ * @file Vector
+ * @public
+ **/
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "./src/js/VertTuple.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Vector = /** @class */ (function (_super) {
+    __extends(Vector, _super);
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name Vector
+     * @extends Line
+     * @param {Vertex} vertA - The start vertex of the vector.
+     * @param {Vertex} vertB - The end vertex of the vector.
+     **/
+    function Vector(vertA, vertB) {
+        var _this = _super.call(this, vertA, vertB, function (a, b) { return new Vector(a, b); }) || this;
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        _this.className = "Vector";
+        return _this;
+    }
+    ;
+    /**
+     * Get the perpendicular of this vector which is located at a.
+     *
+     * @param {Number} t The position on the vector.
+     * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
+     **/
+    Vector.prototype.perp = function () {
+        var v = this.clone();
+        v.sub(this.a);
+        v = new Vector(new Vertex_1.Vertex(), new Vertex_1.Vertex(-v.b.y, v.b.x));
+        v.a.add(this.a);
+        v.b.add(this.a);
+        return v;
+    };
+    ;
+    /**
+     * The inverse of a vector is a vector witht the same magnitude but oppose direction.
+     *
+     * Please not that the origin of this vector changes here: a->b becomes b->a.
+     *
+     * @return {Vector}
+     **/
+    Vector.prototype.inverse = function () {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
+    };
+    ;
+    /**
+     * This function computes the inverse of the vector, which means 'a' stays untouched.
+     *
+     * @return {Vector} this for chaining.
+     **/
+    Vector.prototype.inv = function () {
+        this.b.x = this.a.x - (this.b.x - this.a.x);
+        this.b.y = this.a.y - (this.b.y - this.a.y);
+        return this;
+    };
+    ;
+    /**
+     * Get the intersection if this vector and the specified vector.
+     *
+     * @method intersection
+     * @param {Vector} line The second vector.
+     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @instance
+     * @memberof Line
+     **/
+    Vector.prototype.intersection = function (line) {
+        var denominator = this.denominator(line);
+        if (denominator == 0)
+            return null;
+        var a = this.a.y - line.a.y;
+        var b = this.a.x - line.a.x;
+        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
+        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+        a = numerator1 / denominator; // NaN if parallel lines
+        b = numerator2 / denominator;
+        // TODO:
+        // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
+        // if we cast these lines infinitely in both directions, they intersect here:
+        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
+    };
+    ;
+    /**
+     * Create an SVG representation of this line.
+     *
+     * @method toSVGString
+     * @override
+     * @param {object=} options - A set of options, like 'className'.
+     * @return {string} The SVG string representation.
+     * @instance
+     * @memberof Vector
+     **/
+    Vector.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        var vertices = Vector.utils.buildArrowHead(this.a, this.b, 8, 1.0, 1.0);
+        buffer.push('<g');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push('>');
+        buffer.push('   <line');
+        buffer.push(' x1="' + this.a.x + '"');
+        buffer.push(' y1="' + this.a.y + '"');
+        buffer.push(' x2="' + vertices[0].x + '"');
+        buffer.push(' y2="' + vertices[0].y + '"');
+        buffer.push(' />');
+        // Add arrow head
+        buffer.push('   <polygon points="');
+        for (var i = 0; i < vertices.length; i++) {
+            if (i > 0)
+                buffer.push(' ');
+            buffer.push('' + vertices[i].x + ',' + vertices[i].y);
+        }
+        buffer.push('"/>');
+        buffer.push('</g>');
+        return buffer.join('');
+    };
+    ;
+    Vector.utils = {
+        /**
+         * Generate a four-point arrow head, starting at the vector end minus the
+         * arrow head length.
+         *
+         * The first vertex in the returned array is guaranteed to be the located
+         * at the vector line end minus the arrow head length.
+         *
+         *
+         * Due to performance all params are required.
+         *
+         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+         * scaling different). Arrow heads should not look distored on non-uniform scaling.
+         *
+         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+         * For headlen use 8, it's a good arrow head size.
+         *
+         * Example:
+         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+         *
+         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
+         * @param {Vertex} zB - The end vertex of the vector.
+         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+         * @param {number} scaleX  - The horizontal scaling during draw.
+         * @param {number} scaleY  - the vertical scaling during draw.
+         **/
+        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
+            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+            var vertices = [];
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX, zB.y * scaleY));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+            return vertices;
+        }
+    };
+    return Vector;
+}(VertTuple_1.VertTuple));
+exports.Vector = Vector;
+//# sourceMappingURL=Vector.js.map
+
+/***/ }),
+
+/***/ "./src/js/VertTuple.js":
+/*!*****************************!*\
+  !*** ./src/js/VertTuple.js ***!
+  \*****************************/
+/*! flagged exports */
+/*! export VertTuple [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requires Vertex
+ *
+ * @author Ikaros Kappler
+ * @date   2020-03-24
+ * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
+ * @modofied 2020-05-12 The angle(line) param was still not optional. Changed that.
+ * @version 1.0.1
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var VertTuple = /** @class */ (function () {
+    /**
+     * Creates an instance.
+     *
+     * @constructor
+     * @name VertTuple
+     * @param {Vertex} a The tuple's first point.
+     * @param {Vertex} b The tuple's second point.
+     **/
+    function VertTuple(a, b, factory) {
+        this.a = a;
+        this.b = b;
+        this.factory = factory;
+    }
+    /**
+     * Get the length of this line.
+     *
+     * @method length
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.length = function () {
+        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
+    };
+    ;
+    /**
+     * Set the length of this vector to the given amount. This only works if this
+     * vector is not a null vector.
+     *
+     * @method setLength
+     * @param {number} length - The desired length.
+     * @memberof VertTuple
+     * @return {T} this (for chaining)
+     **/
+    VertTuple.prototype.setLength = function (length) {
+        return this.scale(length / this.length());
+    };
+    ;
+    /**
+     * Substract the given vertex from this line's end points.
+     *
+     * @method sub
+     * @param {Vertex} amount The amount (x,y) to substract.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.sub = function (amount) {
+        this.a.sub(amount);
+        this.b.sub(amount);
+        return this;
+    };
+    ;
+    /**
+     * Add the given vertex to this line's end points.
+     *
+     * @method add
+     * @param {Vertex} amount The amount (x,y) to add.
+     * @return {Line} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.add = function (amount) {
+        this.a.add(amount);
+        this.b.add(amount);
+        return this;
+    };
+    ;
+    /**
+     * Normalize this line (set to length 1).
+     *
+     * @method normalize
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.normalize = function () {
+        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
+        return this;
+    };
+    ;
+    /**
+     * Scale this line by the given factor.
+     *
+     * @method scale
+     * @param {number} factor The factor for scaling (1.0 means no scale).
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.scale = function (factor) {
+        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
+        return this;
+    };
+    ;
+    /**
+     * Move this line to a new location.
+     *
+     * @method moveTo
+     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.moveTo = function (newA) {
+        var diff = this.a.difference(newA);
+        this.a.add(diff);
+        this.b.add(diff);
+        return this;
+    };
+    ;
+    /**
+     * Get the angle between this and the passed line (in radians).
+     *
+     * @method angle
+     * @param {VertTuple} line - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
+     * @return {number} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.angle = function (line) {
+        if (line == null || typeof line == 'undefined') {
+            line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0));
+        }
+        // Compute the angle from x axis and the return the difference :)
+        var v0 = this.b.clone().sub(this.a);
+        var v1 = line.b.clone().sub(line.a);
+        // Thank you, Javascript, for this second atan function. No additional math is needed here!
+        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
+        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
+    };
+    ;
+    /**
+     * Get line point at position t in [0 ... 1]:<br>
+     * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
+     * <br>
+     * The counterpart of this function is Line.getClosestT(Vertex).
+     *
+     * @method vertAt
+     * @param {number} t The position scalar.
+     * @return {Vertex} The vertex a position t.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.vertAt = function (t) {
+        return new Vertex_1.Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
+    };
+    ;
+    /**
+     * Get the denominator of this and the given line.
+     *
+     * If the denominator is zero (or close to zero) both line are co-linear.
+     *
+     * @method denominator
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
+     * @return {Number}
+     **/
+    VertTuple.prototype.denominator = function (line) {
+        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
+        return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
+    };
+    ;
+    /**
+     * Checks if this and the given line are co-linear.
+     *
+     * The constant Vertex.EPSILON is used for tolerance.
+     *
+     * @method colinear
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
+     * @return true if both lines are co-linear.
+     */
+    VertTuple.prototype.colinear = function (line) {
+        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
+    };
+    ;
+    /**
+     * Get the closest position T from this line to the specified point.
+     *
+     * The counterpart for this function is Line.vertAt(Number).
+     *
+     * @method getClosestT
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {number} The line position t of minimal distance to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.getClosestT = function (p) {
+        var l2 = VertTuple.vtutils.dist2(this.a, this.b);
+        if (l2 === 0)
+            return 0;
+        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
+        // Wrap to [0,1]?
+        // t = Math.max(0, Math.min(1, t));
+        return t;
+    };
+    ;
+    /**
+     * Get the closest point on this line to the specified point.
+     *
+     * @method getClosestPoint
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {Vertex} The point on the line that is closest to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.getClosestPoint = function (p) {
+        var t = this.getClosestT(p);
+        return this.vertAt(t);
+    };
+    ;
+    /**
+     * The the minimal distance between this line and the specified point.
+     *
+     * @method pointDistance
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {number} The absolute minimal distance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.pointDistance = function (p) {
+        // Taken From:
+        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+        //function dist2(v, w) {
+        //    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
+        //}
+        return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
+    };
+    ;
+    /**
+     * Create a deep clone of this instance.
+     *
+     * @method cloneLine
+     * @return {T} A type safe clone if this instance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.clone = function () {
+        return this.factory(this.a.clone(), this.b.clone());
+    };
+    ;
+    /**
+     * Create a string representation of this line.
+     *
+     * @method totring
+     * @return {string} The string representing this line.
+     * @instance
+     * @memberof VertTuple
+     **/
+    VertTuple.prototype.toString = function () {
+        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
+    };
+    ;
+    /**
+     * @private
+     **/
+    VertTuple.vtutils = {
+        dist2: function (v, w) {
+            return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+        }
+    };
+    return VertTuple;
+}());
+exports.VertTuple = VertTuple;
+//# sourceMappingURL=VertTuple.js.map
+
+/***/ }),
+
+/***/ "./src/js/Vertex.js":
+/*!**************************!*\
+  !*** ./src/js/Vertex.js ***!
+  \**************************/
+/*! flagged exports */
+/*! export Vertex [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+/**
+ * @classdesc A vertex is a pair of two numbers.<br>
+ * <br>
+ * It is used to identify a 2-dimensional point on the x-y-plane.
+ *
+ * @requires VertexAttr
+ *
+ * @author   Ikaros Kappler
+ * @date     2012-10-17
+ * @modified 2018-04-03 Refactored the code of october 2012 into a new class.
+ * @modified 2018-04-28 Added some documentation.
+ * @modified 2018-08-16 Added the set() function.
+ * @modified 2018-08-26 Added VertexAttr.
+ * @modified 2018-10-31 Extended the constructor by object{x,y}.
+ * @modified 2018-11-19 Extended the set(number,number) function to set(Vertex).
+ * @modified 2018-11-28 Added 'this' to the VertexAttr constructor.
+ * @modified 2018-12-05 Added the sub(...) function. Changed the signature of the add() function! add(Vertex) and add(number,number) are now possible.
+ * @modified 2018-12-21 (It's winter solstice) Added the inv()-function.
+ * @modified 2019-01-30 Added the setX(Number) and setY(Number) functions.
+ * @modified 2019-02-19 Added the difference(Vertex) function.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-04-24 Added the randomVertex(ViewPort) function.
+ * @modified 2019-11-07 Added toSVGString(object) function.
+ * @modified 2019-11-18 Added the rotate(number,Vertex) function.
+ * @modified 2019-11-21 Fixed a bug in the rotate(...) function (elements were moved).
+ * @modified 2020-03-06 Added functions invX() and invY().
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @modified 2020-05-26 Added functions addX(number) and addY(number).
+ * @modifeid 2020-10-30 Change the warnings in `sub(...)` and `add(...)` into real errors.
+ * @version  2.4.1
+ *
+ * @file Vertex
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "./src/js/VertexAttr.js");
+var VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "./src/js/VertexListeners.js");
+var Vertex = /** @class */ (function () {
+    /**
+     * The constructor for the vertex class.
+     *
+     * @constructor
+     * @name Vertex
+     * @param {number} x - The x-coordinate of the new vertex.
+     * @param {number} y - The y-coordinate of the new vertex.
+     **/
+    function Vertex(x, y) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Vertex";
+        if (typeof x == 'undefined') {
+            this.x = 0;
+            this.y = 0;
+        }
+        else if (typeof x == 'number' && typeof y == 'number') {
+            this.x = x;
+            this.y = y;
+        }
+        else {
+            var tuple = x;
+            if (typeof tuple.x == "number" && typeof tuple.y == "number") {
+                this.x = tuple.x;
+                this.y = tuple.y;
+            }
+            else {
+                if (typeof x == 'number')
+                    this.x = x;
+                else if (typeof x == 'undefined')
+                    this.x = 0;
+                else
+                    this.x = NaN;
+                if (typeof y == 'number')
+                    this.y = y;
+                else if (typeof y == 'undefined')
+                    this.y = 0;
+                else
+                    this.y = NaN;
+            }
+        }
+        this.attr = new VertexAttr_1.VertexAttr();
+        this.listeners = new VertexListeners_1.VertexListeners(this);
+    }
+    ;
+    /**
+     * Set the x- and y- component of this vertex.
+     *
+     * @method set
+     * @param {number} x - The new x-component.
+     * @param {number} y - The new y-component.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.set = function (x, y) {
+        if (typeof x == 'number' && typeof y == 'number') {
+            this.x = x;
+            this.y = y;
+        }
+        else {
+            var tuple = x;
+            if (typeof tuple.x == "number" && typeof tuple.y == "number") {
+                this.x = tuple.x;
+                this.y = tuple.y;
+            }
+            else {
+                if (typeof x == 'number')
+                    this.x = x;
+                else if (typeof x == 'undefined')
+                    this.x = 0;
+                else
+                    this.x = NaN;
+                if (typeof y == 'number')
+                    this.y = y;
+                else if (typeof y == 'undefined')
+                    this.y = 0;
+                else
+                    this.y = NaN;
+            }
+        }
+        return this;
+    };
+    ;
+    /**
+     * Set the x-component of this vertex.
+     *
+     * @method setX
+     * @param {number} x - The new x-component.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.setX = function (x) {
+        this.x = x;
+        return this;
+    };
+    ;
+    /**
+     * Set the y-component of this vertex.
+     *
+     * @method setY
+     * @param {number} y - The new y-component.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.setY = function (y) {
+        this.y = y;
+        return this;
+    };
+    ;
+    /**
+     * Set the x-component if this vertex to the inverse of its value.
+     *
+     * @method invX
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.invX = function () {
+        this.x = -this.x;
+        return this;
+    };
+    ;
+    /**
+     * Set the y-component if this vertex to the inverse of its value.
+     *
+     * @method invy
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.invY = function () {
+        this.y = -this.y;
+        return this;
+    };
+    ;
+    /**
+     * Add the passed amount to x- and y- component of this vertex.<br>
+     * <br>
+     * This function works with add( {number}, {number} ) and
+     * add( {Vertex} ), as well.
+     *
+     * @method add
+     * @param {(number|Vertex)} x - The amount to add to x (or a vertex itself).
+     * @param {number=} y - The amount to add to y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.add = function (x, y) {
+        if (typeof x == 'number' && typeof y == 'number') {
+            this.x += x;
+            this.y += y;
+        }
+        else {
+            var tuple = x;
+            if (typeof tuple.x == "number" && typeof tuple.y == "number") {
+                this.x += tuple.x;
+                this.y += tuple.y;
+            }
+            else {
+                if (typeof x == 'number')
+                    this.x += x;
+                else
+                    throw "Cannot add " + typeof x + " to numeric x component!";
+                if (typeof y == 'number')
+                    this.y += y;
+                else
+                    throw "Cannot add " + typeof y + " to numeric y component!";
+            }
+        }
+        return this;
+    };
+    ;
+    /**
+     * Add the passed amounts to the x- and y- components of this vertex.
+     *
+     * @method addXY
+     * @param {number} x - The amount to add to x.
+     * @param {number} y - The amount to add to y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.addXY = function (amountX, amountY) {
+        this.x += amountX;
+        this.y += amountY;
+        return this;
+    };
+    ;
+    /**
+     * Add the passed amounts to the x-component of this vertex.
+     *
+     * @method addX
+     * @param {number} x - The amount to add to x.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.addX = function (amountX) {
+        this.x += amountX;
+        return this;
+    };
+    ;
+    /**
+     * Add the passed amounts to the y-component of this vertex.
+     *
+     * @method addY
+     * @param {number} y - The amount to add to y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.addY = function (amountY) {
+        this.y += amountY;
+        return this;
+    };
+    ;
+    /**
+     * Substract the passed amount from x- and y- component of this vertex.<br>
+     * <br>
+     * This function works with sub( {number}, {number} ) and
+     * sub( {Vertex} ), as well.
+     *
+     * @method sub
+     * @param {(number|Vertex)} x - The amount to substract from x (or a vertex itself).
+     * @param {number=} y - The amount to substract from y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.sub = function (x, y) {
+        if (typeof x == 'number' && typeof y == 'number') {
+            this.x -= x;
+            this.y -= y;
+        }
+        else {
+            var tuple = x;
+            if (typeof tuple.x == "number" && typeof tuple.y == "number") {
+                this.x -= tuple.x;
+                this.y -= tuple.y;
+            }
+            else {
+                if (typeof x == 'number')
+                    this.x -= x;
+                else
+                    throw "Cannot add " + typeof x + " to numeric x component!";
+                if (typeof y == 'number')
+                    this.y -= y;
+                else
+                    throw "Cannot add " + typeof y + " to numeric y component!";
+            }
+        }
+        return this;
+    };
+    ;
+    /**
+     * Check if this vertex equals the passed one.
+     * <br>
+     * This function uses an internal epsilon as tolerance.
+     *
+     * @method equals
+     * @param {Vertex} vertex - The vertex to compare this with.
+     * @return {boolean}
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.equals = function (vertex) {
+        var eqX = (Math.abs(this.x - vertex.x) < Vertex.EPSILON);
+        var eqY = (Math.abs(this.y - vertex.y) < Vertex.EPSILON);
+        var result = eqX && eqY;
+        return result;
+    };
+    ;
+    /**
+     * Create a copy of this vertex.
+     *
+     * @method clone
+     * @return {Vertex} A new vertex, an exact copy of this.
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.clone = function () {
+        return new Vertex(this.x, this.y);
+    };
+    ;
+    /**
+     * Get the distance to the passed point (in euclidean metric)
+     *
+     * @method distance
+     * @param {Vertex} vert - The vertex to measure the distance to.
+     * @return {number}
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.distance = function (vert) {
+        return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
+    };
+    ;
+    /**
+     * Get the difference to the passed point.<br>
+     * <br>
+     * The difference is (vert.x-this.x, vert.y-this.y).
+     *
+     * @method difference
+     * @param {Vertex} vert - The vertex to measure the x-y-difference to.
+     * @return {Vertex} A new vertex.
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.difference = function (vert) {
+        return new Vertex(vert.x - this.x, vert.y - this.y);
+    };
+    ;
+    /**
+     * This is a vector-like behavior and 'scales' this vertex
+     * towards/from a given center.
+     *
+     * @method scale
+     * @param {number} factor - The factor to 'scale' this vertex; 1.0 means no change.
+     * @param {Vertex=} center - The origin of scaling; default is (0,0).
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.scale = function (factor, center) {
+        if (!center || typeof center === "undefined")
+            center = new Vertex(0, 0);
+        this.x = center.x + (this.x - center.x) * factor;
+        this.y = center.y + (this.y - center.y) * factor;
+        return this;
+    };
+    ;
+    /**
+     * This is a vector-like behavior and 'rotates' this vertex
+     * around given center.
+     *
+     * @method rotate
+     * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
+     * @param {Vertex=} center - The center of rotation; default is (0,0).
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.rotate = function (angle, center) {
+        if (!center || typeof center === "undefined")
+            center = new Vertex(0, 0);
+        this.sub(center);
+        angle += Math.atan2(this.y, this.x);
+        var len = this.distance(Vertex.ZERO); // {x:0,y:0});
+        var lenX = this.x;
+        var lenY = this.y;
+        this.x = len * Math.cos(angle);
+        this.y = len * Math.sin(angle);
+        this.add(center);
+        return this;
+    };
+    ;
+    /**
+     * Multiply both components of this vertex with the given scalar.<br>
+     * <br>
+     * Note: as in<br>
+     *    https://threejs.org/docs/#api/math/Vector2.multiplyScalar
+     *
+     * @method multiplyScalar
+     * @param {number} scalar - The scale factor; 1.0 means no change.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.multiplyScalar = function (scalar) {
+        this.x *= scalar;
+        this.y *= scalar;
+        return this;
+    };
+    ;
+    /**
+     * Round the two components x and y of this vertex.
+     *
+     * @method round
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.round = function () {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        return this;
+    };
+    ;
+    /**
+     * Change this vertex (x,y) to its inverse (-x,-y).
+     *
+     * @method inv
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.inv = function () {
+        this.x = -this.x;
+        this.y = -this.y;
+        return this;
+    };
+    ;
+    /**
+     * Get a string representation of this vertex.
+     *
+     * @method toString
+     * @return {string} The string representation of this vertex.
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.toString = function () {
+        return '(' + this.x + ',' + this.y + ')';
+    };
+    ;
+    /**
+     * Convert this vertex to SVG code.
+     *
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        buffer.push('<circle');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        buffer.push(' cx="' + this.x + '"');
+        buffer.push(' cy="' + this.y + '"');
+        buffer.push(' r="2"');
+        buffer.push(' />');
+        return buffer.join('');
+    };
+    ;
+    // END Vertex
+    /**
+     * Create a new random vertex inside the given viewport.
+     *
+     * @param {ViewPort} viewPort - A {min:Vertex, max:Vertex} viewport specifying the bounds.
+     * @return A new vertex with a random position.
+     **/
+    Vertex.randomVertex = function (viewPort) {
+        return new Vertex(viewPort.min.x + Math.random() * (viewPort.max.x - viewPort.min.x), viewPort.min.y + Math.random() * (viewPort.max.y - viewPort.min.y));
+    };
+    ;
+    Vertex.ZERO = new Vertex(0, 0);
+    /**
+     * An epsilon for comparison
+     *
+     * @private
+     **/
+    Vertex.EPSILON = 1.0e-6;
+    Vertex.utils = {
+        /**
+         * Generate a four-point arrow head, starting at the vector end minus the
+         * arrow head length.
+         *
+         * The first vertex in the returned array is guaranteed to be the located
+         * at the vector line end minus the arrow head length.
+         *
+         *
+         * Due to performance all params are required.
+         *
+         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+         * scaling different). Arrow heads should not look distored on non-uniform scaling.
+         *
+         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+         * For headlen use 8, it's a good arrow head size.
+         *
+         * Example:
+         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+         *
+         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
+         * @param {Vertex} zB - The end vertex of the vector.
+         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+         * @param {number} scaleX  - The horizontal scaling during draw.
+         * @param {number} scaleY  - the vertical scaling during draw.
+         **/
+        // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
+        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
+            // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+            var vertices = [];
+            vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+            vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
+            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+            return vertices;
+        }
+    };
+    return Vertex;
+}());
+exports.Vertex = Vertex;
+//# sourceMappingURL=Vertex.js.map
+
+/***/ }),
+
+/***/ "./src/js/VertexAttr.js":
+/*!******************************!*\
+  !*** ./src/js/VertexAttr.js ***!
+  \******************************/
+/*! flagged exports */
+/*! export VertexAttr [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/**
+ * @classdesc The VertexAttr is a helper class to wrap together additional attributes
+ * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
+ * <br>
+ * This is some sort of 'userData' object, but the constructor uses a global model
+ * to obtain a (configurable) default attribute set to all instances.<br>
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-08-26
+ * @modified 2018-11-17 Added the 'isSelected' attribute.
+ * @modified 2018-11-27 Added the global model for instantiating with custom attributes.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2020-02-29 Added the 'selectable' attribute.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @version  1.1.1
+ *
+ * @file VertexAttr
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var VertexAttr = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * Attributes will be initialized as defined in the model object
+     * which serves as a singleton.
+     *
+     * @constructor
+     * @name VertexAttr
+     **/
+    function VertexAttr() {
+        this.draggable = true;
+        this.selectable = true;
+        this.isSelected = false;
+        this.visible = true;
+        for (var key in VertexAttr.model)
+            this[key] = VertexAttr.model[key];
+    }
+    ;
+    /**
+     * This is the global attribute model. Set these object on the initialization
+     * of your app to gain all VertexAttr instances have these attributes.
+     *
+     * @type {object}
+     **/
+    VertexAttr.model = {
+        draggable: true,
+        selectable: true,
+        isSelected: false,
+        visible: true
+    };
+    return VertexAttr;
+}());
+exports.VertexAttr = VertexAttr;
+//# sourceMappingURL=VertexAttr.js.map
+
+/***/ }),
+
+/***/ "./src/js/VertexListeners.js":
+/*!***********************************!*\
+  !*** ./src/js/VertexListeners.js ***!
+  \***********************************/
+/*! flagged exports */
+/*! export VertexListeners [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/**
+ * @classdesc An event listeners wrapper. This is just a set of three listener
+ *              queues (drag, dragStart, dragEnd) and their respective firing
+ *              functions.
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-08-27
+ * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @version  1.0.4
+ *
+ * @file VertexListeners
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var VertexListeners = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name VertexListeners
+     * @param {Vertex} vertex - The vertex to use these listeners on (just a backward reference).
+     **/
+    function VertexListeners(vertex) {
+        this.drag = [];
+        this.dragStart = [];
+        this.dragEnd = [];
+        this.vertex = vertex;
+    }
+    ;
+    /**
+     * Add a drag listener.
+     *
+     * @method addDragListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to add (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.addDragListener = function (listener) {
+        // this.drag.push( listener );
+        VertexListeners._addListener(this.drag, listener);
+        return this;
+    };
+    ;
+    /**
+     * The drag listener is a function with a single drag event param.
+     * @callback VertexListeners~dragListener
+     * @param {Event} e - The (extended) drag event.
+     */
+    /**
+     * Remove a drag listener.
+     *
+     * @method removeDragListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.removeDragListener = function (listener) {
+        // this.drag.push( listener );
+        this.drag = VertexListeners._removeListener(this.drag, listener);
+        return this;
+    };
+    ;
+    /**
+     * Add a dragStart listener.
+     *
+     * @method addDragListener
+     * @param {VertexListeners~dragStartListener} listener - The drag-start listener to add (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.addDragStartListener = function (listener) {
+        //this.dragStart.push( listener );
+        VertexListeners._addListener(this.dragStart, listener);
+        return this;
+    };
+    ;
+    /**
+     * The drag-start listener is a function with a single drag event param.
+     * @callback VertexListeners~dragStartListener
+     * @param {Event} e - The (extended) drag event.
+     */
+    /**
+     * Remove a dragStart listener.
+     *
+     * @method addDragStartListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.removeDragStartListener = function (listener) {
+        // this.drag.push( listener );
+        this.dragStart = VertexListeners._removeListener(this.dragStart, listener);
+        return this;
+    };
+    ;
+    /**
+     * Add a dragEnd listener.
+     *
+     * @method addDragListener
+     * @param {VertexListeners~dragEndListener} listener - The drag-end listener to add (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.addDragEndListener = function (listener) {
+        // this.dragEnd.push( listener );
+        VertexListeners._addListener(this.dragEnd, listener);
+        return this;
+    };
+    ;
+    /**
+     * The drag-end listener is a function with a single drag event param.
+     * @callback VertexListeners~dragEndListener
+     * @param {Event} e - The (extended) drag event.
+     */
+    /**
+     * Remove a dragEnd listener.
+     *
+     * @method addDragEndListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.removeDragEndListener = function (listener) {
+        // this.drag.push( listener );
+        this.dragEnd = VertexListeners._removeListener(this.dragEnd, listener);
+        return this;
+    };
+    ;
+    /**
+     * Fire a drag event with the given event instance to all
+     * installed drag listeners.
+     *
+     * @method fireDragEvent
+     * @param {VertEvent|XMouseEvent} e - The drag event itself to be fired to all installed drag listeners.
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.fireDragEvent = function (e) {
+        VertexListeners._fireEvent(this, this.drag, e);
+    };
+    ;
+    /**
+     * Fire a dragStart event with the given event instance to all
+     * installed drag-start listeners.
+     *
+     * @method fireDragStartEvent
+     * @param {VertEvent|XMouseEvent} e - The drag-start event itself to be fired to all installed dragStart listeners.
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.fireDragStartEvent = function (e) {
+        VertexListeners._fireEvent(this, this.dragStart, e);
+    };
+    ;
+    /**
+     * Fire a dragEnd event with the given event instance to all
+     * installed drag-end listeners.
+     *
+     * @method fireDragEndEvent
+     * @param {VertEvent|XMouseEvent} e - The drag-end event itself to be fired to all installed dragEnd listeners.
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.fireDragEndEvent = function (e) {
+        VertexListeners._fireEvent(this, this.dragEnd, e);
+    };
+    ;
+    /**
+     * @private
+     **/
+    VertexListeners._fireEvent = function (_self, listeners, e) {
+        var ve = e;
+        if (typeof ve.params == 'undefined')
+            ve.params = { vertex: _self.vertex };
+        else
+            ve.params.vertex = _self.vertex;
+        for (var i in listeners) {
+            listeners[i](ve);
+        }
+    };
+    ;
+    /**
+     * @private
+     */
+    VertexListeners._addListener = function (listeners, newListener) {
+        for (var i in listeners) {
+            if (listeners[i] == newListener)
+                return false;
+        }
+        listeners.push(newListener);
+        return true;
+    };
+    ;
+    /**
+     * @private
+     */
+    VertexListeners._removeListener = function (listeners, oldListener) {
+        for (var i = 0; i < listeners.length; i++) {
+            if (listeners[i] == oldListener)
+                return listeners.splice(i, 1);
+        }
+        return listeners;
+    };
+    ;
+    return VertexListeners;
+}());
+exports.VertexListeners = VertexListeners;
+//# sourceMappingURL=VertexListeners.js.map
+
+/***/ }),
+
+/***/ "./src/js/draw.js":
+/*!************************!*\
+  !*** ./src/js/draw.js ***!
+  \************************/
+/*! flagged exports */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export drawutils [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+/**
+ * A wrapper class for basic drawing operations.
+ *
+ * @require Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2018-04-22
+ * @modified 2018-08-16 Added the curve() function to draw cubic bézier curves.
+ * @modified 2018-10-23 Recognizing the offset param in the circle() function.
+ * @modified 2018-11-27 Added the diamondHandle() function.
+ * @modified 2018-11-28 Added the grid() function and the ellipse() function.
+ * @modified 2018-11-30 Renamed the text() function to label() as it is not scaling.
+ * @modified 2018-12-06 Added a test function for drawing arc in SVG style.
+ * @modified 2018-12-09 Added the dot(Vertex,color) function (copied from Feigenbaum-plot-script).
+ * @modified 2019-01-30 Added the arrow(Vertex,Vertex,color) function for drawing arrow heads.
+ * @modified 2019-01-30 Added the image(Image,Vertex,Vertex) function for drawing images.
+ * @modified 2019-04-27 Fixed a severe drawing bug in the arrow(...) function. Scaling arrows did not work properly.
+ * @modified 2019-04-28 Added Math.round to the dot() drawing parameters to really draw a singlt dot.
+ * @modified 2019-06-07 Fixed an issue in the cubicBezier() function. Paths were always closed.
+ * @modified 2019-10-03 Added the beginDrawCycle hook.
+ * @modified 2019-10-25 Polygons are no longer drawn with dashed lines (solid lines instead).
+ * @modified 2019-11-18 Added the polyline function.
+ * @modified 2019-11-22 Added a second workaround for th drawImage bug in Safari.
+ * @modified 2019-12-07 Added the 'lineWidth' param to the line(...) function.
+ * @modified 2019-12-07 Added the 'lineWidth' param to the cubicBezier(...) function.
+ * @modified 2019-12-11 Added the 'color' param to the label(...) function.
+ * @modified 2019-12-18 Added the quadraticBezier(...) function (for the sake of approximating Lissajous curves).
+ * @modified 2019-12-20 Added the 'lineWidth' param to the polyline(...) function.
+ * @modified 2020-01-09 Added the 'lineWidth' param to the ellipse(...) function.
+ * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
+ * @modified 2020-05-05 Added the 'lineWidth' param to the circle(...) function.
+ * @modified 2020-05-12 Drawing any handles (square, circle, diamond) with lineWidth 1 now; this was not reset before.
+ * @modified 2020-06-22 Added a context.clearRect() call to the clear() function; clearing with alpha channel did not work as expected.
+ * @modified 2020-09-07 Added the circleArc(...) function to draw sections of circles.
+ * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
+ * @modified 2020-10-15 Re-added the text() function.
+ * @modified 2020-10-28 Added the path(Path2D) function.
+ * @version  1.8.0
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "./src/js/CubicBezierCurve.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+// Todo: rename this class to Drawutils
+var drawutils = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name drawutils
+     * @param {anvasRenderingContext2D} context - The drawing context.
+     * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
+     **/
+    function drawutils(context, fillShapes) {
+        this.ctx = context;
+        this.offset = new Vertex_1.Vertex(0, 0);
+        this.scale = new Vertex_1.Vertex(1, 1);
+        this.fillShapes = fillShapes;
+    }
+    ;
+    /**
+     * Called before each draw cycle.
+     **/
+    drawutils.prototype.beginDrawCycle = function () {
+        // NOOP
+    };
+    ;
+    /**
+     * Draw the line between the given two points with the specified (CSS-) color.
+     *
+     * @method line
+     * @param {Vertex} zA - The start point of the line.
+     * @param {Vertex} zB - The end point of the line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number|string} lineWidth? - [optional] The line's width.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    drawutils.prototype.line = function (zA, zB, color, lineWidth) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = lineWidth || 1;
+        this.ctx.stroke();
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method arrow
+     * @param {Vertex} zA - The start point of the arrow-line.
+     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    drawutils.prototype.arrow = function (zA, zB, color) {
+        var headlen = 8; // length of head in pixels
+        // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+        // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+        this.ctx.save();
+        this.ctx.beginPath();
+        var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
+        this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        for (var i = 0; i < vertices.length; i++) {
+            this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
+        }
+        this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method image
+     * @param {Image} image - The image object to draw.
+     * @param {Vertex} position - The position to draw the the upper left corner at.
+     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    drawutils.prototype.image = function (image, position, size) {
+        this.ctx.save();
+        // Note that there is a Safari bug with the 3 or 5 params variant.
+        // Only the 9-param varaint works.
+        this.ctx.drawImage(image, 0, 0, image.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        image.naturalHeight - 1, // To avoid errors substract 1 here.
+        this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw a rectangle.
+     *
+     * @param {Vertex} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    drawutils.prototype.rect = function (position, width, height, color, lineWidth) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
+        this.ctx.lineTo(this.offset.x + position.x * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
+        // this.ctx.lineTo( this.offset.x+position.x*this.scale.x, this.offset.y+position.y*this.scale.y );
+        this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    };
+    ;
+    // +---------------------------------------------------------------------------------
+    // | This is the final helper function for drawing and filling stuff. It is not
+    // | intended to be used from the outside.
+    // |
+    // | When in draw mode it draws the current shape.
+    // | When in fill mode it fills the current shape.
+    // |
+    // | This function is usually only called internally.
+    // |
+    // | @param color A stroke/fill color to use.
+    // +-------------------------------
+    // TODO: convert this to a STATIC function.
+    drawutils.prototype._fillOrDraw = function (color) {
+        if (this.fillShapes) {
+            this.ctx.fillStyle = color;
+            this.ctx.fill();
+        }
+        else {
+            this.ctx.strokeStyle = color;
+            this.ctx.stroke();
+        }
+    };
+    ;
+    /**
+     * Draw the given (cubic) bézier curve.
+     *
+     * @method cubicBezier
+     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
+     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
+     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number|string} lineWidth - (optional) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
+        if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
+            this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
+            return;
+        }
+        // Draw curve
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
+        this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
+        //this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 2;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw the given (quadratic) bézier curve.
+     *
+     * @method quadraticBezier
+     * @param {Vertex} startPoint   - The start point of the cubic Bézier curve
+     * @param {Vertex} controlPoint - The control point the cubic Bézier curve.
+     * @param {Vertex} endPoint     - The end control point the cubic Bézier curve.
+     * @param {string} color        - The CSS color to draw the curve with.
+     * @param {number|string} lineWidth - (optional) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.quadraticBezier = function (startPoint, controlPoint, endPoint, color, lineWidth) {
+        // Draw curve
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
+        this.ctx.quadraticCurveTo(this.offset.x + controlPoint.x * this.scale.x, this.offset.y + controlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
+        this.ctx.lineWidth = lineWidth || 2;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw the given (cubic) Bézier path.
+     *
+     * The given path must be an array with n*3+1 vertices, where n is the number of
+     * curves in the path:
+     * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
+     *
+     * @method cubicBezierPath
+     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {string} color - The CSS colot to draw the path with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.cubicBezierPath = function (path, color) {
+        if (!path || path.length == 0)
+            return;
+        // Draw curve
+        this.ctx.save();
+        this.ctx.beginPath();
+        var curve, startPoint, endPoint, startControlPoint, endControlPoint;
+        this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
+        for (var i = 1; i < path.length; i += 3) {
+            startControlPoint = path[i];
+            endControlPoint = path[i + 1];
+            endPoint = path[i + 2];
+            this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
+        }
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw the given handle and handle point (used to draw interactive Bézier curves).
+     *
+     * The colors for this are fixed and cannot be specified.
+     *
+     * @method handle
+     * @param {Vertex} startPoint - The start of the handle.
+     * @param {Vertex} endPoint - The end point of the handle.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.handle = function (startPoint, endPoint) {
+        // Draw handles
+        // (No need to save and restore here)
+        this.point(startPoint, 'rgb(0,32,192)');
+        this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
+    };
+    ;
+    /**
+     * Draw the given handle cubic Bézier curve handle lines.
+     *
+     * The colors for this are fixed and cannot be specified.
+     *
+     * @method cubicBezierCurveHandleLines
+     * @param {CubicBezierCurve} curve - The curve.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    /* cubicBezierCurveHandleLines( curve:CubicBezierCurve ) {
+    // Draw handle lines
+    this.cubicBezierHandleLines( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
+    // this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
+    // this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
+    }; */
+    /**
+     * Draw a handle line (with a light grey).
+     *
+     * @method handleLine
+     * @param {Vertex} startPoint - The start point to draw the handle at.
+     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.handleLine = function (startPoint, endPoint) {
+        // Draw handle lines
+        this.line(startPoint, endPoint, 'rgb(192,192,192)');
+    };
+    ;
+    /**
+     * Draw a 1x1 dot with the specified (CSS-) color.
+     *
+     * @method dot
+     * @param {Vertex} p - The position to draw the dot at.
+     * @param {string} color - The CSS color to draw the dot with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.dot = function (p, color) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
+        this.ctx.lineTo(Math.round(this.offset.x + this.scale.x * p.x + 1), Math.round(this.offset.y + this.scale.y * p.y + 1));
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw the given point with the specified (CSS-) color and radius 3.
+     *
+     * @method point
+     * @param {Vertex} p - The position to draw the point at.
+     * @param {string} color - The CSS color to draw the point with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.point = function (p, color) {
+        var radius = 3;
+        this.ctx.beginPath();
+        this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
+     * Draw a circle with the specified (CSS-) color and radius.<br>
+     * <br>
+     * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
+     *
+     * @method circle
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @param {number} lineWidth - The line width (optional, default=1).
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.circle = function (center, radius, color, lineWidth) {
+        this.ctx.beginPath();
+        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
+        this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
+        this.ctx.beginPath();
+        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
+        // this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
+     * Draw an ellipse with the specified (CSS-) color and thw two radii.
+     *
+     * @method ellipse
+     * @param {Vertex} center - The center of the ellipse.
+     * @param {number} radiusX - The radius of the ellipse.
+     * @param {number} radiusY - The radius of the ellipse.
+     * @param {string} color - The CSS color to draw the ellipse with.
+     * @param {number} lineWidth=1 - An optional line width param (default is 1).
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
+        this.ctx.beginPath();
+        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, 0.0, 0.0, Math.PI * 2);
+        this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
+     * Draw square at the given center, size and with the specified (CSS-) color.<br>
+     * <br>
+     * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
+     *
+     * @method square
+     * @param {Vertex} center - The center of the square.
+     * @param {Vertex} size - The size of the square.
+     * @param {string} color - The CSS color to draw the square with.
+     * @param {number} lineWidth - The line with to use (optional, default is 1).
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.square = function (center, size, color, lineWidth) {
+        this.ctx.beginPath();
+        this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
+        this.ctx.closePath();
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
+     * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
+     *
+     * @method grid
+     * @param {Vertex} center - The center of the grid.
+     * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
+     * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
+     * @param {number} sizeX - The horizontal grid size.
+     * @param {number} sizeY - The vertical grid size.
+     * @param {string} color - The CSS color to draw the grid with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
+        this.ctx.beginPath();
+        var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
+        var yMax = height / 2;
+        for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
+            this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + yMin) * this.scale.y);
+            this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + yMax) * this.scale.y);
+        }
+        var xMin = -Math.ceil((width * 0.5) / sizeX) * sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
+        var xMax = width / 2; // height/2;
+        for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
+            this.ctx.moveTo(this.offset.x + (center.x + xMin) * this.scale.x - 4, this.offset.y + (center.y + y) * this.scale.y);
+            this.ctx.lineTo(this.offset.x + (center.x + xMax) * this.scale.x + 4, this.offset.y + (center.y + y) * this.scale.y);
+        }
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 1.0;
+        this.ctx.stroke();
+        this.ctx.closePath();
+    };
+    ;
+    /**
+     * Draw a raster of crosshairs in the given grid.<br>
+     *
+     * This works analogue to the grid() function
+     *
+     * @method raster
+     * @param {Vertex} center - The center of the raster.
+     * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
+     * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
+     * @param {number} sizeX - The horizontal raster size.
+     * @param {number} sizeY - The vertical raster size.
+     * @param {string} color - The CSS color to draw the raster with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        var cx = 0, cy = 0;
+        for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
+            cx++;
+            for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
+                if (cx == 1)
+                    cy++;
+                // Draw a crosshair
+                this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x - 4, this.offset.y + (center.y + y) * this.scale.y);
+                this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x + 4, this.offset.y + (center.y + y) * this.scale.y);
+                this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + y) * this.scale.y - 4);
+                this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x, this.offset.y + (center.y + y) * this.scale.y + 4);
+            }
+        }
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 1.0;
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw a diamond handle (square rotated by 45°) with the given CSS color.
+     *
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped diamonds.
+     *
+     * @method diamondHandle
+     * @param {Vertex} center - The center of the diamond.
+     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {string} color - The CSS color to draw the diamond with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.diamondHandle = function (center, size, color) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - size / 2.0);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x + size / 2.0, this.offset.y + center.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y + size / 2.0);
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
+     * Draw a square handle with the given CSS color.<br>
+     * <br>
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped squares.
+     *
+     * @method squareHandle
+     * @param {Vertex} center - The center of the square.
+     * @param {Vertex} size - The x/y-size of the square.
+     * @param {string} color - The CSS color to draw the square with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.squareHandle = function (center, size, color) {
+        this.ctx.beginPath();
+        this.ctx.rect(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y - size / 2.0, size, size);
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
+     * Draw a circle handle with the given CSS color.<br>
+     * <br>
+     * It is an inherent feature of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped circles.
+     *
+     * @method circleHandle
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.circleHandle = function (center, radius, color) {
+        radius = radius || 3;
+        this.ctx.beginPath();
+        this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw(color);
+    };
+    ;
+    /**
+     * Draw a crosshair with given radius and color at the given position.<br>
+     * <br>
+     * Note that the crosshair radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.crosshair = function (center, radius, color) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y);
+        this.ctx.moveTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - radius);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y + radius);
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 0.5;
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw a polygon.
+     *
+     * @method polygon
+     * @param {Polygon}  polygon - The polygon to draw.
+     * @param {string}   color - The CSS color to draw the polygon with.
+     * @param {string}   lineWidth - The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.polygon = function (polygon, color, lineWidth) {
+        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    };
+    ;
+    /**
+     * Draw a polygon line (alternative function to the polygon).
+     *
+     * @method polyline
+     * @param {Vertex[]} vertices   - The polygon vertices to draw.
+     * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
+     * @param {string}   color      - The CSS color to draw the polygon with.
+     * @param {number}   lineWidth  - The line width (default is 1.0);
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
+        if (vertices.length <= 1)
+            return;
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.lineWidth = lineWidth || 1.0;
+        this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
+        for (var i = 0; i < vertices.length; i++) {
+            this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
+        }
+        if (!isOpen && vertices.length > 2)
+            this.ctx.closePath();
+        this._fillOrDraw(color);
+        this.ctx.setLineDash([]);
+        this.ctx.restore();
+    };
+    ;
+    drawutils.prototype.text = function (text, x, y, options) {
+        options = options || {};
+        this.ctx.save();
+        x = this.offset.x + x * this.scale.x;
+        y = this.offset.y + y * this.scale.y;
+        var color = options.color || 'black';
+        if (this.fillShapes) {
+            this.ctx.fillStyle = color;
+            this.ctx.fillText(text, x, y);
+        }
+        else {
+            this.ctx.strokeStyle = color;
+            this.ctx.strokeText(text, x, y);
+        }
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Draw a non-scaling text label at the given position.
+     *
+     * Note that these are absolute label positions, they are not affected by offset or scale.
+     *
+     * @method label
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {number=} rotation - The (optional) rotation in radians (default=0).
+     * @param {string=} color - The color to render the text with (default=black).
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.label = function (text, x, y, rotation, color) {
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        if (typeof rotation != 'undefined')
+            this.ctx.rotate(rotation);
+        this.ctx.fillStyle = color || 'black';
+        if (this.fillShapes) {
+            this.ctx.fillText(text, 0, 0);
+        }
+        else {
+            this.ctx.strokeText(text, 0, 0);
+        }
+        this.ctx.restore();
+    };
+    ;
+    /**
+     * Due to gl compatibility there is a generic 'clear' function required
+     * to avoid accessing the context object itself directly.
+     *
+     * This function just fills the whole canvas with a single color.
+     *
+     * @param {string} color - The color to clear with.
+     **/
+    drawutils.prototype.clear = function (color) {
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    };
+    ;
+    return drawutils;
+}());
+exports.drawutils = drawutils;
+//# sourceMappingURL=draw.js.map
+
+/***/ }),
+
+/***/ "./src/js/drawgl.js":
+/*!**************************!*\
+  !*** ./src/js/drawgl.js ***!
+  \**************************/
+/*! flagged exports */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export drawutilsgl [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+/**
+ * A wrapper class for basic drawing operations. This is the WebGL
+ * implementation whih sould work with shaders.
+ *
+ * @require Vertex
+ *
+ * @author   Ikaros Kappler
+ * @date     2019-09-18
+ * @modified 2019-10-03 Added the beginDrawCycle hook.
+ * @modified 2020-03-25 Ported stub to Typescript.
+ * @modified 2020-10-15 Re-added the text() function.
+ * @version  0.0.4
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var drawutilsgl = /** @class */ (function () {
+    /**
+     * The constructor.
+     *
+     * @constructor
+     * @name drawutils
+     * @param {WebGLRenderingContext} context - The drawing context.
+     * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
+     **/
+    function drawutilsgl(context, fillShapes) {
+        this.gl = context;
+        this.offset = new Vertex_1.Vertex(0, 0);
+        this.scale = new Vertex_1.Vertex(1, 1);
+        this.fillShapes = fillShapes;
+        this._zindex = 0.0;
+        if (context == null || typeof context === 'undefined')
+            return;
+        this.glutils = new GLU(context);
+        // PROBLEM: CANNOT USE MULTIPLE SHADER PROGRAM INSTANCES ON THE SAME CONTEXT!
+        // SOLUTION: USE SHARED SHADER PROGRAM!!! ... somehow ...
+        // This needs to be considered in the overlying component; both draw-instances need to
+        // share their gl context.
+        // That's what the copyInstace(boolean) method is good for.
+        this._vertShader = this.glutils.compileShader(drawutilsgl.vertCode, this.gl.VERTEX_SHADER);
+        this._fragShader = this.glutils.compileShader(drawutilsgl.fragCode, this.gl.FRAGMENT_SHADER);
+        this._program = this.glutils.makeProgram(this._vertShader, this._fragShader);
+        // Create an empty buffer object
+        this.vertex_buffer = this.gl.createBuffer();
+        // Bind appropriate array buffer to it
+        // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
+        console.log('gl initialized');
+    }
+    ;
+    /**
+     * Called before each draw cycle.
+     **/
+    drawutilsgl.prototype.beginDrawCycle = function () {
+        this._zindex = 0.0;
+    };
+    ;
+    /**
+     * Creates a 'shallow' (non deep) copy of this instance. This implies
+     * that under the hood the same gl context and gl program will be used.
+     */
+    drawutilsgl.prototype.copyInstance = function (fillShapes) {
+        var copy = new drawutilsgl(null, fillShapes);
+        copy.gl = this.gl;
+        copy.glutils = this.glutils;
+        copy._vertShader = this._vertShader;
+        copy._fragShader = this._fragShader;
+        copy._program = this._program;
+        return copy;
+    };
+    ;
+    drawutilsgl.prototype._x2rel = function (x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; };
+    ;
+    drawutilsgl.prototype._y2rel = function (y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; };
+    ;
+    /**
+     * Draw the line between the given two points with the specified (CSS-) color.
+     *
+     * @method line
+     * @param {Vertex} zA - The start point of the line.
+     * @param {Vertex} zB - The end point of the line.
+     * @param {string} color - Any valid CSS color string.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    drawutilsgl.prototype.line = function (zA, zB, color) {
+        var vertices = new Float32Array(6);
+        vertices[0] = this._x2rel(zA.x);
+        vertices[1] = this._y2rel(zA.y);
+        vertices[2] = this._zindex;
+        vertices[3] = this._x2rel(zB.x);
+        vertices[4] = this._y2rel(zB.y);
+        vertices[5] = this._zindex;
+        this._zindex += 0.001;
+        // Create an empty buffer object
+        // const vertex_buffer = this.gl.createBuffer();
+        // Bind appropriate array buffer to it
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
+        // Pass the vertex data to the buffer
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+        // Bind vertex buffer object
+        // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
+        // Get the attribute location
+        var coord = this.gl.getAttribLocation(this._program, "position");
+        // Point an attribute to the currently bound VBO
+        this.gl.vertexAttribPointer(coord, 3, this.gl.FLOAT, false, 0, 0);
+        // Enable the attribute
+        this.gl.enableVertexAttribArray(coord);
+        // Unbind the buffer?
+        //this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+        // Set the view port
+        this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+        var uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
+        // let radians = currentAngle * Math.PI / 180.0;
+        var currentRotation = [0.0, 1.0];
+        //currentRotation[0] = Math.sin(radians);
+        //currentRotation[1] = Math.cos(radians);
+        this.gl.uniform2fv(uRotationVector, currentRotation);
+        this.gl.lineWidth(5);
+        // Draw the line
+        this.gl.drawArrays(this.gl.LINES, 0, vertices.length / 3);
+        // POINTS, LINE_STRIP, LINE_LOOP, LINES,
+        // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
+    };
+    ;
+    /**
+     * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method arrow
+     * @param {Vertex} zA - The start point of the arrow-line.
+     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    drawutilsgl.prototype.arrow = function (zA, zB, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method image
+     * @param {Image} image - The image object to draw.
+     * @param {Vertex} position - The position to draw the the upper left corner at.
+     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    drawutilsgl.prototype.image = function (image, position, size) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    // +---------------------------------------------------------------------------------
+    // | This is the final helper function for drawing and filling stuff. It is not
+    // | intended to be used from the outside.
+    // |
+    // | When in draw mode it draws the current shape.
+    // | When in fill mode it fills the current shape.
+    // |
+    // | This function is usually only called internally.
+    // |
+    // | @param color A stroke/fill color to use.
+    // +-------------------------------
+    drawutilsgl.prototype._fillOrDraw = function (color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw the given (cubic) bézier curve.
+     *
+     * @method cubicBezier
+     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
+     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
+     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw the given (cubic) Bézier path.
+     *
+     * The given path must be an array with n*3+1 vertices, where n is the number of
+     * curves in the path:
+     * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
+     *
+     * @method cubicBezierPath
+     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {string} color - The CSS colot to draw the path with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.cubicBezierPath = function (path, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw the given handle and handle point (used to draw interactive Bézier curves).
+     *
+     * The colors for this are fixed and cannot be specified.
+     *
+     * @method handle
+     * @param {Vertex} startPoint - The start of the handle.
+     * @param {Vertex} endPoint - The end point of the handle.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.handle = function (startPoint, endPoint) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw the given handle cubic Bézier curve handle lines.
+     *
+     * The colors for this are fixed and cannot be specified.
+     *
+     * @method cubicBezierCurveHandleLines
+     * @param {CubicBezierCurve} curve - The curve.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.cubicBezierCurveHandleLines = function (curve) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a handle line (with a light grey).
+     *
+     * @method handleLine
+     * @param {Vertex} startPoint - The start point to draw the handle at.
+     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.handleLine = function (startPoint, endPoint) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a 1x1 dot with the specified (CSS-) color.
+     *
+     * @method dot
+     * @param {Vertex} p - The position to draw the dot at.
+     * @param {string} color - The CSS color to draw the dot with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.dot = function (p, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw the given point with the specified (CSS-) color and radius 3.
+     *
+     * @method point
+     * @param {Vertex} p - The position to draw the point at.
+     * @param {string} color - The CSS color to draw the point with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.point = function (p, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a circle with the specified (CSS-) color and radius.<br>
+     * <br>
+     * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
+     *
+     * @method circle
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.circle = function (center, radius, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw an ellipse with the specified (CSS-) color and thw two radii.
+     *
+     * @method ellipse
+     * @param {Vertex} center - The center of the ellipse.
+     * @param {number} radiusX - The radius of the ellipse.
+     * @param {number} radiusY - The radius of the ellipse.
+     * @param {string} color - The CSS color to draw the ellipse with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.ellipse = function (center, radiusX, radiusY, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw square at the given center, size and with the specified (CSS-) color.<br>
+     * <br>
+     * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
+     *
+     * @method square
+     * @param {Vertex} center - The center of the square.
+     * @param {Vertex} size - The size of the square.
+     * @param {string} color - The CSS color to draw the square with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.square = function (center, size, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
+     *
+     * @method grid
+     * @param {Vertex} center - The center of the grid.
+     * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
+     * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
+     * @param {number} sizeX - The horizontal grid size.
+     * @param {number} sizeY - The vertical grid size.
+     * @param {string} color - The CSS color to draw the grid with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a raster of crosshairs in the given grid.<br>
+     *
+     * This works analogue to the grid() function
+     *
+     * @method raster
+     * @param {Vertex} center - The center of the raster.
+     * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
+     * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
+     * @param {number} sizeX - The horizontal raster size.
+     * @param {number} sizeY - The vertical raster size.
+     * @param {string} color - The CSS color to draw the raster with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a diamond handle (square rotated by 45°) with the given CSS color.
+     *
+     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped diamonds.
+     *
+     * @method diamondHandle
+     * @param {Vertex} center - The center of the diamond.
+     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {string} color - The CSS color to draw the diamond with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.diamondHandle = function (center, size, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a square handle with the given CSS color.<br>
+     * <br>
+     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped squares.
+     *
+     * @method squareHandle
+     * @param {Vertex} center - The center of the square.
+     * @param {Vertex} size - The x/y-size of the square.
+     * @param {string} color - The CSS color to draw the square with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.squareHandle = function (center, size, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a circle handle with the given CSS color.<br>
+     * <br>
+     * It is an inherent featur of the handle functions that the drawn elements are not scaled and not
+     * distorted. So even if the user zooms in or changes the aspect ratio, the handles will be drawn
+     * as even shaped circles.
+     *
+     * @method circleHandle
+     * @param {Vertex} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {string} color - The CSS color to draw the circle with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.circleHandle = function (center, size, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a crosshair with given radius and color at the given position.<br>
+     * <br>
+     * Note that the crosshair radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.crosshair = function (center, radius, color) {
+        // NOT YET IMPLEMENTED	
+    };
+    ;
+    /**
+     * Draw a polygon.
+     *
+     * @method polygon
+     * @param {Polygon} polygon - The polygon to draw.
+     * @param {string} color - The CSS color to draw the polygon with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.polygon = function (polygon, color, lineWidth) {
+        var vertices = new Float32Array(polygon.vertices.length * 3);
+        for (var i = 0; i < polygon.vertices.length; i++) {
+            vertices[i * 3 + 0] = this._x2rel(polygon.vertices[i].x);
+            vertices[i * 3 + 1] = this._y2rel(polygon.vertices[i].y);
+            vertices[i * 3 + 2] = this._zindex;
+        }
+        this._zindex += 0.001;
+        //console.log( vertices );
+        // Create an empty buffer object
+        // const vertex_buffer = this.gl.createBuffer();
+        // Bind appropriate array buffer to it
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
+        // Pass the vertex data to the buffer
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, vertices, this.gl.STATIC_DRAW);
+        // Bind vertex buffer object
+        // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vertex_buffer);
+        // Get the attribute location
+        var coord = this.gl.getAttribLocation(this._program, "position");
+        // Point an attribute to the currently bound VBO
+        this.gl.vertexAttribPointer(coord, 3, this.gl.FLOAT, false, 0, 0);
+        // Enable the attribute
+        this.gl.enableVertexAttribArray(coord);
+        // Unbind the buffer?
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+        // Set the view port
+        this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+        var uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
+        // let radians = currentAngle * Math.PI / 180.0;
+        var currentRotation = [0.0, 1.0];
+        //currentRotation[0] = Math.sin(radians);
+        //currentRotation[1] = Math.cos(radians);
+        this.gl.uniform2fv(uRotationVector, currentRotation);
+        // Draw the polygon
+        this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, vertices.length / 3);
+        // POINTS, LINE_STRIP, LINE_LOOP, LINES,
+        // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
+    };
+    ;
+    /**
+     * Draw a polygon line (alternative function to the polygon).
+     *
+     * @method polyline
+     * @param {Vertex[]} vertices - The polygon vertices to draw.
+     * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
+     * @param {string}   color    - The CSS color to draw the polygon with.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.polyline = function (vertices, isOpen, color) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    drawutilsgl.prototype.text = function (text, x, y, options) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Draw a non-scaling text label at the given position.
+     *
+     * @method label
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    // +---------------------------------------------------------------------------------
+    // | Draw a non-scaling text label at the given position.
+    // +-------------------------------
+    drawutilsgl.prototype.label = function (text, x, y, rotation) {
+        // NOT YET IMPLEMENTED
+    };
+    ;
+    /**
+     * Due to gl compatibility there is a generic 'clear' function required
+     * to avoid accessing the context object itself directly.
+     *
+     * This function just fills the whole canvas with a single color.
+     *
+     * @param {string} color - The color to clear with.
+     **/
+    drawutilsgl.prototype.clear = function (color) {
+        // NOT YET IMPLEMENTED
+        // if( typeof color == 'string' )
+        // color = Color.parse(color); // Color class does not yet exist in TS
+        // Clear the canvas
+        this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        // Enable the depth test
+        this.gl.enable(this.gl.DEPTH_TEST);
+        // Clear the color and depth buffer
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    };
+    ;
+    // Vertex shader source code
+    drawutilsgl.vertCode = "\n    precision mediump float;\n\n    attribute vec3 position;\n\n    uniform vec2 uRotationVector;\n\n    void main(void) {\n\tvec2 rotatedPosition = vec2(\n\t    position.x * uRotationVector.y +\n\t\tposition.y * uRotationVector.x,\n\t    position.y * uRotationVector.y -\n\t\tposition.x * uRotationVector.x\n\t);\n\n\tgl_Position = vec4(rotatedPosition, position.z, 1.0);\n    }";
+    // Fragment shader source code
+    drawutilsgl.fragCode = "\n    precision highp float;\n\n    void main(void) {\n\tgl_FragColor = vec4(0.0,0.75,1.0,1.0);\n    }";
+    return drawutilsgl;
+}());
+exports.drawutilsgl = drawutilsgl;
+/**
+ * Some GL helper utils.
+ **/
+var GLU = /** @class */ (function () {
+    function GLU(gl) {
+        this.gl = gl;
+    }
+    ;
+    GLU.prototype.bufferData = function (verts) {
+        // Create an empty buffer object
+        var vbuffer = this.gl.createBuffer();
+        // Bind appropriate array buffer to it
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbuffer);
+        // Pass the vertex data to the buffer
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, verts, this.gl.STATIC_DRAW);
+        // Unbind the buffer
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+        return vbuffer;
+    };
+    ;
+    /*=================== Shaders ====================*/
+    GLU.prototype.compileShader = function (shaderCode, shaderType) {
+        // Create a vertex shader object
+        var shader = this.gl.createShader(shaderType);
+        // Attach vertex shader source code
+        this.gl.shaderSource(shader, shaderCode);
+        // Compile the vertex shader
+        this.gl.compileShader(shader);
+        var vertStatus = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
+        if (!vertStatus) {
+            console.warn("Error in shader:" + this.gl.getShaderInfoLog(shader));
+            this.gl.deleteShader(shader);
+            return null;
+        }
+        return shader;
+    };
+    ;
+    GLU.prototype.makeProgram = function (vertShader, fragShader) {
+        // Create a shader program object to store
+        // the combined shader program
+        var program = this.gl.createProgram();
+        // Attach a vertex shader
+        this.gl.attachShader(program, vertShader);
+        // Attach a fragment shader
+        this.gl.attachShader(program, fragShader);
+        // Link both the programs
+        this.gl.linkProgram(program);
+        // Use the combined shader program object
+        this.gl.useProgram(program);
+        /*======= Do some cleanup ======*/
+        this.gl.detachShader(program, vertShader);
+        this.gl.detachShader(program, fragShader);
+        this.gl.deleteShader(vertShader);
+        this.gl.deleteShader(fragShader);
+        return program;
+    };
+    ;
+    return GLU;
+}());
+//# sourceMappingURL=drawgl.js.map
+
+/***/ }),
+
+/***/ "./src/js/geomutils.js":
+/*!*****************************!*\
+  !*** ./src/js/geomutils.js ***!
+  \*****************************/
+/*! flagged exports */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export geomutils [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
+var Triangle_1 = __webpack_require__(/*! ./Triangle */ "./src/js/Triangle.js");
+/**
+ * @global
+ **/
+exports.geomutils = {
+    /**
+     * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
+     *
+     * @param {Vertex} pA - The first triangle point.
+     * @param {Vertex} pB - The second triangle point.
+     * @param {Vertex} pC - The third triangle point.
+     * @param {number} n - The number of desired angle sections (example: 2 means the angle will be divided into two sections,
+     *                      means an returned array with length 1, the middle line).
+     *
+     * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
+     */
+    nsectAngle: function (pA, pB, pC, n) {
+        var triangle = new Triangle_1.Triangle(pA, pB, pC);
+        var lineAB = new Line_1.Line(pA, pB);
+        var lineAC = new Line_1.Line(pA, pC);
+        // Compute the slope (theta) of line AB and line AC
+        var thetaAB = lineAB.angle();
+        var thetaAC = lineAC.angle();
+        // Compute the difference; this is the angle between AB and AC
+        var insideAngle = lineAB.angle(lineAC);
+        // We want the inner angles of the triangle, not the outer angle;
+        //   which one is which depends on the triangle 'direction'
+        var clockwise = triangle.determinant() > 0;
+        // For convenience convert the angle [-PI,PI] to [0,2*PI]
+        if (insideAngle < 0)
+            insideAngle = 2 * Math.PI + insideAngle;
+        if (!clockwise)
+            insideAngle = (2 * Math.PI - insideAngle) * (-1);
+        // Scale the rotated lines to the max leg length (looks better)
+        var lineLength = Math.max(lineAB.length(), lineAC.length());
+        var scaleFactor = lineLength / lineAB.length();
+        var result = [];
+        for (var i = 1; i < n; i++) {
+            // Compute the i-th inner sector line
+            result.push(new Line_1.Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
+        }
+        return result;
+    }
+};
+//# sourceMappingURL=geomutils.js.map
+
 /***/ })
-/******/ ]);
-});
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		if(__webpack_module_cache__[moduleId]) {
+/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+(() => {
+/*!*************************!*\
+  !*** ./src/js/entry.js ***!
+  \*************************/
+/*! unknown exports (runtime-defined) */
+/*! runtime requirements: __webpack_require__ */
+
+/* Imports for webpack */
+
+window.VertexAttr = __webpack_require__(/*! ./VertexAttr.js */ "./src/js/VertexAttr.js").VertexAttr;
+window.VertexListeners = __webpack_require__(/*! ./VertexListeners.js */ "./src/js/VertexListeners.js").VertexListeners;
+window.Vertex = __webpack_require__(/*! ./Vertex.js */ "./src/js/Vertex.js").Vertex;
+
+window.Bounds = __webpack_require__(/*! ./Bounds.js */ "./src/js/Bounds.js").Bounds;
+window.Grid = __webpack_require__(/*! ./Grid.js */ "./src/js/Grid.js").Grid;
+window.Line = __webpack_require__(/*! ./Line.js */ "./src/js/Line.js").Line;
+window.Vector = __webpack_require__(/*! ./Vector.js */ "./src/js/Vector.js").Vector;
+window.CubicBezierCurve = __webpack_require__(/*! ./CubicBezierCurve.js */ "./src/js/CubicBezierCurve.js").CubicBezierCurve;
+window.BezierPath = __webpack_require__(/*! ./BezierPath.js */ "./src/js/BezierPath.js").BezierPath;
+window.Polygon = __webpack_require__(/*! ./Polygon.js */ "./src/js/Polygon.js").Polygon;
+window.Triangle = __webpack_require__(/*! ./Triangle.js */ "./src/js/Triangle.js").Triangle;
+window.VEllipse = __webpack_require__(/*! ./VEllipse.js */ "./src/js/VEllipse.js").VEllipse;
+window.Circle = __webpack_require__(/*! ./Circle.js */ "./src/js/Circle.js").Circle;
+window.PBImage = __webpack_require__(/*! ./PBImage.js */ "./src/js/PBImage.js").PBImage;
+window.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "./src/js/MouseHandler.js").MouseHandler;
+window.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "./src/js/KeyHandler.js").KeyHandler;
+window.drawutils = __webpack_require__(/*! ./draw.js */ "./src/js/draw.js").drawutils;
+window.drawutilsgl = __webpack_require__(/*! ./drawgl.js */ "./src/js/drawgl.js").drawutilsgl;
+window.geomutils = __webpack_require__(/*! ./geomutils.js */ "./src/js/geomutils.js").geomutils;
+window.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "./src/js/PlotBoilerplate.js").PlotBoilerplate;
+
+
+})();
+
+/******/ })()
+;
+//# sourceMappingURL=plotboilerplate.js.map
