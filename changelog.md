@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-11-01
+  * Migrated the build tools from Webpack-4 to Webpack-5.
+  * Moved the build scripts to ./bin.
 * 2020-10-31
   * Including utils in the docs now.
   * Added thet `Polygon.getVertexAt` function.

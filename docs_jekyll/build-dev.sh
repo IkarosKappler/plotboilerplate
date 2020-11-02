@@ -10,12 +10,12 @@ cp -R ../screenshots/ .
 # ./renderjsdoc.sh
 
 # Build the JS files
-../run-build.sh
+../bin/run-build.sh
 
 ./generate-demo-page.sh
 
 # Use this docs build script instead
-(cd .. && ./run-mkdocs.sh)
+(cd ../bin && ./run-mkdocs.sh)
 
 echo "Building markdown page from template and readme ..."
 echo '---' > index.md

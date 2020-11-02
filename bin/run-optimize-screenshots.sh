@@ -17,14 +17,14 @@ _GREY="\033[0;37m"
 _NC='\033[0m'
  
  
-# Take files from ./screenhots/screenshots-fullcolor/
-# Output directory is ./screenshots/
+# Take files from ../screenhots/screenshots-fullcolor/
+# Output directory is ../screenshots/
  
  
  
 # Iterate through all large start-JPG files.
 # for file in "$dirname/"*.jpg; do 
-for file in "screenshots/screenshots-fullcolor/"*.{png,PNG}; do
+for file in "../screenshots/screenshots-fullcolor/"*.{png,PNG}; do
 
     echo "FILE: $file"
     filename=$(basename "$file")
@@ -34,7 +34,7 @@ for file in "screenshots/screenshots-fullcolor/"*.{png,PNG}; do
 	
 	echo -e "   ${_PURPLE}Generating optimized screensot for file ${filename} ${_NC}"
 	# convert "$file" -resize 128 -define jpeg:extent=10kb "./$dirname_thumbs/$filename"
-	convert -colors 32 "screenshots/screenshots-fullcolor/$filename" "screenshots/$filename"
+	convert -colors 32 "../screenshots/screenshots-fullcolor/$filename" "../screenshots/$filename"
 	
 	echo -e "   ${_GREEN}Done.${_NC}"
 

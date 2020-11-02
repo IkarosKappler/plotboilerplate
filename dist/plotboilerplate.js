@@ -2,10 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/js/BezierPath.js":
-/*!******************************!*\
-  !*** ./src/js/BezierPath.js ***!
-  \******************************/
+/***/ "../src/js/BezierPath.js":
+/*!*******************************!*\
+  !*** ../src/js/BezierPath.js ***!
+  \*******************************/
 /*! flagged exports */
 /*! export BezierPath [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -44,9 +44,9 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
-var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "./src/js/CubicBezierCurve.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var BezierPath = /** @class */ (function () {
     /**
      * The constructor.<br>
@@ -1221,10 +1221,10 @@ exports.BezierPath = BezierPath;
 
 /***/ }),
 
-/***/ "./src/js/Bounds.js":
-/*!**************************!*\
-  !*** ./src/js/Bounds.js ***!
-  \**************************/
+/***/ "../src/js/Bounds.js":
+/*!***************************!*\
+  !*** ../src/js/Bounds.js ***!
+  \***************************/
 /*! flagged exports */
 /*! export Bounds [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -1248,7 +1248,7 @@ exports.BezierPath = BezierPath;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var Bounds = /** @class */ (function () {
     /**
      * The constructor.
@@ -1301,10 +1301,10 @@ exports.Bounds = Bounds;
 
 /***/ }),
 
-/***/ "./src/js/Circle.js":
-/*!**************************!*\
-  !*** ./src/js/Circle.js ***!
-  \**************************/
+/***/ "../src/js/Circle.js":
+/*!***************************!*\
+  !*** ../src/js/Circle.js ***!
+  \***************************/
 /*! flagged exports */
 /*! export Circle [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -1332,9 +1332,9 @@ exports.Bounds = Bounds;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
-var Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var Circle = /** @class */ (function () {
     /**
      * Create a new circle with given center point and radius.
@@ -1496,10 +1496,10 @@ exports.Circle = Circle;
 
 /***/ }),
 
-/***/ "./src/js/CubicBezierCurve.js":
-/*!************************************!*\
-  !*** ./src/js/CubicBezierCurve.js ***!
-  \************************************/
+/***/ "../src/js/CubicBezierCurve.js":
+/*!*************************************!*\
+  !*** ../src/js/CubicBezierCurve.js ***!
+  \*************************************/
 /*! flagged exports */
 /*! export CubicBezierCurve [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -1537,9 +1537,9 @@ exports.Circle = Circle;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
-var Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
 var CubicBezierCurve = /** @class */ (function () {
     /**
      * The constructor.
@@ -2211,10 +2211,10 @@ exports.CubicBezierCurve = CubicBezierCurve;
 
 /***/ }),
 
-/***/ "./src/js/Grid.js":
-/*!************************!*\
-  !*** ./src/js/Grid.js ***!
-  \************************/
+/***/ "../src/js/Grid.js":
+/*!*************************!*\
+  !*** ../src/js/Grid.js ***!
+  \*************************/
 /*! flagged exports */
 /*! export Grid [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -2310,10 +2310,10 @@ exports.Grid = Grid;
 
 /***/ }),
 
-/***/ "./src/js/KeyHandler.js":
-/*!******************************!*\
-  !*** ./src/js/KeyHandler.js ***!
-  \******************************/
+/***/ "../src/js/KeyHandler.js":
+/*!*******************************!*\
+  !*** ../src/js/KeyHandler.js ***!
+  \*******************************/
 /*! flagged exports */
 /*! export KeyHandler [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -2722,10 +2722,10 @@ exports.KeyHandler = KeyHandler;
 
 /***/ }),
 
-/***/ "./src/js/Line.js":
-/*!************************!*\
-  !*** ./src/js/Line.js ***!
-  \************************/
+/***/ "../src/js/Line.js":
+/*!*************************!*\
+  !*** ../src/js/Line.js ***!
+  \*************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
 /*! CommonJS bailout: this is used directly at 27:17-21 */
@@ -2771,8 +2771,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "./src/js/VertTuple.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var Line = /** @class */ (function (_super) {
     __extends(Line, _super);
     /**
@@ -2846,10 +2846,10 @@ exports.Line = Line;
 
 /***/ }),
 
-/***/ "./src/js/MouseHandler.js":
-/*!********************************!*\
-  !*** ./src/js/MouseHandler.js ***!
-  \********************************/
+/***/ "../src/js/MouseHandler.js":
+/*!*********************************!*\
+  !*** ../src/js/MouseHandler.js ***!
+  \*********************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__ */
 /*! CommonJS bailout: this is used directly at 75:17-21 */
@@ -3157,10 +3157,10 @@ exports.XWheelEvent = XWheelEvent;
 
 /***/ }),
 
-/***/ "./src/js/PBImage.js":
-/*!***************************!*\
-  !*** ./src/js/PBImage.js ***!
-  \***************************/
+/***/ "../src/js/PBImage.js":
+/*!****************************!*\
+  !*** ../src/js/PBImage.js ***!
+  \****************************/
 /*! flagged exports */
 /*! export PBImage [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -3234,10 +3234,10 @@ exports.PBImage = PBImage;
 
 /***/ }),
 
-/***/ "./src/js/PlotBoilerplate.js":
-/*!***********************************!*\
-  !*** ./src/js/PlotBoilerplate.js ***!
-  \***********************************/
+/***/ "../src/js/PlotBoilerplate.js":
+/*!************************************!*\
+  !*** ../src/js/PlotBoilerplate.js ***!
+  \************************************/
 /*! flagged exports */
 /*! export PlotBoilerplate [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -3316,23 +3316,23 @@ exports.PBImage = PBImage;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var draw_1 = __webpack_require__(/*! ./draw */ "./src/js/draw.js");
-var drawgl_1 = __webpack_require__(/*! ./drawgl */ "./src/js/drawgl.js");
-var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "./src/js/BezierPath.js");
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
-var Circle_1 = __webpack_require__(/*! ./Circle */ "./src/js/Circle.js");
-var Grid_1 = __webpack_require__(/*! ./Grid */ "./src/js/Grid.js");
-var KeyHandler_1 = __webpack_require__(/*! ./KeyHandler */ "./src/js/KeyHandler.js");
-var Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
-var MouseHandler_1 = __webpack_require__(/*! ./MouseHandler */ "./src/js/MouseHandler.js");
-var PBImage_1 = __webpack_require__(/*! ./PBImage */ "./src/js/PBImage.js");
-var Polygon_1 = __webpack_require__(/*! ./Polygon */ "./src/js/Polygon.js");
-var SVGBuilder_1 = __webpack_require__(/*! ./SVGBuilder */ "./src/js/SVGBuilder.js");
-var Triangle_1 = __webpack_require__(/*! ./Triangle */ "./src/js/Triangle.js");
-var VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "./src/js/VEllipse.js");
-var Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
-var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "./src/js/VertexAttr.js");
+var draw_1 = __webpack_require__(/*! ./draw */ "../src/js/draw.js");
+var drawgl_1 = __webpack_require__(/*! ./drawgl */ "../src/js/drawgl.js");
+var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+var Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
+var Grid_1 = __webpack_require__(/*! ./Grid */ "../src/js/Grid.js");
+var KeyHandler_1 = __webpack_require__(/*! ./KeyHandler */ "../src/js/KeyHandler.js");
+var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+var MouseHandler_1 = __webpack_require__(/*! ./MouseHandler */ "../src/js/MouseHandler.js");
+var PBImage_1 = __webpack_require__(/*! ./PBImage */ "../src/js/PBImage.js");
+var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
+var SVGBuilder_1 = __webpack_require__(/*! ./SVGBuilder */ "../src/js/SVGBuilder.js");
+var Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
+var VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "../src/js/VEllipse.js");
+var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
 var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
@@ -4964,10 +4964,10 @@ exports.PlotBoilerplate = PlotBoilerplate;
 
 /***/ }),
 
-/***/ "./src/js/Polygon.js":
-/*!***************************!*\
-  !*** ./src/js/Polygon.js ***!
-  \***************************/
+/***/ "../src/js/Polygon.js":
+/*!****************************!*\
+  !*** ../src/js/Polygon.js ***!
+  \****************************/
 /*! flagged exports */
 /*! export Polygon [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -4999,8 +4999,8 @@ exports.PlotBoilerplate = PlotBoilerplate;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "./src/js/BezierPath.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var Polygon = /** @class */ (function () {
     /**
      * The constructor.
@@ -5287,10 +5287,10 @@ exports.Polygon = Polygon;
 
 /***/ }),
 
-/***/ "./src/js/SVGBuilder.js":
-/*!******************************!*\
-  !*** ./src/js/SVGBuilder.js ***!
-  \******************************/
+/***/ "../src/js/SVGBuilder.js":
+/*!*******************************!*\
+  !*** ../src/js/SVGBuilder.js ***!
+  \*******************************/
 /*! flagged exports */
 /*! export SVGBuilder [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -5386,10 +5386,10 @@ exports.SVGBuilder = SVGBuilder;
 
 /***/ }),
 
-/***/ "./src/js/Triangle.js":
-/*!****************************!*\
-  !*** ./src/js/Triangle.js ***!
-  \****************************/
+/***/ "../src/js/Triangle.js":
+/*!*****************************!*\
+  !*** ../src/js/Triangle.js ***!
+  \*****************************/
 /*! flagged exports */
 /*! export Triangle [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -5431,12 +5431,12 @@ exports.SVGBuilder = SVGBuilder;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
-var Circle_1 = __webpack_require__(/*! ./Circle */ "./src/js/Circle.js");
-var Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
-var Polygon_1 = __webpack_require__(/*! ./Polygon */ "./src/js/Polygon.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
-var geomutils_1 = __webpack_require__(/*! ./geomutils */ "./src/js/geomutils.js");
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+var Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
+var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+var geomutils_1 = __webpack_require__(/*! ./geomutils */ "../src/js/geomutils.js");
 var Triangle = /** @class */ (function () {
     /**
      * The constructor.
@@ -5812,10 +5812,10 @@ exports.Triangle = Triangle;
 
 /***/ }),
 
-/***/ "./src/js/VEllipse.js":
-/*!****************************!*\
-  !*** ./src/js/VEllipse.js ***!
-  \****************************/
+/***/ "../src/js/VEllipse.js":
+/*!*****************************!*\
+  !*** ../src/js/VEllipse.js ***!
+  \*****************************/
 /*! flagged exports */
 /*! export VEllipse [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -5884,10 +5884,10 @@ exports.VEllipse = VEllipse;
 
 /***/ }),
 
-/***/ "./src/js/Vector.js":
-/*!**************************!*\
-  !*** ./src/js/Vector.js ***!
-  \**************************/
+/***/ "../src/js/Vector.js":
+/*!***************************!*\
+  !*** ../src/js/Vector.js ***!
+  \***************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
 /*! CommonJS bailout: this is used directly at 24:17-21 */
@@ -5930,8 +5930,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "./src/js/VertTuple.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var Vector = /** @class */ (function (_super) {
     __extends(Vector, _super);
     /**
@@ -6096,10 +6096,10 @@ exports.Vector = Vector;
 
 /***/ }),
 
-/***/ "./src/js/VertTuple.js":
-/*!*****************************!*\
-  !*** ./src/js/VertTuple.js ***!
-  \*****************************/
+/***/ "../src/js/VertTuple.js":
+/*!******************************!*\
+  !*** ../src/js/VertTuple.js ***!
+  \******************************/
 /*! flagged exports */
 /*! export VertTuple [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -6120,7 +6120,7 @@ exports.Vector = Vector;
  * @version 1.0.1
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var VertTuple = /** @class */ (function () {
     /**
      * Creates an instance.
@@ -6392,10 +6392,10 @@ exports.VertTuple = VertTuple;
 
 /***/ }),
 
-/***/ "./src/js/Vertex.js":
-/*!**************************!*\
-  !*** ./src/js/Vertex.js ***!
-  \**************************/
+/***/ "../src/js/Vertex.js":
+/*!***************************!*\
+  !*** ../src/js/Vertex.js ***!
+  \***************************/
 /*! flagged exports */
 /*! export Vertex [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -6439,8 +6439,8 @@ exports.VertTuple = VertTuple;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "./src/js/VertexAttr.js");
-var VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "./src/js/VertexListeners.js");
+var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
+var VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "../src/js/VertexListeners.js");
 var Vertex = /** @class */ (function () {
     /**
      * The constructor for the vertex class.
@@ -6946,10 +6946,10 @@ exports.Vertex = Vertex;
 
 /***/ }),
 
-/***/ "./src/js/VertexAttr.js":
-/*!******************************!*\
-  !*** ./src/js/VertexAttr.js ***!
-  \******************************/
+/***/ "../src/js/VertexAttr.js":
+/*!*******************************!*\
+  !*** ../src/js/VertexAttr.js ***!
+  \*******************************/
 /*! flagged exports */
 /*! export VertexAttr [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -7016,10 +7016,10 @@ exports.VertexAttr = VertexAttr;
 
 /***/ }),
 
-/***/ "./src/js/VertexListeners.js":
-/*!***********************************!*\
-  !*** ./src/js/VertexListeners.js ***!
-  \***********************************/
+/***/ "../src/js/VertexListeners.js":
+/*!************************************!*\
+  !*** ../src/js/VertexListeners.js ***!
+  \************************************/
 /*! flagged exports */
 /*! export VertexListeners [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -7251,10 +7251,10 @@ exports.VertexListeners = VertexListeners;
 
 /***/ }),
 
-/***/ "./src/js/draw.js":
-/*!************************!*\
-  !*** ./src/js/draw.js ***!
-  \************************/
+/***/ "../src/js/draw.js":
+/*!*************************!*\
+  !*** ../src/js/draw.js ***!
+  \*************************/
 /*! flagged exports */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export drawutils [provided] [no usage info] [missing usage info prevents renaming] */
@@ -7303,8 +7303,8 @@ exports.VertexListeners = VertexListeners;
  * @version  1.8.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "./src/js/CubicBezierCurve.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 // Todo: rename this class to Drawutils
 var drawutils = /** @class */ (function () {
     /**
@@ -7999,10 +7999,10 @@ exports.drawutils = drawutils;
 
 /***/ }),
 
-/***/ "./src/js/drawgl.js":
-/*!**************************!*\
-  !*** ./src/js/drawgl.js ***!
-  \**************************/
+/***/ "../src/js/drawgl.js":
+/*!***************************!*\
+  !*** ../src/js/drawgl.js ***!
+  \***************************/
 /*! flagged exports */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export drawutilsgl [provided] [no usage info] [missing usage info prevents renaming] */
@@ -8025,7 +8025,7 @@ exports.drawutils = drawutils;
  * @version  0.0.4
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var drawutilsgl = /** @class */ (function () {
     /**
      * The constructor.
@@ -8646,10 +8646,10 @@ var GLU = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/js/geomutils.js":
-/*!*****************************!*\
-  !*** ./src/js/geomutils.js ***!
-  \*****************************/
+/***/ "../src/js/geomutils.js":
+/*!******************************!*\
+  !*** ../src/js/geomutils.js ***!
+  \******************************/
 /*! flagged exports */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export geomutils [provided] [no usage info] [missing usage info prevents renaming] */
@@ -8659,8 +8659,8 @@ var GLU = /** @class */ (function () {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
-var Triangle_1 = __webpack_require__(/*! ./Triangle */ "./src/js/Triangle.js");
+var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+var Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
 /**
  * @global
  **/
@@ -8735,35 +8735,35 @@ exports.geomutils = {
 /******/ 	
 /************************************************************************/
 (() => {
-/*!*************************!*\
-  !*** ./src/js/entry.js ***!
-  \*************************/
+/*!**************************!*\
+  !*** ../src/js/entry.js ***!
+  \**************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__ */
 
 /* Imports for webpack */
 
-window.VertexAttr = __webpack_require__(/*! ./VertexAttr.js */ "./src/js/VertexAttr.js").VertexAttr;
-window.VertexListeners = __webpack_require__(/*! ./VertexListeners.js */ "./src/js/VertexListeners.js").VertexListeners;
-window.Vertex = __webpack_require__(/*! ./Vertex.js */ "./src/js/Vertex.js").Vertex;
+window.VertexAttr = __webpack_require__(/*! ./VertexAttr.js */ "../src/js/VertexAttr.js").VertexAttr;
+window.VertexListeners = __webpack_require__(/*! ./VertexListeners.js */ "../src/js/VertexListeners.js").VertexListeners;
+window.Vertex = __webpack_require__(/*! ./Vertex.js */ "../src/js/Vertex.js").Vertex;
 
-window.Bounds = __webpack_require__(/*! ./Bounds.js */ "./src/js/Bounds.js").Bounds;
-window.Grid = __webpack_require__(/*! ./Grid.js */ "./src/js/Grid.js").Grid;
-window.Line = __webpack_require__(/*! ./Line.js */ "./src/js/Line.js").Line;
-window.Vector = __webpack_require__(/*! ./Vector.js */ "./src/js/Vector.js").Vector;
-window.CubicBezierCurve = __webpack_require__(/*! ./CubicBezierCurve.js */ "./src/js/CubicBezierCurve.js").CubicBezierCurve;
-window.BezierPath = __webpack_require__(/*! ./BezierPath.js */ "./src/js/BezierPath.js").BezierPath;
-window.Polygon = __webpack_require__(/*! ./Polygon.js */ "./src/js/Polygon.js").Polygon;
-window.Triangle = __webpack_require__(/*! ./Triangle.js */ "./src/js/Triangle.js").Triangle;
-window.VEllipse = __webpack_require__(/*! ./VEllipse.js */ "./src/js/VEllipse.js").VEllipse;
-window.Circle = __webpack_require__(/*! ./Circle.js */ "./src/js/Circle.js").Circle;
-window.PBImage = __webpack_require__(/*! ./PBImage.js */ "./src/js/PBImage.js").PBImage;
-window.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "./src/js/MouseHandler.js").MouseHandler;
-window.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "./src/js/KeyHandler.js").KeyHandler;
-window.drawutils = __webpack_require__(/*! ./draw.js */ "./src/js/draw.js").drawutils;
-window.drawutilsgl = __webpack_require__(/*! ./drawgl.js */ "./src/js/drawgl.js").drawutilsgl;
-window.geomutils = __webpack_require__(/*! ./geomutils.js */ "./src/js/geomutils.js").geomutils;
-window.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "./src/js/PlotBoilerplate.js").PlotBoilerplate;
+window.Bounds = __webpack_require__(/*! ./Bounds.js */ "../src/js/Bounds.js").Bounds;
+window.Grid = __webpack_require__(/*! ./Grid.js */ "../src/js/Grid.js").Grid;
+window.Line = __webpack_require__(/*! ./Line.js */ "../src/js/Line.js").Line;
+window.Vector = __webpack_require__(/*! ./Vector.js */ "../src/js/Vector.js").Vector;
+window.CubicBezierCurve = __webpack_require__(/*! ./CubicBezierCurve.js */ "../src/js/CubicBezierCurve.js").CubicBezierCurve;
+window.BezierPath = __webpack_require__(/*! ./BezierPath.js */ "../src/js/BezierPath.js").BezierPath;
+window.Polygon = __webpack_require__(/*! ./Polygon.js */ "../src/js/Polygon.js").Polygon;
+window.Triangle = __webpack_require__(/*! ./Triangle.js */ "../src/js/Triangle.js").Triangle;
+window.VEllipse = __webpack_require__(/*! ./VEllipse.js */ "../src/js/VEllipse.js").VEllipse;
+window.Circle = __webpack_require__(/*! ./Circle.js */ "../src/js/Circle.js").Circle;
+window.PBImage = __webpack_require__(/*! ./PBImage.js */ "../src/js/PBImage.js").PBImage;
+window.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "../src/js/MouseHandler.js").MouseHandler;
+window.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "../src/js/KeyHandler.js").KeyHandler;
+window.drawutils = __webpack_require__(/*! ./draw.js */ "../src/js/draw.js").drawutils;
+window.drawutilsgl = __webpack_require__(/*! ./drawgl.js */ "../src/js/drawgl.js").drawutilsgl;
+window.geomutils = __webpack_require__(/*! ./geomutils.js */ "../src/js/geomutils.js").geomutils;
+window.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "../src/js/PlotBoilerplate.js").PlotBoilerplate;
 
 
 })();

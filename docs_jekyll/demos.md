@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-10-31
+date: 2020-11-02
 ---
 
 <div class="full-width">
@@ -137,7 +137,7 @@ date: 2020-10-31
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/26-girih/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/na.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20201101-0-girih-basic-tiles.png');"></div>
    </a>
 </div>
 </div>

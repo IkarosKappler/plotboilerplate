@@ -2,7 +2,7 @@
 # Found at
 #    https://gist.github.com/DarrenN/8c6a5b969481725a4413
 
-PACKAGE_VERSION=$(cat package.json \
+PACKAGE_VERSION=$(cat ../package.json \
   | grep version \
   | head -1 \
   | awk -F: '{ print $2 }' \

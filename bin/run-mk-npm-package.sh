@@ -9,7 +9,7 @@ _YELLOW="\033[0;33m"
 _NC='\033[0m'
 
 
-TARGET_DIR="./npm-package/"
+TARGET_DIR="../npm-package/"
 
 
 # Copy all required files to the target package
@@ -37,17 +37,17 @@ fi
 
 echo -e "${_PURPLE} *** Copying files for minimal package ... ${_NC}"
 # (no docs, no demos, no jekyll, no config files, no screenshots)
-cp README.md "$TARGET_DIR/"README.md
-cp changelog.md "$TARGET_DIR/"changelog.md
-cp basics.md "$TARGET_DIR/"basics.md
-cp package.json "$TARGET_DIR/"package.json
-cp -r src/ "$TARGET_DIR/"
-cp -r dist/ "$TARGET_DIR/"
-cp main-dist.html "$TARGET_DIR/"main-dist.html
-cp main.html "$TARGET_DIR/"main.html
-cp style.css "$TARGET_DIR/"style.css
-cp example-image.png "$TARGET_DIR/"example-image.png
-cp license.txt "$TARGET_DIR/"license.txt
+cp ../README.md "$TARGET_DIR/"README.md
+cp ../changelog.md "$TARGET_DIR/"changelog.md
+cp ../basics.md "$TARGET_DIR/"basics.md
+cp ../package.json "$TARGET_DIR/"package.json
+cp -r ../src/ "$TARGET_DIR/"
+cp -r ../dist/ "$TARGET_DIR/"
+cp ../main-dist.html "$TARGET_DIR/"main-dist.html
+cp ../main.html "$TARGET_DIR/"main.html
+cp ../style.css "$TARGET_DIR/"style.css
+cp ../example-image.png "$TARGET_DIR/"example-image.png
+cp ../license.txt "$TARGET_DIR/"license.txt
 
 BUILDDATE=$(date)
 echo -e "$BUILDDATE" >> "$TARGET_DIR/builddate"
