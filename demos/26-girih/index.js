@@ -83,6 +83,22 @@
 	var hoverEdgeIndex = -1;
 	var tiles = [];
 	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
+
+	/**
+	 * Find that tile (index) which contains the given position. First match will be returned.
+	 *
+	 * @name locateContainingTile
+	 * @param {Vertex} position
+	 * @return {number} The index of the containing tile or -1 if none was found.
+	 **/
+	var locateConatiningTile = function( position ) {
+	    for( var i in tiles ) {
+		if( tiles[i].containsVert( position ) )
+		    return i;
+	    }
+	    return -1;
+	};
+	
 	// Todo for all tiles: `position` should be first param
 	var decagon = new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 );
 	tiles.push( decagon );
@@ -109,6 +125,9 @@
 	    // Draw all tiles
 	    for( var i in tiles ) {
 		var tile = tiles[i];
+		// Fill polygon when highlighted (mouse hover)
+		if( hoverTileIndex == i ) 
+		    pb.fill.polygon( tile, 'rgba(128,128,128,0.12)' );
 		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
 		// Draw all inner polygons
 		for( var j = 0; j < tile.innerTilePolygons.length; j++ ) {
@@ -171,27 +190,36 @@
 		if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 
-		// Find Girih edge nearby ...
-		var oldHoverTileIndex = hoverTileIndex;
-		var oldHoverEdgeIndex = hoverEdgeIndex;
-		hoverTileIndex = -1;
-		hoverEdgeIndex = -1;
-		for( var i in tiles ) {
-		    var tile = tiles[i];
-		    var tmpPos = tile.position.clone().add( relPos );
-		    var edgeIndex = tile.locateEdgeAtPoint( tmpPos, edgeLength/2 );
-
-		    if( edgeIndex != -1 ) {
-			// highlight edge
-			hoverTileIndex = i;
-			hoverEdgeIndex = edgeIndex;
-		    }
-		}
-		if( oldHoverTileIndex != hoverTileIndex || oldHoverEdgeIndex != hoverEdgeIndex )
-		    pb.redraw();
+		handleMouseMove( relPos );
 	    } );  
 
 
+	// @param {XYCoords} relPos
+	var handleMouseMove = function( relPos ) {
+	    var containedTileIndex = locateConatiningTile(relPos);
+	    
+	    // Find Girih edge nearby ...
+	    var oldHoverTileIndex = hoverTileIndex;
+	    var oldHoverEdgeIndex = hoverEdgeIndex;
+	    hoverTileIndex = -1;
+	    hoverEdgeIndex = -1;
+	    var i = containedTileIndex == -1 ? 0 : containedTileIndex;
+	    do {
+		var tile = tiles[i];
+		var tmpPos = tile.position.clone().add( relPos );
+		// May be -1
+		hoverEdgeIndex = tile.locateEdgeAtPoint( tmpPos, edgeLength/2 );
+		if( hoverEdgeIndex != -1 )
+		    hoverTileIndex = i;
+		i++;
+	    } while( i < tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1 );
+	    if( hoverTileIndex == -1 )
+		hoverTileIndex = containedTileIndex;
+	    
+	    if( oldHoverTileIndex != hoverTileIndex || oldHoverEdgeIndex != hoverEdgeIndex )
+		pb.redraw();
+	};
+	
 	// +---------------------------------------------------------------------------------
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------

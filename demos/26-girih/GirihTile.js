@@ -129,6 +129,8 @@ GirihTile.prototype.getTranslatedVertex = function( index ) {
  * @param point The point to be checked.
  * @retrn true|false
  **/
+// THIS IS NOW PART OF THE POLYGON CLASS
+/*
 GirihTile.prototype.containsPoint = function( point ) {    
     // Thanks to
     // http://stackoverflow.com/questions/2212604/javascript-check-mouse-clicked-inside-the-circle-or-polygon/2212851#2212851
@@ -143,7 +145,7 @@ GirihTile.prototype.containsPoint = function( point ) {
     }
     return c;
 
-}
+} */
 
 /**
  * This function locates the closest tile edge (polygon edge)

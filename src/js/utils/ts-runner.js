@@ -34,7 +34,6 @@
 	 * @return {void}
 	 **/
 	var requestResource = function(path,success,reject) {
-	    // console.log('Requesting path', path );
 	    var xhr = new XMLHttpRequest();
 	    xhr.open('GET', path);
 	    xhr.onload = function() {
@@ -87,10 +86,8 @@
 		scriptNode.setAttribute('id','ts-transpiled-concat');
 		var finalCode =
 		    jsCodes.join(' ') +
-		    // "console.log('SCRIPT EXECUTED'); " +
 		    "window."+callbackName+"("+(errorCount==0)+")";
 		scriptNode.innerHTML = finalCode;
-		// console.log( finalCode );
 		head.appendChild(scriptNode);
 	    }
 	    return errorCount;

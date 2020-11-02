@@ -1514,7 +1514,6 @@ var PlotBoilerplate = /** @class */ (function () {
         _a);
     /**
      * A set of helper functions.
-     * @private
      **/
     PlotBoilerplate.utils = {
         /**

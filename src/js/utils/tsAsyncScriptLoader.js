@@ -82,7 +82,6 @@ var require = window.require = function(...args) { console.log(args); return win
 	    scriptNode.setAttribute('async',false);
 	    scriptNode.setAttribute('defer',false);
 	    scriptNode.addEventListener('load', function() {
-		// console.log('script loaded');
 		scriptsLoaded++;
 		if( scriptsLoaded == jsSources.length )
 		    window.initializePB();

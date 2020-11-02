@@ -665,7 +665,6 @@ export declare class PlotBoilerplate {
     createGUI(): GUI;
     /**
      * A set of helper functions.
-     * @private
      **/
     static utils: {
         /**
