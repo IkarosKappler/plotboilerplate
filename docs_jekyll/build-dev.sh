@@ -10,7 +10,7 @@ cp -R ../screenshots/ .
 # ./renderjsdoc.sh
 
 # Build the JS files
-../bin/run-build.sh
+(cd ../bin && ./run-build.sh)
 
 ./generate-demo-page.sh
 

@@ -560,7 +560,7 @@ The Vertex class has basic drag event support:
 
 ## Minimize the package
 
-The package is minimized with webpack. See the `webpack.config.js` file.
+The package is minimized with webpack. See the `./bin/webpack.config.js` file.
 
 ### Install webpack
 This will install the `npm-webpack` package with the required dependencies
