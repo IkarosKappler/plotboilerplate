@@ -3,8 +3,9 @@
  * Use to avoid load massive libraries like jQuery.
  *
  * Usage
- * =====
- * Javascript: 
+ * ===== 
+ * @example 
+ *   // Javascript
  *   new MouseHandler( document.getElementById('mycanvas') )
  *	    .drag( function(e) {
  *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
@@ -26,8 +27,9 @@
  *          .wheel( function(e) {
  *              console.log( 'Wheel. delta='+e.deltaY );
  *          } )
- *
- * Typescript: 
+ * 
+ * @example
+ *   // Typescript
  *   new MouseHandler( document.getElementById('mycanvas') )
  *	    .drag( (e:XMouseEvent) => {
  *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
@@ -49,6 +51,7 @@
  *          .wheel( (e:XMouseEvent) => {
  *              console.log( 'Wheel. delta='+e.deltaY );
  *          } )
+ * 
  *
  *
  * @author   Ikaros Kappler

@@ -3,7 +3,8 @@
  *
  * Example
  * =======
- *
+ * @example
+ *      // Javascript
  *	new KeyHandler( { trackAll : true } )
  *	    .down('enter',function() { console.log('ENTER was hit.'); } )
  *	    .press('enter',function() { console.log('ENTER was pressed.'); } )

@@ -118,6 +118,27 @@
 	var penrose = new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true );
 	tiles.push( penrose );
 
+
+	// +---------------------------------------------------------------------------------
+	// | Find contrast color.
+	// | Found at
+	// |    https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y/38542#38542
+	// | Thanks to Martin Sojka
+	// +-------------------------------
+	var BLACK = Color.makeRGB( 0, 0, 0 );
+	var WHITE = Color.makeRGB( 255, 255, 255 );
+	var getContrastColor = function( color ) {
+	    // console.log( color );
+	    // r,g,b in [0..1]
+	    var gamma = 2.2;
+	    var L = 0.2126 * Math.pow( color.r, gamma )
+		+ 0.7152 * Math.pow( color.g, gamma )
+		+ 0.0722 * Math.pow( color.b, gamma );
+	    var use_black = ( L > Math.pow( 0.5, gamma ) );
+	    // console.log( 'use_black', use_black );
+	    return use_black ? BLACK.cssRGB() : WHITE.cssRGB();
+	};
+	
 	// +---------------------------------------------------------------------------------
 	// | This is the actual render function.
 	// +-------------------------------
@@ -129,6 +150,7 @@
 		if( hoverTileIndex == i ) 
 		    pb.fill.polygon( tile, 'rgba(128,128,128,0.12)' );
 		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
+
 		// Draw all inner polygons
 		for( var j = 0; j < tile.innerTilePolygons.length; j++ ) {
 		    pb.draw.polygon( tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0 );
@@ -140,6 +162,15 @@
 		// Draw a crosshair at the center
 		// pb.draw.crosshair( tile.position, 7, 'rgba(0,192,192,0.5)' );
 		drawFancyCrosshair( tile.position, hoverTileIndex == i );
+
+		// Draw corner numbers?
+		if( config.drawCornerNumbers ) {
+		    var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor));
+		    for( var i = 0; i < tile.vertices.length; i++ ) {		
+			var pos = tile.vertices[i].clone().scale( 0.85, tile.position );
+			pb.fill.text( ""+i, pos.x, pos.y, { color : contrastColor } );
+		    }
+		}
 	    }
 
 	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
@@ -224,7 +255,7 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	   
+	    drawCornerNumbers : false
 	}, GUP );
 	
 
@@ -234,7 +265,7 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-	    
+	    gui.add(config, 'drawCornerNumbers').onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
 	}
 
 	pb.config.preDraw = drawAll;

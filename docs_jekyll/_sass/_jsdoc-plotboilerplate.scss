@@ -169,9 +169,9 @@ h1
     margin: 12px 24px 20px;
 }
 
-h2, h3.subsection-title
+h2
 {
-    font-size: 30px;
+    font-size: 2.0rem; 
     font-weight: 700;
     letter-spacing: -1px;
     margin-bottom: 12px;
@@ -179,9 +179,14 @@ h2, h3.subsection-title
 
 h3
 {
-    font-size: 24px;
+    font-size: 1.0rem;
     letter-spacing: -0.5px;
     margin-bottom: 12px;
+}
+
+h3.subsection-title
+{
+    color : #888888;
 }
 
 h4
@@ -276,6 +281,11 @@ tr > th:last-child { border-right: 1px solid #ddd; }
 .details li { margin-left: 30px; padding-top: 6px; }
 .details pre.prettyprint { margin: 0 }
 .details .object-value { padding-top: 0; }
+
+ul li.subsection-requires {
+    font-size : 1.0rem;
+    color:  #888888;
+}
 
 .description {
     margin-bottom: 1em;

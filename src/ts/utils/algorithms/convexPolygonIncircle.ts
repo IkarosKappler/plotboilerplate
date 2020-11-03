@@ -111,7 +111,7 @@ export const convexPolygonIncircle = ( convexHull:Polygon ) : PolygonIncircle =>
  * @param {Vertex} vertB - The second point of the three connected lines.
  * @param {Vertex} vertC - The third point of the three connected lines.
  * @param {Vertex} vertD - The fourth point of the three connected lines.
- * @return {Triangle}
+ * @return {Triangle} The triangle of the circular tangential points with the given lines (3 or 4 of them).
  */
 const getTangentTriangle4 = ( vertA, vertB, vertC, vertD ) : Triangle => {
     const lineA : Line = new Line(vertA,vertB);
@@ -136,7 +136,7 @@ const getTangentTriangle4 = ( vertA, vertB, vertC, vertD ) : Triangle => {
  *
  * @param {Polygon} convexHull - The polygon to detect the intersections on (here this is the convex hull given).
  * @param {Circle} circle - The circle to detect the intersections with.
- * @return
+ * @return {Array<number>} The indices of those lines that intersect (or touch) the circle.
  **/
 const findCircleIntersections = ( convexHull:Polygon, circle:Circle ) : Array<number> => {
     var result = [];

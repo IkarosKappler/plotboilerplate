@@ -8,6 +8,13 @@ import { Polygon } from "./Polygon";
 import { BezierPath } from "./BezierPath";
 import { Line } from "./Line";
 import { PlotBoilerplate } from "./PlotBoilerplate";
+/**
+ * @classdesc Coordinates (x,y) on the plane.
+ *
+ * @interface
+ * @class
+ * @name XYCoords
+ **/
 export interface XYCoords {
     x: number;
     y: number;

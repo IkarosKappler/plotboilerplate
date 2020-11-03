@@ -1234,16 +1234,19 @@ exports.BezierPath = BezierPath;
 
 
 /**
+ * @module PlotBoilerplate
  * @classdesc A bounds class with min and max values.
  *
- * @requires XYCoords, Vertex, IBounds
+ * @requires XYCoords
+ * @requires Vertex
+ * @requires IBounds
  *
  * @author   Ikaros Kappler
  * @date     2020-05-11
  * @modified 2020-10-30 Added the static computeFromVertices function.
  * @version  1.1.0
  *
- * @file Bopunds
+ * @file Bounds
  * @fileoverview A simple bounds class implementing IBounds.
  * @public
  **/
@@ -1316,7 +1319,11 @@ exports.Bounds = Bounds;
 /**
  * @classdesc A simple circle: center point and radius.
  *
- * @requires Line, Vector, VertTuple, Vertex, SVGSerializale
+ * @requires Line
+ * @requires Vector
+ * @requires VertTuple
+ * @requires Vertex
+ * @requires SVGSerializale
  *
  * @author   Ikaros Kappler
  * @version  1.1.0
@@ -2327,7 +2334,8 @@ exports.Grid = Grid;
  *
  * Example
  * =======
- *
+ * @example
+ *      // Javascript
  *	new KeyHandler( { trackAll : true } )
  *	    .down('enter',function() { console.log('ENTER was hit.'); } )
  *	    .press('enter',function() { console.log('ENTER was pressed.'); } )
@@ -2852,7 +2860,7 @@ exports.Line = Line;
   \*********************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__ */
-/*! CommonJS bailout: this is used directly at 75:17-21 */
+/*! CommonJS bailout: this is used directly at 78:17-21 */
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -2862,7 +2870,8 @@ exports.Line = Line;
  *
  * Usage
  * =====
- * Javascript:
+ * @example
+ *   // Javascript
  *   new MouseHandler( document.getElementById('mycanvas') )
  *	    .drag( function(e) {
  *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
@@ -2885,7 +2894,8 @@ exports.Line = Line;
  *              console.log( 'Wheel. delta='+e.deltaY );
  *          } )
  *
- * Typescript:
+ * @example
+ *   // Typescript
  *   new MouseHandler( document.getElementById('mycanvas') )
  *	    .drag( (e:XMouseEvent) => {
  *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
@@ -2907,6 +2917,7 @@ exports.Line = Line;
  *          .wheel( (e:XMouseEvent) => {
  *              console.log( 'Wheel. delta='+e.deltaY );
  *          } )
+ *
  *
  *
  * @author   Ikaros Kappler
@@ -3249,7 +3260,21 @@ exports.PBImage = PBImage;
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
- * @requires Vertex, Line, Vector, Polygon, PBImage, VEllipse, Circle, MouseHandler, KeyHandler, VertexAttr, CubicBezierCurve, BezierPath, Triangle, drawutils, drawutilsgl
+ * @requires Vertex
+ * @requires Line
+ * @requires Vector
+ * @requires Polygon
+ * @requires PBImage
+ * @requires VEllipse
+ * @requires Circle
+ * @requires MouseHandler
+ * @requires KeyHandler
+ * @requires VertexAttr
+ * @requires CubicBezierCurve
+ * @requires BezierPath
+ * @requires Triangle
+ * @requires drawutils
+ * @requires drawutilsgl
  *
  * @author   Ikaros Kappler
  * @date     2018-10-23

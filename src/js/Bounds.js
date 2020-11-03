@@ -1,15 +1,18 @@
 "use strict";
 /**
+ * @module PlotBoilerplate
  * @classdesc A bounds class with min and max values.
  *
- * @requires XYCoords, Vertex, IBounds
+ * @requires XYCoords
+ * @requires Vertex
+ * @requires IBounds
  *
  * @author   Ikaros Kappler
  * @date     2020-05-11
  * @modified 2020-10-30 Added the static computeFromVertices function.
  * @version  1.1.0
  *
- * @file Bopunds
+ * @file Bounds
  * @fileoverview A simple bounds class implementing IBounds.
  * @public
  **/

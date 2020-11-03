@@ -1,5 +1,22 @@
 #!/bin/bash
-
+#
+# Generate a markdown document containing an overview of all
+# available demo pages.
+#
+# The source files are located in the directories ../demos/*
+#  * only directories are accepted
+#  * directories starting with _* will be ignored
+#  * directories starting with basic-* will be ignored
+#
+# Follwing header tags should be contained in each */index.html file
+#  * <title>...</title>
+#  * <meta property="og:image" content="..." >
+#  * <meta property="og:description" content="..." >
+#  * <meta property="og:title" content="..." >
+#
+# @date    2020-05-13
+# @author  Ikaros Kappler
+# @version 1.0.0
 
 function mkDemoPage() {
     # Read tracker code into file

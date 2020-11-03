@@ -1,7 +1,11 @@
 /**
  * @classdesc A simple circle: center point and radius.
  *
- * @requires Line, Vector, VertTuple, Vertex, SVGSerializale
+ * @requires Line
+ * @requires Vector
+ * @requires VertTuple 
+ * @requires Vertex
+ * @requires SVGSerializale
  *
  * @author   Ikaros Kappler
  * @version  1.1.0

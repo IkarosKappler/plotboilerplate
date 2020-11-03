@@ -240,6 +240,7 @@ export class Color {
 	RGB: function(...args: any[]) {
             var o = [];
             if(arguments.length == 0) return;
+	    // const allAreFrac = Color.testFrac( arguments );
             for(var i = 0 ; i < arguments.length ; i++) {
 		var c = arguments[i];
 		if("string" == typeof c && c.indexOf("%") > -1) {
@@ -249,10 +250,14 @@ export class Color {
 			throw new Error("Bad format");
                     o[i] = c/100;
 		} else {
+		    // console.log( 'allAreFrac', allAreFrac, arguments );
                     if("string" == typeof c && (c = parseInt(c)) == NaN) throw new Error("Bad format");
                     if(c < 0) throw new Error("Bad format");
+		    //else if( allAreFrac ) o[i] = c; // c >= 0 && c <= 1 (all)
                     else if(c >= 0 && c < 1) o[i] = c;
-                    else if(c >= 1 && c < 256) o[i] = c/255;
+		    // else if(c >= 0.0 && c <= 1.0) o[i] = c;
+                    else if(c >= 1 && c < 256) o[i] = c/255; // ???
+		    // else if(c >= 0 && c < 256) o[i] = c/255;
                     else throw new Error("Bad format ("+c+")");
 		}
             }
@@ -363,6 +368,15 @@ export class Color {
 	
     };
 
+    // Check if all arguments are numbers in the range [0..1] (inclusive)
+    /* private static testFrac( args: IArguments ) : boolean {
+	for( var i in arguments ) {
+	    const n:number = Number(arguments[i]);
+	    if( n === NaN || n < 0 || n > 1 )
+		return false;
+	}
+	return true;
+    }; */
 
     // Added by Ika 2017-0-19
     clone() : Color {
