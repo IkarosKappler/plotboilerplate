@@ -2,57 +2,6 @@
  * @classdesc A simple mouse handler for demos. 
  * Use to avoid load massive libraries like jQuery.
  *
- * Usage
- * ===== 
- * @example 
- *   // Javascript
- *   new MouseHandler( document.getElementById('mycanvas') )
- *	    .drag( function(e) {
- *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
- *		if( e.params.leftMouse ) ;
- *		else if( e.params.rightMouse ) ;
- *	    } )
- *	    .move( function(e) {
- *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
- *	    } )
- *          .up( function(e) {
- *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
- *          } )
- *          .down( function(e) {
- *              console.log( 'Mouse down.' );
- *          } )
- *          .click( function(e) {
- *              console.log( 'Click.' );
- *          } )
- *          .wheel( function(e) {
- *              console.log( 'Wheel. delta='+e.deltaY );
- *          } )
- * 
- * @example
- *   // Typescript
- *   new MouseHandler( document.getElementById('mycanvas') )
- *	    .drag( (e:XMouseEvent) => {
- *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
- *		if( e.params.leftMouse ) ;
- *		else if( e.params.rightMouse ) ;
- *	    } )
- *	    .move( (e:XMouseEvent) => {
- *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
- *	    } )
- *          .up( (e:XMouseEvent) => {
- *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
- *          } )
- *          .down( (e:XMouseEvent) => {
- *              console.log( 'Mouse down.' );
- *          } )
- *          .click( (e:XMouseEvent) => {
- *              console.log( 'Click.' );
- *          } )
- *          .wheel( (e:XMouseEvent) => {
- *              console.log( 'Wheel. delta='+e.deltaY );
- *          } )
- * 
- *
  *
  * @author   Ikaros Kappler
  * @date     2018-03-19
@@ -69,12 +18,15 @@
  * @modified 2020-04-08 Added the optional 'name' property. (1.0.11)
  * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even 
  *                      if there is no external drag listener installed (1.1.0).
- * @version  1.1.0
+ * @modified 2020-10-04 Added extended JSDoc comments.
+ * @version  1.1.1
  *
  * @file MouseHandler
  * @public
  **/
 
+
+import { XYCoords } from "./interfaces";
 
 export class MouseHandler {
 
@@ -92,6 +44,56 @@ export class MouseHandler {
      * The constructor.
      *
      * Pass the DOM element you want to receive mouse events from.
+     *
+     * Usage
+     * ===== 
+     * @example 
+     *   // Javascript
+     *   new MouseHandler( document.getElementById('mycanvas') )
+     *	    .drag( function(e) {
+     *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
+     *		if( e.params.leftMouse ) ;
+     *		else if( e.params.rightMouse ) ;
+     *	    } )
+     *	    .move( function(e) {
+     *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
+     *	    } )
+     *          .up( function(e) {
+     *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
+     *          } )
+     *          .down( function(e) {
+     *              console.log( 'Mouse down.' );
+     *          } )
+     *          .click( function(e) {
+     *              console.log( 'Click.' );
+     *          } )
+     *          .wheel( function(e) {
+     *              console.log( 'Wheel. delta='+e.deltaY );
+     *          } )
+     * 
+     * @example
+     *   // Typescript
+     *   new MouseHandler( document.getElementById('mycanvas') )
+     *	    .drag( (e:XMouseEvent) => {
+     *		console.log( 'Mouse dragged: ' + JSON.stringify(e) );
+     *		if( e.params.leftMouse ) ;
+     *		else if( e.params.rightMouse ) ;
+     *	    } )
+     *	    .move( (e:XMouseEvent) => {
+     *		console.log( 'Mouse moved: ' + JSON.stringify(e.params) );
+     *	    } )
+     *          .up( (e:XMouseEvent) => {
+     *              console.log( 'Mouse up. Was dragged?', e.params.wasDragged );
+     *          } )
+     *          .down( (e:XMouseEvent) => {
+     *              console.log( 'Mouse down.' );
+     *          } )
+     *          .click( (e:XMouseEvent) => {
+     *              console.log( 'Click.' );
+     *          } )
+     *          .wheel( (e:XMouseEvent) => {
+     *              console.log( 'Wheel. delta='+e.deltaY );
+     *          } )
      *
      * @constructor
      * @instance
@@ -150,16 +152,35 @@ export class MouseHandler {
 	this.element.addEventListener('wheel',this.handlers['wheel']);
     }
 
-    // +----------------------------------------------------------------------
-    // | Some private vars to store the current mouse/position/button state.
-    // +-------------------------------------------------
-    private relPos(e:MouseEvent) : { x:number, y:number } {
+    /**
+     * Get relative position from the given MouseEvent.
+     *
+     * @name relPos
+     * @memberof MouseHandler
+     * @instance
+     * @private
+     * @param {MouseEvent} e - The mouse event to get the relative position for.
+     * @return {XYCoords} The relative mouse coordinates.
+     */
+    private relPos(e:MouseEvent) : XYCoords { // { x:number, y:number } {
 	return { x : e.offsetX, // e.pageX - e.target.offsetLeft,
 		 y : e.offsetY  // e.pageY - e.target.offsetTop
 	       };
-    }
-    
-    private mkParams(e:MouseEvent,eventName:string) : XMouseEvent {
+    };
+
+
+    /**
+     * Build the extended event params.
+     *
+     * @name mkParams
+     * @memberof MouseHandler
+     * @instance
+     * @private
+     * @param {MouseEvent} e - The mouse event to get the relative position for.
+     * @param {string} eventName - The name of the firing event.
+     * @return {XMouseEvent} 
+     */
+    private mkParams( e:MouseEvent, eventName:string ) : XMouseEvent {
 	const rel : {x:number,y:number} = this.relPos(e);
 	const xEvent : XMouseEvent = ((e as unknown) as XMouseEvent);
 	xEvent.params = {
@@ -178,28 +199,55 @@ export class MouseHandler {
 	return xEvent;
     }
 
+
+    /**
+     * Install a new listener.
+     * Please note that this mouse handler can only handle one listener per event type.
+     *
+     * @name listenFor
+     * @memberof MouseHandler
+     * @instance
+     * @private
+     * @param {string} eventName - The name of the firing event to listen for.
+     * @return {void} 
+     */
     private listenFor( eventName:string ) {
 	if( this.installed[eventName] ) return;
 	// In the new version 1.1.0 has all internal listeners installed by default.
-	// this.element.addEventListener(eventName,this.handlers[eventName]);
 	this.installed[eventName] = true;
     }
 
+
+    /**
+     * Un-install a new listener.
+     *
+     * @name listenFor
+     * @memberof MouseHandler
+     * @instance
+     * @private
+     * @param {string} eventName - The name of the firing event to unlisten for.
+     * @return {void} 
+     */
     private unlistenFor( eventName:string ) {
 	if( !this.installed[eventName] ) return;
 	// In the new version 1.1.0 has all internal listeners installed by default.
-	// this.element.removeEventListener(eventName,this.handlers[eventName]);
 	delete this.installed[eventName];
     }
 
 
-    // +----------------------------------------------------------------------
-    // | The installer functions.
-    // |
-    // | Pass your callbacks here.
-    // | Note: they support chaining.
-    // +-------------------------------------------------
-    drag( callback:(e:XMouseEvent)=>void ) : MouseHandler {
+    /**
+     * Installer function to listen for a specific event: mouse-drag.
+     * Pass your callbacks here.
+     * 
+     * Note: this support chaining.
+     *
+     * @name drag
+     * @memberof MouseHandler
+     * @instance
+     * @param {XMouseCallback} callback - The drag-callback to listen for.
+     * @return {MouseHandler} this 
+     */
+    drag( callback:XMouseCallback ) : MouseHandler {
 	if( this.listeners.drag ) this.throwAlreadyInstalled('drag');
 	this.listeners.drag = callback;
 	this.listenFor('mousedown');
@@ -208,30 +256,95 @@ export class MouseHandler {
 	//listeners.drag = callback;
 	return this;
     };
+
+    /**
+     * Installer function to listen for a specific event: mouse-move.
+     * Pass your callbacks here.
+     * 
+     * Note: this support chaining.
+     *
+     * @name move
+     * @memberof MouseHandler
+     * @instance
+     * @param {XMouseCallback} callback - The move-callback to listen for.
+     * @return {MouseHandler} this 
+     */
     move( callback:(e:XMouseEvent)=>void ) : MouseHandler {
 	if( this.listeners.mousemove ) this.throwAlreadyInstalled('mousemove');
 	this.listenFor('mousemove');
 	this.listeners.mousemove = callback;
 	return this;
     };
+
+    /**
+     * Installer function to listen for a specific event: mouse-up.
+     * Pass your callbacks here.
+     * 
+     * Note: this support chaining.
+     *
+     * @name up
+     * @memberof MouseHandler
+     * @instance
+     * @param {XMouseCallback} callback - The up-callback to listen for.
+     * @return {MouseHandler} this 
+     */
     up( callback:(e:XMouseEvent)=>void ) : MouseHandler {
 	if( this.listeners.mouseup ) this.throwAlreadyInstalled('mouseup'); 
 	this.listenFor('mouseup');
 	this.listeners.mouseup = callback;
 	return this;
     };
+
+    /**
+     * Installer function to listen for a specific event: mouse-down.
+     * Pass your callbacks here.
+     * 
+     * Note: this support chaining.
+     *
+     * @name down
+     * @memberof MouseHandler
+     * @instance
+     * @param {XMouseCallback} callback - The down-callback to listen for.
+     * @return {MouseHandler} this 
+     */
     down( callback:(e:XMouseEvent)=>void ) : MouseHandler {
 	if( this.listeners.mousedown ) this.throwAlreadyInstalled('mousedown'); 
 	this.listenFor('mousedown');
 	this.listeners.mousedown = callback;
 	return this;
     };
+
+    /**
+     * Installer function to listen for a specific event: mouse-click.
+     * Pass your callbacks here.
+     * 
+     * Note: this support chaining.
+     *
+     * @name click
+     * @memberof MouseHandler
+     * @instance
+     * @param {XMouseCallback} callback - The click-callback to listen for.
+     * @return {MouseHandler} this 
+     */
     click( callback:(e:XMouseEvent)=>void ) : MouseHandler {
 	if( this.listeners.click ) this.throwAlreadyInstalled('click'); 
 	this.listenFor('click');
 	this.listeners.click = callback;
 	return this;
     };
+
+    /**
+     * Installer function to listen for a specific event: mouse-wheel.
+     * Pass your callbacks here.
+     * 
+     * Note: this support chaining.
+     *
+     * @name wheel
+     * @memberof MouseHandler
+     * @instance
+     * @param {XWheelCallback} callback - The wheel-callback to listen for.
+     * @return {MouseHandler} this 
+     */
     wheel( callback:(e:XWheelEvent)=>void ) : MouseHandler {
 	if( this.listeners.wheel ) this.throwAlreadyInstalled('wheel');
 	this.listenFor('wheel');
@@ -239,15 +352,33 @@ export class MouseHandler {
 	return this;
     };
 
+
+    /**
+     * An internal function to throw events.
+     *
+     * @name throwAlreadyInstalled
+     * @memberof MouseHandler
+     * @instance
+     * @private
+     * @param {string} name - The name of the event.
+     * @return {void}
+     */
     private throwAlreadyInstalled( name:string ) {
 	throw `This MouseHandler already has a '${name}' callback. To keep the code simple there is only room for one.`;
-    }
-    
-    // +----------------------------------------------------------------------
-    // | Call this when your work is done.
-    // |
-    // | The function will un-install all event listeners.
-    // +-------------------------------------------------
+    };
+
+
+    /**
+     * Call this when your work is done.
+     *
+     * The function will un-install all event listeners.
+     *
+     * @name destroy
+     * @memberof MouseHandler
+     * @instance
+     * @private
+     * @return {void}
+     */
     destroy() {
 	this.unlistenFor('mousedown');
 	this.unlistenFor('mousemove');
@@ -277,9 +408,14 @@ export interface XMouseParams {
     wasDragged   : boolean;
     dragAmount   : {x:number,y:number};
 }
+
 export class XMouseEvent extends MouseEvent {
     params: XMouseParams;
 }
 export class XWheelEvent extends WheelEvent {
     params: XMouseParams;
 }
+
+export type XMouseCallback = (e:XMouseEvent)=>void;
+
+export type XWheelCallback = (e:XWheelEvent)=>void;

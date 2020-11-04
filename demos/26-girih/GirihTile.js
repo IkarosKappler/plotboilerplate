@@ -100,12 +100,26 @@ GirihTile.prototype.getOuterTilePolygonAt = function( index ) {
 	return this.outerTilePolygons[ index % this.outerTilePolygons.length ];
 };
 
-
+ 
 GirihTile.prototype.getTranslatedVertex = function( index ) {
     // Rotate around the absolut center!
     // (the position is applied later)
     return this.translateVertex( this.vertices[index % this.vertices.length ] );
 };
+
+
+GirihTile.prototype.rotate = function( angle ) {
+
+    Polygon.prototype.rotate.call( this, angle, this.position );
+
+    for( var i in this.innerTilePolygons ) {
+	this.innerTilePolygons[i].rotate( angle, this.position );
+    }
+    for( var i in this.outerTilePolygons ) {
+	this.outerTilePolygons[i].rotate( angle, this.position );
+    }
+};
+
 
 /**
  * This is a special get* function that modulates the index and also
@@ -166,15 +180,17 @@ GirihTile.prototype.locateEdgeAtPoint = function( point,
     if( this.vertices.length == 0 )
 	return -1;
 
-
     var middle         = new Vertex( 0, 0 );
     var tmpDistance    = 0;
     var resultDistance = tolerance*2;   // definitely outside the tolerance :)
     var resultIndex    = -1;
     for( var i = 0; i < this.vertices.length; i++ ) {
 	
-	var vertI = this.getTranslatedVertex( i ); 
-	var vertJ = this.getTranslatedVertex( i+1 ); // (i+1 < this.vertices.length ? i+1 : 0) ); 
+	// var vertI = this.getTranslatedVertex( i ); 
+	// var vertJ = this.getTranslatedVertex( i+1 );
+
+	var vertI = this.getVertexAt( i ); 
+	var vertJ = this.getVertexAt( i+1 ); 
 
 	// Create a point in the middle of the edge	
 	middle.x = vertI.x + (vertJ.x - vertI.x)/2.0;
@@ -297,13 +313,14 @@ GirihTile.prototype._polygonToSVG = function( polygon,
     buffer.push( " />\n" );
 };
 
+// TODO: Move this to Polygon?
 GirihTile.prototype.computeBounds = function() {
     return Bounds.computeFromVertices( this.vertices );
 };
 
-GirihTile.prototype.translateVertex = function( vertex ) {
+/* GirihTile.prototype.translateVertex = function( vertex ) {
     return vertex.clone().rotate( this.angle, new Vertex(0,0) ).add( this.position );   
-};
+}; */
 
 GirihTile.prototype.addVertex = function( vertex ) {
     this.vertices.push( vertex );

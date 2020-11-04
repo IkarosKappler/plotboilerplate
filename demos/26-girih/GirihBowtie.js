@@ -154,6 +154,7 @@ GirihBowtie.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTilePo
 GirihBowtie.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 //GirihBowtie.prototype.containsPoint         = GirihTile.prototype.containsPoint;
 GirihBowtie.prototype.containsVert         = Polygon.prototype.containsVert;
+GirihBowtie.prototype.rotate         = GirihTile.prototype.rotate;
 GirihBowtie.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihBowtie.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihBowtie.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;

@@ -106,9 +106,9 @@ cd ../npm-package && npm publish
 
 if [ $? -eq 0 ]; then
     echo ""
-    echo "Ooops, something failed."
+    echo -e "${_GREEN} !!! Don't forget to upload the compiled package to your staging environment !!! ${_NC}"
 else
     echo ""
-    echo -e "${_GREEN} !!! Don't forget to upload the compiled package to your staging environment !!! ${_NC}"
+    echo "Ooops, something failed."
 fi
-    
+

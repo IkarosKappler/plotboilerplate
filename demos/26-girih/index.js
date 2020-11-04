@@ -208,6 +208,14 @@
 	    }
 	};
 
+
+	var handleTurnTile = function( turnCount ) {
+	    if( hoverTileIndex == -1 )
+		return;
+
+	    tiles[hoverTileIndex].rotate( turnCount * Math.PI/4 );
+	    pb.redraw();
+	};
 	
 
 	// +---------------------------------------------------------------------------------
@@ -222,7 +230,21 @@
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 
 		handleMouseMove( relPos );
-	    } );  
+	    } );
+
+	// +---------------------------------------------------------------------------------
+	// | Add a key listener.
+	// +-------------------------------
+	new KeyHandler( { trackAll : true } )
+ 	    .down('q',function() {
+		console.log('q was hit.');
+		handleTurnTile(-1);
+	    } )
+	    .down('e',function() {
+		console.log('e was hit.');
+		handleTurnTile(1);
+	    } )
+ 	;
 
 
 	// @param {XYCoords} relPos
@@ -237,7 +259,7 @@
 	    var i = containedTileIndex == -1 ? 0 : containedTileIndex;
 	    do {
 		var tile = tiles[i];
-		var tmpPos = tile.position.clone().add( relPos );
+		var tmpPos = relPos; // tile.position.clone().add( relPos );
 		// May be -1
 		hoverEdgeIndex = tile.locateEdgeAtPoint( tmpPos, edgeLength/2 );
 		if( hoverEdgeIndex != -1 )

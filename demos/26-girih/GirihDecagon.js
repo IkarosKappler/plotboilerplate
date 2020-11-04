@@ -133,6 +133,7 @@ GirihDecagon.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTileP
 GirihDecagon.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 // GirihDecagon.prototype.containsPoint         = GirihTile.prototype.containsPoint;
 GirihDecagon.prototype.containsVert         = Polygon.prototype.containsVert;
+GirihDecagon.prototype.rotate         = GirihTile.prototype.rotate;
 GirihDecagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihDecagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihDecagon.prototype.getVertexAt          = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;

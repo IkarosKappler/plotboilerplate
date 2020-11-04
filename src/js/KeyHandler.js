@@ -20,8 +20,9 @@
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
- * @modified 2020-10-14 Changed `window` to `globalThis`.
- * @version  1.0.3
+ * @modified 2020-10-04 Changed `window` to `globalThis`.
+ * @modified 2020-10-04 Added extended JSDoc.
+ * @version  1.0.4
  *
  * @file KeyHandler
  * @public
@@ -34,8 +35,8 @@ var KeyHandler = /** @class */ (function () {
      * @constructor
      * @instance
      * @memberof KeyHandler
-     * @param options.element (optional) The HTML element to listen on; if null then 'window' will be used.
-     * @param options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
+     * @param {HTMLElement} options.element (optional) The HTML element to listen on; if null then 'window' will be used.
+     * @param {boolean} options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
     **/
     function KeyHandler(options) {
         this.downListeners = [];
@@ -78,8 +79,13 @@ var KeyHandler = /** @class */ (function () {
      * Internal function to fire a new keydown event to all listeners.
      * You should not call this function on your own unless you know what you do.
      *
+     * @name fireDownEvent
+     * @memberof KeyHandler
+     * @instance
+     * @private
      * @param {KeyboardEvent} e
      * @param {KeyHandler} handler
+     * @return {void}
      */
     KeyHandler.prototype.fireDownEvent = function (e, handler) {
         if (handler.fireEvent(e, handler.downListeners) || handler.trackAllKeys) {
@@ -92,8 +98,13 @@ var KeyHandler = /** @class */ (function () {
      * Internal function to fire a new keypress event to all listeners.
      * You should not call this function on your own unless you know what you do.
      *
+     * @name firePressEvent
+     * @memberof KeyHandler
+     * @instance
+     * @private
      * @param {KeyboardEvent} e
      * @param {KeyHandler} handler
+     * @return void
      */
     KeyHandler.prototype.firePressEvent = function (e, handler) {
         handler.fireEvent(e, handler.pressListeners);
@@ -103,8 +114,13 @@ var KeyHandler = /** @class */ (function () {
      * Internal function to fire a new keyup event to all listeners.
      * You should not call this function on your own unless you know what you do.
      *
+     * @name fireUpEvent
+     * @memberof KeyHandler
+     * @instance
+     * @private
      * @param {KeyboardEvent} e
      * @param {KeyHandler} handler
+     * @return {void}
      */
     KeyHandler.prototype.fireUpEvent = function (e, handler) {
         if (handler.fireEvent(e, handler.upListeners) || handler.trackAllKeys) {
@@ -153,8 +169,12 @@ var KeyHandler = /** @class */ (function () {
      *
      * Example: new KeyHandler().down('enter',function() {console.log('Enter hit.')});
      *
+     * @name down
+     * @memberof KeyHandler
+     * @instance
      * @param {string|number} key -  Any key identifier, key code or one from the KEY_CODES list.
      * @param {(e:KeyboardEvent)=>void} e -  The callback to be triggered.
+     * @return {KeyHandler} this
      */
     KeyHandler.prototype.down = function (key, listener) {
         this.downListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
@@ -166,8 +186,12 @@ var KeyHandler = /** @class */ (function () {
      *
      * Example: new KeyHandler().press('enter',function() {console.log('Enter pressed.')});
      *
+     * @name press
+     * @memberof KeyHandler
+     * @instance
      * @param {string|number} key - Any key identifier, key code or one from the KEY_CODES list.
      * @param {(e:KeyboardEvent)=>void} listener - The callback to be triggered.
+     * @return {KeyHandler} this
      */
     KeyHandler.prototype.press = function (key, listener) {
         this.pressListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
@@ -179,8 +203,12 @@ var KeyHandler = /** @class */ (function () {
      *
      * Example: new KeyHandler().up('enter',function() {console.log('Enter released.')});
      *
-     *  @param {string} key - Any key identifier, key code or one from the KEY_CODES list.
-     *  @param {(e:KeyboardEvent)=>void) e - The callback to be triggered.
+     * @name up
+     * @memberof KeyHandler
+     * @instance
+     * @param {string} key - Any key identifier, key code or one from the KEY_CODES list.
+     * @param {(e:KeyboardEvent)=>void)} e - The callback to be triggered.
+     * @return {KeyHandler} this
      */
     KeyHandler.prototype.up = function (key, listener) {
         this.upListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
@@ -188,7 +216,7 @@ var KeyHandler = /** @class */ (function () {
     };
     ;
     /**
-     *  Check if a specific key is currently held pressed.
+     * Check if a specific key is currently held pressed.
      *
      * @param {string|number} key - Any key identifier, key code or one from the KEY_CODES list.
      */

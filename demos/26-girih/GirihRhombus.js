@@ -138,6 +138,7 @@ GirihRhombus.prototype.getInnerTilePolygonAt = GirihTile.prototype.getInnerTileP
 GirihRhombus.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTilePolygonAt;
 GirihRhombus.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 GirihRhombus.prototype.containsVert         = Polygon.prototype.containsVert; // GirihTile.prototype.containsPoint;
+GirihRhombus.prototype.rotate         = GirihTile.prototype.rotate;
 GirihRhombus.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihRhombus.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihRhombus.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;

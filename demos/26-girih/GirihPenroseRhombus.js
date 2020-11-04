@@ -183,6 +183,7 @@ GirihPenroseRhombus.prototype.getInnerTilePolygonAt = GirihTile.prototype.getInn
 GirihPenroseRhombus.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTilePolygonAt;
 GirihPenroseRhombus.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 GirihPenroseRhombus.prototype.containsVert         = Polygon.prototype.containsVert; // GirihTile.prototype.containsPoint;
+GirihPenroseRhombus.prototype.rotate         = GirihTile.prototype.rotate;
 GirihPenroseRhombus.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihPenroseRhombus.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihPenroseRhombus.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;

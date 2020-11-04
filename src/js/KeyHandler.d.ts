@@ -19,8 +19,9 @@
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
- * @modified 2020-10-14 Changed `window` to `globalThis`.
- * @version  1.0.3
+ * @modified 2020-10-04 Changed `window` to `globalThis`.
+ * @modified 2020-10-04 Added extended JSDoc.
+ * @version  1.0.4
  *
  * @file KeyHandler
  * @public
@@ -41,8 +42,8 @@ export declare class KeyHandler {
      * @constructor
      * @instance
      * @memberof KeyHandler
-     * @param options.element (optional) The HTML element to listen on; if null then 'window' will be used.
-     * @param options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
+     * @param {HTMLElement} options.element (optional) The HTML element to listen on; if null then 'window' will be used.
+     * @param {boolean} options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
     **/
     constructor(options: {
         element?: HTMLElement | Window | (typeof globalThis);
@@ -59,24 +60,39 @@ export declare class KeyHandler {
      * Internal function to fire a new keydown event to all listeners.
      * You should not call this function on your own unless you know what you do.
      *
+     * @name fireDownEvent
+     * @memberof KeyHandler
+     * @instance
+     * @private
      * @param {KeyboardEvent} e
      * @param {KeyHandler} handler
+     * @return {void}
      */
     private fireDownEvent;
     /**
      * Internal function to fire a new keypress event to all listeners.
      * You should not call this function on your own unless you know what you do.
      *
+     * @name firePressEvent
+     * @memberof KeyHandler
+     * @instance
+     * @private
      * @param {KeyboardEvent} e
      * @param {KeyHandler} handler
+     * @return void
      */
     private firePressEvent;
     /**
      * Internal function to fire a new keyup event to all listeners.
      * You should not call this function on your own unless you know what you do.
      *
+     * @name fireUpEvent
+     * @memberof KeyHandler
+     * @instance
+     * @private
      * @param {KeyboardEvent} e
      * @param {KeyHandler} handler
+     * @return {void}
      */
     private fireUpEvent;
     /**
@@ -104,30 +120,42 @@ export declare class KeyHandler {
      *
      * Example: new KeyHandler().down('enter',function() {console.log('Enter hit.')});
      *
+     * @name down
+     * @memberof KeyHandler
+     * @instance
      * @param {string|number} key -  Any key identifier, key code or one from the KEY_CODES list.
      * @param {(e:KeyboardEvent)=>void} e -  The callback to be triggered.
+     * @return {KeyHandler} this
      */
-    down(key: string | number, listener: (e: KeyboardEvent) => void): KeyHandler;
+    down(key: string | number, listener: XKeyCallback): KeyHandler;
     /**
      * Listen for key press.
      *
      * Example: new KeyHandler().press('enter',function() {console.log('Enter pressed.')});
      *
+     * @name press
+     * @memberof KeyHandler
+     * @instance
      * @param {string|number} key - Any key identifier, key code or one from the KEY_CODES list.
      * @param {(e:KeyboardEvent)=>void} listener - The callback to be triggered.
+     * @return {KeyHandler} this
      */
-    press(key: string | number, listener: (e: KeyboardEvent) => void): KeyHandler;
+    press(key: string | number, listener: XKeyCallback): KeyHandler;
     /**
      * Listen for key up.
      *
      * Example: new KeyHandler().up('enter',function() {console.log('Enter released.')});
      *
-     *  @param {string} key - Any key identifier, key code or one from the KEY_CODES list.
-     *  @param {(e:KeyboardEvent)=>void) e - The callback to be triggered.
+     * @name up
+     * @memberof KeyHandler
+     * @instance
+     * @param {string} key - Any key identifier, key code or one from the KEY_CODES list.
+     * @param {(e:KeyboardEvent)=>void)} e - The callback to be triggered.
+     * @return {KeyHandler} this
      */
-    up(key: string, listener: (e: KeyboardEvent) => void): KeyHandler;
+    up(key: string, listener: XKeyCallback): KeyHandler;
     /**
-     *  Check if a specific key is currently held pressed.
+     * Check if a specific key is currently held pressed.
      *
      * @param {string|number} key - Any key identifier, key code or one from the KEY_CODES list.
      */
@@ -138,3 +166,4 @@ export interface XKeyListener {
     keyCode: number;
     listener: (event: KeyboardEvent) => void;
 }
+export declare type XKeyCallback = (e: KeyboardEvent) => void;
