@@ -18,8 +18,9 @@
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
- * @version  1.0.2
+ * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
+ * @modified 2020-10-14 Changed `window` to `globalThis`.
+ * @version  1.0.3
  *
  * @file KeyHandler
  * @public
@@ -44,7 +45,7 @@ export declare class KeyHandler {
      * @param options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
     **/
     constructor(options: {
-        element?: HTMLElement | Window;
+        element?: HTMLElement | Window | (typeof globalThis);
         trackAll?: boolean;
     });
     /**

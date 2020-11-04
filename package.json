@@ -1,14 +1,15 @@
 {
   "name": "plotboilerplate",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
   "private": false,
   "main": "dist/plotboilerplate.min.js",
   "scripts": {
     "compile-typescript": "tsc",
+    "build" : "cd bin && ./run-build.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "webpack": "npx webpack --mode production --config webpack.config.js",
-    "webpack:w": "webpack -w --mode production"
+    "webpack": "npx webpack --mode production --config ./webpack5.config.js",
+    "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js"
   },
   "repository": {
     "type": "git",

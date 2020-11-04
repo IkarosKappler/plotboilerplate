@@ -18,8 +18,9 @@
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
- * @version  1.0.2
+ * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
+ * @modified 2020-10-14 Changed `window` to `globalThis`.
+ * @version  1.0.3
  *
  * @file KeyHandler
  * @public
@@ -27,7 +28,7 @@
 
 export class KeyHandler {
 
-    private element           : HTMLElement | Window;
+    private element           : HTMLElement | Window | (typeof globalThis);
     private downListeners     : Array<any> = [];
     private pressListeners    : Array<any> = [];
     private upListeners       : Array<any> = [];
@@ -49,9 +50,9 @@ export class KeyHandler {
      * @param options.element (optional) The HTML element to listen on; if null then 'window' will be used.
      * @param options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
     **/
-    constructor( options:{element?:HTMLElement|Window, trackAll?:boolean } ) {
+    constructor( options:{element?:HTMLElement|Window|(typeof globalThis), trackAll?:boolean } ) {
 	options = options || {};
-	this.element = options.element ? options.element : window;
+	this.element = options.element ? options.element : globalThis;
 	this.downListeners = [];
 	this.pressListeners = [];
 	this.upListeners = [];

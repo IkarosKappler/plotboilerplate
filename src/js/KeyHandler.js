@@ -19,8 +19,9 @@
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
- * @version  1.0.2
+ * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
+ * @modified 2020-10-14 Changed `window` to `globalThis`.
+ * @version  1.0.3
  *
  * @file KeyHandler
  * @public
@@ -42,7 +43,7 @@ var KeyHandler = /** @class */ (function () {
         this.upListeners = [];
         this.keyStates = {};
         options = options || {};
-        this.element = options.element ? options.element : window;
+        this.element = options.element ? options.element : globalThis;
         this.downListeners = [];
         this.pressListeners = [];
         this.upListeners = [];

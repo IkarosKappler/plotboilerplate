@@ -308,7 +308,7 @@ export declare class PlotBoilerplate {
      * Set the console for this instance.
      *
      * @method setConsole
-     * @param {Console} con - The new console object (default is window.console).
+     * @param {Console} con - The new console object (default is globalThis.console).
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}

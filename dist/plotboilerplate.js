@@ -2349,8 +2349,9 @@ exports.Grid = Grid;
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-07-28 Changed the 'delete' key code from 8 to 46.
- * @version  1.0.2
+ * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
+ * @modified 2020-10-14 Changed `window` to `globalThis`.
+ * @version  1.0.3
  *
  * @file KeyHandler
  * @public
@@ -2372,7 +2373,7 @@ var KeyHandler = /** @class */ (function () {
         this.upListeners = [];
         this.keyStates = {};
         options = options || {};
-        this.element = options.element ? options.element : window;
+        this.element = options.element ? options.element : globalThis;
         this.downListeners = [];
         this.pressListeners = [];
         this.upListeners = [];
@@ -3568,8 +3569,7 @@ var PlotBoilerplate = /** @class */ (function () {
         };
         var _self = this;
         // TODO: this should be placed in the caller and work for modules/global, too!
-        if (window)
-            window.addEventListener('resize', function () { return _self.resizeCanvas(); });
+        globalThis.addEventListener('resize', function () { return _self.resizeCanvas(); });
         this.resizeCanvas();
         if (config.autoDetectRetina) {
             this._setToRetina();
@@ -3600,9 +3600,9 @@ var PlotBoilerplate = /** @class */ (function () {
         var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
-        if (typeof window["saveAs"] != "function")
+        if (typeof globalThis["saveAs"] != "function")
             throw "Cannot save file; did you load the ./utils/savefile helper function an the eligrey/SaveFile library?";
-        var _saveAs = window["saveAs"];
+        var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
     };
     ;
@@ -3618,7 +3618,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype._setToRetina = function () {
         this.config.autoDetectRetina = true;
-        var pixelRatio = window.devicePixelRatio || 1;
+        var pixelRatio = globalThis.devicePixelRatio || 1;
         this.config.cssScaleX = this.config.cssScaleY = 1.0 / pixelRatio; // 0.5;
         this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio; // 2.0;
         this.resizeCanvas();
@@ -3656,7 +3656,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * Set the console for this instance.
      *
      * @method setConsole
-     * @param {Console} con - The new console object (default is window.console).
+     * @param {Console} con - The new console object (default is globalThis.console).
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
@@ -4212,11 +4212,10 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.getAvailableContainerSpace = function () {
         var _self = this;
-        // var container : HTMLElement = _self.canvas.parentNode;
         var container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
         var canvas = _self.canvas;
         canvas.style.display = 'none';
-        var padding = parseFloat(window.getComputedStyle(container, null).getPropertyValue('padding')) || 0, border = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('border-width')) || 0, pl = parseFloat(window.getComputedStyle(container, null).getPropertyValue('padding-left')) || padding, pr = parseFloat(window.getComputedStyle(container, null).getPropertyValue('padding-right')) || padding, pt = parseFloat(window.getComputedStyle(container, null).getPropertyValue('padding-top')) || padding, pb = parseFloat(window.getComputedStyle(container, null).getPropertyValue('padding-bottom')) || padding, bl = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('border-left-width')) || border, br = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('border-right-width')) || border, bt = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('border-top-width')) || border, bb = parseFloat(window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width')) || border;
+        var padding = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding')) || 0, border = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-width')) || 0, pl = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding-left')) || padding, pr = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding-right')) || padding, pt = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding-top')) || padding, pb = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom')) || padding, bl = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-left-width')) || border, br = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-right-width')) || border, bt = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-top-width')) || border, bb = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width')) || border;
         var w = container.clientWidth;
         var h = container.clientHeight;
         canvas.style.display = 'block';
@@ -4249,8 +4248,8 @@ var PlotBoilerplate = /** @class */ (function () {
         };
         if (_self.config.fullSize && !_self.config.fitToParent) {
             // Set editor size
-            var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-            var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            var width = globalThis.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            var height = globalThis.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             _self.canvas.style.position = 'absolute';
             _self.canvas.style.width = (_self.config.canvasWidthFactor * width) + 'px';
             _self.canvas.style.height = (_self.config.canvasWidthFactor * height) + 'px';
@@ -4262,7 +4261,6 @@ var PlotBoilerplate = /** @class */ (function () {
             // Set editor size
             _self.canvas.style.position = 'absolute';
             var space = this.getAvailableContainerSpace();
-            // window.alert( space.width + " " + space.height );
             _self.canvas.style.width = (_self.config.canvasWidthFactor * space.width) + 'px';
             _self.canvas.style.height = (_self.config.canvasHeightFactor * space.height) + 'px';
             _self.canvas.style.top = null;
@@ -4419,7 +4417,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.mouseDownHandler = function (e) {
         var _self = this;
-        if (e.which != 1) // && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
+        if (e.which != 1)
             return; // Only react on left mouse or touch events
         var p = _self.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
         if (!p)
@@ -4614,11 +4612,11 @@ var PlotBoilerplate = /** @class */ (function () {
                     y: pos.y - _self.canvas.offsetTop
                 };
             };
-            if (window["AlloyFinger"] && typeof window["AlloyFinger"] == "function") {
+            if (globalThis["AlloyFinger"] && typeof globalThis["AlloyFinger"] == "function") {
                 try {
                     // Do not include AlloyFinger itself to the library
                     // (17kb, but we want to keep this lib as tiny as possible).
-                    var AF = window["AlloyFinger"];
+                    var AF = globalThis["AlloyFinger"];
                     var touchMovePos = null;
                     var touchDownPos = null;
                     var draggedElement = null;
@@ -4704,7 +4702,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 }
                 ;
             }
-            else if (window["Touchy"] && typeof window["Touchy"] == "function") {
+            else if (globalThis["Touchy"] && typeof globalThis["Touchy"] == "function") {
                 console.error('[Deprecation] Found Touchy which is not supported any more. Please use AlloyFinger instead.');
                 // Convert absolute touch positions to relative DOM element position (relative to canvas)
             }
@@ -4750,9 +4748,8 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.createGUI = function () {
         // This function moved to the helper utils.
         // We do not want to include the whole dat.GUI package.
-        // TODO: move to demos.
-        if (window["utils"] && typeof window["utils"].createGUI == "function")
-            return window["utils"].createGUI(this);
+        if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
+            return globalThis["utils"].createGUI(this);
         else
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
     };

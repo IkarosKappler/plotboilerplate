@@ -472,7 +472,7 @@ export class PlotBoilerplate {
 	var _self = this;
 
 	// TODO: this should be placed in the caller and work for modules/global, too!
-	if( window ) window.addEventListener( 'resize', () => _self.resizeCanvas() );
+	globalThis.addEventListener( 'resize', () => _self.resizeCanvas() );
 	this.resizeCanvas();
 	if( config.autoDetectRetina ) {
 	    this._setToRetina();
@@ -505,9 +505,9 @@ export class PlotBoilerplate {
 
 	// See documentation for FileSaver.js for usage.
 	//    https://github.com/eligrey/FileSaver.js
-	if( typeof window["saveAs"] != "function" )
+	if( typeof globalThis["saveAs"] != "function" )
 	    throw "Cannot save file; did you load the ./utils/savefile helper function an the eligrey/SaveFile library?";
-	const _saveAs:saveAs = window["saveAs"] as saveAs;
+	const _saveAs:saveAs = globalThis["saveAs"] as saveAs;
 	_saveAs(blob, "plotboilerplate.svg");   
     };
 
@@ -524,7 +524,7 @@ export class PlotBoilerplate {
      **/
     private _setToRetina() : void {
 	this.config.autoDetectRetina = true;
-	const pixelRatio : number = window.devicePixelRatio || 1;
+	const pixelRatio : number = globalThis.devicePixelRatio || 1;
 	this.config.cssScaleX = this.config.cssScaleY = 1.0/pixelRatio; // 0.5;
 	this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio; // 2.0;
 	this.resizeCanvas();
@@ -566,7 +566,7 @@ export class PlotBoilerplate {
      * Set the console for this instance.
      *
      * @method setConsole
-     * @param {Console} con - The new console object (default is window.console).
+     * @param {Console} con - The new console object (default is globalThis.console).
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
@@ -1130,21 +1130,20 @@ export class PlotBoilerplate {
      **/	
     private getAvailableContainerSpace() : XYDimension {
 	const _self : PlotBoilerplate = this;
-	// var container : HTMLElement = _self.canvas.parentNode;
 	const container : HTMLElement = (_self.canvas.parentNode as unknown) as HTMLElement; // Element | Document | DocumentFragment;
 	var canvas : HTMLCanvasElement = _self.canvas;
 	canvas.style.display = 'none';
 	var
-	padding : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
-	border : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-width') ) || 0,
-	pl : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
-	pr : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
-	pt : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
-	pb : number = parseFloat( window.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
-	bl : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-left-width') ) || border,
-	br : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
-	bt : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
-	bb : number = parseFloat( window.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
+	padding : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
+	border : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-width') ) || 0,
+	pl : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
+	pr : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
+	pt : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
+	pb : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
+	bl : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-left-width') ) || border,
+	br : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
+	bt : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
+	bb : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
 	var w : number = container.clientWidth; 
 	var h : number = container.clientHeight;
 	canvas.style.display = 'block';
@@ -1178,8 +1177,8 @@ export class PlotBoilerplate {
 	};
 	if( _self.config.fullSize && !_self.config.fitToParent ) {
 	    // Set editor size
-	    var width : number  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-	    var height : number = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+	    var width : number  = globalThis.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	    var height : number = globalThis.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 	    _self.canvas.style.position = 'absolute';
 	    _self.canvas.style.width = (_self.config.canvasWidthFactor * width) + 'px';
 	    _self.canvas.style.height = (_self.config.canvasWidthFactor * height) + 'px';
@@ -1190,7 +1189,6 @@ export class PlotBoilerplate {
 	    // Set editor size
 	    _self.canvas.style.position = 'absolute';
 	    const space : XYDimension = this.getAvailableContainerSpace();
-	    // window.alert( space.width + " " + space.height );
 	    _self.canvas.style.width = (_self.config.canvasWidthFactor*space.width)+'px';
 	    _self.canvas.style.height = (_self.config.canvasHeightFactor*space.height)+'px';
 	    _self.canvas.style.top = null;
@@ -1355,7 +1353,7 @@ export class PlotBoilerplate {
      **/
     private mouseDownHandler(e:XMouseEvent) {
 	const _self = this;
-	if( e.which != 1 ) // && !(window.TouchEvent && e.originalEvent instanceof TouchEvent) )
+	if( e.which != 1 ) 
 	    return; // Only react on left mouse or touch events
 	var p : IDraggable = _self.locatePointNear( _self.transformMousePosition(e.params.pos.x, e.params.pos.y),
 						   PlotBoilerplate.DEFAULT_CLICK_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
@@ -1552,11 +1550,11 @@ export class PlotBoilerplate {
 		       };
 	    }
 	    
-	    if( window["AlloyFinger"] && typeof window["AlloyFinger"] == "function" ) {		
+	    if( globalThis["AlloyFinger"] && typeof globalThis["AlloyFinger"] == "function" ) {		
 		try {
 		    // Do not include AlloyFinger itself to the library
 		    // (17kb, but we want to keep this lib as tiny as possible).
-		    const AF : AlloyFinger = window["AlloyFinger"] as AlloyFinger;
+		    const AF : AlloyFinger = globalThis["AlloyFinger"] as AlloyFinger;
 		    var touchMovePos : Vertex|undefined|null= null;
 		    var touchDownPos : Vertex|undefined|null = null;
 		    var draggedElement : IDraggable|undefined|null = null;
@@ -1639,7 +1637,7 @@ export class PlotBoilerplate {
 		    console.error(e);
 		};
 
-	    } else if( window["Touchy"] && typeof window["Touchy"] == "function" ) {
+	    } else if( globalThis["Touchy"] && typeof globalThis["Touchy"] == "function" ) {
 		console.error('[Deprecation] Found Touchy which is not supported any more. Please use AlloyFinger instead.');
 		// Convert absolute touch positions to relative DOM element position (relative to canvas)
 	    } else {
@@ -1684,9 +1682,8 @@ export class PlotBoilerplate {
     createGUI() : GUI {
 	// This function moved to the helper utils.
 	// We do not want to include the whole dat.GUI package.
-	// TODO: move to demos.
-	if( window["utils"] && typeof window["utils"].createGUI == "function" )
-	    return window["utils"].createGUI(this);
+	if( globalThis["utils"] && typeof globalThis["utils"].createGUI == "function" )
+	    return globalThis["utils"].createGUI(this);
 	else
 	    throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
     };
