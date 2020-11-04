@@ -12,5 +12,5 @@
  * @date 2020-04-01
  **/
 
-var exports = window.export = window;
-var require = window.require = function(...args) { return window; };
+var exports = globalThis.export = globalThis;
+var require = globalThis.require = function(...args) { return globalThis; };

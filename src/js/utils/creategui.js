@@ -9,7 +9,7 @@
  * @modified 2020-04-03 Added empty default global object 'utils'. Added createGUI as an optional child.
  * @version  1.0.1
  **/
-var utils = window.utils = window.utils || {};
+var utils = globalThis.utils = globalThis.utils || {};
 
 
 /**
@@ -22,7 +22,7 @@ var utils = window.utils = window.utils || {};
  * @memberof utils
  * @return {dat.gui.GUI} 
  **/
-window.utils.createGUI = function(pb) {
+globalThis.utils.createGUI = function(pb) {
 
     var dummy = {
 	resetOffset : function() {

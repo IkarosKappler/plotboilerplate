@@ -7,7 +7,7 @@
  * It requires typescriptServices.js and tslib.js to be present.
  *
  * If you want to be called back when all Typescripts have been loaded and transpiled
- * add a function: window.onTypescriptsLoaded(boolean).
+ * add a function: globalThis.onTypescriptsLoaded(boolean).
  *
  * @author  Ikaros Kappler
  * @date    2020-03-18
@@ -22,7 +22,7 @@
 	// Register a pseudo-hidden global callback.
 	// The callback will be appended to the end of the transpiled JS code.
 	var callbackName = 'tsRunner_'+Math.floor(Math.random()*65535)+'_callback';
-	window[callbackName] = onTypescriptsExecuted;
+	globalThis[callbackName] = onTypescriptsExecuted;
 	
 	/**
 	 * Request to load the given resource (specified by 'path', relative or absolute)
@@ -62,7 +62,7 @@
 	    var errorCount = 0;
 	    for( var i = 0; i < tsCodes.length; i++ ) {
 		try {
-		    let jsCode = window.ts.transpile(tsCodes[i]);
+		    let jsCode = globalThis.ts.transpile(tsCodes[i]);
 		    if( !concatCodes ) {
 			var scriptNode = document.createElement('script');
 			scriptNode.setAttribute('id','ts-transpiled-'+i);
@@ -86,7 +86,7 @@
 		scriptNode.setAttribute('id','ts-transpiled-concat');
 		var finalCode =
 		    jsCodes.join(' ') +
-		    "window."+callbackName+"("+(errorCount==0)+")";
+		    "globalThis."+callbackName+"("+(errorCount==0)+")";
 		scriptNode.innerHTML = finalCode;
 		head.appendChild(scriptNode);
 	    }
@@ -143,4 +143,4 @@
 
     }; // END constructor
 
-}(window ? window : module.exports));
+}(globalThis ? globalThis : module.exports));

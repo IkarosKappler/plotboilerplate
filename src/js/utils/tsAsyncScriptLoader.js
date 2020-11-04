@@ -13,17 +13,17 @@
 
 
 // Prevent plotboilerplate from auto-loading.
-window.pbPreventAutoLoad = true;
+globalThis.pbPreventAutoLoad = true;
 
 // This simulates the 'export' and 'require' directives.
 // There is no other way than to define these global!
-var exports = window.exports = window;
-var require = window.require = function(...args) { console.log(args); return window; };
+var exports = globalThis.exports = globalThis;
+var require = globalThis.require = function(...args) { console.log(args); return globalThis; };
 
 (function() {
 
     // Start the process when the document is fully loaded.
-    window.addEventListener('load', function() {
+    globalThis.addEventListener('load', function() {
 	var tsRunner = new TSRunner(
 	    function(status) {
 		console.log(status ? '===> Typescript successfully loaded.' : '===> Error loading typescript.' );
@@ -34,7 +34,7 @@ var require = window.require = function(...args) { console.log(args); return win
 	    function(status) {
 		console.log(status ? '===> Typescript successfully executed.' : '===> Error executing typescript.' );
 		loadJSFiles();
-		window.initializePB();
+		globalThis.initializePB();
 	    },
 	    true  // concat codes to one single 'file'
 	);
@@ -84,7 +84,7 @@ var require = window.require = function(...args) { console.log(args); return win
 	    scriptNode.addEventListener('load', function() {
 		scriptsLoaded++;
 		if( scriptsLoaded == jsSources.length )
-		    window.initializePB();
+		    globalThis.initializePB();
             });
             scriptNode.setAttribute('src',jsSources[i]);
             head.appendChild(scriptNode);      

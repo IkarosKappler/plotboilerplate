@@ -5,9 +5,10 @@
  *    https://stackoverflow.com/questions/27362914/how-to-add-tooltips-to-dat-gui
  *    by greginvm
  *
- * @author  Ikaros Kappler
- * @date    2020-02-13
- * version  1.0.0
+ * @author   Ikaros Kappler
+ * @date     2020-02-13
+ * @modified 2020-10-14 Changed 'window' to 'globalthis'.
+ * version   1.0.1
  **/
 
 
@@ -62,13 +63,8 @@
 	    node.innerHTML = '<div class="bounce">' + v + '&nbsp;<span style="margin-left: 3em;">➤</span></div>';
 	    this.__li.prepend(node);
 	    if( typeof options.detachAfter == 'number' )
-		window.setTimeout( function() { removeElement(); /*node.parentElement.removeChild(node);*/ }, options.detachAfter );
+		globalThis.setTimeout( function() { removeElement(); }, options.detachAfter );
 	} else {
-	    /* this.__li.querySelectorAll('.arrowBounce').forEach( function(elem) {
-		elem.parentElement.removeChild(elem);
-	    } );
-	    this.__li.style.overflow = 'hidden';
-	    */
 	    removeElement();
 	}
 

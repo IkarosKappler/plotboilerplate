@@ -29,6 +29,7 @@ window.addEventListener(
 	checkMember( "devicePixelRatio", "number" );
 	checkMember( "innerWidth", "number" );
 	checkMember( "innerHeight", "number" );
+	checkMember( "setTimeout", "function" );
     }
 );
 
