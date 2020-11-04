@@ -8765,27 +8765,27 @@ exports.geomutils = {
 
 /* Imports for webpack */
 
-window.VertexAttr = __webpack_require__(/*! ./VertexAttr.js */ "../src/js/VertexAttr.js").VertexAttr;
-window.VertexListeners = __webpack_require__(/*! ./VertexListeners.js */ "../src/js/VertexListeners.js").VertexListeners;
-window.Vertex = __webpack_require__(/*! ./Vertex.js */ "../src/js/Vertex.js").Vertex;
+globalThis.VertexAttr = __webpack_require__(/*! ./VertexAttr.js */ "../src/js/VertexAttr.js").VertexAttr;
+globalThis.VertexListeners = __webpack_require__(/*! ./VertexListeners.js */ "../src/js/VertexListeners.js").VertexListeners;
+globalThis.Vertex = __webpack_require__(/*! ./Vertex.js */ "../src/js/Vertex.js").Vertex;
 
-window.Bounds = __webpack_require__(/*! ./Bounds.js */ "../src/js/Bounds.js").Bounds;
-window.Grid = __webpack_require__(/*! ./Grid.js */ "../src/js/Grid.js").Grid;
-window.Line = __webpack_require__(/*! ./Line.js */ "../src/js/Line.js").Line;
-window.Vector = __webpack_require__(/*! ./Vector.js */ "../src/js/Vector.js").Vector;
-window.CubicBezierCurve = __webpack_require__(/*! ./CubicBezierCurve.js */ "../src/js/CubicBezierCurve.js").CubicBezierCurve;
-window.BezierPath = __webpack_require__(/*! ./BezierPath.js */ "../src/js/BezierPath.js").BezierPath;
-window.Polygon = __webpack_require__(/*! ./Polygon.js */ "../src/js/Polygon.js").Polygon;
-window.Triangle = __webpack_require__(/*! ./Triangle.js */ "../src/js/Triangle.js").Triangle;
-window.VEllipse = __webpack_require__(/*! ./VEllipse.js */ "../src/js/VEllipse.js").VEllipse;
-window.Circle = __webpack_require__(/*! ./Circle.js */ "../src/js/Circle.js").Circle;
-window.PBImage = __webpack_require__(/*! ./PBImage.js */ "../src/js/PBImage.js").PBImage;
-window.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "../src/js/MouseHandler.js").MouseHandler;
-window.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "../src/js/KeyHandler.js").KeyHandler;
-window.drawutils = __webpack_require__(/*! ./draw.js */ "../src/js/draw.js").drawutils;
-window.drawutilsgl = __webpack_require__(/*! ./drawgl.js */ "../src/js/drawgl.js").drawutilsgl;
-window.geomutils = __webpack_require__(/*! ./geomutils.js */ "../src/js/geomutils.js").geomutils;
-window.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "../src/js/PlotBoilerplate.js").PlotBoilerplate;
+globalThis.Bounds = __webpack_require__(/*! ./Bounds.js */ "../src/js/Bounds.js").Bounds;
+globalThis.Grid = __webpack_require__(/*! ./Grid.js */ "../src/js/Grid.js").Grid;
+globalThis.Line = __webpack_require__(/*! ./Line.js */ "../src/js/Line.js").Line;
+globalThis.Vector = __webpack_require__(/*! ./Vector.js */ "../src/js/Vector.js").Vector;
+globalThis.CubicBezierCurve = __webpack_require__(/*! ./CubicBezierCurve.js */ "../src/js/CubicBezierCurve.js").CubicBezierCurve;
+globalThis.BezierPath = __webpack_require__(/*! ./BezierPath.js */ "../src/js/BezierPath.js").BezierPath;
+globalThis.Polygon = __webpack_require__(/*! ./Polygon.js */ "../src/js/Polygon.js").Polygon;
+globalThis.Triangle = __webpack_require__(/*! ./Triangle.js */ "../src/js/Triangle.js").Triangle;
+globalThis.VEllipse = __webpack_require__(/*! ./VEllipse.js */ "../src/js/VEllipse.js").VEllipse;
+globalThis.Circle = __webpack_require__(/*! ./Circle.js */ "../src/js/Circle.js").Circle;
+globalThis.PBImage = __webpack_require__(/*! ./PBImage.js */ "../src/js/PBImage.js").PBImage;
+globalThis.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "../src/js/MouseHandler.js").MouseHandler;
+globalThis.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "../src/js/KeyHandler.js").KeyHandler;
+globalThis.drawutils = __webpack_require__(/*! ./draw.js */ "../src/js/draw.js").drawutils;
+globalThis.drawutilsgl = __webpack_require__(/*! ./drawgl.js */ "../src/js/drawgl.js").drawutilsgl;
+globalThis.geomutils = __webpack_require__(/*! ./geomutils.js */ "../src/js/geomutils.js").geomutils;
+globalThis.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "../src/js/PlotBoilerplate.js").PlotBoilerplate;
 
 
 })();
