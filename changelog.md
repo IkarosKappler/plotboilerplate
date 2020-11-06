@@ -1,9 +1,11 @@
 
 
 # Changelog
-* 2020-10-14
+* 2020-11-06
+  * Added the `Polygon.move(XYCoords)` function.
+* 2020-11-04
   * Changed `window` to `globalThis`.
-* 2020-10-01
+* 2020-11-01
   * Migrated the build tools from Webpack-4 to Webpack-5.
   * Moved the build scripts to ./bin.
 * 2020-10-31

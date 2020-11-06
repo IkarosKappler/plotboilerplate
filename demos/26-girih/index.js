@@ -24,6 +24,18 @@
 	
 	// Fetch the GET params
 	let GUP = gup();
+
+	// Initialize templates, one for each Girih tile type.
+	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
+	var templatePointer = 0;
+	var TILE_TEMPLATES = [
+	    new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 ),
+	    new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 ),
+	    new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 ),
+	    new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 ),
+	    new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 ),
+	    new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true )
+	];
 	
 	// All config params are optional.
 	var pb = new PlotBoilerplate(
@@ -35,7 +47,7 @@
 		  scaleY                : 1.0,
 		  rasterGrid            : true,
 		  drawGrid              : true,
-		  drawOrigin            : true,
+		  drawOrigin            : false,
 		  rasterAdjustFactor    : 2.0,
 		  redrawOnResize        : true,
 		  defaultCanvasWidth    : 1024,
@@ -82,7 +94,11 @@
 	var hoverTileIndex = -1;
 	var hoverEdgeIndex = -1;
 	var tiles = [];
-	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
+	var previewTileAdjacency = null; // adjadency
+	var previewTile = null;
+	for( var i in TILE_TEMPLATES )
+	    tiles.push( TILE_TEMPLATES[i].clone() );
+	
 
 	/**
 	 * Find that tile (index) which contains the given position. First match will be returned.
@@ -98,25 +114,7 @@
 	    }
 	    return -1;
 	};
-	
-	// Todo for all tiles: `position` should be first param
-	var decagon = new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 );
-	tiles.push( decagon );
 
-	var pentagon = new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 );
-	tiles.push( pentagon );
-
-	var hexagon = new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 );
-	tiles.push( hexagon );
-
-	var bowtie = new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 );
-	tiles.push( bowtie );
-
-	var rhombus = new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 );
-	tiles.push( rhombus );
-
-	var penrose = new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true );
-	tiles.push( penrose );
 
 
 	// +---------------------------------------------------------------------------------
@@ -143,6 +141,13 @@
 	// | This is the actual render function.
 	// +-------------------------------
 	var drawAll = function() {
+	    // Draw the preview polygon first
+	    if( previewTile ) {
+		//template.move( adjacency.offset );
+		// drawTile( previewTile, -1 );
+		pb.draw.polygon( previewTile, 'rgba(128,128,128,1.0)', 1.0 ); // Polygon is not open
+	    }
+	    
 	    // Draw all tiles
 	    for( var i in tiles ) {
 		var tile = tiles[i];
@@ -150,27 +155,7 @@
 		if( hoverTileIndex == i ) 
 		    pb.fill.polygon( tile, 'rgba(128,128,128,0.12)' );
 		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
-
-		// Draw all inner polygons
-		for( var j = 0; j < tile.innerTilePolygons.length; j++ ) {
-		    pb.draw.polygon( tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0 );
-		}
-		// Draw all outer polygons
-		for( var j = 0; j < tile.outerTilePolygons.length; j++ ) {
-		    pb.draw.polygon( tile.outerTilePolygons[j], Teal.cssRGB(), 1.0 );
-		}
-		// Draw a crosshair at the center
-		// pb.draw.crosshair( tile.position, 7, 'rgba(0,192,192,0.5)' );
-		drawFancyCrosshair( tile.position, hoverTileIndex == i );
-
-		// Draw corner numbers?
-		if( config.drawCornerNumbers ) {
-		    var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor));
-		    for( var i = 0; i < tile.vertices.length; i++ ) {		
-			var pos = tile.vertices[i].clone().scale( 0.85, tile.position );
-			pb.fill.text( ""+i, pos.x, pos.y, { color : contrastColor } );
-		    }
-		}
+		drawTile( tile, i );
 	    }
 
 	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
@@ -179,6 +164,29 @@
 				     tile.vertices[ (hoverEdgeIndex+1) % tile.vertices.length ]
 				   ); 
 		pb.draw.line( edge.a, edge.b, Red.cssRGB(), 2.0 );
+	    }
+	};
+
+	var drawTile = function( tile, index ) {
+	    // Draw all inner polygons
+	    for( var j = 0; j < tile.innerTilePolygons.length; j++ ) {
+		pb.draw.polygon( tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0 );
+	    }
+	    // Draw all outer polygons
+	    for( var j = 0; j < tile.outerTilePolygons.length; j++ ) {
+		pb.draw.polygon( tile.outerTilePolygons[j], Teal.cssRGB(), 1.0 );
+	    }
+	    // Draw a crosshair at the center
+	    // pb.draw.crosshair( tile.position, 7, 'rgba(0,192,192,0.5)' );
+	    drawFancyCrosshair( tile.position, hoverTileIndex == i );
+
+	    // Draw corner numbers?
+	    if( config.drawCornerNumbers ) {
+		var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor));
+		for( var i = 0; i < tile.vertices.length; i++ ) {		
+		    var pos = tile.vertices[i].clone().scale( 0.85, tile.position );
+		    pb.fill.text( ""+i, pos.x, pos.y, { color : contrastColor } );
+		}
 	    }
 	};
 
@@ -212,8 +220,16 @@
 	var handleTurnTile = function( turnCount ) {
 	    if( hoverTileIndex == -1 )
 		return;
+	    var tile = tiles[hoverTileIndex];
+	    tile.rotate( turnCount * Math.PI/tile.symmetry );
+	    pb.redraw();
+	};
 
-	    tiles[hoverTileIndex].rotate( turnCount * Math.PI/4 );
+	var handleMoveTile = function( moveXAmount, moveYAmount ) {
+	    if( hoverTileIndex == -1 )
+		return;
+	    var tile = tiles[hoverTileIndex];
+	    tile.move( { x: moveXAmount*10, y : moveYAmount*10 } );
 	    pb.redraw();
 	};
 	
@@ -235,7 +251,7 @@
 	// +---------------------------------------------------------------------------------
 	// | Add a key listener.
 	// +-------------------------------
-	new KeyHandler( { trackAll : true } )
+	var keyHandler = new KeyHandler( { trackAll : true } )
  	    .down('q',function() {
 		console.log('q was hit.');
 		handleTurnTile(-1);
@@ -243,6 +259,34 @@
 	    .down('e',function() {
 		console.log('e was hit.');
 		handleTurnTile(1);
+	    } )
+	    .down('w',function(e) {
+		console.log('w was hit.');
+		if( keyHandler.isDown('shift') ) {
+		    console.log('shift + w');
+		    handleMoveTile(0,-1);
+		}
+	    } )
+	    .down('a',function(e) {
+		console.log('a was hit.');
+		if( keyHandler.isDown('shift') ) {
+		    console.log('shift + a');
+		    handleMoveTile(-1,0);
+		}
+	    } )
+	    .down('s',function(e) {
+		console.log('s was hit.');
+		if( keyHandler.isDown('shift') ) {
+		    console.log('shift + s');
+		    handleMoveTile(0,1);
+		}
+	    } )
+	    .down('d',function(e) {
+		console.log('d was hit.');
+		if( keyHandler.isDown('shift') ) {
+		    console.log('shift + d');
+		    handleMoveTile(1,0);
+		}
 	    } )
  	;
 
@@ -269,8 +313,30 @@
 	    if( hoverTileIndex == -1 )
 		hoverTileIndex = containedTileIndex;
 	    
-	    if( oldHoverTileIndex != hoverTileIndex || oldHoverEdgeIndex != hoverEdgeIndex )
-		pb.redraw();
+	    if( oldHoverTileIndex == hoverTileIndex && oldHoverEdgeIndex == hoverEdgeIndex ) 
+		return;
+
+	    // Find the next possible tile to place?
+	    previewTile = null;
+	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
+		var template = TILE_TEMPLATES[ templatePointer ].clone();
+		// Find a rotation for that tile to match
+		for( var i = 0; i < template.symmetry; i++ ) {
+		    var adjacency =
+			tiles[hoverTileIndex].findAdjacentTilePosition(
+			    hoverEdgeIndex,
+			    template
+			);
+		    // console.log( adjacency );
+		    if( adjacency ) {
+			template.move( adjacency.offset );
+			previewTile = template;
+			// previewTileAdjacency = adjacency;
+		    }
+		}
+	    }
+	    
+	    pb.redraw();
 	};
 	
 	// +---------------------------------------------------------------------------------

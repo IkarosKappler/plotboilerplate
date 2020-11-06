@@ -71,6 +71,16 @@ var GirihRhombus = function( position, size, angle ) {
     this._buildOuterPolygons();  // Call only AFTER the inner polygons were built!
 };
 
+
+/**
+ * @abstract Subclasses must override this.
+ */
+GirihRhombus.prototype.clone = function() {
+    return new GirihRhombus( this.position.clone(), this.size, this.rotation );
+};
+
+
+
 GirihRhombus.prototype._buildInnerPolygons = function() {
 
        // Connect all edges half-the-way
@@ -143,5 +153,7 @@ GirihRhombus.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtP
 GirihRhombus.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihRhombus.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 GirihRhombus.prototype.toSVG                 = GirihTile.prototype.toSVG;
+
+GirihRhombus.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihRhombus.prototype.constructor           = GirihRhombus;

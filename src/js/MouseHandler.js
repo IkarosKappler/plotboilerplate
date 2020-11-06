@@ -91,7 +91,7 @@ var MouseHandler = /** @class */ (function () {
      *          .click( (e:XMouseEvent) => {
      *              console.log( 'Click.' );
      *          } )
-     *          .wheel( (e:XMouseEvent) => {
+     *          .wheel( (e:XWheelEvent) => {
      *              console.log( 'Wheel. delta='+e.deltaY );
      *          } )
      *

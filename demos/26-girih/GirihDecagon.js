@@ -58,6 +58,13 @@ var GirihDecagon = function( position, size, angle ) {
   
 };
 
+/**
+ * @abstract Subclasses must override this.
+ */
+GirihDecagon.prototype.clone = function() {
+    return new GirihDecagon( this.position.clone(), this.size, this.rotation );
+};
+
 
 /**
  * Build the inner polygons.
@@ -69,7 +76,7 @@ var GirihDecagon = function( position, size, angle ) {
  */
 GirihDecagon.prototype._buildInnerPolygons = function( edgeLength ) {
 
-    console.log( this.position );
+    //console.log( this.position );
     var centralStar = new Polygon();
     for( var i = 0; i < 10; i++ ) {
 	var innerTile = new Polygon();
@@ -137,6 +144,9 @@ GirihDecagon.prototype.rotate         = GirihTile.prototype.rotate;
 GirihDecagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihDecagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihDecagon.prototype.getVertexAt          = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
+GirihDecagon.prototype.move         = GirihTile.prototype.move;
 GirihDecagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+
+GirihDecagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihDecagon.prototype.constructor           = GirihDecagon;

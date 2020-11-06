@@ -45,6 +45,7 @@ exports.getConvexHull = function (points) {
  * Compare two vertices to create an order on the 2D plane.
  *
  * @name comparison
+ * @private
  * @param {XYCoords} a - The first of the two points to compare.
  * @param {XYCoords} b - The second of the two points to compare.
  * @return {number} A number indicating the order (negative if `a` is 'smaller', 0 if both are equal, positive if `a` is 'larger').
@@ -55,6 +56,8 @@ var comparison = function (a, b) {
 /**
  * Calculate the cross product of the three coordinates, interpreted as vectors.
  *
+ * @name cross
+ * @private
  * @param {XYCoords} a
  * @param {XYCoords} b
  * @param {XYCoords} o

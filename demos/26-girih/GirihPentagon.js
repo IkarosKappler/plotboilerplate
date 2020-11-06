@@ -57,6 +57,15 @@ var GirihPentagon = function( position, size, angle ) {
     this._buildOuterPolygons( size );       // Only call AFTER the inner polygons were built!
 };
 
+
+/**
+ * @abstract Subclasses must override this.
+ */
+GirihPentagon.prototype.clone = function() {
+    return new GirihPentagon( this.position.clone(), this.size, this.rotation );
+};
+
+
 GirihPentagon.prototype._buildInnerPolygons = function( edgeLength ) {
     // Connect all edges half-the-way
     var innerTile = new Polygon(); 
@@ -101,5 +110,8 @@ GirihPentagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAt
 GirihPentagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihPentagon.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 GirihPentagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+
+GirihPentagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
+
 
 GirihPentagon.prototype.constructor           = GirihPentagon;

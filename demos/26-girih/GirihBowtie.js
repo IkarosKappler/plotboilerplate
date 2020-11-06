@@ -83,6 +83,13 @@ var GirihBowtie = function( position, size, angle ) {
   
 };
 
+/**
+ * @abstract Subclasses must override this.
+ */
+GirihBowtie.prototype.clone = function() {
+    return new GirihBowtie( this.position.clone(), this.size, this.rotation );
+};
+
 GirihBowtie.prototype._buildInnerPolygons = function( edgeLength ) {
 
     var indices = [ 1, 4 ];
@@ -146,6 +153,7 @@ GirihBowtie.prototype._buildOuterPolygons = function( edgeLength ) {
 // This is totally shitty. Why object inheritance when I still
 // have to inherit object methods manually??!
 // GirihBowtie.prototype.computeBounds         = GirihTile.prototype.computeBounds;
+//GirihBowtie.prototype.           = Polygon.prototype.addVertex;
 GirihBowtie.prototype.addVertex            = Polygon.prototype.addVertex; // GirihTile.prototype.addVertex;
 GirihBowtie.prototype.translateVertex      = GirihTile.prototype.translateVertex;
 GirihBowtie.prototype._polygonToSVG         = GirihTile.prototype._polygonToSVG;
@@ -159,5 +167,7 @@ GirihBowtie.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPo
 GirihBowtie.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihBowtie.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 GirihBowtie.prototype.toSVG                 = GirihTile.prototype.toSVG;
+
+GirihBowtie.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihBowtie.prototype.constructor           = GirihBowtie;

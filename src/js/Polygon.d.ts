@@ -14,8 +14,9 @@
  * @modified 2019-11-22 Added the rotate(number,Vertex) function.
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-10-30 Added the `addVertex` function.
- * @modified 2020-10-31 Added thet `getVertexAt` function.
- * @version 1.3.0
+ * @modified 2020-10-31 Added the `getVertexAt` function.
+ * @modified 2020-11-06 Added the `move` function.
+ * @version 1.4.0
  *
  * @file Polygon
  * @public
@@ -72,6 +73,16 @@ export declare class Polygon implements SVGSerializable {
      * @return {Vertex} At the given index.
      **/
     getVertexAt(index: number): Vertex;
+    /**
+     * Move the polygon's vertices by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Polygon
+     * @return {Polygon} this for chaining
+     **/
+    move(vert: Vertex): Polygon;
     /**
      * Check if the given vertex is inside this polygon.<br>
      * <br>

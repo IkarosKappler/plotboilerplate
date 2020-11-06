@@ -83,6 +83,14 @@ var GirihPenroseRhombus = function( position, size, angle, opt_addCenterPolygon 
     this._buildOuterPolygons( size, opt_addCenterPolygon );
 };
 
+/**
+ * @abstract Subclasses must override this.
+ */
+GirihPenroseRhombus.prototype.clone = function() {
+    return new GirihPenroseRhombus( this.position.clone(), this.size, this.rotation );
+};
+
+
 GirihPenroseRhombus.prototype._buildInnerPolygons = function( edgeLength, addCenterPolygon ) {
     var indices              = [ 0, 2 ];
     // var innerPointIndexLeft  = -1;
@@ -189,5 +197,7 @@ GirihPenroseRhombus.prototype.locateAdjacentEdge    = GirihTile.prototype.locate
 GirihPenroseRhombus.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 //GirihPenroseRhombus.prototype.getVertexAt           = GirihTile.prototype.getVertexAt;
 GirihPenroseRhombus.prototype.toSVG                 = GirihTile.prototype.toSVG;
+
+GirihPenroseRhombus.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihPenroseRhombus.prototype.constructor           = GirihPenroseRhombus;

@@ -39,9 +39,8 @@ var GirihTile = function( position,
     
     this.size                 = size;
     this.position             = position;
-    this.angle                = angle;
-    //this.vertices            = [];
-    // this.polygon              = new Polygon(); // Empty vertice array
+    this.rotation             = angle;
+    this.symmetry             = 10;
 
     // An array of polygons.
     // The inner tile polygons are those that do not share edges with the outer
@@ -81,6 +80,46 @@ GirihTile.DEFAULT_EDGE_LENGTH     = 58;
 
 
 /**
+ * @abstract Subclasses must override this.
+ */
+GirihTile.prototype.clone = function() {
+    throw "Subclasses must override the clone() function.";
+};
+
+/**
+ * @param {XYCoords} amount
+ */
+GirihTile.prototype.move = function( amount ) {
+    Polygon.prototype.move.call( this, amount );
+    for( var i in this.innerTilePolygons )
+	this.innerTilePolygons[i].move( amount );
+    for( var i in this.outerTilePolygons )
+	this.outerTilePolygons[i].move( amount );
+    this.position.add( amount );
+};
+
+
+GirihTile.prototype.findAdjacentTilePosition = function( edgeIndex, tile ) {
+    var edgeA = new Line( this.vertices[ edgeIndex % this.vertices.length ],
+			 this.vertices[ (edgeIndex+1) % this.vertices.length ] );
+    // Find adjacent edge
+    for( var i = 0; i < tile.vertices.length; i++ ) {
+	var edgeB = new Line( tile.vertices[ i % tile.vertices.length ].clone(),
+			      tile.vertices[ (i+1) % tile.vertices.length ].clone() );
+	// Goal: edgeA.a==edgeB.b && edgeA.b==edgeB.a
+	// So move edgeB
+	var offset = edgeB.b.difference(edgeA.a);
+	edgeB.add( offset );
+	// console.log( edgeB.a.distance(edgeA.b), edgeB.b.distance(edgeA.a) ); // edgeB, edgeA );
+	if( edgeB.a.distance(edgeA.b) < 0.1 ) {
+	    return { edgeIndex : i, offset : offset };
+	} 	
+    }
+    return null;
+};
+    
+
+/**
  * This function applies MOD to the index.
  **/
 GirihTile.prototype.getInnerTilePolygonAt = function( index ) {
@@ -109,15 +148,14 @@ GirihTile.prototype.getTranslatedVertex = function( index ) {
 
 
 GirihTile.prototype.rotate = function( angle ) {
-
     Polygon.prototype.rotate.call( this, angle, this.position );
-
     for( var i in this.innerTilePolygons ) {
 	this.innerTilePolygons[i].rotate( angle, this.position );
     }
     for( var i in this.outerTilePolygons ) {
 	this.outerTilePolygons[i].rotate( angle, this.position );
     }
+    this.rotation += angle;
 };
 
 

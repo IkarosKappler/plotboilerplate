@@ -82,6 +82,14 @@ var GirihHexagon = function( position, size, angle ) {
 };
 
 
+/**
+ * @abstract Subclasses must override this.
+ */
+GirihHexagon.prototype.clone = function() {
+    return new GirihHexagon( this.position.clone(), this.size, this.rotation );
+};
+
+
 GirihHexagon.prototype._buildInnerPolygons = function( edgeLength) {
 
     
@@ -210,5 +218,7 @@ GirihHexagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtP
 GirihHexagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihHexagon.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // IKRS.Tile.prototype.getVertexAt;
 GirihHexagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+
+GirihHexagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihHexagon.prototype.constructor           = GirihHexagon;

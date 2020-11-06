@@ -2985,7 +2985,7 @@ var MouseHandler = /** @class */ (function () {
      *          .click( (e:XMouseEvent) => {
      *              console.log( 'Click.' );
      *          } )
-     *          .wheel( (e:XMouseEvent) => {
+     *          .wheel( (e:XWheelEvent) => {
      *              console.log( 'Wheel. delta='+e.deltaY );
      *          } )
      *
@@ -5163,8 +5163,9 @@ exports.PlotBoilerplate = PlotBoilerplate;
  * @modified 2019-11-22 Added the rotate(number,Vertex) function.
  * @modified 2020-03-24 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-10-30 Added the `addVertex` function.
- * @modified 2020-10-31 Added thet `getVertexAt` function.
- * @version 1.3.0
+ * @modified 2020-10-31 Added the `getVertexAt` function.
+ * @modified 2020-11-06 Added the `move` function.
+ * @version 1.4.0
  *
  * @file Polygon
  * @public
@@ -5220,6 +5221,22 @@ var Polygon = /** @class */ (function () {
             return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
         else
             return this.vertices[index % this.vertices.length];
+    };
+    ;
+    /**
+     * Move the polygon's vertices by the given amount.
+     *
+     * @method move
+     * @param {XYCoords} amount - The amount to move.
+     * @instance
+     * @memberof Polygon
+     * @return {Polygon} this for chaining
+     **/
+    Polygon.prototype.move = function (vert) {
+        for (var i in this.vertices) {
+            this.vertices[i].add(vert);
+        }
+        return this;
     };
     ;
     /**
