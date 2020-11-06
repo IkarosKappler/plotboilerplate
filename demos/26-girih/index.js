@@ -145,7 +145,7 @@
 	    if( previewTile ) {
 		//template.move( adjacency.offset );
 		// drawTile( previewTile, -1 );
-		pb.draw.polygon( previewTile, 'rgba(128,128,128,1.0)', 1.0 ); // Polygon is not open
+		pb.draw.polygon( previewTile, 'rgba(128,128,128,0.5)', 1.0 ); // Polygon is not open
 	    }
 	    
 	    // Draw all tiles
@@ -154,7 +154,6 @@
 		// Fill polygon when highlighted (mouse hover)
 		if( hoverTileIndex == i ) 
 		    pb.fill.polygon( tile, 'rgba(128,128,128,0.12)' );
-		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
 		drawTile( tile, i );
 	    }
 
@@ -168,17 +167,23 @@
 	};
 
 	var drawTile = function( tile, index ) {
-	    // Draw all inner polygons
-	    for( var j = 0; j < tile.innerTilePolygons.length; j++ ) {
-		pb.draw.polygon( tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0 );
+	    if( config.drawOutlines )
+		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
+	    // Draw all inner polygons?
+	    if( config.drawInnerPolygons ) {
+		for( var j = 0; j < tile.innerTilePolygons.length; j++ ) {
+		    pb.draw.polygon( tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0 );
+		}
 	    }
-	    // Draw all outer polygons
-	    for( var j = 0; j < tile.outerTilePolygons.length; j++ ) {
-		pb.draw.polygon( tile.outerTilePolygons[j], Teal.cssRGB(), 1.0 );
+	    // Draw all outer polygons?
+	    if( config.drawOuterPolygons ) {
+		for( var j = 0; j < tile.outerTilePolygons.length; j++ ) {
+		    pb.draw.polygon( tile.outerTilePolygons[j], Teal.cssRGB(), 1.0 );
+		}
 	    }
 	    // Draw a crosshair at the center
-	    // pb.draw.crosshair( tile.position, 7, 'rgba(0,192,192,0.5)' );
-	    drawFancyCrosshair( tile.position, hoverTileIndex == i );
+	    if( config.drawCenters )
+		drawFancyCrosshair( tile.position, hoverTileIndex == i );
 
 	    // Draw corner numbers?
 	    if( config.drawCornerNumbers ) {
@@ -252,42 +257,25 @@
 	// | Add a key listener.
 	// +-------------------------------
 	var keyHandler = new KeyHandler( { trackAll : true } )
- 	    .down('q',function() {
-		console.log('q was hit.');
-		handleTurnTile(-1);
-	    } )
-	    .down('e',function() {
-		console.log('e was hit.');
-		handleTurnTile(1);
-	    } )
-	    .down('w',function(e) {
-		console.log('w was hit.');
-		if( keyHandler.isDown('shift') ) {
-		    console.log('shift + w');
+ 	    .down('q',function() { handleTurnTile(-1); } )
+	    .down('e',function() { handleTurnTile(1); } )
+	    .down('w',function(e) { if( keyHandler.isDown('shift') ) {
 		    handleMoveTile(0,-1);
-		}
-	    } )
-	    .down('a',function(e) {
-		console.log('a was hit.');
-		if( keyHandler.isDown('shift') ) {
-		    console.log('shift + a');
-		    handleMoveTile(-1,0);
-		}
-	    } )
-	    .down('s',function(e) {
-		console.log('s was hit.');
-		if( keyHandler.isDown('shift') ) {
-		    console.log('shift + s');
-		    handleMoveTile(0,1);
-		}
-	    } )
-	    .down('d',function(e) {
-		console.log('d was hit.');
-		if( keyHandler.isDown('shift') ) {
-		    console.log('shift + d');
-		    handleMoveTile(1,0);
-		}
-	    } )
+	    } } )
+	    .down('a',function(e) { if( keyHandler.isDown('shift') ) {
+		handleMoveTile(-1,0);
+	    } } )
+	    .down('s',function(e) { if( keyHandler.isDown('shift') ) {
+		handleMoveTile(0,1);
+	    } } )
+	    .down('d',function(e) { if( keyHandler.isDown('shift') ) {
+		handleMoveTile(1,0);
+	    } } )
+	    .down('o',function() { config.drawOutlines = !config.drawOutlines; pb.redraw(); } )
+	    .down('n',function() { config.drawCornerNumbers = !config.drawCornerNumbers; pb.redraw(); } )
+	    .down('c',function() { config.drawCenters = !config.drawCenters; pb.redraw(); } )
+	    .down('p',function() { config.drawOuterPolygons = !config.drawOuterPolygons; pb.redraw(); } )
+	    .down('i',function() { config.drawInnerPolygons = !config.drawInnerPolygons; pb.redraw(); } )
  	;
 
 
@@ -327,11 +315,9 @@
 			    hoverEdgeIndex,
 			    template
 			);
-		    // console.log( adjacency );
 		    if( adjacency ) {
 			template.move( adjacency.offset );
 			previewTile = template;
-			// previewTileAdjacency = adjacency;
 		    }
 		}
 	    }
@@ -343,7 +329,11 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    drawCornerNumbers : false
+	    drawOutlines : true,
+	    drawCenters : true,
+	    drawCornerNumbers : false,
+	    drawOuterPolygons : true,
+	    drawInnerPolygons : true
 	}, GUP );
 	
 
@@ -353,7 +343,11 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-	    gui.add(config, 'drawCornerNumbers').onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
+	    gui.add(config, 'drawCornerNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
+	    gui.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
+	    gui.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
+	    gui.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
+	    gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
 	}
 
 	pb.config.preDraw = drawAll;
