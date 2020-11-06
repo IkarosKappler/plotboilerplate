@@ -197,7 +197,7 @@ GirihPenroseRhombus.prototype.locateAdjacentEdge    = GirihTile.prototype.locate
 GirihPenroseRhombus.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 //GirihPenroseRhombus.prototype.getVertexAt           = GirihTile.prototype.getVertexAt;
 GirihPenroseRhombus.prototype.toSVG                 = GirihTile.prototype.toSVG;
-
+GirihPenroseRhombus.prototype.move         = GirihTile.prototype.move;
 GirihPenroseRhombus.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihPenroseRhombus.prototype.constructor           = GirihPenroseRhombus;

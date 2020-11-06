@@ -110,7 +110,7 @@ GirihPentagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAt
 GirihPentagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihPentagon.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 GirihPentagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
-
+GirihPentagon.prototype.move         = GirihTile.prototype.move;
 GirihPentagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 

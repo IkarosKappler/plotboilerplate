@@ -91,14 +91,17 @@
 	// +---------------------------------------------------------------------------------
 	// | Initialize 
 	// +-------------------------------
+	// The index of the tile the mouse is hovering on or nearby (in the tiles-array)
 	var hoverTileIndex = -1;
+	// The index of the closest edge to the mouse pointer
 	var hoverEdgeIndex = -1;
+	// The set of all Girih tiles in scene
 	var tiles = [];
-	var previewTileAdjacency = null; // adjadency
+	// If the mouse hovers over an edge the next possible adjacent Girih tile will be this
 	var previewTile = null;
-	for( var i in TILE_TEMPLATES )
+	for( var i in TILE_TEMPLATES ) {
 	    tiles.push( TILE_TEMPLATES[i].clone() );
-	
+	}
 
 	/**
 	 * Find that tile (index) which contains the given position. First match will be returned.
@@ -166,6 +169,12 @@
 	    }
 	};
 
+	// +---------------------------------------------------------------------------------
+	// | Draw the given tile.
+	// |
+	// | @param {GirihTile} tile - The tile itself.
+	// | @param {number} index - The index in the tiles-array (to highlight hover).
+	// +-------------------------------
 	var drawTile = function( tile, index ) {
 	    if( config.drawOutlines )
 		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
@@ -196,6 +205,9 @@
 	};
 
 	
+	// +---------------------------------------------------------------------------------
+	// | Draw a fancy crosshair. The default one is useful but boring.
+	// +-------------------------------
 	var drawFancyCrosshair = function( position, isHighlighted ) {
 	    var color = isHighlighted ? 'rgba(192,0,0,0.5)' : 'rgba(0,192,192,0.5)';
 	    var crossRadius = 2;
@@ -220,8 +232,12 @@
 				   color, 1.0 );
 	    }
 	};
+	
 
-
+	// +---------------------------------------------------------------------------------
+	// | Turn the tile the mouse is hovering over.
+	// | The turnCount is ab abstract number: -1 for one turn left, +1 for one turn right.
+	// +-------------------------------
 	var handleTurnTile = function( turnCount ) {
 	    if( hoverTileIndex == -1 )
 		return;
@@ -230,12 +246,40 @@
 	    pb.redraw();
 	};
 
+
+	// +---------------------------------------------------------------------------------
+	// | Move that tile the mouse is hovering over.
+	// | The move amounts are abstract numbers, 1 indicating one unit along each axis.
+	// +-------------------------------
 	var handleMoveTile = function( moveXAmount, moveYAmount ) {
 	    if( hoverTileIndex == -1 )
 		return;
 	    var tile = tiles[hoverTileIndex];
 	    tile.move( { x: moveXAmount*10, y : moveYAmount*10 } );
 	    pb.redraw();
+	};
+
+
+	// +---------------------------------------------------------------------------------
+	// | Find the adjadent tile and location (offset).
+	// | 
+	// +-------------------------------
+	var findAdjacentTile = function() {
+	    previewTile = null;
+	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
+		var template = TILE_TEMPLATES[ templatePointer ].clone();
+		// Find a rotation for that tile to match
+		for( var i = 0; i < template.symmetry; i++ ) {
+		    var adjacency =
+			tiles[hoverTileIndex].findAdjacentTilePosition(
+			    hoverEdgeIndex,
+			    template
+			);
+		    if( adjacency ) {
+			previewTile = template;
+		    }
+		}
+	    }  
 	};
 	
 
@@ -251,6 +295,13 @@
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 
 		handleMouseMove( relPos );
+	    } )
+	    .click( function(e) {
+		console.log( 'clicked' );
+		if( previewTile ) {
+		    tiles.push( previewTile );
+		    pb.redraw();
+		}
 	    } );
 
 	// +---------------------------------------------------------------------------------
@@ -276,6 +327,18 @@
 	    .down('c',function() { config.drawCenters = !config.drawCenters; pb.redraw(); } )
 	    .down('p',function() { config.drawOuterPolygons = !config.drawOuterPolygons; pb.redraw(); } )
 	    .down('i',function() { config.drawInnerPolygons = !config.drawInnerPolygons; pb.redraw(); } )
+	    .down('rightarrow',function() {
+		templatePointer = (templatePointer+1)%TILE_TEMPLATES.length;
+		findAdjacentTile();
+		pb.redraw();
+	    } )
+	    .down('leftarrow',function() {
+		templatePointer--;
+		if(templatePointer < 0 )
+		    templatePointer = TILE_TEMPLATES.length-1;
+		findAdjacentTile();
+		pb.redraw();
+	    } )
  	;
 
 
@@ -306,22 +369,7 @@
 
 	    // Find the next possible tile to place?
 	    previewTile = null;
-	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
-		var template = TILE_TEMPLATES[ templatePointer ].clone();
-		// Find a rotation for that tile to match
-		for( var i = 0; i < template.symmetry; i++ ) {
-		    var adjacency =
-			tiles[hoverTileIndex].findAdjacentTilePosition(
-			    hoverEdgeIndex,
-			    template
-			);
-		    if( adjacency ) {
-			template.move( adjacency.offset );
-			previewTile = template;
-		    }
-		}
-	    }
-	    
+	    findAdjacentTile();
 	    pb.redraw();
 	};
 	

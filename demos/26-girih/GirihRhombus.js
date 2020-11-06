@@ -153,7 +153,7 @@ GirihRhombus.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtP
 GirihRhombus.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihRhombus.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 GirihRhombus.prototype.toSVG                 = GirihTile.prototype.toSVG;
-
+GirihRhombus.prototype.move         = GirihTile.prototype.move;
 GirihRhombus.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihRhombus.prototype.constructor           = GirihRhombus;

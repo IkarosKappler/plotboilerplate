@@ -218,7 +218,7 @@ GirihHexagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtP
 GirihHexagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihHexagon.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // IKRS.Tile.prototype.getVertexAt;
 GirihHexagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
-
+GirihHexagon.prototype.move         = GirihTile.prototype.move;
 GirihHexagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihHexagon.prototype.constructor           = GirihHexagon;

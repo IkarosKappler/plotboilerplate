@@ -167,7 +167,7 @@ GirihBowtie.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPo
 GirihBowtie.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihBowtie.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 GirihBowtie.prototype.toSVG                 = GirihTile.prototype.toSVG;
-
+GirihBowtie.prototype.move         = GirihTile.prototype.move;
 GirihBowtie.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihBowtie.prototype.constructor           = GirihBowtie;

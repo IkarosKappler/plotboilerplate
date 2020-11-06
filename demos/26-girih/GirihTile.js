@@ -98,22 +98,28 @@ GirihTile.prototype.move = function( amount ) {
     this.position.add( amount );
 };
 
-
+// Find the adjacent tile (given by the template tile)
+// Note that the tile itself will be modified (rotated and moved to the correct position).
 GirihTile.prototype.findAdjacentTilePosition = function( edgeIndex, tile ) {
     var edgeA = new Line( this.vertices[ edgeIndex % this.vertices.length ],
-			 this.vertices[ (edgeIndex+1) % this.vertices.length ] );
-    // Find adjacent edge
-    for( var i = 0; i < tile.vertices.length; i++ ) {
-	var edgeB = new Line( tile.vertices[ i % tile.vertices.length ].clone(),
-			      tile.vertices[ (i+1) % tile.vertices.length ].clone() );
-	// Goal: edgeA.a==edgeB.b && edgeA.b==edgeB.a
-	// So move edgeB
-	var offset = edgeB.b.difference(edgeA.a);
-	edgeB.add( offset );
-	// console.log( edgeB.a.distance(edgeA.b), edgeB.b.distance(edgeA.a) ); // edgeB, edgeA );
-	if( edgeB.a.distance(edgeA.b) < 0.1 ) {
-	    return { edgeIndex : i, offset : offset };
-	} 	
+			  this.vertices[ (edgeIndex+1) % this.vertices.length ] );
+    // try each rotation of the symmetry
+    for( var i = 0; i < tile.symmetry; i++ ) {
+	// Find adjacent edge
+	for( var i = 0; i < tile.vertices.length; i++ ) {
+	    var edgeB = new Line( tile.vertices[ i % tile.vertices.length ].clone(),
+				  tile.vertices[ (i+1) % tile.vertices.length ].clone() );
+	    // Goal: edgeA.a==edgeB.b && edgeA.b==edgeB.a
+	    // So move edgeB
+	    var offset = edgeB.b.difference(edgeA.a);
+	    edgeB.add( offset );
+	    // console.log( edgeB.a.distance(edgeA.b), edgeB.b.distance(edgeA.a) ); // edgeB, edgeA );
+	    if( edgeB.a.distance(edgeA.b) < 0.001 ) {
+		tile.move( offset );
+		return { edgeIndex : i, offset : offset };
+	    } 	
+	}
+	tile.rotate( (Math.PI*2)/tile.symmetry );
     }
     return null;
 };
