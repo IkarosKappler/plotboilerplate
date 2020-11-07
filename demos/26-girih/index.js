@@ -27,15 +27,23 @@
 
 	// Initialize templates, one for each Girih tile type.
 	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
-	var templatePointer = 0;
-	var TILE_TEMPLATES = [
-	    new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 ),
+	var templatePointer = 0;	
+	var TILE_TEMPLATES = [];
+	
+	    /* new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 ),
 	    new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 ),
 	    new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 ),
 	    new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 ),
 	    new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 ),
+	    new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true ) */
+/*
+	    decagon,
+	    new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 ),
+	    new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 ),
+	    applyAdjacentTile( decagon, new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 ), 4 ),
+	    new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 ),
 	    new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true )
-	];
+	    ]; */
 	
 	// All config params are optional.
 	var pb = new PlotBoilerplate(
@@ -99,9 +107,27 @@
 	var tiles = [];
 	// If the mouse hovers over an edge the next possible adjacent Girih tile will be this
 	var previewTile = null;
-	for( var i in TILE_TEMPLATES ) {
-	    tiles.push( TILE_TEMPLATES[i].clone() );
-	}
+
+	var initTiles = function() {
+	    var decagon = new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 ); // Positions don't matter here
+	    var pentagon = new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 );
+	    var hexagon = new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 );
+	    var bowtie = new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 );
+	    var rhombus = new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 );
+	    var penrose = new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true );
+
+	    // Add tiles to array and put them in the correct adjacency position.
+	    TILE_TEMPLATES.push( decagon );
+	    TILE_TEMPLATES.push( applyAdjacentTile( decagon, 2, pentagon ) );
+	    TILE_TEMPLATES.push( applyAdjacentTile( pentagon, 1, penrose ) );
+	    TILE_TEMPLATES.push( applyAdjacentTile( penrose, 3, hexagon ) );
+	    TILE_TEMPLATES.push( applyAdjacentTile( decagon, 5, bowtie ) );
+	    TILE_TEMPLATES.push( applyAdjacentTile( pentagon, 4, rhombus ) );
+	    
+	    for( var i in TILE_TEMPLATES ) {
+		tiles.push( TILE_TEMPLATES[i].clone() );
+	    }
+	};
 
 	/**
 	 * Find that tile (index) which contains the given position. First match will be returned.
@@ -269,17 +295,32 @@
 	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
 		var template = TILE_TEMPLATES[ templatePointer ].clone();
 		// Find a rotation for that tile to match
-		for( var i = 0; i < template.symmetry; i++ ) {
-		    var adjacency =
-			tiles[hoverTileIndex].findAdjacentTilePosition(
-			    hoverEdgeIndex,
-			    template
-			);
-		    if( adjacency ) {
-			previewTile = template;
-		    }
-		}
+		previewTile = applyAdjacentTile( tiles[hoverTileIndex], hoverEdgeIndex, template );
 	    }  
+	};
+
+
+	// +---------------------------------------------------------------------------------
+	// | Apply adjacent tile position. 
+	// +-------------------------------
+	var applyAdjacentTile = function( baseTile, baseEdgeIndex, adjacentTile ) {
+	    // Find a rotation for that tile to match
+	    var i = 0;
+	    while( i < adjacentTile.symmetry ) {
+		// { edgeIndex:number, offset:XYCoords }
+		var adjacency =
+		    baseTile.findAdjacentTilePosition(
+			baseEdgeIndex,
+			adjacentTile
+		    );
+		if( adjacency && !previewTile ) {
+		    return adjacentTile; // previewTile = template;
+		} else {
+		    adjacentTile.rotate( (Math.PI*2)/adjacentTile.symmetry );
+		}
+		i++
+	    }
+	    return null;
 	};
 	
 
@@ -398,6 +439,7 @@
 	    gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
 	}
 
+	    initTiles();
 	pb.config.preDraw = drawAll;
 	pb.redraw();
 

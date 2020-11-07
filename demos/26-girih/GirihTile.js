@@ -103,23 +103,19 @@ GirihTile.prototype.move = function( amount ) {
 GirihTile.prototype.findAdjacentTilePosition = function( edgeIndex, tile ) {
     var edgeA = new Line( this.vertices[ edgeIndex % this.vertices.length ],
 			  this.vertices[ (edgeIndex+1) % this.vertices.length ] );
-    // try each rotation of the symmetry
-    for( var i = 0; i < tile.symmetry; i++ ) {
-	// Find adjacent edge
-	for( var i = 0; i < tile.vertices.length; i++ ) {
-	    var edgeB = new Line( tile.vertices[ i % tile.vertices.length ].clone(),
-				  tile.vertices[ (i+1) % tile.vertices.length ].clone() );
-	    // Goal: edgeA.a==edgeB.b && edgeA.b==edgeB.a
-	    // So move edgeB
-	    var offset = edgeB.b.difference(edgeA.a);
-	    edgeB.add( offset );
-	    // console.log( edgeB.a.distance(edgeA.b), edgeB.b.distance(edgeA.a) ); // edgeB, edgeA );
-	    if( edgeB.a.distance(edgeA.b) < 0.001 ) {
-		tile.move( offset );
-		return { edgeIndex : i, offset : offset };
-	    } 	
-	}
-	tile.rotate( (Math.PI*2)/tile.symmetry );
+    // Find adjacent edge
+    for( var i = 0; i < tile.vertices.length; i++ ) {
+	var edgeB = new Line( tile.vertices[ i % tile.vertices.length ].clone(),
+			      tile.vertices[ (i+1) % tile.vertices.length ].clone() );
+	// Goal: edgeA.a==edgeB.b && edgeA.b==edgeB.a
+	// So move edgeB
+	var offset = edgeB.b.difference(edgeA.a);
+	edgeB.add( offset );
+	// console.log( edgeB.a.distance(edgeA.b), edgeB.b.distance(edgeA.a) ); // edgeB, edgeA );
+	if( edgeB.a.distance(edgeA.b) < 0.001 ) {
+	    tile.move( offset );
+	    return { edgeIndex : i, offset : offset };
+	} 	
     }
     return null;
 };
@@ -152,14 +148,18 @@ GirihTile.prototype.getTranslatedVertex = function( index ) {
     return this.translateVertex( this.vertices[index % this.vertices.length ] );
 };
 
-
-GirihTile.prototype.rotate = function( angle ) {
-    Polygon.prototype.rotate.call( this, angle, this.position );
+// Note: this function behaves a bitdifferent than the genuine Polygon.rotate function!
+// Polygon has the default center of rotation at (0,0).
+// The GirihTile rotates around its center (position) by default.
+GirihTile.prototype.rotate = function( angle, center ) {
+    if( typeof center === "undefined" )
+	center = this.position;
+    Polygon.prototype.rotate.call( this, angle, center );
     for( var i in this.innerTilePolygons ) {
-	this.innerTilePolygons[i].rotate( angle, this.position );
+	this.innerTilePolygons[i].rotate( angle, center );
     }
     for( var i in this.outerTilePolygons ) {
-	this.outerTilePolygons[i].rotate( angle, this.position );
+	this.outerTilePolygons[i].rotate( angle, center );
     }
     this.rotation += angle;
 };
