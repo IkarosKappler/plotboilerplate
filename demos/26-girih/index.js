@@ -27,23 +27,9 @@
 
 	// Initialize templates, one for each Girih tile type.
 	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
-	var templatePointer = 0;	
+	var templatePointer = 0;
+	// The template array will be filled on initialization (see below).
 	var TILE_TEMPLATES = [];
-	
-	    /* new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 ),
-	    new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 ),
-	    new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 ),
-	    new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 ),
-	    new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 ),
-	    new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true ) */
-/*
-	    decagon,
-	    new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 ),
-	    new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 ),
-	    applyAdjacentTile( decagon, new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 ), 4 ),
-	    new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 ),
-	    new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true )
-	    ]; */
 	
 	// All config params are optional.
 	var pb = new PlotBoilerplate(

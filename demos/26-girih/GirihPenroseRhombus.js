@@ -58,8 +58,7 @@ var GirihPenroseRhombus = function( position, size, angle, opt_addCenterPolygon 
     
     // Move to center and position
     var bounds = Bounds.computeFromVertices( this.vertices );
-    console.log( bounds );
-    var move   = new Vertex( bounds.width/2.0 - (bounds.width-size), //  - size/2.0, 
+    var move   = new Vertex( bounds.width/2.0 - (bounds.width-size),
 			     bounds.height/2.0
 			   );
     for( var i = 0; i < this.vertices.length; i++ ) {	
@@ -93,8 +92,6 @@ GirihPenroseRhombus.prototype.clone = function() {
 
 GirihPenroseRhombus.prototype._buildInnerPolygons = function( edgeLength, addCenterPolygon ) {
     var indices              = [ 0, 2 ];
-    // var innerPointIndexLeft  = -1;
-    // var innerPointIndexRight = -1;
     var centerTile           = new Polygon();
     for( var i = 0; i < indices.length; i++ ) {
 
@@ -102,8 +99,6 @@ GirihPenroseRhombus.prototype._buildInnerPolygons = function( edgeLength, addCen
 	var index = indices[i];
 	var left   = this.getVertexAt( index   ).clone().scale( 0.5, this.getVertexAt(index+1) );
 	var right  = this.getVertexAt( index+1 ).clone().scale( 0.5, this.getVertexAt(index+2) );
-	// var innerA = this.getVertexAt( index+1 ).clone().multiplyScalar( 0.28 );
-	// var innerB = this.getVertexAt( index+1 ).clone().multiplyScalar( 0.55 );
 	var innerA = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position );
 	var innerB = this.getVertexAt( index+1 ).clone().scale( 0.55, this.position );
 	
@@ -111,14 +106,9 @@ GirihPenroseRhombus.prototype._buildInnerPolygons = function( edgeLength, addCen
 	innerTile.addVertex( innerA );
 	innerTile.addVertex( right );
 	innerTile.addVertex( innerB );
-
-	// if( i == 0 ) {
-	    centerTile.addVertex( this.getVertexAt( index ).clone().scale( 0.1775, this.getVertexAt(index+2) ) );
-	    centerTile.addVertex( innerA );
-	// } else { // if( i == 1 ) {
-	//    centerTile.addVertex( this.getVertexAt( index ).clone().scale( 0.1775, this.getVertexAt(index+2) ) );
-	//    centerTile.addVertex( innerA );
-	//}
+	
+	centerTile.addVertex( this.getVertexAt( index ).clone().scale( 0.1775, this.getVertexAt(index+2) ) );
+	centerTile.addVertex( innerA.clone() );
 
 	this.innerTilePolygons.push( innerTile );
     }
