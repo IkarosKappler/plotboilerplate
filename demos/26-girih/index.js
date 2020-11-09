@@ -92,7 +92,8 @@
 	// The set of all Girih tiles in scene
 	var tiles = [];
 	// If the mouse hovers over an edge the next possible adjacent Girih tile will be this
-	var previewTile = null;
+	var previewTiles = [];
+	var previewTilePointer = 0;
 
 	var initTiles = function() {
 	    var decagon = new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 ); // Positions don't matter here
@@ -103,12 +104,19 @@
 	    var penrose = new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true );
 
 	    // Add tiles to array and put them in the correct adjacency position.
+	    /* TILE_TEMPLATES.push( decagon );
+	    TILE_TEMPLATES.push( transformTileToAdjacency( decagon, 2, pentagon ) );
+	    TILE_TEMPLATES.push( transformTileToAdjacency( pentagon, 1, penrose ) );
+	    TILE_TEMPLATES.push( transformTileToAdjacency( penrose, 3, hexagon ) );
+	    TILE_TEMPLATES.push( transformTileToAdjacency( decagon, 5, bowtie ) );
+	    TILE_TEMPLATES.push( transformTileToAdjacency( pentagon, 4, rhombus ) ); */
+
 	    TILE_TEMPLATES.push( decagon );
-	    TILE_TEMPLATES.push( applyAdjacentTile( decagon, 2, pentagon ) );
-	    TILE_TEMPLATES.push( applyAdjacentTile( pentagon, 1, penrose ) );
-	    TILE_TEMPLATES.push( applyAdjacentTile( penrose, 3, hexagon ) );
-	    TILE_TEMPLATES.push( applyAdjacentTile( decagon, 5, bowtie ) );
-	    TILE_TEMPLATES.push( applyAdjacentTile( pentagon, 4, rhombus ) );
+	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( decagon, 2, pentagon ) );
+	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( pentagon, 1, penrose ) );
+	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( penrose, 3, hexagon ) );
+	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( decagon, 5, bowtie ) );
+	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( pentagon, 4, rhombus ) );
 	    
 	    for( var i in TILE_TEMPLATES ) {
 		tiles.push( TILE_TEMPLATES[i].clone() );
@@ -157,10 +165,8 @@
 	// +-------------------------------
 	var drawAll = function() {
 	    // Draw the preview polygon first
-	    if( previewTile ) {
-		//template.move( adjacency.offset );
-		// drawTile( previewTile, -1 );
-		pb.draw.polygon( previewTile, 'rgba(128,128,128,0.5)', 1.0 ); // Polygon is not open
+	    if( previewTilePointer < previewTiles.length ) {
+		pb.draw.polygon( previewTiles[previewTilePointer], 'rgba(128,128,128,0.5)', 1.0 ); // Polygon is not open
 	    }
 	    
 	    // Draw all tiles
@@ -188,8 +194,9 @@
 	// | @param {number} index - The index in the tiles-array (to highlight hover).
 	// +-------------------------------
 	var drawTile = function( tile, index ) {
-	    if( config.drawOutlines )
+	    if( config.drawOutlines ) {
 		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
+	    }
 	    // Draw all inner polygons?
 	    if( config.drawInnerPolygons ) {
 		for( var j = 0; j < tile.innerTilePolygons.length; j++ ) {
@@ -254,7 +261,7 @@
 	    if( hoverTileIndex == -1 )
 		return;
 	    var tile = tiles[hoverTileIndex];
-	    tile.rotate( turnCount * Math.PI/tile.symmetry );
+	    tile.rotate( turnCount * Math.PI*2/tile.symmetry );
 	    pb.redraw();
 	};
 
@@ -273,38 +280,105 @@
 
 
 	// +---------------------------------------------------------------------------------
-	// | Find the adjadent tile and location (offset).
-	// | 
+	// | Find all possible adjadent tiles and their locations (type, rotation and offset).
 	// +-------------------------------
-	var findAdjacentTile = function() {
-	    previewTile = null;
-	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
-		var template = TILE_TEMPLATES[ templatePointer ].clone();
-		// Find a rotation for that tile to match
-		previewTile = applyAdjacentTile( tiles[hoverTileIndex], hoverEdgeIndex, template );
-	    }  
+	var findAdjacentTiles = function() {
+	    previewTiles = [];
+	    if( hoverTileIndex == -1 ||  hoverEdgeIndex == -1 )
+		return;
+	    
+	    var template = null; // TILE_TEMPLATES[ templatePointer ].clone();
+	    for( var i in TILE_TEMPLATES ) {
+		template = TILE_TEMPLATES[ i ].clone();
+		console.log('tile=' , template.tileType, 'symmetry=', template.symmetry, 'uniqueSymmetries=', template.uniqueSymmetries );
+		// Find all rotations and positions for that tile to match
+		var foundTiles = transformTileToAdjacencies( tiles[hoverTileIndex],
+							     hoverEdgeIndex,
+							     template
+							     // true // findAll
+							   );
+		console.log('foundTiles', foundTiles.length );
+		if( foundTiles.length != 0 ) {
+		    console.log('foundTiles # type', foundTiles[0].tileType );
+		    previewTiles = previewTiles.concat( foundTiles );
+		}
+	    }
+	    // Set pointer to save range.
+	    previewTilePointer = Math.min( previewTiles.length-1, previewTilePointer );
+
+	    console.log('found adjacent tiles', previewTiles.length );
+	    for( var i in previewTiles ) {
+		console.log('found ', previewTiles[i].tileType, previewTiles[i].rotation );
+	    }
 	};
 
 
 	// +---------------------------------------------------------------------------------
-	// | Apply adjacent tile position. 
+	// | Apply adjacent tile position to `neighbourTile`. 
 	// +-------------------------------
-	var applyAdjacentTile = function( baseTile, baseEdgeIndex, adjacentTile ) {
+	var transformTileToAdjacencies = function( baseTile, baseEdgeIndex, neighbourTile ) { // , findAll ) {
 	    // Find a rotation for that tile to match
 	    var i = 0;
-	    while( i < adjacentTile.symmetry ) {
+	    var foundAlignments = [];
+	    var positionedTile = null;
+	    while( i < neighbourTile.uniqueSymmetries ) {
+		positionedTile = transformTilePositionToAdjacency( baseTile, baseEdgeIndex, neighbourTile );
+		if( positionedTile != null ) {
+		    // console.log('Found?', adjacency );
+		    positionedTile = positionedTile.clone();
+		    // positionedTile.rotate( (Math.PI*2)/positionedTile.symmetry );
+		    foundAlignments.push( positionedTile );
+		} // else {
+		neighbourTile.rotate( (Math.PI*2)/neighbourTile.symmetry );
+		// }
+		i++
+	    }
+	    return foundAlignments;
+	};
+	/* var transformTileToAdjacency = function( baseTile, baseEdgeIndex, neighbourTile, findAll ) {
+	    // Find a rotation for that tile to match
+	    var i = 0;
+	    // let previewTile = null;
+	    var foundAlignments = [];
+	    // var foundTile = null;
+	    while( i < neighbourTile.uniqueSymmetries ) {
 		// { edgeIndex:number, offset:XYCoords }
 		var adjacency =
 		    baseTile.findAdjacentTilePosition(
 			baseEdgeIndex,
-			adjacentTile
+			neighbourTile
 		    );
-		if( adjacency && !previewTile ) {
-		    return adjacentTile; // previewTile = template;
+		if( adjacency != null ) { // && !foundTile ) { // && !previewTile ) {
+		    // console.log('Found?', adjacency );
+		    neighbourTile.move( adjacency.offset );
+		    // foundAlignments.push( adjacentTile.clone() );
+		    // if( !findAll )
+		    ///	return foundTile; // foundAlignments;
+		    // foundTile = adjacentTile;
+		    return neighbourTile;
+		    // adjacentTile.rotate( (Math.PI*2)/adjacentTile.symmetry );
 		} else {
-		    adjacentTile.rotate( (Math.PI*2)/adjacentTile.symmetry );
+		    neighbourTile.rotate( (Math.PI*2)/neighbourTile.symmetry );
 		}
 		i++
+	    }
+	    return null; // foundAlignments;
+	}; */
+
+	// +---------------------------------------------------------------------------------
+	// | Apply adjacent tile position to `neighbourTile`. 
+	// +-------------------------------
+	var transformTilePositionToAdjacency = function( baseTile, baseEdgeIndex, neighbourTile ) {
+	    // Find the position for that tile to match (might not exist)
+	    // { edgeIndex:number, offset:XYCoords }
+	    var adjacency =
+		baseTile.findAdjacentTilePosition(
+		    baseEdgeIndex,
+		    neighbourTile
+		);
+	    if( adjacency != null ) {
+		neighbourTile.move( adjacency.offset );
+		return neighbourTile;
 	    }
 	    return null;
 	};
@@ -325,8 +399,8 @@
 	    } )
 	    .click( function(e) {
 		console.log( 'clicked' );
-		if( previewTile ) {
-		    tiles.push( previewTile );
+		if( previewTilePointer < previewTiles.length ) {
+		    tiles.push( previewTiles[previewTilePointer] );
 		    pb.redraw();
 		}
 	    } );
@@ -355,15 +429,20 @@
 	    .down('p',function() { config.drawOuterPolygons = !config.drawOuterPolygons; pb.redraw(); } )
 	    .down('i',function() { config.drawInnerPolygons = !config.drawInnerPolygons; pb.redraw(); } )
 	    .down('rightarrow',function() {
-		templatePointer = (templatePointer+1)%TILE_TEMPLATES.length;
-		findAdjacentTile();
+		// templatePointer = (templatePointer+1)%TILE_TEMPLATES.length;
+		// findAdjacentTiles();
+		previewTilePointer = (previewTilePointer+1)%previewTiles.length;
+		findAdjacentTiles();
 		pb.redraw();
 	    } )
 	    .down('leftarrow',function() {
-		templatePointer--;
-		if(templatePointer < 0 )
-		    templatePointer = TILE_TEMPLATES.length-1;
-		findAdjacentTile();
+		// templatePointer--;
+		// if( templatePointer < 0 )
+		//     templatePointer = TILE_TEMPLATES.length-1;
+		// findAdjacentTiles();
+		previewTilePointer--;
+		if( previewTilePointer < 0 )
+		     previewTilePointer = previewTiles.length-1;
 		pb.redraw();
 	    } )
  	;
@@ -395,8 +474,8 @@
 		return;
 
 	    // Find the next possible tile to place?
-	    previewTile = null;
-	    findAdjacentTile();
+	    previewTiles = [];
+	    findAdjacentTiles();
 	    pb.redraw();
 	};
 	

@@ -26,7 +26,7 @@
  **/
 var GirihTile = function( position,
 			  size, 
-			  angle, 
+			  angle, // TODO: remove the 'angle' param from ALL tiles. The param makes no sense.
 			  tileType
 			) {
 
@@ -41,6 +41,11 @@ var GirihTile = function( position,
     this.position             = position;
     this.rotation             = angle;
     this.symmetry             = 10;
+    this.uniqueSymmetries     = 10;
+    // this.uniqueSymmetries     = [];
+    // Initialize the default symmetrie set
+    // for( var i = 0; i < this.symmetry; i++ )
+    // this.uniqueSymmetries.push( Math.PI/5 * i ); // 2Pi/10 * i
 
     // An array of polygons.
     // The inner tile polygons are those that do not share edges with the outer
@@ -64,13 +69,13 @@ var GirihTile = function( position,
 
 GirihTile.TYPE_UNKNOWN            = "UNKNOWN";
 GirihTile.TYPE_DECAGON            = "DECAGON";
-GirihTile.TYPE_PENTAGON           = "PANTAGON";
+GirihTile.TYPE_PENTAGON           = "PENTAGON";
 GirihTile.TYPE_IRREGULAR_HEXAGON  = "IRREGULAR_HEXAGON";
 GirihTile.TYPE_RHOMBUS            = "RHOMBUS";
 GirihTile.TYPE_BOW_TIE            = "BOW_TIE";
 // This is not part of the actual girih tile set!
 GirihTile.TYPE_PENROSE_RHOMBUS    = "PENROSE_RHOMBUS";
-GirihTile.TYPE_OCTAGON            = "OCTAGON";
+//GirihTile.TYPE_OCTAGON            = "OCTAGON";
 
 
 // Prepare the tile alignment matrix:
@@ -113,7 +118,7 @@ GirihTile.prototype.findAdjacentTilePosition = function( edgeIndex, tile ) {
 	edgeB.add( offset );
 	// console.log( edgeB.a.distance(edgeA.b), edgeB.b.distance(edgeA.a) ); // edgeB, edgeA );
 	if( edgeB.a.distance(edgeA.b) < 0.001 ) {
-	    tile.move( offset );
+	    // tile.move( offset );
 	    return { edgeIndex : i, offset : offset };
 	} 	
     }
@@ -162,6 +167,7 @@ GirihTile.prototype.rotate = function( angle, center ) {
 	this.outerTilePolygons[i].rotate( angle, center );
     }
     this.rotation += angle;
+    return this;
 };
 
 

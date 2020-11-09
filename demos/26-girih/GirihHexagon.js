@@ -28,6 +28,10 @@
 var GirihHexagon = function( position, size, angle ) {
     
     GirihTile.call( this, position, size, angle, GirihTile.TYPE_IRREGULAR_HEXAGON );
+
+    // Overwrite the default symmetries:
+    //    the hexagon tile has a 180° symmetry (5/10 * 360°)
+    this.uniqueSymmetries     = 5;
     
     // Init the actual decahedron shape with the passed size
     var pointA        = new Vertex(0,0);
@@ -86,7 +90,7 @@ var GirihHexagon = function( position, size, angle ) {
  * @abstract Subclasses must override this.
  */
 GirihHexagon.prototype.clone = function() {
-    return new GirihHexagon( this.position.clone(), this.size, this.rotation );
+    return new GirihHexagon( this.position.clone(), this.size, this.rotation ).rotate( this.rotation );
 };
 
 
@@ -111,8 +115,6 @@ GirihHexagon.prototype._buildInnerPolygons = function( edgeLength) {
     // One of the two points is inside the tile, the other is outside.
     // Locate the inside point.
     // Use the point that is closer to the center
-    // if( intersection.pointA.length() < intersection.pointB.length() ) innerTile.addVertex(intersection.pointA);
-    // else                                                              innerTile.addVertex(intersection.pointB);
     if( this.position.distance(intersection.a) < this.position.distance(intersection.b) ) innerTile.addVertex(intersection.a);
     else                                                              innerTile.addVertex(intersection.b);
     
@@ -126,11 +128,9 @@ GirihHexagon.prototype._buildInnerPolygons = function( edgeLength) {
     // The intersection is definitely not empty (by construction)
     // There are two points again (one inside, one outside the tile)
     // Use the point that is closer to the center
-    // if( intersection.pointA.length() < intersection.pointB.length() ) innerTile.addVertex(intersection.pointA);
-    // else                                                              innerTile.addVertex(intersection.pointB);
     if( this.position.distance(intersection.a) < this.position.distance(intersection.b) ) innerTile.addVertex(intersection.a);
     else                                                              innerTile.addVertex(intersection.b);
-    innerTile.addVertex( circleB.center );
+    innerTile.addVertex( circleB.center.clone() );
 
     innerTile.addVertex( this.vertices[4].clone().scale( 0.5, this.vertices[5] ) );
 
@@ -145,7 +145,7 @@ GirihHexagon.prototype._buildInnerPolygons = function( edgeLength) {
     // Use the point that is closer to the center
     if( this.position.distance(intersection.a) < this.position.distance(intersection.b) ) innerTile.addVertex(intersection.a);
     else                                                              innerTile.addVertex(intersection.b);    
-    innerTile.addVertex( circleB.center );
+    innerTile.addVertex( circleB.center.clone() );
   
 
 
@@ -159,15 +159,12 @@ GirihHexagon.prototype._buildInnerPolygons = function( edgeLength) {
     // Use the point that is closer to the center
     if( this.position.distance(intersection.a) < this.position.distance(intersection.b) ) innerTile.addVertex(intersection.a);
     else                                                              innerTile.addVertex(intersection.b);
-    innerTile.addVertex( circleB.center );
+    innerTile.addVertex( circleB.center.clone() );
     this.innerTilePolygons.push( innerTile );	
 };
 
 
 GirihHexagon.prototype._buildOuterPolygons = function( edgeLength ) {
-
-    console.log( this.innerTilePolygons );
-    
     // First add the two triangles at the 'ends' of the shape.
     var indicesA = [ 0, 3 ];  //  6:2
     var indicesB = [ 0, 5 ];  // 10:2

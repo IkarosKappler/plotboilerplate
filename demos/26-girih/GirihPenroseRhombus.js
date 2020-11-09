@@ -27,6 +27,9 @@ var GirihPenroseRhombus = function( position, size, angle, opt_addCenterPolygon 
     
     GirihTile.call( this, position, size, angle, GirihTile.TYPE_PENROSE_RHOMBUS  );
 
+    // Overwrite the default symmetries:
+    //    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
+    this.uniqueSymmetries     = 5;
 
     if( typeof opt_addCenterPolygon == "undefined" )
 	opt_addCenterPolygon = true;  // Add by default
@@ -86,7 +89,7 @@ var GirihPenroseRhombus = function( position, size, angle, opt_addCenterPolygon 
  * @abstract Subclasses must override this.
  */
 GirihPenroseRhombus.prototype.clone = function() {
-    return new GirihPenroseRhombus( this.position.clone(), this.size, this.rotation );
+    return new GirihPenroseRhombus( this.position.clone(), this.size, this.rotation ).rotate( this.rotation );
 };
 
 

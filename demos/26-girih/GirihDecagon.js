@@ -27,6 +27,10 @@
 var GirihDecagon = function( position, size, angle ) {
 
     GirihTile.call( this, position, size, angle, GirihTile.TYPE_DECAGON );
+
+    // Overwrite the default symmetries:
+    //    the decagon tile has a 36° symmetry (1/10 * 360°)
+    this.uniqueSymmetries     = 1;
     
     // Init the actual decahedron shape with the passed size:
     // Divide the full circle into 10 sections (we want to make a regular decagon).
@@ -55,14 +59,13 @@ var GirihDecagon = function( position, size, angle ) {
 
     this._buildInnerPolygons( size );
     this._buildOuterPolygons( size );       // Important: call AFTER inner polygons were created!
-  
 };
 
 /**
  * @abstract Subclasses must override this.
  */
 GirihDecagon.prototype.clone = function() {
-    return new GirihDecagon( this.position.clone(), this.size, this.rotation );
+    return new GirihDecagon( this.position.clone(), this.size, this.rotation ).rotate( this.rotation );
 };
 
 

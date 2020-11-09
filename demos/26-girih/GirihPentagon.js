@@ -28,6 +28,11 @@
 var GirihPentagon = function( position, size, angle ) {
     
     GirihTile.call( this, position, size, angle, GirihTile.TYPE_PENTAGON );
+
+    // Overwrite the default symmetries:
+    //    the pentagon tile has a 72° symmetry (2/10 * 360°)
+    this.uniqueSymmetries     = 2;
+    
     // Init the actual pentagon shape with the passed size:
     // Divide the full circle into 5 sections (we want to make a regular pentagon).
     var theta = (Math.PI*2) / 5.0;
@@ -62,7 +67,7 @@ var GirihPentagon = function( position, size, angle ) {
  * @abstract Subclasses must override this.
  */
 GirihPentagon.prototype.clone = function() {
-    return new GirihPentagon( this.position.clone(), this.size, this.rotation );
+    return new GirihPentagon( this.position.clone(), this.size, this.rotation ).rotate( this.rotation );
 };
 
 
@@ -79,7 +84,6 @@ GirihPentagon.prototype._buildInnerPolygons = function( edgeLength ) {
 
 
 GirihPentagon.prototype._buildOuterPolygons = function( edgeLength ) {
-    console.log( this.innerTilePolygons );
     for( var i = 0; i < this.vertices.length; i++ ) {
 	var indexA     = i;
 	var indexB     = i*2;

@@ -23,6 +23,10 @@
 var GirihRhombus = function( position, size, angle ) {
     
     GirihTile.call( this, position, size, angle, GirihTile.TYPE_RHOMBUS );
+
+    // Overwrite the default symmetries:
+    //    the rhombus tile has a 180° symmetry (5/10 * 360°)
+    this.uniqueSymmetries     = 5;
     
     // Init the actual rhombus shape with the passed size
     var pointA = new Vertex(0,0);
@@ -76,7 +80,7 @@ var GirihRhombus = function( position, size, angle ) {
  * @abstract Subclasses must override this.
  */
 GirihRhombus.prototype.clone = function() {
-    return new GirihRhombus( this.position.clone(), this.size, this.rotation );
+    return new GirihRhombus( this.position.clone(), this.size, this.rotation ).rotate( this.rotation );
 };
 
 
