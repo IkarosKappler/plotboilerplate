@@ -98,18 +98,20 @@
 	// | Initialize n random circles and store them in the array.
 	// +-------------------------------
 	var numCircles = Math.max( 1, PlotBoilerplate.utils.fetch.num(GUP,'numCircles',7) );
+	var centerPoints = [];
+	var radiusPoints = [];
 	var circles = [];
 	for( var i = 0; i < numCircles; i++ ) {
 	    var center = randomVertex();
-	    var circle = new Circle( center,
-				     i==0
-				     ? Math.abs(randomVertex().x)
-				     : circles[i-1].center.distance(center)*Math.random()*1.2
-				   );
-	    circles[i] = circle;
+	    var randomRadius = Math.random() * pb.canvasSize.height * 0.25;
+	    var circle = new Circle( center, randomRadius );
 	    var radiusPoint = new Vertex( center.clone().addXY(circle.radius*Math.sin(Math.PI/4),circle.radius*Math.cos(Math.PI/4)) );
 	    pb.add( circle.center );
 	    pb.add( radiusPoint );
+
+	    circles[i] = circle;
+	    centerPoints[i] = circle.center;
+	    radiusPoints[i] = radiusPoint;
 
 	    new CircleHelper( circle, radiusPoint, pb );
 	}
@@ -384,7 +386,54 @@
 		var cy = document.getElementById('cy');
 		if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-	    } );  
+	    } );
+
+	
+	var updateRadiusPoints = function() {
+	    // Update them ...
+	    for( var i in circles ) {
+		// console.log( radiusPoints[i] );
+		radiusPoints[i].set( circles[i].center.x + circle.radius*Math.sin(Math.PI/4),
+				     circles[i].center.y + circle.radius*Math.cos(Math.PI/4)
+				   );
+	    }
+	    // ... then redraw
+	    pb.redraw();
+	};
+	
+
+	// +---------------------------------------------------------------------------------
+	// | Animate the vertices: make them bounce around and reflect on the walls.
+	// +-------------------------------
+	var animator = null;
+	var toggleAnimation = function() {
+	    if( config.animate ) {
+		if( animator )
+		    animator.stop();
+		if( config.animationType=='radial' )
+		    animator = new CircularVertexAnimator( centerPoints, pb.viewport(), updateRadiusPoints );
+		else // 'linear'
+		    animator = new LinearVertexAnimator( centerPoints, pb.viewport(), updateRadiusPoints );
+		animator.start();
+	    } else {
+		if( animator )
+		    animator.stop();
+		animator = null;
+	    }
+	};
+
+
+	// +---------------------------------------------------------------------------------
+	// | Unfortunately the animator is not smart, so we have to create a new
+	// | one (and stop the old one) each time the vertex count changes.
+	// +-------------------------------
+	var updateAnimator = function() {
+	    if( !animator )
+		return;
+	    animator.stop();
+	    animator = null;
+	    toggleAnimation(); 
+	};
 
 
 	// +---------------------------------------------------------------------------------
@@ -394,15 +443,17 @@
 	    alwaysDrawFullCircles  : false,
 	    drawCircleSections     : false,
 	    lineWidth              : 3.0,
-	    lineJoin               : "round",    // [ "bevel", "round", "miter" ]
+	    lineJoin               : "round",     // [ "bevel", "round", "miter" ]
 	    drawAsSVGArcs          : false,
 	    drawRadicalLines       : false,
 	    drawCircleNumbers      : false,
-	    sectionDrawPct         : 100,        // [0..100]
+	    sectionDrawPct         : 100,         // [0..100]
 	    drawNestedCircles      : true,
 	    nestedCircleStep       : 25,
 	    fillNestedCircles      : false,
-	    colorSet               : "WebColors" // [ "WebColors", "Mixed", "Malachite" ]
+	    colorSet               : "WebColors", // [ "WebColors", "Mixed", "Malachite" ]
+	    animate               : false,
+	    animationType         : 'radial'      // 'linear' or 'radial'
 	}, GUP );
 	
 
@@ -424,6 +475,8 @@
 	    gui.add(config, 'nestedCircleStep').min(2).max(100).step(1).onChange( function() { pb.redraw(); } ).name("nestedCircleStep").title("Distance of nested circles.");
 	    gui.add(config, 'fillNestedCircles').onChange( function() { pb.redraw(); } ).name("fillNestedCircles").title("Fill circles?");
 	    gui.add(config, 'colorSet', [ "WebColors", "Mixed", "Malachite" ] ).onChange( function() { pb.redraw(); } ).name("colorSet").title("Which color set to use.");
+	    gui.add(config, 'animate').onChange( toggleAnimation ).title("Toggle point animation on/off.");
+	    gui.add(config, 'animationType', { Linear: 'linear', Radial : 'radial' } ).onChange( function() { toggleAnimation(); } );
 	}
 
 	pb.config.preDraw = drawAll;

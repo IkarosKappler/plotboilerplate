@@ -162,7 +162,7 @@
 		randomize             : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuild(); },
 		fullCover             : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuild(); },
 		animate               : false,
-		animationType         : 'linear' // 'linear' or 'circular'
+		animationType         : 'linear' // 'linear' or 'radial'
 	    }, GUP );
 
 
@@ -406,7 +406,9 @@
 	    };
 	    
 
-	    // Animate the vertices: make them bounce around and reflect on the walls.
+	    // +---------------------------------------------------------------------------------
+	    // | Animate the vertices: make them bounce around and reflect on the walls.
+	    // +-------------------------------
 	    var animator = null;
 	    var toggleAnimation = function() {
 		if( config.animate ) {
@@ -418,15 +420,16 @@
 			animator = new LinearVertexAnimator( pointList, pb.viewport(), rebuild );
 		    animator.start();
 		} else {
-		    animator.stop();
+		    if( animator )
+			animator.stop();
 		    animator = null;
 		}
 	    };
 
-	    /**
-	     * Unfortunately the animator is not smart, so we have to create a new
-	     * one (and stop the old one) each time the vertex count changes.
-	     **/
+	    // +---------------------------------------------------------------------------------
+	    // | Unfortunately the animator is not smart, so we have to create a new
+	    // | one (and stop the old one) each time the vertex count changes.
+	    // +-------------------------------
 	    var updateAnimator = function() {
 		if( !animator )
 		    return;
