@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-11-10
+  * Added the `Polygon.getBounds()` function.
 * 2020-11-06
   * Added the `Polygon.move(XYCoords)` function.
 * 2020-11-04

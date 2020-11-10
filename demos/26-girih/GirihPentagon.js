@@ -109,11 +109,13 @@ GirihPentagon.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTile
 GirihPentagon.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 // GirihPentagon.prototype.containsPoint         = GirihTile.prototype.containsPoint;
 GirihPentagon.prototype.containsVert         = Polygon.prototype.containsVert;
+GirihPentagon.prototype.getBounds         = Polygon.prototype.getBounds;
 GirihPentagon.prototype.rotate         = GirihTile.prototype.rotate;
 GirihPentagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihPentagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihPentagon.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
-GirihPentagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+// GirihPentagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+GirihPentagon.prototype.toSVGString                 = Polygon.prototype.toSVGString;
 GirihPentagon.prototype.move         = GirihTile.prototype.move;
 GirihPentagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 

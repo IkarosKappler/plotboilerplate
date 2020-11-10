@@ -104,13 +104,6 @@
 	    var penrose = new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true );
 
 	    // Add tiles to array and put them in the correct adjacency position.
-	    /* TILE_TEMPLATES.push( decagon );
-	    TILE_TEMPLATES.push( transformTileToAdjacency( decagon, 2, pentagon ) );
-	    TILE_TEMPLATES.push( transformTileToAdjacency( pentagon, 1, penrose ) );
-	    TILE_TEMPLATES.push( transformTileToAdjacency( penrose, 3, hexagon ) );
-	    TILE_TEMPLATES.push( transformTileToAdjacency( decagon, 5, bowtie ) );
-	    TILE_TEMPLATES.push( transformTileToAdjacency( pentagon, 4, rhombus ) ); */
-
 	    TILE_TEMPLATES.push( decagon );
 	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( decagon, 2, pentagon ) );
 	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( pentagon, 1, penrose ) );
@@ -149,7 +142,6 @@
 	var BLACK = Color.makeRGB( 0, 0, 0 );
 	var WHITE = Color.makeRGB( 255, 255, 255 );
 	var getContrastColor = function( color ) {
-	    // console.log( color );
 	    // r,g,b in [0..1]
 	    var gamma = 2.2;
 	    var L = 0.2126 * Math.pow( color.r, gamma )
@@ -165,7 +157,7 @@
 	// +-------------------------------
 	var drawAll = function() {
 	    // Draw the preview polygon first
-	    if( previewTilePointer < previewTiles.length ) {
+	    if( 0 <= previewTilePointer && previewTilePointer < previewTiles.length ) {
 		pb.draw.polygon( previewTiles[previewTilePointer], 'rgba(128,128,128,0.5)', 1.0 ); // Polygon is not open
 	    }
 	    
@@ -290,26 +282,18 @@
 	    var template = null; // TILE_TEMPLATES[ templatePointer ].clone();
 	    for( var i in TILE_TEMPLATES ) {
 		template = TILE_TEMPLATES[ i ].clone();
-		console.log('tile=' , template.tileType, 'symmetry=', template.symmetry, 'uniqueSymmetries=', template.uniqueSymmetries );
+		// console.log('tile=' , template.tileType, 'symmetry=', template.symmetry, 'uniqueSymmetries=', template.uniqueSymmetries );
 		// Find all rotations and positions for that tile to match
 		var foundTiles = transformTileToAdjacencies( tiles[hoverTileIndex],
 							     hoverEdgeIndex,
 							     template
-							     // true // findAll
 							   );
-		console.log('foundTiles', foundTiles.length );
 		if( foundTiles.length != 0 ) {
-		    console.log('foundTiles # type', foundTiles[0].tileType );
 		    previewTiles = previewTiles.concat( foundTiles );
 		}
 	    }
 	    // Set pointer to save range.
 	    previewTilePointer = Math.min( previewTiles.length-1, previewTilePointer );
-
-	    console.log('found adjacent tiles', previewTiles.length );
-	    for( var i in previewTiles ) {
-		console.log('found ', previewTiles[i].tileType, previewTiles[i].rotation );
-	    }
 	};
 
 
@@ -335,35 +319,7 @@
 	    }
 	    return foundAlignments;
 	};
-	/* var transformTileToAdjacency = function( baseTile, baseEdgeIndex, neighbourTile, findAll ) {
-	    // Find a rotation for that tile to match
-	    var i = 0;
-	    // let previewTile = null;
-	    var foundAlignments = [];
-	    // var foundTile = null;
-	    while( i < neighbourTile.uniqueSymmetries ) {
-		// { edgeIndex:number, offset:XYCoords }
-		var adjacency =
-		    baseTile.findAdjacentTilePosition(
-			baseEdgeIndex,
-			neighbourTile
-		    );
-		if( adjacency != null ) { // && !foundTile ) { // && !previewTile ) {
-		    // console.log('Found?', adjacency );
-		    neighbourTile.move( adjacency.offset );
-		    // foundAlignments.push( adjacentTile.clone() );
-		    // if( !findAll )
-		    ///	return foundTile; // foundAlignments;
-		    // foundTile = adjacentTile;
-		    return neighbourTile;
-		    // adjacentTile.rotate( (Math.PI*2)/adjacentTile.symmetry );
-		} else {
-		    neighbourTile.rotate( (Math.PI*2)/neighbourTile.symmetry );
-		}
-		i++
-	    }
-	    return null; // foundAlignments;
-	}; */
+
 
 	// +---------------------------------------------------------------------------------
 	// | Apply adjacent tile position to `neighbourTile`. 
@@ -429,20 +385,16 @@
 	    .down('p',function() { config.drawOuterPolygons = !config.drawOuterPolygons; pb.redraw(); } )
 	    .down('i',function() { config.drawInnerPolygons = !config.drawInnerPolygons; pb.redraw(); } )
 	    .down('rightarrow',function() {
-		// templatePointer = (templatePointer+1)%TILE_TEMPLATES.length;
-		// findAdjacentTiles();
 		previewTilePointer = (previewTilePointer+1)%previewTiles.length;
-		findAdjacentTiles();
+		// findAdjacentTiles();
+		createAdjacentTilePreview( previewTiles, previewTilePointer );
 		pb.redraw();
 	    } )
 	    .down('leftarrow',function() {
-		// templatePointer--;
-		// if( templatePointer < 0 )
-		//     templatePointer = TILE_TEMPLATES.length-1;
-		// findAdjacentTiles();
 		previewTilePointer--;
 		if( previewTilePointer < 0 )
-		     previewTilePointer = previewTiles.length-1;
+		    previewTilePointer = previewTiles.length-1;
+		createAdjacentTilePreview( previewTiles, previewTilePointer );
 		pb.redraw();
 	    } )
  	;
@@ -477,6 +429,8 @@
 	    previewTiles = [];
 	    findAdjacentTiles();
 	    pb.redraw();
+	    if( previewTiles.length != 0 )
+		createAdjacentTilePreview( previewTiles, previewTilePointer );
 	};
 	
 	// +---------------------------------------------------------------------------------
@@ -489,7 +443,38 @@
 	    drawOuterPolygons : true,
 	    drawInnerPolygons : true
 	}, GUP );
-	
+
+
+	// +---------------------------------------------------------------------------------
+	// | Build a preview of all available tiles.
+	// +-------------------------------
+	var createAdjacentTilePreview = function( tiles, pointer ) {
+	    var container = document.querySelector('.wrapper-bottom');
+	    // console.log( "container", container );
+	    while(container.firstChild){
+		container.removeChild( container.firstChild );
+	    }
+
+	    var svgBuilder = new SVGBuilder();
+	    for( var i in tiles ) {
+		var tile = tiles[i].clone();
+		tile.move( tile.position.clone().inv() );
+		var bounds = tile.getBounds();
+		
+		var svgString = svgBuilder.build( [tile],
+						  { canvasSize : { width : bounds.width/2, height : bounds.height/2 },
+						    zoom : { x:0.333, y:0.333 },
+						    offset: { x:bounds.width/2 , y:bounds.height/2 }
+						  }
+						);
+		var node = document.createElement('div');
+		if( i == pointer )
+		    node.setAttribute( 'class', 'highlighted-preview-tile' );
+		node.innerHTML = svgString;
+		container.appendChild( node );
+	    }
+	    
+	};
 
 
 	// +---------------------------------------------------------------------------------

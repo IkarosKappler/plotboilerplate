@@ -74,10 +74,34 @@
 
 
     <script src="index.js"></script>
-    <link rel="stylesheet" href="../style.css"> 
+    <link rel="stylesheet" href="../style.css">
+    <style>
+      body {
+      display: flex;
+      flex-direction: column;
+      }
+      .wrapper-top {
+      height : 90%;
+      width: 100%;
+      }
+      .wrapper-bottom {
+      display: flex;
+      flex-direction: row;
+      height : 10%;
+      width : 100%;
+      }
+      .highlighted-preview-tile {
+      background: rgba(0,192,192,0.5);
+      }
+    </style>
   </head>
   <body class="fullscreen">
-    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>      
+    <div class="wrapper-top">
+      <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+    </div>
+    <div class="wrapper-bottom">
+      Preview
+    </div>
     <div class="info monospace">
       [<span id="cx">-</span>,<span id="cy">-</span>]
     </div>

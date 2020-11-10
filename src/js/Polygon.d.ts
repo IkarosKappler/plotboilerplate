@@ -16,12 +16,14 @@
  * @modified 2020-10-30 Added the `addVertex` function.
  * @modified 2020-10-31 Added the `getVertexAt` function.
  * @modified 2020-11-06 Added the `move` function.
- * @version 1.4.0
+ * @modified 2020-11-10 Added the `getBounds` function.
+ * @version 1.5.0
  *
  * @file Polygon
  * @public
  **/
 import { BezierPath } from "./BezierPath";
+import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
 export declare class Polygon implements SVGSerializable {
@@ -108,16 +110,25 @@ export declare class Polygon implements SVGSerializable {
      **/
     scale(factor: number, center: Vertex): Polygon;
     /**
-     * Rotatee the polygon around the given center.
+     * Rotate the polygon around the given center.
      *
      * @method rotate
      * @param {number} angle  - The rotation angle.
      * @param {Vertex} center - The center of rotation.
-     * @return {Polygon} this, for chaining.
      * @instance
      * @memberof Polygon
+     * @return {Polygon} this, for chaining.
      **/
     rotate(angle: number, center: Vertex): Polygon;
+    /**
+     * Get the bounding box (bounds) of this polygon.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Polygon
+     * @return {Bounds} The rectangular bounds of this polygon.
+     **/
+    getBounds(): Bounds;
     /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>

@@ -5165,13 +5165,15 @@ exports.PlotBoilerplate = PlotBoilerplate;
  * @modified 2020-10-30 Added the `addVertex` function.
  * @modified 2020-10-31 Added the `getVertexAt` function.
  * @modified 2020-11-06 Added the `move` function.
- * @version 1.4.0
+ * @modified 2020-11-10 Added the `getBounds` function.
+ * @version 1.5.0
  *
  * @file Polygon
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
+var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var Polygon = /** @class */ (function () {
     /**
@@ -5252,8 +5254,8 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      **/
     Polygon.prototype.containsVert = function (vert) {
-        //    // ray-casting algorithm based on
-        //    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+        // ray-casting algorithm based on
+        //    http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
         var inside = false;
         for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
             var xi = this.vertices[i].x, yi = this.vertices[i].y;
@@ -5287,20 +5289,32 @@ var Polygon = /** @class */ (function () {
     };
     ;
     /**
-     * Rotatee the polygon around the given center.
+     * Rotate the polygon around the given center.
      *
      * @method rotate
      * @param {number} angle  - The rotation angle.
      * @param {Vertex} center - The center of rotation.
-     * @return {Polygon} this, for chaining.
      * @instance
      * @memberof Polygon
+     * @return {Polygon} this, for chaining.
      **/
     Polygon.prototype.rotate = function (angle, center) {
         for (var i in this.vertices) {
             this.vertices[i].rotate(angle, center);
         }
         return this;
+    };
+    ;
+    /**
+     * Get the bounding box (bounds) of this polygon.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Polygon
+     * @return {Bounds} The rectangular bounds of this polygon.
+     **/
+    Polygon.prototype.getBounds = function () {
+        return Bounds_1.Bounds.computeFromVertices(this.vertices);
     };
     ;
     /**

@@ -657,6 +657,7 @@ for this purpose.
 * Color.js
 * [FileSaver.js](https://www.npmjs.com/package/file-saver "FileSaver.js")
 * [AlloyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
+* [Ray Casting Algorithm](https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon "Ray Casting Algorithm") by Aaron Digulla
 * Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
 * [hobby.pdf](https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf "hobby.pdf")
 * [jsHobby](https://github.com/loopspace/jsHobby "jsHobby")
@@ -667,7 +668,7 @@ for this purpose.
 * [The 'Circles and spheres' article by Paul Bourke](http://paulbourke.net/geometry/circlesphere/ "the 'Circles and spheres' article by Paul Bourke")
 * [shamansir/draw_svg.js](https://gist.github.com/shamansir/6294f8cfdd555a9d1b9e182007dd0c2f "shamansir/draw_svg.js") for manipulating SVG path data strings
 * ["opsb's stackoverflow proposal"](https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle "opsb's stackoverflow proposal") for converting ellipses sectors to SVG arcs.
-* ["Martin Sojka's contrast-color-algorithm"](https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y/38542#38542" "Martin Sojka's contrast-color-algorithm")
+* [contrast-color-algorithm](https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y/38542#38542" "contrast-color-algorithm") by Martin Sojka's
 
 
 ## Known bugs

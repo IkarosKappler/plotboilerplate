@@ -42,10 +42,6 @@ var GirihTile = function( position,
     this.rotation             = angle;
     this.symmetry             = 10;
     this.uniqueSymmetries     = 10;
-    // this.uniqueSymmetries     = [];
-    // Initialize the default symmetrie set
-    // for( var i = 0; i < this.symmetry; i++ )
-    // this.uniqueSymmetries.push( Math.PI/5 * i ); // 2Pi/10 * i
 
     // An array of polygons.
     // The inner tile polygons are those that do not share edges with the outer
@@ -64,6 +60,7 @@ var GirihTile = function( position,
     this.imageProperties      = null;
 
     this.tileType             = tileType;
+    this.epsilon              = 0.001;
 
 };
 
@@ -75,12 +72,11 @@ GirihTile.TYPE_RHOMBUS            = "RHOMBUS";
 GirihTile.TYPE_BOW_TIE            = "BOW_TIE";
 // This is not part of the actual girih tile set!
 GirihTile.TYPE_PENROSE_RHOMBUS    = "PENROSE_RHOMBUS";
-//GirihTile.TYPE_OCTAGON            = "OCTAGON";
 
 
 // Prepare the tile alignment matrix:
 // [ actual_tile ] x [ edge_index ] x [ successor_index ] = tile_align
-GirihTile.TILE_ALIGN              = Array();
+// GirihTile.TILE_ALIGN              = Array();
 GirihTile.DEFAULT_EDGE_LENGTH     = 58;
 
 
@@ -116,9 +112,7 @@ GirihTile.prototype.findAdjacentTilePosition = function( edgeIndex, tile ) {
 	// So move edgeB
 	var offset = edgeB.b.difference(edgeA.a);
 	edgeB.add( offset );
-	// console.log( edgeB.a.distance(edgeA.b), edgeB.b.distance(edgeA.a) ); // edgeB, edgeA );
-	if( edgeB.a.distance(edgeA.b) < 0.001 ) {
-	    // tile.move( offset );
+	if( edgeB.a.distance(edgeA.b) < this.epsilon ) {
 	    return { edgeIndex : i, offset : offset };
 	} 	
     }
@@ -364,9 +358,9 @@ GirihTile.prototype._polygonToSVG = function( polygon,
 };
 
 // TODO: Move this to Polygon?
-GirihTile.prototype.computeBounds = function() {
+/* GirihTile.prototype.computeBounds = function() {
     return Bounds.computeFromVertices( this.vertices );
-};
+}; */
 
 /* GirihTile.prototype.translateVertex = function( vertex ) {
     return vertex.clone().rotate( this.angle, new Vertex(0,0) ).add( this.position );   

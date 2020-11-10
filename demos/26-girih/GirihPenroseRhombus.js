@@ -185,11 +185,13 @@ GirihPenroseRhombus.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOut
 GirihPenroseRhombus.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 GirihPenroseRhombus.prototype.containsVert         = Polygon.prototype.containsVert; // GirihTile.prototype.containsPoint;
 GirihPenroseRhombus.prototype.rotate         = GirihTile.prototype.rotate;
+GirihPenroseRhombus.prototype.getBounds         = Polygon.prototype.getBounds;
 GirihPenroseRhombus.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihPenroseRhombus.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihPenroseRhombus.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 //GirihPenroseRhombus.prototype.getVertexAt           = GirihTile.prototype.getVertexAt;
-GirihPenroseRhombus.prototype.toSVG                 = GirihTile.prototype.toSVG;
+//GirihPenroseRhombus.prototype.toSVG                 = GirihTile.prototype.toSVG;
+GirihPenroseRhombus.prototype.toSVGString                 = Polygon.prototype.toSVGString;
 GirihPenroseRhombus.prototype.move         = GirihTile.prototype.move;
 GirihPenroseRhombus.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 

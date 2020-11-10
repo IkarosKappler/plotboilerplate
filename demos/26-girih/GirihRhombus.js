@@ -152,11 +152,13 @@ GirihRhombus.prototype.getInnerTilePolygonAt = GirihTile.prototype.getInnerTileP
 GirihRhombus.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTilePolygonAt;
 GirihRhombus.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 GirihRhombus.prototype.containsVert         = Polygon.prototype.containsVert; // GirihTile.prototype.containsPoint;
+GirihRhombus.prototype.getBounds         = Polygon.prototype.getBounds;
 GirihRhombus.prototype.rotate         = GirihTile.prototype.rotate;
 GirihRhombus.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihRhombus.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihRhombus.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
-GirihRhombus.prototype.toSVG                 = GirihTile.prototype.toSVG;
+// GirihRhombus.prototype.toSVG                 = GirihTile.prototype.toSVG;
+GirihRhombus.prototype.toSVGString                 = Polygon.prototype.toSVGString;
 GirihRhombus.prototype.move         = GirihTile.prototype.move;
 GirihRhombus.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 

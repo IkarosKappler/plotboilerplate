@@ -210,11 +210,13 @@ GirihHexagon.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTileP
 GirihHexagon.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 // GirihHexagon.prototype.containsPoint         = GirihTile.prototype.containsPoint;
 GirihHexagon.prototype.containsVert         = Polygon.prototype.containsVert;
+GirihHexagon.prototype.getBounds         = Polygon.prototype.getBounds;
 GirihHexagon.prototype.rotate         = GirihTile.prototype.rotate;
 GirihHexagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihHexagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihHexagon.prototype.getVertexAt           = Polygon.prototype.getVertexAt; // IKRS.Tile.prototype.getVertexAt;
-GirihHexagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+// GirihHexagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+GirihHexagon.prototype.toSVGString                 = Polygon.prototype.toSVGString;
 GirihHexagon.prototype.move         = GirihTile.prototype.move;
 GirihHexagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 

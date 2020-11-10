@@ -33,7 +33,7 @@ export class SVGBuilder {
      **/
     build( drawables:Array<SVGSerializable>,
 	   options:{canvasSize:{width:number,height:number},zoom:Vertex,offset:Vertex}
-	 ) {
+	 ) : string {
 	
 	var nl : string = '\n';
 	var indent : string = '  ';

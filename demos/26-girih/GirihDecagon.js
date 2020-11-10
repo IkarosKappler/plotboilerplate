@@ -143,12 +143,14 @@ GirihDecagon.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTileP
 GirihDecagon.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
 // GirihDecagon.prototype.containsPoint         = GirihTile.prototype.containsPoint;
 GirihDecagon.prototype.containsVert         = Polygon.prototype.containsVert;
+GirihDecagon.prototype.getBounds         = Polygon.prototype.getBounds;
 GirihDecagon.prototype.rotate         = GirihTile.prototype.rotate;
 GirihDecagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
 GirihDecagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
 GirihDecagon.prototype.getVertexAt          = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
 GirihDecagon.prototype.move         = GirihTile.prototype.move;
-GirihDecagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+// GirihDecagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
+GirihDecagon.prototype.toSVGString                 = Polygon.prototype.toSVGString;
 
 GirihDecagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 

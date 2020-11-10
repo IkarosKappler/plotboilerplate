@@ -16,13 +16,15 @@
  * @modified 2020-10-30 Added the `addVertex` function.
  * @modified 2020-10-31 Added the `getVertexAt` function.
  * @modified 2020-11-06 Added the `move` function.  
- * @version 1.4.0
+ * @modified 2020-11-10 Added the `getBounds` function.
+ * @version 1.5.0
  *
  * @file Polygon
  * @public
  **/
 
 import { BezierPath } from "./BezierPath";
+import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
@@ -132,8 +134,8 @@ export class Polygon implements SVGSerializable {
      * @memberof Polygon
      **/
     containsVert( vert:Vertex ) : boolean {
-	//    // ray-casting algorithm based on
-	//    // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+	// ray-casting algorithm based on
+	//    http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
 	var inside : boolean = false;
 	for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
             let xi : number = this.vertices[i].x, yi : number = this.vertices[i].y;
@@ -170,20 +172,33 @@ export class Polygon implements SVGSerializable {
 
 
     /**
-     * Rotatee the polygon around the given center.
+     * Rotate the polygon around the given center.
      *
      * @method rotate
      * @param {number} angle  - The rotation angle.
      * @param {Vertex} center - The center of rotation.
-     * @return {Polygon} this, for chaining.
      * @instance
      * @memberof Polygon
+     * @return {Polygon} this, for chaining.
      **/
     rotate( angle:number, center:Vertex ) : Polygon {
 	for( var i in this.vertices ) {
 	    this.vertices[i].rotate( angle, center );
 	}
 	return this;
+    };
+
+
+    /**
+     * Get the bounding box (bounds) of this polygon.
+     *
+     * @method getBounds
+     * @instance
+     * @memberof Polygon
+     * @return {Bounds} The rectangular bounds of this polygon.
+     **/
+    getBounds() : Bounds {
+	return Bounds.computeFromVertices( this.vertices );
     };
 
 
