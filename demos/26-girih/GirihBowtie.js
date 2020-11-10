@@ -18,11 +18,10 @@
  * @name GirihBowtie
  * @param {Vertex} position
  * @param {number} size
- * @param {number} angle
  */
-var GirihBowtie = function( position, size, angle ) {
+var GirihBowtie = function( position, size ) {
     
-    GirihTile.call( this, position, size, angle, GirihTile.TYPE_BOW_TIE );
+    GirihTile.call( this, position, size, GirihTile.TYPE_BOW_TIE );
 
     // Overwrite the default symmetries:
     //    the bow-tie tile has a 180° symmetry (5/10 * 360°)

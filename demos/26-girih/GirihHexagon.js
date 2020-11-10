@@ -23,11 +23,10 @@
  * @name GirihHexagon
  * @param {Vertex} position
  * @param {number} size
- * @param {number} angle
  */
 var GirihHexagon = function( position, size, angle ) {
     
-    GirihTile.call( this, position, size, angle, GirihTile.TYPE_IRREGULAR_HEXAGON );
+    GirihTile.call( this, position, size, GirihTile.TYPE_IRREGULAR_HEXAGON );
 
     // Overwrite the default symmetries:
     //    the hexagon tile has a 180° symmetry (5/10 * 360°)

@@ -21,11 +21,10 @@
  * @name GirihPenroseRhombus
  * @param {Vertex} position
  * @param {number} size
- * @param {number} angle
  */
-var GirihPenroseRhombus = function( position, size, angle, opt_addCenterPolygon ) {
+var GirihPenroseRhombus = function( position, size, opt_addCenterPolygon ) {
     
-    GirihTile.call( this, position, size, angle, GirihTile.TYPE_PENROSE_RHOMBUS  );
+    GirihTile.call( this, position, size, GirihTile.TYPE_PENROSE_RHOMBUS  );
 
     // Overwrite the default symmetries:
     //    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)

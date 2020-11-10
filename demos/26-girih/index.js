@@ -386,7 +386,6 @@
 	    .down('i',function() { config.drawInnerPolygons = !config.drawInnerPolygons; pb.redraw(); } )
 	    .down('rightarrow',function() {
 		previewTilePointer = (previewTilePointer+1)%previewTiles.length;
-		// findAdjacentTiles();
 		createAdjacentTilePreview( previewTiles, previewTilePointer );
 		pb.redraw();
 	    } )
@@ -468,8 +467,10 @@
 						  }
 						);
 		var node = document.createElement('div');
-		if( i == pointer )
-		    node.setAttribute( 'class', 'highlighted-preview-tile' );
+		if( i == pointer ) {
+		    // node.setAttribute( 'class', 'highlighted-preview-tile' );
+		    node.classList.add( 'highlighted-preview-tile' );
+		}
 		node.innerHTML = svgString;
 		container.appendChild( node );
 	    }

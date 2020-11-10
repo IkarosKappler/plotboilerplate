@@ -23,11 +23,10 @@
  * @name GirihPentagon
  * @param {Vertex} position
  * @param {number} size
- * @param {number} angle
  */
 var GirihPentagon = function( position, size, angle ) {
     
-    GirihTile.call( this, position, size, angle, GirihTile.TYPE_PENTAGON );
+    GirihTile.call( this, position, size, GirihTile.TYPE_PENTAGON );
 
     // Overwrite the default symmetries:
     //    the pentagon tile has a 72° symmetry (2/10 * 360°)

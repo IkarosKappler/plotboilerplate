@@ -22,11 +22,10 @@
  * @name GirihDecagon
  * @param {Vertex} position
  * @param {number} size
- * @param {number} angle
  */
-var GirihDecagon = function( position, size, angle ) {
+var GirihDecagon = function( position, size ) {
 
-    GirihTile.call( this, position, size, angle, GirihTile.TYPE_DECAGON );
+    GirihTile.call( this, position, size, GirihTile.TYPE_DECAGON );
 
     // Overwrite the default symmetries:
     //    the decagon tile has a 36° symmetry (1/10 * 360°)

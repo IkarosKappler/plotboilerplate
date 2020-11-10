@@ -18,11 +18,10 @@
  * @name GirihRhombus
  * @param {Vertex} position
  * @param {number} size
- * @param {number} angle
  */
-var GirihRhombus = function( position, size, angle ) {
+var GirihRhombus = function( position, size ) {
     
-    GirihTile.call( this, position, size, angle, GirihTile.TYPE_RHOMBUS );
+    GirihTile.call( this, position, size, GirihTile.TYPE_RHOMBUS );
 
     // Overwrite the default symmetries:
     //    the rhombus tile has a 180° symmetry (5/10 * 360°)

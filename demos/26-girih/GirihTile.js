@@ -1,6 +1,9 @@
 /**
  * @class
- * @classdesc This is a general Tile superclass. All other tile classes extends this one.
+ * @classdesc This is a general tile superclass. All other tile classes extends this one.
+ *
+ * Rule:
+ *  * the outer and the inner sub polygons must be inside the main polygon's bounds.
  *
  * @requires Bounds
  * @requires Polyon
@@ -21,25 +24,23 @@
  * @abstract class
  * @param {Vertex} position - The position of the tile.
  * @param {number} size     - The edge size (usually IKRS.Girih.DEFAULT_EDGE_LENGTH).
- * @param {number} angle    - The rotation angle.
  * @param {string} tileType - One of GirihTile.TILE_TYPE_*.
  **/
 var GirihTile = function( position,
-			  size, 
-			  angle, // TODO: remove the 'angle' param from ALL tiles. The param makes no sense.
+			  size,
 			  tileType
 			) {
 
     Polygon.call( this, [], false ); // ..., vertices, isOpen
 
-    if( typeof angle == "undefined" )
-	angle = 0.0;
+    // if( typeof angle == "undefined" )
+    //angle = 0.0;
     if( typeof tileType == "unknown" )
 	tileType = GirihTile.TYPE_UNKNOWN;
     
     this.size                 = size;
     this.position             = position;
-    this.rotation             = angle;
+    this.rotation             = 0.0; // angle;
     this.symmetry             = 10;
     this.uniqueSymmetries     = 10;
 
