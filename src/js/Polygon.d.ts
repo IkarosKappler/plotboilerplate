@@ -17,7 +17,8 @@
  * @modified 2020-10-31 Added the `getVertexAt` function.
  * @modified 2020-11-06 Added the `move` function.
  * @modified 2020-11-10 Added the `getBounds` function.
- * @version 1.5.0
+ * @modified 2020-11-11 Generalized `move(Vertex)` to `move(XYCoords)`.
+ * @version 1.5.1
  *
  * @file Polygon
  * @public
@@ -25,7 +26,7 @@
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
-import { SVGSerializable } from "./interfaces";
+import { XYCoords, SVGSerializable } from "./interfaces";
 export declare class Polygon implements SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
@@ -68,6 +69,11 @@ export declare class Polygon implements SVGSerializable {
      *
      * The index may exceed the total vertex count, and will be wrapped around then (modulo).
      *
+     * For k >= 0:
+     *  - getVertexAt( vertices.length )     == getVertexAt( 0 )
+     *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
+     *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
+     *
      * @metho getVertexAt
      * @param {number} index - The index of the desired vertex.
      * @instance
@@ -84,7 +90,7 @@ export declare class Polygon implements SVGSerializable {
      * @memberof Polygon
      * @return {Polygon} this for chaining
      **/
-    move(vert: Vertex): Polygon;
+    move(vert: XYCoords): Polygon;
     /**
      * Check if the given vertex is inside this polygon.<br>
      * <br>

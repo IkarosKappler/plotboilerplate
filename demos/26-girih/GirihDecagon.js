@@ -82,19 +82,11 @@ GirihDecagon.prototype.clone = function() {
  * @param {number} edgeLength
  */
 GirihDecagon.prototype._buildInnerPolygons = function( edgeLength ) {
-
-    //console.log( this.position );
     var centralStar = new Polygon();
     for( var i = 0; i < 10; i++ ) {
 	var innerTile = new Polygon();
 	// Make polygon
 	var topPoint    = this.getVertexAt( i ).clone().scale( 0.5, this.getVertexAt(i+1) );
-	/*
-	var bottomPoint = topPoint.clone().multiplyScalar( 0.615 );
-	var leftPoint   = this.getVertexAt( i ).clone().multiplyScalar( 0.69 );
-	var rightPoint  = this.getVertexAt( i+1 ).clone().multiplyScalar( 0.69 );
-	*/
-
 	var bottomPoint = topPoint.clone().scale( 0.615, this.position );
 	var leftPoint   = this.getVertexAt( i ).clone().scale( 0.69, this.position );
 	var rightPoint  = this.getVertexAt( i+1 ).clone().scale( 0.69, this.position );
@@ -134,30 +126,4 @@ GirihDecagon.prototype._buildOuterPolygons = function( edgeLength ) {
 	this.outerTilePolygons.push( outerTile );
     }
 };
-
-
-// This is totally shitty. Why object inheritance when I still
-// have to inherit object methods manually??!
-/* GirihDecagon.prototype.computeBounds         = GirihTile.prototype.computeBounds;
-GirihDecagon.prototype.addVertex             = GirihTile.prototype.addVertex;
-GirihDecagon.prototype.translateVertex       = GirihTile.prototype.translateVertex;
-GirihDecagon.prototype._polygonToSVG         = GirihTile.prototype._polygonToSVG;
-GirihDecagon.prototype.getInnerTilePolygonAt = GirihTile.prototype.getInnerTilePolygonAt;
-GirihDecagon.prototype.getOuterTilePolygonAt = GirihTile.prototype.getOuterTilePolygonAt;
-GirihDecagon.prototype.getTranslatedVertex   = GirihTile.prototype.getTranslatedVertex;
-// GirihDecagon.prototype.containsPoint         = GirihTile.prototype.containsPoint;
-GirihDecagon.prototype.containsVert         = Polygon.prototype.containsVert;
-GirihDecagon.prototype.getBounds         = Polygon.prototype.getBounds;
-GirihDecagon.prototype.rotate         = GirihTile.prototype.rotate;
-GirihDecagon.prototype.locateEdgeAtPoint     = GirihTile.prototype.locateEdgeAtPoint;
-GirihDecagon.prototype.locateAdjacentEdge    = GirihTile.prototype.locateAdjacentEdge;
-GirihDecagon.prototype.getVertexAt          = Polygon.prototype.getVertexAt; // GirihTile.prototype.getVertexAt;
-GirihDecagon.prototype.move         = GirihTile.prototype.move;
-// GirihDecagon.prototype.toSVG                 = GirihTile.prototype.toSVG;
-GirihDecagon.prototype.toSVGString                 = Polygon.prototype.toSVGString;
-
-GirihDecagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
-
-GirihDecagon.prototype.constructor           = GirihDecagon;
-*/
 

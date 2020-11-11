@@ -1,6 +1,10 @@
 
 
 # Changelog
+* 2020-11-11
+  * Generalized `move(Vertex)` to `move(XYCoords)` in the Polygon class.
+  * Generalized the `VertTuple.add` and `VertTuple.sub` param from `Vertex` to `XYCoords`.
+  * Girih-demo: ported the GirihTile class from vanilla JS to TypeScript.	
 * 2020-11-10
   * Added the `Polygon.getBounds()` function.
 * 2020-11-06

@@ -5166,7 +5166,8 @@ exports.PlotBoilerplate = PlotBoilerplate;
  * @modified 2020-10-31 Added the `getVertexAt` function.
  * @modified 2020-11-06 Added the `move` function.
  * @modified 2020-11-10 Added the `getBounds` function.
- * @version 1.5.0
+ * @modified 2020-11-11 Generalized `move(Vertex)` to `move(XYCoords)`.
+ * @version 1.5.1
  *
  * @file Polygon
  * @public
@@ -5211,6 +5212,11 @@ var Polygon = /** @class */ (function () {
      * Get the polygon vertex at the given position (index).
      *
      * The index may exceed the total vertex count, and will be wrapped around then (modulo).
+     *
+     * For k >= 0:
+     *  - getVertexAt( vertices.length )     == getVertexAt( 0 )
+     *  - getVertexAt( vertices.length + k ) == getVertexAt( k )
+     *  - getVertexAt( -k )                  == getVertexAt( vertices.length -k )
      *
      * @metho getVertexAt
      * @param {number} index - The index of the desired vertex.
@@ -6318,8 +6324,9 @@ exports.Vector = Vector;
  * @author Ikaros Kappler
  * @date   2020-03-24
  * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
- * @modofied 2020-05-12 The angle(line) param was still not optional. Changed that.
- * @version 1.0.1
+ * @modified 2020-05-12 The angle(line) param was still not optional. Changed that.
+ * @modified 2020-11-11 Generalized the `add` and `sub` param from `Vertex` to `XYCoords`.
+ * @version 1.0.2
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
@@ -6365,7 +6372,7 @@ var VertTuple = /** @class */ (function () {
      * Substract the given vertex from this line's end points.
      *
      * @method sub
-     * @param {Vertex} amount The amount (x,y) to substract.
+     * @param {XYCoords} amount The amount (x,y) to substract.
      * @return {VertTuple} this
      * @instance
      * @memberof VertTuple
@@ -6380,7 +6387,7 @@ var VertTuple = /** @class */ (function () {
      * Add the given vertex to this line's end points.
      *
      * @method add
-     * @param {Vertex} amount The amount (x,y) to add.
+     * @param {XYCoords} amount The amount (x,y) to add.
      * @return {Line} this
      * @instance
      * @memberof VertTuple

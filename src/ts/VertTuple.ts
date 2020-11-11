@@ -6,8 +6,9 @@
  * @author Ikaros Kappler
  * @date   2020-03-24
  * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
- * @modofied 2020-05-12 The angle(line) param was still not optional. Changed that.
- * @version 1.0.1
+ * @modified 2020-05-12 The angle(line) param was still not optional. Changed that.
+ * @modified 2020-11-11 Generalized the `add` and `sub` param from `Vertex` to `XYCoords`.
+ * @version 1.0.2
  */
 
 import { Vertex } from "./Vertex";
@@ -78,12 +79,12 @@ export class VertTuple<T extends VertTuple<T>> {
      * Substract the given vertex from this line's end points.
      *
      * @method sub
-     * @param {Vertex} amount The amount (x,y) to substract.
+     * @param {XYCoords} amount The amount (x,y) to substract.
      * @return {VertTuple} this
      * @instance
      * @memberof VertTuple
      **/
-    sub( amount:Vertex ):VertTuple<T> {
+    sub( amount:XYCoords ):VertTuple<T> {
 	this.a.sub( amount );
 	this.b.sub( amount );
 	return this;
@@ -94,12 +95,12 @@ export class VertTuple<T extends VertTuple<T>> {
      * Add the given vertex to this line's end points.
      *
      * @method add
-     * @param {Vertex} amount The amount (x,y) to add.
+     * @param {XYCoords} amount The amount (x,y) to add.
      * @return {Line} this
      * @instance
      * @memberof VertTuple
      **/
-    add( amount:Vertex ):VertTuple<T> {
+    add( amount:XYCoords ):VertTuple<T> {
 	this.a.add( amount );
 	this.b.add( amount );
 	return this;
