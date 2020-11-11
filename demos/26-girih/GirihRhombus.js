@@ -74,6 +74,10 @@ var GirihRhombus = function( position, size ) {
     this._buildOuterPolygons();  // Call only AFTER the inner polygons were built!
 };
 
+Object.assign( GirihRhombus.prototype, Polygon.prototype );
+Object.assign( GirihRhombus.prototype, GirihTile.prototype );
+GirihRhombus.prototype.constructor = GirihRhombus;
+
 
 /**
  * @abstract Subclasses must override this.
@@ -143,7 +147,7 @@ GirihRhombus.prototype._buildOuterPolygons = function() {
     }
 };
 
-
+/*
 GirihRhombus.prototype.addVertex            = Polygon.prototype.addVertex; // GirihTile.prototype.addVertex;
 GirihRhombus.prototype.translateVertex      = GirihTile.prototype.translateVertex;
 GirihRhombus.prototype._polygonToSVG         = GirihTile.prototype._polygonToSVG;
@@ -162,3 +166,5 @@ GirihRhombus.prototype.move         = GirihTile.prototype.move;
 GirihRhombus.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihRhombus.prototype.constructor           = GirihRhombus;
+*/
+

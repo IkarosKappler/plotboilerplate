@@ -119,7 +119,50 @@ GirihTile.prototype.findAdjacentTilePosition = function( edgeIndex, tile ) {
     }
     return null;
 };
-    
+
+
+// +---------------------------------------------------------------------------------
+// | Apply adjacent tile position to `neighbourTile`. 
+// +-------------------------------
+GirihTile.prototype.transformTileToAdjacencies = function( // baseTile,
+							   baseEdgeIndex,
+							   neighbourTile ) {
+    // Find a rotation for that tile to match
+    var i = 0;
+    var foundAlignments = [];
+    var positionedTile = null;
+    while( i < neighbourTile.uniqueSymmetries ) {
+	positionedTile = this.transformTilePositionToAdjacency( /* baseTile,*/ baseEdgeIndex, neighbourTile );
+	if( positionedTile != null ) {
+	    // console.log('Found?', adjacency );
+	    positionedTile = positionedTile.clone();
+	    // positionedTile.rotate( (Math.PI*2)/positionedTile.symmetry );
+	    foundAlignments.push( positionedTile );
+	} // else {
+	neighbourTile.rotate( (Math.PI*2)/neighbourTile.symmetry );
+	// }
+	i++
+    }
+    return foundAlignments;
+};
+
+
+// +---------------------------------------------------------------------------------
+// | Apply adjacent tile position to `neighbourTile`. 
+// +-------------------------------
+GirihTile.prototype.transformTilePositionToAdjacency = function( // baseTile,
+								 baseEdgeIndex,
+								 neighbourTile ) {
+    // Find the position for that tile to match (might not exist)
+    // { edgeIndex:number, offset:XYCoords }
+    var adjacency = this.findAdjacentTilePosition( baseEdgeIndex, neighbourTile );
+    if( adjacency != null ) {
+	neighbourTile.move( adjacency.offset );
+	return neighbourTile;
+    }
+    return null;
+};
+
 
 /**
  * This function applies MOD to the index.

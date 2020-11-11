@@ -60,6 +60,11 @@ var GirihDecagon = function( position, size ) {
     this._buildOuterPolygons( size );       // Important: call AFTER inner polygons were created!
 };
 
+Object.assign( GirihDecagon.prototype, Polygon.prototype );
+Object.assign( GirihDecagon.prototype, GirihTile.prototype );
+GirihDecagon.prototype.constructor = GirihDecagon;
+
+
 /**
  * @abstract Subclasses must override this.
  */
@@ -133,7 +138,7 @@ GirihDecagon.prototype._buildOuterPolygons = function( edgeLength ) {
 
 // This is totally shitty. Why object inheritance when I still
 // have to inherit object methods manually??!
-GirihDecagon.prototype.computeBounds         = GirihTile.prototype.computeBounds;
+/* GirihDecagon.prototype.computeBounds         = GirihTile.prototype.computeBounds;
 GirihDecagon.prototype.addVertex             = GirihTile.prototype.addVertex;
 GirihDecagon.prototype.translateVertex       = GirihTile.prototype.translateVertex;
 GirihDecagon.prototype._polygonToSVG         = GirihTile.prototype._polygonToSVG;
@@ -154,3 +159,5 @@ GirihDecagon.prototype.toSVGString                 = Polygon.prototype.toSVGStri
 GirihDecagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihDecagon.prototype.constructor           = GirihDecagon;
+*/
+

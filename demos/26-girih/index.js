@@ -105,15 +105,17 @@
 
 	    // Add tiles to array and put them in the correct adjacency position.
 	    TILE_TEMPLATES.push( decagon );
-	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( decagon, 2, pentagon ) );
-	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( pentagon, 1, penrose ) );
-	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( penrose, 3, hexagon ) );
-	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( decagon, 5, bowtie ) );
-	    TILE_TEMPLATES.push( transformTilePositionToAdjacency( pentagon, 4, rhombus ) );
+	    TILE_TEMPLATES.push( decagon.transformTilePositionToAdjacency( 2, pentagon ) );
+	    TILE_TEMPLATES.push( pentagon.transformTilePositionToAdjacency( 1, penrose ) );
+	    TILE_TEMPLATES.push( penrose.transformTilePositionToAdjacency( 3, hexagon ) );
+	    TILE_TEMPLATES.push( decagon.transformTilePositionToAdjacency( 5, bowtie ) );
+	    TILE_TEMPLATES.push( pentagon.transformTilePositionToAdjacency( 4, rhombus ) );
 	    
 	    for( var i in TILE_TEMPLATES ) {
 		tiles.push( TILE_TEMPLATES[i].clone() );
 	    }
+
+	    console.log( 'tiles', tiles );
 	};
 
 	/**
@@ -279,12 +281,11 @@
 	    if( hoverTileIndex == -1 ||  hoverEdgeIndex == -1 )
 		return;
 	    
-	    var template = null; // TILE_TEMPLATES[ templatePointer ].clone();
+	    var template = null; 
 	    for( var i in TILE_TEMPLATES ) {
 		template = TILE_TEMPLATES[ i ].clone();
-		// console.log('tile=' , template.tileType, 'symmetry=', template.symmetry, 'uniqueSymmetries=', template.uniqueSymmetries );
 		// Find all rotations and positions for that tile to match
-		var foundTiles = transformTileToAdjacencies( tiles[hoverTileIndex],
+		var foundTiles = tiles[hoverTileIndex].transformTileToAdjacencies( // tiles[hoverTileIndex],
 							     hoverEdgeIndex,
 							     template
 							   );
@@ -300,7 +301,7 @@
 	// +---------------------------------------------------------------------------------
 	// | Apply adjacent tile position to `neighbourTile`. 
 	// +-------------------------------
-	var transformTileToAdjacencies = function( baseTile, baseEdgeIndex, neighbourTile ) { // , findAll ) {
+	/* var transformTileToAdjacencies = function( baseTile, baseEdgeIndex, neighbourTile ) { // , findAll ) {
 	    // Find a rotation for that tile to match
 	    var i = 0;
 	    var foundAlignments = [];
@@ -318,13 +319,13 @@
 		i++
 	    }
 	    return foundAlignments;
-	};
+	}; */
 
 
 	// +---------------------------------------------------------------------------------
 	// | Apply adjacent tile position to `neighbourTile`. 
 	// +-------------------------------
-	var transformTilePositionToAdjacency = function( baseTile, baseEdgeIndex, neighbourTile ) {
+	/* var transformTilePositionToAdjacency = function( baseTile, baseEdgeIndex, neighbourTile ) {
 	    // Find the position for that tile to match (might not exist)
 	    // { edgeIndex:number, offset:XYCoords }
 	    var adjacency =
@@ -337,7 +338,7 @@
 		return neighbourTile;
 	    }
 	    return null;
-	};
+	}; */
 	
 
 	// +---------------------------------------------------------------------------------

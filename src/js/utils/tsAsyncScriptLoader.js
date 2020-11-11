@@ -48,30 +48,9 @@ var require = globalThis.require = function(...args) { console.log(args); return
      */
     var loadJSFiles = function() {
 	var jsSources = [
-	    /*
-	    "src/js/extend.js",
-	    "src/js/SVGBuilder.js",
-	    // "src/js/VertexAttr.js",      // already ported to TS 2020-03-23
-	    // "src/js/VertexListeners.js", // already ported to TS 2020-03-23
-	    // "src/js/Vertex.js",          // already ported to TS 2020-03-20
-	    "src/js/Grid.js",
-	    // "src/Line.js",            // already ported to TS 2020-03-20
-	    "src/js/Vector.js",
-	    "src/js/CubicBezierCurve.js",
-	    "src/js/BezierPath.js",
-	    "src/js/Polygon.js",
-	    "src/js/Triangle.js",
-	    "src/js/VEllipse.js",
-	    "src/js/PBImage.js",
-	    
-	    "src/js/MouseHandler.js",
-	    "src/js/KeyHandler.js",
-	    "src/js/draw.js",
-	    
-	    "src/js/PlotBoilerplate.js",
-	    // "demos/gup.js"
-	    // "src/index.js"
-	    */
+	    // Place your JS file paths to load here
+	    // Example:
+	    // "src/js/draw.js"
 	];
 	var head = document.getElementsByTagName('head')[0];
 	var scriptsLoaded = 0;

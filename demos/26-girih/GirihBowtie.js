@@ -83,8 +83,12 @@ var GirihBowtie = function( position, size ) {
     
     this._buildInnerPolygons( size );
     this._buildOuterPolygons( size );       // Only call AFTER the inner polygons were created!
-  
 };
+
+Object.assign( GirihBowtie.prototype, Polygon.prototype );
+Object.assign( GirihBowtie.prototype, GirihTile.prototype );
+GirihBowtie.prototype.constructor = GirihBowtie;
+
 
 /**
  * @abstract Subclasses must override this.
@@ -157,7 +161,7 @@ GirihBowtie.prototype._buildOuterPolygons = function( edgeLength ) {
 // have to inherit object methods manually??!
 // GirihBowtie.prototype.computeBounds         = GirihTile.prototype.computeBounds;
 //GirihBowtie.prototype.           = Polygon.prototype.addVertex;
-GirihBowtie.prototype.addVertex            = Polygon.prototype.addVertex; // GirihTile.prototype.addVertex;
+/* GirihBowtie.prototype.addVertex            = Polygon.prototype.addVertex; // GirihTile.prototype.addVertex;
 GirihBowtie.prototype.translateVertex      = GirihTile.prototype.translateVertex;
 GirihBowtie.prototype._polygonToSVG         = GirihTile.prototype._polygonToSVG;
 GirihBowtie.prototype.getInnerTilePolygonAt = GirihTile.prototype.getInnerTilePolygonAt;
@@ -176,3 +180,4 @@ GirihBowtie.prototype.move         = GirihTile.prototype.move;
 GirihBowtie.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihBowtie.prototype.constructor           = GirihBowtie;
+*/

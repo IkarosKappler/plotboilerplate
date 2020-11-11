@@ -85,6 +85,12 @@ var GirihHexagon = function( position, size, angle ) {
 };
 
 
+Object.assign( GirihHexagon.prototype, Polygon.prototype );
+Object.assign( GirihHexagon.prototype, GirihTile.prototype );
+GirihHexagon.prototype.constructor = GirihHexagon;
+
+
+
 /**
  * @abstract Subclasses must override this.
  */
@@ -200,7 +206,7 @@ GirihHexagon.prototype._buildOuterPolygons = function( edgeLength ) {
 
 // This is totally shitty. Why object inheritance when I still
 // have to inherit object methods manually??!
-GirihHexagon.prototype.computeBounds         = GirihTile.prototype.computeBounds;
+/* GirihHexagon.prototype.computeBounds         = GirihTile.prototype.computeBounds;
 GirihHexagon.prototype.addVertex            = Polygon.prototype.addVertex; // IKRS.Tile.prototype._addVertex;
 GirihHexagon.prototype.translateVertex      = GirihTile.prototype.translateVertex;
 GirihHexagon.prototype._polygonToSVG         = GirihTile.prototype._polygonToSVG;
@@ -220,3 +226,5 @@ GirihHexagon.prototype.move         = GirihTile.prototype.move;
 GirihHexagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjacentTilePosition;
 
 GirihHexagon.prototype.constructor           = GirihHexagon;
+*/
+

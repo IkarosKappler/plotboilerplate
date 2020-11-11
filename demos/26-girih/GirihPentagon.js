@@ -62,6 +62,11 @@ var GirihPentagon = function( position, size, angle ) {
 };
 
 
+Object.assign( GirihPentagon.prototype, Polygon.prototype );
+Object.assign( GirihPentagon.prototype, GirihTile.prototype );
+GirihPentagon.prototype.constructor = GirihPentagon;
+
+
 /**
  * @abstract Subclasses must override this.
  */
@@ -96,7 +101,7 @@ GirihPentagon.prototype._buildOuterPolygons = function( edgeLength ) {
     }
 };
 
-
+/*
 // This is totally shitty. Why object inheritance when I still
 // have to inherit object methods manually??!
 GirihPentagon.prototype.computeBounds         = GirihTile.prototype.computeBounds;
@@ -120,3 +125,5 @@ GirihPentagon.prototype.findAdjacentTilePosition = GirihTile.prototype.findAdjac
 
 
 GirihPentagon.prototype.constructor           = GirihPentagon;
+*/
+
