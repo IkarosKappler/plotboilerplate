@@ -1,6 +1,13 @@
 /**
  * @classdesc The rhombus tile from the Girih set.
  *
+ * @requires Bounds
+ * @requires GirihTile
+ * @requires Polygon
+ * @requires TileType
+ * @requires Vertex
+ *
+ *
  * @author Ikaros Kappler
  * @date 2013-11-28
  * @date 2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
@@ -9,7 +16,7 @@
  * @version 2.0.0-alpha
  * @file GirihRhombus
  * @public
- **/
+ */
 
 
 /**
