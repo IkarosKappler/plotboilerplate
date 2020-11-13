@@ -6780,7 +6780,7 @@ var Vertex = /** @class */ (function () {
     /**
      * Set the y-component if this vertex to the inverse of its value.
      *
-     * @method invy
+     * @method invY
      * @return {Vertex} this
      * @instance
      * @memberof Vertex
