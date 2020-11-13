@@ -22,7 +22,8 @@
  * 
  * @author   Ikaros Kappler
  * @date     2020-10-05
- * @version  1.0.0
+ * @modified 2020-11-13 Fixed the drawing of sector lines.
+ * @version  1.0.1
  **/
 
 
@@ -188,13 +189,13 @@
 
 	// +---------------------------------------------------------------------------------
 	// | Draw the inner angles of intersecions.
-	// +-------------------------------
+	// +-pb.add( radiusPoint );------------------------------
 	var drawCircleSections = function( circle, radicalLines ) {
 	    for( var r = 0; r < radicalLines.length; r++ ) {
 		if( radicalLines[r] == null )
 		    continue;
-		pb.draw.line( circle.center, radicalLines[r].a, 1.0, 'rgba(0,192,192,0.25)' );
-		pb.draw.line( circle.center, radicalLines[r].b, 1.0, 'rgba(0,192,192,0.25)' );
+		pb.draw.line( circle.center, radicalLines[r].a, 'rgba(0,192,192,0.25)', 1.0 );
+		pb.draw.line( circle.center, radicalLines[r].b, 'rgba(0,192,192,0.25)', 1.0 );
 	    }
 	};
 

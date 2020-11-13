@@ -14,7 +14,8 @@
  * 
  * @author   Ikaros Kappler
  * @date     2020-09-04
- * @version  1.0.0
+ * @modified 2020-11-13 Added drawing of sector lines.
+ * @version  1.0.1
  **/
 
 
@@ -84,8 +85,8 @@
 	    circles[i] = circle;
 	    circleSegments[i] = [ Math.PI*2.0 ];
 	    var radiusPoint = new Vertex( center.clone().addXY(circle.radius*Math.sin(Math.PI/4),circle.radius*Math.cos(Math.PI/4)) );
-	    pb.add( circle.center );
 	    pb.add( radiusPoint );
+	    pb.add( circle.center );
 
 	    new CircleHelper( circle, radiusPoint, pb );
 	}
@@ -102,6 +103,12 @@
 	    if( radLine !== null ) {
 		if( config.drawRadicalLine ) {
 		    pb.draw.line( radLine.a, radLine.b, 'rgba(34,168,168,0.5)', 1.0 );
+		}
+		if( config.drawSectorLines ) {
+		    pb.draw.line( circles[0].center, radLine.a, 'rgba(0,192,192,0.25)', 1.0 );
+		    pb.draw.line( circles[0].center, radLine.b, 'rgba(0,192,192,0.25)', 1.0 );
+		    pb.draw.line( circles[1].center, radLine.a, 'rgba(0,192,192,0.25)', 1.0 );
+		    pb.draw.line( circles[1].center, radLine.b, 'rgba(0,192,192,0.25)', 1.0 );
 		}
 		if( config.drawIntersectionPoints ) {
 		    pb.draw.diamondHandle( radLine.a, 9, 'rgba(0,192,0,1.0)' );
@@ -150,7 +157,8 @@
 	    alwaysDrawFullCircles  : false,
 	    drawCircleSections     : true,
 	    drawRadicalLine        : true,
-	    drawIntersectionPoints : false
+	    drawIntersectionPoints : false,
+	    drawSectorLines        : false
 	}, GUP );
 	
 
@@ -164,6 +172,7 @@
 	    gui.add(config, 'drawCircleSections').onChange( function() { pb.redraw(); } ).name("drawCircleSections").title("Draw the circle sections separately?");
 	    gui.add(config, 'drawRadicalLine').onChange( function() { pb.redraw(); } ).name("drawRadicalLine").title("Draw the radical line?");
 	    gui.add(config, 'drawIntersectionPoints').onChange( function() { pb.redraw(); } ).name("drawIntersectionPoints").title("Draw the intersection points?");
+	    gui.add(config, 'drawSectorLines').onChange( function() { pb.redraw(); } ).name("drawSectorLines").title("Draw the sector lines of circle sections?");
 	}
 
 	pb.config.preDraw = drawAll;
