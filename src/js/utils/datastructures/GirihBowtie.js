@@ -73,7 +73,7 @@ var GirihBowtie = /** @class */ (function (_super) {
             _this.addVertex(pointB);
             if (i == 2)
                 oppositePoint = pointB;
-        }
+        } // END for
         // Move to center and position 
         var bounds = Bounds_1.Bounds.computeFromVertices(_this.vertices);
         var move = new Vertex_1.Vertex((oppositePoint.x - startPoint.x) / 2.0, // bounds.getWidth()/2.0,
@@ -99,7 +99,7 @@ var GirihBowtie = /** @class */ (function (_super) {
     }
     ;
     /**
-     * @abstract Subclasses must override this.
+     * @override
      */
     GirihBowtie.prototype.clone = function () {
         return new GirihBowtie(this.position.clone(), this.size).rotate(this.rotation);

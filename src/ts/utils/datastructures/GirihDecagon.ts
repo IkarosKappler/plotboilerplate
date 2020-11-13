@@ -40,15 +40,17 @@ export class GirihDecagon extends GirihTile {
 	
 	// Init the actual decahedron shape with the passed size:
 	// Divide the full circle into 10 sections (we want to make a regular decagon).
-	var theta = (Math.PI*2) / 10.0;
+	const theta = (Math.PI*2) / 10.0;
 	// Compute the 'radius' using pythagoras
-	var radius = Math.sqrt(
+	const radius = Math.sqrt(
 	    Math.pow(size/2,2)
 		+
 		Math.pow( 1/Math.tan(theta/2) * size/2, 2 )
 	);
 	for( var i = 0; i < 10; i++ ) {
-	    this.addVertex( position.clone().addY( -radius ).rotate( theta/2 + i*theta, position ) );
+	    this.addVertex(
+		position.clone().addY( -radius ).rotate( theta/2 + i*theta, position )
+	    );
 	}
 	
 	this.imageProperties = {
@@ -71,7 +73,7 @@ export class GirihDecagon extends GirihTile {
     /**
      * @override
      */
-    clone() {
+    clone() : GirihTile {
 	return new GirihDecagon( this.position.clone(), this.size ).rotate( this.rotation );
     };
 
@@ -85,14 +87,14 @@ export class GirihDecagon extends GirihTile {
      * @param {number} edgeLength
      */
     _buildInnerPolygons( edgeLength:number ) {
-	var centralStar = new Polygon();
+	const centralStar = new Polygon();
 	for( var i = 0; i < 10; i++ ) {
-	    var innerTile = new Polygon();
+	    const innerTile = new Polygon();
 	    // Make polygon
-	    var topPoint    = this.getVertexAt( i ).clone().scale( 0.5, this.getVertexAt(i+1) );
-	    var bottomPoint = topPoint.clone().scale( 0.615, this.position );
-	    var leftPoint   = this.getVertexAt( i ).clone().scale( 0.69, this.position );
-	    var rightPoint  = this.getVertexAt( i+1 ).clone().scale( 0.69, this.position );
+	    const topPoint    = this.getVertexAt( i ).clone().scale( 0.5, this.getVertexAt(i+1) );
+	    const bottomPoint = topPoint.clone().scale( 0.615, this.position );
+	    const leftPoint   = this.getVertexAt( i ).clone().scale( 0.69, this.position );
+	    const rightPoint  = this.getVertexAt( i+1 ).clone().scale( 0.69, this.position );
 	    
 	    innerTile.addVertex( topPoint );
 	    innerTile.addVertex( rightPoint );
@@ -100,7 +102,6 @@ export class GirihDecagon extends GirihTile {
 	    innerTile.addVertex( leftPoint );
 
 	    this.innerTilePolygons.push( innerTile );
-
 
 	    centralStar.addVertex( leftPoint.clone() );
 	    centralStar.addVertex( bottomPoint.clone() );
@@ -121,7 +122,7 @@ export class GirihDecagon extends GirihTile {
     _buildOuterPolygons( edgeLength:number ) {
 	// DON'T include the inner star here!
 	for( var i = 0; i < 10; i++ ) {
-	    var outerTile = new Polygon();
+	    const outerTile = new Polygon();
 	    outerTile.addVertex( this.getVertexAt(i).clone() );
 	    outerTile.addVertex( this.innerTilePolygons[i].vertices[0].clone() );
 	    outerTile.addVertex( this.innerTilePolygons[i].vertices[3].clone() );

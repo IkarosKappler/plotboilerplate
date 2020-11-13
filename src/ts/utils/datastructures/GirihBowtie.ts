@@ -41,10 +41,10 @@ export class GirihBowtie extends GirihTile {
 	this.uniqueSymmetries     = 5;
 	
 	// Init the actual decahedron shape with the passed size
-	var pointA          = new Vertex(0,0);
-	var pointB          = pointA;
-	var startPoint      = pointA;
-	var oppositePoint   = null;
+	let pointA          = new Vertex(0,0);
+	let pointB          = pointA;
+	const startPoint    = pointA;
+	let oppositePoint   = null;
 	this.addVertex( pointB );
 
 	// TODO: notate in radians
@@ -57,29 +57,24 @@ export class GirihBowtie extends GirihTile {
 
 	var theta = 0.0;
 	for( var i = 0; i < angles.length; i++ ) {
-
 	    theta += (180.0 - angles[i]);
-
 	    pointA = pointB; // center of rotation
 	    pointB = pointB.clone();
 	    pointB.x -= size;
 	    pointB.rotate( theta * (Math.PI/180.0), pointA );
 	    this.addVertex( pointB );	
-
 	    if( i == 2 )
 		oppositePoint = pointB;
-
-	}
+	} // END for
 
 	// Move to center and position 
-	var bounds = Bounds.computeFromVertices( this.vertices );
-	var move   = new Vertex( (oppositePoint.x - startPoint.x)/2.0, // bounds.getWidth()/2.0,
-				 (oppositePoint.y - startPoint.y)/2.0  // -size/2.0
-			       );
-	for( var i = 0; i < this.vertices.length; i++ ) {
-	    
-	    this.vertices[i].add( position ).sub( move );
-	    
+	const bounds:Bounds = Bounds.computeFromVertices( this.vertices );
+	const move:Vertex   = new Vertex( (oppositePoint.x - startPoint.x)/2.0, // bounds.getWidth()/2.0,
+					  (oppositePoint.y - startPoint.y)/2.0  // -size/2.0
+					);
+	
+	for( var i = 0; i < this.vertices.length; i++ ) {	    
+	    this.vertices[i].add( position ).sub( move );	    
 	}
 
 	this.imageProperties = {
@@ -101,52 +96,48 @@ export class GirihBowtie extends GirihTile {
 
 
     /**
-     * @abstract Subclasses must override this.
+     * @override
      */
-    clone() {
+    clone() : GirihTile {
 	return new GirihBowtie( this.position.clone(), this.size ).rotate( this.rotation );
     };
 
-    _buildInnerPolygons( edgeLength:number ) {
+    _buildInnerPolygons( edgeLength:number ) : void {
 
-	var indices = [ 1, 4 ];
+	const indices:Array<number> = [ 1, 4 ];
 	for( var i = 0; i < indices.length; i++ ) {
-
-	    var index       = indices[i];
-
-	    var middlePoint = this.getVertexAt( index ).clone().scale( 0.5, this.getVertexAt(index+1) );
-	    var leftPoint   = this.getVertexAt( index-1 ).clone().scale( 0.5, this.getVertexAt(index) );
-	    var rightPoint  = this.getVertexAt( index+1 ).clone().scale( 0.5, this.getVertexAt(index+2) );
-	    var innerPoint  = middlePoint.clone().scale( 0.38, this.position ); // multiplyScalar( 0.38 );
+	    const index:number       = indices[i];
+	    const middlePoint:Vertex = this.getVertexAt( index ).clone().scale( 0.5, this.getVertexAt(index+1) );
+	    const leftPoint:Vertex   = this.getVertexAt( index-1 ).clone().scale( 0.5, this.getVertexAt(index) );
+	    const rightPoint:Vertex  = this.getVertexAt( index+1 ).clone().scale( 0.5, this.getVertexAt(index+2) );
+	    const innerPoint:Vertex  = middlePoint.clone().scale( 0.38, this.position ); // multiplyScalar( 0.38 );
 	    
-	    var innerTile = new Polygon( [] );
+	    const innerTile:Polygon = new Polygon( [] );
 	    innerTile.addVertex( middlePoint );
 	    innerTile.addVertex( rightPoint );
 	    innerTile.addVertex( innerPoint );
 	    innerTile.addVertex( leftPoint );
 
-
 	    this.innerTilePolygons.push( innerTile );
 	}
     };
 
-    _buildOuterPolygons( edgeLength ) {
-
+    _buildOuterPolygons( edgeLength:number ) : void {
 	// Add the outer four 'edges'
-	var indices = [ 0, 3 ];
+	const indices:Array<number> = [ 0, 3 ];
 	for( var i = 0; i < indices.length; i++ ) {
 
-	    var index       = indices[i];
+	    const index:number       = indices[i];
 	    
 	    // The first/third triangle
-	    var outerTileA   = new Polygon(); 
+	    const outerTileA:Polygon   = new Polygon(); 
 	    outerTileA.addVertex( this.innerTilePolygons[i].getVertexAt(0).clone() );
 	    outerTileA.addVertex( this.getVertexAt(index+2).clone() );
 	    outerTileA.addVertex( this.innerTilePolygons[i].getVertexAt(1).clone()) ;
 	    this.outerTilePolygons.push( outerTileA );
 
 	    // The second/fourth triangle
-	    var outerTileB = new Polygon();
+	    const outerTileB:Polygon = new Polygon();
 	    outerTileB.addVertex( this.innerTilePolygons[i].getVertexAt(0).clone() );
 	    outerTileB.addVertex( this.getVertexAt(index+1).clone() );
 	    outerTileB.addVertex( this.innerTilePolygons[i].getVertexAt(3).clone()) ;
@@ -155,7 +146,7 @@ export class GirihBowtie extends GirihTile {
 	}
 
 	// Add the center polygon
-	var centerTile = new Polygon();
+	const centerTile:Polygon = new Polygon();
 	centerTile.addVertex( this.getVertexAt(0).clone() );
 	centerTile.addVertex( this.innerTilePolygons[0].getVertexAt(3).clone() );
 	centerTile.addVertex( this.innerTilePolygons[0].getVertexAt(2).clone() );

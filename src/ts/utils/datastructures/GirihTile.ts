@@ -113,7 +113,7 @@ export abstract class GirihTile extends Polygon {
     /**
      * @abstract Subclasses must override this.
      */
-    abstract clone();
+    abstract clone() : GirihTile;
 
     /**
      * Move this tile around (together will all inner polygons).

@@ -5,6 +5,7 @@
  * @requires Bounds
  * @requires Circle
  * @requires GirihTile
+ * @requires Lines
  * @requires Polygon
  * @requires TileType
  * @requires Vertex
@@ -57,6 +58,7 @@ var GirihHexagon = /** @class */ (function (_super) {
         var startPoint = pointA;
         var oppositePoint = null;
         _this.addVertex(pointB);
+        // TODO: use radians here
         var angles = [0.0,
             72.0,
             144.0,
@@ -104,7 +106,7 @@ var GirihHexagon = /** @class */ (function (_super) {
     ;
     GirihHexagon.prototype._buildInnerPolygons = function (edgeLength) {
         // Connect all edges half-the-way
-        var innerTile = new Polygon_1.Polygon(); // []
+        var innerTile = new Polygon_1.Polygon();
         innerTile.addVertex(this.vertices[0].clone().scale(0.5, this.vertices[1]));
         innerTile.addVertex(this.vertices[1].clone().scale(0.5, this.vertices[2]));
         // Compute the next inner polygon vertex by the intersection of two circles
@@ -123,7 +125,7 @@ var GirihHexagon = /** @class */ (function (_super) {
         else
             innerTile.addVertex(intersection.b);
         innerTile.addVertex(circleB.center.clone());
-        var i = 3;
+        // var i = 3;
         // Move circles
         circleA.center = circleB.center;
         circleB.center = this.vertices[3].clone().scale(0.5, this.vertices[4]);

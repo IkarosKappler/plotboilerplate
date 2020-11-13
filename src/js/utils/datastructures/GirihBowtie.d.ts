@@ -29,9 +29,9 @@ export declare class GirihBowtie extends GirihTile {
      */
     constructor(position: Vertex, size: number);
     /**
-     * @abstract Subclasses must override this.
+     * @override
      */
     clone(): GirihTile;
     _buildInnerPolygons(edgeLength: number): void;
-    _buildOuterPolygons(edgeLength: any): void;
+    _buildOuterPolygons(edgeLength: number): void;
 }
