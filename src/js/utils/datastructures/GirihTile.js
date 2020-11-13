@@ -8,6 +8,7 @@
  * @requires Bounds
  * @requires Polyon
  * @requires Vertex
+ * @requires XYCoords
  *
  * @author   Ikaros Kappler
  * @date     2013-11-27
