@@ -95,7 +95,7 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
     }
     ;
     /**
-     * @abstract Subclasses must override this.
+     * @override
      */
     GirihPenroseRhombus.prototype.clone = function () {
         return new GirihPenroseRhombus(this.position.clone(), this.size, true).rotate(this.rotation);
@@ -142,10 +142,10 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
         // If the center polygon exists then the last outer polygon is split into two.
         if (centerPolygonExists) {
             // Two polygons
-            var indices = [0, 2];
-            for (var i = 0; i < indices.length; i++) {
+            var indices_1 = [0, 2];
+            for (var i = 0; i < indices_1.length; i++) {
                 var outerTile = new Polygon_1.Polygon();
-                var index = indices[i];
+                var index = indices_1[i];
                 outerTile.addVertex(this.getVertexAt(index).clone());
                 outerTile.addVertex(this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1)));
                 outerTile.addVertex(this.innerTilePolygons[i].getVertexAt(1).clone());
@@ -154,9 +154,6 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
                 outerTile.addVertex(this.getVertexAt(index - 1).clone().scale(0.5, this.getVertexAt(index)));
                 this.outerTilePolygons.push(outerTile);
             }
-        }
-        else {
-            // One polygon
         }
     };
     ;

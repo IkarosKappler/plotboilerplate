@@ -46,15 +46,17 @@ export class GirihPentagon extends GirihTile {
 	
 	// Init the actual pentagon shape with the passed size:
 	// Divide the full circle into 5 sections (we want to make a regular pentagon).
-	var theta = (Math.PI*2) / 5.0;
+	const theta:number = (Math.PI*2) / 5.0;
 	// Compute the 'radius' using pythagoras
-	var radius = Math.sqrt(
+	const radius:number = Math.sqrt(
 	    Math.pow(size/2,2)
 		+
 		Math.pow( 1/Math.tan(theta/2) * size/2, 2 )
 	);
 	for( var i = 0; i < 5; i++ ) {
-	    this.addVertex( position.clone().addY( -radius ).rotate( theta/2 + i*theta, position ) );
+	    this.addVertex(
+		position.clone().addY( -radius ).rotate( theta/2 + i*theta, position )
+	    );
 	}
 	
 	this.imageProperties = {
@@ -77,14 +79,14 @@ export class GirihPentagon extends GirihTile {
     /**
      * @override
      */
-    clone() {
+    clone() : GirihTile {
 	return new GirihPentagon( this.position.clone(), this.size ).rotate( this.rotation );
     };
 
 
-    _buildInnerPolygons( edgeLength:number ) {
+    _buildInnerPolygons( edgeLength:number ) : void {
 	// Connect all edges half-the-way
-	var innerTile = new Polygon(); 
+	const innerTile:Polygon = new Polygon(); 
 	for( var i = 0; i < this.vertices.length; i++ ) {
 	    innerTile.addVertex( this.getVertexAt(i).clone().scale( 0.5, this.getVertexAt(i+1) ) );
 	    // ... make linear approximation instead
@@ -94,12 +96,12 @@ export class GirihPentagon extends GirihTile {
     };
 
 
-    _buildOuterPolygons( edgeLength:number ) {
+    _buildOuterPolygons( edgeLength:number ) : void {
 	for( var i = 0; i < this.vertices.length; i++ ) {
-	    var indexA     = i;
-	    var indexB     = i*2;
+	    const indexA:number     = i;
+	    const indexB:number     = i*2;
 	    // The triangle
-	    var outerTile = new Polygon();
+	    const outerTile:Polygon = new Polygon();
 	    outerTile.addVertex( this.getVertexAt(indexA+1).clone() );
 	    outerTile.addVertex( this.innerTilePolygons[0].getVertexAt(indexB).clone() );
 	    outerTile.addVertex( this.innerTilePolygons[0].getVertexAt(indexB+1).clone() );

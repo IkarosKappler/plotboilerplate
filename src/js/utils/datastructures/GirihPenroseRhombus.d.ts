@@ -33,7 +33,7 @@ export declare class GirihPenroseRhombus extends GirihTile {
      */
     constructor(position: Vertex, size: number, addCenterPolygon?: boolean);
     /**
-     * @abstract Subclasses must override this.
+     * @override
      */
     clone(): GirihTile;
     _buildInnerPolygons(edgeLength: number, addCenterPolygon: boolean): void;

@@ -52,38 +52,34 @@ export class GirihPenroseRhombus extends GirihTile {
 
 	
 	// Init the actual decahedron shape with the passed size
-	var pointA = new Vertex(0,0);
-	var pointB = pointA;
+	let pointA:Vertex = new Vertex(0,0);
+	let pointB:Vertex = pointA;
 	this.addVertex( pointB );
 
-	var angles = [ 0.0,
-		       36.0,  // 72.0,
-		       144.0  // 108.0
-		     ];
+	const angles:Array<number> = [ 0.0,
+				       36.0,  // 72.0,
+				       144.0  // 108.0
+				     ];
 	
-	var theta = 0.0;
+	let theta:number = 0.0;
 	for( var i = 0; i < angles.length; i++ ) {
-
 	    theta += (180.0 - angles[i]);
-
 	    pointA = pointB; // center of rotation
 	    pointB = pointB.clone();
 	    pointB.x += size;
 	    pointB.rotate( theta * (Math.PI/180.0), pointA );
 	    this.addVertex( pointB );	
-
 	}
 
 	
 	// Move to center and position
-	var bounds = Bounds.computeFromVertices( this.vertices );
-	var move   = new Vertex( bounds.width/2.0 - (bounds.width-size),
-				 bounds.height/2.0
-			       );
+	const bounds:Bounds = Bounds.computeFromVertices( this.vertices );
+	const move:Vertex   = new Vertex( bounds.width/2.0 - (bounds.width-size),
+					  bounds.height/2.0
+					);
 	for( var i = 0; i < this.vertices.length; i++ ) {	
 	    this.vertices[i].add( move ).add( position );		
 	}
-
 	
 	this.imageProperties = {
 	    source: { x:      2/500.0,
@@ -95,32 +91,31 @@ export class GirihPenroseRhombus extends GirihTile {
 			   yOffset: 0.0
 			 }
 	};
-	
-	
+		
 	this._buildInnerPolygons( size, addCenterPolygon );
 	this._buildOuterPolygons( size, addCenterPolygon );
     };
 
 
     /**
-     * @abstract Subclasses must override this.
+     * @override
      */
-    clone() {
+    clone() : GirihTile {
 	return new GirihPenroseRhombus( this.position.clone(), this.size, true ).rotate( this.rotation );
     };
 
 
-    _buildInnerPolygons( edgeLength:number, addCenterPolygon:boolean ) {
-	var indices              = [ 0, 2 ];
-	var centerTile           = new Polygon();
+    _buildInnerPolygons( edgeLength:number, addCenterPolygon:boolean ) : void {
+	const indices:Array<number> = [ 0, 2 ];
+	const centerTile:Polygon    = new Polygon();
+	
 	for( var i = 0; i < indices.length; i++ ) {
-
-	    var innerTile = new Polygon();
-	    var index = indices[i];
-	    var left   = this.getVertexAt( index   ).clone().scale( 0.5, this.getVertexAt(index+1) );
-	    var right  = this.getVertexAt( index+1 ).clone().scale( 0.5, this.getVertexAt(index+2) );
-	    var innerA = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position );
-	    var innerB = this.getVertexAt( index+1 ).clone().scale( 0.55, this.position );
+	    const innerTile:Polygon = new Polygon();
+	    const index:number   = indices[i];
+	    const left:Vertex   = this.getVertexAt( index   ).clone().scale( 0.5, this.getVertexAt(index+1) );
+	    const right:Vertex  = this.getVertexAt( index+1 ).clone().scale( 0.5, this.getVertexAt(index+2) );
+	    const innerA:Vertex = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position );
+	    const innerB:Vertex = this.getVertexAt( index+1 ).clone().scale( 0.55, this.position );
 	    
 	    innerTile.addVertex( left );
 	    innerTile.addVertex( innerA );
@@ -137,18 +132,17 @@ export class GirihPenroseRhombus extends GirihTile {
 	    this.innerTilePolygons.push( centerTile );
     };
 
-    _buildOuterPolygons( edgeLength:number, centerPolygonExists:boolean ) {
-
+    _buildOuterPolygons( edgeLength:number, centerPolygonExists:boolean ) : void {
 	// Add left and right 'spikes'.
-	var indices = [ 0, 2 ];
+	const indices:Array<number> = [ 0, 2 ];
+	
 	for( var i = 0; i < indices.length; i++ ) {
-
-	    var outerTile = new Polygon();
-	    var index = indices[i];
-	    var left   = this.getVertexAt( index   ).clone().scale( 0.5, this.getVertexAt(index+1) );
-	    var right  = this.getVertexAt( index+1 ).clone().scale( 0.5, this.getVertexAt(index+2) );
-	    var innerA = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position ); // multiplyScalar( 0.28 );
-	    var innerB = this.getVertexAt( index+1 ).clone().scale( 0.55, this.position ); // multiplyScalar( 0.55 );
+	    const outerTile:Polygon = new Polygon();
+	    const index:number = indices[i];
+	    const left:Vertex   = this.getVertexAt( index   ).clone().scale( 0.5, this.getVertexAt(index+1) );
+	    const right:Vertex  = this.getVertexAt( index+1 ).clone().scale( 0.5, this.getVertexAt(index+2) );
+	    const innerA:Vertex = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position ); // multiplyScalar( 0.28 );
+	    const innerB:Vertex = this.getVertexAt( index+1 ).clone().scale( 0.55, this.position ); // multiplyScalar( 0.55 );
 
 	    outerTile.addVertex( left.clone() );
 	    outerTile.addVertex( this.getVertexAt( index+1 ).clone() );
@@ -156,17 +150,16 @@ export class GirihPenroseRhombus extends GirihTile {
 	    outerTile.addVertex( innerB.clone() );
 	    
 	    this.outerTilePolygons.push( outerTile );
-	    
 	}
 	
 	// If the center polygon exists then the last outer polygon is split into two.
 	if( centerPolygonExists ) {
 	    // Two polygons
 	    
-	    var indices = [ 0, 2 ];
+	    const indices:Array<number> = [ 0, 2 ];
 	    for( var i = 0; i < indices.length; i++ ) {
-		var outerTile = new Polygon();
-		var index = indices[i];
+		const outerTile:Polygon = new Polygon();
+		const index:number = indices[i];
 		outerTile.addVertex( this.getVertexAt(index).clone() );
 		outerTile.addVertex( this.getVertexAt(index).clone().scale(0.5,this.getVertexAt(index+1)) );
 		outerTile.addVertex( this.innerTilePolygons[i].getVertexAt(1).clone() );
@@ -177,9 +170,6 @@ export class GirihPenroseRhombus extends GirihTile {
 		this.outerTilePolygons.push( outerTile );
 	    }
 
-	} else {
-	    // One polygon
-	    
 	}
 
     };
@@ -189,7 +179,7 @@ export class GirihPenroseRhombus extends GirihTile {
      * know the respective polygon index (inside the this.innerTilePolygons array).
      **/
     // TODO: IS THIS STILL REQUIRED
-    getCenterPolygonIndex() {
+    getCenterPolygonIndex() : number {
 	return 2;
     };
 

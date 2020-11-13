@@ -5,7 +5,7 @@
  * @requires Bounds
  * @requires Circle
  * @requires GirihTile
- * @requires Lines
+ * @requires Line
  * @requires Polygon
  * @requires TileType
  * @requires Vertex
