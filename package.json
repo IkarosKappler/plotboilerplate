@@ -6,7 +6,7 @@
   "main": "dist/plotboilerplate.min.js",
   "scripts": {
     "compile-typescript": "tsc",
-    "build" : "cd bin && ./run-build.sh",
+    "build": "cd bin && ./run-build.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "npx webpack --mode production --config ./webpack5.config.js",
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js"
@@ -59,7 +59,7 @@
     "ts-loader": "^6.2.2",
     "typescript": "^3.8.3",
     "webpack": "^5.3.2",
-    "webpack-cli": "^3.3.11",
+    "webpack-cli": "^4.2.0",
     "webpack-uglify-harmony-plugin": "^1.0.0"
   },
   "dependencies": {
