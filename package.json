@@ -9,7 +9,8 @@
     "build": "cd bin && ./run-build.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "npx webpack --mode production --config ./webpack5.config.js",
-    "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js"
+    "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",
+    "tslint": "npx eslint ./src/ts/"
   },
   "repository": {
     "type": "git",
@@ -48,9 +49,12 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@types/dat.gui": "^0.7.5",
+    "@typescript-eslint/eslint-plugin": "^4.7.0",
+    "@typescript-eslint/parser": "^4.7.0",
     "alloyfinger": "^0.1.16",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.1.0",
+    "eslint": "^7.13.0",
     "file-saver": "^2.0.2",
     "git-revision-webpack-plugin": "^3.0.4",
     "jsdoc": "^3.6.3",
