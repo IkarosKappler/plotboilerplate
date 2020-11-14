@@ -640,7 +640,7 @@ for this purpose.
  * Rename BezierPath.adjustCircular to .isCircular, because cirularity does not only affect vertex adjustment.
  * The inverse-functions are called Vertex.inv() but Vector.inverse(). Harmonize this.
  * CubicBezierCurve.getTangentAt(number) and .getTangent(number) return Vertex, why not a Vector?
- 
+ * Add a pointDeleted event handler to PB? Would be helpful to delete objects outside the PB when their associated points are deleted by the user. 
 
 
 ## Browsers support

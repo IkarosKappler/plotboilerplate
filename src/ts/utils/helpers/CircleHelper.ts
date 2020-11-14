@@ -14,7 +14,7 @@ import { PlotBoilerplate } from "../../PlotBoilerplate";
 import { VertEvent } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
 
-class CircleHelper {
+export class CircleHelper {
 
     /**
      * The constructor.
