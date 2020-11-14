@@ -431,7 +431,7 @@
 		var svgString = svgBuilder.build( [tile],
 						  { canvasSize : { width : bounds.width/2, height : bounds.height/2 },
 						    zoom : { x:0.333, y:0.333 },
-						    offset: { x:bounds.width/2 , y:bounds.height/2 }
+						    offset: { x:bounds.width*0.666 , y:bounds.height * 0.666 }
 						  }
 						);
 		var node = document.createElement('div');
@@ -439,7 +439,6 @@
 		node.dataset.tileIndex = i;
 		node.addEventListener('click', (function(tileIndex) {
 		    return function(event) {
-			console.log('highlighting ...', tileIndex );
 			previewTilePointer = tileIndex;
 			highlightPreviewTile(tileIndex);
 		    };
