@@ -33,4 +33,5 @@ var CircleHelper = /** @class */ (function () {
     ;
     return CircleHelper;
 }());
+exports.CircleHelper = CircleHelper;
 //# sourceMappingURL=CircleHelper.js.map

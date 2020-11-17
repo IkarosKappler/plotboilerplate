@@ -75,7 +75,8 @@
  * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
  * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
  * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
- * @version  1.9.1
+ * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
+ * @version  1.9.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -620,7 +621,7 @@ export declare class PlotBoilerplate {
      * It moves selected elements around or performs the panning if the ctrl-key if
      * hold down.
      *
-     * @method mouseDownHandler.
+     * @method mouseDragHandler.
      * @param {XMouseEvent} e - The event to handle
      * @private
      * @return {void}

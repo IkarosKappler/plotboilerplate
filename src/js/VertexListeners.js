@@ -10,7 +10,8 @@
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.0.4
+ * @modified 2020-11-17 Added the `click` handler.
+ * @version  1.1.0
  *
  * @file VertexListeners
  * @public
@@ -25,12 +26,51 @@ var VertexListeners = /** @class */ (function () {
      * @param {Vertex} vertex - The vertex to use these listeners on (just a backward reference).
      **/
     function VertexListeners(vertex) {
+        this.click = [];
         this.drag = [];
         this.dragStart = [];
         this.dragEnd = [];
         this.vertex = vertex;
     }
     ;
+    /**
+     * Add a click listener.
+     *
+     * @method addClickListener
+     * @param {VertexListeners~dragListener} listener - The click listener to add (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.addClickListener = function (listener) {
+        VertexListeners._addListener(this.click, listener);
+        return this;
+    };
+    ;
+    /**
+     * The click listener is a function with a single drag event param.
+     * @callback VertexListeners~clickListener
+     * @param {Event} e - The (extended) click event.
+     */
+    /**
+     * Remove a drag listener.
+     *
+     * @method removeDragListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.removeClickListener = function (listener) {
+        this.click = VertexListeners._removeListener(this.click, listener);
+        return this;
+    };
+    ;
+    /**
+     * The click listener is a function with a single drag event param.
+     * @callback VertexListeners~clickListener
+     * @param {Event} e - The (extended) click event.
+     */
     /**
      * Add a drag listener.
      *
@@ -41,7 +81,6 @@ var VertexListeners = /** @class */ (function () {
      * @memberof VertexListeners
      **/
     VertexListeners.prototype.addDragListener = function (listener) {
-        // this.drag.push( listener );
         VertexListeners._addListener(this.drag, listener);
         return this;
     };
@@ -61,7 +100,6 @@ var VertexListeners = /** @class */ (function () {
      * @memberof VertexListeners
      **/
     VertexListeners.prototype.removeDragListener = function (listener) {
-        // this.drag.push( listener );
         this.drag = VertexListeners._removeListener(this.drag, listener);
         return this;
     };
@@ -76,7 +114,6 @@ var VertexListeners = /** @class */ (function () {
      * @memberof VertexListeners
      **/
     VertexListeners.prototype.addDragStartListener = function (listener) {
-        //this.dragStart.push( listener );
         VertexListeners._addListener(this.dragStart, listener);
         return this;
     };
@@ -96,7 +133,6 @@ var VertexListeners = /** @class */ (function () {
      * @memberof VertexListeners
      **/
     VertexListeners.prototype.removeDragStartListener = function (listener) {
-        // this.drag.push( listener );
         this.dragStart = VertexListeners._removeListener(this.dragStart, listener);
         return this;
     };
@@ -122,18 +158,32 @@ var VertexListeners = /** @class */ (function () {
      * @param {Event} e - The (extended) drag event.
      */
     /**
-     * Remove a dragEnd listener.
-     *
-     * @method addDragEndListener
-     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
-     * @return {VertexListeners} this (for chaining)
-     * @instance
-     * @memberof VertexListeners
-     **/
+    * Remove a drag listener.
+    *
+    * @method removeDragEndListener
+    * @param {VertexListeners~clickListener} listener - The drag listener to remove (a callback).
+    * @return {VertexListeners} this (for chaining)
+    * @instance
+    * @memberof VertexListeners
+    **/
     VertexListeners.prototype.removeDragEndListener = function (listener) {
         // this.drag.push( listener );
         this.dragEnd = VertexListeners._removeListener(this.dragEnd, listener);
         return this;
+    };
+    ;
+    /**
+     * Fire a click event with the given event instance to all
+     * installed click listeners.
+     *
+     * @method fireClickEvent
+     * @param {VertEvent|XMouseEvent} e - The click event itself to be fired to all installed drag listeners.
+     * @return {void}
+     * @instance
+     * @memberof VertexListeners
+     **/
+    VertexListeners.prototype.fireClickEvent = function (e) {
+        VertexListeners._fireEvent(this, this.click, e);
     };
     ;
     /**

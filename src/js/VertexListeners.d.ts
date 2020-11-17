@@ -9,7 +9,8 @@
  * @modified 2019-03-20 Added JSDoc tags.
  * @modified 2020-02-22 Added 'return this' to the add* functions (for chanining).
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.0.4
+ * @modified 2020-11-17 Added the `click` handler.
+ * @version  1.1.0
  *
  * @file VertexListeners
  * @public
@@ -22,11 +23,13 @@ export interface VertEventParams extends XMouseParams {
 export interface VertEvent {
     params: VertEventParams;
 }
+export declare type VertListener = (e: VertEvent) => void;
 export declare class VertexListeners {
-    drag: Array<(e: VertEvent) => void>;
-    dragStart: Array<(e: VertEvent) => void>;
-    dragEnd: Array<(e: VertEvent) => void>;
-    vertex: Vertex;
+    private click;
+    private drag;
+    private dragStart;
+    private dragEnd;
+    private vertex;
     /**
      * The constructor.
      *
@@ -36,6 +39,36 @@ export declare class VertexListeners {
      **/
     constructor(vertex: Vertex);
     /**
+     * Add a click listener.
+     *
+     * @method addClickListener
+     * @param {VertexListeners~dragListener} listener - The click listener to add (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    addClickListener(listener: VertListener): VertexListeners;
+    /**
+     * The click listener is a function with a single drag event param.
+     * @callback VertexListeners~clickListener
+     * @param {Event} e - The (extended) click event.
+     */
+    /**
+     * Remove a drag listener.
+     *
+     * @method removeDragListener
+     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
+    removeClickListener(listener: VertListener): VertexListeners;
+    /**
+     * The click listener is a function with a single drag event param.
+     * @callback VertexListeners~clickListener
+     * @param {Event} e - The (extended) click event.
+     */
+    /**
      * Add a drag listener.
      *
      * @method addDragListener
@@ -44,7 +77,7 @@ export declare class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    addDragListener(listener: (e: VertEvent) => void): this;
+    addDragListener(listener: VertListener): VertexListeners;
     /**
      * The drag listener is a function with a single drag event param.
      * @callback VertexListeners~dragListener
@@ -59,7 +92,7 @@ export declare class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    removeDragListener(listener: (e: VertEvent) => void): this;
+    removeDragListener(listener: VertListener): VertexListeners;
     /**
      * Add a dragStart listener.
      *
@@ -69,7 +102,7 @@ export declare class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    addDragStartListener(listener: (e: VertEvent) => void): this;
+    addDragStartListener(listener: VertListener): VertexListeners;
     /**
      * The drag-start listener is a function with a single drag event param.
      * @callback VertexListeners~dragStartListener
@@ -84,7 +117,7 @@ export declare class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    removeDragStartListener(listener: (e: VertEvent) => void): this;
+    removeDragStartListener(listener: VertListener): VertexListeners;
     /**
      * Add a dragEnd listener.
      *
@@ -94,22 +127,33 @@ export declare class VertexListeners {
      * @instance
      * @memberof VertexListeners
      **/
-    addDragEndListener(listener: (e: VertEvent) => void): this;
+    addDragEndListener(listener: (e: VertEvent) => void): VertexListeners;
     /**
      * The drag-end listener is a function with a single drag event param.
      * @callback VertexListeners~dragEndListener
      * @param {Event} e - The (extended) drag event.
      */
     /**
-     * Remove a dragEnd listener.
+    * Remove a drag listener.
+    *
+    * @method removeDragEndListener
+    * @param {VertexListeners~clickListener} listener - The drag listener to remove (a callback).
+    * @return {VertexListeners} this (for chaining)
+    * @instance
+    * @memberof VertexListeners
+    **/
+    removeDragEndListener(listener: (e: VertEvent) => void): VertexListeners;
+    /**
+     * Fire a click event with the given event instance to all
+     * installed click listeners.
      *
-     * @method addDragEndListener
-     * @param {VertexListeners~dragListener} listener - The drag listener to remove (a callback).
-     * @return {VertexListeners} this (for chaining)
+     * @method fireClickEvent
+     * @param {VertEvent|XMouseEvent} e - The click event itself to be fired to all installed drag listeners.
+     * @return {void}
      * @instance
      * @memberof VertexListeners
      **/
-    removeDragEndListener(listener: (e: VertEvent) => void): this;
+    fireClickEvent(e: VertEvent | XMouseEvent): void;
     /**
      * Fire a drag event with the given event instance to all
      * installed drag listeners.

@@ -76,7 +76,8 @@
  * @modified 2020-07-28 Added PlotBoilerplate.revertMousePosition(number,number) –  the inverse function of transformMousePosition(...).
  * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
  * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
- * @version  1.9.1
+ * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
+ * @version  1.9.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -1073,10 +1074,13 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      * @return {void}
      **/
-    PlotBoilerplate.prototype.handleClick = function (x, y) {
+    PlotBoilerplate.prototype.handleClick = function (e) {
         var _self = this;
-        var p = this.locatePointNear(_self.transformMousePosition(x, y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
+        // const x:number = e.params.pos.x;
+        //const y:number = e.params.pos.y;
+        var p = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
         if (p) {
+            _self.vertices[p.vindex].listeners.fireClickEvent(e);
             if (this.keyHandler && this.keyHandler.isDown('shift')) {
                 if (p.typeName == 'bpath') {
                     var vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
@@ -1096,7 +1100,7 @@ var PlotBoilerplate = /** @class */ (function () {
             }
         }
         else if (_self.selectPolygon != null) {
-            var vert = _self.transformMousePosition(x, y);
+            var vert = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
             _self.selectPolygon.vertices.push(new Vertex_1.Vertex(vert.x, vert.y));
             _self.redraw();
         }
@@ -1193,7 +1197,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * It moves selected elements around or performs the panning if the ctrl-key if
      * hold down.
      *
-     * @method mouseDownHandler.
+     * @method mouseDragHandler.
      * @param {XMouseEvent} e - The event to handle
      * @private
      * @return {void}
@@ -1254,8 +1258,9 @@ var PlotBoilerplate = /** @class */ (function () {
         var _self = this;
         if (e.which != 1)
             return; // Only react on left mouse;
-        if (!e.params.wasDragged)
-            _self.handleClick(e.params.pos.x, e.params.pos.y);
+        if (!e.params.wasDragged) {
+            _self.handleClick(e); // e.params.pos.x, e.params.pos.y );
+        }
         for (var i in _self.draggedElements) {
             var p = _self.draggedElements[i];
             if (p.typeName == 'bpath') {
@@ -1414,7 +1419,17 @@ var PlotBoilerplate = /** @class */ (function () {
                             if (draggedElement && draggedElement.typeName == 'vertex') {
                                 var draggingVertex = _self.vertices[draggedElement.vindex];
                                 var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
-                                draggingVertex.listeners.fireDragEndEvent(fakeEvent);
+                                // var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
+                                // var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
+                                // var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
+                                // Check if vertex was moved
+                                if (touchMovePos && touchDownPos && touchDownPos.distance(touchMovePos) < 0.001) {
+                                    // if( e.touches.length == 1 && diff.x == 0 && diff.y == 0 ) {
+                                    draggingVertex.listeners.fireClickEvent(fakeEvent);
+                                }
+                                else {
+                                    draggingVertex.listeners.fireDragEndEvent(fakeEvent);
+                                }
                             }
                             clearTouch_1();
                         },

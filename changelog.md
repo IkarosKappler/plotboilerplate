@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-11-17
+  * Added the `VertexListeners.click(VertListener)` handler.
+  * Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
 * 2020-11-11
   * Generalized `move(Vertex)` to `move(XYCoords)` in the Polygon class.
   * Generalized the `VertTuple.add` and `VertTuple.sub` param from `Vertex` to `XYCoords`.

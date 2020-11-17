@@ -112,7 +112,10 @@
 	    TILE_TEMPLATES.push( pentagon.transformTilePositionToAdjacency( 4, rhombus ) );
 	    
 	    for( var i in TILE_TEMPLATES ) {
-		tiles.push( TILE_TEMPLATES[i].clone() );
+		var tile = TILE_TEMPLATES[i].clone();
+		tile.position.listeners.addClickListener( function(clickEvent) { console.log('clicked'); } );
+		pb.add( tile.position );
+		tiles.push( tile );
 	    }
 
 	    console.log( 'tiles', tiles );
@@ -346,7 +349,6 @@
 	    .down('i',function() { config.drawInnerPolygons = !config.drawInnerPolygons; pb.redraw(); } )
 	    .down('rightarrow',function() {
 		previewTilePointer = (previewTilePointer+1)%previewTiles.length;
-		// createAdjacentTilePreview( previewTiles, previewTilePointer );
 		highlightPreviewTile( previewTilePointer );
 		if( hoverTileIndex != -1 & hoverEdgeIndex != -1 )
 		    pb.redraw();
@@ -355,8 +357,7 @@
 		previewTilePointer--;
 		if( previewTilePointer < 0 )
 		    previewTilePointer = previewTiles.length-1;
-		// createAdjacentTilePreview( previewTiles, previewTilePointer );
-		highlightPreviewtile( previewTilePointer );
+		highlightPreviewTile( previewTilePointer );
 		if( hoverTileIndex != -1 && hoverEdgeIndex != -1 )
 		    pb.redraw();
 	    } )
@@ -366,33 +367,37 @@
 	// @param {XYCoords} relPos
 	var handleMouseMove = function( relPos ) {
 	    var containedTileIndex = locateConatiningTile(relPos);
-	    
-	    // Find Girih edge nearby ...
+
+	    // Reset currently highlighted tile/edge (if re-detected nothing changed in the end)
 	    var oldHoverTileIndex = hoverTileIndex;
 	    var oldHoverEdgeIndex = hoverEdgeIndex;
 	    hoverTileIndex = -1;
 	    hoverEdgeIndex = -1;
-	    var i = containedTileIndex == -1 ? 0 : containedTileIndex;
-	    do {
-		var tile = tiles[i];
-		var tmpPos = relPos; // tile.position.clone().add( relPos );
-		// May be -1
-		hoverEdgeIndex = tile.locateEdgeAtPoint( tmpPos, edgeLength/2 );
-		if( hoverEdgeIndex != -1 )
-		    hoverTileIndex = i;
-		i++;
-	    } while( i < tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1 );
-	    if( hoverTileIndex == -1 )
-		hoverTileIndex = containedTileIndex;
 	    
-	    if( oldHoverTileIndex == hoverTileIndex && oldHoverEdgeIndex == hoverEdgeIndex ) 
-		return;
+	    // Find Girih edge nearby ...
+	    if( containedTileIndex != -1 ) {
+		var i = containedTileIndex == -1 ? 0 : containedTileIndex;
+		do {
+		    var tile = tiles[i];
+		    var tmpPos = relPos; // tile.position.clone().add( relPos );
+		    // May be -1
+		    hoverEdgeIndex = tile.locateEdgeAtPoint( tmpPos, edgeLength/2 );
+		    if( hoverEdgeIndex != -1 )
+			hoverTileIndex = i;
+		    i++;
+		} while( i < tiles.length && containedTileIndex == -1 && hoverEdgeIndex == -1 );
+		if( hoverTileIndex == -1 )
+		    hoverTileIndex = containedTileIndex;
+		
+		if( oldHoverTileIndex == hoverTileIndex && oldHoverEdgeIndex == hoverEdgeIndex ) 
+		    return;
 
-	    // Find the next possible tile to place?
-	    if( hoverTileIndex != -1 ) {
-		previewTiles = findAdjacentTiles();
-		// Set pointer to save range
-		previewTilePointer = Math.min( previewTiles.length-1, previewTilePointer );
+		// Find the next possible tile to place?
+		if( hoverTileIndex != -1 ) {
+		    previewTiles = findAdjacentTiles();
+		    // Set pointer to save range
+		    previewTilePointer = Math.min( Math.max(previewTiles.length-1, previewTilePointer), previewTilePointer );
+		}
 	    }
 	    pb.redraw();
 	    if( previewTiles.length != 0 )
@@ -459,7 +464,6 @@
 		} else {
 		    node.classList.remove( 'highlighted-preview-tile' );
 		}
-		
 	    }
 	};
 
@@ -479,6 +483,7 @@
 	    initTiles();
 	pb.config.preDraw = drawAll;
 	pb.redraw();
+	pb.canvas.focus();
 
     }
 
