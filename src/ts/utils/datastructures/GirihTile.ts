@@ -36,10 +36,10 @@ export enum TileType {
 };
 
 export interface ImageProperties {
-    source: { x: number,
-	      y: number,
-	      width: number,
-	      height: number
+    source: { x: number,     // [0..1]
+	      y: number,     // [0..1]
+	      width: number, // [0..1]
+	      height: number // [0..1]
 	    },
     destination: { xOffset: number,
 		   yOffset: number

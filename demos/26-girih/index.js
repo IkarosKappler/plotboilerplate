@@ -21,9 +21,13 @@
 	if( window.pbInitialized )
 	    return;
 	window.pbInitialized = true;
+
+	
 	
 	// Fetch the GET params
 	let GUP = gup();
+
+	var textureImage = null;
 
 	// Initialize templates, one for each Girih tile type.
 	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
@@ -192,6 +196,7 @@
 	// | @param {number} index - The index in the tiles-array (to highlight hover).
 	// +-------------------------------
 	var drawTile = function( tile, index ) {
+	    drawTileTexture( tile, textureImage );
 	    if( config.drawOutlines ) {
 		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
 	    }
@@ -248,6 +253,122 @@
 				   Math.PI/2 * (i+1) + Math.PI*2*0.3,
 				   color, 1.0 );
 	    }
+	};
+
+
+	var drawTileTexture = function( tile, imageObject ) {
+	    // console.log( tile.tileType, TileType.TYPE_DECAGON );
+	    if( tile.tileType != TileType.TYPE_DECAGON ) 
+		return;
+		
+	    pb.draw.ctx.save();
+
+	    var imgProps = tile.imageProperties;
+	    var tileBounds = tile.getBounds();
+	    var scale = pb.draw.scale;
+	    var offset = pb.draw.offset;
+	    
+	    var srcBounds = new Bounds(
+		new Vertex( imgProps.source.x * imageObject.width,
+			    imgProps.source.y * imageObject.height
+			  ),
+		new Vertex( (tile.imageProperties.source.x + imgProps.source.width) * imageObject.width,
+			    (tile.imageProperties.source.y + imgProps.source.height) * imageObject.height
+			  )
+	    );
+
+	    var destBounds = new Bounds(
+		new Vertex( tileBounds.min.x * scale.x,
+			    tileBounds.min.y * scale.y
+			  ),
+		new Vertex( tileBounds.max.x * scale.x,
+			    tileBounds.max.y * scale.y
+			  )
+	    );
+
+	    console.log( "tileBounds.width", tileBounds.width, "scale.x", scale.x );
+	    console.log( "destBounds.width", destBounds.width );
+	    
+
+	    pb.draw.ctx.translate( offset.x, offset.y );
+	    pb.draw.ctx.drawImage(
+		imageObject,
+		
+		srcBounds.min.x,  // source x
+		srcBounds.min.y,  // source y
+		srcBounds.width,  // source w
+		srcBounds.height, // source h
+		
+		destBounds.min.x, // dest x,
+		destBounds.min.y, // dest y,
+		destBounds.width, // dest w
+		destBounds.height // dest h
+	    );
+		 
+	    pb.draw.ctx.restore();
+	};
+
+
+	var _drawTileTexture = function( tile, imageObject ) {
+	    pb.draw.ctx.save();
+	    // Build absolute image bounds from relative
+	    /* var imgBounds = new IKRS.BoundingBox2( imgProperties.source.x * imageObject.width,
+						   (imgProperties.source.x + imgProperties.source.width) * imageObject.width,
+						   imgProperties.source.y * imageObject.height,
+						   (imgProperties.source.y + imgProperties.source.height) * imageObject.height
+						   ); */
+	    var originalBounds = tile.getBounds();
+	    var imgBounds = new Bounds(
+		new Vertex(tile.imageProperties.source.x * imageObject.width,
+			   (tile.imageProperties.source.x + tile.imageProperties.source.width) * imageObject.width),
+		new Vertex(tile.imageProperties.source.y * imageObject.height,
+			   (tile.imageProperties.source.y + tile.imageProperties.source.height) * imageObject.height)
+	    );
+	    var polyImageRatio = new Vertex( originalBounds.width / imgBounds.width,
+					     originalBounds.height / imgBounds.height
+					   );
+	    //window.alert( "polyImageRatio=" + polyImageRatio );
+
+	    // Draw clip line ... again?
+	    //pb.draw.ctx.clip();
+	    var _imageX = pb.draw.offset.x + tile.position.x * pb.draw.scale.x + originalBounds.min.x * pb.draw.scale.x;
+	    var _imageY = pb.draw.offset.y + tile.position.y * pb.draw.scale.y + originalBounds.min.y * pb.draw.scale.y;	
+	    var imageW = (originalBounds.width + tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x) * pb.draw.scale.x; 
+	    var imageH = (originalBounds.height + tile.imageProperties.destination.yOffset*imageObject.height*polyImageRatio.y) * pb.draw.scale.y; 
+
+	    // var translation = { x : -pb.draw.offset.x + (imageX + imageW/2.0) * pb.draw.scale.x,
+	    //			y : -pb.draw.offset.y + (imageY + imageH/2.0) * pb.draw.scale.y
+	    //		      };
+	    var translation = { x : pb.draw.offset.x + (imageW/2.0) * pb.draw.scale.x,
+				y : pb.draw.offset.y + (imageH/2.0) * pb.draw.scale.y
+			      };
+	    pb.draw.ctx.translate( translation.x,
+				   translation.y );	    
+	    pb.draw.ctx.rotate( tile.rotation ); 
+
+	    // var drawStartX = (-originalBounds.width/2.0) * pb.draw.scale.x; 
+	    // var drawStartY = (-originalBounds.height/2.0) * pb.draw.scale.y;
+	    var leftUpperX = -(originalBounds.width/2.0 * pb.draw.scale.x); // (-originalBounds.width/2.0) * pb.draw.scale.x; 
+	    var leftUpperY = -(originalBounds.height/2.0 * pb.draw.scale.y); // (-originalBounds.height/2.0) * pb.draw.scale.y;
+	    console.log(
+		'imageObject', imageObject.width, imageObject.height,  imageW, imageH,
+		leftUpperX + tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x*0.5*pb.draw.scale.x
+	    ); 
+	    pb.draw.ctx.drawImage(
+		imageObject,
+		tile.imageProperties.source.x*imageObject.width,                    // source x
+		tile.imageProperties.source.y*imageObject.height,                   // source y
+		tile.imageProperties.source.width*imageObject.width,                // source width
+		tile.imageProperties.source.height*imageObject.height,              // source height
+		leftUpperX, //  + tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x*0.5*pb.draw.scale.x,         // destination x
+		leftUpperY, //  + tile.imageProperties.destination.yOffset*imageObject.height*polyImageRatio.y*0.5*pb.draw.scale.y,        // destination y
+		// (originalBounds.width - tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x) * pb.draw.scale.x,       // destination width
+		// (originalBounds.height - tile.imageProperties.destination.yOffset*imageObject.height*polyImageRatio.y) * pb.draw.scale.y      // destination height
+		(originalBounds.width - tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x) * pb.draw.scale.x,       // destination width
+		(originalBounds.height - tile.imageProperties.destination.yOffset*imageObject.height*polyImageRatio.y) * pb.draw.scale.y      // destination height
+	    );
+
+	    pb.draw.ctx.restore();
 	};
 	
 
@@ -466,6 +587,21 @@
 		}
 	    }
 	};
+
+
+	// Keep track of loaded textures
+	var textureStore = new Map();
+	var loadTextureImage = function( path, onLoad ) {
+	    var texture = textureStore.get(path); 
+	    if( !texture ) {
+		texture = new Image();
+		texture.onload = onLoad;
+		texture.src = path;
+		textureStore.set(path,texture);
+	    }
+	    return texture;
+	};
+	textureImage = loadTextureImage('girihtexture-500px-2.png', function() { console.log('Texture loaded'); pb.redraw(); });
 
 
 	// +---------------------------------------------------------------------------------

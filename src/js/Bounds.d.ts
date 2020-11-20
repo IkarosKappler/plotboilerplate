@@ -9,7 +9,8 @@
  * @author   Ikaros Kappler
  * @date     2020-05-11
  * @modified 2020-10-30 Added the static computeFromVertices function.
- * @version  1.1.0
+ * @modified 2020-11-19 Set min, max, width and height to private.
+ * @version  1.1.1
  *
  * @file Bounds
  * @fileoverview A simple bounds class implementing IBounds.
@@ -24,28 +25,28 @@ export declare class Bounds implements IBounds, XYDimension {
      * @instance
      * @public
      */
-    min: XYCoords;
+    readonly min: XYCoords;
     /**
      * @member {XYCoords}
      * @memberof Bounds
      * @instance
      * @public
      */
-    max: XYCoords;
+    readonly max: XYCoords;
     /**
      * @member {number}
      * @memberof Bounds
      * @instance
      * @public
      */
-    width: number;
+    readonly width: number;
     /**
      * @member {number}
      * @memberof Bounds
      * @instance
      * @public
      */
-    height: number;
+    readonly height: number;
     /**
      * The constructor.
      *
