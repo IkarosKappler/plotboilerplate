@@ -258,8 +258,8 @@
 
 	var drawTileTexture = function( tile, imageObject ) {
 	    // console.log( tile.tileType, TileType.TYPE_DECAGON );
-	    if( tile.tileType != TileType.TYPE_DECAGON ) 
-		return;
+	    // if( tile.tileType != TileType.TYPE_DECAGON ) 
+	    //	return;
 		
 	    pb.draw.ctx.save();
 
@@ -287,10 +287,19 @@
 	    );
 
 	    console.log( "tileBounds.width", tileBounds.width, "scale.x", scale.x );
-	    console.log( "destBounds.width", destBounds.width );
-	    
+	    // console.log( "destBounds.width", destBounds.width );
 
-	    pb.draw.ctx.translate( offset.x, offset.y );
+	    clipPoly( pb.draw.ctx, pb.draw.offset, pb.draw.scale, tile.vertices );
+	    
+	    // Set offset and translation here.
+	    // Other ways we will not be able to rotate textures properly.
+	    pb.draw.ctx.translate( offset.x + tile.position.x,
+				   offset.y + tile.position.y
+				 );
+	    pb.draw.ctx.rotate( tile.rotation );
+
+
+	   
 	    pb.draw.ctx.drawImage(
 		imageObject,
 		
@@ -299,13 +308,35 @@
 		srcBounds.width,  // source w
 		srcBounds.height, // source h
 		
-		destBounds.min.x, // dest x,
-		destBounds.min.y, // dest y,
+		destBounds.min.x - tile.position.x, // dest x,
+		destBounds.min.y - tile.position.y, // dest y,
 		destBounds.width, // dest w
 		destBounds.height // dest h
 	    );
 		 
 	    pb.draw.ctx.restore();
+	};
+
+
+	var clipPoly = function( ctx, offset, scale, vertices ) {
+	    ctx.beginPath();
+	    // Set clip mask
+	    ctx.moveTo( offset.x + vertices[0].x * scale.x,
+			offset.y + vertices[0].y * scale.y );
+	    for( var i = 1; i < vertices.length; i++ ) {
+		var vert = vertices[i];
+		// point.rotate( IKRS.Point2.ZERO_POINT, angle );
+		//window.alert( "point=(" + point.x + ", "+ point.y + ")" );
+		ctx.lineTo( offset.x + vert.x * scale.x,
+			    offset.y + vert.y * scale.y
+			  );
+	    }
+	    // Close path
+	    /* this.context.lineTo( startPoint.x * this.zoomFactor + this.drawOffset.x + position.x * this.zoomFactor, 
+	       startPoint.y * this.zoomFactor + this.drawOffset.y + position.y * this.zoomFactor
+	       ); */
+	    ctx.closePath();
+	    pb.draw.ctx.clip();
 	};
 
 
@@ -533,7 +564,8 @@
 	    drawCenters : true,
 	    drawCornerNumbers : false,
 	    drawOuterPolygons : true,
-	    drawInnerPolygons : true
+	    drawInnerPolygons : true,
+	    drawTextures : true
 	}, GUP );
 
 
@@ -614,6 +646,7 @@
 	    gui.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
 	    gui.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
 	    gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
+	    gui.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
 	}
 
 	    initTiles();
