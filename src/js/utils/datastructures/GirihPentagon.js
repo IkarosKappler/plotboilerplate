@@ -60,9 +60,9 @@ var GirihPentagon = /** @class */ (function (_super) {
         }
         _this.imageProperties = {
             source: { x: 7 / 500.0,
-                y: (303 - 15) / 460.0,
+                y: (303) / 460.0,
                 width: 157 / 500.0,
-                height: (150 + 15) / 460.0 // +16
+                height: (150) / 460.0 // +15
             },
             destination: { xOffset: 0.0,
                 yOffset: -18 / 460.0 // -16

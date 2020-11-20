@@ -165,6 +165,7 @@
 	// | This is the actual render function.
 	// +-------------------------------
 	var drawAll = function() {
+	    pb.draw.ctx.lineJoin = config.lineJoin;
 	    // Draw the preview polygon first
 	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1
 		&& 0 <= previewTilePointer && previewTilePointer < previewTiles.length ) {
@@ -196,7 +197,9 @@
 	// | @param {number} index - The index in the tiles-array (to highlight hover).
 	// +-------------------------------
 	var drawTile = function( tile, index ) {
-	    drawTileTexture( tile, textureImage );
+	    if( config.drawTextures ) {
+		drawTileTexture( tile, textureImage );
+	    }
 	    if( config.drawOutlines ) {
 		pb.draw.polygon( tile, Green.cssRGB(), 2.0 ); // Polygon is not open
 	    }
@@ -260,6 +263,16 @@
 	    // console.log( tile.tileType, TileType.TYPE_DECAGON );
 	    // if( tile.tileType != TileType.TYPE_DECAGON ) 
 	    //	return;
+
+	    /* if( tile.tileType == TileType.TYPE_PENTAGON ) {
+		//{	x:      7/500.0,
+		//		y:      (303)/460.0, // -16
+		//		width:  157/500.0, 
+		//		height: (150)/460.0  // +16
+		//	};
+		tile.imageProperties.source.y = (303)/460.0;
+		tile.imageProperties.source.height = (150)/460.0;
+	    } */
 		
 	    pb.draw.ctx.save();
 
@@ -286,7 +299,7 @@
 			  )
 	    );
 
-	    console.log( "tileBounds.width", tileBounds.width, "scale.x", scale.x );
+	    // console.log( "tileBounds.width", tileBounds.width, "scale.x", scale.x );
 	    // console.log( "destBounds.width", destBounds.width );
 
 	    clipPoly( pb.draw.ctx, pb.draw.offset, pb.draw.scale, tile.vertices );
@@ -297,9 +310,7 @@
 				   offset.y + tile.position.y
 				 );
 	    pb.draw.ctx.rotate( tile.rotation );
-
-
-	   
+ 
 	    pb.draw.ctx.drawImage(
 		imageObject,
 		
@@ -325,82 +336,14 @@
 			offset.y + vertices[0].y * scale.y );
 	    for( var i = 1; i < vertices.length; i++ ) {
 		var vert = vertices[i];
-		// point.rotate( IKRS.Point2.ZERO_POINT, angle );
-		//window.alert( "point=(" + point.x + ", "+ point.y + ")" );
 		ctx.lineTo( offset.x + vert.x * scale.x,
 			    offset.y + vert.y * scale.y
 			  );
 	    }
-	    // Close path
-	    /* this.context.lineTo( startPoint.x * this.zoomFactor + this.drawOffset.x + position.x * this.zoomFactor, 
-	       startPoint.y * this.zoomFactor + this.drawOffset.y + position.y * this.zoomFactor
-	       ); */
 	    ctx.closePath();
 	    pb.draw.ctx.clip();
 	};
 
-
-	var _drawTileTexture = function( tile, imageObject ) {
-	    pb.draw.ctx.save();
-	    // Build absolute image bounds from relative
-	    /* var imgBounds = new IKRS.BoundingBox2( imgProperties.source.x * imageObject.width,
-						   (imgProperties.source.x + imgProperties.source.width) * imageObject.width,
-						   imgProperties.source.y * imageObject.height,
-						   (imgProperties.source.y + imgProperties.source.height) * imageObject.height
-						   ); */
-	    var originalBounds = tile.getBounds();
-	    var imgBounds = new Bounds(
-		new Vertex(tile.imageProperties.source.x * imageObject.width,
-			   (tile.imageProperties.source.x + tile.imageProperties.source.width) * imageObject.width),
-		new Vertex(tile.imageProperties.source.y * imageObject.height,
-			   (tile.imageProperties.source.y + tile.imageProperties.source.height) * imageObject.height)
-	    );
-	    var polyImageRatio = new Vertex( originalBounds.width / imgBounds.width,
-					     originalBounds.height / imgBounds.height
-					   );
-	    //window.alert( "polyImageRatio=" + polyImageRatio );
-
-	    // Draw clip line ... again?
-	    //pb.draw.ctx.clip();
-	    var _imageX = pb.draw.offset.x + tile.position.x * pb.draw.scale.x + originalBounds.min.x * pb.draw.scale.x;
-	    var _imageY = pb.draw.offset.y + tile.position.y * pb.draw.scale.y + originalBounds.min.y * pb.draw.scale.y;	
-	    var imageW = (originalBounds.width + tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x) * pb.draw.scale.x; 
-	    var imageH = (originalBounds.height + tile.imageProperties.destination.yOffset*imageObject.height*polyImageRatio.y) * pb.draw.scale.y; 
-
-	    // var translation = { x : -pb.draw.offset.x + (imageX + imageW/2.0) * pb.draw.scale.x,
-	    //			y : -pb.draw.offset.y + (imageY + imageH/2.0) * pb.draw.scale.y
-	    //		      };
-	    var translation = { x : pb.draw.offset.x + (imageW/2.0) * pb.draw.scale.x,
-				y : pb.draw.offset.y + (imageH/2.0) * pb.draw.scale.y
-			      };
-	    pb.draw.ctx.translate( translation.x,
-				   translation.y );	    
-	    pb.draw.ctx.rotate( tile.rotation ); 
-
-	    // var drawStartX = (-originalBounds.width/2.0) * pb.draw.scale.x; 
-	    // var drawStartY = (-originalBounds.height/2.0) * pb.draw.scale.y;
-	    var leftUpperX = -(originalBounds.width/2.0 * pb.draw.scale.x); // (-originalBounds.width/2.0) * pb.draw.scale.x; 
-	    var leftUpperY = -(originalBounds.height/2.0 * pb.draw.scale.y); // (-originalBounds.height/2.0) * pb.draw.scale.y;
-	    console.log(
-		'imageObject', imageObject.width, imageObject.height,  imageW, imageH,
-		leftUpperX + tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x*0.5*pb.draw.scale.x
-	    ); 
-	    pb.draw.ctx.drawImage(
-		imageObject,
-		tile.imageProperties.source.x*imageObject.width,                    // source x
-		tile.imageProperties.source.y*imageObject.height,                   // source y
-		tile.imageProperties.source.width*imageObject.width,                // source width
-		tile.imageProperties.source.height*imageObject.height,              // source height
-		leftUpperX, //  + tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x*0.5*pb.draw.scale.x,         // destination x
-		leftUpperY, //  + tile.imageProperties.destination.yOffset*imageObject.height*polyImageRatio.y*0.5*pb.draw.scale.y,        // destination y
-		// (originalBounds.width - tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x) * pb.draw.scale.x,       // destination width
-		// (originalBounds.height - tile.imageProperties.destination.yOffset*imageObject.height*polyImageRatio.y) * pb.draw.scale.y      // destination height
-		(originalBounds.width - tile.imageProperties.destination.xOffset*imageObject.width*polyImageRatio.x) * pb.draw.scale.x,       // destination width
-		(originalBounds.height - tile.imageProperties.destination.yOffset*imageObject.height*polyImageRatio.y) * pb.draw.scale.y      // destination height
-	    );
-
-	    pb.draw.ctx.restore();
-	};
 	
 
 	// +---------------------------------------------------------------------------------
@@ -565,6 +508,7 @@
 	    drawCornerNumbers : false,
 	    drawOuterPolygons : true,
 	    drawInnerPolygons : true,
+	    lineJoin  : "round",     // [ "bevel", "round", "miter" ]
 	    drawTextures : true
 	}, GUP );
 
@@ -633,7 +577,7 @@
 	    }
 	    return texture;
 	};
-	textureImage = loadTextureImage('girihtexture-500px-2.png', function() { console.log('Texture loaded'); pb.redraw(); });
+	textureImage = loadTextureImage('girihtexture-500px-3.png', function() { console.log('Texture loaded'); pb.redraw(); });
 
 
 	// +---------------------------------------------------------------------------------
@@ -646,6 +590,7 @@
 	    gui.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
 	    gui.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
 	    gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
+	    gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
 	    gui.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
 	}
 
