@@ -259,6 +259,75 @@
 	};
 
 
+	var __drawTileTexture = function( tile, imageObject ) {
+	    // console.log( tile.tileType, TileType.TYPE_DECAGON );
+	    if( tile.tileType == TileType.TYPE_IRREGULAR_HEXAGON ) {
+		//	return;
+		console.log( "rotation=" + tile.rotation, "deg=", tile.rotation * (180/Math.PI) );
+	    }
+		
+	    pb.draw.ctx.save();
+
+	    var imgProps = tile.imageProperties;
+	    var tileBounds = tile.getBounds();
+	    var scale = pb.draw.scale;
+	    var offset = pb.draw.offset;
+
+	    var polyImageRatio = new Vertex(
+		tileBounds.width / imageObject.width,
+		tileBounds.height / imageObject.height
+	    );
+	    
+	    var srcBounds = new Bounds(
+		new Vertex( imgProps.source.x * imageObject.width,
+			    imgProps.source.y * imageObject.height
+			  ),
+		new Vertex( (imgProps.source.x + imgProps.source.width) * imageObject.width,
+			    (imgProps.source.y + imgProps.source.height) * imageObject.height
+			  )
+	    );
+
+	    var destBounds = new Bounds(
+		new Vertex( tileBounds.min.x * scale.x,
+			    tileBounds.min.y * scale.y 
+			  ),
+		new Vertex( tileBounds.max.x * scale.x,
+			    tileBounds.max.y * scale.y 
+			  )
+	    );
+
+	    // !!! tile.position was 'position' before
+	    var imageX = offset.x + (tile.position.x-tileBounds.width/2) * scale.x + tileBounds.min.x * scale.x;
+	    var imageY = offset.y + (tile.position.y-tileBounds.height/2) * scale.y + tileBounds.min.y * scale.y;	
+	    var imageW = (tileBounds.width + imgProps.destination.xOffset*imageObject.width*polyImageRatio.x) * scale.x; 
+	    var imageH = (tileBounds.height + imgProps.destination.yOffset*imageObject.height*polyImageRatio.y) * scale.y; 
+	    pb.draw.ctx.translate( imageX + imageW/2.0, 
+				    imageY + imageH/2.0 
+				  );
+	    
+	    //pb.draw.ctx.translate( offset.x + tile.position.x,
+	    //			   offset.y + tile.position.y
+			//	 );
+	    pb.draw.ctx.rotate( tile.rotation );
+
+	    // Copied
+	    var drawStartX = (-tileBounds.width/2.0) * scale.x; 
+	    var drawStartY = (-tileBounds.height/2.0) * scale.y; 
+	    pb.draw.ctx.drawImage(
+		imageObject,
+		imgProps.source.x*imageObject.width,                    // source x
+		imgProps.source.y*imageObject.height,                   // source y
+		imgProps.source.width*imageObject.width,                // source width
+		imgProps.source.height*imageObject.height,              // source height
+		drawStartX + imgProps.destination.xOffset*imageObject.width*polyImageRatio.x*0.5*scale.x,         // destination x
+		drawStartY + imgProps.destination.yOffset*imageObject.height*polyImageRatio.y*0.5*scale.y,        // destination y
+		(tileBounds.width - imgProps.destination.xOffset*imageObject.width*polyImageRatio.x) * scale.x,       // destination width
+		(tileBounds.height - imgProps.destination.yOffset*imageObject.height*polyImageRatio.y) * scale.y      // destination height
+	    );
+
+	    pb.draw.ctx.restore();
+	}
+	
 	var drawTileTexture = function( tile, imageObject ) {
 	    // console.log( tile.tileType, TileType.TYPE_DECAGON );
 	    if( tile.tileType == TileType.TYPE_IRREGULAR_HEXAGON ) {
