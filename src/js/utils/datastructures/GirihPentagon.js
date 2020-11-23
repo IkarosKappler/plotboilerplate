@@ -68,6 +68,7 @@ var GirihPentagon = /** @class */ (function (_super) {
                 yOffset: -18 / 460.0 // -16
             }
         };
+        _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons(size);
         _this._buildOuterPolygons(size); // Only call AFTER the inner polygons were built!
         return _this;

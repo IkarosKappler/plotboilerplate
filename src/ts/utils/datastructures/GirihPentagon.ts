@@ -70,6 +70,7 @@ export class GirihPentagon extends GirihTile {
 			 }
 	    
 	};
+	this.baseBounds = this.getBounds();
 
 	this._buildInnerPolygons( size );
 	this._buildOuterPolygons( size );       // Only call AFTER the inner polygons were built!

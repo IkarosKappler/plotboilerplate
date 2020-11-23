@@ -117,7 +117,14 @@
 	    
 	    for( var i in TILE_TEMPLATES ) {
 		var tile = TILE_TEMPLATES[i].clone();
-		tile.position.listeners.addClickListener( function(clickEvent) { console.log('clicked'); } );
+		tile.position.listeners.addClickListener( (function(vertex) {
+		    return function(clickEvent) {
+			console.log('clicked', clickEvent );
+			vertex.attr.isSelected = !vertex.attr.isSelected;
+			pb.redraw();
+		    } })(tile.position)
+		);
+		tile.position.attr.draggable = false;
 		pb.add( tile.position );
 		tiles.push( tile );
 	    }
@@ -217,7 +224,7 @@
 	    }
 	    // Draw a crosshair at the center
 	    if( config.drawCenters )
-		drawFancyCrosshair( tile.position, hoverTileIndex == i );
+		drawFancyCrosshair( tile.position, hoverTileIndex == i, tile.position.attr.isSelected );
 
 	    // Draw corner numbers?
 	    if( config.drawCornerNumbers ) {
@@ -233,8 +240,9 @@
 	// +---------------------------------------------------------------------------------
 	// | Draw a fancy crosshair. The default one is useful but boring.
 	// +-------------------------------
-	var drawFancyCrosshair = function( position, isHighlighted ) {
-	    var color = isHighlighted ? 'rgba(192,0,0,0.5)' : 'rgba(0,192,192,0.5)';
+	var drawFancyCrosshair = function( position, isHighlighted, isSelected ) {
+	    var color = isSelected ? 'red' : isHighlighted ? 'rgba(192,0,0,0.5)' : 'rgba(0,192,192,0.5)';
+	    var lineWidth = isSelected ? 2.0 : 1.0;
 	    var crossRadius = 2;
 	    var arcRadius = 3;
 	    var s = Math.sin(Math.PI/4)*crossRadius;
@@ -243,109 +251,28 @@
 				      position.y + s ),
 			  new Vertex( position.x - c,
 				      position.y - s ),
-			  color );
+			  color, lineWidth );
 	    pb.draw.line( new Vertex( position.x + c,
 				      position.y - s ),
 			  new Vertex( position.x - c,
 				      position.y + s ),
-			  color );
+			  color, lineWidth );
 	    for( var i = 0; i < 4; i++ ) {
 		pb.draw.circleArc( position,
 				   arcRadius,
 				   Math.PI/2 * (i+1) + Math.PI*2*0.2,
 				   Math.PI/2 * (i+1) + Math.PI*2*0.3,
-				   color, 1.0 );
+				   color, lineWidth );
 	    }
 	};
-
-
-	var __drawTileTexture = function( tile, imageObject ) {
-	    // console.log( tile.tileType, TileType.TYPE_DECAGON );
-	    if( tile.tileType == TileType.TYPE_IRREGULAR_HEXAGON ) {
-		//	return;
-		console.log( "rotation=" + tile.rotation, "deg=", tile.rotation * (180/Math.PI) );
-	    }
-		
-	    pb.draw.ctx.save();
-
-	    var imgProps = tile.imageProperties;
-	    var tileBounds = tile.getBounds();
-	    var scale = pb.draw.scale;
-	    var offset = pb.draw.offset;
-
-	    var polyImageRatio = new Vertex(
-		tileBounds.width / imageObject.width,
-		tileBounds.height / imageObject.height
-	    );
-	    
-	    var srcBounds = new Bounds(
-		new Vertex( imgProps.source.x * imageObject.width,
-			    imgProps.source.y * imageObject.height
-			  ),
-		new Vertex( (imgProps.source.x + imgProps.source.width) * imageObject.width,
-			    (imgProps.source.y + imgProps.source.height) * imageObject.height
-			  )
-	    );
-
-	    var destBounds = new Bounds(
-		new Vertex( tileBounds.min.x * scale.x,
-			    tileBounds.min.y * scale.y 
-			  ),
-		new Vertex( tileBounds.max.x * scale.x,
-			    tileBounds.max.y * scale.y 
-			  )
-	    );
-
-	    // !!! tile.position was 'position' before
-	    var imageX = offset.x + (tile.position.x-tileBounds.width/2) * scale.x + tileBounds.min.x * scale.x;
-	    var imageY = offset.y + (tile.position.y-tileBounds.height/2) * scale.y + tileBounds.min.y * scale.y;	
-	    var imageW = (tileBounds.width + imgProps.destination.xOffset*imageObject.width*polyImageRatio.x) * scale.x; 
-	    var imageH = (tileBounds.height + imgProps.destination.yOffset*imageObject.height*polyImageRatio.y) * scale.y; 
-	    pb.draw.ctx.translate( imageX + imageW/2.0, 
-				    imageY + imageH/2.0 
-				  );
-	    
-	    //pb.draw.ctx.translate( offset.x + tile.position.x,
-	    //			   offset.y + tile.position.y
-			//	 );
-	    pb.draw.ctx.rotate( tile.rotation );
-
-	    // Copied
-	    var drawStartX = (-tileBounds.width/2.0) * scale.x; 
-	    var drawStartY = (-tileBounds.height/2.0) * scale.y; 
-	    pb.draw.ctx.drawImage(
-		imageObject,
-		imgProps.source.x*imageObject.width,                    // source x
-		imgProps.source.y*imageObject.height,                   // source y
-		imgProps.source.width*imageObject.width,                // source width
-		imgProps.source.height*imageObject.height,              // source height
-		drawStartX + imgProps.destination.xOffset*imageObject.width*polyImageRatio.x*0.5*scale.x,         // destination x
-		drawStartY + imgProps.destination.yOffset*imageObject.height*polyImageRatio.y*0.5*scale.y,        // destination y
-		(tileBounds.width - imgProps.destination.xOffset*imageObject.width*polyImageRatio.x) * scale.x,       // destination width
-		(tileBounds.height - imgProps.destination.yOffset*imageObject.height*polyImageRatio.y) * scale.y      // destination height
-	    );
-
-	    pb.draw.ctx.restore();
-	}
 	
-	var drawTileTexture = function( tile, imageObject ) {
-	    // console.log( tile.tileType, TileType.TYPE_DECAGON );
-	    if( tile.tileType == TileType.TYPE_IRREGULAR_HEXAGON ) {
-		//	return;
-		console.log( "rotation=" + tile.rotation, "deg=", tile.rotation * (180/Math.PI) );
-	    }
-		
+	var drawTileTexture = function( tile, imageObject ) {		
 	    pb.draw.ctx.save();
 
 	    var imgProps = tile.imageProperties;
 	    var tileBounds = tile.getBounds();
 	    var scale = pb.draw.scale;
 	    var offset = pb.draw.offset;
-
-	    /* var polyImageRatio = new Vertex(
-		tileBounds.width / imageObject.width,
-		tileBounds.height / imageObject.height
-	    ); */
 	    
 	    var srcBounds = new Bounds(
 		new Vertex( imgProps.source.x * imageObject.width,
@@ -357,31 +284,22 @@
 	    );
 
 	    var destBounds = new Bounds(
-		new Vertex( tileBounds.min.x * scale.x,
-			    tileBounds.min.y * scale.y 
+		new Vertex( tile.baseBounds.min.x * scale.x,
+			    tile.baseBounds.min.y * scale.y 
 			  ),
-		new Vertex( tileBounds.max.x * scale.x,
-			    tileBounds.max.y * scale.y 
+		new Vertex( tile.baseBounds.max.x * scale.x,
+			    tile.baseBounds.max.y * scale.y 
 			  )
 	    );
 
-	    // console.log( "tileBounds.width", tileBounds.width, "scale.x", scale.x );
-	    // console.log( "destBounds.width", destBounds.width );
-
-	    // clipPoly( pb.draw.ctx, pb.draw.offset, pb.draw.scale, tile.vertices );
-
-	    
-	    // pb.draw.ctx.rotate( tile.rotation );
+	    clipPoly( pb.draw.ctx, pb.draw.offset, pb.draw.scale, tile.vertices );
+  
 	    // Set offset and translation here.
-	    // Other ways we will not be able to rotate textures properly.
+	    // Other ways we will not be able to rotate textures properly around the tile center.
 	    pb.draw.ctx.translate( offset.x + tile.position.x,
 				   offset.y + tile.position.y
 				 );
 	    pb.draw.ctx.rotate( tile.rotation );
-
-	    var luCorner = { x : Math.cos(tile.rotation) * tile.position.x,
-			     y : Math.sin(tile.rotation) * tile.position.y
-			   };
 	    pb.draw.ctx.drawImage(
 		imageObject,
 		
@@ -395,22 +313,6 @@
 		destBounds.width, // dest w
 		destBounds.height // dest h
 	    );
-
-	    pb.draw.ctx.beginPath();
-	    pb.draw.ctx.moveTo(-10,10);
-	    pb.draw.ctx.lineTo(10,-10);
-	    pb.draw.ctx.moveTo(10,10);
-	    pb.draw.ctx.lineTo(-10,-10);
-	    pb.draw.ctx.strokeStyle = "red";
-	    pb.draw.ctx.lineWidth = 3;
-	    pb.draw.ctx.stroke();
-
-	    pb.draw.ctx.beginPath();
-	    pb.draw.ctx.rect( destBounds.min.x - tile.position.x, // dest x,
-			      destBounds.min.y - tile.position.y, // dest y,
-			      destBounds.width, // dest w
-			      destBounds.height );
-	    pb.draw.ctx.stroke();
 		 
 	    pb.draw.ctx.restore();
 	};
@@ -500,7 +402,8 @@
 	    } )
 	    .click( function(e) {
 		console.log( 'clicked' );
-		if( previewTilePointer < previewTiles.length ) {
+		var clickedVert = pb.getVertexNear( e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE );
+		if( !clickedVert && previewTilePointer < previewTiles.length ) {
 		    tiles.push( previewTiles[previewTilePointer] );
 		    pb.redraw();
 		}
@@ -596,7 +499,7 @@
 	    drawOuterPolygons : true,
 	    drawInnerPolygons : true,
 	    lineJoin  : "round",     // [ "bevel", "round", "miter" ]
-	    drawTextures : true
+	    drawTextures : false
 	}, GUP );
 
 

@@ -63,6 +63,7 @@ export class GirihDecagon extends GirihTile {
 			   yOffset: 0.0
 			 }
 	};
+	this.baseBounds = this.getBounds();
 
 
 	this._buildInnerPolygons( size );

@@ -89,6 +89,7 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
                 yOffset: 0.0
             }
         };
+        _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons(size, addCenterPolygon);
         _this._buildOuterPolygons(size, addCenterPolygon);
         return _this;

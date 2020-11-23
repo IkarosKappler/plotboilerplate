@@ -86,6 +86,7 @@ var GirihRhombus = /** @class */ (function (_super) {
                 yOffset: 0.0
             }
         };
+        _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons();
         _this._buildOuterPolygons(); // Call only AFTER the inner polygons were built!
         return _this;

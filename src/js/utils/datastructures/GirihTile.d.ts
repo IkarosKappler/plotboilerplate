@@ -18,6 +18,7 @@
  * @version  2.0.1-alpha
  * @name GirihTile
  **/
+import { Bounds } from "../../Bounds";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
 import { XYCoords } from "../../interfaces";
@@ -56,6 +57,7 @@ export declare abstract class GirihTile extends Polygon {
     outerTilePolygons: Array<Polygon>;
     imageProperties: ImageProperties;
     tileType: TileType;
+    baseBounds: Bounds;
     static epsilon: number;
     static DEFAULT_EDGE_LENGTH: number;
     /**

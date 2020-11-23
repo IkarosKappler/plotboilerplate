@@ -67,6 +67,7 @@ var GirihDecagon = /** @class */ (function (_super) {
                 yOffset: 0.0
             }
         };
+        _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons(size);
         _this._buildOuterPolygons(size); // Important: call AFTER inner polygons were created!
         return _this;

@@ -90,6 +90,7 @@ export class GirihPenroseRhombus extends GirihTile {
 			   yOffset: 0.0
 			 }
 	};
+	this.baseBounds = this.getBounds();
 		
 	this._buildInnerPolygons( size, addCenterPolygon );
 	this._buildOuterPolygons( size, addCenterPolygon );

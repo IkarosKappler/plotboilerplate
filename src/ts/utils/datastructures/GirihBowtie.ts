@@ -88,6 +88,7 @@ export class GirihBowtie extends GirihTile {
 			   yOffset: 0.0
 			 }
 	};
+	this.baseBounds = this.getBounds();
 	
 	this._buildInnerPolygons( size );
 	this._buildOuterPolygons( size );       // Only call AFTER the inner polygons were created!

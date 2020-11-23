@@ -19,6 +19,7 @@
  * @name GirihTile
  **/
 
+import { Bounds } from "../../Bounds";
 import { Line } from "../../Line";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
@@ -63,6 +64,7 @@ export abstract class GirihTile extends Polygon {
     public outerTilePolygons:Array<Polygon>;
     public imageProperties:ImageProperties;
     public tileType:TileType;
+    public baseBounds:Bounds; // The tile's bounds in un-rotated state; it's required to map the texture
     public static epsilon:number = 0.001;
 
     public static DEFAULT_EDGE_LENGTH:number = 58;
@@ -108,6 +110,10 @@ export abstract class GirihTile extends Polygon {
 	
 	this.tileType             = tileType;
     };
+
+    // public setBaseBounds( b:Bounds ) : void {
+    // this.baseBounds = b;
+    // };
 
 
     /**

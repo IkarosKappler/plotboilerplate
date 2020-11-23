@@ -87,6 +87,7 @@ export class GirihRhombus extends GirihTile {
 			   yOffset: 0.0
 			 }
 	};
+	this.baseBounds = this.getBounds();
 	
 	this._buildInnerPolygons();
 	this._buildOuterPolygons();  // Call only AFTER the inner polygons were built!
