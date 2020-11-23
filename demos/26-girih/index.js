@@ -261,18 +261,10 @@
 
 	var drawTileTexture = function( tile, imageObject ) {
 	    // console.log( tile.tileType, TileType.TYPE_DECAGON );
-	    // if( tile.tileType != TileType.TYPE_DECAGON ) 
-	    //	return;
-
-	    /* if( tile.tileType == TileType.TYPE_PENTAGON ) {
-		//{	x:      7/500.0,
-		//		y:      (303)/460.0, // -16
-		//		width:  157/500.0, 
-		//		height: (150)/460.0  // +16
-		//	};
-		tile.imageProperties.source.y = (303)/460.0;
-		tile.imageProperties.source.height = (150)/460.0;
-	    } */
+	    if( tile.tileType == TileType.TYPE_IRREGULAR_HEXAGON ) {
+		//	return;
+		console.log( "rotation=" + tile.rotation, "deg=", tile.rotation * (180/Math.PI) );
+	    }
 		
 	    pb.draw.ctx.save();
 
@@ -280,6 +272,11 @@
 	    var tileBounds = tile.getBounds();
 	    var scale = pb.draw.scale;
 	    var offset = pb.draw.offset;
+
+	    /* var polyImageRatio = new Vertex(
+		tileBounds.width / imageObject.width,
+		tileBounds.height / imageObject.height
+	    ); */
 	    
 	    var srcBounds = new Bounds(
 		new Vertex( imgProps.source.x * imageObject.width,
@@ -292,25 +289,30 @@
 
 	    var destBounds = new Bounds(
 		new Vertex( tileBounds.min.x * scale.x,
-			    tileBounds.min.y * scale.y
+			    tileBounds.min.y * scale.y 
 			  ),
 		new Vertex( tileBounds.max.x * scale.x,
-			    tileBounds.max.y * scale.y
+			    tileBounds.max.y * scale.y 
 			  )
 	    );
 
 	    // console.log( "tileBounds.width", tileBounds.width, "scale.x", scale.x );
 	    // console.log( "destBounds.width", destBounds.width );
 
-	    clipPoly( pb.draw.ctx, pb.draw.offset, pb.draw.scale, tile.vertices );
+	    // clipPoly( pb.draw.ctx, pb.draw.offset, pb.draw.scale, tile.vertices );
+
 	    
+	    // pb.draw.ctx.rotate( tile.rotation );
 	    // Set offset and translation here.
 	    // Other ways we will not be able to rotate textures properly.
 	    pb.draw.ctx.translate( offset.x + tile.position.x,
 				   offset.y + tile.position.y
 				 );
 	    pb.draw.ctx.rotate( tile.rotation );
- 
+
+	    var luCorner = { x : Math.cos(tile.rotation) * tile.position.x,
+			     y : Math.sin(tile.rotation) * tile.position.y
+			   };
 	    pb.draw.ctx.drawImage(
 		imageObject,
 		
@@ -324,6 +326,22 @@
 		destBounds.width, // dest w
 		destBounds.height // dest h
 	    );
+
+	    pb.draw.ctx.beginPath();
+	    pb.draw.ctx.moveTo(-10,10);
+	    pb.draw.ctx.lineTo(10,-10);
+	    pb.draw.ctx.moveTo(10,10);
+	    pb.draw.ctx.lineTo(-10,-10);
+	    pb.draw.ctx.strokeStyle = "red";
+	    pb.draw.ctx.lineWidth = 3;
+	    pb.draw.ctx.stroke();
+
+	    pb.draw.ctx.beginPath();
+	    pb.draw.ctx.rect( destBounds.min.x - tile.position.x, // dest x,
+			      destBounds.min.y - tile.position.y, // dest y,
+			      destBounds.width, // dest w
+			      destBounds.height );
+	    pb.draw.ctx.stroke();
 		 
 	    pb.draw.ctx.restore();
 	};
@@ -577,7 +595,7 @@
 	    }
 	    return texture;
 	};
-	textureImage = loadTextureImage('girihtexture-500px-3.png', function() { console.log('Texture loaded'); pb.redraw(); });
+	textureImage = loadTextureImage('girihtexture-500px-2.png', function() { console.log('Texture loaded'); pb.redraw(); });
 
 
 	// +---------------------------------------------------------------------------------
