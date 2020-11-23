@@ -197,7 +197,7 @@
 	// | @param {number} index - The index in the tiles-array (to highlight hover).
 	// +-------------------------------
 	var drawTile = function( tile, index ) {
-	    if( config.drawTextures ) {
+	    if( config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0 ) {
 		drawTileTexture( tile, textureImage );
 	    }
 	    if( config.drawOutlines ) {
