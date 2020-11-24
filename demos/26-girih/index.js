@@ -31,6 +31,9 @@
 
 	// Initialize templates, one for each Girih tile type.
 	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
+
+	var girih = new Girih( edgeLength );
+	
 	var templatePointer = 0;
 	// The template array will be filled on initialization (see below).
 	var TILE_TEMPLATES = [];
