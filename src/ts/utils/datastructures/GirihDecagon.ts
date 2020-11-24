@@ -32,7 +32,7 @@ export class GirihDecagon extends GirihTile {
      */
     constructor( position:Vertex, size:number ) {
 
-	super( position, size, TileType.TYPE_DECAGON );
+	super( position, size, TileType.DECAGON );
 
 	// Overwrite the default symmetries:
 	//    the decagon tile has a 36° symmetry (1/10 * 360°)
@@ -52,7 +52,8 @@ export class GirihDecagon extends GirihTile {
 		position.clone().addY( -radius ).rotate( theta/2 + i*theta, position )
 	    );
 	}
-	
+
+	/*
 	this.imageProperties = {
 	    source: { x:      169/500.0,
 		      y:      140/460.0,
@@ -62,7 +63,13 @@ export class GirihDecagon extends GirihTile {
 	    destination: { xOffset: 0.0,
 			   yOffset: 0.0
 			 }
-	};
+	}; */
+
+	this.textureSource.min.x = 169/500.0;
+	this.textureSource.min.y = 140/460.0;
+	this.textureSource.max.x = this.textureSource.min.x + 313/500.0;
+	this.textureSource.max.y = this.textureSource.min.y + 297/460.0;
+	
 	this.baseBounds = this.getBounds();
 
 

@@ -23,25 +23,13 @@ import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
 import { XYCoords } from "../../interfaces";
 export declare enum TileType {
-    TYPE_UNKNOWN = "UNKNOWN",
-    TYPE_DECAGON = "DECAGON",
-    TYPE_PENTAGON = "PENTAGON",
-    TYPE_IRREGULAR_HEXAGON = "IRREGULAR_HEXAGON",
-    TYPE_RHOMBUS = "RHOMBUS",
-    TYPE_BOW_TIE = "BOW_TIE",
-    TYPE_PENROSE_RHOMBUS = "PENROSE_RHOMBUS"
-}
-export interface ImageProperties {
-    source: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
-    destination: {
-        xOffset: number;
-        yOffset: number;
-    };
+    UNKNOWN = "UNKNOWN",
+    DECAGON = "DECAGON",
+    PENTAGON = "PENTAGON",
+    IRREGULAR_HEXAGON = "IRREGULAR_HEXAGON",
+    RHOMBUS = "RHOMBUS",
+    BOW_TIE = "BOW_TIE",
+    PENROSE_RHOMBUS = "PENROSE_RHOMBUS"
 }
 export interface IAdjacency {
     edgeIndex: number;
@@ -55,7 +43,7 @@ export declare abstract class GirihTile extends Polygon {
     uniqueSymmetries: number;
     innerTilePolygons: Array<Polygon>;
     outerTilePolygons: Array<Polygon>;
-    imageProperties: ImageProperties;
+    textureSource: Bounds;
     tileType: TileType;
     baseBounds: Bounds;
     static epsilon: number;

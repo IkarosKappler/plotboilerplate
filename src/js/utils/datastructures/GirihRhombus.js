@@ -48,7 +48,7 @@ var GirihRhombus = /** @class */ (function (_super) {
      * @param {number} size
      */
     function GirihRhombus(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.TYPE_RHOMBUS) || this;
+        var _this = _super.call(this, position, size, GirihTile_1.TileType.RHOMBUS) || this;
         // Overwrite the default symmetries:
         //    the rhombus tile has a 180° symmetry (5/10 * 360°)
         _this.uniqueSymmetries = 5;
@@ -76,16 +76,20 @@ var GirihRhombus = /** @class */ (function (_super) {
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(move).add(_this.position);
         }
-        _this.imageProperties = {
-            source: { x: 32 / 500.0,
-                y: 188 / 460.0,
-                width: 127 / 500.0,
-                height: 92 / 460.0
-            },
+        /* this.imageProperties = {
+            source: { x:      32/500.0,
+                  y:      188/460.0,
+                  width:  127/500.0, // 127,
+                  height: 92/460.0
+                },
             destination: { xOffset: 0.0,
-                yOffset: 0.0
-            }
-        };
+                   yOffset: 0.0
+                 }
+        }; */
+        _this.textureSource.min.x = 32 / 500.0;
+        _this.textureSource.min.y = 188 / 460.0;
+        _this.textureSource.max.x = _this.textureSource.min.x + 127 / 500.0;
+        _this.textureSource.max.y = _this.textureSource.min.y + 92 / 460.0;
         _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons();
         _this._buildOuterPolygons(); // Call only AFTER the inner polygons were built!

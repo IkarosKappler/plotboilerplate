@@ -44,7 +44,7 @@ var GirihPentagon = /** @class */ (function (_super) {
      * @param {number} size
      */
     function GirihPentagon(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.TYPE_PENTAGON) || this;
+        var _this = _super.call(this, position, size, GirihTile_1.TileType.PENTAGON) || this;
         // Overwrite the default symmetries:
         //    the pentagon tile has a 72° symmetry (2/10 * 360°)
         _this.uniqueSymmetries = 2;
@@ -58,16 +58,21 @@ var GirihPentagon = /** @class */ (function (_super) {
         for (var i = 0; i < 5; i++) {
             _this.addVertex(position.clone().addY(-radius).rotate(theta / 2 + i * theta, position));
         }
-        _this.imageProperties = {
-            source: { x: 7 / 500.0,
-                y: (303) / 460.0,
-                width: 157 / 500.0,
-                height: (150) / 460.0 // +15
-            },
+        /*
+        this.imageProperties = {
+            source: {	x:      7/500.0,
+                y:      (303)/460.0, // -15
+                width:  157/500.0,
+                height: (150)/460.0  // +15
+                },
             destination: { xOffset: 0.0,
-                yOffset: -18 / 460.0 // -16
-            }
-        };
+                   yOffset: -18/460.0 // -16
+                 }
+        }; */
+        _this.textureSource.min.x = 7 / 500.0;
+        _this.textureSource.min.y = (303) / 460.0;
+        _this.textureSource.max.x = _this.textureSource.min.x + 157 / 500.0;
+        _this.textureSource.max.y = _this.textureSource.min.y + (150) / 460.0;
         _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons(size);
         _this._buildOuterPolygons(size); // Only call AFTER the inner polygons were built!

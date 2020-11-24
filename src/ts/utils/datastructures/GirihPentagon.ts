@@ -38,7 +38,7 @@ export class GirihPentagon extends GirihTile {
      */
     constructor( position:Vertex, size:number ) {
 	
-	super( position, size, TileType.TYPE_PENTAGON );
+	super( position, size, TileType.PENTAGON );
 
 	// Overwrite the default symmetries:
 	//    the pentagon tile has a 72° symmetry (2/10 * 360°)
@@ -58,7 +58,8 @@ export class GirihPentagon extends GirihTile {
 		position.clone().addY( -radius ).rotate( theta/2 + i*theta, position )
 	    );
 	}
-	
+
+	/* 
 	this.imageProperties = {
 	    source: {	x:      7/500.0,
 			y:      (303)/460.0, // -15
@@ -68,8 +69,13 @@ export class GirihPentagon extends GirihTile {
 	    destination: { xOffset: 0.0,
 			   yOffset: -18/460.0 // -16
 			 }
-	    
-	};
+	}; */
+
+	this.textureSource.min.x = 7/500.0;
+	this.textureSource.min.y = (303)/460.0;
+	this.textureSource.max.x = this.textureSource.min.x + 157/500.0;
+	this.textureSource.max.y = this.textureSource.min.y + (150)/460.0;
+	
 	this.baseBounds = this.getBounds();
 
 	this._buildInnerPolygons( size );

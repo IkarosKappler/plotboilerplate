@@ -50,7 +50,7 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
      * @param {number} size
      */
     function GirihPenroseRhombus(position, size, addCenterPolygon) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.TYPE_PENROSE_RHOMBUS) || this;
+        var _this = _super.call(this, position, size, GirihTile_1.TileType.PENROSE_RHOMBUS) || this;
         // Overwrite the default symmetries:
         //    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
         _this.uniqueSymmetries = 5;
@@ -79,16 +79,22 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(move).add(position);
         }
-        _this.imageProperties = {
-            source: { x: 2 / 500.0,
-                y: 8 / 460.0,
-                width: 173 / 500.0,
-                height: 56 / 460.0
-            },
+        /*
+        this.imageProperties = {
+            source: { x:      2/500.0,
+                  y:      8/460.0,
+                  width:  173/500.0,
+                  height: 56/460.0
+                },
             destination: { xOffset: 0.0,
-                yOffset: 0.0
-            }
-        };
+                   yOffset: 0.0
+                 }
+        }; */
+        _this.textureSource.min.x = 2 / 500.0,
+            _this.textureSource.min.y = 8 / 460.0;
+        _this.textureSource.max.x = _this.textureSource.min.x + 173 / 500.0;
+        _this.textureSource.max.y = _this.textureSource.min.y + 56 / 460.0;
+        ;
         _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons(size, addCenterPolygon);
         _this._buildOuterPolygons(size, addCenterPolygon);

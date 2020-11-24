@@ -48,7 +48,7 @@ var GirihHexagon = /** @class */ (function (_super) {
      * @param {number} size
      */
     function GirihHexagon(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.TYPE_IRREGULAR_HEXAGON) || this;
+        var _this = _super.call(this, position, size, GirihTile_1.TileType.IRREGULAR_HEXAGON) || this;
         // Overwrite the default symmetries:
         //    the hexagon tile has a 180° symmetry (5/10 * 360°)
         _this.uniqueSymmetries = 5;
@@ -82,16 +82,21 @@ var GirihHexagon = /** @class */ (function (_super) {
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(position).sub(move);
         }
-        _this.imageProperties = {
-            source: { x: 77 / 500.0,
-                y: 11 / 460.0,
-                width: 205 / 500.0,
-                height: 150 / 460.0 // 150
-            },
+        /*
+        this.imageProperties = {
+            source: { x:      77/500.0, // 75,
+                  y:      11/460.0,
+                  width:  205/500.0, // 207,
+                  height: 150/460.0  // 150
+                },
             destination: { xOffset: 0.0,
-                yOffset: 0.0
-            }
-        };
+                   yOffset: 0.0
+                 }
+        }; */
+        _this.textureSource.min.x = 77 / 500.0;
+        _this.textureSource.min.y = 11 / 460.0;
+        _this.textureSource.max.x = _this.textureSource.min.x + 205 / 500.0;
+        _this.textureSource.max.y = _this.textureSource.min.y + 150 / 460.0;
         _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons(size);
         _this._buildOuterPolygons(size); // Only call AFTER the inner polygons were created!

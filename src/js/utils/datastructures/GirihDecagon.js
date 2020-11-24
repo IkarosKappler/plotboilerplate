@@ -43,7 +43,7 @@ var GirihDecagon = /** @class */ (function (_super) {
      * @param {number} size
      */
     function GirihDecagon(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.TYPE_DECAGON) || this;
+        var _this = _super.call(this, position, size, GirihTile_1.TileType.DECAGON) || this;
         // Overwrite the default symmetries:
         //    the decagon tile has a 36° symmetry (1/10 * 360°)
         _this.uniqueSymmetries = 1;
@@ -57,16 +57,21 @@ var GirihDecagon = /** @class */ (function (_super) {
         for (var i = 0; i < 10; i++) {
             _this.addVertex(position.clone().addY(-radius).rotate(theta / 2 + i * theta, position));
         }
-        _this.imageProperties = {
-            source: { x: 169 / 500.0,
-                y: 140 / 460.0,
-                width: 313 / 500.0,
-                height: 297 / 460.0
-            },
+        /*
+        this.imageProperties = {
+            source: { x:      169/500.0,
+                  y:      140/460.0,
+                  width:  313/500.0,
+                  height: 297/460.0
+                },
             destination: { xOffset: 0.0,
-                yOffset: 0.0
-            }
-        };
+                   yOffset: 0.0
+                 }
+        }; */
+        _this.textureSource.min.x = 169 / 500.0;
+        _this.textureSource.min.y = 140 / 460.0;
+        _this.textureSource.max.x = _this.textureSource.min.x + 313 / 500.0;
+        _this.textureSource.max.y = _this.textureSource.min.y + 297 / 460.0;
         _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons(size);
         _this._buildOuterPolygons(size); // Important: call AFTER inner polygons were created!

@@ -26,16 +26,17 @@ import { Vertex } from "../../Vertex";
 import { XYCoords } from "../../interfaces";
 
 export enum TileType {
-    TYPE_UNKNOWN            = "UNKNOWN",
-    TYPE_DECAGON            = "DECAGON",
-    TYPE_PENTAGON           = "PENTAGON",
-    TYPE_IRREGULAR_HEXAGON  = "IRREGULAR_HEXAGON",
-    TYPE_RHOMBUS            = "RHOMBUS",
-    TYPE_BOW_TIE            = "BOW_TIE",
+    UNKNOWN            = "UNKNOWN",
+    DECAGON            = "DECAGON",
+    PENTAGON           = "PENTAGON",
+    IRREGULAR_HEXAGON  = "IRREGULAR_HEXAGON",
+    RHOMBUS            = "RHOMBUS",
+    BOW_TIE            = "BOW_TIE",
     // This is not part of the actual girih tile set!
-    TYPE_PENROSE_RHOMBUS    = "PENROSE_RHOMBUS"
+    PENROSE_RHOMBUS    = "PENROSE_RHOMBUS"
 };
 
+/* 
 export interface ImageProperties {
     source: { x: number,     // [0..1]
 	      y: number,     // [0..1]
@@ -46,6 +47,7 @@ export interface ImageProperties {
 		   yOffset: number
 		 }
 };
+*/ 
 
 export interface IAdjacency {
     edgeIndex : number;
@@ -62,7 +64,8 @@ export abstract class GirihTile extends Polygon {
     public uniqueSymmetries:number;
     public innerTilePolygons:Array<Polygon>;
     public outerTilePolygons:Array<Polygon>;
-    public imageProperties:ImageProperties;
+    // public imageProperties:ImageProperties;
+    public textureSource:Bounds;
     public tileType:TileType;
     public baseBounds:Bounds; // The tile's bounds in un-rotated state; it's required to map the texture
     public static epsilon:number = 0.001;
@@ -84,7 +87,7 @@ export abstract class GirihTile extends Polygon {
 	super( [], false ); // vertices, isOpen
 
 	if( typeof tileType == "undefined" )
-	    tileType = TileType.TYPE_UNKNOWN;
+	    tileType = TileType.UNKNOWN;
 	
 	this.size                 = size;
 	this.position             = position;
@@ -106,7 +109,8 @@ export abstract class GirihTile extends Polygon {
 	// Outer tile polygon share at least one (partial) edge with the complete
 	// tile polygon (length > 0).
 	this.outerTilePolygons    = [];  
-	this.imageProperties      = null;
+	// this.imageProperties      = null;
+	this.textureSource = new Bounds( new Vertex(), new Vertex() );
 	
 	this.tileType             = tileType;
     };

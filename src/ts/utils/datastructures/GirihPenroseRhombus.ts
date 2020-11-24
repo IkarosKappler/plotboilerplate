@@ -40,7 +40,7 @@ export class GirihPenroseRhombus extends GirihTile {
      */
     constructor( position:Vertex, size:number, addCenterPolygon?:boolean ) {
 	
-	super( position, size, TileType.TYPE_PENROSE_RHOMBUS  );
+	super( position, size, TileType.PENROSE_RHOMBUS  );
 
 	// Overwrite the default symmetries:
 	//    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
@@ -79,7 +79,8 @@ export class GirihPenroseRhombus extends GirihTile {
 	for( var i = 0; i < this.vertices.length; i++ ) {	
 	    this.vertices[i].add( move ).add( position );		
 	}
-	
+
+	/*
 	this.imageProperties = {
 	    source: { x:      2/500.0,
 		      y:      8/460.0,
@@ -89,7 +90,13 @@ export class GirihPenroseRhombus extends GirihTile {
 	    destination: { xOffset: 0.0,
 			   yOffset: 0.0
 			 }
-	};
+	}; */
+
+	this.textureSource.min.x = 2/500.0,
+	this.textureSource.min.y = 8/460.0;
+	this.textureSource.max.x = this.textureSource.min.x + 173/500.0
+	this.textureSource.max.y = this.textureSource.min.y + 56/460.0;;
+	
 	this.baseBounds = this.getBounds();
 		
 	this._buildInnerPolygons( size, addCenterPolygon );

@@ -34,7 +34,7 @@ export class GirihBowtie extends GirihTile {
      */
     constructor( position:Vertex, size:number ) {
 	
-	super( position, size, TileType.TYPE_BOW_TIE );
+	super( position, size, TileType.BOW_TIE );
 
 	// Overwrite the default symmetries:
 	//    the bow-tie tile has a 180° symmetry (5/10 * 360°)
@@ -77,6 +77,7 @@ export class GirihBowtie extends GirihTile {
 	    this.vertices[i].add( position ).sub( move );	    
 	}
 
+	/* 
 	this.imageProperties = {
 	    source: { x:      288/500.0, // 287,
 		      y:      7/460.0,
@@ -87,7 +88,12 @@ export class GirihBowtie extends GirihTile {
 	    destination: { xOffset: 0.0,
 			   yOffset: 0.0
 			 }
-	};
+			 }; */
+	this.textureSource.min.x = 288/500.0;
+	this.textureSource.min.y = 7/460.0;
+	this.textureSource.max.x = this.textureSource.min.x + 206/500.0;
+	this.textureSource.max.y = this.textureSource.min.y + 150/460.0;
+	
 	this.baseBounds = this.getBounds();
 	
 	this._buildInnerPolygons( size );

@@ -99,7 +99,7 @@
     Girih.prototype.turnTile = function( tileIndex, turnCount ) {
 	if( tileIndex == -1 ) // TODO: still required?
 	    return;
-	var tile = tiles[tileIndex];
+	var tile = this.tiles[tileIndex];
 	tile.rotate( turnCount * Math.PI*2/tile.symmetry );
 	// pb.redraw();
     };

@@ -22,21 +22,13 @@
 	    return;
 	window.pbInitialized = true;
 
-	
-	
 	// Fetch the GET params
 	let GUP = gup();
 
 	var textureImage = null;
 
 	// Initialize templates, one for each Girih tile type.
-	var edgeLength = GirihTile.DEFAULT_EDGE_LENGTH;
-
-	var girih = new Girih( edgeLength );
-	
-	var templatePointer = 0;
-	// The template array will be filled on initialization (see below).
-	// var TILE_TEMPLATES = [];
+	var girih = new Girih( GirihTile.DEFAULT_EDGE_LENGTH );
 	
 	// All config params are optional.
 	var pb = new PlotBoilerplate(
@@ -96,45 +88,15 @@
 	var hoverTileIndex = -1;
 	// The index of the closest edge to the mouse pointer
 	var hoverEdgeIndex = -1;
-	// The set of all Girih tiles in scene
-	// var tiles = [];
 	// If the mouse hovers over an edge the next possible adjacent Girih tile will be this
 	var previewTiles = [];
 	var previewTilePointer = 0;
 
 	var initTiles = function() {
-	    /* var decagon = new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 ); // Positions don't matter here
-	    var pentagon = new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 );
-	    var hexagon = new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 );
-	    var bowtie = new GirihBowtie( new Vertex(-232,0), edgeLength, 0.0 );
-	    var rhombus = new GirihRhombus( new Vertex(-68,-127.5), edgeLength, 0.0 );
-	    var penrose = new GirihPenroseRhombus( new Vertex(-24,-28), edgeLength, 0.0, true );
-
-	    // Add tiles to array and put them in the correct adjacency position.
-	    TILE_TEMPLATES.push( decagon );
-	    TILE_TEMPLATES.push( decagon.transformTilePositionToAdjacency( 2, pentagon ) );
-	    TILE_TEMPLATES.push( pentagon.transformTilePositionToAdjacency( 1, penrose ) );
-	    TILE_TEMPLATES.push( penrose.transformTilePositionToAdjacency( 3, hexagon ) );
-	    TILE_TEMPLATES.push( decagon.transformTilePositionToAdjacency( 5, bowtie ) );
-	    TILE_TEMPLATES.push( pentagon.transformTilePositionToAdjacency( 4, rhombus ) );
-	    */
-
 	    for( var i in girih.TILE_TEMPLATES ) {
 		var tile = girih.TILE_TEMPLATES[i].clone();
-		/* tile.position.listeners.addClickListener( (function(vertex) {
-		    return function(clickEvent) {
-			console.log('clicked', clickEvent );
-			vertex.attr.isSelected = !vertex.attr.isSelected;
-			pb.redraw();
-		    } })(tile.position)
-		);
-		tile.position.attr.draggable = false;
-		pb.add( tile.position );
-		girih.addTile( tile ); // tiles.push( tile );
-		*/
 		addTile( tile );
 	    }
-
 	    console.log( 'tiles', girih.tiles );
 	};
 
@@ -147,45 +109,11 @@
 		} })(tile.position)
 						    );
 	    tile.position.attr.draggable = false;
+	    tile.position.attr.visible = false;
 	    pb.add( tile.position );
 	    girih.addTile( tile ); 
 	};
 
-	/**
-	 * Find that tile (index) which contains the given position. First match will be returned.
-	 *
-	 * @name locateContainingTile
-	 * @param {Vertex} position
-	 * @return {number} The index of the containing tile or -1 if none was found.
-	 **/
-	/* var locateConatiningTile = function( position ) {
-	    for( var i in tiles ) {
-		if( tiles[i].containsVert( position ) )
-		    return i;
-	    }
-	    return -1;
-	}; */
-
-
-
-	// +---------------------------------------------------------------------------------
-	// | Find contrast color.
-	// | Found at
-	// |    https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y/38542#38542
-	// | Thanks to Martin Sojka
-	// +-------------------------------
-	/* var BLACK = Color.makeRGB( 0, 0, 0 );
-	var WHITE = Color.makeRGB( 255, 255, 255 );
-	var getContrastColor = function( color ) {
-	    // r,g,b in [0..1]
-	    var gamma = 2.2;
-	    var L = 0.2126 * Math.pow( color.r, gamma )
-		+ 0.7152 * Math.pow( color.g, gamma )
-		+ 0.0722 * Math.pow( color.b, gamma );
-	    var use_black = ( L > Math.pow( 0.5, gamma ) );
-	    // console.log( 'use_black', use_black );
-	    return use_black ? BLACK.cssRGB() : WHITE.cssRGB();
-	    }; */
 	var toContrastColor = function( color ) {
 	    return getContrastColor(color).cssRGB();
 	};
@@ -291,17 +219,16 @@
 	var drawTileTexture = function( tile, imageObject ) {		
 	    pb.draw.ctx.save();
 
-	    var imgProps = tile.imageProperties;
 	    var tileBounds = tile.getBounds();
 	    var scale = pb.draw.scale;
 	    var offset = pb.draw.offset;
-	    
+
 	    var srcBounds = new Bounds(
-		new Vertex( imgProps.source.x * imageObject.width,
-			    imgProps.source.y * imageObject.height
+		new Vertex( tile.textureSource.min.x * imageObject.width,
+			    tile.textureSource.min.y * imageObject.height
 			  ),
-		new Vertex( (tile.imageProperties.source.x + imgProps.source.width) * imageObject.width,
-			    (tile.imageProperties.source.y + imgProps.source.height) * imageObject.height
+		new Vertex( tile.textureSource.max.x * imageObject.width,
+			    tile.textureSource.max.y * imageObject.height
 			  )
 	    );
 
@@ -364,8 +291,6 @@
 	var handleTurnTile = function( turnCount ) {
 	    if( hoverTileIndex == -1 )
 		return;
-	    // var tile = tiles[hoverTileIndex];
-	    // tile.rotate( turnCount * Math.PI*2/tile.symmetry );
 	    girih.turnTile( hoverTileIndex, turnCount );
 	    pb.redraw();
 	};
@@ -378,44 +303,15 @@
 	var handleMoveTile = function( moveXAmount, moveYAmount ) {
 	    if( hoverTileIndex == -1 )
 		return;
-	    // var tile = tiles[hoverTileIndex];
-	    // tile.move( { x: moveXAmount*10, y : moveYAmount*10 } );
 	    girih.moveTile( hoverTileIndex, moveXAmount, moveYAmount );
 	    pb.redraw();
 	};
-
-
-	// +---------------------------------------------------------------------------------
-	// | Find all possible adjadent tiles and their locations (type, rotation and offset).
-	// +-------------------------------
-	/* var findAdjacentTiles = function() {
-	    var adjTiles = [];
-	    if( hoverTileIndex == -1 ||  hoverEdgeIndex == -1 )
-		return [];
-	    
-	    var template = null; 
-	    for( var i in TILE_TEMPLATES ) {
-		template = TILE_TEMPLATES[ i ].clone();
-		// Find all rotations and positions for that tile to match
-		var foundTiles = tiles[hoverTileIndex].transformTileToAdjacencies( // tiles[hoverTileIndex],
-							     hoverEdgeIndex,
-							     template
-							   );
-		if( foundTiles.length != 0 ) {
-		    adjTiles = adjTiles.concat( foundTiles );
-		}
-	    }
-	    // Set pointer to save range.
-	    // previewTilePointer = Math.min( adjTiles.length-1, previewTiilePointer );
-	    return adjTiles;
-	    }; */
-
 
 	var findSelectedTileIndices = function() {
 	    var selectedTileIndices = [];
 	    for( var i in girih.tiles ) {
 		if( girih.tiles[i].position.attr.isSelected )
-		    selectedTileIndices.push( i ); // girih.tiles[i] );
+		    selectedTileIndices.push( i );
 	    }
 	    return selectedTileIndices;
 	};
@@ -449,7 +345,6 @@
 		var clickedVert = pb.getVertexNear( e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE );
 		console.log( clickedVert, previewTilePointer, 'of', previewTiles.length );
 		if( !clickedVert && previewTilePointer < previewTiles.length ) {
-		    // girih.tiles.push( previewTiles[previewTilePointer] );
 		    addTile( previewTiles[previewTilePointer].clone() );
 		    pb.redraw();
 		}
@@ -478,6 +373,7 @@
 	    .down('c',function() { config.drawCenters = !config.drawCenters; pb.redraw(); } )
 	    .down('p',function() { config.drawOuterPolygons = !config.drawOuterPolygons; pb.redraw(); } )
 	    .down('i',function() { config.drawInnerPolygons = !config.drawInnerPolygons; pb.redraw(); } )
+	    .down('t',function() { config.drawTextures = !config.drawTextures; pb.redraw(); } )
 	    .down('rightarrow',function() {
 		previewTilePointer = (previewTilePointer+1)%previewTiles.length;
 		highlightPreviewTile( previewTilePointer );
@@ -516,7 +412,7 @@
 		    var tile = girih.tiles[i];
 		    var tmpPos = relPos; // tile.position.clone().add( relPos );
 		    // May be -1
-		    hoverEdgeIndex = tile.locateEdgeAtPoint( tmpPos, edgeLength/2 );
+		    hoverEdgeIndex = tile.locateEdgeAtPoint( tmpPos, girih.edgeLength/2 );
 		    if( hoverEdgeIndex != -1 )
 			hoverTileIndex = i;
 		    i++;
@@ -557,9 +453,7 @@
 	// | Build a preview of all available tiles.
 	// +-------------------------------
 	var createAdjacentTilePreview = function( tiles, pointer ) {
-	    // console.log("createAdjacentTilePreview", tiles.length);
 	    var container = document.querySelector('.wrapper-bottom');
-	    // console.log( "container", container );
 	    while(container.firstChild){
 		container.removeChild( container.firstChild );
 	    }

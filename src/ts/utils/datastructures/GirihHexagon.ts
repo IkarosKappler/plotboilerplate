@@ -40,7 +40,7 @@ export class GirihHexagon extends GirihTile {
      */
     constructor( position:Vertex, size:number ) {
 	
-	super( position, size, TileType.TYPE_IRREGULAR_HEXAGON );
+	super( position, size, TileType.IRREGULAR_HEXAGON );
 
 	// Overwrite the default symmetries:
 	//    the hexagon tile has a 180° symmetry (5/10 * 360°)
@@ -82,6 +82,7 @@ export class GirihHexagon extends GirihTile {
 	    this.vertices[i].add( position ).sub( move );
 	}
 
+	/*
 	this.imageProperties = {
 	    source: { x:      77/500.0, // 75,
 		      y:      11/460.0,
@@ -91,7 +92,13 @@ export class GirihHexagon extends GirihTile {
 	    destination: { xOffset: 0.0,
 			   yOffset: 0.0
 			 }
-	};
+	}; */
+
+	this.textureSource.min.x = 77/500.0;
+	this.textureSource.min.y = 11/460.0;
+	this.textureSource.max.x = this.textureSource.min.x + 205/500.0;
+	this.textureSource.max.y = this.textureSource.min.y + 150/460.0;
+	
 	this.baseBounds = this.getBounds();
 
 	this._buildInnerPolygons( size );

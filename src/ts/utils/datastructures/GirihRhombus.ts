@@ -40,7 +40,7 @@ export class GirihRhombus extends GirihTile {
      */
     constructor( position:Vertex, size:number ) {
 	
-	super( position, size, TileType.TYPE_RHOMBUS );
+	super( position, size, TileType.RHOMBUS );
 
 	// Overwrite the default symmetries:
 	//    the rhombus tile has a 180° symmetry (5/10 * 360°)
@@ -77,7 +77,7 @@ export class GirihRhombus extends GirihTile {
 	    this.vertices[i].add( move ).add( this.position );
 	}
 
-	this.imageProperties = {
+	/* this.imageProperties = {
 	    source: { x:      32/500.0,
 		      y:      188/460.0,
 		      width:  127/500.0, // 127,
@@ -86,7 +86,13 @@ export class GirihRhombus extends GirihTile {
 	    destination: { xOffset: 0.0,
 			   yOffset: 0.0
 			 }
-	};
+	}; */
+
+	this.textureSource.min.x = 32/500.0;
+	this.textureSource.min.y = 188/460.0;
+	this.textureSource.max.x = this.textureSource.min.x + 127/500.0;
+	this.textureSource.max.y = this.textureSource.min.y + 92/460.0;
+	
 	this.baseBounds = this.getBounds();
 	
 	this._buildInnerPolygons();

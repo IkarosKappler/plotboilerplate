@@ -33,21 +33,21 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var Bounds_1 = require("../../Bounds");
 var Line_1 = require("../../Line");
 var Polygon_1 = require("../../Polygon");
 var Vertex_1 = require("../../Vertex");
 var TileType;
 (function (TileType) {
-    TileType["TYPE_UNKNOWN"] = "UNKNOWN";
-    TileType["TYPE_DECAGON"] = "DECAGON";
-    TileType["TYPE_PENTAGON"] = "PENTAGON";
-    TileType["TYPE_IRREGULAR_HEXAGON"] = "IRREGULAR_HEXAGON";
-    TileType["TYPE_RHOMBUS"] = "RHOMBUS";
-    TileType["TYPE_BOW_TIE"] = "BOW_TIE";
+    TileType["UNKNOWN"] = "UNKNOWN";
+    TileType["DECAGON"] = "DECAGON";
+    TileType["PENTAGON"] = "PENTAGON";
+    TileType["IRREGULAR_HEXAGON"] = "IRREGULAR_HEXAGON";
+    TileType["RHOMBUS"] = "RHOMBUS";
+    TileType["BOW_TIE"] = "BOW_TIE";
     // This is not part of the actual girih tile set!
-    TileType["TYPE_PENROSE_RHOMBUS"] = "PENROSE_RHOMBUS";
+    TileType["PENROSE_RHOMBUS"] = "PENROSE_RHOMBUS";
 })(TileType = exports.TileType || (exports.TileType = {}));
-;
 ;
 ;
 var GirihTile = /** @class */ (function (_super) {
@@ -63,7 +63,7 @@ var GirihTile = /** @class */ (function (_super) {
     function GirihTile(position, size, tileType) {
         var _this = _super.call(this, [], false) || this;
         if (typeof tileType == "undefined")
-            tileType = TileType.TYPE_UNKNOWN;
+            tileType = TileType.UNKNOWN;
         _this.size = size;
         _this.position = position;
         _this.rotation = 0.0; // angle;
@@ -82,7 +82,8 @@ var GirihTile = /** @class */ (function (_super) {
         // Outer tile polygon share at least one (partial) edge with the complete
         // tile polygon (length > 0).
         _this.outerTilePolygons = [];
-        _this.imageProperties = null;
+        // this.imageProperties      = null;
+        _this.textureSource = new Bounds_1.Bounds(new Vertex_1.Vertex(), new Vertex_1.Vertex());
         _this.tileType = tileType;
         return _this;
     }
