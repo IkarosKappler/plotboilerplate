@@ -27,10 +27,11 @@
 	// The set of all Girih tiles in scene
 	this.tiles = [];
 
-	this.initTiles( edgeLength );
+	this.initTemplates( edgeLength );
     };
 
-    Girih.prototype.initTiles = function( edgeLength ) {
+    // @private
+    Girih.prototype.initTemplates = function( edgeLength ) {
 	var decagon = new GirihDecagon( new Vertex(-200,-100), edgeLength, 0.0 ); // Positions don't matter here
 	var pentagon = new GirihPentagon( new Vertex(-77,-60), edgeLength, 0.0 );
 	var hexagon = new GirihHexagon( new Vertex(25,-0.5), edgeLength, 0.0 );
@@ -45,11 +46,12 @@
 	this.TILE_TEMPLATES.push( penrose.transformTilePositionToAdjacency( 3, hexagon ) );
 	this.TILE_TEMPLATES.push( decagon.transformTilePositionToAdjacency( 5, bowtie ) );
 	this.TILE_TEMPLATES.push( pentagon.transformTilePositionToAdjacency( 4, rhombus ) );
-	
+
+	/*
 	for( var i in this.TILE_TEMPLATES ) {
 	    var tile = this.TILE_TEMPLATES[i].clone();
 	    // TODO: move click listener somewhere else
-	    /* tile.position.listeners.addClickListener( (function(vertex) {
+	    tile.position.listeners.addClickListener( (function(vertex) {
 		return function(clickEvent) {
 		    console.log('clicked', clickEvent );
 		    vertex.attr.isSelected = !vertex.attr.isSelected;
@@ -58,11 +60,20 @@
 						    );
 	    tile.position.attr.draggable = false;
 	    pb.add( tile.position );
-	    */
+	    
 	    this.tiles.push( tile );
 	}
 
 	console.log( 'tiles', this.tiles );
+	*/
+    };
+
+    Girih.prototype.addTile = function( tile ) {
+	this.tiles.push( tile );
+    };
+
+    Girih.prototype.removeTileAt = function( index ) {
+	this.tiles.splice( index, 1 );
     };
 
     /**
@@ -85,7 +96,7 @@
     // | Turn the tile the mouse is hovering over.
     // | The turnCount is ab abstract number: -1 for one turn left, +1 for one turn right.
     // +-------------------------------
-    Girih.prototype.handleTurnTile = function( tileIndex, turnCount ) {
+    Girih.prototype.turnTile = function( tileIndex, turnCount ) {
 	if( tileIndex == -1 ) // TODO: still required?
 	    return;
 	var tile = tiles[tileIndex];
@@ -110,7 +121,7 @@
     // +---------------------------------------------------------------------------------
     // | Find all possible adjadent tiles and their locations (type, rotation and offset).
     // +-------------------------------
-    GirihTile.prototype.findAdjacentTiles = function( tileIndex, edgeIndex ) {
+    Girih.prototype.findAdjacentTiles = function( tileIndex, edgeIndex ) {
 	var adjTiles = [];
 	if( tileIndex == -1 ||  edgeIndex == -1 ) // TODO: still required
 	    return [];
@@ -119,7 +130,7 @@
 	for( var i in this.TILE_TEMPLATES ) {
 	    template = this.TILE_TEMPLATES[ i ].clone();
 	    // Find all rotations and positions for that tile to match
-	    var foundTiles = tiles[tileIndex].transformTileToAdjacencies( 
+	    var foundTiles = this.tiles[tileIndex].transformTileToAdjacencies( 
 		edgeIndex,
 		template
 	    );

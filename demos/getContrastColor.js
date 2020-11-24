@@ -1,3 +1,4 @@
+// @deprecated: use ../src/{js,ts}/utils/algorithms/getContrastColor instead.
 function getContrastColor(tinyColor){
     
     /*
