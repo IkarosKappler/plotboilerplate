@@ -12,6 +12,10 @@
  * @version  1.0.0
  **/
 
+// TODOs
+//  * detect polygon intersection (avoid displaced tiled)
+//  * build auto-generation (random)
+//  * build grid of all possible positions (centers only)
 
 (function(_context) {
     "use strict";
