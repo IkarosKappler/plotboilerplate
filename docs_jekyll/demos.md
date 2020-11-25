@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-11-04
+date: 2020-11-25
 ---
 
 <div class="full-width">
