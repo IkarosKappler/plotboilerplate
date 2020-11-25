@@ -36,27 +36,143 @@ export interface IAdjacency {
     offset: XYCoords;
 }
 export declare abstract class GirihTile extends Polygon {
+    /**
+     * The center of this tile.
+     *
+     * @name position
+     * @member {Vertex}
+     * @memberof GirihTile
+     * @type {Vertex}
+     * @instance
+     */
     position: Vertex;
-    size: number;
+    /**
+     * The edge length of this tile (all edges of a Girih tile have same length).
+     *
+     * @name edgeLength
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @instance
+     */
+    edgeLength: number;
+    /**
+     * The rotation of this tile. This is stored to make cloning easier.
+     *
+     * @name rotation.
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @instance
+     */
     rotation: number;
+    /**
+     * The symmetry (=order) of this tile. This is the number of steps used for a full
+     * rotation (in this Girih case: 10). Future Girih implementations might have other symmetries.
+     *
+     * @name symmetry
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @instance
+     */
     symmetry: number;
+    /**
+     * The unique symmetries. This must be an nth part of the global `symmetry`.
+     * Rotating this tile `uniqueSymmetries' times results in the same visual tile (flipped around
+     * a symmetry axis).
+     *
+     * @name uniqueSymmetries
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @instance
+     */
     uniqueSymmetries: number;
+    /**
+     * The inner tile polygons.
+     *
+     * @name innerTilePolygons
+     * @member {Array<Polygon>}
+     * @memberof GirihTile
+     * @type {Array<Polygon>}
+     * @instance
+     */
     innerTilePolygons: Array<Polygon>;
+    /**
+     * The outer tile polygons.
+     *
+     * @name outerTilePolygons
+     * @member {Array<Polygon>}
+     * @memberof GirihTile
+     * @type {Array<Polygon>}
+     * @instance
+     */
     outerTilePolygons: Array<Polygon>;
-    textureSource: Bounds;
+    /**
+     * An identifier for the tile type.
+     *
+     * @name tileType
+     * @member {TileType}
+     * @memberof GirihTile
+     * @type {TileType}
+     * @instance
+     */
     tileType: TileType;
+    /**
+     * The initial bounds (of the un-rotated tile). These are required to calculate the
+     * correct texture mapping.
+     *
+     * @name baseBounds
+     * @member {Bounds}
+     * @memberof GirihTile
+     * @type {Bounds}
+     * @instance
+     */
     baseBounds: Bounds;
+    /**
+     * A rectangle on the shipped texture image (`girihtexture-500px.png`) marking the
+     * texture position. The bounds are relative, so each component must be in [0..1].
+     * The texture is a square.
+     *
+     * @name textureSource
+     * @member {Bounds}
+     * @memberof GirihTile
+     * @type {Bounds}
+     * @instance
+     */
+    readonly textureSource: Bounds;
+    /**
+     * An epsilon to use for detecting adjacent edges. 0.001 seems to be a good value.
+     * Adjust if needed.
+     *
+     * @name epsilon
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @static
+     */
     static epsilon: number;
-    static DEFAULT_EDGE_LENGTH: number;
+    /**
+     * The default edge length.
+     *
+     * @name DEFAULT_EDGE_LENGTH
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @readonly
+     * @static
+     */
+    static readonly DEFAULT_EDGE_LENGTH: number;
     /**
      * @constructor
      * @memberof GirihTile
      * @abstract class
-     * @param {Vertex} position - The position of the tile.
-     * @param {number} size     - The edge size (usually IKRS.Girih.DEFAULT_EDGE_LENGTH).
-     * @param {TileType} tileType - One of GirihTile.TILE_TYPE_*.
+     * @param {Vertex} position   - The position of the tile.
+     * @param {number} edgeLength - The edge length (usually GirihTile.DEFAULT_EDGE_LENGTH).
+     * @param {TileType} tileType - One of `TileType.*` enum members.
      **/
-    constructor(position: Vertex, size: number, tileType?: TileType);
+    constructor(position: Vertex, edgeLength: number, tileType?: TileType);
     /**
      * @abstract Subclasses must override this.
      */

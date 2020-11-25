@@ -29,15 +29,15 @@ export declare class GirihPenroseRhombus extends GirihTile {
      * @extends GirihTile
      * @name GirihPenroseRhombus
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor(position: Vertex, size: number, addCenterPolygon?: boolean);
+    constructor(position: Vertex, edgeLength: number, addCenterPolygon?: boolean);
     /**
      * @override
      */
     clone(): GirihTile;
-    _buildInnerPolygons(edgeLength: number, addCenterPolygon: boolean): void;
-    _buildOuterPolygons(edgeLength: number, centerPolygonExists: boolean): void;
+    private _buildInnerPolygons;
+    private _buildOuterPolygons;
     /**
      * If you want the center polygon not to be drawn the canvas handler needs to
      * know the respective polygon index (inside the this.innerTilePolygons array).

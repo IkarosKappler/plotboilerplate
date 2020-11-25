@@ -19,9 +19,7 @@ var CircularIntervalSet = /** @class */ (function () {
      * @param {number} start
      * @param {number} end
      * @method clear
-     * @instance
      * @memberof CircularIntervalSet
-     * @return {void}
      **/
     function CircularIntervalSet(start, end) {
         this.start = start;

@@ -45,10 +45,10 @@ var GirihRhombus = /** @class */ (function (_super) {
      * @extends GirihTile
      * @name GirihRhombus
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    function GirihRhombus(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.RHOMBUS) || this;
+    function GirihRhombus(position, edgeLength) {
+        var _this = _super.call(this, position, edgeLength, GirihTile_1.TileType.RHOMBUS) || this;
         // Overwrite the default symmetries:
         //    the rhombus tile has a 180° symmetry (5/10 * 360°)
         _this.uniqueSymmetries = 5;
@@ -66,26 +66,16 @@ var GirihRhombus = /** @class */ (function (_super) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x += size;
+            pointB.x += edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
             _this.addVertex(pointB);
         }
         // Move to center    
         var bounds = Bounds_1.Bounds.computeFromVertices(_this.vertices);
-        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - size), bounds.height / 2.0);
+        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - edgeLength), bounds.height / 2.0);
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(move).add(_this.position);
         }
-        /* this.imageProperties = {
-            source: { x:      32/500.0,
-                  y:      188/460.0,
-                  width:  127/500.0, // 127,
-                  height: 92/460.0
-                },
-            destination: { xOffset: 0.0,
-                   yOffset: 0.0
-                 }
-        }; */
         _this.textureSource.min.x = 32 / 500.0;
         _this.textureSource.min.y = 188 / 460.0;
         _this.textureSource.max.x = _this.textureSource.min.x + 127 / 500.0;
@@ -100,7 +90,7 @@ var GirihRhombus = /** @class */ (function (_super) {
      * @override
      */
     GirihRhombus.prototype.clone = function () {
-        return new GirihRhombus(this.position.clone(), this.size).rotate(this.rotation);
+        return new GirihRhombus(this.position.clone(), this.edgeLength).rotate(this.rotation);
     };
     ;
     GirihRhombus.prototype._buildInnerPolygons = function () {

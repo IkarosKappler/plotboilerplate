@@ -38,9 +38,7 @@ export declare class CircularIntervalSet {
      * @param {number} start
      * @param {number} end
      * @method clear
-     * @instance
      * @memberof CircularIntervalSet
-     * @return {void}
      **/
     constructor(start: number, end: number);
     /**

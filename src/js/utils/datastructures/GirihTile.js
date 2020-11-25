@@ -56,15 +56,15 @@ var GirihTile = /** @class */ (function (_super) {
      * @constructor
      * @memberof GirihTile
      * @abstract class
-     * @param {Vertex} position - The position of the tile.
-     * @param {number} size     - The edge size (usually IKRS.Girih.DEFAULT_EDGE_LENGTH).
-     * @param {TileType} tileType - One of GirihTile.TILE_TYPE_*.
+     * @param {Vertex} position   - The position of the tile.
+     * @param {number} edgeLength - The edge length (usually GirihTile.DEFAULT_EDGE_LENGTH).
+     * @param {TileType} tileType - One of `TileType.*` enum members.
      **/
-    function GirihTile(position, size, tileType) {
+    function GirihTile(position, edgeLength, tileType) {
         var _this = _super.call(this, [], false) || this;
         if (typeof tileType == "undefined")
             tileType = TileType.UNKNOWN;
-        _this.size = size;
+        _this.edgeLength = edgeLength;
         _this.position = position;
         _this.rotation = 0.0; // angle;
         _this.symmetry = 10;
@@ -284,7 +284,27 @@ var GirihTile = /** @class */ (function (_super) {
         }
         return resultIndex;
     };
+    /**
+     * An epsilon to use for detecting adjacent edges. 0.001 seems to be a good value.
+     * Adjust if needed.
+     *
+     * @name epsilon
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @static
+     */
     GirihTile.epsilon = 0.001;
+    /**
+     * The default edge length.
+     *
+     * @name DEFAULT_EDGE_LENGTH
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @readonly
+     * @static
+     */
     GirihTile.DEFAULT_EDGE_LENGTH = 58;
     return GirihTile;
 }(Polygon_1.Polygon));

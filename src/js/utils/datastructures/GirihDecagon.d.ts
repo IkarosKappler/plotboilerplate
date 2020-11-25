@@ -24,9 +24,9 @@ export declare class GirihDecagon extends GirihTile {
      * @extends GirihTile
      * @name GirihDecagon
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor(position: Vertex, size: number);
+    constructor(position: Vertex, edgeLength: number);
     /**
      * @override
      */
@@ -39,7 +39,7 @@ export declare class GirihDecagon extends GirihTile {
      * @private
      * @param {number} edgeLength
      */
-    _buildInnerPolygons(edgeLength: number): void;
+    private _buildInnerPolygons;
     /**
      * Build the outer polygons.
      *
@@ -48,5 +48,5 @@ export declare class GirihDecagon extends GirihTile {
      * @private
      * @param {number} edgeLength
      */
-    _buildOuterPolygons(edgeLength: number): void;
+    private _buildOuterPolygons;
 }

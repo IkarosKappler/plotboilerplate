@@ -1382,7 +1382,7 @@ var PlotBoilerplate = /** @class */ (function () {
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
                                 if (draggedElement && draggedElement.typeName == 'vertex') {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
-                                    var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
+                                    var fakeEvent = { params: { isTouchEvent: true, dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
                                     _self.draggedElements = [draggedElement];
                                     draggingVertex.listeners.fireDragStartEvent(fakeEvent);
                                 }
@@ -1400,7 +1400,7 @@ var PlotBoilerplate = /** @class */ (function () {
                                         return;
                                     _self.vertices[draggedElement.vindex].add(diff);
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
-                                    var fakeEvent = { params: { dragAmount: diff.clone(), wasDragged: true, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone().add(diff), vertex: draggingVertex } };
+                                    var fakeEvent = { isTouchEvent: true, params: { dragAmount: diff.clone(), wasDragged: true, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone().add(diff), vertex: draggingVertex } };
                                     draggingVertex.listeners.fireDragEvent(fakeEvent);
                                     _self.redraw();
                                 }
@@ -1418,7 +1418,7 @@ var PlotBoilerplate = /** @class */ (function () {
                             // Note: e.touches.length is 0 here
                             if (draggedElement && draggedElement.typeName == 'vertex') {
                                 var draggingVertex = _self.vertices[draggedElement.vindex];
-                                var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
+                                var fakeEvent = { isTouchEvent: true, params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
                                 // var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
                                 // var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
                                 // var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);

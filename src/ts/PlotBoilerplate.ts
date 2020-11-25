@@ -1579,7 +1579,7 @@ export class PlotBoilerplate {
 				draggedElement = _self.locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 				if( draggedElement && draggedElement.typeName == 'vertex' ) {
 				    var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
-				    var fakeEvent : VertEvent = ({ params : { dragAmount : { x: 0, y : 0 }, wasDragged : false, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone(), vertex : draggingVertex}} as unknown) as VertEvent;
+				    var fakeEvent : VertEvent = ({ params : { isTouchEvent : true, dragAmount : { x: 0, y : 0 }, wasDragged : false, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone(), vertex : draggingVertex}} as unknown) as VertEvent;
 				    _self.draggedElements = [ draggedElement ];
 				    draggingVertex.listeners.fireDragStartEvent( fakeEvent );
 				}
@@ -1597,7 +1597,7 @@ export class PlotBoilerplate {
 					return;
 				    _self.vertices[draggedElement.vindex].add( diff );
 				    var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
-				    var fakeEvent : VertEvent = ({ params : { dragAmount : diff.clone(), wasDragged : true, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone().add(diff), vertex : draggingVertex}} as unknown) as VertEvent;
+				    var fakeEvent : VertEvent = ({ isTouchEvent : true, params : { dragAmount : diff.clone(), wasDragged : true, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone().add(diff), vertex : draggingVertex}} as unknown) as VertEvent;
 				    draggingVertex.listeners.fireDragEvent( fakeEvent );
 				    _self.redraw();
 				}
@@ -1614,7 +1614,7 @@ export class PlotBoilerplate {
 			    // Note: e.touches.length is 0 here
 			    if( draggedElement && draggedElement.typeName == 'vertex' ) {
 				var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
-				var fakeEvent : VertEvent = ({ params : { dragAmount : { x: 0, y : 0 }, wasDragged : false, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone(), vertex : draggingVertex}} as unknown) as VertEvent;
+				var fakeEvent : VertEvent = ({ isTouchEvent : true, params : { dragAmount : { x: 0, y : 0 }, wasDragged : false, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone(), vertex : draggingVertex}} as unknown) as VertEvent;
 				// var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
 				// var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
 				// var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);

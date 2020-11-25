@@ -41,10 +41,10 @@ var GirihPentagon = /** @class */ (function (_super) {
      * @extends GirihTile
      * @name GirihPentagon
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    function GirihPentagon(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.PENTAGON) || this;
+    function GirihPentagon(position, edgeLength) {
+        var _this = _super.call(this, position, edgeLength, GirihTile_1.TileType.PENTAGON) || this;
         // Overwrite the default symmetries:
         //    the pentagon tile has a 72° symmetry (2/10 * 360°)
         _this.uniqueSymmetries = 2;
@@ -52,30 +52,19 @@ var GirihPentagon = /** @class */ (function (_super) {
         // Divide the full circle into 5 sections (we want to make a regular pentagon).
         var theta = (Math.PI * 2) / 5.0;
         // Compute the 'radius' using pythagoras
-        var radius = Math.sqrt(Math.pow(size / 2, 2)
+        var radius = Math.sqrt(Math.pow(edgeLength / 2, 2)
             +
-                Math.pow(1 / Math.tan(theta / 2) * size / 2, 2));
+                Math.pow(1 / Math.tan(theta / 2) * edgeLength / 2, 2));
         for (var i = 0; i < 5; i++) {
             _this.addVertex(position.clone().addY(-radius).rotate(theta / 2 + i * theta, position));
         }
-        /*
-        this.imageProperties = {
-            source: {	x:      7/500.0,
-                y:      (303)/460.0, // -15
-                width:  157/500.0,
-                height: (150)/460.0  // +15
-                },
-            destination: { xOffset: 0.0,
-                   yOffset: -18/460.0 // -16
-                 }
-        }; */
         _this.textureSource.min.x = 7 / 500.0;
         _this.textureSource.min.y = (303) / 460.0;
         _this.textureSource.max.x = _this.textureSource.min.x + 157 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + (150) / 460.0;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(size);
-        _this._buildOuterPolygons(size); // Only call AFTER the inner polygons were built!
+        _this._buildInnerPolygons(edgeLength);
+        _this._buildOuterPolygons(edgeLength); // Only call AFTER the inner polygons were built!
         return _this;
     }
     ;
@@ -83,7 +72,7 @@ var GirihPentagon = /** @class */ (function (_super) {
      * @override
      */
     GirihPentagon.prototype.clone = function () {
-        return new GirihPentagon(this.position.clone(), this.size).rotate(this.rotation);
+        return new GirihPentagon(this.position.clone(), this.edgeLength).rotate(this.rotation);
     };
     ;
     GirihPentagon.prototype._buildInnerPolygons = function (edgeLength) {

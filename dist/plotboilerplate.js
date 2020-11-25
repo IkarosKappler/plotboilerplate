@@ -2890,7 +2890,7 @@ exports.Line = Line;
   \*********************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__ */
-/*! CommonJS bailout: this is used directly at 28:17-21 */
+/*! CommonJS bailout: this is used directly at 29:17-21 */
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -2915,7 +2915,8 @@ exports.Line = Line;
  * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even
  *                      if there is no external drag listener installed (1.1.0).
  * @modified 2020-10-04 Added extended JSDoc comments.
- * @version  1.1.1
+ * @modified 2020-11-25 Added the `isTouchEvent` param.
+ * @version  1.2.0
  *
  * @file MouseHandler
  * @public
@@ -2934,6 +2935,22 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+var XMouseEvent = /** @class */ (function (_super) {
+    __extends(XMouseEvent, _super);
+    function XMouseEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XMouseEvent;
+}(MouseEvent));
+exports.XMouseEvent = XMouseEvent;
+var XWheelEvent = /** @class */ (function (_super) {
+    __extends(XWheelEvent, _super);
+    function XWheelEvent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return XWheelEvent;
+}(WheelEvent));
+exports.XWheelEvent = XWheelEvent;
 var MouseHandler = /** @class */ (function () {
     /**
      * The constructor.
@@ -3091,6 +3108,7 @@ var MouseHandler = /** @class */ (function () {
         xEvent.params = {
             element: this.element,
             name: eventName,
+            isTouchEvent: false,
             pos: rel,
             button: this.mouseButton,
             leftButton: this.mouseButton == 0,
@@ -3299,22 +3317,6 @@ var MouseHandler = /** @class */ (function () {
     return MouseHandler;
 }());
 exports.MouseHandler = MouseHandler;
-var XMouseEvent = /** @class */ (function (_super) {
-    __extends(XMouseEvent, _super);
-    function XMouseEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XMouseEvent;
-}(MouseEvent));
-exports.XMouseEvent = XMouseEvent;
-var XWheelEvent = /** @class */ (function (_super) {
-    __extends(XWheelEvent, _super);
-    function XWheelEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XWheelEvent;
-}(WheelEvent));
-exports.XWheelEvent = XWheelEvent;
 //# sourceMappingURL=MouseHandler.js.map
 
 /***/ }),
@@ -4791,7 +4793,7 @@ var PlotBoilerplate = /** @class */ (function () {
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
                                 if (draggedElement && draggedElement.typeName == 'vertex') {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
-                                    var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
+                                    var fakeEvent = { params: { isTouchEvent: true, dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
                                     _self.draggedElements = [draggedElement];
                                     draggingVertex.listeners.fireDragStartEvent(fakeEvent);
                                 }
@@ -4809,7 +4811,7 @@ var PlotBoilerplate = /** @class */ (function () {
                                         return;
                                     _self.vertices[draggedElement.vindex].add(diff);
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
-                                    var fakeEvent = { params: { dragAmount: diff.clone(), wasDragged: true, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone().add(diff), vertex: draggingVertex } };
+                                    var fakeEvent = { isTouchEvent: true, params: { dragAmount: diff.clone(), wasDragged: true, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone().add(diff), vertex: draggingVertex } };
                                     draggingVertex.listeners.fireDragEvent(fakeEvent);
                                     _self.redraw();
                                 }
@@ -4827,7 +4829,7 @@ var PlotBoilerplate = /** @class */ (function () {
                             // Note: e.touches.length is 0 here
                             if (draggedElement && draggedElement.typeName == 'vertex') {
                                 var draggingVertex = _self.vertices[draggedElement.vindex];
-                                var fakeEvent = { params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
+                                var fakeEvent = { isTouchEvent: true, params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
                                 // var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
                                 // var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
                                 // var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);

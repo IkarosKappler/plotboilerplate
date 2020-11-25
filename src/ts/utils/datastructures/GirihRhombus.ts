@@ -36,11 +36,11 @@ export class GirihRhombus extends GirihTile {
      * @extends GirihTile
      * @name GirihRhombus
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor( position:Vertex, size:number ) {
+    constructor( position:Vertex, edgeLength:number ) {
 	
-	super( position, size, TileType.RHOMBUS );
+	super( position, edgeLength, TileType.RHOMBUS );
 
 	// Overwrite the default symmetries:
 	//    the rhombus tile has a 180° symmetry (5/10 * 360°)
@@ -62,7 +62,7 @@ export class GirihRhombus extends GirihTile {
 	    theta += (180.0 - angles[i]);
 	    pointA = pointB; // center of rotation
 	    pointB = pointB.clone();
-	    pointB.x += size;
+	    pointB.x += edgeLength;
 	    pointB.rotate( theta * (Math.PI/180.0), pointA );
 	    this.addVertex( pointB );	
 	}
@@ -70,23 +70,12 @@ export class GirihRhombus extends GirihTile {
 	
 	// Move to center    
 	const bounds:Bounds = Bounds.computeFromVertices( this.vertices );
-	const move:Vertex   = new Vertex( bounds.width/2.0 - (bounds.width-size), 
+	const move:Vertex   = new Vertex( bounds.width/2.0 - (bounds.width-edgeLength), 
 					  bounds.height/2.0
 					);
 	for( var i = 0; i < this.vertices.length; i++ ) {
 	    this.vertices[i].add( move ).add( this.position );
 	}
-
-	/* this.imageProperties = {
-	    source: { x:      32/500.0,
-		      y:      188/460.0,
-		      width:  127/500.0, // 127,
-		      height: 92/460.0
-		    },
-	    destination: { xOffset: 0.0,
-			   yOffset: 0.0
-			 }
-	}; */
 
 	this.textureSource.min.x = 32/500.0;
 	this.textureSource.min.y = 188/460.0;
@@ -104,12 +93,12 @@ export class GirihRhombus extends GirihTile {
      * @override
      */
     clone() : GirihTile {
-	return new GirihRhombus( this.position.clone(), this.size ).rotate( this.rotation );
+	return new GirihRhombus( this.position.clone(), this.edgeLength ).rotate( this.rotation );
     };
 
 
 
-    _buildInnerPolygons() : void {
+    private _buildInnerPolygons() : void {
 
 	// Connect all edges half-the-way
 	const innerTile:Polygon = new Polygon(); // [];
@@ -143,7 +132,7 @@ export class GirihRhombus extends GirihTile {
 
     };
 
-    _buildOuterPolygons() {
+    private _buildOuterPolygons() {
 
 	const indicesA:Array<number> = [ 0, 2 ];  // 4:2
 	const indicesB:Array<number> = [ 0, 3 ];  // 6:2

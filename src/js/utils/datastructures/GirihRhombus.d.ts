@@ -26,13 +26,13 @@ export declare class GirihRhombus extends GirihTile {
      * @extends GirihTile
      * @name GirihRhombus
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor(position: Vertex, size: number);
+    constructor(position: Vertex, edgeLength: number);
     /**
      * @override
      */
     clone(): GirihTile;
-    _buildInnerPolygons(): void;
-    _buildOuterPolygons(): void;
+    private _buildInnerPolygons;
+    private _buildOuterPolygons;
 }

@@ -36,11 +36,11 @@ export class GirihPenroseRhombus extends GirihTile {
      * @extends GirihTile
      * @name GirihPenroseRhombus
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor( position:Vertex, size:number, addCenterPolygon?:boolean ) {
+    constructor( position:Vertex, edgeLength:number, addCenterPolygon?:boolean ) {
 	
-	super( position, size, TileType.PENROSE_RHOMBUS  );
+	super( position, edgeLength, TileType.PENROSE_RHOMBUS  );
 
 	// Overwrite the default symmetries:
 	//    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
@@ -65,7 +65,7 @@ export class GirihPenroseRhombus extends GirihTile {
 	    theta += (180.0 - angles[i]);
 	    pointA = pointB; // center of rotation
 	    pointB = pointB.clone();
-	    pointB.x += size;
+	    pointB.x += edgeLength;
 	    pointB.rotate( theta * (Math.PI/180.0), pointA );
 	    this.addVertex( pointB );	
 	}
@@ -73,24 +73,12 @@ export class GirihPenroseRhombus extends GirihTile {
 	
 	// Move to center and position
 	const bounds:Bounds = Bounds.computeFromVertices( this.vertices );
-	const move:Vertex   = new Vertex( bounds.width/2.0 - (bounds.width-size),
+	const move:Vertex   = new Vertex( bounds.width/2.0 - (bounds.width-edgeLength),
 					  bounds.height/2.0
 					);
 	for( var i = 0; i < this.vertices.length; i++ ) {	
 	    this.vertices[i].add( move ).add( position );		
 	}
-
-	/*
-	this.imageProperties = {
-	    source: { x:      2/500.0,
-		      y:      8/460.0,
-		      width:  173/500.0, 
-		      height: 56/460.0
-		    },
-	    destination: { xOffset: 0.0,
-			   yOffset: 0.0
-			 }
-	}; */
 
 	this.textureSource.min.x = 2/500.0,
 	this.textureSource.min.y = 8/460.0;
@@ -99,8 +87,8 @@ export class GirihPenroseRhombus extends GirihTile {
 	
 	this.baseBounds = this.getBounds();
 		
-	this._buildInnerPolygons( size, addCenterPolygon );
-	this._buildOuterPolygons( size, addCenterPolygon );
+	this._buildInnerPolygons( edgeLength, addCenterPolygon );
+	this._buildOuterPolygons( edgeLength, addCenterPolygon );
     };
 
 
@@ -108,11 +96,11 @@ export class GirihPenroseRhombus extends GirihTile {
      * @override
      */
     clone() : GirihTile {
-	return new GirihPenroseRhombus( this.position.clone(), this.size, true ).rotate( this.rotation );
+	return new GirihPenroseRhombus( this.position.clone(), this.edgeLength, true ).rotate( this.rotation );
     };
 
 
-    _buildInnerPolygons( edgeLength:number, addCenterPolygon:boolean ) : void {
+    private _buildInnerPolygons( edgeLength:number, addCenterPolygon:boolean ) : void {
 	const indices:Array<number> = [ 0, 2 ];
 	const centerTile:Polygon    = new Polygon();
 	
@@ -139,7 +127,7 @@ export class GirihPenroseRhombus extends GirihTile {
 	    this.innerTilePolygons.push( centerTile );
     };
 
-    _buildOuterPolygons( edgeLength:number, centerPolygonExists:boolean ) : void {
+    private _buildOuterPolygons( edgeLength:number, centerPolygonExists:boolean ) : void {
 	// Add left and right 'spikes'.
 	const indices:Array<number> = [ 0, 2 ];
 	

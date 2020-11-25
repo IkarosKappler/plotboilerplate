@@ -28,11 +28,11 @@ export class GirihDecagon extends GirihTile {
      * @extends GirihTile
      * @name GirihDecagon
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor( position:Vertex, size:number ) {
+    constructor( position:Vertex, edgeLength:number ) {
 
-	super( position, size, TileType.DECAGON );
+	super( position, edgeLength, TileType.DECAGON );
 
 	// Overwrite the default symmetries:
 	//    the decagon tile has a 36° symmetry (1/10 * 360°)
@@ -43,27 +43,15 @@ export class GirihDecagon extends GirihTile {
 	const theta = (Math.PI*2) / 10.0;
 	// Compute the 'radius' using pythagoras
 	const radius = Math.sqrt(
-	    Math.pow(size/2,2)
+	    Math.pow(edgeLength/2,2)
 		+
-		Math.pow( 1/Math.tan(theta/2) * size/2, 2 )
+		Math.pow( 1/Math.tan(theta/2) * edgeLength/2, 2 )
 	);
 	for( var i = 0; i < 10; i++ ) {
 	    this.addVertex(
 		position.clone().addY( -radius ).rotate( theta/2 + i*theta, position )
 	    );
 	}
-
-	/*
-	this.imageProperties = {
-	    source: { x:      169/500.0,
-		      y:      140/460.0,
-		      width:  313/500.0,
-		      height: 297/460.0
-		    },
-	    destination: { xOffset: 0.0,
-			   yOffset: 0.0
-			 }
-	}; */
 
 	this.textureSource.min.x = 169/500.0;
 	this.textureSource.min.y = 140/460.0;
@@ -73,8 +61,8 @@ export class GirihDecagon extends GirihTile {
 	this.baseBounds = this.getBounds();
 
 
-	this._buildInnerPolygons( size );
-	this._buildOuterPolygons( size ); // Important: call AFTER inner polygons were created!
+	this._buildInnerPolygons( edgeLength );
+	this._buildOuterPolygons( edgeLength ); // Important: call AFTER inner polygons were created!
     };
 
 
@@ -82,7 +70,7 @@ export class GirihDecagon extends GirihTile {
      * @override
      */
     clone() : GirihTile {
-	return new GirihDecagon( this.position.clone(), this.size ).rotate( this.rotation );
+	return new GirihDecagon( this.position.clone(), this.edgeLength ).rotate( this.rotation );
     };
 
 
@@ -94,7 +82,7 @@ export class GirihDecagon extends GirihTile {
      * @private
      * @param {number} edgeLength
      */
-    _buildInnerPolygons( edgeLength:number ) {
+    private _buildInnerPolygons( edgeLength:number ) {
 	const centralStar = new Polygon();
 	for( var i = 0; i < 10; i++ ) {
 	    const innerTile = new Polygon();
@@ -127,7 +115,7 @@ export class GirihDecagon extends GirihTile {
      * @private
      * @param {number} edgeLength
      */
-    _buildOuterPolygons( edgeLength:number ) {
+    private _buildOuterPolygons( edgeLength:number ) {
 	// DON'T include the inner star here!
 	for( var i = 0; i < 10; i++ ) {
 	    const outerTile = new Polygon();

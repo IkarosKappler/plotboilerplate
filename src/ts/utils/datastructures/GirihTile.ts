@@ -36,19 +36,6 @@ export enum TileType {
     PENROSE_RHOMBUS    = "PENROSE_RHOMBUS"
 };
 
-/* 
-export interface ImageProperties {
-    source: { x: number,     // [0..1]
-	      y: number,     // [0..1]
-	      width: number, // [0..1]
-	      height: number // [0..1]
-	    },
-    destination: { xOffset: number,
-		   yOffset: number
-		 }
-};
-*/ 
-
 export interface IAdjacency {
     edgeIndex : number;
     offset : XYCoords;
@@ -57,31 +44,158 @@ export interface IAdjacency {
 
 export abstract class GirihTile extends Polygon {
 
+    /**
+     * The center of this tile.
+     *
+     * @name position
+     * @member {Vertex}
+     * @memberof GirihTile
+     * @type {Vertex}
+     * @instance
+     */
     public position:Vertex;
-    public size:number;
+
+    /**
+     * The edge length of this tile (all edges of a Girih tile have same length).
+     *
+     * @name edgeLength
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @instance
+     */
+    public edgeLength:number;
+
+    /**
+     * The rotation of this tile. This is stored to make cloning easier.
+     *
+     * @name rotation.
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @instance
+     */
     public rotation:number;
-    public symmetry:number // Todo: rename to 'symmetries'
+
+    /**
+     * The symmetry (=order) of this tile. This is the number of steps used for a full
+     * rotation (in this Girih case: 10). Future Girih implementations might have other symmetries.
+     *
+     * @name symmetry
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @instance
+     */
+    public symmetry:number // Todo: rename to 'symmetries'?
+
+    /**
+     * The unique symmetries. This must be an nth part of the global `symmetry`.
+     * Rotating this tile `uniqueSymmetries' times results in the same visual tile (flipped around
+     * a symmetry axis).
+     *
+     * @name uniqueSymmetries
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @instance
+     */
     public uniqueSymmetries:number;
+
+    /**
+     * The inner tile polygons.
+     *
+     * @name innerTilePolygons
+     * @member {Array<Polygon>}
+     * @memberof GirihTile
+     * @type {Array<Polygon>}
+     * @instance
+     */
     public innerTilePolygons:Array<Polygon>;
+
+    /**
+     * The outer tile polygons.
+     *
+     * @name outerTilePolygons
+     * @member {Array<Polygon>}
+     * @memberof GirihTile
+     * @type {Array<Polygon>}
+     * @instance
+     */
     public outerTilePolygons:Array<Polygon>;
-    // public imageProperties:ImageProperties;
-    public textureSource:Bounds;
+
+    /**
+     * An identifier for the tile type.
+     *
+     * @name tileType
+     * @member {TileType}
+     * @memberof GirihTile
+     * @type {TileType}
+     * @instance
+     */
     public tileType:TileType;
-    public baseBounds:Bounds; // The tile's bounds in un-rotated state; it's required to map the texture
+
+    /**
+     * The initial bounds (of the un-rotated tile). These are required to calculate the
+     * correct texture mapping.
+     *
+     * @name baseBounds
+     * @member {Bounds}
+     * @memberof GirihTile
+     * @type {Bounds}
+     * @instance
+     */
+    public baseBounds:Bounds;
+
+    /**
+     * A rectangle on the shipped texture image (`girihtexture-500px.png`) marking the
+     * texture position. The bounds are relative, so each component must be in [0..1].
+     * The texture is a square.
+     *
+     * @name textureSource
+     * @member {Bounds}
+     * @memberof GirihTile
+     * @type {Bounds}
+     * @instance
+     */
+    public readonly textureSource:Bounds;
+
+    /**
+     * An epsilon to use for detecting adjacent edges. 0.001 seems to be a good value.
+     * Adjust if needed.
+     *
+     * @name epsilon
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @static
+     */
     public static epsilon:number = 0.001;
 
-    public static DEFAULT_EDGE_LENGTH:number = 58;
+    /**
+     * The default edge length.
+     *
+     * @name DEFAULT_EDGE_LENGTH
+     * @member {number}
+     * @memberof GirihTile
+     * @type {number}
+     * @readonly 
+     * @static
+     */
+    public static readonly DEFAULT_EDGE_LENGTH:number = 58;
+
+
     
     /**
      * @constructor
      * @memberof GirihTile
      * @abstract class
-     * @param {Vertex} position - The position of the tile.
-     * @param {number} size     - The edge size (usually IKRS.Girih.DEFAULT_EDGE_LENGTH).
-     * @param {TileType} tileType - One of GirihTile.TILE_TYPE_*.
+     * @param {Vertex} position   - The position of the tile.
+     * @param {number} edgeLength - The edge length (usually GirihTile.DEFAULT_EDGE_LENGTH).
+     * @param {TileType} tileType - One of `TileType.*` enum members.
      **/
     constructor( position:Vertex,
-		 size:number,
+		 edgeLength:number,
 		 tileType?:TileType
 	       ) {
 	super( [], false ); // vertices, isOpen
@@ -89,7 +203,7 @@ export abstract class GirihTile extends Polygon {
 	if( typeof tileType == "undefined" )
 	    tileType = TileType.UNKNOWN;
 	
-	this.size                 = size;
+	this.edgeLength           = edgeLength;
 	this.position             = position;
 	this.rotation             = 0.0; // angle;
 	this.symmetry             = 10;
@@ -114,10 +228,6 @@ export abstract class GirihTile extends Polygon {
 	
 	this.tileType             = tileType;
     };
-
-    // public setBaseBounds( b:Bounds ) : void {
-    // this.baseBounds = b;
-    // };
 
 
     /**

@@ -47,10 +47,10 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
      * @extends GirihTile
      * @name GirihPenroseRhombus
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    function GirihPenroseRhombus(position, size, addCenterPolygon) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.PENROSE_RHOMBUS) || this;
+    function GirihPenroseRhombus(position, edgeLength, addCenterPolygon) {
+        var _this = _super.call(this, position, edgeLength, GirihTile_1.TileType.PENROSE_RHOMBUS) || this;
         // Overwrite the default symmetries:
         //    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
         _this.uniqueSymmetries = 5;
@@ -69,35 +69,24 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x += size;
+            pointB.x += edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
             _this.addVertex(pointB);
         }
         // Move to center and position
         var bounds = Bounds_1.Bounds.computeFromVertices(_this.vertices);
-        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - size), bounds.height / 2.0);
+        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - edgeLength), bounds.height / 2.0);
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(move).add(position);
         }
-        /*
-        this.imageProperties = {
-            source: { x:      2/500.0,
-                  y:      8/460.0,
-                  width:  173/500.0,
-                  height: 56/460.0
-                },
-            destination: { xOffset: 0.0,
-                   yOffset: 0.0
-                 }
-        }; */
         _this.textureSource.min.x = 2 / 500.0,
             _this.textureSource.min.y = 8 / 460.0;
         _this.textureSource.max.x = _this.textureSource.min.x + 173 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + 56 / 460.0;
         ;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(size, addCenterPolygon);
-        _this._buildOuterPolygons(size, addCenterPolygon);
+        _this._buildInnerPolygons(edgeLength, addCenterPolygon);
+        _this._buildOuterPolygons(edgeLength, addCenterPolygon);
         return _this;
     }
     ;
@@ -105,7 +94,7 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
      * @override
      */
     GirihPenroseRhombus.prototype.clone = function () {
-        return new GirihPenroseRhombus(this.position.clone(), this.size, true).rotate(this.rotation);
+        return new GirihPenroseRhombus(this.position.clone(), this.edgeLength, true).rotate(this.rotation);
     };
     ;
     GirihPenroseRhombus.prototype._buildInnerPolygons = function (edgeLength, addCenterPolygon) {

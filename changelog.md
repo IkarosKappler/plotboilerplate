@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-11-25
+  * Added the `isTouchEvent` param to the XMouseEvent params.
 * 2020-11-19
   * Set min, max, width and height to private.
 * 2020-11-17

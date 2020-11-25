@@ -34,11 +34,11 @@ export class GirihPentagon extends GirihTile {
      * @extends GirihTile
      * @name GirihPentagon
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor( position:Vertex, size:number ) {
+    constructor( position:Vertex, edgeLength:number ) {
 	
-	super( position, size, TileType.PENTAGON );
+	super( position, edgeLength, TileType.PENTAGON );
 
 	// Overwrite the default symmetries:
 	//    the pentagon tile has a 72° symmetry (2/10 * 360°)
@@ -49,27 +49,15 @@ export class GirihPentagon extends GirihTile {
 	const theta:number = (Math.PI*2) / 5.0;
 	// Compute the 'radius' using pythagoras
 	const radius:number = Math.sqrt(
-	    Math.pow(size/2,2)
+	    Math.pow(edgeLength/2,2)
 		+
-		Math.pow( 1/Math.tan(theta/2) * size/2, 2 )
+		Math.pow( 1/Math.tan(theta/2) * edgeLength/2, 2 )
 	);
 	for( var i = 0; i < 5; i++ ) {
 	    this.addVertex(
 		position.clone().addY( -radius ).rotate( theta/2 + i*theta, position )
 	    );
 	}
-
-	/* 
-	this.imageProperties = {
-	    source: {	x:      7/500.0,
-			y:      (303)/460.0, // -15
-			width:  157/500.0, 
-			height: (150)/460.0  // +15
-		    },
-	    destination: { xOffset: 0.0,
-			   yOffset: -18/460.0 // -16
-			 }
-	}; */
 
 	this.textureSource.min.x = 7/500.0;
 	this.textureSource.min.y = (303)/460.0;
@@ -78,8 +66,8 @@ export class GirihPentagon extends GirihTile {
 	
 	this.baseBounds = this.getBounds();
 
-	this._buildInnerPolygons( size );
-	this._buildOuterPolygons( size );       // Only call AFTER the inner polygons were built!
+	this._buildInnerPolygons( edgeLength );
+	this._buildOuterPolygons( edgeLength );       // Only call AFTER the inner polygons were built!
     };
 
 
@@ -87,11 +75,11 @@ export class GirihPentagon extends GirihTile {
      * @override
      */
     clone() : GirihTile {
-	return new GirihPentagon( this.position.clone(), this.size ).rotate( this.rotation );
+	return new GirihPentagon( this.position.clone(), this.edgeLength ).rotate( this.rotation );
     };
 
 
-    _buildInnerPolygons( edgeLength:number ) : void {
+    private _buildInnerPolygons( edgeLength:number ) : void {
 	// Connect all edges half-the-way
 	const innerTile:Polygon = new Polygon(); 
 	for( var i = 0; i < this.vertices.length; i++ ) {
@@ -103,7 +91,7 @@ export class GirihPentagon extends GirihTile {
     };
 
 
-    _buildOuterPolygons( edgeLength:number ) : void {
+    private _buildOuterPolygons( edgeLength:number ) : void {
 	for( var i = 0; i < this.vertices.length; i++ ) {
 	    const indexA:number     = i;
 	    const indexB:number     = i*2;

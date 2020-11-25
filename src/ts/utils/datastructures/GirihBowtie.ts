@@ -30,11 +30,11 @@ export class GirihBowtie extends GirihTile {
      * @extends GirihTile
      * @name GirihBowtie
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor( position:Vertex, size:number ) {
+    constructor( position:Vertex, edgeLength:number ) {
 	
-	super( position, size, TileType.BOW_TIE );
+	super( position, edgeLength, TileType.BOW_TIE );
 
 	// Overwrite the default symmetries:
 	//    the bow-tie tile has a 180° symmetry (5/10 * 360°)
@@ -60,7 +60,7 @@ export class GirihBowtie extends GirihTile {
 	    theta += (180.0 - angles[i]);
 	    pointA = pointB; // center of rotation
 	    pointB = pointB.clone();
-	    pointB.x -= size;
+	    pointB.x -= edgeLength;
 	    pointB.rotate( theta * (Math.PI/180.0), pointA );
 	    this.addVertex( pointB );	
 	    if( i == 2 )
@@ -69,26 +69,14 @@ export class GirihBowtie extends GirihTile {
 
 	// Move to center and position 
 	const bounds:Bounds = Bounds.computeFromVertices( this.vertices );
-	const move:Vertex   = new Vertex( (oppositePoint.x - startPoint.x)/2.0, // bounds.getWidth()/2.0,
-					  (oppositePoint.y - startPoint.y)/2.0  // -size/2.0
+	const move:Vertex   = new Vertex( (oppositePoint.x - startPoint.x)/2.0,
+					  (oppositePoint.y - startPoint.y)/2.0 
 					);
 	
 	for( var i = 0; i < this.vertices.length; i++ ) {	    
 	    this.vertices[i].add( position ).sub( move );	    
 	}
 
-	/* 
-	this.imageProperties = {
-	    source: { x:      288/500.0, // 287,
-		      y:      7/460.0,
-		      width:  206/500.0,
-		      height: 150/460.0
-		      //angle:  0.0   // IKRS.Girih.MINIMAL_ANGLE
-		    },
-	    destination: { xOffset: 0.0,
-			   yOffset: 0.0
-			 }
-			 }; */
 	this.textureSource.min.x = 288/500.0;
 	this.textureSource.min.y = 7/460.0;
 	this.textureSource.max.x = this.textureSource.min.x + 206/500.0;
@@ -96,8 +84,8 @@ export class GirihBowtie extends GirihTile {
 	
 	this.baseBounds = this.getBounds();
 	
-	this._buildInnerPolygons( size );
-	this._buildOuterPolygons( size );       // Only call AFTER the inner polygons were created!
+	this._buildInnerPolygons( edgeLength );
+	this._buildOuterPolygons( edgeLength );       // Only call AFTER the inner polygons were created!
     };
 
 
@@ -106,10 +94,10 @@ export class GirihBowtie extends GirihTile {
      * @override
      */
     clone() : GirihTile {
-	return new GirihBowtie( this.position.clone(), this.size ).rotate( this.rotation );
+	return new GirihBowtie( this.position.clone(), this.edgeLength ).rotate( this.rotation );
     };
 
-    _buildInnerPolygons( edgeLength:number ) : void {
+    private _buildInnerPolygons( edgeLength:number ) : void {
 
 	const indices:Array<number> = [ 1, 4 ];
 	for( var i = 0; i < indices.length; i++ ) {
@@ -129,7 +117,7 @@ export class GirihBowtie extends GirihTile {
 	}
     };
 
-    _buildOuterPolygons( edgeLength:number ) : void {
+    private _buildOuterPolygons( edgeLength:number ) : void {
 	// Add the outer four 'edges'
 	const indices:Array<number> = [ 0, 3 ];
 	for( var i = 0; i < indices.length; i++ ) {

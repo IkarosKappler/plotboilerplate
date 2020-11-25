@@ -40,10 +40,10 @@ var GirihDecagon = /** @class */ (function (_super) {
      * @extends GirihTile
      * @name GirihDecagon
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    function GirihDecagon(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.DECAGON) || this;
+    function GirihDecagon(position, edgeLength) {
+        var _this = _super.call(this, position, edgeLength, GirihTile_1.TileType.DECAGON) || this;
         // Overwrite the default symmetries:
         //    the decagon tile has a 36° symmetry (1/10 * 360°)
         _this.uniqueSymmetries = 1;
@@ -51,30 +51,19 @@ var GirihDecagon = /** @class */ (function (_super) {
         // Divide the full circle into 10 sections (we want to make a regular decagon).
         var theta = (Math.PI * 2) / 10.0;
         // Compute the 'radius' using pythagoras
-        var radius = Math.sqrt(Math.pow(size / 2, 2)
+        var radius = Math.sqrt(Math.pow(edgeLength / 2, 2)
             +
-                Math.pow(1 / Math.tan(theta / 2) * size / 2, 2));
+                Math.pow(1 / Math.tan(theta / 2) * edgeLength / 2, 2));
         for (var i = 0; i < 10; i++) {
             _this.addVertex(position.clone().addY(-radius).rotate(theta / 2 + i * theta, position));
         }
-        /*
-        this.imageProperties = {
-            source: { x:      169/500.0,
-                  y:      140/460.0,
-                  width:  313/500.0,
-                  height: 297/460.0
-                },
-            destination: { xOffset: 0.0,
-                   yOffset: 0.0
-                 }
-        }; */
         _this.textureSource.min.x = 169 / 500.0;
         _this.textureSource.min.y = 140 / 460.0;
         _this.textureSource.max.x = _this.textureSource.min.x + 313 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + 297 / 460.0;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(size);
-        _this._buildOuterPolygons(size); // Important: call AFTER inner polygons were created!
+        _this._buildInnerPolygons(edgeLength);
+        _this._buildOuterPolygons(edgeLength); // Important: call AFTER inner polygons were created!
         return _this;
     }
     ;
@@ -82,7 +71,7 @@ var GirihDecagon = /** @class */ (function (_super) {
      * @override
      */
     GirihDecagon.prototype.clone = function () {
-        return new GirihDecagon(this.position.clone(), this.size).rotate(this.rotation);
+        return new GirihDecagon(this.position.clone(), this.edgeLength).rotate(this.rotation);
     };
     ;
     /**

@@ -43,10 +43,10 @@ var GirihBowtie = /** @class */ (function (_super) {
      * @extends GirihTile
      * @name GirihBowtie
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    function GirihBowtie(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.BOW_TIE) || this;
+    function GirihBowtie(position, edgeLength) {
+        var _this = _super.call(this, position, edgeLength, GirihTile_1.TileType.BOW_TIE) || this;
         // Overwrite the default symmetries:
         //    the bow-tie tile has a 180° symmetry (5/10 * 360°)
         _this.uniqueSymmetries = 5;
@@ -68,7 +68,7 @@ var GirihBowtie = /** @class */ (function (_super) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x -= size;
+            pointB.x -= edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
             _this.addVertex(pointB);
             if (i == 2)
@@ -76,31 +76,17 @@ var GirihBowtie = /** @class */ (function (_super) {
         } // END for
         // Move to center and position 
         var bounds = Bounds_1.Bounds.computeFromVertices(_this.vertices);
-        var move = new Vertex_1.Vertex((oppositePoint.x - startPoint.x) / 2.0, // bounds.getWidth()/2.0,
-        (oppositePoint.y - startPoint.y) / 2.0 // -size/2.0
-        );
+        var move = new Vertex_1.Vertex((oppositePoint.x - startPoint.x) / 2.0, (oppositePoint.y - startPoint.y) / 2.0);
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(position).sub(move);
         }
-        /*
-        this.imageProperties = {
-            source: { x:      288/500.0, // 287,
-                  y:      7/460.0,
-                  width:  206/500.0,
-                  height: 150/460.0
-                  //angle:  0.0   // IKRS.Girih.MINIMAL_ANGLE
-                },
-            destination: { xOffset: 0.0,
-                   yOffset: 0.0
-                 }
-                 }; */
         _this.textureSource.min.x = 288 / 500.0;
         _this.textureSource.min.y = 7 / 460.0;
         _this.textureSource.max.x = _this.textureSource.min.x + 206 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + 150 / 460.0;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(size);
-        _this._buildOuterPolygons(size); // Only call AFTER the inner polygons were created!
+        _this._buildInnerPolygons(edgeLength);
+        _this._buildOuterPolygons(edgeLength); // Only call AFTER the inner polygons were created!
         return _this;
     }
     ;
@@ -108,7 +94,7 @@ var GirihBowtie = /** @class */ (function (_super) {
      * @override
      */
     GirihBowtie.prototype.clone = function () {
-        return new GirihBowtie(this.position.clone(), this.size).rotate(this.rotation);
+        return new GirihBowtie(this.position.clone(), this.edgeLength).rotate(this.rotation);
     };
     ;
     GirihBowtie.prototype._buildInnerPolygons = function (edgeLength) {

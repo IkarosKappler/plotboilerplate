@@ -45,10 +45,10 @@ var GirihHexagon = /** @class */ (function (_super) {
      * @extends GirihTile
      * @name GirihHexagon
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    function GirihHexagon(position, size) {
-        var _this = _super.call(this, position, size, GirihTile_1.TileType.IRREGULAR_HEXAGON) || this;
+    function GirihHexagon(position, edgeLength) {
+        var _this = _super.call(this, position, edgeLength, GirihTile_1.TileType.IRREGULAR_HEXAGON) || this;
         // Overwrite the default symmetries:
         //    the hexagon tile has a 180° symmetry (5/10 * 360°)
         _this.uniqueSymmetries = 5;
@@ -71,7 +71,7 @@ var GirihHexagon = /** @class */ (function (_super) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x -= size;
+            pointB.x -= edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
             _this.addVertex(pointB);
             if (i == 2)
@@ -82,24 +82,13 @@ var GirihHexagon = /** @class */ (function (_super) {
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(position).sub(move);
         }
-        /*
-        this.imageProperties = {
-            source: { x:      77/500.0, // 75,
-                  y:      11/460.0,
-                  width:  205/500.0, // 207,
-                  height: 150/460.0  // 150
-                },
-            destination: { xOffset: 0.0,
-                   yOffset: 0.0
-                 }
-        }; */
         _this.textureSource.min.x = 77 / 500.0;
         _this.textureSource.min.y = 11 / 460.0;
         _this.textureSource.max.x = _this.textureSource.min.x + 205 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + 150 / 460.0;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(size);
-        _this._buildOuterPolygons(size); // Only call AFTER the inner polygons were created!
+        _this._buildInnerPolygons(edgeLength);
+        _this._buildOuterPolygons(edgeLength); // Only call AFTER the inner polygons were created!
         return _this;
     }
     ;
@@ -107,7 +96,7 @@ var GirihHexagon = /** @class */ (function (_super) {
      * @override
      */
     GirihHexagon.prototype.clone = function () {
-        return new GirihHexagon(this.position.clone(), this.size).rotate(this.rotation);
+        return new GirihHexagon(this.position.clone(), this.edgeLength).rotate(this.rotation);
     };
     ;
     GirihHexagon.prototype._buildInnerPolygons = function (edgeLength) {

@@ -36,11 +36,11 @@ export class GirihHexagon extends GirihTile {
      * @extends GirihTile
      * @name GirihHexagon
      * @param {Vertex} position
-     * @param {number} size
+     * @param {number} edgeLength
      */
-    constructor( position:Vertex, size:number ) {
+    constructor( position:Vertex, edgeLength:number ) {
 	
-	super( position, size, TileType.IRREGULAR_HEXAGON );
+	super( position, edgeLength, TileType.IRREGULAR_HEXAGON );
 
 	// Overwrite the default symmetries:
 	//    the hexagon tile has a 180° symmetry (5/10 * 360°)
@@ -67,7 +67,7 @@ export class GirihHexagon extends GirihTile {
 	    theta += (180.0 - angles[i]);
 	    pointA = pointB; // center of rotation
 	    pointB = pointB.clone();
-	    pointB.x -= size;
+	    pointB.x -= edgeLength;
 	    pointB.rotate( theta * (Math.PI/180.0), pointA );
 	    this.addVertex( pointB );	
 	    if( i == 2 )
@@ -82,18 +82,6 @@ export class GirihHexagon extends GirihTile {
 	    this.vertices[i].add( position ).sub( move );
 	}
 
-	/*
-	this.imageProperties = {
-	    source: { x:      77/500.0, // 75,
-		      y:      11/460.0,
-		      width:  205/500.0, // 207,
-		      height: 150/460.0  // 150
-		    },
-	    destination: { xOffset: 0.0,
-			   yOffset: 0.0
-			 }
-	}; */
-
 	this.textureSource.min.x = 77/500.0;
 	this.textureSource.min.y = 11/460.0;
 	this.textureSource.max.x = this.textureSource.min.x + 205/500.0;
@@ -101,8 +89,8 @@ export class GirihHexagon extends GirihTile {
 	
 	this.baseBounds = this.getBounds();
 
-	this._buildInnerPolygons( size );
-	this._buildOuterPolygons( size );   // Only call AFTER the inner polygons were created!
+	this._buildInnerPolygons( edgeLength );
+	this._buildOuterPolygons( edgeLength );   // Only call AFTER the inner polygons were created!
     };
 
 
@@ -110,11 +98,11 @@ export class GirihHexagon extends GirihTile {
      * @override
      */
     clone() : GirihTile {
-	return new GirihHexagon( this.position.clone(), this.size ).rotate( this.rotation );
+	return new GirihHexagon( this.position.clone(), this.edgeLength ).rotate( this.rotation );
     };
 
 
-    _buildInnerPolygons( edgeLength:number ) : void {
+    private _buildInnerPolygons( edgeLength:number ) : void {
 	// Connect all edges half-the-way
 	const innerTile:Polygon = new Polygon();
 	innerTile.addVertex( this.vertices[0].clone().scale( 0.5, this.vertices[1] ) );
@@ -182,7 +170,7 @@ export class GirihHexagon extends GirihTile {
     };
 
 
-    _buildOuterPolygons( edgeLength:number ) : void {
+    private _buildOuterPolygons( edgeLength:number ) : void {
 	// First add the two triangles at the 'ends' of the shape.
 	const indicesA:Array<number> = [ 0, 3 ];  //  6:2
 	const indicesB:Array<number> = [ 0, 5 ];  // 10:2

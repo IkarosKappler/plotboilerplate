@@ -19,7 +19,8 @@
  * @modified 2020-04-08 The new version always installs internal listenrs to track drag events even 
  *                      if there is no external drag listener installed (1.1.0).
  * @modified 2020-10-04 Added extended JSDoc comments.
- * @version  1.1.1
+ * @modified 2020-11-25 Added the `isTouchEvent` param.
+ * @version  1.2.0
  *
  * @file MouseHandler
  * @public
@@ -27,6 +28,35 @@
 
 
 import { XYCoords } from "./interfaces";
+
+
+export interface XMouseParams {
+    button       : number;
+    element      : HTMLElement;
+    isTouchEvent : boolean;
+    name         : string;
+    pos          : {x:number,y:number};
+    leftButton   : boolean;
+    middleButton : boolean;
+    rightButton  : boolean;
+    mouseDownPos : {x:number,y:number}; 
+    draggedFrom  : {x:number,y:number};
+    wasDragged   : boolean;
+    dragAmount   : {x:number,y:number};
+}
+
+export class XMouseEvent extends MouseEvent {
+    params: XMouseParams;
+}
+export class XWheelEvent extends WheelEvent {
+    params: XMouseParams;
+}
+
+export type XMouseCallback = (e:XMouseEvent)=>void;
+
+export type XWheelCallback = (e:XWheelEvent)=>void;
+
+
 
 export class MouseHandler {
 
@@ -186,6 +216,7 @@ export class MouseHandler {
 	xEvent.params = {
 	    element : this.element,
 	    name : eventName,
+	    isTouchEvent : false,
 	    pos : rel,
 	    button : this.mouseButton,
 	    leftButton : this.mouseButton==0,
@@ -393,29 +424,3 @@ export class MouseHandler {
 	this.element.removeEventListener('wheel',this.handlers['wheel']);
     }
 }
-
-
-export interface XMouseParams {
-    element      : HTMLElement; 
-    name         : string;
-    pos          : {x:number,y:number};
-    button       : number;
-    leftButton   : boolean;
-    middleButton : boolean;
-    rightButton  : boolean;
-    mouseDownPos : {x:number,y:number}; 
-    draggedFrom  : {x:number,y:number};
-    wasDragged   : boolean;
-    dragAmount   : {x:number,y:number};
-}
-
-export class XMouseEvent extends MouseEvent {
-    params: XMouseParams;
-}
-export class XWheelEvent extends WheelEvent {
-    params: XMouseParams;
-}
-
-export type XMouseCallback = (e:XMouseEvent)=>void;
-
-export type XWheelCallback = (e:XWheelEvent)=>void;
