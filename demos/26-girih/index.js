@@ -318,6 +318,12 @@
 		if( hoverTileIndex != -1 && hoverEdgeIndex != -1 )
 		    pb.redraw();
 	    } )
+	    .down('enter', function() {
+		if( previewTilePointer < previewTiles.length ) {
+		    addTile( previewTiles[previewTilePointer].clone() );
+		    pb.redraw();
+		}
+	    } )
 	    .down('delete',function() {
 		console.log('delete');
 		handleDeleteTile();
