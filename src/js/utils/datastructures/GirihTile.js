@@ -101,7 +101,8 @@ var GirihTile = /** @class */ (function (_super) {
      * @return {Polygon} this
      */
     GirihTile.prototype.move = function (amount) {
-        Polygon_1.Polygon.prototype.move.call(this, amount);
+        // Polygon.prototype.move.call( this, amount );
+        _super.prototype.move.call(this, amount);
         for (var i in this.innerTilePolygons)
             this.innerTilePolygons[i].move(amount);
         for (var i in this.outerTilePolygons)

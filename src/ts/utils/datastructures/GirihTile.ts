@@ -248,7 +248,7 @@ export abstract class GirihTile extends Polygon {
      * @return {Polygon} this
      */
     move( amount:XYCoords ) : Polygon {
-	Polygon.prototype.move.call( this, amount );
+	super.move.call( this, amount );
 	for( var i in this.innerTilePolygons )
 	    this.innerTilePolygons[i].move( amount );
 	for( var i in this.outerTilePolygons )

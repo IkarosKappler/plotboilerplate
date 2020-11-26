@@ -254,6 +254,11 @@
 	    pb.redraw();
 	};
 
+	var setPreviewTilePointer = function( pointer ) {
+	    previewTilePointer = pointer;
+	    pb.redraw();
+	};
+
 
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
@@ -270,7 +275,7 @@
 	    } )
 	    .click( function(e) {
 		var clickedVert = pb.getVertexNear( e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE );
-		console.log( clickedVert, previewTilePointer, 'of', previewTiles.length );
+		// console.log( clickedVert, previewTilePointer, 'of', previewTiles.length );
 		if( !clickedVert && previewTilePointer < previewTiles.length ) {
 		    // Touch and mouse devices handle this differently
 		    if( e.params.isTouchEvent || (!e.params.isTouchEvent && hoverTileIndex != -1 && hoverEdgeIndex != -1) ) {
@@ -331,7 +336,9 @@
  	;
 
 
-	// @param {XYCoords} relPos
+	// +---------------------------------------------------------------------------------
+	// | @param {XYCoords} relPos
+	// +-------------------------------
 	var handleMouseMove = function( relPos ) {
 	    var containedTileIndex = girih.locateConatiningTile(relPos);
 
@@ -346,9 +353,8 @@
 		var i = containedTileIndex == -1 ? 0 : containedTileIndex;
 		do {
 		    var tile = girih.tiles[i];
-		    var tmpPos = relPos; // tile.position.clone().add( relPos );
 		    // May be -1
-		    hoverEdgeIndex = tile.locateEdgeAtPoint( tmpPos, girih.edgeLength/2 );
+		    hoverEdgeIndex = tile.locateEdgeAtPoint( relPos, girih.edgeLength/2 );
 		    if( hoverEdgeIndex != -1 )
 			hoverTileIndex = i;
 		    i++;
@@ -368,7 +374,7 @@
 	    }
 	    pb.redraw();
 	    if( previewTiles.length != 0 )
-		createAdjacentTilePreview( previewTiles, previewTilePointer );
+		createAdjacentTilePreview( previewTiles, previewTilePointer, setPreviewTilePointer );
 	};
 	
 	// +---------------------------------------------------------------------------------
