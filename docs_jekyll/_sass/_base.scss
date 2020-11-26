@@ -189,9 +189,12 @@ pre {
     padding: 0px;
 }
 
+/* The docs are now contained in a iframe. They are not rendered by jekyll any more
+ * due to styling reasons (they already look pretty cool).
+ */
 iframe.iframe-typedoc {
     width : 100%;
-    height: calc( 100vh - 82px ); /* substract height of navbar header */
+    height: calc( 100vh - 97px ); /* substract height of navbar header */
     border: 0;
 }
 

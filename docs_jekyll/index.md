@@ -8,10 +8,10 @@ For plotting visual 2D data with Javascript and HTML canvas (in 2d-context).
 This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
  * adding elements like [vertices](https://plotboilerplate.io/docs/Vertex.html "Vertex class"), [lines](https://plotboilerplate.io/docs/Line.html "Line class"), [vectors](https://plotboilerplate.io/docs/Vector.html "Vector class"), [triangles](https://plotboilerplate.io/docs/Triangle.html "Triangle class"), [curves](https://plotboilerplate.io/docs/CubicBezierCurve.html "CubicBezierCurve class"), [circles](https://plotboilerplate.io/docs/Circle.html "Circle class"), [polygons](https://plotboilerplate.io/docs/Polygon.html "Polygon class"), [ellipses](https://plotboilerplate.io/docs/VEllipse.html "VEllipse class"), [images](https://plotboilerplate.io/docs/PBImage.html "PBImage class")
- * cofiguration of the canvas behavior (fullsize, interaction, raster)
+ * configuration of the canvas behavior (fullsize, interaction, raster)
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
- * touch interaction for dragging vertices (mobile deviced; zoom, pan, drag)
+ * touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
 
 
 The compressed library has 89kb.
@@ -275,10 +275,16 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 
 ### Multiple circle intersections and their outlines
 
-![Multiple-circle-intersections](https://plotboilerplate.io/repo/screenshots/screenshot-20201029-0-multiple-circle-intersections-rainbow.png "Two-circle-radical-line")
+![Multiple-circle-intersections](https://plotboilerplate.io/repo/screenshots/screenshot-20201029-0-multiple-circle-intersections-rainbow.png "Multiple-circle-intersections")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/25-multiple-circle-intersections/index.html" title="See the demo">See the demo</a>
 
+
+### Port of a Girih pattern generator
+
+![Port of a Girih pattern](https://plotboilerplate.io/repo/screenshots/screenshot-20201101-0-girih-basic-tiles.png "Port of a Girih pattern")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/26-girih/index.html" title="See the demo">See the demo</a>
 
 
 
@@ -610,11 +616,9 @@ for this purpose.
  * Add image flipping.
  * Add Images to the SVGBuiler.
  * Add image/svg support (adding SVG images).
- * Add a vertex attribute: visible. (to hide vertices).
  * [Partially done] Add control button: set to retina resolution (size factors and css scale).
  * Add a demo that draws a proper mathematical xy-grid.
  * Extend the leaf venation generator demo.
- * Add a thumbnail generator script for the screenshots (like with imagick).
  * Add a retina detection; initialize the canvas with double resolution on startup if retina display (optional-flag).
  * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
  * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
@@ -634,6 +638,7 @@ for this purpose.
  * Extend the SVGBuilder with these new two classes then.
  * Extend the demo 25 (multiple circle intersection): add SVG export.
  * Research about categories for JSDoc (algorithms, datastructures, helpers). Think about a different generator or template.
+ * Get rid of the JSDoc generator. Using Typedoc now, yeah.
  
 
 ### Todos for future Version 2
