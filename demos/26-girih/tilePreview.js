@@ -18,7 +18,7 @@
     // +-------------------------------
     var createAdjacentTilePreview = function( tiles, pointer, setPreviewTilePointer ) {
 	var container = document.querySelector('.wrapper-bottom');
-	while(container.firstChild){
+	while(container.firstChild) {
 	    container.removeChild( container.firstChild );
 	}
 
@@ -39,7 +39,6 @@
 	    node.dataset.tileIndex = i;
 	    node.addEventListener('click', (function(tileIndex) {
 		return function(event) {
-		    // previewTilePointer = tileIndex;
 		    setPreviewTilePointer(tileIndex);
 		    highlightPreviewTile(tileIndex);
 		};
@@ -51,6 +50,12 @@
 	highlightPreviewTile( pointer );
     };
 
+
+    // +---------------------------------------------------------------------------------
+    // | Helper function: highlight the preview tile at the given index.
+    // |
+    // | @param {number} pointer - The tile pointer (index of highlighted preview tile).
+    // +-------------------------------
     var highlightPreviewTile = function( pointer ) {
 	var nodes = document.querySelectorAll('.wrapper-bottom .preview-wrapper');
 	for( var i = 0; i < nodes.length; i++ ) {
