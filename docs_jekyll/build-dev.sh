@@ -15,7 +15,7 @@ cp -R ../screenshots/ .
 ./generate-demo-page.sh
 
 # Use this docs build script instead
-(cd ../bin && ./run-mkdocs.sh)
+(cd ../bin && ./run-mk-typedocs.sh)
 
 echo "Building markdown page from template and readme ..."
 echo '---' > index.md

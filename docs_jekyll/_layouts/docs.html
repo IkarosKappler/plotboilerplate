@@ -13,13 +13,13 @@
     </head>
   <!-- END DOCS HEAD -->
 
-  <body>
+  <body class="body-noscroll">
 
     {% include header.html %}
 
     <div class="header-padding">
         <div class="page-content">
-            <div class="wrapper wrapper-docs">
+            <div class="wrapper wrapper-docs wrapper-docs-typedoc">
                 <!-- Here starts JSDoc generated content -->
                 {{ content }}
                 <!-- Here ends JSDoc -->
@@ -27,7 +27,9 @@
         </div>
     </div>
 
+    {%comment%}
     {% include footer.html %}
+    {%endcomment%}
 
     <script> prettyPrint(); </script>
     <script src="scripts/linenumber.js"> </script>

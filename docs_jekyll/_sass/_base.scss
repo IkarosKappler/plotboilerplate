@@ -29,6 +29,11 @@ body {
     font-kerning: normal;
 }
 
+body.body-noscroll {
+    overflow: hidden;
+    height: 100vh;
+}
+
 
 
 /**
@@ -180,6 +185,15 @@ pre {
     max-width : 100%;
 }
 
+.wrapper-docs-typedoc {
+    padding: 0px;
+}
+
+iframe.iframe-typedoc {
+    width : 100%;
+    height: calc( 100vh - 82px ); /* substract height of navbar header */
+    border: 0;
+}
 
 
 /**

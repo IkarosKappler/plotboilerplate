@@ -612,11 +612,9 @@ for this purpose.
  * Add image flipping.
  * Add Images to the SVGBuiler.
  * Add image/svg support (adding SVG images).
- * Add a vertex attribute: visible. (to hide vertices).
  * [Partially done] Add control button: set to retina resolution (size factors and css scale).
  * Add a demo that draws a proper mathematical xy-grid.
  * Extend the leaf venation generator demo.
- * Add a thumbnail generator script for the screenshots (like with imagick).
  * Add a retina detection; initialize the canvas with double resolution on startup if retina display (optional-flag).
  * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
  * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
@@ -636,6 +634,7 @@ for this purpose.
  * Extend the SVGBuilder with these new two classes then.
  * Extend the demo 25 (multiple circle intersection): add SVG export.
  * Research about categories for JSDoc (algorithms, datastructures, helpers). Think about a different generator or template.
+ * Get rid of the JSDoc generator. Using Typedoc now, yeah.
  
 
 ### Todos for future Version 2

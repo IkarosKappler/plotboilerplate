@@ -21,7 +21,10 @@ date: 2019-12-08
 exclude: [
   "*~",
   "#*#",
+  "docs/",
   "docs_md", # Intermediate jsdoc markdown files are not needed any more
+  "docs_typedoc_md_wheaders",
+  "docs_typedoc_md",
   "Gemfile",
   "Gemfile.lock",
   "generate-demo-page.sh",
