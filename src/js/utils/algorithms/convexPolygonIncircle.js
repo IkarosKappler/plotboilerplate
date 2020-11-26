@@ -19,6 +19,7 @@
  * @public
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.convexPolygonIncircle = void 0;
 var Circle_1 = require("../../Circle");
 var geomutils_1 = require("../../geomutils");
 var Line_1 = require("../../Line");
@@ -41,7 +42,7 @@ var EPS = 0.000001;
  * @param {Polygon} convexHull - The actual convex polygon.
  * @return {PolygonIncircle} A pair of a circle (the incircle) and a triangle (the three points where the circle is touching the polygon).
  */
-exports.convexPolygonIncircle = function (convexHull) {
+var convexPolygonIncircle = function (convexHull) {
     var n = convexHull.vertices.length;
     var bestCircle = undefined;
     var bestTriangle = undefined;
@@ -82,6 +83,7 @@ exports.convexPolygonIncircle = function (convexHull) {
     return { circle: bestCircle,
         triangle: bestTriangle };
 };
+exports.convexPolygonIncircle = convexPolygonIncircle;
 /**
  * This function computes the three points for the inner maximum circle
  * lying tangential to the three subsequential lines (given by four points).

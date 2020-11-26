@@ -18,6 +18,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Bounds = void 0;
 var Vertex_1 = require("./Vertex");
 var Bounds = /** @class */ (function () {
     /**

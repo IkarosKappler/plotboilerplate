@@ -18,6 +18,7 @@
  * @file     Girih
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Girih = void 0;
 var Vertex_1 = require("../../Vertex");
 var GirihBowtie_1 = require("./GirihBowtie");
 var GirihDecagon_1 = require("./GirihDecagon");

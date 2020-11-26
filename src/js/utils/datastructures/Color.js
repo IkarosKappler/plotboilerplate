@@ -12,6 +12,7 @@
  * @modified 2020-10-23 Ported to Typescript.
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Color = void 0;
 var Color = /** @class */ (function () {
     function Color() {
         this.r = this.g = this.b = 0;

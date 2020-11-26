@@ -39,6 +39,7 @@
  * @version  1.8.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.drawutils = void 0;
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Vertex_1 = require("./Vertex");
 // Todo: rename this class to Drawutils

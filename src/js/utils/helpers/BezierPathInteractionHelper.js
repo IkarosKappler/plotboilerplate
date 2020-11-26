@@ -25,6 +25,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BezierPathInteractionHelper = void 0;
 var alloyfinger_1 = require("alloyfinger"); // node_modules
 var BezierPath_1 = require("../../BezierPath");
 var KeyHandler_1 = require("../../KeyHandler");

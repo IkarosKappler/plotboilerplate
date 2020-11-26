@@ -7,12 +7,14 @@
  * @version 1.0.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.matrixFill = void 0;
 var arrayFill_1 = require("./arrayFill");
-exports.matrixFill = function (countA, countB, initialValue) {
+var matrixFill = function (countA, countB, initialValue) {
     var arr = Array(countA);
     for (var i = 0; i < countA; i++) {
         arr[i] = arrayFill_1.arrayFill(countB, initialValue);
     }
     return arr;
 };
+exports.matrixFill = matrixFill;
 //# sourceMappingURL=matrixFill.js.map

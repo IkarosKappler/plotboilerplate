@@ -343,6 +343,6 @@ export declare class Vertex implements XYCoords, SVGSerializable {
          * @param {number} scaleX  - The horizontal scaling during draw.
          * @param {number} scaleY  - the vertical scaling during draw.
          **/
-        buildArrowHead: (zA: Vertex, zB: Vertex, headlen: number, scaleX: number, scaleY: number) => Vertex[];
+        buildArrowHead: (zA: Vertex, zB: Vertex, headlen: number, scaleX: number, scaleY: number) => Array<Vertex>;
     };
 }

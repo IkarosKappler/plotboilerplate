@@ -10,6 +10,7 @@
  * @version  1.0.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircleHelper = void 0;
 var CircleHelper = /** @class */ (function () {
     /**
      * The constructor.

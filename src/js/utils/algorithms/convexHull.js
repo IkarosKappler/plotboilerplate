@@ -15,13 +15,14 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getConvexHull = void 0;
 /**
  * @global
  * @name convexHull
  * @param {Array<XYCoords>} points - The points on the 2D plane to find the convex hull for.
  * @return {Array<XYCoords>} A ordered array of points defining the convex hull.
  **/
-exports.getConvexHull = function (points) {
+var getConvexHull = function (points) {
     points.sort(comparison);
     var L = [];
     for (var i = 0; i < points.length; i++) {
@@ -41,6 +42,7 @@ exports.getConvexHull = function (points) {
     U.pop();
     return L.concat(U);
 };
+exports.getConvexHull = getConvexHull;
 /**
  * Compare two vertices to create an order on the 2D plane.
  *

@@ -8,10 +8,11 @@
  * @date 2020-11-10
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getContrastColor = void 0;
 var Color_1 = require("../datastructures/Color");
 var BLACK = Color_1.Color.makeRGB(0, 0, 0);
 var WHITE = Color_1.Color.makeRGB(255, 255, 255);
-exports.getContrastColor = function (color) {
+var getContrastColor = function (color) {
     // r,g,b in [0..1]
     var gamma = 2.2;
     var L = 0.2126 * Math.pow(color.r, gamma)
@@ -21,4 +22,5 @@ exports.getContrastColor = function (color) {
     // console.log( 'use_black', use_black );
     return use_black ? BLACK : WHITE;
 };
+exports.getContrastColor = getContrastColor;
 //# sourceMappingURL=getContrastColor.js.map

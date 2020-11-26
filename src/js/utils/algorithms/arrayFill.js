@@ -7,10 +7,12 @@
  * @version 1.0.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.arrayFill = function (count, initialValue) {
+exports.arrayFill = void 0;
+var arrayFill = function (count, initialValue) {
     var arr = Array(count);
     for (var i = 0; i < count; i++)
         arr[i] = initialValue;
     return arr;
 };
+exports.arrayFill = arrayFill;
 //# sourceMappingURL=arrayFill.js.map

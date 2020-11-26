@@ -14,6 +14,7 @@
  * @modified 2020-10-30 Exporting each color under its name globally.
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.shuffleWebColors = exports.WebColors = exports.LightGreen = exports.Green = exports.Teal = exports.Cyan = exports.LightBlue = exports.Blue = exports.Indigo = exports.DeepPurple = exports.Purple = exports.Pink = exports.Red = void 0;
 var Color_1 = require("./datastructures/Color");
 exports.Red = Color_1.Color.makeRGB(255, 67, 55);
 exports.Pink = Color_1.Color.makeRGB(232, 31, 100);
@@ -54,11 +55,12 @@ exports.WebColors = [
     exports.Green,
     exports.LightGreen
 ];
-exports.shuffleWebColors = function (order) {
+var shuffleWebColors = function (order) {
     var result = Array(order.length);
     for (var i = 0; i < order.length; i++) {
         result[i] = exports.WebColors[order[i] % exports.WebColors.length];
     }
     return result;
 };
+exports.shuffleWebColors = shuffleWebColors;
 //# sourceMappingURL=WebColors.js.map

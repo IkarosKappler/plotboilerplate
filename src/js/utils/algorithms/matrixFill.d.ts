@@ -6,4 +6,4 @@
  * @version 1.0.0
  **/
 import { Matrix } from "../datastructures/interfaces";
-export declare const matrixFill: <T extends any>(countA: number, countB: number, initialValue: T) => Matrix<T>;
+export declare const matrixFill: <T extends unknown>(countA: number, countB: number, initialValue: T) => Matrix<T>;

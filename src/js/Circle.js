@@ -22,6 +22,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Circle = void 0;
 var Line_1 = require("./Line");
 var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");

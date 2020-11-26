@@ -25,4 +25,4 @@ export declare const Teal: Color;
 export declare const Green: Color;
 export declare const LightGreen: Color;
 export declare const WebColors: Array<Color>;
-export declare const shuffleWebColors: (order: number[]) => Color[];
+export declare const shuffleWebColors: (order: Array<number>) => Color[];

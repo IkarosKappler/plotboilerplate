@@ -85,7 +85,7 @@ export declare class Color {
     static parse(str: string): Color;
     static Sanitizer: {
         RGB: (...args: any[]) => any[];
-        HSL: (...args: (string | number)[]) => number[];
+        HSL: (...args: Array<string | number>) => Array<number>;
     };
     static Validator: {
         /**

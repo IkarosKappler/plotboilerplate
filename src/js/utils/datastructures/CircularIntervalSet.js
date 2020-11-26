@@ -10,6 +10,7 @@
  * @name CircularIntervalSet
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircularIntervalSet = void 0;
 var CircularIntervalSet = /** @class */ (function () {
     /**
      * Create a new CircularIntervalSet with the given lower and upperBound (start and end).

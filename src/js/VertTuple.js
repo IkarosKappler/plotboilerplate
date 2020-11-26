@@ -12,6 +12,7 @@
  * @version 1.0.2
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.VertTuple = void 0;
 var Vertex_1 = require("./Vertex");
 var VertTuple = /** @class */ (function () {
     /**

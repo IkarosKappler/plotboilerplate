@@ -18,6 +18,7 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircleIntersections = void 0;
 var arrayFill_1 = require("./arrayFill");
 var matrixFill_1 = require("./matrixFill");
 var Line_1 = require("../../Line");
