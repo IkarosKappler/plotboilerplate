@@ -1,11 +1,4 @@
 /**
- * @classdesc A line consists of two vertices a and b.<br>
- * <br>
- * This is some refactored code from my 'Morley Triangle' test<br>
- *   https://github.com/IkarosKappler/morleys-trisector-theorem
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2016-03-12
  * @modified 2018-12-05 Refactored the code from the morley-triangle script.
@@ -29,7 +22,18 @@ import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
-export class Line extends VertTuple<Line> implements SVGSerializable {
+
+/**
+ * @classdesc A line consists of two vertices a and b.<br>
+ * <br>
+ * This is some refactored code from my 'Morley Triangle' test<br>
+ *   https://github.com/IkarosKappler/morleys-trisector-theorem
+ *
+ * @requires Vertex
+ */
+export class Line
+    extends VertTuple<Line>
+    implements SVGSerializable {
 
 
     /**

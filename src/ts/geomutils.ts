@@ -1,9 +1,17 @@
+/**
+ * @author  Ikaros Kappler
+ * @date    2019-02-03
+ * @version 1.0.0
+ **/
+
 
 import { Line } from "./Line";
 import { Triangle } from "./Triangle";
 import { Vertex } from "./Vertex";
 
 /**
+ * A collection of usefull geometry utilities.
+ *
  * @global
  **/
 export const geomutils = {

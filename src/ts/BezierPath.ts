@@ -1,8 +1,4 @@
 /**
- * @classdesc A refactored BezierPath class.
- *
- * @require Bounds, Vertex, CubicBezierCurve, XYCoords, SVGSerializable
- * 
  * @author Ikaros Kappler
  * @date 2013-08-19
  * @modified 2018-08-16 Added closure. Removed the 'IKRS' wrapper.
@@ -33,6 +29,18 @@ import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
+
+/**
+ * @classdesc A BezierPath class.
+ *
+ * This was refactored from an older project.
+ *
+ * @requires Bounds
+ * @requires Vertex 
+ * @requires CubicBezierCurve
+ * @requires XYCoords
+ * @requires SVGSerializable
+ **/
 export class BezierPath implements SVGSerializable {
 
 

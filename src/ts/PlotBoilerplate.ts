@@ -1,22 +1,4 @@
 /**
- * @classdesc The main class of the PlotBoilerplate.
- *
- * @requires Vertex 
- * @requires Line
- * @requires Vector 
- * @requires Polygon
- * @requires PBImage
- * @requires VEllipse
- * @requires Circle
- * @requires MouseHandler
- * @requires KeyHandler
- * @requires VertexAttr
- * @requires CubicBezierCurve
- * @requires BezierPath
- * @requires Triangle
- * @requires drawutils
- * @requires drawutilsgl
- *
  * @author   Ikaros Kappler
  * @date     2018-10-23
  * @modified 2018-11-19 Added multi-select and multi-drag.
@@ -109,6 +91,32 @@ import { VertEvent } from "./VertexListeners";
 import { IBounds, IDraggable, Config, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
 
 
+/**
+ * @classdesc The main class of the PlotBoilerplate.
+ *
+ * @requires Vertex 
+ * @requires Line
+ * @requires Vector 
+ * @requires Polygon
+ * @requires PBImage
+ * @requires VEllipse
+ * @requires Circle
+ * @requires MouseHandler
+ * @requires KeyHandler
+ * @requires VertexAttr
+ * @requires CubicBezierCurve
+ * @requires BezierPath
+ * @requires Drawable
+ * @requires DrawConfig
+ * @requires IHooks
+ * @requires PBParams
+ * @requires Triangle
+ * @requires drawutils
+ * @requires drawutilsgl
+ * @requires SVGSerializable
+ * @requires XYCoords
+ * @requires XYDimension
+ */
 export class PlotBoilerplate {
 
     /** @constant {number} */

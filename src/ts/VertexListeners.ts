@@ -1,8 +1,4 @@
 /**
- * @classdesc An event listeners wrapper. This is just a set of three listener 
- *              queues (drag, dragStart, dragEnd) and their respective firing
- *              functions.
- *
  * @author   Ikaros Kappler
  * @date     2018-08-27
  * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
@@ -29,6 +25,13 @@ export interface VertEvent {
 
 export type VertListener = (e:VertEvent) => void;
 
+
+/**
+ * @classdesc An event listeners wrapper. This is just a set of three listener 
+ *              queues (drag, dragStart, dragEnd) and their respective firing
+ *              functions.
+ *
+ */
 export class VertexListeners {
 
     private click:Array<VertListener>;

@@ -5,7 +5,9 @@
 # npx typedoc --out ../docs_jekyll/docs_typedoc_md --mode file ../src/ts --plugin typedoc-plugin-markdown --hideProjectName=false --hideBreadcrumbs=false --publicPath=https:\/\/plotboilerplate.io\/ --namedAnchors=false
 
 # So just generate HTML output and display it in an iframe (see ../docs_jekyll/_layouts/docs.html)
-npx typedoc --out ../docs_jekyll/docs_typedoc --mode file ../src/ts  --plugin none
+# npx typedoc --out ../docs_jekyll/docs_typedoc --mode file ../src/ts  --plugin none --readme none --theme minimal
+
+npx typedoc --options typedoc-config.json
 
 
 TARGET_DIR="../docs_jekyll/docs_typedoc_md_wheaders"

@@ -1,8 +1,4 @@
 /**
- * @classdesc A wrapper for image objects.
- *
- * @requires Vertex, SVGSerializable
- *
  * @author   Ikaros Kappler
  * @date     2019-01-30
  * @modified 2019-03-23 Added JSDoc tags.
@@ -20,6 +16,12 @@ import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
 
+/**
+ * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
+ *
+ * @requires Vertex
+ * @requires SVGSerializable
+ */
 export class PBImage implements SVGSerializable {
 
 
@@ -61,12 +63,6 @@ export class PBImage implements SVGSerializable {
      * @param {Vertex} lowerRight - The lower right corner.
      **/
     constructor( image:HTMLImageElement, upperLeft:Vertex, lowerRight:Vertex ) {
-	/* if( typeof image == 'undefined' )
-	    throw Error('image must not be null.');
-	if( typeof upperLeft == 'undefined' )
-	    throw Error('upperLeft must not be null.');
-	if( typeof lowerRight == 'undefined' )
-	    throw Error('lowerRight must not be null.'); */
 	this.image = image;
 	this.upperLeft = upperLeft;
 	this.lowerRight = lowerRight;

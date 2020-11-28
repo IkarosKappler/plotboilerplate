@@ -1,12 +1,4 @@
 /**
- * @classdesc A simple circle: center point and radius.
- *
- * @requires Line
- * @requires Vector
- * @requires VertTuple 
- * @requires Vertex
- * @requires SVGSerializale
- *
  * @author   Ikaros Kappler
  * @version  1.1.0
  * @date     2020-05-04
@@ -15,10 +7,6 @@
  * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
  * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  * @modified 2020-10-16 Added the containsCircle(...) function.
- * 
- * @file Circle
- * @fileoverview A simple circle class: center point and radius.
- * @public
  **/
 
 
@@ -28,6 +16,16 @@ import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
 
+
+/**
+ * @classdesc A simple circle: center point and radius.
+ *
+ * @requires Line
+ * @requires Vector
+ * @requires VertTuple 
+ * @requires Vertex
+ * @requires SVGSerializale
+ **/
 export class Circle implements SVGSerializable {
 
     /** 

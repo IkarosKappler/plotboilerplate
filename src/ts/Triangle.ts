@@ -1,12 +1,4 @@
 /**
- * @classdesc A triangle class for triangulations.
- *
- * The class was written for a Delaunay trinagulation demo so it might 
- * contain some strange and unexpected functions.
- *
- * @requires Vertex, Polygon, SVGSerializale
- * 
- *
  * @author    Ikaros Kappler
  * @date_init 2012-10-17 (Wrote a first version of this in that year).
  * @date      2018-04-03 (Refactored the code into a new class).
@@ -41,6 +33,22 @@ import { geomutils } from "./geomutils";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
 
+/**
+ * @classdesc A triangle class for triangulations.
+ *
+ * The class was written for a Delaunay trinagulation demo so it might 
+ * contain some strange and unexpected functions.
+ *
+ * @requires Bounds
+ * @requires Circle
+ * @requires Line
+ * @requires Vertex
+ * @requires Polygon
+ * @requires SVGSerializale
+ * @requires XYCoords
+ * @requires geomutils
+ *
+ */
 export class Triangle implements SVGSerializable {
 
     /**

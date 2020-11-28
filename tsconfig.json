@@ -10,7 +10,7 @@
 	"declaration": true
 
     },
-    "inclue": ["./src/ts/*"],
+    "include": ["./src/ts/*"],
     "exclude": ["./dist", "./tmp","./src/js","./src/vanilla", "npm-package", "demos"],
     "removeComments": false
 }

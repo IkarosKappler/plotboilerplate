@@ -1,8 +1,4 @@
 /**
- * @classdesc A simple mouse handler for demos. 
- * Use to avoid load massive libraries like jQuery.
- *
- *
  * @author   Ikaros Kappler
  * @date     2018-03-19
  * @modified 2018-04-28 Added the param 'wasDragged'.
@@ -28,7 +24,6 @@
 
 
 import { XYCoords } from "./interfaces";
-
 
 export interface XMouseParams {
     button       : number;
@@ -58,6 +53,12 @@ export type XWheelCallback = (e:XWheelEvent)=>void;
 
 
 
+/**
+ * @classdesc A simple mouse handler for demos. 
+ * Use to avoid load massive libraries like jQuery.
+ *
+ * @requires XYCoords
+ */
 export class MouseHandler {
 
     private name           : string;

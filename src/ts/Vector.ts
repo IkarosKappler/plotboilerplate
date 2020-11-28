@@ -1,11 +1,4 @@
 /**
- * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
- *            <br>
- *            Vectors are drawn with an arrow at their end point.<br>
- *            <b>The Vector class extends the Line class.</b>
- *
- * @requires Vertex, Line
- *
  * @author   Ikaros Kappler
  * @date     2019-01-30
  * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
@@ -21,12 +14,18 @@
  * @public
  **/
 
-
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
-
+/**
+ * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
+ *            <br>
+ *            Vectors are drawn with an arrow at their end point.<br>
+ *            <b>The Vector class extends the Line class.</b>
+ *
+ * @requires Vertex, Line
+ **/
 export class Vector extends VertTuple<Vector> implements SVGSerializable {  
 
     /**

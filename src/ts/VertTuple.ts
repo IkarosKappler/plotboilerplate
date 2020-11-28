@@ -1,8 +1,4 @@
 /**
- * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
- * @abstract
- * @requires Vertex 
- *
  * @author Ikaros Kappler
  * @date   2020-03-24
  * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
@@ -14,6 +10,13 @@
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requiers SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 export class VertTuple<T extends VertTuple<T>> {
 
 

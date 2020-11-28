@@ -1,0 +1,9 @@
+{
+    "out" : "../docs_jekyll/docs_typedoc",
+    "toc" : "BezierPath,Bounds,drawutils,Circle,CubicBezierCurve,Line,PBImage,PlotBoilerplate,Polygon,VEllipse,Vector,Vertex",
+    "mode" : "file",
+    "plugin" : "none",
+    "readme" : "none",
+    "theme" : "minimal",
+    "inputFiles" : "../src/ts/"
+}

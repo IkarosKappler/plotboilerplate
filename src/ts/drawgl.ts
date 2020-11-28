@@ -1,9 +1,4 @@
 /**
- * A wrapper class for basic drawing operations. This is the WebGL
- * implementation whih sould work with shaders.
- *
- * @require Vertex
- *
  * @author   Ikaros Kappler
  * @date     2019-09-18
  * @modified 2019-10-03 Added the beginDrawCycle hook.
@@ -19,6 +14,16 @@ import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
 
+/**
+ * @classdesc A wrapper class for basic drawing operations. This is the WebGL
+ * implementation whih sould work with shaders.
+ *
+ * @requires CubicBzierCurvce
+ * @requires Polygon
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 export class drawutilsgl {
     
     // Vertex shader source code

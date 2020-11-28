@@ -53,9 +53,10 @@ export declare abstract class GirihTile extends Polygon {
      * @member {number}
      * @memberof GirihTile
      * @type {number}
+     * @readonly
      * @instance
      */
-    edgeLength: number;
+    readonly edgeLength: number;
     /**
      * The rotation of this tile. This is stored to make cloning easier.
      *

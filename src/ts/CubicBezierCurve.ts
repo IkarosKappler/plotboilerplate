@@ -1,8 +1,4 @@
 /**
- * @classdesc A refactored cubic bezier curve class.
- *
- * @requires Vertex, Vector
- *
  * @author   Ikaros Kappler
  * @date     2013-08-15
  * @modified 2018-08-16 Added a closure. Removed the wrapper class 'IKRS'. Replaced class THREE.Vector2 by Vertex class.
@@ -33,6 +29,15 @@ import { Vector } from "./Vector";
 import { XYCoords, SVGSerializable} from "./interfaces";
 
 
+/**
+ * @classdesc A refactored cubic bezier curve class.
+ *
+ * @requires Bounds
+ * @requires Vertex
+ * @requires Vector
+ * @requires XYCoords
+ * @requires SVGSerializable
+ */
 export class CubicBezierCurve {
 
     /** @constant {number} */
