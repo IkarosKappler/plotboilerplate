@@ -1,8 +1,4 @@
 /**
- * @classdesc A wrapper for image objects.
- *
- * @requires Vertex, SVGSerializable
- *
  * @author   Ikaros Kappler
  * @date     2019-01-30
  * @modified 2019-03-23 Added JSDoc tags.
@@ -16,6 +12,12 @@
  **/
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
+/**
+ * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
+ *
+ * @requires Vertex
+ * @requires SVGSerializable
+ */
 export declare class PBImage implements SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.

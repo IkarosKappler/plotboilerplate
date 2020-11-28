@@ -1,10 +1,4 @@
 /**
- * @classdesc The VertexAttr is a helper class to wrap together additional attributes
- * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
- * <br>
- * This is some sort of 'userData' object, but the constructor uses a global model
- * to obtain a (configurable) default attribute set to all instances.<br>
- *
  * @author   Ikaros Kappler
  * @date     2018-08-26
  * @modified 2018-11-17 Added the 'isSelected' attribute.
@@ -25,6 +19,13 @@ export interface IVertexAttr {
     renderTime?: number;
     visible: boolean;
 }
+/**
+ * @classdesc The VertexAttr is a helper class to wrap together additional attributes
+ * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
+ * <br>
+ * This is some sort of 'userData' object, but the constructor uses a global model
+ * to obtain a (configurable) default attribute set to all instances.<br>
+ */
 export declare class VertexAttr implements IVertexAttr {
     /**
      * @member {boolean}

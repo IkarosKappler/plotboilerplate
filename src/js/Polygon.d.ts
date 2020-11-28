@@ -1,8 +1,4 @@
 /**
- * @classdesc A polygon class.
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-04-14
  * @modified 2018-11-17 Added the containsVert function.
@@ -27,6 +23,15 @@ import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable } from "./interfaces";
+/**
+ * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
+ *
+ * @requires BezierPath
+ * @requires Bounds
+ * @requires SVGSerializabe
+ * @requires Vertex
+ * @requires XYCoords
+ */
 export declare class Polygon implements SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.

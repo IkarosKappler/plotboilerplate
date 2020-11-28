@@ -1,8 +1,4 @@
 /**
- * A wrapper class for basic drawing operations.
- *
- * @require Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-04-22
  * @modified 2018-08-16 Added the curve() function to draw cubic bézier curves.
@@ -40,6 +36,15 @@
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { XYCoords } from "./interfaces";
+/**
+ * @classdesc A wrapper class for basic drawing operations.
+ *
+ * @requires CubicBzierCurvce
+ * @requires Polygon
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 export declare class drawutils {
     /**
      * @member {CanvasRenderingContext2D}

@@ -1,9 +1,5 @@
 "use strict";
 /**
- * @classdesc A wrapper for image objects.
- *
- * @requires Vertex, SVGSerializable
- *
  * @author   Ikaros Kappler
  * @date     2019-01-30
  * @modified 2019-03-23 Added JSDoc tags.
@@ -17,6 +13,12 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PBImage = void 0;
+/**
+ * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
+ *
+ * @requires Vertex
+ * @requires SVGSerializable
+ */
 var PBImage = /** @class */ (function () {
     /**
      * The constructor.
@@ -32,12 +34,6 @@ var PBImage = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "PBImage";
-        /* if( typeof image == 'undefined' )
-            throw Error('image must not be null.');
-        if( typeof upperLeft == 'undefined' )
-            throw Error('upperLeft must not be null.');
-        if( typeof lowerRight == 'undefined' )
-            throw Error('lowerRight must not be null.'); */
         this.image = image;
         this.upperLeft = upperLeft;
         this.lowerRight = lowerRight;

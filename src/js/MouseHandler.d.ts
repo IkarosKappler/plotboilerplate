@@ -1,8 +1,4 @@
 /**
- * @classdesc A simple mouse handler for demos.
- * Use to avoid load massive libraries like jQuery.
- *
- *
  * @author   Ikaros Kappler
  * @date     2018-03-19
  * @modified 2018-04-28 Added the param 'wasDragged'.
@@ -59,6 +55,12 @@ export declare class XWheelEvent extends WheelEvent {
 }
 export declare type XMouseCallback = (e: XMouseEvent) => void;
 export declare type XWheelCallback = (e: XWheelEvent) => void;
+/**
+ * @classdesc A simple mouse handler for demos.
+ * Use to avoid load massive libraries like jQuery.
+ *
+ * @requires XYCoords
+ */
 export declare class MouseHandler {
     private name;
     private element;

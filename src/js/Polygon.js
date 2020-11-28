@@ -1,9 +1,5 @@
 "use strict";
 /**
- * @classdesc A polygon class.
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-04-14
  * @modified 2018-11-17 Added the containsVert function.
@@ -29,6 +25,15 @@ exports.Polygon = void 0;
 var BezierPath_1 = require("./BezierPath");
 var Bounds_1 = require("./Bounds");
 var Vertex_1 = require("./Vertex");
+/**
+ * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
+ *
+ * @requires BezierPath
+ * @requires Bounds
+ * @requires SVGSerializabe
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var Polygon = /** @class */ (function () {
     /**
      * The constructor.

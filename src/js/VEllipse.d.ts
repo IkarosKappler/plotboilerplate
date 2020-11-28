@@ -1,8 +1,4 @@
 /**
- * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-11-28
  * @modified 2018-12-04 Added the toSVGString function.
@@ -14,6 +10,13 @@
  **/
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
+/**
+ * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
+ *
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 export declare class VEllipse implements SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.

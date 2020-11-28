@@ -1,9 +1,16 @@
 "use strict";
+/**
+ * @author  Ikaros Kappler
+ * @date    2019-02-03
+ * @version 1.0.0
+ **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.geomutils = void 0;
 var Line_1 = require("./Line");
 var Triangle_1 = require("./Triangle");
 /**
+ * A collection of usefull geometry utilities.
+ *
  * @global
  **/
 exports.geomutils = {

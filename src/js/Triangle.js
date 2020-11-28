@@ -1,13 +1,5 @@
 "use strict";
 /**
- * @classdesc A triangle class for triangulations.
- *
- * The class was written for a Delaunay trinagulation demo so it might
- * contain some strange and unexpected functions.
- *
- * @requires Vertex, Polygon, SVGSerializale
- *
- *
  * @author    Ikaros Kappler
  * @date_init 2012-10-17 (Wrote a first version of this in that year).
  * @date      2018-04-03 (Refactored the code into a new class).
@@ -39,6 +31,22 @@ var Line_1 = require("./Line");
 var Polygon_1 = require("./Polygon");
 var Vertex_1 = require("./Vertex");
 var geomutils_1 = require("./geomutils");
+/**
+ * @classdesc A triangle class for triangulations.
+ *
+ * The class was written for a Delaunay trinagulation demo so it might
+ * contain some strange and unexpected functions.
+ *
+ * @requires Bounds
+ * @requires Circle
+ * @requires Line
+ * @requires Vertex
+ * @requires Polygon
+ * @requires SVGSerializale
+ * @requires XYCoords
+ * @requires geomutils
+ *
+ */
 var Triangle = /** @class */ (function () {
     /**
      * The constructor.

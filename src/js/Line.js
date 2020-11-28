@@ -1,12 +1,5 @@
 "use strict";
 /**
- * @classdesc A line consists of two vertices a and b.<br>
- * <br>
- * This is some refactored code from my 'Morley Triangle' test<br>
- *   https://github.com/IkarosKappler/morleys-trisector-theorem
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2016-03-12
  * @modified 2018-12-05 Refactored the code from the morley-triangle script.
@@ -41,6 +34,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Line = void 0;
 var VertTuple_1 = require("./VertTuple");
 var Vertex_1 = require("./Vertex");
+/**
+ * @classdesc A line consists of two vertices a and b.<br>
+ * <br>
+ * This is some refactored code from my 'Morley Triangle' test<br>
+ *   https://github.com/IkarosKappler/morleys-trisector-theorem
+ *
+ * @requires Vertex
+ */
 var Line = /** @class */ (function (_super) {
     __extends(Line, _super);
     /**

@@ -4,11 +4,6 @@
  *
  * This Hobby curve (path) implementation was strongly inspired by
  * the one by Prof. Dr. Edmund Weitz:
- *  // Copyright (c) 2018-2019, Dr. Edmund Weitz.  All rights reserved.
- *  // The code in this file is written mainly for demonstration purposes
- *  // and to illustrate the videos mentioned on the HTML page.  It would
- *  // be fairly easy to make it shorter and more efficient, but I
- *  // refrained from doing this on purpose.
  * Here's the website:
  *  http://weitz.de/hobby/
  *
@@ -29,6 +24,14 @@ interface IControlPoints {
     endControlPoints : Array<Vertex>;
 };
 
+
+/**
+ * @classdesc A HobbyCurve/HobbyPath calculation class: compute a set of optimal
+ *            cubic Bézier curves from a sequence of vertices.
+ *
+ * @requires CubicBezierCurve
+ * @requires Vertex
+ */
 export class HobbyPath {
 
     /**

@@ -1,25 +1,21 @@
 "use strict";
 /**
- * @module PlotBoilerplate
- * @classdesc A bounds class with min and max values.
- *
- * @requires XYCoords
- * @requires Vertex
- * @requires IBounds
- *
  * @author   Ikaros Kappler
  * @date     2020-05-11
  * @modified 2020-10-30 Added the static computeFromVertices function.
  * @modified 2020-11-19 Set min, max, width and height to private.
  * @version  1.1.1
- *
- * @file Bounds
- * @fileoverview A simple bounds class implementing IBounds.
- * @public
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bounds = void 0;
 var Vertex_1 = require("./Vertex");
+/**
+ * @classdesc A bounds class with min and max values. Implementing IBounds.
+ *
+ * @requires XYCoords
+ * @requires Vertex
+ * @requires IBounds
+ **/
 var Bounds = /** @class */ (function () {
     /**
      * The constructor.

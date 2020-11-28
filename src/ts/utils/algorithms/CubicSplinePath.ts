@@ -1,8 +1,4 @@
 /**
- * @classdesc Compute a natural cubic Bézier spline path from a given sequence of points/vertices.
- * 
- * Inspired by http://weitz.de/hobby/
- *
  * @author   Ikaros Kappler (ported from basic script to class).
  * @date     2020-04-15
  * @modified 2020-08-19 Ported this class from vanilla JS to TypeScript.
@@ -21,6 +17,17 @@ interface IControlCoords {
     end : Array<number>;
 };
 
+
+
+/**
+ * @classdesc Compute a natural cubic Bézier spline path from a given sequence of points/vertices.
+ * 
+ * Inspired by http://weitz.de/hobby/
+ *
+ * @requires CubicBezierCurve
+ * @requires HobbyPath
+ * @requires Vertex
+ */
 export class CubicSplinePath {
 
     /**

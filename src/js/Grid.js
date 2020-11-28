@@ -1,9 +1,5 @@
 "use strict";
 /**
- * @classdesc A grid class with vertical and horizontal lines.
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-11-28
  * @modified 2018-12-09 Added the utils: baseLog(Number,Number) and mapRasterScale(Number,Number).
@@ -17,6 +13,15 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Grid = void 0;
+/**
+ * @classdesc A grid class with vertical and horizontal lines (or a raster).
+ *
+ * Note that the PlotBoilerplate already has a Grid instance member. The Grid is not meant
+ * to be added to the canvas as a drawable as it encapsulates more an abstract concept of the canvas
+ * rather than a drawable object.
+ *
+ * @requires Vertex
+ */
 var Grid = /** @class */ (function () {
     /**
      * The constructor.

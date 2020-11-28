@@ -1,7 +1,5 @@
 "use strict";
 /**
- * A default SVG builder.
- *
  * Todos:
  *  + use a Drawable interface
  *  + use a SVGSerializable interface
@@ -17,7 +15,17 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SVGBuilder = void 0;
+/**
+ * @classdesc A default SVG builder.
+ *
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var SVGBuilder = /** @class */ (function () {
+    /**
+     * @constructor
+     **/
     function SVGBuilder() {
     }
     ;

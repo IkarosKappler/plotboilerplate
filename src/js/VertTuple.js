@@ -1,9 +1,5 @@
 "use strict";
 /**
- * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
- * @abstract
- * @requires Vertex
- *
  * @author Ikaros Kappler
  * @date   2020-03-24
  * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
@@ -14,6 +10,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VertTuple = void 0;
 var Vertex_1 = require("./Vertex");
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requiers SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var VertTuple = /** @class */ (function () {
     /**
      * Creates an instance.

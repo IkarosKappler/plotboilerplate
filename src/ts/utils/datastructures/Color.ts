@@ -1,8 +1,5 @@
 /**
- *   Found at
- *    https://gist.github.com/neolitec/1344610
- * Thanks to neolitec
- *
+ * @author Extended, bugfixed and ported to TypeScript by Ikaros Kappler.
  * @modified 2018-xx-xx Added a clone() function.
  * @modified 2018-xx-xx Allowing leading '#' in the makeHEX() function.
  * @modified 2018-11-28 Fixed the checkHEX() function to accept 000000.
@@ -12,6 +9,12 @@
  **/
 
 
+/**
+ * @classdesc A color class, inspired by neolitec's Javascript class. 
+ *    Original found at
+ *      https://gist.github.com/neolitec/1344610
+ *    Thanks to neolitec
+ */
 export class Color {
 
     /** 

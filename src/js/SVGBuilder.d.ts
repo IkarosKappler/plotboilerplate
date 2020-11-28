@@ -1,6 +1,4 @@
 /**
- * A default SVG builder.
- *
  * Todos:
  *  + use a Drawable interface
  *  + use a SVGSerializable interface
@@ -16,7 +14,17 @@
  **/
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";
+/**
+ * @classdesc A default SVG builder.
+ *
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 export declare class SVGBuilder {
+    /**
+     * @constructor
+     **/
     constructor();
     /**
      *  Builds the SVG code from the given list of drawables.

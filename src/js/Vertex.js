@@ -1,11 +1,5 @@
 "use strict";
 /**
- * @classdesc A vertex is a pair of two numbers.<br>
- * <br>
- * It is used to identify a 2-dimensional point on the x-y-plane.
- *
- * @requires VertexAttr
- *
  * @author   Ikaros Kappler
  * @date     2012-10-17
  * @modified 2018-04-03 Refactored the code of october 2012 into a new class.
@@ -37,6 +31,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Vertex = void 0;
 var VertexAttr_1 = require("./VertexAttr");
 var VertexListeners_1 = require("./VertexListeners");
+/**
+ * @classdesc A vertex is a pair of two numbers.<br>
+ * <br>
+ * It is used to identify a 2-dimensional point on the x-y-plane.
+ *
+ * @requires IVertexAttr
+ * @requires SVGSerializable
+ * @requires VertexAttr
+ * @requires VertexListeners
+ * @requires XYCoords
+ *
+ */
 var Vertex = /** @class */ (function () {
     /**
      * The constructor for the vertex class.

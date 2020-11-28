@@ -1,9 +1,5 @@
 "use strict";
 /**
- * @classdesc A refactored BezierPath class.
- *
- * @require Bounds, Vertex, CubicBezierCurve, XYCoords, SVGSerializable
- *
  * @author Ikaros Kappler
  * @date 2013-08-19
  * @modified 2018-08-16 Added closure. Removed the 'IKRS' wrapper.
@@ -33,6 +29,17 @@ exports.BezierPath = void 0;
 var Bounds_1 = require("./Bounds");
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Vertex_1 = require("./Vertex");
+/**
+ * @classdesc A BezierPath class.
+ *
+ * This was refactored from an older project.
+ *
+ * @requires Bounds
+ * @requires Vertex
+ * @requires CubicBezierCurve
+ * @requires XYCoords
+ * @requires SVGSerializable
+ **/
 var BezierPath = /** @class */ (function () {
     /**
      * The constructor.<br>

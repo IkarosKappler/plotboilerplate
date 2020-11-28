@@ -15,10 +15,6 @@
 
 
 /**
- * @classdesc A refactored BezierPath class.
- *
- * @require Bounds, Vertex, CubicBezierCurve, XYCoords, SVGSerializable
- *
  * @author Ikaros Kappler
  * @date 2013-08-19
  * @modified 2018-08-16 Added closure. Removed the 'IKRS' wrapper.
@@ -44,9 +40,21 @@
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BezierPath = void 0;
 var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
 var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * @classdesc A BezierPath class.
+ *
+ * This was refactored from an older project.
+ *
+ * @requires Bounds
+ * @requires Vertex
+ * @requires CubicBezierCurve
+ * @requires XYCoords
+ * @requires SVGSerializable
+ **/
 var BezierPath = /** @class */ (function () {
     /**
      * The constructor.<br>
@@ -1234,25 +1242,22 @@ exports.BezierPath = BezierPath;
 
 
 /**
- * @module PlotBoilerplate
- * @classdesc A bounds class with min and max values.
- *
- * @requires XYCoords
- * @requires Vertex
- * @requires IBounds
- *
  * @author   Ikaros Kappler
  * @date     2020-05-11
  * @modified 2020-10-30 Added the static computeFromVertices function.
  * @modified 2020-11-19 Set min, max, width and height to private.
  * @version  1.1.1
- *
- * @file Bounds
- * @fileoverview A simple bounds class implementing IBounds.
- * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Bounds = void 0;
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * @classdesc A bounds class with min and max values. Implementing IBounds.
+ *
+ * @requires XYCoords
+ * @requires Vertex
+ * @requires IBounds
+ **/
 var Bounds = /** @class */ (function () {
     /**
      * The constructor.
@@ -1318,14 +1323,6 @@ exports.Bounds = Bounds;
 
 
 /**
- * @classdesc A simple circle: center point and radius.
- *
- * @requires Line
- * @requires Vector
- * @requires VertTuple
- * @requires Vertex
- * @requires SVGSerializale
- *
  * @author   Ikaros Kappler
  * @version  1.1.0
  * @date     2020-05-04
@@ -1334,15 +1331,21 @@ exports.Bounds = Bounds;
  * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
  * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  * @modified 2020-10-16 Added the containsCircle(...) function.
- *
- * @file Circle
- * @fileoverview A simple circle class: center point and radius.
- * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Circle = void 0;
 var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
 var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * @classdesc A simple circle: center point and radius.
+ *
+ * @requires Line
+ * @requires Vector
+ * @requires VertTuple
+ * @requires Vertex
+ * @requires SVGSerializale
+ **/
 var Circle = /** @class */ (function () {
     /**
      * Create a new circle with given center point and radius.
@@ -1517,10 +1520,6 @@ exports.Circle = Circle;
 
 
 /**
- * @classdesc A refactored cubic bezier curve class.
- *
- * @requires Vertex, Vector
- *
  * @author   Ikaros Kappler
  * @date     2013-08-15
  * @modified 2018-08-16 Added a closure. Removed the wrapper class 'IKRS'. Replaced class THREE.Vector2 by Vertex class.
@@ -1545,9 +1544,19 @@ exports.Circle = Circle;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CubicBezierCurve = void 0;
 var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
+/**
+ * @classdesc A refactored cubic bezier curve class.
+ *
+ * @requires Bounds
+ * @requires Vertex
+ * @requires Vector
+ * @requires XYCoords
+ * @requires SVGSerializable
+ */
 var CubicBezierCurve = /** @class */ (function () {
     /**
      * The constructor.
@@ -2232,10 +2241,6 @@ exports.CubicBezierCurve = CubicBezierCurve;
 
 
 /**
- * @classdesc A grid class with vertical and horizontal lines.
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-11-28
  * @modified 2018-12-09 Added the utils: baseLog(Number,Number) and mapRasterScale(Number,Number).
@@ -2248,6 +2253,16 @@ exports.CubicBezierCurve = CubicBezierCurve;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Grid = void 0;
+/**
+ * @classdesc A grid class with vertical and horizontal lines (or a raster).
+ *
+ * Note that the PlotBoilerplate already has a Grid instance member. The Grid is not meant
+ * to be added to the canvas as a drawable as it encapsulates more an abstract concept of the canvas
+ * rather than a drawable object.
+ *
+ * @requires Vertex
+ */
 var Grid = /** @class */ (function () {
     /**
      * The constructor.
@@ -2331,6 +2346,20 @@ exports.Grid = Grid;
 
 
 /**
+ * @author   Ikaros Kappler
+ * @date     2018-11-11 (Alaaf)
+ * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
+ * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
+ * @modified 2020-10-04 Changed `window` to `globalThis`.
+ * @modified 2020-10-04 Added extended JSDoc.
+ * @version  1.0.4
+ *
+ * @file KeyHandler
+ * @public
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.KeyHandler = void 0;
+/**
  * @classdesc A generic key handler.
  *
  * Example
@@ -2346,19 +2375,7 @@ exports.Grid = Grid;
  *
  *	    .up('windows',function() { console.log('windows was released.'); } )
  *	;
- *
- * @author   Ikaros Kappler
- * @date     2018-11-11 (Alaaf)
- * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
- * @modified 2020-10-04 Changed `window` to `globalThis`.
- * @modified 2020-10-04 Added extended JSDoc.
- * @version  1.0.4
- *
- * @file KeyHandler
- * @public
- **/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
+ */
 var KeyHandler = /** @class */ (function () {
     /**
      * The constructor.
@@ -2766,18 +2783,11 @@ exports.KeyHandler = KeyHandler;
   \*************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 27:17-21 */
+/*! CommonJS bailout: this is used directly at 20:17-21 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 /**
- * @classdesc A line consists of two vertices a and b.<br>
- * <br>
- * This is some refactored code from my 'Morley Triangle' test<br>
- *   https://github.com/IkarosKappler/morleys-trisector-theorem
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2016-03-12
  * @modified 2018-12-05 Refactored the code from the morley-triangle script.
@@ -2799,7 +2809,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -2809,8 +2819,17 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Line = void 0;
 var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * @classdesc A line consists of two vertices a and b.<br>
+ * <br>
+ * This is some refactored code from my 'Morley Triangle' test<br>
+ *   https://github.com/IkarosKappler/morleys-trisector-theorem
+ *
+ * @requires Vertex
+ */
 var Line = /** @class */ (function (_super) {
     __extends(Line, _super);
     /**
@@ -2890,15 +2909,11 @@ exports.Line = Line;
   \*********************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__ */
-/*! CommonJS bailout: this is used directly at 29:17-21 */
+/*! CommonJS bailout: this is used directly at 25:17-21 */
 /***/ (function(__unused_webpack_module, exports) {
 
 
 /**
- * @classdesc A simple mouse handler for demos.
- * Use to avoid load massive libraries like jQuery.
- *
- *
  * @author   Ikaros Kappler
  * @date     2018-03-19
  * @modified 2018-04-28 Added the param 'wasDragged'.
@@ -2925,7 +2940,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -2935,6 +2950,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MouseHandler = exports.XWheelEvent = exports.XMouseEvent = void 0;
 var XMouseEvent = /** @class */ (function (_super) {
     __extends(XMouseEvent, _super);
     function XMouseEvent() {
@@ -2951,6 +2967,12 @@ var XWheelEvent = /** @class */ (function (_super) {
     return XWheelEvent;
 }(WheelEvent));
 exports.XWheelEvent = XWheelEvent;
+/**
+ * @classdesc A simple mouse handler for demos.
+ * Use to avoid load massive libraries like jQuery.
+ *
+ * @requires XYCoords
+ */
 var MouseHandler = /** @class */ (function () {
     /**
      * The constructor.
@@ -3334,10 +3356,6 @@ exports.MouseHandler = MouseHandler;
 
 
 /**
- * @classdesc A wrapper for image objects.
- *
- * @requires Vertex, SVGSerializable
- *
  * @author   Ikaros Kappler
  * @date     2019-01-30
  * @modified 2019-03-23 Added JSDoc tags.
@@ -3350,6 +3368,13 @@ exports.MouseHandler = MouseHandler;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PBImage = void 0;
+/**
+ * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
+ *
+ * @requires Vertex
+ * @requires SVGSerializable
+ */
 var PBImage = /** @class */ (function () {
     /**
      * The constructor.
@@ -3365,12 +3390,6 @@ var PBImage = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "PBImage";
-        /* if( typeof image == 'undefined' )
-            throw Error('image must not be null.');
-        if( typeof upperLeft == 'undefined' )
-            throw Error('upperLeft must not be null.');
-        if( typeof lowerRight == 'undefined' )
-            throw Error('lowerRight must not be null.'); */
         this.image = image;
         this.upperLeft = upperLeft;
         this.lowerRight = lowerRight;
@@ -3411,24 +3430,6 @@ exports.PBImage = PBImage;
 
 
 /**
- * @classdesc The main class of the PlotBoilerplate.
- *
- * @requires Vertex
- * @requires Line
- * @requires Vector
- * @requires Polygon
- * @requires PBImage
- * @requires VEllipse
- * @requires Circle
- * @requires MouseHandler
- * @requires KeyHandler
- * @requires VertexAttr
- * @requires CubicBezierCurve
- * @requires BezierPath
- * @requires Triangle
- * @requires drawutils
- * @requires drawutilsgl
- *
  * @author   Ikaros Kappler
  * @date     2018-10-23
  * @modified 2018-11-19 Added multi-select and multi-drag.
@@ -3495,6 +3496,7 @@ exports.PBImage = PBImage;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PlotBoilerplate = void 0;
 var draw_1 = __webpack_require__(/*! ./draw */ "../src/js/draw.js");
 var drawgl_1 = __webpack_require__(/*! ./drawgl */ "../src/js/drawgl.js");
 var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
@@ -3512,6 +3514,32 @@ var VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "../src/js/VEllipse.js");
 var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
+/**
+ * @classdesc The main class of the PlotBoilerplate.
+ *
+ * @requires Vertex
+ * @requires Line
+ * @requires Vector
+ * @requires Polygon
+ * @requires PBImage
+ * @requires VEllipse
+ * @requires Circle
+ * @requires MouseHandler
+ * @requires KeyHandler
+ * @requires VertexAttr
+ * @requires CubicBezierCurve
+ * @requires BezierPath
+ * @requires Drawable
+ * @requires DrawConfig
+ * @requires IHooks
+ * @requires PBParams
+ * @requires Triangle
+ * @requires drawutils
+ * @requires drawutilsgl
+ * @requires SVGSerializable
+ * @requires XYCoords
+ * @requires XYDimension
+ */
 var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
@@ -5166,10 +5194,6 @@ exports.PlotBoilerplate = PlotBoilerplate;
 
 
 /**
- * @classdesc A polygon class.
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-04-14
  * @modified 2018-11-17 Added the containsVert function.
@@ -5191,9 +5215,19 @@ exports.PlotBoilerplate = PlotBoilerplate;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Polygon = void 0;
 var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
 var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
+ *
+ * @requires BezierPath
+ * @requires Bounds
+ * @requires SVGSerializabe
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var Polygon = /** @class */ (function () {
     /**
      * The constructor.
@@ -5526,8 +5560,6 @@ exports.Polygon = Polygon;
 
 
 /**
- * A default SVG builder.
- *
  * Todos:
  *  + use a Drawable interface
  *  + use a SVGSerializable interface
@@ -5542,7 +5574,18 @@ exports.Polygon = Polygon;
  * @version  1.0.3
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SVGBuilder = void 0;
+/**
+ * @classdesc A default SVG builder.
+ *
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var SVGBuilder = /** @class */ (function () {
+    /**
+     * @constructor
+     **/
     function SVGBuilder() {
     }
     ;
@@ -5625,14 +5668,6 @@ exports.SVGBuilder = SVGBuilder;
 
 
 /**
- * @classdesc A triangle class for triangulations.
- *
- * The class was written for a Delaunay trinagulation demo so it might
- * contain some strange and unexpected functions.
- *
- * @requires Vertex, Polygon, SVGSerializale
- *
- *
  * @author    Ikaros Kappler
  * @date_init 2012-10-17 (Wrote a first version of this in that year).
  * @date      2018-04-03 (Refactored the code into a new class).
@@ -5657,12 +5692,29 @@ exports.SVGBuilder = SVGBuilder;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Triangle = void 0;
 var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
 var Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
 var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
 var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var geomutils_1 = __webpack_require__(/*! ./geomutils */ "../src/js/geomutils.js");
+/**
+ * @classdesc A triangle class for triangulations.
+ *
+ * The class was written for a Delaunay trinagulation demo so it might
+ * contain some strange and unexpected functions.
+ *
+ * @requires Bounds
+ * @requires Circle
+ * @requires Line
+ * @requires Vertex
+ * @requires Polygon
+ * @requires SVGSerializale
+ * @requires XYCoords
+ * @requires geomutils
+ *
+ */
 var Triangle = /** @class */ (function () {
     /**
      * The constructor.
@@ -6051,10 +6103,6 @@ exports.Triangle = Triangle;
 
 
 /**
- * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-11-28
  * @modified 2018-12-04 Added the toSVGString function.
@@ -6065,6 +6113,14 @@ exports.Triangle = Triangle;
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VEllipse = void 0;
+/**
+ * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
+ *
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var VEllipse = /** @class */ (function () {
     /**
      * The constructor.
@@ -6116,18 +6172,11 @@ exports.VEllipse = VEllipse;
   \***************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 24:17-21 */
+/*! CommonJS bailout: this is used directly at 17:17-21 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 /**
- * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
- *            <br>
- *            Vectors are drawn with an arrow at their end point.<br>
- *            <b>The Vector class extends the Line class.</b>
- *
- * @requires Vertex, Line
- *
  * @author   Ikaros Kappler
  * @date     2019-01-30
  * @modified 2019-02-23 Added the toSVGString function, overriding Line.toSVGString.
@@ -6146,7 +6195,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -6156,8 +6205,17 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Vector = void 0;
 var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
+ *            <br>
+ *            Vectors are drawn with an arrow at their end point.<br>
+ *            <b>The Vector class extends the Line class.</b>
+ *
+ * @requires Vertex, Line
+ **/
 var Vector = /** @class */ (function (_super) {
     __extends(Vector, _super);
     /**
@@ -6335,10 +6393,6 @@ exports.Vector = Vector;
 
 
 /**
- * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
- * @abstract
- * @requires Vertex
- *
  * @author Ikaros Kappler
  * @date   2020-03-24
  * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
@@ -6347,7 +6401,15 @@ exports.Vector = Vector;
  * @version 1.0.2
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VertTuple = void 0;
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requiers SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var VertTuple = /** @class */ (function () {
     /**
      * Creates an instance.
@@ -6632,12 +6694,6 @@ exports.VertTuple = VertTuple;
 
 
 /**
- * @classdesc A vertex is a pair of two numbers.<br>
- * <br>
- * It is used to identify a 2-dimensional point on the x-y-plane.
- *
- * @requires VertexAttr
- *
  * @author   Ikaros Kappler
  * @date     2012-10-17
  * @modified 2018-04-03 Refactored the code of october 2012 into a new class.
@@ -6666,8 +6722,21 @@ exports.VertTuple = VertTuple;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Vertex = void 0;
 var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
 var VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "../src/js/VertexListeners.js");
+/**
+ * @classdesc A vertex is a pair of two numbers.<br>
+ * <br>
+ * It is used to identify a 2-dimensional point on the x-y-plane.
+ *
+ * @requires IVertexAttr
+ * @requires SVGSerializable
+ * @requires VertexAttr
+ * @requires VertexListeners
+ * @requires XYCoords
+ *
+ */
 var Vertex = /** @class */ (function () {
     /**
      * The constructor for the vertex class.
@@ -7186,12 +7255,6 @@ exports.Vertex = Vertex;
 
 
 /**
- * @classdesc The VertexAttr is a helper class to wrap together additional attributes
- * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
- * <br>
- * This is some sort of 'userData' object, but the constructor uses a global model
- * to obtain a (configurable) default attribute set to all instances.<br>
- *
  * @author   Ikaros Kappler
  * @date     2018-08-26
  * @modified 2018-11-17 Added the 'isSelected' attribute.
@@ -7205,6 +7268,14 @@ exports.Vertex = Vertex;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VertexAttr = void 0;
+/**
+ * @classdesc The VertexAttr is a helper class to wrap together additional attributes
+ * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
+ * <br>
+ * This is some sort of 'userData' object, but the constructor uses a global model
+ * to obtain a (configurable) default attribute set to all instances.<br>
+ */
 var VertexAttr = /** @class */ (function () {
     /**
      * The constructor.
@@ -7256,10 +7327,6 @@ exports.VertexAttr = VertexAttr;
 
 
 /**
- * @classdesc An event listeners wrapper. This is just a set of three listener
- *              queues (drag, dragStart, dragEnd) and their respective firing
- *              functions.
- *
  * @author   Ikaros Kappler
  * @date     2018-08-27
  * @modified 2018-11-28 Added the vertex-param to the constructor and extended the event. Vertex events now have a 'params' attribute object.
@@ -7273,6 +7340,13 @@ exports.VertexAttr = VertexAttr;
  * @public
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.VertexListeners = void 0;
+/**
+ * @classdesc An event listeners wrapper. This is just a set of three listener
+ *              queues (drag, dragStart, dragEnd) and their respective firing
+ *              functions.
+ *
+ */
 var VertexListeners = /** @class */ (function () {
     /**
      * The constructor.
@@ -7541,10 +7615,6 @@ exports.VertexListeners = VertexListeners;
 
 
 /**
- * A wrapper class for basic drawing operations.
- *
- * @require Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-04-22
  * @modified 2018-08-16 Added the curve() function to draw cubic bézier curves.
@@ -7580,9 +7650,19 @@ exports.VertexListeners = VertexListeners;
  * @version  1.8.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.drawutils = void 0;
 var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 // Todo: rename this class to Drawutils
+/**
+ * @classdesc A wrapper class for basic drawing operations.
+ *
+ * @requires CubicBzierCurvce
+ * @requires Polygon
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var drawutils = /** @class */ (function () {
     /**
      * The constructor.
@@ -8289,11 +8369,6 @@ exports.drawutils = drawutils;
 
 
 /**
- * A wrapper class for basic drawing operations. This is the WebGL
- * implementation whih sould work with shaders.
- *
- * @require Vertex
- *
  * @author   Ikaros Kappler
  * @date     2019-09-18
  * @modified 2019-10-03 Added the beginDrawCycle hook.
@@ -8302,7 +8377,18 @@ exports.drawutils = drawutils;
  * @version  0.0.4
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.drawutilsgl = void 0;
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * @classdesc A wrapper class for basic drawing operations. This is the WebGL
+ * implementation whih sould work with shaders.
+ *
+ * @requires CubicBzierCurvce
+ * @requires Polygon
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var drawutilsgl = /** @class */ (function () {
     /**
      * The constructor.
@@ -8935,10 +9021,18 @@ var GLU = /** @class */ (function () {
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
+/**
+ * @author  Ikaros Kappler
+ * @date    2019-02-03
+ * @version 1.0.0
+ **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.geomutils = void 0;
 var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
 var Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
 /**
+ * A collection of usefull geometry utilities.
+ *
  * @global
  **/
 exports.geomutils = {

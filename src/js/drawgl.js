@@ -1,10 +1,5 @@
 "use strict";
 /**
- * A wrapper class for basic drawing operations. This is the WebGL
- * implementation whih sould work with shaders.
- *
- * @require Vertex
- *
  * @author   Ikaros Kappler
  * @date     2019-09-18
  * @modified 2019-10-03 Added the beginDrawCycle hook.
@@ -15,6 +10,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilsgl = void 0;
 var Vertex_1 = require("./Vertex");
+/**
+ * @classdesc A wrapper class for basic drawing operations. This is the WebGL
+ * implementation whih sould work with shaders.
+ *
+ * @requires CubicBzierCurvce
+ * @requires Polygon
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var drawutilsgl = /** @class */ (function () {
     /**
      * The constructor.

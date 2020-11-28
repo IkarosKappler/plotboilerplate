@@ -1,15 +1,4 @@
 /**
- * @classdesc A script for finding the intersection points of two circles (the 'radical line').
- *
- * Based on the C++ implementation by Robert King
- *    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
- * and the 'Circles and spheres' article by Paul Bourke.
- *    http://paulbourke.net/geometry/circlesphere/
- *
- * @requires Circle
- * @requires Line
- * @requires CirularIntervalSet
- * 
  * @author   Ikaros Kappler
  * @date     2020-10-05
  * @version  1.0.0
@@ -24,6 +13,24 @@ import { Line } from "../../Line";
 import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
 import { Interval, IndexPair, Matrix } from "../datastructures/interfaces";
 
+
+/**
+ * @classdesc A script for finding the intersection points of two circles (the 'radical line').
+ *
+ * Based on the C++ implementation by Robert King
+ *    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
+ * and the 'Circles and spheres' article by Paul Bourke.
+ *    http://paulbourke.net/geometry/circlesphere/
+ *
+ * @requires arrayFill
+ * @requires matrixFill
+ * @requires Circle
+ * @requires IndexPair
+ * @requires Matrix
+ * @requires Interval
+ * @requires Line
+ * @requires CirularIntervalSet
+ */
 export class CircleIntersections {
 
     /**

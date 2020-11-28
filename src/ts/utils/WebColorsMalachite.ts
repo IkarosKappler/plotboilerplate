@@ -1,7 +1,17 @@
+/**
+ * @author   Ikaros Kappler
+ * @version  1.0.0
+ * @date     2018-11-11
+ **/
 
 import { Color } from "./datastructures/Color";
 
-// A mix of green shades
+
+/**
+ * A mix of green shades.
+ *
+ * @requires Color
+ */
 export const WebColorsMalachite : Array<Color> = [
     Color.makeRGB(0,21,6),
     Color.makeRGB(0,30,12),

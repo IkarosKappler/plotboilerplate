@@ -1,9 +1,5 @@
 "use strict";
 /**
- * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
- *
- * @requires Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-11-28
  * @modified 2018-12-04 Added the toSVGString function.
@@ -15,6 +11,13 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipse = void 0;
+/**
+ * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
+ *
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var VEllipse = /** @class */ (function () {
     /**
      * The constructor.

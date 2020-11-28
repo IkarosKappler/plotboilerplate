@@ -1,15 +1,4 @@
 /**
- * @classdesc The Girih datastructure for generating patterns.
- *
- * @requires Vertex
- * @requires GirihTile
- * @requires GirihBowtie
- * @requires GirihDecagon
- * @requires GirihHexagon
- * @requires GirihPenroseRhombus
- * @requires GirihPentagon
- * @requires GirihRhombus
- *
  * @author   Ikaros Kappler
  * @date     2020-11-24
  * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
@@ -27,6 +16,19 @@ import { GirihPentagon } from "./GirihPentagon";
 import { GirihRhombus } from "./GirihRhombus";
 
 
+
+/**
+ * @classdesc The Girih datastructure for generating patterns.
+ *
+ * @requires Vertex
+ * @requires GirihTile
+ * @requires GirihBowtie
+ * @requires GirihDecagon
+ * @requires GirihHexagon
+ * @requires GirihPenroseRhombus
+ * @requires GirihPentagon
+ * @requires GirihRhombus
+ */
 export class Girih {
 
     /**

@@ -1,22 +1,4 @@
 /**
- * @classdesc The main class of the PlotBoilerplate.
- *
- * @requires Vertex
- * @requires Line
- * @requires Vector
- * @requires Polygon
- * @requires PBImage
- * @requires VEllipse
- * @requires Circle
- * @requires MouseHandler
- * @requires KeyHandler
- * @requires VertexAttr
- * @requires CubicBezierCurve
- * @requires BezierPath
- * @requires Triangle
- * @requires drawutils
- * @requires drawutilsgl
- *
  * @author   Ikaros Kappler
  * @date     2018-10-23
  * @modified 2018-11-19 Added multi-select and multi-drag.
@@ -91,6 +73,32 @@ import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { IDraggable, Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
+/**
+ * @classdesc The main class of the PlotBoilerplate.
+ *
+ * @requires Vertex
+ * @requires Line
+ * @requires Vector
+ * @requires Polygon
+ * @requires PBImage
+ * @requires VEllipse
+ * @requires Circle
+ * @requires MouseHandler
+ * @requires KeyHandler
+ * @requires VertexAttr
+ * @requires CubicBezierCurve
+ * @requires BezierPath
+ * @requires Drawable
+ * @requires DrawConfig
+ * @requires IHooks
+ * @requires PBParams
+ * @requires Triangle
+ * @requires drawutils
+ * @requires drawutilsgl
+ * @requires SVGSerializable
+ * @requires XYCoords
+ * @requires XYDimension
+ */
 export declare class PlotBoilerplate {
     /** @constant {number} */
     static readonly DEFAULT_CANVAS_WIDTH: number;

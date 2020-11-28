@@ -1,9 +1,5 @@
 "use strict";
 /**
- * @classdesc A simple mouse handler for demos.
- * Use to avoid load massive libraries like jQuery.
- *
- *
  * @author   Ikaros Kappler
  * @date     2018-03-19
  * @modified 2018-04-28 Added the param 'wasDragged'.
@@ -57,6 +53,12 @@ var XWheelEvent = /** @class */ (function (_super) {
     return XWheelEvent;
 }(WheelEvent));
 exports.XWheelEvent = XWheelEvent;
+/**
+ * @classdesc A simple mouse handler for demos.
+ * Use to avoid load massive libraries like jQuery.
+ *
+ * @requires XYCoords
+ */
 var MouseHandler = /** @class */ (function () {
     /**
      * The constructor.

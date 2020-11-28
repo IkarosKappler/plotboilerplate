@@ -1,9 +1,5 @@
 "use strict";
 /**
- * A wrapper class for basic drawing operations.
- *
- * @require Vertex
- *
  * @author   Ikaros Kappler
  * @date     2018-04-22
  * @modified 2018-08-16 Added the curve() function to draw cubic bézier curves.
@@ -43,6 +39,15 @@ exports.drawutils = void 0;
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Vertex_1 = require("./Vertex");
 // Todo: rename this class to Drawutils
+/**
+ * @classdesc A wrapper class for basic drawing operations.
+ *
+ * @requires CubicBzierCurvce
+ * @requires Polygon
+ * @requires SVGSerializable
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var drawutils = /** @class */ (function () {
     /**
      * The constructor.

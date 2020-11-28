@@ -1,4 +1,16 @@
 /**
+ * @author   Ikaros Kappler
+ * @date     2018-11-11 (Alaaf)
+ * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
+ * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
+ * @modified 2020-10-04 Changed `window` to `globalThis`.
+ * @modified 2020-10-04 Added extended JSDoc.
+ * @version  1.0.4
+ *
+ * @file KeyHandler
+ * @public
+ **/
+/**
  * @classdesc A generic key handler.
  *
  * Example
@@ -14,18 +26,7 @@
  *
  *	    .up('windows',function() { console.log('windows was released.'); } )
  *	;
- *
- * @author   Ikaros Kappler
- * @date     2018-11-11 (Alaaf)
- * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
- * @modified 2020-10-04 Changed `window` to `globalThis`.
- * @modified 2020-10-04 Added extended JSDoc.
- * @version  1.0.4
- *
- * @file KeyHandler
- * @public
- **/
+ */
 export declare class KeyHandler {
     private element;
     private downListeners;

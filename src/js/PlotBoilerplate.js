@@ -1,23 +1,5 @@
 "use strict";
 /**
- * @classdesc The main class of the PlotBoilerplate.
- *
- * @requires Vertex
- * @requires Line
- * @requires Vector
- * @requires Polygon
- * @requires PBImage
- * @requires VEllipse
- * @requires Circle
- * @requires MouseHandler
- * @requires KeyHandler
- * @requires VertexAttr
- * @requires CubicBezierCurve
- * @requires BezierPath
- * @requires Triangle
- * @requires drawutils
- * @requires drawutilsgl
- *
  * @author   Ikaros Kappler
  * @date     2018-10-23
  * @modified 2018-11-19 Added multi-select and multi-drag.
@@ -102,6 +84,32 @@ var VEllipse_1 = require("./VEllipse");
 var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");
 var VertexAttr_1 = require("./VertexAttr");
+/**
+ * @classdesc The main class of the PlotBoilerplate.
+ *
+ * @requires Vertex
+ * @requires Line
+ * @requires Vector
+ * @requires Polygon
+ * @requires PBImage
+ * @requires VEllipse
+ * @requires Circle
+ * @requires MouseHandler
+ * @requires KeyHandler
+ * @requires VertexAttr
+ * @requires CubicBezierCurve
+ * @requires BezierPath
+ * @requires Drawable
+ * @requires DrawConfig
+ * @requires IHooks
+ * @requires PBParams
+ * @requires Triangle
+ * @requires drawutils
+ * @requires drawutilsgl
+ * @requires SVGSerializable
+ * @requires XYCoords
+ * @requires XYDimension
+ */
 var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
