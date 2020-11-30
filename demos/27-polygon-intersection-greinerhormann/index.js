@@ -1,5 +1,5 @@
 /**
- * A script for drawing Girihs.
+ * A script for testing the Greiner-Hormann polygon intersection algorithm with PlotBoilerplate.
  *
  * @requires PlotBoilerplate
  * @requires MouseHandler
