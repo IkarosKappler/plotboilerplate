@@ -95,8 +95,8 @@
 	// | This is the actual render function.
 	// +-------------------------------
 	var drawAll = function() {
-	    var polygonA = new Polygon( getConvexHull(verticesA), false ); // Polygons are not open
-	    var polygonB = new Polygon( getConvexHull(verticesB), false );
+	    var polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); // Polygons are not open
+	    var polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false );
 
 	    var intersect = polygonsIntersect( polygonA, polygonB );
 
@@ -136,7 +136,7 @@
 		}
 		for(var i = 0, len = intersection.length; i < len; i++){
 		    // L.polygon(intersection[i], {...}).addTo(map);
-		    pb.fill.polyline( intersection[0],
+		    pb.fill.polyline( intersection[i],
 				      false,
 				     'rgba(0,192,192,0.5)',
 				      2.0 ); // Polygon is not open
@@ -172,7 +172,8 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    
+	    useConvexHullA : true,
+	    useConvexHullB : true
 	}, GUP );
 
 
@@ -181,13 +182,9 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-	    /* gui.add(config, 'drawCornerNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
-	    gui.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
-	    gui.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
-	    gui.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");
-	    gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
-	    gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
-	    gui.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?"); */
+	    gui.add(config, 'useConvexHullA').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullA").title("Use the convex hull of polygon A?");
+	    gui.add(config, 'useConvexHullB').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullB").title("Use the convex hull of polygon B?");
+	    
 	}
 
 	pb.config.preDraw = drawAll;
