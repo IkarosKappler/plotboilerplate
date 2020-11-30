@@ -6,6 +6,8 @@
  * @date 2020-11-30
  */
 
+import Vertex from "./vertex";
+
 /**
  * Defines an edge intersection.
  */
@@ -20,16 +22,6 @@ export default class Intersection {
      * @type {Number}
      */
     public y : number;
-
-    /**
-     * @type {Number}
-     */
-    public toSource : number;
-
-    /**
-     * @type {Number}
-     */
-    public toClip : number;
 
     /**
      * @type {Number}

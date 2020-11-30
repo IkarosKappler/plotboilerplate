@@ -6,7 +6,7 @@
  * @date 2020-11-30
  */
 
-import { IVertex, IArrayVertex } from "./interfaces";
+import { IObjVertex, IArrayVertex } from "./interfaces";
 import Vertex from './vertex';
 import Intersection from './intersection';
 
@@ -30,14 +30,19 @@ export default class Polygon {
     /**
      * @type {Vertex}
      */
-    public lastUnprocessed : Vertex | undefined;
+    public _lastUnprocessed : Vertex | undefined;
 
     /**
      * Whether to handle input and output as [x,y] or {x:x,y:y}
      * @type {Boolean}
      */
     public _arrayVertices : boolean;
-    
+
+    /**
+     * @type {Vertex}
+     * @private 
+     */
+    private _firstIntersect : Vertex | undefined;
 
     /**
      * Construct a new polygon.
@@ -46,7 +51,7 @@ export default class Polygon {
      * @param {Array.<Array.<Number>>} p
      * @param {Boolean=}               arrayVertices
      */
-    constructor (p:Array<IVertex|IArrayVertex>, arrayVertices:boolean) {
+    constructor (p:Array<IObjVertex|IArrayVertex>, arrayVertices?:boolean) {
 	
 	this.first = null;
 	this.vertices = 0;
@@ -114,7 +119,7 @@ export default class Polygon {
      * @param  {Vertex} v
      * @return {Vertex}
      */
-    getNext (v : Vertex ) : void {
+    getNext (v : Vertex ) : Vertex {
 	let c = v;
 	while (c._isIntersection) c = c.next;
 	return c;

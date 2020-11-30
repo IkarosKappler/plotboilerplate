@@ -6,7 +6,7 @@
  * @date 2020-11-30
  */
 
-import { IArrayVertex } from "./interfaces";
+import { IArrayVertex, IObjVertex } from "./interfaces";
 import Polygon from "./polygon";
 
 /**
@@ -75,20 +75,26 @@ export default class Vertex {
      * @param {Number|Array.<Number>} x
      * @param {Number=}               y
      */
-    constructor (x:number|Vertex|IArrayVertex, y?:number) {
+    constructor (x:number|IObjVertex|IArrayVertex, y?:number) {
+	let numX : number;
+	let numY : number;
 	if (arguments.length === 1) {
 	    // Coords
 	    if (Array.isArray(x)) {
-		y = x[1];
-		x = x[0];
-	    } else if( typeof x.x !== "undefined" && typeof x.y !== "undefined" ) {
-		y = x.y;
-		x = x.x;
+		this.y = x[1];
+		this.x = x[0];
+	    } else if( typeof x !== "number" && typeof x.x === "number" && typeof x.y === "number" ) {
+		this.y = x.y;
+		this.x = x.x;
+	    } else {
+		// Not a valid case: only one numeric parameter. Throw exception?
 	    }
+	} else if( typeof x === "number" && typeof y === "number" ) {
+	    this.x = x;
+	    this.y = y;
+	} else {
+	    throw `Illegal vertex constrctor call: (${typeof x}, ${typeof y}).`;
 	}
-
-	this.x = x;
-	this.y = y;
 	this.next = null;
 	this.prev = null;
 	this._corresponding = null;
@@ -145,6 +151,7 @@ export default class Vertex {
      */
     isInside (poly:Polygon) : boolean {
 	let oddNodes = false;
+	let b : boolean;
 	let vertex = poly.first;
 	let next = vertex.next;
 	const x = this.x;
@@ -154,8 +161,12 @@ export default class Vertex {
 	    if ((vertex.y < y && next.y   >= y ||
 		next.y < y && vertex.y >= y) &&
 		(vertex.x <= x || next.x <= x)) {
-		oddNodes ^= (vertex.x + (y - vertex.y) /
+		// TODO: cleanup
+		// oddNodes ^= (vertex.x + (y - vertex.y) /
+		//    (next.y - vertex.y) * (next.x - vertex.x) < x);
+		b = (vertex.x + (y - vertex.y) /
 		    (next.y - vertex.y) * (next.x - vertex.x) < x);
+		oddNodes = (!oddNodes && b) || (oddNodes && !b);
 	    }
 
 	    vertex = vertex.next;
