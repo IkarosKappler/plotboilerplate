@@ -10,7 +10,7 @@
 	"declaration": true
 
     },
-    "include": ["./src/ts/*","./src/ts/utils/algorithms/greiner-hormann-typescript/src/*"],
+    "include": ["./src/ts/*","./src/ts/utils/algorithms/greiner-hormann-typescript/src/*.ts"],
     "exclude": ["./dist", "./tmp","./src/js","./src/vanilla", "npm-package", "demos"],
     "removeComments": false
 }

@@ -8,6 +8,17 @@
 
 import Polygon from './polygon';
 
+// Minimal L.Polygon from Leaflet, as used here
+// Compare https://github.com/Leaflet/Leaflet/blob/master/src/layer/vector/Polygon.js
+type L_ILatLng = Array<{
+    lat: number;
+    lang: number;
+}>;
+
+interface L_IPolygon {
+    _latlngs : Array<L_ILatLng>;
+}
+
 /**
  * Clip driver
  * @param  {L.Polygon} polygonA
@@ -18,7 +29,7 @@ import Polygon from './polygon';
  */
 // TODO: types?
 // TODO: as arrow function
-export default function (polygonA:any, polygonB:any, sourceForwards:boolean, clipForwards:boolean) {
+export default function (polygonA:L_IPolygon, polygonB:L_IPolygon, sourceForwards:boolean, clipForwards:boolean) {
     let sourceArr = [], clipArr = [];
 
     let latlngs = polygonA['_latlngs'][0];
