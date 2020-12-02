@@ -1,3 +1,5 @@
+[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
+
 # An interactive Javascript Plotting Boilerplate
 For plotting visual 2D data with Javascript and HTML canvas (in 2d-context).
 
