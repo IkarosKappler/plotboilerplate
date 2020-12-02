@@ -118,24 +118,23 @@
 	    pb.fill.label( 'polygonsIntersect=' + intersect, 3, 30, 0, 'black' );
 
 	    // Array<Vertex>
-	    var intersectionPoints = drawGreinerHormannIntersection( polygonA.vertices, polygonB.vertices );
-
-	    drawTriangulation( intersectionPoints, polygonA, polygonB );
+	    var intersectionPoints = drawGreinerHormannIntersection( polygonA, polygonB );
 	};
 
-	var drawGreinerHormannIntersection = function( source, clip ) {
+	var drawGreinerHormannIntersection = function( sourcePolygon, clipPolygon ) {
 	    // Array<Vertex> | Array<Array<Vertex>>
 	    // TODO: the algorithm should be more clear here. Just return an array of Polygons.
 	    //       If there is only one intersection polygon, there should be a returned
 	    //       array with length 1. (or 0 if there is none; currently the result is null then).
-	    var intersection = greinerHormann.intersection(source, clip);
-	    var union        = greinerHormann.union(source, clip);
-	    var diff         = greinerHormann.diff(source, clip);
+	    var intersection = greinerHormann.intersection(sourcePolygon.vertices, clipPolygon.vertices);
+	    // These can be remove but they are there for fun :)
+	    var union        = greinerHormann.union(sourcePolygon.vertices, clipPolygon.vertices);
+	    var diff         = greinerHormann.diff(sourcePolygon.vertices, clipPolygon.vertices);
 
 	    // console.log( intersection );
 
 	    // Collect all intersection points (may contain duplicates)
-	    var intersectionPoints = [];
+	    // var intersectionPoints = [];
 
 	    if( intersection ) {
 		if( typeof intersection[0][0] === 'number' ) { // single linear ring
@@ -153,12 +152,16 @@
 				     'rgba(0,192,192,0.25)',
 				      2.0 ); // Polygon is not open
 		    
-		    for( var j = 0; j < intersection[i].length; j++ ) {
+		    /* for( var j = 0; j < intersection[i].length; j++ ) {
 			intersectionPoints.push( intersection[i][j] ); // Add vertex
-		    }    
+		    }*/ 
+
+		    console.log( intersection[i] );
+		    if( config.triangulate )
+			drawTriangulation( intersection[i], sourcePolygon, clipPolygon );
 		}
 	    }
-	    return intersectionPoints;
+	    // return intersectionPoints;
 	};
 
 	var drawTriangulation = function( intersectionPoints, polygonA, polygonB ) {
@@ -214,7 +217,8 @@
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
 	    useConvexHullA : true,
-	    useConvexHullB : true
+	    useConvexHullB : true,
+	    triangulate : false
 	}, GUP );
 
 
@@ -225,6 +229,7 @@
 	    var gui = pb.createGUI();
 	    gui.add(config, 'useConvexHullA').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullA").title("Use the convex hull of polygon A?");
 	    gui.add(config, 'useConvexHullB').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullB").title("Use the convex hull of polygon B?");
+	    gui.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name("triangulate").title("Tringulate the result?");
 	    
 	}
 
