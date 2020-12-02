@@ -23,6 +23,7 @@
 
 	// Fetch the GET params
 	let GUP = gup();
+	let Orange = Color.makeRGB( 255, 128, 0 );
 
 	// All config params are optional.
 	var pb = new PlotBoilerplate(
@@ -104,7 +105,7 @@
 			     Teal.cssRGB(), // 'rgba(128,128,128,0.5)',
 			     1.0 ); // Polygon is not open
 	    pb.draw.polygon( polygonB,
-			     Red.cssRGB(), // 'rgba(128,128,128,0.5)',
+			     Orange.cssRGB(), // 'rgba(128,128,128,0.5)',
 			     1.0 ); // Polygon is not open
 
 	    var intersect = polygonsIntersect( polygonA, polygonB );
@@ -116,31 +117,71 @@
 	    pb.fill.label( 'polygonB.contains(mouse)=' + mouseInB, 3, 20, 0, 'black' );
 	    pb.fill.label( 'polygonsIntersect=' + intersect, 3, 30, 0, 'black' );
 
-	    drawGreinerHormannIntersection( polygonA.vertices, polygonB.vertices );
+	    // Array<Vertex>
+	    var intersectionPoints = drawGreinerHormannIntersection( polygonA.vertices, polygonB.vertices );
+
+	    drawTriangulation( intersectionPoints, polygonA, polygonB );
 	};
 
 	var drawGreinerHormannIntersection = function( source, clip ) {
+	    // Array<Vertex> | Array<Array<Vertex>>
+	    // TODO: the algorithm should be more clear here. Just return an array of Polygons.
+	    //       If there is only one intersection polygon, there should be a returned
+	    //       array with length 1. (or 0 if there is none; currently the result is null then).
 	    var intersection = greinerHormann.intersection(source, clip);
 	    var union        = greinerHormann.union(source, clip);
 	    var diff         = greinerHormann.diff(source, clip);
 
 	    // console.log( intersection );
 
-	    if(intersection){
-		if(typeof intersection[0][0] === 'number'){ // single linear ring
+	    // Collect all intersection points (may contain duplicates)
+	    var intersectionPoints = [];
+
+	    if( intersection ) {
+		if( typeof intersection[0][0] === 'number' ) { // single linear ring
 		    intersection = [intersection];
-		    pb.fill.polyline( intersection,
+		    /* pb.fill.polyline( intersection,
 				      'rgba(0,192,192,0.5)',
 				      false,
-				      2.0 ); // Polygon is not open
+				      2.0 ); // Polygon is not open */
 		}
-		for(var i = 0, len = intersection.length; i < len; i++){
-		    // L.polygon(intersection[i], {...}).addTo(map);
+		
+		//console.log( intersection );
+		for( var i = 0, len = intersection.length; i < len; i++ ){
 		    pb.fill.polyline( intersection[i],
 				      false,
-				     'rgba(0,192,192,0.5)',
+				     'rgba(0,192,192,0.25)',
 				      2.0 ); // Polygon is not open
+		    
+		    for( var j = 0; j < intersection[i].length; j++ ) {
+			intersectionPoints.push( intersection[i][j] ); // Add vertex
+		    }    
 		}
+	    }
+	    return intersectionPoints;
+	};
+
+	var drawTriangulation = function( intersectionPoints, polygonA, polygonB ) {
+	    var delaunay = new Delaunay( intersectionPoints, {} );
+	    // Array<Triangle>
+	    var triangles = delaunay.triangulate();
+
+	    for( var i in triangles ) {
+		var tri = triangles[i];
+		// Check if triangle belongs to the polygon or is outside
+		if( !polygonA.containsVert( tri.getCentroid() ) )
+		    continue;
+		if( !polygonB.containsVert( tri.getCentroid() ) )
+		    continue;
+
+		// Cool, triangle is part of the intersection.
+		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgb(0,128,255)', 1 );
+		// pb.draw.crosshair( tri.a, 8, 'green' );
+		// pb.draw.crosshair( tri.b, 8, 'green' );
+		// pb.draw.crosshair( tri.c, 8, 'green' );
+		drawFancyCrosshair( pb, tri.a, false, false );
+		drawFancyCrosshair( pb, tri.b, false, false );
+		drawFancyCrosshair( pb, tri.c, false, false );
 	    }
 	};
 
