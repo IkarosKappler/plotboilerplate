@@ -4,7 +4,10 @@
  * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
  * @modified 2020-05-12 The angle(line) param was still not optional. Changed that.
  * @modified 2020-11-11 Generalized the `add` and `sub` param from `Vertex` to `XYCoords`.
- * @version 1.0.2
+ * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
+ * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
+ * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
+ * @version 1.0.3
  */
 import { Vertex } from "./Vertex";
 import { XYCoords } from "./interfaces";
@@ -157,13 +160,26 @@ export declare class VertTuple<T extends VertTuple<T>> {
      *
      * The counterpart for this function is Line.vertAt(Number).
      *
+     * @name getClosetT
      * @method getClosestT
-     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @param {XYCoords} p The point (vertex) to measure the distance to.
      * @return {number} The line position t of minimal distance to p.
      * @instance
      * @memberof VertTuple
      **/
-    getClosestT(p: Vertex): number;
+    getClosestT(p: XYCoords): number;
+    /**
+     * Check if the given point is located on this line. Optionally also check if
+     * that point is located between point `a` and `b`.
+     *
+     * @method hasPoint
+     * @param {Vertex} point The point to check.
+     * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
+     * @return {boolean} True if the given point is on this line.
+     * @instance
+     * @memberof VertTuple
+     */
+    hasPoint(point: XYCoords, insideBoundsOnly?: boolean): boolean;
     /**
      * Get the closest point on this line to the specified point.
      *
@@ -206,6 +222,6 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @private
      **/
     static vtutils: {
-        dist2: (v: Vertex, w: Vertex) => number;
+        dist2: (v: XYCoords, w: XYCoords) => number;
     };
 }

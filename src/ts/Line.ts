@@ -11,7 +11,8 @@
  * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
  * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  2.1.2
+ * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
+ * @version  2.1.3
  *
  * @file Line
  * @public
@@ -60,26 +61,33 @@ export class Line
      *
      * @method intersection
      * @param {Line} line The second line.
-     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
      * @instance
      * @memberof Line
      **/
     // !!! DO NOT MOVE TO VertTuple
-    intersection( line:Line ):Vertex {
-	var denominator = this.denominator(line);
+    intersection( line:Line ):Vertex|undefined {
+	const denominator : number = this.denominator(line);
 	if( denominator == 0 ) 
 	    return null;
 	
-	var a = this.a.y - line.a.y; 
-	var b = this.a.x - line.a.x; 
-	var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-	var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+	let a : number = this.a.y - line.a.y; 
+	let b : number = this.a.x - line.a.x; 
+	const numerator1 : number = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
+	const numerator2 : number = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
 	a = numerator1 / denominator; // NaN if parallel lines
 	b = numerator2 / denominator;
+
+	// Catch NaN?
+	const x : number = this.a.x + (a * (this.b.x - this.a.x));
+	const y : number = this.a.y + (a * (this.b.y - this.a.y));
+
+	if( isNaN(a) || isNaN(x) || isNaN(y) ) {
+	    return undefined;
+	}
 	
 	// if we cast these lines infinitely in both directions, they intersect here:
-	return new Vertex( this.a.x + (a * (this.b.x - this.a.x)),
-			   this.a.y + (a * (this.b.y - this.a.y)) );
+	return new Vertex( x, y );
     };
     
 

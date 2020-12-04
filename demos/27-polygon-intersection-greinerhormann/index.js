@@ -66,8 +66,12 @@
 	// +---------------------------------------------------------------------------------
 	// | Pick a color from the WebColors array.
 	// +-------------------------------
-	var randomWebColor = function(index) {
-	    return WebColors[ index % WebColors.length ].cssRGB();
+	var randomWebColor = function(alpha,index) {
+	    if( typeof index === "undefined" )
+		index = Math.floor( Math.random() * WebColors.length );
+	    var clone = WebColors[ index % WebColors.length ].clone();
+	    clone.a = alpha;
+	    return clone.cssRGB();
 	};
 
 	
@@ -121,6 +125,13 @@
 	    var intersectionPoints = drawGreinerHormannIntersection( polygonA, polygonB );
 	};
 
+	/**
+	 * Draw the intersection polygon as the result of the Greiner-Horman
+	 * clipping algorihm.
+	 *
+	 * @param {Polygon} sourcePolygon
+	 * @param {Polygon} clipPolygon
+	 */
 	var drawGreinerHormannIntersection = function( sourcePolygon, clipPolygon ) {
 	    // Array<Vertex> | Array<Array<Vertex>>
 	    // TODO: the algorithm should be more clear here. Just return an array of Polygons.
@@ -156,25 +167,92 @@
 			intersectionPoints.push( intersection[i][j] ); // Add vertex
 		    }*/ 
 
-		    console.log( intersection[i] );
+		    // console.log( intersection[i] );
 		    if( config.triangulate )
-			drawTriangulation( intersection[i], sourcePolygon, clipPolygon );
+			drawTriangulation( new Polygon(intersection[i]), sourcePolygon, clipPolygon );
 		}
 	    }
 	    // return intersectionPoints;
 	};
 
-	var drawTriangulation = function( intersectionPoints, polygonA, polygonB ) {
-	    var delaunay = new Delaunay( intersectionPoints, {} );
+
+	var __drawTriangulation = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
+	    var cleanPolyVerts = findNonIntersectingPolygons( intersectionPolygon.vertices );
+	    console.log('cleanPolyVerts', cleanPolyVerts );
+
+	    for( var i = 0; i < cleanPolyVerts.length; i++ ) {
+		var color = randomWebColor(0.9,i);
+		// console.log( 'color', color );
+		pb.draw.polyline( cleanPolyVerts[i],
+				  false,
+				  color, // 'rgb(0,128,255)', // 'rgba(0,192,192,0.25)',
+				  1.5
+				); // Polygon is not open
+		pb.fill.text( '' + i, cleanPolyVerts[i][0].x+3, cleanPolyVerts[i][0].y, 0, 'white' );
+	    }
+	};
+
+
+
+
+	/**
+	 * @param {Polygon} intersectionPolygon
+	 * @param {Polygon} sourcePolygon
+	 * @param {Polygon} clipPolygon
+	 */
+	var _drawTriangulation = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
+	    // Convert for the earcut algorithm
+	    var earcutVertices = [];
+	    for( var i = 0; i < intersectionPolygon.vertices.length; i++ ) {
+		earcutVertices.push( intersectionPolygon.vertices[i].x );
+		earcutVertices.push( intersectionPolygon.vertices[i].y );
+	    }
+
+	    var triangleIndices = earcut( earcutVertices,
+					  [], // holeIndices
+					  2 // dim
+					);
+	    // console.log( triangleIndices );
+
+	    var triangles = [];
+	    for( var i = 0; i+2 < triangleIndices.length; i+= 3 ) {
+		var a = triangleIndices[i];
+		var b = triangleIndices[i+1];
+		var c = triangleIndices[i+2];
+		var tri = new Triangle( intersectionPolygon.vertices[a],
+					intersectionPolygon.vertices[b],
+					intersectionPolygon.vertices[c] );
+		triangles.push( tri );
+		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgb(0,128,255)', 1 );
+	    }
+	    
+	};
+	
+	/**
+	 * @param {Polygon} intersectionPolygon
+	 * @param {Polygon} sourcePolygon
+	 * @param {Polygon} clipPolygon
+	 */
+	var drawTriangulation = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
+	    var selfIntersectionPoints = findSelfIntersecionPoints(intersectionPolygon);
+	    var extendedPointList = intersectionPolygon.vertices.concat( selfIntersectionPoints );
+	
+	  
+	    // var delaunay = new Delaunay( intersectionPolygon.vertices, {} );
+	    var delaunay = new Delaunay( extendedPointList, {} );
 	    // Array<Triangle>
 	    var triangles = delaunay.triangulate();
+
+	    // Find real intersections with the triangulations and the polygon
+	    // extendedPointList
+	    
 
 	    for( var i in triangles ) {
 		var tri = triangles[i];
 		// Check if triangle belongs to the polygon or is outside
-		if( !polygonA.containsVert( tri.getCentroid() ) )
+		if( !sourcePolygon.containsVert( tri.getCentroid() ) )
 		    continue;
-		if( !polygonB.containsVert( tri.getCentroid() ) )
+		if( !clipPolygon.containsVert( tri.getCentroid() ) )
 		    continue;
 
 		// Cool, triangle is part of the intersection.
@@ -185,7 +263,35 @@
 		drawFancyCrosshair( pb, tri.a, false, false );
 		drawFancyCrosshair( pb, tri.b, false, false );
 		drawFancyCrosshair( pb, tri.c, false, false );
+		var circumCircle = tri.getCircumcircle();
+		pb.draw.crosshair( circumCircle.center, 5, 'rgba(255,0,0,0.25)' );
+		pb.draw.circle(  circumCircle.center, circumCircle.radius, 'rgba(255,0,0,0.25)',1.0 );
 	    }
+	};
+
+
+	var findSelfIntersecionPoints = function( polygon ) {
+	    var pointList = [];
+	    var lineA = new Line( new Vertex(), new Vertex() );
+	    var lineB = new Line( new Vertex(), new Vertex() );
+	    for( var a = 0; a < polygon.vertices.length; a++ ) {
+		lineA.a.set( polygon.getVertexAt(a) );
+		lineA.b.set( polygon.getVertexAt(a+1) );
+		for( var b = 0; b < polygon.vertices.length; b++ ) {
+		    if( a == b )
+			continue;
+		    lineB.a.set( polygon.getVertexAt(b) );
+		    lineB.b.set( polygon.getVertexAt(b+1) );
+
+		    const intersectionPoint = lineA.intersection(lineB);
+		    // console.log( 'intersectionPoint', intersectionPoint );
+		    if( intersectionPoint && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint) ) {
+			pointList.push( intersectionPoint );
+		    }
+		}	
+	    }
+	    // console.log( 'intersectionPoints', pointList );
+	    return pointList;
 	};
 
 

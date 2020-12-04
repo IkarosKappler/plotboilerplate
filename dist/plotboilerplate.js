@@ -2783,7 +2783,7 @@ exports.KeyHandler = KeyHandler;
   \*************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 20:17-21 */
+/*! CommonJS bailout: this is used directly at 21:17-21 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2800,7 +2800,8 @@ exports.KeyHandler = KeyHandler;
  * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
  * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  2.1.2
+ * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
+ * @version  2.1.3
  *
  * @file Line
  * @public
@@ -2853,7 +2854,7 @@ var Line = /** @class */ (function (_super) {
      *
      * @method intersection
      * @param {Line} line The second line.
-     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
      * @instance
      * @memberof Line
      **/
@@ -2868,8 +2869,14 @@ var Line = /** @class */ (function (_super) {
         var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
         a = numerator1 / denominator; // NaN if parallel lines
         b = numerator2 / denominator;
+        // Catch NaN?
+        var x = this.a.x + (a * (this.b.x - this.a.x));
+        var y = this.a.y + (a * (this.b.y - this.a.y));
+        if (isNaN(a) || isNaN(x) || isNaN(y)) {
+            ; // return undefined;
+        }
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
+        return new Vertex_1.Vertex(x, y);
     };
     ;
     /**
@@ -6398,7 +6405,10 @@ exports.Vector = Vector;
  * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
  * @modified 2020-05-12 The angle(line) param was still not optional. Changed that.
  * @modified 2020-11-11 Generalized the `add` and `sub` param from `Vertex` to `XYCoords`.
- * @version 1.0.2
+ * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
+ * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
+ * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
+ * @version 1.0.3
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
@@ -6594,8 +6604,9 @@ var VertTuple = /** @class */ (function () {
      *
      * The counterpart for this function is Line.vertAt(Number).
      *
+     * @name getClosetT
      * @method getClosestT
-     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @param {XYCoords} p The point (vertex) to measure the distance to.
      * @return {number} The line position t of minimal distance to p.
      * @instance
      * @memberof VertTuple
@@ -6605,11 +6616,34 @@ var VertTuple = /** @class */ (function () {
         if (l2 === 0)
             return 0;
         var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
-        // Wrap to [0,1]?
+        // Do not wrap to [0,1] here.
+        // Other results are of interest, too.
         // t = Math.max(0, Math.min(1, t));
         return t;
     };
     ;
+    /**
+     * Check if the given point is located on this line. Optionally also check if
+     * that point is located between point `a` and `b`.
+     *
+     * @method hasPoint
+     * @param {Vertex} point The point to check.
+     * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
+     * @return {boolean} True if the given point is on this line.
+     * @instance
+     * @memberof VertTuple
+     */
+    VertTuple.prototype.hasPoint = function (point, insideBoundsOnly) {
+        var t = this.getClosestT(point);
+        // Compare to pointDistance?
+        if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
+            var distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
+            return distance < Vertex_1.Vertex.EPSILON && t >= 0 && t <= 1;
+        }
+        else {
+            return t >= 0 && t <= 1;
+        }
+    };
     /**
      * Get the closest point on this line to the specified point.
      *
@@ -6636,9 +6670,6 @@ var VertTuple = /** @class */ (function () {
     VertTuple.prototype.pointDistance = function (p) {
         // Taken From:
         // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-        //function dist2(v, w) {
-        //    return (v.x - w.x)*(v.x - w.x) + (v.y - w.y)*(v.y - w.y);
-        //}
         return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
     };
     ;

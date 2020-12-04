@@ -1,6 +1,11 @@
 
 
 # Changelog
+* 2020-12-04
+  * The `Line.intersection` function returns undefined if both lines are parallel.
+  * Changed `VertTuple.vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
+  * Changed `VertTuple.getClosestT` param from `Vertex` to `XYCoords` (generalized).
+  * Added the `VertTuple.hasPoint(XYCoords)` function.
 * 2020-11-25
   * Added the `isTouchEvent` param to the XMouseEvent params.
 * 2020-11-19

@@ -12,7 +12,8 @@
  * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
  * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  2.1.2
+ * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
+ * @version  2.1.3
  *
  * @file Line
  * @public
@@ -65,7 +66,7 @@ var Line = /** @class */ (function (_super) {
      *
      * @method intersection
      * @param {Line} line The second line.
-     * @return {Vertex} The intersection (may lie outside the end-points).
+     * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
      * @instance
      * @memberof Line
      **/
@@ -80,8 +81,14 @@ var Line = /** @class */ (function (_super) {
         var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
         a = numerator1 / denominator; // NaN if parallel lines
         b = numerator2 / denominator;
+        // Catch NaN?
+        var x = this.a.x + (a * (this.b.x - this.a.x));
+        var y = this.a.y + (a * (this.b.y - this.a.y));
+        if (isNaN(a) || isNaN(x) || isNaN(y)) {
+            ; // return undefined;
+        }
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
+        return new Vertex_1.Vertex(x, y);
     };
     ;
     /**
