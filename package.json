@@ -7,7 +7,7 @@
   "scripts": {
     "compile-typescript": "tsc",
     "build": "cd bin && ./run-build.sh",
-    "mkdocs": "cd bin && ./run-mk-typedocs.sh",  
+    "mkdocs": "cd bin && ./run-mk-typedocs.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "npx webpack --mode production --config ./webpack5.config.js",
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",

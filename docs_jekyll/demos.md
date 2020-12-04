@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2020-11-26
+date: 2020-12-04
 ---
 
 <div class="full-width">
@@ -138,6 +138,11 @@ date: 2020-11-26
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/26-girih/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20201101-0-girih-basic-tiles.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/27-polygon-intersection-greinerhormann/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20201130-0-polygon-intersection-greiner-hormann.png');"></div>
    </a>
 </div>
 </div>

@@ -2873,7 +2873,7 @@ var Line = /** @class */ (function (_super) {
         var x = this.a.x + (a * (this.b.x - this.a.x));
         var y = this.a.y + (a * (this.b.y - this.a.y));
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
-            ; // return undefined;
+            return undefined;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
