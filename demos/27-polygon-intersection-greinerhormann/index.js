@@ -71,7 +71,7 @@
 		index = Math.floor( Math.random() * WebColors.length );
 	    var clone = WebColors[ index % WebColors.length ].clone();
 	    clone.a = alpha;
-	    return clone.cssRGB();
+	    return clone.cssRGBA();
 	};
 
 	
@@ -139,8 +139,8 @@
 	    //       array with length 1. (or 0 if there is none; currently the result is null then).
 	    var intersection = greinerHormann.intersection(sourcePolygon.vertices, clipPolygon.vertices);
 	    // These can be remove but they are there for fun :)
-	    var union        = greinerHormann.union(sourcePolygon.vertices, clipPolygon.vertices);
-	    var diff         = greinerHormann.diff(sourcePolygon.vertices, clipPolygon.vertices);
+	    // var union        = greinerHormann.union(sourcePolygon.vertices, clipPolygon.vertices);
+	    // var diff         = greinerHormann.diff(sourcePolygon.vertices, clipPolygon.vertices);
 
 	    // console.log( intersection );
 
@@ -156,27 +156,52 @@
 				      2.0 ); // Polygon is not open */
 		}
 		
-		//console.log( intersection );
-		for( var i = 0, len = intersection.length; i < len; i++ ){
+		console.log( 'intersection', intersection );
+		
+		for( var i = 0, len = intersection.length; i < len; i++ ) {
+		    // Warning intersection polygons have duplicate vertices
+		    // (first and last are the same)
+		    intersection[i].pop();
+		    
 		    pb.fill.polyline( intersection[i],
 				      false,
-				     'rgba(0,192,192,0.25)',
+				      randomWebColor(0.25, i), // 'rgba(0,192,192,0.25)',
 				      2.0 ); // Polygon is not open
 		    
 		    /* for( var j = 0; j < intersection[i].length; j++ ) {
 			intersectionPoints.push( intersection[i][j] ); // Add vertex
-		    }*/ 
+			}*/
 
-		    // console.log( intersection[i] );
-		    if( config.triangulate )
-			drawTriangulation( new Polygon(intersection[i]), sourcePolygon, clipPolygon );
+		    var clearedPolys = config.clearSelfIntersections 
+			? findNonIntersectingPolygons( intersection[i], false, 10 )
+			: [ intersection[i] ];
+
+		    console.log( 'clearedPolys', clearedPolys );
+
+		    for( var j = 0; j < clearedPolys.length; j++ ) {
+
+			// console.log( intersection[i] );
+			if( config.triangulate ) {
+
+
+			    // console.log("method", config.triangulationMethod );
+			    if( config.triangulationMethod === "Delaunay" ) {
+				// drawTriangulation_delaunay( new Polygon(intersection[i]), sourcePolygon, clipPolygon );
+				// console.log('delaunay');
+				drawTriangulation_delaunay( new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );
+			    } else if( config.triangulationMethod === "Earcut" ) {
+				drawTriangulation_earcut( new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );
+
+			    }
+			}
+		    }
 		}
 	    }
 	    // return intersectionPoints;
 	};
 
 
-	var __drawTriangulation = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
+	/* var __drawTriangulation = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
 	    var cleanPolyVerts = findNonIntersectingPolygons( intersectionPolygon.vertices );
 	    console.log('cleanPolyVerts', cleanPolyVerts );
 
@@ -190,7 +215,7 @@
 				); // Polygon is not open
 		pb.fill.text( '' + i, cleanPolyVerts[i][0].x+3, cleanPolyVerts[i][0].y, 0, 'white' );
 	    }
-	};
+	}; */
 
 
 
@@ -200,7 +225,7 @@
 	 * @param {Polygon} sourcePolygon
 	 * @param {Polygon} clipPolygon
 	 */
-	var _drawTriangulation = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
+	var drawTriangulation_earcut = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
 	    // Convert for the earcut algorithm
 	    var earcutVertices = [];
 	    for( var i = 0; i < intersectionPolygon.vertices.length; i++ ) {
@@ -223,7 +248,7 @@
 					intersectionPolygon.vertices[b],
 					intersectionPolygon.vertices[c] );
 		triangles.push( tri );
-		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgb(0,128,255)', 1 );
+		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgba(0,128,255,0.5)', 1 );
 	    }
 	    
 	};
@@ -233,7 +258,7 @@
 	 * @param {Polygon} sourcePolygon
 	 * @param {Polygon} clipPolygon
 	 */
-	var drawTriangulation = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
+	var drawTriangulation_delaunay = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
 	    var selfIntersectionPoints = findSelfIntersecionPoints(intersectionPolygon);
 	    var extendedPointList = intersectionPolygon.vertices.concat( selfIntersectionPoints );
 	
@@ -257,15 +282,14 @@
 
 		// Cool, triangle is part of the intersection.
 		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgb(0,128,255)', 1 );
-		// pb.draw.crosshair( tri.a, 8, 'green' );
-		// pb.draw.crosshair( tri.b, 8, 'green' );
-		// pb.draw.crosshair( tri.c, 8, 'green' );
 		drawFancyCrosshair( pb, tri.a, false, false );
 		drawFancyCrosshair( pb, tri.b, false, false );
 		drawFancyCrosshair( pb, tri.c, false, false );
-		var circumCircle = tri.getCircumcircle();
-		pb.draw.crosshair( circumCircle.center, 5, 'rgba(255,0,0,0.25)' );
-		pb.draw.circle(  circumCircle.center, circumCircle.radius, 'rgba(255,0,0,0.25)',1.0 );
+		if( config.drawDelaunayCirles ) {
+		    var circumCircle = tri.getCircumcircle();
+		    pb.draw.crosshair( circumCircle.center, 5, 'rgba(255,0,0,0.25)' );
+		    pb.draw.circle(  circumCircle.center, circumCircle.radius, 'rgba(255,0,0,0.25)',1.0 );
+		}
 	    }
 	};
 
@@ -324,7 +348,10 @@
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
 	    useConvexHullA : true,
 	    useConvexHullB : true,
-	    triangulate : false
+	    triangulate : false,
+	    triangulationMethod : "Delaunay", // [ "Delaunay", "Earcut" ]
+	    clearSelfIntersections : true,
+	    drawDelaunayCircles : false
 	}, GUP );
 
 
@@ -336,7 +363,9 @@
 	    gui.add(config, 'useConvexHullA').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullA").title("Use the convex hull of polygon A?");
 	    gui.add(config, 'useConvexHullB').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullB").title("Use the convex hull of polygon B?");
 	    gui.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name("triangulate").title("Tringulate the result?");
-	    
+	    gui.add(config, 'clearSelfIntersections').listen().onChange( function() { pb.redraw(); } ).name("clearSelfIntersections").title("Clear polygons of self intersections before triangulating?");
+	    gui.add(config, 'triangulationMethod', ['Delaunay','Earcut']).listen().onChange( function() { pb.redraw(); } ).name("triangulationMethod").title("The triangulation method to use (Delaunay is not safe here; might result in ivalid triangulations)");
+	    gui.add(config, 'drawDelaunayCircles').listen().onChange( function() { pb.redraw(); } ).name("drawDelaunayCircles").title("Draw triangle circumcircles when in Delaunay mode?");
 	}
 
 	pb.config.preDraw = drawAll;
