@@ -1,9 +1,5 @@
 "use strict";
 /**
- * Create the voronoi diagram from the given delaunay triangulation (they are dual graphs).
- *
- * @requires VoronoiCell, Triangle
- *
  * @author   Ikaros Kappler
  * @date     2018-04-07
  * @modified 2018-04-11 Using VoronoiCells now (was array before).
@@ -13,6 +9,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.delaunay2voronoi = void 0;
 var VoronoiCell_1 = require("../datastructures/VoronoiCell");
+/**
+ * @classdesc Create the voronoi diagram from the given delaunay triangulation (they are dual graphs).
+ *
+ * @requires VoronoiCell
+ * @requires Triangle
+ */
 var delaunay2voronoi = /** @class */ (function () {
     function delaunay2voronoi(pointList, triangles) {
         this.failedTriangleSets = [];

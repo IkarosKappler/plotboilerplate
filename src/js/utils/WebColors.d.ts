@@ -1,11 +1,4 @@
 /**
- * A set of beautiful web colors (I know, beauty is in the eye of the beholder).
- *
- * I found this color chart with 11 colors and think it is somewhat nice
- *    https://www.pinterest.com/pin/229965124706497134/
- *
- * @requires Color
- *
  * @author   Ikaros Kappler
  * @version  1.0.1
  * @date     2018-11-10
@@ -24,5 +17,17 @@ export declare const Cyan: Color;
 export declare const Teal: Color;
 export declare const Green: Color;
 export declare const LightGreen: Color;
+/**
+ * A set of beautiful web colors (I know, beauty is in the eye of the beholder).
+ *
+ * I found this color chart with 11 colors and think it is somewhat nice
+ *    https://www.pinterest.com/pin/229965124706497134/
+ *
+ * @requires Color
+ *
+ */
 export declare const WebColors: Array<Color>;
+/**
+ * A helper function to shuffle the colors into a new order.
+ */
 export declare const shuffleWebColors: (order: Array<number>) => Color[];

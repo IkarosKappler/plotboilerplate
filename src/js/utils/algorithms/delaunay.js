@@ -1,11 +1,5 @@
 "use strict";
 /**
- * Inspired by
- *    http://www.travellermap.com/tmp/delaunay.htm
- *
- * License: Public Domain
- *          Original C++ code by Joshua Bell
- *
  * @modified_by Ikaros Kappler
  * @date_init   2012-10-17
  * @date        2017-07-31
@@ -18,21 +12,17 @@ var Triangle_1 = require("../../Triangle");
 var Vertex_1 = require("../../Vertex");
 var Line_1 = require("../../Line");
 var EPSILON = 1.0e-6;
-//------------------------------------------------------------
-// Edge class
-//------------------------------------------------------------
-/* class Edge {
-
-    public a:Vertex;
-    public b:Vertex;
-
-    constructor( a:Vertex, b:Vertex ) {
-    this.a = a;
-    this.b = b;
-    }
-    
-}; // Edge
-*/
+/**
+ * @classdesc A Delaunay pointset triangulation implementation.  Inspired by
+ *    http://www.travellermap.com/tmp/delaunay.htm
+ *
+ * License: Public Domain
+ *          Original C++ code by Joshua Bell
+ *
+ * @requires Triangle
+ * @requires Line
+ * @requires Vertex
+ */
 var Delaunay = /** @class */ (function () {
     function Delaunay(pointList) {
         this.pointList = pointList;

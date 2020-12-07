@@ -1,16 +1,5 @@
 "use strict";
 /**
- * @classdesc The Girih datastructure for generating patterns.
- *
- * @requires Vertex
- * @requires GirihTile
- * @requires GirihBowtie
- * @requires GirihDecagon
- * @requires GirihHexagon
- * @requires GirihPenroseRhombus
- * @requires GirihPentagon
- * @requires GirihRhombus
- *
  * @author   Ikaros Kappler
  * @date     2020-11-24
  * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
@@ -26,6 +15,18 @@ var GirihHexagon_1 = require("./GirihHexagon");
 var GirihPenroseRhombus_1 = require("./GirihPenroseRhombus");
 var GirihPentagon_1 = require("./GirihPentagon");
 var GirihRhombus_1 = require("./GirihRhombus");
+/**
+ * @classdesc The Girih datastructure for generating patterns.
+ *
+ * @requires Vertex
+ * @requires GirihTile
+ * @requires GirihBowtie
+ * @requires GirihDecagon
+ * @requires GirihHexagon
+ * @requires GirihPenroseRhombus
+ * @requires GirihPentagon
+ * @requires GirihRhombus
+ */
 var Girih = /** @class */ (function () {
     /**
      * Create a new empty Girih pattern.

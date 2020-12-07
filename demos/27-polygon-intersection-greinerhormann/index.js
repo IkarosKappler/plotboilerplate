@@ -103,7 +103,7 @@
 	    var polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); // Polygons are not open
 	    var polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false );
 
-	    var intersect = polygonsIntersect( polygonA, polygonB );
+	    // var intersect = polygonsIntersect( polygonA, polygonB );
 
 	    pb.draw.polygon( polygonA,
 			     Teal.cssRGB(), // 'rgba(128,128,128,0.5)',
@@ -112,14 +112,12 @@
 			     Orange.cssRGB(), // 'rgba(128,128,128,0.5)',
 			     1.0 ); // Polygon is not open
 
-	    var intersect = polygonsIntersect( polygonA, polygonB );
-
 	    var mouseInA = mousePosition != null && polygonA.containsVert(mousePosition);
 	    var mouseInB = mousePosition != null && polygonB.containsVert(mousePosition);
 
 	    pb.fill.label( 'polygonA.contains(mouse)=' + mouseInA, 3, 10, 0, 'black' );
 	    pb.fill.label( 'polygonB.contains(mouse)=' + mouseInB, 3, 20, 0, 'black' );
-	    pb.fill.label( 'polygonsIntersect=' + intersect, 3, 30, 0, 'black' );
+	    // pb.fill.label( 'polygonsIntersect=' + intersect, 3, 30, 0, 'black' );
 
 	    // Array<Vertex>
 	    var intersectionPoints = drawGreinerHormannIntersection( polygonA, polygonB );
@@ -156,38 +154,26 @@
 				      2.0 ); // Polygon is not open */
 		}
 		
-		console.log( 'intersection', intersection );
+		// console.log( 'intersection', intersection );
 		
 		for( var i = 0, len = intersection.length; i < len; i++ ) {
 		    // Warning intersection polygons have duplicate vertices
 		    // (first and last are the same)
 		    intersection[i].pop();
-		    
-		    pb.fill.polyline( intersection[i],
-				      false,
-				      randomWebColor(0.25, i), // 'rgba(0,192,192,0.25)',
-				      2.0 ); // Polygon is not open
-		    
-		    /* for( var j = 0; j < intersection[i].length; j++ ) {
-			intersectionPoints.push( intersection[i][j] ); // Add vertex
-			}*/
 
 		    var clearedPolys = config.clearSelfIntersections 
-			? findNonIntersectingPolygons( intersection[i], false, 10 )
+			? splitPolygonToNonIntersecting( intersection[i], 10 )
 			: [ intersection[i] ];
-
-		    console.log( 'clearedPolys', clearedPolys );
 
 		    for( var j = 0; j < clearedPolys.length; j++ ) {
 
-			// console.log( intersection[i] );
+			pb.fill.polyline( clearedPolys[j],
+					  false,
+					  randomWebColor(0.25, i*intersection.length+j), // 'rgba(0,192,192,0.25)',
+					  2.0 ); // Polygon is not open
+
 			if( config.triangulate ) {
-
-
-			    // console.log("method", config.triangulationMethod );
 			    if( config.triangulationMethod === "Delaunay" ) {
-				// drawTriangulation_delaunay( new Polygon(intersection[i]), sourcePolygon, clipPolygon );
-				// console.log('delaunay');
 				drawTriangulation_delaunay( new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );
 			    } else if( config.triangulationMethod === "Earcut" ) {
 				drawTriangulation_earcut( new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );

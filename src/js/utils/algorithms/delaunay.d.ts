@@ -1,10 +1,4 @@
 /**
- * Inspired by
- *    http://www.travellermap.com/tmp/delaunay.htm
- *
- * License: Public Domain
- *          Original C++ code by Joshua Bell
- *
  * @modified_by Ikaros Kappler
  * @date_init   2012-10-17
  * @date        2017-07-31
@@ -14,6 +8,17 @@
 import { Triangle } from "../../Triangle";
 import { Vertex } from "../../Vertex";
 import { Line as Edge } from "../../Line";
+/**
+ * @classdesc A Delaunay pointset triangulation implementation.  Inspired by
+ *    http://www.travellermap.com/tmp/delaunay.htm
+ *
+ * License: Public Domain
+ *          Original C++ code by Joshua Bell
+ *
+ * @requires Triangle
+ * @requires Line
+ * @requires Vertex
+ */
 export declare class Delaunay {
     private pointList;
     constructor(pointList: Array<Vertex>);

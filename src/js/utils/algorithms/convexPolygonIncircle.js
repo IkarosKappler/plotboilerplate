@@ -1,17 +1,5 @@
 "use strict";
 /**
- * @description Compute a max incircle for the given polygon.
- *
- * @requires Circle
- * @requires Line
- * @requires Vertex
- * @requires Triangle
- * @requires nsectAngle
- * @requires geomutils
- *
- * https://observablehq.com/@mbostock/convex-polygon-incircle
- * https://observablehq.com/@mbostock/circle-tangent-to-three-lines
- *
  * @author  mbostock, extended and ported to TypeScript by Ikaros Kappler
  * @date    2020-05-19
  * @version 1.0.1
@@ -36,6 +24,18 @@ var EPS = 0.000001;
  *
  * The function will return an object with either: the circle, and the triangle that defines
  * the three tangent points where the circle touches the polygon.
+ *
+ * Inspired by
+ *  https://observablehq.com/@mbostock/convex-polygon-incircle
+ *  https://observablehq.com/@mbostock/circle-tangent-to-three-lines
+ *
+ *
+ * @requires Circle
+ * @requires Line
+ * @requires Vertex
+ * @requires Triangle
+ * @requires nsectAngle
+ * @requires geomutils
  *
  * @global
  * @name convexPolygonIncircle

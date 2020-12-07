@@ -1,4 +1,13 @@
 /**
+ * @author   Ikaros Kappler
+ * @date     2020-11-24
+ * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
+ * @version  1.0.1
+ * @file     Girih
+ **/
+import { Vertex } from "../../Vertex";
+import { GirihTile } from "./GirihTile";
+/**
  * @classdesc The Girih datastructure for generating patterns.
  *
  * @requires Vertex
@@ -9,15 +18,7 @@
  * @requires GirihPenroseRhombus
  * @requires GirihPentagon
  * @requires GirihRhombus
- *
- * @author   Ikaros Kappler
- * @date     2020-11-24
- * @modified 2020-11-25 Ported to TypeScript from vanilla JS.
- * @version  1.0.1
- * @file     Girih
- **/
-import { Vertex } from "../../Vertex";
-import { GirihTile } from "./GirihTile";
+ */
 export declare class Girih {
     /**
      * The edge length to use in this Girih pattern.

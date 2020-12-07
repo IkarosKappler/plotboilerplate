@@ -1,8 +1,4 @@
 /**
- * Create the voronoi diagram from the given delaunay triangulation (they are dual graphs).
- *
- * @requires VoronoiCell, Triangle
- *
  * @author   Ikaros Kappler
  * @date     2018-04-07
  * @modified 2018-04-11 Using VoronoiCells now (was array before).
@@ -12,6 +8,12 @@
 import { Triangle } from "../../Triangle";
 import { Vertex } from "../../Vertex";
 import { VoronoiCell } from "../datastructures/VoronoiCell";
+/**
+ * @classdesc Create the voronoi diagram from the given delaunay triangulation (they are dual graphs).
+ *
+ * @requires VoronoiCell
+ * @requires Triangle
+ */
 export declare class delaunay2voronoi {
     failedTriangleSets: Array<Triangle>;
     hasErrors: boolean;

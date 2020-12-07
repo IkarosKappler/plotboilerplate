@@ -1,8 +1,17 @@
 "use strict";
+/**
+ * @author   Ikaros Kappler
+ * @version  1.0.0
+ * @date     2018-11-11
+ **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebColorsMalachite = void 0;
 var Color_1 = require("./datastructures/Color");
-// A mix of green shades
+/**
+ * A mix of green shades.
+ *
+ * @requires Color
+ */
 exports.WebColorsMalachite = [
     Color_1.Color.makeRGB(0, 21, 6),
     Color_1.Color.makeRGB(0, 30, 12),

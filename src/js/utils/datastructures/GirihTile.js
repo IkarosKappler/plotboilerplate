@@ -1,15 +1,5 @@
 "use strict";
 /**
- * @classdesc This is a general tile superclass. All other tile classes extends this one.
- *
- * Rule:
- *  * the outer and the inner sub polygons must be inside the main polygon's bounds.
- *
- * @requires Bounds
- * @requires Polyon
- * @requires Vertex
- * @requires XYCoords
- *
  * @author   Ikaros Kappler
  * @date     2013-11-27
  * @modified 2014-04-05 Ikaros Kappler (member array outerTilePolygons added).
@@ -51,6 +41,17 @@ var TileType;
 })(TileType = exports.TileType || (exports.TileType = {}));
 ;
 ;
+/**
+ * @classdesc This is a general tile superclass. All other tile classes extends this one.
+ *
+ * Rule:
+ *  * the outer and the inner sub polygons must be inside the main polygon's bounds.
+ *
+ * @requires Bounds
+ * @requires Polyon
+ * @requires Vertex
+ * @requires XYCoords
+ */
 var GirihTile = /** @class */ (function (_super) {
     __extends(GirihTile, _super);
     /**

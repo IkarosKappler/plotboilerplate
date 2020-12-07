@@ -1,13 +1,5 @@
 "use strict";
 /**
- * @classdesc Compute the Catmull-Rom spline path from a sequence of points (vertices).
- *
- * For comparison to the HobbyCurve I wanted to add a Catmull-Rom path (to show that the
- * HobbyCurve is smoother).
- *
- * This demo implementation was inspired by this Codepen by Blake Bowen
- * https://codepen.io/osublake/pen/BowJed
- *
  * @date     2020-04-15
  * @author   Converted to a class by Ikaros Kappler
  * @modified 2020-08-19 Ported this class from vanilla JS to TypeScript.
@@ -20,6 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CatmullRomPath = void 0;
 var CubicBezierCurve_1 = require("../../CubicBezierCurve");
 var Vertex_1 = require("../../Vertex");
+/**
+ * @classdesc Compute the Catmull-Rom spline path from a sequence of points (vertices).
+ *
+ * For comparison to the HobbyCurve I wanted to add a Catmull-Rom path (to show that the
+ * HobbyCurve is smoother).
+ *
+ * This demo implementation was inspired by this Codepen by Blake Bowen
+ * https://codepen.io/osublake/pen/BowJed
+ *
+ * @requires CubicBezierCurve
+ * @requires Vertex
+ */
 var CatmullRomPath = /** @class */ (function () {
     /**
      * @constructor
