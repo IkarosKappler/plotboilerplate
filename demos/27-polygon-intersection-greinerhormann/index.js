@@ -146,7 +146,8 @@
 		for( var i = 0, len = intersection.length; i < len; i++ ) {
 		    // Warning intersection polygons have duplicate vertices
 		    // (first and last are the same)
-		    intersection[i].pop();
+		    if( intersection.length > 0 && new Vertex(intersection[0]).equals(intersection[intersection.length-1]) )
+			intersection[i].pop();
 
 		    var clearedPolys = config.clearSelfIntersections 
 			? splitPolygonToNonIntersecting( intersection[i], 10 )
