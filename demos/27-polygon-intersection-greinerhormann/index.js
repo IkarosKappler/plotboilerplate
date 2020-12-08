@@ -255,8 +255,7 @@
 	    var triangles = delaunay.triangulate();
 
 	    // Find real intersections with the triangulations and the polygon
-	    // extendedPointList
-	    
+	    // extendedPointList    
 
 	    for( var i in triangles ) {
 		var tri = triangles[i];
@@ -271,7 +270,7 @@
 		drawFancyCrosshair( pb, tri.a, false, false );
 		drawFancyCrosshair( pb, tri.b, false, false );
 		drawFancyCrosshair( pb, tri.c, false, false );
-		if( config.drawDelaunayCirles ) {
+		if( config.drawDelaunayCircles ) {
 		    var circumCircle = tri.getCircumcircle();
 		    pb.draw.crosshair( circumCircle.center, 5, 'rgba(255,0,0,0.25)' );
 		    pb.draw.circle(  circumCircle.center, circumCircle.radius, 'rgba(255,0,0,0.25)',1.0 );
