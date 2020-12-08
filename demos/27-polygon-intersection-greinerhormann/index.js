@@ -1,6 +1,10 @@
 /**
  * A script for testing the Greiner-Hormann polygon intersection algorithm with PlotBoilerplate.
  *
+ * @requires delaunay
+ * @requires earcut
+ * @requires findSelfIntersectingPoints
+ * @requires greinerHormann
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
@@ -14,7 +18,6 @@
 
 (function(_context) {
     "use strict";
-
 
     window.initializePB = function() {
 	if( window.pbInitialized )
@@ -103,14 +106,12 @@
 	    var polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); // Polygons are not open
 	    var polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false );
 
-	    // var intersect = polygonsIntersect( polygonA, polygonB );
-
 	    pb.draw.polygon( polygonA,
-			     Teal.cssRGB(), // 'rgba(128,128,128,0.5)',
-			     1.0 ); // Polygon is not open
+			     Teal.cssRGB(),   // 'rgba(128,128,128,0.5)',
+			     1.0 );           // Polygon is not open
 	    pb.draw.polygon( polygonB,
 			     Orange.cssRGB(), // 'rgba(128,128,128,0.5)',
-			     1.0 ); // Polygon is not open
+			     1.0 );           // Polygon is not open
 
 	    var mouseInA = mousePosition != null && polygonA.containsVert(mousePosition);
 	    var mouseInB = mousePosition != null && polygonB.containsVert(mousePosition);
@@ -136,25 +137,11 @@
 	    //       If there is only one intersection polygon, there should be a returned
 	    //       array with length 1. (or 0 if there is none; currently the result is null then).
 	    var intersection = greinerHormann.intersection(sourcePolygon.vertices, clipPolygon.vertices);
-	    // These can be remove but they are there for fun :)
-	    // var union        = greinerHormann.union(sourcePolygon.vertices, clipPolygon.vertices);
-	    // var diff         = greinerHormann.diff(sourcePolygon.vertices, clipPolygon.vertices);
-
-	    // console.log( intersection );
-
-	    // Collect all intersection points (may contain duplicates)
-	    // var intersectionPoints = [];
 
 	    if( intersection ) {
 		if( typeof intersection[0][0] === 'number' ) { // single linear ring
 		    intersection = [intersection];
-		    /* pb.fill.polyline( intersection,
-				      'rgba(0,192,192,0.5)',
-				      false,
-				      2.0 ); // Polygon is not open */
 		}
-		
-		// console.log( 'intersection', intersection );
 		
 		for( var i = 0, len = intersection.length; i < len; i++ ) {
 		    // Warning intersection polygons have duplicate vertices
@@ -183,27 +170,7 @@
 		    }
 		}
 	    }
-	    // return intersectionPoints;
 	};
-
-
-	/* var __drawTriangulation = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
-	    var cleanPolyVerts = findNonIntersectingPolygons( intersectionPolygon.vertices );
-	    console.log('cleanPolyVerts', cleanPolyVerts );
-
-	    for( var i = 0; i < cleanPolyVerts.length; i++ ) {
-		var color = randomWebColor(0.9,i);
-		// console.log( 'color', color );
-		pb.draw.polyline( cleanPolyVerts[i],
-				  false,
-				  color, // 'rgb(0,128,255)', // 'rgba(0,192,192,0.25)',
-				  1.5
-				); // Polygon is not open
-		pb.fill.text( '' + i, cleanPolyVerts[i][0].x+3, cleanPolyVerts[i][0].y, 0, 'white' );
-	    }
-	}; */
-
-
 
 
 	/**
@@ -221,9 +188,8 @@
 
 	    var triangleIndices = earcut( earcutVertices,
 					  [], // holeIndices
-					  2 // dim
+					  2   // dim
 					);
-	    // console.log( triangleIndices );
 
 	    var triangles = [];
 	    for( var i = 0; i+2 < triangleIndices.length; i+= 3 ) {
@@ -245,14 +211,13 @@
 	 * @param {Polygon} clipPolygon
 	 */
 	var drawTriangulation_delaunay = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
-	    var selfIntersectionPoints = findSelfIntersecionPoints(intersectionPolygon);
+	    var selfIntersectionPoints = findSelfIntersectionPoints( intersectionPolygon );
 	    var extendedPointList = intersectionPolygon.vertices.concat( selfIntersectionPoints );
 	
-	  
-	    // var delaunay = new Delaunay( intersectionPolygon.vertices, {} );
 	    var delaunay = new Delaunay( extendedPointList, {} );
 	    // Array<Triangle>
 	    var triangles = delaunay.triangulate();
+	    console.log( 'extendedPointList', extendedPointList.length, 'triangles', triangles.length );
 
 	    // Find real intersections with the triangulations and the polygon
 	    // extendedPointList    
@@ -279,32 +244,6 @@
 	};
 
 
-	var findSelfIntersecionPoints = function( polygon ) {
-	    var pointList = [];
-	    var lineA = new Line( new Vertex(), new Vertex() );
-	    var lineB = new Line( new Vertex(), new Vertex() );
-	    for( var a = 0; a < polygon.vertices.length; a++ ) {
-		lineA.a.set( polygon.getVertexAt(a) );
-		lineA.b.set( polygon.getVertexAt(a+1) );
-		for( var b = 0; b < polygon.vertices.length; b++ ) {
-		    if( a == b )
-			continue;
-		    lineB.a.set( polygon.getVertexAt(b) );
-		    lineB.b.set( polygon.getVertexAt(b+1) );
-
-		    const intersectionPoint = lineA.intersection(lineB);
-		    // console.log( 'intersectionPoint', intersectionPoint );
-		    if( intersectionPoint && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint) ) {
-			pointList.push( intersectionPoint );
-		    }
-		}	
-	    }
-	    // console.log( 'intersectionPoints', pointList );
-	    return pointList;
-	};
-
-
-
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
 	// +-------------------------------
@@ -315,10 +254,6 @@
 		var cy = document.getElementById('cy');
 		if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-
-		// handleMouseMove( relPos );
-		// mousePosition = relPos;
-		// pb.redraw();
 	    } )
 	    .click( function(e) {
 		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
