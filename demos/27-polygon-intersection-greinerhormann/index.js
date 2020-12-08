@@ -213,15 +213,16 @@
 	var drawTriangulation_delaunay = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
 	    var selfIntersectionPoints = findSelfIntersectionPoints( intersectionPolygon );
 	    var extendedPointList = intersectionPolygon.vertices.concat( selfIntersectionPoints );
-	
+
 	    var delaunay = new Delaunay( extendedPointList, {} );
 	    // Array<Triangle>
 	    var triangles = delaunay.triangulate();
-	    console.log( 'extendedPointList', extendedPointList.length, 'triangles', triangles.length );
 
 	    // Find real intersections with the triangulations and the polygon
 	    // extendedPointList    
 
+	    // Remember: delaunay returns an array with lots of empty slots.
+	    //           So don't use triangles.length to access the triangles.
 	    for( var i in triangles ) {
 		var tri = triangles[i];
 		// Check if triangle belongs to the polygon or is outside
@@ -231,10 +232,10 @@
 		    continue;
 
 		// Cool, triangle is part of the intersection.
-		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgb(0,128,255)', 1 );
-		drawFancyCrosshair( pb, tri.a, false, false );
-		drawFancyCrosshair( pb, tri.b, false, false );
-		drawFancyCrosshair( pb, tri.c, false, false );
+		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgba(0,128,255,0.5)', 1 );
+		// drawFancyCrosshair( pb, tri.a, false, false );
+		// drawFancyCrosshair( pb, tri.b, false, false );
+		// drawFancyCrosshair( pb, tri.c, false, false );
 		if( config.drawDelaunayCircles ) {
 		    var circumCircle = tri.getCircumcircle();
 		    pb.draw.crosshair( circumCircle.center, 5, 'rgba(255,0,0,0.25)' );
