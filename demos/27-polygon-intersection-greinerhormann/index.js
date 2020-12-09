@@ -175,6 +175,12 @@
 
 
 	/**
+	 * This will only work if non-self-overlapping polygons.
+	 *
+	 * * Concave polygons work
+	 * * Convex polygons are fine
+	 * * Self intersections are fine
+	 *
 	 * @param {Polygon} intersectionPolygon
 	 * @param {Polygon} sourcePolygon
 	 * @param {Polygon} clipPolygon
@@ -205,14 +211,20 @@
 	    }
 	    
 	};
+
 	
 	/**
+	 * This will only work if non-self-overlapping polygons.
+	 *
+	 * * Concave polygons work
+	 * * Convex polygons are fine
+	 * * Self intersections are fine
+	 *
 	 * @param {Polygon} intersectionPolygon
 	 * @param {Polygon} sourcePolygon
 	 * @param {Polygon} clipPolygon
 	 */
 	var drawTriangulation_delaunay = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
-	    // var selfIntersectionPoints = findSelfIntersectionPoints( intersectionPolygon );
 	    var selfIntersectionPoints = findPolygonSelfIntersections( intersectionPolygon );
 	    var extendedPointList = intersectionPolygon.vertices.concat( selfIntersectionPoints );
 

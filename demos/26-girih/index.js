@@ -103,6 +103,9 @@
 	    }
 	};
 
+	var previewIntersectionPolygons = [];
+	var previewIntersectionAreas = [];
+
 	
 	// +---------------------------------------------------------------------------------
 	// | Add a tile and install listeners.
@@ -145,7 +148,13 @@
 	    // Draw the preview polygon first
 	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1
 		&& 0 <= previewTilePointer && previewTilePointer < previewTiles.length ) {
+		
 		pb.draw.polygon( previewTiles[previewTilePointer], 'rgba(128,128,128,0.5)', 1.0 ); // Polygon is not open
+
+		// Draw intersection polygons (if there are any)
+		for( var i = 0; i < previewIntersectionPolygons.length; i++ ) {
+		    pb.fill.polygon( previewIntersectionPolygons[i], 'rgba(255,0,0,0.25)' );
+		}
 	    }
 	    
 	    // Draw all tiles
@@ -153,7 +162,7 @@
 		var tile = girih.tiles[i];
 		// Fill polygon when highlighted (mouse hover)
 		if( hoverTileIndex == i ) 
-		    pb.fill.polygon( tile, 'rgba(128,128,128,0.12)' );
+		    ; // pb.fill.polygon( tile, 'rgba(128,128,128,0.12)' );
 		drawTile( tile, i );
 	    }
 
@@ -195,13 +204,17 @@
 	    if( config.drawCenters )
 		drawFancyCrosshair( pb, tile.position, hoverTileIndex == i, tile.position.attr.isSelected );
 
+	    var contrastColor = toContrastColor(Color.parse(pb.config.backgroundColor));
 	    // Draw corner numbers?
 	    if( config.drawCornerNumbers ) {
-		var contrastColor = toContrastColor(Color.parse(pb.config.backgroundColor));
 		for( var i = 0; i < tile.vertices.length; i++ ) {		
 		    var pos = tile.vertices[i].clone().scale( 0.85, tile.position );
 		    pb.fill.text( ""+i, pos.x, pos.y, { color : contrastColor } );
 		}
+	    }
+
+	    if( config.drawTileNumbers ) {
+		pb.fill.text( ""+index, tile.position.x, tile.position.y, { color : contrastColor } );
 	    }
 	}; 
 	
@@ -312,16 +325,20 @@
 	    .down('d',function() {
 		previewTilePointer = (previewTilePointer+1)%previewTiles.length;
 		highlightPreviewTile( previewTilePointer );
-		if( hoverTileIndex != -1 & hoverEdgeIndex != -1 )
+		if( hoverTileIndex != -1 & hoverEdgeIndex != -1 ) {
+		    findPreviewIntersections();
 		    pb.redraw();
+		}
 	    } )
 	    .down('a',function() {
 		previewTilePointer--;
 		if( previewTilePointer < 0 )
 		    previewTilePointer = previewTiles.length-1;
 		highlightPreviewTile( previewTilePointer );
-		if( hoverTileIndex != -1 && hoverEdgeIndex != -1 )
+		if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
+		    findPreviewIntersections();
 		    pb.redraw();
+		}
 	    } )
 	    .down('enter', function() {
 		if( previewTilePointer < previewTiles.length ) {
@@ -370,12 +387,87 @@
 		    previewTiles = girih.findPossibleAdjacentTiles( hoverTileIndex, hoverEdgeIndex );
 		    // Set pointer to save range
 		    previewTilePointer = Math.min( Math.max(previewTiles.length-1, previewTilePointer), previewTilePointer );
+		    // Find any intersections for the new preview tile
+		    findPreviewIntersections();
 		}
 	    }
 	    pb.redraw();
 	    if( previewTiles.length != 0 )
 		createAdjacentTilePreview( previewTiles, previewTilePointer, setPreviewTilePointer );
 	};
+
+	var findPreviewIntersections = function() {
+	    previewIntersectionPolygons = [];
+	    previewIntersectionAreas = [];
+	    if( hoverTileIndex == -1 || hoverEdgeIndex == -1 || previewTilePointer < 0 || previewTilePointer >= previewTiles.length ) {
+		return;
+	    }
+	    // console.log( previewTilePointer, previewTiles );
+	    var currentPreviewTile = previewTiles[ previewTilePointer ];
+	    // console.log( 'girih.tiles', girih.tiles );
+	    for( var i = 0; i < girih.tiles.length; i++ ) {
+		// console.log( "i", i );
+		if( i == hoverTileIndex )
+		    continue;
+		var intersections = findPreviewIntersectionsFor( currentPreviewTile, girih.tiles[i] );
+		// console.log( "["+i+"] intersections found", intersections.length, intersections );
+		// previewIntersectionPolygons = intersections;
+		for( var j = 0; j < intersections.length; j++ ) {
+		    var poly = new Polygon(copyVertArray(intersections[j]), false);
+		    // poly.scale( 1.05 );
+		    var area = signedPolygonArea( poly.vertices );
+		    previewIntersectionAreas.push( area );
+		    previewIntersectionPolygons.push( poly );
+		    // console.log( "Area: " + area );
+		}
+		// return;
+	    }
+	    // console.log('total intersections found', previewIntersectionPolygons.length );
+	};
+
+	// Helper function to convert XYCoords[] to Vertex[]
+	var copyVertArray = function( vertices ) {
+	    var result = [];
+	    for( var i = 0; i < vertices.length; i++ )
+		result.push( new Vertex(vertices[i]) );
+	    return result;
+	};
+	
+	var findPreviewIntersectionsFor = function( previewTile, girihTile ) {
+	    // Check if there are intersec
+	    var intersection = greinerHormann.intersection( girihTile.vertices, // Source
+							    previewTile.vertices  // Clip
+							  );
+	    if( !intersection ) {
+		return [];
+	    }
+
+	    // Only one single polygon returned?
+	    if( typeof intersection[0][0] === "number" )
+		intersection = [intersection];
+
+	    // Calculate size or triangulation here?
+	    return intersection;
+	};
+
+	// Found at earclip
+	/* var calcTriangleArea = function(a, b, c) {
+	    return (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
+	    }; */
+
+	// ( data : Array<number>, start:number, end:number, dim:number) : number => {
+	var signedPolygonArea = function( vertices ) {
+	    var sum = 0;
+	    // for (var i = start, j = end - dim; i < end; i += dim) {
+	    for (var i = 0; i < vertices.length; i++ ) {
+		// sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
+		var j = (i+1) % vertices.length;
+		sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
+		// j = i;
+	    }
+	    return sum;
+	};
+
 	
 	// +---------------------------------------------------------------------------------
 	// | A global config that's attached to the dat.gui control interface.
@@ -384,6 +476,7 @@
 	    drawOutlines : true,
 	    drawCenters : true,
 	    drawCornerNumbers : false,
+	    drawTileNumbers: false,
 	    drawOuterPolygons : true,
 	    drawInnerPolygons : true,
 	    lineJoin  : "round",     // [ "bevel", "round", "miter" ]
@@ -412,6 +505,7 @@
         {
 	    var gui = pb.createGUI();
 	    gui.add(config, 'drawCornerNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
+	    gui.add(config, 'drawTileNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawTileNumbers").title("Draw the index of each tile?");
 	    gui.add(config, 'drawOutlines').listen().onChange( function() { pb.redraw(); } ).name("drawOutlines").title("Draw the tile outlines?");
 	    gui.add(config, 'drawCenters').listen().onChange( function() { pb.redraw(); } ).name("drawCenters").title("Draw the center points?");
 	    gui.add(config, 'drawOuterPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawOuterPolygons").title("Draw the outer polygons?");

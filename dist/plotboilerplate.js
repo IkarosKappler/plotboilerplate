@@ -8312,9 +8312,10 @@ var drawutils = /** @class */ (function () {
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
         }
-        if (!isOpen && vertices.length > 2)
+        if (!isOpen) // && vertices.length > 2 )
             this.ctx.closePath();
         this._fillOrDraw(color);
+        this.ctx.closePath();
         this.ctx.setLineDash([]);
         this.ctx.restore();
     };
