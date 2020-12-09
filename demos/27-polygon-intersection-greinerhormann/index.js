@@ -180,7 +180,7 @@
 	 * @param {Polygon} clipPolygon
 	 */
 	var drawTriangulation_earcut = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
-	    // Convert for the earcut algorithm
+	    // Convert vertices into a sequence of coordinates for the earcut algorithm
 	    var earcutVertices = [];
 	    for( var i = 0; i < intersectionPolygon.vertices.length; i++ ) {
 		earcutVertices.push( intersectionPolygon.vertices[i].x );
@@ -212,7 +212,8 @@
 	 * @param {Polygon} clipPolygon
 	 */
 	var drawTriangulation_delaunay = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
-	    var selfIntersectionPoints = findSelfIntersectionPoints( intersectionPolygon );
+	    // var selfIntersectionPoints = findSelfIntersectionPoints( intersectionPolygon );
+	    var selfIntersectionPoints = findPolygonSelfIntersections( intersectionPolygon );
 	    var extendedPointList = intersectionPolygon.vertices.concat( selfIntersectionPoints );
 
 	    var delaunay = new Delaunay( extendedPointList, {} );
