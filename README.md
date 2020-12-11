@@ -649,6 +649,7 @@ for this purpose.
  * CubicBezierCurve.getTangentAt(number) and .getTangent(number) return Vertex, why not a Vector?
  * Add a pointDeleted event handler to PB? Would be helpful to delete objects outside the PB when their associated points are deleted by the user.
  * Tweak the SVGBuilder: make the style classes configurable (colors, line thickness, custom classes, ...).
+ * Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
 
 
 ## Browsers support

@@ -64,6 +64,9 @@
 	var mousePosition = { x : Number.MAX_VALUE, y : Number.MAX_VALUE }; // XYCoords
 	var verticesA = [];
 	var verticesB = [];
+	// Two points for moving whole polygons :)
+	var controlPointA = new Vertex(0,0);
+	var controlPointB = new Vertex(0,0);
 
 	
 	// +---------------------------------------------------------------------------------
@@ -87,17 +90,56 @@
 			     );
 	};
 
+	
+	// +---------------------------------------------------------------------------------
+	// | Set the source and clipping polygons (as vertices).
+	// |
+	// | PB drawables will not be cleared.
+	// |
+	// | @param {Vertex[]} sourcesVertices
+	// | @param {Vertex[]} clipVertices
+	// +-------------------------------
+	var setVertices = function( sourceVertices, clipVertices ) {
+	    verticesA = sourceVertices;
+	    verticesB = clipVertices;
+	    var boundsA = Bounds.computeFromVertices(sourceVertices);
+	    var boundsB = Bounds.computeFromVertices(clipVertices);
+	    pb.add( controlPointA = new Vertex(boundsA.min).scale(0.5,boundsA.max) ); // Todo: use center of polygon instead
+	    pb.add( controlPointB = new Vertex(boundsB.min).scale(0.5,boundsB.max) );
+	    controlPointA.attr.visible = false;
+	    controlPointB.attr.visible = false;
+	    for( var i in verticesA )
+		pb.add( verticesA[i] );
+	    for( var i in verticesB )
+		pb.add( verticesB[i] );
+	    installPolygonControlPoint( controlPointA, new Polygon(verticesA) );
+	    installPolygonControlPoint( controlPointB, new Polygon(verticesB) );
+	};
+
+	
+	var installPolygonControlPoint = function( controlPoint, polygon ) {
+	    controlPoint.listeners.addDragListener( function(dragEvent) {
+		polygon.move( dragEvent.params.dragAmount );
+	    } );
+	};
+
 	// +---------------------------------------------------------------------------------
 	// | Initialize 
 	// +-------------------------------
-	for( var i = 0; i < 7; i++ ) {
-	    var vertA = randomVertex();
-	    var vertB = randomVertex();
-	    verticesA.push( vertA );
-	    verticesB.push( vertB );
-	    pb.add( vertA );
-	    pb.add( vertB );
-	}
+	var initialize = function() {
+	    var vertsA = [];
+	    var vertsB = [];
+	    for( var i = 0; i < 7; i++ ) {
+		var vertA = randomVertex();
+		var vertB = randomVertex();
+		vertsA.push( vertA );
+		vertsB.push( vertB );
+		// pb.add( vertA );
+		// pb.add( vertB );
+	    }
+	    setVertices( vertsA, vertsB );
+	};
+	initialize();
 	
 	// +---------------------------------------------------------------------------------
 	// | This is the actual render function.
@@ -122,6 +164,10 @@
 
 	    // Array<Vertex>
 	    var intersectionPoints = drawGreinerHormannIntersection( polygonA, polygonB );
+
+	    // Draw both control points
+	    drawFancyCrosshair( pb, controlPointA, Teal.cssRGB(), 2.0, 4.0 );
+	    drawFancyCrosshair( pb, controlPointB, Orange.cssRGB(), 2.0, 4.0 );
 	};
 
 	/**
@@ -286,7 +332,9 @@
 	    triangulate : false,
 	    triangulationMethod : "Delaunay", // [ "Delaunay", "Earcut" ]
 	    clearSelfIntersections : true,
-	    drawDelaunayCircles : false
+	    drawDelaunayCircles : false,
+
+	    test_squares : function() { loadSquareTestCase(pb,setVertices); }
 	}, GUP );
 
 
@@ -295,6 +343,10 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
+
+	    var fold0 = gui.addFolder("Test Cases");
+	    fold0.add(config, 'test_squares').name('Squares').title('Load the \'Squares\' test case.');
+	    
 	    gui.add(config, 'useConvexHullA').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullA").title("Use the convex hull of polygon A?");
 	    gui.add(config, 'useConvexHullB').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullB").title("Use the convex hull of polygon B?");
 	    gui.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name("triangulate").title("Tringulate the result?");

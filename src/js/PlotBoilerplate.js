@@ -59,7 +59,8 @@
  * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
  * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
- * @version  1.9.2
+ * @modified 2020-12-11 Added the `removeAll(boolean)` function.
+ * @version  1.10.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -595,7 +596,6 @@ var PlotBoilerplate = /** @class */ (function () {
                         this.removeVertex(drawable.c, false);
                     }
                     else if (drawable instanceof BezierPath_1.BezierPath) {
-                        PlotBoilerplate.utils.disableBezierPathAutoAdjust(drawable);
                         for (var i = 0; i < drawable.bezierCurves.length; i++) {
                             this.removeVertex(drawable.bezierCurves[i].startPoint, false);
                             this.removeVertex(drawable.bezierCurves[i].startControlPoint, false);
@@ -636,6 +636,25 @@ var PlotBoilerplate = /** @class */ (function () {
                 return;
             }
         }
+    };
+    ;
+    /**
+     * Remove all elements.
+     *
+     * If you want to keep the vertices, pass `true`.
+     *
+     * @method removeAll
+     * @param {boolean=false} keepVertices
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {void}
+     */
+    PlotBoilerplate.prototype.removeAll = function (keepVertices) {
+        this.drawables = [];
+        if (!Boolean(keepVertices)) {
+            this.vertices = [];
+        }
+        this.redraw();
     };
     ;
     /**
@@ -1724,24 +1743,6 @@ var PlotBoilerplate = /** @class */ (function () {
                     });
                 }
             } // END for
-        },
-        /**
-         * Removes vertex listeners from the path's vertices. This needs to be called
-         * when BezierPaths are removed from the canvas.
-         *
-         * Sorry, this is not yet implemented.
-         *
-         * @param {BezierPath} bezierPath - The path to use un-auto-adjustment for.
-         **/
-        disableBezierPathAutoAdjust: function (bezierPath) {
-            // How to determine which listeners are mine???
-            /*
-              for( var i = 0; i < bezierPath.bezierCurves.length; i++ ) {
-            // Just try to remove listeners from all vertices on the Bézier path.
-            // No matter if there are not listeners installed for some reason.
-            bezierPath.bezierCurves[i].startPoint.listeners.removeDragListener( );
-            }
-            */
         }
     }; // END utils
     return PlotBoilerplate;

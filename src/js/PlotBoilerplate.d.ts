@@ -58,7 +58,8 @@
  * @modified 2020-07-31 Added PlotBoilerplate.getDraggedElementCount() to check wether any elements are currently being dragged.
  * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
- * @version  1.9.2
+ * @modified 2020-12-11 Added the `removeAll(boolean)` function.
+ * @version  1.10.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -394,6 +395,18 @@ export declare class PlotBoilerplate {
      * @return {void}
      **/
     removeVertex(vert: Vertex, redraw?: boolean): void;
+    /**
+     * Remove all elements.
+     *
+     * If you want to keep the vertices, pass `true`.
+     *
+     * @method removeAll
+     * @param {boolean=false} keepVertices
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {void}
+     */
+    removeAll(keepVertices?: boolean): void;
     /**
      * Find the vertex near the given position.
      *
@@ -757,14 +770,5 @@ export declare class PlotBoilerplate {
          * @param {BezierPath} bezierPath - The path to use auto-adjustment for.
          **/
         enableBezierPathAutoAdjust: (bezierPath: BezierPath) => void;
-        /**
-         * Removes vertex listeners from the path's vertices. This needs to be called
-         * when BezierPaths are removed from the canvas.
-         *
-         * Sorry, this is not yet implemented.
-         *
-         * @param {BezierPath} bezierPath - The path to use un-auto-adjustment for.
-         **/
-        disableBezierPathAutoAdjust: (bezierPath: BezierPath) => void;
     };
 }

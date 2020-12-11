@@ -201,8 +201,15 @@
 		}
 	    }
 	    // Draw a crosshair at the center
-	    if( config.drawCenters )
-		drawFancyCrosshair( pb, tile.position, hoverTileIndex == i, tile.position.attr.isSelected );
+	    var isHighlighted = (index == hoverTileIndex);
+	    if( config.drawCenters ) {
+		drawFancyCrosshair(
+		    pb, tile.position,
+		    tile.position.attr.isSelected ? 'red' : isHighlighted ? 'rgba(192,0,0,0.5)' : 'rgba(0,192,192,0.5)',
+		    tile.position.attr.isSelected ? 2.0 : 1.0,
+		    3.0
+		);
+	    }
 
 	    var contrastColor = toContrastColor(Color.parse(pb.config.backgroundColor));
 	    // Draw corner numbers?

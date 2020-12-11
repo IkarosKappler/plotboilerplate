@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-12-11 [v1.10.0]
+  * Added the `PlotBoilerplate.removeAll(boolean)` function.
 * 2020-12-09
   * Ported function `findPolygonSelfIntersections` to Typescript (added to `utils/algorithms/`).
 * 2020-12-08
