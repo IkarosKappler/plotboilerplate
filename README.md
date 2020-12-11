@@ -285,7 +285,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/26-girih/index.html" title="See the demo">See the demo</a>
 
 
-### Testing Polygon Intersection and Triangulation algorithms ([Greiner-Hormann](https://github.com/mapbox/earcut "Greiner-Hormann") with [Earcut](https://github.com/mapbox/earcut "Earcut") or [Delaunay](https://github.com/IkarosKappler/plotboilerplate/blob/master/src/ts/utils/algorithms/delaunay.ts) "Delaunay")
+### Testing Polygon Intersection and Triangulation algorithms ([Greiner-Hormann](https://github.com/mapbox/earcut "Greiner-Hormann") with [Earcut](https://github.com/mapbox/earcut "Earcut") or [Delaunay](https://github.com/IkarosKappler/plotboilerplate/blob/master/src/ts/utils/algorithms/delaunay.ts "Delaunay")
 
 ![Polygon clipping algorithms](https://plotboilerplate.io/repo/screenshots/screenshot-20201211-0-polygon-clipping.png "Polygon clipping algorithms")
 
