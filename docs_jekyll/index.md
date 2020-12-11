@@ -2,7 +2,7 @@
 layout: home
 date: 2019-03-11
 ---
-[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 # An interactive Javascript Plotting Boilerplate
 For plotting visual 2D data with Javascript and HTML canvas (in 2d-context).
@@ -287,6 +287,13 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 ![Port of a Girih pattern](https://plotboilerplate.io/repo/screenshots/screenshot-20201101-0-girih-basic-tiles.png "Port of a Girih pattern")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/26-girih/index.html" title="See the demo">See the demo</a>
+
+
+### Testing Polygon Intersection and Triangulation algorithms ([Greiner-Hormann](https://github.com/mapbox/earcut "Greiner-Hormann") with [Earcut](https://github.com/mapbox/earcut "Earcut") or [Delaunay](https://github.com/IkarosKappler/plotboilerplate/blob/master/src/ts/utils/algorithms/delaunay.ts) "Delaunay")
+
+![Polygon clipping algorithms](https://plotboilerplate.io/repo/screenshots/screenshot-20201211-0-polygon-clipping.png "Polygon clipping algorithms")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/27-polygon-intersection-greinerhormann/index.html" title="See the demo">See the demo</a>
 
 
 
@@ -653,6 +660,7 @@ for this purpose.
  * CubicBezierCurve.getTangentAt(number) and .getTangent(number) return Vertex, why not a Vector?
  * Add a pointDeleted event handler to PB? Would be helpful to delete objects outside the PB when their associated points are deleted by the user.
  * Tweak the SVGBuilder: make the style classes configurable (colors, line thickness, custom classes, ...).
+ * Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
 
 
 ## Browsers support
@@ -683,6 +691,8 @@ for this purpose.
 * [contrast-color-algorithm](https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y/38542#38542" "contrast-color-algorithm") by Martin Sojka's
 * Lu-Steinhardt for the work on Girih
 * Cronholm144 for the [Girih texture](https://commons.wikimedia.org/wiki/File:Girih_tiles.svg "Girih texture")
+* [Mapbox's Earcut polygon algorithm](https://github.com/mapbox/earcut "Mapbox's Earcut polygon algorithm")
+
 
 
 ## Known bugs

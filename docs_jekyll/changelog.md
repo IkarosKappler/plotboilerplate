@@ -4,6 +4,12 @@ layout: page
 
 
 # Changelog
+* 2020-12-11 [v1.10.0]
+  * Added the `PlotBoilerplate.removeAll(boolean)` function.
+* 2020-12-09
+  * Ported function `findPolygonSelfIntersections` to Typescript (added to `utils/algorithms/`).
+* 2020-12-08
+  * Adding a new demo (27) for presenting polygon clipping and polygon triangulation.
 * 2020-12-04
   * The `Line.intersection` function returns undefined if both lines are parallel.
   * Changed `VertTuple.vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
