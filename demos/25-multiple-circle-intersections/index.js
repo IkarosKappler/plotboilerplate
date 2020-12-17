@@ -305,7 +305,7 @@
 		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
 
 		if( i == 0 ) {
-		    // At the beginning add the inital position
+		    // At the beginning add the inital position?
 		    var startPoint = circle.vertAt( interval[0] );
 		    svgData.push( "M", offs.x + scale.x * startPoint.x, offs.y + scale.y * startPoint.y );
 		}
@@ -314,7 +314,8 @@
 		    offs.y + center.y * scale.y,
 		    radius  * (scale.x), // scal.y??
 		    interval[0],
-		    interval[1]
+		    interval[1],
+		    { moveToStart : false }
 		);
 		svgData = svgData.concat( lastArc );
 	    }

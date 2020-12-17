@@ -152,8 +152,10 @@
 		pb.draw.polygon( previewTiles[previewTilePointer], 'rgba(128,128,128,0.5)', 1.0 ); // Polygon is not open
 
 		// Draw intersection polygons (if there are any)
-		for( var i = 0; i < previewIntersectionPolygons.length; i++ ) {
-		    pb.fill.polygon( previewIntersectionPolygons[i], 'rgba(255,0,0,0.25)' );
+		if( config.showOverlaps ) {
+		    for( var i = 0; i < previewIntersectionPolygons.length; i++ ) {
+			pb.fill.polygon( previewIntersectionPolygons[i], 'rgba(255,0,0,0.25)' );
+		    }
 		}
 	    }
 	    
@@ -487,7 +489,8 @@
 	    drawOuterPolygons : true,
 	    drawInnerPolygons : true,
 	    lineJoin  : "round",     // [ "bevel", "round", "miter" ]
-	    drawTextures : false
+	    drawTextures : false,
+	    showOverlaps : false
 	}, GUP );
 
 
@@ -519,6 +522,7 @@
 	    gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
 	    gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
 	    gui.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
+	    gui.add(config, 'showOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showOverlaps').title("Detect and draw overlaps?");
 	}
 
 	initTiles();

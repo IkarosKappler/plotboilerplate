@@ -11,7 +11,8 @@
  * @modified 2019-11-07 Added the 'Triangle' style class.
  * @modified 2019-11-13 Added the <?xml ...?> tag.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version  1.0.3
+ * @modified 2020-12-17 Added Circle and CircleSection style classes.
+ * @version  1.0.4
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SVGBuilder = void 0;
@@ -60,6 +61,8 @@ var SVGBuilder = /** @class */ (function () {
         buffer.push(indent + indent + ' .BezierPath { fill : none; stroke : blue; stroke-width : 2px; } ' + nl);
         buffer.push(indent + indent + ' .VEllipse { fill : none; stroke : black; stroke-width : 1px; } ' + nl);
         buffer.push(indent + indent + ' .Line { fill : none; stroke : purple; stroke-width : 1px; } ' + nl);
+        buffer.push(indent + indent + ' .Circle { fill : none; stroke : purple; stroke-width : 1px; } ' + nl);
+        buffer.push(indent + indent + ' .CircleSector { fill : none; stroke : purple; stroke-width : 1px; } ' + nl);
         buffer.push(indent + '</style>' + nl);
         buffer.push(indent + '</defs>' + nl);
         buffer.push(indent + '<g class="main-g"');

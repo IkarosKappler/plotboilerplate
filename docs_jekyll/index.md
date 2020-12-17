@@ -9,7 +9,7 @@ For plotting visual 2D data with Javascript and HTML canvas (in 2d-context).
 
 This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
- * adding elements like [vertices](https://plotboilerplate.io/docs/Vertex.html "Vertex class"), [lines](https://plotboilerplate.io/docs/Line.html "Line class"), [vectors](https://plotboilerplate.io/docs/Vector.html "Vector class"), [triangles](https://plotboilerplate.io/docs/Triangle.html "Triangle class"), [curves](https://plotboilerplate.io/docs/CubicBezierCurve.html "CubicBezierCurve class"), [circles](https://plotboilerplate.io/docs/Circle.html "Circle class"), [polygons](https://plotboilerplate.io/docs/Polygon.html "Polygon class"), [ellipses](https://plotboilerplate.io/docs/VEllipse.html "VEllipse class"), [images](https://plotboilerplate.io/docs/PBImage.html "PBImage class")
+ * adding elements like [vertices](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class"), [lines](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class"), [vectors](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class"), [triangles](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class"), [curves](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class"), [circle sectors](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class"), [circles](https://plotboilerplate.io/docs_typedoc/classes/circle.htmll "Circle class"), [polygons](https://plotboilerplate.io/docs_typedoc/classes/polygon.html "Polygon class"), [ellipses](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class"), [images](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class")
  * configuration of the canvas behavior (fullsize, interaction, raster)
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
@@ -289,7 +289,7 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/26-girih/index.html" title="See the demo">See the demo</a>
 
 
-### Testing Polygon Intersection and Triangulation algorithms ([Greiner-Hormann](https://github.com/mapbox/earcut "Greiner-Hormann") with [Earcut](https://github.com/mapbox/earcut "Earcut") or [Delaunay](https://github.com/IkarosKappler/plotboilerplate/blob/master/src/ts/utils/algorithms/delaunay.ts) "Delaunay")
+### Testing Polygon Intersection and Triangulation algorithms ([Greiner-Hormann](https://github.com/mapbox/earcut "Greiner-Hormann") with [Earcut](https://github.com/mapbox/earcut "Earcut") or [Delaunay](https://github.com/IkarosKappler/plotboilerplate/blob/master/src/ts/utils/algorithms/delaunay.ts "Delaunay")
 
 ![Polygon clipping algorithms](https://plotboilerplate.io/repo/screenshots/screenshot-20201211-0-polygon-clipping.png "Polygon clipping algorithms")
 

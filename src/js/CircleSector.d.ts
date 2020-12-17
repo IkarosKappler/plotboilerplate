@@ -11,7 +11,6 @@ export declare type SVGArcPathParams = [string, number, number, number, number, 
  *
  * @requires Line
  * @requires SVGSerializale
- * @requires Vertex
  * @requires XYCoords
  **/
 export declare class CircleSector implements SVGSerializable {
@@ -62,7 +61,6 @@ export declare class CircleSector implements SVGSerializable {
     static circleSectorUtils: {
         /**
          * Helper function to convert polar circle coordinates to cartesian coordinates.
-         * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
          *
          * TODO: generalize for ellipses (two radii).
          *
@@ -71,11 +69,15 @@ export declare class CircleSector implements SVGSerializable {
         polarToCartesian: (centerX: number, centerY: number, radius: number, angle: number) => XYCoords;
         /**
          * Helper function to convert a circle section as SVG arc params (for the `d` attribute).
+         * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
          *
          * TODO: generalize for ellipses (two radii).
          *
+         * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
          * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
-        describeSVGArc: (x: number, y: number, radius: number, startAngle: number, endAngle: number) => SVGPathParams;
+        describeSVGArc: (x: number, y: number, radius: number, startAngle: number, endAngle: number, options?: {
+            moveToStart: boolean;
+        }) => SVGPathParams;
     };
 }

@@ -11,7 +11,6 @@ exports.CircleSector = void 0;
  *
  * @requires Line
  * @requires SVGSerializale
- * @requires Vertex
  * @requires XYCoords
  **/
 var CircleSector = /** @class */ (function () {
@@ -53,13 +52,17 @@ var CircleSector = /** @class */ (function () {
         buffer.push( ' cy="' + this.center.y + '"' );
         buffer.push( ' r="' + this.radius + '"' );
         buffer.push( ' />' ); */
+        buffer.push('<path ');
+        if (options.className)
+            buffer.push(' class="' + options.className + '"');
+        var data = CircleSector.circleSectorUtils.describeSVGArc(this.circle.center.x, this.circle.center.y, this.circle.radius, this.startAngle, this.endAngle);
+        buffer.push(' d="' + data.join(" ") + '" />');
         return buffer.join('');
     };
     ;
     CircleSector.circleSectorUtils = {
         /**
          * Helper function to convert polar circle coordinates to cartesian coordinates.
-         * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
          *
          * TODO: generalize for ellipses (two radii).
          *
@@ -73,29 +76,37 @@ var CircleSector = /** @class */ (function () {
         },
         /**
          * Helper function to convert a circle section as SVG arc params (for the `d` attribute).
+         * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
          *
          * TODO: generalize for ellipses (two radii).
          *
+         * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
          * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
-        describeSVGArc: function (x, y, radius, startAngle, endAngle) {
+        describeSVGArc: function (x, y, radius, startAngle, endAngle, options) {
+            if (typeof options === 'undefined')
+                options = { moveToStart: true };
             var end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
             var start = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
             // Split full circles into two halves.
             // Some browsers have problems to render full circles (described by start==end).
             if (Math.PI * 2 - Math.abs(startAngle - endAngle) < 0.001) {
-                var firstHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle, startAngle + (endAngle - startAngle) / 2);
-                // const firstEndPoint : XYCoords = new Vertex( firstHalf[firstHalf.length-2], firstHalf[firstHalf.length-1] );
+                var firstHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle, startAngle + (endAngle - startAngle) / 2, options);
                 var firstEndPoint = { x: firstHalf[firstHalf.length - 2],
                     y: firstHalf[firstHalf.length - 1]
                 };
-                var secondHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle + (endAngle - startAngle) / 2, endAngle);
+                var secondHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle + (endAngle - startAngle) / 2, endAngle, options);
                 return firstHalf.concat(secondHalf);
             }
             // Boolean stored as integers (0|1).
             var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
             var sweepFlag = 1;
-            return ["A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y];
+            var pathData = [];
+            if (options.moveToStart) {
+                pathData.push('M', start.x, start.y);
+            }
+            pathData.push("A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y);
+            return pathData;
         }
     };
     return CircleSector;

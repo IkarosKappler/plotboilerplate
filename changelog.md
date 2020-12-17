@@ -4,6 +4,8 @@
 * 2020-12-17
   * Added the `CircleSector` drawable (class).
   * Added the `SVGPathParams` type.
+  * Extended the main class `PlotBoilerplate` for circle sector rendering.
+  * Extended the `SVGBuilder` for circle sector rendering.
 * 2020-12-11 [v1.10.0]
   * Added the `PlotBoilerplate.removeAll(boolean)` function.
 * 2020-12-09

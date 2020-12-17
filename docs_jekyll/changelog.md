@@ -4,6 +4,9 @@ layout: page
 
 
 # Changelog
+* 2020-12-17
+  * Added the `CircleSector` drawable (class).
+  * Added the `SVGPathParams` type.
 * 2020-12-11 [v1.10.0]
   * Added the `PlotBoilerplate.removeAll(boolean)` function.
 * 2020-12-09
