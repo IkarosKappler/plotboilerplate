@@ -55,7 +55,6 @@ export class CircleIntersections {
 	}
 	const usedIntervals : Matrix<boolean> = matrixFill<boolean>( intervalSets.length, maxSetLength, false );
 	
-	// Draw connected paths?
 	var path : Array<IndexPair>|null = null;
 	var pathList : Array<Array<IndexPair>> = [];
 	while( (path = CircleIntersections.findOuterPartition(circles,intervalSets,usedIntervals)) != null ) {
