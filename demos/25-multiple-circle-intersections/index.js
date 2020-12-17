@@ -23,7 +23,8 @@
  * @author   Ikaros Kappler
  * @date     2020-10-05
  * @modified 2020-11-13 Fixed the drawing of sector lines.
- * @version  1.0.1
+ * @modified 2020-12-17 Added basic SVG export (experimental).
+ * @version  1.1.0
  **/
 
 
@@ -262,38 +263,7 @@
 	// | @param {drawutils} draw
 	// +-------------------------------
 	var drawConnectedPathAsSVGArcs = function( circles, path, intervalSets, color, draw ) {
-	    // Build the SVG path data 
-	    // https://www.w3.org/TR/SVG/paths.html
-	    
-	    var offs = draw.offset;
-	    var scal = draw.scale;
-	    var svgData = [];
-	    var lastArc = null;
-	    
-	    for( var i = 0; i < path.length; i++ ) {
-		var circleIndex = path[i].i;
-		var circle = circles[ circleIndex ];
-		var center = circle.center;
-		var radius = circle.radius;
-		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
-
-		if( i == 0 ) {
-		    // At the beginning add the inital position
-		    var startPoint = circle.vertAt( interval[0] );
-		    svgData.push( "M", offs.x + scal.x * startPoint.x, offs.y + scal.y * startPoint.y );
-		}
-		lastArc = CircleSector.circleSectorUtils.describeSVGArc(
-		    offs.x + center.x * scal.x,
-		    offs.y + center.y * scal.y,
-		    radius  * (scal.x), // scal.y??
-		    interval[0],
-		    interval[1]
-		);
-		svgData = svgData.concat( lastArc );
-	    }
-	    // Close the path
-	    svgData.push( "Z" );
-			      
+	    var svgData = pathToSVGData( circles, path, intervalSets, color, draw.offset, draw.scale );	      
 	    // console.log( svgData );
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
@@ -307,6 +277,51 @@
 		draw.ctx.stroke( new Path2D(svgData.join(" ")) );
 	    }
 	    draw.ctx.restore();    
+	};
+
+	// +---------------------------------------------------------------------------------
+	// | Convert the given circle arc path (must be connected to look good) to
+	// | SVG path data.
+	// |
+	// | @param {Cirle[]} circles
+	// | @param {IndexPair[]} path
+	// | @param {CircularIntervalSet[]} intervalSets
+	// | @param {string} color
+	// | @param {XYCoords} offs - The draw offset to use.
+	// | @param {XYCoords} scale - The zoom to use.
+	// +-------------------------------
+	var pathToSVGData = function( circles, path, intervalSets, color, offs, scale ) {
+	    // Build the SVG path data 
+	    // https://www.w3.org/TR/SVG/paths.html
+
+	    var svgData = [];
+	    var lastArc = null;
+	    
+	    for( var i = 0; i < path.length; i++ ) {
+		var circleIndex = path[i].i;
+		var circle = circles[ circleIndex ];
+		var center = circle.center;
+		var radius = circle.radius;
+		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
+
+		if( i == 0 ) {
+		    // At the beginning add the inital position
+		    var startPoint = circle.vertAt( interval[0] );
+		    svgData.push( "M", offs.x + scale.x * startPoint.x, offs.y + scale.y * startPoint.y );
+		}
+		lastArc = CircleSector.circleSectorUtils.describeSVGArc(
+		    offs.x + center.x * scale.x,
+		    offs.y + center.y * scale.y,
+		    radius  * (scale.x), // scal.y??
+		    interval[0],
+		    interval[1]
+		);
+		svgData = svgData.concat( lastArc );
+	    }
+	    // Close the path
+	    svgData.push( "Z" );
+
+	    return svgData;
 	};
 
 	
@@ -350,17 +365,45 @@
 		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 	    } );
 
-	
+
+	// +---------------------------------------------------------------------------------
+	// | After circles were moved their radius control points must be updated
+	// | to match the circles' radii again.
+	// +-------------------------------
 	var updateRadiusPoints = function() {
-	    // Update them ...
 	    for( var i in circles ) {
-		// console.log( radiusPoints[i] );
 		radiusPoints[i].set( circles[i].center.x + circle.radius*Math.sin(Math.PI/4),
 				     circles[i].center.y + circle.radius*Math.cos(Math.PI/4)
 				   );
 	    }
-	    // ... then redraw
 	    pb.redraw();
+	};
+
+	// +---------------------------------------------------------------------------------
+	// | Build and export the outer paths a an SVG file.
+	// | This is a really dirty and quick hack.
+	// +-------------------------------
+	var exportSVG = function() {
+	    // Do the same as in the draw function (refactor?)
+	    var innerCircleIndices   = CircleIntersections.findInnerCircles( circles ); 
+	    var radicalLineMatrix    = CircleIntersections.buildRadicalLineMatrix( circles );
+	    var intervalSets         = CircleIntersections.findOuterCircleIntervals( circles, radicalLineMatrix );
+	    var pathList             = CircleIntersections.findOuterPartitions( circles, intervalSets );
+	    
+	    var canvasSize = pb.canvasSize;
+	    var offset = pb.draw.offset;
+	    var scale = pb.draw.scale;
+	    // TODO: writer a better SVGBuilder so we do not have to write pure SVG code here.
+	    var svgBuffer = [ '<svg width="'+canvasSize.width+'" height="'+canvasSize.height+'" xmlns="http://www.w3.org/2000/svg"><defs><style>.main-g { transform: scale('+scale.x+','+scale.y+') translate('+offset.x+'px,'+offset.y+'px) } .CircleArcPath { fill : none; stroke : green; stroke-width : 2px; } </style></defs>   <g class="main-g">' ];
+	    for( var i = 0; i < pathList.length; i++ ) {
+		var pathData = pathToSVGData( circles, pathList[i], intervalSets, 'rgb(0,0,0)', pb.draw.offset, pb.draw.scale );
+		svgBuffer.push( '<path class="CircleArcPath" d="' + pathData.join(" ") + '" />' );
+	    }	    
+	    svgBuffer.push( '</g></svg>' );
+
+	    var svgString = svgBuffer.join("");
+	    // console.log( svgString );
+	    saveAs( new Blob( [ svgString ], { type: 'image/svg' } ), 'circles.svg' );
 	};
 	
 
@@ -414,8 +457,9 @@
 	    nestedCircleStep       : 25,
 	    fillNestedCircles      : false,
 	    colorSet               : "WebColors", // [ "WebColors", "Mixed", "Malachite" ]
-	    animate               : false,
-	    animationType         : 'radial'      // 'linear' or 'radial'
+	    animate                : false,
+	    animationType          : 'radial',     // 'linear' or 'radial'
+	    exportSVG              : function() { exportSVG(); }
 	}, GUP );
 	
 
