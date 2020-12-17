@@ -300,22 +300,5 @@ export class CircleIntersections {
 	    }
 	}
 	return null;
-    };
-
-    /* 
-    public static arrayFill<T extends any>( count:number, initialValue:T ) : Array<T> {
-	const arr : Array<T> = Array<T>( count );
-	for( var i = 0; i < count; i++ )
-	    arr[i] = initialValue;
-	return arr;
-    };
-
-    public static matrixFill<T extends any>( countA:number, countB:number, initialValue:T ) : Matrix<T> {
-	const arr : Matrix<T> = Array<Array<T>>( countA );
-	for( var i = 0; i < countA; i++ ) {
-	    arr[i] = CircleIntersections.arrayFill( countB, initialValue );
-	}
-	return arr;
-    }; */
-     
+    };     
 };
