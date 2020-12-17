@@ -61,6 +61,15 @@ export class Circle implements SVGSerializable {
     };
 
 
+    /**
+     * Check if the given circle is fully contained inside this circle.
+     *
+     * @method containsCircle
+     * @param {Circle} circle - The circle to check if it is contained in this circle.
+     * @instance
+     * @memberof Circle
+     * @return {boolean} `true` if any only if the given circle is completely inside this circle.
+     */
     containsCircle( circle:Circle ) : boolean {
 	return this.center.distance(circle.center) + circle.radius < this.radius;
     };

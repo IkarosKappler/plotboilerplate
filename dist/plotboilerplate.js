@@ -1364,6 +1364,15 @@ var Circle = /** @class */ (function () {
         this.radius = radius;
     }
     ;
+    /**
+     * Check if the given circle is fully contained inside this circle.
+     *
+     * @method containsCircle
+     * @param {Circle} circle - The circle to check if it is contained in this circle.
+     * @instance
+     * @memberof Circle
+     * @return {boolean} `true` if any only if the given circle is completely inside this circle.
+     */
     Circle.prototype.containsCircle = function (circle) {
         return this.center.distance(circle.center) + circle.radius < this.radius;
     };
@@ -1504,6 +1513,124 @@ var Circle = /** @class */ (function () {
 }()); // END class
 exports.Circle = Circle;
 //# sourceMappingURL=Circle.js.map
+
+/***/ }),
+
+/***/ "../src/js/CircleSector.js":
+/*!*********************************!*\
+  !*** ../src/js/CircleSector.js ***!
+  \*********************************/
+/*! flagged exports */
+/*! export CircleSector [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/**
+ * @author   Ikaros Kappler
+ * @version  1.0.0
+ * @date     2020-12-17
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CircleSector = void 0;
+/**
+ * @classdesc A simple circle sector: circle, start- and end-angle.
+ *
+ * @requires Line
+ * @requires SVGSerializale
+ * @requires Vertex
+ * @requires XYCoords
+ **/
+var CircleSector = /** @class */ (function () {
+    /**
+     * Create a new circle sector with given circle, start- and end-angle.
+     *
+     * @constructor
+     * @name CircleSector
+     * @param {Circle} circle - The circle.
+     * @param {number} startAngle - The start angle of the sector.
+     * @param {number} endAngle - The end angle of the sector.
+     */
+    function CircleSector(circle, startAngle, endAngle) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "CircleSector";
+        this.circle = circle;
+        this.startAngle = startAngle;
+        this.endAngle = endAngle;
+    }
+    ;
+    /**
+      * Create an SVG representation of this circle.
+      *
+      * @method toSVGString
+      * @param {object=} options - An optional set of options, like 'className'.
+      * @return {string} A string representing the SVG code for this vertex.
+      * @instance
+      * @memberof Circle
+      */
+    CircleSector.prototype.toSVGString = function (options) {
+        options = options || {};
+        var buffer = [];
+        /* buffer.push( '<circle' );
+        if( options.className )
+            buffer.push( ' class="' + options.className + '"' );
+        buffer.push( ' cx="' + this.center.x + '"' );
+        buffer.push( ' cy="' + this.center.y + '"' );
+        buffer.push( ' r="' + this.radius + '"' );
+        buffer.push( ' />' ); */
+        return buffer.join('');
+    };
+    ;
+    CircleSector.circleSectorUtils = {
+        /**
+         * Helper function to convert polar circle coordinates to cartesian coordinates.
+         * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+         *
+         * TODO: generalize for ellipses (two radii).
+         *
+         * @param {number} angle - The angle in radians.
+        */
+        polarToCartesian: function (centerX, centerY, radius, angle) {
+            return {
+                x: centerX + (radius * Math.cos(angle)),
+                y: centerY + (radius * Math.sin(angle))
+            };
+        },
+        /**
+         * Helper function to convert a circle section as SVG arc params (for the `d` attribute).
+         *
+         * TODO: generalize for ellipses (two radii).
+         *
+         * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
+         */
+        describeSVGArc: function (x, y, radius, startAngle, endAngle) {
+            var end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
+            var start = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
+            // Split full circles into two halves.
+            // Some browsers have problems to render full circles (described by start==end).
+            if (Math.PI * 2 - Math.abs(startAngle - endAngle) < 0.001) {
+                var firstHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle, startAngle + (endAngle - startAngle) / 2);
+                // const firstEndPoint : XYCoords = new Vertex( firstHalf[firstHalf.length-2], firstHalf[firstHalf.length-1] );
+                var firstEndPoint = { x: firstHalf[firstHalf.length - 2],
+                    y: firstHalf[firstHalf.length - 1]
+                };
+                var secondHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle + (endAngle - startAngle) / 2, endAngle);
+                return firstHalf.concat(secondHalf);
+            }
+            // Boolean stored as integers (0|1).
+            var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
+            var sweepFlag = 1;
+            return ["A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y];
+        }
+    };
+    return CircleSector;
+}()); // END class
+exports.CircleSector = CircleSector;
+//# sourceMappingURL=CircleSector.js.map
 
 /***/ }),
 
@@ -3497,7 +3624,8 @@ exports.PBImage = PBImage;
  * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
- * @version  1.10.0
+ * @modified 2020-12-17 Added the `CircleSector` drawable.
+ * @version  1.11.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -3510,6 +3638,7 @@ var drawgl_1 = __webpack_require__(/*! ./drawgl */ "../src/js/drawgl.js");
 var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
 var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
 var Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
+var CircleSector_1 = __webpack_require__(/*! ./CircleSector */ "../src/js/CircleSector.js");
 var Grid_1 = __webpack_require__(/*! ./Grid */ "../src/js/Grid.js");
 var KeyHandler_1 = __webpack_require__(/*! ./KeyHandler */ "../src/js/KeyHandler.js");
 var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
@@ -3705,6 +3834,10 @@ var PlotBoilerplate = /** @class */ (function () {
             circle: {
                 color: '#22a8a8',
                 lineWidth: 2
+            },
+            circleSector: {
+                color: '#2280a8',
+                lineWidth: 1
             },
             vertex: {
                 color: '#a8a8a8',
@@ -3931,6 +4064,10 @@ var PlotBoilerplate = /** @class */ (function () {
             this.vertices.push(drawable.center);
             this.drawables.push(drawable);
         }
+        else if (drawable instanceof CircleSector_1.CircleSector) {
+            this.vertices.push(drawable.circle.center);
+            this.drawables.push(drawable);
+        }
         else if (drawable instanceof Polygon_1.Polygon) {
             this.drawables.push(drawable);
             // for( var i in drawable.vertices )
@@ -4021,6 +4158,9 @@ var PlotBoilerplate = /** @class */ (function () {
                     }
                     else if (drawable instanceof Circle_1.Circle) {
                         this.removeVertex(drawable.center, false);
+                    }
+                    else if (drawable instanceof CircleSector_1.CircleSector) {
+                        this.removeVertex(drawable.circle.center, false);
                     }
                     else if (drawable instanceof Polygon_1.Polygon) {
                         // for( var i in drawable.vertices )
@@ -4237,6 +4377,9 @@ var PlotBoilerplate = /** @class */ (function () {
             }
             else if (d instanceof Circle_1.Circle) {
                 this.draw.circle(d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth);
+            }
+            else if (d instanceof CircleSector_1.CircleSector) {
+                this.draw.circleArc(d.circle.center, d.circle.radius, d.startAngle, d.endAngle, this.drawConfig.circleSector.color, this.drawConfig.circleSector.lineWidth);
             }
             else if (d instanceof Vertex_1.Vertex) {
                 if (this.drawConfig.drawVertices &&
@@ -9161,6 +9304,7 @@ globalThis.Polygon = __webpack_require__(/*! ./Polygon.js */ "../src/js/Polygon.
 globalThis.Triangle = __webpack_require__(/*! ./Triangle.js */ "../src/js/Triangle.js").Triangle;
 globalThis.VEllipse = __webpack_require__(/*! ./VEllipse.js */ "../src/js/VEllipse.js").VEllipse;
 globalThis.Circle = __webpack_require__(/*! ./Circle.js */ "../src/js/Circle.js").Circle;
+globalThis.CircleSector = __webpack_require__(/*! ./CircleSector.js */ "../src/js/CircleSector.js").CircleSector;
 globalThis.PBImage = __webpack_require__(/*! ./PBImage.js */ "../src/js/PBImage.js").PBImage;
 globalThis.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "../src/js/MouseHandler.js").MouseHandler;
 globalThis.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "../src/js/KeyHandler.js").KeyHandler;

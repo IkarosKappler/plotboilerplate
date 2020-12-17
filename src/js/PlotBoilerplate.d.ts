@@ -59,7 +59,8 @@
  * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
- * @version  1.10.0
+ * @modified 2020-12-17 Added the `CircleSector` drawable.
+ * @version  1.11.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

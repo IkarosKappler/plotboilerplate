@@ -59,7 +59,8 @@
  * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
- * @version  1.10.0
+ * @modified 2020-12-17 Added the `CircleSector` drawable.
+ * @version  1.11.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -75,6 +76,7 @@ import { drawutilsgl } from "./drawgl";
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
+import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Grid } from "./Grid";
 import { KeyHandler, XKeyListener } from "./KeyHandler";
@@ -428,6 +430,10 @@ export class PlotBoilerplate {
 	    	color : '#22a8a8',
 		lineWidth : 2
 	    },
+	    circleSector : {
+	    	color : '#2280a8',
+		lineWidth : 1
+	    },
 	    vertex : {
 		color : '#a8a8a8',
 		lineWidth : 1
@@ -660,6 +666,9 @@ export class PlotBoilerplate {
 	} else if( drawable instanceof Circle ) {
 	    this.vertices.push( drawable.center );
 	    this.drawables.push( drawable );
+	} else if( drawable instanceof CircleSector ) {
+	    this.vertices.push( drawable.circle.center );
+	    this.drawables.push( drawable );
 	} else if( drawable instanceof Polygon ) {
 	    this.drawables.push( drawable );
 	    // for( var i in drawable.vertices )
@@ -746,6 +755,8 @@ export class PlotBoilerplate {
 			this.removeVertex( drawable.axis, false );
 		    } else if( drawable instanceof Circle ) {
 			this.removeVertex( drawable.center, false );
+		    } else if( drawable instanceof CircleSector ) {
+			this.removeVertex( drawable.circle.center, false );
 		    } else if( drawable instanceof Polygon ) {
 			// for( var i in drawable.vertices )
 			for( var i = 0; i < drawable.vertices.length; i++ )
@@ -965,6 +976,8 @@ export class PlotBoilerplate {
 		}
 	    } else if( d instanceof Circle ) {
 		this.draw.circle( d.center, d.radius, this.drawConfig.circle.color,  this.drawConfig.circle.lineWidth );
+	    } else if( d instanceof CircleSector ) {
+		this.draw.circleArc( d.circle.center, d.circle.radius, d.startAngle, d.endAngle, this.drawConfig.circleSector.color,  this.drawConfig.circleSector.lineWidth );
 	    } else if( d instanceof Vertex ) {
 		if( this.drawConfig.drawVertices &&
 		    (!d.attr.selectable || !d.attr.draggable) && d.attr.visible ) {

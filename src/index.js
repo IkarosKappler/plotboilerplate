@@ -95,9 +95,10 @@
 	// +---------------------------------------------------------------------------------
 	// | Add some elements to draw (demo).
 	// +-------------------------------
-	var diameter = Math.min(pb.canvasSize.width,pb.canvasSize.height)/3.5;
+	var diameter = Math.min(pb.canvasSize.width,pb.canvasSize.height)/4.5;
 	var radius   = diameter*0.5;
 	var hypo     = Math.sqrt( radius*radius*2 );
+	var D2R      = Math.PI/180.0;
 
 	// +---------------------------------------------------------------------------------
 	// | Add an image.
@@ -147,7 +148,18 @@
 	var circle = new Circle( new Vertex(0,0), diameter );
 	pb.add( circle, false );
 
+	// +---------------------------------------------------------------------------------
+	// | Add four circle sectors.
+	// +-------------------------------
+	var csectorA = new CircleSector( new Circle( new Vertex(diameter*0.8,0), diameter ), -20*D2R, 20*D2R );
+	var csectorB = new CircleSector( new Circle( new Vertex(0,diameter*0.8), diameter ), (90-25)*D2R, (90+25)*D2R );
+	var csectorC = new CircleSector( new Circle( new Vertex(-diameter*0.8,0), diameter ), (180-20)*D2R, (180+20)*D2R );
+	var csectorD = new CircleSector( new Circle( new Vertex(0,-diameter*0.8), diameter ), (270-25)*D2R, (270+25)*D2R );
 	
+	pb.add( csectorA, false );
+	pb.add( csectorB, false );
+	pb.add( csectorC, false );
+	pb.add( csectorD, false );
 	
 	// +---------------------------------------------------------------------------------
 	// | Add a circular connected bezier path.

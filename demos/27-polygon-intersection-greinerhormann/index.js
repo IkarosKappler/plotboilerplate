@@ -134,8 +134,6 @@
 		var vertB = randomVertex();
 		vertsA.push( vertA );
 		vertsB.push( vertB );
-		// pb.add( vertA );
-		// pb.add( vertB );
 	    }
 	    setVertices( vertsA, vertsB );
 	};
@@ -148,12 +146,8 @@
 	    var polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); // Polygons are not open
 	    var polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false );
 
-	    pb.draw.polygon( polygonA,
-			     Teal.cssRGB(),   // 'rgba(128,128,128,0.5)',
-			     1.0 );           // Polygon is not open
-	    pb.draw.polygon( polygonB,
-			     Orange.cssRGB(), // 'rgba(128,128,128,0.5)',
-			     1.0 );           // Polygon is not open
+	    pb.draw.polygon( polygonA, Teal.cssRGB(), 1.0 );
+	    pb.draw.polygon( polygonB, Orange.cssRGB(), 1.0 );
 
 	    var mouseInA = mousePosition != null && polygonA.containsVert(mousePosition);
 	    var mouseInB = mousePosition != null && polygonB.containsVert(mousePosition);

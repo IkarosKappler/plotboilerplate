@@ -282,12 +282,13 @@
 		    var startPoint = circle.vertAt( interval[0] );
 		    svgData.push( "M", offs.x + scal.x * startPoint.x, offs.y + scal.y * startPoint.y );
 		}
-		lastArc = describeArc( offs.x + center.x * scal.x,
-				       offs.y + center.y * scal.y,
-				       radius  * (scal.x), // scal.y??
-				       interval[0],
-				       interval[1]
-				     );
+		lastArc = CircleSector.circleSectorUtils.describeSVGArc(
+		    offs.x + center.x * scal.x,
+		    offs.y + center.y * scal.y,
+		    radius  * (scal.x), // scal.y??
+		    interval[0],
+		    interval[1]
+		);
 		svgData = svgData.concat( lastArc );
 	    }
 	    // Close the path
@@ -316,12 +317,12 @@
 	// |
 	// | @param {number} angle - The angle in radians.
 	// +-------------------------------
-	function polarToCartesian( centerX, centerY, radius, angle ) {
+	/* function polarToCartesian( centerX, centerY, radius, angle ) {
 	    return {
 		x: centerX + (radius * Math.cos(angle)),
 		y: centerY + (radius * Math.sin(angle))
 	    };
-	}
+	} */ 
 
 	// +---------------------------------------------------------------------------------
 	// | Helper function to convert a circle section as SVG arc params (for the `d` attribute).
@@ -330,7 +331,7 @@
 	// |
 	// | @rerturn [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
 	// +-------------------------------
-	function describeArc( x, y, radius, startAngle, endAngle ) {
+	/* function describeArc( x, y, radius, startAngle, endAngle ) {
 	    var end = polarToCartesian(x, y, radius, endAngle);
 	    var start = polarToCartesian(x, y, radius, startAngle);
 
@@ -346,7 +347,7 @@
 	    var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
 	    var sweepFlag = 1;
 	    return ["A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y ];
-	}
+	} */
 
 	
 	// +---------------------------------------------------------------------------------

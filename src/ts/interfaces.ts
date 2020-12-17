@@ -5,6 +5,7 @@ import { Triangle } from "./Triangle";
 import { PBImage } from "./PBImage";
 import { VEllipse } from "./VEllipse";
 import { Circle } from "./Circle";
+import { CircleSector } from "./CircleSector";
 import { Polygon } from "./Polygon";
 import { BezierPath } from "./BezierPath";
 import { Line } from "./Line";
@@ -37,7 +38,7 @@ export interface IBounds {
     max : XYCoords;
 }
 
-export type Drawable = Vertex | Vector | Triangle | Circle | PBImage | VEllipse | Polygon | BezierPath | Line;
+export type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | VEllipse | Polygon | BezierPath | Line;
 
 export interface Config {
     canvas : HTMLCanvasElement | string;   //  Your canvas element in the DOM (required).
@@ -120,6 +121,7 @@ export interface DrawConfig {
     triangle : DrawSettings;
     ellipse : DrawSettings;
     circle : DrawSettings;
+    circleSector : DrawSettings;
     vertex : DrawSettings;
     selectedVertex : DrawSettings;
     line : DrawSettings;
@@ -154,6 +156,12 @@ export interface SVGSerializable {
      **/
     toSVGString : ( options:{ className?:string } ) => string;
 }
+
+/**
+ * A type for SVG &lt;path d="..." /> params.
+ * Example: [ 'A':string, radiusx:number, radiusy:number, rotation:number, largeArcFlag=1|0, sweepFlag=1|0, endx:number, endy:number ]
+ */
+export type SVGPathParams = Array<string|number>;
 
 export interface IHooks {
     saveFile: (pb:PlotBoilerplate)=>void;

@@ -15,6 +15,7 @@ globalThis.Polygon = require("./Polygon.js").Polygon;
 globalThis.Triangle = require("./Triangle.js").Triangle;
 globalThis.VEllipse = require("./VEllipse.js").VEllipse;
 globalThis.Circle = require("./Circle.js").Circle;
+globalThis.CircleSector = require("./CircleSector.js").CircleSector;
 globalThis.PBImage = require("./PBImage.js").PBImage;
 globalThis.MouseHandler = require("./MouseHandler.js").MouseHandler;
 globalThis.KeyHandler = require("./KeyHandler.js").KeyHandler;

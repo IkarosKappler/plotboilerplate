@@ -60,7 +60,8 @@
  * @modified 2020-08-19 Added the VertexAttributes.visible attribute to make vertices invisible.
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
- * @version  1.10.0
+ * @modified 2020-12-17 Added the `CircleSector` drawable.
+ * @version  1.11.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -73,6 +74,7 @@ var drawgl_1 = require("./drawgl");
 var BezierPath_1 = require("./BezierPath");
 var Bounds_1 = require("./Bounds");
 var Circle_1 = require("./Circle");
+var CircleSector_1 = require("./CircleSector");
 var Grid_1 = require("./Grid");
 var KeyHandler_1 = require("./KeyHandler");
 var Line_1 = require("./Line");
@@ -268,6 +270,10 @@ var PlotBoilerplate = /** @class */ (function () {
             circle: {
                 color: '#22a8a8',
                 lineWidth: 2
+            },
+            circleSector: {
+                color: '#2280a8',
+                lineWidth: 1
             },
             vertex: {
                 color: '#a8a8a8',
@@ -494,6 +500,10 @@ var PlotBoilerplate = /** @class */ (function () {
             this.vertices.push(drawable.center);
             this.drawables.push(drawable);
         }
+        else if (drawable instanceof CircleSector_1.CircleSector) {
+            this.vertices.push(drawable.circle.center);
+            this.drawables.push(drawable);
+        }
         else if (drawable instanceof Polygon_1.Polygon) {
             this.drawables.push(drawable);
             // for( var i in drawable.vertices )
@@ -584,6 +594,9 @@ var PlotBoilerplate = /** @class */ (function () {
                     }
                     else if (drawable instanceof Circle_1.Circle) {
                         this.removeVertex(drawable.center, false);
+                    }
+                    else if (drawable instanceof CircleSector_1.CircleSector) {
+                        this.removeVertex(drawable.circle.center, false);
                     }
                     else if (drawable instanceof Polygon_1.Polygon) {
                         // for( var i in drawable.vertices )
@@ -800,6 +813,9 @@ var PlotBoilerplate = /** @class */ (function () {
             }
             else if (d instanceof Circle_1.Circle) {
                 this.draw.circle(d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth);
+            }
+            else if (d instanceof CircleSector_1.CircleSector) {
+                this.draw.circleArc(d.circle.center, d.circle.radius, d.startAngle, d.endAngle, this.drawConfig.circleSector.color, this.drawConfig.circleSector.lineWidth);
             }
             else if (d instanceof Vertex_1.Vertex) {
                 if (this.drawConfig.drawVertices &&
