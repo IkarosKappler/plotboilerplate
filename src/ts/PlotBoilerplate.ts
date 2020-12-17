@@ -346,49 +346,50 @@ export class PlotBoilerplate {
 	 * @memberof PlotBoilerplate
 	 * @instance
 	 */
+	const f = PlotBoilerplate.utils.fetch;
 	this.config = {
 	    canvas                : config.canvas,
-	    fullSize              : PlotBoilerplate.utils.fetch.val(config,'fullSize',true), 
-	    fitToParent           : PlotBoilerplate.utils.fetch.bool(config,'fitToParent',true),
-	    scaleX                : PlotBoilerplate.utils.fetch.num(config,'scaleX',1.0), 
-	    scaleY                : PlotBoilerplate.utils.fetch.num(config,'scaleY',1.0),
-	    offsetX               : PlotBoilerplate.utils.fetch.num(config,'offsetX',0.0), 
-	    offsetY               : PlotBoilerplate.utils.fetch.num(config,'offsetY',0.0), 
-	    rasterGrid            : PlotBoilerplate.utils.fetch.bool(config,'rasterGrid',true),
-	    rasterScaleX          : PlotBoilerplate.utils.fetch.num(config,'rasterScaleX',1.0),
-	    rasterScaleY          : PlotBoilerplate.utils.fetch.num(config,'rasterScaleY',1.0),
-	    rasterAdjustFactor    : PlotBoilerplate.utils.fetch.num(config,'rasterAdjustdFactror',2.0),
-	    drawOrigin            : PlotBoilerplate.utils.fetch.bool(config,'drawOrigin',false),
-	    autoAdjustOffset      : PlotBoilerplate.utils.fetch.val(config,'autoAdjustOffset',true),
-	    offsetAdjustXPercent  : PlotBoilerplate.utils.fetch.num(config,'offsetAdjustXPercent',50),
-	    offsetAdjustYPercent  : PlotBoilerplate.utils.fetch.num(config,'offsetAdjustYPercent',50),
+	    fullSize              : f.val(config,'fullSize',true), 
+	    fitToParent           : f.bool(config,'fitToParent',true),
+	    scaleX                : f.num(config,'scaleX',1.0), 
+	    scaleY                : f.num(config,'scaleY',1.0),
+	    offsetX               : f.num(config,'offsetX',0.0), 
+	    offsetY               : f.num(config,'offsetY',0.0), 
+	    rasterGrid            : f.bool(config,'rasterGrid',true),
+	    rasterScaleX          : f.num(config,'rasterScaleX',1.0),
+	    rasterScaleY          : f.num(config,'rasterScaleY',1.0),
+	    rasterAdjustFactor    : f.num(config,'rasterAdjustdFactror',2.0),
+	    drawOrigin            : f.bool(config,'drawOrigin',false),
+	    autoAdjustOffset      : f.val(config,'autoAdjustOffset',true),
+	    offsetAdjustXPercent  : f.num(config,'offsetAdjustXPercent',50),
+	    offsetAdjustYPercent  : f.num(config,'offsetAdjustYPercent',50),
 	    backgroundColor       : config.backgroundColor || '#ffffff',
-	    redrawOnResize        : PlotBoilerplate.utils.fetch.bool(config,'redrawOnResize',true), 
-	    defaultCanvasWidth    : PlotBoilerplate.utils.fetch.num(config,'defaultCanvasWidth',PlotBoilerplate.DEFAULT_CANVAS_WIDTH),
-	    defaultCanvasHeight   : PlotBoilerplate.utils.fetch.num(config,'defaultCanvasHeight',PlotBoilerplate.DEFAULT_CANVAS_HEIGHT),
-	    canvasWidthFactor     : PlotBoilerplate.utils.fetch.num(config,'canvasWidthFactor',1.0),
-	    canvasHeightFactor    : PlotBoilerplate.utils.fetch.num(config,'canvasHeightFactor',1.0),
-	    cssScaleX             : PlotBoilerplate.utils.fetch.num(config,'cssScaleX',1.0),
-	    cssScaleY             : PlotBoilerplate.utils.fetch.num(config,'cssScaleY',1.0),
-	    cssUniformScale       : PlotBoilerplate.utils.fetch.bool(config,'cssUniformScale',true),
-	    saveFile              : function() { _self.hooks.saveFile(_self); },
-	    setToRetina           : function() { _self._setToRetina(); },
-	    autoDetectRetina      : PlotBoilerplate.utils.fetch.bool(config,'autoDetectRetina',true),
-	    enableSVGExport       : PlotBoilerplate.utils.fetch.bool(config,'enableSVGExport',true),
+	    redrawOnResize        : f.bool(config,'redrawOnResize',true), 
+	    defaultCanvasWidth    : f.num(config,'defaultCanvasWidth',PlotBoilerplate.DEFAULT_CANVAS_WIDTH),
+	    defaultCanvasHeight   : f.num(config,'defaultCanvasHeight',PlotBoilerplate.DEFAULT_CANVAS_HEIGHT),
+	    canvasWidthFactor     : f.num(config,'canvasWidthFactor',1.0),
+	    canvasHeightFactor    : f.num(config,'canvasHeightFactor',1.0),
+	    cssScaleX             : f.num(config,'cssScaleX',1.0),
+	    cssScaleY             : f.num(config,'cssScaleY',1.0),
+	    cssUniformScale       : f.bool(config,'cssUniformScale',true),
+	    saveFile              : () => { _self.hooks.saveFile(_self); },
+	    setToRetina           : () => { _self._setToRetina(); },
+	    autoDetectRetina      : f.bool(config,'autoDetectRetina',true),
+	    enableSVGExport       : f.bool(config,'enableSVGExport',true),
 
 	    // Listeners/observers
-	    preClear              : PlotBoilerplate.utils.fetch.func(config,'preClear',null),
-	    preDraw               : PlotBoilerplate.utils.fetch.func(config,'preDraw',null),
-	    postDraw              : PlotBoilerplate.utils.fetch.func(config,'postDraw',null),
+	    preClear              : f.func(config,'preClear',null),
+	    preDraw               : f.func(config,'preDraw',null),
+	    postDraw              : f.func(config,'postDraw',null),
 
 	    // Interaction
-	    enableMouse           : PlotBoilerplate.utils.fetch.bool(config,'enableMouse',true),
-	    enableTouch           : PlotBoilerplate.utils.fetch.bool(config,'enableTouch',true),
-	    enableKeys            : PlotBoilerplate.utils.fetch.bool(config,'enableKeys',true),
-	    enableMouseWheel      : PlotBoilerplate.utils.fetch.bool(config,'enableMouseWheel',true),
+	    enableMouse           : f.bool(config,'enableMouse',true),
+	    enableTouch           : f.bool(config,'enableTouch',true),
+	    enableKeys            : f.bool(config,'enableKeys',true),
+	    enableMouseWheel      : f.bool(config,'enableMouseWheel',true),
 
 	    // Experimental (and unfinished)
-	    enableGL              : PlotBoilerplate.utils.fetch.bool(config,'enableGL',false)
+	    enableGL              : f.bool(config,'enableGL',false)
 	}; // END confog
 
 
@@ -401,11 +402,11 @@ export class PlotBoilerplate {
 	 */
 	this.drawConfig = {
 	    drawVertices : true,
-	    drawBezierHandleLines : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandleLines',true),
-	    drawBezierHandlePoints : PlotBoilerplate.utils.fetch.bool(config,'drawBezierHandlePoints',true),
-	    drawHandleLines  : PlotBoilerplate.utils.fetch.bool(config,'drawHandleLines',true),
-	    drawHandlePoints : PlotBoilerplate.utils.fetch.bool(config,'drawHandlePoints',true),
-	    drawGrid : PlotBoilerplate.utils.fetch.bool(config,'drawGrid',true),
+	    drawBezierHandleLines : f.bool(config,'drawBezierHandleLines',true),
+	    drawBezierHandlePoints : f.bool(config,'drawBezierHandlePoints',true),
+	    drawHandleLines  : f.bool(config,'drawHandleLines',true),
+	    drawHandlePoints : f.bool(config,'drawHandlePoints',true),
+	    drawGrid : f.bool(config,'drawGrid',true),
 	    bezier : {
 		color : '#00a822',
 		lineWidth : 2,
