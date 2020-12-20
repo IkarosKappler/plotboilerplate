@@ -27,7 +27,7 @@ export declare class GirihPentagon extends GirihTile {
      * @param {Vertex} position
      * @param {number} edgeLength
      */
-    constructor(position: Vertex, edgeLength: number);
+    constructor(position: Vertex, edgeLength?: number);
     /**
      * @override
      */

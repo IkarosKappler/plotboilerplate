@@ -45,13 +45,6 @@ var CircleSector = /** @class */ (function () {
     CircleSector.prototype.toSVGString = function (options) {
         options = options || {};
         var buffer = [];
-        /* buffer.push( '<circle' );
-        if( options.className )
-            buffer.push( ' class="' + options.className + '"' );
-        buffer.push( ' cx="' + this.center.x + '"' );
-        buffer.push( ' cy="' + this.center.y + '"' );
-        buffer.push( ' r="' + this.radius + '"' );
-        buffer.push( ' />' ); */
         buffer.push('<path ');
         if (options.className)
             buffer.push(' class="' + options.className + '"');

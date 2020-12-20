@@ -171,10 +171,10 @@ export declare abstract class GirihTile extends Polygon {
      * @memberof GirihTile
      * @abstract class
      * @param {Vertex} position   - The position of the tile.
-     * @param {number} edgeLength - The edge length (usually GirihTile.DEFAULT_EDGE_LENGTH).
+     * @param {number} edgeLength - The edge length (default is GirihTile.DEFAULT_EDGE_LENGTH).
      * @param {TileType} tileType - One of `TileType.*` enum members.
      **/
-    constructor(position: Vertex, edgeLength: number, tileType?: TileType);
+    constructor(position: Vertex, edgeLength?: number, tileType?: TileType);
     /**
      * @abstract Subclasses must override this.
      */

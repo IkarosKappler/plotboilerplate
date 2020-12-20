@@ -36,7 +36,7 @@ export class GirihPentagon extends GirihTile {
      * @param {Vertex} position
      * @param {number} edgeLength
      */
-    constructor( position:Vertex, edgeLength:number ) {
+    constructor( position:Vertex, edgeLength?:number ) {
 	
 	super( position, edgeLength, TileType.PENTAGON );
 
@@ -49,9 +49,9 @@ export class GirihPentagon extends GirihTile {
 	const theta:number = (Math.PI*2) / 5.0;
 	// Compute the 'radius' using pythagoras
 	const radius:number = Math.sqrt(
-	    Math.pow(edgeLength/2,2)
+	    Math.pow(this.edgeLength/2,2)
 		+
-		Math.pow( 1/Math.tan(theta/2) * edgeLength/2, 2 )
+		Math.pow( 1/Math.tan(theta/2) * this.edgeLength/2, 2 )
 	);
 	for( var i = 0; i < 5; i++ ) {
 	    this.addVertex(
@@ -66,8 +66,8 @@ export class GirihPentagon extends GirihTile {
 	
 	this.baseBounds = this.getBounds();
 
-	this._buildInnerPolygons( edgeLength );
-	this._buildOuterPolygons( edgeLength );       // Only call AFTER the inner polygons were built!
+	this._buildInnerPolygons( this.edgeLength );
+	this._buildOuterPolygons( this.edgeLength );       // Only call AFTER the inner polygons were built!
     };
 
 

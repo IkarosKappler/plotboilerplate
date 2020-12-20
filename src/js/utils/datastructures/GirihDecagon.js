@@ -52,9 +52,9 @@ var GirihDecagon = /** @class */ (function (_super) {
         // Divide the full circle into 10 sections (we want to make a regular decagon).
         var theta = (Math.PI * 2) / 10.0;
         // Compute the 'radius' using pythagoras
-        var radius = Math.sqrt(Math.pow(edgeLength / 2, 2)
+        var radius = Math.sqrt(Math.pow(_this.edgeLength / 2, 2)
             +
-                Math.pow(1 / Math.tan(theta / 2) * edgeLength / 2, 2));
+                Math.pow(1 / Math.tan(theta / 2) * _this.edgeLength / 2, 2));
         for (var i = 0; i < 10; i++) {
             _this.addVertex(position.clone().addY(-radius).rotate(theta / 2 + i * theta, position));
         }
@@ -63,8 +63,8 @@ var GirihDecagon = /** @class */ (function (_super) {
         _this.textureSource.max.x = _this.textureSource.min.x + 313 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + 297 / 460.0;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(edgeLength);
-        _this._buildOuterPolygons(edgeLength); // Important: call AFTER inner polygons were created!
+        _this._buildInnerPolygons(_this.edgeLength);
+        _this._buildOuterPolygons(_this.edgeLength); // Important: call AFTER inner polygons were created!
         return _this;
     }
     ;

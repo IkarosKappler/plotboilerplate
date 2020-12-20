@@ -53,9 +53,9 @@ var GirihPentagon = /** @class */ (function (_super) {
         // Divide the full circle into 5 sections (we want to make a regular pentagon).
         var theta = (Math.PI * 2) / 5.0;
         // Compute the 'radius' using pythagoras
-        var radius = Math.sqrt(Math.pow(edgeLength / 2, 2)
+        var radius = Math.sqrt(Math.pow(_this.edgeLength / 2, 2)
             +
-                Math.pow(1 / Math.tan(theta / 2) * edgeLength / 2, 2));
+                Math.pow(1 / Math.tan(theta / 2) * _this.edgeLength / 2, 2));
         for (var i = 0; i < 5; i++) {
             _this.addVertex(position.clone().addY(-radius).rotate(theta / 2 + i * theta, position));
         }
@@ -64,8 +64,8 @@ var GirihPentagon = /** @class */ (function (_super) {
         _this.textureSource.max.x = _this.textureSource.min.x + 157 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + (150) / 460.0;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(edgeLength);
-        _this._buildOuterPolygons(edgeLength); // Only call AFTER the inner polygons were built!
+        _this._buildInnerPolygons(_this.edgeLength);
+        _this._buildOuterPolygons(_this.edgeLength); // Only call AFTER the inner polygons were built!
         return _this;
     }
     ;

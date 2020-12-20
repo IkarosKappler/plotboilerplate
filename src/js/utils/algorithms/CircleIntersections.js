@@ -50,7 +50,6 @@ var CircleIntersections = /** @class */ (function () {
             maxSetLength = Math.max(maxSetLength, intervalSets[i].intervals.length);
         }
         var usedIntervals = matrixFill_1.matrixFill(intervalSets.length, maxSetLength, false);
-        // Draw connected paths?
         var path = null;
         var pathList = [];
         while ((path = CircleIntersections.findOuterPartition(circles, intervalSets, usedIntervals)) != null) {

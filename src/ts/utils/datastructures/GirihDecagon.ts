@@ -30,7 +30,7 @@ export class GirihDecagon extends GirihTile {
      * @param {Vertex} position
      * @param {number} edgeLength
      */
-    constructor( position:Vertex, edgeLength:number ) {
+    constructor( position:Vertex, edgeLength?:number ) {
 
 	super( position, edgeLength, TileType.DECAGON );
 
@@ -43,9 +43,9 @@ export class GirihDecagon extends GirihTile {
 	const theta = (Math.PI*2) / 10.0;
 	// Compute the 'radius' using pythagoras
 	const radius = Math.sqrt(
-	    Math.pow(edgeLength/2,2)
+	    Math.pow(this.edgeLength/2,2)
 		+
-		Math.pow( 1/Math.tan(theta/2) * edgeLength/2, 2 )
+		Math.pow( 1/Math.tan(theta/2) * this.edgeLength/2, 2 )
 	);
 	for( var i = 0; i < 10; i++ ) {
 	    this.addVertex(
@@ -61,8 +61,8 @@ export class GirihDecagon extends GirihTile {
 	this.baseBounds = this.getBounds();
 
 
-	this._buildInnerPolygons( edgeLength );
-	this._buildOuterPolygons( edgeLength ); // Important: call AFTER inner polygons were created!
+	this._buildInnerPolygons( this.edgeLength );
+	this._buildOuterPolygons( this.edgeLength ); // Important: call AFTER inner polygons were created!
     };
 
 

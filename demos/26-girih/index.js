@@ -444,9 +444,12 @@
 	
 	var findPreviewIntersectionsFor = function( previewTile, girihTile ) {
 	    // Check if there are intersec
-	    var intersection = greinerHormann.intersection( girihTile.vertices, // Source
-							    previewTile.vertices  // Clip
-							  );
+	    var intersection = greinerHormann.intersection(
+		// This is a workaround about a colinearity problem with greiner-hormann:
+		    // ... add some random jitter.
+		addPolygonJitter(cloneVertexArray(girihTile.vertices),0.0001), // Source
+		addPolygonJitter(cloneVertexArray(previewTile.vertices),0.0001)  // Clip
+	    );
 	    if( !intersection ) {
 		return [];
 	    }

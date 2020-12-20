@@ -31,7 +31,7 @@ export declare class GirihPenroseRhombus extends GirihTile {
      * @param {Vertex} position
      * @param {number} edgeLength
      */
-    constructor(position: Vertex, edgeLength: number, addCenterPolygon?: boolean);
+    constructor(position: Vertex, edgeLength?: number, addCenterPolygon?: boolean);
     /**
      * @override
      */

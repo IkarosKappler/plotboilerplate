@@ -1,7 +1,41 @@
 /**
- * @author Ikaros Kappler
- * @date   2020-12-11
+ * @requires Vertex
+ * @requires GirihDecagon
+ * @requires GirihPentagon
+ *
+ * @author   Ikaros Kappler
+ * @date     2020-12-11
+ * @modified 2020-12-20
  */
+
+// @param {PlotBoilerplate} pb
+// @param {function(Vertex[],Vertex[])=>void}
+function loadRandomTestCase(pb, setVertices) {
+
+    console.log('Loading random test case ...');
+
+    // +---------------------------------------------------------------------------------
+    // | Create a random vertex inside the canvas viewport.
+    // +-------------------------------
+    var randomVertex = function() {
+	return new Vertex( Math.random()*pb.canvasSize.width*0.5 - pb.canvasSize.width/2*0.5,
+			   Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
+			 );
+    };
+
+    pb.removeAll();
+
+    var vertsA = [];
+    var vertsB = [];
+    for( var i = 0; i < 7; i++ ) {
+	var vertA = randomVertex();
+	var vertB = randomVertex();
+	vertsA.push( vertA );
+	vertsB.push( vertB );
+    }
+    setVertices( vertsA, vertsB );
+}
+
 
 // @param {PlotBoilerplate} pb
 // @param {function(Vertex[],Vertex[])=>void}
@@ -29,4 +63,22 @@ function loadSquareTestCase(pb, setVertices) {
     vertsB.push( new Vertex(0,sizeB) );
 
     setVertices( vertsA, vertsB );
+}
+
+// @param {PlotBoilerplate} pb
+// @param {function(Vertex[],Vertex[])=>void}
+function loadGirihTestCase(pb, setVertices) {
+
+    console.log('Loading girih test case ...');
+
+    pb.removeAll();
+
+    var tileA = new GirihDecagon( new Vertex(0,0) );
+    var tileB = new GirihPentagon( new Vertex(0,0) );
+
+    // Move A[9] to B[4] so the points are congruent
+    var diff = tileA.vertices[5].difference( tileB.vertices[1] );
+    tileA.move( diff );
+    
+    setVertices( tileA.vertices, tileB.vertices ); 
 }

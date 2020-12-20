@@ -67,13 +67,13 @@ var GirihRhombus = /** @class */ (function (_super) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x += edgeLength;
+            pointB.x += _this.edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
             _this.addVertex(pointB);
         }
         // Move to center    
         var bounds = Bounds_1.Bounds.computeFromVertices(_this.vertices);
-        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - edgeLength), bounds.height / 2.0);
+        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - _this.edgeLength), bounds.height / 2.0);
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(move).add(_this.position);
         }

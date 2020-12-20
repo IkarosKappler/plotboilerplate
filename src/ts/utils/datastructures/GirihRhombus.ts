@@ -38,7 +38,7 @@ export class GirihRhombus extends GirihTile {
      * @param {Vertex} position
      * @param {number} edgeLength
      */
-    constructor( position:Vertex, edgeLength:number ) {
+    constructor( position:Vertex, edgeLength?:number ) {
 	
 	super( position, edgeLength, TileType.RHOMBUS );
 
@@ -62,7 +62,7 @@ export class GirihRhombus extends GirihTile {
 	    theta += (180.0 - angles[i]);
 	    pointA = pointB; // center of rotation
 	    pointB = pointB.clone();
-	    pointB.x += edgeLength;
+	    pointB.x += this.edgeLength;
 	    pointB.rotate( theta * (Math.PI/180.0), pointA );
 	    this.addVertex( pointB );	
 	}
@@ -70,7 +70,7 @@ export class GirihRhombus extends GirihTile {
 	
 	// Move to center    
 	const bounds:Bounds = Bounds.computeFromVertices( this.vertices );
-	const move:Vertex   = new Vertex( bounds.width/2.0 - (bounds.width-edgeLength), 
+	const move:Vertex   = new Vertex( bounds.width/2.0 - (bounds.width-this.edgeLength), 
 					  bounds.height/2.0
 					);
 	for( var i = 0; i < this.vertices.length; i++ ) {

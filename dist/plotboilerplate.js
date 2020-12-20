@@ -1574,13 +1574,6 @@ var CircleSector = /** @class */ (function () {
     CircleSector.prototype.toSVGString = function (options) {
         options = options || {};
         var buffer = [];
-        /* buffer.push( '<circle' );
-        if( options.className )
-            buffer.push( ' class="' + options.className + '"' );
-        buffer.push( ' cx="' + this.center.x + '"' );
-        buffer.push( ' cy="' + this.center.y + '"' );
-        buffer.push( ' r="' + this.radius + '"' );
-        buffer.push( ' />' ); */
         buffer.push('<path ');
         if (options.className)
             buffer.push(' class="' + options.className + '"');
@@ -1609,6 +1602,7 @@ var CircleSector = /** @class */ (function () {
          *
          * TODO: generalize for ellipses (two radii).
          *
+         * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
          * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
         describeSVGArc: function (x, y, radius, startAngle, endAngle, options) {
@@ -1620,7 +1614,6 @@ var CircleSector = /** @class */ (function () {
             // Some browsers have problems to render full circles (described by start==end).
             if (Math.PI * 2 - Math.abs(startAngle - endAngle) < 0.001) {
                 var firstHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle, startAngle + (endAngle - startAngle) / 2, options);
-                // const firstEndPoint : XYCoords = new Vertex( firstHalf[firstHalf.length-2], firstHalf[firstHalf.length-1] );
                 var firstEndPoint = { x: firstHalf[firstHalf.length - 2],
                     y: firstHalf[firstHalf.length - 1]
                 };
@@ -1632,7 +1625,6 @@ var CircleSector = /** @class */ (function () {
             var sweepFlag = 1;
             var pathData = [];
             if (options.moveToStart) {
-                console.log('Adding moveToStart');
                 pathData.push('M', start.x, start.y);
             }
             pathData.push("A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y);

@@ -72,7 +72,7 @@ var GirihHexagon = /** @class */ (function (_super) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x -= edgeLength;
+            pointB.x -= _this.edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
             _this.addVertex(pointB);
             if (i == 2)
@@ -88,8 +88,8 @@ var GirihHexagon = /** @class */ (function (_super) {
         _this.textureSource.max.x = _this.textureSource.min.x + 205 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + 150 / 460.0;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(edgeLength);
-        _this._buildOuterPolygons(edgeLength); // Only call AFTER the inner polygons were created!
+        _this._buildInnerPolygons(_this.edgeLength);
+        _this._buildOuterPolygons(_this.edgeLength); // Only call AFTER the inner polygons were created!
         return _this;
     }
     ;

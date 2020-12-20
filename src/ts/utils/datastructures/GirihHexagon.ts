@@ -38,7 +38,7 @@ export class GirihHexagon extends GirihTile {
      * @param {Vertex} position
      * @param {number} edgeLength
      */
-    constructor( position:Vertex, edgeLength:number ) {
+    constructor( position:Vertex, edgeLength?:number ) {
 	
 	super( position, edgeLength, TileType.IRREGULAR_HEXAGON );
 
@@ -67,7 +67,7 @@ export class GirihHexagon extends GirihTile {
 	    theta += (180.0 - angles[i]);
 	    pointA = pointB; // center of rotation
 	    pointB = pointB.clone();
-	    pointB.x -= edgeLength;
+	    pointB.x -= this.edgeLength;
 	    pointB.rotate( theta * (Math.PI/180.0), pointA );
 	    this.addVertex( pointB );	
 	    if( i == 2 )
@@ -89,8 +89,8 @@ export class GirihHexagon extends GirihTile {
 	
 	this.baseBounds = this.getBounds();
 
-	this._buildInnerPolygons( edgeLength );
-	this._buildOuterPolygons( edgeLength );   // Only call AFTER the inner polygons were created!
+	this._buildInnerPolygons( this.edgeLength );
+	this._buildOuterPolygons( this.edgeLength );   // Only call AFTER the inner polygons were created!
     };
 
 

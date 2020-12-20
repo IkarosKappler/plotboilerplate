@@ -4,6 +4,7 @@
  * @requires delaunay
  * @requires earcut
  * @requires findSelfIntersectingPoints
+ * @requires getContrastColor
  * @requires greinerHormann
  * @requires PlotBoilerplate
  * @requires MouseHandler
@@ -82,16 +83,6 @@
 
 	
 	// +---------------------------------------------------------------------------------
-	// | Create a random vertex inside the canvas viewport.
-	// +-------------------------------
-	var randomVertex = function() {
-	    return new Vertex( Math.random()*pb.canvasSize.width*0.5 - pb.canvasSize.width/2*0.5,
-			       Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
-			     );
-	};
-
-	
-	// +---------------------------------------------------------------------------------
 	// | Set the source and clipping polygons (as vertices).
 	// |
 	// | PB drawables will not be cleared.
@@ -102,21 +93,28 @@
 	var setVertices = function( sourceVertices, clipVertices ) {
 	    verticesA = sourceVertices;
 	    verticesB = clipVertices;
+	    // Compute bounds to determie a 'middle' point (used to move whole polygons)
 	    var boundsA = Bounds.computeFromVertices(sourceVertices);
 	    var boundsB = Bounds.computeFromVertices(clipVertices);
-	    pb.add( controlPointA = new Vertex(boundsA.min).scale(0.5,boundsA.max) ); // Todo: use center of polygon instead
+	    // Use center of polygon as control points
+	    pb.add( controlPointA = new Vertex(boundsA.min).scale(0.5,boundsA.max) ); 
 	    pb.add( controlPointB = new Vertex(boundsB.min).scale(0.5,boundsB.max) );
 	    controlPointA.attr.visible = false;
 	    controlPointB.attr.visible = false;
 	    for( var i in verticesA )
-		pb.add( verticesA[i] );
+		pb.add( verticesA[i], false ); // Do not redraw here
 	    for( var i in verticesB )
-		pb.add( verticesB[i] );
+		pb.add( verticesB[i], false );
+	    // Bind all polygon points to their respective control point
 	    installPolygonControlPoint( controlPointA, new Polygon(verticesA) );
 	    installPolygonControlPoint( controlPointB, new Polygon(verticesB) );
+	    pb.redraw();
 	};
 
-	
+
+	// +---------------------------------------------------------------------------------
+	// | Install a drag handler that moves all polygon points with the given control point.
+	// +-------------------------------
 	var installPolygonControlPoint = function( controlPoint, polygon ) {
 	    controlPoint.listeners.addDragListener( function(dragEvent) {
 		polygon.move( dragEvent.params.dragAmount );
@@ -126,18 +124,8 @@
 	// +---------------------------------------------------------------------------------
 	// | Initialize 
 	// +-------------------------------
-	var initialize = function() {
-	    var vertsA = [];
-	    var vertsB = [];
-	    for( var i = 0; i < 7; i++ ) {
-		var vertA = randomVertex();
-		var vertB = randomVertex();
-		vertsA.push( vertA );
-		vertsB.push( vertB );
-	    }
-	    setVertices( vertsA, vertsB );
-	};
-	initialize();
+	loadRandomTestCase(pb, setVertices);
+	
 	
 	// +---------------------------------------------------------------------------------
 	// | This is the actual render function.
@@ -157,11 +145,27 @@
 	    // pb.fill.label( 'polygonsIntersect=' + intersect, 3, 30, 0, 'black' );
 
 	    // Array<Vertex>
-	    var intersectionPoints = drawGreinerHormannIntersection( polygonA, polygonB );
-
+	    var intersectionPoints =
+		drawGreinerHormannIntersection(
+		    // This is a workaround about a colinearity problem with greiner-hormann:
+		    // ... add some random jitter.
+		    new Polygon( addPolygonJitter(cloneVertexArray(polygonA.vertices),0.001) ),
+		    new Polygon( addPolygonJitter(cloneVertexArray(polygonB.vertices),0.001) )
+		);
+	    
 	    // Draw both control points
 	    drawFancyCrosshair( pb, controlPointA, Teal.cssRGB(), 2.0, 4.0 );
 	    drawFancyCrosshair( pb, controlPointB, Orange.cssRGB(), 2.0, 4.0 );
+
+	    if( config.drawPointNumbers ) {
+		var contrastColor = getContrastColor( pb.config.backgroundColor ).cssRGB();
+		for( var i = 0; i < polygonA.vertices.length; i++ ) {
+		    pb.fill.text( ''+i, polygonA.vertices[i].x, polygonA.vertices[i].y, { color : contrastColor } );
+		}
+		for( var i = 0; i < polygonB.vertices.length; i++ ) {
+		    pb.fill.text( ''+i, polygonB.vertices[i].x, polygonB.vertices[i].y, { color : contrastColor } );
+		}
+	    }
 	};
 
 	/**
@@ -184,17 +188,18 @@
 		}
 		
 		for( var i = 0, len = intersection.length; i < len; i++ ) {
-		    // Warning intersection polygons have duplicate vertices
-		    // (first and last are the same)
-		    if( intersection.length > 0 && new Vertex(intersection[0]).equals(intersection[intersection.length-1]) )
-			intersection[i].pop();
+		    // Warning intersection polygons may have duplicate vertices (beginning and end).
+		    // Remove duplicate vertices from the intersection polygons.
+		    // These may also occur if two vertices of the clipping and the source polygon are congruent.
+		    // var intrsctn = clearPolygonDuplicateVertices( intersection[i] );
+		    var intrsctn = intersection[i]; // clearPolygonDuplicateVertices( intersection[i] );
 
 		    var clearedPolys = config.clearSelfIntersections 
-			? splitPolygonToNonIntersecting( intersection[i], 10 )
-			: [ intersection[i] ];
+			? splitPolygonToNonIntersecting( intrsctn, 10 )
+			: [ intrsctn ];
 
 		    for( var j = 0; j < clearedPolys.length; j++ ) {
-
+			// console.log('intersctn', j, clearedPolys[j].length, clearedPolys[j] );
 			pb.fill.polyline( clearedPolys[j],
 					  false,
 					  randomWebColor(0.25, i*intersection.length+j), // 'rgba(0,192,192,0.25)',
@@ -321,6 +326,7 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
+	    drawPointNumbers : false,
 	    useConvexHullA : true,
 	    useConvexHullB : true,
 	    triangulate : false,
@@ -328,7 +334,9 @@
 	    clearSelfIntersections : true,
 	    drawDelaunayCircles : false,
 
-	    test_squares : function() { loadSquareTestCase(pb,setVertices); }
+	    test_random : function() { loadRandomTestCase(pb,setVertices); },
+	    test_squares : function() { loadSquareTestCase(pb,setVertices); },
+	    test_girih : function() { loadGirihTestCase(pb,setVertices); }
 	}, GUP );
 
 
@@ -338,15 +346,18 @@
         {
 	    var gui = pb.createGUI();
 
-	    var fold0 = gui.addFolder("Test Cases");
+	    var fold0 = gui.addFolder('Test Cases');
+	    fold0.add(config, 'test_random').name('Random').title('Load the \'Random\' test case.');
 	    fold0.add(config, 'test_squares').name('Squares').title('Load the \'Squares\' test case.');
-	    
-	    gui.add(config, 'useConvexHullA').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullA").title("Use the convex hull of polygon A?");
-	    gui.add(config, 'useConvexHullB').listen().onChange( function() { pb.redraw(); } ).name("useConvexHullB").title("Use the convex hull of polygon B?");
-	    gui.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name("triangulate").title("Tringulate the result?");
-	    gui.add(config, 'clearSelfIntersections').listen().onChange( function() { pb.redraw(); } ).name("clearSelfIntersections").title("Clear polygons of self intersections before triangulating?");
-	    gui.add(config, 'triangulationMethod', ['Delaunay','Earcut']).listen().onChange( function() { pb.redraw(); } ).name("triangulationMethod").title("The triangulation method to use (Delaunay is not safe here; might result in ivalid triangulations)");
-	    gui.add(config, 'drawDelaunayCircles').listen().onChange( function() { pb.redraw(); } ).name("drawDelaunayCircles").title("Draw triangle circumcircles when in Delaunay mode?");
+	    fold0.add(config, 'test_girih').name('Girih').title('Load the \'Girih\' test case.');
+
+	    gui.add(config, 'drawPointNumbers').listen().onChange( function() { pb.redraw(); } ).name('drawPointNumbers').title('Tringulate the result?');
+	    gui.add(config, 'useConvexHullA').listen().onChange( function() { pb.redraw(); } ).name('useConvexHullA').title('Use the convex hull of polygon A?');
+	    gui.add(config, 'useConvexHullB').listen().onChange( function() { pb.redraw(); } ).name('useConvexHullB').title('Use the convex hull of polygon B?');
+	    gui.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name('triangulate').title('Tringulate the result?');
+	    gui.add(config, 'clearSelfIntersections').listen().onChange( function() { pb.redraw(); } ).name('clearSelfIntersections').title('Clear polygons of self intersections before triangulating?');
+	    gui.add(config, 'triangulationMethod', ['Delaunay','Earcut']).listen().onChange( function() { pb.redraw(); } ).name('triangulationMethod').title('The triangulation method to use (Delaunay is not safe here; might result in ivalid triangulations)');
+	    gui.add(config, 'drawDelaunayCircles').listen().onChange( function() { pb.redraw(); } ).name('drawDelaunayCircles').title('Draw triangle circumcircles when in Delaunay mode?');
 	}
 
 	pb.config.preDraw = drawAll;

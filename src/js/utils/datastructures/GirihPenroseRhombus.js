@@ -70,13 +70,13 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x += edgeLength;
+            pointB.x += _this.edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
             _this.addVertex(pointB);
         }
         // Move to center and position
         var bounds = Bounds_1.Bounds.computeFromVertices(_this.vertices);
-        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - edgeLength), bounds.height / 2.0);
+        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - _this.edgeLength), bounds.height / 2.0);
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(move).add(position);
         }
@@ -86,8 +86,8 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
         _this.textureSource.max.y = _this.textureSource.min.y + 56 / 460.0;
         ;
         _this.baseBounds = _this.getBounds();
-        _this._buildInnerPolygons(edgeLength, addCenterPolygon);
-        _this._buildOuterPolygons(edgeLength, addCenterPolygon);
+        _this._buildInnerPolygons(_this.edgeLength, addCenterPolygon);
+        _this._buildOuterPolygons(_this.edgeLength, addCenterPolygon);
         return _this;
     }
     ;
