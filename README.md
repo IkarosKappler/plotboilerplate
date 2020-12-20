@@ -12,7 +12,7 @@ visualizing 2D geometries. Basic features are
    * [triangles](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class")
    * [curves](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class")
    * [circles](https://plotboilerplate.io/docs_typedoc/classes/circle.html "Circle class")
-   * [circle sectors](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class"),
+   * [circle sectors](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class")
    * [polygons](https://plotboilerplate.io/docs_typedoc/classes/polygon.html "Polygon class")
    * [ellipses](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class")
    * [images](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class")
