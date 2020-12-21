@@ -339,7 +339,7 @@
 	    test_girih : function() { loadGirihTestCase(pb,setVertices); }
 	}, GUP );
 
-
+	var liveStats = { message : "Init" };
 	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
 	// +-------------------------------
@@ -358,6 +358,14 @@
 	    gui.add(config, 'clearSelfIntersections').listen().onChange( function() { pb.redraw(); } ).name('clearSelfIntersections').title('Clear polygons of self intersections before triangulating?');
 	    gui.add(config, 'triangulationMethod', ['Delaunay','Earcut']).listen().onChange( function() { pb.redraw(); } ).name('triangulationMethod').title('The triangulation method to use (Delaunay is not safe here; might result in ivalid triangulations)');
 	    gui.add(config, 'drawDelaunayCircles').listen().onChange( function() { pb.redraw(); } ).name('drawDelaunayCircles').title('Draw triangle circumcircles when in Delaunay mode?');
+
+	    // Add stats
+	    
+	    liveStats = new LiveStats( liveStats, [ "message" ] );
+	    window.setTimeout( function() {
+		console.log('timeout message change');
+		liveStats["message"] = "blaaaa";
+	    }, 1000 );
 	}
 
 	pb.config.preDraw = drawAll;
