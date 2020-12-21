@@ -158,7 +158,7 @@
 	    drawFancyCrosshair( pb, controlPointB, Orange.cssRGB(), 2.0, 4.0 );
 
 	    if( config.drawPointNumbers ) {
-		var contrastColor = getContrastColor( pb.config.backgroundColor ).cssRGB();
+		var contrastColor = getContrastColor( Color.parse(pb.config.backgroundColor) ).cssRGB();
 		for( var i = 0; i < polygonA.vertices.length; i++ ) {
 		    pb.fill.text( ''+i, polygonA.vertices[i].x, polygonA.vertices[i].y, { color : contrastColor } );
 		}

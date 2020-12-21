@@ -9,7 +9,17 @@ For plotting visual 2D data with Javascript and HTML canvas (in 2d-context).
 
 This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
- * adding elements like [vertices](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class"), [lines](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class"), [vectors](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class"), [triangles](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class"), [curves](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class"), [circle sectors](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class"), [circles](https://plotboilerplate.io/docs_typedoc/classes/circle.htmll "Circle class"), [polygons](https://plotboilerplate.io/docs_typedoc/classes/polygon.html "Polygon class"), [ellipses](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class"), [images](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class")
+ * adding elements like
+   * [vertices](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class")
+   * [lines](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class")
+   * [vectors](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class")
+   * [triangles](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class")
+   * [curves](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class")
+   * [circles](https://plotboilerplate.io/docs_typedoc/classes/circle.html "Circle class")
+   * [circle sectors](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class")
+   * [polygons](https://plotboilerplate.io/docs_typedoc/classes/polygon.html "Polygon class")
+   * [ellipses](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class")
+   * [images](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class")
  * configuration of the canvas behavior (fullsize, interaction, raster)
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
