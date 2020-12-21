@@ -217,8 +217,8 @@
 			area += calcPolygonArea( clearedPolys[j] ); // Math.random()*20;
 		    } // END for
 		} // END for
-		liveStats['area'] = area;
 	    } // END if
+	    liveStats['area'] = area;
 	};
 
 
