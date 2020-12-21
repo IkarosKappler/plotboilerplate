@@ -404,7 +404,8 @@
 
 	    // Add stats
 	    
-	    stats = new LiveStats( stats, [ "area" ] );
+	    // stats = new LiveStats( stats, [ "area" ] );
+	    stats = new LiveStats( stats, { "area" : { precision : 3 } } );
 	}
 
 	pb.config.preDraw = drawAll;

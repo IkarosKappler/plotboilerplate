@@ -163,9 +163,16 @@
 	    for( var i in girih.tiles ) {
 		var tile = girih.tiles[i];
 		// Fill polygon when highlighted (mouse hover)
-		if( hoverTileIndex == i ) 
-		    ; // pb.fill.polygon( tile, 'rgba(128,128,128,0.12)' );
 		drawTile( tile, i );
+	    }
+
+	    // Draw intersection polygons? (if there are any)
+	    if( config.showOverlaps
+		&& hoverTileIndex != -1 && hoverEdgeIndex != -1
+		&& 0 <= previewTilePointer && previewTilePointer < previewTiles.length ) {
+		for( var i = 0; i < previewIntersectionPolygons.length; i++ ) {
+		    pb.fill.polygon( previewIntersectionPolygons[i], 'rgba(255,0,0,0.25)' );
+		}
 	    }
 
 	    if( hoverTileIndex != -1 && hoverEdgeIndex != -1 ) {
@@ -276,6 +283,10 @@
 	    pb.redraw();
 	};
 
+	
+	// +---------------------------------------------------------------------------------
+	// | Set the currently highlighted preview tile from the preview set.
+	// +-------------------------------
 	var setPreviewTilePointer = function( pointer ) {
 	    previewTilePointer = pointer;
 	    pb.redraw();
@@ -297,7 +308,6 @@
 	    } )
 	    .click( function(e) {
 		var clickedVert = pb.getVertexNear( e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE );
-		// console.log( clickedVert, previewTilePointer, 'of', previewTiles.length );
 		if( !clickedVert && previewTilePointer < previewTiles.length ) {
 		    // Touch and mouse devices handle this differently
 		    if( e.params.isTouchEvent || (!e.params.isTouchEvent && hoverTileIndex != -1 && hoverEdgeIndex != -1) ) {
@@ -411,36 +421,28 @@
 	    if( hoverTileIndex == -1 || hoverEdgeIndex == -1 || previewTilePointer < 0 || previewTilePointer >= previewTiles.length ) {
 		return;
 	    }
-	    // console.log( previewTilePointer, previewTiles );
 	    var currentPreviewTile = previewTiles[ previewTilePointer ];
-	    // console.log( 'girih.tiles', girih.tiles );
 	    for( var i = 0; i < girih.tiles.length; i++ ) {
-		// console.log( "i", i );
 		if( i == hoverTileIndex )
 		    continue;
 		var intersections = findPreviewIntersectionsFor( currentPreviewTile, girih.tiles[i] );
-		// console.log( "["+i+"] intersections found", intersections.length, intersections );
-		// previewIntersectionPolygons = intersections;
 		for( var j = 0; j < intersections.length; j++ ) {
-		    var poly = new Polygon(copyVertArray(intersections[j]), false);
-		    // poly.scale( 1.05 );
+		    // var poly = new Polygon(copyVertArray(intersections[j]), false);
+		    var poly = new Polygon(cloneVertexArray(intersections[j]), false);
 		    var area = signedPolygonArea( poly.vertices );
 		    previewIntersectionAreas.push( area );
 		    previewIntersectionPolygons.push( poly );
-		    // console.log( "Area: " + area );
 		}
-		// return;
 	    }
-	    // console.log('total intersections found', previewIntersectionPolygons.length );
 	};
 
 	// Helper function to convert XYCoords[] to Vertex[]
-	var copyVertArray = function( vertices ) {
+	/* var copyVertArray = function( vertices ) {
 	    var result = [];
 	    for( var i = 0; i < vertices.length; i++ )
 		result.push( new Vertex(vertices[i]) );
 	    return result;
-	};
+	}; */
 	
 	var findPreviewIntersectionsFor = function( previewTile, girihTile ) {
 	    // Check if there are intersec
@@ -464,7 +466,7 @@
 
 	// Found at earclip
 	/* var calcTriangleArea = function(a, b, c) {
-	    return (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
+	   return (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
 	    }; */
 
 	// ( data : Array<number>, start:number, end:number, dim:number) : number => {
