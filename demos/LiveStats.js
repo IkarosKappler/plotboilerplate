@@ -48,7 +48,7 @@
 	    //       return "getter overridden";
 	    // }, 
 	    set: function(obj, prop, value) {
-		console.log( 'set function', obj, prop, value );
+		// console.log( 'set function', obj, prop, value );
 		if( prop === 'message' ) {
 		    console.log('new value: ' + value);
 		    // document.getElementById('output').innerHTML = value;

@@ -181,6 +181,7 @@
 	    //       If there is only one intersection polygon, there should be a returned
 	    //       array with length 1. (or 0 if there is none; currently the result is null then).
 	    var intersection = greinerHormann.intersection(sourcePolygon.vertices, clipPolygon.vertices);
+	    var area = 0;
 
 	    if( intersection ) {
 		if( typeof intersection[0][0] === 'number' ) { // single linear ring
@@ -213,9 +214,11 @@
 
 			    }
 			}
-		    }
-		}
-	    }
+			area += calcPolygonArea( clearedPolys[j] ); // Math.random()*20;
+		    } // END for
+		} // END for
+		liveStats['area'] = area;
+	    } // END if
 	};
 
 
@@ -339,7 +342,46 @@
 	    test_girih : function() { loadGirihTestCase(pb,setVertices); }
 	}, GUP );
 
-	var liveStats = { message : "Init" };
+	
+	//var signedArea = ( data : Array<number>, start:number, end:number, dim:number) : number => {
+	/* var signedArea = ( data : Array<Vertex>, start:number, end:number, dim:number) : number => {
+	    var sum = 0;
+	    var n = data.length;
+	    start = 0;
+	    end = data.length; // -1?
+	    //for (var i = start, j = end - dim; i < end; i += dim) {
+	    for (var i = start, j = end-1; i < end; i ++ ) {
+		// sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
+		var vertA = data[i];
+		var vertB = data[j];
+		// sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
+		sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
+		j = i;
+	    }
+	    return sum;
+	    };  */
+
+	// https://stackoverflow.com/questions/16285134/calculating-polygon-area
+	function calcPolygonArea(vertices) {
+	    var total = 0;
+
+	    for (var i = 0, l = vertices.length; i < l; i++) {
+		var addX = vertices[i].x;
+		var addY = vertices[i == vertices.length - 1 ? 0 : i + 1].y;
+		var subX = vertices[i == vertices.length - 1 ? 0 : i + 1].x;
+		var subY = vertices[i].y;
+
+		total += (addX * addY * 0.5);
+		total -= (subX * subY * 0.5);
+	    }
+
+	    return Math.abs(total);
+	}
+
+	var liveStats = {
+	    message : "Init",
+	    area : 0
+	};
 	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
 	// +-------------------------------
@@ -361,10 +403,11 @@
 
 	    // Add stats
 	    
-	    liveStats = new LiveStats( liveStats, [ "message" ] );
+	    liveStats = new LiveStats( liveStats, [ "message", "area" ] );
 	    window.setTimeout( function() {
 		console.log('timeout message change');
 		liveStats["message"] = "blaaaa";
+		liveStats["area"] = "0";
 	    }, 1000 );
 	}
 
