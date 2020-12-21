@@ -403,9 +403,9 @@
 	    gui.add(config, 'drawDelaunayCircles').listen().onChange( function() { pb.redraw(); } ).name('drawDelaunayCircles').title('Draw triangle circumcircles when in Delaunay mode?');
 
 	    // Add stats
-	    
-	    // stats = new LiveStats( stats, [ "area" ] );
-	    stats = new LiveStats( stats, { "area" : { precision : 3 } } );
+	    var liveStats = new LiveStats( stats );
+	    stats = liveStats.proxy;
+	    liveStats.add( 'area' ).precision( 3 ).suffix(' spx');
 	}
 
 	pb.config.preDraw = drawAll;
