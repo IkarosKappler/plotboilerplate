@@ -381,7 +381,7 @@
 	}
 
 	var stats = {
-	    area : 0
+	    area : 0.0
 	};
 	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
@@ -403,9 +403,9 @@
 	    gui.add(config, 'drawDelaunayCircles').listen().onChange( function() { pb.redraw(); } ).name('drawDelaunayCircles').title('Draw triangle circumcircles when in Delaunay mode?');
 
 	    // Add stats
-	    var liveStats = new LiveStats( stats );
-	    stats = liveStats.proxy;
-	    liveStats.add( 'area' ).precision( 3 ).suffix(' spx');
+	    var uiStats = new UIStats( stats );
+	    stats = uiStats.proxy;
+	    uiStats.add( 'area' ).precision( 3 ).suffix(' spx');
 	}
 
 	pb.config.preDraw = drawAll;
