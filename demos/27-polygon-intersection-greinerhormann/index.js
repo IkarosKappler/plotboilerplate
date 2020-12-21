@@ -218,7 +218,9 @@
 		    } // END for
 		} // END for
 	    } // END if
-	    liveStats['area'] = area;
+
+	    // Update the stats (experimental)
+	    stats['area'] = area;
 	};
 
 
@@ -378,8 +380,7 @@
 	    return Math.abs(total);
 	}
 
-	var liveStats = {
-	    message : "Init",
+	var stats = {
 	    area : 0
 	};
 	// +---------------------------------------------------------------------------------
@@ -403,12 +404,7 @@
 
 	    // Add stats
 	    
-	    liveStats = new LiveStats( liveStats, [ "message", "area" ] );
-	    window.setTimeout( function() {
-		console.log('timeout message change');
-		liveStats["message"] = "blaaaa";
-		liveStats["area"] = "0";
-	    }, 1000 );
+	    stats = new LiveStats( stats, [ "area" ] );
 	}
 
 	pb.config.preDraw = drawAll;
