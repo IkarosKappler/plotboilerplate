@@ -62,12 +62,14 @@
 	    )
 	);
 
-	var mousePosition = { x : Number.MAX_VALUE, y : Number.MAX_VALUE }; // XYCoords
 	var verticesA = [];
 	var verticesB = [];
 	// Two points for moving whole polygons :)
 	var controlPointA = new Vertex(0,0);
 	var controlPointB = new Vertex(0,0);
+	// The polygons themselves
+	var polygonA = null;
+	var polygonB = null;
 
 	
 	// +---------------------------------------------------------------------------------
@@ -106,8 +108,10 @@
 	    for( var i in verticesB )
 		pb.add( verticesB[i], false );
 	    // Bind all polygon points to their respective control point
-	    installPolygonControlPoint( controlPointA, new Polygon(verticesA) );
-	    installPolygonControlPoint( controlPointB, new Polygon(verticesB) );
+	    polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); 
+	    polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false ); // new Polygon(verticesB);
+	    installPolygonControlPoint( controlPointA, polygonA );
+	    installPolygonControlPoint( controlPointB, polygonB );
 	    pb.redraw();
 	};
 
@@ -120,29 +124,16 @@
 		polygon.move( dragEvent.params.dragAmount );
 	    } );
 	};
-
-	// +---------------------------------------------------------------------------------
-	// | Initialize 
-	// +-------------------------------
-	loadRandomTestCase(pb, setVertices);
 	
 	
 	// +---------------------------------------------------------------------------------
 	// | This is the actual render function.
 	// +-------------------------------
 	var drawAll = function() {
-	    var polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); // Polygons are not open
-	    var polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false );
-
+	    if( polygonA == null || polygonB == null )
+		return;
 	    pb.draw.polygon( polygonA, Teal.cssRGB(), 1.0 );
 	    pb.draw.polygon( polygonB, Orange.cssRGB(), 1.0 );
-
-	    var mouseInA = mousePosition != null && polygonA.containsVert(mousePosition);
-	    var mouseInB = mousePosition != null && polygonB.containsVert(mousePosition);
-
-	    pb.fill.label( 'polygonA.contains(mouse)=' + mouseInA, 3, 10, 0, 'black' );
-	    pb.fill.label( 'polygonB.contains(mouse)=' + mouseInB, 3, 20, 0, 'black' );
-	    // pb.fill.label( 'polygonsIntersect=' + intersect, 3, 30, 0, 'black' );
 
 	    // Array<Vertex>
 	    var intersectionPoints =
@@ -192,122 +183,36 @@
 		    // Warning intersection polygons may have duplicate vertices (beginning and end).
 		    // Remove duplicate vertices from the intersection polygons.
 		    // These may also occur if two vertices of the clipping and the source polygon are congruent.
+		    var intrsctn = intersection[i]; 
 		    // var intrsctn = clearPolygonDuplicateVertices( intersection[i] );
-		    var intrsctn = intersection[i]; // clearPolygonDuplicateVertices( intersection[i] );
 
 		    var clearedPolys = config.clearSelfIntersections 
 			? splitPolygonToNonIntersecting( intrsctn, 10 )
 			: [ intrsctn ];
 
 		    for( var j = 0; j < clearedPolys.length; j++ ) {
-			// console.log('intersctn', j, clearedPolys[j].length, clearedPolys[j] );
 			pb.fill.polyline( clearedPolys[j],
 					  false,
-					  randomWebColor(0.25, i*intersection.length+j), // 'rgba(0,192,192,0.25)',
+					  randomWebColor(0.25, i*intersection.length+j), 
 					  2.0 ); // Polygon is not open
 
 			if( config.triangulate ) {
 			    if( config.triangulationMethod === "Delaunay" ) {
-				drawTriangulation_delaunay( new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );
+				drawTriangulation_delaunay( pb, new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon, config.drawDelaunayCircles );
 			    } else if( config.triangulationMethod === "Earcut" ) {
-				drawTriangulation_earcut( new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );
+				drawTriangulation_earcut( pb, new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );
 
 			    }
 			}
-			area += calcPolygonArea( clearedPolys[j] ); // Math.random()*20;
+			area += calcPolygonArea( clearedPolys[j] );
 		    } // END for
 		} // END for
 	    } // END if
 
 	    // Update the stats (experimental)
-	    stats['area'] = area;
+	    stats.area = area;
+	    stats.polygonsIntersect = (intersection !== null && typeof intersection !== 'undefined' && intersection.length > 0 );
 	};
-
-
-	/**
-	 * This will only work if non-self-overlapping polygons.
-	 *
-	 * * Concave polygons work
-	 * * Convex polygons are fine
-	 * * Self intersections are fine
-	 *
-	 * @param {Polygon} intersectionPolygon
-	 * @param {Polygon} sourcePolygon
-	 * @param {Polygon} clipPolygon
-	 */
-	var drawTriangulation_earcut = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
-	    // Convert vertices into a sequence of coordinates for the earcut algorithm
-	    var earcutVertices = [];
-	    for( var i = 0; i < intersectionPolygon.vertices.length; i++ ) {
-		earcutVertices.push( intersectionPolygon.vertices[i].x );
-		earcutVertices.push( intersectionPolygon.vertices[i].y );
-	    }
-
-	    var triangleIndices = earcut( earcutVertices,
-					  [], // holeIndices
-					  2   // dim
-					);
-
-	    var triangles = [];
-	    for( var i = 0; i+2 < triangleIndices.length; i+= 3 ) {
-		var a = triangleIndices[i];
-		var b = triangleIndices[i+1];
-		var c = triangleIndices[i+2];
-		var tri = new Triangle( intersectionPolygon.vertices[a],
-					intersectionPolygon.vertices[b],
-					intersectionPolygon.vertices[c] );
-		triangles.push( tri );
-		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgba(0,128,255,0.5)', 1 );
-	    }
-	    
-	};
-
-	
-	/**
-	 * This will only work if non-self-overlapping polygons.
-	 *
-	 * * Concave polygons work
-	 * * Convex polygons are fine
-	 * * Self intersections are fine
-	 *
-	 * @param {Polygon} intersectionPolygon
-	 * @param {Polygon} sourcePolygon
-	 * @param {Polygon} clipPolygon
-	 */
-	var drawTriangulation_delaunay = function( intersectionPolygon, sourcePolygon, clipPolygon ) {
-	    var selfIntersectionPoints = findPolygonSelfIntersections( intersectionPolygon );
-	    var extendedPointList = intersectionPolygon.vertices.concat( selfIntersectionPoints );
-
-	    var delaunay = new Delaunay( extendedPointList, {} );
-	    // Array<Triangle>
-	    var triangles = delaunay.triangulate();
-
-	    // Find real intersections with the triangulations and the polygon
-	    // extendedPointList    
-
-	    // Remember: delaunay returns an array with lots of empty slots.
-	    //           So don't use triangles.length to access the triangles.
-	    for( var i in triangles ) {
-		var tri = triangles[i];
-		// Check if triangle belongs to the polygon or is outside
-		if( !sourcePolygon.containsVert( tri.getCentroid() ) )
-		    continue;
-		if( !clipPolygon.containsVert( tri.getCentroid() ) )
-		    continue;
-
-		// Cool, triangle is part of the intersection.
-		pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgba(0,128,255,0.5)', 1 );
-		// drawFancyCrosshair( pb, tri.a, false, false );
-		// drawFancyCrosshair( pb, tri.b, false, false );
-		// drawFancyCrosshair( pb, tri.c, false, false );
-		if( config.drawDelaunayCircles ) {
-		    var circumCircle = tri.getCircumcircle();
-		    pb.draw.crosshair( circumCircle.center, 5, 'rgba(255,0,0,0.25)' );
-		    pb.draw.circle(  circumCircle.center, circumCircle.radius, 'rgba(255,0,0,0.25)',1.0 );
-		}
-	    }
-	};
-
 
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
@@ -315,16 +220,10 @@
 	new MouseHandler(pb.canvas,'girih-demo')
 	    .move( function(e) {
 		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
-		var cx = document.getElementById('cx');
-		var cy = document.getElementById('cy');
-		if( cx ) cx.innerHTML = relPos.x.toFixed(2);
-		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-	    } )
-	    .click( function(e) {
-		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
-		mousePosition = relPos;
-		pb.redraw();
-		
+		stats.positionInA = (polygonA != null && relPos != null && polygonA.containsVert(relPos));
+		stats.positionInB = (polygonB != null && relPos != null && polygonB.containsVert(relPos));
+		stats.mouseX = relPos.x;
+		stats.mouseY = relPos.y;
 	    } );
 
 	// +---------------------------------------------------------------------------------
@@ -343,25 +242,7 @@
 	    test_squares : function() { loadSquareTestCase(pb,setVertices); },
 	    test_girih : function() { loadGirihTestCase(pb,setVertices); }
 	}, GUP );
-
 	
-	//var signedArea = ( data : Array<number>, start:number, end:number, dim:number) : number => {
-	/* var signedArea = ( data : Array<Vertex>, start:number, end:number, dim:number) : number => {
-	    var sum = 0;
-	    var n = data.length;
-	    start = 0;
-	    end = data.length; // -1?
-	    //for (var i = start, j = end - dim; i < end; i += dim) {
-	    for (var i = start, j = end-1; i < end; i ++ ) {
-		// sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
-		var vertA = data[i];
-		var vertB = data[j];
-		// sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
-		sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
-		j = i;
-	    }
-	    return sum;
-	    };  */
 
 	// https://stackoverflow.com/questions/16285134/calculating-polygon-area
 	function calcPolygonArea(vertices) {
@@ -381,7 +262,12 @@
 	}
 
 	var stats = {
-	    area : 0.0
+	    area : 0.0,
+	    polygonsIntersect : false,
+	    positionInA : false,
+	    positionInB : false,
+	    mouseX : 0,
+	    mouseY : 0
 	};
 	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
@@ -395,8 +281,8 @@
 	    fold0.add(config, 'test_girih').name('Girih').title('Load the \'Girih\' test case.');
 
 	    gui.add(config, 'drawPointNumbers').listen().onChange( function() { pb.redraw(); } ).name('drawPointNumbers').title('Tringulate the result?');
-	    gui.add(config, 'useConvexHullA').listen().onChange( function() { pb.redraw(); } ).name('useConvexHullA').title('Use the convex hull of polygon A?');
-	    gui.add(config, 'useConvexHullB').listen().onChange( function() { pb.redraw(); } ).name('useConvexHullB').title('Use the convex hull of polygon B?');
+	    gui.add(config, 'useConvexHullA').listen().onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullA').title('Use the convex hull of polygon A?');
+	    gui.add(config, 'useConvexHullB').listen().onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullB').title('Use the convex hull of polygon B?');
 	    gui.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name('triangulate').title('Tringulate the result?');
 	    gui.add(config, 'clearSelfIntersections').listen().onChange( function() { pb.redraw(); } ).name('clearSelfIntersections').title('Clear polygons of self intersections before triangulating?');
 	    gui.add(config, 'triangulationMethod', ['Delaunay','Earcut']).listen().onChange( function() { pb.redraw(); } ).name('triangulationMethod').title('The triangulation method to use (Delaunay is not safe here; might result in ivalid triangulations)');
@@ -406,10 +292,18 @@
 	    var uiStats = new UIStats( stats );
 	    stats = uiStats.proxy;
 	    uiStats.add( 'area' ).precision( 3 ).suffix(' spx');
+	    uiStats.add( 'polygonsIntersect' );
+	    uiStats.add( 'positionInA' );
+	    uiStats.add( 'positionInB' );
+	    uiStats.add( 'mouseX' );
+	    uiStats.add( 'mouseY' );
 	}
 
+	// +---------------------------------------------------------------------------------
+	// | Initialize 
+	// +-------------------------------
 	pb.config.preDraw = drawAll;
-	pb.redraw();
+	loadRandomTestCase(pb, setVertices);
     }
 
     if( !window.pbPreventAutoLoad )
