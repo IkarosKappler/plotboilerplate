@@ -179,6 +179,7 @@
 	this.root.style.background = '#1a1a1a'; // Like in dat.gui
 	this.root.style.fontFamily = 'Calibri, Arial, Helvetica';
 	this.root.style.fontSize = '12px';
+	this.root.style.transition = 'left 1s';
 
 	this.header.style.position = 'absolute';
 	this.header.style.display = 'flex';
