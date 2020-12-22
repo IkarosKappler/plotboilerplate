@@ -108,11 +108,19 @@
 	    for( var i in verticesB )
 		pb.add( verticesB[i], false );
 	    // Bind all polygon points to their respective control point
-	    polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); 
-	    polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false ); // new Polygon(verticesB);
+	    // polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); 
+	    // polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false ); // new Polygon(verticesB);
+	    adjustPolygons();
 	    installPolygonControlPoint( controlPointA, polygonA );
 	    installPolygonControlPoint( controlPointB, polygonB );
 	    pb.redraw();
+	};
+
+
+	var adjustPolygons = function() {
+	    // Bind all polygon points to their respective control point
+	    polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); 
+	    polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false ); // new Polygon(verticesB);
 	};
 
 
@@ -224,6 +232,11 @@
 		stats.positionInB = (polygonB != null && relPos != null && polygonB.containsVert(relPos));
 		stats.mouseX = relPos.x;
 		stats.mouseY = relPos.y;
+	    } )
+	    .drag( function(e) {
+		// When vertices are moved, the convex hull might change
+		if( config.useConvexHullA || config.useConvexHullB )
+		    adjustPolygons();
 	    } );
 
 	// +---------------------------------------------------------------------------------
@@ -304,6 +317,7 @@
 	// +-------------------------------
 	pb.config.preDraw = drawAll;
 	loadRandomTestCase(pb, setVertices);
+	pb.redraw();
     }
 
     if( !window.pbPreventAutoLoad )
