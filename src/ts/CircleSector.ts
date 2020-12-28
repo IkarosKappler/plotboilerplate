@@ -9,7 +9,7 @@ import { Circle } from "./Circle";
 import { SVGPathParams, SVGSerializable, XYCoords } from "./interfaces";
 
 // [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
-export type SVGArcPathParams = [ string, number, number, number, number, number, number, number ];
+// export type SVGArcPathParams = [ string, number, number, number, number, number, number, number ];
 
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.

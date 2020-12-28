@@ -6,6 +6,8 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CircleSector = void 0;
+// [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
+// export type SVGArcPathParams = [ string, number, number, number, number, number, number, number ];
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *

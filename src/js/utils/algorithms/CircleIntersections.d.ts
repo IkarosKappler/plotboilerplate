@@ -6,11 +6,13 @@
  * @public
  **/
 import { Circle } from "../../Circle";
+import { CircleSector } from "../../CircleSector";
 import { Line } from "../../Line";
 import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
 import { IndexPair, Matrix } from "../datastructures/interfaces";
 /**
- * @classdesc A script for finding the intersection points of two circles (the 'radical line').
+ * @classdesc A script for finding the intersection points of two or
+ * multiple circles (the 'radical lines').
  *
  * Based on the C++ implementation by Robert King
  *    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
@@ -38,6 +40,17 @@ export declare class CircleIntersections {
      * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
      **/
     static findOuterPartitions(circles: Array<Circle>, intervalSets: Array<CircularIntervalSet>): Array<Array<IndexPair>>;
+    /**
+     * Find all connected outer path partitions (as CirclePartitions).
+     *
+     * @method findOuterPartitionsAsSectors
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
+     * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
+     **/
+    static findOuterPartitionsAsSectors(circles: Array<Circle>, intervalSets: Array<CircularIntervalSet>): Array<Array<CircleSector>>;
     /**
      * Build the n*n intersection matrix: contains the radical line at (i,j) if circle i and circle j do intersect;
      * conatins null at (i,j) otherwise.

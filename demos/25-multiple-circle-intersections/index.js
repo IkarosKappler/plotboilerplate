@@ -150,6 +150,7 @@
 	    var radicalLineMatrix    = CircleIntersections.buildRadicalLineMatrix( circles );
 	    var intervalSets         = CircleIntersections.findOuterCircleIntervals( circles, radicalLineMatrix );
 	    var pathList             = CircleIntersections.findOuterPartitions( circles, intervalSets );
+	    var pathListSectors      = CircleIntersections.findOuterPartitionsAsSectors( circles, intervalSets );
 
 	    // Draw what is required to be drawn
 	    for( var i = 0; i < circles.length; i++ ) {
@@ -208,6 +209,11 @@
 	// | The function switches between canvas.ellipse draw or SVG path draw.
 	// |
 	// | pre: circles.length > 0
+	// | @param {Circle[]} circles
+	// | @param {IndexPair[]} path
+	// | @param {CircularIntervalSet[]} intervalSets
+	// | @param {number} iteration
+	// | @param {number} pathNumber
 	// +-------------------------------
 	var drawConnectedPath = function( circles, path, intervalSets, iteration, pathNumber ) {
 	    var color = randomWebColor( iteration + pathNumber );

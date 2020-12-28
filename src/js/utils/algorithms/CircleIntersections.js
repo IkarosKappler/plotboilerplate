@@ -10,10 +10,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CircleIntersections = void 0;
 var arrayFill_1 = require("./arrayFill");
 var matrixFill_1 = require("./matrixFill");
+var CircleSector_1 = require("../../CircleSector");
 var Line_1 = require("../../Line");
 var CircularIntervalSet_1 = require("../datastructures/CircularIntervalSet");
 /**
- * @classdesc A script for finding the intersection points of two circles (the 'radical line').
+ * @classdesc A script for finding the intersection points of two or
+ * multiple circles (the 'radical lines').
  *
  * Based on the C++ implementation by Robert King
  *    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
@@ -56,6 +58,44 @@ var CircleIntersections = /** @class */ (function () {
             pathList.push(path);
         }
         return pathList;
+    };
+    ;
+    /**
+     * Find all connected outer path partitions (as CirclePartitions).
+     *
+     * @method findOuterPartitionsAsSectors
+     * @static
+     * @memberof CircleIntersections
+     * @param {Array<Circle>} circles - The circles to find intersections for.
+     * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
+     * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
+     **/
+    CircleIntersections.findOuterPartitionsAsSectors = function (circles, intervalSets) {
+        var partitions = CircleIntersections.findOuterPartitions(circles, intervalSets);
+        var partitionsAsArcs = [];
+        for (var p = 0; p < partitions.length; p++) {
+            var path = partitions[p];
+            var pathAsArcs = [];
+            for (var i = 0; i < path.length; i++) {
+                var circleIndex = path[i].i;
+                var circle = circles[circleIndex];
+                // const center : Vertex = circle.center;
+                // const radius  : number = circle.radius;
+                var interval = intervalSets[path[i].i].intervals[path[i].j];
+                /* pb.draw.ctx.ellipse( draw.offset.x+center.x*draw.scale.x,
+                             draw.offset.y+center.y*draw.scale.y,
+                             radius*draw.scale.x,
+                             radius*draw.scale.y,
+                             0.0,
+                             interval[0], // startAngle,
+                             interval[1], // endAngle,
+                             false ); */
+                // Params: circle, startAngle, endAngle
+                pathAsArcs.push(new CircleSector_1.CircleSector(circle, interval[0], interval[1]));
+            } // END for
+            partitionsAsArcs.push(pathAsArcs);
+        } // END for
+        return partitionsAsArcs;
     };
     ;
     /**

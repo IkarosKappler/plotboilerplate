@@ -5,7 +5,6 @@
  **/
 import { Circle } from "./Circle";
 import { SVGPathParams, SVGSerializable, XYCoords } from "./interfaces";
-export declare type SVGArcPathParams = [string, number, number, number, number, number, number, number];
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
