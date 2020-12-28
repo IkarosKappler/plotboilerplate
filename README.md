@@ -22,7 +22,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
 
 
-The compressed library has 89kb.
+The compressed library has 94kb.
 
 
 ## Install the package via npm

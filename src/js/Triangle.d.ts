@@ -15,8 +15,9 @@
  * @modified  2020-05-12 Added getIncircularTriangle() function.
  * @modified  2020-05-12 Added getIncircle() function.
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
- * @modified  2020-06-18 Added the getIncenter function.
- * @version   2.3.0
+ * @modified  2020-06-18 Added the `getIncenter` function.
+ * @modified  2020-12-28 Added the `getArea` function.
+ * @version   2.4.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -117,6 +118,19 @@ export declare class Triangle implements SVGSerializable {
      * @return {Triangle}
      **/
     static fromArray(arr: Array<Vertex>): Triangle;
+    /**
+     * Get the area of this triangle. The returned area is never negative.
+     *
+     * If you are interested in the signed area, please consider using the
+     * `Triangle.utils.signedArea` helper function. This method just returns
+     * the absolute value of the signed area.
+     *
+     * @method getArea
+     * @instance
+     * @memberof Triangle
+     * @return {number} The non-negative area of this triangle.
+     */
+    getArea(): number;
     /**
      * Get the centroid of this triangle.
      *

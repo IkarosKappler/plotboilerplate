@@ -13,7 +13,7 @@
  **/
 
 // TODOs
-//  * detect polygon intersection (avoid displaced tiled)
+//  * detect polygon intersection (avoid displaced tiles)
 //  * build auto-generation (random)
 //  * build grid of all possible positions (centers only)
 //  * detect connecting lines (inner polygons to max paths)
@@ -464,20 +464,12 @@
 	    return intersection;
 	};
 
-	// Found at earclip
-	/* var calcTriangleArea = function(a, b, c) {
-	   return (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
-	    }; */
-
 	// ( data : Array<number>, start:number, end:number, dim:number) : number => {
 	var signedPolygonArea = function( vertices ) {
 	    var sum = 0;
-	    // for (var i = start, j = end - dim; i < end; i += dim) {
 	    for (var i = 0; i < vertices.length; i++ ) {
-		// sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
 		var j = (i+1) % vertices.length;
 		sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
-		// j = i;
 	    }
 	    return sum;
 	};

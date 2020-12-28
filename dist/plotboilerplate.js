@@ -1535,6 +1535,8 @@ exports.Circle = Circle;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CircleSector = void 0;
+// [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
+// export type SVGArcPathParams = [ string, number, number, number, number, number, number, number ];
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
@@ -5843,8 +5845,9 @@ exports.SVGBuilder = SVGBuilder;
  * @modified  2020-05-12 Added getIncircularTriangle() function.
  * @modified  2020-05-12 Added getIncircle() function.
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
- * @modified  2020-06-18 Added the getIncenter function.
- * @version   2.3.0
+ * @modified  2020-06-18 Added the `getIncenter` function.
+ * @modified  2020-12-28 Added the `getArea` function.
+ * @version   2.4.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -5907,11 +5910,25 @@ var Triangle = /** @class */ (function () {
      * @return {Triangle}
      **/
     Triangle.fromArray = function (arr) {
-        //if( !Array.isArray(arr) )
-        //    throw new Exception("Cannot create triangle fromArray from non-array.");
         if (arr.length < 3)
             throw "Cannot create triangle from array with less than three vertices (" + arr.length + ")";
         return new Triangle(arr[0], arr[1], arr[2]);
+    };
+    ;
+    /**
+     * Get the area of this triangle. The returned area is never negative.
+     *
+     * If you are interested in the signed area, please consider using the
+     * `Triangle.utils.signedArea` helper function. This method just returns
+     * the absolute value of the signed area.
+     *
+     * @method getArea
+     * @instance
+     * @memberof Triangle
+     * @return {number} The non-negative area of this triangle.
+     */
+    Triangle.prototype.getArea = function () {
+        return Math.abs(Triangle.utils.signedArea(this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y));
     };
     ;
     /**
@@ -6226,6 +6243,9 @@ var Triangle = /** @class */ (function () {
         min3: function (a, b, c) {
             return (a <= b && a <= c) ? a : (b <= a && b <= c) ? b : c;
         },
+        signedArea: function (p0x, p0y, p1x, p1y, p2x, p2y) {
+            return 0.5 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
+        },
         /**
          * Used by the containsPoint() function.
          *
@@ -6235,8 +6255,8 @@ var Triangle = /** @class */ (function () {
             //
             // Point-in-Triangle test found at
             //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-            //
-            var area = 1 / 2 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
+            // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+            var area = Triangle.utils.signedArea(p0x, p0y, p1x, p1y, p2x, p2y);
             var s = 1 / (2 * area) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
             var t = 1 / (2 * area) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
             return s > 0 && t > 0 && (1 - s - t) > 0;
@@ -7830,7 +7850,8 @@ exports.VertexListeners = VertexListeners;
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2020-10-28 Added the path(Path2D) function.
- * @version  1.8.0
+ * @modified 2020-12-28 Added the `singleSegment` mode.
+ * @version  1.8.1
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -8198,17 +8219,23 @@ var drawutils = /** @class */ (function () {
      * @param {number} radius - The radius of the circle.
      * @param {number} startAngle - The angle to start at.
      * @param {number} endAngle - The angle to end at.
-     * @param {string} color - The CSS color to draw the circle with.
+     * @param {string=#000000} color - The CSS color to draw the circle with.
+     * @param {number=1} lineWidth - The line width to use
+     // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
-        this.ctx.beginPath();
+    drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth, options) {
+        if (!options || !options.asSegment) {
+            this.ctx.beginPath();
+        }
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
-        // this.ctx.closePath();
-        this.ctx.lineWidth = lineWidth || 1;
-        this._fillOrDraw(color);
+        if (!options || !options.asSegment) {
+            // this.ctx.closePath();
+            this.ctx.lineWidth = lineWidth || 1;
+            this._fillOrDraw(color || '#000000');
+        }
     };
     ;
     /**

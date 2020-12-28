@@ -4,12 +4,18 @@
  * * Concave polygons work
  * * Convex polygons are fine
  * * Self intersections are fine
- *
+ * 
+ * @param {PlotBoilerplate} pb
  * @param {Polygon} intersectionPolygon
  * @param {Polygon} sourcePolygon
  * @param {Polygon} clipPolygon
+ * @return {Triangle[]}
  */
-var drawTriangulation_earcut = function( pb, intersectionPolygon, sourcePolygon, clipPolygon ) {
+var drawTriangulation_earcut = function( pb,
+					 intersectionPolygon,
+					 sourcePolygon,
+					 clipPolygon
+				       ) {
     // Convert vertices into a sequence of coordinates for the earcut algorithm
     var earcutVertices = [];
     for( var i = 0; i < intersectionPolygon.vertices.length; i++ ) {
@@ -33,5 +39,6 @@ var drawTriangulation_earcut = function( pb, intersectionPolygon, sourcePolygon,
 	triangles.push( tri );
 	pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgba(0,128,255,0.5)', 1 );
     }
-    
+
+    return triangles;
 };

@@ -15,8 +15,9 @@
  * @modified  2020-05-12 Added getIncircularTriangle() function.
  * @modified  2020-05-12 Added getIncircle() function.
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
- * @modified  2020-06-18 Added the getIncenter function.
- * @version   2.3.0
+ * @modified  2020-06-18 Added the `getIncenter` function.
+ * @modified  2020-12-28 Added the `getArea` function.
+ * @version   2.4.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -142,14 +143,31 @@ export class Triangle implements SVGSerializable {
      * @return {Triangle}
      **/
     static fromArray( arr:Array<Vertex> ) : Triangle {
-	//if( !Array.isArray(arr) )
-	//    throw new Exception("Cannot create triangle fromArray from non-array.");
 	if( arr.length < 3 )
 	    throw `Cannot create triangle from array with less than three vertices (${arr.length})`;
 	return new Triangle( arr[0], arr[1], arr[2] );
     };
     
 
+    /**
+     * Get the area of this triangle. The returned area is never negative.
+     *
+     * If you are interested in the signed area, please consider using the
+     * `Triangle.utils.signedArea` helper function. This method just returns
+     * the absolute value of the signed area.
+     *
+     * @method getArea
+     * @instance
+     * @memberof Triangle
+     * @return {number} The non-negative area of this triangle.
+     */
+    getArea() : number {
+	return Math.abs(
+	    Triangle.utils.signedArea(this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y)
+	);
+    };
+    
+    
     /**
      * Get the centroid of this triangle.
      *
@@ -488,6 +506,9 @@ export class Triangle implements SVGSerializable {
 	min3( a:number, b:number, c:number ) : number {
 	    return ( a <= b && a <= c ) ? a : ( b <= a && b <= c ) ? b : c;
 	},
+	signedArea( p0x:number, p0y:number, p1x:number, p1y:number, p2x:number, p2y:number ) : number {
+	    return 0.5*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+	},
 	/**
 	 * Used by the containsPoint() function.
 	 *
@@ -497,9 +518,9 @@ export class Triangle implements SVGSerializable {
 	    //
 	    // Point-in-Triangle test found at
 	    //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-	    //
-	    var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
-
+	    // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+	    var area : number = Triangle.utils.signedArea( p0x, p0y, p1x, p1y, p2x, p2y );
+	    
 	    var s : number = 1/(2*area)*(p0y*p2x - p0x*p2y + (p2y - p0y)*px + (p0x - p2x)*py);
 	    var t : number = 1/(2*area)*(p0x*p1y - p0y*p1x + (p0y - p1y)*px + (p1x - p0x)*py);
 

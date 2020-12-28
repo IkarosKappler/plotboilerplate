@@ -62,6 +62,9 @@ function loadSquareTestCase(pb, setVertices) {
     vertsB.push( new Vertex(sizeB,0) );
     vertsB.push( new Vertex(0,sizeB) );
 
+    // Print area to compare with polygon-area algorithm
+    // console.log( '[loadSquareTestCase] square edge length A', 2*sizeA, 'area', Math.pow(2*sizeA,2) );
+    // console.log( '[loadSquareTestCase] square edge length B', 2*sizeB, 'area', Math.pow(2*sizeB,2) );
     setVertices( vertsA, vertsB );
 }
 

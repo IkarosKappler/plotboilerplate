@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2020-12-28
+  * Added the `Triangle.getArea` function.
+  * Added the `Triangle.utils.signedArea` helper function.
 * 2020-12-17
   * Added the `CircleSector` drawable (class).
   * Added the `SVGPathParams` type.

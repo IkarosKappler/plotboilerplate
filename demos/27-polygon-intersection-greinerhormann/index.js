@@ -180,7 +180,8 @@
 	    //       If there is only one intersection polygon, there should be a returned
 	    //       array with length 1. (or 0 if there is none; currently the result is null then).
 	    var intersection = greinerHormann.intersection(sourcePolygon.vertices, clipPolygon.vertices);
-	    var area = 0;
+	    var area = 0.0;
+	    var triangleArea = 0.0;
 
 	    if( intersection ) {
 		if( typeof intersection[0][0] === 'number' ) { // single linear ring
@@ -205,12 +206,14 @@
 					  2.0 ); // Polygon is not open
 
 			if( config.triangulate ) {
+			    var triangles = null;
 			    if( config.triangulationMethod === "Delaunay" ) {
-				drawTriangulation_delaunay( pb, new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon, config.drawDelaunayCircles );
+				triangles = drawTriangulation_delaunay( pb, new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon, config.drawDelaunayCircles );
 			    } else if( config.triangulationMethod === "Earcut" ) {
-				drawTriangulation_earcut( pb, new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );
-
+				triangles = drawTriangulation_earcut( pb, new Polygon(clearedPolys[j]), sourcePolygon, clipPolygon );
 			    }
+			    // Add triangle area
+			    triangleArea += calculateTrianglesArea(triangles);
 			}
 			area += calcPolygonArea( clearedPolys[j] );
 		    } // END for
@@ -219,6 +222,12 @@
 
 	    // Update the stats (experimental)
 	    stats.area = area;
+	    stats.triangleArea = config.triangulate ? triangleArea : NaN;
+	    // TODO: think about these areas
+	    stats.areaA = calcPolygonArea( sourcePolygon.vertices );
+	    stats.areaB = calcPolygonArea( clipPolygon.vertices );
+	    stats.signedAreaA = signedPolygonArea( sourcePolygon.vertices );
+	    stats.signedAreaB = signedPolygonArea( clipPolygon.vertices );
 	    stats.polygonsIntersect = (intersection !== null && typeof intersection !== 'undefined' && intersection.length > 0 );
 	};
 
@@ -257,14 +266,15 @@
 	}, GUP );
 	
 
+	// TODO: think about these two area calculation functions.
 	// https://stackoverflow.com/questions/16285134/calculating-polygon-area
-	function calcPolygonArea(vertices) {
+	var calcPolygonArea = function(vertices) {
 	    var total = 0;
 
 	    for (var i = 0, l = vertices.length; i < l; i++) {
 		var addX = vertices[i].x;
-		var addY = vertices[i == vertices.length - 1 ? 0 : i + 1].y;
-		var subX = vertices[i == vertices.length - 1 ? 0 : i + 1].x;
+		var addY = vertices[(i + 1)%l].y;
+		var subX = vertices[(i + 1)%l].x;
 		var subY = vertices[i].y;
 
 		total += (addX * addY * 0.5);
@@ -274,8 +284,23 @@
 	    return Math.abs(total);
 	}
 
+	// ( data : Array<number>, start:number, end:number, dim:number) : number => {
+	var signedPolygonArea = function( vertices ) {
+	    var sum = 0;
+	    for (var i = 0; i < vertices.length; i++ ) {
+		var j = (i+1) % vertices.length;
+		sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
+	    }
+	    return sum;
+	};
+
 	var stats = {
 	    area : 0.0,
+	    triangleArea : NaN,
+	    signedAreaA : 0.0,
+	    areaA : 0.0,
+	    signedAreaB : 0.0,
+	    areaB : 0.0,
 	    polygonsIntersect : false,
 	    positionInA : false,
 	    positionInB : false,
@@ -305,6 +330,11 @@
 	    var uiStats = new UIStats( stats );
 	    stats = uiStats.proxy;
 	    uiStats.add( 'area' ).precision( 3 ).suffix(' spx');
+	    uiStats.add( 'triangleArea' ).precision( 3 ).suffix(' spx');
+	    uiStats.add( 'areaA' ).precision( 3 ).suffix(' spx');
+	    uiStats.add( 'areaB' ).precision( 3 ).suffix(' spx');
+	    uiStats.add( 'signedAreaA' ).precision( 3 ).suffix(' spx');
+	    uiStats.add( 'signedAreaB' ).precision( 3 ).suffix(' spx');
 	    uiStats.add( 'polygonsIntersect' );
 	    uiStats.add( 'positionInA' );
 	    uiStats.add( 'positionInB' );
