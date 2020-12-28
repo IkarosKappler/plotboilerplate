@@ -152,7 +152,7 @@
 		pb.draw.polygon( previewTiles[previewTilePointer], 'rgba(128,128,128,0.5)', 1.0 ); // Polygon is not open
 
 		// Draw intersection polygons (if there are any)
-		if( config.showOverlaps ) {
+		if( config.showPreviewOverlaps ) {
 		    for( var i = 0; i < previewIntersectionPolygons.length; i++ ) {
 			pb.fill.polygon( previewIntersectionPolygons[i], 'rgba(255,0,0,0.25)' );
 		    }
@@ -167,7 +167,7 @@
 	    }
 
 	    // Draw intersection polygons? (if there are any)
-	    if( config.showOverlaps
+	    if( config.showPreviewOverlaps
 		&& hoverTileIndex != -1 && hoverEdgeIndex != -1
 		&& 0 <= previewTilePointer && previewTilePointer < previewTiles.length ) {
 		for( var i = 0; i < previewIntersectionPolygons.length; i++ ) {
@@ -293,6 +293,21 @@
 	};
 
 
+	var addPreviewTile = function() {
+	    console.log('area', stats, stats.intersectionArea );
+	    
+	    // Avoid overlaps?
+	    if( !config.allowOverlaps && stats.intersectionArea > 1 ) {
+		console.log('Adding overlapping tiles not allowed.');
+		if( humane )
+		    humane.log('Adding overlapping tiles not allowed.');
+		return;
+	    }
+	    
+	    addTile( previewTiles[previewTilePointer].clone() );
+	    pb.redraw();
+	};
+	
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
 	// +-------------------------------
@@ -310,9 +325,19 @@
 		var clickedVert = pb.getVertexNear( e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE );
 		if( !clickedVert && previewTilePointer < previewTiles.length ) {
 		    // Touch and mouse devices handle this differently
-		    if( e.params.isTouchEvent || (!e.params.isTouchEvent && hoverTileIndex != -1 && hoverEdgeIndex != -1) ) {
+		    if( e.params.isTouchEvent
+			|| (!e.params.isTouchEvent && hoverTileIndex != -1 && hoverEdgeIndex != -1) ) {
+			/* 
+			// Avoid overlaps?
+			if( !config.allowOverlaps && stats.intersectionArea > 1 ) {
+			    console.log('Adding overlapping tiles not allowed.');
+			    return;
+			}
+			
 			addTile( previewTiles[previewTilePointer].clone() );
 			pb.redraw();
+			*/
+			addPreviewTile();
 		    }
 		}
 	    } );
@@ -361,8 +386,9 @@
 	    } )
 	    .down('enter', function() {
 		if( previewTilePointer < previewTiles.length ) {
-		    addTile( previewTiles[previewTilePointer].clone() );
-		    pb.redraw();
+		    // addTile( previewTiles[previewTilePointer].clone() );
+		    // pb.redraw();
+		    addPreviewTile();
 		}
 	    } )
 	    .down('delete',function() {
@@ -415,35 +441,50 @@
 		createAdjacentTilePreview( previewTiles, previewTilePointer, setPreviewTilePointer );
 	};
 
+
+	// +---------------------------------------------------------------------------------
+	// | Find all intersections of the Girih tiles and the
+	// | currently selected preview polygon.
+	// |
+	// | Following global vars will be updated:
+	// |  * previewIntersectionPolygons
+	// |  * previewIntersectionAreas
+	// +-------------------------------
 	var findPreviewIntersections = function() {
 	    previewIntersectionPolygons = [];
 	    previewIntersectionAreas = [];
 	    if( hoverTileIndex == -1 || hoverEdgeIndex == -1 || previewTilePointer < 0 || previewTilePointer >= previewTiles.length ) {
+		stats.intersectionArea = 0.0;
 		return;
 	    }
+	    var totalArea = 0.0;
 	    var currentPreviewTile = previewTiles[ previewTilePointer ];
 	    for( var i = 0; i < girih.tiles.length; i++ ) {
 		if( i == hoverTileIndex )
 		    continue;
 		var intersections = findPreviewIntersectionsFor( currentPreviewTile, girih.tiles[i] );
 		for( var j = 0; j < intersections.length; j++ ) {
-		    // var poly = new Polygon(copyVertArray(intersections[j]), false);
 		    var poly = new Polygon(cloneVertexArray(intersections[j]), false);
-		    var area = signedPolygonArea( poly.vertices );
+		    var area = calculatePolygonArea( poly.vertices );
+		    // if( area === NaN )
+		    //	area = 0.0;
 		    previewIntersectionAreas.push( area );
 		    previewIntersectionPolygons.push( poly );
+		    totalArea += area;
 		}
 	    }
+	    stats.intersectionArea = totalArea;
 	};
 
-	// Helper function to convert XYCoords[] to Vertex[]
-	/* var copyVertArray = function( vertices ) {
-	    var result = [];
-	    for( var i = 0; i < vertices.length; i++ )
-		result.push( new Vertex(vertices[i]) );
-	    return result;
-	}; */
-	
+
+	// +---------------------------------------------------------------------------------
+	// | Find the polygon intersections for the given preview tile and
+	// | girih tile.
+	// |
+	// | @param {Polygon} previewTile - The tile you want to place.
+	// | @param {Polygon} girihTile - The tile currently on the canvas.
+	// | @return {Vertex[][]} A set of intersection polygons.
+	// +-------------------------------
 	var findPreviewIntersectionsFor = function( previewTile, girihTile ) {
 	    // Check if there are intersec
 	    var intersection = greinerHormann.intersection(
@@ -464,16 +505,7 @@
 	    return intersection;
 	};
 
-	// ( data : Array<number>, start:number, end:number, dim:number) : number => {
-	var signedPolygonArea = function( vertices ) {
-	    var sum = 0;
-	    for (var i = 0; i < vertices.length; i++ ) {
-		var j = (i+1) % vertices.length;
-		sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
-	    }
-	    return sum;
-	};
-
+	
 	
 	// +---------------------------------------------------------------------------------
 	// | A global config that's attached to the dat.gui control interface.
@@ -487,7 +519,8 @@
 	    drawInnerPolygons : true,
 	    lineJoin  : "round",     // [ "bevel", "round", "miter" ]
 	    drawTextures : false,
-	    showOverlaps : false
+	    showPreviewOverlaps : false,
+	    allowOverlaps : false
 	}, GUP );
 
 
@@ -505,11 +538,16 @@
 	};
 	textureImage = loadTextureImage('girihtexture-500px-2.png', function() { console.log('Texture loaded'); pb.redraw(); });
 
+	var stats = {
+	    intersectionArea : 0.0
+	};
 
 	// +---------------------------------------------------------------------------------
 	// | Initialize dat.gui
 	// +-------------------------------
         {
+	   
+	    
 	    var gui = pb.createGUI();
 	    gui.add(config, 'drawCornerNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
 	    gui.add(config, 'drawTileNumbers').listen().onChange( function() { pb.redraw(); } ).name("drawTileNumbers").title("Draw the index of each tile?");
@@ -519,7 +557,13 @@
 	    gui.add(config, 'drawInnerPolygons').listen().onChange( function() { pb.redraw(); } ).name("drawInnerPolygons").title("Draw the inner polygons?");
 	    gui.add(config, 'lineJoin', [ "bevel", "round", "miter" ] ).onChange( function() { pb.redraw(); } ).name("lineJoin").title("The shape of the line joins.");
 	    gui.add(config, 'drawTextures').listen().onChange( function() { pb.redraw(); } ).name("drawTextures").title("Draw the Girih textures?");
-	    gui.add(config, 'showOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showOverlaps').title("Detect and draw overlaps?");
+	    gui.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
+	    gui.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
+
+	    // Add stats
+	    var uiStats = new UIStats( stats );
+	    stats = uiStats.proxy;
+	    uiStats.add( 'intersectionArea' ).precision( 3 ).suffix(' spx');
 	}
 
 	initTiles();

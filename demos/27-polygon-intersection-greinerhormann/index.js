@@ -215,7 +215,7 @@
 			    // Add triangle area
 			    triangleArea += calculateTrianglesArea(triangles);
 			}
-			area += calcPolygonArea( clearedPolys[j] );
+			area += calculatePolygonArea( clearedPolys[j] );
 		    } // END for
 		} // END for
 	    } // END if
@@ -224,10 +224,10 @@
 	    stats.area = area;
 	    stats.triangleArea = config.triangulate ? triangleArea : NaN;
 	    // TODO: think about these areas
-	    stats.areaA = calcPolygonArea( sourcePolygon.vertices );
-	    stats.areaB = calcPolygonArea( clipPolygon.vertices );
-	    stats.signedAreaA = signedPolygonArea( sourcePolygon.vertices );
-	    stats.signedAreaB = signedPolygonArea( clipPolygon.vertices );
+	    stats.areaA = calculatePolygonArea( sourcePolygon.vertices );
+	    stats.areaB = calculatePolygonArea( clipPolygon.vertices );
+	    stats.signedAreaA = calculateSignedPolygonArea( sourcePolygon.vertices );
+	    stats.signedAreaB = calculateSignedPolygonArea( clipPolygon.vertices );
 	    stats.polygonsIntersect = (intersection !== null && typeof intersection !== 'undefined' && intersection.length > 0 );
 	};
 
@@ -268,7 +268,7 @@
 
 	// TODO: think about these two area calculation functions.
 	// https://stackoverflow.com/questions/16285134/calculating-polygon-area
-	var calcPolygonArea = function(vertices) {
+	/* var calcPolygonArea = function(vertices) {
 	    var total = 0;
 
 	    for (var i = 0, l = vertices.length; i < l; i++) {
@@ -282,17 +282,17 @@
 	    }
 
 	    return Math.abs(total);
-	}
+	}; */
 
 	// ( data : Array<number>, start:number, end:number, dim:number) : number => {
-	var signedPolygonArea = function( vertices ) {
+	/* var signedPolygonArea = function( vertices ) {
 	    var sum = 0;
 	    for (var i = 0; i < vertices.length; i++ ) {
 		var j = (i+1) % vertices.length;
 		sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
 	    }
 	    return sum;
-	};
+	}; */
 
 	var stats = {
 	    area : 0.0,

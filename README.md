@@ -705,7 +705,7 @@ for this purpose.
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
  * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
  * The BBTree.iterator() fails if the tree is empty! (Demos)
- * The minifid BBTree and BBTreeCollection files do not export anything. The un-minified to. Why that?
+ * The minifid BBTree and BBTreeCollection files do not export anything. The un-minified does. Why that?
  * Currently no more known. Please report bugs.
 
 
