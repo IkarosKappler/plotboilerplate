@@ -31,7 +31,8 @@
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2020-10-28 Added the path(Path2D) function.
- * @version  1.8.0
+ * @modified 2020-12-28 Added the `singleSegment` mode.
+ * @version  1.8.1
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -261,12 +262,16 @@ export declare class drawutils {
      * @param {number} radius - The radius of the circle.
      * @param {number} startAngle - The angle to start at.
      * @param {number} endAngle - The angle to end at.
-     * @param {string} color - The CSS color to draw the circle with.
+     * @param {string=#000000} color - The CSS color to draw the circle with.
+     * @param {number=1} lineWidth - The line width to use
+     // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number): void;
+    circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color?: string, lineWidth?: number, options?: {
+        asSegment?: boolean;
+    }): void;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *

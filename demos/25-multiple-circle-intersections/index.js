@@ -176,8 +176,9 @@
 
 	    // Draw connected paths?
 	    if( config.sectionDrawPct == 100 ) {
-		for( var i = 0; i < pathList.length; i++ ) {
-		    drawConnectedPath( circles, pathList[i], intervalSets, iteration, i );
+		for( var i = 0; i < pathListSectors.length; i++ ) {
+		    // drawConnectedPath( circles, pathList[i], intervalSets, iteration, i );
+		    drawConnectedPath( circles, pathListSectors[i], intervalSets, iteration, i );
 		}
 	    }
 
@@ -210,7 +211,7 @@
 	// |
 	// | pre: circles.length > 0
 	// | @param {Circle[]} circles
-	// | @param {IndexPair[]} path
+	// | @param {CircleSector[]} path
 	// | @param {CircularIntervalSet[]} intervalSets
 	// | @param {number} iteration
 	// | @param {number} pathNumber
@@ -230,7 +231,7 @@
 	// | Draw the given path as ellipses (using canvs.ellipse function).
 	// |
 	// | @param {Cirle[]} circles
-	// | @param {IndexPair[]} path
+	// | @param {CircleSector[]} path
 	// | @param {CircularIntervalSet[]} intervalSets
 	// | @param {string} color
 	// | @param {drawutils} draw
@@ -239,7 +240,7 @@
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
 	    for( var i = 0; i < path.length; i++ ) {
-		var circleIndex = path[i].i;
+		/* var circleIndex = path[i].i;
 		var circle = circles[ circleIndex ];
 		var center = circle.center;
 		var radius = circle.radius;
@@ -251,7 +252,24 @@
 				     0.0,
 				     interval[0], // startAngle,
 				     interval[1], // endAngle,
-				     false );
+				     false ); */
+		var sector = path[i];
+		/* pb.draw.ctx.ellipse( draw.offset.x + sector.circle.center.x*draw.scale.x,
+				     draw.offset.y + sector.circle.center.y*draw.scale.y,
+				     sector.circle.radius*draw.scale.x,
+				     sector.circle.radius*draw.scale.y,
+				     0.0,
+				     sector.startAngle,
+				     sector.endAngle,
+				     false ); */
+		pb.draw.circleArc( sector.circle.center,
+				   sector.circle.radius,
+				   sector.startAngle,
+				   sector.endAngle,
+				   color,
+				   config.lineWidth,
+				   { asSegment: true }
+				 );
 	    }
 	    draw.ctx.closePath();
 	    draw.ctx.lineWidth = config.lineWidth;
@@ -263,14 +281,13 @@
 	// | Draw the given path as ellipses (using canvs.ellipse function).
 	// |
 	// | @param {Cirle[]} circles
-	// | @param {IndexPair[]} path
+	// | @param {CircleSector[]} path
 	// | @param {CircularIntervalSet[]} intervalSets
 	// | @param {string} color
 	// | @param {drawutils} draw
 	// +-------------------------------
 	var drawConnectedPathAsSVGArcs = function( circles, path, intervalSets, color, draw ) {
-	    var svgData = pathToSVGData( circles, path, intervalSets, color, draw.offset, draw.scale );	      
-	    // console.log( svgData );
+	    var svgData = pathToSVGData( circles, path, intervalSets, color, draw.offset, draw.scale );
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
 	    draw.ctx.lineWidth = config.lineWidth;
@@ -283,52 +300,6 @@
 		draw.ctx.stroke( new Path2D(svgData.join(" ")) );
 	    }
 	    draw.ctx.restore();    
-	};
-
-	// +---------------------------------------------------------------------------------
-	// | Convert the given circle arc path (must be connected to look good) to
-	// | SVG path data.
-	// |
-	// | @param {Cirle[]} circles
-	// | @param {IndexPair[]} path
-	// | @param {CircularIntervalSet[]} intervalSets
-	// | @param {string} color
-	// | @param {XYCoords} offs - The draw offset to use.
-	// | @param {XYCoords} scale - The zoom to use.
-	// +-------------------------------
-	var pathToSVGData = function( circles, path, intervalSets, color, offs, scale ) {
-	    // Build the SVG path data 
-	    // https://www.w3.org/TR/SVG/paths.html
-
-	    var svgData = [];
-	    var lastArc = null;
-	    
-	    for( var i = 0; i < path.length; i++ ) {
-		var circleIndex = path[i].i;
-		var circle = circles[ circleIndex ];
-		var center = circle.center;
-		var radius = circle.radius;
-		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
-
-		if( i == 0 ) {
-		    // At the beginning add the inital position?
-		    var startPoint = circle.vertAt( interval[0] );
-		    svgData.push( "M", offs.x + scale.x * startPoint.x, offs.y + scale.y * startPoint.y );
-		}
-		lastArc = CircleSector.circleSectorUtils.describeSVGArc(
-		    offs.x + center.x * scale.x,
-		    offs.y + center.y * scale.y,
-		    radius  * (scale.x), // scal.y??
-		    interval[0],
-		    interval[1],
-		    { moveToStart : false }
-		);
-		svgData = svgData.concat( lastArc );
-	    }
-	    // Close the path
-	    svgData.push( "Z" );
-
-	    return svgData;
 	};
 
 	
