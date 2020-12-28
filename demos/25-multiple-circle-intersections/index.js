@@ -177,8 +177,7 @@
 	    // Draw connected paths?
 	    if( config.sectionDrawPct == 100 ) {
 		for( var i = 0; i < pathListSectors.length; i++ ) {
-		    // drawConnectedPath( circles, pathList[i], intervalSets, iteration, i );
-		    drawConnectedPath( circles, pathListSectors[i], intervalSets, iteration, i );
+		    drawConnectedPath( pathListSectors[i], iteration, i );
 		}
 	    }
 
@@ -209,59 +208,33 @@
 	// |
 	// | The function switches between canvas.ellipse draw or SVG path draw.
 	// |
-	// | pre: circles.length > 0
-	// | @param {Circle[]} circles
 	// | @param {CircleSector[]} path
-	// | @param {CircularIntervalSet[]} intervalSets
 	// | @param {number} iteration
 	// | @param {number} pathNumber
 	// +-------------------------------
-	var drawConnectedPath = function( circles, path, intervalSets, iteration, pathNumber ) {
+	var drawConnectedPath = function( path, iteration, pathNumber ) {
 	    var color = randomWebColor( iteration + pathNumber );
 	    var draw = config.fillNestedCircles ? pb.fill : pb.draw;
 
 	    if( config.drawAsSVGArcs ) 
-		drawConnectedPathAsSVGArcs( circles, path, intervalSets, color, draw );
+		drawConnectedPathAsSVGArcs( path, color, draw );
 	    else
-		drawConnectedPathAsEllipses( circles, path, intervalSets, color, draw );
+		drawConnectedPathAsEllipses( path, color, draw );
 	};
 
 
 	// +---------------------------------------------------------------------------------
 	// | Draw the given path as ellipses (using canvs.ellipse function).
 	// |
-	// | @param {Cirle[]} circles
 	// | @param {CircleSector[]} path
-	// | @param {CircularIntervalSet[]} intervalSets
 	// | @param {string} color
 	// | @param {drawutils} draw
 	// +-------------------------------
-	var drawConnectedPathAsEllipses = function( circles, path, intervalSets, color, draw ) {
+	var drawConnectedPathAsEllipses = function( path, color, draw ) {
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
 	    for( var i = 0; i < path.length; i++ ) {
-		/* var circleIndex = path[i].i;
-		var circle = circles[ circleIndex ];
-		var center = circle.center;
-		var radius = circle.radius;
-		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
-		pb.draw.ctx.ellipse( draw.offset.x+center.x*draw.scale.x,
-				     draw.offset.y+center.y*draw.scale.y,
-				     radius*draw.scale.x,
-				     radius*draw.scale.y,
-				     0.0,
-				     interval[0], // startAngle,
-				     interval[1], // endAngle,
-				     false ); */
 		var sector = path[i];
-		/* pb.draw.ctx.ellipse( draw.offset.x + sector.circle.center.x*draw.scale.x,
-				     draw.offset.y + sector.circle.center.y*draw.scale.y,
-				     sector.circle.radius*draw.scale.x,
-				     sector.circle.radius*draw.scale.y,
-				     0.0,
-				     sector.startAngle,
-				     sector.endAngle,
-				     false ); */
 		pb.draw.circleArc( sector.circle.center,
 				   sector.circle.radius,
 				   sector.startAngle,
@@ -280,14 +253,12 @@
 	// +---------------------------------------------------------------------------------
 	// | Draw the given path as ellipses (using canvs.ellipse function).
 	// |
-	// | @param {Cirle[]} circles
 	// | @param {CircleSector[]} path
-	// | @param {CircularIntervalSet[]} intervalSets
 	// | @param {string} color
 	// | @param {drawutils} draw
 	// +-------------------------------
-	var drawConnectedPathAsSVGArcs = function( circles, path, intervalSets, color, draw ) {
-	    var svgData = pathToSVGData( circles, path, intervalSets, color, draw.offset, draw.scale );
+	var drawConnectedPathAsSVGArcs = function( path, color, draw ) {
+	    var svgData = pathToSVGData( path, color, draw.offset, draw.scale );
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
 	    draw.ctx.lineWidth = config.lineWidth;

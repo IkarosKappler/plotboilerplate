@@ -67,14 +67,14 @@ export class CircleIntersections {
     };
 
     /**
-     * Find all connected outer path partitions (as CirclePartitions).
+     * Find all connected outer path partitions (as CircleSectors).
      *
      * @method findOuterPartitionsAsSectors
      * @static
      * @memberof CircleIntersections
      * @param {Array<Circle>} circles - The circles to find intersections for.
      * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
-     * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
+     * @return {Array<Array<CircleSector>>} An array of paths, each defined by a sequence of SircleSectors.
      **/
     static findOuterPartitionsAsSectors( circles:Array<Circle>,
 					 intervalSets:Array<CircularIntervalSet>
@@ -88,17 +88,7 @@ export class CircleIntersections {
 	    for( var i = 0; i < path.length; i++ ) {
 		const circleIndex : number  = path[i].i;
 		const circle : Circle = circles[ circleIndex ];
-		// const center : Vertex = circle.center;
-		// const radius  : number = circle.radius;
 		var interval = intervalSets[ path[i].i ].intervals[ path[i].j ];
-		/* pb.draw.ctx.ellipse( draw.offset.x+center.x*draw.scale.x,
-				     draw.offset.y+center.y*draw.scale.y,
-				     radius*draw.scale.x,
-				     radius*draw.scale.y,
-				     0.0,
-				     interval[0], // startAngle,
-				     interval[1], // endAngle,
-				     false ); */
 		// Params: circle, startAngle, endAngle
 		pathAsArcs.push( new CircleSector( circle, interval[0], interval[1] ) );
 	    } // END for

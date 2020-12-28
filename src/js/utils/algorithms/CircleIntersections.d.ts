@@ -41,14 +41,14 @@ export declare class CircleIntersections {
      **/
     static findOuterPartitions(circles: Array<Circle>, intervalSets: Array<CircularIntervalSet>): Array<Array<IndexPair>>;
     /**
-     * Find all connected outer path partitions (as CirclePartitions).
+     * Find all connected outer path partitions (as CircleSectors).
      *
      * @method findOuterPartitionsAsSectors
      * @static
      * @memberof CircleIntersections
      * @param {Array<Circle>} circles - The circles to find intersections for.
      * @param {Array<CircularIntervalSet>} intervalSets - The determined interval sets (see `findOuterCircleIntervals`).
-     * @return {Array<Array<IndexPair>>} An array of paths, each defined by a sequence of IndexPairs adressing circle i and interval j.
+     * @return {Array<Array<CircleSector>>} An array of paths, each defined by a sequence of SircleSectors.
      **/
     static findOuterPartitionsAsSectors(circles: Array<Circle>, intervalSets: Array<CircularIntervalSet>): Array<Array<CircleSector>>;
     /**
