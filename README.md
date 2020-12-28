@@ -679,8 +679,8 @@ for this purpose.
 
 
 ### Credits
-* dat.gui
-* Color.js
+* [dat.gui by dataarts](https://github.com/dataarts/dat.gui "dat.gui dataarts")
+* [Neolitec's Color.js class](https://gist.github.com/neolitec/1344610 "Neolitec's Color.js class")
 * [FileSaver.js](https://www.npmjs.com/package/file-saver "FileSaver.js")
 * [AlloyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
 * [Ray Casting Algorithm](https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon "Ray Casting Algorithm") by Aaron Digulla
