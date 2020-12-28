@@ -7,11 +7,10 @@
  * @date    2020-12-01
  *
  * @param {CircleSector[]} path
- * @param {string} color
  * @param {XYCoords} offs - The draw offset to use.
  * @param {XYCoords} scale - The zoom to use.
  */
-var pathToSVGData = function( path, color, offs, scale ) {
+var pathToSVGData = function( path, offs, scale ) {
     // Build the SVG path data 
     // https://www.w3.org/TR/SVG/paths.html
     

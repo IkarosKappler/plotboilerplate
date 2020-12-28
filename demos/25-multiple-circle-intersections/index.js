@@ -3,18 +3,22 @@
  *
  * Here's a tiny article about how it's working:
  *    http://www.polygon-berlin.de/circle-section-math
+ *
  * 
  * The intersection outline can be drawn/filled in two ways:
  *  + canvas.ellipse(...)
  *  + SVG path (arc command)
+ *
  *
  * Based on the C++ implementation by Robert King
  *    https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
  * and the 'Circles and spheres' article by Paul Bourke.
  *    http://paulbourke.net/geometry/circlesphere/
  *
+ *
  * Is actual implementation of the circle intersection algorithm is located at 
  * ./src/ts/utils/algoriths/CircleIntersections.ts
+ *
  *
  * @requires PlotBoilerplate
  * @requires MouseHandler
@@ -27,7 +31,7 @@
  * @date     2020-10-05
  * @modified 2020-11-13 Fixed the drawing of sector lines.
  * @modified 2020-12-17 Added basic SVG export (experimental).
- * @version  1.1.0
+ * @version  1.2.0
  **/
 
 
@@ -193,7 +197,7 @@
 
 	// +---------------------------------------------------------------------------------
 	// | Draw the inner angles of intersecions.
-	// +-pb.add( radiusPoint );------------------------------
+	// +-------------------------------
 	var drawCircleSections = function( circle, radicalLines ) {
 	    for( var r = 0; r < radicalLines.length; r++ ) {
 		if( radicalLines[r] == null )
@@ -260,7 +264,7 @@
 	// | @param {drawutils} draw
 	// +-------------------------------
 	var drawConnectedPathAsSVGArcs = function( path, color, draw ) {
-	    var svgData = pathToSVGData( path, color, draw.offset, draw.scale );
+	    var svgData = pathToSVGData( path, draw.offset, draw.scale );
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
 	    draw.ctx.lineWidth = config.lineWidth;
@@ -347,10 +351,17 @@
 	    // TODO: writer a better SVGBuilder so we do not have to write pure SVG code here.
 	    var svgBuffer = [
 		'<?xml version="1.0" encoding="UTF-8"?>',
-		'<svg width="'+canvasSize.width+'" height="'+canvasSize.height+'" xmlns="http://www.w3.org/2000/svg"><defs><style>.main-g { transform: scale('+scale.x+','+scale.y+') translate('+offset.x+'px,'+offset.y+'px) } .CircleArcPath { fill : none; stroke : green; stroke-width : 2px; } </style></defs>   <g class="main-g">'
+		'<svg viewBox="0 0 '+canvasSize.width+' '+canvasSize.height+'" width="'+canvasSize.width+'" height="'+canvasSize.height+'" xmlns="http://www.w3.org/2000/svg">',
+		'<defs><style>.main-g { transform: scale('+scale.x+','+scale.y+') translate('+offset.x+'px,'+offset.y+'px); background-color: '+pb.config.backgroundColor+'; } .CircleArcPath { fill : none; stroke : green; stroke-width : 2px; } </style></defs>',
+		'<g class="main-g">'
 	    ];
 	    for( var i = 0; i < pathListArcs.length; i++ ) {
-		var pathData = pathToSVGData( pathListArcs[i], 'rgb(0,0,0)', pb.draw.offset, pb.draw.scale );
+		var pathData = pathToSVGData(
+		    pathListArcs[i],
+		    // Scaling and offset is already part of the SVG viewport
+		    { x : 0, y : 0 }, // pb.draw.offset,
+		    { x : 1, y : 1 }  // pb.draw.scale
+		);
 		svgBuffer.push( '<path class="CircleArcPath" d="' + pathData.join(" ") + '" />' );
 	    }	    
 	    svgBuffer.push( '</g></svg>' );
