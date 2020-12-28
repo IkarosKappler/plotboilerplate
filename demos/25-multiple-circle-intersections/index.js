@@ -149,7 +149,6 @@
 	    var innerCircleIndices   = CircleIntersections.findInnerCircles( circles ); 
 	    var radicalLineMatrix    = CircleIntersections.buildRadicalLineMatrix( circles );
 	    var intervalSets         = CircleIntersections.findOuterCircleIntervals( circles, radicalLineMatrix );
-	    var pathList             = CircleIntersections.findOuterPartitions( circles, intervalSets );
 	    var pathListSectors      = CircleIntersections.findOuterPartitionsAsSectors( circles, intervalSets );
 
 	    // Draw what is required to be drawn
