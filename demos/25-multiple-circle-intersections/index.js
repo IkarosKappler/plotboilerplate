@@ -195,6 +195,7 @@
 	    return affectedCircles;
 	};
 
+	
 	// +---------------------------------------------------------------------------------
 	// | Draw the inner angles of intersecions.
 	// +-------------------------------
@@ -352,7 +353,8 @@
 	    var svgBuffer = [
 		'<?xml version="1.0" encoding="UTF-8"?>',
 		'<svg viewBox="0 0 '+canvasSize.width+' '+canvasSize.height+'" width="'+canvasSize.width+'" height="'+canvasSize.height+'" xmlns="http://www.w3.org/2000/svg">',
-		'<defs><style>.main-g { transform: scale('+scale.x+','+scale.y+') translate('+offset.x+'px,'+offset.y+'px); background-color: '+pb.config.backgroundColor+'; } .CircleArcPath { fill : none; stroke : green; stroke-width : 2px; } </style></defs>',
+		'<defs><style>.main-g { transform: scale('+scale.x+','+scale.y+') translate('+offset.x+'px,'+offset.y+'px); } .bg { background-color: '+pb.config.backgroundColor+'; } .CircleArcPath { fill : none; stroke : green; stroke-width : 2px; } </style></defs>',
+		'<rect class="bg" x="0px" y="0px" width="'+canvasSize.width+'px" height="'+canvasSize.height+'px" />',
 		'<g class="main-g">'
 	    ];
 	    for( var i = 0; i < pathListArcs.length; i++ ) {
