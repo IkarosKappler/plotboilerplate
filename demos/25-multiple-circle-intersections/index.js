@@ -1,6 +1,9 @@
 /**
  * A script for finding the intersection points of two circles (the 'radical line').
  *
+ * Here's a tiny article about how it's working:
+ *    http://www.polygon-berlin.de/circle-section-math
+ * 
  * The intersection outline can be drawn/filled in two ways:
  *  + canvas.ellipse(...)
  *  + SVG path (arc command)
@@ -333,25 +336,28 @@
 	// +-------------------------------
 	var exportSVG = function() {
 	    // Do the same as in the draw function (refactor?)
-	    var innerCircleIndices   = CircleIntersections.findInnerCircles( circles ); 
+	    // var innerCircleIndices   = CircleIntersections.findInnerCircles( circles ); 
 	    var radicalLineMatrix    = CircleIntersections.buildRadicalLineMatrix( circles );
 	    var intervalSets         = CircleIntersections.findOuterCircleIntervals( circles, radicalLineMatrix );
-	    var pathList             = CircleIntersections.findOuterPartitions( circles, intervalSets );
+	    var pathListArcs         = CircleIntersections.findOuterPartitionsAsSectors( circles, intervalSets );
 	    
 	    var canvasSize = pb.canvasSize;
 	    var offset = pb.draw.offset;
 	    var scale = pb.draw.scale;
 	    // TODO: writer a better SVGBuilder so we do not have to write pure SVG code here.
-	    var svgBuffer = [ '<svg width="'+canvasSize.width+'" height="'+canvasSize.height+'" xmlns="http://www.w3.org/2000/svg"><defs><style>.main-g { transform: scale('+scale.x+','+scale.y+') translate('+offset.x+'px,'+offset.y+'px) } .CircleArcPath { fill : none; stroke : green; stroke-width : 2px; } </style></defs>   <g class="main-g">' ];
-	    for( var i = 0; i < pathList.length; i++ ) {
-		var pathData = pathToSVGData( circles, pathList[i], intervalSets, 'rgb(0,0,0)', pb.draw.offset, pb.draw.scale );
+	    var svgBuffer = [
+		'<?xml version="1.0" encoding="UTF-8"?>',
+		'<svg width="'+canvasSize.width+'" height="'+canvasSize.height+'" xmlns="http://www.w3.org/2000/svg"><defs><style>.main-g { transform: scale('+scale.x+','+scale.y+') translate('+offset.x+'px,'+offset.y+'px) } .CircleArcPath { fill : none; stroke : green; stroke-width : 2px; } </style></defs>   <g class="main-g">'
+	    ];
+	    for( var i = 0; i < pathListArcs.length; i++ ) {
+		var pathData = pathToSVGData( pathListArcs[i], 'rgb(0,0,0)', pb.draw.offset, pb.draw.scale );
 		svgBuffer.push( '<path class="CircleArcPath" d="' + pathData.join(" ") + '" />' );
 	    }	    
 	    svgBuffer.push( '</g></svg>' );
 
-	    var svgString = svgBuffer.join("");
+	    var svgString = svgBuffer.join("\n");
 	    // console.log( svgString );
-	    saveAs( new Blob( [ svgString ], { type: 'image/svg' } ), 'circles.svg' );
+	    saveAs( new Blob( [ svgString ], { type: 'image/svg' } ), 'circles-'+getFormattedTime()+'.svg' );
 	};
 	
 
