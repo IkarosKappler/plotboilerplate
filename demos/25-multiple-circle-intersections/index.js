@@ -84,7 +84,7 @@
 	    switch( config.colorSet ) {
 	    case "Malachite" : return WebColorsMalachite[ index % WebColorsMalachite.length ].cssRGB();
 	    case "Mixed": return WebColorsContrast[ index % WebColorsContrast.length ].cssRGB();
-	    case "Mixed":
+	    case "WebColors":
 	    default: return WebColors[ index % WebColors.length ].cssRGB();
 	    }
 	};
@@ -111,8 +111,8 @@
 	    var randomRadius = Math.random() * pb.canvasSize.height * 0.25;
 	    var circle = new Circle( center, randomRadius );
 	    var radiusPoint = new Vertex( center.clone().addXY(circle.radius*Math.sin(Math.PI/4),circle.radius*Math.cos(Math.PI/4)) );
-	    pb.add( circle.center );
 	    pb.add( radiusPoint );
+	    pb.add( circle.center );
 
 	    circles[i] = circle;
 	    centerPoints[i] = circle.center;
