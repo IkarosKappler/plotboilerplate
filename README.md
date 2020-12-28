@@ -693,7 +693,7 @@ for this purpose.
 * [Circle Intersection in C++ by Robert King](https://stackoverflow.com/questions/3349125/circle-circle-intersection-points "Circle Intersection in C++ by Robert King")
 * [The 'Circles and spheres' article by Paul Bourke](http://paulbourke.net/geometry/circlesphere/ "the 'Circles and spheres' article by Paul Bourke")
 * [shamansir/draw_svg.js](https://gist.github.com/shamansir/6294f8cfdd555a9d1b9e182007dd0c2f "shamansir/draw_svg.js") for manipulating SVG path data strings
-* ["opsb's stackoverflow proposal"](https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle "opsb's stackoverflow proposal") for converting ellipses sectors to SVG arcs.
+* [opsb's stackoverflow proposal](https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle "opsb's stackoverflow proposal") for converting ellipses sectors to SVG arcs.
 * [contrast-color-algorithm](https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y/38542#38542" "contrast-color-algorithm") by Martin Sojka's
 * Lu-Steinhardt for the work on Girih
 * Cronholm144 for the [Girih texture](https://commons.wikimedia.org/wiki/File:Girih_tiles.svg "Girih texture")
