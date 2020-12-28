@@ -519,7 +519,7 @@
 	    drawInnerPolygons : true,
 	    lineJoin  : "round",     // [ "bevel", "round", "miter" ]
 	    drawTextures : false,
-	    showPreviewOverlaps : false,
+	    showPreviewOverlaps : true,
 	    allowOverlaps : false
 	}, GUP );
 
