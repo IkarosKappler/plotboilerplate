@@ -684,7 +684,7 @@ for this purpose.
 * [FileSaver.js](https://www.npmjs.com/package/file-saver "FileSaver.js")
 * [AlloyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
 * [Ray Casting Algorithm](https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon "Ray Casting Algorithm") by Aaron Digulla
-* Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
+* [Hobby Curves in Javascript](http://weitz.de/hobby/ "Hobby Curves in Javascript") by [Prof. Dr. Edmund Weitz](http://weitz.de)
 * [hobby.pdf](https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf "hobby.pdf")
 * [jsHobby](https://github.com/loopspace/jsHobby "jsHobby")
 * [Blake Bowen's Catmull-Rom demo](https://codepen.io/osublake/pen/BowJed "Blake Bowen's Catmull-Rom demo")
