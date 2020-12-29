@@ -18,7 +18,8 @@
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
  * @modified 2020-07-24 Added the getClosestT(Vertex) function.
- * @version 2.2.2
+ * @modified 2020-12-29 Constructor is now private (no explicit use intended).
+ * @version 2.3.0
  *
  * @file BezierPath
  * @public
@@ -119,7 +120,7 @@ export class BezierPath implements SVGSerializable {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    constructor( pathPoints:Array<Vertex> ) {
+    private constructor( pathPoints:Array<Vertex> ) {
 	
 	if( !pathPoints )
 	    pathPoints = [];

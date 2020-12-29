@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2020-12-29
+  * Constructor `BezierPath` is now private (not explicit use intended).
 * 2020-12-28
   * Added the `Triangle.getArea` function.
   * Added the `Triangle.utils.signedArea` helper function.

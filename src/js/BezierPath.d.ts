@@ -102,7 +102,7 @@ export declare class BezierPath implements SVGSerializable {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    constructor(pathPoints: Array<Vertex>);
+    private constructor();
     /**
      * Add a cubic bezier curve to the end of this path.
      *
