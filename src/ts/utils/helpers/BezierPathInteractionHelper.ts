@@ -1,6 +1,5 @@
 /**
- * @classdesc A helper for adding vertices to and remove vertices from Bézier paths.
- * By default the 'delete' key is used to remove vertices or paths.
+ * Interfaces and class for automatically handling Bézier curves. 
  *
  * @requires AlloyFinger
  * @requires BezierPath
@@ -18,7 +17,9 @@
  * @date     2020-07-31
  * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
  * @modified 2020-08-12 Added a distance check before handling the click/tap event.
- * @version  1.0.1
+ * @modified 2021-01-03 Changed property to `autoAdjustPaths` in the HandlerOptions interface (typo).
+ * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
+ * @version  1.1.0
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -30,28 +31,43 @@ import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { KeyHandler } from "../../KeyHandler";
 import { MouseHandler } from "../../MouseHandler";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
-import { VertEvent } from "../../VertexListeners";
+import { VertEvent, VertListener } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
 import { XMouseEvent } from "../../MouseHandler";
 import { XYCoords } from "../../interfaces";
 
+/**
+ * Handler type for mouse-pointer-moved listeners.
+ */
 type OnPointerMoved = ( pathIndex:number,
 			pathPoint:Vertex,
 			pointerPos:Vertex,
 			t:number ) => void;
+/**
+ * Handler type for vertex-inserted listeners.
+ */
 type OnVertexInserted = ( pathIndex:number,
 			  insertIndex:number,
 			  newPath:BezierPath,
 			  oldPath:BezierPath ) => void;
+/**
+ * Handler type for vertex-removed listeners.
+ */
 type OnVerticesDeleted = ( pathIndex:number,
 			   removedVertexIndices:Array<number>,
 			   newPath:BezierPath,
 			   oldPath:BezierPath ) => void;
+/**
+ * Handler type for path-removed listeners.
+ */
 type OnPathRemoved = ( pathIndex:number,
 		       oldPath:BezierPath ) => void;
 
+/**
+ * Options passed to the constructor.
+ */
 interface HelperOptions {
-    autoAdjustPath?: boolean;    // default true
+    autoAdjustPaths?: boolean;   // default true
     allowPathRemoval?: boolean;  // default true
     maxDetectDistance?: number;  // default Number.MAX_VALUE
     onPointerMoved?: OnPointerMoved;
@@ -61,6 +77,17 @@ interface HelperOptions {
 };
 
 
+/**
+ * @classdesc A helper for adding vertices to and remove vertices from Bézier paths.
+ * By default the 'delete' key is used to remove vertices or paths.
+ *
+ * For convenience this helper is capable of handling multiple paths which are kept 
+ * in an array.
+ *
+ * [Demo](https://www.plotboilerplate.io/repo/demos/23-bezier-point-distance/ "Demo")
+ *
+ * @public
+ **/
 export class BezierPathInteractionHelper {
 
     /**
@@ -119,17 +146,27 @@ export class BezierPathInteractionHelper {
      * @param {function(number,number[],BezierPath,BezierPath)} options.onVerticesDeleted (pathIndex,removedVertexIndices,newPath,oldPath)
      * @param {function(number,BezierPath)} options.onPathRemoved (pathIndex,oldPath)
      **/
-    constructor( pb:PlotBoilerplate, paths:Array<BezierPath>, options:any ) {
+    constructor( pb : PlotBoilerplate,
+		 paths : Array<BezierPath>,
+		 options : HelperOptions
+	       ) {
 	options = options || {};
 	this.pb = pb;
 	this.paths = [];
-	this.onPointerMoved = options.onPointerMoved || function(i,a,b,t) { };
-	this.onVertexInserted = options.onVertexInserted || function(i,j,n,o) { };
-	this.onVerticesDeleted = options.onVerticesDeleted || function(i,r,n,o) { },
-	this.onPathRemoved = options.onPathRemoved || function(i,o) { };
-	this.autoAdjustPaths = typeof options.autoAdjustPaths == 'boolean' ? options.autoAdjustPaths : true;
-	this.allowPathRemoval = typeof options.allowPathRemoval == 'boolean' ? options.allowPathRemoval : true;
-	this.maxDetectDistance = typeof options.maxDetectDistance == 'number' ? options.maxDetectDistance : Number.MAX_VALUE;
+	this.onPointerMoved =
+	    typeof options.onPointerMoved === 'function' ? options.onPointerMoved : ((i:number,a:Vertex,b:Vertex,t:number) => { });
+	this.onVertexInserted =
+	    typeof options.onVertexInserted  === 'function' ? options.onVertexInserted : ((i:number,j:number,n:BezierPath,o:BezierPath) => { });
+	this.onVerticesDeleted =
+	    typeof options.onVerticesDeleted === 'function' ? options.onVerticesDeleted : ((i:number,r:Array<number>,n:BezierPath,o:BezierPath) => { });
+	this.onPathRemoved =
+	    typeof options.onPathRemoved === 'function' ? options.onPathRemoved : ((i:number,o:BezierPath) => { });
+	this.autoAdjustPaths =
+	    typeof options.autoAdjustPaths === 'boolean' ? options.autoAdjustPaths : true;
+	this.allowPathRemoval =
+	    typeof options.allowPathRemoval === 'boolean' ? options.allowPathRemoval : true;
+	this.maxDetectDistance =
+	    typeof options.maxDetectDistance === 'number' ? options.maxDetectDistance : Number.MAX_VALUE;
 
 	
 	this.mouseIsOver = false;
@@ -350,8 +387,6 @@ export class BezierPathInteractionHelper {
 	BezierPathInteractionHelper.setPathAutoAdjust( newPath );
 	this.paths[ pathIndex ] = newPath;
 	this.pb.add( newPath );
-	// Replace path inside the array with the new path
-	// this._addDefaultPathListeners( newPath );
     }; 
 
 
@@ -363,7 +398,6 @@ export class BezierPathInteractionHelper {
 	this.currentB.set( point );
 	this._updateMinDistance();
 	// Always fire even if nothing visually changed?
-	// console.log( this.currentDistance, this.maxDetectDistance, this.mouseIsOver );
 	if( (this.currentDistance <= this.maxDetectDistance && this.mouseIsOver)
 	    && this.pb.getDraggedElementCount() == 0 ) {
 	    this.onPointerMoved( this.currentPathIndex, this.currentA, this.currentB, this.currentT );
@@ -431,7 +465,6 @@ export class BezierPathInteractionHelper {
 		// Check if there is already a path point at the given split position
 		const pathPoint:Vertex = path.getPointAt(_self.currentT);
 		const pointNear:Vertex = _self.pb.getVertexNear( _self.pb.revertMousePosition(pathPoint.x,pathPoint.y), 6.0 );
-		// console.log( "pathPoint", pathPoint, pointNear );
 		if( pointNear ) {
 		    for( var i = 0; i < path.bezierCurves.length; i++ ) {
 			if( path.bezierCurves[i].startPoint.distance(pointNear) <= 6.0 || path.bezierCurves[i].endPoint.distance(pointNear) <= 6.0 ) {
@@ -555,6 +588,70 @@ export class BezierPathInteractionHelper {
 
 
     /**
+     * A helper function to add drag-start-listener to given vertices.
+     */
+    /* private static _addVertsDragStartListener( verts:Array<Vertex>, dragStartListener:VertListener ) : void {
+	for( var i in verts ) {
+	    verts[i].addDragStartListener( dragStartListener );
+	}
+    }; */
+
+    /**
+     * A helper function to remove drag-start-listener to given vertices.
+     */
+    /* private static _removeVertsDragStartListener( verts:Array<Vertex>, dragEndListener:VertListener ) : void {
+	for( var i in verts ) {
+	    verts[i].removeDragStartListener( dragStartListener );
+	}
+    }; */
+
+    /**
+     * A helper function to add drag-start listeners to all vertices of the given path.
+     *
+     * @static
+     * @method addPathVertexDragStartListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to add vertex listeners to.
+     * @param {function} vertexDragStartListener - The drag listeners to add to each path vertex.
+     * @return void
+     **/
+    static addPathVertexDragStartListeners( path:BezierPath, vertexDragStartListener:VertListener ) : void {
+	for( var i = 0; i < path.bezierCurves.length; i++ ) {
+	    const curve:CubicBezierCurve = path.bezierCurves[i];
+	    curve.startPoint.listeners.addDragStartListener( vertexDragStartListener );
+	    curve.startControlPoint.listeners.addDragStartListener( vertexDragStartListener );
+	    curve.endControlPoint.listeners.addDragStartListener( vertexDragStartListener ); 
+	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+		curve.endPoint.listeners.addDragStartListener( vertexDragStartListener );
+	    // if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+	    // BezierPathIntractionHelper._addVertsDragListener( [curve.startPoint, curve.startControlPoint, curve.endPoint, curve.endControlPoint ], vertexDragListener );
+	}
+    };
+
+
+    /**
+     * A helper function to remove drag-start listeners to all vertices of the given path.
+     *
+     * @static
+     * @method removePathVertexDragStartListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to remove vertex listeners from.
+     * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
+     * @return void
+     **/
+    static removePathVertexDragStartListeners( path:BezierPath, vertexDragStartListener:VertListener ) : void {
+	for( var i = 0; i < path.bezierCurves.length; i++ ) {
+	    const curve:CubicBezierCurve = path.bezierCurves[i];
+	    curve.startPoint.listeners.removeDragStartListener( vertexDragStartListener );
+	    curve.startControlPoint.listeners.removeDragStartListener( vertexDragStartListener );
+	    curve.endControlPoint.listeners.removeDragStartListener( vertexDragStartListener ); 
+	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+		curve.endPoint.listeners.removeDragStartListener( vertexDragStartListener ); 
+	}
+    };
+
+    
+    /**
      * A helper function to add drag listeners to all vertices of the given path.
      *
      * @static
@@ -564,14 +661,16 @@ export class BezierPathInteractionHelper {
      * @param {function} vertexDragListener - The drag listeners to add to each path vertex.
      * @return void
      **/
-    static addPathVertexDragListeners( path:BezierPath, vertexDragListener:(e:VertEvent)=>void ) : void {
+    static addPathVertexDragListeners( path:BezierPath, vertexDragListener:VertListener ) : void {
 	for( var i = 0; i < path.bezierCurves.length; i++ ) {
 	    const curve:CubicBezierCurve = path.bezierCurves[i];
 	    curve.startPoint.listeners.addDragListener( vertexDragListener );
 	    curve.startControlPoint.listeners.addDragListener( vertexDragListener );
 	    curve.endControlPoint.listeners.addDragListener( vertexDragListener ); 
 	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
-		curve.endPoint.listeners.addDragListener( vertexDragListener ); 
+		curve.endPoint.listeners.addDragListener( vertexDragListener );
+	    // if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+	    // BezierPathIntractionHelper._addVertsDragListener( [curve.startPoint, curve.startControlPoint, curve.endPoint, curve.endControlPoint ], vertexDragListener );
 	}
     };
 
@@ -586,7 +685,7 @@ export class BezierPathInteractionHelper {
      * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
      * @return void
      **/
-    static removePathVertexDragListeners( path:BezierPath, vertexDragListener:(e:VertEvent)=>void ) : void {
+    static removePathVertexDragListeners( path:BezierPath, vertexDragListener:VertListener ) : void {
 	for( var i = 0; i < path.bezierCurves.length; i++ ) {
 	    const curve:CubicBezierCurve = path.bezierCurves[i];
 	    curve.startPoint.listeners.removeDragListener( vertexDragListener );
@@ -594,6 +693,52 @@ export class BezierPathInteractionHelper {
 	    curve.endControlPoint.listeners.removeDragListener( vertexDragListener ); 
 	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
 		curve.endPoint.listeners.removeDragListener( vertexDragListener ); 
+	}
+    };
+
+
+    /**
+     * A helper function to add drag-end listeners to all vertices of the given path.
+     *
+     * @static
+     * @method addPathVertexDragEndListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to add vertex listeners to.
+     * @param {function} vertexDragEndListener - The drag listeners to add to each path vertex.
+     * @return void
+     **/
+    static addPathVertexDragEndListeners( path:BezierPath, vertexDragEndListener:VertListener ) : void {
+	for( var i = 0; i < path.bezierCurves.length; i++ ) {
+	    const curve:CubicBezierCurve = path.bezierCurves[i];
+	    curve.startPoint.listeners.addDragEndListener( vertexDragEndListener );
+	    curve.startControlPoint.listeners.addDragEndListener( vertexDragEndListener );
+	    curve.endControlPoint.listeners.addDragEndListener( vertexDragEndListener ); 
+	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+		curve.endPoint.listeners.addDragEndListener( vertexDragEndListener );
+	    // if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+	    // BezierPathIntractionHelper._addVertsDragListener( [curve.startPoint, curve.startControlPoint, curve.endPoint, curve.endControlPoint ], vertexDragListener );
+	}
+    };
+
+
+    /**
+     * A helper function to remove drag-end listeners to all vertices of the given path.
+     *
+     * @static
+     * @method removePathVertexDragEndListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to remove vertex listeners from.
+     * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
+     * @return void
+     **/
+    static removePathVertexDragEndListeners( path:BezierPath, vertexDragEndListener:VertListener ) : void {
+	for( var i = 0; i < path.bezierCurves.length; i++ ) {
+	    const curve:CubicBezierCurve = path.bezierCurves[i];
+	    curve.startPoint.listeners.removeDragEndListener( vertexDragEndListener );
+	    curve.startControlPoint.listeners.removeDragEndListener( vertexDragEndListener );
+	    curve.endControlPoint.listeners.removeDragEndListener( vertexDragEndListener ); 
+	    if( i+1 == path.bezierCurves.length && !path.adjustCircular )
+		curve.endPoint.listeners.removeDragEndListener( vertexDragEndListener ); 
 	}
     };
 

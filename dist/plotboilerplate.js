@@ -34,7 +34,8 @@
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
  * @modified 2020-07-24 Added the getClosestT(Vertex) function.
- * @version 2.2.2
+ * @modified 2020-12-29 Constructor is now private (no explicit use intended).
+ * @version 2.3.0
  *
  * @file BezierPath
  * @public
@@ -3335,7 +3336,6 @@ var MouseHandler = /** @class */ (function () {
         this.listenFor('mousedown');
         this.listenFor('mousemove');
         this.listenFor('mouseup');
-        //listeners.drag = callback;
         return this;
     };
     ;

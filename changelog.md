@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2021-01-03
+  * Changed property in BezierPathInteractionHelper to `autoAdjustPaths` in the HandlerOptions interface (typo).
+  * Added following new functions to BezierPathInteractionHelper: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
 * 2020-12-29
   * Constructor `BezierPath` is now private (not explicit use intended).
 * 2020-12-28

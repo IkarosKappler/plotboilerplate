@@ -67,9 +67,9 @@ export class MouseHandler {
     private mouseDragPos   : { x:number, y:number }|undefined = undefined;
     private mousePos       : { x:number, y:number }|undefined = undefined;
     private mouseButton    : number = -1;
-    private listeners      : Record<string,(e:XMouseEvent)=>void> = {};
+    private listeners      : Record<string,XMouseCallback> = {};
     private installed      : Record<string,boolean> = {};
-    private handlers       : Record<string,(e:XMouseEvent)=>void> = {};
+    private handlers       : Record<string,XMouseCallback> = {};
     
     /**
      * The constructor.
@@ -285,7 +285,6 @@ export class MouseHandler {
 	this.listenFor('mousedown');
 	this.listenFor('mousemove');
 	this.listenFor('mouseup');
-	//listeners.drag = callback;
 	return this;
     };
 

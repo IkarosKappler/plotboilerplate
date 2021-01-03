@@ -281,7 +281,6 @@ var MouseHandler = /** @class */ (function () {
         this.listenFor('mousedown');
         this.listenFor('mousemove');
         this.listenFor('mouseup');
-        //listeners.drag = callback;
         return this;
     };
     ;

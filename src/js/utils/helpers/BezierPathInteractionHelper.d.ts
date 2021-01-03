@@ -1,6 +1,5 @@
 /**
- * @classdesc A helper for adding vertices to and remove vertices from Bézier paths.
- * By default the 'delete' key is used to remove vertices or paths.
+ * Interfaces and class for automatically handling Bézier curves.
  *
  * @requires AlloyFinger
  * @requires BezierPath
@@ -18,14 +17,56 @@
  * @date     2020-07-31
  * @modified 2020-08-03 Ported this class from vanilla JS to Typescript.
  * @modified 2020-08-12 Added a distance check before handling the click/tap event.
- * @version  1.0.1
+ * @modified 2021-01-03 Changed property to `autoAdjustPaths` in the HandlerOptions interface (typo).
+ * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
+ * @version  1.1.0
  *
  * @file BezierPathInteractionHelper
  * @public
  **/
 import { BezierPath } from "../../BezierPath";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
-import { VertEvent } from "../../VertexListeners";
+import { VertListener } from "../../VertexListeners";
+import { Vertex } from "../../Vertex";
+/**
+ * Handler type for mouse-pointer-moved listeners.
+ */
+declare type OnPointerMoved = (pathIndex: number, pathPoint: Vertex, pointerPos: Vertex, t: number) => void;
+/**
+ * Handler type for vertex-inserted listeners.
+ */
+declare type OnVertexInserted = (pathIndex: number, insertIndex: number, newPath: BezierPath, oldPath: BezierPath) => void;
+/**
+ * Handler type for vertex-removed listeners.
+ */
+declare type OnVerticesDeleted = (pathIndex: number, removedVertexIndices: Array<number>, newPath: BezierPath, oldPath: BezierPath) => void;
+/**
+ * Handler type for path-removed listeners.
+ */
+declare type OnPathRemoved = (pathIndex: number, oldPath: BezierPath) => void;
+/**
+ * Options passed to the constructor.
+ */
+interface HelperOptions {
+    autoAdjustPaths?: boolean;
+    allowPathRemoval?: boolean;
+    maxDetectDistance?: number;
+    onPointerMoved?: OnPointerMoved;
+    onVertexInserted?: OnVertexInserted;
+    onVerticesDeleted?: OnVerticesDeleted;
+    onPathRemoved?: OnPathRemoved;
+}
+/**
+ * @classdesc A helper for adding vertices to and remove vertices from Bézier paths.
+ * By default the 'delete' key is used to remove vertices or paths.
+ *
+ * For convenience this helper is capable of handling multiple paths which are kept
+ * in an array.
+ *
+ * [Demo](https://www.plotboilerplate.io/repo/demos/23-bezier-point-distance/ "Demo")
+ *
+ * @public
+ **/
 export declare class BezierPathInteractionHelper {
     /**
      * @member {PlotBoilerplate} pb
@@ -71,7 +112,7 @@ export declare class BezierPathInteractionHelper {
      * @param {function(number,number[],BezierPath,BezierPath)} options.onVerticesDeleted (pathIndex,removedVertexIndices,newPath,oldPath)
      * @param {function(number,BezierPath)} options.onPathRemoved (pathIndex,oldPath)
      **/
-    constructor(pb: PlotBoilerplate, paths: Array<BezierPath>, options: any);
+    constructor(pb: PlotBoilerplate, paths: Array<BezierPath>, options: HelperOptions);
     /**
      * Manually add a path to this helper.
      * Note that if `autoAdjustPaths==true` then listeners will be installed to the path's vertices to
@@ -131,6 +172,34 @@ export declare class BezierPathInteractionHelper {
     private _updateMinDistance;
     static setPathAutoAdjust(path: BezierPath): void;
     /**
+     * A helper function to add drag-start-listener to given vertices.
+     */
+    /**
+     * A helper function to remove drag-start-listener to given vertices.
+     */
+    /**
+     * A helper function to add drag-start listeners to all vertices of the given path.
+     *
+     * @static
+     * @method addPathVertexDragStartListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to add vertex listeners to.
+     * @param {function} vertexDragStartListener - The drag listeners to add to each path vertex.
+     * @return void
+     **/
+    static addPathVertexDragStartListeners(path: BezierPath, vertexDragStartListener: VertListener): void;
+    /**
+     * A helper function to remove drag-start listeners to all vertices of the given path.
+     *
+     * @static
+     * @method removePathVertexDragStartListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to remove vertex listeners from.
+     * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
+     * @return void
+     **/
+    static removePathVertexDragStartListeners(path: BezierPath, vertexDragStartListener: VertListener): void;
+    /**
      * A helper function to add drag listeners to all vertices of the given path.
      *
      * @static
@@ -140,7 +209,7 @@ export declare class BezierPathInteractionHelper {
      * @param {function} vertexDragListener - The drag listeners to add to each path vertex.
      * @return void
      **/
-    static addPathVertexDragListeners(path: BezierPath, vertexDragListener: (e: VertEvent) => void): void;
+    static addPathVertexDragListeners(path: BezierPath, vertexDragListener: VertListener): void;
     /**
      * A helper function to remove drag listeners to all vertices of the given path.
      *
@@ -151,5 +220,28 @@ export declare class BezierPathInteractionHelper {
      * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
      * @return void
      **/
-    static removePathVertexDragListeners(path: BezierPath, vertexDragListener: (e: VertEvent) => void): void;
+    static removePathVertexDragListeners(path: BezierPath, vertexDragListener: VertListener): void;
+    /**
+     * A helper function to add drag-end listeners to all vertices of the given path.
+     *
+     * @static
+     * @method addPathVertexDragEndListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to add vertex listeners to.
+     * @param {function} vertexDragEndListener - The drag listeners to add to each path vertex.
+     * @return void
+     **/
+    static addPathVertexDragEndListeners(path: BezierPath, vertexDragEndListener: VertListener): void;
+    /**
+     * A helper function to remove drag-end listeners to all vertices of the given path.
+     *
+     * @static
+     * @method removePathVertexDragEndListeners
+     * @memberof BezierPathInteractionHelper
+     * @param {BezierPath} path - The Bézier path to remove vertex listeners from.
+     * @param {function} vertexDragListener - The drag listeners to remove from each path vertex.
+     * @return void
+     **/
+    static removePathVertexDragEndListeners(path: BezierPath, vertexDragEndListener: VertListener): void;
 }
+export {};

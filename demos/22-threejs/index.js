@@ -171,10 +171,10 @@
 		rebuild();
 	    };
 	    var addPathListeners = function( path ) {
-		BezierPathInteractionHelper.addPathVertexDragListeners( path, dragListener );
+		BezierPathInteractionHelper.addPathVertexDragEndListeners( path, dragListener );
 	    };
 	    var removePathListeners = function( path ) {
-		BezierPathInteractionHelper.removePathVertexDragListeners( path, dragListener );
+		BezierPathInteractionHelper.removePathVertexDragEndListeners( path, dragListener );
 	    };
 	    
 	    // +---------------------------------------------------------------------------------
