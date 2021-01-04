@@ -1142,7 +1142,7 @@ export class PlotBoilerplate {
     /**
      * Get the current view port.
      *
-     * @method viewPort
+     * @method viewport
      * @instance
      * @memberof PlotBoilerplate
      * @return {Bounds} The current viewport.

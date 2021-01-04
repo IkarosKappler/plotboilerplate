@@ -11,7 +11,7 @@ import { Bounds } from "../../Bounds";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { XYCoords, SVGSerializable} from "../../interfaces";
+import { XYCoords, XYDimension, SVGSerializable } from "../../interfaces";
 
 
 /**
@@ -34,7 +34,9 @@ export class drawutilssvg {
 
     fillShapes:boolean;
 
-    canvasSize:Bounds;
+    canvasSize:XYDimension;
+    
+    viewport:Bounds;
     
     /**
      * The constructor.
@@ -44,16 +46,17 @@ export class drawutilssvg {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    constructor( svgNode:SVGElement, canvasSize:Bounds, fillShapes:boolean ) {
+    constructor( svgNode:SVGElement, canvasSize:XYDimension, viewport:Bounds, fillShapes:boolean ) {
 	this.svgNode = svgNode;
 	this.offset = new Vertex( 0, 0 );
 	this.scale = new Vertex( 1, 1 );
 	this.fillShapes = fillShapes;
 	this.canvasSize = canvasSize;
+	this.viewport = viewport;
 
-	this.svgNode.setAttribute('viewBox', `${this.canvasSize.min.x} ${this.canvasSize.min.y} ${this.canvasSize.width} ${this.canvasSize.height}`);
-	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
-	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
+	this.svgNode.setAttribute('viewBox', `${this.viewport.min.x} ${this.viewport.min.y} ${this.viewport.width} ${this.viewport.height}`);
+	this.svgNode.setAttribute('width', `${this.viewport.width}` );
+	this.svgNode.setAttribute('height', `${this.viewport.height}` );
     };
 
     private createNode(name:string) : HTMLElement {

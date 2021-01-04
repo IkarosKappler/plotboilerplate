@@ -29,15 +29,16 @@ var drawutilssvg = /** @class */ (function () {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    function drawutilssvg(svgNode, canvasSize, fillShapes) {
+    function drawutilssvg(svgNode, canvasSize, viewport, fillShapes) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0);
         this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
         this.canvasSize = canvasSize;
-        this.svgNode.setAttribute('viewBox', this.canvasSize.min.x + " " + this.canvasSize.min.y + " " + this.canvasSize.width + " " + this.canvasSize.height);
-        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
-        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
+        this.viewport = viewport;
+        this.svgNode.setAttribute('viewBox', this.viewport.min.x + " " + this.viewport.min.y + " " + this.viewport.width + " " + this.viewport.height);
+        this.svgNode.setAttribute('width', "" + this.viewport.width);
+        this.svgNode.setAttribute('height', "" + this.viewport.height);
     }
     ;
     drawutilssvg.prototype.createNode = function (name) {

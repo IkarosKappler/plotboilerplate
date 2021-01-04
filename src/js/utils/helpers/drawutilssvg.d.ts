@@ -9,7 +9,7 @@ import { Bounds } from "../../Bounds";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { XYCoords } from "../../interfaces";
+import { XYCoords, XYDimension } from "../../interfaces";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -25,7 +25,8 @@ export declare class drawutilssvg {
     scale: Vertex;
     offset: Vertex;
     fillShapes: boolean;
-    canvasSize: Bounds;
+    canvasSize: XYDimension;
+    viewport: Bounds;
     /**
      * The constructor.
      *
@@ -34,7 +35,7 @@ export declare class drawutilssvg {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    constructor(svgNode: SVGElement, canvasSize: Bounds, fillShapes: boolean);
+    constructor(svgNode: SVGElement, canvasSize: XYDimension, viewport: Bounds, fillShapes: boolean);
     private createNode;
     /**
      * Called before each draw cycle.

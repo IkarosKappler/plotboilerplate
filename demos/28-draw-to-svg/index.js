@@ -67,8 +67,8 @@
 			     }; */
 
 	// Use a helper function to build all demo-drawables.
-	var drawables = createDemoDrawables( pb.canvasSize,
-					     'example-image.png',
+	var drawables = createDemoDrawables( pb.viewport(), // canvasSize,
+					     '../../example-image.png',
 					     function() { pb.redraw(); }
 					   );
 	pb.add( drawables );
@@ -76,7 +76,12 @@
 
 	var drawAll = function() {
 	    // TODO: draw everything to SVG
-	    
+	    try {
+		var svgNode = document.getElementById('preview-svg');
+		var tosvg = new drawutilssvg( svgNode, pb.canvasSize, false );
+	    } catch( e ) {
+		console.error( e );
+	    }
 	};
 
 	new MouseHandler(pb.canvas,'drawsvg-demo')

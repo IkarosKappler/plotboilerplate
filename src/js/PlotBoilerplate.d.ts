@@ -60,7 +60,8 @@
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
  * @modified 2020-12-17 Added the `CircleSector` drawable.
- * @version  1.11.0
+ * @modified 2021-01-04 Avoiding multiple redraw call on adding multiple Drawables (array).
+ * @version  1.11.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -526,7 +527,7 @@ export declare class PlotBoilerplate {
     /**
      * Get the current view port.
      *
-     * @method viewPort
+     * @method viewport
      * @instance
      * @memberof PlotBoilerplate
      * @return {Bounds} The current viewport.
