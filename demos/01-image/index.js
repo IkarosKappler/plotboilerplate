@@ -64,8 +64,8 @@
 				     humane.log(arguments[0]);
 				 }
 			       } );
+		humane.log('PlotBoilerplate');
 	    }
-	    humane.log('PlotBoilerplate');
 	   	    
 
 	    // +---------------------------------------------------------------------------------

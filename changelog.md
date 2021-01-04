@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2021-01-04
+  * Avoiding multiple redraw call on adding multiple Drawables (array).
 * 2021-01-03
   * Changed property in BezierPathInteractionHelper to `autoAdjustPaths` in the HandlerOptions interface (typo).
   * Added following new functions to BezierPathInteractionHelper: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.

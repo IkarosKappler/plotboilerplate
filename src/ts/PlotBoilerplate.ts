@@ -60,7 +60,8 @@
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
  * @modified 2020-12-17 Added the `CircleSector` drawable.
- * @version  1.11.0
+ * @modified 2021-01-04 Avoiding multiple redraw call on adding multiple Drawables (array).
+ * @version  1.11.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -643,8 +644,9 @@ export class PlotBoilerplate {
 	if( Array.isArray(drawable) ) {
 	    const arr : Array<Drawable> = (drawable as Array<Drawable>);
 	    // for( var i in arr )
-	    for( var i = 0; i < arr.length; i++ )
-		this.add( arr[i] );
+	    for( var i = 0; i < arr.length; i++ ) {
+		this.add( arr[i], false );
+	    }
 	} else if( drawable instanceof Vertex ) {
 	    this.drawables.push( drawable );
 	    this.vertices.push( drawable );

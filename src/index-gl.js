@@ -65,8 +65,8 @@
 				     humane.log(arguments[0]);
 				 }
 			       } );
+		humane.log('plotboilerplate-gl');
 	    }
-	    humane.log('plotboilerplate-gl');
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Initialize dat.gui
@@ -87,146 +87,12 @@
 		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 		} );
 
-	    // +---------------------------------------------------------------------------------
-	    // | Add some elements to draw (demo).
-	    // +-------------------------------
-	    var diameter = Math.min(pb.canvasSize.width,pb.canvasSize.height)/3.5;
-	    var radius   = diameter*0.5;
-	    var hypo     = Math.sqrt( radius*radius*2 );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add an image.
-	    // +-------------------------------
-	    var img = new Image(50,50);
-	    pb.add( new PBImage(img, new Vertex(-25,-25), new Vertex(25,25)), false );
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | Add some Lines.
-	    // +-------------------------------
-	    pb.add( new Line( new Vertex(-diameter,-diameter), new Vertex(-hypo,-hypo) ), false );
-	    pb.add( new Line( new Vertex(-diameter,diameter), new Vertex(-hypo,hypo) ), false );
-	    pb.add( new Line( new Vertex(diameter,-diameter), new Vertex(hypo,-hypo) ), false );
-	    pb.add( new Line( new Vertex(diameter,diameter), new Vertex(hypo,hypo) ), false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add some Vectors.
-	    // +-------------------------------
-	    pb.add( new Vector( new Vertex(-diameter*1.6,0), new Vertex(-diameter*1.2,0) ), false );
-	    pb.add( new Vector( new Vertex(diameter*1.6,0), new Vertex(diameter*1.2,0) ), false );
-	    pb.add( new Vector( new Vertex(0,-diameter*1.6), new Vertex(0,-diameter*1.2) ), false );
-	    pb.add( new Vector( new Vertex(0,diameter*1.6), new Vertex(0,diameter*1.2) ), false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add polygon (here a square).
-	    // +-------------------------------
-	    var squareSize = diameter*0.35;
-	    var squareVerts = [ new Vertex(-squareSize,-squareSize), new Vertex(squareSize,-squareSize), new Vertex(squareSize,squareSize), new Vertex(-squareSize,squareSize) ];
-	    var square = new Polygon( squareVerts );
-	    pb.add( square, false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add two circles.
-	    // +-------------------------------
-	    var circle1 = new VEllipse( new Vertex(0,0), new Vertex(radius,radius) );
-	    pb.add( circle1, false );
-	    var circle2 = new VEllipse( new Vertex(0,0), new Vertex(diameter,diameter) );
-	    pb.add( circle2, false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add a circular connected bezier path
-	    // +-------------------------------
-	    var fract = 0.5;
-	    var bpath = [];
-	    bpath[0] = [ new Vertex( 0, -diameter ),
-			 new Vertex( diameter, 0 ),
-			 new Vertex( diameter*fract, -diameter ),
-			 new Vertex( diameter*fract, 0 ) ];
-	    bpath[1] = [ bpath[0][1], // Use same reference
-			 new Vertex( 0, diameter ),
-			 new Vertex( diameter, diameter*fract ),
-			 new Vertex( 0, diameter*fract ) ];
-	    bpath[2] = [ bpath[1][1], // Use same reference
-			 new Vertex( -diameter, 0 ),
-			 new Vertex( -diameter*fract, diameter ),
-			 new Vertex( -diameter*fract, 0 ) ];
-	    bpath[3] = [ bpath[2][1], // Use same reference
-			 bpath[0][0], // Use same reference
-			 new Vertex( -diameter, -diameter*fract ),
-			 new Vertex( 0, -diameter*fract )
-		       ];
-	    // Construct
-	    var path = BezierPath.fromArray( bpath );
-	    path.adjustCircular = true;
-	    pb.add( path, false );
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add four equilateral triangles.
-	    // +-------------------------------
-	    let triangles = [
-		new Triangle( new Vertex(-hypo*1.5,-diameter*1.45), new Vertex(-diameter*1.45,-hypo*1.5),
-			      new Vertex(-diameter*1.6,-diameter*1.6) ),
-		new Triangle( new Vertex(diameter*1.45,-hypo*1.5), new Vertex(hypo*1.5,-diameter*1.45),
-			      new Vertex(diameter*1.6,-diameter*1.6) ),
-		new Triangle( new Vertex(-diameter*1.45,hypo*1.5), new Vertex(-hypo*1.5,diameter*1.45),
-			      new Vertex(-diameter*1.6,diameter*1.6) ),
-		new Triangle( new Vertex(hypo*1.5,diameter*1.45), new Vertex(diameter*1.45,hypo*1.5),
-			      new Vertex(diameter*1.6,diameter*1.6) ) 
-	    ];
-	    const setEquilateral = function( triangle ) {
-		const vec  = new Vector(triangle.a,triangle.b);
-		const mid  = vec.vertAt(0.5);
-		const perp = vec.perp().add( mid ).sub( vec.a );
-		perp.setLength( vec.length() * Math.sqrt(3) / 2 ); // The height of a equilateral triangle
-		triangle.c.set( perp.b ); 
-	    };
-	    for( var i in triangles ) {
-		let tri = triangles[i];
-		tri.c.attr.draggable = false;
-		tri.a.listeners.addDragListener( function(e) { setEquilateral(tri) } );
-		tri.b.listeners.addDragListener( function(e) { setEquilateral(tri) } );
-	    }
-	    pb.add( triangles );
-
-
-	    // +---------------------------------------------------------------------------------
-	    // | Add an auto-adjusting bezier path.
-	    // +-------------------------------
-	    var bpath2 = [];
-	    fract *= 0.66;
-	    bpath2[0] = [ new Vertex( 0, -diameter ),
-			  new Vertex( diameter, 0 ),
-			  new Vertex( diameter*fract, -diameter ),
-			  new Vertex( diameter, -diameter*fract ) ];
-	    bpath2[1] = [ bpath2[0][1], // Use same reference
-			  new Vertex( 0, diameter ),
-			  new Vertex( diameter, diameter*fract ),
-			  new Vertex( diameter*fract, diameter ) ]; 
-	    bpath2[2] = [ bpath2[1][1], // Use same reference
-			  new Vertex( -diameter, -0 ),
-			  new Vertex( -diameter*fract, diameter ),
-			  new Vertex( -diameter, diameter*fract ) ];
-	    bpath2[3] = [ bpath2[2][1], // Use same reference
-			  bpath2[0][0], // Use same reference
-			  new Vertex( -diameter, -diameter*fract ),
-			  new Vertex( -diameter*fract, -diameter )
-			]; 
-	    // Construct
-	    var path2 = BezierPath.fromArray( bpath2 ); 
-	    path2.adjustCircular = true;
-	    path2.scale( new Vertex(0,0), 1.13 );
-	    path2.rotate( Math.PI/2 );
-	    for( var i in path2.bezierCurves ) {
-		path2.bezierCurves[i].startPoint.attr.bezierAutoAdjust = true;
-		path2.bezierCurves[i].endPoint.attr.bezierAutoAdjust = true;
-	    }
-	    pb.add( path2 );
-	    
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | Finally load an image.
-	    // +-------------------------------
-	    img.addEventListener('load', function() { pb.redraw(); } );
-	    img.src = 'example-image.png';
+	    // Use a helper function to build all demo-drawables.
+	    var drawables = createDemoDrawables( pb.canvasSize,
+						 'example-image.png',
+						 function() { pb.redraw(); }
+					       );
+	    pb.add( drawables );
 	} );
     
 })(window); 
