@@ -79,7 +79,7 @@ var drawutils = /** @class */ (function () {
      * @param {Vertex} zA - The start point of the line.
      * @param {Vertex} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
-     * @param {number|string} lineWidth? - [optional] The line's width.
+     * @param {number} lineWidth? - [optional] The line's width.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -201,7 +201,7 @@ var drawutils = /** @class */ (function () {
      * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
      * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
-     * @param {number|string} lineWidth - (optional) The line width to use.
+     * @param {number} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -256,11 +256,12 @@ var drawutils = /** @class */ (function () {
      * @method cubicBezierPath
      * @param {Vertex[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.cubicBezierPath = function (path, color) {
+    drawutils.prototype.cubicBezierPath = function (path, color, lineWidth) {
         if (!path || path.length == 0)
             return;
         // Draw curve
@@ -275,7 +276,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         }
         this.ctx.closePath();
-        this.ctx.lineWidth = 1;
+        this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
     };
