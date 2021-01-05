@@ -3631,7 +3631,8 @@ exports.PBImage = PBImage;
  * @modified 2020-11-17 Added pure click handling (no dragEnd and !wasMoved jiggliny any more) to the PlotBoilerplate.
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
  * @modified 2020-12-17 Added the `CircleSector` drawable.
- * @version  1.11.0
+ * @modified 2021-01-04 Avoiding multiple redraw call on adding multiple Drawables (array).
+ * @version  1.11.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -3657,6 +3658,7 @@ var VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "../src/js/VEllipse.js");
 var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
+var utils_1 = __webpack_require__(/*! ./utils */ "../src/js/utils.js");
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -4041,8 +4043,9 @@ var PlotBoilerplate = /** @class */ (function () {
         if (Array.isArray(drawable)) {
             var arr = drawable;
             // for( var i in arr )
-            for (var i = 0; i < arr.length; i++)
-                this.add(arr[i]);
+            for (var i = 0; i < arr.length; i++) {
+                this.add(arr[i], false);
+            }
         }
         else if (drawable instanceof Vertex_1.Vertex) {
             this.drawables.push(drawable);
@@ -4323,112 +4326,108 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.drawDrawables = function (renderTime) {
-        for (var i in this.drawables) {
-            var d = this.drawables[i];
-            if (d instanceof BezierPath_1.BezierPath) {
-                for (var c in d.bezierCurves) {
-                    this.draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
-                    if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
-                        if (!d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
-                            if (d.bezierCurves[c].startPoint.attr.visible)
-                                this.draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.vertex.color));
-                            d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
-                        }
-                        if (!d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
-                            if (d.bezierCurves[c].endPoint.attr.visible)
-                                this.draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.vertex.color));
-                            d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
-                        }
-                        if (d.bezierCurves[c].startControlPoint.attr.visible)
-                            this.draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
-                        if (d.bezierCurves[c].endControlPoint.attr.visible)
-                            this.draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
-                        d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
-                        d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
-                    }
-                    else {
-                        d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
-                        d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
-                        d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
-                        d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
-                    }
-                    if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
-                        this.draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
-                        this.draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
-                    }
+        // Call globally imported helper function.
+        utils_1.drawDrawables(this.drawables, this.draw, this.fill, this.drawConfig, renderTime, this._handleColor);
+        /*
+        for( var i in this.drawables ) {
+            var d : Drawable = this.drawables[i];
+            if( d instanceof BezierPath ) {
+            for( var c in d.bezierCurves ) {
+                this.draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth );
+    
+                if( this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints ) {
+                if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
+                    if( d.bezierCurves[c].startPoint.attr.visible )
+                    this.draw.diamondHandle( d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint,this.drawConfig.vertex.color) );
+                    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+                }
+                if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
+                    if( d.bezierCurves[c].endPoint.attr.visible )
+                    this.draw.diamondHandle( d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint,this.drawConfig.vertex.color) );
+                    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+                }
+                if( d.bezierCurves[c].startControlPoint.attr.visible )
+                    this.draw.circleHandle( d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint,'#008888') );
+                if( d.bezierCurves[c].endControlPoint.attr.visible )
+                    this.draw.circleHandle( d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint,'#008888') );
+                d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+                d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
+                } else {
+                d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+                d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+                d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+                d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
+                }
+                
+                if( this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines ) {
+                this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
+                this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
+                }
+                
+            }
+            } else if( d instanceof Polygon ) {
+            this.draw.polygon( d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth );
+            if( !this.drawConfig.drawHandlePoints ) {
+                for( var i in d.vertices ) {
+                d.vertices[i].attr.renderTime = renderTime;
                 }
             }
-            else if (d instanceof Polygon_1.Polygon) {
-                this.draw.polygon(d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth);
-                if (!this.drawConfig.drawHandlePoints) {
-                    for (var i in d.vertices) {
-                        d.vertices[i].attr.renderTime = renderTime;
-                    }
-                }
+            } else if( d instanceof Triangle ) {
+            this.draw.polyline( [d.a,d.b,d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth );
+            if( !this.drawConfig.drawHandlePoints )
+                d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+            } else if( d instanceof VEllipse ) {
+            if( this.drawConfig.drawHandleLines ) {
+                this.draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+                this.draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
             }
-            else if (d instanceof Triangle_1.Triangle) {
-                this.draw.polyline([d.a, d.b, d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth);
-                if (!this.drawConfig.drawHandlePoints)
-                    d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+            this.draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color,  this.drawConfig.ellipse.lineWidth );
+            if( !this.drawConfig.drawHandlePoints ) {
+                d.center.attr.renderTime = renderTime;
+                d.axis.attr.renderTime = renderTime;
             }
-            else if (d instanceof VEllipse_1.VEllipse) {
-                if (this.drawConfig.drawHandleLines) {
-                    this.draw.line(d.center.clone().add(0, d.axis.y - d.center.y), d.axis, '#c8c8c8');
-                    this.draw.line(d.center.clone().add(d.axis.x - d.center.x, 0), d.axis, '#c8c8c8');
-                }
-                this.draw.ellipse(d.center, Math.abs(d.axis.x - d.center.x), Math.abs(d.axis.y - d.center.y), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
-                if (!this.drawConfig.drawHandlePoints) {
-                    d.center.attr.renderTime = renderTime;
-                    d.axis.attr.renderTime = renderTime;
-                }
+            } else if( d instanceof Circle ) {
+            this.draw.circle( d.center, d.radius, this.drawConfig.circle.color,  this.drawConfig.circle.lineWidth );
+            } else if( d instanceof CircleSector ) {
+            this.draw.circleArc( d.circle.center, d.circle.radius, d.startAngle, d.endAngle, this.drawConfig.circleSector.color,  this.drawConfig.circleSector.lineWidth );
+            } else if( d instanceof Vertex ) {
+            if( this.drawConfig.drawVertices &&
+                (!d.attr.selectable || !d.attr.draggable) && d.attr.visible ) {
+                // Draw as special point (grey)
+                this.draw.circleHandle( d, 7, this.drawConfig.vertex.color );
+                d.attr.renderTime = renderTime;
             }
-            else if (d instanceof Circle_1.Circle) {
-                this.draw.circle(d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth);
+            } else if( d instanceof Line ) {
+            this.draw.line( d.a, d.b, this.drawConfig.line.color,  this.drawConfig.line.lineWidth );
+            if( !this.drawConfig.drawHandlePoints || !d.a.attr.selectable )
+                d.a.attr.renderTime = renderTime;
+            if( !this.drawConfig.drawHandlePoints || !d.b.attr.selectable )
+                d.b.attr.renderTime = renderTime;
+            } else if( d instanceof Vector ) {
+            this.draw.arrow( d.a, d.b, this.drawConfig.vector.color ); // , this.drawConfig.vector.lineWidth );
+            if( this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible ) {
+                this.draw.circleHandle( d.b, 3, '#a8a8a8' );
+            } else {
+                d.b.attr.renderTime = renderTime;
             }
-            else if (d instanceof CircleSector_1.CircleSector) {
-                this.draw.circleArc(d.circle.center, d.circle.radius, d.startAngle, d.endAngle, this.drawConfig.circleSector.color, this.drawConfig.circleSector.lineWidth);
+            if( !this.drawConfig.drawHandlePoints || !d.a.attr.selectable )
+                d.a.attr.renderTime = renderTime;
+            if( !this.drawConfig.drawHandlePoints || !d.b.attr.selectable )
+                d.b.attr.renderTime = renderTime;
+            
+            } else if( d instanceof PBImage ) {
+            if( this.drawConfig.drawHandleLines )
+                this.draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth );
+            this.fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
+            if( this.drawConfig.drawHandlePoints ) {
+                this.draw.circleHandle( d.lowerRight, 3, this.drawConfig.image.color );
+                d.lowerRight.attr.renderTime = renderTime;
             }
-            else if (d instanceof Vertex_1.Vertex) {
-                if (this.drawConfig.drawVertices &&
-                    (!d.attr.selectable || !d.attr.draggable) && d.attr.visible) {
-                    // Draw as special point (grey)
-                    this.draw.circleHandle(d, 7, this.drawConfig.vertex.color);
-                    d.attr.renderTime = renderTime;
-                }
-            }
-            else if (d instanceof Line_1.Line) {
-                this.draw.line(d.a, d.b, this.drawConfig.line.color, this.drawConfig.line.lineWidth);
-                if (!this.drawConfig.drawHandlePoints || !d.a.attr.selectable)
-                    d.a.attr.renderTime = renderTime;
-                if (!this.drawConfig.drawHandlePoints || !d.b.attr.selectable)
-                    d.b.attr.renderTime = renderTime;
-            }
-            else if (d instanceof Vector_1.Vector) {
-                this.draw.arrow(d.a, d.b, this.drawConfig.vector.color); // , this.drawConfig.vector.lineWidth );
-                if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
-                    this.draw.circleHandle(d.b, 3, '#a8a8a8');
-                }
-                else {
-                    d.b.attr.renderTime = renderTime;
-                }
-                if (!this.drawConfig.drawHandlePoints || !d.a.attr.selectable)
-                    d.a.attr.renderTime = renderTime;
-                if (!this.drawConfig.drawHandlePoints || !d.b.attr.selectable)
-                    d.b.attr.renderTime = renderTime;
-            }
-            else if (d instanceof PBImage_1.PBImage) {
-                if (this.drawConfig.drawHandleLines)
-                    this.draw.line(d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth);
-                this.fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
-                if (this.drawConfig.drawHandlePoints) {
-                    this.draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
-                    d.lowerRight.attr.renderTime = renderTime;
-                }
-            }
-            else {
-                this.console.error('Cannot draw object. Unknown class.'); //  ' + d.constructor.name + '.' );
+            } else {
+            this.console.error( 'Cannot draw object. Unknown class.'); //  ' + d.constructor.name + '.' );
             }
         }
+        */
     };
     ;
     /**
@@ -4541,7 +4540,7 @@ var PlotBoilerplate = /** @class */ (function () {
     /**
      * Get the current view port.
      *
-     * @method viewPort
+     * @method viewport
      * @instance
      * @memberof PlotBoilerplate
      * @return {Bounds} The current viewport.
@@ -5156,6 +5155,122 @@ var PlotBoilerplate = /** @class */ (function () {
      * A set of helper functions.
      **/
     PlotBoilerplate.utils = {
+        /**
+         * Draw all drawables.
+         *
+         * This function is usually only used internally.
+         *
+         * @method drawDrawables
+         * @param {number} renderTime - The current render time. It will be used to distinct
+         *                              already draw vertices from non-draw-yet vertices.
+         * @return {void}
+         **/
+        /* drawDrawables : ( drawables:Array<Drawable>,
+                  draw:drawutils|drawutilsgl, // TODO: put behind an interface
+                  fill:drawutils|drawutilsgl,
+                  drawConfig:DrawConfig,
+                  renderTime:number,
+                  _handleColor:(vertex:Vertex, color:string) => string
+                ) : void => {
+            for( var i in drawables ) {
+            var d : Drawable = drawables[i];
+            if( d instanceof BezierPath ) {
+                for( var c in d.bezierCurves ) {
+                draw.cubicBezier( d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, drawConfig.bezier.color, drawConfig.bezier.lineWidth );
+    
+                if( drawConfig.drawBezierHandlePoints && drawConfig.drawHandlePoints ) {
+                    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
+                    if( d.bezierCurves[c].startPoint.attr.visible )
+                        draw.diamondHandle( d.bezierCurves[c].startPoint, 7, _handleColor(d.bezierCurves[c].startPoint,drawConfig.vertex.color) );
+                    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+                    }
+                    if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
+                    if( d.bezierCurves[c].endPoint.attr.visible )
+                        draw.diamondHandle( d.bezierCurves[c].endPoint, 7, _handleColor(d.bezierCurves[c].endPoint,drawConfig.vertex.color) );
+                    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+                    }
+                    if( d.bezierCurves[c].startControlPoint.attr.visible )
+                    draw.circleHandle( d.bezierCurves[c].startControlPoint, 3, _handleColor(d.bezierCurves[c].startControlPoint,'#008888') );
+                    if( d.bezierCurves[c].endControlPoint.attr.visible )
+                    draw.circleHandle( d.bezierCurves[c].endControlPoint, 3, _handleColor(d.bezierCurves[c].endControlPoint,'#008888') );
+                    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+                    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
+                } else {
+                    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+                    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+                    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+                    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
+                }
+                
+                if( drawConfig.drawBezierHandleLines && drawConfig.drawHandleLines ) {
+                    draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, drawConfig.bezier.handleLine.color, drawConfig.bezier.handleLine.lineWidth );
+                    draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, drawConfig.bezier.handleLine.color, drawConfig.bezier.handleLine.lineWidth );
+                }
+                
+                }
+            } else if( d instanceof Polygon ) {
+                draw.polygon( d, drawConfig.polygon.color, drawConfig.polygon.lineWidth );
+                if( !drawConfig.drawHandlePoints ) {
+                for( var i in d.vertices ) {
+                    d.vertices[i].attr.renderTime = renderTime;
+                }
+                }
+            } else if( d instanceof Triangle ) {
+                draw.polyline( [d.a,d.b,d.c], false, drawConfig.triangle.color, drawConfig.triangle.lineWidth );
+                if( !drawConfig.drawHandlePoints )
+                d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+            } else if( d instanceof VEllipse ) {
+                if( drawConfig.drawHandleLines ) {
+                draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+                draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
+                }
+                draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), drawConfig.ellipse.color,  drawConfig.ellipse.lineWidth );
+                if( !drawConfig.drawHandlePoints ) {
+                d.center.attr.renderTime = renderTime;
+                d.axis.attr.renderTime = renderTime;
+                }
+            } else if( d instanceof Circle ) {
+                draw.circle( d.center, d.radius, drawConfig.circle.color, drawConfig.circle.lineWidth );
+            } else if( d instanceof CircleSector ) {
+                draw.circleArc( d.circle.center, d.circle.radius, d.startAngle, d.endAngle, drawConfig.circleSector.color, drawConfig.circleSector.lineWidth );
+            } else if( d instanceof Vertex ) {
+                if( drawConfig.drawVertices &&
+                (!d.attr.selectable || !d.attr.draggable) && d.attr.visible ) {
+                // Draw as special point (grey)
+                draw.circleHandle( d, 7, drawConfig.vertex.color );
+                d.attr.renderTime = renderTime;
+                }
+            } else if( d instanceof Line ) {
+                draw.line( d.a, d.b, drawConfig.line.color, drawConfig.line.lineWidth );
+                if( !drawConfig.drawHandlePoints || !d.a.attr.selectable )
+                d.a.attr.renderTime = renderTime;
+                if( !drawConfig.drawHandlePoints || !d.b.attr.selectable )
+                d.b.attr.renderTime = renderTime;
+            } else if( d instanceof Vector ) {
+                draw.arrow( d.a, d.b, drawConfig.vector.color );
+                if( drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible ) {
+                draw.circleHandle( d.b, 3, '#a8a8a8' );
+                } else {
+                d.b.attr.renderTime = renderTime;
+                }
+                if( !drawConfig.drawHandlePoints || !d.a.attr.selectable )
+                d.a.attr.renderTime = renderTime;
+                if( !drawConfig.drawHandlePoints || !d.b.attr.selectable )
+                d.b.attr.renderTime = renderTime;
+                
+            } else if( d instanceof PBImage ) {
+                if( drawConfig.drawHandleLines )
+                draw.line( d.upperLeft, d.lowerRight, drawConfig.image.color, drawConfig.image.lineWidth );
+                fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
+                if( drawConfig.drawHandlePoints ) {
+                draw.circleHandle( d.lowerRight, 3, drawConfig.image.color );
+                d.lowerRight.attr.renderTime = renderTime;
+                }
+            } else {
+                console.error( 'Cannot draw object. Unknown class.');
+            }
+            }
+        }, */
         /**
          * Merge the elements in the 'extension' object into the 'base' object based on
          * the keys of 'base'.
@@ -7850,8 +7965,9 @@ exports.VertexListeners = VertexListeners;
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2020-10-28 Added the path(Path2D) function.
- * @modified 2020-12-28 Added the `singleSegment` mode.
- * @version  1.8.1
+ * @modified 2020-12-28 Added the `singleSegment` mode (test).
+ * @modified 2021-01-05 Added the image-loaded/broken check.
+ * @version  1.8.2
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -7897,7 +8013,7 @@ var drawutils = /** @class */ (function () {
      * @param {Vertex} zA - The start point of the line.
      * @param {Vertex} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
-     * @param {number|string} lineWidth? - [optional] The line's width.
+     * @param {number} lineWidth? - [optional] The line's width.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -7955,6 +8071,10 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      **/
     drawutils.prototype.image = function (image, position, size) {
+        if (!image.complete || !image.naturalWidth) {
+            // Avoid drawing un-unloaded or broken images
+            return;
+        }
         this.ctx.save();
         // Note that there is a Safari bug with the 3 or 5 params variant.
         // Only the 9-param varaint works.
@@ -8019,7 +8139,7 @@ var drawutils = /** @class */ (function () {
      * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
      * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
-     * @param {number|string} lineWidth - (optional) The line width to use.
+     * @param {number} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -8074,11 +8194,12 @@ var drawutils = /** @class */ (function () {
      * @method cubicBezierPath
      * @param {Vertex[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.cubicBezierPath = function (path, color) {
+    drawutils.prototype.cubicBezierPath = function (path, color, lineWidth) {
         if (!path || path.length == 0)
             return;
         // Draw curve
@@ -8093,7 +8214,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         }
         this.ctx.closePath();
-        this.ctx.lineWidth = 1;
+        this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
     };
@@ -9288,6 +9409,164 @@ exports.geomutils = {
 };
 //# sourceMappingURL=geomutils.js.map
 
+/***/ }),
+
+/***/ "../src/js/utils.js":
+/*!**************************!*\
+  !*** ../src/js/utils.js ***!
+  \**************************/
+/*! flagged exports */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export drawDrawables [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+/**
+ * @author Ikaros Kappler
+ * @date   2021-04-05
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.drawDrawables = void 0;
+// import { Drawable } from "./interfaces";
+var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
+// import { Bounds } from "./Bounds";
+var Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
+var CircleSector_1 = __webpack_require__(/*! ./CircleSector */ "../src/js/CircleSector.js");
+// import { Grid } from "./Grid";
+// import { KeyHandler, XKeyListener } from "./KeyHandler";
+var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+// import { MouseHandler, XMouseEvent, XWheelEvent } from "./MouseHandler";
+var PBImage_1 = __webpack_require__(/*! ./PBImage */ "../src/js/PBImage.js");
+var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
+// import { SVGBuilder } from "./SVGBuilder";
+var Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
+var VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "../src/js/VEllipse.js");
+var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
+var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+/**
+ * Draw all drawables.
+ *
+ * This function is used by the main draw procedure and some further tools (like svg-draw).
+ *
+ * @method drawDrawables
+ * @param {number} renderTime - The current render time. It will be used to distinct
+ *                              already draw vertices from non-draw-yet vertices.
+ * @return {void}
+ **/
+var drawDrawables = function (drawables, draw, // TODO: put behind an interface
+fill, drawConfig, renderTime, _handleColor) {
+    for (var i in drawables) {
+        var d = drawables[i];
+        if (d instanceof BezierPath_1.BezierPath) {
+            for (var c in d.bezierCurves) {
+                draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, drawConfig.bezier.color, drawConfig.bezier.lineWidth);
+                if (drawConfig.drawBezierHandlePoints && drawConfig.drawHandlePoints) {
+                    if (!d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
+                        if (d.bezierCurves[c].startPoint.attr.visible)
+                            draw.diamondHandle(d.bezierCurves[c].startPoint, 7, _handleColor(d.bezierCurves[c].startPoint, drawConfig.vertex.color));
+                        d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+                    }
+                    if (!d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
+                        if (d.bezierCurves[c].endPoint.attr.visible)
+                            draw.diamondHandle(d.bezierCurves[c].endPoint, 7, _handleColor(d.bezierCurves[c].endPoint, drawConfig.vertex.color));
+                        d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+                    }
+                    if (d.bezierCurves[c].startControlPoint.attr.visible)
+                        draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, _handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
+                    if (d.bezierCurves[c].endControlPoint.attr.visible)
+                        draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, _handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
+                    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+                    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
+                }
+                else {
+                    d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
+                    d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
+                    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
+                    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
+                }
+                if (drawConfig.drawBezierHandleLines && drawConfig.drawHandleLines) {
+                    draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, drawConfig.bezier.handleLine.color, drawConfig.bezier.handleLine.lineWidth);
+                    draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, drawConfig.bezier.handleLine.color, drawConfig.bezier.handleLine.lineWidth);
+                }
+            }
+        }
+        else if (d instanceof Polygon_1.Polygon) {
+            draw.polygon(d, drawConfig.polygon.color, drawConfig.polygon.lineWidth);
+            if (!drawConfig.drawHandlePoints) {
+                for (var i in d.vertices) {
+                    d.vertices[i].attr.renderTime = renderTime;
+                }
+            }
+        }
+        else if (d instanceof Triangle_1.Triangle) {
+            draw.polyline([d.a, d.b, d.c], false, drawConfig.triangle.color, drawConfig.triangle.lineWidth);
+            if (!drawConfig.drawHandlePoints)
+                d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
+        }
+        else if (d instanceof VEllipse_1.VEllipse) {
+            if (drawConfig.drawHandleLines) {
+                draw.line(d.center.clone().add(0, d.axis.y - d.center.y), d.axis, '#c8c8c8');
+                draw.line(d.center.clone().add(d.axis.x - d.center.x, 0), d.axis, '#c8c8c8');
+            }
+            draw.ellipse(d.center, Math.abs(d.axis.x - d.center.x), Math.abs(d.axis.y - d.center.y), drawConfig.ellipse.color, drawConfig.ellipse.lineWidth);
+            if (!drawConfig.drawHandlePoints) {
+                d.center.attr.renderTime = renderTime;
+                d.axis.attr.renderTime = renderTime;
+            }
+        }
+        else if (d instanceof Circle_1.Circle) {
+            draw.circle(d.center, d.radius, drawConfig.circle.color, drawConfig.circle.lineWidth);
+        }
+        else if (d instanceof CircleSector_1.CircleSector) {
+            draw.circleArc(d.circle.center, d.circle.radius, d.startAngle, d.endAngle, drawConfig.circleSector.color, drawConfig.circleSector.lineWidth);
+        }
+        else if (d instanceof Vertex_1.Vertex) {
+            if (drawConfig.drawVertices &&
+                (!d.attr.selectable || !d.attr.draggable) && d.attr.visible) {
+                // Draw as special point (grey)
+                draw.circleHandle(d, 7, drawConfig.vertex.color);
+                d.attr.renderTime = renderTime;
+            }
+        }
+        else if (d instanceof Line_1.Line) {
+            draw.line(d.a, d.b, drawConfig.line.color, drawConfig.line.lineWidth);
+            if (!drawConfig.drawHandlePoints || !d.a.attr.selectable)
+                d.a.attr.renderTime = renderTime;
+            if (!drawConfig.drawHandlePoints || !d.b.attr.selectable)
+                d.b.attr.renderTime = renderTime;
+        }
+        else if (d instanceof Vector_1.Vector) {
+            draw.arrow(d.a, d.b, drawConfig.vector.color);
+            if (drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
+                draw.circleHandle(d.b, 3, '#a8a8a8');
+            }
+            else {
+                d.b.attr.renderTime = renderTime;
+            }
+            if (!drawConfig.drawHandlePoints || !d.a.attr.selectable)
+                d.a.attr.renderTime = renderTime;
+            if (!drawConfig.drawHandlePoints || !d.b.attr.selectable)
+                d.b.attr.renderTime = renderTime;
+        }
+        else if (d instanceof PBImage_1.PBImage) {
+            if (drawConfig.drawHandleLines)
+                draw.line(d.upperLeft, d.lowerRight, drawConfig.image.color, drawConfig.image.lineWidth);
+            fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
+            if (drawConfig.drawHandlePoints) {
+                draw.circleHandle(d.lowerRight, 3, drawConfig.image.color);
+                d.lowerRight.attr.renderTime = renderTime;
+            }
+        }
+        else {
+            console.error('Cannot draw object. Unknown class.');
+        }
+    }
+};
+exports.drawDrawables = drawDrawables;
+//# sourceMappingURL=utils.js.map
+
 /***/ })
 
 /******/ 	});
@@ -9346,6 +9625,7 @@ globalThis.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "../src/js/Ke
 globalThis.drawutils = __webpack_require__(/*! ./draw.js */ "../src/js/draw.js").drawutils;
 globalThis.drawutilsgl = __webpack_require__(/*! ./drawgl.js */ "../src/js/drawgl.js").drawutilsgl;
 globalThis.geomutils = __webpack_require__(/*! ./geomutils.js */ "../src/js/geomutils.js").geomutils;
+globalThis.utils = __webpack_require__(/*! ./utils.js */ "../src/js/utils.js").utils;
 globalThis.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "../src/js/PlotBoilerplate.js").PlotBoilerplate;
 
 
