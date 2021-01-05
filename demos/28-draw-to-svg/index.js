@@ -73,12 +73,22 @@
 					   );
 	pb.add( drawables );
 
+	var clearChildren = function( node ) {
+	    while (node.firstChild) {
+		node.removeChild(node.lastChild);
+	    }
+	};
+
 
 	var drawAll = function() {
 	    // TODO: draw everything to SVG
 	    try {
 		var svgNode = document.getElementById('preview-svg');
-		var tosvg = new drawutilssvg( svgNode, pb.canvasSize, false );
+		clearChildren( svgNode );
+		var tosvg = new drawutilssvg( svgNode, pb.canvasSize, pb.viewport(), false );
+		// for( var i in pb.drawables ) {
+		drawDrawables( pb.drawables, tosvg, tosvg, pb.drawConfig, 0, function(vert,color) { return color; } );
+		// }
 	    } catch( e ) {
 		console.error( e );
 	    }

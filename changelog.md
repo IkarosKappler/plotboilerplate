@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2021-01-05
+  * Added the image-loaded/broken check.
+  * Exposing the `drawDrawables` method as a static utility function (for further use).
 * 2021-01-04
   * Avoiding multiple redraw call on adding multiple Drawables (array).
 * 2021-01-03

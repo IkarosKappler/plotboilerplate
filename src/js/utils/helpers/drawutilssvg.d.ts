@@ -42,8 +42,8 @@ export declare class drawutilssvg {
      * This is required for compatibility with other draw classes in the library.
      **/
     beginDrawCycle(): void;
-    _x(x: number): number;
-    _y(y: number): number;
+    private _x;
+    private _y;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *

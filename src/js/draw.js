@@ -32,8 +32,9 @@
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2020-10-28 Added the path(Path2D) function.
- * @modified 2020-12-28 Added the `singleSegment` mode.
- * @version  1.8.1
+ * @modified 2020-12-28 Added the `singleSegment` mode (test).
+ * @modified 2021-01-05 Added the image-loaded/broken check.
+ * @version  1.8.2
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutils = void 0;
@@ -137,6 +138,10 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      **/
     drawutils.prototype.image = function (image, position, size) {
+        if (!image.complete || !image.naturalWidth) {
+            // Avoid drawing un-unloaded or broken images
+            return;
+        }
         this.ctx.save();
         // Note that there is a Safari bug with the 3 or 5 params variant.
         // Only the 9-param varaint works.

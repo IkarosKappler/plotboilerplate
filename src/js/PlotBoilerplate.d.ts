@@ -706,6 +706,16 @@ export declare class PlotBoilerplate {
      **/
     static utils: {
         /**
+         * Draw all drawables.
+         *
+         * This function is usually only used internally.
+         *
+         * @method drawDrawables
+         * @param {number} renderTime - The current render time. It will be used to distinct
+         *                              already draw vertices from non-draw-yet vertices.
+         * @return {void}
+         **/
+        /**
          * Merge the elements in the 'extension' object into the 'base' object based on
          * the keys of 'base'.
          *

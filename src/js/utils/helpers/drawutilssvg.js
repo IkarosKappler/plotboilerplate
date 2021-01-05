@@ -36,13 +36,15 @@ var drawutilssvg = /** @class */ (function () {
         this.fillShapes = fillShapes;
         this.canvasSize = canvasSize;
         this.viewport = viewport;
+        // console.log('viewport', viewport );
         this.svgNode.setAttribute('viewBox', this.viewport.min.x + " " + this.viewport.min.y + " " + this.viewport.width + " " + this.viewport.height);
-        this.svgNode.setAttribute('width', "" + this.viewport.width);
-        this.svgNode.setAttribute('height', "" + this.viewport.height);
+        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
+        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
     }
     ;
     drawutilssvg.prototype.createNode = function (name) {
-        var node = document.createElement(name);
+        // const node : HTMLElement = document.createElement(name);
+        var node = document.createElementNS("http://www.w3.org/2000/svg", name);
         this.svgNode.appendChild(node);
         return node;
     };
@@ -83,6 +85,7 @@ var drawutilssvg = /** @class */ (function () {
         else
             line.setAttribute('stroke', color);
         line.setAttribute('stroke-width', "" + (lineWidth || 1));
+        // console.log('line', line);
     };
     ;
     /**

@@ -54,13 +54,15 @@ export class drawutilssvg {
 	this.canvasSize = canvasSize;
 	this.viewport = viewport;
 
+	// console.log('viewport', viewport );
 	this.svgNode.setAttribute('viewBox', `${this.viewport.min.x} ${this.viewport.min.y} ${this.viewport.width} ${this.viewport.height}`);
-	this.svgNode.setAttribute('width', `${this.viewport.width}` );
-	this.svgNode.setAttribute('height', `${this.viewport.height}` );
+	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
+	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
     };
 
-    private createNode(name:string) : HTMLElement {
-	const node : HTMLElement = document.createElement(name);
+    private createNode( name:string ) : SVGElement {
+	// const node : HTMLElement = document.createElement(name);
+	const node : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", name);
 	this.svgNode.appendChild( node );
 	return node;
     };
@@ -77,8 +79,8 @@ export class drawutilssvg {
     // private _x2rel(x:number) : number { return (this.scale.x*x+this.offset.x)/this.gl.canvas.width*2.0-1.0; };
     // private _y2rel(y:number) : number { return (this.scale.y*y+this.offset.y)/this.gl.canvas.height*2.0-1.0; };
 
-    _x(x:number) : number { return this.offset.x + this.scale.x * x; }
-    _y(y:number) : number { return this.offset.y + this.scale.y * y; }
+    private _x(x:number) : number { return this.offset.x + this.scale.x * x; }
+    private _y(y:number) : number { return this.offset.y + this.scale.y * y; }
 
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
@@ -94,7 +96,7 @@ export class drawutilssvg {
      **/
     line( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
-	const line : HTMLElement = this.createNode('line');
+	const line : SVGElement = this.createNode('line');
 	line.setAttribute('x1', `${this._x(zA.x)}` );
 	line.setAttribute('y1', `${this._y(zA.y)}` );
 	line.setAttribute('x2', `${this._x(zB.x)}` );
@@ -104,6 +106,7 @@ export class drawutilssvg {
 	else 
 	    line.setAttribute('stroke', color);
 	line.setAttribute('stroke-width', `${lineWidth || 1}`);
+	// console.log('line', line);
     };
 
 
@@ -121,7 +124,7 @@ export class drawutilssvg {
     arrow( zA:Vertex, zB:Vertex, color:string ) {
 	// NOT YET IMPLEMENTED
 	const lineWidth :number = 1;
-	const path : HTMLElement = this.createNode('path');
+	const path : SVGElement = this.createNode('path');
 	// line.setAttribute('x1', `${this._x(zA.x)}` );
 	// line.setAttribute('y1', `${this._y(zA.y)}` );
 	// line.setAttribute('x2', `${this._x(zB.x)}` );
@@ -218,7 +221,7 @@ export class drawutilssvg {
 	    this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth );
 	    return;
 	}
-	const path : HTMLElement = this.createNode('path');
+	const path : SVGElement = this.createNode('path');
 	
 	// Draw curve
 	//this.ctx.save();
@@ -263,7 +266,7 @@ export class drawutilssvg {
 	if( !path || path.length == 0 )
 	    return;
 
-	const pathNode : HTMLElement = this.createNode('path');
+	const pathNode : SVGElement = this.createNode('path');
 	
 	// Draw curve
 	//this.ctx.save();

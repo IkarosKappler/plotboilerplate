@@ -177,10 +177,9 @@ function createDemoDrawables( canvasSize, imagePath, drawCallback ) {
     // +---------------------------------------------------------------------------------
     // | Finally load an image.
     // +-------------------------------
-    img.image.addEventListener('load', drawCallback ); // function() { pb.redraw(); } );
-    img.image.src = 'example-image.png';
+    img.image.addEventListener('load', drawCallback ); 
+    img.image.src = imagePath; // 'example-image.png';
 
-    // drawables.push( img );
 
     return drawables;
 }

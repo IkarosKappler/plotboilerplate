@@ -31,8 +31,9 @@
  * @modified 2020-10-06 Removed the .closePath() instruction from the circleArc function.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2020-10-28 Added the path(Path2D) function.
- * @modified 2020-12-28 Added the `singleSegment` mode.
- * @version  1.8.1
+ * @modified 2020-12-28 Added the `singleSegment` mode (test).
+ * @modified 2021-01-05 Added the image-loaded/broken check.
+ * @version  1.8.2
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
