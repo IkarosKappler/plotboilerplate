@@ -8164,11 +8164,12 @@ var drawutils = /** @class */ (function () {
      * @param {Vertex} zA - The start point of the arrow-line.
      * @param {Vertex} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    drawutils.prototype.arrow = function (zA, zB, color) {
+    drawutils.prototype.arrow = function (zA, zB, color, lineWidth) {
         var headlen = 8; // length of head in pixels
         // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
         // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
@@ -8180,7 +8181,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
         }
         this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
-        this.ctx.lineWidth = 1;
+        this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
     };
@@ -8366,23 +8367,6 @@ var drawutils = /** @class */ (function () {
         this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
     };
     ;
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    /* cubicBezierCurveHandleLines( curve:CubicBezierCurve ) {
-    // Draw handle lines
-    this.cubicBezierHandleLines( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
-    // this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
-    // this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
-    }; */
     /**
      * Draw a handle line (with a light grey).
      *
@@ -9015,11 +8999,12 @@ var drawutilsgl = /** @class */ (function () {
      * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
      * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color) {
+    drawutilsgl.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -9033,11 +9018,12 @@ var drawutilsgl = /** @class */ (function () {
      * @method cubicBezierPath
      * @param {Vertex[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.cubicBezierPath = function (path, color) {
+    drawutilsgl.prototype.cubicBezierPath = function (path, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -9054,21 +9040,6 @@ var drawutilsgl = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilsgl.prototype.handle = function (startPoint, endPoint) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilsgl.prototype.cubicBezierCurveHandleLines = function (curve) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -9123,11 +9094,12 @@ var drawutilsgl = /** @class */ (function () {
      * @param {Vertex} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.circle = function (center, radius, color) {
+    drawutilsgl.prototype.circle = function (center, radius, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -9156,11 +9128,12 @@ var drawutilsgl = /** @class */ (function () {
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.ellipse = function (center, radiusX, radiusY, color) {
+    drawutilsgl.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -9173,11 +9146,12 @@ var drawutilsgl = /** @class */ (function () {
      * @param {Vertex} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.square = function (center, size, color) {
+    drawutilsgl.prototype.square = function (center, size, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -9349,11 +9323,12 @@ var drawutilsgl = /** @class */ (function () {
      * @param {Vertex[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
+     * @param {number=}  lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.polyline = function (vertices, isOpen, color) {
+    drawutilsgl.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;

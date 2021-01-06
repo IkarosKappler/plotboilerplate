@@ -323,7 +323,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    polygon(polygon: Polygon, color: string, lineWidth?: number): void;
+    polygon(polygon: Polygon, color: string, lineWidth?: number): SVGElement;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -336,7 +336,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): void;
+    polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): SVGElement;
     text(text: string, x: number, y: number, options?: {
         color?: string;
     }): void;

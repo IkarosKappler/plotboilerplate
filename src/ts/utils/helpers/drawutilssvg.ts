@@ -512,8 +512,9 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    polygon( polygon:Polygon, color:string, lineWidth?:number ) {	
+    polygon( polygon:Polygon, color:string, lineWidth?:number ) : SVGElement {	
 	// NOT YET IMPLEMENTED
+	return this.polyline( polygon.vertices, polygon.isOpen, color, lineWidth );
     };
 
 
@@ -529,8 +530,27 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    polyline( vertices:Array<Vertex>, isOpen:boolean, color:string, lineWidth?:number ) {
+    polyline( vertices:Array<Vertex>, isOpen:boolean, color:string, lineWidth?:number ) : SVGElement  {
 	// NOT YET IMPLEMENTED
+	const pathNode : SVGElement = this.createNode('path');
+	if( vertices.length == 0 )
+	    return pathNode;
+	
+	// Draw curve
+	const d : Array<string|number> = [
+	    'M', this._x(vertices[0].x), this._y(vertices[0].y)
+	];
+	var n = vertices.length;
+	for( var i = 1; i < n; i++ ) {
+	    d.push('L', this._x(vertices[i].x), this._y(vertices[i].y) );
+	}
+	if( !isOpen )
+	    d.push('Z');
+	pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	pathNode.setAttribute( 'd', d.join(' ') );
+	return pathNode;
     };
 
     text( text:string, x:number, y:number, options?:{color?:string}) {

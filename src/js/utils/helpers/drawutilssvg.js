@@ -464,6 +464,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.polygon = function (polygon, color, lineWidth) {
         // NOT YET IMPLEMENTED
+        return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
     };
     ;
     /**
@@ -480,6 +481,24 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
+        var pathNode = this.createNode('path');
+        if (vertices.length == 0)
+            return pathNode;
+        // Draw curve
+        var d = [
+            'M', this._x(vertices[0].x), this._y(vertices[0].y)
+        ];
+        var n = vertices.length;
+        for (var i = 1; i < n; i++) {
+            d.push('L', this._x(vertices[i].x), this._y(vertices[i].y));
+        }
+        if (!isOpen)
+            d.push('Z');
+        pathNode.setAttribute('fill', this.fillShapes ? color : 'none');
+        pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        pathNode.setAttribute('stroke-width', "" + (lineWidth || 1));
+        pathNode.setAttribute('d', d.join(' '));
+        return pathNode;
     };
     ;
     drawutilssvg.prototype.text = function (text, x, y, options) {
