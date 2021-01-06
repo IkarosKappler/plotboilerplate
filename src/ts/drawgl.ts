@@ -11,7 +11,7 @@
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable} from "./interfaces";
+import { DrawLib, XYCoords, SVGSerializable} from "./interfaces";
 
 
 /**
@@ -24,7 +24,7 @@ import { XYCoords, SVGSerializable} from "./interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export class drawutilsgl {
+export class drawutilsgl implements DrawLib<void> {
     
     // Vertex shader source code
     private static vertCode : string = `
@@ -246,11 +246,12 @@ export class drawutilsgl {
      * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
      * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    cubicBezier( startPoint:Vertex, endPoint:Vertex, startControlPoint:Vertex, endControlPoint:Vertex, color:string ) {
+    cubicBezier( startPoint:Vertex, endPoint:Vertex, startControlPoint:Vertex, endControlPoint:Vertex, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };
 
@@ -265,11 +266,12 @@ export class drawutilsgl {
      * @method cubicBezierPath
      * @param {Vertex[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath( path:Array<Vertex>, color:string ) {
+    cubicBezierPath( path:Array<Vertex>, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };
 
@@ -287,22 +289,6 @@ export class drawutilsgl {
      * @memberof drawutils
      */
     handle( startPoint:Vertex, endPoint:Vertex ) { 
-	// NOT YET IMPLEMENTED
-    };
-
-
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    cubicBezierCurveHandleLines( curve:CubicBezierCurve ) {
 	// NOT YET IMPLEMENTED
     };
 
@@ -362,11 +348,12 @@ export class drawutilsgl {
      * @param {Vertex} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    circle( center:Vertex, radius:number, color:string ) {
+    circle( center:Vertex, radius:number, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };
 
@@ -397,11 +384,12 @@ export class drawutilsgl {
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse( center:Vertex, radiusX:number, radiusY:number, color:string ) {
+    ellipse( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number) {
 	// NOT YET IMPLEMENTED
     };   
 
@@ -415,11 +403,12 @@ export class drawutilsgl {
      * @param {Vertex} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    square( center:Vertex, size:number, color:string ) {
+    square( center:Vertex, size:number, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };
 
@@ -603,11 +592,12 @@ export class drawutilsgl {
      * @param {Vertex[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
+     * @param {number=}  lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polyline( vertices:Array<Vertex>, isOpen:boolean, color:string ) {
+    polyline( vertices:Array<Vertex>, isOpen:boolean, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };
 

@@ -86,9 +86,7 @@
 		var svgNode = document.getElementById('preview-svg');
 		clearChildren( svgNode );
 		var tosvg = new drawutilssvg( svgNode, pb.canvasSize, pb.viewport(), false );
-		// for( var i in pb.drawables ) {
-		drawDrawables( pb.drawables, tosvg, tosvg, pb.drawConfig, 0, function(vert,color) { return color; } );
-		// }
+		pb.drawDrawables( new Date().getMilliseconds(), tosvg, tosvg );
 	    } catch( e ) {
 		console.error( e );
 	    }

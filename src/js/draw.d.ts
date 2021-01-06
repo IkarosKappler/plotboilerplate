@@ -37,7 +37,7 @@
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { XYCoords } from "./interfaces";
+import { DrawLib, XYCoords } from "./interfaces";
 /**
  * @classdesc A wrapper class for basic drawing operations.
  *
@@ -47,7 +47,7 @@ import { XYCoords } from "./interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export declare class drawutils {
+export declare class drawutils implements DrawLib<void> {
     /**
      * @member {CanvasRenderingContext2D}
      * @memberof drawutils
@@ -109,11 +109,12 @@ export declare class drawutils {
      * @param {Vertex} zA - The start point of the arrow-line.
      * @param {Vertex} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    arrow(zA: Vertex, zB: Vertex, color: string): void;
+    arrow(zA: Vertex, zB: Vertex, color: string, lineWidth?: number): void;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -197,17 +198,6 @@ export declare class drawutils {
      * @memberof drawutils
      */
     handle(startPoint: Vertex, endPoint: Vertex): void;
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
     /**
      * Draw a handle line (with a light grey).
      *

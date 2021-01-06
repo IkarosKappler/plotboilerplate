@@ -75,7 +75,7 @@ import { Bounds } from "./Bounds";
 import { Grid } from "./Grid";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { IDraggable, Config, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
+import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -447,21 +447,20 @@ export declare class PlotBoilerplate {
     /**
      * This is just a tiny helper function to determine the render color of vertices.
      **/
-    _handleColor(h: Vertex, color: string): string;
+    private _handleColor;
     /**
      * Draw all drawables.
      *
      * This function is usually only used internally.
      *
      * @method drawDrawables
-     * @private
      * @param {number} renderTime - The current render time. It will be used to distinct
      *                              already draw vertices from non-draw-yet vertices.
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawDrawables(renderTime: number): void;
+    drawDrawables(renderTime: number, draw?: DrawLib<any>, fill?: DrawLib<any>): void;
     /**
      * Draw the select-polygon (if there is one).
      *

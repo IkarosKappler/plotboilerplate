@@ -36,14 +36,12 @@ var drawutilssvg = /** @class */ (function () {
         this.fillShapes = fillShapes;
         this.canvasSize = canvasSize;
         this.viewport = viewport;
-        // console.log('viewport', viewport );
         this.svgNode.setAttribute('viewBox', this.viewport.min.x + " " + this.viewport.min.y + " " + this.viewport.width + " " + this.viewport.height);
         this.svgNode.setAttribute('width', "" + this.canvasSize.width);
         this.svgNode.setAttribute('height', "" + this.canvasSize.height);
     }
     ;
     drawutilssvg.prototype.createNode = function (name) {
-        // const node : HTMLElement = document.createElement(name);
         var node = document.createElementNS("http://www.w3.org/2000/svg", name);
         this.svgNode.appendChild(node);
         return node;
@@ -57,8 +55,6 @@ var drawutilssvg = /** @class */ (function () {
         // NOOP
     };
     ;
-    // private _x2rel(x:number) : number { return (this.scale.x*x+this.offset.x)/this.gl.canvas.width*2.0-1.0; };
-    // private _y2rel(y:number) : number { return (this.scale.y*y+this.offset.y)/this.gl.canvas.height*2.0-1.0; };
     drawutilssvg.prototype._x = function (x) { return this.offset.x + this.scale.x * x; };
     drawutilssvg.prototype._y = function (y) { return this.offset.y + this.scale.y * y; };
     /**
@@ -74,18 +70,15 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      **/
     drawutilssvg.prototype.line = function (zA, zB, color, lineWidth) {
-        // NOT YET IMPLEMENTED
         var line = this.createNode('line');
         line.setAttribute('x1', "" + this._x(zA.x));
         line.setAttribute('y1', "" + this._y(zA.y));
         line.setAttribute('x2', "" + this._x(zB.x));
         line.setAttribute('y2', "" + this._y(zB.y));
-        if (this.fillShapes)
-            line.setAttribute('fill', color);
-        else
-            line.setAttribute('stroke', color);
+        line.setAttribute('fill', this.fillShapes ? color : 'none');
+        line.setAttribute('stroke', this.fillShapes ? 'none' : color);
         line.setAttribute('stroke-width', "" + (lineWidth || 1));
-        // console.log('line', line);
+        return line;
     };
     ;
     /**
@@ -95,48 +88,27 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Vertex} zA - The start point of the arrow-line.
      * @param {Vertex} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    drawutilssvg.prototype.arrow = function (zA, zB, color) {
-        // NOT YET IMPLEMENTED
-        var lineWidth = 1;
-        var path = this.createNode('path');
-        // line.setAttribute('x1', `${this._x(zA.x)}` );
-        // line.setAttribute('y1', `${this._y(zA.y)}` );
-        // line.setAttribute('x2', `${this._x(zB.x)}` );
-        // line.setAttribute('y2', `${this._y(zB.y)}` );
-        // if( this.fillShapes )
-        //     line.setAttribute('fill', color);
-        // else 
-        //     line.setAttribute('stroke', color);
-        // line.setAttribute('stroke-width', `${lineWidth || 1}`);
+    drawutilssvg.prototype.arrow = function (zA, zB, color, lineWidth) {
+        var pathNode = this.createNode('path');
         var headlen = 8; // length of head in pixels
-        // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-        // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-        // this.ctx.save();
-        // this.ctx.beginPath();
         var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
         var d = [
             'M', this._x(zA.x), this._y(zA.y)
         ];
-        // this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
         for (var i = 0; i <= vertices.length; i++) {
-            // this.ctx.lineTo( this.offset.x+vertices[i].x, this.offset.y+vertices[i].y );
             d.push(this._x(vertices[i % vertices.length].x));
             d.push(this._y(vertices[i % vertices.length].y));
         }
-        // this.ctx.lineTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
-        // this.ctx.lineWidth = 1;
-        // this._fillOrDraw( color );
-        // this.ctx.restore();
-        if (this.fillShapes)
-            path.setAttribute('fill', color);
-        else
-            path.setAttribute('stroke', color);
-        path.setAttribute('stroke-width', "" + (lineWidth || 1));
-        path.setAttribute('d', d.join(' '));
+        pathNode.setAttribute('fill', this.fillShapes ? color : 'none');
+        pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        pathNode.setAttribute('stroke-width', "" + (lineWidth || 1));
+        pathNode.setAttribute('d', d.join(' '));
+        return pathNode;
     };
     ;
     /**
@@ -185,31 +157,20 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
-        // NOT YET IMPLEMENTED
         if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
-            this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
-            return;
+            return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
         }
-        var path = this.createNode('path');
+        var pathNode = this.createNode('path');
         // Draw curve
-        //this.ctx.save();
-        //this.ctx.beginPath();
-        // this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
         var d = [
             'M', this._x(startPoint.x), this._y(startPoint.y),
             'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y)
         ];
-        // this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
-        //			this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
-        //			this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-        //this.ctx.closePath();
-        //this.ctx.lineWidth = lineWidth || 2;
-        if (this.fillShapes)
-            path.setAttribute('fill', color);
-        else
-            path.setAttribute('stroke', color);
-        path.setAttribute('stroke-width', "" + (lineWidth || 1));
-        path.setAttribute('d', d.join(' '));
+        pathNode.setAttribute('fill', this.fillShapes ? color : 'none');
+        pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        pathNode.setAttribute('stroke-width', "" + (lineWidth || 1));
+        pathNode.setAttribute('d', d.join(' '));
+        return pathNode;
     };
     ;
     /**
@@ -228,44 +189,26 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.cubicBezierPath = function (path, color, lineWidth) {
-        // NOT YET IMPLEMENTED
-        if (!path || path.length == 0)
-            return;
         var pathNode = this.createNode('path');
+        if (!path || path.length == 0)
+            return pathNode;
         // Draw curve
-        //this.ctx.save();
-        //this.ctx.beginPath();
-        // this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
         var d = [
             'M', this._x(path[0].x), this._y(path[0].y)
-            // 'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y), t
         ];
         // Draw curve path
-        // this.ctx.save();
-        // this.ctx.beginPath();
-        var // curve:any,
-        startPoint, endPoint, startControlPoint, endControlPoint;
-        // this.ctx.moveTo( this.offset.x+path[0].x*this.scale.x, this.offset.y+path[0].y*this.scale.y );
+        var startPoint, endPoint, startControlPoint, endControlPoint;
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
             endControlPoint = path[i + 1];
             endPoint = path[i + 2];
-            /* this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
-                        this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
-                        this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-            */
             d.push('C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
         }
-        // this.ctx.closePath();
-        // this.ctx.lineWidth = 1;
-        // this._fillOrDraw( color );
-        // this.ctx.restore();
-        if (this.fillShapes)
-            pathNode.setAttribute('fill', color);
-        else
-            pathNode.setAttribute('stroke', color);
+        pathNode.setAttribute('fill', this.fillShapes ? color : 'none');
+        pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color);
         pathNode.setAttribute('stroke-width', "" + (lineWidth || 1));
         pathNode.setAttribute('d', d.join(' '));
+        return pathNode;
     };
     ;
     /**
@@ -281,21 +224,6 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.handle = function (startPoint, endPoint) {
-        // NOT YET IMPLEMENTED
-    };
-    ;
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    drawutilssvg.prototype.cubicBezierCurveHandleLines = function (curve) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -350,11 +278,12 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Vertex} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilssvg.prototype.circle = function (center, radius, color) {
+    drawutilssvg.prototype.circle = function (center, radius, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -383,11 +312,12 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color) {
+    drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -400,11 +330,12 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Vertex} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilssvg.prototype.square = function (center, size, color) {
+    drawutilssvg.prototype.square = function (center, size, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;
@@ -526,6 +457,7 @@ var drawutilssvg = /** @class */ (function () {
      * @method polygon
      * @param {Polygon} polygon - The polygon to draw.
      * @param {string} color - The CSS color to draw the polygon with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -541,11 +473,12 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Vertex[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilssvg.prototype.polyline = function (vertices, isOpen, color) {
+    drawutilssvg.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     ;

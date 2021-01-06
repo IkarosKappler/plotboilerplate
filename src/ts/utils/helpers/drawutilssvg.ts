@@ -11,7 +11,7 @@ import { Bounds } from "../../Bounds";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { XYCoords, XYDimension, SVGSerializable } from "../../interfaces";
+import { DrawLib, XYCoords, XYDimension, SVGSerializable } from "../../interfaces";
 
 
 /**
@@ -24,7 +24,7 @@ import { XYCoords, XYDimension, SVGSerializable } from "../../interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export class drawutilssvg {
+export class drawutilssvg implements DrawLib<void|SVGElement> {
 
     svgNode:SVGElement;
     
@@ -54,14 +54,12 @@ export class drawutilssvg {
 	this.canvasSize = canvasSize;
 	this.viewport = viewport;
 
-	// console.log('viewport', viewport );
 	this.svgNode.setAttribute('viewBox', `${this.viewport.min.x} ${this.viewport.min.y} ${this.viewport.width} ${this.viewport.height}`);
 	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
 	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
     };
 
     private createNode( name:string ) : SVGElement {
-	// const node : HTMLElement = document.createElement(name);
 	const node : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", name);
 	this.svgNode.appendChild( node );
 	return node;
@@ -74,10 +72,6 @@ export class drawutilssvg {
     beginDrawCycle() {
 	// NOOP
     };
-
-
-    // private _x2rel(x:number) : number { return (this.scale.x*x+this.offset.x)/this.gl.canvas.width*2.0-1.0; };
-    // private _y2rel(y:number) : number { return (this.scale.y*y+this.offset.y)/this.gl.canvas.height*2.0-1.0; };
 
     private _x(x:number) : number { return this.offset.x + this.scale.x * x; }
     private _y(y:number) : number { return this.offset.y + this.scale.y * y; }
@@ -94,19 +88,17 @@ export class drawutilssvg {
      * @instance
      * @memberof drawutils
      **/
-    line( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) {
-	// NOT YET IMPLEMENTED
+    line( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) : SVGElement {
 	const line : SVGElement = this.createNode('line');
 	line.setAttribute('x1', `${this._x(zA.x)}` );
 	line.setAttribute('y1', `${this._y(zA.y)}` );
 	line.setAttribute('x2', `${this._x(zB.x)}` );
 	line.setAttribute('y2', `${this._y(zB.y)}` );
-	if( this.fillShapes )
-	    line.setAttribute('fill', color);
-	else 
-	    line.setAttribute('stroke', color);
+
+	line.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	line.setAttribute('stroke', this.fillShapes ? 'none' : color );
 	line.setAttribute('stroke-width', `${lineWidth || 1}`);
-	// console.log('line', line);
+	return line;
     };
 
 
@@ -117,53 +109,27 @@ export class drawutilssvg {
      * @param {Vertex} zA - The start point of the arrow-line.
      * @param {Vertex} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    arrow( zA:Vertex, zB:Vertex, color:string ) {
-	// NOT YET IMPLEMENTED
-	const lineWidth :number = 1;
-	const path : SVGElement = this.createNode('path');
-	// line.setAttribute('x1', `${this._x(zA.x)}` );
-	// line.setAttribute('y1', `${this._y(zA.y)}` );
-	// line.setAttribute('x2', `${this._x(zB.x)}` );
-	// line.setAttribute('y2', `${this._y(zB.y)}` );
-	// if( this.fillShapes )
-	//     line.setAttribute('fill', color);
-	// else 
-	//     line.setAttribute('stroke', color);
-	// line.setAttribute('stroke-width', `${lineWidth || 1}`);
-
+    arrow( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) : SVGElement {
+	const pathNode : SVGElement = this.createNode('path');
 	var headlen:number = 8;   // length of head in pixels
-	// var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-	// var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-	
-	// this.ctx.save();
-	// this.ctx.beginPath();
 	var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-
 	const d : Array<string|number> = [
 	    'M', this._x(zA.x), this._y(zA.y)
 	];
-	// this.ctx.moveTo( this.offset.x+zA.x*this.scale.x, this.offset.y+zA.y*this.scale.y );
 	for( var i = 0; i <= vertices.length; i++ ) {
-	    // this.ctx.lineTo( this.offset.x+vertices[i].x, this.offset.y+vertices[i].y );
 	    d.push( this._x(vertices[i%vertices.length].x) );
 	    d.push( this._y(vertices[i%vertices.length].y) );
 	}
-	// this.ctx.lineTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
-	// this.ctx.lineWidth = 1;
-	// this._fillOrDraw( color );
-	// this.ctx.restore();
-
-	if( this.fillShapes ) 
-	    path.setAttribute('fill', color);
-	else
-	    path.setAttribute('stroke', color);
-	path.setAttribute('stroke-width', `${lineWidth || 1}`);
-	
-	path.setAttribute( 'd', d.join(' ') );
+	pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	pathNode.setAttribute( 'd', d.join(' ') );
+	return pathNode;
     };
 
 
@@ -215,34 +181,21 @@ export class drawutilssvg {
      * @instance
      * @memberof drawutils
      */
-    cubicBezier( startPoint:Vertex, endPoint:Vertex, startControlPoint:Vertex, endControlPoint:Vertex, color:string, lineWidth?:number ) {
-	// NOT YET IMPLEMENTED
+    cubicBezier( startPoint:Vertex, endPoint:Vertex, startControlPoint:Vertex, endControlPoint:Vertex, color:string, lineWidth?:number ) : SVGElement {
 	if( startPoint instanceof CubicBezierCurve ) {
-	    this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth );
-	    return;
+	    return this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth );
 	}
-	const path : SVGElement = this.createNode('path');
-	
+	const pathNode : SVGElement = this.createNode('path');	
 	// Draw curve
-	//this.ctx.save();
-	//this.ctx.beginPath();
-	// this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
 	const d : Array<string|number> = [
 	    'M', this._x(startPoint.x), this._y(startPoint.y),
 	    'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y)
 	];
-	// this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
-	//			this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
-	//			this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-	//this.ctx.closePath();
-	//this.ctx.lineWidth = lineWidth || 2;
-
-	if( this.fillShapes ) 
-	    path.setAttribute('fill', color);
-	else
-	    path.setAttribute('stroke', color);
-	path.setAttribute('stroke-width', `${lineWidth || 1}`);	
-	path.setAttribute( 'd', d.join(' ') );	
+	pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	pathNode.setAttribute( 'd', d.join(' ') );
+	return pathNode;
     };
 
 
@@ -261,54 +214,35 @@ export class drawutilssvg {
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath( path:Array<Vertex>, color:string, lineWidth?:number ) {
-	// NOT YET IMPLEMENTED
-	if( !path || path.length == 0 )
-	    return;
+    cubicBezierPath( path:Array<Vertex>, color:string, lineWidth?:number ) : SVGElement {
+	const pathNode: SVGElement = this.createNode('path');
 
-	const pathNode : SVGElement = this.createNode('path');
+	if( !path || path.length == 0 )
+	    return pathNode;
 	
 	// Draw curve
-	//this.ctx.save();
-	//this.ctx.beginPath();
-	// this.ctx.moveTo( this.offset.x+startPoint.x*this.scale.x, this.offset.y+startPoint.y*this.scale.y );
 	const d : Array<string|number> = [
-	    'M', this._x(path[0].x), this._y(path[0].y)
-	    // 'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y), t
-	    
+	    'M', this._x(path[0].x), this._y(path[0].y)	    
 	];
 	
 	// Draw curve path
-	// this.ctx.save();
-	// this.ctx.beginPath();
-	var // curve:any,
+	var 
 	startPoint:Vertex,
 	endPoint:Vertex,
 	startControlPoint:Vertex,
 	endControlPoint:Vertex;
-	// this.ctx.moveTo( this.offset.x+path[0].x*this.scale.x, this.offset.y+path[0].y*this.scale.y );
 	for( var i = 1; i < path.length; i+=3 ) {
 	    startControlPoint = path[i];
 	    endControlPoint = path[i+1];
 	    endPoint = path[i+2];
-	    /* this.ctx.bezierCurveTo( this.offset.x+startControlPoint.x*this.scale.x, this.offset.y+startControlPoint.y*this.scale.y,
-				    this.offset.x+endControlPoint.x*this.scale.x, this.offset.y+endControlPoint.y*this.scale.y,
-				    this.offset.x+endPoint.x*this.scale.x, this.offset.y+endPoint.y*this.scale.y );
-	    */
 	    d.push( 'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y) );
 	    
 	}
-	// this.ctx.closePath();
-	// this.ctx.lineWidth = 1;
-	// this._fillOrDraw( color );
-	// this.ctx.restore();
-
-	if( this.fillShapes ) 
-	    pathNode.setAttribute('fill', color);
-	else
-	    pathNode.setAttribute('stroke', color);
+	pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
 	pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
 	pathNode.setAttribute( 'd', d.join(' ') );
+	return pathNode;
     };
 
 
@@ -325,22 +259,6 @@ export class drawutilssvg {
      * @memberof drawutils
      */
     handle( startPoint:Vertex, endPoint:Vertex ) { 
-	// NOT YET IMPLEMENTED
-    };
-
-
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    cubicBezierCurveHandleLines( curve:CubicBezierCurve ) {
 	// NOT YET IMPLEMENTED
     };
 
@@ -400,11 +318,12 @@ export class drawutilssvg {
      * @param {Vertex} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    circle( center:Vertex, radius:number, color:string ) {
+    circle( center:Vertex, radius:number, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };
 
@@ -435,11 +354,12 @@ export class drawutilssvg {
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse( center:Vertex, radiusX:number, radiusY:number, color:string ) {
+    ellipse( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };   
 
@@ -453,11 +373,12 @@ export class drawutilssvg {
      * @param {Vertex} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    square( center:Vertex, size:number, color:string ) {
+    square( center:Vertex, size:number, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };
 
@@ -586,6 +507,7 @@ export class drawutilssvg {
      * @method polygon
      * @param {Polygon} polygon - The polygon to draw.
      * @param {string} color - The CSS color to draw the polygon with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -602,11 +524,12 @@ export class drawutilssvg {
      * @param {Vertex[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polyline( vertices:Array<Vertex>, isOpen:boolean, color:string ) {
+    polyline( vertices:Array<Vertex>, isOpen:boolean, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
     };
 

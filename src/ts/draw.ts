@@ -39,7 +39,7 @@
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable } from "./interfaces";
+import { DrawLib, XYCoords, SVGSerializable } from "./interfaces";
 
 
 // Todo: rename this class to Drawutils
@@ -52,7 +52,7 @@ import { XYCoords, SVGSerializable } from "./interfaces";
  * @requires Vertex
  * @requires XYCoords
  */
-export class drawutils {
+export class drawutils implements DrawLib<void> {
 
     /** 
      * @member {CanvasRenderingContext2D} 
@@ -140,11 +140,12 @@ export class drawutils {
      * @param {Vertex} zA - The start point of the arrow-line.
      * @param {Vertex} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    arrow( zA:Vertex, zB:Vertex, color:string ) {
+    arrow( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) {
 	var headlen:number = 8;   // length of head in pixels
 	// var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	// var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
@@ -158,7 +159,7 @@ export class drawutils {
 	    this.ctx.lineTo( this.offset.x+vertices[i].x, this.offset.y+vertices[i].y );
 	}
 	this.ctx.lineTo( this.offset.x+vertices[0].x, this.offset.y+vertices[0].y );
-	this.ctx.lineWidth = 1;
+	this.ctx.lineWidth = lineWidth || 1;
 	this._fillOrDraw( color );
 	this.ctx.restore();
     };
@@ -360,26 +361,6 @@ export class drawutils {
 	this.point( startPoint, 'rgb(0,32,192)' );
 	this.square( endPoint, 5, 'rgba(0,128,192,0.5)' );
     };
-
-
-    /**
-     * Draw the given handle cubic Bézier curve handle lines.
-     *
-     * The colors for this are fixed and cannot be specified.
-     *
-     * @method cubicBezierCurveHandleLines
-     * @param {CubicBezierCurve} curve - The curve.
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
-    /* cubicBezierCurveHandleLines( curve:CubicBezierCurve ) {
-	// Draw handle lines
-	this.cubicBezierHandleLines( curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint );
-	// this.draw.line( d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
-	// this.draw.line( d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth );
-    }; */
-
     
     /**
      * Draw a handle line (with a light grey).
