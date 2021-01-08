@@ -354,7 +354,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    label(text: string, x: number, y: number, rotation: number): void;
+    label(text: string, x: number, y: number, rotation: number): SVGElement;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.

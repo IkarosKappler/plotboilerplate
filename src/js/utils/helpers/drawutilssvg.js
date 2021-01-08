@@ -98,11 +98,7 @@ var drawutilssvg = /** @class */ (function () {
         line.setAttribute('y1', "" + this._y(zA.y));
         line.setAttribute('x2', "" + this._x(zB.x));
         line.setAttribute('y2', "" + this._y(zB.y));
-        //line.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //line.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //line.setAttribute('stroke-width', `${lineWidth || 1}`);
-        // return line;
-        return this._bindFillDraw(line, color, lineWidth);
+        return this._bindFillDraw(line, color, lineWidth || 1);
     };
     ;
     /**
@@ -130,12 +126,9 @@ var drawutilssvg = /** @class */ (function () {
             d.push(this.offset.x + vertices[i % vertices.length].x);
             d.push(this.offset.y + vertices[i % vertices.length].y);
         }
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${lineWidth || 1}`);	
         node.setAttribute('d', d.join(' '));
         // return pathNode;
-        return this._bindFillDraw(node, color, lineWidth);
+        return this._bindFillDraw(node, color, lineWidth || 1);
     };
     ;
     /**
@@ -159,7 +152,7 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('height', "" + size.y * this.scale.y);
         node.setAttribute('src', image.src);
         // return node;
-        return this._bindFillDraw(node, null, null); // lineWidth );
+        return this._bindFillDraw(node, null, null);
     };
     ;
     /**
@@ -187,8 +180,6 @@ var drawutilssvg = /** @class */ (function () {
             'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y)
         ];
         node.setAttribute('d', d.join(' '));
-        // this._bindFillDraw( pathNode, color, lineWidth );
-        // return pathNode;
         return this._bindFillDraw(node, color, lineWidth);
     };
     ;
@@ -223,12 +214,8 @@ var drawutilssvg = /** @class */ (function () {
             endPoint = path[i + 2];
             d.push('C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
         }
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${lineWidth || 1}`);	
         node.setAttribute('d', d.join(' '));
-        // return pathNode;
-        return this._bindFillDraw(node, color, lineWidth);
+        return this._bindFillDraw(node, color, lineWidth || 1);
     };
     ;
     /**
@@ -279,10 +266,6 @@ var drawutilssvg = /** @class */ (function () {
             'M', this._x(p.x), this._y(p.y),
             'L', this._x(p.x + 1), this._y(p.y + 1)
         ];
-        // node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        // node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        // node.setAttribute('stroke-width', `${1}`);	
-        // return node;
         return this._bindFillDraw(node, color, 1);
     };
     ;
@@ -302,10 +285,6 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('cx', "" + this._x(p.x));
         node.setAttribute('cy', "" + this._y(p.y));
         node.setAttribute('r', "" + radius);
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${1}`);	
-        // return node;
         return this._bindFillDraw(node, color, 1);
     };
     ;
@@ -328,10 +307,6 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('cx', "" + this._x(center.x));
         node.setAttribute('cy', "" + this._y(center.y));
         node.setAttribute('r', "" + radius * this.scale.x); // y?
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${lineWidth || 1}`);	
-        // return node;
         return this._bindFillDraw(node, color, lineWidth || 1);
     };
     ;
@@ -353,10 +328,6 @@ var drawutilssvg = /** @class */ (function () {
         var arcData = CircleSector_1.CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
         startAngle, endAngle);
         node.setAttribute('d', arcData.join(' '));
-        // node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        // node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        // node.setAttribute('stroke-width', `${lineWidth || 1}`);	
-        // return node;
         return this._bindFillDraw(node, color, lineWidth || 1);
     };
     ;
@@ -379,10 +350,6 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('cy', "" + this._y(center.y));
         node.setAttribute('rx', "" + radiusX * this.scale.x);
         node.setAttribute('ry', "" + radiusY * this.scale.y);
-        // node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        // node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        // node.setAttribute('stroke-width', `${lineWidth || 1}`);	
-        // return node;
         return this._bindFillDraw(node, color, lineWidth || 1);
     };
     ;
@@ -406,10 +373,6 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('y', "" + this._y(center.y - size / 2.0));
         node.setAttribute('width', "" + size * this.scale.x);
         node.setAttribute('height', "" + size * this.scale.y);
-        // node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        // node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        // node.setAttribute('stroke-width', `${lineWidth || 1}`);	
-        // return node;
         return this._bindFillDraw(node, color, lineWidth || 1);
     };
     ;
@@ -443,10 +406,6 @@ var drawutilssvg = /** @class */ (function () {
             d.push('L', this._x(center.x + xMax), this._y(center.y + y));
         }
         node.setAttribute('d', d.join(' '));
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${1}`);	
-        // return node;
         return this._bindFillDraw(node, color, 1);
     };
     ;
@@ -483,10 +442,6 @@ var drawutilssvg = /** @class */ (function () {
             }
         }
         node.setAttribute('d', d.join(' '));
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${1}`);	
-        // return node;
         return this._bindFillDraw(node, color, 1);
     };
     ;
@@ -514,11 +469,8 @@ var drawutilssvg = /** @class */ (function () {
             'L', this._x(center.x), this._y(center.y) + size / 2.0,
             'Z'
         ];
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${1}`);
+        ;
         node.setAttribute('d', d.join(' '));
-        // return node;
         return this._bindFillDraw(node, color, 1);
     };
     ;
@@ -543,10 +495,6 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('y', "" + (this._y(center.y) - size / 2.0));
         node.setAttribute('width', "" + size);
         node.setAttribute('height', "" + size);
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${1}`);
-        //return node;
         return this._bindFillDraw(node, color, 1);
     };
     ;
@@ -571,10 +519,6 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('cx', "" + this._x(center.x));
         node.setAttribute('cy', "" + this._y(center.y));
         node.setAttribute('r', "" + radius);
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${1}`);
-        //return node;
         return this._bindFillDraw(node, color, 1);
     };
     ;
@@ -599,11 +543,7 @@ var drawutilssvg = /** @class */ (function () {
             'M', this._x(center.x), this._y(center.y) - radius,
             'L', this._x(center.x), this._y(center.y) + radius
         ];
-        //node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        //node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        //node.setAttribute('stroke-width', `${0.5}`);
-        //node.setAttribute('d', d.join(' ') );
-        //return node;
+        node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, color, 0.5);
     };
     ;
@@ -648,24 +588,17 @@ var drawutilssvg = /** @class */ (function () {
         }
         if (!isOpen)
             d.push('Z');
-        // pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-        // pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
-        // pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
         node.setAttribute('d', d.join(' '));
-        // return pathNode;
-        return this._bindFillDraw(node, color, lineWidth);
+        return this._bindFillDraw(node, color, lineWidth || 1);
     };
     ;
     drawutilssvg.prototype.text = function (text, x, y, options) {
-        // NOT YET IMPLEMENTED
-        // <text x="20" y="40">Example SVG text 1</text>
         options = options || {};
         var color = options.color || 'black';
         var node = this.createNode('text');
         node.setAttribute('x', "" + this._x(x));
         node.setAttribute('y', "" + this._x(y));
         node.innerHTML = text;
-        // return node;
         return this._bindFillDraw(node, color, 1);
     };
     ;
@@ -685,7 +618,11 @@ var drawutilssvg = /** @class */ (function () {
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
     drawutilssvg.prototype.label = function (text, x, y, rotation) {
-        // NOT YET IMPLEMENTED
+        var node = this.createNode('text');
+        // For some strange reason SVG rotation transforms use degrees instead of radians
+        node.setAttribute('transform', "translate(" + this.offset.x + "," + this.offset.y + "), rotate(" + rotation / Math.PI * 180 + ")");
+        node.innerHTML = text;
+        return this._bindFillDraw(node, 'black', null);
     };
     ;
     /**
@@ -697,7 +634,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The color to clear with.
      **/
     drawutilssvg.prototype.clear = function (color) {
-        // NOT YET IMPLEMENTED
+        // Clearing an SVG is equivalent to removing all its child elements.
         while (this.svgNode.firstChild) {
             this.svgNode.removeChild(this.svgNode.lastChild);
         }

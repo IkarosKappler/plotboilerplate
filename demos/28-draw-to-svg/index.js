@@ -58,26 +58,13 @@
 	);
 
 	// +---------------------------------------------------------------------------------
-	// | Create a random vertex inside the canvas viewport.
+	// | Use a helper function to build all demo-drawables.
 	// +-------------------------------
-	/* var randomVertex = function() {
-	    return new Vertex( Math.random()*pb.canvasSize.width*0.5 - pb.canvasSize.width/2*0.5,
-			       Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
-			     );
-			     }; */
-
-	// Use a helper function to build all demo-drawables.
 	var drawables = createDemoDrawables( pb.viewport(), // canvasSize,
 					     '../../example-image.png',
 					     function() { pb.redraw(); }
 					   );
 	pb.add( drawables );
-
-	/* var clearChildren = function( node ) {
-	    while (node.firstChild) {
-		node.removeChild(node.lastChild);
-	    }
-	}; */
 
 
 	var drawAll = function() {
@@ -87,9 +74,13 @@
 		// clearChildren( svgNode );
 		var tosvg = new drawutilssvg( svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, pb.viewport(), false );
 		tosvg.clear();
+
+		// tosvg.label('My Label', 0, 0, 45/180*Math.PI );
+		
 		// console.log( 'canvasSize', tosvg.canvasSize, 'viewport', tosvg.viewport );
 		// tosvg.resize();
 		pb.drawAll( new Date().getMilliseconds(), tosvg, tosvg );
+
 	    } catch( e ) {
 		console.error( e );
 	    }
@@ -97,12 +88,8 @@
 
 	new MouseHandler(pb.canvas,'drawsvg-demo')
 	    .move( function(e) {
+		// Display the mouse position
 		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
-		/* var cx = document.getElementById('cx');
-		var cy = document.getElementById('cy');
-		if( cx ) cx.innerHTML = relPos.x.toFixed(2);
-		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
-		*/
 		stats.mouseX = relPos.x;
 		stats.mouseY = relPos.y;
 	    } );  

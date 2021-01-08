@@ -669,6 +669,8 @@ for this purpose.
  * Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
  * Change draw.image(image, position:Vertex, size:Vertex) to Bounds or XYDimension.
  * Change draw.text(text, x:number, y:number, ...) to (..., position:XYCoords, ...). Same with draw.label(...).
+ * draw.text() and draw.label() require color params.
+ * Render dashed lines around images that cannot be rendered (e.g. file not found).
 
 
 ## Browsers support
