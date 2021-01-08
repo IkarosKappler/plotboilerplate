@@ -363,5 +363,5 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      *
      * @param {string} color - The color to clear with.
      **/
-    clear(color: string): void;
+    clear(color: string): SVGElement;
 }
