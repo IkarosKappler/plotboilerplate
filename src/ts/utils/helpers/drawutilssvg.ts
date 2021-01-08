@@ -59,8 +59,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     };
 
     resize() {
-	// this.svgNode.setAttribute('viewBox', `${this.viewport.min.x} ${this.viewport.min.y} ${this.viewport.width} ${this.viewport.height}`);
-	// this.svgNode.setAttribute('viewBox', `0 0 ${this.viewport.width} ${this.viewport.height}`);
 	this.svgNode.setAttribute('viewBox', `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
 	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
 	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
@@ -68,6 +66,25 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 
     private createNode( name:string ) : SVGElement {
 	const node : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", name);
+	// this.svgNode.appendChild( node );
+	return node;
+    };
+
+       // +---------------------------------------------------------------------------------
+    // | This is the final helper function for drawing and filling stuff. It is not
+    // | intended to be used from the outside.
+    // |
+    // | When in draw mode it draws the current shape.
+    // | When in fill mode it fills the current shape.
+    // |
+    // | This function is usually only called internally.
+    // |
+    // | @param color A stroke/fill color to use.
+    // +-------------------------------
+    private _bindFillDraw( node, color:string, lineWidth?:number ) : SVGElement {
+	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	node.setAttribute('stroke-width', `${lineWidth || 1}`);
 	this.svgNode.appendChild( node );
 	return node;
     };
@@ -102,10 +119,11 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	line.setAttribute('x2', `${this._x(zB.x)}` );
 	line.setAttribute('y2', `${this._y(zB.y)}` );
 
-	line.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	line.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	line.setAttribute('stroke-width', `${lineWidth || 1}`);
-	return line;
+	//line.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//line.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//line.setAttribute('stroke-width', `${lineWidth || 1}`);
+	// return line;
+	return this._bindFillDraw( line, color, lineWidth );
     };
 
 
@@ -122,7 +140,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      **/
     arrow( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) : SVGElement {
-	const pathNode : SVGElement = this.createNode('path');
+	const node : SVGElement = this.createNode('path');
 	var headlen:number = 8;   // length of head in pixels
 	var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	const d : Array<string|number> = [
@@ -134,11 +152,12 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    d.push( this.offset.x + vertices[i%vertices.length].x );
 	    d.push( this.offset.y + vertices[i%vertices.length].y );
 	}
-	pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
-	pathNode.setAttribute( 'd', d.join(' ') );
-	return pathNode;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	node.setAttribute( 'd', d.join(' ') );
+	// return pathNode;
+	return this._bindFillDraw( node, color, lineWidth );
     };
 
 
@@ -156,34 +175,14 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      **/
     image( image:HTMLImageElement, position:Vertex, size:Vertex ) {
-	// NOT YET IMPLEMENTED
-
 	const node : SVGElement = this.createNode('image');	
 	node.setAttribute('x', `${this._x(position.x)}`);
 	node.setAttribute('y', `${this._y(position.y)}`);
 	node.setAttribute('width', `${size.x*this.scale.x}`);
 	node.setAttribute('height', `${size.y*this.scale.y}`);
 	node.setAttribute('src', image.src );
-	return node;
-    };
-
-    
-    // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff. It is not
-    // | intended to be used from the outside.
-    // |
-    // | When in draw mode it draws the current shape.
-    // | When in fill mode it fills the current shape.
-    // |
-    // | This function is usually only called internally.
-    // |
-    // | @param color A stroke/fill color to use.
-    // +-------------------------------
-    private _fillOrDraw( node, color:string, lineWidth?:number ) {
-	// NOT YET IMPLEMENTED
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${lineWidth || 1}`);
+	// return node;
+	return this._bindFillDraw( node, null, null ); // lineWidth );
     };
 
 
@@ -205,18 +204,16 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	if( startPoint instanceof CubicBezierCurve ) {
 	    return this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth );
 	}
-	const pathNode : SVGElement = this.createNode('path');	
+	const node : SVGElement = this.createNode('path');	
 	// Draw curve
 	const d : Array<string|number> = [
 	    'M', this._x(startPoint.x), this._y(startPoint.y),
 	    'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y)
 	];
-	/* pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	 */
-	pathNode.setAttribute( 'd', d.join(' ') );
-	this._fillOrDraw( pathNode, color, lineWidth );
-	return pathNode;
+	node.setAttribute( 'd', d.join(' ') );
+	// this._bindFillDraw( pathNode, color, lineWidth );
+	// return pathNode;
+	return this._bindFillDraw( node, color, lineWidth );
     };
 
 
@@ -236,10 +233,10 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     cubicBezierPath( path:Array<Vertex>, color:string, lineWidth?:number ) : SVGElement {
-	const pathNode: SVGElement = this.createNode('path');
-
+	
+	const node: SVGElement = this.createNode('path');
 	if( !path || path.length == 0 )
-	    return pathNode;
+	    return node;
 	
 	// Draw curve
 	const d : Array<string|number> = [
@@ -259,11 +256,12 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    d.push( 'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y) );
 	    
 	}
-	pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
-	pathNode.setAttribute( 'd', d.join(' ') );
-	return pathNode;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	node.setAttribute( 'd', d.join(' ') );
+	// return pathNode;
+	return this._bindFillDraw( node, color, lineWidth );
     };
 
 
@@ -279,7 +277,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    handle( startPoint:Vertex, endPoint:Vertex ) {
+    handle( startPoint:Vertex, endPoint:Vertex ) : void {
 	// TODO: redefine methods like these into an abstract class?
 	this.point( startPoint, 'rgb(0,32,192)' );
 	this.square( endPoint, 5, 'rgba(0,128,192,0.5)' );
@@ -296,7 +294,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    handleLine( startPoint:Vertex, endPoint:Vertex ) {
+    handleLine( startPoint:Vertex, endPoint:Vertex ): void  {
 	this.line( startPoint, endPoint, 'rgb(192,192,192)' );	
     };
 
@@ -313,27 +311,16 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     dot( p:Vertex, color:string ) {
-	// NOT YET IMPLEMENTED
-	/* this.ctx.save();
-	this.ctx.beginPath();
-	this.ctx.moveTo( Math.round(this.offset.x + this.scale.x*p.x), Math.round(this.offset.y + this.scale.y*p.y) );
-	this.ctx.lineTo( Math.round(this.offset.x + this.scale.x*p.x+1), Math.round(this.offset.y + this.scale.y*p.y+1) );
-	this.ctx.closePath();
-	this.ctx.lineWidth = 1;
-	this._fillOrDraw( color );
-	this.ctx.restore(); */
-
-
 	const node : SVGElement = this.createNode('line');	
-	// Draw curve
 	const d : Array<string|number> = [
 	    'M', this._x(p.x), this._y(p.y),
 	    'L', this._x(p.x+1), this._y(p.y+1)
 	];
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${1}`);	
-	return node;
+	// node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	// node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	// node.setAttribute('stroke-width', `${1}`);	
+	// return node;
+	return this._bindFillDraw( node, color, 1 );
     };
 
     
@@ -348,23 +335,16 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     point( p:Vertex, color:string ) {
-	// NOT YET IMPLEMENTED
 	var radius:number = 3;
-	
-	/* this.ctx.beginPath();
-	this.ctx.arc( this.offset.x+p.x*this.scale.x, this.offset.y+p.y*this.scale.y, radius, 0, 2 * Math.PI, false );
-	this.ctx.closePath();
-	this.ctx.lineWidth = 1;
-	this._fillOrDraw( color ); */
-
 	const node : SVGElement = this.createNode('circle');	
 	node.setAttribute('cx', `${this._x(p.x)}` );
 	node.setAttribute('cy', `${this._y(p.y)}` );
 	node.setAttribute('r', `${radius}` );
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${1}`);	
-	return node;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${1}`);	
+	// return node;
+	return this._bindFillDraw( node, color, 1 );
     };
 
 
@@ -388,10 +368,11 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	node.setAttribute( 'cy', `${this._y(center.y)}` );
 	node.setAttribute( 'r', `${radius * this.scale.x}` ); // y?
 	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${lineWidth || 1}`);	
-	return node;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	// return node;
+	return this._bindFillDraw( node, color, lineWidth || 1 );
     };
 
 
@@ -409,30 +390,20 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     circleArc( center:Vertex, radius:number, startAngle:number, endAngle:number, color:string, lineWidth?:number ) {
-	// NOT YET IMPLEMENTED
-
 	const node : SVGElement = this.createNode('path');	
-
-	//const end : XYCoords = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
-	//const start : XYCoords = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
 	const arcData : SVGPathParams =
 	    CircleSector.circleSectorUtils.describeSVGArc(
 		this._x(center.x),
 		this._y(center.y),
 		radius*this.scale.x, // y?
-		startAngle, endAngle );
-
-	// TODO: as SVGPathParams?
-	/* const d : Array<number|string> = [
-	    'M', this._x(start.x), this._y(start.y),
-	    ...arcData
-	    ]; */
-	
+		startAngle, endAngle
+	    );
 	node.setAttribute('d', arcData.join(' ') );
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${lineWidth || 1}`);	
-	return node;	
+	// node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	// node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	// node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	// return node;
+	return this._bindFillDraw( node, color, lineWidth || 1 );
     };
 
 
@@ -456,10 +427,11 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	node.setAttribute( 'rx', `${radiusX * this.scale.x}` );
 	node.setAttribute( 'ry', `${radiusY * this.scale.y}` );
 	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${lineWidth || 1}`);	
-	return node;
+	// node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	// node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	// node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	// return node;
+	return this._bindFillDraw( node, color, lineWidth || 1 );
     };   
 
 
@@ -484,10 +456,11 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	node.setAttribute( 'width', `${size * this.scale.x}` );
 	node.setAttribute( 'height', `${size * this.scale.y}` );
 	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${lineWidth || 1}`);	
-	return node;
+	// node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	// node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	// node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	// return node;
+	return this._bindFillDraw( node, color, lineWidth || 1 );
     };
 
 
@@ -506,28 +479,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     grid( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {
-	//console.log('grid');
-	
-	// NOT YET IMPLEMENTED
-	/* this.ctx.beginPath();
-	var yMin : number = -Math.ceil((height*0.5)/sizeY)*sizeY;
-	var yMax : number = height/2;
-	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
-	    this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMin)*this.scale.y );
-	    this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMax)*this.scale.y );
-	}
-
-	var xMin : number = -Math.ceil((width*0.5)/sizeX)*sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
-	var xMax : number = width/2; // height/2;
-	for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
-	    this.ctx.moveTo( this.offset.x+(center.x+xMin)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
-	    this.ctx.lineTo( this.offset.x+(center.x+xMax)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
-	}
-	this.ctx.strokeStyle = color;
-	this.ctx.lineWidth = 1.0;
-	this.ctx.stroke();
-	this.ctx.closePath(); */
-
 	const node : SVGElement = this.createNode('path');
 	const d : SVGPathParams = [
 	];
@@ -535,8 +486,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	var yMin : number = -Math.ceil((height*0.5)/sizeY)*sizeY;
 	var yMax : number = height/2;
 	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
-	    // this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMin)*this.scale.y );
-	    // this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMax)*this.scale.y );
 	    d.push( 'M', this._x(center.x+x), this._y(center.y+yMin) );
 	    d.push( 'L', this._x(center.x+x), this._y(center.y+yMax) );
 	}
@@ -544,19 +493,16 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	var xMin : number = -Math.ceil((width*0.5)/sizeX)*sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
 	var xMax : number = width/2; // height/2;
 	for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
-	    // this.ctx.moveTo( this.offset.x+(center.x+xMin)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
-	    // this.ctx.lineTo( this.offset.x+(center.x+xMax)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
 	    d.push( 'M', this._x(center.x+xMin), this._y(center.y+y) );
 	    d.push( 'L', this._x(center.x+xMax), this._y(center.y+y) );
 	}
 
-	// console.log( 'd', d );
 	node.setAttribute( 'd', d.join(' ') );
-	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${1}`);	
-	return node;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${1}`);	
+	// return node;
+	return this._bindFillDraw( node, color, 1 );
     };
 
 
@@ -576,31 +522,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    raster( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {
-	// NOT YET IMPLEMENTED
-	// console.log('raster');
-
-	/* this.ctx.save();
-	this.ctx.beginPath();
-	var cx : number = 0, cy : number = 0;
-	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
-	    cx++;
-	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
-		if( cx == 1 ) cy++;
-		// Draw a crosshair
-		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
-		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
-		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
-		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );	
-	    }
-	}
-	this.ctx.strokeStyle = color;
-	this.ctx.lineWidth = 1.0; 
-	this.ctx.stroke();
-	this.ctx.closePath();
-	this.ctx.restore(); */
-
-	
+    raster( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {	
 	const node : SVGElement = this.createNode('path');
 	const d : SVGPathParams = [
 	];
@@ -611,11 +533,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
 		if( cx == 1 ) cy++;
 		// Draw a crosshair
-		// this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
-		// this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
-		// this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
-		// this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );
-
 		d.push( 'M', this._x(center.x+x)-4, this._y(center.y+y) );
 		d.push( 'L', this._x(center.x+x)+4, this._y(center.y+y) );
 
@@ -623,14 +540,13 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		d.push( 'L', this._x(center.x+x), this._y(center.y+y)+4 );
 	    }
 	}
-
-	//console.log( 'd', d );
 	node.setAttribute( 'd', d.join(' ') );
 	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${1}`);	
-	return node;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${1}`);	
+	// return node;
+	return this._bindFillDraw( node, color, 1 );
     };
     
 
@@ -650,17 +566,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     diamondHandle( center:Vertex, size:number, color:string ) {
-	// NOT YET IMPLEMENTED
-
-	/* this.ctx.beginPath();
-	this.ctx.moveTo( this.offset.x + center.x*this.scale.x - size/2.0, this.offset.y + center.y*this.scale.y );
-	this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y - size/2.0 );
-	this.ctx.lineTo( this.offset.x + center.x*this.scale.x + size/2.0, this.offset.y + center.y*this.scale.y );
-	this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y + size/2.0 );
-	this.ctx.closePath();
-	this.ctx.lineWidth = 1;
-	this._fillOrDraw( color ); */
-
 	const node : SVGElement = this.createNode('path');	
 	const d : SVGPathParams = [
 	    'M', this._x(center.x) - size/2.0, this._y(center.y),
@@ -668,13 +573,13 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    'L', this._x(center.x) + size/2.0, this._y(center.y),
 	    'L', this._x(center.x), this._y(center.y) + size/2.0,
 	    'Z'
-	];
-	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${1}`);
+	];	
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${1}`);
 	node.setAttribute('d', d.join(' '));
-	return node;
+	// return node;
+	return this._bindFillDraw( node, color, 1 );
     };
 
 
@@ -694,19 +599,17 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     squareHandle( center:Vertex, size:number, color:string ) {
-	// NOT YET IMPLEMENTED
-
 	const node : SVGElement = this.createNode('rect');	
 	node.setAttribute('x', `${this._x(center.x)-size/2.0}`);
 	node.setAttribute('y', `${this._y(center.y)-size/2.0}`);
 	node.setAttribute('width', `${size}`);
 	node.setAttribute('height', `${size}`);
 	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${1}`);
-	// node.setAttribute('d', d.join(' '));
-	return node;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${1}`);
+	//return node;
+	return this._bindFillDraw( node, color, 1 );
     };
 
 
@@ -726,19 +629,17 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     circleHandle( center:Vertex, radius:number, color:string ) {
-	// NOT YET IMPLEMENTED
 	radius = radius || 3;
-
+	
 	const node : SVGElement = this.createNode('circle');	
 	node.setAttribute('cx', `${this._x(center.x)}`);
 	node.setAttribute('cy', `${this._y(center.y)}`);
 	node.setAttribute('r', `${radius}`);
-	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${1}`);
-
-	return node;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${1}`);
+	//return node;
+	return this._bindFillDraw( node, color, 1 );
     };
 
 
@@ -756,8 +657,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     crosshair( center:XYCoords, radius:number, color:string ) {
-	// NOT YET IMPLEMENTED
-
 	const node : SVGElement = this.createNode('path');
 	const d : SVGPathParams = [
 	    'M', this._x(center.x)-radius, this._y(center.y),
@@ -765,13 +664,12 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    'M', this._x(center.x), this._y(center.y)-radius,
 	    'L', this._x(center.x), this._y(center.y)+radius
 	];
-	
-	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	node.setAttribute('stroke-width', `${0.5}`);
-	node.setAttribute('d', d.join(' ') );
-	
-	return node;
+	//node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	//node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	//node.setAttribute('stroke-width', `${0.5}`);
+	//node.setAttribute('d', d.join(' ') );
+	//return node;
+	return this._bindFillDraw( node, color, 0.5 );
     };
 
 
@@ -787,7 +685,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     polygon( polygon:Polygon, color:string, lineWidth?:number ) : SVGElement {	
-	// NOT YET IMPLEMENTED
 	return this.polyline( polygon.vertices, polygon.isOpen, color, lineWidth );
     };
 
@@ -805,11 +702,9 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     polyline( vertices:Array<Vertex>, isOpen:boolean, color:string, lineWidth?:number ) : SVGElement  {
-	// NOT YET IMPLEMENTED
-	const pathNode : SVGElement = this.createNode('path');
+	const node : SVGElement = this.createNode('path');
 	if( vertices.length == 0 )
-	    return pathNode;
-	
+	    return node;
 	// Draw curve
 	const d : Array<string|number> = [
 	    'M', this._x(vertices[0].x), this._y(vertices[0].y)
@@ -820,15 +715,27 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	}
 	if( !isOpen )
 	    d.push('Z');
-	pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
-	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
-	pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
-	pathNode.setAttribute( 'd', d.join(' ') );
-	return pathNode;
+	// pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	// pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	// pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	node.setAttribute( 'd', d.join(' ') );
+	// return pathNode;
+	return this._bindFillDraw( node, color, lineWidth );
     };
 
     text( text:string, x:number, y:number, options?:{color?:string}) {
-     	   // NOT YET IMPLEMENTED
+     	// NOT YET IMPLEMENTED
+	// <text x="20" y="40">Example SVG text 1</text>
+
+	options = options || {};
+	const color:string = options.color || 'black';
+	
+	const node : SVGElement = this.createNode('text');
+	node.setAttribute('x', `${this._x(x)}`);
+	node.setAttribute('y', `${this._x(y)}`);
+	node.innerHTML = text;
+	// return node;
+	return this._bindFillDraw( node, color, 1 );
     };
     
 

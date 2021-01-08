@@ -37,6 +37,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, viewport: Bounds, fillShapes: boolean);
     resize(): void;
     private createNode;
+    private _bindFillDraw;
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
@@ -84,7 +85,6 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @memberof drawutils
      **/
     image(image: HTMLImageElement, position: Vertex, size: Vertex): SVGElement;
-    private _fillOrDraw;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -341,7 +341,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): SVGElement;
     text(text: string, x: number, y: number, options?: {
         color?: string;
-    }): void;
+    }): SVGElement;
     /**
      * Draw a non-scaling text label at the given position.
      *

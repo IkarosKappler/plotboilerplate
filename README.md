@@ -668,6 +668,7 @@ for this purpose.
  * Tweak the SVGBuilder: make the style classes configurable (colors, line thickness, custom classes, ...).
  * Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
  * Change draw.image(image, position:Vertex, size:Vertex) to Bounds or XYDimension.
+ * Change draw.text(text, x:number, y:number, ...) to (..., position:XYCoords, ...). Same with draw.label(...).
 
 
 ## Browsers support
