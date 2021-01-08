@@ -61,7 +61,8 @@
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
  * @modified 2020-12-17 Added the `CircleSector` drawable.
  * @modified 2021-01-04 Avoiding multiple redraw call on adding multiple Drawables (array).
- * @version  1.11.1
+ * @modified 2021-01-08 Added param `draw:DraLib<void>` to the methods `drawVertices`, `drawGrid` and `drawSelectPolygon`.
+ * @version  1.11.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -431,7 +432,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawGrid(): void;
+    drawGrid(draw: DrawLib<any>): void;
     /**
      * Draw the origin with the current config settings.<br>
      *
@@ -443,7 +444,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawOrigin(): void;
+    drawOrigin(draw: DrawLib<any>): void;
     /**
      * This is just a tiny helper function to determine the render color of vertices.
      **/
@@ -460,7 +461,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawDrawables(renderTime: number, draw?: DrawLib<any>, fill?: DrawLib<any>): void;
+    drawDrawables(renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>): void;
     /**
      * Draw the select-polygon (if there is one).
      *
@@ -472,7 +473,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawSelectPolygon(): void;
+    drawSelectPolygon(draw: DrawLib<any>): void;
     /**
      * Draw all vertices that were not yet drawn with the given render time.<br>
      * <br>
@@ -486,7 +487,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawVertices(renderTime: number): void;
+    drawVertices(renderTime: number, draw: DrawLib<any>): void;
     /**
      * Trigger redrawing of all objects.<br>
      * <br>
@@ -498,6 +499,15 @@ export declare class PlotBoilerplate {
      * @return {void}
      **/
     redraw(): void;
+    /**
+     * Draw all: drawables, grid, select-polygon and vertices.
+     *
+     * @method drawAll
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {void}
+     **/
+    drawAll(renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>): void;
     /**
      * This function clears the canvas with the configured background color.<br>
      * <br>

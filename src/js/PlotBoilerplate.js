@@ -62,7 +62,8 @@
  * @modified 2020-12-11 Added the `removeAll(boolean)` function.
  * @modified 2020-12-17 Added the `CircleSector` drawable.
  * @modified 2021-01-04 Avoiding multiple redraw call on adding multiple Drawables (array).
- * @version  1.11.1
+ * @modified 2021-01-08 Added param `draw:DraLib<void>` to the methods `drawVertices`, `drawGrid` and `drawSelectPolygon`.
+ * @version  1.11.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -700,7 +701,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawGrid = function () {
+    PlotBoilerplate.prototype.drawGrid = function (draw) {
         var gScale = {
             x: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX / this.config.cssScaleX,
             y: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) * this.config.rasterScaleY / this.config.cssScaleY
@@ -712,9 +713,9 @@ var PlotBoilerplate = /** @class */ (function () {
         offset.y = (Math.round(offset.y + cs.height) / Math.round(gSize.height)) * (gSize.height) / this.draw.scale.y + (((this.draw.offset.y - cs.height) / this.draw.scale.x) % gSize.height);
         if (this.drawConfig.drawGrid) {
             if (this.config.rasterGrid) // TODO: move config member to drawConfig
-                this.draw.raster(offset, (this.canvasSize.width) / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.125)');
+                draw.raster(offset, (this.canvasSize.width) / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.125)');
             else
-                this.draw.grid(offset, (this.canvasSize.width) / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.095)');
+                draw.grid(offset, (this.canvasSize.width) / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.095)');
         }
     };
     ;
@@ -729,9 +730,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawOrigin = function () {
+    PlotBoilerplate.prototype.drawOrigin = function (draw) {
         // Add a crosshair to mark the origin
-        this.draw.crosshair({ x: 0, y: 0 }, 10, '#000000');
+        draw.crosshair({ x: 0, y: 0 }, 10, '#000000');
     };
     ;
     /**
@@ -755,12 +756,12 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.drawDrawables = function (renderTime, draw, fill) {
         // Call globally imported helper function.
         //drawDrawables( this.drawables, this.draw, this.fill, this.drawConfig, renderTime, this._handleColor );
-        if (!draw) {
+        /* if( !draw ) {
             draw = this.draw;
         }
-        if (!fill) {
+        if( !fill ) {
             fill = this.fill;
-        }
+        } */
         /*
         for( var i in this.drawables ) {
             var d : Drawable = this.drawables[i];
@@ -979,11 +980,11 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawSelectPolygon = function () {
+    PlotBoilerplate.prototype.drawSelectPolygon = function (draw) {
         // Draw select polygon?
         if (this.selectPolygon != null && this.selectPolygon.vertices.length > 0) {
-            this.draw.polygon(this.selectPolygon, '#888888');
-            this.draw.crosshair(this.selectPolygon.vertices[0], 3, '#008888');
+            draw.polygon(this.selectPolygon, '#888888');
+            draw.crosshair(this.selectPolygon.vertices[0], 3, '#008888');
         }
     };
     ;
@@ -1000,11 +1001,11 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawVertices = function (renderTime) {
+    PlotBoilerplate.prototype.drawVertices = function (renderTime, draw) {
         // Draw all vertices as small squares if they were not already drawn by other objects
         for (var i in this.vertices) {
             if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible) {
-                this.draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], 'rgb(0,128,192)'));
+                draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], 'rgb(0,128,192)'));
             }
         }
     };
@@ -1026,17 +1027,32 @@ var PlotBoilerplate = /** @class */ (function () {
         this.clear();
         if (this.config.preDraw)
             this.config.preDraw();
-        // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
-        this.draw.beginDrawCycle();
-        this.fill.beginDrawCycle();
-        this.drawGrid();
-        if (this.config.drawOrigin)
-            this.drawOrigin();
-        this.drawDrawables(renderTime, this.draw, this.fill);
-        this.drawVertices(renderTime);
-        this.drawSelectPolygon();
+        this.drawAll(renderTime, this.draw, this.fill);
         if (this.config.postDraw)
             this.config.postDraw();
+    };
+    ;
+    /**
+     * Draw all: drawables, grid, select-polygon and vertices.
+     *
+     * @method drawAll
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {void}
+     **/
+    PlotBoilerplate.prototype.drawAll = function (renderTime, draw, fill) {
+        //if( !draw ) {
+        //    draw = this.draw;
+        //}
+        // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+        draw.beginDrawCycle();
+        fill.beginDrawCycle();
+        this.drawGrid(draw);
+        if (this.config.drawOrigin)
+            this.drawOrigin(draw);
+        this.drawDrawables(renderTime, draw, fill);
+        this.drawVertices(renderTime, draw);
+        this.drawSelectPolygon(draw);
     };
     ; // END redraw
     /**

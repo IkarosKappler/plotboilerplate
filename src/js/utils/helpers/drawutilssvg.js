@@ -8,6 +8,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
+var CircleSector_1 = require("../../CircleSector");
 var CubicBezierCurve_1 = require("../../CubicBezierCurve");
 var Vertex_1 = require("../../Vertex");
 /**
@@ -29,18 +30,23 @@ var drawutilssvg = /** @class */ (function () {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    function drawutilssvg(svgNode, canvasSize, viewport, fillShapes) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, viewport, fillShapes) {
         this.svgNode = svgNode;
-        this.offset = new Vertex_1.Vertex(0, 0);
-        this.scale = new Vertex_1.Vertex(1, 1);
+        this.offset = new Vertex_1.Vertex(0, 0).set(offset);
+        this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.canvasSize = canvasSize;
         this.viewport = viewport;
-        this.svgNode.setAttribute('viewBox', this.viewport.min.x + " " + this.viewport.min.y + " " + this.viewport.width + " " + this.viewport.height);
-        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
-        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
+        this.resize();
     }
     ;
+    drawutilssvg.prototype.resize = function () {
+        // this.svgNode.setAttribute('viewBox', `${this.viewport.min.x} ${this.viewport.min.y} ${this.viewport.width} ${this.viewport.height}`);
+        // this.svgNode.setAttribute('viewBox', `0 0 ${this.viewport.width} ${this.viewport.height}`);
+        this.svgNode.setAttribute('viewBox', "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
+        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
+        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
+    };
     drawutilssvg.prototype.createNode = function (name) {
         var node = document.createElementNS("http://www.w3.org/2000/svg", name);
         this.svgNode.appendChild(node);
@@ -101,8 +107,10 @@ var drawutilssvg = /** @class */ (function () {
             'M', this._x(zA.x), this._y(zA.y)
         ];
         for (var i = 0; i <= vertices.length; i++) {
-            d.push(this._x(vertices[i % vertices.length].x));
-            d.push(this._y(vertices[i % vertices.length].y));
+            d.push('L');
+            // Note: only use offset here (the vertices are already scaled)
+            d.push(this.offset.x + vertices[i % vertices.length].x);
+            d.push(this.offset.y + vertices[i % vertices.length].y);
         }
         pathNode.setAttribute('fill', this.fillShapes ? color : 'none');
         pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color);
@@ -284,7 +292,14 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.circle = function (center, radius, color, lineWidth) {
-        // NOT YET IMPLEMENTED
+        var node = this.createNode('circle');
+        node.setAttribute('cx', "" + this._x(center.x));
+        node.setAttribute('cy', "" + this._y(center.y));
+        node.setAttribute('r', "" + radius * this.scale.x); // y?
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + (lineWidth || 1));
+        return node;
     };
     ;
     /**
@@ -302,6 +317,21 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
         // NOT YET IMPLEMENTED
+        var node = this.createNode('path');
+        //const end : XYCoords = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
+        //const start : XYCoords = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
+        var arcData = CircleSector_1.CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
+        startAngle, endAngle);
+        // TODO: as SVGPathParams?
+        /* const d : Array<number|string> = [
+            'M', this._x(start.x), this._y(start.y),
+            ...arcData
+            ]; */
+        node.setAttribute('d', arcData.join(' '));
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + (lineWidth || 1));
+        return node;
     };
     ;
     /**
@@ -318,7 +348,15 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
-        // NOT YET IMPLEMENTED
+        var node = this.createNode('ellipse');
+        node.setAttribute('cx', "" + this._x(center.x));
+        node.setAttribute('cy', "" + this._y(center.y));
+        node.setAttribute('rx', "" + radiusX * this.scale.x);
+        node.setAttribute('ry', "" + radiusY * this.scale.y);
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + (lineWidth || 1));
+        return node;
     };
     ;
     /**
@@ -336,7 +374,15 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.square = function (center, size, color, lineWidth) {
-        // NOT YET IMPLEMENTED
+        var node = this.createNode('rectangle');
+        node.setAttribute('x', "" + this._x(center.x - size / 2.0));
+        node.setAttribute('y', "" + this._y(center.y - size / 2.0));
+        node.setAttribute('width', "" + size * this.scale.x);
+        node.setAttribute('height', "" + size * this.scale.y);
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + (lineWidth || 1));
+        return node;
     };
     ;
     /**
@@ -354,7 +400,50 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
+        console.log('grid');
         // NOT YET IMPLEMENTED
+        /* this.ctx.beginPath();
+        var yMin : number = -Math.ceil((height*0.5)/sizeY)*sizeY;
+        var yMax : number = height/2;
+        for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
+            this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMin)*this.scale.y );
+            this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMax)*this.scale.y );
+        }
+    
+        var xMin : number = -Math.ceil((width*0.5)/sizeX)*sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
+        var xMax : number = width/2; // height/2;
+        for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
+            this.ctx.moveTo( this.offset.x+(center.x+xMin)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+            this.ctx.lineTo( this.offset.x+(center.x+xMax)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+        }
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 1.0;
+        this.ctx.stroke();
+        this.ctx.closePath(); */
+        var node = this.createNode('path');
+        var d = [];
+        var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
+        var yMax = height / 2;
+        for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
+            // this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMin)*this.scale.y );
+            // this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMax)*this.scale.y );
+            d.push('M', this._x(center.x + x), this._y(center.y + yMin));
+            d.push('L', this._x(center.x + x), this._y(center.y + yMax));
+        }
+        var xMin = -Math.ceil((width * 0.5) / sizeX) * sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
+        var xMax = width / 2; // height/2;
+        for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
+            // this.ctx.moveTo( this.offset.x+(center.x+xMin)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+            // this.ctx.lineTo( this.offset.x+(center.x+xMax)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+            d.push('M', this._x(center.x + xMin), this._y(center.y + y));
+            d.push('L', this._x(center.x + xMax), this._y(center.y + y));
+        }
+        console.log('d', d);
+        node.setAttribute('d', d.join(' '));
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + 1);
+        return node;
     };
     ;
     /**
@@ -375,6 +464,51 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
+        console.log('raster');
+        /* this.ctx.save();
+        this.ctx.beginPath();
+        var cx : number = 0, cy : number = 0;
+        for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
+            cx++;
+            for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
+            if( cx == 1 ) cy++;
+            // Draw a crosshair
+            this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+            this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+            this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
+            this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );
+            }
+        }
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = 1.0;
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore(); */
+        var node = this.createNode('path');
+        var d = [];
+        var cx = 0, cy = 0;
+        for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
+            cx++;
+            for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
+                if (cx == 1)
+                    cy++;
+                // Draw a crosshair
+                // this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+                // this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+                // this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
+                // this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );
+                d.push('M', this._x(center.x + x) - 4, this._y(center.y + y));
+                d.push('L', this._x(center.x + x) + 4, this._y(center.y + y));
+                d.push('M', this._x(center.x + x), this._y(center.y + y) - 4);
+                d.push('L', this._x(center.x + x), this._y(center.y + y) + 4);
+            }
+        }
+        console.log('d', d);
+        node.setAttribute('d', d.join(' '));
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + 1);
+        return node;
     };
     ;
     /**

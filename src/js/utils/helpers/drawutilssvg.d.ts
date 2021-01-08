@@ -34,7 +34,8 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    constructor(svgNode: SVGElement, canvasSize: XYDimension, viewport: Bounds, fillShapes: boolean);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, viewport: Bounds, fillShapes: boolean);
+    resize(): void;
     private createNode;
     /**
      * Called before each draw cycle.
@@ -174,7 +175,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    circle(center: Vertex, radius: number, color: string, lineWidth?: number): void;
+    circle(center: Vertex, radius: number, color: string, lineWidth?: number): SVGElement;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
@@ -188,7 +189,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number): void;
+    circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number): SVGElement;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -202,7 +203,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number): void;
+    ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number): SVGElement;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -217,7 +218,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    square(center: Vertex, size: number, color: string, lineWidth?: number): void;
+    square(center: Vertex, size: number, color: string, lineWidth?: number): SVGElement;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -232,7 +233,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    grid(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string): void;
+    grid(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string): SVGElement;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
@@ -249,7 +250,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    raster(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string): void;
+    raster(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string): SVGElement;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *

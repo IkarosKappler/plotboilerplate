@@ -85,8 +85,12 @@
 	    try {
 		var svgNode = document.getElementById('preview-svg');
 		clearChildren( svgNode );
-		var tosvg = new drawutilssvg( svgNode, pb.canvasSize, pb.viewport(), false );
-		pb.drawDrawables( new Date().getMilliseconds(), tosvg, tosvg );
+		var tosvg = new drawutilssvg( svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, pb.viewport(), false );
+		console.log( 'canvasSize', tosvg.canvasSize, 'viewport', tosvg.viewport );
+		// tosvg.scale.set( pb.draw.scale );
+		// tosvg.offset.set( pb.draw.offset );
+		tosvg.resize();
+		pb.drawAll( new Date().getMilliseconds(), tosvg, tosvg );
 	    } catch( e ) {
 		console.error( e );
 	    }

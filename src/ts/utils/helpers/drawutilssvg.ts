@@ -8,10 +8,11 @@
 
 
 import { Bounds } from "../../Bounds";
+import { CircleSector } from "../../CircleSector";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { DrawLib, XYCoords, XYDimension, SVGSerializable } from "../../interfaces";
+import { DrawLib, XYCoords, XYDimension, SVGPathParams, SVGSerializable } from "../../interfaces";
 
 
 /**
@@ -46,18 +47,24 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    constructor( svgNode:SVGElement, canvasSize:XYDimension, viewport:Bounds, fillShapes:boolean ) {
+    constructor( svgNode:SVGElement, offset:XYCoords, scale:XYCoords, canvasSize:XYDimension, viewport:Bounds, fillShapes:boolean ) {
 	this.svgNode = svgNode;
-	this.offset = new Vertex( 0, 0 );
-	this.scale = new Vertex( 1, 1 );
+	this.offset = new Vertex( 0, 0 ).set(offset);
+	this.scale = new Vertex( 1, 1 ).set(scale);
 	this.fillShapes = fillShapes;
 	this.canvasSize = canvasSize;
 	this.viewport = viewport;
 
-	this.svgNode.setAttribute('viewBox', `${this.viewport.min.x} ${this.viewport.min.y} ${this.viewport.width} ${this.viewport.height}`);
+	this.resize();
+    };
+
+    resize() {
+	// this.svgNode.setAttribute('viewBox', `${this.viewport.min.x} ${this.viewport.min.y} ${this.viewport.width} ${this.viewport.height}`);
+	// this.svgNode.setAttribute('viewBox', `0 0 ${this.viewport.width} ${this.viewport.height}`);
+	this.svgNode.setAttribute('viewBox', `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
 	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
 	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
-    };
+    }
 
     private createNode( name:string ) : SVGElement {
 	const node : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -122,8 +129,10 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    'M', this._x(zA.x), this._y(zA.y)
 	];
 	for( var i = 0; i <= vertices.length; i++ ) {
-	    d.push( this._x(vertices[i%vertices.length].x) );
-	    d.push( this._y(vertices[i%vertices.length].y) );
+	    d.push( 'L' );
+	    // Note: only use offset here (the vertices are already scaled)
+	    d.push( this.offset.x + vertices[i%vertices.length].x );
+	    d.push( this.offset.y + vertices[i%vertices.length].y );
 	}
 	pathNode.setAttribute('fill', this.fillShapes ? color : 'none' ); 
 	pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
@@ -324,7 +333,15 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     circle( center:Vertex, radius:number, color:string, lineWidth?:number ) {
-	// NOT YET IMPLEMENTED
+	const node : SVGElement = this.createNode('circle');	
+	node.setAttribute( 'cx', `${this._x(center.x)}` );
+	node.setAttribute( 'cy', `${this._y(center.y)}` );
+	node.setAttribute( 'r', `${radius * this.scale.x}` ); // y?
+	
+	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	return node;
     };
 
 
@@ -343,6 +360,29 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */
     circleArc( center:Vertex, radius:number, startAngle:number, endAngle:number, color:string, lineWidth?:number ) {
 	// NOT YET IMPLEMENTED
+
+	const node : SVGElement = this.createNode('path');	
+
+	//const end : XYCoords = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
+	//const start : XYCoords = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
+	const arcData : SVGPathParams =
+	    CircleSector.circleSectorUtils.describeSVGArc(
+		this._x(center.x),
+		this._y(center.y),
+		radius*this.scale.x, // y?
+		startAngle, endAngle );
+
+	// TODO: as SVGPathParams?
+	/* const d : Array<number|string> = [
+	    'M', this._x(start.x), this._y(start.y),
+	    ...arcData
+	    ]; */
+	
+	node.setAttribute('d', arcData.join(' ') );
+	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	return node;	
     };
 
 
@@ -360,7 +400,16 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     ellipse( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number ) {
-	// NOT YET IMPLEMENTED
+	const node : SVGElement = this.createNode('ellipse');	
+	node.setAttribute( 'cx', `${this._x(center.x)}` );
+	node.setAttribute( 'cy', `${this._y(center.y)}` );
+	node.setAttribute( 'rx', `${radiusX * this.scale.x}` );
+	node.setAttribute( 'ry', `${radiusY * this.scale.y}` );
+	
+	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	return node;
     };   
 
 
@@ -378,8 +427,17 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    square( center:Vertex, size:number, color:string, lineWidth?:number ) {
-	// NOT YET IMPLEMENTED
+    square( center:Vertex, size:number, color:string, lineWidth?:number ) {	
+	const node : SVGElement = this.createNode('rectangle');	
+	node.setAttribute( 'x', `${this._x(center.x-size/2.0)}` );
+	node.setAttribute( 'y', `${this._y(center.y-size/2.0)}` );
+	node.setAttribute( 'width', `${size * this.scale.x}` );
+	node.setAttribute( 'height', `${size * this.scale.y}` );
+	
+	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	node.setAttribute('stroke-width', `${lineWidth || 1}`);	
+	return node;
     };
 
 
@@ -398,7 +456,56 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     grid( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {
+	console.log('grid');
 	// NOT YET IMPLEMENTED
+	/* this.ctx.beginPath();
+	var yMin : number = -Math.ceil((height*0.5)/sizeY)*sizeY;
+	var yMax : number = height/2;
+	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
+	    this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMin)*this.scale.y );
+	    this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMax)*this.scale.y );
+	}
+
+	var xMin : number = -Math.ceil((width*0.5)/sizeX)*sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
+	var xMax : number = width/2; // height/2;
+	for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
+	    this.ctx.moveTo( this.offset.x+(center.x+xMin)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+	    this.ctx.lineTo( this.offset.x+(center.x+xMax)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+	}
+	this.ctx.strokeStyle = color;
+	this.ctx.lineWidth = 1.0;
+	this.ctx.stroke();
+	this.ctx.closePath(); */
+
+	const node : SVGElement = this.createNode('path');
+	const d : SVGPathParams = [
+	];
+
+	var yMin : number = -Math.ceil((height*0.5)/sizeY)*sizeY;
+	var yMax : number = height/2;
+	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
+	    // this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMin)*this.scale.y );
+	    // this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+yMax)*this.scale.y );
+	    d.push( 'M', this._x(center.x+x), this._y(center.y+yMin) );
+	    d.push( 'L', this._x(center.x+x), this._y(center.y+yMax) );
+	}
+
+	var xMin : number = -Math.ceil((width*0.5)/sizeX)*sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
+	var xMax : number = width/2; // height/2;
+	for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
+	    // this.ctx.moveTo( this.offset.x+(center.x+xMin)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+	    // this.ctx.lineTo( this.offset.x+(center.x+xMax)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+	    d.push( 'M', this._x(center.x+xMin), this._y(center.y+y) );
+	    d.push( 'L', this._x(center.x+xMax), this._y(center.y+y) );
+	}
+
+	console.log( 'd', d );
+	node.setAttribute( 'd', d.join(' ') );
+	
+	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	node.setAttribute('stroke-width', `${1}`);	
+	return node;
     };
 
 
@@ -420,6 +527,60 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */
     raster( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {
 	// NOT YET IMPLEMENTED
+	console.log('raster');
+
+	/* this.ctx.save();
+	this.ctx.beginPath();
+	var cx : number = 0, cy : number = 0;
+	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
+	    cx++;
+	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
+		if( cx == 1 ) cy++;
+		// Draw a crosshair
+		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+		this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
+		this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );	
+	    }
+	}
+	this.ctx.strokeStyle = color;
+	this.ctx.lineWidth = 1.0; 
+	this.ctx.stroke();
+	this.ctx.closePath();
+	this.ctx.restore(); */
+
+	
+	const node : SVGElement = this.createNode('path');
+	const d : SVGPathParams = [
+	];
+	
+	var cx : number = 0, cy : number = 0;
+	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
+	    cx++;
+	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
+		if( cx == 1 ) cy++;
+		// Draw a crosshair
+		// this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x-4, this.offset.y+(center.y+y)*this.scale.y );
+		// this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x+4, this.offset.y+(center.y+y)*this.scale.y );
+		// this.ctx.moveTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y-4 );
+		// this.ctx.lineTo( this.offset.x+(center.x+x)*this.scale.x, this.offset.y+(center.y+y)*this.scale.y+4 );
+
+		d.push( 'M', this._x(center.x+x)-4, this._y(center.y+y) );
+		d.push( 'L', this._x(center.x+x)+4, this._y(center.y+y) );
+
+		d.push( 'M', this._x(center.x+x), this._y(center.y+y)-4 );
+		d.push( 'L', this._x(center.x+x), this._y(center.y+y)+4 );
+	    }
+	}
+
+	
+	console.log( 'd', d );
+	node.setAttribute( 'd', d.join(' ') );
+	
+	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
+	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
+	node.setAttribute('stroke-width', `${1}`);	
+	return node;
     };
     
 
