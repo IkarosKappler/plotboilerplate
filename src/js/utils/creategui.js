@@ -85,6 +85,7 @@ globalThis.utils.createGUI = function(pb) {
     fold0.add(pb.config, 'scaleY').title("Scale y.").min(0.01).max(10.0).step(0.01).onChange( function() { _self.draw.scale.y = _self.fill.scale.y = _self.config.scaleY; _self.redraw(); } ).listen();
     fold0.add(pb.config, 'offsetX').title("Offset x.").step(10.0).onChange( function() { _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX; _self.redraw(); } ).listen();
     fold0.add(pb.config, 'offsetY').title("Offset y.").step(10.0).onChange( function() { _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY; _self.redraw(); } ).listen();
+    fold0.add(pb.config, 'drawOrigin').title('Draw the origin (0,0).').onChange( function() { _self.redraw(); } ).listen();
     fold0.add(pb.config, 'rasterGrid').title("Draw a fine raster instead a full grid.").onChange( function() { _self.redraw(); } ).listen();
     fold0.add(pb.config, 'redrawOnResize').title("Automatically redraw the data if window or canvas is resized.").listen();
     fold0.addColor(pb.config, 'backgroundColor').onChange( function() { _self.redraw(); } ).title("Choose a background color.");

@@ -667,6 +667,7 @@ for this purpose.
  * Add a pointDeleted event handler to PB? Would be helpful to delete objects outside the PB when their associated points are deleted by the user.
  * Tweak the SVGBuilder: make the style classes configurable (colors, line thickness, custom classes, ...).
  * Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
+ * Change draw.image(image, position:Vertex, size:Vertex) to Bounds or XYDimension.
 
 
 ## Browsers support

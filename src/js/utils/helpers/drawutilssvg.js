@@ -134,6 +134,13 @@ var drawutilssvg = /** @class */ (function () {
      **/
     drawutilssvg.prototype.image = function (image, position, size) {
         // NOT YET IMPLEMENTED
+        var node = this.createNode('image');
+        node.setAttribute('x', "" + this._x(position.x));
+        node.setAttribute('y', "" + this._y(position.y));
+        node.setAttribute('width', "" + size.x * this.scale.x);
+        node.setAttribute('height', "" + size.y * this.scale.y);
+        node.setAttribute('src', image.src);
+        return node;
     };
     ;
     // +---------------------------------------------------------------------------------
@@ -147,9 +154,13 @@ var drawutilssvg = /** @class */ (function () {
     // |
     // | @param color A stroke/fill color to use.
     // +-------------------------------
-    //_fillOrDraw( color:string ) {
-    // NOT YET IMPLEMENTED
-    //};
+    drawutilssvg.prototype._fillOrDraw = function (node, color, lineWidth) {
+        // NOT YET IMPLEMENTED
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + (lineWidth || 1));
+    };
+    ;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -174,10 +185,11 @@ var drawutilssvg = /** @class */ (function () {
             'M', this._x(startPoint.x), this._y(startPoint.y),
             'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y)
         ];
-        pathNode.setAttribute('fill', this.fillShapes ? color : 'none');
-        pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color);
-        pathNode.setAttribute('stroke-width', "" + (lineWidth || 1));
+        /* pathNode.setAttribute('fill', this.fillShapes ? color : 'none' );
+        pathNode.setAttribute('stroke', this.fillShapes ? 'none' : color );
+        pathNode.setAttribute('stroke-width', `${lineWidth || 1}`);	 */
         pathNode.setAttribute('d', d.join(' '));
+        this._fillOrDraw(pathNode, color, lineWidth);
         return pathNode;
     };
     ;
@@ -232,7 +244,9 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.handle = function (startPoint, endPoint) {
-        // NOT YET IMPLEMENTED
+        // TODO: redefine methods like these into an abstract class?
+        this.point(startPoint, 'rgb(0,32,192)');
+        this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
     };
     ;
     /**
@@ -246,7 +260,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.handleLine = function (startPoint, endPoint) {
-        // NOT YET IMPLEMENTED
+        this.line(startPoint, endPoint, 'rgb(192,192,192)');
     };
     ;
     /**
@@ -261,6 +275,24 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.dot = function (p, color) {
         // NOT YET IMPLEMENTED
+        /* this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo( Math.round(this.offset.x + this.scale.x*p.x), Math.round(this.offset.y + this.scale.y*p.y) );
+        this.ctx.lineTo( Math.round(this.offset.x + this.scale.x*p.x+1), Math.round(this.offset.y + this.scale.y*p.y+1) );
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw( color );
+        this.ctx.restore(); */
+        var node = this.createNode('line');
+        // Draw curve
+        var d = [
+            'M', this._x(p.x), this._y(p.y),
+            'L', this._x(p.x + 1), this._y(p.y + 1)
+        ];
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + 1);
+        return node;
     };
     ;
     /**
@@ -275,6 +307,20 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.point = function (p, color) {
         // NOT YET IMPLEMENTED
+        var radius = 3;
+        /* this.ctx.beginPath();
+        this.ctx.arc( this.offset.x+p.x*this.scale.x, this.offset.y+p.y*this.scale.y, radius, 0, 2 * Math.PI, false );
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw( color ); */
+        var node = this.createNode('circle');
+        node.setAttribute('cx', "" + this._x(p.x));
+        node.setAttribute('cy', "" + this._y(p.y));
+        node.setAttribute('r', "" + radius);
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + 1);
+        return node;
     };
     ;
     /**
@@ -400,7 +446,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
-        console.log('grid');
+        //console.log('grid');
         // NOT YET IMPLEMENTED
         /* this.ctx.beginPath();
         var yMin : number = -Math.ceil((height*0.5)/sizeY)*sizeY;
@@ -438,7 +484,7 @@ var drawutilssvg = /** @class */ (function () {
             d.push('M', this._x(center.x + xMin), this._y(center.y + y));
             d.push('L', this._x(center.x + xMax), this._y(center.y + y));
         }
-        console.log('d', d);
+        // console.log( 'd', d );
         node.setAttribute('d', d.join(' '));
         node.setAttribute('fill', this.fillShapes ? color : 'none');
         node.setAttribute('stroke', this.fillShapes ? 'none' : color);
@@ -464,7 +510,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
-        console.log('raster');
+        // console.log('raster');
         /* this.ctx.save();
         this.ctx.beginPath();
         var cx : number = 0, cy : number = 0;
@@ -503,7 +549,7 @@ var drawutilssvg = /** @class */ (function () {
                 d.push('L', this._x(center.x + x), this._y(center.y + y) + 4);
             }
         }
-        console.log('d', d);
+        //console.log( 'd', d );
         node.setAttribute('d', d.join(' '));
         node.setAttribute('fill', this.fillShapes ? color : 'none');
         node.setAttribute('stroke', this.fillShapes ? 'none' : color);
@@ -528,6 +574,27 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.diamondHandle = function (center, size, color) {
         // NOT YET IMPLEMENTED
+        /* this.ctx.beginPath();
+        this.ctx.moveTo( this.offset.x + center.x*this.scale.x - size/2.0, this.offset.y + center.y*this.scale.y );
+        this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y - size/2.0 );
+        this.ctx.lineTo( this.offset.x + center.x*this.scale.x + size/2.0, this.offset.y + center.y*this.scale.y );
+        this.ctx.lineTo( this.offset.x + center.x*this.scale.x,            this.offset.y + center.y*this.scale.y + size/2.0 );
+        this.ctx.closePath();
+        this.ctx.lineWidth = 1;
+        this._fillOrDraw( color ); */
+        var node = this.createNode('path');
+        var d = [
+            'M', this._x(center.x) - size / 2.0, this._y(center.y),
+            'L', this._x(center.x), this._y(center.y) - size / 2.0,
+            'L', this._x(center.x) + size / 2.0, this._y(center.y),
+            'L', this._x(center.x), this._y(center.y) + size / 2.0,
+            'Z'
+        ];
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + 1);
+        node.setAttribute('d', d.join(' '));
+        return node;
     };
     ;
     /**
@@ -547,6 +614,16 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.squareHandle = function (center, size, color) {
         // NOT YET IMPLEMENTED
+        var node = this.createNode('rect');
+        node.setAttribute('x', "" + (this._x(center.x) - size / 2.0));
+        node.setAttribute('y', "" + (this._y(center.y) - size / 2.0));
+        node.setAttribute('width', "" + size);
+        node.setAttribute('height', "" + size);
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + 1);
+        // node.setAttribute('d', d.join(' '));
+        return node;
     };
     ;
     /**
@@ -564,8 +641,17 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilssvg.prototype.circleHandle = function (center, size, color) {
+    drawutilssvg.prototype.circleHandle = function (center, radius, color) {
         // NOT YET IMPLEMENTED
+        radius = radius || 3;
+        var node = this.createNode('circle');
+        node.setAttribute('cx', "" + this._x(center.x));
+        node.setAttribute('cy', "" + this._y(center.y));
+        node.setAttribute('r', "" + radius);
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + 1);
+        return node;
     };
     ;
     /**
@@ -582,7 +668,19 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.crosshair = function (center, radius, color) {
-        // NOT YET IMPLEMENTED	
+        // NOT YET IMPLEMENTED
+        var node = this.createNode('path');
+        var d = [
+            'M', this._x(center.x) - radius, this._y(center.y),
+            'L', this._x(center.x) + radius, this._y(center.y),
+            'M', this._x(center.x), this._y(center.y) - radius,
+            'L', this._x(center.x), this._y(center.y) + radius
+        ];
+        node.setAttribute('fill', this.fillShapes ? color : 'none');
+        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
+        node.setAttribute('stroke-width', "" + 0.5);
+        node.setAttribute('d', d.join(' '));
+        return node;
     };
     ;
     /**
@@ -668,6 +766,9 @@ var drawutilssvg = /** @class */ (function () {
      **/
     drawutilssvg.prototype.clear = function (color) {
         // NOT YET IMPLEMENTED
+        while (this.svgNode.firstChild) {
+            this.svgNode.removeChild(this.svgNode.lastChild);
+        }
     };
     ;
     return drawutilssvg;

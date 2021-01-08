@@ -83,7 +83,8 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      **/
-    image(image: HTMLImageElement, position: Vertex, size: Vertex): void;
+    image(image: HTMLImageElement, position: Vertex, size: Vertex): SVGElement;
+    private _fillOrDraw;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -149,7 +150,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    dot(p: Vertex, color: string): void;
+    dot(p: Vertex, color: string): SVGElement;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
@@ -160,7 +161,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    point(p: Vertex, color: string): void;
+    point(p: Vertex, color: string): SVGElement;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
@@ -266,7 +267,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    diamondHandle(center: Vertex, size: number, color: string): void;
+    diamondHandle(center: Vertex, size: number, color: string): SVGElement;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -282,7 +283,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    squareHandle(center: Vertex, size: number, color: string): void;
+    squareHandle(center: Vertex, size: number, color: string): SVGElement;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -298,7 +299,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    circleHandle(center: Vertex, size: number, color: string): void;
+    circleHandle(center: Vertex, radius: number, color: string): SVGElement;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -312,7 +313,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutils
      */
-    crosshair(center: XYCoords, radius: number, color: string): void;
+    crosshair(center: XYCoords, radius: number, color: string): SVGElement;
     /**
      * Draw a polygon.
      *
