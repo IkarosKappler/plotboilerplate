@@ -26,7 +26,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
 
 
-The compressed library has 89kb.
+The compressed library has 94kb.
 
 
 ## Install the package via npm
@@ -671,6 +671,10 @@ for this purpose.
  * Add a pointDeleted event handler to PB? Would be helpful to delete objects outside the PB when their associated points are deleted by the user.
  * Tweak the SVGBuilder: make the style classes configurable (colors, line thickness, custom classes, ...).
  * Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
+ * Change draw.image(image, position:Vertex, size:Vertex) to Bounds or XYDimension.
+ * Change draw.text(text, x:number, y:number, ...) to (..., position:XYCoords, ...). Same with draw.label(...).
+ * draw.text() and draw.label() require color params.
+ * Render dashed lines around images that cannot be rendered (e.g. file not found).
 
 
 ## Browsers support
@@ -683,23 +687,23 @@ for this purpose.
 
 
 ### Credits
-* dat.gui
-* Color.js
+* [dat.gui by dataarts](https://github.com/dataarts/dat.gui "dat.gui dataarts")
+* [Neolitec's Color.js class](https://gist.github.com/neolitec/1344610 "Neolitec's Color.js class")
 * [FileSaver.js](https://www.npmjs.com/package/file-saver "FileSaver.js")
 * [AlloyFinger.js](https://github.com/AlloyTeam/AlloyFinger "AlloyFinger.js")
 * [Ray Casting Algorithm](https://stackoverflow.com/questions/22521982/check-if-point-is-inside-a-polygon "Ray Casting Algorithm") by Aaron Digulla
-* Hobby-Curve quick implementation by Prof. Dr. Edmund Weitz, http://weitz.de/hobby/
+* [Hobby Curves in Javascript](http://weitz.de/hobby/ "Hobby Curves in Javascript") by [Prof. Dr. Edmund Weitz](http://weitz.de)
 * [hobby.pdf](https://ctan.mc1.root.project-creative.net/graphics/pgf/contrib/hobby/hobby.pdf "hobby.pdf")
 * [jsHobby](https://github.com/loopspace/jsHobby "jsHobby")
 * [Blake Bowen's Catmull-Rom demo](https://codepen.io/osublake/pen/BowJed "Blake Bowen's Catmull-Rom demo")
 * [mbostock](https://github.com/mbostock "mbostok") for the great [convex-polygon-incircle implementation](https://observablehq.com/@mbostock/convex-polygon-incircle "convex-polygon-incircle implementation")
-* and for [circle-tangent-to-three-lines](https://observablehq.com/@mbostock/circle-tangent-to-three-lines "circle-tangent-to-three-lines")
+  * and for [circle-tangent-to-three-lines](https://observablehq.com/@mbostock/circle-tangent-to-three-lines "circle-tangent-to-three-lines")
 * [Circle Intersection in C++ by Robert King](https://stackoverflow.com/questions/3349125/circle-circle-intersection-points "Circle Intersection in C++ by Robert King")
 * [The 'Circles and spheres' article by Paul Bourke](http://paulbourke.net/geometry/circlesphere/ "the 'Circles and spheres' article by Paul Bourke")
 * [shamansir/draw_svg.js](https://gist.github.com/shamansir/6294f8cfdd555a9d1b9e182007dd0c2f "shamansir/draw_svg.js") for manipulating SVG path data strings
-* ["opsb's stackoverflow proposal"](https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle "opsb's stackoverflow proposal") for converting ellipses sectors to SVG arcs.
+* [opsb's stackoverflow proposal](https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle "opsb's stackoverflow proposal") for converting ellipses sectors to SVG arcs.
 * [contrast-color-algorithm](https://gamedev.stackexchange.com/questions/38536/given-a-rgb-color-x-how-to-find-the-most-contrasting-color-y/38542#38542" "contrast-color-algorithm") by Martin Sojka's
-* Lu-Steinhardt for the work on Girih
+* [Peter James Lu](https://www.peterlu.com/) and [Paul Steinhardt](https://paulsteinhardt.org/) for their work on [Girih patterns](https://physics.princeton.edu//~steinh/peterlu_SOM7_sm.pdf "Girih")
 * Cronholm144 for the [Girih texture](https://commons.wikimedia.org/wiki/File:Girih_tiles.svg "Girih texture")
 * [Mapbox's Earcut polygon algorithm](https://github.com/mapbox/earcut "Mapbox's Earcut polygon algorithm")
 
@@ -709,7 +713,7 @@ for this purpose.
  * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
  * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
  * The BBTree.iterator() fails if the tree is empty! (Demos)
- * The minifid BBTree and BBTreeCollection files do not export anything. The un-minified to. Why that?
+ * The minifid BBTree and BBTreeCollection files do not export anything. The un-minified does. Why that?
  * Currently no more known. Please report bugs.
 
 

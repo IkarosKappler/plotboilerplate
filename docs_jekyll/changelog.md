@@ -4,6 +4,25 @@ layout: page
 
 
 # Changelog
+* 2021-01-08
+  * Added the customizable `PlotBoilerplate.drawAll(...)` function.
+* 2021-01-08
+  * PlotBoilerplate main class: Added param `draw:DraLib<void>` to the methods `drawVertices`, `drawGrid` and `drawSelectPolygon`.
+  * Adding the svg-draw library (testing) in utils/helpers/.
+  * Added the customizable `PlotBoilerplate.drawAll(...)` function.
+* 2021-01-05
+  * Added the image-loaded/broken check.
+  * Exposing the `drawDrawables` method as a static utility function (for further use).
+* 2021-01-04
+  * Avoiding multiple redraw call on adding multiple Drawables (array).
+* 2021-01-03
+  * Changed property in BezierPathInteractionHelper to `autoAdjustPaths` in the HandlerOptions interface (typo).
+  * Added following new functions to BezierPathInteractionHelper: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
+* 2020-12-29
+  * Constructor `BezierPath` is now private (not explicit use intended).
+* 2020-12-28
+  * Added the `Triangle.getArea` function.
+  * Added the `Triangle.utils.signedArea` helper function.
 * 2020-12-17
   * Added the `CircleSector` drawable (class).
   * Added the `SVGPathParams` type.

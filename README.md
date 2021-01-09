@@ -302,6 +302,13 @@ A full working demo repository about the [Usage with Typescript is here](https:/
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/27-polygon-intersection-greinerhormann/index.html" title="See the demo">See the demo</a>
 
 
+### Render as SVG (testing)
+
+![Render elements as SVG](https://plotboilerplate.io/repo/screenshots/screenshot-20210109-0-draw-svg.png "Render elements as SVG")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/28-draw-to-svg/index.html" title="See the demo">See the demo</a>
+
+
 
 ## Initialization parameters
 
