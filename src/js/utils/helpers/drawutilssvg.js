@@ -35,34 +35,60 @@ var drawutilssvg = /** @class */ (function () {
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
-        this.canvasSize = canvasSize;
         this.viewport = viewport;
-        this.resize();
+        this.setSize(canvasSize);
     }
     ;
-    drawutilssvg.prototype.resize = function () {
+    /**
+     * Sets the size and view box of the document. Call this if canvas size changes.
+     *
+     * @method setSize
+     * @instance
+     * @memberof drawutilssvg
+     * @param {XYDimension} canvasSize - The new canvas size.
+     */
+    drawutilssvg.prototype.setSize = function (canvasSize) {
+        this.canvasSize = canvasSize;
         this.svgNode.setAttribute('viewBox', "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
         this.svgNode.setAttribute('width', "" + this.canvasSize.width);
         this.svgNode.setAttribute('height', "" + this.canvasSize.height);
     };
     ;
+    /**
+     * Create a new SVG node with the given node name (circle, path, line, rect, ...).
+     *
+     * @method createNode
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {string} name - The node name.
+     * @return {SVGElement} The new node, which is not yet added to any document.
+     */
     drawutilssvg.prototype.createNode = function (name) {
         var node = document.createElementNS("http://www.w3.org/2000/svg", name);
-        // this.svgNode.appendChild( node );
         return node;
     };
     ;
-    // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff. It is not
-    // | intended to be used from the outside.
-    // |
-    // | When in draw mode it draws the current shape.
-    // | When in fill mode it fills the current shape.
-    // |
-    // | This function is usually only called internally.
-    // |
-    // | @param color A stroke/fill color to use.
-    // +-------------------------------
+    /**
+     * This is the final helper function for drawing and filling stuff and binding new
+     * nodes to the SVG document.
+     * It is not intended to be used from the outside.
+     *
+     * When in draw mode it draws the current shape.
+     * When in fill mode it fills the current shape.
+     *
+     * This function is usually only called internally.
+     *
+     * @method _bindFillDraw
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The node to draw/fill and bind.
+     * @param {string} className - The class name(s) to use.
+     * @param {string} color - A stroke/fill color to use.
+     * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
+     * @return {SVGElement} The node itself (for chaining).
+     */
     drawutilssvg.prototype._bindFillDraw = function (node, className, color, lineWidth) {
         node.setAttribute('class', className);
         node.setAttribute('fill', this.fillShapes ? color : 'none');
@@ -92,7 +118,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=1} lineWidth? - [optional] The line's width.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.line = function (zA, zB, color, lineWidth) {
         var line = this.createNode('line');
@@ -129,7 +155,6 @@ var drawutilssvg = /** @class */ (function () {
             d.push(this.offset.y + vertices[i % vertices.length].y);
         }
         node.setAttribute('d', d.join(' '));
-        // return pathNode;
         return this._bindFillDraw(node, 'arrow', color, lineWidth || 1);
     };
     ;
@@ -147,13 +172,24 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      **/
     drawutilssvg.prototype.image = function (image, position, size) {
+        var _this = this;
         var node = this.createNode('image');
+        // We need to re-adjust the image if it was not yet fully loaded before.
+        var setImageSize = function (image) {
+            if (image.naturalWidth) {
+                var ratioX = size.x / image.naturalWidth;
+                var ratioY = size.y / image.naturalHeight;
+                node.setAttribute('width', "" + image.naturalWidth * _this.scale.x);
+                node.setAttribute('height', "" + image.naturalHeight * _this.scale.y);
+                node.setAttribute('transform', "scale(" + (ratioX) + ", " + (ratioY) + ")");
+            }
+        };
+        image.addEventListener('load', function (event) { setImageSize(image); });
         node.setAttribute('x', "" + this._x(position.x));
         node.setAttribute('y', "" + this._y(position.y));
-        node.setAttribute('width', "" + size.x * this.scale.x);
-        node.setAttribute('height', "" + size.y * this.scale.y);
-        node.setAttribute('src', image.src);
-        // return node;
+        node.setAttribute('transform-origin', this._x(position.x) + "px " + this._y(position.y) + "px");
+        setImageSize(image);
+        node.setAttribute('href', image.src);
         return this._bindFillDraw(node, 'image', null, null);
     };
     ;
@@ -643,12 +679,11 @@ var drawutilssvg = /** @class */ (function () {
         // Add a covering rect with the given background color
         var node = this.createNode('rect');
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute('x', "" + this._x(-this.canvasSize.width / 2));
-        node.setAttribute('y', "" + this._y(-this.canvasSize.height / 2));
-        node.setAttribute('width', "" + this.canvasSize.width * this.scale.x);
-        node.setAttribute('height', "" + this.canvasSize.height * this.scale.y);
-        // node.setAttribute( 'fill', color );
-        // node.setAttribute( 'stroke', 'none' );
+        // Note that the background does not scale with the zoom level (always covers full element)
+        node.setAttribute('x', '0');
+        node.setAttribute('y', '0');
+        node.setAttribute('width', "" + this.canvasSize.width);
+        node.setAttribute('height', "" + this.canvasSize.height);
         // Bind this special element into the document
         this._bindFillDraw(node, 'background', null, null);
         node.setAttribute('fill', color);

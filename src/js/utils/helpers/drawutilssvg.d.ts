@@ -35,8 +35,46 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
     constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, viewport: Bounds, fillShapes: boolean);
-    resize(): void;
+    /**
+     * Sets the size and view box of the document. Call this if canvas size changes.
+     *
+     * @method setSize
+     * @instance
+     * @memberof drawutilssvg
+     * @param {XYDimension} canvasSize - The new canvas size.
+     */
+    setSize(canvasSize: XYDimension): void;
+    /**
+     * Create a new SVG node with the given node name (circle, path, line, rect, ...).
+     *
+     * @method createNode
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {string} name - The node name.
+     * @return {SVGElement} The new node, which is not yet added to any document.
+     */
     private createNode;
+    /**
+     * This is the final helper function for drawing and filling stuff and binding new
+     * nodes to the SVG document.
+     * It is not intended to be used from the outside.
+     *
+     * When in draw mode it draws the current shape.
+     * When in fill mode it fills the current shape.
+     *
+     * This function is usually only called internally.
+     *
+     * @method _bindFillDraw
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The node to draw/fill and bind.
+     * @param {string} className - The class name(s) to use.
+     * @param {string} color - A stroke/fill color to use.
+     * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
+     * @return {SVGElement} The node itself (for chaining).
+     */
     private _bindFillDraw;
     /**
      * Called before each draw cycle.
@@ -55,7 +93,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number=1} lineWidth? - [optional] The line's width.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      **/
     line(zA: Vertex, zB: Vertex, color: string, lineWidth?: number): SVGElement;
     /**

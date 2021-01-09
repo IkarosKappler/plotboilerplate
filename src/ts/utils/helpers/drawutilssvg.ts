@@ -47,41 +47,75 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    constructor( svgNode:SVGElement, offset:XYCoords, scale:XYCoords, canvasSize:XYDimension, viewport:Bounds, fillShapes:boolean ) {
+    constructor( svgNode:SVGElement,
+		 offset:XYCoords,
+		 scale:XYCoords,
+		 canvasSize:XYDimension,
+		 viewport:Bounds,
+		 fillShapes:boolean
+	       ) {
 	this.svgNode = svgNode;
 	this.offset = new Vertex( 0, 0 ).set(offset);
 	this.scale = new Vertex( 1, 1 ).set(scale);
 	this.fillShapes = fillShapes;
-	this.canvasSize = canvasSize;
 	this.viewport = viewport;
-
-	this.resize();
+	this.setSize( canvasSize );
     };
+    
 
-    resize() {
+    /**
+     * Sets the size and view box of the document. Call this if canvas size changes.
+     *
+     * @method setSize
+     * @instance
+     * @memberof drawutilssvg
+     * @param {XYDimension} canvasSize - The new canvas size.
+     */
+    setSize( canvasSize:XYDimension ) {
+	this.canvasSize = canvasSize;
 	this.svgNode.setAttribute('viewBox', `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
 	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
 	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
     };
 
+
+    /**
+     * Create a new SVG node with the given node name (circle, path, line, rect, ...).
+     *
+     * @method createNode
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {string} name - The node name.
+     * @return {SVGElement} The new node, which is not yet added to any document.
+     */
     private createNode( name:string ) : SVGElement {
 	const node : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", name);
-	// this.svgNode.appendChild( node );
 	return node;
     };
 
-       // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff. It is not
-    // | intended to be used from the outside.
-    // |
-    // | When in draw mode it draws the current shape.
-    // | When in fill mode it fills the current shape.
-    // |
-    // | This function is usually only called internally.
-    // |
-    // | @param color A stroke/fill color to use.
-    // +-------------------------------
-    private _bindFillDraw( node, className: string,  color:string, lineWidth?:number ) : SVGElement {
+    
+    /**
+     * This is the final helper function for drawing and filling stuff and binding new
+     * nodes to the SVG document.
+     * It is not intended to be used from the outside.
+     *
+     * When in draw mode it draws the current shape.
+     * When in fill mode it fills the current shape.
+     *
+     * This function is usually only called internally.
+     *
+     * @method _bindFillDraw
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The node to draw/fill and bind.
+     * @param {string} className - The class name(s) to use.
+     * @param {string} color - A stroke/fill color to use.
+     * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
+     * @return {SVGElement} The node itself (for chaining).
+     */
+    private _bindFillDraw( node, className: string, color:string, lineWidth?:number ) : SVGElement {
 	node.setAttribute('class', className );
 	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
 	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
@@ -101,6 +135,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     private _x(x:number) : number { return this.offset.x + this.scale.x * x; }
     private _y(y:number) : number { return this.offset.y + this.scale.y * y; }
 
+    
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -111,7 +146,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @param {number=1} lineWidth? - [optional] The line's width.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      **/
     line( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) : SVGElement {
 	const line : SVGElement = this.createNode('line');
@@ -150,7 +185,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    d.push( this.offset.y + vertices[i%vertices.length].y );
 	}	
 	node.setAttribute( 'd', d.join(' ') );
-	// return pathNode;
 	return this._bindFillDraw( node, 'arrow', color, lineWidth || 1 );
     };
 
@@ -169,13 +203,26 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      **/
     image( image:HTMLImageElement, position:Vertex, size:Vertex ) {
-	const node : SVGElement = this.createNode('image');	
+	const node : SVGElement = this.createNode('image');
+
+	// We need to re-adjust the image if it was not yet fully loaded before.
+	const setImageSize = (image) => {
+	    if( image.naturalWidth ) {
+		const ratioX = size.x/image.naturalWidth;
+		const ratioY = size.y/image.naturalHeight;
+		node.setAttribute('width', `${image.naturalWidth*this.scale.x}`);
+		node.setAttribute('height', `${image.naturalHeight*this.scale.y}`);
+		node.setAttribute('transform', `scale(${(ratioX)}, ${(ratioY)})` );
+	    }
+	    
+	};
+	image.addEventListener('load', (event) => { setImageSize(image); } );
+		
 	node.setAttribute('x', `${this._x(position.x)}`);
 	node.setAttribute('y', `${this._y(position.y)}`);
-	node.setAttribute('width', `${size.x*this.scale.x}`);
-	node.setAttribute('height', `${size.y*this.scale.y}`);
-	node.setAttribute('src', image.src );
-	// return node;
+	node.setAttribute('transform-origin', `${this._x(position.x)}px ${this._y(position.y)}px`);
+	setImageSize( image );
+	node.setAttribute('href', image.src );
 	return this._bindFillDraw( node, 'image', null, null );
     };
 
@@ -709,12 +756,11 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	// Add a covering rect with the given background color
 	const node : SVGElement = this.createNode('rect');
 	// For some strange reason SVG rotation transforms use degrees instead of radians
-	node.setAttribute( 'x', `${this._x(-this.canvasSize.width/2)}` );
-	node.setAttribute( 'y', `${this._y(-this.canvasSize.height/2)}` );
-	node.setAttribute( 'width', `${this.canvasSize.width * this.scale.x}` );
-	node.setAttribute( 'height', `${this.canvasSize.height * this.scale.y}` );
-	// node.setAttribute( 'fill', color );
-	// node.setAttribute( 'stroke', 'none' );
+	// Note that the background does not scale with the zoom level (always covers full element)
+	node.setAttribute( 'x', '0' );
+	node.setAttribute( 'y', '0' );
+	node.setAttribute( 'width', `${this.canvasSize.width}` );
+	node.setAttribute( 'height', `${this.canvasSize.height}` );
 
 	// Bind this special element into the document
 	this._bindFillDraw( node, 'background', null, null );
