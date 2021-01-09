@@ -2,8 +2,11 @@
 
 # Changelog
 * 2021-01-08
+  * Added the customizable `PlotBoilerplate.drawAll(...)` function.
+* 2021-01-08
   * PlotBoilerplate main class: Added param `draw:DraLib<void>` to the methods `drawVertices`, `drawGrid` and `drawSelectPolygon`.
   * Adding the svg-draw library (testing) in utils/helpers/.
+  * Added the customizable `PlotBoilerplate.drawAll(...)` function.
 * 2021-01-05
   * Added the image-loaded/broken check.
   * Exposing the `drawDrawables` method as a static utility function (for further use).

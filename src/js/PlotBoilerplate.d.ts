@@ -62,7 +62,9 @@
  * @modified 2020-12-17 Added the `CircleSector` drawable.
  * @modified 2021-01-04 Avoiding multiple redraw call on adding multiple Drawables (array).
  * @modified 2021-01-08 Added param `draw:DraLib<void>` to the methods `drawVertices`, `drawGrid` and `drawSelectPolygon`.
- * @version  1.11.2
+ * @modified 2021-01-08 Added the customizable `drawAll(...)` function.
+ * @modified 2021-01-09 Added the `drawDrawable(...)` function.
+ * @version  1.12.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -427,6 +429,7 @@ export declare class PlotBoilerplate {
      * This function is usually only used internally.
      *
      * @method drawGrid
+     * @param {DrawLib} draw - The drawing library to use to draw lines.
      * @private
      * @instance
      * @memberof PlotBoilerplate
@@ -439,6 +442,7 @@ export declare class PlotBoilerplate {
      * This function is usually only used internally.
      *
      * @method drawOrigin
+     * @param {DrawLib} draw - The drawing library to use to draw lines.
      * @private
      * @instance
      * @memberof PlotBoilerplate
@@ -457,11 +461,29 @@ export declare class PlotBoilerplate {
      * @method drawDrawables
      * @param {number} renderTime - The current render time. It will be used to distinct
      *                              already draw vertices from non-draw-yet vertices.
+     * @param {DrawLib} draw - The drawing library to use to draw lines.
+     * @param {DrawLib} fill - The drawing library to use to fill areas.
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      **/
     drawDrawables(renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>): void;
+    /**
+     * Draw the given drawable.
+     *
+     * This function is usually only used internally.
+     *
+     * @method drawDrawable
+     * @param {Drawable} d - The drawable to draw.
+     * @param {number} renderTime - The current render time. It will be used to distinct
+     *                              already draw vertices from non-draw-yet vertices.
+     * @param {DrawLib} draw - The drawing library to use to draw lines.
+     * @param {DrawLib} fill - The drawing library to use to fill areas.
+     * @instance
+     * @memberof PlotBoilerplate
+     * @return {void}
+     **/
+    drawDrawable(d: Drawable, renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>): void;
     /**
      * Draw the select-polygon (if there is one).
      *
@@ -714,16 +736,6 @@ export declare class PlotBoilerplate {
      * A set of helper functions.
      **/
     static utils: {
-        /**
-         * Draw all drawables.
-         *
-         * This function is usually only used internally.
-         *
-         * @method drawDrawables
-         * @param {number} renderTime - The current render time. It will be used to distinct
-         *                              already draw vertices from non-draw-yet vertices.
-         * @return {void}
-         **/
         /**
          * Merge the elements in the 'extension' object into the 'base' object based on
          * the keys of 'base'.
