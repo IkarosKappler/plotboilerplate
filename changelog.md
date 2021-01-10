@@ -2,7 +2,7 @@
 
 # Changelog
 * 2021-01-10
-  * Added the `PBCanvas` interface.
+  * Added the `PlotBoilerplate.eventCatcher` to simplify event listening event on complex structures like SVG documents.
 * 2021-01-08
   * Added the customizable `PlotBoilerplate.drawAll(...)` function.
 * 2021-01-08

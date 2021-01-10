@@ -64,7 +64,8 @@
  * @modified 2021-01-08 Added param `draw:DraLib<void>` to the methods `drawVertices`, `drawGrid` and `drawSelectPolygon`.
  * @modified 2021-01-08 Added the customizable `drawAll(...)` function.
  * @modified 2021-01-09 Added the `drawDrawable(...)` function.
- * @version  1.12.0
+ * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
+ * @version  1.12.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -135,6 +136,14 @@ export declare class PlotBoilerplate {
      * @instance
      */
     canvas: HTMLCanvasElement | SVGElement;
+    /**
+     * The event catcher might be a different element positioned over the actual canvas.
+     *
+     * @member {HTMLElement}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
+    eventCatcher: HTMLElement;
     /**
      * @member {Config}
      * @memberof PlotBoilerplate

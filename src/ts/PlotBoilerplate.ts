@@ -64,7 +64,8 @@
  * @modified 2021-01-08 Added param `draw:DraLib<void>` to the methods `drawVertices`, `drawGrid` and `drawSelectPolygon`.
  * @modified 2021-01-08 Added the customizable `drawAll(...)` function.
  * @modified 2021-01-09 Added the `drawDrawable(...)` function.
- * @version  1.12.0
+ * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
+ * @version  1.12.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -163,14 +164,24 @@ export class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @instance
      */
-    canvas:HTMLCanvasElement | SVGElement;
+    canvas : HTMLCanvasElement | SVGElement;
+
+
+    /**
+     * The event catcher might be a different element positioned over the actual canvas.
+     *
+     * @member {HTMLElement}
+     * @memberof PlotBoilerplate
+     * @instance
+     */
+    eventCatcher : HTMLElement;
 
     /** 
      * @member {Config} 
      * @memberof PlotBoilerplate
      * @instance
      */
-    config:Config;
+    config : Config;
 
     /** 
      * @member {CanvasRenderingContext2D|WebGLRenderingContext} 
@@ -179,7 +190,7 @@ export class PlotBoilerplate {
      * @instance
      */
     // @DEPRECATED Will be removed in version 2
-    ctx:CanvasRenderingContext2D|WebGLRenderingContext|undefined;
+    ctx: CanvasRenderingContext2D | WebGLRenderingContext | undefined;
 
     /** 
      * @member {drawutils|drawutilsgl} 
@@ -477,6 +488,7 @@ export class PlotBoilerplate {
 	    : config.canvas;
 	if( canvasElement.tagName.toLowerCase() === 'canvas' ) {
 	    this.canvas = canvasElement as HTMLCanvasElement;
+	    this.eventCatcher = this.canvas;
 	    if( this.config.enableGL ) {
 		this.ctx                 = this.canvas.getContext( 'webgl' ); // webgl-experimental?
 		this.draw                = new drawutilsgl(this.ctx,false);
@@ -493,8 +505,20 @@ export class PlotBoilerplate {
 	    if( typeof drawutilssvg === "undefined" )
 		throw `The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.`;
 	    this.canvas = canvasElement as SVGElement;
-	    this.draw = new drawutilssvg( this.canvas as SVGElement, new Vertex(), new Vertex(), this.canvasSize, false );
-	    this.fill = new drawutilssvg( this.canvas as SVGElement, new Vertex(), new Vertex(), this.canvasSize, true );
+	    this.draw = new drawutilssvg( this.canvas as SVGElement,
+					  new Vertex(), new Vertex(), this.canvasSize, false );
+	    this.fill = new drawutilssvg( this.canvas as SVGElement,
+					  new Vertex(), new Vertex(), this.canvasSize, true );
+	    if( this.canvas.parentElement ) {
+		this.eventCatcher = document.createElement('div');
+		this.eventCatcher.style.position = 'absolute';
+		this.eventCatcher.style.left = '0';
+		this.eventCatcher.style.top = '0';
+		this.canvas.parentElement.style.position = 'relative';
+		this.canvas.parentElement.appendChild( this.eventCatcher );
+	    } else {
+		this.eventCatcher = document.body;
+	    }
 	} else {
 	    throw 'Element is neither a canvas nor an svg element.';
 	}
@@ -1294,6 +1318,9 @@ export class PlotBoilerplate {
 		this.canvas.setAttribute('viewBox', `0 0 ${w} ${h}`);
 		this.canvas.setAttribute('width', `${w}` );
 		this.canvas.setAttribute('height', `${h}` );
+		// console.log(
+		this.eventCatcher.style.width = `${w}px`;
+		this.eventCatcher.style.height = `${h}px`;
 	    } else {
 		console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
 	    }
@@ -1437,6 +1464,9 @@ export class PlotBoilerplate {
      * @return {XYCoords} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
      **/
     transformMousePosition( x:number, y:number ) : XYCoords {
+	/* return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
+	   y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) }; */
+	// console.log('offset', this.config.offsetX, this.config.offsetY, this.draw.offset );
 	return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
 		 y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) };
     };
@@ -1661,7 +1691,7 @@ export class PlotBoilerplate {
 	var _self : PlotBoilerplate = this;
 	if( this.config.enableMouse ) { 
 	    // Install a mouse handler on the canvas.
-	    new MouseHandler(this.canvas)
+	    new MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
 		.down( (e:XMouseEvent) => { _self.mouseDownHandler(e); } )
 		.drag( (e:XMouseEvent) => { _self.mouseDragHandler(e); } )
 		.up( (e:XMouseEvent) => { _self.mouseUpHandler(e); } )
@@ -1670,7 +1700,7 @@ export class PlotBoilerplate {
 	
 	if( this.config.enableMouseWheel ) { 
 	    // Install a mouse handler on the canvas.
-	    new MouseHandler(this.canvas)
+	    new MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
 		.wheel( (e:XWheelEvent) => { _self.mouseWheelHandler(e); } );
 	} else { _self.console.log('Mouse wheel interaction disabled.'); }
 	
@@ -1699,7 +1729,7 @@ export class PlotBoilerplate {
 			multiTouchStartScale = null;
 			_self.draggedElements = [];
 		    };
-		    var af = new AF( this.canvas, {
+		    var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
 			touchStart: function (e) {
 			    if( e.touches.length == 1 ) {
 				touchMovePos = new Vertex( relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ) );

@@ -666,6 +666,8 @@ for this purpose.
  * Change draw.text(text, x:number, y:number, ...) to (..., position:XYCoords, ...). Same with draw.label(...).
  * draw.text() and draw.label() require color params.
  * Render dashed lines around images that cannot be rendered (e.g. file not found).
+ * Each render method should also get the ID of the rendered element; this is required to keep track of changes in SVG documents.
+ * PlotBoilerplate.paths can be removed.
 
 
 ## Browsers support

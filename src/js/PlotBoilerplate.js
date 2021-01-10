@@ -65,7 +65,8 @@
  * @modified 2021-01-08 Added param `draw:DraLib<void>` to the methods `drawVertices`, `drawGrid` and `drawSelectPolygon`.
  * @modified 2021-01-08 Added the customizable `drawAll(...)` function.
  * @modified 2021-01-09 Added the `drawDrawable(...)` function.
- * @version  1.12.0
+ * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
+ * @version  1.12.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -313,6 +314,7 @@ var PlotBoilerplate = /** @class */ (function () {
             : config.canvas;
         if (canvasElement.tagName.toLowerCase() === 'canvas') {
             this.canvas = canvasElement;
+            this.eventCatcher = this.canvas;
             if (this.config.enableGL) {
                 this.ctx = this.canvas.getContext('webgl'); // webgl-experimental?
                 this.draw = new drawgl_1.drawutilsgl(this.ctx, false);
@@ -333,6 +335,17 @@ var PlotBoilerplate = /** @class */ (function () {
             this.canvas = canvasElement;
             this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), new Vertex_1.Vertex(), this.canvasSize, false);
             this.fill = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), new Vertex_1.Vertex(), this.canvasSize, true);
+            if (this.canvas.parentElement) {
+                this.eventCatcher = document.createElement('div');
+                this.eventCatcher.style.position = 'absolute';
+                this.eventCatcher.style.left = '0';
+                this.eventCatcher.style.top = '0';
+                this.canvas.parentElement.style.position = 'relative';
+                this.canvas.parentElement.appendChild(this.eventCatcher);
+            }
+            else {
+                this.eventCatcher = document.body;
+            }
         }
         else {
             throw 'Element is neither a canvas nor an svg element.';
@@ -1109,6 +1122,9 @@ var PlotBoilerplate = /** @class */ (function () {
                 _this.canvas.setAttribute('viewBox', "0 0 " + w + " " + h);
                 _this.canvas.setAttribute('width', "" + w);
                 _this.canvas.setAttribute('height', "" + h);
+                // console.log(
+                _this.eventCatcher.style.width = w + "px";
+                _this.eventCatcher.style.height = h + "px";
             }
             else {
                 console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
@@ -1248,6 +1264,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {XYCoords} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
      **/
     PlotBoilerplate.prototype.transformMousePosition = function (x, y) {
+        /* return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
+           y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) }; */
+        // console.log('offset', this.config.offsetX, this.config.offsetY, this.draw.offset );
         return { x: (x / this.config.cssScaleX - this.config.offsetX) / (this.config.scaleX),
             y: (y / this.config.cssScaleY - this.config.offsetY) / (this.config.scaleY) };
     };
@@ -1466,7 +1485,7 @@ var PlotBoilerplate = /** @class */ (function () {
         var _self = this;
         if (this.config.enableMouse) {
             // Install a mouse handler on the canvas.
-            new MouseHandler_1.MouseHandler(this.canvas)
+            new MouseHandler_1.MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
                 .down(function (e) { _self.mouseDownHandler(e); })
                 .drag(function (e) { _self.mouseDragHandler(e); })
                 .up(function (e) { _self.mouseUpHandler(e); });
@@ -1476,7 +1495,7 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         if (this.config.enableMouseWheel) {
             // Install a mouse handler on the canvas.
-            new MouseHandler_1.MouseHandler(this.canvas)
+            new MouseHandler_1.MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
                 .wheel(function (e) { _self.mouseWheelHandler(e); });
         }
         else {
@@ -1506,7 +1525,7 @@ var PlotBoilerplate = /** @class */ (function () {
                         multiTouchStartScale = null;
                         _self.draggedElements = [];
                     };
-                    var af = new AF(this.canvas, {
+                    var af = new AF(this.eventCatcher ? this.eventCatcher : this.canvas, {
                         touchStart: function (e) {
                             if (e.touches.length == 1) {
                                 touchMovePos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));

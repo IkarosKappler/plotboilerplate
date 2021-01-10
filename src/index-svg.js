@@ -65,7 +65,7 @@
 				     humane.log(arguments[0]);
 				 }
 			       } );
-		humane.log('plotboilerplate-gl');
+		humane.log('plotboilerplate-svg');
 	    }
 	    
 	    // +---------------------------------------------------------------------------------
@@ -90,12 +90,15 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Add a mouse listener to track the mouse position.
 	    // +-------------------------------
-	    new MouseHandler(pb.canvas)
+	    new MouseHandler(pb.eventCatcher)
 		.move( function(e) {
 		    // Display the mouse position
 		    var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
 		    stats.mouseX = relPos.x;
 		    stats.mouseY = relPos.y;
+		    console.log( 'canvasSize', pb.canvasSize );
+		    console.log( 'viewPort', pb.viewport() );
+		    console.log( 'draw.offset', pb.draw.offset );
 		} );
 
 	    // Use a helper function to build all demo-drawables.

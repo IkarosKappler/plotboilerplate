@@ -195,6 +195,13 @@ var MouseHandler = /** @class */ (function () {
      * @return {XYCoords} The relative mouse coordinates.
      */
     MouseHandler.prototype.relPos = function (e) {
+        console.log(e.offsetX, e.offsetY, e.target);
+        /* return { x : e.offsetX - e.target.offsetLeft,
+             y : e.offsetY - e.target.offsetTop
+             }; */
+        /* return { x : e.offsetX - parseFloat( globalThis.getComputedStyle(e.target, null).getPropertyValue("offsetLeft") ),
+             y : e.offsetY - parseFloat( globalThis.getComputedStyle(e.target, null).getPropertyValue("offsetTop") )
+               };*/
         return { x: e.offsetX,
             y: e.offsetY
         };
