@@ -22,6 +22,7 @@ var Vertex_1 = require("../../Vertex");
  * @requires XYCoords
  */
 var drawutilssvg = /** @class */ (function () {
+    // viewport:Bounds;
     /**
      * The constructor.
      *
@@ -30,14 +31,41 @@ var drawutilssvg = /** @class */ (function () {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, viewport, fillShapes) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, 
+    // viewport:Bounds,
+    fillShapes) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
-        this.viewport = viewport;
+        // this.viewport = viewport;
         this.setSize(canvasSize);
+        this.addStyleDefs();
     }
+    ;
+    drawutilssvg.prototype.addStyleDefs = function () {
+        var nodeDef = this.createNode('def');
+        var nodeStyle = this.createNode('style');
+        nodeDef.appendChild(nodeStyle);
+        this.svgNode.appendChild(nodeDef);
+        // TODO: how to add style sheets?
+        // console.log( nodeStyle );
+        // nodeStyle.sheet = `.Vertex { fill : blue; stroke : none; }`;
+        // ?
+        // https://stackoverflow.com/questions/24920186/how-do-i-create-a-style-sheet-for-an-svg-element
+        /*
+        if (!('sheet' in SVGStyleElement.prototype)) {
+            Object.defineProperty(SVGStyleElement.prototype, 'sheet', {
+            get:function(){
+                var all = document.styleSheets;
+                for (var i=0, sheet; sheet=all[i++];) {
+                if (sheet.ownerNode === this) return sheet;
+                }
+    
+            }
+            });
+        } */
+    };
     ;
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.
@@ -96,6 +124,17 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('stroke-width', "" + (lineWidth || 1));
         this.svgNode.appendChild(node);
         return node;
+    };
+    ;
+    /**
+     * Creates a 'shallow' (non deep) copy of this instance. This implies
+     * that under the hood the same gl context and gl program will be used.
+     */
+    drawutilssvg.prototype.copyInstance = function (fillShapes) {
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, 
+        // this.viewport,
+        this.fillShapes);
+        return copy;
     };
     ;
     /**

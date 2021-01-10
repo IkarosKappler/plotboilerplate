@@ -77,6 +77,7 @@ import { GUI } from "dat.gui";
 
 import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
+import { drawutilssvg } from "./utils/helpers/drawutilssvg";
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
@@ -162,7 +163,7 @@ export class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @instance
      */
-    canvas:HTMLCanvasElement;
+    canvas:HTMLCanvasElement | SVGElement;
 
     /** 
      * @member {Config} 
@@ -174,23 +175,25 @@ export class PlotBoilerplate {
     /** 
      * @member {CanvasRenderingContext2D|WebGLRenderingContext} 
      * @memberof PlotBoilerplate
+     * @deprecated
      * @instance
      */
-    ctx:CanvasRenderingContext2D|WebGLRenderingContext;
+    // @DEPRECATED Will be removed in version 2
+    ctx:CanvasRenderingContext2D|WebGLRenderingContext|undefined;
 
     /** 
      * @member {drawutils|drawutilsgl} 
      * @memberof PlotBoilerplate
      * @instance
      */
-    draw:drawutils|drawutilsgl;
+    draw : DrawLib<void>; // drawutils|drawutilsgl;
 
     /** 
      * @member {drawutils|drawutilsgl} 
      * @memberof PlotBoilerplate
      * @instance
      */
-    fill:drawutils|drawutilsgl;
+    fill : DrawLib<void>; // drawutils|drawutilsgl;
 
     /** 
      * @member {DrawConfig} 
@@ -465,22 +468,38 @@ export class PlotBoilerplate {
 	// +---------------------------------------------------------------------------------
 	// | Object members.
 	// +-------------------------------
-	this.canvas              = typeof config.canvas == 'string' ? (document.querySelector(config.canvas) as HTMLCanvasElement) : config.canvas;
-	if( this.config.enableGL ) {
-	    this.ctx                 = this.canvas.getContext( 'webgl' ); // webgl-experimental?
-	    this.draw                = new drawutilsgl(this.ctx,false);
-	    // PROBLEM: same instance of fill and draw when using WebGL. Shader program cannot be duplicated on the same context
-	    this.fill                = this.draw.copyInstance(true);
-	    console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
+	this.grid                = new Grid( new Vertex(0,0), new Vertex(50,50) );
+	this.canvasSize          = { width : PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height : PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
+	// this.canvas              = typeof config.canvas == 'string' ? (document.querySelector(config.canvas) as HTMLCanvasElement) : config.canvas;
+	const canvasElement : Element =
+	    typeof config.canvas == 'string'
+	    ? (document.querySelector(config.canvas) as Element)
+	    : config.canvas;
+	if( canvasElement.tagName.toLowerCase() === 'canvas' ) {
+	    this.canvas = canvasElement as HTMLCanvasElement;
+	    if( this.config.enableGL ) {
+		this.ctx                 = this.canvas.getContext( 'webgl' ); // webgl-experimental?
+		this.draw                = new drawutilsgl(this.ctx,false);
+		// PROBLEM: same instance of fill and draw when using WebGL.
+		//          Shader program cannot be duplicated on the same context.
+		this.fill                = (this.draw as drawutilsgl).copyInstance(true);
+		console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
+	    } else {
+		this.ctx                 = this.canvas.getContext( '2d' );
+		this.draw                = new drawutils(this.ctx,false);
+		this.fill                = new drawutils(this.ctx,true);
+	    }
+	} else if( canvasElement.tagName.toLowerCase() === 'svg' ) {
+	    if( typeof drawutilssvg === "undefined" )
+		throw `The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.`;
+	    this.canvas = canvasElement as SVGElement;
+	    this.draw = new drawutilssvg( this.canvas as SVGElement, new Vertex(), new Vertex(), this.canvasSize, false );
+	    this.fill = new drawutilssvg( this.canvas as SVGElement, new Vertex(), new Vertex(), this.canvasSize, true );
 	} else {
-	    this.ctx                 = this.canvas.getContext( '2d' );
-	    this.draw                = new drawutils(this.ctx,false);
-	    this.fill                = new drawutils(this.ctx,true);
+	    throw 'Element is neither a canvas nor an svg element.';
 	}
 	this.draw.scale.set(this.config.scaleX,this.config.scaleY);
 	this.fill.scale.set(this.config.scaleX,this.config.scaleY);
-	this.grid                = new Grid( new Vertex(0,0), new Vertex(50,50) );
-	this.canvasSize          = { width : PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height : PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
 	this.vertices            = [];
 	this.selectPolygon       = null;
 	this.draggedElements     = [];
@@ -526,7 +545,7 @@ export class PlotBoilerplate {
 	// See documentation for FileSaver.js for usage.
 	//    https://github.com/eligrey/FileSaver.js
 	if( typeof globalThis["saveAs"] != "function" )
-	    throw "Cannot save file; did you load the ./utils/savefile helper function an the eligrey/SaveFile library?";
+	    throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
 	const _saveAs:saveAs = globalThis["saveAs"] as saveAs;
 	_saveAs(blob, "plotboilerplate.svg");   
     };
@@ -1204,6 +1223,13 @@ export class PlotBoilerplate {
     };
 
 
+    /**
+     * Internal helper function used to get 'float' properties from elements.
+     * Used to determine border withs and paddings that were defined using CSS.
+     */
+    private getFProp( elem : HTMLElement | SVGElement, propName : string ) : number {
+	return parseFloat( globalThis.getComputedStyle(elem, null).getPropertyValue(propName) )
+    }
 
     /**
      * Get the available inner space of the given container.
@@ -1213,22 +1239,34 @@ export class PlotBoilerplate {
     private getAvailableContainerSpace() : XYDimension {
 	const _self : PlotBoilerplate = this;
 	const container : HTMLElement = (_self.canvas.parentNode as unknown) as HTMLElement; // Element | Document | DocumentFragment;
-	var canvas : HTMLCanvasElement = _self.canvas;
-	canvas.style.display = 'none';
-	var
+	// var canvas : HTMLCanvasElement = _self.canvas;
+	_self.canvas.style.display = 'none';
+	/* var
 	padding : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
-	border : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-width') ) || 0,
+	border : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-width') ) || 0,
 	pl : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
 	pr : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
 	pt : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
 	pb : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
-	bl : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-left-width') ) || border,
-	br : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-right-width') ) || border,
-	bt : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-top-width') ) || border,
-	bb : number = parseFloat( globalThis.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width') ) || border;
+	bl : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-left-width') ) || border,
+	br : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-right-width') ) || border,
+	bt : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-top-width') ) || border,
+	bb : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-bottom-width') ) || border;
+	*/
+	var
+	padding : number = this.getFProp(container, 'padding') || 0,
+	border : number = this.getFProp(_self.canvas,'border-width') || 0,
+	pl : number = this.getFProp(container,'padding-left') || padding,
+	pr : number = this.getFProp(container,'padding-right') || padding,
+	pt : number = this.getFProp(container,'padding-top') || padding,
+	pb : number = this.getFProp(container,'padding-bottom') || padding,
+	bl : number = this.getFProp(_self.canvas,'border-left-width') || border,
+	br : number = this.getFProp(_self.canvas,'border-right-width') || border,
+	bt : number = this.getFProp(_self.canvas,'border-top-width') || border,
+	bb : number = this.getFProp(_self.canvas,'border-bottom-width') || border;
 	var w : number = container.clientWidth; 
 	var h : number = container.clientHeight;
-	canvas.style.display = 'block';
+	_self.canvas.style.display = 'block';
 	return { width : (w-pl-pr-bl-br), height : (h-pt-pb-bt-bb) };
     }; 
 
@@ -1248,8 +1286,17 @@ export class PlotBoilerplate {
 	const _setSize = (w:number,h:number) => {
 	    w *= _self.config.canvasWidthFactor;
 	    h *= _self.config.canvasHeightFactor;
-	    _self.canvas.width      = w; 
-	    _self.canvas.height     = h; 
+	    // TODO: use CanvasWrapper.setSize here?
+	    if( _self.canvas instanceof HTMLCanvasElement ) {
+		_self.canvas.width      = w; 
+		_self.canvas.height     = h;
+	    } else if( _self.canvas instanceof SVGElement ) {
+		this.canvas.setAttribute('viewBox', `0 0 ${w} ${h}`);
+		this.canvas.setAttribute('width', `${w}` );
+		this.canvas.setAttribute('height', `${h}` );
+	    } else {
+		console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
+	    }
 	    _self.canvasSize.width  = w;
 	    _self.canvasSize.height = h;
 	    if( _self.config.autoAdjustOffset ) {
@@ -1630,8 +1677,9 @@ export class PlotBoilerplate {
 	if( this.config.enableTouch) { 
 	    // Install a touch handler on the canvas.
 	    const relPos = (pos:XYCoords) : XYCoords => {
-		return { x : pos.x - _self.canvas.offsetLeft,
-			 y : pos.y - _self.canvas.offsetTop
+		const bounds = _self.canvas.getBoundingClientRect();
+		return { x : pos.x - bounds.left, // _self.canvas.offsetLeft,
+			 y : pos.y - bounds.top   // _self.canvas.offsetTop
 		       };
 	    }
 	    
@@ -1826,9 +1874,9 @@ export class PlotBoilerplate {
 	 * @param {number} scaleY The - Y scale factor.
 	 * @return {void}
 	 **/ 
-	setCSSscale : ( element:HTMLElement,
-			scaleX:number,
-			scaleY:number ) : void => {
+	setCSSscale : ( element : HTMLElement | SVGElement,
+			scaleX : number,
+			scaleY : number ) : void => {
 	    element.style['transform-origin'] = '0 0';
 	    if( scaleX==1.0 && scaleY==1.0 ) element.style.transform = null;
 	    else                             element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';

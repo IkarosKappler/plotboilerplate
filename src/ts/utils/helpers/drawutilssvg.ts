@@ -37,7 +37,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 
     canvasSize:XYDimension;
     
-    viewport:Bounds;
+    // viewport:Bounds;
     
     /**
      * The constructor.
@@ -51,17 +51,43 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		 offset:XYCoords,
 		 scale:XYCoords,
 		 canvasSize:XYDimension,
-		 viewport:Bounds,
+		 // viewport:Bounds,
 		 fillShapes:boolean
 	       ) {
 	this.svgNode = svgNode;
 	this.offset = new Vertex( 0, 0 ).set(offset);
 	this.scale = new Vertex( 1, 1 ).set(scale);
 	this.fillShapes = fillShapes;
-	this.viewport = viewport;
+	// this.viewport = viewport;
 	this.setSize( canvasSize );
+	this.addStyleDefs();
     };
-    
+
+    private addStyleDefs() {
+	const nodeDef : SVGElement = this.createNode('def');
+	const nodeStyle : SVGElement = this.createNode('style');
+	nodeDef.appendChild(nodeStyle);
+	this.svgNode.appendChild(nodeDef);
+
+	// TODO: how to add style sheets?
+	// console.log( nodeStyle );
+	// nodeStyle.sheet = `.Vertex { fill : blue; stroke : none; }`;
+
+	// ?
+	// https://stackoverflow.com/questions/24920186/how-do-i-create-a-style-sheet-for-an-svg-element
+	/*
+	if (!('sheet' in SVGStyleElement.prototype)) {
+	    Object.defineProperty(SVGStyleElement.prototype, 'sheet', {
+		get:function(){
+		    var all = document.styleSheets;
+		    for (var i=0, sheet; sheet=all[i++];) {
+			if (sheet.ownerNode === this) return sheet;
+		    }
+
+		}
+	    });
+	} */
+    };
 
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.
@@ -123,6 +149,22 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	this.svgNode.appendChild( node );
 	return node;
     };
+
+    /**
+     * Creates a 'shallow' (non deep) copy of this instance. This implies
+     * that under the hood the same gl context and gl program will be used.
+     */
+    copyInstance( fillShapes:boolean ) : drawutilssvg {
+	var copy : drawutilssvg = new drawutilssvg(
+	    this.svgNode,
+	    this.offset,
+	    this.scale,
+	    this.canvasSize,
+	    // this.viewport,
+	    this.fillShapes
+	);
+	return copy;
+    }; 
 
     /**
      * Called before each draw cycle.

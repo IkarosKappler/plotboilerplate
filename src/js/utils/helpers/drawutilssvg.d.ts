@@ -5,7 +5,6 @@
  * @date     2021-01-03
  * @version  0.0.1
  **/
-import { Bounds } from "../../Bounds";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
 import { DrawLib, XYCoords, XYDimension } from "../../interfaces";
@@ -25,7 +24,6 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     offset: Vertex;
     fillShapes: boolean;
     canvasSize: XYDimension;
-    viewport: Bounds;
     /**
      * The constructor.
      *
@@ -34,7 +32,8 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, viewport: Bounds, fillShapes: boolean);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean);
+    private addStyleDefs;
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.
      *
@@ -76,6 +75,11 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @return {SVGElement} The node itself (for chaining).
      */
     private _bindFillDraw;
+    /**
+     * Creates a 'shallow' (non deep) copy of this instance. This implies
+     * that under the hood the same gl context and gl program will be used.
+     */
+    copyInstance(fillShapes: boolean): drawutilssvg;
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.

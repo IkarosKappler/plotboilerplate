@@ -75,6 +75,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlotBoilerplate = void 0;
 var draw_1 = require("./draw");
 var drawgl_1 = require("./drawgl");
+var drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
 var BezierPath_1 = require("./BezierPath");
 var Bounds_1 = require("./Bounds");
 var Circle_1 = require("./Circle");
@@ -304,23 +305,40 @@ var PlotBoilerplate = /** @class */ (function () {
         // +---------------------------------------------------------------------------------
         // | Object members.
         // +-------------------------------
-        this.canvas = typeof config.canvas == 'string' ? document.querySelector(config.canvas) : config.canvas;
-        if (this.config.enableGL) {
-            this.ctx = this.canvas.getContext('webgl'); // webgl-experimental?
-            this.draw = new drawgl_1.drawutilsgl(this.ctx, false);
-            // PROBLEM: same instance of fill and draw when using WebGL. Shader program cannot be duplicated on the same context
-            this.fill = this.draw.copyInstance(true);
-            console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
+        this.grid = new Grid_1.Grid(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(50, 50));
+        this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
+        // this.canvas              = typeof config.canvas == 'string' ? (document.querySelector(config.canvas) as HTMLCanvasElement) : config.canvas;
+        var canvasElement = typeof config.canvas == 'string'
+            ? document.querySelector(config.canvas)
+            : config.canvas;
+        if (canvasElement.tagName.toLowerCase() === 'canvas') {
+            this.canvas = canvasElement;
+            if (this.config.enableGL) {
+                this.ctx = this.canvas.getContext('webgl'); // webgl-experimental?
+                this.draw = new drawgl_1.drawutilsgl(this.ctx, false);
+                // PROBLEM: same instance of fill and draw when using WebGL.
+                //          Shader program cannot be duplicated on the same context.
+                this.fill = this.draw.copyInstance(true);
+                console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
+            }
+            else {
+                this.ctx = this.canvas.getContext('2d');
+                this.draw = new draw_1.drawutils(this.ctx, false);
+                this.fill = new draw_1.drawutils(this.ctx, true);
+            }
+        }
+        else if (canvasElement.tagName.toLowerCase() === 'svg') {
+            if (typeof drawutilssvg_1.drawutilssvg === "undefined")
+                throw "The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.";
+            this.canvas = canvasElement;
+            this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), new Vertex_1.Vertex(), this.canvasSize, false);
+            this.fill = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), new Vertex_1.Vertex(), this.canvasSize, true);
         }
         else {
-            this.ctx = this.canvas.getContext('2d');
-            this.draw = new draw_1.drawutils(this.ctx, false);
-            this.fill = new draw_1.drawutils(this.ctx, true);
+            throw 'Element is neither a canvas nor an svg element.';
         }
         this.draw.scale.set(this.config.scaleX, this.config.scaleY);
         this.fill.scale.set(this.config.scaleX, this.config.scaleY);
-        this.grid = new Grid_1.Grid(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(50, 50));
-        this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
         this.vertices = [];
         this.selectPolygon = null;
         this.draggedElements = [];
@@ -363,7 +381,7 @@ var PlotBoilerplate = /** @class */ (function () {
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
         if (typeof globalThis["saveAs"] != "function")
-            throw "Cannot save file; did you load the ./utils/savefile helper function an the eligrey/SaveFile library?";
+            throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
     };
@@ -1031,6 +1049,13 @@ var PlotBoilerplate = /** @class */ (function () {
     };
     ;
     /**
+     * Internal helper function used to get 'float' properties from elements.
+     * Used to determine border withs and paddings that were defined using CSS.
+     */
+    PlotBoilerplate.prototype.getFProp = function (elem, propName) {
+        return parseFloat(globalThis.getComputedStyle(elem, null).getPropertyValue(propName));
+    };
+    /**
      * Get the available inner space of the given container.
      *
      * Size minus padding minus border.
@@ -1038,12 +1063,24 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.getAvailableContainerSpace = function () {
         var _self = this;
         var container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        var canvas = _self.canvas;
-        canvas.style.display = 'none';
-        var padding = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding')) || 0, border = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-width')) || 0, pl = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding-left')) || padding, pr = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding-right')) || padding, pt = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding-top')) || padding, pb = parseFloat(globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom')) || padding, bl = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-left-width')) || border, br = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-right-width')) || border, bt = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-top-width')) || border, bb = parseFloat(globalThis.getComputedStyle(canvas, null).getPropertyValue('border-bottom-width')) || border;
+        // var canvas : HTMLCanvasElement = _self.canvas;
+        _self.canvas.style.display = 'none';
+        /* var
+        padding : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
+        border : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-width') ) || 0,
+        pl : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
+        pr : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
+        pt : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
+        pb : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
+        bl : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-left-width') ) || border,
+        br : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-right-width') ) || border,
+        bt : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-top-width') ) || border,
+        bb : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-bottom-width') ) || border;
+        */
+        var padding = this.getFProp(container, 'padding') || 0, border = this.getFProp(_self.canvas, 'border-width') || 0, pl = this.getFProp(container, 'padding-left') || padding, pr = this.getFProp(container, 'padding-right') || padding, pt = this.getFProp(container, 'padding-top') || padding, pb = this.getFProp(container, 'padding-bottom') || padding, bl = this.getFProp(_self.canvas, 'border-left-width') || border, br = this.getFProp(_self.canvas, 'border-right-width') || border, bt = this.getFProp(_self.canvas, 'border-top-width') || border, bb = this.getFProp(_self.canvas, 'border-bottom-width') || border;
         var w = container.clientWidth;
         var h = container.clientHeight;
-        canvas.style.display = 'block';
+        _self.canvas.style.display = 'block';
         return { width: (w - pl - pr - bl - br), height: (h - pt - pb - bt - bb) };
     };
     ;
@@ -1058,12 +1095,24 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.resizeCanvas = function () {
+        var _this = this;
         var _self = this;
         var _setSize = function (w, h) {
             w *= _self.config.canvasWidthFactor;
             h *= _self.config.canvasHeightFactor;
-            _self.canvas.width = w;
-            _self.canvas.height = h;
+            // TODO: use CanvasWrapper.setSize here?
+            if (_self.canvas instanceof HTMLCanvasElement) {
+                _self.canvas.width = w;
+                _self.canvas.height = h;
+            }
+            else if (_self.canvas instanceof SVGElement) {
+                _this.canvas.setAttribute('viewBox', "0 0 " + w + " " + h);
+                _this.canvas.setAttribute('width', "" + w);
+                _this.canvas.setAttribute('height', "" + h);
+            }
+            else {
+                console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
+            }
             _self.canvasSize.width = w;
             _self.canvasSize.height = h;
             if (_self.config.autoAdjustOffset) {
@@ -1436,8 +1485,9 @@ var PlotBoilerplate = /** @class */ (function () {
         if (this.config.enableTouch) {
             // Install a touch handler on the canvas.
             var relPos_1 = function (pos) {
-                return { x: pos.x - _self.canvas.offsetLeft,
-                    y: pos.y - _self.canvas.offsetTop
+                var bounds = _self.canvas.getBoundingClientRect();
+                return { x: pos.x - bounds.left,
+                    y: pos.y - bounds.top // _self.canvas.offsetTop
                 };
             };
             if (globalThis["AlloyFinger"] && typeof globalThis["AlloyFinger"] == "function") {

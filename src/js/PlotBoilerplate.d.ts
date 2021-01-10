@@ -71,8 +71,6 @@
  * @public
  **/
 import { GUI } from "dat.gui";
-import { drawutils } from "./draw";
-import { drawutilsgl } from "./drawgl";
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Grid } from "./Grid";
@@ -136,7 +134,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @instance
      */
-    canvas: HTMLCanvasElement;
+    canvas: HTMLCanvasElement | SVGElement;
     /**
      * @member {Config}
      * @memberof PlotBoilerplate
@@ -146,21 +144,22 @@ export declare class PlotBoilerplate {
     /**
      * @member {CanvasRenderingContext2D|WebGLRenderingContext}
      * @memberof PlotBoilerplate
+     * @deprecated
      * @instance
      */
-    ctx: CanvasRenderingContext2D | WebGLRenderingContext;
+    ctx: CanvasRenderingContext2D | WebGLRenderingContext | undefined;
     /**
      * @member {drawutils|drawutilsgl}
      * @memberof PlotBoilerplate
      * @instance
      */
-    draw: drawutils | drawutilsgl;
+    draw: DrawLib<void>;
     /**
      * @member {drawutils|drawutilsgl}
      * @memberof PlotBoilerplate
      * @instance
      */
-    fill: drawutils | drawutilsgl;
+    fill: DrawLib<void>;
     /**
      * @member {DrawConfig}
      * @memberof PlotBoilerplate
@@ -574,6 +573,11 @@ export declare class PlotBoilerplate {
      **/
     saveFile(): void;
     /**
+     * Internal helper function used to get 'float' properties from elements.
+     * Used to determine border withs and paddings that were defined using CSS.
+     */
+    private getFProp;
+    /**
      * Get the available inner space of the given container.
      *
      * Size minus padding minus border.
@@ -755,7 +759,7 @@ export declare class PlotBoilerplate {
          * @param {number} scaleY The - Y scale factor.
          * @return {void}
          **/
-        setCSSscale: (element: HTMLElement, scaleX: number, scaleY: number) => void;
+        setCSSscale: (element: HTMLElement | SVGElement, scaleX: number, scaleY: number) => void;
         fetch: {
             /**
              * A helper function to the the object property value specified by the given key.

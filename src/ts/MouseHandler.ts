@@ -16,6 +16,7 @@
  *                      if there is no external drag listener installed (1.1.0).
  * @modified 2020-10-04 Added extended JSDoc comments.
  * @modified 2020-11-25 Added the `isTouchEvent` param.
+ * @modified 2021-01-10 The mouse handler is now also working with SVGElements.
  * @version  1.2.0
  *
  * @file MouseHandler
@@ -27,7 +28,7 @@ import { XYCoords } from "./interfaces";
 
 export interface XMouseParams {
     button       : number;
-    element      : HTMLElement;
+    element      : HTMLElement | SVGElement;
     isTouchEvent : boolean;
     name         : string;
     pos          : {x:number,y:number};
@@ -62,7 +63,7 @@ export type XWheelCallback = (e:XWheelEvent)=>void;
 export class MouseHandler {
 
     private name           : string;
-    private element        : HTMLElement;
+    private element        : HTMLElement | SVGElement;
     private mouseDownPos   : { x:number, y:number }|undefined = undefined;
     private mouseDragPos   : { x:number, y:number }|undefined = undefined;
     private mousePos       : { x:number, y:number }|undefined = undefined;
@@ -131,7 +132,7 @@ export class MouseHandler {
      * @memberof MouseHandler
      * @param {HTMLElement} element
      **/
-    constructor( element:HTMLElement, name?:string ) {
+    constructor( element:HTMLElement | SVGElement, name?:string ) {
 	// +----------------------------------------------------------------------
 	// | Some private vars to store the current mouse/position/button state.
 	// +-------------------------------------------------
@@ -193,9 +194,10 @@ export class MouseHandler {
      * @param {MouseEvent} e - The mouse event to get the relative position for.
      * @return {XYCoords} The relative mouse coordinates.
      */
-    private relPos(e:MouseEvent) : XYCoords { // { x:number, y:number } {
-	return { x : e.offsetX, // e.pageX - e.target.offsetLeft,
-		 y : e.offsetY  // e.pageY - e.target.offsetTop
+    private relPos(e:MouseEvent) : XYCoords {
+	console.log(e.offsetX, e.offsetY);
+	return { x : e.offsetX,
+		 y : e.offsetY
 	       };
     };
 

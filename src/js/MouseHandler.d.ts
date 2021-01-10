@@ -16,6 +16,7 @@
  *                      if there is no external drag listener installed (1.1.0).
  * @modified 2020-10-04 Added extended JSDoc comments.
  * @modified 2020-11-25 Added the `isTouchEvent` param.
+ * @modified 2021-01-10 The mouse handler is now also working with SVGElements.
  * @version  1.2.0
  *
  * @file MouseHandler
@@ -23,7 +24,7 @@
  **/
 export interface XMouseParams {
     button: number;
-    element: HTMLElement;
+    element: HTMLElement | SVGElement;
     isTouchEvent: boolean;
     name: string;
     pos: {
@@ -131,7 +132,7 @@ export declare class MouseHandler {
      * @memberof MouseHandler
      * @param {HTMLElement} element
      **/
-    constructor(element: HTMLElement, name?: string);
+    constructor(element: HTMLElement | SVGElement, name?: string);
     /**
      * Get relative position from the given MouseEvent.
      *

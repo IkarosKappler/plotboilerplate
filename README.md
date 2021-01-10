@@ -27,7 +27,6 @@ The compressed library has 94kb.
 
 ## Install the package via npm
 ~~~sh
-   $ npm i -g npm          # Updates your npm if necessary
    $ npm i plotboilerplate # Installs the package
 ~~~
 
@@ -39,13 +38,8 @@ For a full example see [main-dist.html](https://github.com/IkarosKappler/plotboi
    <canvas id="my-canvas">
       Your browser does not support the canvas tag.
    </canvas>
-
-   <!-- Optional: a helper to display the mouse/touch position -->
-   <div class="info monospace">
-      [<span id="cx">-</span>,<span id="cy">-</span>]
-   </div>
 ~~~
-The 'info' block is just for displaying the current mouse/touch coordinates.
+The element canvas will be used to draw on.
 
 
 ## The javascript
@@ -90,7 +84,7 @@ Screenshot
 
 
 #### API
-See [API Documentation](https://plotboilerplate.io/docs/PlotBoilerplate.html "API Documentation") for details.
+See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation") for details.
 
 
 
@@ -644,26 +638,20 @@ for this purpose.
  * Add a retina detection; initialize the canvas with double resolution on startup if retina display (optional-flag).
  * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
  * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
- * Use the new Bounds class in the RectSelector helper.
- * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
+ * Use the new Bounds class in the RectSelector helper (use min:Vertex and max:Vertex).
  * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
    See ctx.setLineDash(...).
  * Add an internal mapping to remember vertices and their installed listeners (for removing them later).
  * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
  * Port all demos from vanilla JS to TypeScript.
  * Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
- * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
  * Add a removeVertices() function (and use it in the threejs demo).
- * https://github.com/nilzona/path2d-polyfill
- * Implement a drawutils.svgPath(Array). Implement 'S' and 's' and 'T' and 't' in that draw.svgPath(...) function?
- * Add two new classes EllipticSection and CircleSection.
- * Extend the SVGBuilder with these new two classes then.
+ * Add class: EllipticSector
  * Extend the demo 25 (multiple circle intersection): add SVG export.
- * Research about categories for JSDoc (algorithms, datastructures, helpers). Think about a different generator or template.
- * Get rid of the JSDoc generator. Using Typedoc now, yeah.
- 
+
 
 ### Todos for future Version 2
+ * Remove class member `PlotBoilerplate.ctx` (SVG renderes don't have such a context).
  * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
  * Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
  * Change BezierPath.getPointAt to .getVertexAt (or .getVertAt or vertAt?).
@@ -713,7 +701,6 @@ for this purpose.
 
 
 ## Known bugs
- * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
  * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
  * The BBTree.iterator() fails if the tree is empty! (Demos)
  * The minifid BBTree and BBTreeCollection files do not export anything. The un-minified does. Why that?

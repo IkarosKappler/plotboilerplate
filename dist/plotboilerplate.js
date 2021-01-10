@@ -3933,7 +3933,7 @@ var PlotBoilerplate = /** @class */ (function () {
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
         if (typeof globalThis["saveAs"] != "function")
-            throw "Cannot save file; did you load the ./utils/savefile helper function an the eligrey/SaveFile library?";
+            throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
     };

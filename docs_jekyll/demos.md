@@ -147,7 +147,7 @@ date: 2021-01-09
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/28-draw-to-svg/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210109-0-draw-svg.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210106-1-draw-svg.png.png');"></div>
    </a>
 </div>
 </div>

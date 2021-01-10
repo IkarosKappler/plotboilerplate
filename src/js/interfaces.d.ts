@@ -1,3 +1,6 @@
+/**
+ * @modified 2021-01-10 Added the `CanvasWrapper` interface.
+ **/
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
 import { Triangle } from "./Triangle";
@@ -34,6 +37,10 @@ export interface IBounds {
     max: XYCoords;
 }
 export declare type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | VEllipse | Polygon | BezierPath | Line;
+export interface CanvasWrapper {
+    setSize: (width: number, height: number) => void;
+    element: HTMLCanvasElement | SVGElement;
+}
 export interface Config {
     canvas: HTMLCanvasElement | string;
     fullSize?: boolean;
@@ -153,6 +160,10 @@ export interface DrawLib<R> {
     scale: Vertex;
     offset: Vertex;
     fillShapes: boolean;
+    /**
+     * Creates a 'shallow' (non deep) copy of this instance. This implies
+     * that under the hood the same gl context and gl program will be used.
+     */
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.

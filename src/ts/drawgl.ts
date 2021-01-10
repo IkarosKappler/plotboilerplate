@@ -106,12 +106,14 @@ export class drawutilsgl implements DrawLib<void> {
 	console.log('gl initialized');
     };
 
+    
     /**
      * Called before each draw cycle.
      **/
     beginDrawCycle() {
 	this._zindex = 0.0;
     };
+
     
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
@@ -126,10 +128,12 @@ export class drawutilsgl implements DrawLib<void> {
 	copy._program = this._program;
 	return copy;
     };
+    
 
     _x2rel(x:number) : number { return (this.scale.x*x+this.offset.x)/this.gl.canvas.width*2.0-1.0; };
     _y2rel(y:number) : number { return (this.offset.y-this.scale.y*y)/this.gl.canvas.height*2.0-1.0; };
 
+    
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *

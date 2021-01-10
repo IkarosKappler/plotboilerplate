@@ -17,6 +17,7 @@
  *                      if there is no external drag listener installed (1.1.0).
  * @modified 2020-10-04 Added extended JSDoc comments.
  * @modified 2020-11-25 Added the `isTouchEvent` param.
+ * @modified 2021-01-10 The mouse handler is now also working with SVGElements.
  * @version  1.2.0
  *
  * @file MouseHandler
@@ -195,7 +196,7 @@ var MouseHandler = /** @class */ (function () {
      */
     MouseHandler.prototype.relPos = function (e) {
         return { x: e.offsetX,
-            y: e.offsetY // e.pageY - e.target.offsetTop
+            y: e.offsetY
         };
     };
     ;

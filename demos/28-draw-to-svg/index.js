@@ -72,13 +72,11 @@
 	    try {
 		var svgNode = document.getElementById('preview-svg');
 		// clearChildren( svgNode );
-		var tosvg = new drawutilssvg( svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, pb.viewport(), false );
+		var tosvg = new drawutilssvg( svgNode, pb.draw.offset, pb.draw.scale,
+					      pb.canvasSize, /* pb.viewport(), */ false );
 		tosvg.clear();
-
 		// tosvg.label('My Label', 0, 0, 45/180*Math.PI );
-		
-		// console.log( 'canvasSize', tosvg.canvasSize, 'viewport', tosvg.viewport );
-		// tosvg.resize();
+
 		pb.drawAll( new Date().getMilliseconds(), tosvg, tosvg );
 
 	    } catch( e ) {
@@ -86,6 +84,29 @@
 	    }
 	};
 
+	
+	// +---------------------------------------------------------------------------------
+	// | Experimental: export SVG files by serializing SVG nodes from the DOM.
+	// +-------------------------------
+	var exportSVG = function() {
+	    var svgNode = document.getElementById('preview-svg');
+	    // Full support in all browsers \o/
+	    //    https://caniuse.com/xml-serializer
+	    var serializer = new XMLSerializer();
+	    var svgCode = serializer.serializeToString(svgNode);
+
+	    var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
+	    // See documentation for FileSaver.js for usage.
+	    //    https://github.com/eligrey/FileSaver.js
+	    if( typeof globalThis["saveAs"] != "function" )
+		throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
+	    var _saveAs = globalThis["saveAs"];
+	    _saveAs(blob, "svg-demo.svg");   
+	};
+
+	// +---------------------------------------------------------------------------------
+	// | Install a mouse handler to display current pointer position.
+	// +-------------------------------
 	new MouseHandler(pb.canvas,'drawsvg-demo')
 	    .move( function(e) {
 		// Display the mouse position
@@ -103,7 +124,9 @@
 	    drawCircleSections     : true,
 	    drawRadicalLine        : true,
 	    drawIntersectionPoints : false,
-	    drawSectorLines        : false
+	    drawSectorLines        : false,
+	    // TODO: when working this should replace the default SVG export function
+	    svgDownload            : function() { exportSVG(); }
 	}, GUP );
 	
 
@@ -122,6 +145,7 @@
 	    gui.add(config, 'drawRadicalLine').onChange( function() { pb.redraw(); } ).name("drawRadicalLine").title("Draw the radical line?");
 	    gui.add(config, 'drawIntersectionPoints').onChange( function() { pb.redraw(); } ).name("drawIntersectionPoints").title("Draw the intersection points?");
 	    gui.add(config, 'drawSectorLines').onChange( function() { pb.redraw(); } ).name("drawSectorLines").title("Draw the sector lines of circle sections?");
+	    gui.add(config, 'svgDownload').onChange( function() { pb.redraw(); } ).name('svgDownload').title('Download the SVG node as an *.svg file.');
 
 	    // Add stats
 	    var uiStats = new UIStats( stats );

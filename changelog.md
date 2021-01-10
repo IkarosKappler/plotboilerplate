@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2021-01-10
+  * Added the `PBCanvas` interface.
 * 2021-01-08
   * Added the customizable `PlotBoilerplate.drawAll(...)` function.
 * 2021-01-08
