@@ -827,7 +827,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 
 	// Bind this special element into the document
 	this._bindFillDraw( node, 'background', null, null );
-	node.setAttribute( 'fill', color );
+	node.setAttribute( 'fill', typeof color === "undefined" ? 'none' : color );
 
 	return node;
     };

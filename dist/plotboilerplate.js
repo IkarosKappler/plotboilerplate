@@ -10110,7 +10110,7 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('height', "" + this.canvasSize.height);
         // Bind this special element into the document
         this._bindFillDraw(node, 'background', null, null);
-        node.setAttribute('fill', color);
+        node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
         return node;
     };
     ;
