@@ -22,7 +22,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
 
 
-The compressed library has 94kb.
+The compressed library has 103kb.
 
 
 ## Install the package via npm
@@ -648,7 +648,7 @@ for this purpose.
  * Add a removeVertices() function (and use it in the threejs demo).
  * Add class: EllipticSector
  * Extend the demo 25 (multiple circle intersection): add SVG export.
-
+ * Replace drawables-to-svg.js by the new svg-draw library.
 
 ### Todos for future Version 2
  * Remove class member `PlotBoilerplate.ctx` (SVG renderes don't have such a context).
