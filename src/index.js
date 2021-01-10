@@ -77,19 +77,29 @@
 	// | Initialize dat.gui
 	// +-------------------------------
 	pb.createGUI(); 
-	// END init dat.gui
-	
 
+
+	// +---------------------------------------------------------------------------------
+	// | Add stats.
+	// +-------------------------------
+	var stats = {
+	    mouseX : 0,
+	    mouseY : 0
+	};
+	var uiStats = new UIStats( stats );
+	stats = uiStats.proxy;
+	uiStats.add( 'mouseX' );
+	uiStats.add( 'mouseY' );
+
+	
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
 	// +-------------------------------
-	new MouseHandler(pb.canvas)
+	new MouseHandler(pb.eventCatcher)
 	    .move( function(e) {
 		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
-		var cx = document.getElementById('cx');
-		var cy = document.getElementById('cy');
-		if( cx ) cx.innerHTML = relPos.x.toFixed(2);
-		if( cy ) cy.innerHTML = relPos.y.toFixed(2);
+		stats.mouseX = relPos.x;
+		stats.mouseY = relPos.y;
 	    } );
 
 	// Use a helper function to build all demo-drawables.

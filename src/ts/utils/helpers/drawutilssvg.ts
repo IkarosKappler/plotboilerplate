@@ -27,17 +27,41 @@ import { DrawLib, XYCoords, XYDimension, SVGPathParams, SVGSerializable } from "
  */
 export class drawutilssvg implements DrawLib<void|SVGElement> {
 
+    /**
+     * @member {SVGElement}
+     * @memberof drawutilssvg
+     * @instance
+     */
     svgNode:SVGElement;
-    
+
+    /**
+     * @member {Vertex}
+     * @memberof scale
+     * @instance
+     */
     scale:Vertex;
 
+    /**
+     * @member {Vertex}
+     * @memberof offset
+     * @instance
+     */
     offset:Vertex;
 
+    /**
+     * @member {boolean}
+     * @memberof fillShapes
+     * @instance
+     */
     fillShapes:boolean;
 
+    /**
+     * @member {XYDimension}
+     * @memberof canvasSize
+     * @instance
+     */
     canvasSize:XYDimension;
-    
-    // viewport:Bounds;
+
     
     /**
      * The constructor.
@@ -51,14 +75,12 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		 offset:XYCoords,
 		 scale:XYCoords,
 		 canvasSize:XYDimension,
-		 // viewport:Bounds,
 		 fillShapes:boolean
 	       ) {
 	this.svgNode = svgNode;
 	this.offset = new Vertex( 0, 0 ).set(offset);
 	this.scale = new Vertex( 1, 1 ).set(scale);
 	this.fillShapes = fillShapes;
-	// this.viewport = viewport;
 	this.setSize( canvasSize );
 	this.addStyleDefs();
     };
@@ -160,7 +182,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    this.offset,
 	    this.scale,
 	    this.canvasSize,
-	    // this.viewport,
 	    this.fillShapes
 	);
 	return copy;

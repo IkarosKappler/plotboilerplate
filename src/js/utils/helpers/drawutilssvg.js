@@ -22,7 +22,6 @@ var Vertex_1 = require("../../Vertex");
  * @requires XYCoords
  */
 var drawutilssvg = /** @class */ (function () {
-    // viewport:Bounds;
     /**
      * The constructor.
      *
@@ -31,14 +30,11 @@ var drawutilssvg = /** @class */ (function () {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, 
-    // viewport:Bounds,
-    fillShapes) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
-        // this.viewport = viewport;
         this.setSize(canvasSize);
         this.addStyleDefs();
     }
@@ -131,9 +127,7 @@ var drawutilssvg = /** @class */ (function () {
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, 
-        // this.viewport,
-        this.fillShapes);
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, this.fillShapes);
         return copy;
     };
     ;

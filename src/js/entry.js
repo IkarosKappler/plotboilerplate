@@ -21,6 +21,7 @@ globalThis.MouseHandler = require("./MouseHandler.js").MouseHandler;
 globalThis.KeyHandler = require("./KeyHandler.js").KeyHandler;
 globalThis.drawutils = require("./draw.js").drawutils;
 globalThis.drawutilsgl = require("./drawgl.js").drawutilsgl;
+globalThis.drawutilssvg = require("./utils/helpers/drawutilssvg.js").drawutilssvg;
 globalThis.geomutils = require("./geomutils.js").geomutils;
 globalThis.PlotBoilerplate = require("./PlotBoilerplate.js").PlotBoilerplate;
 

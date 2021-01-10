@@ -19,10 +19,35 @@ import { DrawLib, XYCoords, XYDimension } from "../../interfaces";
  * @requires XYCoords
  */
 export declare class drawutilssvg implements DrawLib<void | SVGElement> {
+    /**
+     * @member {SVGElement}
+     * @memberof drawutilssvg
+     * @instance
+     */
     svgNode: SVGElement;
+    /**
+     * @member {Vertex}
+     * @memberof scale
+     * @instance
+     */
     scale: Vertex;
+    /**
+     * @member {Vertex}
+     * @memberof offset
+     * @instance
+     */
     offset: Vertex;
+    /**
+     * @member {boolean}
+     * @memberof fillShapes
+     * @instance
+     */
     fillShapes: boolean;
+    /**
+     * @member {XYDimension}
+     * @memberof canvasSize
+     * @instance
+     */
     canvasSize: XYDimension;
     /**
      * The constructor.
