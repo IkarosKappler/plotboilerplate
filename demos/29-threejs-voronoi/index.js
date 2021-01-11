@@ -257,10 +257,10 @@
 		    console.log( 'The error report contains '+voronoiBuilder.failedTriangleSets.length+' unconnected set(s) of triangles:' );
 		    // Draw illegal triangle sets?
 		    for( var s = 0; s < voronoiBuilder.failedTriangleSets.length; s++ ) {
-			console.log( 'Set '+s+': ' + JSON.stringify(voronoiBuilder.failedTriangleSets[s]) );
+			// console.log( 'Set '+s+': ' + JSON.stringify(voronoiBuilder.failedTriangleSets[s]) );
 			var n = voronoiBuilder.failedTriangleSets[s].length;
 			for( var i = 0; i < n; i++ ) {
-			    console.log('highlight triangle ' + i );
+			    // console.log('highlight triangle ' + i );
 			    var tri = voronoiBuilder.failedTriangleSets[s][i];
 			    drawTriangle( tri, 'rgb(255,'+Math.floor(255*(i/n))+',0)' );
 			    draw.circle( tri.center, tri.radius, 'rgb(255,'+Math.floor(255*(i/n))+',0)' );

@@ -89,6 +89,7 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
 
 
 ### Typescript
+<details> <summary>Typescript implementation</summary>
 ~~~typescript
    // Usage with Typescript could look like this
    import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
@@ -111,7 +112,7 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
    } );
 ~~~
 A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
-
+</details>
 
 
 
