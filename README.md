@@ -90,7 +90,9 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
 
 ### Typescript
 <details>
+
  <summary>Typescript implementation</summary>
+ 
  ~~~typescript
     // Usage with Typescript could look like this
     import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
