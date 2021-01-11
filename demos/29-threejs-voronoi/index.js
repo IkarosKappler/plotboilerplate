@@ -241,7 +241,7 @@
 		triangles  = delau.triangulate();
 		trianglesPointCount = pointList.length;
 		voronoiDiagram = [];
-		redraw();
+		// redraw();
 	    };
 
 
@@ -405,14 +405,14 @@
 	    var rebuildVoronoiMesh = function() {
 		// rebuildVoronoi();
 		var buildId = new Date().getTime();
-		window.setTimeout( (function(bId) {
-		    return function() {
-			if( bId == buildId ) {
+		// window.setTimeout( (function(bId) {
+		//    return function() {
+		//	if( bId == buildId ) {
 			    // voronoiGeneration.rebuild( Object.assign( { outline : outline }, config ) );
 			    voronoiGeneration.rebuild( Object.assign( { voronoiDiagram : voronoiDiagram }, config ) );
-			}
-		    };
-		})(buildId), 50 );
+		//	}
+		//    };
+		//})(buildId), 50 );
 	    };
 	    
 	    // new DoubleclickHandler( pb, handleDoubleclick );
@@ -530,7 +530,7 @@
 		f5.add(config, 'fillVoronoiCells').onChange( rebuildVoronoi ).title("If checked the Voronoi cells will be filled.");
 		f5.addColor(config, 'voronoiCellColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi cell color.");
 		f5.add(config, 'voronoiCubicThreshold').min(0.0).max(1.0).onChange( function() { pb.redraw() } ).title("(Experimental) Specifiy the cubic or cell coefficients.");
-		f5.add(config, 'voronoiCellScale').min(-1.0).max(2.0).onChange( function() { pb.redraw() } ).title("Scale each voronoi cell before rendering.");
+		f5.add(config, 'voronoiCellScale').min(-1.0).max(2.0).onChange( function() { pb.redraw(); rebuildVoronoi() } ).title("Scale each voronoi cell before rendering.");
 	    }
 
 	    // pb.config.preDraw = preDraw;
