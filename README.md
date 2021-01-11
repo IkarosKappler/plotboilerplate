@@ -90,12 +90,12 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
 
 ### Typescript
 <details>
-<summary>Typescript implementation</summary>
-~~~typescript
-   // Usage with Typescript could look like this
-   import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
-
-   window.addEventListener( 'load', () => {
+ <summary>Typescript implementation</summary>
+ ~~~typescript
+    // Usage with Typescript could look like this
+    import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
+ 
+    window.addEventListener( 'load', () => {
     
        const pointA : Vertex = new Vertex( 100,-100);
        const pointB : Vertex = new Vertex(-100, 100);
@@ -110,9 +110,9 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
     
        pb.add( line );
 
-   } );
-~~~
-A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
+    } );
+ ~~~
+ A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
 
 </details>
 
