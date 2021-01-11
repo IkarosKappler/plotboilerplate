@@ -73,35 +73,35 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		outlineSegmentCount   : 128,
-		shapeSegmentCount     : 64,
+		// outlineSegmentCount   : 128,
+		// shapeSegmentCount     : 64,
 		showNormals           : false,
 		normalsLength         : 10.0,
 		useTextureImage       : true,
 		textureImagePath      : 'wood.png',
 		wireframe             : false,
 		exportSTL             : function() { exportSTL(); },
-		showPathJSON          : function() { showPathJSON(); },
-		insertPathJSON        : function() { insertPathJSON(); },
+		// showPathJSON          : function() { showPathJSON(); },
+		// insertPathJSON        : function() { insertPathJSON(); },
 
 		makeVoronoiDiagram    : true,
 		drawPoints            : true,
-		drawTriangles         : true,
-		drawCircumCircles     : false,
+		// drawTriangles         : true,
+		// drawCircumCircles     : false,
 		drawCubicCurves       : false,
-		fillVoronoiCells      : true,
+		// fillVoronoiCells      : true,
 		voronoiOutlineColor   : 'rgba(0,168,40, 1.0)',
 		voronoiCellColor      : 'rgba(0,128,192, 0.5)',
 		voronoiCubicThreshold : 1.0,
 		voronoiCellScale      : 0.8,
-		drawVoronoiIncircles  : false,
+		// drawVoronoiIncircles  : false,
 		drawVoronoiOutlines   : true,
 		pointCount            : 32,
 		rebuild               : function() { rebuildVoronoi(); },
 		randomize             : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuildVoronoi(); },
 		fullCover             : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuildVoronoi(); },
-		animate               : false,
-		animationType         : 'linear' // 'linear' or 'radial'
+		// animate               : false,
+		// animationType         : 'linear' // 'linear' or 'radial'
 	    }, GUP );
 
 
@@ -480,7 +480,7 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Create the outline: a Bézier path.
 	    // +-------------------------------
-	    var outline = null;
+	    // var outline = null;
 	    // This will trigger the first initial postDraw/draw/redraw call
 	    // setPathInstance( BezierPath.fromJSON( DEFAULT_BEZIER_JSON ) );
 
@@ -492,8 +492,8 @@
             {
 		var gui = pb.createGUI();
 		var fold0 = gui.addFolder("Mesh");
-		fold0.add(config, "outlineSegmentCount").min(3).max(512).onChange( function() { rebuild() } ).name('outlineSegmentCount').title('The number of segments on the outline.');
-		fold0.add(config, "shapeSegmentCount").min(3).max(256).onChange( function() { rebuild() } ).name('shapeSegmentCount').title('The number of segments on the shape.');
+		// fold0.add(config, "outlineSegmentCount").min(3).max(512).onChange( function() { rebuild() } ).name('outlineSegmentCount').title('The number of segments on the outline.');
+		// fold0.add(config, "shapeSegmentCount").min(3).max(256).onChange( function() { rebuild() } ).name('shapeSegmentCount').title('The number of segments on the shape.');
 		fold0.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
 		fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
 		fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image.');
@@ -501,12 +501,12 @@
 
 		var fold1 = gui.addFolder("Export");
 		fold1.add(config, "exportSTL").name('STL').title('Export an STL file.');
-		fold1.add(config, "showPathJSON").name('Show Path JSON ...').title('Show the path data.');
+		// fold1.add(config, "showPathJSON").name('Show Path JSON ...').title('Show the path data.');
 
-		var fold2 = gui.addFolder("Import");
-		fold2.add(config, "insertPathJSON").name('Insert Path JSON ...').title('Insert path data as JSON.');
+		// var fold2 = gui.addFolder("Import");
+		// fold2.add(config, "insertPathJSON").name('Insert Path JSON ...').title('Insert path data as JSON.');
 
-		fold0.open();
+		// fold0.open();
 
 
 		var f3 = gui.addFolder('Points');
@@ -517,17 +517,17 @@
 		// f3.add(config, 'animationType', { Linear: 'linear', Radial : 'radial' } ).onChange( function() { toggleAnimation(); } );
 		// f3.open();
 		
-		var f4 = gui.addFolder('Delaunay');
-		f4.add(config, 'drawTriangles').onChange( function() { pb.redraw() } ).title("If checked the triangle edges will be drawn.");
-		f4.add(config, 'drawCircumCircles').onChange( function() { pb.redraw() } ).title("If checked the triangles circumcircles will be drawn.");
+		// var f4 = gui.addFolder('Delaunay');
+		// f4.add(config, 'drawTriangles').onChange( function() { pb.redraw() } ).title("If checked the triangle edges will be drawn.");
+		// f4.add(config, 'drawCircumCircles').onChange( function() { pb.redraw() } ).title("If checked the triangles circumcircles will be drawn.");
 
 		var f5 = gui.addFolder('Voronoi');
-		f5.add(config, 'makeVoronoiDiagram').onChange( rebuildVoronoi ).title("Make voronoi diagram from the triangle set.");
+		// f5.add(config, 'makeVoronoiDiagram').onChange( rebuildVoronoi ).title("Make voronoi diagram from the triangle set.");
 		f5.addColor(config, 'voronoiOutlineColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi outline color.");
 		f5.add(config, 'drawCubicCurves').onChange( rebuildVoronoi ).title("If checked the Voronoi's cubic curves will be drawn.");
-		f5.add(config, 'drawVoronoiOutlines').onChange( rebuildVoronoi ).title("If checked the Voronoi cells' outlines will be drawn.");
-		f5.add(config, 'drawVoronoiIncircles').onChange( rebuildVoronoi ).title("If checked the Voronoi cells' incircles will be drawn.");
-		f5.add(config, 'fillVoronoiCells').onChange( rebuildVoronoi ).title("If checked the Voronoi cells will be filled.");
+		// f5.add(config, 'drawVoronoiOutlines').onChange( rebuildVoronoi ).title("If checked the Voronoi cells' outlines will be drawn.");
+		// f5.add(config, 'drawVoronoiIncircles').onChange( rebuildVoronoi ).title("If checked the Voronoi cells' incircles will be drawn.");
+		// f5.add(config, 'fillVoronoiCells').onChange( rebuildVoronoi ).title("If checked the Voronoi cells will be filled.");
 		f5.addColor(config, 'voronoiCellColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi cell color.");
 		f5.add(config, 'voronoiCubicThreshold').min(0.0).max(1.0).onChange( function() { pb.redraw() } ).title("(Experimental) Specifiy the cubic or cell coefficients.");
 		f5.add(config, 'voronoiCellScale').min(-1.0).max(2.0).onChange( function() { pb.redraw(); rebuildVoronoi() } ).title("Scale each voronoi cell before rendering.");

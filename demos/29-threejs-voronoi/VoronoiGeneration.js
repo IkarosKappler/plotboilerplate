@@ -69,28 +69,21 @@
     };
 
     /**
-     * @param {BezierPath} options.outline
-     * @param {number}     options.segmentCount
-     * @param {number}     outlineSegmentCount (>= 2).
-     * @param {boolean?}   useTextureImage
-     * @param {string?}    textureImagePath
-     * @param {boolean?}   wireframe
+     * @param {VoronoiCell[]}   options.voronoiDiagram
+     * @param {boolean}         options.useTextureImage
+     * @param {boolean?}        useTextureImage
+     * @param {string?}         textureImagePath
+     * @param {boolean?}        wireframe
+     * @param {boolean?}        showNormals
      **/
     VoronoiGeneration.prototype.rebuild = function( options ) {
 	this.removeCachedGeometries();
 
-	
-	// var baseRadius       = options.outline.getBounds().width;
-	// var baseShape        = mkCircularPolygon( baseRadius, options.shapeSegmentCount );
-	// var geometry         = new VoronoiGeometry( Object.assign( { baseShape : baseShape }, options ) );
 	var voronoiDiagram   = options.voronoiDiagram;
 	var geometry         = new VoronoiGeometry( Object.assign( { voronoiDiagram : voronoiDiagram }, options ) );
 	var useTextureImage  = options.useTextureImage && typeof options.textureImagePath != "undefined";
 	var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
 	var wireframe        = typeof options.wireframe != "undefined" ? options.wireframe : null;
-	
-
-	
 
 	var material = useTextureImage ?
 	    new THREE.MeshLambertMaterial( {
@@ -135,11 +128,11 @@
 	this.scene.add( latheMesh );
 	this.geometries.push( latheMesh );
 
-	/* if( options.showNormals ) {
+	if( options.showNormals ) {
 	    var vnHelper = new VertexNormalsHelper( latheMesh, options.normalsLength, 0x00ff00, 1 );
 	    this.scene.add( vnHelper );
 	    this.geometries.push( vnHelper );
-	} */
+	}
 	
     };
 
@@ -182,7 +175,7 @@
 	}
     };
 
-    var mkCircularPolygon = function( radius, pointCount ) {
+    /* var mkCircularPolygon = function( radius, pointCount ) {
 	var vertices = [];
 	var phi;
 	for( var i = 0; i < pointCount; i++ ) {
@@ -192,7 +185,7 @@
 			 );
 	}
 	return new Polygon( vertices, false );
-    };
+    }; */
 
     window.VoronoiGeneration = VoronoiGeneration;
 })();
