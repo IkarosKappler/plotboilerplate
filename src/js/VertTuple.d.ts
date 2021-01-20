@@ -7,18 +7,29 @@
  * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
- * @version 1.0.3
+ * @modified 2021-01-20 Added UID.
+ * @version 1.1.0
  */
 import { Vertex } from "./Vertex";
-import { XYCoords } from "./interfaces";
+import { XYCoords, UID } from "./interfaces";
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
- * @requiers SVGSerializable
+ * @requires SVGSerializable
+ * @requires UID
  * @requires Vertex
  * @requires XYCoords
  */
 export declare class VertTuple<T extends VertTuple<T>> {
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof VertTuple
+     * @instance
+     * @readonly
+     */
+    readonly uid: UID;
     /**
      * @member {Vertex}
      * @memberof VertTuple

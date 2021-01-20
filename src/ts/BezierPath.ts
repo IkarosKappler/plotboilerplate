@@ -27,8 +27,9 @@
 
 import { Bounds } from "./Bounds";
 import { CubicBezierCurve } from "./CubicBezierCurve";
+import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable} from "./interfaces";
+import { XYCoords, SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -41,6 +42,8 @@ import { XYCoords, SVGSerializable} from "./interfaces";
  * @requires CubicBezierCurve
  * @requires XYCoords
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  **/
 export class BezierPath implements SVGSerializable {
 
@@ -49,6 +52,17 @@ export class BezierPath implements SVGSerializable {
      * Required to generate proper CSS classes and other class related IDs.
      **/
     readonly className : string = "BezierPath";
+
+
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof BezierCurve
+     * @instance
+     * @readonly 
+     */
+    readonly uid : UID;
     
 
     /** 
@@ -121,7 +135,8 @@ export class BezierPath implements SVGSerializable {
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
     private constructor( pathPoints:Array<Vertex> ) {
-	
+	this.uid = UIDGenerator.next();
+	    
 	if( !pathPoints )
 	    pathPoints = [];
 	this.totalArcLength = 0.0;
@@ -129,38 +144,6 @@ export class BezierPath implements SVGSerializable {
 	// last point of the path to be auto adjusted, too.
 	this.adjustCircular = false;
 	this.bezierCurves = [];
-
-
-	//console.error( "THIS CONSTRUCTOR IS DEPRECATED. USE .fromArray INSTEAD." );
-	//throw Error("THIS CONSTRUCTOR IS DEPRECATED. USE .fromArray INSTEAD.");
-	/*
-	for( var i = 1; i < pathPoints.length; i++ ) {
-	    var bounds = new THREE.Box2( pathPoints[i].x - pathPoints[i-1].x, 
-					 pathPoints[i].y - pathPoints[i-1].y
-				       );
-	    // Create a new Bezier curve inside the box
-	    var bCurve =  new CubicBezierCurve( pathPoints[i-1],
-						pathPoints[i],
-						new Vertex( pathPoints[i-1].x, 
-							    pathPoints[i-1].y - bounds.min/2
-							  ),
-						// This control point will be auto-adjusted in the next step
-						new Vertex( pathPoints[i].x + bounds.max/2,
-							    pathPoints[i].y 
-							  )
-					      );
-	    this.bezierCurves.push( bCurve );
-	    this.totalArcLength += bCurve.getLength();
-	    
-	    // Auto adjust the second control point (should be on a linear sub-space)
-	    if( this.bezierCurves.length >= 2 ) {
-		this.adjustSuccessorControlPoint( this.bezierCurves.length-2, // curveIndex, 
-						  true,                       // obtain handle length?
-						  true                        // update arc lengths
-						);
-	    }
-	}
-	*/
     };
 
 

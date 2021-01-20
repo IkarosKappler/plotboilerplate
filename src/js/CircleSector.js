@@ -1,18 +1,20 @@
 "use strict";
 /**
  * @author   Ikaros Kappler
- * @version  1.0.0
  * @date     2020-12-17
+ * @modified 2021-01-20 Added UID.
+ * @version  1.1.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CircleSector = void 0;
-// [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
-// export type SVGArcPathParams = [ string, number, number, number, number, number, number, number ];
+var UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
  * @requires Line
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  * @requires XYCoords
  **/
 var CircleSector = /** @class */ (function () {
@@ -30,6 +32,7 @@ var CircleSector = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "CircleSector";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.circle = circle;
         this.startAngle = startAngle;
         this.endAngle = endAngle;

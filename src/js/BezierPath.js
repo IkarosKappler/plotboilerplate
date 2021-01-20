@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BezierPath = void 0;
 var Bounds_1 = require("./Bounds");
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
+var UIDGenerator_1 = require("./UIDGenerator");
 var Vertex_1 = require("./Vertex");
 /**
  * @classdesc A BezierPath class.
@@ -40,6 +41,8 @@ var Vertex_1 = require("./Vertex");
  * @requires CubicBezierCurve
  * @requires XYCoords
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  **/
 var BezierPath = /** @class */ (function () {
     /**
@@ -67,6 +70,7 @@ var BezierPath = /** @class */ (function () {
         this.END_CONTROL_POINT = 2;
         /** @constant {number} */
         this.END_POINT = 3;
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         if (!pathPoints)
             pathPoints = [];
         this.totalArcLength = 0.0;
@@ -74,36 +78,6 @@ var BezierPath = /** @class */ (function () {
         // last point of the path to be auto adjusted, too.
         this.adjustCircular = false;
         this.bezierCurves = [];
-        //console.error( "THIS CONSTRUCTOR IS DEPRECATED. USE .fromArray INSTEAD." );
-        //throw Error("THIS CONSTRUCTOR IS DEPRECATED. USE .fromArray INSTEAD.");
-        /*
-        for( var i = 1; i < pathPoints.length; i++ ) {
-            var bounds = new THREE.Box2( pathPoints[i].x - pathPoints[i-1].x,
-                         pathPoints[i].y - pathPoints[i-1].y
-                           );
-            // Create a new Bezier curve inside the box
-            var bCurve =  new CubicBezierCurve( pathPoints[i-1],
-                            pathPoints[i],
-                            new Vertex( pathPoints[i-1].x,
-                                    pathPoints[i-1].y - bounds.min/2
-                                  ),
-                            // This control point will be auto-adjusted in the next step
-                            new Vertex( pathPoints[i].x + bounds.max/2,
-                                    pathPoints[i].y
-                                  )
-                              );
-            this.bezierCurves.push( bCurve );
-            this.totalArcLength += bCurve.getLength();
-            
-            // Auto adjust the second control point (should be on a linear sub-space)
-            if( this.bezierCurves.length >= 2 ) {
-            this.adjustSuccessorControlPoint( this.bezierCurves.length-2, // curveIndex,
-                              true,                       // obtain handle length?
-                              true                        // update arc lengths
-                            );
-            }
-        }
-        */
     }
     ;
     /**

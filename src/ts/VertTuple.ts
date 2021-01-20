@@ -7,21 +7,33 @@
  * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
- * @version 1.0.3
+ * @modified 2021-01-20 Added UID.
+ * @version 1.1.0
  */
 
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable} from "./interfaces";
+import { UIDGenerator } from "./UIDGenerator";
+import { XYCoords, SVGSerializable, UID } from "./interfaces";
 
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
- * @requiers SVGSerializable
+ * @requires SVGSerializable
+ * @requires UID
  * @requires Vertex
  * @requires XYCoords
  */
 export class VertTuple<T extends VertTuple<T>> {
 
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof VertTuple
+     * @instance
+     * @readonly 
+     */
+    readonly uid : UID;
 
     /** 
      * @member {Vertex} 
@@ -48,7 +60,8 @@ export class VertTuple<T extends VertTuple<T>> {
      * @param {Vertex} a The tuple's first point.
      * @param {Vertex} b The tuple's second point.
      **/
-    constructor(a:Vertex,b:Vertex,factory:(a:Vertex,b:Vertex)=>T) { 
+    constructor(a:Vertex,b:Vertex,factory:(a:Vertex,b:Vertex)=>T) {
+	this.uid = UIDGenerator.next();
        	this.a = a;
 	this.b = b;
 	this.factory = factory;

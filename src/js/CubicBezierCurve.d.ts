@@ -17,14 +17,15 @@
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
  * @modified 2020-07-24 Added the getClosestT function and the helper function locateIntervalByDistance(...).
- * @version 2.4.2
+ * @modified 2021-01-20 Added UID.
+ * @version 2.5.0
  *
  * @file CubicBezierCurve
  * @public
  **/
 import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
-import { XYCoords } from "./interfaces";
+import { XYCoords, UID } from "./interfaces";
 /**
  * @classdesc A refactored cubic bezier curve class.
  *
@@ -33,6 +34,8 @@ import { XYCoords } from "./interfaces";
  * @requires Vector
  * @requires XYCoords
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  */
 export declare class CubicBezierCurve {
     /** @constant {number} */
@@ -51,6 +54,15 @@ export declare class CubicBezierCurve {
     readonly END_CONTROL_POINT: number;
     /** @constant {number} */
     readonly END_POINT: number;
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof CubicBezierCurve
+     * @instance
+     * @readonly
+     */
+    readonly uid: UID;
     /**
      * @member {CubicBezierCurve}
      * @memberof CubicBezierCurve

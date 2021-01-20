@@ -18,7 +18,8 @@
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
  * @modified  2020-06-18 Added the `getIncenter` function.
  * @modified  2020-12-28 Added the `getArea` function.
- * @version   2.4.0
+ * @modified  2021-01-20 Added UID.
+ * @version   2.5.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -30,6 +31,7 @@ var Bounds_1 = require("./Bounds");
 var Circle_1 = require("./Circle");
 var Line_1 = require("./Line");
 var Polygon_1 = require("./Polygon");
+var UIDGenerator_1 = require("./UIDGenerator");
 var Vertex_1 = require("./Vertex");
 var geomutils_1 = require("./geomutils");
 /**
@@ -44,6 +46,8 @@ var geomutils_1 = require("./geomutils");
  * @requires Vertex
  * @requires Polygon
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  * @requires XYCoords
  * @requires geomutils
  *
@@ -63,6 +67,7 @@ var Triangle = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Triangle";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.a = a;
         this.b = b;
         this.c = c;

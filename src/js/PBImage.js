@@ -4,7 +4,8 @@
  * @date     2019-01-30
  * @modified 2019-03-23 Added JSDoc tags.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version 1.0.2
+ * @modified 2021-01-20 Added UID.
+ * @version 1.1.0
  *
  * @file PBImage
  * @fileoverview As native Image objects have only a position and with
@@ -13,11 +14,14 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PBImage = void 0;
+var UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
  *
  * @requires Vertex
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  */
 var PBImage = /** @class */ (function () {
     /**
@@ -34,6 +38,7 @@ var PBImage = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "PBImage";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.image = image;
         this.upperLeft = upperLeft;
         this.lowerRight = lowerRight;

@@ -17,16 +17,18 @@
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
  * @modified 2020-07-24 Added the getClosestT function and the helper function locateIntervalByDistance(...).
- * @version 2.4.2
+ * @modified 2021-01-20 Added UID.
+ * @version 2.5.0
  *
  * @file CubicBezierCurve
  * @public
  **/
 
 import { Bounds } from "./Bounds";
+import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
-import { XYCoords, SVGSerializable} from "./interfaces";
+import { XYCoords, SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -37,6 +39,8 @@ import { XYCoords, SVGSerializable} from "./interfaces";
  * @requires Vector
  * @requires XYCoords
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  */
 export class CubicBezierCurve {
 
@@ -59,6 +63,17 @@ export class CubicBezierCurve {
     /** @constant {number} */
     readonly END_POINT:number            = CubicBezierCurve.END_POINT;
 
+
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof CubicBezierCurve
+     * @instance
+     * @readonly 
+     */
+    readonly uid : UID;
+    
 
     /** 
      * @member {CubicBezierCurve} 
@@ -134,7 +149,8 @@ export class CubicBezierCurve {
 		 endPoint:Vertex,
 		 startControlPoint:Vertex,
 		 endControlPoint:Vertex
-	       ) {	
+	       ) {
+	this.uid                = UIDGenerator.next();
 	this.startPoint         = startPoint;
 	this.startControlPoint  = startControlPoint;
 	this.endPoint           = endPoint;

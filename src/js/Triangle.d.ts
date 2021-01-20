@@ -17,7 +17,8 @@
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
  * @modified  2020-06-18 Added the `getIncenter` function.
  * @modified  2020-12-28 Added the `getArea` function.
- * @version   2.4.0
+ * @modified  2021-01-20 Added UID.
+ * @version   2.5.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -27,7 +28,7 @@ import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { SVGSerializable } from "./interfaces";
+import { SVGSerializable, UID } from "./interfaces";
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -40,6 +41,8 @@ import { SVGSerializable } from "./interfaces";
  * @requires Vertex
  * @requires Polygon
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  * @requires XYCoords
  * @requires geomutils
  *
@@ -49,6 +52,15 @@ export declare class Triangle implements SVGSerializable {
      * Required to generate proper CSS classes and other class related IDs.
      **/
     readonly className: string;
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof Triangle
+     * @instance
+     * @readonly
+     */
+    readonly uid: UID;
     /**
      * An epsilon for comparison.
      * This should be the same epsilon as in Vertex.

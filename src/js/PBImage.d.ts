@@ -3,7 +3,8 @@
  * @date     2019-01-30
  * @modified 2019-03-23 Added JSDoc tags.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version 1.0.2
+ * @modified 2021-01-20 Added UID.
+ * @version 1.1.0
  *
  * @file PBImage
  * @fileoverview As native Image objects have only a position and with
@@ -11,18 +12,29 @@
  * @public
  **/
 import { Vertex } from "./Vertex";
-import { SVGSerializable } from "./interfaces";
+import { SVGSerializable, UID } from "./interfaces";
 /**
  * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
  *
  * @requires Vertex
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  */
 export declare class PBImage implements SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
     readonly className: string;
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof PBImage
+     * @instance
+     * @readonly
+     */
+    readonly uid: UID;
     /**
      * @member {Vertex}
      * @memberof PBImage

@@ -28,7 +28,7 @@
  **/
 import { IVertexAttr } from "./VertexAttr";
 import { VertexListeners } from "./VertexListeners";
-import { XYCoords, SVGSerializable } from "./interfaces";
+import { XYCoords, SVGSerializable, UID } from "./interfaces";
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -36,6 +36,8 @@ import { XYCoords, SVGSerializable } from "./interfaces";
  *
  * @requires IVertexAttr
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  * @requires VertexAttr
  * @requires VertexListeners
  * @requires XYCoords
@@ -48,9 +50,19 @@ export declare class Vertex implements XYCoords, SVGSerializable {
      **/
     readonly className: string;
     /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof Vertex
+     * @instance
+     * @readonly
+     */
+    readonly uid: UID;
+    /**
      * An epsilon for comparison
      *
      * @private
+     * @readonly
      **/
     static readonly EPSILON = 0.000001;
     /**

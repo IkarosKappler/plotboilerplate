@@ -1,25 +1,44 @@
 /**
  * @author   Ikaros Kappler
- * @version  1.0.0
  * @date     2020-12-17
+ * @modified 2021-01-20 Added UID.
+ * @version  1.1.0
  **/
 
 
 import { Circle } from "./Circle";
-import { SVGPathParams, SVGSerializable, XYCoords } from "./interfaces";
+import { UIDGenerator } from "./UIDGenerator";
+import { SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";
 
-// [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
-// export type SVGArcPathParams = [ string, number, number, number, number, number, number, number ];
 
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
  * @requires Line
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  * @requires XYCoords
  **/
 export class CircleSector implements SVGSerializable {
 
+    /** 
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string = "CircleSector";
+    
+    
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof CircleSector
+     * @instance
+     * @readonly 
+     */
+    readonly uid : UID;
+    
+    
     /** 
      * @member {Circle} 
      * @memberof CircleSector
@@ -41,10 +60,6 @@ export class CircleSector implements SVGSerializable {
      */
     endAngle:number;
 
-    /** 
-     * Required to generate proper CSS classes and other class related IDs.
-     **/
-    readonly className : string = "CircleSector";
 
     /**
      * Create a new circle sector with given circle, start- and end-angle.
@@ -56,6 +71,7 @@ export class CircleSector implements SVGSerializable {
      * @param {number} endAngle - The end angle of the sector.
      */
     constructor( circle:Circle, startAngle:number, endAngle:number ) {
+	this.uid = UIDGenerator.next();
 	this.circle = circle;
 	this.startAngle = startAngle;
 	this.endAngle = endAngle;

@@ -30,6 +30,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Vertex = void 0;
 var VertexAttr_1 = require("./VertexAttr");
+var UIDGenerator_1 = require("./UIDGenerator");
 var VertexListeners_1 = require("./VertexListeners");
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
@@ -38,6 +39,8 @@ var VertexListeners_1 = require("./VertexListeners");
  *
  * @requires IVertexAttr
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  * @requires VertexAttr
  * @requires VertexListeners
  * @requires XYCoords
@@ -57,6 +60,7 @@ var Vertex = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Vertex";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         if (typeof x == 'undefined') {
             this.x = 0;
             this.y = 0;
@@ -501,6 +505,7 @@ var Vertex = /** @class */ (function () {
      * An epsilon for comparison
      *
      * @private
+     * @readonly
      **/
     Vertex.EPSILON = 1.0e-6;
     Vertex.utils = {

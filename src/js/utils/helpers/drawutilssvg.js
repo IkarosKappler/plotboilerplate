@@ -214,7 +214,7 @@ var drawutilssvg = /** @class */ (function () {
                 var ratioY = size.y / image.naturalHeight;
                 node.setAttribute('width', "" + image.naturalWidth * _this.scale.x);
                 node.setAttribute('height', "" + image.naturalHeight * _this.scale.y);
-                node.setAttribute('transform', "translate(" + position.x + "px " + position.y + "px) scale(" + (ratioX) + " " + (ratioY) + ")");
+                // node.setAttribute('transform', `translate(${position.x}px ${position.y}px) scale(${(ratioX)} ${(ratioY)})` );
                 node.setAttribute('transform', "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + (ratioX) + " " + (ratioY) + ")");
             }
         };

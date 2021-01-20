@@ -14,7 +14,8 @@
  * @modified 2020-11-06 Added the `move` function.
  * @modified 2020-11-10 Added the `getBounds` function.
  * @modified 2020-11-11 Generalized `move(Vertex)` to `move(XYCoords)`.
- * @version 1.5.1
+ * @modified 2021-01-20 Added UID.
+ * @version 1.6.0
  *
  * @file Polygon
  * @public
@@ -22,13 +23,15 @@
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable } from "./interfaces";
+import { XYCoords, SVGSerializable, UID } from "./interfaces";
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
  * @requires BezierPath
  * @requires Bounds
  * @requires SVGSerializabe
+ * @requires UID
+ * @requires UIDGenerator
  * @requires Vertex
  * @requires XYCoords
  */
@@ -37,6 +40,15 @@ export declare class Polygon implements SVGSerializable {
      * Required to generate proper CSS classes and other class related IDs.
      **/
     readonly className: string;
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof Polygon
+     * @instance
+     * @readonly
+     */
+    readonly uid: UID;
     /**
      * @member {Array<Vertex>}
      * @memberof Polygon

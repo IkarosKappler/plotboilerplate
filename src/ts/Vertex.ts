@@ -29,8 +29,9 @@
 
 
 import { IVertexAttr, VertexAttr } from "./VertexAttr";
+import { UIDGenerator } from "./UIDGenerator";
 import { VertexListeners } from "./VertexListeners";
-import { XYCoords, SVGSerializable} from "./interfaces";
+import { XYCoords, SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -40,6 +41,8 @@ import { XYCoords, SVGSerializable} from "./interfaces";
  *
  * @requires IVertexAttr
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  * @requires VertexAttr
  * @requires VertexListeners
  * @requires XYCoords
@@ -53,11 +56,22 @@ export class Vertex implements XYCoords, SVGSerializable {
      * Required to generate proper CSS classes and other class related IDs.
      **/
     readonly className : string = "Vertex";
+
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof Vertex
+     * @instance
+     * @readonly 
+     */
+    readonly uid : UID;
     
     /**
      * An epsilon for comparison
      *
      * @private
+     * @readonly
      **/
     static readonly EPSILON = 1.0e-6;
 
@@ -100,6 +114,7 @@ export class Vertex implements XYCoords, SVGSerializable {
      * @param {number} y - The y-coordinate of the new vertex.
      **/
     constructor( x?:number|XYCoords|undefined, y?:number|undefined ) {
+	this.uid = UIDGenerator.next();
 	if( typeof x == 'undefined' ) {
 	    this.x = 0;
 	    this.y = 0;

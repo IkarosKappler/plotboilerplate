@@ -1,20 +1,22 @@
 /**
  * @author   Ikaros Kappler
- * @version  1.1.0
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
  * @modified 2020-05-25 Added the vertAt and tangentAt functions.
  * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
  * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  * @modified 2020-10-16 Added the containsCircle(...) function.
+ * @modified 2021-01-20 Added UID.
+ * @version  1.2.0
  **/
 
 
 import { Line } from "./Line";
+import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable } from "./interfaces";
+import { SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -25,9 +27,27 @@ import { SVGSerializable } from "./interfaces";
  * @requires VertTuple 
  * @requires Vertex
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  **/
 export class Circle implements SVGSerializable {
 
+    /** 
+     * Required to generate proper CSS classes and other class related IDs.
+     **/
+    readonly className : string = "Circle";
+    
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof Circle
+     * @instance
+     * @readonly 
+     */
+    readonly uid : UID;
+    
+    
     /** 
      * @member {Vertex} 
      * @memberof Circle
@@ -35,17 +55,13 @@ export class Circle implements SVGSerializable {
      */
     center:Vertex;
 
-   /**	
+    /**	
      * @member {number} 
      * @memberof Circle
      * @instance
      */
     radius:number;
 
-    /** 
-     * Required to generate proper CSS classes and other class related IDs.
-     **/
-    readonly className : string = "Circle";
 
     /**
      * Create a new circle with given center point and radius.
@@ -56,6 +72,7 @@ export class Circle implements SVGSerializable {
      * @param {number} radius - The radius of the circle.
      */
     constructor( center:Vertex, radius:number ) {
+	this.uid = UIDGenerator.next();
 	this.center = center;
 	this.radius = radius;
     };

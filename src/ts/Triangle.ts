@@ -17,7 +17,8 @@
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
  * @modified  2020-06-18 Added the `getIncenter` function.
  * @modified  2020-12-28 Added the `getArea` function.
- * @version   2.4.0
+ * @modified  2021-01-20 Added UID.
+ * @version   2.5.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -29,9 +30,10 @@ import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { Line } from "./Line";
 import { Polygon } from "./Polygon";
+import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { XYCoords, SVGSerializable} from "./interfaces";
+import { XYCoords, SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -46,6 +48,8 @@ import { XYCoords, SVGSerializable} from "./interfaces";
  * @requires Vertex
  * @requires Polygon
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  * @requires XYCoords
  * @requires geomutils
  *
@@ -56,6 +60,18 @@ export class Triangle implements SVGSerializable {
      * Required to generate proper CSS classes and other class related IDs.
      **/
     readonly className : string = "Triangle";
+
+    
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof Triangle
+     * @instance
+     * @readonly 
+     */
+    readonly uid : UID;
+    
     
     /**
      * An epsilon for comparison.
@@ -121,6 +137,7 @@ export class Triangle implements SVGSerializable {
      * @param {Vertex} c - The third vertex of the triangle.
      **/
     constructor( a:Vertex, b:Vertex, c:Vertex )	{
+	this.uid = UIDGenerator.next();
 	this.a = a;
 	this.b = b;
 	this.c = c;

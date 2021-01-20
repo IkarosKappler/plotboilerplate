@@ -8,15 +8,18 @@
  * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
- * @version 1.0.3
+ * @modified 2021-01-20 Added UID.
+ * @version 1.1.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VertTuple = void 0;
 var Vertex_1 = require("./Vertex");
+var UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
- * @requiers SVGSerializable
+ * @requires SVGSerializable
+ * @requires UID
  * @requires Vertex
  * @requires XYCoords
  */
@@ -30,6 +33,7 @@ var VertTuple = /** @class */ (function () {
      * @param {Vertex} b The tuple's second point.
      **/
     function VertTuple(a, b, factory) {
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.a = a;
         this.b = b;
         this.factory = factory;

@@ -18,7 +18,8 @@
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
  * @modified 2020-07-24 Added the getClosestT function and the helper function locateIntervalByDistance(...).
- * @version 2.4.2
+ * @modified 2021-01-20 Added UID.
+ * @version 2.5.0
  *
  * @file CubicBezierCurve
  * @public
@@ -26,6 +27,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CubicBezierCurve = void 0;
 var Bounds_1 = require("./Bounds");
+var UIDGenerator_1 = require("./UIDGenerator");
 var Vertex_1 = require("./Vertex");
 var Vector_1 = require("./Vector");
 /**
@@ -36,6 +38,8 @@ var Vector_1 = require("./Vector");
  * @requires Vector
  * @requires XYCoords
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  */
 var CubicBezierCurve = /** @class */ (function () {
     /**
@@ -57,6 +61,7 @@ var CubicBezierCurve = /** @class */ (function () {
         this.END_CONTROL_POINT = CubicBezierCurve.END_CONTROL_POINT;
         /** @constant {number} */
         this.END_POINT = CubicBezierCurve.END_POINT;
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.startPoint = startPoint;
         this.startControlPoint = startControlPoint;
         this.endPoint = endPoint;

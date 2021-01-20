@@ -1,5 +1,7 @@
 /**
+ * @author Ikaros Kappler
  * @modified 2021-01-10 Added the `CanvasWrapper` interface.
+ * @modified 2021-01-20 Added the `UID` type.
  **/
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
@@ -23,24 +25,46 @@ export interface XYCoords {
     x: number;
     y: number;
 }
+/**
+ * @classdesc Object with `width` and `height`.
+ *
+ * @interface
+ * @name XYDimension
+ */
 export interface XYDimension {
     width: number;
     height: number;
 }
 /**
- * @typedef {Object} Bounds
- * @property {Vertex} min The upper left position.
- * @property {Vertex} max The lower right position;.
+ * @typedef {Object} IBounds
+ * @property {XYCoords} min The upper left position.
+ * @property {XYCoords} max The lower right position;.
  */
 export interface IBounds {
     min: XYCoords;
     max: XYCoords;
 }
+/**
+ * The types that can be drawn and thus added to the draw queue.
+ */
 export declare type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | VEllipse | Polygon | BezierPath | Line;
+/**
+ * A unique identifier (UID) to tell drawables apart in a performant manner.
+ */
+export declare type UID = string;
+/**
+ * Drawables that implement this interface should have a UID.
+ */
+/**
+ * This is used to wrap 2d/gl/svg canvas elements together.
+ */
 export interface CanvasWrapper {
     setSize: (width: number, height: number) => void;
     element: HTMLCanvasElement | SVGElement;
 }
+/**
+ * The config that's used by PB.
+ */
 export interface Config {
     canvas: HTMLCanvasElement | string;
     fullSize?: boolean;
@@ -79,6 +103,9 @@ export interface Config {
     setToRetina?: () => void;
     autoDetectRetina?: boolean;
 }
+/**
+ * For initialization the constructor needs a mix of config and draw-settings.
+ */
 export interface PBParams extends Config, DrawSettings {
 }
 export interface DrawSettings {

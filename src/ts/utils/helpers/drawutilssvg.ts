@@ -275,7 +275,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		const ratioY = size.y/image.naturalHeight;
 		node.setAttribute('width', `${image.naturalWidth*this.scale.x}`);
 		node.setAttribute('height', `${image.naturalHeight*this.scale.y}`);
-		node.setAttribute('transform', `translate(${position.x}px ${position.y}px) scale(${(ratioX)} ${(ratioY)})` );
+		// node.setAttribute('transform', `translate(${position.x}px ${position.y}px) scale(${(ratioX)} ${(ratioY)})` );
 		node.setAttribute('transform', `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${(ratioX)} ${(ratioY)})` );
 	    }
 	    

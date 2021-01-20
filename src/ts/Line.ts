@@ -36,82 +36,81 @@ export class Line
     extends VertTuple<Line>
     implements SVGSerializable {
 
-
-    /**
-     * Required to generate proper CSS classes and other class related IDs.
-     **/
-    readonly className : string = "Line";
-    
-    
-    /**
-     * Creates an instance of Line.
-     *
-     * @constructor
-     * @name Line
-     * @param {Vertex} a The line's first point.
-     * @param {Vertex} b The line's second point.
-     **/
-    constructor(a:Vertex,b:Vertex) {
-	super(a,b,(a:Vertex,b:Vertex)=>new Line(a,b));
-    }
-	    
-
-    /**
-     * Get the intersection if this line and the specified line.
-     *
-     * @method intersection
-     * @param {Line} line The second line.
-     * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
-     * @instance
-     * @memberof Line
-     **/
-    // !!! DO NOT MOVE TO VertTuple
-    intersection( line:Line ):Vertex|undefined {
-	const denominator : number = this.denominator(line);
-	if( denominator == 0 ) 
-	    return null;
+	/**
+	 * Required to generate proper CSS classes and other class related IDs.
+	 **/
+	readonly className : string = "Line";
 	
-	let a : number = this.a.y - line.a.y; 
-	let b : number = this.a.x - line.a.x; 
-	const numerator1 : number = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-	const numerator2 : number = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
-	a = numerator1 / denominator; // NaN if parallel lines
-	b = numerator2 / denominator;
-
-	// Catch NaN?
-	const x : number = this.a.x + (a * (this.b.x - this.a.x));
-	const y : number = this.a.y + (a * (this.b.y - this.a.y));
-
-	if( isNaN(a) || isNaN(x) || isNaN(y) ) {
-	    return undefined;
+	
+	/**
+	 * Creates an instance of Line.
+	 *
+	 * @constructor
+	 * @name Line
+	 * @param {Vertex} a The line's first point.
+	 * @param {Vertex} b The line's second point.
+	 **/
+	constructor(a:Vertex,b:Vertex) {
+	    super(a,b,(a:Vertex,b:Vertex)=>new Line(a,b));
 	}
 	
-	// if we cast these lines infinitely in both directions, they intersect here:
-	return new Vertex( x, y );
-    };
-    
 
-    /**
-     * Create an SVG representation of this line.
-     *
-     * @method toSVGString
-     * @param {options} p - A set of options, like the 'classname' to use 
-     *                      for the line object.
-     * @return {string} The SVG string representing this line.
-     * @instance
-     * @memberof Line
-     **/
-    toSVGString( options:{ className?: string } ):string {
-	options = options || {};
-	var buffer = [];
-	buffer.push( '<line' );
-	if( options.className )
-	    buffer.push( ' class="' + options.className + '"' );
-	buffer.push( ' x1="' + this.a.x + '"' );
-	buffer.push( ' y1="' + this.a.y + '"' );
-	buffer.push( ' x2="' + this.b.x + '"' );
-	buffer.push( ' y2="' + this.b.y + '"' );
-	buffer.push( ' />' );
-	return buffer.join('');
-    };
-}
+	/**
+	 * Get the intersection if this line and the specified line.
+	 *
+	 * @method intersection
+	 * @param {Line} line The second line.
+	 * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
+	 * @instance
+	 * @memberof Line
+	 **/
+	// !!! DO NOT MOVE TO VertTuple
+	intersection( line:Line ):Vertex|undefined {
+	    const denominator : number = this.denominator(line);
+	    if( denominator == 0 ) 
+		return null;
+	    
+	    let a : number = this.a.y - line.a.y; 
+	    let b : number = this.a.x - line.a.x; 
+	    const numerator1 : number = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
+	    const numerator2 : number = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+	    a = numerator1 / denominator; // NaN if parallel lines
+	    b = numerator2 / denominator;
+
+	    // Catch NaN?
+	    const x : number = this.a.x + (a * (this.b.x - this.a.x));
+	    const y : number = this.a.y + (a * (this.b.y - this.a.y));
+
+	    if( isNaN(a) || isNaN(x) || isNaN(y) ) {
+		return undefined;
+	    }
+	    
+	    // if we cast these lines infinitely in both directions, they intersect here:
+	    return new Vertex( x, y );
+	};
+	
+
+	/**
+	 * Create an SVG representation of this line.
+	 *
+	 * @method toSVGString
+	 * @param {options} p - A set of options, like the 'classname' to use 
+	 *                      for the line object.
+	 * @return {string} The SVG string representing this line.
+	 * @instance
+	 * @memberof Line
+	 **/
+	toSVGString( options:{ className?: string } ):string {
+	    options = options || {};
+	    var buffer = [];
+	    buffer.push( '<line' );
+	    if( options.className )
+		buffer.push( ' class="' + options.className + '"' );
+	    buffer.push( ' x1="' + this.a.x + '"' );
+	    buffer.push( ' y1="' + this.a.y + '"' );
+	    buffer.push( ' x2="' + this.b.x + '"' );
+	    buffer.push( ' y2="' + this.b.y + '"' );
+	    buffer.push( ' />' );
+	    return buffer.join('');
+	};
+    }

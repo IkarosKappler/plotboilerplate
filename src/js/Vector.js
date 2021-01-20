@@ -9,7 +9,8 @@
  * @modified 2019-09-02 Added the Vector.inverse() function.
  * @modified 2019-12-04 Added the Vector.inv() function.
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.2.1
+ * @modified 2021-01-20 Added UID.
+ * @version  1.3.0
  *
  * @file Vector
  * @public

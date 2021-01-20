@@ -15,7 +15,8 @@
  * @modified 2020-11-06 Added the `move` function.
  * @modified 2020-11-10 Added the `getBounds` function.
  * @modified 2020-11-11 Generalized `move(Vertex)` to `move(XYCoords)`.
- * @version 1.5.1
+ * @modified 2021-01-20 Added UID.
+ * @version 1.6.0
  *
  * @file Polygon
  * @public
@@ -24,6 +25,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Polygon = void 0;
 var BezierPath_1 = require("./BezierPath");
 var Bounds_1 = require("./Bounds");
+var UIDGenerator_1 = require("./UIDGenerator");
 var Vertex_1 = require("./Vertex");
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
@@ -31,6 +33,8 @@ var Vertex_1 = require("./Vertex");
  * @requires BezierPath
  * @requires Bounds
  * @requires SVGSerializabe
+ * @requires UID
+ * @requires UIDGenerator
  * @requires Vertex
  * @requires XYCoords
  */
@@ -48,6 +52,7 @@ var Polygon = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Polygon";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         if (typeof vertices == 'undefined')
             vertices = [];
         this.vertices = vertices;

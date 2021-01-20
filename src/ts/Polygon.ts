@@ -14,7 +14,8 @@
  * @modified 2020-11-06 Added the `move` function.  
  * @modified 2020-11-10 Added the `getBounds` function.
  * @modified 2020-11-11 Generalized `move(Vertex)` to `move(XYCoords)`.
- * @version 1.5.1
+ * @modified 2021-01-20 Added UID.
+ * @version 1.6.0
  *
  * @file Polygon
  * @public
@@ -22,8 +23,9 @@
 
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
+import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable } from "./interfaces";
+import { XYCoords, SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -32,6 +34,8 @@ import { XYCoords, SVGSerializable } from "./interfaces";
  * @requires BezierPath
  * @requires Bounds
  * @requires SVGSerializabe
+ * @requires UID
+ * @requires UIDGenerator
  * @requires Vertex
  * @requires XYCoords
  */
@@ -43,6 +47,17 @@ export class Polygon implements SVGSerializable {
      **/
     readonly className : string = "Polygon";
 
+    
+    /**
+     * The UID of this drawable object.
+     *
+     * @member {UID}
+     * @memberof Polygon
+     * @instance
+     * @readonly 
+     */
+    readonly uid : UID;
+    
     
     /** 
      * @member {Array<Vertex>} 
@@ -71,6 +86,7 @@ export class Polygon implements SVGSerializable {
      * @param {boolean} isOpen - Indicates if the polygon should be rendered as an open or closed shape.
      **/
     constructor( vertices?:Array<Vertex>, isOpen?:boolean ) {
+	this.uid = UIDGenerator.next();
 	if( typeof vertices == 'undefined' )
 	    vertices = [];
 	this.vertices = vertices;
