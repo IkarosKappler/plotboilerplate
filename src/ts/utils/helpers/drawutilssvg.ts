@@ -275,15 +275,17 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		const ratioY = size.y/image.naturalHeight;
 		node.setAttribute('width', `${image.naturalWidth*this.scale.x}`);
 		node.setAttribute('height', `${image.naturalHeight*this.scale.y}`);
-		node.setAttribute('transform', `scale(${(ratioX)}, ${(ratioY)})` );
+		node.setAttribute('transform', `translate(${position.x}px ${position.y}px) scale(${(ratioX)} ${(ratioY)})` );
+		node.setAttribute('transform', `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${(ratioX)} ${(ratioY)})` );
 	    }
 	    
 	};
 	image.addEventListener('load', (event) => { setImageSize(image); } );
 		
-	node.setAttribute('x', `${this._x(position.x)}`);
-	node.setAttribute('y', `${this._y(position.y)}`);
-	node.setAttribute('transform-origin', `${this._x(position.x)}px ${this._y(position.y)}px`);
+	// Safari has a transform-origin bug.
+	// Use x=0, y=0 and translate/scale instead (see above)
+	node.setAttribute('x', `${0}`);
+	node.setAttribute('y', `${0}`);
 	setImageSize( image );
 	node.setAttribute('href', image.src );
 	return this._bindFillDraw( node, 'image', null, null );

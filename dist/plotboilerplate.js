@@ -9605,13 +9605,15 @@ var drawutilssvg = /** @class */ (function () {
                 var ratioY = size.y / image.naturalHeight;
                 node.setAttribute('width', "" + image.naturalWidth * _this.scale.x);
                 node.setAttribute('height', "" + image.naturalHeight * _this.scale.y);
-                node.setAttribute('transform', "scale(" + (ratioX) + ", " + (ratioY) + ")");
+                node.setAttribute('transform', "translate(" + position.x + "px " + position.y + "px) scale(" + (ratioX) + " " + (ratioY) + ")");
+                node.setAttribute('transform', "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + (ratioX) + " " + (ratioY) + ")");
             }
         };
         image.addEventListener('load', function (event) { setImageSize(image); });
-        node.setAttribute('x', "" + this._x(position.x));
-        node.setAttribute('y', "" + this._y(position.y));
-        node.setAttribute('transform-origin', this._x(position.x) + "px " + this._y(position.y) + "px");
+        // Safari has a transform-origin bug.
+        // Use x=0, y=0 and translate/scale instead (see above)
+        node.setAttribute('x', "" + 0);
+        node.setAttribute('y', "" + 0);
         setImageSize(image);
         node.setAttribute('href', image.src);
         return this._bindFillDraw(node, 'image', null, null);
