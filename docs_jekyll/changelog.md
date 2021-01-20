@@ -4,6 +4,12 @@ layout: page
 
 
 # Changelog
+* 2021-01-20
+  * Added `UID` interface.
+  * Added `UIDGenerator` abstract class.
+  * Added uids to all Drawables.
+* 2021-01-10
+  * Added the `PlotBoilerplate.eventCatcher` to simplify event listening event on complex structures like SVG documents.
 * 2021-01-08
   * Added the customizable `PlotBoilerplate.drawAll(...)` function.
 * 2021-01-08

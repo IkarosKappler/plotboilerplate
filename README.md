@@ -85,34 +85,30 @@ The element canvas will be used to draw on.
 ~~~
 
 ### Typescript
-<details>
 
- <summary>Using Typescript</summary>
+~~~typescript
+   // Usage with Typescript could look like this
+   import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
  
- ~~~typescript
-    // Usage with Typescript could look like this
-    import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
- 
-    globalThis.addEventListener( 'load', () => {
+   globalThis.addEventListener( 'load', () => {
     
-       const pointA : Vertex = new Vertex( 100,-100);
-       const pointB : Vertex = new Vertex(-100, 100);
-       console.log( pointA, pointB );
+      const pointA : Vertex = new Vertex( 100,-100);
+      const pointB : Vertex = new Vertex(-100, 100);
+      console.log( pointA, pointB );
 
-       const line : Line = new Line( pointA, pointB );
+      const line : Line = new Line( pointA, pointB );
     
-       const pb : PlotBoilerplate = new PlotBoilerplate( {
-   	   canvas     : document.getElementById('my-canvas'),
-	   fullSize   : true
-       } );
+      const pb : PlotBoilerplate = new PlotBoilerplate( {
+           canvas     : document.getElementById('my-canvas'),
+           fullSize   : true
+      } );
     
-       pb.add( line );
+      pb.add( line );
 
-    } );
- ~~~
+   } );
+~~~
  A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
 
-</details>
 
 
 ### Screenshot
@@ -134,7 +130,7 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
 
 
 ## Examples and Demos
-[Examples and Demos](examples.md "Examples and Demos")
+[Examples and Demos](https://github.com/IkarosKappler/plotboilerplate/blob/master/examples.md "Examples and Demos")
 
 
 ## Initialization parameters
@@ -414,7 +410,7 @@ The Vertex class has basic drag event support:
 
 
 ## Build the package
-[Compile and build howto](build.md "Compile and build howto")
+[Compile and build howto](https://github.com/IkarosKappler/plotboilerplate/blob/master/build.md "Compile and build howto")
 
 
 
@@ -451,7 +447,7 @@ The Vertex class has basic drag event support:
 
 
 ## Todos
-[What needs to be done](todos.md "Future To-Dos")
+[What needs to be done](https://github.com/IkarosKappler/plotboilerplate/blob/master/todos.md "Future To-Dos")
 
 
 ## Known bugs

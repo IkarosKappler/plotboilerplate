@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2021-01-09
+date: 2021-01-20
 ---
 
 <div class="full-width">
@@ -147,7 +147,12 @@ date: 2021-01-09
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/28-draw-to-svg/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210106-1-draw-svg.png.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210106-1-draw-svg.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/29-threejs-voronoi/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210111-0-threejs-voronoi.png');"></div>
    </a>
 </div>
 </div>

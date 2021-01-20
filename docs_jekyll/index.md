@@ -11,27 +11,36 @@ This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
  * adding elements like
    * [vertices](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class")
+     	([example](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex example"))
    * [lines](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class")
+     	([example](https://plotboilerplate.io/repo/demos/basic-Line "Line example"))
    * [vectors](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class")
+        ([example](https://plotboilerplate.io/repo/demos/basic-Vector "Vector example"))
    * [triangles](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class")
+        ([example](https://plotboilerplate.io/repo/demos/basic-Triangle "Triangle example"))
    * [curves](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class")
+        ([example](https://plotboilerplate.io/repo/demos/basic-BezierPath "BezierPath example"))
    * [circles](https://plotboilerplate.io/docs_typedoc/classes/circle.html "Circle class")
+        ([example](https://plotboilerplate.io/repo/demos/basic-Circle "Circle example"))
    * [circle sectors](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class")
+        ([example](https://plotboilerplate.io/repo/demos/basic-CircleSector "CircleSector example"))
    * [polygons](https://plotboilerplate.io/docs_typedoc/classes/polygon.html "Polygon class")
+        ([example](https://plotboilerplate.io/repo/demos/basic-Polygon "Polygon example"))
    * [ellipses](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class")
+        ([example](https://plotboilerplate.io/repo/demos/basic-VEllipse "VEllipse example"))
    * [images](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class")
+        ([example](https://plotboilerplate.io/repo/demos/basic-PBImage "PBImage example"))
  * configuration of the canvas behavior (fullsize, interaction, raster)
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
  * touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
 
 
-The compressed library has 94kb.
+The compressed library has 103kb.
 
 
 ## Install the package via npm
 ~~~sh
-   $ npm i -g npm          # Updates your npm if necessary
    $ npm i plotboilerplate # Installs the package
 ~~~
 
@@ -43,13 +52,8 @@ For a full example see [main-dist.html](https://github.com/IkarosKappler/plotboi
    <canvas id="my-canvas">
       Your browser does not support the canvas tag.
    </canvas>
-
-   <!-- Optional: a helper to display the mouse/touch position -->
-   <div class="info monospace">
-      [<span id="cx">-</span>,<span id="cy">-</span>]
-   </div>
 ~~~
-The 'info' block is just for displaying the current mouse/touch coordinates.
+The element canvas will be used to draw on.
 
 
 ## The javascript
@@ -84,234 +88,53 @@ The 'info' block is just for displaying the current mouse/touch coordinates.
    } );
 ~~~
 
+### Typescript
+
+~~~typescript
+   // Usage with Typescript could look like this
+   import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
+ 
+   globalThis.addEventListener( 'load', () => {
+    
+      const pointA : Vertex = new Vertex( 100,-100);
+      const pointB : Vertex = new Vertex(-100, 100);
+      console.log( pointA, pointB );
+
+      const line : Line = new Line( pointA, pointB );
+    
+      const pb : PlotBoilerplate = new PlotBoilerplate( {
+           canvas     : document.getElementById('my-canvas'),
+           fullSize   : true
+      } );
+    
+      pb.add( line );
+
+   } );
+~~~
+ A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
+
+
+
+### Screenshot
 
 ![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
-
-Screenshot
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
 
 
 #### API
-See [API Documentation](https://plotboilerplate.io/docs/PlotBoilerplate.html "API Documentation") for details.
+See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation") for details.
 
 
-
-### Typescript
-~~~typescript
-   // Usage with Typescript could look like this
-   import { PlotBoilerplate, Vertex, Line } from "plotboilerplate";
-
-   window.addEventListener( 'load', () => {
-    
-       const pointA : Vertex = new Vertex( 100,-100);
-       const pointB : Vertex = new Vertex(-100, 100);
-       console.log( pointA, pointB );
-
-       const line : Line = new Line( pointA, pointB );
-    
-       const pb : PlotBoilerplate = new PlotBoilerplate( {
-   	   canvas     : document.getElementById('my-canvas'),
-	   fullSize   : true
-       } );
-    
-       pb.add( line );
-
-   } );
-~~~
-A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
-
-
-
-
-## Examples and screenshots
+## Screenshot
 ![Current demo](https://plotboilerplate.io/repo/screenshots/preview-image-large.png "Current demo")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/main-dist.html" title="See the demo">See the demo</a>
 
-### Feigenbaum bifurcation (logistic map)
-![Plotting the Feigenbaum bifurcation](https://plotboilerplate.io/repo/screenshots/screenshot-20181212_3_feigenbaum.png "Plotting the Feigenbaum bifurcation")
-![Plotting the Feigenbaum bifurcation](https://plotboilerplate.io/repo/screenshots/screenshot-20190223_0_feigenbaum.png "Plotting the Feigenbaum bifurcation")
 
-[For a detailed description of this plot see my Feigenbaum-plot mini-project](https://github.com/IkarosKappler/feigenbaum-plot "Feigenbaum bifurcation diagram")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/06-feigenbaum/index.html" title="See the demo">See the demo</a>
-
-[And here is a tiny article about it](http://www.polygon-berlin.de/deterministisches-chaos "Article about deterministic chaos")
-
-
-### Perpendiducular point-to-line-distance demo
-
-![Perpendiducular point-to-line distance](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_2_line-to-point.png "Perpendiducular point-to-line distance")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/02-line-point-distance/index.html" title="See the demo">See the demo</a>
-
-
-### Random-scripture demo
-
-![Random-scripture demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190117-0-random-scripture.png "Random-scripture demo")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/03-random-scripture/index.html" title="See the demo">See the demo</a>
-
-
-### Vector field test 
-
-![Vectorfield test](https://plotboilerplate.io/repo/screenshots/screenshot-20190428_0_vector_field_changes.png "Vectorfield test demo")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/04-vectorfield/index.html" title="See the demo">See the demo</a>
-
-
-### Simple circumcircles of walking triangles animation
-
-![Circumcircle animation](https://plotboilerplate.io/repo/screenshots/screenshot-20190415_1_circumcircles.png "Circumcircles (of walking triangles) animation")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/05-circumcircle-animation/index.html" title="See the demo">See the demo</a>
-
-
-### Interactive Delaunay triangulation and Voronoi diagram
-
-![Delaunay and Voronoi](https://plotboilerplate.io/repo/screenshots/screenshot-20190416_0_voronoi_delaunay.png "Delaunay triangulation and Voronoi diagrams")
-![Voronoi Bézier Cells](https://plotboilerplate.io/repo/screenshots/screenshot-20190417_0_voronoi_bezier_cells.png "Voronoi Bézier Cells")
-![Voronoi Bézier Cells with scaling](https://plotboilerplate.io/repo/screenshots/screenshot-20191025_1_voronoi_with_scaling.png "Voronoi Bézier with scaling")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/07-voronoi-and-delaunay/index.html" title="See the demo">See the demo</a>
-
-
-### Walking triangle demo
-
-![Walking Triangles, Demo A](https://plotboilerplate.io/repo/screenshots/screenshot-20190911_0_walking_triangles.png "Walking triangles, demo a")
-![Walking Triangles, Demo B](https://plotboilerplate.io/repo/screenshots/screenshot-20190911_1_walking_triangles.png "Walking triangles, demo b")
-![Walking Triangles, Demo C](https://plotboilerplate.io/repo/screenshots/screenshot-20190911_2_walking_triangles.png "Walking triangles, demo c")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/08-walking-triangles/index.html" title="See the demo">See the demo</a>
-
-
-### Simple tweening animation using the GSAP library
-
-![Simple Tweening Animation](https://plotboilerplate.io/repo/screenshots/screenshot-20191218-tweenmax-bezier-animation.png "Simple Tweening Animation")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/10-bezier-animation-gsap/index.html" title="See the demo">See the demo</a>
-
-
-### Perpendiculars of a Bézier path
-
-![Perpendiculars of a Bézier path](https://plotboilerplate.io/repo/screenshots/screenshot-20191218-bezier-perpendiculars.png "Perpendiculars of a Bézier path")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/11-bezier-perpendiculars/index.html" title="See the demo">See the demo</a>
-
-
-### Tracing a cubic Bézier spline (finding the tangent values for each vertex)
-
-![Tracing a cubic Bézier spline](https://plotboilerplate.io/repo/screenshots/screenshot-20191218-tracing-bsplines.png "Tracing a cubic Bézier spline")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/12-trace-bspline/index.html" title="See the demo">See the demo</a>
-
-
-### Drawing pursuit curves (each point following one other point)
-
-![Drawing pursuit curves (each point following one other point)](https://plotboilerplate.io/repo/screenshots/screenshot-2020014-pursuit-curves.png "Drawing pursuit curves")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/14-pursuit-curves/index.html" title="See the demo">See the demo</a>
-
-
-### Drawing leaf venations (approach inspired by bleeptrack, see [Operation Mindfuck](https://media.ccc.de/v/36c3-66-operation-mindfuck-vol-3#t=2524 "Operation Mindfuck @ 36c3"))
-
-![Drawing leaf venations (venation patterns in a leaf shape)](https://plotboilerplate.io/repo/screenshots/screenshot-20200317-leaf-venation-test.png "Drawing leaf venations")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/15-leaf-venation-patterns/index.html" title="See the demo">See the demo</a>
-
-
-### Morley triangle
-
-![Presenting the Morley triangle theorem](https://plotboilerplate.io/repo/screenshots/screenshot-20200317-morley-triangle.png "The Morley trisector triangle")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/16-morley-trisectors/index.html" title="See the demo">See the demo</a>
-
-
-### Hobby Curve
-
-![Hobby Curves](https://plotboilerplate.io/repo/screenshots/screenshot-20200414-1-Hobby-cubic.png "Hobby Curves")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/17-hobby-curves/index.html" title="See the demo">See the demo</a>
-
-
-### Urquhart graph / Relative Neighbourhood graph
-
-![Urquhart graph](https://plotboilerplate.io/repo/screenshots/screenshot-20200427-relative-neighbour-graph-urquhart.png "Urquhart graph")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/18-relative-neighbourhood-graph/index.html" title="See the demo">See the demo</a>
-
-
-### Convex Polygon Incircle
-
-![Convex Polygon Incircle](https://plotboilerplate.io/repo/screenshots/screenshot-20200506-convex-polygon-incircle.png "Convex Polygon Incircle")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/19-convex-polygon-incircle/index.html" title="See the demo">See the demo</a>
-
-
-### Pattern Gradient
-
-![Pattern Gradient](https://plotboilerplate.io/repo/screenshots/screenshot-20200526-0-parquet-deformations.png "Pattern Gradient")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/20-pattern-gradient/index.html" title="See the demo">See the demo</a>
-
-
-### Pattern Gradient, Variant
-
-![Pattern Gradient, Variant](https://plotboilerplate.io/repo/screenshots/screenshot-20200622-0-parquet-transformation.png "Pattern Gradient, Variant")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/21-parquet-deformation/index.html" title="See the demo">See the demo</a>
-
-
-### Remember the [`Extrusion Generator`](https://github.com/IkarosKappler/extrusiongen "Extrusion Generator")? Here's a refactored one
-
-![Extrusion Generator](https://plotboilerplate.io/repo/screenshots/screenshot-20201019-threejs-highres.png "Extrusion Generator")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/22-threejs/index.html" title="See the demo">See the demo</a>
-
-
-### Distance between point and Bézier curve
-
-![Point-Bézier-Distance](https://plotboilerplate.io/repo/screenshots/screenshot-from-20200724-0-bezier-point-distance.png "Point-Bézier-Distance")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/23-bezier-point-distance/index.html" title="See the demo">See the demo</a>
-
-
-### Intersection of two circles (radical line)
-
-![Two-circle-radical-line](https://plotboilerplate.io/repo/screenshots/screenshot-20200907-circle-intersection-radical-line.png "Two-circle-radical-line")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/24-two-circles-radical-line/index.html" title="See the demo">See the demo</a>
-
-
-### Multiple circle intersections and their outlines
-
-![Multiple-circle-intersections](https://plotboilerplate.io/repo/screenshots/screenshot-20201029-0-multiple-circle-intersections-rainbow.png "Multiple-circle-intersections")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/25-multiple-circle-intersections/index.html" title="See the demo">See the demo</a>
-
-
-### Port of a Girih pattern generator
-
-![Port of a Girih pattern](https://plotboilerplate.io/repo/screenshots/screenshot-20201101-0-girih-basic-tiles.png "Port of a Girih pattern")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/26-girih/index.html" title="See the demo">See the demo</a>
-
-
-### Testing Polygon Intersection and Triangulation algorithms ([Greiner-Hormann](https://github.com/mapbox/earcut "Greiner-Hormann") with [Earcut](https://github.com/mapbox/earcut "Earcut") or [Delaunay](https://github.com/IkarosKappler/plotboilerplate/blob/master/src/ts/utils/algorithms/delaunay.ts "Delaunay")
-
-![Polygon clipping algorithms](https://plotboilerplate.io/repo/screenshots/screenshot-20201211-0-polygon-clipping.png "Polygon clipping algorithms")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/27-polygon-intersection-greinerhormann/index.html" title="See the demo">See the demo</a>
-
-
-### Render as SVG (testing)
-
-![Render elements as SVG](https://plotboilerplate.io/repo/screenshots/screenshot-20210106-1-draw-svg.png "Render elements as SVG")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/28-draw-to-svg/index.html" title="See the demo">See the demo</a>
-
+## Examples and Demos
+[Examples and Demos](https://github.com/IkarosKappler/plotboilerplate/blob/master/examples.md "Examples and Demos")
 
 
 ## Initialization parameters
@@ -590,98 +413,10 @@ The Vertex class has basic drag event support:
 
 
 
-## Minimize the package
-
-The package is minimized with webpack. See the `./bin/webpack.config.js` file.
-
-### Install webpack
-This will install the `npm-webpack` package with the required dependencies
-for you from the `package.json` file.
-~~~bash
- $ npm install
-~~~
+## Build the package
+[Compile and build howto](https://github.com/IkarosKappler/plotboilerplate/blob/master/build.md "Compile and build howto")
 
 
-### Run webpack
-This will generate the `./dist/plotboilerplate.min.js` file for you
-from the sources code files in `./src/js/*`.
-~~~bash
- $ npm run webpack
-~~~
-
-
-
-
-## Compile Typescript
-
-The package is compiled with npm typescript. See the `tsconfig.json` file.
-
-### Run the typescript compiler
-This is not yet finished; the old vanilla-JS files will soon be dropped and replaced
-by generated files, compiled from Typescript.
-~~~bash
- $ npm run compile-typescript
-~~~
-There is also a sandbox script, compiling and running the typescript files inside your browser. Please note that
-due to performance reasons it is not recommended to use this in production. Always compile your typescript files
-for this purpose.
-
-
-
-## Todos
- * Add a method to draw connected paths (different types of path segments: linear, curve, arc, ...). Useful for the circle intersections demo.
- * Use a sorted map in the line-point-distance demo.
- * The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.
- * The Color.parse(string) function does only recognize HEX, RGB and RGBA strings. HSL is still missing. Required?
- * Replace all color params: replace type string by color. (tinycolor?)
- * Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
- * Implement snap-to-grid.
- * Make ellipses rotatable.
- * Write better viewport/viewbox export. Some viewers do not understand the current format. Refactor BoundingBox2 for this?
- * Add arcs?
- * Add image flipping.
- * Add Images to the SVGBuiler.
- * Add image/svg support (adding SVG images).
- * [Partially done] Add control button: set to retina resolution (size factors and css scale).
- * Add a demo that draws a proper mathematical xy-grid.
- * Extend the leaf venation generator demo.
- * Add a retina detection; initialize the canvas with double resolution on startup if retina display (optional-flag).
- * Change the behavior of Vector.intersection(...). The intersection should be on both vectors, not only on their line intersection!
- * Rename drawutils class to Drawutils or DrawUtils. Repective name DrawUtilsGL.
- * Use the new Bounds class in the RectSelector helper.
- * Adapt the bounds in the RectSelector (use min:Vertex and max:Vertex).
- * Build a feature for line-styles; each 'color' param could also be gradient or a pattern (stroked, dotted, dashed, ... ).
-   See ctx.setLineDash(...).
- * Add an internal mapping to remember vertices and their installed listeners (for removing them later).
- * Destroy installed vertex listeners from vertices after removing them (like the Bézier auto-adjuster).
- * Port all demos from vanilla JS to TypeScript.
- * Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
- * Listeners using Vertex.listeners.addDragStopListener() are not triggered on touch events.
- * Add a removeVertices() function (and use it in the threejs demo).
- * https://github.com/nilzona/path2d-polyfill
- * Implement a drawutils.svgPath(Array). Implement 'S' and 's' and 'T' and 't' in that draw.svgPath(...) function?
- * Add two new classes EllipticSection and CircleSection.
- * Extend the SVGBuilder with these new two classes then.
- * Extend the demo 25 (multiple circle intersection): add SVG export.
- * Research about categories for JSDoc (algorithms, datastructures, helpers). Think about a different generator or template.
- * Get rid of the JSDoc generator. Using Typedoc now, yeah.
- 
-
-### Todos for future Version 2
- * Change the Vector.inverse() function to reverse (or something). Currently this is not what the inverse of a vector should be.
- * Change the bezier point path order from [start,end,startContro,endControl] to [start,startControl,endControl,end].
- * Change BezierPath.getPointAt to .getVertexAt (or .getVertAt or vertAt?).
- * Change BezierPath.scale( center, factor ) to BezierPath.scale( factor, center ) and make center optional (like in Polygon).
- * Rename BezierPath.adjustCircular to .isCircular, because cirularity does not only affect vertex adjustment.
- * The inverse-functions are called Vertex.inv() but Vector.inverse(). Harmonize this.
- * CubicBezierCurve.getTangentAt(number) and .getTangent(number) return Vertex, why not a Vector?
- * Add a pointDeleted event handler to PB? Would be helpful to delete objects outside the PB when their associated points are deleted by the user.
- * Tweak the SVGBuilder: make the style classes configurable (colors, line thickness, custom classes, ...).
- * Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
- * Change draw.image(image, position:Vertex, size:Vertex) to Bounds or XYDimension.
- * Change draw.text(text, x:number, y:number, ...) to (..., position:XYCoords, ...). Same with draw.label(...).
- * draw.text() and draw.label() require color params.
- * Render dashed lines around images that cannot be rendered (e.g. file not found).
 
 
 ## Browsers support
@@ -715,9 +450,11 @@ for this purpose.
 * [Mapbox's Earcut polygon algorithm](https://github.com/mapbox/earcut "Mapbox's Earcut polygon algorithm")
 
 
+## Todos
+[What needs to be done](https://github.com/IkarosKappler/plotboilerplate/blob/master/todos.md "Future To-Dos")
+
 
 ## Known bugs
- * BezierPath counstructor (from an older implementation) fails. This needs to be refactored.
  * SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
  * The BBTree.iterator() fails if the tree is empty! (Demos)
  * The minifid BBTree and BBTreeCollection files do not export anything. The un-minified does. Why that?
