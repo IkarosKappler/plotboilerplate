@@ -7,7 +7,9 @@
 	"lib": [ "es2015", "dom" ],
 	
 	"sourceMap": true,
-	"declaration": true
+	"declaration": true,
+
+	"allowJs": false
 
     },
     "include": ["./src/ts/**/*.ts"],
