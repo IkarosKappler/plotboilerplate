@@ -52,7 +52,7 @@ For a full example see [main-dist.html](https://github.com/IkarosKappler/plotboi
 The element canvas will be used to draw on.
 
 
-D## The javascript
+## The javascript
 ~~~javascript
    var pb = new PlotBoilerplate( {
        canvas		: document.getElementById('my-canvas'),
@@ -84,19 +84,6 @@ D## The javascript
    } );
 ~~~
 
-
-### Screenshot
-
-![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
-
-<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
-
-
-
-#### API
-See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation") for details.
-
-
 ### Typescript
 <details>
 
@@ -127,6 +114,17 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
 
 </details>
 
+
+### Screenshot
+
+![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
+
+
+
+#### API
+See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation") for details.
 
 
 ## Screenshot
