@@ -44,6 +44,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BezierPath = void 0;
 var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
 var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A BezierPath class.
@@ -55,6 +56,8 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires CubicBezierCurve
  * @requires XYCoords
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  **/
 var BezierPath = /** @class */ (function () {
     /**
@@ -82,6 +85,7 @@ var BezierPath = /** @class */ (function () {
         this.END_CONTROL_POINT = 2;
         /** @constant {number} */
         this.END_POINT = 3;
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         if (!pathPoints)
             pathPoints = [];
         this.totalArcLength = 0.0;
@@ -89,36 +93,6 @@ var BezierPath = /** @class */ (function () {
         // last point of the path to be auto adjusted, too.
         this.adjustCircular = false;
         this.bezierCurves = [];
-        //console.error( "THIS CONSTRUCTOR IS DEPRECATED. USE .fromArray INSTEAD." );
-        //throw Error("THIS CONSTRUCTOR IS DEPRECATED. USE .fromArray INSTEAD.");
-        /*
-        for( var i = 1; i < pathPoints.length; i++ ) {
-            var bounds = new THREE.Box2( pathPoints[i].x - pathPoints[i-1].x,
-                         pathPoints[i].y - pathPoints[i-1].y
-                           );
-            // Create a new Bezier curve inside the box
-            var bCurve =  new CubicBezierCurve( pathPoints[i-1],
-                            pathPoints[i],
-                            new Vertex( pathPoints[i-1].x,
-                                    pathPoints[i-1].y - bounds.min/2
-                                  ),
-                            // This control point will be auto-adjusted in the next step
-                            new Vertex( pathPoints[i].x + bounds.max/2,
-                                    pathPoints[i].y
-                                  )
-                              );
-            this.bezierCurves.push( bCurve );
-            this.totalArcLength += bCurve.getLength();
-            
-            // Auto adjust the second control point (should be on a linear sub-space)
-            if( this.bezierCurves.length >= 2 ) {
-            this.adjustSuccessorControlPoint( this.bezierCurves.length-2, // curveIndex,
-                              true,                       // obtain handle length?
-                              true                        // update arc lengths
-                            );
-            }
-        }
-        */
     }
     ;
     /**
@@ -1325,17 +1299,19 @@ exports.Bounds = Bounds;
 
 /**
  * @author   Ikaros Kappler
- * @version  1.1.0
  * @date     2020-05-04
  * @modified 2020-05-09 Ported to typescript.
  * @modified 2020-05-25 Added the vertAt and tangentAt functions.
  * @mofidied 2020-09-07 Added the circleIntersection(Circle) function.
  * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  * @modified 2020-10-16 Added the containsCircle(...) function.
+ * @modified 2021-01-20 Added UID.
+ * @version  1.2.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Circle = void 0;
 var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
@@ -1346,6 +1322,8 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires VertTuple
  * @requires Vertex
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  **/
 var Circle = /** @class */ (function () {
     /**
@@ -1361,6 +1339,7 @@ var Circle = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Circle";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.center = center;
         this.radius = radius;
     }
@@ -1525,24 +1504,26 @@ exports.Circle = Circle;
 /*! export CircleSector [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__ */
-/***/ ((__unused_webpack_module, exports) => {
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 /**
  * @author   Ikaros Kappler
- * @version  1.0.0
  * @date     2020-12-17
+ * @modified 2021-01-20 Added UID.
+ * @version  1.1.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CircleSector = void 0;
-// [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
-// export type SVGArcPathParams = [ string, number, number, number, number, number, number, number ];
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
  * @requires Line
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  * @requires XYCoords
  **/
 var CircleSector = /** @class */ (function () {
@@ -1560,6 +1541,7 @@ var CircleSector = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "CircleSector";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.circle = circle;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
@@ -1672,7 +1654,8 @@ exports.CircleSector = CircleSector;
  * @modified 2020-06-03 Added the getBounds() function.
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
  * @modified 2020-07-24 Added the getClosestT function and the helper function locateIntervalByDistance(...).
- * @version 2.4.2
+ * @modified 2021-01-20 Added UID.
+ * @version 2.5.0
  *
  * @file CubicBezierCurve
  * @public
@@ -1680,6 +1663,7 @@ exports.CircleSector = CircleSector;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CubicBezierCurve = void 0;
 var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
 /**
@@ -1690,6 +1674,8 @@ var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
  * @requires Vector
  * @requires XYCoords
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  */
 var CubicBezierCurve = /** @class */ (function () {
     /**
@@ -1711,6 +1697,7 @@ var CubicBezierCurve = /** @class */ (function () {
         this.END_CONTROL_POINT = CubicBezierCurve.END_CONTROL_POINT;
         /** @constant {number} */
         this.END_POINT = CubicBezierCurve.END_POINT;
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.startPoint = startPoint;
         this.startControlPoint = startControlPoint;
         this.endPoint = endPoint;
@@ -3492,8 +3479,8 @@ exports.MouseHandler = MouseHandler;
 /*! export PBImage [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__ */
-/***/ ((__unused_webpack_module, exports) => {
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 /**
@@ -3501,7 +3488,8 @@ exports.MouseHandler = MouseHandler;
  * @date     2019-01-30
  * @modified 2019-03-23 Added JSDoc tags.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version 1.0.2
+ * @modified 2021-01-20 Added UID.
+ * @version 1.1.0
  *
  * @file PBImage
  * @fileoverview As native Image objects have only a position and with
@@ -3510,11 +3498,14 @@ exports.MouseHandler = MouseHandler;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PBImage = void 0;
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 /**
  * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
  *
  * @requires Vertex
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  */
 var PBImage = /** @class */ (function () {
     /**
@@ -3531,6 +3522,7 @@ var PBImage = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "PBImage";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.image = image;
         this.upperLeft = upperLeft;
         this.lowerRight = lowerRight;
@@ -5474,7 +5466,8 @@ exports.PlotBoilerplate = PlotBoilerplate;
  * @modified 2020-11-06 Added the `move` function.
  * @modified 2020-11-10 Added the `getBounds` function.
  * @modified 2020-11-11 Generalized `move(Vertex)` to `move(XYCoords)`.
- * @version 1.5.1
+ * @modified 2021-01-20 Added UID.
+ * @version 1.6.0
  *
  * @file Polygon
  * @public
@@ -5483,6 +5476,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Polygon = void 0;
 var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
 var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
@@ -5490,6 +5484,8 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires BezierPath
  * @requires Bounds
  * @requires SVGSerializabe
+ * @requires UID
+ * @requires UIDGenerator
  * @requires Vertex
  * @requires XYCoords
  */
@@ -5507,6 +5503,7 @@ var Polygon = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Polygon";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         if (typeof vertices == 'undefined')
             vertices = [];
         this.vertices = vertices;
@@ -5954,7 +5951,8 @@ exports.SVGBuilder = SVGBuilder;
  * @modified  2020-05-12 Fixed the signature of getCircumcirle(). Was still a generic object.
  * @modified  2020-06-18 Added the `getIncenter` function.
  * @modified  2020-12-28 Added the `getArea` function.
- * @version   2.4.0
+ * @modified  2021-01-20 Added UID.
+ * @version   2.5.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -5966,6 +5964,7 @@ var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
 var Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
 var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
 var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 var geomutils_1 = __webpack_require__(/*! ./geomutils */ "../src/js/geomutils.js");
 /**
@@ -5980,6 +5979,8 @@ var geomutils_1 = __webpack_require__(/*! ./geomutils */ "../src/js/geomutils.js
  * @requires Vertex
  * @requires Polygon
  * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
  * @requires XYCoords
  * @requires geomutils
  *
@@ -5999,6 +6000,7 @@ var Triangle = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Triangle";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.a = a;
         this.b = b;
         this.c = c;
@@ -6376,6 +6378,41 @@ exports.Triangle = Triangle;
 
 /***/ }),
 
+/***/ "../src/js/UIDGenerator.js":
+/*!*********************************!*\
+  !*** ../src/js/UIDGenerator.js ***!
+  \*********************************/
+/*! flagged exports */
+/*! export UIDGenerator [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/**
+ * @classdesc A static UIDGenerator.
+ *
+ * @author  Ikaros Kappler
+ * @date    2021-01-20
+ * @version 1.0.0
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UIDGenerator = void 0;
+var UIDGenerator = /** @class */ (function () {
+    function UIDGenerator() {
+    }
+    UIDGenerator.next = function () { return "" + UIDGenerator.current++; };
+    ;
+    UIDGenerator.current = 0;
+    return UIDGenerator;
+}());
+exports.UIDGenerator = UIDGenerator;
+;
+//# sourceMappingURL=UIDGenerator.js.map
+
+/***/ }),
+
 /***/ "../src/js/VEllipse.js":
 /*!*****************************!*\
   !*** ../src/js/VEllipse.js ***!
@@ -6384,8 +6421,8 @@ exports.Triangle = Triangle;
 /*! export VEllipse [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__ */
-/***/ ((__unused_webpack_module, exports) => {
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 /**
@@ -6393,17 +6430,21 @@ exports.Triangle = Triangle;
  * @date     2018-11-28
  * @modified 2018-12-04 Added the toSVGString function.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @version  1.0.1
+ * @modified 2021-01-20 Added UID.
+ * @version  1.1.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VEllipse = void 0;
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  * @requires Vertex
  * @requires XYCoords
  */
@@ -6421,6 +6462,7 @@ var VEllipse = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "VEllipse";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.center = center;
         this.axis = axis;
     }
@@ -6458,7 +6500,7 @@ exports.VEllipse = VEllipse;
   \***************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 17:17-21 */
+/*! CommonJS bailout: this is used directly at 18:17-21 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -6472,7 +6514,8 @@ exports.VEllipse = VEllipse;
  * @modified 2019-09-02 Added the Vector.inverse() function.
  * @modified 2019-12-04 Added the Vector.inv() function.
  * @modified 2020-03-23 Ported to Typescript from JS.
- * @version  1.2.1
+ * @modified 2021-01-20 Added UID.
+ * @version  1.3.0
  *
  * @file Vector
  * @public
@@ -6687,15 +6730,18 @@ exports.Vector = Vector;
  * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
- * @version 1.0.3
+ * @modified 2021-01-20 Added UID.
+ * @version 1.1.0
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
 var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
- * @requiers SVGSerializable
+ * @requires SVGSerializable
+ * @requires UID
  * @requires Vertex
  * @requires XYCoords
  */
@@ -6709,6 +6755,7 @@ var VertTuple = /** @class */ (function () {
      * @param {Vertex} b The tuple's second point.
      **/
     function VertTuple(a, b, factory) {
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.a = a;
         this.b = b;
         this.factory = factory;
@@ -7034,6 +7081,7 @@ exports.VertTuple = VertTuple;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Vertex = void 0;
 var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
+var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 var VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "../src/js/VertexListeners.js");
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
@@ -7042,6 +7090,8 @@ var VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "../src/js/
  *
  * @requires IVertexAttr
  * @requires SVGSerializable
+ * @requires UID
+ * @requires UIDGenerator
  * @requires VertexAttr
  * @requires VertexListeners
  * @requires XYCoords
@@ -7061,6 +7111,7 @@ var Vertex = /** @class */ (function () {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Vertex";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         if (typeof x == 'undefined') {
             this.x = 0;
             this.y = 0;
@@ -7505,6 +7556,7 @@ var Vertex = /** @class */ (function () {
      * An epsilon for comparison
      *
      * @private
+     * @readonly
      **/
     Vertex.EPSILON = 1.0e-6;
     Vertex.utils = {
@@ -9605,7 +9657,7 @@ var drawutilssvg = /** @class */ (function () {
                 var ratioY = size.y / image.naturalHeight;
                 node.setAttribute('width', "" + image.naturalWidth * _this.scale.x);
                 node.setAttribute('height', "" + image.naturalHeight * _this.scale.y);
-                node.setAttribute('transform', "translate(" + position.x + "px " + position.y + "px) scale(" + (ratioX) + " " + (ratioY) + ")");
+                // node.setAttribute('transform', `translate(${position.x}px ${position.y}px) scale(${(ratioX)} ${(ratioY)})` );
                 node.setAttribute('transform', "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + (ratioX) + " " + (ratioY) + ")");
             }
         };
@@ -10158,6 +10210,7 @@ exports.drawutilssvg = drawutilssvg;
 
 /* Imports for webpack */
 
+globalThis.UIDGenerator = __webpack_require__(/*! ./UIDGenerator.js */ "../src/js/UIDGenerator.js").geomutils;
 globalThis.VertexAttr = __webpack_require__(/*! ./VertexAttr.js */ "../src/js/VertexAttr.js").VertexAttr;
 globalThis.VertexListeners = __webpack_require__(/*! ./VertexListeners.js */ "../src/js/VertexListeners.js").VertexListeners;
 globalThis.Vertex = __webpack_require__(/*! ./Vertex.js */ "../src/js/Vertex.js").Vertex;

@@ -15,7 +15,8 @@
  * @modified 2020-05-18 Added function VoronoiCell.toPolygon().
  * @modified 2020-08-12 Ported this class from vanilla JS to TypeScript.
  * @modified 2020-08-17 Added some missing type declarations.
- * @version  1.1.2
+ * @modified 2021-01-20 Members `triangles` and `sharedVertex` are now public.
+ * @version  1.1.3
  *
  * @file VoronoiCell
  * @public
@@ -34,7 +35,7 @@ export class VoronoiCell {
      * @type {Array<Triangle>}
      * @instance
      */
-    private triangles: Array<Triangle>;
+    triangles: Array<Triangle>;
 
     /**
      * @member {Vertex} sharedVertex
@@ -42,7 +43,7 @@ export class VoronoiCell {
      * @type {Vertex}
      * @instance
      */
-    private sharedVertex: Vertex;
+    sharedVertex: Vertex;
     
     /**
      * The constructor.
