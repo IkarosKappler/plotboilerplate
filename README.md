@@ -7,9 +7,9 @@ This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
  * adding elements like
    * [vertices](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class")
-     	[Demo](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex Demo")
+     	([example](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex example"))
    * [lines](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class")
-     	[Demo](https://plotboilerplate.io/repo/demos/basic-Line "Line Demo")
+     	([example](https://plotboilerplate.io/repo/demos/basic-Line "Line example"))
    * [vectors](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class")
    * [triangles](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class")
    * [curves](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class")
