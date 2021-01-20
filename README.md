@@ -7,7 +7,9 @@ This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
  * adding elements like
    * [vertices](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class")
+     	[Demo](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex Demo")
    * [lines](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class")
+     	[Demo](https://plotboilerplate.io/repo/demos/basic-Line "Line Demo")
    * [vectors](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class")
    * [triangles](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class")
    * [curves](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class")
@@ -42,7 +44,7 @@ For a full example see [main-dist.html](https://github.com/IkarosKappler/plotboi
 The element canvas will be used to draw on.
 
 
-## The javascript
+D## The javascript
 ~~~javascript
    var pb = new PlotBoilerplate( {
        canvas		: document.getElementById('my-canvas'),
@@ -75,9 +77,9 @@ The element canvas will be used to draw on.
 ~~~
 
 
-![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
+### Screenshot
 
-Screenshot
+![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/00-simple/index.html" title="And the simple demo is here">And the simple demo is here</a>
 
@@ -87,10 +89,10 @@ Screenshot
 See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation") for details.
 
 
-
+### Typescript
 <details>
 
- <summary>###Using Typescript</summary>
+ <summary>Using Typescript</summary>
  
  ~~~typescript
     // Usage with Typescript could look like this
