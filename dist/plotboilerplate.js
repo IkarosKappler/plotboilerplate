@@ -6087,8 +6087,8 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      */
     Triangle.prototype.getCircumcircle = function () {
-        if (!this.center || !this.radius)
-            this.calcCircumcircle();
+        // if( !this.center || !this.radius ) 
+        this.calcCircumcircle();
         return new Circle_1.Circle(this.center.clone(), this.radius);
     };
     ;

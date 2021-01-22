@@ -47,7 +47,7 @@ cp ../main-dist.html "$TARGET_DIR/"main-dist.html
 cp ../main.html "$TARGET_DIR/"main.html
 cp ../style.css "$TARGET_DIR/"style.css
 cp ../example-image.png "$TARGET_DIR/"example-image.png
-cp ../license.txt "$TARGET_DIR/"license.txt
+cp ../LICENSE "$TARGET_DIR/"LICENSE
 
 BUILDDATE=$(date)
 echo -e "$BUILDDATE" >> "$TARGET_DIR/builddate"

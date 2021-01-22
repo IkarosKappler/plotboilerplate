@@ -21,7 +21,7 @@
 	    // All config params except the canvas are optional.
 	    var pb = new PlotBoilerplate(
 		PlotBoilerplate.utils.safeMergeByKeys(
-		    { canvas                : document.getElementById('my-canvas'),					    
+		    { canvas                : document.getElementById('my-canvas'),
 		      fullSize              : true
 		    }, GUP
 		)
@@ -38,6 +38,11 @@
 	    pb.add( circle );
 
 	    // Note: the center point is draggable now :)
+
+	    // Install a circle helper: change radius via a second control point.
+	    var radiusPoint = circle.vertAt( Math.PI*1.75 );
+	    pb.add( radiusPoint );
+	    new CircleHelper( circle, radiusPoint, pb );
 
 	} );
     

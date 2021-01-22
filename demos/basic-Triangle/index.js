@@ -40,6 +40,15 @@
 
 	    // Note: the triangle's points are draggable now :)
 
+	    
+	    // Want to display the incircle?
+	    pb.config.postDraw = function() {
+		var circumcircle = triangle.getCircumcircle();
+		var incircle = triangle.getIncircle();
+		pb.draw.circle( circumcircle.center, circumcircle.radius, 'rgba(0,192,128,0.5)', 1.0 );
+		pb.fill.circle( incircle.center, incircle.radius, 'rgba(128,128,128,0.333)' );
+	    };
+	    pb.redraw();
 	} );
     
 })(window); 

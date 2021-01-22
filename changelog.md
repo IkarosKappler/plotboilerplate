@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2021-01-22
+  * Triangle: Always updating circumcircle when retieving it.
 * 2021-01-20
   * Added `UID` interface.
   * Added `UIDGenerator` abstract class.
