@@ -7,16 +7,20 @@
  * @author   Ikaros Kappler
  * @date     2020-09-07
  * @modified 2020-10-18 Ported to Typescript from vanilla JS.
- * @version  1.0.0
+ * @modified 2021-01-22 Removed `pb.redraw()` call from update handlers (changed vertices already triggered redraw).
+ * @version  1.0.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CircleHelper = void 0;
+/**
+ * @classdesc A helper for handling circles with an additional radius-control-point.
+ */
 var CircleHelper = /** @class */ (function () {
     /**
      * The constructor.
      *
      * @constructor
-     * @name VoronoiCell
+     * @name CircleHelper
      * @param {Circle} circle - The circle to handle.
      * @param {Vertex} radiusPoint - A point to define the radius (distance from center).
      * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle and point.
@@ -24,11 +28,11 @@ var CircleHelper = /** @class */ (function () {
     function CircleHelper(circle, radiusPoint, pb) {
         circle.center.listeners.addDragListener(function (e) {
             radiusPoint.add(e.params.dragAmount);
-            pb.redraw();
+            // pb.redraw();
         });
         radiusPoint.listeners.addDragListener(function (e) {
             circle.radius = circle.center.distance(radiusPoint);
-            pb.redraw();
+            // pb.redraw();
         });
     }
     ;

@@ -39,6 +39,7 @@
 
 	    // Note: the center point is draggable now :)
 
+	    
 	    // Install a circle helper: change radius via a second control point.
 	    var radiusPoint = circle.vertAt( Math.PI*1.75 );
 	    pb.add( radiusPoint );

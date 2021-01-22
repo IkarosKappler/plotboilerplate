@@ -231,12 +231,22 @@ export declare class Vertex implements XYCoords, SVGSerializable {
      * Get the distance to the passed point (in euclidean metric)
      *
      * @method distance
-     * @param {Vertex} vert - The vertex to measure the distance to.
+     * @param {XYCoords} vert - The vertex to measure the distance to.
      * @return {number}
      * @instance
      * @memberof Vertex
      **/
     distance(vert: XYCoords): number;
+    /**
+     * Get the angle of this point (relative to (0,0) or to the given other origin point).
+     *
+     * @method angle
+     * @param {XYCoords} origin - The vertex to measure the angle from.
+     * @return {number}
+     * @instance
+     * @memberof Vertex
+     **/
+    angle(origin?: XYCoords): number;
     /**
      * Get the difference to the passed point.<br>
      * <br>

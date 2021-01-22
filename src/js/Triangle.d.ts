@@ -18,7 +18,8 @@
  * @modified  2020-06-18 Added the `getIncenter` function.
  * @modified  2020-12-28 Added the `getArea` function.
  * @modified  2021-01-20 Added UID.
- * @version   2.5.0
+ * @modified  2021-01-22 Always updating circumcircle when retieving it.
+ * @version   2.5.1
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.

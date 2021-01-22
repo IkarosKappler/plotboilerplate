@@ -4,8 +4,9 @@
  * @requires PlotBoilerplate, gup, dat.gui, 
  * 
  * @author   Ikaros Kappler
- * @date     2020-05-18
- * @version  1.0.0
+ * @date     2020-12-18
+ * @modified 2021-01-22 Added the circle sector helper.
+ * @version  1.1.0
  **/
 
 
@@ -44,6 +45,13 @@
 
 	    // Note: the center point is draggable now :)
 
+
+	    
+	    // Further: add a circle sector helper to edit angles and radius manually (mouse or touch)
+	    var controlPointA = circleSector.circle.vertAt( circleSector.startAngle );
+	    var controlPointB = circleSector.circle.vertAt( circleSector.endAngle );
+	    new CircleSectorHelper( circleSector, controlPointA, controlPointB, pb );
+	    pb.add( [controlPointA, controlPointB] );
 	} );
     
 })(window); 

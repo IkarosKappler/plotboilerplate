@@ -5952,7 +5952,8 @@ exports.SVGBuilder = SVGBuilder;
  * @modified  2020-06-18 Added the `getIncenter` function.
  * @modified  2020-12-28 Added the `getArea` function.
  * @modified  2021-01-20 Added UID.
- * @version   2.5.0
+ * @modified  2021-01-22 Always updating circumcircle when retieving it.
+ * @version   2.5.1
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -7392,13 +7393,28 @@ var Vertex = /** @class */ (function () {
      * Get the distance to the passed point (in euclidean metric)
      *
      * @method distance
-     * @param {Vertex} vert - The vertex to measure the distance to.
+     * @param {XYCoords} vert - The vertex to measure the distance to.
      * @return {number}
      * @instance
      * @memberof Vertex
      **/
     Vertex.prototype.distance = function (vert) {
         return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
+    };
+    ;
+    /**
+     * Get the angle of this point (relative to (0,0) or to the given other origin point).
+     *
+     * @method angle
+     * @param {XYCoords} origin - The vertex to measure the angle from.
+     * @return {number}
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.angle = function (origin) {
+        var a = (typeof origin === "undefined" ? Math.PI / 2 - Math.atan2(this.x, this.y) : Math.PI / 2 - Math.atan2(origin.x - this.x, origin.y - this.y));
+        // Map to positive value
+        return a < 0 ? Math.PI * 2 + a : a;
     };
     ;
     /**

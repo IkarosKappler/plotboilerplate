@@ -3,6 +3,9 @@
 # Changelog
 * 2021-01-22
   * Triangle: Always updating circumcircle when retieving it.
+  * Removed `pb.redraw()` call from `CircleHelper` update handlers (changed vertices already triggered redraw).
+  * Added the `CircleSectorHelpler` class.
+  * Added the `Vertex.angle` function to determine 'angle' of the vertex relative to an origin.
 * 2021-01-20
   * Added `UID` interface.
   * Added `UIDGenerator` abstract class.

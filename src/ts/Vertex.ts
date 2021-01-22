@@ -382,13 +382,29 @@ export class Vertex implements XYCoords, SVGSerializable {
      * Get the distance to the passed point (in euclidean metric)
      *
      * @method distance
-     * @param {Vertex} vert - The vertex to measure the distance to.
+     * @param {XYCoords} vert - The vertex to measure the distance to.
      * @return {number}
      * @instance
      * @memberof Vertex
      **/
     distance( vert:XYCoords ):number {
 	return Math.sqrt( Math.pow(vert.x-this.x,2) + Math.pow(vert.y-this.y,2) );
+    };
+
+    
+    /**
+     * Get the angle of this point (relative to (0,0) or to the given other origin point).
+     *
+     * @method angle
+     * @param {XYCoords} origin - The vertex to measure the angle from.
+     * @return {number}
+     * @instance
+     * @memberof Vertex
+     **/
+    angle( origin?:XYCoords ) : number {
+	const a : number = (typeof origin === "undefined" ? Math.PI/2-Math.atan2( this.x, this.y ) : Math.PI/2-Math.atan2( origin.x-this.x, origin.y-this.y ));
+	// Map to positive value
+	return a < 0 ? Math.PI*2+a : a;
     };
 
 
