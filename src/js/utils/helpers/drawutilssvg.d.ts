@@ -3,11 +3,12 @@
  *
  * @author   Ikaros Kappler
  * @date     2021-01-03
- * @version  0.0.1
+ * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
+ * @version  0.2.0
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { DrawLib, XYCoords, XYDimension } from "../../interfaces";
+import { DrawLib, XYCoords, XYDimension, UID } from "../../interfaces";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -27,28 +28,36 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     svgNode: SVGElement;
     /**
      * @member {Vertex}
-     * @memberof scale
+     * @memberof drawutilssvg
      * @instance
      */
     scale: Vertex;
     /**
      * @member {Vertex}
-     * @memberof offset
+     * @memberof drawutilssvg
      * @instance
      */
     offset: Vertex;
     /**
      * @member {boolean}
-     * @memberof fillShapes
+     * @memberof drawutilssvg
      * @instance
      */
     fillShapes: boolean;
     /**
      * @member {XYDimension}
-     * @memberof canvasSize
+     * @memberof drawutilssvg
      * @instance
      */
     canvasSize: XYDimension;
+    /**
+     * The current drawable-ID.
+     *
+     * @member {UID|undefined}
+     * @memberof drawutilssvg
+     * @instance
+     */
+    private curId;
     /**
      * The constructor.
      *
@@ -105,6 +114,15 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * that under the hood the same gl context and gl program will be used.
      */
     copyInstance(fillShapes: boolean): drawutilssvg;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     *
+     * @name setCurrentId
+     * @method
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    setCurrentId(uid?: UID): void;
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.

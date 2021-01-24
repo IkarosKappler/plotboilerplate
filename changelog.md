@@ -1,6 +1,8 @@
 
 
 # Changelog
+  * 2021-01-24
+  * Added `DrawLib.setCurrentId` function.
 * 2021-01-22
   * Triangle: Always updating circumcircle when retieving it.
   * Removed `pb.redraw()` call from `CircleHelper` update handlers (changed vertices already triggered redraw).

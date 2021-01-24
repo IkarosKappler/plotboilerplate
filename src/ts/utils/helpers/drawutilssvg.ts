@@ -3,7 +3,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2021-01-03
- * @version  0.0.1
+ * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
+ * @version  0.2.0
  **/
 
 
@@ -12,7 +13,7 @@ import { CircleSector } from "../../CircleSector";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { DrawLib, XYCoords, XYDimension, SVGPathParams, SVGSerializable } from "../../interfaces";
+import { DrawLib, XYCoords, XYDimension, SVGPathParams, SVGSerializable, UID } from "../../interfaces";
 
 
 /**
@@ -36,31 +37,41 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 
     /**
      * @member {Vertex}
-     * @memberof scale
+     * @memberof drawutilssvg
      * @instance
      */
     scale:Vertex;
 
     /**
      * @member {Vertex}
-     * @memberof offset
+     * @memberof drawutilssvg
      * @instance
      */
     offset:Vertex;
 
     /**
      * @member {boolean}
-     * @memberof fillShapes
+     * @memberof drawutilssvg
      * @instance
      */
     fillShapes:boolean;
 
     /**
      * @member {XYDimension}
-     * @memberof canvasSize
+     * @memberof drawutilssvg
      * @instance
      */
     canvasSize:XYDimension;
+
+    /**
+     * The current drawable-ID.
+     *
+     * @member {UID|undefined}
+     * @memberof drawutilssvg
+     * @instance
+     */  
+    private curId : UID | undefined;
+
 
     
     /**
@@ -168,6 +179,10 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
 	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
 	node.setAttribute('stroke-width', `${lineWidth || 1}`);
+	if( this.curId ) {
+	    node.setAttribute('key', `${this.curId}`);
+	    // node.dataSet.key = this.curId;
+	}
 	this.svgNode.appendChild( node );
 	return node;
     };
@@ -182,10 +197,22 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    this.offset,
 	    this.scale,
 	    this.canvasSize,
-	    this.fillShapes
+	    fillShapes
 	);
 	return copy;
-    }; 
+    };
+
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     * 
+     * @name setCurrentId
+     * @method 
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    setCurrentId( uid?:UID ) : void {
+	this.curId = uid;
+    };
 
     /**
      * Called before each draw cycle.

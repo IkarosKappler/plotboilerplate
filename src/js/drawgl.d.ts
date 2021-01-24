@@ -4,11 +4,12 @@
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2020-03-25 Ported stub to Typescript.
  * @modified 2020-10-15 Re-added the text() function.
- * @version  0.0.4
+ * @modified 2021-01-24 Added the `setCurrentId` function.
+ * @version  0.0.5
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords } from "./interfaces";
+import { DrawLib, XYCoords, UID } from "./interfaces";
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -41,17 +42,26 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
     constructor(context: WebGLRenderingContext, fillShapes: boolean);
-    /**
-     * Called before each draw cycle.
-     **/
-    beginDrawCycle(): void;
+    _x2rel(x: number): number;
+    _y2rel(y: number): number;
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
      */
     copyInstance(fillShapes: boolean): drawutilsgl;
-    _x2rel(x: number): number;
-    _y2rel(y: number): number;
+    /**
+     * Called before each draw cycle.
+     **/
+    beginDrawCycle(): void;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     *
+     * @name setCurrentId
+     * @method
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    setCurrentId(uid?: UID): void;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *

@@ -34,7 +34,8 @@
  * @modified 2020-10-28 Added the path(Path2D) function.
  * @modified 2020-12-28 Added the `singleSegment` mode (test).
  * @modified 2021-01-05 Added the image-loaded/broken check.
- * @version  1.8.2
+ * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
+ * @version  1.8.3
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutils = void 0;
@@ -70,6 +71,18 @@ var drawutils = /** @class */ (function () {
      * Called before each draw cycle.
      **/
     drawutils.prototype.beginDrawCycle = function () {
+        // NOOP
+    };
+    ;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     *
+     * @name setCurrentId
+     * @method
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    drawutils.prototype.setCurrentId = function (uid) {
         // NOOP
     };
     ;

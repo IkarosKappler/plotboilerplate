@@ -4,14 +4,15 @@
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2020-03-25 Ported stub to Typescript.
  * @modified 2020-10-15 Re-added the text() function.
- * @version  0.0.4
+ * @modified 2021-01-24 Added the `setCurrentId` function.
+ * @version  0.0.5
  **/
 
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGSerializable} from "./interfaces";
+import { DrawLib, XYCoords, SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -107,14 +108,10 @@ export class drawutilsgl implements DrawLib<void> {
     };
 
     
-    /**
-     * Called before each draw cycle.
-     **/
-    beginDrawCycle() {
-	this._zindex = 0.0;
-    };
+    _x2rel(x:number) : number { return (this.scale.x*x+this.offset.x)/this.gl.canvas.width*2.0-1.0; };
+    _y2rel(y:number) : number { return (this.offset.y-this.scale.y*y)/this.gl.canvas.height*2.0-1.0; };
 
-    
+
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
@@ -130,9 +127,25 @@ export class drawutilsgl implements DrawLib<void> {
     };
     
 
-    _x2rel(x:number) : number { return (this.scale.x*x+this.offset.x)/this.gl.canvas.width*2.0-1.0; };
-    _y2rel(y:number) : number { return (this.offset.y-this.scale.y*y)/this.gl.canvas.height*2.0-1.0; };
+    /**
+     * Called before each draw cycle.
+     **/
+    beginDrawCycle() {
+	this._zindex = 0.0;
+    };
 
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     * 
+     * @name setCurrentId
+     * @method 
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    setCurrentId( uid?:UID ) : void {
+	// NOOP
+	// this.curId = uid;
+    };
     
     /**
      * Draw the line between the given two points with the specified (CSS-) color.

@@ -53,9 +53,6 @@ export declare type Drawable = Vertex | Vector | Triangle | Circle | CircleSecto
  */
 export declare type UID = string;
 /**
- * Drawables that implement this interface should have a UID.
- */
-/**
  * This is used to wrap 2d/gl/svg canvas elements together.
  */
 export interface CanvasWrapper {
@@ -135,6 +132,12 @@ export interface DrawConfig {
     vector: DrawSettings;
     image: DrawSettings;
 }
+/** This is a fix for the problem, that the constructor's "name" attribute is not
+ * visible in ES6:
+ *   >> The 'name' property is part of ES6 that's why you don't see it in lib.d.ts.
+ *   >> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name
+ * ... does this collide with anything?
+ */
 export interface SVGSerializable {
     /**
      * Required to generate proper CSS classes and other class related IDs.
@@ -188,12 +191,21 @@ export interface DrawLib<R> {
     offset: Vertex;
     fillShapes: boolean;
     /**
-     * Creates a 'shallow' (non deep) copy of this instance. This implies
-     * that under the hood the same gl context and gl program will be used.
-     */
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     *
+     * @name setCurrentId
+     * @method
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    setCurrentId: (uid?: UID) => void;
     /**
      * Called before each draw cycle.
-     * This is required for compatibility with other draw classes in the library.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @method
+     * @instance
      **/
     beginDrawCycle: () => R;
     /**

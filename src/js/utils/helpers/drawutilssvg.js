@@ -4,7 +4,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2021-01-03
- * @version  0.0.1
+ * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
+ * @version  0.2.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -118,6 +119,10 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('fill', this.fillShapes ? color : 'none');
         node.setAttribute('stroke', this.fillShapes ? 'none' : color);
         node.setAttribute('stroke-width', "" + (lineWidth || 1));
+        if (this.curId) {
+            node.setAttribute('key', "" + this.curId);
+            // node.dataSet.key = this.curId;
+        }
         this.svgNode.appendChild(node);
         return node;
     };
@@ -127,8 +132,20 @@ var drawutilssvg = /** @class */ (function () {
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, this.fillShapes);
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes);
         return copy;
+    };
+    ;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     *
+     * @name setCurrentId
+     * @method
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    drawutilssvg.prototype.setCurrentId = function (uid) {
+        this.curId = uid;
     };
     ;
     /**

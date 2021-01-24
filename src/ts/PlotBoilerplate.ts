@@ -489,6 +489,11 @@ export class PlotBoilerplate {
 	if( canvasElement.tagName.toLowerCase() === 'canvas' ) {
 	    this.canvas = canvasElement as HTMLCanvasElement;
 	    this.eventCatcher = this.canvas;
+	    if( typeof drawutilsgl === "undefined" ) {
+		console.warn( `Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.` );
+		console.warn( `Disabling GL and falling back to Canvas2D.` );
+		this.config.enableGL = false;
+	    }
 	    if( this.config.enableGL ) {
 		this.ctx                 = this.canvas.getContext( 'webgl' ); // webgl-experimental?
 		this.draw                = new drawutilsgl(this.ctx,false);

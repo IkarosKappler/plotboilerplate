@@ -33,13 +33,14 @@
  * @modified 2020-10-28 Added the path(Path2D) function.
  * @modified 2020-12-28 Added the `singleSegment` mode (test).
  * @modified 2021-01-05 Added the image-loaded/broken check.
- * @version  1.8.2
+ * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
+ * @version  1.8.3
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGSerializable } from "./interfaces";
+import { DrawLib, XYCoords, SVGSerializable, UID } from "./interfaces";
 
 
 // Todo: rename this class to Drawutils
@@ -105,6 +106,18 @@ export class drawutils implements DrawLib<void> {
      * Called before each draw cycle.
      **/
     beginDrawCycle() {
+	// NOOP
+    };
+
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     * 
+     * @name setCurrentId
+     * @method 
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    setCurrentId( uid?:UID ) : void {
 	// NOOP
     };
 

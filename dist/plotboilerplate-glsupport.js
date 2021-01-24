@@ -10300,4 +10300,4 @@ globalThis.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "..
 
 /******/ })()
 ;
-//# sourceMappingURL=plotboilerplate.js.map
+//# sourceMappingURL=plotboilerplate-glsupport.js.map

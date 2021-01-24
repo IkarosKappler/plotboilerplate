@@ -5,7 +5,8 @@
  * @modified 2019-10-03 Added the beginDrawCycle hook.
  * @modified 2020-03-25 Ported stub to Typescript.
  * @modified 2020-10-15 Re-added the text() function.
- * @version  0.0.4
+ * @modified 2021-01-24 Added the `setCurrentId` function.
+ * @version  0.0.5
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilsgl = void 0;
@@ -53,12 +54,9 @@ var drawutilsgl = /** @class */ (function () {
         console.log('gl initialized');
     }
     ;
-    /**
-     * Called before each draw cycle.
-     **/
-    drawutilsgl.prototype.beginDrawCycle = function () {
-        this._zindex = 0.0;
-    };
+    drawutilsgl.prototype._x2rel = function (x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; };
+    ;
+    drawutilsgl.prototype._y2rel = function (y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; };
     ;
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
@@ -74,9 +72,25 @@ var drawutilsgl = /** @class */ (function () {
         return copy;
     };
     ;
-    drawutilsgl.prototype._x2rel = function (x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; };
+    /**
+     * Called before each draw cycle.
+     **/
+    drawutilsgl.prototype.beginDrawCycle = function () {
+        this._zindex = 0.0;
+    };
     ;
-    drawutilsgl.prototype._y2rel = function (y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; };
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * It is used by some libraries for identifying elemente on re-renders.
+     *
+     * @name setCurrentId
+     * @method
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     **/
+    drawutilsgl.prototype.setCurrentId = function (uid) {
+        // NOOP
+        // this.curId = uid;
+    };
     ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
