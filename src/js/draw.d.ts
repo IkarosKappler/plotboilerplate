@@ -88,8 +88,9 @@ export declare class drawutils implements DrawLib<void> {
     constructor(context: CanvasRenderingContext2D, fillShapes: boolean);
     /**
      * Called before each draw cycle.
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      **/
-    beginDrawCycle(): void;
+    beginDrawCycle(renderTime: number): void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.

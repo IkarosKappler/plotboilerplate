@@ -66,14 +66,37 @@
 					   );
 	pb.add( drawables );
 
+	/* var clearNode = function( node ) {
+	    // Clearing an SVG is equivalent to removing all its child elements.
+	    while (node.firstChild) {
+	        node.removeChild( node.lastChild );
+	    }
+	}; */
+
+	var svgNode = document.getElementById('preview-svg');
+	// clearChildren( svgNode );
+	var tosvg = new drawutilssvg( svgNode,
+				      pb.draw.offset,
+				      pb.draw.scale,
+				      pb.canvasSize,
+				      false,
+				      true
+				    );
 
 	var drawAll = function() {
 	    // TODO: draw everything to SVG
 	    try {
-		var svgNode = document.getElementById('preview-svg');
+		//var svgNode = document.getElementById('preview-svg');
+		//clearNode( svgNode );
+		
 		// clearChildren( svgNode );
-		var tosvg = new drawutilssvg( svgNode, pb.draw.offset, pb.draw.scale,
-					      pb.canvasSize, /* pb.viewport(), */ false );
+		/* var tosvg = new drawutilssvg( svgNode,
+					      pb.draw.offset,
+					      pb.draw.scale,
+					      pb.canvasSize,
+					      false,
+					      true
+					    ); */
 		tosvg.clear();
 		// tosvg.label('My Label', 0, 0, 45/180*Math.PI );
 

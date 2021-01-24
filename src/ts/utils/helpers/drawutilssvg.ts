@@ -33,7 +33,13 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutilssvg
      * @instance
      */
-    svgNode:SVGElement;
+    svgNode : SVGElement;
+
+    /**
+     * The root elements container <g> in the svgNode.
+     */
+    // TODO: private
+    gNode : SVGElement;
 
     /**
      * @member {Vertex}
@@ -72,6 +78,21 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */  
     private curId : UID | undefined;
 
+    private curClassName : string | undefined;
+
+    /**
+     * The time (milliseconds) of the current draw cycle.
+     *
+     * @member {member}
+     * @memberof drawutilssvg
+     * @instance
+     */
+    private renderTime : number;
+
+
+    private cache : Map<string,SVGElement>;
+
+    private isPrimary : boolean;
 
     
     /**
@@ -86,41 +107,57 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		 offset:XYCoords,
 		 scale:XYCoords,
 		 canvasSize:XYDimension,
-		 fillShapes:boolean
+		 fillShapes:boolean,
+		 isPrimary?:boolean,
+		 gNode?:SVGElement
 	       ) {
 	this.svgNode = svgNode;
 	this.offset = new Vertex( 0, 0 ).set(offset);
 	this.scale = new Vertex( 1, 1 ).set(scale);
 	this.fillShapes = fillShapes;
+	this.isPrimary = isPrimary;
+	console.log( 'fillShapes', fillShapes, 'isPrimary', isPrimary );
+	
+	this.cache = new Map<string,SVGElement>();
 	this.setSize( canvasSize );
-	this.addStyleDefs();
+	if( typeof isPrimary === "undefined" || isPrimary ) {
+	    this.addStyleDefs();
+	    this.gNode = this.createNode('g');
+	    this.svgNode.appendChild( this.gNode );
+	} else {
+	    this.gNode = gNode;
+	}
     };
 
     private addStyleDefs() {
 	const nodeDef : SVGElement = this.createNode('def');
-	const nodeStyle : SVGElement = this.createNode('style');
+	const nodeStyle : HTMLStyleElement = document.createElement('style');
 	nodeDef.appendChild(nodeStyle);
 	this.svgNode.appendChild(nodeDef);
 
-	// TODO: how to add style sheets?
-	// console.log( nodeStyle );
-	// nodeStyle.sheet = `.Vertex { fill : blue; stroke : none; }`;
+	// TODO: how to properly add style sheets?
+	console.log('add style rule');
+	nodeStyle.sheet.insertRule('.Vertex { fill : blue; stroke : none; }');
+	console.log( nodeStyle.sheet );
 
-	// ?
-	// https://stackoverflow.com/questions/24920186/how-do-i-create-a-style-sheet-for-an-svg-element
-	/*
-	if (!('sheet' in SVGStyleElement.prototype)) {
-	    Object.defineProperty(SVGStyleElement.prototype, 'sheet', {
-		get:function(){
-		    var all = document.styleSheets;
-		    for (var i=0, sheet; sheet=all[i++];) {
-			if (sheet.ownerNode === this) return sheet;
-		    }
-
-		}
-	    });
-	} */
     };
+
+    
+    /**
+     * Create a new SVG node with the given node name (circle, path, line, rect, ...).
+     *
+     * @method createNode
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {string} name - The node name.
+     * @return {SVGElement} The new node, which is not yet added to any document.
+     */
+    private createNode( name:string ) : SVGElement {
+	const node : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", name);
+	return node;
+    };
+    
 
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.
@@ -135,22 +172,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	this.svgNode.setAttribute('viewBox', `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
 	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
 	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
-    };
-
-
-    /**
-     * Create a new SVG node with the given node name (circle, path, line, rect, ...).
-     *
-     * @method createNode
-     * @private
-     * @instance
-     * @memberof drawutilssvg
-     * @param {string} name - The node name.
-     * @return {SVGElement} The new node, which is not yet added to any document.
-     */
-    private createNode( name:string ) : SVGElement {
-	const node : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", name);
-	return node;
     };
 
     
@@ -183,7 +204,8 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    node.setAttribute('key', `${this.curId}`);
 	    // node.dataSet.key = this.curId;
 	}
-	this.svgNode.appendChild( node );
+	// this.svgNode.appendChild( node );1
+	this.gNode.appendChild( node );
 	return node;
     };
 
@@ -197,8 +219,11 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    this.offset,
 	    this.scale,
 	    this.canvasSize,
-	    fillShapes
+	    fillShapes,
+	    false, // !isPrimary
+	    this.gNode
 	);
+	// copy.gNode = this.gNode;
 	return copy;
     };
 
@@ -217,9 +242,12 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
+
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     *
      **/
-    beginDrawCycle() {
-	// NOOP
+    beginDrawCycle( renderTime:number ) {
+	this.renderTime = renderTime;
     };
 
     private _x(x:number) : number { return this.offset.x + this.scale.x * x; }
@@ -841,10 +869,16 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @param {string} color - The color to clear with.
      **/
     clear( color:string ) {
-	// Clearing an SVG is equivalent to removing all its child elements.
-	while (this.svgNode.firstChild) {
-	    this.svgNode.removeChild(this.svgNode.lastChild);
+	// If this isn't the primary handler then do not remove anything here.
+	// The primary handler will do that (no double work).
+	if( !this.isPrimary ) {
+	    return;
 	}
+	// Clearing an SVG is equivalent to removing all its child elements.
+	while( this.gNode.firstChild ) {
+	    this.gNode.removeChild(this.gNode.lastChild);
+	}
+	
 	// Add a covering rect with the given background color
 	const node : SVGElement = this.createNode('rect');
 	// For some strange reason SVG rotation transforms use degrees instead of radians

@@ -65,10 +65,13 @@ export class drawutilsgl implements DrawLib<void> {
 
     private glutils:GLU;
 
-    private _vertShader:WebGLShader;  // TODO (what's the type?)
-    private _fragShader:WebGLShader;  // TODO
-    private _program:WebGLProgram;
-    private vertex_buffer:WebGLBuffer; // TODO
+    private _vertShader : WebGLShader;  // TODO (what's the type?)
+    private _fragShader : WebGLShader;  // TODO
+    private _program : WebGLProgram;
+    private vertex_buffer : WebGLBuffer; // TODO
+
+    private curId : UID | undefined;
+    private renderTime : number;
     
     /**
      * The constructor.
@@ -129,9 +132,11 @@ export class drawutilsgl implements DrawLib<void> {
 
     /**
      * Called before each draw cycle.
+     * @param {number} renderTime
      **/
-    beginDrawCycle() {
+    beginDrawCycle( renderTime:number ) {
 	this._zindex = 0.0;
+	this.renderTime = renderTime;
     };
 
     /**
@@ -144,7 +149,7 @@ export class drawutilsgl implements DrawLib<void> {
      **/
     setCurrentId( uid?:UID ) : void {
 	// NOOP
-	// this.curId = uid;
+	this.curId = uid;
     };
     
     /**

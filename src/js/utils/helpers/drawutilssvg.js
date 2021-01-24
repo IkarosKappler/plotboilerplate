@@ -31,23 +31,46 @@ var drawutilssvg = /** @class */ (function () {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, isPrimary, gNode) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
+        this.isPrimary = isPrimary;
+        console.log('fillShapes', fillShapes, 'isPrimary', isPrimary);
+        this.cache = new Map();
         this.setSize(canvasSize);
-        this.addStyleDefs();
+        if (typeof isPrimary === "undefined" || isPrimary) {
+            this.addStyleDefs();
+            this.gNode = this.createNode('g');
+            this.svgNode.appendChild(this.gNode);
+        }
+        else {
+            this.gNode = gNode;
+        }
     }
     ;
     drawutilssvg.prototype.addStyleDefs = function () {
         var nodeDef = this.createNode('def');
-        var nodeStyle = this.createNode('style');
+        /* const nodeStyle : SVGElement = this.createNode('style');
+        nodeDef.appendChild(nodeStyle);
+        this.svgNode.appendChild(nodeDef);
+    
+        // TODO: how to add style sheets?
+        // console.log( nodeStyle );
+        nodeStyle.sheet = `.Vertex { fill : blue; stroke : none; }`;
+        */
+        var nodeStyle = document.createElement('style');
         nodeDef.appendChild(nodeStyle);
         this.svgNode.appendChild(nodeDef);
         // TODO: how to add style sheets?
         // console.log( nodeStyle );
         // nodeStyle.sheet = `.Vertex { fill : blue; stroke : none; }`;
+        // nodeStyle.sheet.rules.Vertex = { fill : 'blue', stroke : 'none' };
+        console.log('add style rule');
+        nodeStyle.sheet.insertRule('.Vertex { fill : blue; stroke : none; }');
+        //nodeStyle.sheet.addRule('.Vertex', 'fill : blue; stroke : none;');
+        console.log(nodeStyle.sheet);
         // ?
         // https://stackoverflow.com/questions/24920186/how-do-i-create-a-style-sheet-for-an-svg-element
         /*
@@ -65,21 +88,6 @@ var drawutilssvg = /** @class */ (function () {
     };
     ;
     /**
-     * Sets the size and view box of the document. Call this if canvas size changes.
-     *
-     * @method setSize
-     * @instance
-     * @memberof drawutilssvg
-     * @param {XYDimension} canvasSize - The new canvas size.
-     */
-    drawutilssvg.prototype.setSize = function (canvasSize) {
-        this.canvasSize = canvasSize;
-        this.svgNode.setAttribute('viewBox', "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
-        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
-        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
-    };
-    ;
-    /**
      * Create a new SVG node with the given node name (circle, path, line, rect, ...).
      *
      * @method createNode
@@ -92,6 +100,21 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.createNode = function (name) {
         var node = document.createElementNS("http://www.w3.org/2000/svg", name);
         return node;
+    };
+    ;
+    /**
+     * Sets the size and view box of the document. Call this if canvas size changes.
+     *
+     * @method setSize
+     * @instance
+     * @memberof drawutilssvg
+     * @param {XYDimension} canvasSize - The new canvas size.
+     */
+    drawutilssvg.prototype.setSize = function (canvasSize) {
+        this.canvasSize = canvasSize;
+        this.svgNode.setAttribute('viewBox', "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
+        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
+        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
     };
     ;
     /**
@@ -123,7 +146,8 @@ var drawutilssvg = /** @class */ (function () {
             node.setAttribute('key', "" + this.curId);
             // node.dataSet.key = this.curId;
         }
-        this.svgNode.appendChild(node);
+        // this.svgNode.appendChild( node );
+        this.gNode.appendChild(node);
         return node;
     };
     ;
@@ -132,7 +156,9 @@ var drawutilssvg = /** @class */ (function () {
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes);
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, false, // !isPrimary
+        this.gNode);
+        // copy.gNode = this.gNode;
         return copy;
     };
     ;
@@ -151,9 +177,12 @@ var drawutilssvg = /** @class */ (function () {
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
+
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     *
      **/
-    drawutilssvg.prototype.beginDrawCycle = function () {
-        // NOOP
+    drawutilssvg.prototype.beginDrawCycle = function (renderTime) {
+        this.renderTime = renderTime;
     };
     ;
     drawutilssvg.prototype._x = function (x) { return this.offset.x + this.scale.x * x; };
@@ -724,9 +753,21 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The color to clear with.
      **/
     drawutilssvg.prototype.clear = function (color) {
+        // If this isn't the primary handler then do not remove anything here.
+        // The primary handler will do that (no double work).
+        if (!this.isPrimary) {
+            return;
+        }
         // Clearing an SVG is equivalent to removing all its child elements.
-        while (this.svgNode.firstChild) {
-            this.svgNode.removeChild(this.svgNode.lastChild);
+        //while (this.svgNode.firstChild) {
+        //    this.svgNode.removeChild(this.svgNode.lastChild);
+        //}
+        //for( var i = 0; i < this.g.childNodes.length; i++ ) {
+        //    // this.g.removeChild(this.g.lastChild);
+        //    this.gl.childNodes[i].setAttribute('visibility','hidden');
+        //}
+        while (this.gNode.firstChild) {
+            this.gNode.removeChild(this.gNode.lastChild);
         }
         // Add a covering rect with the given background color
         var node = this.createNode('rect');

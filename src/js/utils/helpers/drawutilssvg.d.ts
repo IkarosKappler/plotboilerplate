@@ -27,6 +27,10 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     svgNode: SVGElement;
     /**
+     * The root elements container <g> in the svgNode.
+     */
+    gNode: SVGElement;
+    /**
      * @member {Vertex}
      * @memberof drawutilssvg
      * @instance
@@ -58,6 +62,17 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      */
     private curId;
+    private curClassName;
+    /**
+     * The time (milliseconds) of the current draw cycle.
+     *
+     * @member {member}
+     * @memberof drawutilssvg
+     * @instance
+     */
+    private renderTime;
+    private cache;
+    private isPrimary;
     /**
      * The constructor.
      *
@@ -66,17 +81,8 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, isPrimary?: boolean, gNode?: SVGElement);
     private addStyleDefs;
-    /**
-     * Sets the size and view box of the document. Call this if canvas size changes.
-     *
-     * @method setSize
-     * @instance
-     * @memberof drawutilssvg
-     * @param {XYDimension} canvasSize - The new canvas size.
-     */
-    setSize(canvasSize: XYDimension): void;
     /**
      * Create a new SVG node with the given node name (circle, path, line, rect, ...).
      *
@@ -88,6 +94,15 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @return {SVGElement} The new node, which is not yet added to any document.
      */
     private createNode;
+    /**
+     * Sets the size and view box of the document. Call this if canvas size changes.
+     *
+     * @method setSize
+     * @instance
+     * @memberof drawutilssvg
+     * @param {XYDimension} canvasSize - The new canvas size.
+     */
+    setSize(canvasSize: XYDimension): void;
     /**
      * This is the final helper function for drawing and filling stuff and binding new
      * nodes to the SVG document.
@@ -126,8 +141,11 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
+
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     *
      **/
-    beginDrawCycle(): void;
+    beginDrawCycle(renderTime: number): void;
     private _x;
     private _y;
     /**

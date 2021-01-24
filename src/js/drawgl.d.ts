@@ -33,6 +33,8 @@ export declare class drawutilsgl implements DrawLib<void> {
     private _fragShader;
     private _program;
     private vertex_buffer;
+    private curId;
+    private renderTime;
     /**
      * The constructor.
      *
@@ -51,8 +53,9 @@ export declare class drawutilsgl implements DrawLib<void> {
     copyInstance(fillShapes: boolean): drawutilsgl;
     /**
      * Called before each draw cycle.
+     * @param {number} renderTime
      **/
-    beginDrawCycle(): void;
+    beginDrawCycle(renderTime: number): void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.

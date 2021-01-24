@@ -69,8 +69,9 @@ var drawutils = /** @class */ (function () {
     ;
     /**
      * Called before each draw cycle.
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      **/
-    drawutils.prototype.beginDrawCycle = function () {
+    drawutils.prototype.beginDrawCycle = function (renderTime) {
         // NOOP
     };
     ;

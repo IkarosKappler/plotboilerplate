@@ -104,8 +104,9 @@ export class drawutils implements DrawLib<void> {
 
     /**
      * Called before each draw cycle.
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      **/
-    beginDrawCycle() {
+    beginDrawCycle( renderTime:number) {
 	// NOOP
     };
 

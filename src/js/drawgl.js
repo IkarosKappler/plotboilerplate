@@ -74,9 +74,11 @@ var drawutilsgl = /** @class */ (function () {
     ;
     /**
      * Called before each draw cycle.
+     * @param {number} renderTime
      **/
-    drawutilsgl.prototype.beginDrawCycle = function () {
+    drawutilsgl.prototype.beginDrawCycle = function (renderTime) {
         this._zindex = 0.0;
+        this.renderTime = renderTime;
     };
     ;
     /**
@@ -89,7 +91,7 @@ var drawutilsgl = /** @class */ (function () {
      **/
     drawutilsgl.prototype.setCurrentId = function (uid) {
         // NOOP
-        // this.curId = uid;
+        this.curId = uid;
     };
     ;
     /**

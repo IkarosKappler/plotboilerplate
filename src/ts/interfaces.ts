@@ -252,9 +252,10 @@ export interface DrawLib<R> {
      * This is required for compatibility with other draw classes in the library (like drawgl).
      * 
      * @method
+     * @param {number} renderTime
      * @instance
      **/
-    beginDrawCycle : () => R;
+    beginDrawCycle : ( renderTime:number ) => R;
 
     /**
      * Draw the line between the given two points with the specified (CSS-) color.

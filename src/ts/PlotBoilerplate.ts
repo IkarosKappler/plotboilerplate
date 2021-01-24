@@ -481,11 +481,11 @@ export class PlotBoilerplate {
 	// +-------------------------------
 	this.grid                = new Grid( new Vertex(0,0), new Vertex(50,50) );
 	this.canvasSize          = { width : PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height : PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
-	// this.canvas              = typeof config.canvas == 'string' ? (document.querySelector(config.canvas) as HTMLCanvasElement) : config.canvas;
 	const canvasElement : Element =
 	    typeof config.canvas == 'string'
 	    ? (document.querySelector(config.canvas) as Element)
 	    : config.canvas;
+	// Which renderer to use: Canvas2D, WebGL (experimental) or SVG?
 	if( canvasElement.tagName.toLowerCase() === 'canvas' ) {
 	    this.canvas = canvasElement as HTMLCanvasElement;
 	    this.eventCatcher = this.canvas;
@@ -511,9 +511,17 @@ export class PlotBoilerplate {
 		throw `The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.`;
 	    this.canvas = canvasElement as SVGElement;
 	    this.draw = new drawutilssvg( this.canvas as SVGElement,
-					  new Vertex(), new Vertex(), this.canvasSize, false );
-	    this.fill = new drawutilssvg( this.canvas as SVGElement,
-					  new Vertex(), new Vertex(), this.canvasSize, true );
+					  new Vertex(), // offset
+					  new Vertex(), // scale
+					  this.canvasSize,
+					  false, // fillShapes=false
+					  true   // isPrimary=true
+					);
+	    /* this.fill = new drawutilssvg( draw.gNode, // this.canvas as SVGElement,
+	       new Vertex(), new Vertex(), this.canvasSize, true, false ); */
+	    this.fill = (this.draw as drawutilssvg).copyInstance( true ); // fillShapes=true
+	    console.log( 'this.fill', (this.fill as drawutilssvg).gNode );
+	    
 	    if( this.canvas.parentElement ) {
 		this.eventCatcher = document.createElement('div');
 		this.eventCatcher.style.position = 'absolute';
@@ -974,8 +982,10 @@ export class PlotBoilerplate {
      **/
     drawDrawables( renderTime:number, draw:DrawLib<any>, fill:DrawLib<any> ) {
 	for( var i in this.drawables ) {
-	    //var d : Drawable = this.drawables[i];
-	    this.drawDrawable( this.drawables[i], renderTime, draw, fill );
+	    var d : Drawable = this.drawables[i];
+	    this.draw.setCurrentId(d.uid);
+	    this.fill.setCurrentId(d.uid);
+	    this.drawDrawable( d, renderTime, draw, fill );
 	}
     };
 
@@ -1173,8 +1183,8 @@ export class PlotBoilerplate {
      **/
     drawAll( renderTime:number, draw:DrawLib<any>, fill:DrawLib<any> ) {
 	// Tell the drawing library that a new drawing cycle begins (required for the GL lib).
-	draw.beginDrawCycle();
-	fill.beginDrawCycle();
+	draw.beginDrawCycle( renderTime );
+	fill.beginDrawCycle( renderTime );
 	
 	this.drawGrid(draw);
 	if( this.config.drawOrigin )
