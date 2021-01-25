@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 
-module.exports = {
+module.exports = [
     {
 	// https://webpack.js.org/configuration/mode/
 	mode: 'production',
@@ -28,4 +28,4 @@ module.exports = {
             minimize: true
 	}
     }
-};
+];

@@ -514,13 +514,10 @@ export class PlotBoilerplate {
 					  new Vertex(), // offset
 					  new Vertex(), // scale
 					  this.canvasSize,
-					  false, // fillShapes=false
-					  true   // isPrimary=true
+					  false,        // fillShapes=false
+					  true          // isPrimary=true
 					);
-	    /* this.fill = new drawutilssvg( draw.gNode, // this.canvas as SVGElement,
-	       new Vertex(), new Vertex(), this.canvasSize, true, false ); */
 	    this.fill = (this.draw as drawutilssvg).copyInstance( true ); // fillShapes=true
-	    console.log( 'this.fill', (this.fill as drawutilssvg).gNode );
 	    
 	    if( this.canvas.parentElement ) {
 		this.eventCatcher = document.createElement('div');
@@ -932,10 +929,13 @@ export class PlotBoilerplate {
 	offset.x = (Math.round(offset.x+cs.width)/Math.round(gSize.width))*(gSize.width)/this.draw.scale.x + (((this.draw.offset.x-cs.width)/this.draw.scale.x)%gSize.width);
 	offset.y = (Math.round(offset.y+cs.height)/Math.round(gSize.height))*(gSize.height)/this.draw.scale.y + (((this.draw.offset.y-cs.height)/this.draw.scale.x)%gSize.height);
 	if( this.drawConfig.drawGrid ) {
-	    if( this.config.rasterGrid ) // TODO: move config member to drawConfig
+	    if( this.config.rasterGrid ) { // TODO: move config member to drawConfig
+		draw.setCurrentId('raster');
 		draw.raster( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.125)' );
-	    else
+	    } else {
+		draw.setCurrentId('grid');
 		draw.grid( offset, (this.canvasSize.width)/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.095)' );
+	    }
 	}
     };
 
@@ -954,6 +954,7 @@ export class PlotBoilerplate {
      **/
     drawOrigin( draw : DrawLib<any> ) {
 	// Add a crosshair to mark the origin
+	draw.setCurrentId('origin');
 	draw.crosshair( { x : 0, y : 0 }, 10, '#000000' );
     };
 
@@ -1012,19 +1013,27 @@ export class PlotBoilerplate {
 
 		if( this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints ) {
 		    if( !d.bezierCurves[c].startPoint.attr.bezierAutoAdjust ) {
-			if( d.bezierCurves[c].startPoint.attr.visible )
+			if( d.bezierCurves[c].startPoint.attr.visible ) {
+			    draw.setCurrentId(`${d.uid}_h0`);
 			    draw.diamondHandle( d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint,this.drawConfig.vertex.color) );
+			}
 			d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
 		    }
 		    if( !d.bezierCurves[c].endPoint.attr.bezierAutoAdjust ) {
-			if( d.bezierCurves[c].endPoint.attr.visible )
+			if( d.bezierCurves[c].endPoint.attr.visible ) {
+			    draw.setCurrentId(`${d.uid}_h1`);
 			    draw.diamondHandle( d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint,this.drawConfig.vertex.color) );
+			}
 			d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
 		    }
-		    if( d.bezierCurves[c].startControlPoint.attr.visible )
+		    if( d.bezierCurves[c].startControlPoint.attr.visible ) {
+			draw.setCurrentId(`${d.uid}_h2`);
 			draw.circleHandle( d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint,'#008888') );
-		    if( d.bezierCurves[c].endControlPoint.attr.visible )
+		    }
+		    if( d.bezierCurves[c].endControlPoint.attr.visible ) {
+			draw.setCurrentId(`${d.uid}_h3`);
 			draw.circleHandle( d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint,'#008888') );
+		    }
 		    d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
 		    d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
 		} else {
@@ -1053,9 +1062,12 @@ export class PlotBoilerplate {
 		d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
 	} else if( d instanceof VEllipse ) {
 	    if( this.drawConfig.drawHandleLines ) {
+		draw.setCurrentId(`${d.uid}_e0`);
 		draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+		draw.setCurrentId(`${d.uid}_e1`);
 		draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
 	    }
+	    draw.setCurrentId(d.uid); 
 	    draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color,  this.drawConfig.ellipse.lineWidth );
 	    if( !this.drawConfig.drawHandlePoints ) {
 		d.center.attr.renderTime = renderTime;
@@ -1081,6 +1093,7 @@ export class PlotBoilerplate {
 	} else if( d instanceof Vector ) {
 	    draw.arrow( d.a, d.b, this.drawConfig.vector.color );
 	    if( this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible ) {
+		draw.setCurrentId(`${d.uid}_h0`);
 		draw.circleHandle( d.b, 3, '#a8a8a8' );
 	    } else {
 		d.b.attr.renderTime = renderTime;	
@@ -1091,10 +1104,14 @@ export class PlotBoilerplate {
 		d.b.attr.renderTime = renderTime;
 	    
 	} else if( d instanceof PBImage ) {
-	    if( this.drawConfig.drawHandleLines )
+	    if( this.drawConfig.drawHandleLines ) {
+		draw.setCurrentId(`${d.uid}_l0`);
 		draw.line( d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth );
+	    }
+	    fill.setCurrentId(d.uid);
 	    fill.image( d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft) );
 	    if( this.drawConfig.drawHandlePoints ) {
+		draw.setCurrentId(`${d.uid}_h0`);
 		draw.circleHandle( d.lowerRight, 3, this.drawConfig.image.color );
 		d.lowerRight.attr.renderTime = renderTime;
 	    }
@@ -1119,6 +1136,7 @@ export class PlotBoilerplate {
     drawSelectPolygon( draw:DrawLib<any> ) {
 	// Draw select polygon?
 	if( this.selectPolygon != null && this.selectPolygon.vertices.length > 0 ) {
+	    draw.setCurrentId( this.selectPolygon.uid );
 	    draw.polygon( this.selectPolygon, '#888888' );
 	    draw.crosshair( this.selectPolygon.vertices[0], 3, '#008888' );
 	}
@@ -1142,7 +1160,11 @@ export class PlotBoilerplate {
     drawVertices( renderTime:number, draw:DrawLib<any> ) {
 	// Draw all vertices as small squares if they were not already drawn by other objects
 	for( var i in this.vertices ) {
-	    if( this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible ) {
+	    if( this.drawConfig.drawVertices
+		&& this.vertices[i].attr.renderTime != renderTime
+		&& this.vertices[i].attr.visible
+	      ) {
+		draw.setCurrentId(this.vertices[i].uid);
 		draw.squareHandle( this.vertices[i], 5, this._handleColor(this.vertices[i],'rgb(0,128,192)') );
 	    }
 	}

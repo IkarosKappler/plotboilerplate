@@ -1,5 +1,5 @@
 /**
- * UNFINISHED
+ * Draws elements into an SVG node.
  *
  * @author   Ikaros Kappler
  * @date     2021-01-03
@@ -78,22 +78,13 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */  
     private curId : UID | undefined;
 
-    private curClassName : string | undefined;
-
+    
     /**
-     * The time (milliseconds) of the current draw cycle.
      *
-     * @member {member}
-     * @memberof drawutilssvg
-     * @instance
      */
-    private renderTime : number;
-
-
-    private cache : Map<string,SVGElement>;
-
+    private cache : Map<UID,SVGElement>;
+    
     private isPrimary : boolean;
-
     
     /**
      * The constructor.
@@ -101,7 +92,9 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @constructor
      * @name drawutilssvg
      * @param {SVGElement} svgNode - The SVG node to use.
+     * @param 
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
+     * @param
      **/
     constructor( svgNode:SVGElement,
 		 offset:XYCoords,
@@ -116,13 +109,12 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	this.scale = new Vertex( 1, 1 ).set(scale);
 	this.fillShapes = fillShapes;
 	this.isPrimary = isPrimary;
-	console.log( 'fillShapes', fillShapes, 'isPrimary', isPrimary );
 	
-	this.cache = new Map<string,SVGElement>();
+	this.cache = new Map<UID,SVGElement>();
 	this.setSize( canvasSize );
 	if( typeof isPrimary === "undefined" || isPrimary ) {
 	    this.addStyleDefs();
-	    this.gNode = this.createNode('g');
+	    this.gNode = this.createSVGNode('g');
 	    this.svgNode.appendChild( this.gNode );
 	} else {
 	    this.gNode = gNode;
@@ -130,51 +122,59 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     };
 
     private addStyleDefs() {
-	const nodeDef : SVGElement = this.createNode('def');
+	const nodeDef : SVGElement = this.createSVGNode('def');
 	const nodeStyle : HTMLStyleElement = document.createElement('style');
 	nodeDef.appendChild(nodeStyle);
 	this.svgNode.appendChild(nodeDef);
 
 	// TODO: how to properly add style sheets?
-	console.log('add style rule');
 	nodeStyle.sheet.insertRule('.Vertex { fill : blue; stroke : none; }');
-	console.log( nodeStyle.sheet );
-
+	nodeStyle.sheet.insertRule('.Polygon { fill : blue !important; stroke : none; }');
+	// console.log( nodeStyle.sheet );
     };
 
+
+    private findElement( key:UID, nodeName:string ) : SVGElement | undefined {
+	var node : SVGElement = this.cache.get(key);
+	if( node && node.nodeName.toUpperCase() === nodeName.toUpperCase() ) {
+	    this.cache.delete(key);
+	    return node;
+	}
+	return null;
+    }
+
+    /**
+     * Create a new DOM node [SVG] in the SVG namespace. 
+     */
+    private createSVGNode( name:string ) : SVGElement {
+	return document.createElementNS("http://www.w3.org/2000/svg", name);
+    };
     
     /**
-     * Create a new SVG node with the given node name (circle, path, line, rect, ...).
+     * Make a new SVG node (or recycle an old one) with the given node name (circle, path, line, rect, ...).
      *
-     * @method createNode
+     * @method makeNode
      * @private
      * @instance
      * @memberof drawutilssvg
      * @param {string} name - The node name.
      * @return {SVGElement} The new node, which is not yet added to any document.
      */
-    private createNode( name:string ) : SVGElement {
-	const node : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", name);
+    private makeNode( name:string ) : SVGElement {
+	// Try to find node in current DOM cache.
+	// Unique node keys are strictly necessary.
+
+	// Try to recycle an old element from cache.
+	var node : SVGElement | undefined = this.findElement(this.curId, name); //this.createSVGNode(name);
+	if( !node ) {
+	    // If no such old elements exists (key not found, tag name not matching),
+	    // then create a new one.
+	    node = this.createSVGNode(name);
+	}
 	return node;
     };
-    
 
-    /**
-     * Sets the size and view box of the document. Call this if canvas size changes.
-     *
-     * @method setSize
-     * @instance
-     * @memberof drawutilssvg
-     * @param {XYDimension} canvasSize - The new canvas size.
-     */
-    setSize( canvasSize:XYDimension ) {
-	this.canvasSize = canvasSize;
-	this.svgNode.setAttribute('viewBox', `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
-	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
-	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
-    };
-
-    
+        
     /**
      * This is the final helper function for drawing and filling stuff and binding new
      * nodes to the SVG document.
@@ -201,13 +201,34 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
 	node.setAttribute('stroke-width', `${lineWidth || 1}`);
 	if( this.curId ) {
-	    node.setAttribute('key', `${this.curId}`);
-	    // node.dataSet.key = this.curId;
+	    node.setAttribute('id',  `${this.curId}`); // Maybe React-style 'key' would be better?
 	}
-	// this.svgNode.appendChild( node );1
-	this.gNode.appendChild( node );
+	if( !node.parentNode ) {
+	    // Attach to DOM only if not already attached
+	    // Clear display="none"
+	    // node.setAttribute('display', null);
+	    this.gNode.appendChild( node );
+	}
+	// node.dataset.isOld = true;
 	return node;
     };
+    
+
+    /**
+     * Sets the size and view box of the document. Call this if canvas size changes.
+     *
+     * @method setSize
+     * @instance
+     * @memberof drawutilssvg
+     * @param {XYDimension} canvasSize - The new canvas size.
+     */
+    setSize( canvasSize:XYDimension ) {
+	this.canvasSize = canvasSize;
+	this.svgNode.setAttribute('viewBox', `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
+	this.svgNode.setAttribute('width', `${this.canvasSize.width}` );
+	this.svgNode.setAttribute('height', `${this.canvasSize.height}` );
+    };
+    
 
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
@@ -247,7 +268,8 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      *
      **/
     beginDrawCycle( renderTime:number ) {
-	this.renderTime = renderTime;
+	// Clear non-recycable elements from last draw cycle.
+	this.cache.clear();
     };
 
     private _x(x:number) : number { return this.offset.x + this.scale.x * x; }
@@ -267,7 +289,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutilssvg
      **/
     line( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) : SVGElement {
-	const line : SVGElement = this.createNode('line');
+	const line : SVGElement = this.makeNode('line');
 	line.setAttribute('x1', `${this._x(zA.x)}` );
 	line.setAttribute('y1', `${this._y(zA.y)}` );
 	line.setAttribute('x2', `${this._x(zB.x)}` );
@@ -290,7 +312,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      **/
     arrow( zA:Vertex, zB:Vertex, color:string, lineWidth?:number ) : SVGElement {
-	const node : SVGElement = this.createNode('path');
+	const node : SVGElement = this.makeNode('path');
 	var headlen:number = 8;   // length of head in pixels
 	var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
 	const d : Array<string|number> = [
@@ -321,7 +343,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      **/
     image( image:HTMLImageElement, position:Vertex, size:Vertex ) {
-	const node : SVGElement = this.createNode('image');
+	const node : SVGElement = this.makeNode('image');
 
 	// We need to re-adjust the image if it was not yet fully loaded before.
 	const setImageSize = (image) => {
@@ -365,7 +387,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	if( startPoint instanceof CubicBezierCurve ) {
 	    return this.cubicBezier( startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth );
 	}
-	const node : SVGElement = this.createNode('path');	
+	const node : SVGElement = this.makeNode('path');	
 	// Draw curve
 	const d : Array<string|number> = [
 	    'M', this._x(startPoint.x), this._y(startPoint.y),
@@ -393,7 +415,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */
     cubicBezierPath( path:Array<Vertex>, color:string, lineWidth?:number ) : SVGElement {
 	
-	const node: SVGElement = this.createNode('path');
+	const node: SVGElement = this.makeNode('path');
 	if( !path || path.length == 0 )
 	    return node;
 	
@@ -466,7 +488,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     dot( p:Vertex, color:string ) {
-	const node : SVGElement = this.createNode('line');	
+	const node : SVGElement = this.makeNode('line');	
 	const d : Array<string|number> = [
 	    'M', this._x(p.x), this._y(p.y),
 	    'L', this._x(p.x+1), this._y(p.y+1)
@@ -487,7 +509,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */
     point( p:Vertex, color:string ) {
 	var radius:number = 3;
-	const node : SVGElement = this.createNode('circle');	
+	const node : SVGElement = this.makeNode('circle');	
 	node.setAttribute('cx', `${this._x(p.x)}` );
 	node.setAttribute('cy', `${this._y(p.y)}` );
 	node.setAttribute('r', `${radius}` );
@@ -510,7 +532,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     circle( center:Vertex, radius:number, color:string, lineWidth?:number ) {
-	const node : SVGElement = this.createNode('circle');	
+	const node : SVGElement = this.makeNode('circle');	
 	node.setAttribute( 'cx', `${this._x(center.x)}` );
 	node.setAttribute( 'cy', `${this._y(center.y)}` );
 	node.setAttribute( 'r', `${radius * this.scale.x}` ); // y?
@@ -533,7 +555,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     circleArc( center:Vertex, radius:number, startAngle:number, endAngle:number, color:string, lineWidth?:number ) {
-	const node : SVGElement = this.createNode('path');	
+	const node : SVGElement = this.makeNode('path');	
 	const arcData : SVGPathParams =
 	    CircleSector.circleSectorUtils.describeSVGArc(
 		this._x(center.x),
@@ -560,7 +582,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     ellipse( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number ) {
-	const node : SVGElement = this.createNode('ellipse');	
+	const node : SVGElement = this.makeNode('ellipse');	
 	node.setAttribute( 'cx', `${this._x(center.x)}` );
 	node.setAttribute( 'cy', `${this._y(center.y)}` );
 	node.setAttribute( 'rx', `${radiusX * this.scale.x}` );
@@ -585,7 +607,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     square( center:Vertex, size:number, color:string, lineWidth?:number ) {	
-	const node : SVGElement = this.createNode('rectangle');	
+	const node : SVGElement = this.makeNode('rectangle');	
 	node.setAttribute( 'x', `${this._x(center.x-size/2.0)}` );
 	node.setAttribute( 'y', `${this._y(center.y-size/2.0)}` );
 	node.setAttribute( 'width', `${size * this.scale.x}` );
@@ -610,7 +632,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     grid( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {
-	const node : SVGElement = this.createNode('path');
+	const node : SVGElement = this.makeNode('path');
 	const d : SVGPathParams = [
 	];
 
@@ -649,7 +671,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     raster( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {	
-	const node : SVGElement = this.createNode('path');
+	const node : SVGElement = this.makeNode('path');
 	const d : SVGPathParams = [
 	];
 	
@@ -688,7 +710,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     diamondHandle( center:Vertex, size:number, color:string ) {
-	const node : SVGElement = this.createNode('path');	
+	const node : SVGElement = this.makeNode('path');	
 	const d : SVGPathParams = [
 	    'M', this._x(center.x) - size/2.0, this._y(center.y),
 	    'L', this._x(center.x), this._y(center.y) - size/2.0,
@@ -717,7 +739,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     squareHandle( center:Vertex, size:number, color:string ) {
-	const node : SVGElement = this.createNode('rect');	
+	const node : SVGElement = this.makeNode('rect');	
 	node.setAttribute('x', `${this._x(center.x)-size/2.0}`);
 	node.setAttribute('y', `${this._y(center.y)-size/2.0}`);
 	node.setAttribute('width', `${size}`);
@@ -744,7 +766,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     circleHandle( center:Vertex, radius:number, color:string ) {
 	radius = radius || 3;
 	
-	const node : SVGElement = this.createNode('circle');	
+	const node : SVGElement = this.makeNode('circle');	
 	node.setAttribute('cx', `${this._x(center.x)}`);
 	node.setAttribute('cy', `${this._y(center.y)}`);
 	node.setAttribute('r', `${radius}`);
@@ -766,7 +788,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     crosshair( center:XYCoords, radius:number, color:string ) {
-	const node : SVGElement = this.createNode('path');
+	const node : SVGElement = this.makeNode('path');
 	const d : SVGPathParams = [
 	    'M', this._x(center.x)-radius, this._y(center.y),
 	    'L', this._x(center.x)+radius, this._y(center.y),
@@ -807,7 +829,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @memberof drawutils
      */
     polyline( vertices:Array<Vertex>, isOpen:boolean, color:string, lineWidth?:number ) : SVGElement  {
-	const node : SVGElement = this.createNode('path');
+	const node : SVGElement = this.makeNode('path');
 	if( vertices.length == 0 )
 	    return node;
 	// Draw curve
@@ -828,7 +850,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	options = options || {};
 	const color:string = options.color || 'black';
 	
-	const node : SVGElement = this.createNode('text');
+	const node : SVGElement = this.makeNode('text');
 	node.setAttribute('x', `${this._x(x)}`);
 	node.setAttribute('y', `${this._x(y)}`);
 	node.innerHTML = text;
@@ -852,7 +874,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
     label( text:string, x:number, y:number, rotation:number ) {
-	const node : SVGElement = this.createNode('text');
+	const node : SVGElement = this.makeNode('text');
 	// For some strange reason SVG rotation transforms use degrees instead of radians
 	node.setAttribute('transform', `translate(${this.offset.x},${this.offset.y}), rotate(${rotation/Math.PI*180})` );
 	node.innerHTML = text;
@@ -875,12 +897,21 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    return;
 	}
 	// Clearing an SVG is equivalent to removing all its child elements.
-	while( this.gNode.firstChild ) {
-	    this.gNode.removeChild(this.gNode.lastChild);
+
+	// console.log( "this.gNode.childNodes", this.gNode.childNodes );
+	for( var i = 0; i < this.gNode.childNodes.length; i++ ) {
+	    // Hide all nodes here. Don't throw them away.
+	    // We can probably re-use them
+	    var child : SVGElement = (this.gNode.childNodes[i] as SVGElement);
+	    // child.setAttribute('display', 'none');
+	    this.cache.set( child.getAttribute('id'), child );
 	}
+	this.removeAllChildNodes();
+	// console.log('post clear', this.cache );
 	
 	// Add a covering rect with the given background color
-	const node : SVGElement = this.createNode('rect');
+	this.curId = 'background';
+	const node : SVGElement = this.makeNode('rect');
 	// For some strange reason SVG rotation transforms use degrees instead of radians
 	// Note that the background does not scale with the zoom level (always covers full element)
 	node.setAttribute( 'x', '0' );
@@ -889,11 +920,16 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	node.setAttribute( 'height', `${this.canvasSize.height}` );
 
 	// Bind this special element into the document
-	this._bindFillDraw( node, 'background', null, null );
+	this._bindFillDraw( node, this.curId, null, null );
 	node.setAttribute( 'fill', typeof color === "undefined" ? 'none' : color );
 
 	return node;
     };
 
+    private removeAllChildNodes() {
+	while( this.gNode.firstChild ) {
+	    this.gNode.removeChild(this.gNode.lastChild);
+	}
+    };
     
 }

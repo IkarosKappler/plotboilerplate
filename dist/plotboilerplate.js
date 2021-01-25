@@ -3871,13 +3871,18 @@ var PlotBoilerplate = /** @class */ (function () {
         // +-------------------------------
         this.grid = new Grid_1.Grid(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(50, 50));
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
-        // this.canvas              = typeof config.canvas == 'string' ? (document.querySelector(config.canvas) as HTMLCanvasElement) : config.canvas;
         var canvasElement = typeof config.canvas == 'string'
             ? document.querySelector(config.canvas)
             : config.canvas;
+        // Which renderer to use: Canvas2D, WebGL (experimental) or SVG?
         if (canvasElement.tagName.toLowerCase() === 'canvas') {
             this.canvas = canvasElement;
             this.eventCatcher = this.canvas;
+            if (typeof drawgl_1.drawutilsgl === "undefined") {
+                console.warn("Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.");
+                console.warn("Disabling GL and falling back to Canvas2D.");
+                this.config.enableGL = false;
+            }
             if (this.config.enableGL) {
                 this.ctx = this.canvas.getContext('webgl'); // webgl-experimental?
                 this.draw = new drawgl_1.drawutilsgl(this.ctx, false);
@@ -3896,8 +3901,15 @@ var PlotBoilerplate = /** @class */ (function () {
             if (typeof drawutilssvg_1.drawutilssvg === "undefined")
                 throw "The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.";
             this.canvas = canvasElement;
-            this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), new Vertex_1.Vertex(), this.canvasSize, false);
-            this.fill = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), new Vertex_1.Vertex(), this.canvasSize, true);
+            this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), // offset
+            new Vertex_1.Vertex(), // scale
+            this.canvasSize, false, // fillShapes=false
+            true // isPrimary=true
+            );
+            /* this.fill = new drawutilssvg( draw.gNode, // this.canvas as SVGElement,
+               new Vertex(), new Vertex(), this.canvasSize, true, false ); */
+            this.fill = this.draw.copyInstance(true); // fillShapes=true
+            console.log('this.fill', this.fill.gNode);
             if (this.canvas.parentElement) {
                 this.eventCatcher = document.createElement('div');
                 this.eventCatcher.style.position = 'absolute';
@@ -4355,8 +4367,10 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.drawDrawables = function (renderTime, draw, fill) {
         for (var i in this.drawables) {
-            //var d : Drawable = this.drawables[i];
-            this.drawDrawable(this.drawables[i], renderTime, draw, fill);
+            var d = this.drawables[i];
+            this.draw.setCurrentId(d.uid);
+            this.fill.setCurrentId(d.uid);
+            this.drawDrawable(d, renderTime, draw, fill);
         }
     };
     ;
@@ -4554,8 +4568,8 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.drawAll = function (renderTime, draw, fill) {
         // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
-        draw.beginDrawCycle();
-        fill.beginDrawCycle();
+        draw.beginDrawCycle(renderTime);
+        fill.beginDrawCycle(renderTime);
         this.drawGrid(draw);
         if (this.config.drawOrigin)
             this.drawOrigin(draw);
@@ -8062,8 +8076,9 @@ var drawutils = /** @class */ (function () {
     ;
     /**
      * Called before each draw cycle.
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      **/
-    drawutils.prototype.beginDrawCycle = function () {
+    drawutils.prototype.beginDrawCycle = function (renderTime) {
         // NOOP
     };
     ;
@@ -8832,9 +8847,11 @@ var drawutilsgl = /** @class */ (function () {
     ;
     /**
      * Called before each draw cycle.
+     * @param {number} renderTime
      **/
-    drawutilsgl.prototype.beginDrawCycle = function () {
+    drawutilsgl.prototype.beginDrawCycle = function (renderTime) {
         this._zindex = 0.0;
+        this.renderTime = renderTime;
     };
     ;
     /**
@@ -8847,7 +8864,7 @@ var drawutilsgl = /** @class */ (function () {
      **/
     drawutilsgl.prototype.setCurrentId = function (uid) {
         // NOOP
-        // this.curId = uid;
+        this.curId = uid;
     };
     ;
     /**
@@ -9517,52 +9534,46 @@ var drawutilssvg = /** @class */ (function () {
      * @param {SVGElement} svgNode - The SVG node to use.
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, isPrimary, gNode) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
+        this.isPrimary = isPrimary;
+        console.log('fillShapes', fillShapes, 'isPrimary', isPrimary);
+        this.cache = new Map();
         this.setSize(canvasSize);
-        this.addStyleDefs();
+        if (typeof isPrimary === "undefined" || isPrimary) {
+            this.addStyleDefs();
+            this.gNode = this.createSVGNode('g');
+            this.svgNode.appendChild(this.gNode);
+        }
+        else {
+            this.gNode = gNode;
+        }
     }
     ;
     drawutilssvg.prototype.addStyleDefs = function () {
-        var nodeDef = this.createNode('def');
-        var nodeStyle = this.createNode('style');
+        var nodeDef = this.createSVGNode('def');
+        var nodeStyle = document.createElement('style');
         nodeDef.appendChild(nodeStyle);
         this.svgNode.appendChild(nodeDef);
-        // TODO: how to add style sheets?
-        // console.log( nodeStyle );
-        // nodeStyle.sheet = `.Vertex { fill : blue; stroke : none; }`;
-        // ?
-        // https://stackoverflow.com/questions/24920186/how-do-i-create-a-style-sheet-for-an-svg-element
-        /*
-        if (!('sheet' in SVGStyleElement.prototype)) {
-            Object.defineProperty(SVGStyleElement.prototype, 'sheet', {
-            get:function(){
-                var all = document.styleSheets;
-                for (var i=0, sheet; sheet=all[i++];) {
-                if (sheet.ownerNode === this) return sheet;
-                }
-    
-            }
-            });
-        } */
+        // TODO: how to properly add style sheets?
+        console.log('add style rule');
+        nodeStyle.sheet.insertRule('.Vertex { fill : blue; stroke : none; }');
+        console.log(nodeStyle.sheet);
     };
     ;
-    /**
-     * Sets the size and view box of the document. Call this if canvas size changes.
-     *
-     * @method setSize
-     * @instance
-     * @memberof drawutilssvg
-     * @param {XYDimension} canvasSize - The new canvas size.
-     */
-    drawutilssvg.prototype.setSize = function (canvasSize) {
-        this.canvasSize = canvasSize;
-        this.svgNode.setAttribute('viewBox', "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
-        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
-        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
+    drawutilssvg.prototype.findElement = function (key) {
+        for (var i = 0; i < this.gNode.children.length; i++) {
+            var node = this.gNode.children[i];
+            if (node.getAttribute('key') === key)
+                return node;
+        }
+        return null;
+    };
+    drawutilssvg.prototype.createSVGNode = function (name) {
+        return document.createElementNS("http://www.w3.org/2000/svg", name);
     };
     ;
     /**
@@ -9576,7 +9587,18 @@ var drawutilssvg = /** @class */ (function () {
      * @return {SVGElement} The new node, which is not yet added to any document.
      */
     drawutilssvg.prototype.createNode = function (name) {
-        var node = document.createElementNS("http://www.w3.org/2000/svg", name);
+        // Try to find node in current DOM
+        // unique node names?
+        // Try to find existing node (by UID)
+        // var node = document.getElementById(this.curId);
+        /* var node : SVGElement | undefined = this.findElement(this.curId); // document.getElementById(this.curId);
+        if( node ) {
+            
+        } else {
+            node = this.createSVGNode(name);
+        } */
+        var node = this.createSVGNode(name);
+        // node.dataset.isOld = false; // string prop?!?
         return node;
     };
     ;
@@ -9605,12 +9627,41 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('fill', this.fillShapes ? color : 'none');
         node.setAttribute('stroke', this.fillShapes ? 'none' : color);
         node.setAttribute('stroke-width', "" + (lineWidth || 1));
+        console.log('Setting curId', this.curId);
         if (this.curId) {
+            node.setAttribute('id', "" + this.curId); // key only would be better
             node.setAttribute('key', "" + this.curId);
             // node.dataSet.key = this.curId;
         }
-        this.svgNode.appendChild(node);
+        // this.svgNode.appendChild( node );
+        // Append or re-visible
+        // console.log('node.dataset.isOld', 
+        if (node.dataset.isOld) {
+            // node.setAttribute('visibility', 'visible');
+            node.removeAttribute('display');
+            // node.dataset.isold = true;
+        }
+        else {
+            this.gNode.appendChild(node);
+            // node.dataset.isold = true;
+        }
+        node.dataset.isold = true;
         return node;
+    };
+    ;
+    /**
+     * Sets the size and view box of the document. Call this if canvas size changes.
+     *
+     * @method setSize
+     * @instance
+     * @memberof drawutilssvg
+     * @param {XYDimension} canvasSize - The new canvas size.
+     */
+    drawutilssvg.prototype.setSize = function (canvasSize) {
+        this.canvasSize = canvasSize;
+        this.svgNode.setAttribute('viewBox', "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
+        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
+        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
     };
     ;
     /**
@@ -9618,7 +9669,9 @@ var drawutilssvg = /** @class */ (function () {
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes);
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, false, // !isPrimary
+        this.gNode);
+        // copy.gNode = this.gNode;
         return copy;
     };
     ;
@@ -9637,9 +9690,12 @@ var drawutilssvg = /** @class */ (function () {
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
+
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     *
      **/
-    drawutilssvg.prototype.beginDrawCycle = function () {
-        // NOOP
+    drawutilssvg.prototype.beginDrawCycle = function (renderTime) {
+        this.renderTime = renderTime;
     };
     ;
     drawutilssvg.prototype._x = function (x) { return this.offset.x + this.scale.x * x; };
@@ -10210,10 +10266,24 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The color to clear with.
      **/
     drawutilssvg.prototype.clear = function (color) {
-        // Clearing an SVG is equivalent to removing all its child elements.
-        while (this.svgNode.firstChild) {
-            this.svgNode.removeChild(this.svgNode.lastChild);
+        // If this isn't the primary handler then do not remove anything here.
+        // The primary handler will do that (no double work).
+        if (!this.isPrimary) {
+            return;
         }
+        // Clearing an SVG is equivalent to removing all its child elements.
+        while (this.gNode.firstChild) {
+            this.gNode.removeChild(this.gNode.lastChild);
+        }
+        // Setting all old nodes invisible
+        /* for( var i = 0; i < this.gNode.children.length; i++ ) {
+            // Hide all nodes here. Don't throw them away.
+            // We can probably re-use them
+            
+            // (this.gNode.childNodes[i] as SVGElement).setAttribute('visibility', 'hidden');
+            //this.gNode.children[i].setAttribute('visibility', 'hidden');
+            this.gNode.children[i].setAttribute('display', 'none');
+        }  */
         // Add a covering rect with the given background color
         var node = this.createNode('rect');
         // For some strange reason SVG rotation transforms use degrees instead of radians
@@ -10290,7 +10360,8 @@ globalThis.PBImage = __webpack_require__(/*! ./PBImage.js */ "../src/js/PBImage.
 globalThis.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "../src/js/MouseHandler.js").MouseHandler;
 globalThis.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "../src/js/KeyHandler.js").KeyHandler;
 globalThis.drawutils = __webpack_require__(/*! ./draw.js */ "../src/js/draw.js").drawutils;
-globalThis.drawutilsgl = __webpack_require__(/*! ./drawgl.js */ "../src/js/drawgl.js").drawutilsgl;
+// globalThis.drawutilsgl = require("./drawgl.js").drawutilsgl;
+// globalThis.drawutilsgl = {};
 globalThis.drawutilssvg = __webpack_require__(/*! ./utils/helpers/drawutilssvg.js */ "../src/js/utils/helpers/drawutilssvg.js").drawutilssvg;
 globalThis.geomutils = __webpack_require__(/*! ./geomutils.js */ "../src/js/geomutils.js").geomutils;
 globalThis.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "../src/js/PlotBoilerplate.js").PlotBoilerplate;

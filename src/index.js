@@ -118,7 +118,10 @@
 	    pb.redraw();
 	    window.requestAnimationFrame( animate );
 	}
-	animate(0);
+	if( GUP.hasOwnProperty('animate') && PlotBoilerplate.utils.fetch.bool(GUP,'animate',true) ) {
+	    console.log('Staring animation');
+	    animate(0);
+	}
 
 	pb.config.postDraw = function() {
 	    for( var i in triangles ) {
