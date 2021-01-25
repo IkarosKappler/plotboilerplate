@@ -2,6 +2,8 @@
  * @author Ikaros Kappler
  * @modified 2021-01-10 Added the `CanvasWrapper` interface.
  * @modified 2021-01-20 Added the `UID` type.
+ * @modified 2021-01-25 Added the `DrawLib.setCurrentId` and `DrawLib.setCurrentClassName` functions.
+ * @modified 2021-01-25 Fixed the `PBParams` interface (inluding DrawConfig).
  **/
 
 import { Vertex } from "./Vertex";
@@ -136,7 +138,7 @@ export interface Config {
 /**
  * For initialization the constructor needs a mix of config and draw-settings.
  */
-export interface PBParams extends Config, DrawSettings {
+export interface PBParams extends Config, DrawConfig { 
     // No additional attributes, just merge two interfaces.
 }
 
@@ -242,9 +244,19 @@ export interface DrawLib<R> {
      * 
      * @name setCurrentId
      * @method 
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s), or null to clear.
      **/
-    setCurrentId : ( uid?:UID ) => void;
+    setCurrentId : ( uid: UID | undefined ) => void;
+
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     * 
+     * @name setCurrentClassName
+     * @method 
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    setCurrentClassName : ( className: string|undefined ) => void;
     
     /**
      * Called before each draw cycle.

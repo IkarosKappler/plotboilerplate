@@ -8,7 +8,7 @@
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { DrawLib, XYCoords, XYDimension, UID } from "../../interfaces";
+import { DrawConfig, DrawLib, XYCoords, XYDimension, UID } from "../../interfaces";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -65,7 +65,14 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     /**
      *
      */
+    private curClassName;
+    /**
+     *
+     */
     private cache;
+    /**
+     *
+     */
     private isPrimary;
     /**
      * The constructor.
@@ -77,7 +84,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      * @param
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, isPrimary?: boolean, gNode?: SVGElement);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isPrimary?: boolean, gNode?: SVGElement);
     private addStyleDefs;
     private findElement;
     /**
@@ -136,9 +143,18 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      *
      * @name setCurrentId
      * @method
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID} uid - A UID identifying the currently drawn element(s).
      **/
-    setCurrentId(uid?: UID): void;
+    setCurrentId(uid: UID | undefined): void;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     *
+     * @name setCurrentClassName
+     * @method
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    setCurrentClassName(className: string | undefined): void;
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.

@@ -87,11 +87,23 @@ var drawutilsgl = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID} uid - A UID identifying the currently drawn element(s).es.
      **/
     drawutilsgl.prototype.setCurrentId = function (uid) {
         // NOOP
         this.curId = uid;
+    };
+    ;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     *
+     * @name setCurrentClassName
+     * @method
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    drawutilsgl.prototype.setCurrentClassName = function (className) {
+        // NOOP
     };
     ;
     /**

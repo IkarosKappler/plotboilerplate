@@ -116,9 +116,21 @@ export class drawutils implements DrawLib<void> {
      * 
      * @name setCurrentId
      * @method 
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID} uid - A UID identifying the currently drawn element(s).
      **/
-    setCurrentId( uid?:UID ) : void {
+    setCurrentId( uid : UID|undefined ) : void {
+	// NOOP
+    };
+
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     * 
+     * @name setCurrentClassName
+     * @method 
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    setCurrentClassName( className:string|undefined ) : void {
 	// NOOP
     };
 

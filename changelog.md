@@ -1,7 +1,10 @@
 
 
 # Changelog
-  * 2021-01-24
+* 2021-01-25
+  * Added the `DrawLib.setCurrentId` and `DrawLib.setCurrentClassName` functions.
+  * Fixed the `PBParams` interface (inluding DrawConfig).
+* 2021-01-24
   * Added `DrawLib.setCurrentId` function.
 * 2021-01-22
   * Triangle: Always updating circumcircle when retieving it.

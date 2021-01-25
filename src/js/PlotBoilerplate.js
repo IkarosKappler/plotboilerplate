@@ -341,7 +341,7 @@ var PlotBoilerplate = /** @class */ (function () {
             this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), // offset
             new Vertex_1.Vertex(), // scale
             this.canvasSize, false, // fillShapes=false
-            true // isPrimary=true
+            this.drawConfig, true // isPrimary=true
             );
             this.fill = this.draw.copyInstance(true); // fillShapes=true
             if (this.canvas.parentElement) {
@@ -809,6 +809,8 @@ var PlotBoilerplate = /** @class */ (function () {
             var d = this.drawables[i];
             this.draw.setCurrentId(d.uid);
             this.fill.setCurrentId(d.uid);
+            this.draw.setCurrentClassName(d.className);
+            this.draw.setCurrentClassName(d.className);
             this.drawDrawable(d, renderTime, draw, fill);
         }
     };
@@ -836,6 +838,7 @@ var PlotBoilerplate = /** @class */ (function () {
                     if (!d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
                         if (d.bezierCurves[c].startPoint.attr.visible) {
                             draw.setCurrentId(d.uid + "_h0");
+                            draw.setCurrentClassName(d.className + "-start-handle");
                             draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.vertex.color));
                         }
                         d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
@@ -843,16 +846,19 @@ var PlotBoilerplate = /** @class */ (function () {
                     if (!d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
                         if (d.bezierCurves[c].endPoint.attr.visible) {
                             draw.setCurrentId(d.uid + "_h1");
+                            draw.setCurrentClassName(d.className + "-end-handle");
                             draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.vertex.color));
                         }
                         d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
                     }
                     if (d.bezierCurves[c].startControlPoint.attr.visible) {
                         draw.setCurrentId(d.uid + "_h2");
+                        draw.setCurrentClassName(d.className + "-start-control-handle");
                         draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
                     }
                     if (d.bezierCurves[c].endControlPoint.attr.visible) {
                         draw.setCurrentId(d.uid + "_h3");
+                        draw.setCurrentClassName(d.className + "-end-control-handle");
                         draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
                     }
                     d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
@@ -865,7 +871,11 @@ var PlotBoilerplate = /** @class */ (function () {
                     d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                 }
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
+                    draw.setCurrentId(d.uid + "_l0");
+                    draw.setCurrentClassName(d.className + "-start-line");
                     draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.setCurrentId(d.uid + "_l1");
+                    draw.setCurrentClassName(d.className + "-end-line");
                     draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
                 }
             }
@@ -886,11 +896,14 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof VEllipse_1.VEllipse) {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId(d.uid + "_e0");
+                draw.setCurrentClassName(d.className + "-v-line");
                 draw.line(d.center.clone().add(0, d.axis.y - d.center.y), d.axis, '#c8c8c8');
                 draw.setCurrentId(d.uid + "_e1");
+                draw.setCurrentClassName(d.className + "-h-line");
                 draw.line(d.center.clone().add(d.axis.x - d.center.x, 0), d.axis, '#c8c8c8');
             }
             draw.setCurrentId(d.uid);
+            draw.setCurrentClassName("" + d.className);
             draw.ellipse(d.center, Math.abs(d.axis.x - d.center.x), Math.abs(d.axis.y - d.center.y), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
             if (!this.drawConfig.drawHandlePoints) {
                 d.center.attr.renderTime = renderTime;
@@ -906,7 +919,7 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof Vertex_1.Vertex) {
             if (this.drawConfig.drawVertices &&
                 (!d.attr.selectable || !d.attr.draggable) && d.attr.visible) {
-                // Draw as special point (grey)
+                // Draw as special point (grey)		
                 draw.circleHandle(d, 7, this.drawConfig.vertex.color);
                 d.attr.renderTime = renderTime;
             }
@@ -922,6 +935,7 @@ var PlotBoilerplate = /** @class */ (function () {
             draw.arrow(d.a, d.b, this.drawConfig.vector.color);
             if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
                 draw.setCurrentId(d.uid + "_h0");
+                draw.setCurrentClassName(d.className + "-handle");
                 draw.circleHandle(d.b, 3, '#a8a8a8');
             }
             else {
@@ -935,12 +949,14 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof PBImage_1.PBImage) {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId(d.uid + "_l0");
+                draw.setCurrentClassName(d.className + "-line");
                 draw.line(d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth);
             }
             fill.setCurrentId(d.uid);
             fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
             if (this.drawConfig.drawHandlePoints) {
                 draw.setCurrentId(d.uid + "_h0");
+                draw.setCurrentClassName(d.className + "-lower-right");
                 draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                 d.lowerRight.attr.renderTime = renderTime;
             }

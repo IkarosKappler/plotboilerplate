@@ -33,7 +33,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      * @param
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, isPrimary, gNode) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isPrimary, gNode) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
@@ -42,7 +42,7 @@ var drawutilssvg = /** @class */ (function () {
         this.cache = new Map();
         this.setSize(canvasSize);
         if (typeof isPrimary === "undefined" || isPrimary) {
-            this.addStyleDefs();
+            this.addStyleDefs(drawConfig);
             this.gNode = this.createSVGNode('g');
             this.svgNode.appendChild(this.gNode);
         }
@@ -51,15 +51,31 @@ var drawutilssvg = /** @class */ (function () {
         }
     }
     ;
-    drawutilssvg.prototype.addStyleDefs = function () {
+    drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
         var nodeDef = this.createSVGNode('def');
         var nodeStyle = document.createElement('style');
         nodeDef.appendChild(nodeStyle);
         this.svgNode.appendChild(nodeDef);
-        // TODO: how to properly add style sheets?
-        nodeStyle.sheet.insertRule('.Vertex { fill : blue; stroke : none; }');
-        nodeStyle.sheet.insertRule('.Polygon { fill : blue !important; stroke : none; }');
-        console.log(nodeStyle.sheet);
+        // Which default styles to add? -> All from the DrawConfig.
+        // Compare with DrawConfig interface
+        var keys = {
+            'polygon': 'Polygon',
+            'triangle': 'Triangle',
+            'ellipse': 'Ellipse',
+            'circle': 'Circle',
+            'circleSector': 'CircleSector',
+            'vertex': 'Vertex',
+            'line': 'Line',
+            'vector': 'Vector',
+            'image': 'Image'
+        };
+        for (var k in keys) {
+            var className = keys[k];
+            var drawSettings = drawConfig[k];
+            if (drawSettings) {
+                nodeStyle.sheet.insertRule("." + className + " { fill : none; stroke: " + drawSettings.color + "; line-width: " + drawSettings.lineWidth + "px }");
+            }
+        }
     };
     ;
     drawutilssvg.prototype.findElement = function (key, nodeName) {
@@ -121,7 +137,12 @@ var drawutilssvg = /** @class */ (function () {
      * @return {SVGElement} The node itself (for chaining).
      */
     drawutilssvg.prototype._bindFillDraw = function (node, className, color, lineWidth) {
-        node.setAttribute('class', className);
+        if (this.curClassName) {
+            node.setAttribute('class', this.curClassName + " " + className);
+        }
+        else {
+            node.setAttribute('class', className);
+        }
         node.setAttribute('fill', this.fillShapes ? color : 'none');
         node.setAttribute('stroke', this.fillShapes ? 'none' : color);
         node.setAttribute('stroke-width', "" + (lineWidth || 1));
@@ -158,7 +179,8 @@ var drawutilssvg = /** @class */ (function () {
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, false, // !isPrimary
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
+        false, // !isPrimary
         this.gNode);
         // copy.gNode = this.gNode;
         return copy;
@@ -170,10 +192,22 @@ var drawutilssvg = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID} uid - A UID identifying the currently drawn element(s).
      **/
     drawutilssvg.prototype.setCurrentId = function (uid) {
         this.curId = uid;
+    };
+    ;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     *
+     * @name setCurrentClassName
+     * @method
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    drawutilssvg.prototype.setCurrentClassName = function (className) {
+        this.curClassName = className;
     };
     ;
     /**
@@ -263,7 +297,7 @@ var drawutilssvg = /** @class */ (function () {
                 var ratioY = size.y / image.naturalHeight;
                 node.setAttribute('width', "" + image.naturalWidth * _this.scale.x);
                 node.setAttribute('height', "" + image.naturalHeight * _this.scale.y);
-                // node.setAttribute('transform', `translate(${position.x}px ${position.y}px) scale(${(ratioX)} ${(ratioY)})` );
+                node.setAttribute('display', null); // Dislay when loaded
                 node.setAttribute('transform', "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + (ratioX) + " " + (ratioY) + ")");
             }
         };
@@ -272,6 +306,7 @@ var drawutilssvg = /** @class */ (function () {
         // Use x=0, y=0 and translate/scale instead (see above)
         node.setAttribute('x', "" + 0);
         node.setAttribute('y', "" + 0);
+        node.setAttribute('display', 'none'); // Hide before loaded
         setImageSize(image);
         node.setAttribute('href', image.src);
         return this._bindFillDraw(node, 'image', null, null);

@@ -13,7 +13,7 @@ import { CircleSector } from "../../CircleSector";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { DrawLib, XYCoords, XYDimension, SVGPathParams, SVGSerializable, UID } from "../../interfaces";
+import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams, SVGSerializable, UID } from "../../interfaces";
 
 
 /**
@@ -78,13 +78,21 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */  
     private curId : UID | undefined;
 
+    /**
+     *
+     */
+    private curClassName : string | undefined;
     
     /**
      *
      */
     private cache : Map<UID,SVGElement>;
-    
+
+    /**
+     *
+     */
     private isPrimary : boolean;
+
     
     /**
      * The constructor.
@@ -101,8 +109,9 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		 scale:XYCoords,
 		 canvasSize:XYDimension,
 		 fillShapes:boolean,
+		 drawConfig:DrawConfig,
 		 isPrimary?:boolean,
-		 gNode?:SVGElement
+		 gNode?:SVGElement,
 	       ) {
 	this.svgNode = svgNode;
 	this.offset = new Vertex( 0, 0 ).set(offset);
@@ -113,7 +122,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	this.cache = new Map<UID,SVGElement>();
 	this.setSize( canvasSize );
 	if( typeof isPrimary === "undefined" || isPrimary ) {
-	    this.addStyleDefs();
+	    this.addStyleDefs( drawConfig );
 	    this.gNode = this.createSVGNode('g');
 	    this.svgNode.appendChild( this.gNode );
 	} else {
@@ -121,16 +130,32 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	}
     };
 
-    private addStyleDefs() {
+    private addStyleDefs( drawConfig ) {
 	const nodeDef : SVGElement = this.createSVGNode('def');
 	const nodeStyle : HTMLStyleElement = document.createElement('style');
 	nodeDef.appendChild(nodeStyle);
 	this.svgNode.appendChild(nodeDef);
 
-	// TODO: how to properly add style sheets?
-	nodeStyle.sheet.insertRule('.Vertex { fill : blue; stroke : none; }');
-	nodeStyle.sheet.insertRule('.Polygon { fill : blue !important; stroke : none; }');
-	// console.log( nodeStyle.sheet );
+	// Which default styles to add? -> All from the DrawConfig.
+	// Compare with DrawConfig interface
+	const keys = {
+	    'polygon' : 'Polygon',
+	    'triangle' : 'Triangle',
+	    'ellipse' : 'Ellipse',
+	    'circle' : 'Circle',
+	    'circleSector' : 'CircleSector',
+	    'vertex' : 'Vertex',
+	    'line' : 'Line',
+	    'vector' : 'Vector',
+	    'image' : 'Image'
+	};
+	for( var k in keys ) {
+	    const className : string = keys[k];
+	    const drawSettings : DrawSettings = drawConfig[k];
+	    if( drawSettings ) { 
+		nodeStyle.sheet.insertRule(`.${className} { fill : none; stroke: ${drawSettings.color}; line-width: ${drawSettings.lineWidth}px }`);
+	    }
+	}
     };
 
 
@@ -195,8 +220,12 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
      * @return {SVGElement} The node itself (for chaining).
      */
-    private _bindFillDraw( node, className: string, color:string, lineWidth?:number ) : SVGElement {
-	node.setAttribute('class', className );
+    private _bindFillDraw( node, className:string, color:string, lineWidth?:number ) : SVGElement {
+	if( this.curClassName ) {
+	    node.setAttribute('class', `${this.curClassName} ${className}`);
+	} else {
+	    node.setAttribute('class', className );
+	}
 	node.setAttribute('fill', this.fillShapes ? color : 'none' ); 
 	node.setAttribute('stroke', this.fillShapes ? 'none' : color );
 	node.setAttribute('stroke-width', `${lineWidth || 1}`);
@@ -241,6 +270,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    this.scale,
 	    this.canvasSize,
 	    fillShapes,
+	    null, // no DrawConfig
 	    false, // !isPrimary
 	    this.gNode
 	);
@@ -254,10 +284,22 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * 
      * @name setCurrentId
      * @method 
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID} uid - A UID identifying the currently drawn element(s).
      **/
-    setCurrentId( uid?:UID ) : void {
+    setCurrentId( uid : UID|undefined ) : void {
 	this.curId = uid;
+    };
+
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     * 
+     * @name setCurrentClassName
+     * @method 
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    setCurrentClassName( className : string|undefined ) : void {
+	this.curClassName = className;
     };
 
     /**
@@ -352,7 +394,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		const ratioY = size.y/image.naturalHeight;
 		node.setAttribute('width', `${image.naturalWidth*this.scale.x}`);
 		node.setAttribute('height', `${image.naturalHeight*this.scale.y}`);
-		// node.setAttribute('transform', `translate(${position.x}px ${position.y}px) scale(${(ratioX)} ${(ratioY)})` );
+		node.setAttribute('display', null); // Dislay when loaded
 		node.setAttribute('transform', `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${(ratioX)} ${(ratioY)})` );
 	    }
 	    
@@ -363,6 +405,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	// Use x=0, y=0 and translate/scale instead (see above)
 	node.setAttribute('x', `${0}`);
 	node.setAttribute('y', `${0}`);
+	node.setAttribute('display', 'none'); // Hide before loaded
 	setImageSize( image );
 	node.setAttribute('href', image.src );
 	return this._bindFillDraw( node, 'image', null, null );
