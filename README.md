@@ -208,7 +208,7 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
 #### Example
 ~~~javascript
  var pb = new PlotBoilerplate( {
-  // HTMLElement | string
+  // HTMLCanvasElement | SVGElement | string
   //   Your canvas element in the DOM (required).
   canvas			: document.getElementById('my-canvas'),
 
