@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2021-01-26
+  * CircleSectorHelper: Moving control points with center points.
 * 2021-01-25
   * Added the `DrawLib.setCurrentId` and `DrawLib.setCurrentClassName` functions.
   * Fixed the `PBParams` interface (inluding DrawConfig).

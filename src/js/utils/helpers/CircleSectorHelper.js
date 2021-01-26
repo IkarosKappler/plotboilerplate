@@ -20,6 +20,10 @@ var CircleSectorHelper = /** @class */ (function () {
      * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle sector and both points.
      **/
     function CircleSectorHelper(circleSector, controlPointStart, controlPointEnd, pb) {
+        circleSector.circle.center.listeners.addDragListener(function (e) {
+            controlPointStart.add(e.params.dragAmount);
+            controlPointEnd.add(e.params.dragAmount);
+        });
         controlPointStart.listeners.addDragListener(function (e) {
             circleSector.circle.radius = circleSector.circle.center.distance(controlPointStart);
             controlPointEnd.set(circleSector.circle.vertAt(circleSector.endAngle));

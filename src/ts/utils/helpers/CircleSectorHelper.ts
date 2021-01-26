@@ -13,7 +13,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2021-01-22
- * @version  1.0.0
+ * @modified 2021-01-26 Moving control points with center points
+ * @version  1.0.1
  **/
 
 import { CircleSector } from "../../CircleSector";
@@ -42,6 +43,11 @@ class CircleSectorHelper {
 		 controlPointEnd:Vertex,
 		 pb:PlotBoilerplate
 	       ) {
+
+	circleSector.circle.center.listeners.addDragListener( (e:VertEvent) => {
+	    controlPointStart.add( e.params.dragAmount );
+	    controlPointEnd.add( e.params.dragAmount );
+	} );
 	
 	controlPointStart.listeners.addDragListener( (e:VertEvent) => {
 	    circleSector.circle.radius = circleSector.circle.center.distance(controlPointStart);

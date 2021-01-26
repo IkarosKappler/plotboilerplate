@@ -1,31 +1,40 @@
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 # An interactive Javascript Plotting Boilerplate
-For plotting visual 2D data with Javascript and HTML canvas (in 2d-context).
+For plotting visual 2D data with Javascript on HTML canvas (in 2d-context) or SVG nodes.
 
 This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
  * adding elements like
-   * [vertices](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class")
-     	([example](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex example"))
-   * [lines](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class")
-     	([example](https://plotboilerplate.io/repo/demos/basic-Line "Line example"))
-   * [vectors](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class")
-        ([example](https://plotboilerplate.io/repo/demos/basic-Vector "Vector example"))
-   * [triangles](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class")
-        ([example](https://plotboilerplate.io/repo/demos/basic-Triangle "Triangle example"))
-   * [curves](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class")
-        ([example](https://plotboilerplate.io/repo/demos/basic-BezierPath "BezierPath example"))
-   * [circles](https://plotboilerplate.io/docs_typedoc/classes/circle.html "Circle class")
-        ([example](https://plotboilerplate.io/repo/demos/basic-Circle "Circle example"))
-   * [circle sectors](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class")
-        ([example](https://plotboilerplate.io/repo/demos/basic-CircleSector "CircleSector example"))
-   * [polygons](https://plotboilerplate.io/docs_typedoc/classes/polygon.html "Polygon class")
-        ([example](https://plotboilerplate.io/repo/demos/basic-Polygon "Polygon example"))
-   * [ellipses](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class")
-        ([example](https://plotboilerplate.io/repo/demos/basic-VEllipse "VEllipse example"))
-   * [images](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class")
-        ([example](https://plotboilerplate.io/repo/demos/basic-PBImage "PBImage example"))
+   * vertices
+	([docs](https://plotboilerplate.io/docs_typedoc/classes/vertex.html "Vertex class"),
+     	[example](https://plotboilerplate.io/repo/demos/basic-Vertex "Vertex example"))
+   * lines
+	([docs](https://plotboilerplate.io/docs_typedoc/classes/line.html "Line class"),
+     	[example](https://plotboilerplate.io/repo/demos/basic-Line "Line example"))
+   * vectors [docs](https://plotboilerplate.io/docs_typedoc/classes/vector.html "Vector class"),
+        [example](https://plotboilerplate.io/repo/demos/basic-Vector "Vector example"))
+   * triangles
+	([docs](https://plotboilerplate.io/docs_typedoc/classes/triangle.html "Triangle class"),
+        [example](https://plotboilerplate.io/repo/demos/basic-Triangle "Triangle example"))
+   * curves
+	([docs](https://plotboilerplate.io/docs_typedoc/classes/cubicbeziercurve.html "CubicBezierCurve class"),
+        [example](https://plotboilerplate.io/repo/demos/basic-BezierPath "BezierPath example"))
+   * circles
+	([docs](https://plotboilerplate.io/docs_typedoc/classes/circle.html "Circle class"),
+        [example](https://plotboilerplate.io/repo/demos/basic-Circle "Circle example"))
+   * circle sectors
+     	([docs](https://plotboilerplate.io/docs_typedoc/classes/circlesector.html "CircleSector class"),
+        [example](https://plotboilerplate.io/repo/demos/basic-CircleSector "CircleSector example"))
+   * polygons
+	([docs](https://plotboilerplate.io/docs_typedoc/classes/polygon.html "Polygon class"),
+        [example](https://plotboilerplate.io/repo/demos/basic-Polygon "Polygon example"))
+   * ellipses
+	([docs](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class"),
+        [example](https://plotboilerplate.io/repo/demos/basic-VEllipse "VEllipse example"))
+   * images
+	([docs](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class"),
+        [example](https://plotboilerplate.io/repo/demos/basic-PBImage "PBImage example"))
  * configuration of the canvas behavior (fullsize, interaction, raster)
  * mouse interaction (zoom, pan, drag elements)
  * keyboard interaction
@@ -57,8 +66,24 @@ The element canvas will be used to draw on.
    var pb = new PlotBoilerplate( {
        canvas		: document.getElementById('my-canvas'),
        fullSize         : true
-    } );
+   } );
 ~~~
+
+### Alternative with SVG elements
+
+Use SVG elements instead of canvas:
+~~~html
+   <svg id="my-svg"></svg>
+~~~
+
+And pass the SVG element:
+~~~javascript
+   var pb = new PlotBoilerplate( {
+       canvas		: document.getElementById('my-svg'),
+       fullSize         : true
+   } );
+~~~
+
 
 
 ## Add elements to your canvas
