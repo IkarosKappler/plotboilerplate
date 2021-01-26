@@ -60,48 +60,31 @@
 	// +---------------------------------------------------------------------------------
 	// | Use a helper function to build all demo-drawables.
 	// +-------------------------------
-	var drawables = createDemoDrawables( pb.viewport(), // canvasSize,
+	var drawables = createDemoDrawables( pb.viewport(),
 					     '../../example-image.png',
 					     function() { pb.redraw(); }
 					   );
 	pb.add( drawables );
 
-	/* var clearNode = function( node ) {
-	    // Clearing an SVG is equivalent to removing all its child elements.
-	    while (node.firstChild) {
-	        node.removeChild( node.lastChild );
-	    }
-	}; */
-
+	// Create a new SVG renderer.
 	var svgNode = document.getElementById('preview-svg');
-	// clearChildren( svgNode );
-	var tosvg = new drawutilssvg( svgNode,
-				      pb.draw.offset,
-				      pb.draw.scale,
-				      pb.canvasSize,
-				      false,
-				      true
-				    );
+	var tosvgDraw = new drawutilssvg( svgNode,
+					  pb.draw.offset,
+					  pb.draw.scale,
+					  pb.canvasSize,
+					  false, // fillShapes=false
+					  pb.drawConfig
+					);
+	var tosvgFill = tosvgDraw.copyInstance( true ); // fillShapes=true
 
 	var drawAll = function() {
-	    // TODO: draw everything to SVG
 	    try {
-		//var svgNode = document.getElementById('preview-svg');
-		//clearNode( svgNode );
-		
-		// clearChildren( svgNode );
-		/* var tosvg = new drawutilssvg( svgNode,
-					      pb.draw.offset,
-					      pb.draw.scale,
-					      pb.canvasSize,
-					      false,
-					      true
-					    ); */
-		tosvg.clear();
+		tosvgDraw.beginDrawCycle(0);
+		tosvgFill.beginDrawCycle(0);
+		tosvgDraw.clear( pb.config.backgroundColor );
 		// tosvg.label('My Label', 0, 0, 45/180*Math.PI );
 
-		pb.drawAll( new Date().getMilliseconds(), tosvg, tosvg );
-
+		pb.drawAll( 0, tosvgDraw, tosvgFill );
 	    } catch( e ) {
 		console.error( e );
 	    }
@@ -143,11 +126,6 @@
 	// | A global config that's attached to the dat.gui control interface.
 	// +-------------------------------
 	var config = PlotBoilerplate.utils.safeMergeByKeys( {
-	    alwaysDrawFullCircles  : false,
-	    drawCircleSections     : true,
-	    drawRadicalLine        : true,
-	    drawIntersectionPoints : false,
-	    drawSectorLines        : false,
 	    // TODO: when working this should replace the default SVG export function
 	    svgDownload            : function() { exportSVG(); }
 	}, GUP );
@@ -163,11 +141,6 @@
 	// +-------------------------------
         {
 	    var gui = pb.createGUI();
-	    gui.add(config, 'alwaysDrawFullCircles').onChange( function() { pb.redraw(); } ).name("alwaysDrawFullCircles").title("Always draw full circles?");
-	    gui.add(config, 'drawCircleSections').onChange( function() { pb.redraw(); } ).name("drawCircleSections").title("Draw the circle sections separately?");
-	    gui.add(config, 'drawRadicalLine').onChange( function() { pb.redraw(); } ).name("drawRadicalLine").title("Draw the radical line?");
-	    gui.add(config, 'drawIntersectionPoints').onChange( function() { pb.redraw(); } ).name("drawIntersectionPoints").title("Draw the intersection points?");
-	    gui.add(config, 'drawSectorLines').onChange( function() { pb.redraw(); } ).name("drawSectorLines").title("Draw the sector lines of circle sections?");
 	    gui.add(config, 'svgDownload').onChange( function() { pb.redraw(); } ).name('svgDownload').title('Download the SVG node as an *.svg file.');
 
 	    // Add stats

@@ -65,7 +65,9 @@
  * @modified 2021-01-08 Added the customizable `drawAll(...)` function.
  * @modified 2021-01-09 Added the `drawDrawable(...)` function.
  * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
- * @version  1.12.1
+ * @modified 2021-01-26 Fixed SVG resizing.
+ * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
+ * @version  1.12.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -90,7 +92,6 @@ import { Line } from "./Line";
 import { MouseHandler, XMouseEvent, XWheelEvent } from "./MouseHandler";
 import { PBImage } from "./PBImage";
 import { Polygon } from "./Polygon";
-import { SVGBuilder } from "./SVGBuilder";
 import { Triangle } from "./Triangle";
 import { VEllipse } from "./VEllipse";
 import { Vector } from "./Vector";
@@ -193,18 +194,18 @@ export class PlotBoilerplate {
     ctx: CanvasRenderingContext2D | WebGLRenderingContext | undefined;
 
     /** 
-     * @member {drawutils|drawutilsgl} 
+     * @member {drawutils|drawutilsgl|drawutilssvg} 
      * @memberof PlotBoilerplate
      * @instance
      */
-    draw : DrawLib<void>; // drawutils|drawutilsgl;
+    draw : DrawLib<void>;
 
     /** 
-     * @member {drawutils|drawutilsgl} 
+     * @member {drawutils|drawutilsgl|drawutilssvg} 
      * @memberof PlotBoilerplate
      * @instance
      */
-    fill : DrawLib<void>; // drawutils|drawutilsgl;
+    fill : DrawLib<void>;
 
     /** 
      * @member {DrawConfig} 
@@ -239,7 +240,6 @@ export class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @instance
      */
-    // TODO: check if this is really still in use.
     paths : Array<BezierPath>;
 
     /** 
@@ -489,22 +489,22 @@ export class PlotBoilerplate {
 	if( canvasElement.tagName.toLowerCase() === 'canvas' ) {
 	    this.canvas = canvasElement as HTMLCanvasElement;
 	    this.eventCatcher = this.canvas;
-	    if( typeof drawutilsgl === "undefined" ) {
+	    if( this.config.enableGL && typeof drawutilsgl === "undefined" ) {
 		console.warn( `Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.` );
 		console.warn( `Disabling GL and falling back to Canvas2D.` );
 		this.config.enableGL = false;
 	    }
 	    if( this.config.enableGL ) {
-		this.ctx                 = this.canvas.getContext( 'webgl' ); // webgl-experimental?
-		this.draw                = new drawutilsgl(this.ctx,false);
+		const ctx : WebGLRenderingContext = this.canvas.getContext( 'webgl' ); // webgl-experimental?
+		this.draw                = new drawutilsgl(ctx,false);
 		// PROBLEM: same instance of fill and draw when using WebGL.
 		//          Shader program cannot be duplicated on the same context.
 		this.fill                = (this.draw as drawutilsgl).copyInstance(true);
 		console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
 	    } else {
-		this.ctx                 = this.canvas.getContext( '2d' );
-		this.draw                = new drawutils(this.ctx,false);
-		this.fill                = new drawutils(this.ctx,true);
+		const ctx : CanvasRenderingContext2D = this.canvas.getContext( '2d' );
+		this.draw                = new drawutils(ctx,false);
+		this.fill                = new drawutils(ctx,true);
 	    }
 	} else if( canvasElement.tagName.toLowerCase() === 'svg' ) {
 	    if( typeof drawutilssvg === "undefined" )
@@ -516,7 +516,7 @@ export class PlotBoilerplate {
 					  this.canvasSize,
 					  false,           // fillShapes=false
 					  this.drawConfig,
-					  true             // isPrimary=true
+					  false             // isSecondary=false
 					);
 	    this.fill = (this.draw as drawutilssvg).copyInstance( true ); // fillShapes=true
 	    
@@ -574,15 +574,40 @@ export class PlotBoilerplate {
      * @private
      **/
     private static _saveFile( pb:PlotBoilerplate ) {
-	var svgCode : string = new SVGBuilder().build( pb.drawables, { canvasSize : pb.canvasSize, offset : pb.draw.offset, zoom : pb.draw.scale } );
-	var blob:Blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
 
+	if( typeof drawutilssvg === "undefined" ) {
+	    console.error(`Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?`);
+	    return;
+	}
+
+	// Create fake SVG node
+	const svgNode : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	// var svgNode = document.getElementById('preview-svg');
+	// Draw everything to fake node.
+	var tosvgDraw = new drawutilssvg( svgNode, pb.draw.offset, pb.draw.scale,
+					  pb.canvasSize,
+					  false, // fillShapes=false
+					  pb.drawConfig
+					);
+	var tosvgFill = tosvgDraw.copyInstance( true ); // fillShapes=true
+
+	tosvgDraw.beginDrawCycle(0);
+	tosvgFill.beginDrawCycle(0);
+	tosvgDraw.clear( pb.config.backgroundColor );
+	pb.drawAll( 0, tosvgDraw, tosvgFill );
+	
+	// Full support in all browsers \o/
+	//    https://caniuse.com/xml-serializer
+	var serializer = new XMLSerializer();
+	var svgCode = serializer.serializeToString(svgNode);
+
+	var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
 	// See documentation for FileSaver.js for usage.
 	//    https://github.com/eligrey/FileSaver.js
 	if( typeof globalThis["saveAs"] != "function" )
 	    throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
-	const _saveAs:saveAs = globalThis["saveAs"] as saveAs;
-	_saveAs(blob, "plotboilerplate.svg");   
+	var _saveAs = globalThis["saveAs"];
+	_saveAs(blob, "plotboilerplate.svg");  
     };
 
 
@@ -1364,6 +1389,8 @@ export class PlotBoilerplate {
 	const _setSize = (w:number,h:number) => {
 	    w *= _self.config.canvasWidthFactor;
 	    h *= _self.config.canvasHeightFactor;
+	    _self.canvasSize.width  = w;
+	    _self.canvasSize.height = h;
 	    // TODO: use CanvasWrapper.setSize here?
 	    if( _self.canvas instanceof HTMLCanvasElement ) {
 		_self.canvas.width      = w; 
@@ -1372,14 +1399,13 @@ export class PlotBoilerplate {
 		this.canvas.setAttribute('viewBox', `0 0 ${w} ${h}`);
 		this.canvas.setAttribute('width', `${w}` );
 		this.canvas.setAttribute('height', `${h}` );
+		(this.draw as drawutilssvg).setSize( _self.canvasSize ); // No need to set size to this.fill (instance copy)
 		// console.log(
 		this.eventCatcher.style.width = `${w}px`;
 		this.eventCatcher.style.height = `${h}px`;
 	    } else {
 		console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
 	    }
-	    _self.canvasSize.width  = w;
-	    _self.canvasSize.height = h;
 	    if( _self.config.autoAdjustOffset ) {
 		_self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = w*(_self.config.offsetAdjustXPercent/100); 
 		_self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = h*(_self.config.offsetAdjustYPercent/100);

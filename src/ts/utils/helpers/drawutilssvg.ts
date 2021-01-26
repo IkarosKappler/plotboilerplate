@@ -4,7 +4,8 @@
  * @author   Ikaros Kappler
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
- * @version  0.2.0
+ * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
+ * @version  0.2.1
  **/
 
 
@@ -91,7 +92,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     /**
      *
      */
-    private isPrimary : boolean;
+    private isSecondary : boolean;
 
     
     /**
@@ -110,24 +111,24 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		 canvasSize:XYDimension,
 		 fillShapes:boolean,
 		 drawConfig:DrawConfig,
-		 isPrimary?:boolean,
+		 isSecondary?:boolean,
 		 gNode?:SVGElement,
 	       ) {
 	this.svgNode = svgNode;
 	this.offset = new Vertex( 0, 0 ).set(offset);
 	this.scale = new Vertex( 1, 1 ).set(scale);
 	this.fillShapes = fillShapes;
-	this.isPrimary = isPrimary;
+	this.isSecondary = isSecondary;
 	
 	this.cache = new Map<UID,SVGElement>();
 	this.setSize( canvasSize );
-	if( typeof isPrimary === "undefined" || isPrimary ) {
+	if( isSecondary ) {
+	    this.gNode = gNode;
+	} else {
 	    this.addStyleDefs( drawConfig );
 	    this.gNode = this.createSVGNode('g');
 	    this.svgNode.appendChild( this.gNode );
-	} else {
-	    this.gNode = gNode;
-	}
+	} 
     };
 
     private addStyleDefs( drawConfig ) {
@@ -149,13 +150,23 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    'vector' : 'Vector',
 	    'image' : 'Image'
 	};
+	// Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
+	/* 
 	for( var k in keys ) {
 	    const className : string = keys[k];
 	    const drawSettings : DrawSettings = drawConfig[k];
 	    if( drawSettings ) { 
 		nodeStyle.sheet.insertRule(`.${className} { fill : none; stroke: ${drawSettings.color}; line-width: ${drawSettings.lineWidth}px }`);
 	    }
+	    } */
+	// Ugly fix: insert rules using innerHtml :/
+	const rules = [];
+	for( var k in keys ) {
+	    const className : string = keys[k];
+	    const drawSettings : DrawSettings = drawConfig[k];
+	    rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; line-width: ${drawSettings.lineWidth}px }`);
 	}
+	nodeStyle.innerHTML = rules.join("\n");
     };
 
 
@@ -271,10 +282,9 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	    this.canvasSize,
 	    fillShapes,
 	    null, // no DrawConfig
-	    false, // !isPrimary
+	    true, // isSecondary
 	    this.gNode
 	);
-	// copy.gNode = this.gNode;
 	return copy;
     };
 
@@ -936,7 +946,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     clear( color:string ) {
 	// If this isn't the primary handler then do not remove anything here.
 	// The primary handler will do that (no double work).
-	if( !this.isPrimary ) {
+	if( this.isSecondary ) {
 	    return;
 	}
 	// Clearing an SVG is equivalent to removing all its child elements.

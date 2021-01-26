@@ -5,7 +5,8 @@
  * @author   Ikaros Kappler
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
- * @version  0.2.0
+ * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
+ * @version  0.2.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -33,21 +34,21 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      * @param
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isPrimary, gNode) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
-        this.isPrimary = isPrimary;
+        this.isSecondary = isSecondary;
         this.cache = new Map();
         this.setSize(canvasSize);
-        if (typeof isPrimary === "undefined" || isPrimary) {
+        if (isSecondary) {
+            this.gNode = gNode;
+        }
+        else {
             this.addStyleDefs(drawConfig);
             this.gNode = this.createSVGNode('g');
             this.svgNode.appendChild(this.gNode);
-        }
-        else {
-            this.gNode = gNode;
         }
     }
     ;
@@ -69,13 +70,23 @@ var drawutilssvg = /** @class */ (function () {
             'vector': 'Vector',
             'image': 'Image'
         };
+        // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
+        /*
+        for( var k in keys ) {
+            const className : string = keys[k];
+            const drawSettings : DrawSettings = drawConfig[k];
+            if( drawSettings ) {
+            nodeStyle.sheet.insertRule(`.${className} { fill : none; stroke: ${drawSettings.color}; line-width: ${drawSettings.lineWidth}px }`);
+            }
+            } */
+        // Ugly fix: insert rules using innerHtml :/
+        var rules = [];
         for (var k in keys) {
             var className = keys[k];
             var drawSettings = drawConfig[k];
-            if (drawSettings) {
-                nodeStyle.sheet.insertRule("." + className + " { fill : none; stroke: " + drawSettings.color + "; line-width: " + drawSettings.lineWidth + "px }");
-            }
+            rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; line-width: " + drawSettings.lineWidth + "px }");
         }
+        nodeStyle.innerHTML = rules.join("\n");
     };
     ;
     drawutilssvg.prototype.findElement = function (key, nodeName) {
@@ -180,9 +191,8 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
         var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
-        false, // !isPrimary
+        true, // isSecondary
         this.gNode);
-        // copy.gNode = this.gNode;
         return copy;
     };
     ;
@@ -793,7 +803,7 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.clear = function (color) {
         // If this isn't the primary handler then do not remove anything here.
         // The primary handler will do that (no double work).
-        if (!this.isPrimary) {
+        if (this.isSecondary) {
             return;
         }
         // Clearing an SVG is equivalent to removing all its child elements.

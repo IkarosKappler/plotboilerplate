@@ -4,7 +4,8 @@
  * @author   Ikaros Kappler
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
- * @version  0.2.0
+ * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
+ * @version  0.2.1
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
@@ -73,7 +74,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     /**
      *
      */
-    private isPrimary;
+    private isSecondary;
     /**
      * The constructor.
      *
@@ -84,7 +85,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      * @param
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isPrimary?: boolean, gNode?: SVGElement);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGElement);
     private addStyleDefs;
     private findElement;
     /**

@@ -65,7 +65,9 @@
  * @modified 2021-01-08 Added the customizable `drawAll(...)` function.
  * @modified 2021-01-09 Added the `drawDrawable(...)` function.
  * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
- * @version  1.12.1
+ * @modified 2021-01-26 Fixed SVG resizing.
+ * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
+ * @version  1.12.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -158,13 +160,13 @@ export declare class PlotBoilerplate {
      */
     ctx: CanvasRenderingContext2D | WebGLRenderingContext | undefined;
     /**
-     * @member {drawutils|drawutilsgl}
+     * @member {drawutils|drawutilsgl|drawutilssvg}
      * @memberof PlotBoilerplate
      * @instance
      */
     draw: DrawLib<void>;
     /**
-     * @member {drawutils|drawutilsgl}
+     * @member {drawutils|drawutilsgl|drawutilssvg}
      * @memberof PlotBoilerplate
      * @instance
      */

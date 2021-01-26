@@ -3,6 +3,7 @@
 # Changelog
 * 2021-01-26
   * CircleSectorHelper: Moving control points with center points.
+  * PlotBoilerplate class: Replaced the old SVGBuilder by the new `drawutilssvg` library.
 * 2021-01-25
   * Added the `DrawLib.setCurrentId` and `DrawLib.setCurrentClassName` functions.
   * Fixed the `PBParams` interface (inluding DrawConfig).

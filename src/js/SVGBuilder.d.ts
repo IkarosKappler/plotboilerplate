@@ -5,13 +5,16 @@
  *
  * @require Vertex
  *
+ * @deprecated THIS CLASS IS DEPRECATED. Please use the new `drawutilssvg` instead.
+ *
  * @author   Ikaros Kappler
  * @date     2018-12-04
  * @modified 2019-11-07 Added the 'Triangle' style class.
  * @modified 2019-11-13 Added the <?xml ...?> tag.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2020-12-17 Added Circle and CircleSection style classes.
- * @version  1.0.4
+ * @modified 2021-01-26 DEPRECATION
+ * @version  1.0.5
  **/
 import { Vertex } from "./Vertex";
 import { SVGSerializable } from "./interfaces";

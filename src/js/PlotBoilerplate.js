@@ -66,7 +66,9 @@
  * @modified 2021-01-08 Added the customizable `drawAll(...)` function.
  * @modified 2021-01-09 Added the `drawDrawable(...)` function.
  * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
- * @version  1.12.1
+ * @modified 2021-01-26 Fixed SVG resizing.
+ * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
+ * @version  1.12.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -87,7 +89,6 @@ var Line_1 = require("./Line");
 var MouseHandler_1 = require("./MouseHandler");
 var PBImage_1 = require("./PBImage");
 var Polygon_1 = require("./Polygon");
-var SVGBuilder_1 = require("./SVGBuilder");
 var Triangle_1 = require("./Triangle");
 var VEllipse_1 = require("./VEllipse");
 var Vector_1 = require("./Vector");
@@ -315,23 +316,23 @@ var PlotBoilerplate = /** @class */ (function () {
         if (canvasElement.tagName.toLowerCase() === 'canvas') {
             this.canvas = canvasElement;
             this.eventCatcher = this.canvas;
-            if (typeof drawgl_1.drawutilsgl === "undefined") {
+            if (this.config.enableGL && typeof drawgl_1.drawutilsgl === "undefined") {
                 console.warn("Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.");
                 console.warn("Disabling GL and falling back to Canvas2D.");
                 this.config.enableGL = false;
             }
             if (this.config.enableGL) {
-                this.ctx = this.canvas.getContext('webgl'); // webgl-experimental?
-                this.draw = new drawgl_1.drawutilsgl(this.ctx, false);
+                var ctx = this.canvas.getContext('webgl'); // webgl-experimental?
+                this.draw = new drawgl_1.drawutilsgl(ctx, false);
                 // PROBLEM: same instance of fill and draw when using WebGL.
                 //          Shader program cannot be duplicated on the same context.
                 this.fill = this.draw.copyInstance(true);
                 console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
             }
             else {
-                this.ctx = this.canvas.getContext('2d');
-                this.draw = new draw_1.drawutils(this.ctx, false);
-                this.fill = new draw_1.drawutils(this.ctx, true);
+                var ctx = this.canvas.getContext('2d');
+                this.draw = new draw_1.drawutils(ctx, false);
+                this.fill = new draw_1.drawutils(ctx, true);
             }
         }
         else if (canvasElement.tagName.toLowerCase() === 'svg') {
@@ -341,7 +342,7 @@ var PlotBoilerplate = /** @class */ (function () {
             this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), // offset
             new Vertex_1.Vertex(), // scale
             this.canvasSize, false, // fillShapes=false
-            this.drawConfig, true // isPrimary=true
+            this.drawConfig, false // isSecondary=false
             );
             this.fill = this.draw.copyInstance(true); // fillShapes=true
             if (this.canvas.parentElement) {
@@ -398,7 +399,25 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      **/
     PlotBoilerplate._saveFile = function (pb) {
-        var svgCode = new SVGBuilder_1.SVGBuilder().build(pb.drawables, { canvasSize: pb.canvasSize, offset: pb.draw.offset, zoom: pb.draw.scale });
+        if (typeof drawutilssvg_1.drawutilssvg === "undefined") {
+            console.error("Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?");
+            return;
+        }
+        // Create fake SVG node
+        var svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        // var svgNode = document.getElementById('preview-svg');
+        // Draw everything to fake node.
+        var tosvgDraw = new drawutilssvg_1.drawutilssvg(svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, false, // fillShapes=false
+        pb.drawConfig);
+        var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
+        tosvgDraw.beginDrawCycle(0);
+        tosvgFill.beginDrawCycle(0);
+        tosvgDraw.clear(pb.config.backgroundColor);
+        pb.drawAll(0, tosvgDraw, tosvgFill);
+        // Full support in all browsers \o/
+        //    https://caniuse.com/xml-serializer
+        var serializer = new XMLSerializer();
+        var svgCode = serializer.serializeToString(svgNode);
         var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
@@ -1165,6 +1184,8 @@ var PlotBoilerplate = /** @class */ (function () {
         var _setSize = function (w, h) {
             w *= _self.config.canvasWidthFactor;
             h *= _self.config.canvasHeightFactor;
+            _self.canvasSize.width = w;
+            _self.canvasSize.height = h;
             // TODO: use CanvasWrapper.setSize here?
             if (_self.canvas instanceof HTMLCanvasElement) {
                 _self.canvas.width = w;
@@ -1174,6 +1195,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 _this.canvas.setAttribute('viewBox', "0 0 " + w + " " + h);
                 _this.canvas.setAttribute('width', "" + w);
                 _this.canvas.setAttribute('height', "" + h);
+                _this.draw.setSize(_self.canvasSize); // No need to set size to this.fill (instance copy)
                 // console.log(
                 _this.eventCatcher.style.width = w + "px";
                 _this.eventCatcher.style.height = h + "px";
@@ -1181,8 +1203,6 @@ var PlotBoilerplate = /** @class */ (function () {
             else {
                 console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
             }
-            _self.canvasSize.width = w;
-            _self.canvasSize.height = h;
             if (_self.config.autoAdjustOffset) {
                 _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = w * (_self.config.offsetAdjustXPercent / 100);
                 _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = h * (_self.config.offsetAdjustYPercent / 100);

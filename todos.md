@@ -29,6 +29,7 @@
  * Add class: EllipticSector
  * Extend the demo 25 (multiple circle intersection): add SVG export.
  * Replace drawables-to-svg.js by the new svg-draw library.
+ * Remove all 'info' blocks and replace by uistats.
 
 ### Todos for future Version 2
  * Remove class member `PlotBoilerplate.ctx` (SVG renderes don't have such a context).
@@ -47,5 +48,4 @@
  * draw.text() and draw.label() require color params.
  * Render dashed lines around images that cannot be rendered (e.g. file not found).
  * Each render method should also get the ID of the rendered element; this is required to keep track of changes in SVG documents.
- * PlotBoilerplate.paths can be removed.
 

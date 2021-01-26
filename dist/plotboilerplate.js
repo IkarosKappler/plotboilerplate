@@ -3629,7 +3629,9 @@ exports.PBImage = PBImage;
  * @modified 2021-01-08 Added the customizable `drawAll(...)` function.
  * @modified 2021-01-09 Added the `drawDrawable(...)` function.
  * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
- * @version  1.12.1
+ * @modified 2021-01-26 Fixed SVG resizing.
+ * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
+ * @version  1.12.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -3650,7 +3652,6 @@ var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
 var MouseHandler_1 = __webpack_require__(/*! ./MouseHandler */ "../src/js/MouseHandler.js");
 var PBImage_1 = __webpack_require__(/*! ./PBImage */ "../src/js/PBImage.js");
 var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
-var SVGBuilder_1 = __webpack_require__(/*! ./SVGBuilder */ "../src/js/SVGBuilder.js");
 var Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
 var VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "../src/js/VEllipse.js");
 var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
@@ -3878,23 +3879,23 @@ var PlotBoilerplate = /** @class */ (function () {
         if (canvasElement.tagName.toLowerCase() === 'canvas') {
             this.canvas = canvasElement;
             this.eventCatcher = this.canvas;
-            if (typeof drawgl_1.drawutilsgl === "undefined") {
+            if (this.config.enableGL && typeof drawgl_1.drawutilsgl === "undefined") {
                 console.warn("Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.");
                 console.warn("Disabling GL and falling back to Canvas2D.");
                 this.config.enableGL = false;
             }
             if (this.config.enableGL) {
-                this.ctx = this.canvas.getContext('webgl'); // webgl-experimental?
-                this.draw = new drawgl_1.drawutilsgl(this.ctx, false);
+                var ctx = this.canvas.getContext('webgl'); // webgl-experimental?
+                this.draw = new drawgl_1.drawutilsgl(ctx, false);
                 // PROBLEM: same instance of fill and draw when using WebGL.
                 //          Shader program cannot be duplicated on the same context.
                 this.fill = this.draw.copyInstance(true);
                 console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
             }
             else {
-                this.ctx = this.canvas.getContext('2d');
-                this.draw = new draw_1.drawutils(this.ctx, false);
-                this.fill = new draw_1.drawutils(this.ctx, true);
+                var ctx = this.canvas.getContext('2d');
+                this.draw = new draw_1.drawutils(ctx, false);
+                this.fill = new draw_1.drawutils(ctx, true);
             }
         }
         else if (canvasElement.tagName.toLowerCase() === 'svg') {
@@ -3904,12 +3905,9 @@ var PlotBoilerplate = /** @class */ (function () {
             this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), // offset
             new Vertex_1.Vertex(), // scale
             this.canvasSize, false, // fillShapes=false
-            true // isPrimary=true
+            this.drawConfig, false // isSecondary=false
             );
-            /* this.fill = new drawutilssvg( draw.gNode, // this.canvas as SVGElement,
-               new Vertex(), new Vertex(), this.canvasSize, true, false ); */
             this.fill = this.draw.copyInstance(true); // fillShapes=true
-            console.log('this.fill', this.fill.gNode);
             if (this.canvas.parentElement) {
                 this.eventCatcher = document.createElement('div');
                 this.eventCatcher.style.position = 'absolute';
@@ -3964,7 +3962,25 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      **/
     PlotBoilerplate._saveFile = function (pb) {
-        var svgCode = new SVGBuilder_1.SVGBuilder().build(pb.drawables, { canvasSize: pb.canvasSize, offset: pb.draw.offset, zoom: pb.draw.scale });
+        if (typeof drawutilssvg_1.drawutilssvg === "undefined") {
+            console.error("Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?");
+            return;
+        }
+        // Create fake SVG node
+        var svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        // var svgNode = document.getElementById('preview-svg');
+        // Draw everything to fake node.
+        var tosvgDraw = new drawutilssvg_1.drawutilssvg(svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, false, // fillShapes=false
+        pb.drawConfig);
+        var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
+        tosvgDraw.beginDrawCycle(0);
+        tosvgFill.beginDrawCycle(0);
+        tosvgDraw.clear(pb.config.backgroundColor);
+        pb.drawAll(0, tosvgDraw, tosvgFill);
+        // Full support in all browsers \o/
+        //    https://caniuse.com/xml-serializer
+        var serializer = new XMLSerializer();
+        var svgCode = serializer.serializeToString(svgNode);
         var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
@@ -4321,10 +4337,14 @@ var PlotBoilerplate = /** @class */ (function () {
         offset.x = (Math.round(offset.x + cs.width) / Math.round(gSize.width)) * (gSize.width) / this.draw.scale.x + (((this.draw.offset.x - cs.width) / this.draw.scale.x) % gSize.width);
         offset.y = (Math.round(offset.y + cs.height) / Math.round(gSize.height)) * (gSize.height) / this.draw.scale.y + (((this.draw.offset.y - cs.height) / this.draw.scale.x) % gSize.height);
         if (this.drawConfig.drawGrid) {
-            if (this.config.rasterGrid) // TODO: move config member to drawConfig
+            if (this.config.rasterGrid) { // TODO: move config member to drawConfig
+                draw.setCurrentId('raster');
                 draw.raster(offset, (this.canvasSize.width) / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.125)');
-            else
+            }
+            else {
+                draw.setCurrentId('grid');
                 draw.grid(offset, (this.canvasSize.width) / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.095)');
+            }
         }
     };
     ;
@@ -4342,6 +4362,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.drawOrigin = function (draw) {
         // Add a crosshair to mark the origin
+        draw.setCurrentId('origin');
         draw.crosshair({ x: 0, y: 0 }, 10, '#000000');
     };
     ;
@@ -4370,6 +4391,8 @@ var PlotBoilerplate = /** @class */ (function () {
             var d = this.drawables[i];
             this.draw.setCurrentId(d.uid);
             this.fill.setCurrentId(d.uid);
+            this.draw.setCurrentClassName(d.className);
+            this.draw.setCurrentClassName(d.className);
             this.drawDrawable(d, renderTime, draw, fill);
         }
     };
@@ -4395,19 +4418,31 @@ var PlotBoilerplate = /** @class */ (function () {
                 draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                 if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                     if (!d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
-                        if (d.bezierCurves[c].startPoint.attr.visible)
+                        if (d.bezierCurves[c].startPoint.attr.visible) {
+                            draw.setCurrentId(d.uid + "_h0");
+                            draw.setCurrentClassName(d.className + "-start-handle");
                             draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.vertex.color));
+                        }
                         d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
                     }
                     if (!d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
-                        if (d.bezierCurves[c].endPoint.attr.visible)
+                        if (d.bezierCurves[c].endPoint.attr.visible) {
+                            draw.setCurrentId(d.uid + "_h1");
+                            draw.setCurrentClassName(d.className + "-end-handle");
                             draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.vertex.color));
+                        }
                         d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
                     }
-                    if (d.bezierCurves[c].startControlPoint.attr.visible)
+                    if (d.bezierCurves[c].startControlPoint.attr.visible) {
+                        draw.setCurrentId(d.uid + "_h2");
+                        draw.setCurrentClassName(d.className + "-start-control-handle");
                         draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
-                    if (d.bezierCurves[c].endControlPoint.attr.visible)
+                    }
+                    if (d.bezierCurves[c].endControlPoint.attr.visible) {
+                        draw.setCurrentId(d.uid + "_h3");
+                        draw.setCurrentClassName(d.className + "-end-control-handle");
                         draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
+                    }
                     d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
                     d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                 }
@@ -4418,7 +4453,11 @@ var PlotBoilerplate = /** @class */ (function () {
                     d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                 }
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
+                    draw.setCurrentId(d.uid + "_l0");
+                    draw.setCurrentClassName(d.className + "-start-line");
                     draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.setCurrentId(d.uid + "_l1");
+                    draw.setCurrentClassName(d.className + "-end-line");
                     draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
                 }
             }
@@ -4438,9 +4477,15 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (d instanceof VEllipse_1.VEllipse) {
             if (this.drawConfig.drawHandleLines) {
+                draw.setCurrentId(d.uid + "_e0");
+                draw.setCurrentClassName(d.className + "-v-line");
                 draw.line(d.center.clone().add(0, d.axis.y - d.center.y), d.axis, '#c8c8c8');
+                draw.setCurrentId(d.uid + "_e1");
+                draw.setCurrentClassName(d.className + "-h-line");
                 draw.line(d.center.clone().add(d.axis.x - d.center.x, 0), d.axis, '#c8c8c8');
             }
+            draw.setCurrentId(d.uid);
+            draw.setCurrentClassName("" + d.className);
             draw.ellipse(d.center, Math.abs(d.axis.x - d.center.x), Math.abs(d.axis.y - d.center.y), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
             if (!this.drawConfig.drawHandlePoints) {
                 d.center.attr.renderTime = renderTime;
@@ -4456,7 +4501,7 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof Vertex_1.Vertex) {
             if (this.drawConfig.drawVertices &&
                 (!d.attr.selectable || !d.attr.draggable) && d.attr.visible) {
-                // Draw as special point (grey)
+                // Draw as special point (grey)		
                 draw.circleHandle(d, 7, this.drawConfig.vertex.color);
                 d.attr.renderTime = renderTime;
             }
@@ -4471,6 +4516,8 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof Vector_1.Vector) {
             draw.arrow(d.a, d.b, this.drawConfig.vector.color);
             if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
+                draw.setCurrentId(d.uid + "_h0");
+                draw.setCurrentClassName(d.className + "-handle");
                 draw.circleHandle(d.b, 3, '#a8a8a8');
             }
             else {
@@ -4482,10 +4529,16 @@ var PlotBoilerplate = /** @class */ (function () {
                 d.b.attr.renderTime = renderTime;
         }
         else if (d instanceof PBImage_1.PBImage) {
-            if (this.drawConfig.drawHandleLines)
+            if (this.drawConfig.drawHandleLines) {
+                draw.setCurrentId(d.uid + "_l0");
+                draw.setCurrentClassName(d.className + "-line");
                 draw.line(d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth);
+            }
+            fill.setCurrentId(d.uid);
             fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
             if (this.drawConfig.drawHandlePoints) {
+                draw.setCurrentId(d.uid + "_h0");
+                draw.setCurrentClassName(d.className + "-lower-right");
                 draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                 d.lowerRight.attr.renderTime = renderTime;
             }
@@ -4509,6 +4562,7 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.drawSelectPolygon = function (draw) {
         // Draw select polygon?
         if (this.selectPolygon != null && this.selectPolygon.vertices.length > 0) {
+            draw.setCurrentId(this.selectPolygon.uid);
             draw.polygon(this.selectPolygon, '#888888');
             draw.crosshair(this.selectPolygon.vertices[0], 3, '#008888');
         }
@@ -4530,7 +4584,10 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.drawVertices = function (renderTime, draw) {
         // Draw all vertices as small squares if they were not already drawn by other objects
         for (var i in this.vertices) {
-            if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible) {
+            if (this.drawConfig.drawVertices
+                && this.vertices[i].attr.renderTime != renderTime
+                && this.vertices[i].attr.visible) {
+                draw.setCurrentId(this.vertices[i].uid);
                 draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], 'rgb(0,128,192)'));
             }
         }
@@ -4690,6 +4747,8 @@ var PlotBoilerplate = /** @class */ (function () {
         var _setSize = function (w, h) {
             w *= _self.config.canvasWidthFactor;
             h *= _self.config.canvasHeightFactor;
+            _self.canvasSize.width = w;
+            _self.canvasSize.height = h;
             // TODO: use CanvasWrapper.setSize here?
             if (_self.canvas instanceof HTMLCanvasElement) {
                 _self.canvas.width = w;
@@ -4699,6 +4758,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 _this.canvas.setAttribute('viewBox', "0 0 " + w + " " + h);
                 _this.canvas.setAttribute('width', "" + w);
                 _this.canvas.setAttribute('height', "" + h);
+                _this.draw.setSize(_self.canvasSize); // No need to set size to this.fill (instance copy)
                 // console.log(
                 _this.eventCatcher.style.width = w + "px";
                 _this.eventCatcher.style.height = h + "px";
@@ -4706,8 +4766,6 @@ var PlotBoilerplate = /** @class */ (function () {
             else {
                 console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
             }
-            _self.canvasSize.width = w;
-            _self.canvasSize.height = h;
             if (_self.config.autoAdjustOffset) {
                 _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = w * (_self.config.offsetAdjustXPercent / 100);
                 _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = h * (_self.config.offsetAdjustYPercent / 100);
@@ -5820,117 +5878,6 @@ var Polygon = /** @class */ (function () {
 }());
 exports.Polygon = Polygon;
 //# sourceMappingURL=Polygon.js.map
-
-/***/ }),
-
-/***/ "../src/js/SVGBuilder.js":
-/*!*******************************!*\
-  !*** ../src/js/SVGBuilder.js ***!
-  \*******************************/
-/*! flagged exports */
-/*! export SVGBuilder [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__ */
-/***/ ((__unused_webpack_module, exports) => {
-
-
-/**
- * Todos:
- *  + use a Drawable interface
- *  + use a SVGSerializable interface
- *
- * @require Vertex
- *
- * @author   Ikaros Kappler
- * @date     2018-12-04
- * @modified 2019-11-07 Added the 'Triangle' style class.
- * @modified 2019-11-13 Added the <?xml ...?> tag.
- * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
- * @modified 2020-12-17 Added Circle and CircleSection style classes.
- * @version  1.0.4
- **/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SVGBuilder = void 0;
-/**
- * @classdesc A default SVG builder.
- *
- * @requires SVGSerializable
- * @requires Vertex
- * @requires XYCoords
- */
-var SVGBuilder = /** @class */ (function () {
-    /**
-     * @constructor
-     **/
-    function SVGBuilder() {
-    }
-    ;
-    /**
-     *  Builds the SVG code from the given list of drawables.
-     *
-     * @param {object[]} drawables - The drawable elements (should implement Drawable) to be converted (each must have a toSVGString-function).
-     * @param {object}   options  - { canvasSize, zoom, offset }
-     * @return {string}
-     **/
-    SVGBuilder.prototype.build = function (drawables, options) {
-        var nl = '\n';
-        var indent = '  ';
-        var buffer = [];
-        buffer.push('<?xml version="1.0" encoding="UTF-8"?>' + nl);
-        buffer.push('<svg width="' + options.canvasSize.width + '" height="' + options.canvasSize.height + '"');
-        buffer.push(' viewBox="');
-        buffer.push('0');
-        buffer.push(' ');
-        buffer.push('0');
-        buffer.push(' ');
-        buffer.push(options.canvasSize.width.toString());
-        buffer.push(' ');
-        buffer.push(options.canvasSize.height.toString());
-        buffer.push('"');
-        buffer.push(' xmlns="http://www.w3.org/2000/svg">' + nl);
-        buffer.push(indent + '<defs>' + nl);
-        buffer.push(indent + '<style>' + nl);
-        buffer.push(indent + indent + ' .Vertex { fill : blue; stroke : none; } ' + nl);
-        buffer.push(indent + indent + ' .Triangle { fill : none; stroke : turquoise; stroke-width : 1px; } ' + nl);
-        buffer.push(indent + indent + ' .Polygon { fill : none; stroke : green; stroke-width : 2px; } ' + nl);
-        buffer.push(indent + indent + ' .BezierPath { fill : none; stroke : blue; stroke-width : 2px; } ' + nl);
-        buffer.push(indent + indent + ' .VEllipse { fill : none; stroke : black; stroke-width : 1px; } ' + nl);
-        buffer.push(indent + indent + ' .Line { fill : none; stroke : purple; stroke-width : 1px; } ' + nl);
-        buffer.push(indent + indent + ' .Circle { fill : none; stroke : purple; stroke-width : 1px; } ' + nl);
-        buffer.push(indent + indent + ' .CircleSector { fill : none; stroke : purple; stroke-width : 1px; } ' + nl);
-        buffer.push(indent + '</style>' + nl);
-        buffer.push(indent + '</defs>' + nl);
-        buffer.push(indent + '<g class="main-g"');
-        if (options.zoom || options.offset) {
-            buffer.push(' transform="');
-            if (options.zoom)
-                buffer.push('scale(' + options.zoom.x + ',' + options.zoom.y + ')');
-            if (options.offset)
-                buffer.push(' translate(' + options.offset.x + ',' + options.offset.y + ')');
-            buffer.push('"');
-        }
-        buffer.push('>' + nl);
-        for (var i in drawables) {
-            var d = drawables[i];
-            if (typeof d.toSVGString == 'function') {
-                buffer.push(indent + indent);
-                buffer.push(d.toSVGString({ 'className': d.className }));
-                buffer.push(nl);
-            }
-            else {
-                console.warn('Unrecognized drawable type has no toSVGString()-function. Ignoring: ' + d.className);
-            }
-        }
-        buffer.push(indent + '</g>' + nl);
-        buffer.push('</svg>' + nl);
-        return buffer.join('');
-    };
-    ;
-    return SVGBuilder;
-}());
-exports.SVGBuilder = SVGBuilder;
-//# sourceMappingURL=SVGBuilder.js.map
 
 /***/ }),
 
@@ -8088,9 +8035,21 @@ var drawutils = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID} uid - A UID identifying the currently drawn element(s).
      **/
     drawutils.prototype.setCurrentId = function (uid) {
+        // NOOP
+    };
+    ;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     *
+     * @name setCurrentClassName
+     * @method
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    drawutils.prototype.setCurrentClassName = function (className) {
         // NOOP
     };
     ;
@@ -8860,11 +8819,23 @@ var drawutilsgl = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID} uid - A UID identifying the currently drawn element(s).es.
      **/
     drawutilsgl.prototype.setCurrentId = function (uid) {
         // NOOP
         this.curId = uid;
+    };
+    ;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     *
+     * @name setCurrentClassName
+     * @method
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    drawutilsgl.prototype.setCurrentClassName = function (className) {
+        // NOOP
     };
     ;
     /**
@@ -9503,12 +9474,13 @@ exports.geomutils = {
 
 
 /**
- * UNFINISHED
+ * Draws elements into an SVG node.
  *
  * @author   Ikaros Kappler
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
- * @version  0.2.0
+ * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
+ * @version  0.2.1
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -9532,73 +9504,100 @@ var drawutilssvg = /** @class */ (function () {
      * @constructor
      * @name drawutilssvg
      * @param {SVGElement} svgNode - The SVG node to use.
+     * @param
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
+     * @param
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, isPrimary, gNode) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
-        this.isPrimary = isPrimary;
-        console.log('fillShapes', fillShapes, 'isPrimary', isPrimary);
+        this.isSecondary = isSecondary;
         this.cache = new Map();
         this.setSize(canvasSize);
-        if (typeof isPrimary === "undefined" || isPrimary) {
-            this.addStyleDefs();
+        if (isSecondary) {
+            this.gNode = gNode;
+        }
+        else {
+            this.addStyleDefs(drawConfig);
             this.gNode = this.createSVGNode('g');
             this.svgNode.appendChild(this.gNode);
         }
-        else {
-            this.gNode = gNode;
-        }
     }
     ;
-    drawutilssvg.prototype.addStyleDefs = function () {
+    drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
         var nodeDef = this.createSVGNode('def');
         var nodeStyle = document.createElement('style');
         nodeDef.appendChild(nodeStyle);
         this.svgNode.appendChild(nodeDef);
-        // TODO: how to properly add style sheets?
-        console.log('add style rule');
-        nodeStyle.sheet.insertRule('.Vertex { fill : blue; stroke : none; }');
-        console.log(nodeStyle.sheet);
+        // Which default styles to add? -> All from the DrawConfig.
+        // Compare with DrawConfig interface
+        var keys = {
+            'polygon': 'Polygon',
+            'triangle': 'Triangle',
+            'ellipse': 'Ellipse',
+            'circle': 'Circle',
+            'circleSector': 'CircleSector',
+            'vertex': 'Vertex',
+            'line': 'Line',
+            'vector': 'Vector',
+            'image': 'Image'
+        };
+        // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
+        /*
+        for( var k in keys ) {
+            const className : string = keys[k];
+            const drawSettings : DrawSettings = drawConfig[k];
+            if( drawSettings ) {
+            nodeStyle.sheet.insertRule(`.${className} { fill : none; stroke: ${drawSettings.color}; line-width: ${drawSettings.lineWidth}px }`);
+            }
+            } */
+        // Ugly fix: insert rules using innerHtml :/
+        var rules = [];
+        for (var k in keys) {
+            var className = keys[k];
+            var drawSettings = drawConfig[k];
+            rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; line-width: " + drawSettings.lineWidth + "px }");
+        }
+        nodeStyle.innerHTML = rules.join("\n");
     };
     ;
-    drawutilssvg.prototype.findElement = function (key) {
-        for (var i = 0; i < this.gNode.children.length; i++) {
-            var node = this.gNode.children[i];
-            if (node.getAttribute('key') === key)
-                return node;
+    drawutilssvg.prototype.findElement = function (key, nodeName) {
+        var node = this.cache.get(key);
+        if (node && node.nodeName.toUpperCase() === nodeName.toUpperCase()) {
+            this.cache.delete(key);
+            return node;
         }
         return null;
     };
+    /**
+     * Create a new DOM node [SVG] in the SVG namespace.
+     */
     drawutilssvg.prototype.createSVGNode = function (name) {
         return document.createElementNS("http://www.w3.org/2000/svg", name);
     };
     ;
     /**
-     * Create a new SVG node with the given node name (circle, path, line, rect, ...).
+     * Make a new SVG node (or recycle an old one) with the given node name (circle, path, line, rect, ...).
      *
-     * @method createNode
+     * @method makeNode
      * @private
      * @instance
      * @memberof drawutilssvg
      * @param {string} name - The node name.
      * @return {SVGElement} The new node, which is not yet added to any document.
      */
-    drawutilssvg.prototype.createNode = function (name) {
-        // Try to find node in current DOM
-        // unique node names?
-        // Try to find existing node (by UID)
-        // var node = document.getElementById(this.curId);
-        /* var node : SVGElement | undefined = this.findElement(this.curId); // document.getElementById(this.curId);
-        if( node ) {
-            
-        } else {
+    drawutilssvg.prototype.makeNode = function (name) {
+        // Try to find node in current DOM cache.
+        // Unique node keys are strictly necessary.
+        // Try to recycle an old element from cache.
+        var node = this.findElement(this.curId, name); //this.createSVGNode(name);
+        if (!node) {
+            // If no such old elements exists (key not found, tag name not matching),
+            // then create a new one.
             node = this.createSVGNode(name);
-        } */
-        var node = this.createSVGNode(name);
-        // node.dataset.isOld = false; // string prop?!?
+        }
         return node;
     };
     ;
@@ -9623,29 +9622,25 @@ var drawutilssvg = /** @class */ (function () {
      * @return {SVGElement} The node itself (for chaining).
      */
     drawutilssvg.prototype._bindFillDraw = function (node, className, color, lineWidth) {
-        node.setAttribute('class', className);
+        if (this.curClassName) {
+            node.setAttribute('class', this.curClassName + " " + className);
+        }
+        else {
+            node.setAttribute('class', className);
+        }
         node.setAttribute('fill', this.fillShapes ? color : 'none');
         node.setAttribute('stroke', this.fillShapes ? 'none' : color);
         node.setAttribute('stroke-width', "" + (lineWidth || 1));
-        console.log('Setting curId', this.curId);
         if (this.curId) {
-            node.setAttribute('id', "" + this.curId); // key only would be better
-            node.setAttribute('key', "" + this.curId);
-            // node.dataSet.key = this.curId;
+            node.setAttribute('id', "" + this.curId); // Maybe React-style 'key' would be better?
         }
-        // this.svgNode.appendChild( node );
-        // Append or re-visible
-        // console.log('node.dataset.isOld', 
-        if (node.dataset.isOld) {
-            // node.setAttribute('visibility', 'visible');
-            node.removeAttribute('display');
-            // node.dataset.isold = true;
-        }
-        else {
+        if (!node.parentNode) {
+            // Attach to DOM only if not already attached
+            // Clear display="none"
+            // node.setAttribute('display', null);
             this.gNode.appendChild(node);
-            // node.dataset.isold = true;
         }
-        node.dataset.isold = true;
+        // node.dataset.isOld = true;
         return node;
     };
     ;
@@ -9669,9 +9664,9 @@ var drawutilssvg = /** @class */ (function () {
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, false, // !isPrimary
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
+        true, // isSecondary
         this.gNode);
-        // copy.gNode = this.gNode;
         return copy;
     };
     ;
@@ -9681,10 +9676,22 @@ var drawutilssvg = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @param {UID} uid - A UID identifying the currently drawn element(s).
      **/
     drawutilssvg.prototype.setCurrentId = function (uid) {
         this.curId = uid;
+    };
+    ;
+    /**
+     * This method shouled be called each time the currently drawn `Drawable` changes.
+     * Determine the class name for further usage here.
+     *
+     * @name setCurrentClassName
+     * @method
+     * @param {string} className - A class name for further custom use cases.
+     **/
+    drawutilssvg.prototype.setCurrentClassName = function (className) {
+        this.curClassName = className;
     };
     ;
     /**
@@ -9695,7 +9702,8 @@ var drawutilssvg = /** @class */ (function () {
      *
      **/
     drawutilssvg.prototype.beginDrawCycle = function (renderTime) {
-        this.renderTime = renderTime;
+        // Clear non-recycable elements from last draw cycle.
+        this.cache.clear();
     };
     ;
     drawutilssvg.prototype._x = function (x) { return this.offset.x + this.scale.x * x; };
@@ -9713,7 +9721,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.line = function (zA, zB, color, lineWidth) {
-        var line = this.createNode('line');
+        var line = this.makeNode('line');
         line.setAttribute('x1', "" + this._x(zA.x));
         line.setAttribute('y1', "" + this._y(zA.y));
         line.setAttribute('x2', "" + this._x(zB.x));
@@ -9734,7 +9742,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      **/
     drawutilssvg.prototype.arrow = function (zA, zB, color, lineWidth) {
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         var headlen = 8; // length of head in pixels
         var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
         var d = [
@@ -9765,7 +9773,7 @@ var drawutilssvg = /** @class */ (function () {
      **/
     drawutilssvg.prototype.image = function (image, position, size) {
         var _this = this;
-        var node = this.createNode('image');
+        var node = this.makeNode('image');
         // We need to re-adjust the image if it was not yet fully loaded before.
         var setImageSize = function (image) {
             if (image.naturalWidth) {
@@ -9773,7 +9781,7 @@ var drawutilssvg = /** @class */ (function () {
                 var ratioY = size.y / image.naturalHeight;
                 node.setAttribute('width', "" + image.naturalWidth * _this.scale.x);
                 node.setAttribute('height', "" + image.naturalHeight * _this.scale.y);
-                // node.setAttribute('transform', `translate(${position.x}px ${position.y}px) scale(${(ratioX)} ${(ratioY)})` );
+                node.setAttribute('display', null); // Dislay when loaded
                 node.setAttribute('transform', "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + (ratioX) + " " + (ratioY) + ")");
             }
         };
@@ -9782,6 +9790,7 @@ var drawutilssvg = /** @class */ (function () {
         // Use x=0, y=0 and translate/scale instead (see above)
         node.setAttribute('x', "" + 0);
         node.setAttribute('y', "" + 0);
+        node.setAttribute('display', 'none'); // Hide before loaded
         setImageSize(image);
         node.setAttribute('href', image.src);
         return this._bindFillDraw(node, 'image', null, null);
@@ -9805,7 +9814,7 @@ var drawutilssvg = /** @class */ (function () {
         if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
             return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
         }
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         // Draw curve
         var d = [
             'M', this._x(startPoint.x), this._y(startPoint.y),
@@ -9831,7 +9840,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.cubicBezierPath = function (path, color, lineWidth) {
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         if (!path || path.length == 0)
             return node;
         // Draw curve
@@ -9893,7 +9902,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.dot = function (p, color) {
-        var node = this.createNode('line');
+        var node = this.makeNode('line');
         var d = [
             'M', this._x(p.x), this._y(p.y),
             'L', this._x(p.x + 1), this._y(p.y + 1)
@@ -9913,7 +9922,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.point = function (p, color) {
         var radius = 3;
-        var node = this.createNode('circle');
+        var node = this.makeNode('circle');
         node.setAttribute('cx', "" + this._x(p.x));
         node.setAttribute('cy', "" + this._y(p.y));
         node.setAttribute('r', "" + radius);
@@ -9935,7 +9944,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.circle = function (center, radius, color, lineWidth) {
-        var node = this.createNode('circle');
+        var node = this.makeNode('circle');
         node.setAttribute('cx', "" + this._x(center.x));
         node.setAttribute('cy', "" + this._y(center.y));
         node.setAttribute('r', "" + radius * this.scale.x); // y?
@@ -9956,7 +9965,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         var arcData = CircleSector_1.CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
         startAngle, endAngle);
         node.setAttribute('d', arcData.join(' '));
@@ -9977,7 +9986,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
-        var node = this.createNode('ellipse');
+        var node = this.makeNode('ellipse');
         node.setAttribute('cx', "" + this._x(center.x));
         node.setAttribute('cy', "" + this._y(center.y));
         node.setAttribute('rx', "" + radiusX * this.scale.x);
@@ -10000,7 +10009,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.square = function (center, size, color, lineWidth) {
-        var node = this.createNode('rectangle');
+        var node = this.makeNode('rectangle');
         node.setAttribute('x', "" + this._x(center.x - size / 2.0));
         node.setAttribute('y', "" + this._y(center.y - size / 2.0));
         node.setAttribute('width', "" + size * this.scale.x);
@@ -10023,7 +10032,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         var d = [];
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
@@ -10058,7 +10067,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         var d = [];
         var cx = 0, cy = 0;
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
@@ -10093,7 +10102,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.diamondHandle = function (center, size, color) {
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         var d = [
             'M', this._x(center.x) - size / 2.0, this._y(center.y),
             'L', this._x(center.x), this._y(center.y) - size / 2.0,
@@ -10122,7 +10131,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.squareHandle = function (center, size, color) {
-        var node = this.createNode('rect');
+        var node = this.makeNode('rect');
         node.setAttribute('x', "" + (this._x(center.x) - size / 2.0));
         node.setAttribute('y', "" + (this._y(center.y) - size / 2.0));
         node.setAttribute('width', "" + size);
@@ -10147,7 +10156,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.circleHandle = function (center, radius, color) {
         radius = radius || 3;
-        var node = this.createNode('circle');
+        var node = this.makeNode('circle');
         node.setAttribute('cx', "" + this._x(center.x));
         node.setAttribute('cy', "" + this._y(center.y));
         node.setAttribute('r', "" + radius);
@@ -10168,7 +10177,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.crosshair = function (center, radius, color) {
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         var d = [
             'M', this._x(center.x) - radius, this._y(center.y),
             'L', this._x(center.x) + radius, this._y(center.y),
@@ -10207,7 +10216,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
-        var node = this.createNode('path');
+        var node = this.makeNode('path');
         if (vertices.length == 0)
             return node;
         // Draw curve
@@ -10227,7 +10236,7 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.text = function (text, x, y, options) {
         options = options || {};
         var color = options.color || 'black';
-        var node = this.createNode('text');
+        var node = this.makeNode('text');
         node.setAttribute('x', "" + this._x(x));
         node.setAttribute('y', "" + this._x(y));
         node.innerHTML = text;
@@ -10250,7 +10259,7 @@ var drawutilssvg = /** @class */ (function () {
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
     drawutilssvg.prototype.label = function (text, x, y, rotation) {
-        var node = this.createNode('text');
+        var node = this.makeNode('text');
         // For some strange reason SVG rotation transforms use degrees instead of radians
         node.setAttribute('transform', "translate(" + this.offset.x + "," + this.offset.y + "), rotate(" + rotation / Math.PI * 180 + ")");
         node.innerHTML = text;
@@ -10268,24 +10277,23 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.clear = function (color) {
         // If this isn't the primary handler then do not remove anything here.
         // The primary handler will do that (no double work).
-        if (!this.isPrimary) {
+        if (this.isSecondary) {
             return;
         }
         // Clearing an SVG is equivalent to removing all its child elements.
-        while (this.gNode.firstChild) {
-            this.gNode.removeChild(this.gNode.lastChild);
-        }
-        // Setting all old nodes invisible
-        /* for( var i = 0; i < this.gNode.children.length; i++ ) {
+        // console.log( "this.gNode.childNodes", this.gNode.childNodes );
+        for (var i = 0; i < this.gNode.childNodes.length; i++) {
             // Hide all nodes here. Don't throw them away.
             // We can probably re-use them
-            
-            // (this.gNode.childNodes[i] as SVGElement).setAttribute('visibility', 'hidden');
-            //this.gNode.children[i].setAttribute('visibility', 'hidden');
-            this.gNode.children[i].setAttribute('display', 'none');
-        }  */
+            var child = this.gNode.childNodes[i];
+            // child.setAttribute('display', 'none');
+            this.cache.set(child.getAttribute('id'), child);
+        }
+        this.removeAllChildNodes();
+        // console.log('post clear', this.cache );
         // Add a covering rect with the given background color
-        var node = this.createNode('rect');
+        this.curId = 'background';
+        var node = this.makeNode('rect');
         // For some strange reason SVG rotation transforms use degrees instead of radians
         // Note that the background does not scale with the zoom level (always covers full element)
         node.setAttribute('x', '0');
@@ -10293,9 +10301,15 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('width', "" + this.canvasSize.width);
         node.setAttribute('height', "" + this.canvasSize.height);
         // Bind this special element into the document
-        this._bindFillDraw(node, 'background', null, null);
+        this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
         return node;
+    };
+    ;
+    drawutilssvg.prototype.removeAllChildNodes = function () {
+        while (this.gNode.firstChild) {
+            this.gNode.removeChild(this.gNode.lastChild);
+        }
     };
     ;
     return drawutilssvg;
