@@ -164,7 +164,7 @@ See [API Documentation](https://plotboilerplate.io/docs.html "API Documentation"
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `canvas`| _HTMLCanvasElement_ \| _string_ | `null` | The canvas or its query selector string (required). |
+| `canvas`| _HTMLCanvasElement_ \| _SVGElement_ \| _string_ | `null` | The canvas or its query selector string (required). |
 | `fullsize`| _boolean_ | `true`| If `true`, then the canvas will always claim tha max available screen size. |
 | `fitToParent`| _boolean_ | `true`| If `true`, then the canvas will alway claim the max available parent container size. |
 | `scaleX`| _number_ | `1.0` | The initial horizontal zoom. Default is 1.0. |
