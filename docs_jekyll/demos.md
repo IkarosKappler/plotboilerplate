@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2021-01-20
+date: 2021-01-27
 ---
 
 <div class="full-width">
@@ -153,6 +153,11 @@ date: 2021-01-20
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/29-threejs-voronoi/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210111-0-threejs-voronoi.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/30-function-plot/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-na.png');"></div>
    </a>
 </div>
 </div>

@@ -475,15 +475,6 @@
 		    if( cx ) cx.innerHTML = relPos.x.toFixed(2);
 		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 		} );	    
-
-
-	    // +---------------------------------------------------------------------------------
-	    // | Create the outline: a Bézier path.
-	    // +-------------------------------
-	    // var outline = null;
-	    // This will trigger the first initial postDraw/draw/redraw call
-	    // setPathInstance( BezierPath.fromJSON( DEFAULT_BEZIER_JSON ) );
-
 	    
 
 	    // +---------------------------------------------------------------------------------
@@ -492,8 +483,6 @@
             {
 		var gui = pb.createGUI();
 		var fold0 = gui.addFolder("Mesh");
-		// fold0.add(config, "outlineSegmentCount").min(3).max(512).onChange( function() { rebuild() } ).name('outlineSegmentCount').title('The number of segments on the outline.');
-		// fold0.add(config, "shapeSegmentCount").min(3).max(256).onChange( function() { rebuild() } ).name('shapeSegmentCount').title('The number of segments on the shape.');
 		fold0.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
 		fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
 		fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image.');
@@ -501,28 +490,14 @@
 
 		var fold1 = gui.addFolder("Export");
 		fold1.add(config, "exportSTL").name('STL').title('Export an STL file.');
-		// fold1.add(config, "showPathJSON").name('Show Path JSON ...').title('Show the path data.');
-
-		// var fold2 = gui.addFolder("Import");
-		// fold2.add(config, "insertPathJSON").name('Insert Path JSON ...').title('Insert path data as JSON.');
-
-		// fold0.open();
 
 
 		var f3 = gui.addFolder('Points');
 		f3.add(config, 'pointCount').min(3).max(200).onChange( function() { config.pointCount = Math.round(config.pointCount); updatePointCount(); } ).title("The total number of points.");
 		f3.add(config, 'randomize').name('Randomize').title("Randomize the point set.");
 		f3.add(config, 'fullCover').name('Full Cover').title("Randomize the point set with full canvas coverage.");
-		// f3.add(config, 'animate').onChange( toggleAnimation ).title("Toggle point animation on/off.");
-		// f3.add(config, 'animationType', { Linear: 'linear', Radial : 'radial' } ).onChange( function() { toggleAnimation(); } );
-		// f3.open();
-		
-		// var f4 = gui.addFolder('Delaunay');
-		// f4.add(config, 'drawTriangles').onChange( function() { pb.redraw() } ).title("If checked the triangle edges will be drawn.");
-		// f4.add(config, 'drawCircumCircles').onChange( function() { pb.redraw() } ).title("If checked the triangles circumcircles will be drawn.");
 
 		var f5 = gui.addFolder('Voronoi');
-		// f5.add(config, 'makeVoronoiDiagram').onChange( rebuildVoronoi ).title("Make voronoi diagram from the triangle set.");
 		f5.addColor(config, 'voronoiOutlineColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi outline color.");
 		f5.add(config, 'drawCubicCurves').onChange( rebuildVoronoi ).title("If checked the Voronoi's cubic curves will be drawn.");
 		// f5.add(config, 'drawVoronoiOutlines').onChange( rebuildVoronoi ).title("If checked the Voronoi cells' outlines will be drawn.");
@@ -533,9 +508,7 @@
 		f5.add(config, 'voronoiCellScale').min(-1.0).max(2.0).onChange( function() { pb.redraw(); rebuildVoronoi() } ).title("Scale each voronoi cell before rendering.");
 	    }
 
-	    // pb.config.preDraw = preDraw;
 	    pb.config.postDraw = redraw;
-	    // pb.fitToView( scaleBounds(outline.getBounds(),1.6) );
 	    randomPoints(true,false,false); // clear ; no full cover ; do not redraw
 	    rebuildVoronoi();
 	    

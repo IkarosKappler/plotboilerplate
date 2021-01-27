@@ -5,7 +5,7 @@
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
  * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
- * @version  0.2.1
+ * @version  0.2.2
  **/
 
 
@@ -943,9 +943,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutilssvg
      */
-    // +---------------------------------------------------------------------------------
-    // | Draw a non-scaling text label at the given position.
-    // +-------------------------------
     label( text:string, x:number, y:number, rotation:number ) {
 	const node : SVGElement = this.makeNode('text');
 	// For some strange reason SVG rotation transforms use degrees instead of radians

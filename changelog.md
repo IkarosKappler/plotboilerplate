@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2021-01-27 [v1.11.0]
+  * Added the new svg renderer as integrated helper.
 * 2021-01-26
   * CircleSectorHelper: Moving control points with center points.
   * PlotBoilerplate class: Replaced the old SVGBuilder by the new `drawutilssvg` library.

@@ -4,6 +4,19 @@ layout: page
 
 
 # Changelog
+* 2021-01-26
+  * CircleSectorHelper: Moving control points with center points.
+  * PlotBoilerplate class: Replaced the old SVGBuilder by the new `drawutilssvg` library.
+* 2021-01-25
+  * Added the `DrawLib.setCurrentId` and `DrawLib.setCurrentClassName` functions.
+  * Fixed the `PBParams` interface (inluding DrawConfig).
+* 2021-01-24
+  * Added `DrawLib.setCurrentId` function.
+* 2021-01-22
+  * Triangle: Always updating circumcircle when retieving it.
+  * Removed `pb.redraw()` call from `CircleHelper` update handlers (changed vertices already triggered redraw).
+  * Added the `CircleSectorHelpler` class.
+  * Added the `Vertex.angle` function to determine 'angle' of the vertex relative to an origin.
 * 2021-01-20
   * Added `UID` interface.
   * Added `UIDGenerator` abstract class.

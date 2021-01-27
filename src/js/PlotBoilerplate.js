@@ -350,6 +350,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 this.eventCatcher.style.position = 'absolute';
                 this.eventCatcher.style.left = '0';
                 this.eventCatcher.style.top = '0';
+                this.eventCatcher.style.cursor = 'pointer';
                 this.canvas.parentElement.style.position = 'relative';
                 this.canvas.parentElement.appendChild(this.eventCatcher);
             }

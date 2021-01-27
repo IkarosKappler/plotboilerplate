@@ -47,7 +47,7 @@
 		      enableMouse            : true,
 		      enableTouch            : true,
 		      enableKeys             : true,
-		      enableGL               : false // experimental
+		      enableSVGExport        : false
 		    }, GUP
 		)
 	    );
@@ -84,10 +84,6 @@
 		this.getPointAt = function(t) {
 		    return new Vertex( Math.sin(this.phaseA + this.freqA*t), Math.sin(this.phaseB + this.freqB*t) );
 		};
-
-		//this.getDerivationAt = function(t) {
-		    
-		//}
 	    };
 
 	    var randColor = function() {
