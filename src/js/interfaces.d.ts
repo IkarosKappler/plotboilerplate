@@ -514,11 +514,23 @@ export interface DrawLib<R> {
      * @memberof drawutils
      */
     polyline: (vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number) => R;
+    /**
+     * Draw a text label at the given relative position.
+     *
+     * @method text
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {number=} rotation - The (optional) rotation in radians.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     text: (text: string, x: number, y: number, options?: {
         color?: string;
     }) => R;
     /**
-     * Draw a non-scaling text label at the given position.
+     * Draw a non-scaling text label at the given absolute position.
      *
      * @method label
      * @param {string} text - The text to draw.

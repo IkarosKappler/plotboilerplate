@@ -30,7 +30,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     /**
      * The root elements container <g> in the svgNode.
      */
-    gNode: SVGElement;
+    private gNode;
     /**
      * @member {Vertex}
      * @memberof drawutilssvg
@@ -56,7 +56,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     canvasSize: XYDimension;
     /**
-     * The current drawable-ID.
+     * The current drawable-ID. This can be any unique ID identifying the following drawn element.
      *
      * @member {UID|undefined}
      * @memberof drawutilssvg
@@ -64,15 +64,15 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     private curId;
     /**
-     *
+     * The current drawable-classname.
      */
     private curClassName;
     /**
-     *
+     * The SVG element cache. On clear() all elements are kept for possible re-use on next draw cycle.
      */
     private cache;
     /**
-     *
+     * Indicates if this library is the primary or seconday instance (draw an fill share the same DOM nodes).
      */
     private isSecondary;
     /**
@@ -81,9 +81,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @constructor
      * @name drawutilssvg
      * @param {SVGElement} svgNode - The SVG node to use.
-     * @param
+     * @param {XYCoords} offset - The draw offset to use.
+     * @param {XYCoords} scale - The scale factors to use.
+     * @param {XYDimension} canvasSize - The initial canvas size (use setSize to change).
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
-     * @param
+     * @param {DrawConfig} drawConfig - The default draw config to use for CSS fallback styles.
+     * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
+     * @param {SVGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
     constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGElement);
     private addStyleDefs;
@@ -145,6 +149,8 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @name setCurrentId
      * @method
      * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @instance
+     * @memberof drawutilssvg
      **/
     setCurrentId(uid: UID | undefined): void;
     /**
@@ -154,14 +160,19 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @name setCurrentClassName
      * @method
      * @param {string} className - A class name for further custom use cases.
+     * @instance
+     * @memberof drawutilssvg
      **/
     setCurrentClassName(className: string | undefined): void;
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
-
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      *
+     * @name beginDrawCycle
+     * @method
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @instance
+     * @memberof drawutilssvg
      **/
     beginDrawCycle(renderTime: number): void;
     private _x;
@@ -189,7 +200,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      **/
     arrow(zA: Vertex, zB: Vertex, color: string, lineWidth?: number): SVGElement;
     /**
@@ -203,7 +214,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {Vertex} size - The x/y-size to draw the image with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      **/
     image(image: HTMLImageElement, position: Vertex, size: Vertex): SVGElement;
     /**
@@ -218,7 +229,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     cubicBezier(startPoint: Vertex, endPoint: Vertex, startControlPoint: Vertex, endControlPoint: Vertex, color: string, lineWidth?: number): SVGElement;
     /**
@@ -234,7 +245,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     cubicBezierPath(path: Array<Vertex>, color: string, lineWidth?: number): SVGElement;
     /**
@@ -247,7 +258,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {Vertex} endPoint - The end point of the handle.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     handle(startPoint: Vertex, endPoint: Vertex): void;
     /**
@@ -258,7 +269,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {Vertex} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     handleLine(startPoint: Vertex, endPoint: Vertex): void;
     /**
@@ -269,7 +280,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     dot(p: Vertex, color: string): SVGElement;
     /**
@@ -280,7 +291,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     point(p: Vertex, color: string): SVGElement;
     /**
@@ -295,7 +306,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     circle(center: Vertex, radius: number, color: string, lineWidth?: number): SVGElement;
     /**
@@ -309,7 +320,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number): SVGElement;
     /**
@@ -323,7 +334,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number): SVGElement;
     /**
@@ -338,7 +349,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     square(center: Vertex, size: number, color: string, lineWidth?: number): SVGElement;
     /**
@@ -353,7 +364,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the grid with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     grid(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string): SVGElement;
     /**
@@ -370,7 +381,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the raster with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     raster(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string): SVGElement;
     /**
@@ -386,7 +397,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     diamondHandle(center: Vertex, size: number, color: string): SVGElement;
     /**
@@ -402,7 +413,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     squareHandle(center: Vertex, size: number, color: string): SVGElement;
     /**
@@ -418,7 +429,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     circleHandle(center: Vertex, radius: number, color: string): SVGElement;
     /**
@@ -432,7 +443,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the crosshair with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     crosshair(center: XYCoords, radius: number, color: string): SVGElement;
     /**
@@ -444,7 +455,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     polygon(polygon: Polygon, color: string, lineWidth?: number): SVGElement;
     /**
@@ -457,9 +468,21 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): SVGElement;
+    /**
+     * Draw a text label at the given relative position.
+     *
+     * @method label
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {number=} rotation - The (optional) rotation in radians.
+     * @return {void}
+     * @instance
+     * @memberof drawutilssvg
+     */
     text(text: string, x: number, y: number, options?: {
         color?: string;
     }): SVGElement;
@@ -470,10 +493,10 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} text - The text to draw.
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
-     * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {number=} rotation - The (optional) rotation in radians.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     label(text: string, x: number, y: number, rotation: number): SVGElement;
     /**
@@ -483,7 +506,15 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * This function just fills the whole canvas with a single color.
      *
      * @param {string} color - The color to clear with.
+     * @return {void}
+     * @instance
+     * @memberof drawutilssvg
      **/
     clear(color: string): SVGElement;
+    /**
+     * A private helper function to clear all SVG nodes from the &gt;g> node.
+     *
+     * @private
+     */
     private removeAllChildNodes;
 }

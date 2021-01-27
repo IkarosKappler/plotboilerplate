@@ -9504,9 +9504,13 @@ var drawutilssvg = /** @class */ (function () {
      * @constructor
      * @name drawutilssvg
      * @param {SVGElement} svgNode - The SVG node to use.
-     * @param
+     * @param {XYCoords} offset - The draw offset to use.
+     * @param {XYCoords} scale - The scale factors to use.
+     * @param {XYDimension} canvasSize - The initial canvas size (use setSize to change).
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
-     * @param
+     * @param {DrawConfig} drawConfig - The default draw config to use for CSS fallback styles.
+     * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
+     * @param {SVGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
     function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
         this.svgNode = svgNode;
@@ -9636,11 +9640,8 @@ var drawutilssvg = /** @class */ (function () {
         }
         if (!node.parentNode) {
             // Attach to DOM only if not already attached
-            // Clear display="none"
-            // node.setAttribute('display', null);
             this.gNode.appendChild(node);
         }
-        // node.dataset.isOld = true;
         return node;
     };
     ;
@@ -9677,6 +9678,8 @@ var drawutilssvg = /** @class */ (function () {
      * @name setCurrentId
      * @method
      * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @instance
+     * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.setCurrentId = function (uid) {
         this.curId = uid;
@@ -9689,6 +9692,8 @@ var drawutilssvg = /** @class */ (function () {
      * @name setCurrentClassName
      * @method
      * @param {string} className - A class name for further custom use cases.
+     * @instance
+     * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.setCurrentClassName = function (className) {
         this.curClassName = className;
@@ -9697,9 +9702,12 @@ var drawutilssvg = /** @class */ (function () {
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
-
-     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      *
+     * @name beginDrawCycle
+     * @method
+     * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
+     * @instance
+     * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.beginDrawCycle = function (renderTime) {
         // Clear non-recycable elements from last draw cycle.
@@ -9739,7 +9747,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.arrow = function (zA, zB, color, lineWidth) {
         var node = this.makeNode('path');
@@ -9769,7 +9777,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Vertex} size - The x/y-size to draw the image with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.image = function (image, position, size) {
         var _this = this;
@@ -9808,7 +9816,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
         if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
@@ -9837,7 +9845,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.cubicBezierPath = function (path, color, lineWidth) {
         var node = this.makeNode('path');
@@ -9869,7 +9877,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Vertex} endPoint - The end point of the handle.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.handle = function (startPoint, endPoint) {
         // TODO: redefine methods like these into an abstract class?
@@ -9885,7 +9893,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Vertex} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.handleLine = function (startPoint, endPoint) {
         this.line(startPoint, endPoint, 'rgb(192,192,192)');
@@ -9899,7 +9907,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.dot = function (p, color) {
         var node = this.makeNode('line');
@@ -9918,7 +9926,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.point = function (p, color) {
         var radius = 3;
@@ -9941,7 +9949,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.circle = function (center, radius, color, lineWidth) {
         var node = this.makeNode('circle');
@@ -9962,7 +9970,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
         var node = this.makeNode('path');
@@ -9983,7 +9991,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
         var node = this.makeNode('ellipse');
@@ -10006,7 +10014,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.square = function (center, size, color, lineWidth) {
         var node = this.makeNode('rectangle');
@@ -10029,7 +10037,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the grid with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
         var node = this.makeNode('path');
@@ -10040,8 +10048,8 @@ var drawutilssvg = /** @class */ (function () {
             d.push('M', this._x(center.x + x), this._y(center.y + yMin));
             d.push('L', this._x(center.x + x), this._y(center.y + yMax));
         }
-        var xMin = -Math.ceil((width * 0.5) / sizeX) * sizeX; // -Math.ceil((height*0.5)/sizeY)*sizeY;
-        var xMax = width / 2; // height/2;
+        var xMin = -Math.ceil((width * 0.5) / sizeX) * sizeX;
+        var xMax = width / 2;
         for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
             d.push('M', this._x(center.x + xMin), this._y(center.y + y));
             d.push('L', this._x(center.x + xMax), this._y(center.y + y));
@@ -10064,7 +10072,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the raster with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
         var node = this.makeNode('path');
@@ -10099,7 +10107,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.diamondHandle = function (center, size, color) {
         var node = this.makeNode('path');
@@ -10128,7 +10136,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.squareHandle = function (center, size, color) {
         var node = this.makeNode('rect');
@@ -10152,7 +10160,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.circleHandle = function (center, radius, color) {
         radius = radius || 3;
@@ -10174,7 +10182,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the crosshair with.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.crosshair = function (center, radius, color) {
         var node = this.makeNode('path');
@@ -10197,7 +10205,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.polygon = function (polygon, color, lineWidth) {
         return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
@@ -10213,7 +10221,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     drawutilssvg.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
         var node = this.makeNode('path');
@@ -10233,6 +10241,18 @@ var drawutilssvg = /** @class */ (function () {
         return this._bindFillDraw(node, 'polyline', color, lineWidth || 1);
     };
     ;
+    /**
+     * Draw a text label at the given relative position.
+     *
+     * @method label
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {number=} rotation - The (optional) rotation in radians.
+     * @return {void}
+     * @instance
+     * @memberof drawutilssvg
+     */
     drawutilssvg.prototype.text = function (text, x, y, options) {
         options = options || {};
         var color = options.color || 'black';
@@ -10250,10 +10270,10 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} text - The text to draw.
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
-     * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {number=} rotation - The (optional) rotation in radians.
      * @return {void}
      * @instance
-     * @memberof drawutils
+     * @memberof drawutilssvg
      */
     // +---------------------------------------------------------------------------------
     // | Draw a non-scaling text label at the given position.
@@ -10273,6 +10293,9 @@ var drawutilssvg = /** @class */ (function () {
      * This function just fills the whole canvas with a single color.
      *
      * @param {string} color - The color to clear with.
+     * @return {void}
+     * @instance
+     * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.clear = function (color) {
         // If this isn't the primary handler then do not remove anything here.
@@ -10281,16 +10304,13 @@ var drawutilssvg = /** @class */ (function () {
             return;
         }
         // Clearing an SVG is equivalent to removing all its child elements.
-        // console.log( "this.gNode.childNodes", this.gNode.childNodes );
         for (var i = 0; i < this.gNode.childNodes.length; i++) {
             // Hide all nodes here. Don't throw them away.
-            // We can probably re-use them
+            // We can probably re-use them in the next draw cycle.
             var child = this.gNode.childNodes[i];
-            // child.setAttribute('display', 'none');
             this.cache.set(child.getAttribute('id'), child);
         }
         this.removeAllChildNodes();
-        // console.log('post clear', this.cache );
         // Add a covering rect with the given background color
         this.curId = 'background';
         var node = this.makeNode('rect');
@@ -10306,6 +10326,11 @@ var drawutilssvg = /** @class */ (function () {
         return node;
     };
     ;
+    /**
+     * A private helper function to clear all SVG nodes from the &gt;g> node.
+     *
+     * @private
+     */
     drawutilssvg.prototype.removeAllChildNodes = function () {
         while (this.gNode.firstChild) {
             this.gNode.removeChild(this.gNode.lastChild);
