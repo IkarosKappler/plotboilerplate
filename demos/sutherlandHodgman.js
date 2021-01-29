@@ -53,7 +53,7 @@ function sutherlandHodgman (subjectPolygon, clipPolygon) {
 
 /**
  * @param {Array<Vertex>} subjectPolygon
- * @param {Array<Vertex>} clipPolygon
+ * @param {Array<Vertex>} clipPolygon - Must be convex.
  */
 var sutherlandHodgman = function(subjectPolygon, clipPolygon) {
     
@@ -62,18 +62,33 @@ var sutherlandHodgman = function(subjectPolygon, clipPolygon) {
      * @param {Vertex}
      * @param {Vertex}
      **/
-    
+
+    /* var inside = function (p) {
+                return (cp2[0]-cp1[0])*(p[1]-cp1[1]) > (cp2[1]-cp1[1])*(p[0]-cp1[0]);
+            }; */
     var inside = function (_cp1,_cp2,p) {
-        return (_cp2[0]-_cp1[0])*(p[1]-_cp1[1]) > (_cp2[1]-_cp1[1])*(p[0]-_cp1[0]);
+	// console.log('x', _cp1);
+        return (_cp2.x-_cp1.x)*(p.y-_cp1.y) > (_cp2.y-_cp1.y)*(p.x-_cp1.x);
     };
-    
+
+    /* var intersection = function () {
+                var dc = [ cp1[0] - cp2[0], cp1[1] - cp2[1] ],
+                    dp = [ s[0] - e[0], s[1] - e[1] ],
+                    n1 = cp1[0] * cp2[1] - cp1[1] * cp2[0],
+                    n2 = s[0] * e[1] - s[1] * e[0], 
+                    n3 = 1.0 / (dc[0] * dp[1] - dc[1] * dp[0]);
+                return [(n1*dp[0] - n2*dc[0]) * n3, (n1*dp[1] - n2*dc[1]) * n3];
+            }; */
     var intersection = function (_cp1,_cp2,_s,_e) {
-        var dc = [ _cp1[0] - _cp2[0], _cp1[1] - _cp2[1] ],
-            dp = [ _s[0] - _e[0], _s[1] - _e[1] ],
-            n1 = _cp1[0] * _cp2[1] - _cp1[1] * _cp2[0],
-            n2 = _s[0] * _e[1] - _s[1] * _e[0], 
-            n3 = 1.0 / (dc[0] * dp[1] - dc[1] * dp[0]);
-        return [(n1*dp[0] - n2*dc[0]) * n3, (n1*dp[1] - n2*dc[1]) * n3];
+        var
+	// dc = [ _cp1.x - _cp2.x, _cp1[1] - _cp2[1] ],
+	dc = { x:  _cp1.x - _cp2.x, y : _cp1.y - _cp2.y },
+        // dp = [ _s.x - _e.x, _s[1] - _e[1] ],
+	dp = { x: _s.x - _e.x, y : _s.y - _e.y },
+            n1 = _cp1.x * _cp2.y - _cp1.y * _cp2.x,
+            n2 = _s.x * _e.y - _s.y * _e.x, 
+            n3 = 1.0 / (dc.x * dp.y - dc.y * dp.x);
+        return { x : (n1*dp.x - n2*dc.x) * n3, y : (n1*dp.y - n2*dc.y) * n3 };
     };
     
     var outputList = subjectPolygon;

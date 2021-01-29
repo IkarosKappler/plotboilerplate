@@ -189,67 +189,16 @@
 	    }
 	};
 
-	/* 
-	var drawConvexIntersection = function( polygonA, polygonB ) {
-	    console.log('drawConvexIntersection');
-	    
-	    // Check if both are clockwise or both are counter clockwise
-	    if( !polygonA.isClockwise() && polygonB.isClockwise() || polygonA.isClockwise() && !polygonB.isClockwise() ) {
-		// Note: Array.reverse operates in-place
-		polygonA = new Polygon( cloneVertexArray(polygonA.vertices.reverse()) );
-	    }
-
-	    var EPS = 0.00001;
-	    // { edgeA:number, edgeB:number, position:{x,y} }
-	    var intersectionPoints = [];
-	    // var intersectionMapA = new Array(polygonA.vertices.length);
-	    // var intersectionMapB = new Array(polygonB.vertices.length);
-
-	    for( var a = 0; a < polygonA.vertices.length; a++ ) {
-		var edgeA = new Line( polygonA.vertices[a], polygonA.vertices[(a+1)%polygonA.vertices.length] );
-		 for( var b = 0; b < polygonB.vertices.length; b++ ) {
-		     var edgeB = new Line( polygonB.vertices[b], polygonB.vertices[(b+1)%polygonB.vertices.length] );
-
-		     var intersection = edgeA.intersection( edgeB );
-		     if( edgeA.hasPoint(intersection) && edgeB.hasPoint(intersection) ) {
-			 console.log( intersection );
-			 intersectionPoints.push( { edgeIndexA : a, edgeIndexB : b, position: intersection } );
-			 pb.draw.diamondHandle( 'rgba(255,0,0,1)' );
-		     }
-		 }
-	    }
-
-	    // Now check all pairs of intersections if their inner line is inside both polygons
-	    for( var i = 0; i < intersectionPoints.length; i++ ) {
-		for( var j  = i+1; j < intersectionPoints.length; j++ ) {
-		    var connection = new Line( intersectionPoints[i].position, intersectionPoints[j].position );
-		    var center = connection.vertAt( 0.5 );
-		    if( polygonA.containsVert(center) ) {
-			// This is an inside connection
-			// ...
-
-			pb.draw.line( connection.a, connection.b, 'rgb(255,0,0)', 2.0 );
-		    }
-		}	
-	    }
-	    
-	}; 
-	*/
-
-	var drawConvexIntersection = function(  polygonA, polygonB ) {
-
+	
+	var _drawConvexIntersection = function(  polygonA, polygonB ) {
 	    var pA = [];
 	    var pB = [];
-
 	    for( var i = 0; i < polygonA.vertices.length; i++ ) {
 		pA.push( [ polygonA.vertices[i].x, polygonA.vertices[i].y ] );
 	    }
-
 	    for( var i = 0; i < polygonB.vertices.length; i++ ) {
 		pB.push( [ polygonB.vertices[i].x, polygonB.vertices[i].y ] );
 	    }
-
-	    
 	    var result = sutherlandHodgman( pA, pB );
 	    // console.log( result );
 
@@ -260,9 +209,23 @@
 			      2.0
 			    );
 	    }
-	}
+	};
+
+	var drawConvexIntersection = function(  polygonA, polygonB ) {
+	    
+	    var result = sutherlandHodgman( polygonA.vertices, polygonB.vertices );
+	    // console.log( result );
+
+	    for( var i = 0; i < result.length; i++ ) {
+		pb.draw.line( result[i],
+			      result[(i+1)%result.length],
+			      'rgb(255,0,0)',
+			      2.0
+			    );
+	    }
+	};
 	
-	function sutherlandHodgman (subjectPolygon, clipPolygon) {
+	/* function sutherlandHodgman (subjectPolygon, clipPolygon) {
  
             var cp1, cp2, s, e;
             var inside = function (p) {
@@ -299,7 +262,7 @@
                 cp1 = cp2;
             }
             return outputList
-        }
+        } */
 
 	/**
 	 * Draw the intersection polygon as the result of the Greiner-Horman
