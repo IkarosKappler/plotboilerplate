@@ -18,6 +18,7 @@
  * @modified 2021-01-29 Added the `signedArea` function (was global function in the demos before).
  * @modified 2021-01-29 Added the `isClockwise` function.
  * @modified 2021-01-29 Added the `area` function.
+ * @modified 2021-01-29 Changed the param type for `containsVert` from Vertex to XYCoords.
  * @version 1.7.0
  *
  * @file Polygon
