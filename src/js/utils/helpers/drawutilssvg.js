@@ -6,7 +6,7 @@
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
  * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
- * @version  0.2.1
+ * @version  0.2.2
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -801,9 +801,6 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    // +---------------------------------------------------------------------------------
-    // | Draw a non-scaling text label at the given position.
-    // +-------------------------------
     drawutilssvg.prototype.label = function (text, x, y, rotation) {
         var node = this.makeNode('text');
         // For some strange reason SVG rotation transforms use degrees instead of radians

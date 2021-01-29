@@ -93,6 +93,10 @@
 	// | @param {Vertex[]} clipVertices
 	// +-------------------------------
 	var setVertices = function( sourceVertices, clipVertices ) {
+	    // Remove old vertices
+	    removeVertices(verticesA);
+	    removeVertices(verticesB);
+	    
 	    verticesA = sourceVertices;
 	    verticesB = clipVertices;
 	    // Compute bounds to determie a 'middle' point (used to move whole polygons)
@@ -108,8 +112,6 @@
 	    for( var i in verticesB )
 		pb.add( verticesB[i], false );
 	    // Bind all polygon points to their respective control point
-	    // polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); 
-	    // polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false ); // new Polygon(verticesB);
 	    adjustPolygons();
 	    installPolygonControlPoint( controlPointA, polygonA );
 	    installPolygonControlPoint( controlPointB, polygonB );
@@ -117,10 +119,26 @@
 	};
 
 
+	// +---------------------------------------------------------------------------------
+	// | Construct polygon: regular or convex hull?
+	// +-------------------------------
 	var adjustPolygons = function() {
 	    // Bind all polygon points to their respective control point
 	    polygonA = new Polygon( config.useConvexHullA ? getConvexHull(verticesA) : verticesA, false ); 
-	    polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false ); // new Polygon(verticesB);
+	    polygonB = new Polygon( config.useConvexHullB ? getConvexHull(verticesB) : verticesB, false );
+	};
+
+
+	// +---------------------------------------------------------------------------------
+	// | Pick a color from the WebColors array.
+	// +-------------------------------
+	var removeVertices = function(vertices) {
+	    if( !vertices || !vertices.length )
+		return;
+	    for( var i = 0; i < vertices.length; i++ ) {
+		pb.remove( vertices[i], false );
+	    }
+	    pb.redraw();
 	};
 
 
@@ -215,7 +233,7 @@
 			    // Add triangle area
 			    triangleArea += calculateTrianglesArea(triangles);
 			}
-			area += calculatePolygonArea( clearedPolys[j] );
+			area += Polygon.utils.area( clearedPolys[j] );
 		    } // END for
 		} // END for
 	    } // END if
@@ -224,17 +242,17 @@
 	    stats.area = area;
 	    stats.triangleArea = config.triangulate ? triangleArea : NaN;
 	    // TODO: think about these areas
-	    stats.areaA = calculatePolygonArea( sourcePolygon.vertices );
-	    stats.areaB = calculatePolygonArea( clipPolygon.vertices );
-	    stats.signedAreaA = calculateSignedPolygonArea( sourcePolygon.vertices );
-	    stats.signedAreaB = calculateSignedPolygonArea( clipPolygon.vertices );
+	    stats.areaA = sourcePolygon.area();
+	    stats.areaB = clipPolygon.area();
+	    stats.signedAreaA = sourcePolygon.signedArea();
+	    stats.signedAreaB = clipPolygon.signedArea();
 	    stats.polygonsIntersect = (intersection !== null && typeof intersection !== 'undefined' && intersection.length > 0 );
 	};
 
 	// +---------------------------------------------------------------------------------
 	// | Add a mouse listener to track the mouse position.
 	// +-------------------------------
-	new MouseHandler(pb.canvas,'girih-demo')
+	new MouseHandler(pb.canvas,'polygon-demo')
 	    .move( function(e) {
 		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
 		stats.positionInA = (polygonA != null && relPos != null && polygonA.containsVert(relPos));
@@ -255,6 +273,7 @@
 	    drawPointNumbers : false,
 	    useConvexHullA : true,
 	    useConvexHullB : true,
+	    useConvexAlgorithm : false,
 	    triangulate : false,
 	    triangulationMethod : "Delaunay", // [ "Delaunay", "Earcut" ]
 	    clearSelfIntersections : true,
@@ -264,35 +283,6 @@
 	    test_squares : function() { loadSquareTestCase(pb,setVertices); },
 	    test_girih : function() { loadGirihTestCase(pb,setVertices); }
 	}, GUP );
-	
-
-	// TODO: think about these two area calculation functions.
-	// https://stackoverflow.com/questions/16285134/calculating-polygon-area
-	/* var calcPolygonArea = function(vertices) {
-	    var total = 0;
-
-	    for (var i = 0, l = vertices.length; i < l; i++) {
-		var addX = vertices[i].x;
-		var addY = vertices[(i + 1)%l].y;
-		var subX = vertices[(i + 1)%l].x;
-		var subY = vertices[i].y;
-
-		total += (addX * addY * 0.5);
-		total -= (subX * subY * 0.5);
-	    }
-
-	    return Math.abs(total);
-	}; */
-
-	// ( data : Array<number>, start:number, end:number, dim:number) : number => {
-	/* var signedPolygonArea = function( vertices ) {
-	    var sum = 0;
-	    for (var i = 0; i < vertices.length; i++ ) {
-		var j = (i+1) % vertices.length;
-		sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
-	    }
-	    return sum;
-	}; */
 
 	var stats = {
 	    area : 0.0,
@@ -319,8 +309,9 @@
 	    fold0.add(config, 'test_girih').name('Girih').title('Load the \'Girih\' test case.');
 
 	    gui.add(config, 'drawPointNumbers').listen().onChange( function() { pb.redraw(); } ).name('drawPointNumbers').title('Tringulate the result?');
-	    gui.add(config, 'useConvexHullA').listen().onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullA').title('Use the convex hull of polygon A?');
-	    gui.add(config, 'useConvexHullB').listen().onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullB').title('Use the convex hull of polygon B?');
+	    gui.add(config, 'useConvexHullA').onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullA').title('Use the convex hull of polygon A?');
+	    gui.add(config, 'useConvexHullB').onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullB').title('Use the convex hull of polygon B?');
+	    gui.add(config, 'useConvexAlgorithm' ).onChange( function() { pb.redraw() } ).name('useConvexAlgorithm').title('Force use of regular convex polygon algorithm. Will fail if any of the polygons is not convex.');
 	    gui.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name('triangulate').title('Tringulate the result?');
 	    gui.add(config, 'clearSelfIntersections').listen().onChange( function() { pb.redraw(); } ).name('clearSelfIntersections').title('Clear polygons of self intersections before triangulating?');
 	    gui.add(config, 'triangulationMethod', ['Delaunay','Earcut']).listen().onChange( function() { pb.redraw(); } ).name('triangulationMethod').title('The triangulation method to use (Delaunay is not safe here; might result in ivalid triangulations)');

@@ -454,7 +454,6 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      **/
     PlotBoilerplate.prototype.fitToView = function (bounds) {
-        //const viewport:Bounds = this.viewport();
         var canvasCenter = new Vertex_1.Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
         var canvasRatio = this.canvasSize.width / this.canvasSize.height;
         var ratio = bounds.width / bounds.height;

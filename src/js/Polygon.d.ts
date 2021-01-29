@@ -15,7 +15,10 @@
  * @modified 2020-11-10 Added the `getBounds` function.
  * @modified 2020-11-11 Generalized `move(Vertex)` to `move(XYCoords)`.
  * @modified 2021-01-20 Added UID.
- * @version 1.6.0
+ * @modified 2021-01-29 Added the `signedArea` function (was global function in the demos before).
+ * @modified 2021-01-29 Added the `isClockwise` function.
+ * @modified 2021-01-29 Added the `area` function.
+ * @version 1.7.0
  *
  * @file Polygon
  * @public
@@ -122,6 +125,36 @@ export declare class Polygon implements SVGSerializable {
      **/
     containsVert(vert: Vertex): boolean;
     /**
+     * Calculate the area of the given polygon (unsigned).
+     *
+     * Note that this does not work for self-intersecting polygons.
+     *
+     * @method area
+     * @instance
+     * @memberof Polygon
+     * @return {number}
+     */
+    area(): number;
+    /**
+     * Calulate the signed polyon area by interpreting the polygon as a matrix
+     * and calculating its determinant.
+     *
+     * @method signedArea
+     * @instance
+     * @memberof Polygon
+     * @return {number}
+     */
+    signedArea(): number;
+    /**
+     * Get the winding order of this polgon: clockwise or counterclockwise.
+     *
+     * @method isClockwise
+     * @instance
+     * @memberof Polygon
+     * @return {boolean}
+     */
+    isClockwise(): boolean;
+    /**
      * Scale the polygon relative to the given center.
      *
      * @method scale
@@ -221,4 +254,23 @@ export declare class Polygon implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     } | undefined): string;
+    static utils: {
+        /**
+         * Calculate the area of the given polygon (unsigned).
+         *
+         * Note that this does not work for self-intersecting polygons.
+         *
+         * @name area
+         * @return {number}
+         */
+        area(vertices: Array<XYCoords>): number;
+        /**
+         * Calulate the signed polyon area by interpreting the polygon as a matrix
+         * and calculating its determinant.
+         *
+         * @name signedArea
+         * @return {number}
+         */
+        signedArea(vertices: Array<XYCoords>): number;
+    };
 }

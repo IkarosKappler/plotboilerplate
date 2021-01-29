@@ -15,7 +15,10 @@
  * @modified 2020-11-10 Added the `getBounds` function.
  * @modified 2020-11-11 Generalized `move(Vertex)` to `move(XYCoords)`.
  * @modified 2021-01-20 Added UID.
- * @version 1.6.0
+ * @modified 2021-01-29 Added the `signedArea` function (was global function in the demos before).
+ * @modified 2021-01-29 Added the `isClockwise` function.
+ * @modified 2021-01-29 Added the `area` function.
+ * @version 1.7.0
  *
  * @file Polygon
  * @public
@@ -176,6 +179,69 @@ export class Polygon implements SVGSerializable {
     };
 
 
+    /**
+     * Calculate the area of the given polygon (unsigned). 
+     *
+     * Note that this does not work for self-intersecting polygons.
+     *
+     * @method area
+     * @instance
+     * @memberof Polygon
+     * @return {number}
+     */
+    area() : number {
+	// Found at:
+	//    https://stackoverflow.com/questions/16285134/calculating-polygon-area
+	/* let total : number = 0.0;
+	
+	for (var i = 0, l = this.vertices.length; i < l; i++) {
+	    const addX = vertices[i].x;
+	    const addY = vertices[(i + 1)%l].y;
+	    const subX = vertices[(i + 1)%l].x;
+	    const subY = vertices[i].y;
+
+	    total += (addX * addY * 0.5);
+	    total -= (subX * subY * 0.5);
+	}
+	return Math.abs(total); */
+	return Polygon.utils.area(this.vertices);
+    };
+
+
+    /**
+     * Calulate the signed polyon area by interpreting the polygon as a matrix
+     * and calculating its determinant.
+     *
+     * @method signedArea
+     * @instance
+     * @memberof Polygon
+     * @return {number}
+     */
+    signedArea() : number {
+	return Polygon.utils.signedArea(this.vertices)
+	/* let sum : number = 0;
+	const n = this.vertices.length;
+	for (var i = 0; i < n; i++ ) {
+	    const j = (i+1) % n;
+	    sum += (this.vertices[j].x - this.vertices[i].x) * (this.vertices[i].y + this.vertices[j].y);
+	}
+	return sum; */
+    };
+
+
+    /**
+     * Get the winding order of this polgon: clockwise or counterclockwise.
+     *
+     * @method isClockwise
+     * @instance
+     * @memberof Polygon
+     * @return {boolean}
+     */
+    isClockwise() : boolean {
+	return Polygon.utils.signedArea(this.vertices) < 0;
+    };
+    
+    
 
     /**
      * Scale the polygon relative to the given center.
@@ -409,6 +475,53 @@ export class Polygon implements SVGSerializable {
 	}
 	buffer.push( '" />' );
 	return buffer.join('');
+    };
+
+    static utils = {
+
+	/**
+	 * Calculate the area of the given polygon (unsigned). 
+	 *
+	 * Note that this does not work for self-intersecting polygons.
+	 *
+	 * @name area
+	 * @return {number}
+	 */
+	area( vertices : Array<XYCoords> ) : number {
+	    // Found at:
+	    //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
+	    let total : number = 0.0;
+	    
+	    for (var i = 0, l = vertices.length; i < l; i++) {
+		const addX = vertices[i].x;
+		const addY = vertices[(i + 1)%l].y;
+		const subX = vertices[(i + 1)%l].x;
+		const subY = vertices[i].y;
+
+		total += (addX * addY * 0.5);
+		total -= (subX * subY * 0.5);
+	    }
+	    return Math.abs(total);
+	},
+
+
+	/**
+	 * Calulate the signed polyon area by interpreting the polygon as a matrix
+	 * and calculating its determinant.
+	 *
+	 * @name signedArea
+	 * @return {number}
+	 */
+	signedArea( vertices : Array<XYCoords> ) : number {
+	    let sum : number = 0;
+	    const n = vertices.length;
+	    for (var i = 0; i < n; i++ ) {
+		const j = (i+1) % n;
+		sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
+	    }
+	    return sum;
+	}
+	
     };
     
 }

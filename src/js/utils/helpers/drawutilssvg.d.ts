@@ -5,7 +5,7 @@
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
  * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
- * @version  0.2.1
+ * @version  0.2.2
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
