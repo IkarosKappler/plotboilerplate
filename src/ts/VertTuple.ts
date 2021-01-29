@@ -49,6 +49,10 @@ export class VertTuple<T extends VertTuple<T>> {
      */
     b:Vertex;
 
+    
+    /**
+     * The factory is used by the `clone` method.
+     */
     private factory: (a:Vertex,b:Vertex)=>T;
     
 

@@ -18,6 +18,7 @@
  * @modified 2021-01-29 Added the `signedArea` function (was global function in the demos before).
  * @modified 2021-01-29 Added the `isClockwise` function.
  * @modified 2021-01-29 Added the `area` function.
+ * @modified 2021-01-29 Changed the param type for `containsVert` from Vertex to XYCoords.
  * @version 1.7.0
  *
  * @file Polygon
@@ -158,12 +159,12 @@ export class Polygon implements SVGSerializable {
      *    https://stackoverflow.com/questions/22521982/check-if-point-inside-a-polygon
      *
      * @method containsVert
-     * @param {Vertex} vert - The vertex to check. The new x-component.
+     * @param {XYCoords} vert - The vertex to check. The new x-component.
      * @return {boolean} True if the passed vertex is inside this polygon. The polygon is considered closed.
      * @instance
      * @memberof Polygon
      **/
-    containsVert( vert:Vertex ) : boolean {
+    containsVert( vert:XYCoords ) : boolean {
 	// ray-casting algorithm based on
 	//    http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
 	var inside : boolean = false;

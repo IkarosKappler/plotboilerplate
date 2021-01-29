@@ -42,6 +42,9 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @instance
      */
     b: Vertex;
+    /**
+     * The factory is used by the `clone` method.
+     */
     private factory;
     /**
      * Creates an instance.

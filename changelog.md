@@ -5,6 +5,7 @@
   * Added the `Polygon.signedArea` function (was global function in the demos before).
   * Added the `Polygon.isClockwise` function.
   * Added the `Polygon.area` function.
+  * Changed the param type for `containsVert` from Vertex to XYCoords.
 * 2021-01-27 [v1.11.0]
   * Added the new svg renderer as integrated helper.
 * 2021-01-26
