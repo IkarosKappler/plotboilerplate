@@ -145,24 +145,27 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		makeVoronoiDiagram    : true,
-		drawPoints            : true,
-		drawTriangles         : true,
-		drawCircumCircles     : false,
-		drawCubicCurves       : false,
-		fillVoronoiCells      : true,
-		voronoiOutlineColor   : 'rgba(0,168,40, 1.0)',
-		voronoiCellColor      : 'rgba(0,128,192, 0.5)',
-		voronoiCubicThreshold : 1.0,
-		voronoiCellScale      : 0.8,
-		drawVoronoiIncircles  : false,
-		drawVoronoiOutlines   : true,
-		pointCount            : 25,
-		rebuild               : function() { rebuild(); },
-		randomize             : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuild(); },
-		fullCover             : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuild(); },
-		animate               : false,
-		animationType         : 'linear' // 'linear' or 'radial'
+		makeVoronoiDiagram        : true,
+		drawPoints                : true,
+		drawTriangles             : true,
+		drawCircumCircles         : false,
+		drawCubicCurves           : false,
+		fillVoronoiCells          : true,
+		voronoiOutlineColor       : 'rgba(0,168,40, 1.0)',
+		voronoiCellColor          : 'rgba(0,128,192, 0.5)',
+		voronoiCubicThreshold     : 1.0,
+		voronoiCellScale          : 0.8,
+		clipVoronoiCells          : false,
+		drawClipBox               : false,
+		drawUnclippedVoronoiCells : false,
+		drawVoronoiIncircles      : false,
+		drawVoronoiOutlines       : true,
+		pointCount                : 25,
+		rebuild                   : function() { rebuild(); },
+		randomize                 : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuild(); },
+		fullCover                 : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuild(); },
+		animate                   : false,
+		animationType             : 'linear' // 'linear' or 'radial'
 	    }, GUP );
 
 
@@ -246,14 +249,37 @@
 	     * Draw the stored voronoi diagram.
 	     */
 	    var drawVoronoiDiagram = function() {
+		var clipBoxPolygon = Bounds.computeFromVertices( pointList ).toPolygon();
+		if( config.drawClipBox )
+		    pb.draw.polygon( clipBoxPolygon, 'rgba(192,192,192,0.25)' );
+		
 		for( var v in voronoiDiagram ) {
 		    var cell = voronoiDiagram[v];
 		    var polygon = cell.toPolygon();
 		    polygon.scale( config.voronoiCellScale, cell.sharedVertex );
-		    if( config.drawVoronoiOutlines )
-			pb.draw.polygon( polygon, config.voronoiOutlineColor ); 
 
-		    if( !cell.isOpen() && cell.triangles.length >= 3 ) {
+		    // Draw large (unclipped) Voronoi cell
+		    if( config.drawVoronoiOutlines
+			&& (!config.clipVoronoiCells || config.drawUnclippedVoronoiCells)
+		      ) {
+			pb.draw.polyline( polygon.vertices, false,
+					  config.clipVoronoiCells ? 'rgba(128,128,128,0.333)' : config.voronoiOutlineColor
+					);
+		    }
+		    
+		    // Apply clipping?
+		    if( config.clipVoronoiCells ) {
+			// Clone the array here: convert Array<XYCoords> to Array<Vertex>
+			polygon = new Polygon( cloneVertexArray(sutherlandHodgman(polygon.vertices, clipBoxPolygon.vertices)),
+					       false
+					     );
+		    }
+
+		    if( config.drawVoronoiOutlines && config.clipVoronoiCells ) {
+			pb.draw.polygon( polygon, config.voronoiOutlineColor );
+		    }
+
+		    if( (!cell.isOpen() || config.clipVoronoiCells) && cell.triangles.length >= 3 ) {
 			if( config.drawCubicCurves ) {
 			    var cbezier = polygon.toCubicBezierData( config.voronoiCubicThreshold );
 			    if( config.fillVoronoiCells ) 
@@ -466,6 +492,9 @@
 		f2.add(config, 'drawVoronoiOutlines').onChange( rebuild ).title("If checked the Voronoi cells' outlines will be drawn.");
 		f2.add(config, 'drawVoronoiIncircles').onChange( rebuild ).title("If checked the Voronoi cells' incircles will be drawn.");
 		f2.add(config, 'fillVoronoiCells').onChange( rebuild ).title("If checked the Voronoi cells will be filled.");
+		f2.add(config, 'clipVoronoiCells').onChange( rebuild ).title("If checked the Voronoi cells will be clipped by the bounding rectangle.");
+		f2.add(config, 'drawClipBox').onChange( rebuild ).title("If checked the clipbox will be draw.");
+		f2.add(config, 'drawUnclippedVoronoiCells').onChange( rebuild ).title("If checked unclipped Voronoi cells will always be drawn.");
 		f2.addColor(config, 'voronoiCellColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi cell color.");
 		f2.add(config, 'voronoiCubicThreshold').min(0.0).max(1.0).onChange( function() { pb.redraw() } ).title("(Experimental) Specifiy the cubic or cell coefficients.");
 		f2.add(config, 'voronoiCellScale').min(-1.0).max(2.0).onChange( function() { pb.redraw() } ).title("Scale each voronoi cell before rendering.");

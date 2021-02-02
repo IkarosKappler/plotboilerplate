@@ -189,80 +189,12 @@
 	    }
 	};
 
-	
-	var _drawConvexIntersection = function(  polygonA, polygonB ) {
-	    var pA = [];
-	    var pB = [];
-	    for( var i = 0; i < polygonA.vertices.length; i++ ) {
-		pA.push( [ polygonA.vertices[i].x, polygonA.vertices[i].y ] );
-	    }
-	    for( var i = 0; i < polygonB.vertices.length; i++ ) {
-		pB.push( [ polygonB.vertices[i].x, polygonB.vertices[i].y ] );
-	    }
-	    var result = sutherlandHodgman( pA, pB );
-	    // console.log( result );
-
-	    for( var i = 0; i < result.length; i++ ) {
-		pb.draw.line( { x : result[i][0], y : result[i][1] },
-			      { x : result[(i+1)%result.length][0], y : result[(i+1)%result.length][1] },
-			      'rgb(255,0,0)',
-			      2.0
-			    );
-	    }
-	};
-
-	var drawConvexIntersection = function(  polygonA, polygonB ) {
-	    
+	var drawConvexIntersection = function(  polygonA, polygonB ) {  
 	    var result = sutherlandHodgman( polygonA.vertices, polygonB.vertices );
-	    // console.log( result );
-
-	    for( var i = 0; i < result.length; i++ ) {
-		pb.draw.line( result[i],
-			      result[(i+1)%result.length],
-			      'rgb(255,0,0)',
-			      2.0
-			    );
-	    }
+	    pb.fill.polyline( result, false, 'rgba(0,164,32,0.333)', 2.0 );
+	    pb.draw.polyline( result, false, 'rgb(255,64,0)', 2.0 );
 	};
 	
-	/* function sutherlandHodgman (subjectPolygon, clipPolygon) {
- 
-            var cp1, cp2, s, e;
-            var inside = function (p) {
-                return (cp2[0]-cp1[0])*(p[1]-cp1[1]) > (cp2[1]-cp1[1])*(p[0]-cp1[0]);
-            };
-            var intersection = function () {
-                var dc = [ cp1[0] - cp2[0], cp1[1] - cp2[1] ],
-                    dp = [ s[0] - e[0], s[1] - e[1] ],
-                    n1 = cp1[0] * cp2[1] - cp1[1] * cp2[0],
-                    n2 = s[0] * e[1] - s[1] * e[0], 
-                    n3 = 1.0 / (dc[0] * dp[1] - dc[1] * dp[0]);
-                return [(n1*dp[0] - n2*dc[0]) * n3, (n1*dp[1] - n2*dc[1]) * n3];
-            };
-            var outputList = subjectPolygon;
-            cp1 = clipPolygon[clipPolygon.length-1];
-            for (var j in clipPolygon) {
-                var cp2 = clipPolygon[j];
-                var inputList = outputList;
-                outputList = [];
-                s = inputList[inputList.length - 1]; //last on the input list
-                for (var i in inputList) {
-                    var e = inputList[i];
-                    if (inside(e)) {
-                        if (!inside(s)) {
-                            outputList.push(intersection());
-                        }
-                        outputList.push(e);
-                    }
-                    else if (inside(s)) {
-                        outputList.push(intersection());
-                    }
-                    s = e;
-                }
-                cp1 = cp2;
-            }
-            return outputList
-        } */
 
 	/**
 	 * Draw the intersection polygon as the result of the Greiner-Horman
@@ -387,14 +319,20 @@
 	    fold0.add(config, 'test_squares').name('Squares').title('Load the \'Squares\' test case.');
 	    fold0.add(config, 'test_girih').name('Girih').title('Load the \'Girih\' test case.');
 
-	    gui.add(config, 'drawPointNumbers').listen().onChange( function() { pb.redraw(); } ).name('drawPointNumbers').title('Tringulate the result?');
-	    gui.add(config, 'useConvexHullA').onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullA').title('Use the convex hull of polygon A?');
-	    gui.add(config, 'useConvexHullB').onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullB').title('Use the convex hull of polygon B?');
-	    gui.add(config, 'useConvexAlgorithm' ).onChange( function() { pb.redraw() } ).name('useConvexAlgorithm').title('Force use of regular convex polygon algorithm. Will fail if any of the polygons is not convex.');
-	    gui.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name('triangulate').title('Tringulate the result?');
-	    gui.add(config, 'clearSelfIntersections').listen().onChange( function() { pb.redraw(); } ).name('clearSelfIntersections').title('Clear polygons of self intersections before triangulating?');
-	    gui.add(config, 'triangulationMethod', ['Delaunay','Earcut']).listen().onChange( function() { pb.redraw(); } ).name('triangulationMethod').title('The triangulation method to use (Delaunay is not safe here; might result in ivalid triangulations)');
-	    gui.add(config, 'drawDelaunayCircles').listen().onChange( function() { pb.redraw(); } ).name('drawDelaunayCircles').title('Draw triangle circumcircles when in Delaunay mode?');
+	    var fold1 = gui.addFolder('Greiner-Hormann');
+	    fold1.add(config, 'drawPointNumbers').listen().onChange( function() { pb.redraw(); } ).name('drawPointNumbers').title('Tringulate the result?');
+	    fold1.add(config, 'useConvexHullA').onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullA').title('Use the convex hull of polygon A?');
+	    fold1.add(config, 'useConvexHullB').onChange( function() { setVertices(verticesA,verticesB); pb.redraw(); } ).name('useConvexHullB').title('Use the convex hull of polygon B?');
+	    fold1.add(config, 'triangulate').listen().onChange( function() { pb.redraw(); } ).name('triangulate').title('Tringulate the result?');
+	    fold1.add(config, 'clearSelfIntersections').listen().onChange( function() { pb.redraw(); } ).name('clearSelfIntersections').title('Clear polygons of self intersections before triangulating?');
+	    fold1.add(config, 'triangulationMethod', ['Delaunay','Earcut']).listen().onChange( function() { pb.redraw(); } ).name('triangulationMethod').title('The triangulation method to use (Delaunay is not safe here; might result in ivalid triangulations)');
+	    fold1.add(config, 'drawDelaunayCircles').listen().onChange( function() { pb.redraw(); } ).name('drawDelaunayCircles').title('Draw triangle circumcircles when in Delaunay mode?');
+	    fold1.open();
+
+	    var fold2 = gui.addFolder('Sutherland-Hodgman');
+	    fold2.add(config, 'useConvexAlgorithm' ).onChange( function() { pb.redraw() } ).name('useConvexAlgorithm').title('Force use of regular convex polygon algorithm. Will fail if any of the polygons is not convex.');
+	    if( config.useConvedAlgorithm )
+		fold2.open();
 
 	    // Add stats
 	    var uiStats = new UIStats( stats );

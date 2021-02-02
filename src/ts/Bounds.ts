@@ -3,9 +3,11 @@
  * @date     2020-05-11
  * @modified 2020-10-30 Added the static computeFromVertices function.
  * @modified 2020-11-19 Set min, max, width and height to private.
- * @version  1.1.1
+ * @modified 2021-02-02 Added the `toPolygon` method.
+ * @version  1.2.0
  **/
 
+import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
 import { Vertex } from "./Vertex";
 
@@ -61,11 +63,29 @@ export class Bounds implements IBounds, XYDimension {
      * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
      * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
-    constructor( min:XYCoords, max:XYCoords ) {
+    constructor( min : XYCoords, max : XYCoords ) {
 	this.min = min;
 	this.max = max;
 	this.width = max.x-min.x;
 	this.height = max.y-min.y;
+    };
+
+
+    /**
+     * Convert this rectangular bounding box to a polygon with four vertices.
+     *
+     * @method toPolygon
+     * @instance
+     * @memberof Bounds
+     * @return {Polygon} This bound rectangle as a polygon.
+     */
+    toPolygon() : Polygon {
+	return new Polygon( [
+	    new Vertex(this.min),
+	    new Vertex(this.max.x,this.min.y),
+	    new Vertex(this.max),
+	    new Vertex(this.min.x,this.max.y)
+	], false );
     };
 
     /**

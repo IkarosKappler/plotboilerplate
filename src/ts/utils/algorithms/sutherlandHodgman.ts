@@ -17,7 +17,7 @@ import { XYCoords } from "../../interfaces";
  * @param {XYCoords}
  * @param {XYCoords}
  **/
-const inside = ( cp1 : XYCoords, cp2 : XYCoords, p : XYCoords) : boolean => {
+const inside = ( cp1 : XYCoords, cp2 : XYCoords, p : XYCoords ) : boolean => {
     return (cp2.x-cp1.x)*(p.y-cp1.y) > (cp2.y-cp1.y)*(p.x-cp1.x);
 };
 
@@ -28,16 +28,17 @@ const inside = ( cp1 : XYCoords, cp2 : XYCoords, p : XYCoords) : boolean => {
  * @param {XYCoords}
  */
 const intersection = ( cp1 : XYCoords ,cp2 : XYCoords ,s : XYCoords, e : XYCoords ) : XYCoords => {
-    const dc = {
+    const dc : XYCoords = {
 	x:  cp1.x - cp2.x,
 	y : cp1.y - cp2.y
-	 },
-    dp = { x: s.x - e.x,
-	   y : s.y - e.y
-	 },
-    n1 = cp1.x * cp2.y - cp1.y * cp2.x,
-    n2 = s.x * e.y - s.y * e.x, 
-    n3 = 1.0 / (dc.x * dp.y - dc.y * dp.x);
+    };
+    const dp : XYCoords = {
+	x: s.x - e.x,
+	y : s.y - e.y
+    };
+    const n1 : number = cp1.x * cp2.y - cp1.y * cp2.x;
+    const n2 : number = s.x * e.y - s.y * e.x;
+    const n3 : number = 1.0 / (dc.x * dp.y - dc.y * dp.x);
     return { x : (n1*dp.x - n2*dc.x) * n3,
 	     y : (n1*dp.y - n2*dc.y) * n3
 	   };
@@ -63,15 +64,14 @@ export const sutherlandHodgman = ( subjectPolygon : Array<XYCoords>,
         var inputList = outputList;
         outputList = [];
         s = inputList[inputList.length - 1]; // last on the input list
-        for (var i in inputList) {
+        for( var i in inputList ) {
 	    e = inputList[i];
-	    if (inside(cp1,cp2,e)) {
-                if (!inside(cp1,cp2,s)) {
+	    if( inside(cp1,cp2,e) ) {
+                if( !inside(cp1,cp2,s) ) {
 		    outputList.push(intersection(cp1,cp2,s,e));
                 }
                 outputList.push(e);
-	    }
-	    else if (inside(cp1,cp2,s)) {
+	    } else if( inside(cp1,cp2,s) ) {
                 outputList.push(intersection(cp1,cp2,s,e));
 	    }
 	    s = e;
