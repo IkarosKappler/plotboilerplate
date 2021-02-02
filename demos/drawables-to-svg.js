@@ -6,10 +6,13 @@
  *
  * @require SVGBuilder
  *
+ * @DEPRECATED Use drawutilssvg instead
  * @date    2019-11-06
  * @author  Ikaros Kappler
  * @version 1.0.0
  **/
+
+console.warn('The drawable-to-svg function is deprecated. Please use the drawutilssvg instead in combination with an XMLSerializer.');
 
 (function(_context) {
     'use strict';
@@ -20,6 +23,7 @@
      * @param {options.zoom} {x,y}
      **/
     var drawablesToSVG = function( options ) {
+	console.warn('The drawable-to-svg function is deprecated. Please use the drawutilssvg instead in combination with an XMLSerializer.');
 	this.options = options;
 	this.drawables = [];
     };

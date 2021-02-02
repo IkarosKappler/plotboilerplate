@@ -69,53 +69,45 @@
 	    pb.config.postDraw = function() {
 		// In this demo the PlotBoilerplate only draws the vertices.
 		// Everything else is drawn by this script, with the help of some PB functions.
-		redraw();
+		redraw( pb.draw, pb.fill );
 	    };
 
 	    /**
 	     * This is a function hooked into the plot boilerplate's savefile-handler.
 	     **/
 	    pb.hooks.saveFile = function() {
-		var v2svg = new drawablesToSVG( { canvasSize : pb.canvasSize, offset : pb.draw.offset, zoom : pb.draw.scale } );
-		if( config.drawTriangles ) {
-		    // let color = config.makeVoronoiDiagram ? 'rgba(0,128,224,0.33)' : '#0088d8';
-		    for( var i in triangles ) {
-			var t = triangles[i];
-			v2svg.addDrawable( t );
-		    }
-		}
+		// Create a new SVG renderer.
+		// var svgNode = document.getElementById('preview-svg');
+		var svgNode = document.createElement('svg');
+		var tosvgDraw = new drawutilssvg( svgNode,
+						  pb.draw.offset,
+						  pb.draw.scale,
+						  pb.canvasSize,
+						  false, // fillShapes=false
+						  pb.drawConfig
+						);
+		var tosvgFill = tosvgDraw.copyInstance( true ); // fillShapes=true
+		tosvgDraw.beginDrawCycle(0);
+		tosvgFill.beginDrawCycle(0);
+		tosvgDraw.clear( pb.config.backgroundColor );
 
-		if( config.drawCircumCircles )
-		    ; // Draw circumcircles in the SVG? 
-		
-		if( config.makeVoronoiDiagram ) {
-		    for( var v in voronoiDiagram ) {
-			var cell = voronoiDiagram[v];
-			var polygon = new Polygon(cell.toPathArray(),cell.isOpen());
-			polygon.scale( config.voronoiCellScale, cell.sharedVertex );
-			// let pcolor = config.voronoiOutlineColor;
-			v2svg.addDrawable( polygon );
+		// Use the 
+		pb.drawAll( 0, tosvgDraw, tosvgFill );
+		redraw( tosvgDraw, tosvgFill );
 
-			if( config.drawCubicCurves && !cell.isOpen() && cell.triangles.length >= 3 ) {
-			    var cbezier = polygon.toCubicBezierData( config.voronoiCubicThreshold );
-			    // let vcolor = config.voronoiCellColor;
-				pb.draw.cubicBezierPath( cbezier, config.voronoiCellColor );
-			    // Add cubic bezier path
-			    v2svg.addDrawable( polygon.toCubicBezierPath() );
-    
-			}
-		    }
-		}
+		// Full support in all browsers \o/
+		//    https://caniuse.com/xml-serializer
+		var serializer = new XMLSerializer();
+		var head = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+		var svgCode = serializer.serializeToString(svgNode);
 
-		if( pb.drawConfig.drawVertices ) {
-		    for( var i in pb.vertices ) {
-			v2svg.addDrawable( pb.vertices[i] );
-		    }
-		}
-
-		var svgCode = v2svg.build();
-		var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" } );
-		saveAs(blob, "voronoi-delaunay.svg");
+		var blob = new Blob([head + "\n" + svgCode], { type: "image/svg;charset=utf-8" } );
+		// See documentation for FileSaver.js for usage.
+		//    https://github.com/eligrey/FileSaver.js
+		if( typeof globalThis["saveAs"] != "function" )
+		    throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
+		var _saveAs = globalThis["saveAs"];
+		_saveAs(blob, "voronoi-delaunay.svg");   	
 	    };
 	    
 
@@ -210,48 +202,48 @@
 	    // +---------------------------------------------------------------------------------
 	    // | Draw the given triangle with the specified (CSS-) color.
 	    // +-------------------------------
-	    var drawTriangle = function( t, color ) {
-		pb.draw.line( t.a, t.b, color );
-		pb.draw.line( t.b, t.c, color );
-		pb.draw.line( t.c, t.a, color );
+	    var drawTriangle = function( draw, t, color ) {
+		draw.line( t.a, t.b, color );
+		draw.line( t.b, t.c, color );
+		draw.line( t.c, t.a, color );
 	    };
 	    
 	    
 	    /**
 	     * The re-drawing function.
 	     */
-	    var redraw = function() {
+	    var redraw = function( drawLib, fillLib ) {
 		// Draw triangles
 		if( config.drawTriangles )
-		    drawTriangles();
+		    drawTriangles( drawLib );
 
 		// Draw circumcircles
 		if( config.drawCircumCircles )
-		    drawCircumCircles();
+		    drawCircumCircles( drawLib );
 		
 		// Draw voronoi diagram?
 		if( config.makeVoronoiDiagram )
-		    drawVoronoiDiagram();
+		    drawVoronoiDiagram( drawLib, fillLib );
 	    };
 
 	    
 	    /**
 	     * A function for drawing the triangles.
 	     */
-	    var drawTriangles = function() {
+	    var drawTriangles = function( draw ) {
 		for( var i in triangles ) {
 		    var t = triangles[i];
-		    drawTriangle( t, config.makeVoronoiDiagram ? 'rgba(0,128,224,0.33)' : '#0088d8' );
+		    drawTriangle( draw, t, config.makeVoronoiDiagram ? 'rgba(0,128,224,0.33)' : '#0088d8' );
 		}
 	    };
 	    
 	    /**
 	     * Draw the stored voronoi diagram.
 	     */
-	    var drawVoronoiDiagram = function() {
+	    var drawVoronoiDiagram = function( draw, fill ) {
 		var clipBoxPolygon = Bounds.computeFromVertices( pointList ).toPolygon();
 		if( config.drawClipBox )
-		    pb.draw.polygon( clipBoxPolygon, 'rgba(192,192,192,0.25)' );
+		    draw.polygon( clipBoxPolygon, 'rgba(192,192,192,0.25)' );
 		
 		for( var v in voronoiDiagram ) {
 		    var cell = voronoiDiagram[v];
@@ -262,7 +254,7 @@
 		    if( config.drawVoronoiOutlines
 			&& (!config.clipVoronoiCells || config.drawUnclippedVoronoiCells)
 		      ) {
-			pb.draw.polyline( polygon.vertices, false,
+			draw.polyline( polygon.vertices, false,
 					  config.clipVoronoiCells ? 'rgba(128,128,128,0.333)' : config.voronoiOutlineColor
 					);
 		    }
@@ -276,16 +268,16 @@
 		    }
 
 		    if( config.drawVoronoiOutlines && config.clipVoronoiCells ) {
-			pb.draw.polygon( polygon, config.voronoiOutlineColor );
+			draw.polygon( polygon, config.voronoiOutlineColor );
 		    }
 
 		    if( (!cell.isOpen() || config.clipVoronoiCells) && cell.triangles.length >= 3 ) {
 			if( config.drawCubicCurves ) {
 			    var cbezier = polygon.toCubicBezierData( config.voronoiCubicThreshold );
 			    if( config.fillVoronoiCells ) 
-				pb.fill.cubicBezierPath( cbezier, config.voronoiCellColor );
+				fill.cubicBezierPath( cbezier, config.voronoiCellColor );
 			    else 
-				pb.draw.cubicBezierPath( cbezier, config.voronoiCellColor );
+				draw.cubicBezierPath( cbezier, config.voronoiCellColor );
 			}
 			if( config.drawVoronoiIncircles  ) {
 			    var result = convexPolygonIncircle( polygon ); 
@@ -293,7 +285,7 @@
 			    var triangle = result.triangle;
 			    // Here we should have found the best inlying circle (and the corresponding triangle)
 			    // inside the Voronoi cell.
-			    pb.draw.circle( circle.center, circle.radius, 'rgba(255,192,0,1.0)', 2 );
+			    draw.circle( circle.center, circle.radius, 'rgba(255,192,0,1.0)', 2 );
 			}
 		    } // END cell is not open
 		}
@@ -306,7 +298,7 @@
 	    var drawCircumCircles = function() {
 		for( var t in triangles ) {
 		    var cc = triangles[t].getCircumcircle();
-		    pb.draw.circle( cc.center, cc.radius, '#e86800' );
+		    draw.circle( cc.center, cc.radius, '#e86800' );
 		}
 	    };
 	    
@@ -336,7 +328,7 @@
 		triangles  = delau.triangulate();
 		trianglesPointCount = pointList.length;
 		voronoiDiagram = [];
-		redraw();
+		redraw( pb.draw, pb.fill );
 	    };
 
 
@@ -346,7 +338,7 @@
 	    var makeVoronoiDiagram = function() {
 		var voronoiBuilder = new delaunay2voronoi(pointList,triangles);
 		voronoiDiagram = voronoiBuilder.build();
-		redraw();
+		redraw( pb.draw, pb.fill );
 		// Handle errors if vertices are too close and/or co-linear:
 		if( voronoiBuilder.failedTriangleSets.length != 0 ) {
 		    console.log( 'The error report contains '+voronoiBuilder.failedTriangleSets.length+' unconnected set(s) of triangles:' );
@@ -357,8 +349,8 @@
 			for( var i = 0; i < n; i++ ) {
 			    console.log('highlight triangle ' + i );
 			    var tri = voronoiBuilder.failedTriangleSets[s][i];
-			    drawTriangle( tri, 'rgb(255,'+Math.floor(255*(i/n))+',0)' );
-			    draw.circle( tri.center, tri.radius, 'rgb(255,'+Math.floor(255*(i/n))+',0)' );
+			    drawTriangle( pb.draw, tri, 'rgb(255,'+Math.floor(255*(i/n))+',0)' );
+			    pb.draw.circle( tri.center, tri.radius, 'rgb(255,'+Math.floor(255*(i/n))+',0)' );
 			}
 		    }
 		    return false;
