@@ -48,5 +48,6 @@
  * draw.text() and draw.label() require color params.
  * Render dashed lines around images that cannot be rendered (e.g. file not found).
  * Each render method should also get the ID of the rendered element; this is required to keep track of changes in SVG documents.
+ * Remove the toSVGString methods from all Drawables and the SVGSerializable interface. The drawutilssvg does everything with SVGs now.
  
 
