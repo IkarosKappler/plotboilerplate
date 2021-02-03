@@ -45,7 +45,7 @@ visualizing 2D geometries. Basic features are
  * touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
 
 
-The compressed library has 103kb.
+The compressed library has 106kb.
 
 
 ## Install the package via npm
@@ -473,6 +473,7 @@ The Vertex class has basic drag event support:
 * [Peter James Lu](https://www.peterlu.com/) and [Paul Steinhardt](https://paulsteinhardt.org/) for their work on [Girih patterns](https://physics.princeton.edu//~steinh/peterlu_SOM7_sm.pdf "Girih")
 * Cronholm144 for the [Girih texture](https://commons.wikimedia.org/wiki/File:Girih_tiles.svg "Girih texture")
 * [Mapbox's Earcut polygon algorithm](https://github.com/mapbox/earcut "Mapbox's Earcut polygon algorithm")
+* [Rosetta-Code for the Sutherland-Hodgman convex polygon clipping algorithm](https://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping#JavaScript "Rosetta-Code for the Sutherland-Hodgman convex polygon clipping algorithm")
 
 
 ## Todos

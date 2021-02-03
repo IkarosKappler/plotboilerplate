@@ -4,6 +4,21 @@ layout: page
 
 
 # Changelog
+* 2021-02-03
+  * Added the static `drawusilssvg.createSvg` function.
+  * Fixed the currentId='background' bug on the drawusilssvg.clear() function.
+  * Fixed CSSProperty `stroke-width` in drawusilssvg (was line-width before, which is wrong).
+  * Added the static `drawusilssvg.HEAD_XML` attribute.
+* 2021-02-02
+  * Added the `Bounds.toPolygon` method.
+* 2021-01-29
+  * Added the `Polygon.signedArea` function (was global function in the demos before).
+  * Added the `Polygon.isClockwise` function.
+  * Added the `Polygon.area` function.
+  * Changed the param type for `containsVert` from Vertex to XYCoords.
+  * Added an implementation of the Sutherland-Hodgman polygon clipping algorithm.
+* 2021-01-27 [v1.11.0]
+  * Added the new svg renderer as integrated helper.
 * 2021-01-26
   * CircleSectorHelper: Moving control points with center points.
   * PlotBoilerplate class: Replaced the old SVGBuilder by the new `drawutilssvg` library.
