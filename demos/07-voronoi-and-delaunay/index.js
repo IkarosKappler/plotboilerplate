@@ -122,15 +122,6 @@
 		    if( cy ) cy.innerHTML = relPos.y.toFixed(2);
 		} );
 
-	    // +---------------------------------------------------------------------------------
-	    // | Create a random vertex inside the canvas viewport.
-	    // +-------------------------------
-	    var randomVertex = function() {
-		return new Vertex( Math.random()*pb.canvasSize.width*0.5 - pb.canvasSize.width/2*0.5,
-				   Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
-				 );
-	    };
-
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | A global config that's attached to the dat.gui control interface.
@@ -172,8 +163,7 @@
 	    // | Adds a random point to the point list. Needed for initialization.
 	    // +-------------------------------
 	    var addRandomPoint = function() {
-		addVertex( randomVertex() );
-		
+		addVertex( Vertex.randomVertex(pb.viewport()).scale(0.5) );
 	    };
 
 	    var addVertex = function( vert ) {

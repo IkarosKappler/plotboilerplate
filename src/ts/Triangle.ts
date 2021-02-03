@@ -483,6 +483,7 @@ export class Triangle implements SVGSerializable {
     /**
      * Create an SVG representation of this triangle.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} The SVG string.

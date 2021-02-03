@@ -30,6 +30,9 @@
  * Extend the demo 25 (multiple circle intersection): add SVG export.
  * Replace drawables-to-svg.js by the new svg-draw library.
  * Remove all 'info' blocks and replace by uistats.
+ * For convenience add an "Info" button to the UI of all demos with a short explanation about what's happening here.
+
+
 
 ### Todos for future Version 2
  * Remove class member `PlotBoilerplate.ctx` (SVG renderes don't have such a context).

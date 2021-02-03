@@ -93,6 +93,7 @@ export class Line
 	/**
 	 * Create an SVG representation of this line.
 	 *
+	 * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
 	 * @method toSVGString
 	 * @param {options} p - A set of options, like the 'classname' to use 
 	 *                      for the line object.

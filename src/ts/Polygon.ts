@@ -446,6 +446,7 @@ export class Polygon implements SVGSerializable {
     /**
      * Create an SVG representation of this polygon.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} The SVG string.
