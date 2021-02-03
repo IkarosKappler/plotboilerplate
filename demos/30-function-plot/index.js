@@ -125,11 +125,31 @@
 
 		var parsed = math.parse(expression);
 		functionCache.push( function(x) { return parsed.evaluate({ x : x }) } );
+		return input;
 	    };
 	    addFunction('sin(x*10)');
 	    addFunction('sin(x*20)*2');
-	    addFunction('sin(x)');
-	    // addFunction('a');
+	    addFunction('sin(x*2)');
+
+	    // Add input function
+	    var index = functionCache.length;
+	    var input = addFunction('x');
+	    input.addEventListener('change', function(e) {
+		console.log('new term', e.target.value );
+		var parsed = math.parse(e.target.value);
+		console.log( 'parsed', parsed );
+		if( !parsed ) {
+		    console.log("ERROR");
+		    return;
+		}
+		functionCache[index] = function(x) { return parsed.evaluate({ x : x }) };
+		pb.redraw();
+	    } );
+	    input.addEventListener('keyup', function(e) {
+		console.log('new term', e.target.value );
+		
+	    } );
+	    
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | This is the part where the magic happens
