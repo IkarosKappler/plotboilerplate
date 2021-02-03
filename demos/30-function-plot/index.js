@@ -74,26 +74,16 @@
 		animate               : true,
 		phaseX                : 0.0,
 		scaleY                : 25.0,
-		stepSizeX             : 2.0
+		stepSizeX             : 2.0,
+		lineWidth             : 2.0
 	    }, GUP );
 
 	    var time = 0;
 
 	    var randColor = function( i ) {
-		/* return Color.makeRGB( Math.floor(255*Math.random()),
-				      Math.floor(255*Math.random()),
-				      Math.floor(255*Math.random())
-				      ).cssRGB(); */
 		return WebColorsContrast[ i % WebColorsContrast.length ].cssRGB();
 	    };
 	    
-
-	    /* var parsed = math.parse('sin(x)');
-	    
-	    var fnA = function(x) { return Math.sin(x*10); };
-	    var fnB = function(x) { return Math.sin(x*20)*2; };
-	    var fnC = function(x) { return parsed.evaluate({ x : x }) }; */
-
 	    var _x = function(x) { return pb.draw.offset.x + x * pb.draw.scale.x; };
 	    var _y = function(y) { return pb.draw.offset.y + y * pb.draw.scale.y; };
 
@@ -131,6 +121,7 @@
 	    addFunction('sin(x*20)*2');
 	    addFunction('sin(x*2)');
 
+	    
 	    // Add input function
 	    var index = functionCache.length;
 	    var input = addFunction('x');
@@ -160,9 +151,6 @@
 		var viewport = pb.viewport();
 		var outputRangeX = [ _x( -pb.canvasSize.width/2 ), _x(  pb.canvasSize.width/2 ) ];
 
-		// var coordsA = calcFunction( fnA, inputRangeX, outputRangeX, 'rgb(0,192,192)' );
-		// var coordsB = calcFunction( fnB, inputRangeX, outputRangeX, 'rgb(192,0,192)' );
-		// var coordsC = calcFunction( fnC, inputRangeX, outputRangeX, 'rgb(192,192,0)' );
 		for( var i = 0; i < functionCache.length; i++ ) {
 		    var coords = calcFunction( functionCache[i], inputRangeX, outputRangeX, randColor(i) );
 		}
@@ -201,6 +189,7 @@
 		}
 		
 		pb.draw.ctx.strokeStyle = color;
+		pb.draw.ctx.lineWidth = config.lineWidth;
 		pb.draw.ctx.stroke( new Path2D(svgData.join(" ")) );
 
 		return coords;
@@ -253,6 +242,7 @@
 
 		f0.add(config, 'stepSizeX').min(0.25).max(12).step(0.25).title('Value step size on the x axis.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'scaleY').min(0.25).max(200.0).step(0.25).title('Vertical scale.').onChange( function() { pb.redraw(); } );
+		f0.add(config, 'lineWidth').min(1).max(20).title('The line with to use.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'animate').title('Toggle phase animation on/off.').onChange( startAnimation );
 		
 		f0.open();
