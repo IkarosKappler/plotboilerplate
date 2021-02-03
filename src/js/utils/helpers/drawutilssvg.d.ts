@@ -8,6 +8,7 @@
  * @modified 2021-02-03 Added the static `createSvg` function.
  * @modified 2021-02-03 Fixed the currentId='background' bug on the clear() function.
  * @modified 2021-02-03 Fixed CSSProperty `stroke-width` (was line-width before, which is wrong).
+ * @modified 2021-02-03 Added the static `HEAD_XML` attribute.
  * @version  1.0.0
  **/
 import { Polygon } from "../../Polygon";
@@ -95,19 +96,39 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      **/
     constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGElement);
     private addStyleDefs;
+    /**
+     * Retieve an old (cached) element.
+     * Only if both – key and nodeName – match, the element will be returned (null otherwise).
+     *
+     * @method findElement
+     * @private
+     * @memberof drawutilssvg
+     * @instance
+     * @param {UID} key - The key of the desired element (used when re-drawing).
+     * @param {string} nodeName - The expected node name.
+     */
     private findElement;
     /**
-     * Create a new DOM node [SVG] in the SVG namespace.
+     * Create a new DOM node &lt;svg&gt; in the SVG namespace.
+     *
+     * @method createSVGNode
+     * @private
+     * @memberof drawutilssvg
+     * @instance
+     * @param {string} nodeName - The node name (tag-name).
+     * @return {SVGElement} A new element in the SVG namespace with the given node name.
      */
     private createSVGNode;
     /**
      * Make a new SVG node (or recycle an old one) with the given node name (circle, path, line, rect, ...).
      *
+     * This function is used in draw cycles to re-use old DOM nodes (in hope to boost performance).
+     *
      * @method makeNode
      * @private
      * @instance
      * @memberof drawutilssvg
-     * @param {string} name - The node name.
+     * @param {string} nodeName - The node name.
      * @return {SVGElement} The new node, which is not yet added to any document.
      */
     private makeNode;

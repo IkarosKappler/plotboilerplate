@@ -9,6 +9,7 @@
  * @modified 2021-02-03 Added the static `createSvg` function.
  * @modified 2021-02-03 Fixed the currentId='background' bug on the clear() function.
  * @modified 2021-02-03 Fixed CSSProperty `stroke-width` (was line-width before, which is wrong).
+ * @modified 2021-02-03 Added the static `HEAD_XML` attribute.
  * @version  1.0.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -60,10 +61,7 @@ var drawutilssvg = /** @class */ (function () {
     }
     ;
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
-        // const nodeDef : SVGElement = this.createSVGNode('def');
-        // const nodeStyle : HTMLStyleElement = document.createElement('style');
         var nodeStyle = this.createSVGNode('style');
-        // nodeDef.appendChild(nodeStyle);
         this.svgNode.appendChild(nodeStyle); // nodeDef);
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
@@ -79,15 +77,6 @@ var drawutilssvg = /** @class */ (function () {
             'image': 'Image'
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
-        /*
-        for( var k in keys ) {
-            const className : string = keys[k];
-            const drawSettings : DrawSettings = drawConfig[k];
-            if( drawSettings ) {
-            nodeStyle.sheet.insertRule(`.${className} { fill : none; stroke: ${drawSettings.color}; line-width: ${drawSettings.lineWidth}px }`);
-            }
-            } */
-        // Ugly fix: insert rules using innerHtml :/
         var rules = [];
         for (var k in keys) {
             var className = keys[k];
@@ -97,6 +86,17 @@ var drawutilssvg = /** @class */ (function () {
         nodeStyle.innerHTML = rules.join("\n");
     };
     ;
+    /**
+     * Retieve an old (cached) element.
+     * Only if both – key and nodeName – match, the element will be returned (null otherwise).
+     *
+     * @method findElement
+     * @private
+     * @memberof drawutilssvg
+     * @instance
+     * @param {UID} key - The key of the desired element (used when re-drawing).
+     * @param {string} nodeName - The expected node name.
+     */
     drawutilssvg.prototype.findElement = function (key, nodeName) {
         var node = this.cache.get(key);
         if (node && node.nodeName.toUpperCase() === nodeName.toUpperCase()) {
@@ -106,31 +106,40 @@ var drawutilssvg = /** @class */ (function () {
         return null;
     };
     /**
-     * Create a new DOM node [SVG] in the SVG namespace.
+     * Create a new DOM node &lt;svg&gt; in the SVG namespace.
+     *
+     * @method createSVGNode
+     * @private
+     * @memberof drawutilssvg
+     * @instance
+     * @param {string} nodeName - The node name (tag-name).
+     * @return {SVGElement} A new element in the SVG namespace with the given node name.
      */
-    drawutilssvg.prototype.createSVGNode = function (name) {
-        return document.createElementNS("http://www.w3.org/2000/svg", name);
+    drawutilssvg.prototype.createSVGNode = function (nodeName) {
+        return document.createElementNS("http://www.w3.org/2000/svg", nodeName);
     };
     ;
     /**
      * Make a new SVG node (or recycle an old one) with the given node name (circle, path, line, rect, ...).
      *
+     * This function is used in draw cycles to re-use old DOM nodes (in hope to boost performance).
+     *
      * @method makeNode
      * @private
      * @instance
      * @memberof drawutilssvg
-     * @param {string} name - The node name.
+     * @param {string} nodeName - The node name.
      * @return {SVGElement} The new node, which is not yet added to any document.
      */
-    drawutilssvg.prototype.makeNode = function (name) {
+    drawutilssvg.prototype.makeNode = function (nodeName) {
         // Try to find node in current DOM cache.
         // Unique node keys are strictly necessary.
         // Try to recycle an old element from cache.
-        var node = this.findElement(this.curId, name); //this.createSVGNode(name);
+        var node = this.findElement(this.curId, nodeName);
         if (!node) {
             // If no such old elements exists (key not found, tag name not matching),
             // then create a new one.
-            node = this.createSVGNode(name);
+            node = this.createSVGNode(nodeName);
         }
         return node;
     };
