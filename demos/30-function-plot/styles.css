@@ -1,0 +1,19 @@
+body {
+    display: flex;
+}
+.left {
+    width : 200px;
+    position : relative;
+    float : left;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.right {
+    width: calc( 100% - 200px );
+    float : right;
+}
+.left input {
+    width : 100%;
+    border : 5px 7px;
+    box-sizing: border-box;
+}

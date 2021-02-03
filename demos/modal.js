@@ -89,7 +89,7 @@
     };
 
     Modal.prototype.open = function() {
-	console.log( this.modalElements.modal.parent );
+	// console.log( this.modalElements.modal.parent );
 	// this.modalElements.modal.parent.style.display = "block";
 	// document.getElementById( this.modalElements.modal.id ).style.display = "block";
 	this.modalElements.modal.parent.classList.remove( 'modal-closed' );
