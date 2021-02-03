@@ -5,7 +5,10 @@
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
  * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
- * @version  0.2.2
+ * @modified 2021-02-03 Added the static `createSvg` function.
+ * @modified 2021-02-03 Fixed the currentId='background' bug on the clear() function.
+ * @modified 2021-02-03 Fixed CSSProperty `stroke-width` (was line-width before, which is wrong).
+ * @version  1.0.0
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
@@ -21,6 +24,7 @@ import { DrawConfig, DrawLib, XYCoords, XYDimension, UID } from "../../interface
  * @requires XYCoords
  */
 export declare class drawutilssvg implements DrawLib<void | SVGElement> {
+    static HEAD_XML: string;
     /**
      * @member {SVGElement}
      * @memberof drawutilssvg
@@ -517,4 +521,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @private
      */
     private removeAllChildNodes;
+    /**
+     * Create a new and empty `SVGElement` &lt;svg&gt; in the svg-namespace.
+     *
+     * @name createSvg
+     * @static
+     * @memberof drawutilssvg
+     * @return SVGElement
+     */
+    static createSvg(): SVGElement;
 }

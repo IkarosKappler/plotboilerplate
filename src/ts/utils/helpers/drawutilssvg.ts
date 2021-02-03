@@ -5,7 +5,11 @@
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
  * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
- * @version  0.2.2
+ * @modified 2021-02-03 Added the static `createSvg` function.
+ * @modified 2021-02-03 Fixed the currentId='background' bug on the clear() function.
+ * @modified 2021-02-03 Fixed CSSProperty `stroke-width` (was line-width before, which is wrong).
+ * @modified 2021-02-03 Added the static `HEAD_XML` attribute.
+ * @version  1.0.0
  **/
 
 
@@ -29,6 +33,12 @@ import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams
  */
 export class drawutilssvg implements DrawLib<void|SVGElement> {
 
+    static HEAD_XML = [
+	'<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+	'<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" ',
+        '         "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
+	'' ].join("\n");
+    
     /**
      * @member {SVGElement}
      * @memberof drawutilssvg
@@ -135,10 +145,11 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
     };
 
     private addStyleDefs( drawConfig ) {
-	const nodeDef : SVGElement = this.createSVGNode('def');
-	const nodeStyle : HTMLStyleElement = document.createElement('style');
-	nodeDef.appendChild(nodeStyle);
-	this.svgNode.appendChild(nodeDef);
+	// const nodeDef : SVGElement = this.createSVGNode('def');
+	// const nodeStyle : HTMLStyleElement = document.createElement('style');
+	const nodeStyle : SVGElement = this.createSVGNode('style');
+	// nodeDef.appendChild(nodeStyle);
+	this.svgNode.appendChild(nodeStyle); // nodeDef);
 
 	// Which default styles to add? -> All from the DrawConfig.
 	// Compare with DrawConfig interface
@@ -167,7 +178,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	for( var k in keys ) {
 	    const className : string = keys[k];
 	    const drawSettings : DrawSettings = drawConfig[k];
-	    rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; line-width: ${drawSettings.lineWidth}px }`);
+	    rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; stroke-width: ${drawSettings.lineWidth}px }`);
 	}
 	nodeStyle.innerHTML = rules.join("\n");
     };
@@ -991,6 +1002,8 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	// Bind this special element into the document
 	this._bindFillDraw( node, this.curId, null, null );
 	node.setAttribute( 'fill', typeof color === "undefined" ? 'none' : color );
+	// Clear the current ID again
+	this.curId = null;
 
 	return node;
     };
@@ -1004,6 +1017,18 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	while( this.gNode.firstChild ) {
 	    this.gNode.removeChild(this.gNode.lastChild);
 	}
+    };
+
+    /**
+     * Create a new and empty `SVGElement` &lt;svg&gt; in the svg-namespace.
+     *
+     * @name createSvg
+     * @static
+     * @memberof drawutilssvg
+     * @return SVGElement
+     */
+    static createSvg() : SVGElement {
+	return document.createElementNS("http://www.w3.org/2000/svg","svg");
     };
     
 }

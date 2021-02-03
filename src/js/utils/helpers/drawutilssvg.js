@@ -6,7 +6,10 @@
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
  * @modified 2021-01-26 Changed the `isPrimary` (default true) attribute to `isSecondary` (default false).
- * @version  0.2.2
+ * @modified 2021-02-03 Added the static `createSvg` function.
+ * @modified 2021-02-03 Fixed the currentId='background' bug on the clear() function.
+ * @modified 2021-02-03 Fixed CSSProperty `stroke-width` (was line-width before, which is wrong).
+ * @version  1.0.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -57,10 +60,11 @@ var drawutilssvg = /** @class */ (function () {
     }
     ;
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
-        var nodeDef = this.createSVGNode('def');
-        var nodeStyle = document.createElement('style');
-        nodeDef.appendChild(nodeStyle);
-        this.svgNode.appendChild(nodeDef);
+        // const nodeDef : SVGElement = this.createSVGNode('def');
+        // const nodeStyle : HTMLStyleElement = document.createElement('style');
+        var nodeStyle = this.createSVGNode('style');
+        // nodeDef.appendChild(nodeStyle);
+        this.svgNode.appendChild(nodeStyle); // nodeDef);
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         var keys = {
@@ -88,7 +92,7 @@ var drawutilssvg = /** @class */ (function () {
         for (var k in keys) {
             var className = keys[k];
             var drawSettings = drawConfig[k];
-            rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; line-width: " + drawSettings.lineWidth + "px }");
+            rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; stroke-width: " + drawSettings.lineWidth + "px }");
         }
         nodeStyle.innerHTML = rules.join("\n");
     };
@@ -846,6 +850,8 @@ var drawutilssvg = /** @class */ (function () {
         // Bind this special element into the document
         this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
+        // Clear the current ID again
+        this.curId = null;
         return node;
     };
     ;
@@ -860,6 +866,24 @@ var drawutilssvg = /** @class */ (function () {
         }
     };
     ;
+    /**
+     * Create a new and empty `SVGElement` &lt;svg&gt; in the svg-namespace.
+     *
+     * @name createSvg
+     * @static
+     * @memberof drawutilssvg
+     * @return SVGElement
+     */
+    drawutilssvg.createSvg = function () {
+        return document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    };
+    ;
+    drawutilssvg.HEAD_XML = [
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+        '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" ',
+        '         "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
+        ''
+    ].join("\n");
     return drawutilssvg;
 }());
 exports.drawutilssvg = drawutilssvg;

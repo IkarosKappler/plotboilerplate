@@ -1,6 +1,11 @@
 
 
 # Changelog
+* 2021-02-03
+  * Added the static `drawusilssvg.createSvg` function.
+  * Fixed the currentId='background' bug on the drawusilssvg.clear() function.
+  * Fixed CSSProperty `stroke-width` in drawusilssvg (was line-width before, which is wrong).
+  * Added the static `drawusilssvg.HEAD_XML` attribute.
 * 2021-02-02
   * Added the `Bounds.toPolygon` method.
 * 2021-01-29

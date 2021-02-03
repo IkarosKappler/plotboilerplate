@@ -76,9 +76,9 @@
 	     * This is a function hooked into the plot boilerplate's savefile-handler.
 	     **/
 	    pb.hooks.saveFile = function() {
+		// SVGElement
+		var svgNode = drawutilssvg.createSvg();
 		// Create a new SVG renderer.
-		// var svgNode = document.getElementById('preview-svg');
-		var svgNode = document.createElement('svg');
 		var tosvgDraw = new drawutilssvg( svgNode,
 						  pb.draw.offset,
 						  pb.draw.scale,
@@ -91,17 +91,16 @@
 		tosvgFill.beginDrawCycle(0);
 		tosvgDraw.clear( pb.config.backgroundColor );
 
-		// Use the 
-		pb.drawAll( 0, tosvgDraw, tosvgFill );
+		// Use the `drawAll` function to draw vertices.
+		pb.drawAll( 1, tosvgDraw, tosvgFill );
 		redraw( tosvgDraw, tosvgFill );
 
 		// Full support in all browsers \o/
 		//    https://caniuse.com/xml-serializer
 		var serializer = new XMLSerializer();
-		var head = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		var svgCode = serializer.serializeToString(svgNode);
 
-		var blob = new Blob([head + "\n" + svgCode], { type: "image/svg;charset=utf-8" } );
+		var blob = new Blob([drawutilssvg.HEAD_XML + svgCode], { type: "image/svg;charset=utf-8" } );
 		// See documentation for FileSaver.js for usage.
 		//    https://github.com/eligrey/FileSaver.js
 		if( typeof globalThis["saveAs"] != "function" )
