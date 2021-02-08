@@ -128,7 +128,7 @@ import { IBounds, IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBP
  * @requires XYDimension
  */
 export class PlotBoilerplate {
-
+    
     /** @constant {number} */
     static readonly DEFAULT_CANVAS_WIDTH : number    = 1024;
     /** @constant {number} */
