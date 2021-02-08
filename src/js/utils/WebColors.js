@@ -8,7 +8,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shuffleWebColors = exports.WebColors = exports.LightGreen = exports.Green = exports.Teal = exports.Cyan = exports.LightBlue = exports.Blue = exports.Indigo = exports.DeepPurple = exports.Purple = exports.Pink = exports.Red = void 0;
-var Color_1 = require("./datastructures/Color");
+const Color_1 = require("./datastructures/Color");
 exports.Red = Color_1.Color.makeRGB(255, 67, 55);
 exports.Pink = Color_1.Color.makeRGB(232, 31, 100);
 exports.Purple = Color_1.Color.makeRGB(156, 39, 175);
@@ -45,8 +45,8 @@ exports.WebColors = [
 /**
  * A helper function to shuffle the colors into a new order.
  */
-var shuffleWebColors = function (order) {
-    var result = Array(order.length);
+const shuffleWebColors = (order) => {
+    const result = Array(order.length);
     for (var i = 0; i < order.length; i++) {
         result[i] = exports.WebColors[order[i] % exports.WebColors.length];
     }

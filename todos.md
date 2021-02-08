@@ -32,7 +32,15 @@
  * Remove all 'info' blocks and replace by uistats.
  * For convenience add an "Info" button to the UI of all demos with a short explanation about what's happening here.
  * Remove all <div id="dialog-wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
-
+ * Fix following compiling "errors":
+        "forceConsistentCasingInFileNames": true,
+	"noImplicitReturns": false,
+	"noImplicitThis": false,
+	"noImplicitAny": false,
+	"strictNullChecks": false,
+	"suppressImplicitAnyIndexErrors": true,
+	"noUnusedLocals": false,
+	"noUnusedParameters": false
 
 ### Todos for future Version 2
  * Remove class member `PlotBoilerplate.ctx` (SVG renderes don't have such a context).

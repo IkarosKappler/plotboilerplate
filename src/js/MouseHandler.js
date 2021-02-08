@@ -23,36 +23,13 @@
  * @file MouseHandler
  * @public
  **/
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MouseHandler = exports.XWheelEvent = exports.XMouseEvent = void 0;
-var XMouseEvent = /** @class */ (function (_super) {
-    __extends(XMouseEvent, _super);
-    function XMouseEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XMouseEvent;
-}(MouseEvent));
+class XMouseEvent extends MouseEvent {
+}
 exports.XMouseEvent = XMouseEvent;
-var XWheelEvent = /** @class */ (function (_super) {
-    __extends(XWheelEvent, _super);
-    function XWheelEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XWheelEvent;
-}(WheelEvent));
+class XWheelEvent extends WheelEvent {
+}
 exports.XWheelEvent = XWheelEvent;
 /**
  * @classdesc A simple mouse handler for demos.
@@ -60,7 +37,7 @@ exports.XWheelEvent = XWheelEvent;
  *
  * @requires XYCoords
  */
-var MouseHandler = /** @class */ (function () {
+class MouseHandler {
     /**
      * The constructor.
      *
@@ -121,7 +98,7 @@ var MouseHandler = /** @class */ (function () {
      * @memberof MouseHandler
      * @param {HTMLElement} element
      **/
-    function MouseHandler(element, name) {
+    constructor(element, name) {
         this.mouseDownPos = undefined;
         this.mouseDragPos = undefined;
         this.mousePos = undefined;
@@ -147,8 +124,8 @@ var MouseHandler = /** @class */ (function () {
         // | They will dispatch the modified event (relative mouse position,
         // | drag offset, ...) to the callbacks.
         // +-------------------------------------------------
-        var _self = this;
-        this.handlers['mousemove'] = function (e) {
+        const _self = this;
+        this.handlers['mousemove'] = (e) => {
             if (_self.listeners.mousemove)
                 _self.listeners.mousemove(_self.mkParams(e, 'mousemove'));
             if (_self.mouseDragPos && _self.listeners.drag)
@@ -156,25 +133,25 @@ var MouseHandler = /** @class */ (function () {
             if (_self.mouseDownPos)
                 _self.mouseDragPos = _self.relPos(e);
         };
-        this.handlers['mouseup'] = function (e) {
+        this.handlers['mouseup'] = (e) => {
             if (_self.listeners.mouseup)
                 _self.listeners.mouseup(_self.mkParams(e, 'mouseup'));
             _self.mouseDragPos = undefined;
             _self.mouseDownPos = undefined;
             _self.mouseButton = -1;
         };
-        this.handlers['mousedown'] = function (e) {
+        this.handlers['mousedown'] = (e) => {
             _self.mouseDragPos = _self.relPos(e);
             _self.mouseDownPos = _self.relPos(e);
             _self.mouseButton = e.button;
             if (_self.listeners.mousedown)
                 _self.listeners.mousedown(_self.mkParams(e, 'mousedown'));
         };
-        this.handlers['click'] = function (e) {
+        this.handlers['click'] = (e) => {
             if (_self.listeners.click)
                 _self.listeners.click(_self.mkParams(e, 'click'));
         };
-        this.handlers['wheel'] = function (e) {
+        this.handlers['wheel'] = (e) => {
             if (_self.listeners.wheel)
                 _self.listeners.wheel(_self.mkParams(e, 'wheel'));
         };
@@ -194,11 +171,11 @@ var MouseHandler = /** @class */ (function () {
      * @param {MouseEvent} e - The mouse event to get the relative position for.
      * @return {XYCoords} The relative mouse coordinates.
      */
-    MouseHandler.prototype.relPos = function (e) {
+    relPos(e) {
         return { x: e.offsetX,
             y: e.offsetY
         };
-    };
+    }
     ;
     /**
      * Build the extended event params.
@@ -211,9 +188,9 @@ var MouseHandler = /** @class */ (function () {
      * @param {string} eventName - The name of the firing event.
      * @return {XMouseEvent}
      */
-    MouseHandler.prototype.mkParams = function (e, eventName) {
-        var rel = this.relPos(e);
-        var xEvent = e;
+    mkParams(e, eventName) {
+        const rel = this.relPos(e);
+        const xEvent = e;
         xEvent.params = {
             element: this.element,
             name: eventName,
@@ -229,7 +206,7 @@ var MouseHandler = /** @class */ (function () {
             dragAmount: (this.mouseDownPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 })
         };
         return xEvent;
-    };
+    }
     /**
      * Install a new listener.
      * Please note that this mouse handler can only handle one listener per event type.
@@ -241,12 +218,12 @@ var MouseHandler = /** @class */ (function () {
      * @param {string} eventName - The name of the firing event to listen for.
      * @return {void}
      */
-    MouseHandler.prototype.listenFor = function (eventName) {
+    listenFor(eventName) {
         if (this.installed[eventName])
             return;
         // In the new version 1.1.0 has all internal listeners installed by default.
         this.installed[eventName] = true;
-    };
+    }
     /**
      * Un-install a new listener.
      *
@@ -257,12 +234,12 @@ var MouseHandler = /** @class */ (function () {
      * @param {string} eventName - The name of the firing event to unlisten for.
      * @return {void}
      */
-    MouseHandler.prototype.unlistenFor = function (eventName) {
+    unlistenFor(eventName) {
         if (!this.installed[eventName])
             return;
         // In the new version 1.1.0 has all internal listeners installed by default.
         delete this.installed[eventName];
-    };
+    }
     /**
      * Installer function to listen for a specific event: mouse-drag.
      * Pass your callbacks here.
@@ -275,7 +252,7 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The drag-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.drag = function (callback) {
+    drag(callback) {
         if (this.listeners.drag)
             this.throwAlreadyInstalled('drag');
         this.listeners.drag = callback;
@@ -283,7 +260,7 @@ var MouseHandler = /** @class */ (function () {
         this.listenFor('mousemove');
         this.listenFor('mouseup');
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-move.
@@ -297,13 +274,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The move-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.move = function (callback) {
+    move(callback) {
         if (this.listeners.mousemove)
             this.throwAlreadyInstalled('mousemove');
         this.listenFor('mousemove');
         this.listeners.mousemove = callback;
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-up.
@@ -317,13 +294,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The up-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.up = function (callback) {
+    up(callback) {
         if (this.listeners.mouseup)
             this.throwAlreadyInstalled('mouseup');
         this.listenFor('mouseup');
         this.listeners.mouseup = callback;
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-down.
@@ -337,13 +314,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The down-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.down = function (callback) {
+    down(callback) {
         if (this.listeners.mousedown)
             this.throwAlreadyInstalled('mousedown');
         this.listenFor('mousedown');
         this.listeners.mousedown = callback;
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-click.
@@ -357,13 +334,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The click-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.click = function (callback) {
+    click(callback) {
         if (this.listeners.click)
             this.throwAlreadyInstalled('click');
         this.listenFor('click');
         this.listeners.click = callback;
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-wheel.
@@ -377,13 +354,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XWheelCallback} callback - The wheel-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.wheel = function (callback) {
+    wheel(callback) {
         if (this.listeners.wheel)
             this.throwAlreadyInstalled('wheel');
         this.listenFor('wheel');
         this.listeners.wheel = callback;
         return this;
-    };
+    }
     ;
     /**
      * An internal function to throw events.
@@ -395,9 +372,9 @@ var MouseHandler = /** @class */ (function () {
      * @param {string} name - The name of the event.
      * @return {void}
      */
-    MouseHandler.prototype.throwAlreadyInstalled = function (name) {
-        throw "This MouseHandler already has a '" + name + "' callback. To keep the code simple there is only room for one.";
-    };
+    throwAlreadyInstalled(name) {
+        throw `This MouseHandler already has a '${name}' callback. To keep the code simple there is only room for one.`;
+    }
     ;
     /**
      * Call this when your work is done.
@@ -410,7 +387,7 @@ var MouseHandler = /** @class */ (function () {
      * @private
      * @return {void}
      */
-    MouseHandler.prototype.destroy = function () {
+    destroy() {
         this.unlistenFor('mousedown');
         this.unlistenFor('mousemove');
         this.unlistenFor('moseup');
@@ -421,8 +398,7 @@ var MouseHandler = /** @class */ (function () {
         this.element.removeEventListener('mousedown', this.handlers['mousedown']);
         this.element.removeEventListener('click', this.handlers['click']);
         this.element.removeEventListener('wheel', this.handlers['wheel']);
-    };
-    return MouseHandler;
-}());
+    }
+}
 exports.MouseHandler = MouseHandler;
 //# sourceMappingURL=MouseHandler.js.map

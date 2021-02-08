@@ -144,7 +144,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	} 
     };
 
-    private addStyleDefs( drawConfig ) {
+    private addStyleDefs( drawConfig:DrawConfig ) {
 	const nodeStyle : SVGElement = this.createSVGNode('style');
 	this.svgNode.appendChild(nodeStyle); // nodeDef);
 
@@ -254,7 +254,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
      * @return {SVGElement} The node itself (for chaining).
      */
-    private _bindFillDraw( node, className:string, color:string, lineWidth?:number ) : SVGElement {
+    private _bindFillDraw( node:SVGElement, className:string, color:string, lineWidth?:number ) : SVGElement {
 	if( this.curClassName ) {
 	    node.setAttribute('class', `${this.curClassName} ${className}`);
 	} else {
@@ -983,7 +983,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutilssvg
      **/
-    clear( color:string ) {
+    clear( color:string ) : void {
 	// If this isn't the primary handler then do not remove anything here.
 	// The primary handler will do that (no double work).
 	if( this.isSecondary ) {
@@ -1014,7 +1014,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	// Clear the current ID again
 	this.curId = null;
 
-	return node;
+	// return node;
     };
 
     /**

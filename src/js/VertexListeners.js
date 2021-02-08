@@ -20,7 +20,7 @@ exports.VertexListeners = void 0;
  *              functions.
  *
  */
-var VertexListeners = /** @class */ (function () {
+class VertexListeners {
     /**
      * The constructor.
      *
@@ -28,7 +28,7 @@ var VertexListeners = /** @class */ (function () {
      * @name VertexListeners
      * @param {Vertex} vertex - The vertex to use these listeners on (just a backward reference).
      **/
-    function VertexListeners(vertex) {
+    constructor(vertex) {
         this.click = [];
         this.drag = [];
         this.dragStart = [];
@@ -45,10 +45,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.addClickListener = function (listener) {
+    addClickListener(listener) {
         VertexListeners._addListener(this.click, listener);
         return this;
-    };
+    }
     ;
     /**
      * The click listener is a function with a single drag event param.
@@ -64,10 +64,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.removeClickListener = function (listener) {
+    removeClickListener(listener) {
         this.click = VertexListeners._removeListener(this.click, listener);
         return this;
-    };
+    }
     ;
     /**
      * The click listener is a function with a single drag event param.
@@ -83,10 +83,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.addDragListener = function (listener) {
+    addDragListener(listener) {
         VertexListeners._addListener(this.drag, listener);
         return this;
-    };
+    }
     ;
     /**
      * The drag listener is a function with a single drag event param.
@@ -102,10 +102,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.removeDragListener = function (listener) {
+    removeDragListener(listener) {
         this.drag = VertexListeners._removeListener(this.drag, listener);
         return this;
-    };
+    }
     ;
     /**
      * Add a dragStart listener.
@@ -116,10 +116,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.addDragStartListener = function (listener) {
+    addDragStartListener(listener) {
         VertexListeners._addListener(this.dragStart, listener);
         return this;
-    };
+    }
     ;
     /**
      * The drag-start listener is a function with a single drag event param.
@@ -135,10 +135,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.removeDragStartListener = function (listener) {
+    removeDragStartListener(listener) {
         this.dragStart = VertexListeners._removeListener(this.dragStart, listener);
         return this;
-    };
+    }
     ;
     /**
      * Add a dragEnd listener.
@@ -149,11 +149,11 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.addDragEndListener = function (listener) {
+    addDragEndListener(listener) {
         // this.dragEnd.push( listener );
         VertexListeners._addListener(this.dragEnd, listener);
         return this;
-    };
+    }
     ;
     /**
      * The drag-end listener is a function with a single drag event param.
@@ -169,11 +169,11 @@ var VertexListeners = /** @class */ (function () {
     * @instance
     * @memberof VertexListeners
     **/
-    VertexListeners.prototype.removeDragEndListener = function (listener) {
+    removeDragEndListener(listener) {
         // this.drag.push( listener );
         this.dragEnd = VertexListeners._removeListener(this.dragEnd, listener);
         return this;
-    };
+    }
     ;
     /**
      * Fire a click event with the given event instance to all
@@ -185,9 +185,9 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireClickEvent = function (e) {
+    fireClickEvent(e) {
         VertexListeners._fireEvent(this, this.click, e);
-    };
+    }
     ;
     /**
      * Fire a drag event with the given event instance to all
@@ -199,9 +199,9 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireDragEvent = function (e) {
+    fireDragEvent(e) {
         VertexListeners._fireEvent(this, this.drag, e);
-    };
+    }
     ;
     /**
      * Fire a dragStart event with the given event instance to all
@@ -213,9 +213,9 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireDragStartEvent = function (e) {
+    fireDragStartEvent(e) {
         VertexListeners._fireEvent(this, this.dragStart, e);
-    };
+    }
     ;
     /**
      * Fire a dragEnd event with the given event instance to all
@@ -227,15 +227,15 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireDragEndEvent = function (e) {
+    fireDragEndEvent(e) {
         VertexListeners._fireEvent(this, this.dragEnd, e);
-    };
+    }
     ;
     /**
      * @private
      **/
-    VertexListeners._fireEvent = function (_self, listeners, e) {
-        var ve = e;
+    static _fireEvent(_self, listeners, e) {
+        const ve = e;
         if (typeof ve.params == 'undefined')
             ve.params = { vertex: _self.vertex };
         else
@@ -243,32 +243,31 @@ var VertexListeners = /** @class */ (function () {
         for (var i in listeners) {
             listeners[i](ve);
         }
-    };
+    }
     ;
     /**
      * @private
      */
-    VertexListeners._addListener = function (listeners, newListener) {
+    static _addListener(listeners, newListener) {
         for (var i in listeners) {
             if (listeners[i] == newListener)
                 return false;
         }
         listeners.push(newListener);
         return true;
-    };
+    }
     ;
     /**
      * @private
      */
-    VertexListeners._removeListener = function (listeners, oldListener) {
+    static _removeListener(listeners, oldListener) {
         for (var i = 0; i < listeners.length; i++) {
             if (listeners[i] == oldListener)
                 return listeners.splice(i, 1);
         }
         return listeners;
-    };
+    }
     ;
-    return VertexListeners;
-}());
+}
 exports.VertexListeners = VertexListeners;
 //# sourceMappingURL=VertexListeners.js.map

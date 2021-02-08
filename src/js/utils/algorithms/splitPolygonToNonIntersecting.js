@@ -10,8 +10,8 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.splitPolygonToNonIntersecting = void 0;
-var Line_1 = require("../../Line");
-var Vertex_1 = require("../../Vertex");
+const Line_1 = require("../../Line");
+const Vertex_1 = require("../../Vertex");
 /**
  * This function cuts a given self-intersecting polygon into non-self-intersecting
  * sub polygons.
@@ -28,17 +28,17 @@ var Vertex_1 = require("../../Vertex");
  * @param {number=10} maxDepth - Number of max recursive steps (default is 10).
  * @return {Array<Array<Vertex>>} A sequence of non-self-intersecting sub polygons.
  */
-exports.splitPolygonToNonIntersecting = (function () {
+exports.splitPolygonToNonIntersecting = (() => {
     /**
      * @param {Array<Vertex>} vertices
      * @param {number=10} maxDepth
      */
-    var splitPolygonToNonIntersecting = function (vertices, maxDepth) {
+    const splitPolygonToNonIntersecting = (vertices, maxDepth) => {
         if (typeof maxDepth === "undefined")
             maxDepth = 10;
         return _splitPolygonToNonIntersecting(vertices, maxDepth);
     };
-    var _splitPolygonToNonIntersecting = function (vertices, maxDepth) {
+    const _splitPolygonToNonIntersecting = (vertices, maxDepth) => {
         if (maxDepth <= 0) {
             // aborting at max depth
             return [vertices];
@@ -47,9 +47,9 @@ exports.splitPolygonToNonIntersecting = (function () {
             // No intersections possible
             return [vertices];
         }
-        var n = vertices.length;
-        var lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
-        var lineB = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+        const n = vertices.length;
+        const lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+        const lineB = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
         for (var a = 0; a < vertices.length; a++) {
             lineA.a.set(vertices[a]);
             lineA.b.set(vertices[(a + 1) % n]);
@@ -61,13 +61,13 @@ exports.splitPolygonToNonIntersecting = (function () {
                     continue;
                 lineB.a.set(vertices[b]);
                 lineB.b.set(vertices[(b + 1) % n]);
-                var intersectionPoint = lineA.intersection(lineB);
+                const intersectionPoint = lineA.intersection(lineB);
                 if (intersectionPoint && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint)) {
                     // Cut polygon into two here
-                    var split = splitPolygonAt(vertices, a, b, intersectionPoint);
+                    const split = splitPolygonAt(vertices, a, b, intersectionPoint);
                     // Split has 2 elements.
-                    var leftCleaned = _splitPolygonToNonIntersecting(split[0], maxDepth - 1);
-                    var rightCleaned = _splitPolygonToNonIntersecting(split[1], maxDepth - 1);
+                    const leftCleaned = _splitPolygonToNonIntersecting(split[0], maxDepth - 1);
+                    const rightCleaned = _splitPolygonToNonIntersecting(split[1], maxDepth - 1);
                     return leftCleaned.concat(rightCleaned);
                 }
             }
@@ -78,8 +78,8 @@ exports.splitPolygonToNonIntersecting = (function () {
         return [vertices];
     };
     // Pre: edgeIndexA < edgeIndexB && vertices.length >= 4
-    var splitPolygonAt = function (vertices, edgeIndexA, edgeIndexB, intersectionPoint) {
-        var first = [];
+    const splitPolygonAt = (vertices, edgeIndexA, edgeIndexB, intersectionPoint) => {
+        const first = [];
         var second = [];
         for (var i = 0; i < vertices.length; i++) {
             if (i <= edgeIndexA)

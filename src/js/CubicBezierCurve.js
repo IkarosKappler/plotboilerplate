@@ -26,10 +26,10 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CubicBezierCurve = void 0;
-var Bounds_1 = require("./Bounds");
-var UIDGenerator_1 = require("./UIDGenerator");
-var Vertex_1 = require("./Vertex");
-var Vector_1 = require("./Vector");
+const Bounds_1 = require("./Bounds");
+const UIDGenerator_1 = require("./UIDGenerator");
+const Vertex_1 = require("./Vertex");
+const Vector_1 = require("./Vector");
 /**
  * @classdesc A refactored cubic bezier curve class.
  *
@@ -41,7 +41,7 @@ var Vector_1 = require("./Vector");
  * @requires UID
  * @requires UIDGenerator
  */
-var CubicBezierCurve = /** @class */ (function () {
+class CubicBezierCurve {
     /**
      * The constructor.
      *
@@ -52,7 +52,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @param {Vertex} startControlPoint - The Bézier curve's start control point.
      * @param {Vertex} endControlPoint   - The Bézier curve's end control point.
      **/
-    function CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint) {
+    constructor(startPoint, endPoint, startControlPoint, endControlPoint) {
         /** @constant {number} */
         this.START_POINT = CubicBezierCurve.START_POINT;
         /** @constant {number} */
@@ -89,7 +89,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {void}
      **/
-    CubicBezierCurve.prototype.moveCurvePoint = function (pointID, moveAmount, moveControlPoint, updateArcLengths) {
+    moveCurvePoint(pointID, moveAmount, moveControlPoint, updateArcLengths) {
         if (pointID == this.START_POINT) {
             this.getStartPoint().add(moveAmount);
             if (moveControlPoint)
@@ -107,11 +107,11 @@ var CubicBezierCurve = /** @class */ (function () {
                 this.getEndControlPoint().add(moveAmount);
         }
         else {
-            console.log("[CubicBezierCurve.moveCurvePoint] pointID '" + pointID + "' invalid.");
+            console.log(`[CubicBezierCurve.moveCurvePoint] pointID '${pointID}' invalid.`);
         }
         if (updateArcLengths)
             this.updateArcLengths();
-    };
+    }
     ;
     /**
      * Translate the whole curve by the given {x,y} amount: moves all four points.
@@ -122,13 +122,13 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} this (for chaining).
      **/
-    CubicBezierCurve.prototype.translate = function (amount) {
+    translate(amount) {
         this.startPoint.add(amount);
         this.startControlPoint.add(amount);
         this.endControlPoint.add(amount);
         this.endPoint.add(amount);
         return this;
-    };
+    }
     ;
     /**
      * Reverse this curve, means swapping start- and end-point and swapping
@@ -139,15 +139,15 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} this (for chaining).
      **/
-    CubicBezierCurve.prototype.reverse = function () {
-        var tmp = this.startPoint;
+    reverse() {
+        let tmp = this.startPoint;
         this.startPoint = this.endPoint;
         this.endPoint = tmp;
         tmp = this.startControlPoint;
         this.startControlPoint = this.endControlPoint;
         this.endControlPoint = tmp;
         return this;
-    };
+    }
     ;
     /**
      * Get the total curve length.<br>
@@ -164,9 +164,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {number} >= 0
      **/
-    CubicBezierCurve.prototype.getLength = function () {
+    getLength() {
         return this.arcLength;
-    };
+    }
     ;
     /**
      * Uptate the internal arc segment buffer and their lengths.<br>
@@ -180,17 +180,17 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {void}
      **/
-    CubicBezierCurve.prototype.updateArcLengths = function () {
-        var pointA = this.startPoint.clone(), pointB = new Vertex_1.Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
-        var u = curveStep;
+    updateArcLengths() {
+        let pointA = this.startPoint.clone(), pointB = new Vertex_1.Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
+        let u = curveStep;
         // Clear segment cache
         this.segmentCache = [];
         // Push start point into buffer
         this.segmentCache.push(this.startPoint);
         this.segmentLengths = [];
-        var newLength = 0.0;
+        let newLength = 0.0;
         var t = 0.0;
-        var tmpLength;
+        let tmpLength;
         while (t <= 1.0) {
             pointB = this.getPointAt(t);
             // Store point into cache
@@ -203,7 +203,7 @@ var CubicBezierCurve = /** @class */ (function () {
             t += curveStep;
         }
         this.arcLength = newLength;
-    };
+    }
     ;
     /**
      * Get a 't' (relative position on curve) with the closest distance to point 'p'.
@@ -215,7 +215,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @param {Vertex} p - The point to find the closest position ('t' on the curve).
      * @return {number}
      **/
-    CubicBezierCurve.prototype.getClosestT = function (p) {
+    getClosestT(p) {
         // We would like to have an error that's not larger than 1.0.
         var desiredEpsilon = 1.0;
         var t = 0.0;
@@ -227,7 +227,7 @@ var CubicBezierCurve = /** @class */ (function () {
             // Be sure: stop after 4 iterations
         } while (iteration < 4 && this.getPointAt(result.tPrev).distance(this.getPointAt(result.tNext)) > desiredEpsilon);
         return result.t;
-    };
+    }
     ;
     /**
      * This helper function locates the 't' on a fixed step interval with the minimal distance
@@ -243,11 +243,11 @@ var CubicBezierCurve = /** @class */ (function () {
      *
      * @return {object} - An object with t, tPrev and tNext (numbers).
      **/
-    CubicBezierCurve.prototype.locateIntervalByDistance = function (p, tStart, tEnd, stepCount) {
+    locateIntervalByDistance(p, tStart, tEnd, stepCount) {
         var minIndex = -1;
         var minDist = 0;
         var t = 0.0;
-        var tDiff = tEnd - tStart;
+        const tDiff = tEnd - tStart;
         for (var i = 0; i <= stepCount; i++) {
             t = tStart + tDiff * (i / stepCount);
             var vert = this.getPointAt(t);
@@ -261,7 +261,7 @@ var CubicBezierCurve = /** @class */ (function () {
             tPrev: tStart + tDiff * (Math.max(0, minIndex - 1) / stepCount),
             tNext: tStart + tDiff * (Math.min(stepCount, minIndex + 1) / stepCount)
         };
-    };
+    }
     ;
     /**
      * Get the bounds of this bezier curve.
@@ -271,10 +271,10 @@ var CubicBezierCurve = /** @class */ (function () {
      *
      * @return {Bounds} The bounds of this curve.
      **/
-    CubicBezierCurve.prototype.getBounds = function () {
+    getBounds() {
         var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
         var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-        var v;
+        let v;
         for (var i = 0; i < this.segmentCache.length; i++) {
             v = this.segmentCache[i];
             min.x = Math.min(min.x, v.x);
@@ -283,7 +283,7 @@ var CubicBezierCurve = /** @class */ (function () {
             max.y = Math.max(max.y, v.y);
         }
         return new Bounds_1.Bounds(min, max);
-    };
+    }
     ;
     /**
      * Get the start point of the curve.<br>
@@ -295,9 +295,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex} this.startPoint
      **/
-    CubicBezierCurve.prototype.getStartPoint = function () {
+    getStartPoint() {
         return this.startPoint;
-    };
+    }
     ;
     /**
      * Get the end point of the curve.<br>
@@ -309,9 +309,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex} this.endPoint
      **/
-    CubicBezierCurve.prototype.getEndPoint = function () {
+    getEndPoint() {
         return this.endPoint;
-    };
+    }
     ;
     /**
      * Get the start control point of the curve.<br>
@@ -323,9 +323,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex} this.startControlPoint
      **/
-    CubicBezierCurve.prototype.getStartControlPoint = function () {
+    getStartControlPoint() {
         return this.startControlPoint;
-    };
+    }
     ;
     /**
      * Get the end control point of the curve.<br>
@@ -337,9 +337,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex} this.endControlPoint
      **/
-    CubicBezierCurve.prototype.getEndControlPoint = function () {
+    getEndControlPoint() {
         return this.endControlPoint;
-    };
+    }
     ;
     /**
      * Get one of the four curve points specified by the passt point ID.
@@ -350,7 +350,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPointByID = function (id) {
+    getPointByID(id) {
         if (id == this.START_POINT)
             return this.startPoint;
         if (id == this.END_POINT)
@@ -359,8 +359,8 @@ var CubicBezierCurve = /** @class */ (function () {
             return this.startControlPoint;
         if (id == this.END_CONTROL_POINT)
             return this.endControlPoint;
-        throw new Error("Invalid point ID '" + id + "'.");
-    };
+        throw new Error(`Invalid point ID '${id}'.`);
+    }
     ;
     /**
      * Get the curve point at a given position t, where t is in [0,1].<br>
@@ -374,14 +374,14 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPointAt = function (t) {
+    getPointAt(t) {
         // Perform some powerful math magic
-        var x = this.startPoint.x * Math.pow(1.0 - t, 3) + this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2)
+        const x = this.startPoint.x * Math.pow(1.0 - t, 3) + this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2)
             + this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.x * Math.pow(t, 3);
-        var y = this.startPoint.y * Math.pow(1.0 - t, 3) + this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2)
+        const y = this.startPoint.y * Math.pow(1.0 - t, 3) + this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2)
             + this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.y * Math.pow(t, 3);
         return new Vertex_1.Vertex(x, y);
-    };
+    }
     ;
     /**
      * Get the curve point at a given position u, where u is in [0,arcLength].<br>
@@ -395,9 +395,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPoint = function (u) {
+    getPoint(u) {
         return this.getPointAt(u / this.arcLength);
-    };
+    }
     ;
     /**
      * Get the curve tangent vector at a given absolute curve position t in [0,1].<br>
@@ -410,27 +410,27 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getTangentAt = function (t) {
-        var a = this.getStartPoint();
-        var b = this.getStartControlPoint();
-        var c = this.getEndControlPoint();
-        var d = this.getEndPoint();
+    getTangentAt(t) {
+        const a = this.getStartPoint();
+        const b = this.getStartControlPoint();
+        const c = this.getEndControlPoint();
+        const d = this.getEndPoint();
         // This is the shortened one
-        var t2 = t * t;
-        var t3 = t * t2;
+        const t2 = t * t;
+        const t3 = t * t2;
         // (1 - t)^2 = (1-t)*(1-t) = 1 - t - t + t^2 = 1 - 2*t + t^2
-        var nt2 = 1 - 2 * t + t2;
-        var tX = -3 * a.x * nt2 +
+        const nt2 = 1 - 2 * t + t2;
+        const tX = -3 * a.x * nt2 +
             b.x * (3 * nt2 - 6 * (t - t2)) +
             c.x * (6 * (t - t2) - 3 * t2) +
             3 * d.x * t2;
-        var tY = -3 * a.y * nt2 +
+        const tY = -3 * a.y * nt2 +
             b.y * (3 * nt2 - 6 * (t - t2)) +
             c.y * (6 * (t - t2) - 3 * t2) +
             3 * d.y * t2;
         // Note: my implementation does NOT normalize tangent vectors!
         return new Vertex_1.Vertex(tX, tY);
-    };
+    }
     ;
     /**
      * Get a sub curve at the given start end end offsets (values between 0.0 and 1.0).
@@ -444,9 +444,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
-    CubicBezierCurve.prototype.getSubCurveAt = function (tStart, tEnd) {
-        var startVec = new Vector_1.Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        var endVec = new Vector_1.Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
+    getSubCurveAt(tStart, tEnd) {
+        const startVec = new Vector_1.Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
+        const endVec = new Vector_1.Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
         // Tangents are relative. Make absolute.
         startVec.b.add(startVec.a);
         endVec.b.add(endVec.a);
@@ -456,7 +456,7 @@ var CubicBezierCurve = /** @class */ (function () {
         // Draw the bezier curve
         // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
         return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
-    };
+    }
     ;
     /**
      * Convert a relative curve position u to the absolute curve position t.
@@ -467,9 +467,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {number}
      **/
-    CubicBezierCurve.prototype.convertU2T = function (u) {
+    convertU2T(u) {
         return Math.max(0.0, Math.min(1.0, (u / this.arcLength)));
-    };
+    }
     ;
     /**
      * Get the curve tangent vector at a given relative position u in [0,arcLength].<br>
@@ -482,9 +482,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getTangent = function (u) {
+    getTangent(u) {
         return this.getTangentAt(this.convertU2T(u));
-    };
+    }
     ;
     /**
      * Get the curve perpendicular at a given relative position u in [0,arcLength] as a vector.<br>
@@ -497,9 +497,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPerpendicular = function (u) {
+    getPerpendicular(u) {
         return this.getPerpendicularAt(this.convertU2T(u));
-    };
+    }
     ;
     /**
      * Get the curve perpendicular at a given absolute position t in [0,1] as a vector.<br>
@@ -512,10 +512,10 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPerpendicularAt = function (t) {
-        var tangentVector = this.getTangentAt(t);
+    getPerpendicularAt(t) {
+        const tangentVector = this.getTangentAt(t);
         return new Vertex_1.Vertex(tangentVector.y, -tangentVector.x);
-    };
+    }
     ;
     /**
      * Clone this Bézier curve (deep clone).
@@ -525,9 +525,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve}
      **/
-    CubicBezierCurve.prototype.clone = function () {
+    clone() {
         return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
-    };
+    }
     ;
     /**
      * Check if this and the specified curve are equal.<br>
@@ -542,7 +542,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {boolean}
      **/
-    CubicBezierCurve.prototype.equals = function (curve) {
+    equals(curve) {
         // Note: in the earlier vanilla-JS version this was callable with plain objects.
         //       Let's see if this restricted version works out.
         if (!curve)
@@ -556,7 +556,7 @@ var CubicBezierCurve = /** @class */ (function () {
             && this.endPoint.equals(curve.endPoint)
             && this.startControlPoint.equals(curve.startControlPoint)
             && this.endControlPoint.equals(curve.endControlPoint);
-    };
+    }
     ;
     /**
      * Quick check for class instance.
@@ -568,7 +568,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {boolean}
      **/
-    CubicBezierCurve.isInstance = function (obj) {
+    static isInstance(obj) {
         // Note: check this again
         /* OLD VANILLA JS IMPLEMENTATION */
         /* if( typeof obj != "object" )
@@ -582,7 +582,7 @@ var CubicBezierCurve = /** @class */ (function () {
             && typeof obj.endControlPoint == "object" && hasXY(obj.endControlPoint);
         */
         return obj instanceof CubicBezierCurve;
-    };
+    }
     ;
     /**
      * Create an SVG path data representation of this bézier curve.
@@ -597,7 +597,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {string}  The SVG path data string.
      **/
-    CubicBezierCurve.prototype.toSVGPathData = function () {
+    toSVGPathData() {
         var buffer = [];
         buffer.push('M ');
         buffer.push(this.startPoint.x.toString());
@@ -616,7 +616,7 @@ var CubicBezierCurve = /** @class */ (function () {
         buffer.push(' ');
         buffer.push(this.endPoint.y.toString());
         return buffer.join('');
-    };
+    }
     ;
     /**
      * Convert this curve to a JSON string.
@@ -627,7 +627,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {string} The JSON data.
      **/
-    CubicBezierCurve.prototype.toJSON = function (prettyFormat) {
+    toJSON(prettyFormat) {
         var jsonString = "{ " + // begin object
             (prettyFormat ? "\n\t" : "") +
             "\"startPoint\" : [" + this.getStartPoint().x + "," + this.getStartPoint().y + "], " +
@@ -640,7 +640,7 @@ var CubicBezierCurve = /** @class */ (function () {
             (prettyFormat ? "\n\t" : "") +
             " }"; // end object
         return jsonString;
-    };
+    }
     ;
     /**
      * Parse a Bézier curve from the given JSON string.
@@ -652,10 +652,10 @@ var CubicBezierCurve = /** @class */ (function () {
      * @throws An exception if the JSON string is malformed.
      * @return {CubicBezierCurve}
      **/
-    CubicBezierCurve.fromJSON = function (jsonString) {
+    static fromJSON(jsonString) {
         var obj = JSON.parse(jsonString);
         return CubicBezierCurve.fromObject(obj);
-    };
+    }
     ;
     /**
      * Try to convert the passed object to a CubicBezierCurve.
@@ -667,7 +667,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @throws An exception if the passed object is malformed.
      * @return {CubicBezierCurve}
      **/
-    CubicBezierCurve.fromObject = function (obj) {
+    static fromObject(obj) {
         if (typeof obj !== "object")
             throw "Can only build from object.";
         if (!obj.startPoint)
@@ -679,7 +679,7 @@ var CubicBezierCurve = /** @class */ (function () {
         if (!obj.endControlPoint)
             throw "Object member \"endControlPoint\" missing.";
         return new CubicBezierCurve(new Vertex_1.Vertex(obj.startPoint[0], obj.startPoint[1]), new Vertex_1.Vertex(obj.endPoint[0], obj.endPoint[1]), new Vertex_1.Vertex(obj.startControlPoint[0], obj.startControlPoint[1]), new Vertex_1.Vertex(obj.endControlPoint[0], obj.endControlPoint[1]));
-    };
+    }
     ;
     /**
      * Convert a 4-element array of vertices to a cubic bézier curve.
@@ -690,23 +690,22 @@ var CubicBezierCurve = /** @class */ (function () {
      * @throws An exception if the passed array is malformed.
      * @return {CubicBezierCurve}
      **/
-    CubicBezierCurve.fromArray = function (arr) {
+    static fromArray(arr) {
         if (!Array.isArray(arr))
             throw "Can only build from object.";
         if (arr.length != 4)
             throw "Can only build from array with four elements.";
         return new CubicBezierCurve(arr[0], arr[1], arr[2], arr[3]);
-    };
+    }
     ;
-    /** @constant {number} */
-    CubicBezierCurve.START_POINT = 0;
-    /** @constant {number} */
-    CubicBezierCurve.START_CONTROL_POINT = 1;
-    /** @constant {number} */
-    CubicBezierCurve.END_CONTROL_POINT = 2;
-    /** @constant {number} */
-    CubicBezierCurve.END_POINT = 3;
-    return CubicBezierCurve;
-}());
+}
 exports.CubicBezierCurve = CubicBezierCurve;
+/** @constant {number} */
+CubicBezierCurve.START_POINT = 0;
+/** @constant {number} */
+CubicBezierCurve.START_CONTROL_POINT = 1;
+/** @constant {number} */
+CubicBezierCurve.END_CONTROL_POINT = 2;
+/** @constant {number} */
+CubicBezierCurve.END_POINT = 3;
 //# sourceMappingURL=CubicBezierCurve.js.map

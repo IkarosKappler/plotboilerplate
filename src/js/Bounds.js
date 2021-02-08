@@ -9,8 +9,8 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bounds = void 0;
-var Polygon_1 = require("./Polygon");
-var Vertex_1 = require("./Vertex");
+const Polygon_1 = require("./Polygon");
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
  *
@@ -18,7 +18,7 @@ var Vertex_1 = require("./Vertex");
  * @requires Vertex
  * @requires IBounds
  **/
-var Bounds = /** @class */ (function () {
+class Bounds {
     /**
      * The constructor.
      *
@@ -27,7 +27,7 @@ var Bounds = /** @class */ (function () {
      * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
      * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
-    function Bounds(min, max) {
+    constructor(min, max) {
         this.min = min;
         this.max = max;
         this.width = max.x - min.x;
@@ -42,14 +42,14 @@ var Bounds = /** @class */ (function () {
      * @memberof Bounds
      * @return {Polygon} This bound rectangle as a polygon.
      */
-    Bounds.prototype.toPolygon = function () {
+    toPolygon() {
         return new Polygon_1.Polygon([
             new Vertex_1.Vertex(this.min),
             new Vertex_1.Vertex(this.max.x, this.min.y),
             new Vertex_1.Vertex(this.max),
             new Vertex_1.Vertex(this.min.x, this.max.y)
         ], false);
-    };
+    }
     ;
     /**
      * Compute the minimal bounding box for a given set of vertices.
@@ -62,14 +62,14 @@ var Bounds = /** @class */ (function () {
      * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
      * @return The minimal Bounds for the given vertices.
      **/
-    Bounds.computeFromVertices = function (vertices) {
+    static computeFromVertices(vertices) {
         if (vertices.length == 0)
             return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
-        var xMin = vertices[0].x;
-        var xMax = vertices[0].x;
-        var yMin = vertices[0].y;
-        var yMax = vertices[0].y;
-        var vert;
+        let xMin = vertices[0].x;
+        let xMax = vertices[0].x;
+        let yMin = vertices[0].y;
+        let yMax = vertices[0].y;
+        let vert;
         for (var i in vertices) {
             vert = vertices[i];
             xMin = Math.min(xMin, vert.x);
@@ -78,9 +78,8 @@ var Bounds = /** @class */ (function () {
             yMax = Math.max(yMax, vert.y);
         }
         return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
-    };
+    }
     ;
-    return Bounds;
-}()); // END class bounds
+} // END class bounds
 exports.Bounds = Bounds;
 //# sourceMappingURL=Bounds.js.map

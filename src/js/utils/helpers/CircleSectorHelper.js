@@ -8,7 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-var CircleSectorHelper = /** @class */ (function () {
+class CircleSectorHelper {
     /**
      * The constructor.
      *
@@ -19,23 +19,22 @@ var CircleSectorHelper = /** @class */ (function () {
      * @param {Vertex} controlPointEnd - A point to define the radius and end angle (distance and angle from center).
      * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle sector and both points.
      **/
-    function CircleSectorHelper(circleSector, controlPointStart, controlPointEnd, pb) {
-        circleSector.circle.center.listeners.addDragListener(function (e) {
+    constructor(circleSector, controlPointStart, controlPointEnd, pb) {
+        circleSector.circle.center.listeners.addDragListener((e) => {
             controlPointStart.add(e.params.dragAmount);
             controlPointEnd.add(e.params.dragAmount);
         });
-        controlPointStart.listeners.addDragListener(function (e) {
+        controlPointStart.listeners.addDragListener((e) => {
             circleSector.circle.radius = circleSector.circle.center.distance(controlPointStart);
             controlPointEnd.set(circleSector.circle.vertAt(circleSector.endAngle));
             circleSector.startAngle = circleSector.circle.center.angle(controlPointStart);
         });
-        controlPointEnd.listeners.addDragListener(function (e) {
+        controlPointEnd.listeners.addDragListener((e) => {
             circleSector.circle.radius = circleSector.circle.center.distance(controlPointEnd);
             controlPointStart.set(circleSector.circle.vertAt(circleSector.startAngle));
             circleSector.endAngle = circleSector.circle.center.angle(controlPointEnd);
         });
     }
-    return CircleSectorHelper;
-}());
+}
 ;
 //# sourceMappingURL=CircleSectorHelper.js.map

@@ -14,7 +14,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PBImage = void 0;
-var UIDGenerator_1 = require("./UIDGenerator");
+const UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
  *
@@ -23,7 +23,7 @@ var UIDGenerator_1 = require("./UIDGenerator");
  * @requires UID
  * @requires UIDGenerator
  */
-var PBImage = /** @class */ (function () {
+class PBImage {
     /**
      * The constructor.
      *
@@ -33,7 +33,7 @@ var PBImage = /** @class */ (function () {
      * @param {Vertex} upperLeft - The upper left corner.
      * @param {Vertex} lowerRight - The lower right corner.
      **/
-    function PBImage(image, upperLeft, lowerRight) {
+    constructor(image, upperLeft, lowerRight) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -54,12 +54,11 @@ var PBImage = /** @class */ (function () {
      * @instance
      * @memberof PBImage
      **/
-    PBImage.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
         return "";
-    };
+    }
     ;
-    return PBImage;
-}());
+}
 exports.PBImage = PBImage;
 //# sourceMappingURL=PBImage.js.map

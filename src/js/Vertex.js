@@ -29,9 +29,9 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Vertex = void 0;
-var VertexAttr_1 = require("./VertexAttr");
-var UIDGenerator_1 = require("./UIDGenerator");
-var VertexListeners_1 = require("./VertexListeners");
+const VertexAttr_1 = require("./VertexAttr");
+const UIDGenerator_1 = require("./UIDGenerator");
+const VertexListeners_1 = require("./VertexListeners");
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -46,7 +46,7 @@ var VertexListeners_1 = require("./VertexListeners");
  * @requires XYCoords
  *
  */
-var Vertex = /** @class */ (function () {
+class Vertex {
     /**
      * The constructor for the vertex class.
      *
@@ -55,7 +55,7 @@ var Vertex = /** @class */ (function () {
      * @param {number} x - The x-coordinate of the new vertex.
      * @param {number} y - The y-coordinate of the new vertex.
      **/
-    function Vertex(x, y) {
+    constructor(x, y) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -70,7 +70,7 @@ var Vertex = /** @class */ (function () {
             this.y = y;
         }
         else {
-            var tuple = x;
+            const tuple = x;
             if (typeof tuple.x == "number" && typeof tuple.y == "number") {
                 this.x = tuple.x;
                 this.y = tuple.y;
@@ -104,13 +104,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.set = function (x, y) {
+    set(x, y) {
         if (typeof x == 'number' && typeof y == 'number') {
             this.x = x;
             this.y = y;
         }
         else {
-            var tuple = x;
+            const tuple = x;
             if (typeof tuple.x == "number" && typeof tuple.y == "number") {
                 this.x = tuple.x;
                 this.y = tuple.y;
@@ -131,7 +131,7 @@ var Vertex = /** @class */ (function () {
             }
         }
         return this;
-    };
+    }
     ;
     /**
      * Set the x-component of this vertex.
@@ -142,10 +142,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.setX = function (x) {
+    setX(x) {
         this.x = x;
         return this;
-    };
+    }
     ;
     /**
      * Set the y-component of this vertex.
@@ -156,10 +156,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.setY = function (y) {
+    setY(y) {
         this.y = y;
         return this;
-    };
+    }
     ;
     /**
      * Set the x-component if this vertex to the inverse of its value.
@@ -169,10 +169,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.invX = function () {
+    invX() {
         this.x = -this.x;
         return this;
-    };
+    }
     ;
     /**
      * Set the y-component if this vertex to the inverse of its value.
@@ -182,10 +182,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.invY = function () {
+    invY() {
         this.y = -this.y;
         return this;
-    };
+    }
     ;
     /**
      * Add the passed amount to x- and y- component of this vertex.<br>
@@ -200,13 +200,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.add = function (x, y) {
+    add(x, y) {
         if (typeof x == 'number' && typeof y == 'number') {
             this.x += x;
             this.y += y;
         }
         else {
-            var tuple = x;
+            const tuple = x;
             if (typeof tuple.x == "number" && typeof tuple.y == "number") {
                 this.x += tuple.x;
                 this.y += tuple.y;
@@ -215,15 +215,15 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == 'number')
                     this.x += x;
                 else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
+                    throw `Cannot add ${typeof x} to numeric x component!`;
                 if (typeof y == 'number')
                     this.y += y;
                 else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
+                    throw `Cannot add ${typeof y} to numeric y component!`;
             }
         }
         return this;
-    };
+    }
     ;
     /**
      * Add the passed amounts to the x- and y- components of this vertex.
@@ -235,11 +235,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.addXY = function (amountX, amountY) {
+    addXY(amountX, amountY) {
         this.x += amountX;
         this.y += amountY;
         return this;
-    };
+    }
     ;
     /**
      * Add the passed amounts to the x-component of this vertex.
@@ -250,10 +250,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.addX = function (amountX) {
+    addX(amountX) {
         this.x += amountX;
         return this;
-    };
+    }
     ;
     /**
      * Add the passed amounts to the y-component of this vertex.
@@ -264,10 +264,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.addY = function (amountY) {
+    addY(amountY) {
         this.y += amountY;
         return this;
-    };
+    }
     ;
     /**
      * Substract the passed amount from x- and y- component of this vertex.<br>
@@ -282,13 +282,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.sub = function (x, y) {
+    sub(x, y) {
         if (typeof x == 'number' && typeof y == 'number') {
             this.x -= x;
             this.y -= y;
         }
         else {
-            var tuple = x;
+            const tuple = x;
             if (typeof tuple.x == "number" && typeof tuple.y == "number") {
                 this.x -= tuple.x;
                 this.y -= tuple.y;
@@ -297,15 +297,15 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == 'number')
                     this.x -= x;
                 else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
+                    throw `Cannot add ${typeof x} to numeric x component!`;
                 if (typeof y == 'number')
                     this.y -= y;
                 else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
+                    throw `Cannot add ${typeof y} to numeric y component!`;
             }
         }
         return this;
-    };
+    }
     ;
     /**
      * Check if this vertex equals the passed one.
@@ -318,12 +318,12 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.equals = function (vertex) {
+    equals(vertex) {
         var eqX = (Math.abs(this.x - vertex.x) < Vertex.EPSILON);
         var eqY = (Math.abs(this.y - vertex.y) < Vertex.EPSILON);
         var result = eqX && eqY;
         return result;
-    };
+    }
     ;
     /**
      * Create a copy of this vertex.
@@ -333,9 +333,9 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.clone = function () {
+    clone() {
         return new Vertex(this.x, this.y);
-    };
+    }
     ;
     /**
      * Get the distance to the passed point (in euclidean metric)
@@ -346,9 +346,9 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.distance = function (vert) {
+    distance(vert) {
         return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
-    };
+    }
     ;
     /**
      * Get the angle of this point (relative to (0,0) or to the given other origin point).
@@ -359,11 +359,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.angle = function (origin) {
-        var a = (typeof origin === "undefined" ? Math.PI / 2 - Math.atan2(this.x, this.y) : Math.PI / 2 - Math.atan2(origin.x - this.x, origin.y - this.y));
+    angle(origin) {
+        const a = (typeof origin === "undefined" ? Math.PI / 2 - Math.atan2(this.x, this.y) : Math.PI / 2 - Math.atan2(origin.x - this.x, origin.y - this.y));
         // Map to positive value
         return a < 0 ? Math.PI * 2 + a : a;
-    };
+    }
     ;
     /**
      * Get the difference to the passed point.<br>
@@ -376,9 +376,9 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.difference = function (vert) {
+    difference(vert) {
         return new Vertex(vert.x - this.x, vert.y - this.y);
-    };
+    }
     ;
     /**
      * This is a vector-like behavior and 'scales' this vertex
@@ -391,13 +391,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.scale = function (factor, center) {
+    scale(factor, center) {
         if (!center || typeof center === "undefined")
             center = new Vertex(0, 0);
         this.x = center.x + (this.x - center.x) * factor;
         this.y = center.y + (this.y - center.y) * factor;
         return this;
-    };
+    }
     ;
     /**
      * This is a vector-like behavior and 'rotates' this vertex
@@ -410,19 +410,19 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.rotate = function (angle, center) {
+    rotate(angle, center) {
         if (!center || typeof center === "undefined")
             center = new Vertex(0, 0);
         this.sub(center);
         angle += Math.atan2(this.y, this.x);
-        var len = this.distance(Vertex.ZERO); // {x:0,y:0});
-        var lenX = this.x;
-        var lenY = this.y;
+        let len = this.distance(Vertex.ZERO); // {x:0,y:0});
+        let lenX = this.x;
+        let lenY = this.y;
         this.x = len * Math.cos(angle);
         this.y = len * Math.sin(angle);
         this.add(center);
         return this;
-    };
+    }
     ;
     /**
      * Multiply both components of this vertex with the given scalar.<br>
@@ -436,11 +436,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.multiplyScalar = function (scalar) {
+    multiplyScalar(scalar) {
         this.x *= scalar;
         this.y *= scalar;
         return this;
-    };
+    }
     ;
     /**
      * Round the two components x and y of this vertex.
@@ -450,11 +450,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.round = function () {
+    round() {
         this.x = Math.round(this.x);
         this.y = Math.round(this.y);
         return this;
-    };
+    }
     ;
     /**
      * Change this vertex (x,y) to its inverse (-x,-y).
@@ -464,11 +464,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.inv = function () {
+    inv() {
         this.x = -this.x;
         this.y = -this.y;
         return this;
-    };
+    }
     ;
     /**
      * Get a string representation of this vertex.
@@ -478,9 +478,9 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.toString = function () {
+    toString() {
         return '(' + this.x + ',' + this.y + ')';
-    };
+    }
     ;
     /**
      * Convert this vertex to SVG code.
@@ -492,7 +492,7 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<circle');
@@ -503,7 +503,7 @@ var Vertex = /** @class */ (function () {
         buffer.push(' r="2"');
         buffer.push(' />');
         return buffer.join('');
-    };
+    }
     ;
     // END Vertex
     /**
@@ -512,57 +512,56 @@ var Vertex = /** @class */ (function () {
      * @param {ViewPort} viewPort - A {min:Vertex, max:Vertex} viewport specifying the bounds.
      * @return A new vertex with a random position.
      **/
-    Vertex.randomVertex = function (viewPort) {
+    static randomVertex(viewPort) {
         return new Vertex(viewPort.min.x + Math.random() * (viewPort.max.x - viewPort.min.x), viewPort.min.y + Math.random() * (viewPort.max.y - viewPort.min.y));
-    };
+    }
     ;
-    Vertex.ZERO = new Vertex(0, 0);
-    /**
-     * An epsilon for comparison
-     *
-     * @private
-     * @readonly
-     **/
-    Vertex.EPSILON = 1.0e-6;
-    Vertex.utils = {
-        /**
-         * Generate a four-point arrow head, starting at the vector end minus the
-         * arrow head length.
-         *
-         * The first vertex in the returned array is guaranteed to be the located
-         * at the vector line end minus the arrow head length.
-         *
-         *
-         * Due to performance all params are required.
-         *
-         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-         * scaling different). Arrow heads should not look distored on non-uniform scaling.
-         *
-         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-         * For headlen use 8, it's a good arrow head size.
-         *
-         * Example:
-         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-         *
-         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-         * @param {Vertex} zB - The end vertex of the vector.
-         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-         * @param {number} scaleX  - The horizontal scaling during draw.
-         * @param {number} scaleY  - the vertical scaling during draw.
-         **/
-        // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
-        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
-            // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
-            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-            var vertices = [];
-            vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
-            vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
-            return vertices;
-        }
-    };
-    return Vertex;
-}());
+}
 exports.Vertex = Vertex;
+Vertex.ZERO = new Vertex(0, 0);
+/**
+ * An epsilon for comparison
+ *
+ * @private
+ * @readonly
+ **/
+Vertex.EPSILON = 1.0e-6;
+Vertex.utils = {
+    /**
+     * Generate a four-point arrow head, starting at the vector end minus the
+     * arrow head length.
+     *
+     * The first vertex in the returned array is guaranteed to be the located
+     * at the vector line end minus the arrow head length.
+     *
+     *
+     * Due to performance all params are required.
+     *
+     * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+     * scaling different). Arrow heads should not look distored on non-uniform scaling.
+     *
+     * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+     * For headlen use 8, it's a good arrow head size.
+     *
+     * Example:
+     *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+     *
+     * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {Vertex} zB - The end vertex of the vector.
+     * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+     * @param {number} scaleX  - The horizontal scaling during draw.
+     * @param {number} scaleY  - the vertical scaling during draw.
+     **/
+    // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
+    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
+        // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+        var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+        var vertices = [];
+        vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
+        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+        return vertices;
+    }
+};
 //# sourceMappingURL=Vertex.js.map

@@ -535,7 +535,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      * @memberof drawutilssvg
      **/
-    clear(color: string): SVGElement;
+    clear(color: string): void;
     /**
      * A private helper function to clear all SVG nodes from the &gt;g> node.
      *

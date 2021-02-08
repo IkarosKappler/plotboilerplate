@@ -28,13 +28,13 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Triangle = void 0;
-var Bounds_1 = require("./Bounds");
-var Circle_1 = require("./Circle");
-var Line_1 = require("./Line");
-var Polygon_1 = require("./Polygon");
-var UIDGenerator_1 = require("./UIDGenerator");
-var Vertex_1 = require("./Vertex");
-var geomutils_1 = require("./geomutils");
+const Bounds_1 = require("./Bounds");
+const Circle_1 = require("./Circle");
+const Line_1 = require("./Line");
+const Polygon_1 = require("./Polygon");
+const UIDGenerator_1 = require("./UIDGenerator");
+const Vertex_1 = require("./Vertex");
+const geomutils_1 = require("./geomutils");
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -53,7 +53,7 @@ var geomutils_1 = require("./geomutils");
  * @requires geomutils
  *
  */
-var Triangle = /** @class */ (function () {
+class Triangle {
     /**
      * The constructor.
      *
@@ -63,7 +63,7 @@ var Triangle = /** @class */ (function () {
      * @param {Vertex} b - The second vertex of the triangle.
      * @param {Vertex} c - The third vertex of the triangle.
      **/
-    function Triangle(a, b, c) {
+    constructor(a, b, c) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -86,11 +86,11 @@ var Triangle = /** @class */ (function () {
      * @memberof Vertex
      * @return {Triangle}
      **/
-    Triangle.fromArray = function (arr) {
+    static fromArray(arr) {
         if (arr.length < 3)
-            throw "Cannot create triangle from array with less than three vertices (" + arr.length + ")";
+            throw `Cannot create triangle from array with less than three vertices (${arr.length})`;
         return new Triangle(arr[0], arr[1], arr[2]);
-    };
+    }
     ;
     /**
      * Get the area of this triangle. The returned area is never negative.
@@ -104,9 +104,9 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      * @return {number} The non-negative area of this triangle.
      */
-    Triangle.prototype.getArea = function () {
+    getArea() {
         return Math.abs(Triangle.utils.signedArea(this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y));
-    };
+    }
     ;
     /**
      * Get the centroid of this triangle.
@@ -118,9 +118,9 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      **/
-    Triangle.prototype.getCentroid = function () {
+    getCentroid() {
         return new Vertex_1.Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
-    };
+    }
     ;
     /**
      * Scale the triangle towards its centroid.
@@ -131,13 +131,13 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.scaleToCentroid = function (factor) {
-        var centroid = this.getCentroid();
+    scaleToCentroid(factor) {
+        let centroid = this.getCentroid();
         this.a.scale(factor, centroid);
         this.b.scale(factor, centroid);
         this.c.scale(factor, centroid);
         return this;
-    };
+    }
     ;
     /**
      * Get the circumcircle of this triangle.
@@ -154,11 +154,11 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.getCircumcircle = function () {
+    getCircumcircle() {
         // if( !this.center || !this.radius ) 
         this.calcCircumcircle();
         return new Circle_1.Circle(this.center.clone(), this.radius);
-    };
+    }
     ;
     /**
      * Check if this triangle and the passed triangle share an
@@ -173,12 +173,12 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.isAdjacent = function (tri) {
+    isAdjacent(tri) {
         var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
         var b = this.b.equals(tri.a) || this.b.equals(tri.b) || this.b.equals(tri.c);
         var c = this.c.equals(tri.a) || this.c.equals(tri.b) || this.c.equals(tri.c);
         return (a && b) || (a && c) || (b && c);
-    };
+    }
     ;
     /**
      * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of
@@ -191,14 +191,14 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.getThirdVertex = function (vert1, vert2) {
+    getThirdVertex(vert1, vert2) {
         if (this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1))
             return this.c;
         if (this.b.equals(vert1) && this.c.equals(vert2) || this.b.equals(vert2) && this.c.equals(vert1))
             return this.a;
         //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
         return this.b;
-    };
+    }
     ;
     /**
      * Re-compute the circumcircle of this triangle (if the vertices
@@ -212,34 +212,34 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.calcCircumcircle = function () {
+    calcCircumcircle() {
         // From
         //    http://www.exaflop.org/docs/cgafaq/cga1.html
-        var A = this.b.x - this.a.x;
-        var B = this.b.y - this.a.y;
-        var C = this.c.x - this.a.x;
-        var D = this.c.y - this.a.y;
-        var E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
-        var F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
-        var G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
-        var dx, dy;
+        const A = this.b.x - this.a.x;
+        const B = this.b.y - this.a.y;
+        const C = this.c.x - this.a.x;
+        const D = this.c.y - this.a.y;
+        const E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
+        const F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
+        const G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
+        let dx, dy;
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
-            var bounds = this.bounds();
+            const bounds = this.bounds();
             this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
             dx = this.center.x - bounds.min.x;
             dy = this.center.y - bounds.min.y;
         }
         else {
-            var cx = (D * E - B * F) / G;
-            var cy = (A * F - C * E) / G;
+            const cx = (D * E - B * F) / G;
+            const cy = (A * F - C * E) / G;
             this.center = new Vertex_1.Vertex(cx, cy);
             dx = this.center.x - this.a.x;
             dy = this.center.y - this.a.y;
         }
         this.radius_squared = dx * dx + dy * dy;
         this.radius = Math.sqrt(this.radius_squared);
-    };
+    }
     ; // END calcCircumcircle
     /**
      * Check if the passed vertex is inside this triangle's
@@ -251,12 +251,12 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.inCircumcircle = function (v) {
-        var dx = this.center.x - v.x;
-        var dy = this.center.y - v.y;
-        var dist_squared = dx * dx + dy * dy;
+    inCircumcircle(v) {
+        const dx = this.center.x - v.x;
+        const dy = this.center.y - v.y;
+        const dist_squared = dx * dx + dy * dy;
         return (dist_squared <= this.radius_squared);
-    };
+    }
     ;
     /**
      * Get the rectangular bounds for this triangle.
@@ -266,9 +266,9 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.bounds = function () {
+    bounds() {
         return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
-    };
+    }
     ;
     /**
      * Convert this triangle to a polygon instance.
@@ -280,9 +280,9 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      **/
-    Triangle.prototype.toPolygon = function () {
+    toPolygon() {
         return new Polygon_1.Polygon([this.a, this.b, this.c]);
-    };
+    }
     ;
     /**
      * Get the determinant of this triangle.
@@ -292,10 +292,10 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.determinant = function () {
+    determinant() {
         // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
         return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
-    };
+    }
     ;
     /**
      * Checks if the passed vertex (p) is inside this triangle.
@@ -308,28 +308,28 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.containsPoint = function (p) {
+    containsPoint(p) {
         return Triangle.utils.pointIsInTriangle(p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y);
-    };
+    }
     ;
     /**
      * Get that inner triangle which defines the maximal incircle.
      *
      * @return {Triangle} The triangle of those points in this triangle that define the incircle.
      */
-    Triangle.prototype.getIncircularTriangle = function () {
-        var lineA = new Line_1.Line(this.a, this.b);
-        var lineB = new Line_1.Line(this.b, this.c);
-        var lineC = new Line_1.Line(this.c, this.a);
-        var bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
-        var bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
-        var intersection = bisector1.intersection(bisector2);
+    getIncircularTriangle() {
+        const lineA = new Line_1.Line(this.a, this.b);
+        const lineB = new Line_1.Line(this.b, this.c);
+        const lineC = new Line_1.Line(this.c, this.a);
+        const bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
+        const bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        const intersection = bisector1.intersection(bisector2);
         // Find the closest points on one of the polygon lines (all have same distance by construction)
-        var circleIntersA = lineA.getClosestPoint(intersection);
-        var circleIntersB = lineB.getClosestPoint(intersection);
-        var circleIntersC = lineC.getClosestPoint(intersection);
+        const circleIntersA = lineA.getClosestPoint(intersection);
+        const circleIntersB = lineB.getClosestPoint(intersection);
+        const circleIntersC = lineC.getClosestPoint(intersection);
         return new Triangle(circleIntersA, circleIntersB, circleIntersC);
-    };
+    }
     ;
     /**
      * Get the incircle of this triangle. That is the circle that touches each side
@@ -339,9 +339,9 @@ var Triangle = /** @class */ (function () {
      *
      * @return {Circle} The incircle of this triangle.
      */
-    Triangle.prototype.getIncircle = function () {
+    getIncircle() {
         return this.getIncircularTriangle().getCircumcircle();
-    };
+    }
     ;
     /**
      * Get the incenter of this triangle (which is the center of the circumcircle).
@@ -351,11 +351,11 @@ var Triangle = /** @class */ (function () {
      *       calcCircumcircle() function first, otherwise you might get wrong results.
      * @return Vertex The incenter of this triangle.
      **/
-    Triangle.prototype.getIncenter = function () {
+    getIncenter() {
         if (!this.center || !this.radius)
             this.calcCircumcircle();
         return this.center.clone();
-    };
+    }
     ;
     /**
      * Converts this triangle into a human-readable string.
@@ -365,9 +365,9 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.toString = function () {
+    toString() {
         return '{ a : ' + this.a.toString() + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
-    };
+    }
     ;
     /**
      * Create an SVG representation of this triangle.
@@ -379,7 +379,7 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      **/
-    Triangle.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<path');
@@ -404,43 +404,42 @@ var Triangle = /** @class */ (function () {
         }
         buffer.push('" />');
         return buffer.join('');
-    };
+    }
     ;
+}
+exports.Triangle = Triangle;
+/**
+ * An epsilon for comparison.
+ * This should be the same epsilon as in Vertex.
+ *
+ * @private
+ **/
+Triangle.EPSILON = 1.0e-6;
+Triangle.utils = {
+    // Used in the bounds() function.
+    max3(a, b, c) {
+        return (a >= b && a >= c) ? a : (b >= a && b >= c) ? b : c;
+    },
+    min3(a, b, c) {
+        return (a <= b && a <= c) ? a : (b <= a && b <= c) ? b : c;
+    },
+    signedArea(p0x, p0y, p1x, p1y, p2x, p2y) {
+        return 0.5 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
+    },
     /**
-     * An epsilon for comparison.
-     * This should be the same epsilon as in Vertex.
+     * Used by the containsPoint() function.
      *
      * @private
      **/
-    Triangle.EPSILON = 1.0e-6;
-    Triangle.utils = {
-        // Used in the bounds() function.
-        max3: function (a, b, c) {
-            return (a >= b && a >= c) ? a : (b >= a && b >= c) ? b : c;
-        },
-        min3: function (a, b, c) {
-            return (a <= b && a <= c) ? a : (b <= a && b <= c) ? b : c;
-        },
-        signedArea: function (p0x, p0y, p1x, p1y, p2x, p2y) {
-            return 0.5 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
-        },
-        /**
-         * Used by the containsPoint() function.
-         *
-         * @private
-         **/
-        pointIsInTriangle: function (px, py, p0x, p0y, p1x, p1y, p2x, p2y) {
-            //
-            // Point-in-Triangle test found at
-            //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-            // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
-            var area = Triangle.utils.signedArea(p0x, p0y, p1x, p1y, p2x, p2y);
-            var s = 1 / (2 * area) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
-            var t = 1 / (2 * area) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
-            return s > 0 && t > 0 && (1 - s - t) > 0;
-        }
-    };
-    return Triangle;
-}());
-exports.Triangle = Triangle;
+    pointIsInTriangle(px, py, p0x, p0y, p1x, p1y, p2x, p2y) {
+        //
+        // Point-in-Triangle test found at
+        //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
+        // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+        var area = Triangle.utils.signedArea(p0x, p0y, p1x, p1y, p2x, p2y);
+        var s = 1 / (2 * area) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
+        var t = 1 / (2 * area) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
+        return s > 0 && t > 0 && (1 - s - t) > 0;
+    }
+};
 //# sourceMappingURL=Triangle.js.map

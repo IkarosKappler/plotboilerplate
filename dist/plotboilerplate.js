@@ -42,10 +42,10 @@
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BezierPath = void 0;
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+const CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A BezierPath class.
  *
@@ -59,7 +59,7 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires UID
  * @requires UIDGenerator
  **/
-var BezierPath = /** @class */ (function () {
+class BezierPath {
     /**
      * The constructor.<br>
      * <br>
@@ -72,7 +72,7 @@ var BezierPath = /** @class */ (function () {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    function BezierPath(pathPoints) {
+    constructor(pathPoints) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -104,7 +104,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {void}
      **/
-    BezierPath.prototype.addCurve = function (curve) {
+    addCurve(curve) {
         if (curve == null || typeof curve == 'undefined')
             throw "Cannot add null curve to bézier path.";
         this.bezierCurves.push(curve);
@@ -118,7 +118,7 @@ var BezierPath = /** @class */ (function () {
         else {
             this.totalArcLength += curve.getLength();
         }
-    };
+    }
     ;
     /**
      * Locate the curve with the given start point (function returns the index).
@@ -129,14 +129,14 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {number} The curve index or -1 if curve (start-) point not found
      **/
-    BezierPath.prototype.locateCurveByStartPoint = function (point) {
+    locateCurveByStartPoint(point) {
         // for( var i in this.bezierCurves ) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             if (this.bezierCurves[i].startPoint.equals(point))
                 return i;
         }
         return -1;
-    };
+    }
     ;
     /**
      * Locate the curve with the given end point (function returns the index).
@@ -147,14 +147,14 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {number} The curve index or -1 if curve (end-) point not found
      **/
-    BezierPath.prototype.locateCurveByEndPoint = function (point) {
+    locateCurveByEndPoint(point) {
         // for( var i in this.bezierCurves ) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             if (this.bezierCurves[i].endPoint.equals(point))
                 return i;
         }
         return -1;
-    };
+    }
     ;
     /**
      * Locate the curve with the given start point (function returns the index).
@@ -165,14 +165,14 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {number} The curve index or -1 if curve (end-) point not found
      **/
-    BezierPath.prototype.locateCurveByStartControlPoint = function (point) {
+    locateCurveByStartControlPoint(point) {
         // for( var i in this.bezierCurves ) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             if (this.bezierCurves[i].startControlPoint.equals(point))
                 return i;
         }
         return -1;
-    };
+    }
     ;
     // +---------------------------------------------------------------------------------
     // | Locate the curve with the given end control point.
@@ -180,14 +180,14 @@ var BezierPath = /** @class */ (function () {
     // | @param point:Vertex The point to look for.
     // | @return Number The index or -1 if not found.
     // +-------------------------------
-    BezierPath.prototype.locateCurveByEndControlPoint = function (point) {
+    locateCurveByEndControlPoint(point) {
         // for( var i in this.bezierCurves ) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             if (this.bezierCurves[i].endControlPoint.equals(point))
                 return i;
         }
         return -1;
-    };
+    }
     ;
     /**
      * Get the total length of this path.<br>
@@ -200,9 +200,9 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {number} The (buffered) length of the path.
      **/
-    BezierPath.prototype.getLength = function () {
+    getLength() {
         return this.totalArcLength;
-    };
+    }
     ;
     /**
      * This function is internally called whenever the curve or path configuration
@@ -217,13 +217,13 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {void}
      **/
-    BezierPath.prototype.updateArcLengths = function () {
+    updateArcLengths() {
         this.totalArcLength = 0.0;
         for (var i = 0; i < this.bezierCurves.length; i++) {
             this.bezierCurves[i].updateArcLengths();
             this.totalArcLength += this.bezierCurves[i].getLength();
         }
-    };
+    }
     ;
     /**
      * Get the number of curves in this path.
@@ -233,9 +233,9 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {number} The number of curves in this path.
      **/
-    BezierPath.prototype.getCurveCount = function () {
+    getCurveCount() {
         return this.bezierCurves.length;
-    };
+    }
     ;
     /**
      * Get the cubic bezier curve at the given index.
@@ -246,9 +246,9 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {CubicBezierCurve} The curve at the specified index.
      **/
-    BezierPath.prototype.getCurveAt = function (curveIndex) {
+    getCurveAt(curveIndex) {
         return this.bezierCurves[curveIndex];
-    };
+    }
     ;
     /**
      * Remove the end point of this path (which removes the last curve from this path).<br>
@@ -469,7 +469,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {BezierPath} this for chaining
      **/
-    BezierPath.prototype.translate = function (amount) {
+    translate(amount) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
             curve.getStartPoint().add(amount);
@@ -481,7 +481,7 @@ var BezierPath = /** @class */ (function () {
         curve.getEndPoint().add(amount);
         this.updateArcLengths();
         return this;
-    };
+    }
     ;
     /**
      * Scale the whole bezier path by the given (x,y)-factors.
@@ -493,7 +493,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {BezierPath} this for chaining.
      **/
-    BezierPath.prototype.scale = function (anchor, scaling) {
+    scale(anchor, scaling) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
             curve.getStartPoint().scale(scaling, anchor);
@@ -509,7 +509,7 @@ var BezierPath = /** @class */ (function () {
         }
         this.updateArcLengths();
         return this;
-    };
+    }
     ;
     /**
      * Rotate the whole bezier path around a point..
@@ -521,7 +521,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {void}
      **/
-    BezierPath.prototype.rotate = function (angle, center) {
+    rotate(angle, center) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
             curve.getStartPoint().rotate(angle, center);
@@ -535,7 +535,7 @@ var BezierPath = /** @class */ (function () {
         if (this.bezierCurves.length > 0 && !this.adjustCircular) {
             this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().rotate(angle, center);
         }
-    };
+    }
     ;
     /**
      * Get the 't' position on this curve with the minimal distance to point p.
@@ -543,10 +543,8 @@ var BezierPath = /** @class */ (function () {
      * @param {Vertex} p - The point to find the closest curve point for.
      * @return {number} A value t with 0.0 <= t <= 1.0.
      **/
-    BezierPath.prototype.getClosestT = function (p) {
+    getClosestT(p) {
         // Find the spline to extract the value from
-        // var i : number = 0;
-        var uTemp = 0.0;
         var minIndex = -1;
         var minDist = 0.0;
         var dist = 0.0;
@@ -564,7 +562,7 @@ var BezierPath = /** @class */ (function () {
             u += this.bezierCurves[i].getLength();
         }
         return Math.max(0.0, Math.min(1.0, uMin / this.totalArcLength));
-    };
+    }
     ;
     /**
      * Get the point on the bézier path at the given relative path location.
@@ -575,10 +573,10 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {Vertex} The point at the relative path position.
      **/
-    BezierPath.prototype.getPoint = function (u) {
+    getPoint(u) {
         if (u < 0 || u > this.totalArcLength) {
             console.log("[BezierPath.getPoint(u)] u is out of bounds: " + u + ".");
-            return null;
+            u = Math.min(this.totalArcLength, Math.max(u, 0));
         }
         // Find the spline to extract the value from
         var i = 0;
@@ -595,7 +593,7 @@ var BezierPath = /** @class */ (function () {
         var bCurve = this.bezierCurves[i];
         var relativeU = u - uTemp;
         return bCurve.getPoint(relativeU);
-    };
+    }
     ;
     /**
      * Get the point on the bézier path at the given path fraction.
@@ -606,9 +604,9 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {Vertex} The point at the absolute path position.
      **/
-    BezierPath.prototype.getPointAt = function (t) {
+    getPointAt(t) {
         return this.getPoint(t * this.totalArcLength);
-    };
+    }
     ;
     /**
      * Get the tangent of the bézier path at the given path fraction.<br>
@@ -621,9 +619,9 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {Vertex} The tangent vector at the absolute path position.
      **/
-    BezierPath.prototype.getTangentAt = function (t) {
+    getTangentAt(t) {
         return this.getTangent(t * this.totalArcLength);
-    };
+    }
     ;
     /**
      *  Get the tangent of the bézier path at the given path location.<br>
@@ -636,10 +634,11 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {Vertex} The tangent vector at the relative path position.
      **/
-    BezierPath.prototype.getTangent = function (u) {
+    getTangent(u) {
         if (u < 0 || u > this.totalArcLength) {
             console.warn("[BezierPath.getTangent(u)] u is out of bounds: " + u + ".");
-            return null;
+            // return undefined;
+            u = Math.min(this.totalArcLength, Math.max(0, u));
         }
         // Find the spline to extract the value from
         var i = 0;
@@ -652,7 +651,7 @@ var BezierPath = /** @class */ (function () {
         var bCurve = this.bezierCurves[i];
         var relativeU = u - uTemp;
         return bCurve.getTangent(relativeU);
-    };
+    }
     ;
     /**
      * Get the perpendicular of the bézier path at the given absolute path location (fraction).<br>
@@ -665,9 +664,9 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {Vertex} The perpendicluar vector at the absolute path position.
      **/
-    BezierPath.prototype.getPerpendicularAt = function (t) {
+    getPerpendicularAt(t) {
         return this.getPerpendicular(t * this.totalArcLength);
-    };
+    }
     ;
     /**
      * Get the perpendicular of the bézier path at the given relative path location.<br>
@@ -680,19 +679,17 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {Vertex} The perpendicluar vector at the relative path position.
      **/
-    BezierPath.prototype.getPerpendicular = function (u) {
+    getPerpendicular(u) {
         if (u < 0 || u > this.totalArcLength) {
             console.log("[BezierPath.getPerpendicular(u)] u is out of bounds: " + u + ".");
-            return null;
+            u = Math.min(this.totalArcLength, Math.max(0, u));
         }
         // Find the spline to extract the value from
-        var i = 0;
-        var uTemp = 0.0;
         var uResult = BezierPath._locateUIndex(this, u);
         var bCurve = this.bezierCurves[uResult.i];
         var relativeU = u - uResult.uPart;
         return bCurve.getPerpendicular(relativeU);
-    };
+    }
     ;
     /**
      * This is a helper function to locate the curve index for a given
@@ -706,7 +703,7 @@ var BezierPath = /** @class */ (function () {
      * - {number} uPart - the absolute curve length sum (length from the beginning to u, should equal u itself).
      * - {number} uBefore - the absolute curve length for all segments _before_ the matched curve (usually uBefore <= uPart).
      **/
-    BezierPath._locateUIndex = function (path, u) {
+    static _locateUIndex(path, u) {
         var i = 0;
         var uTemp = 0.0;
         var uBefore = 0.0;
@@ -718,7 +715,7 @@ var BezierPath = /** @class */ (function () {
             i++;
         }
         return { i: i, uPart: uTemp, uBefore: uBefore };
-    };
+    }
     ;
     /**
      * Get a specific sub path from this path. The start and end position are specified by
@@ -738,11 +735,11 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {BezierPath} The desired sub path in the bounds [startT..endT].
      **/
-    BezierPath.prototype.getSubPathAt = function (startT, endT) {
+    getSubPathAt(startT, endT) {
         startT = Math.max(0, startT);
         endT = Math.min(1.0, endT);
-        var startU = startT * this.totalArcLength;
-        var endU = endT * this.totalArcLength;
+        let startU = startT * this.totalArcLength;
+        let endU = endT * this.totalArcLength;
         var uStartResult = BezierPath._locateUIndex(this, startU); // { i:int, uPart:float, uBefore:float }
         var uEndResult = BezierPath._locateUIndex(this, endU); // { i:int, uPart:float, uBefore:float }
         var firstT = (startU - uStartResult.uBefore) / this.bezierCurves[uStartResult.i].getLength();
@@ -776,7 +773,7 @@ var BezierPath = /** @class */ (function () {
             }
             return BezierPath.fromArray(curves);
         }
-    };
+    }
     ;
     /**
      * This function moves the addressed curve point (or control point) with
@@ -793,7 +790,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {void}
      **/
-    BezierPath.prototype.moveCurvePoint = function (curveIndex, pointID, moveAmount) {
+    moveCurvePoint(curveIndex, pointID, moveAmount) {
         var bCurve = this.getCurveAt(curveIndex);
         bCurve.moveCurvePoint(pointID, moveAmount, true, // move control point, too
         true // updateArcLengths
@@ -827,7 +824,7 @@ var BezierPath = /** @class */ (function () {
         // Don't forget to update the arc lengths!
         // Note: this can be optimized as only two curves have changed their lengths!
         this.updateArcLengths();
-    };
+    }
     ;
     /**
      * This helper function adjusts the given point's predecessor's control point.
@@ -841,7 +838,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {void}
      **/
-    BezierPath.prototype.adjustPredecessorControlPoint = function (curveIndex, obtainHandleLength, updateArcLengths) {
+    adjustPredecessorControlPoint(curveIndex, obtainHandleLength, updateArcLengths) {
         if (!this.adjustCircular && curveIndex <= 0)
             return; // false;
         var mainCurve = this.getCurveAt(curveIndex);
@@ -851,7 +848,7 @@ var BezierPath = /** @class */ (function () {
         neighbourCurve.getEndPoint(), // the neighbour's point
         neighbourCurve.getEndControlPoint(), // the neighbour's control point to adjust
         obtainHandleLength, updateArcLengths);
-    };
+    }
     ;
     /**
      * This helper function adjusts the given point's successor's control point.
@@ -865,7 +862,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {void}
      **/
-    BezierPath.prototype.adjustSuccessorControlPoint = function (curveIndex, obtainHandleLength, updateArcLengths) {
+    adjustSuccessorControlPoint(curveIndex, obtainHandleLength, updateArcLengths) {
         if (!this.adjustCircular && curveIndex + 1 > this.getCurveCount())
             return; //  false; 
         var mainCurve = this.getCurveAt(curveIndex);
@@ -875,7 +872,7 @@ var BezierPath = /** @class */ (function () {
         neighbourCurve.getStartPoint(), // the neighbour's point
         neighbourCurve.getStartControlPoint(), // the neighbour's control point to adjust
         obtainHandleLength, updateArcLengths);
-    };
+    }
     ;
     /**
      * This helper function adjusts the given point's successor's control point.
@@ -894,8 +891,9 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {void}
      **/
-    // !!! TODO: SHOULDNT THIS BE A STATIC FUNCTION ???
-    BezierPath.adjustNeighbourControlPoint = function (mainCurve, neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, updateArcLengths) {
+    static adjustNeighbourControlPoint(_mainCurve, // TODO: remove param
+    neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, _updateArcLengths // TODO: remove param
+    ) {
         // Calculate start handle length
         var mainHandleBounds = new Vertex_1.Vertex(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
         var neighbourHandleBounds = new Vertex_1.Vertex(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
@@ -911,7 +909,7 @@ var BezierPath = /** @class */ (function () {
             neighbourControlPoint.set(neighbourPoint.x - mainHandleBounds.x, neighbourPoint.y - mainHandleBounds.y);
         }
         neighbourCurve.updateArcLengths();
-    };
+    }
     ;
     /**
      * Get the bounds of this Bézier path.
@@ -921,9 +919,9 @@ var BezierPath = /** @class */ (function () {
      *
      * @return {Bounds} The bounds of this Bézier path.
      **/
-    BezierPath.prototype.getBounds = function () {
-        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+    getBounds() {
+        const min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        const max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
         var b;
         for (var i = 0; i < this.bezierCurves.length; i++) {
             b = this.bezierCurves[i].getBounds();
@@ -933,7 +931,7 @@ var BezierPath = /** @class */ (function () {
             max.y = Math.max(max.y, b.max.y);
         }
         return new Bounds_1.Bounds(min, max);
-    };
+    }
     ;
     /**
      * Clone this BezierPath (deep clone).
@@ -943,8 +941,8 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {BezierPath}
      **/
-    BezierPath.prototype.clone = function () {
-        var path = new BezierPath(null);
+    clone() {
+        var path = new BezierPath(undefined);
         for (var i = 0; i < this.bezierCurves.length; i++) {
             path.bezierCurves.push(this.bezierCurves[i].clone());
             // Connect splines
@@ -954,7 +952,7 @@ var BezierPath = /** @class */ (function () {
         path.updateArcLengths();
         path.adjustCircular = this.adjustCircular;
         return path;
-    };
+    }
     ;
     /**
      * Compare this and the passed Bézier path.
@@ -965,7 +963,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {boolean}
      **/
-    BezierPath.prototype.equals = function (path) {
+    equals(path) {
         if (!path)
             return false;
         // Check if path contains the credentials
@@ -980,7 +978,7 @@ var BezierPath = /** @class */ (function () {
                 return false;
         }
         return true;
-    };
+    }
     ;
     /**
      * Create a <pre>&lt;path&gt;</pre> SVG representation of this bézier curve.
@@ -993,7 +991,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {string} The SVG string.
      **/
-    BezierPath.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<path');
@@ -1007,7 +1005,7 @@ var BezierPath = /** @class */ (function () {
         }
         buffer.push('" />');
         return buffer.join('');
-    };
+    }
     ;
     /**
      * Create a JSON string representation of this bézier curve.
@@ -1018,7 +1016,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {string} The JSON string.
      **/
-    BezierPath.prototype.toJSON = function (prettyFormat) {
+    toJSON(prettyFormat) {
         var buffer = [];
         buffer.push("["); // array begin
         for (var i = 0; i < this.bezierCurves.length; i++) {
@@ -1034,7 +1032,7 @@ var BezierPath = /** @class */ (function () {
             buffer.push(" ");
         buffer.push("]"); // array end
         return buffer.join(""); // Convert to string, with empty separator.
-    };
+    }
     ;
     /**
      * Parse a BezierPath from the given JSON string.
@@ -1046,10 +1044,10 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {BezierPath} The parsed bezier path instance.
      **/
-    BezierPath.fromJSON = function (jsonString) {
+    static fromJSON(jsonString) {
         var obj = JSON.parse(jsonString);
         return BezierPath.fromArray(obj);
-    };
+    }
     ;
     /**
      * Create a BezierPath instance from the given array.
@@ -1061,18 +1059,18 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {BezierPath} The bezier path instance retrieved from the array data.
      **/
-    BezierPath.fromArray = function (obj) {
+    static fromArray(obj) {
         if (!Array.isArray(obj))
             throw "[BezierPath.fromArray] Passed object must be an array.";
-        var arr = obj; // FORCE?
+        const arr = obj; // FORCE?
         if (arr.length < 1)
             throw "[BezierPath.fromArray] Passed array must contain at least one bezier curve (has " + arr.length + ").";
         // Create an empty bezier path
-        var bPath = new BezierPath(null);
+        var bPath = new BezierPath(undefined);
         var lastCurve = null;
         for (var i = 0; i < arr.length; i++) {
             // Convert object (or array?) to bezier curve
-            var bCurve = null;
+            var bCurve;
             if (CubicBezierCurve_1.CubicBezierCurve.isInstance(arr[i])) {
                 bCurve = arr[i].clone();
             }
@@ -1096,7 +1094,7 @@ var BezierPath = /** @class */ (function () {
         bPath.updateArcLengths();
         // Bezier segments added. Done
         return bPath;
-    };
+    }
     ;
     /**
      * This function converts the bezier path into a string containing
@@ -1112,7 +1110,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {string} The reduced list representation of this path.
      **/
-    BezierPath.prototype.toReducedListRepresentation = function (digits) {
+    toReducedListRepresentation(digits) {
         if (typeof digits == "undefined")
             digits = 1;
         var buffer = [];
@@ -1140,7 +1138,7 @@ var BezierPath = /** @class */ (function () {
         }
         buffer.push("]"); // array end
         return buffer.join(""); // Convert to string, with empty separator.
-    };
+    }
     ;
     /**
      * Parse a BezierPath instance from the reduced list representation.<br>
@@ -1154,7 +1152,7 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {BezierPath} The bezier path instance retrieved from the string.
      **/
-    BezierPath.fromReducedListRepresentation = function (listJSON) {
+    static fromReducedListRepresentation(listJSON) {
         // Parse the array
         var pointArray = JSON.parse(listJSON);
         if (!pointArray.length) {
@@ -1167,14 +1165,14 @@ var BezierPath = /** @class */ (function () {
         }
         // Convert to object
         var bezierPath = new BezierPath(null); // No points yet
-        var startPoint = null;
-        var startControlPoint = null;
-        var endControlPoint = null;
-        var endPoint = null;
+        var startPoint;
+        var startControlPoint;
+        var endControlPoint;
+        var endPoint;
         var i = 0;
         do {
-            if (i == 0)
-                startPoint = new Vertex_1.Vertex(pointArray[i], pointArray[i + 1]);
+            //if( i == 0 )
+            startPoint = new Vertex_1.Vertex(pointArray[i], pointArray[i + 1]);
             startControlPoint = new Vertex_1.Vertex(pointArray[i + 2], pointArray[i + 3]);
             endControlPoint = new Vertex_1.Vertex(pointArray[i + 4], pointArray[i + 5]);
             endPoint = new Vertex_1.Vertex(pointArray[i + 6], pointArray[i + 7]);
@@ -1185,22 +1183,21 @@ var BezierPath = /** @class */ (function () {
         } while (i + 2 < pointArray.length);
         bezierPath.updateArcLengths();
         return bezierPath;
-    };
+    }
     ;
-    // +---------------------------------------------------------------------------------
-    // | These constants equal the values from CubicBezierCurve.
-    // +-------------------------------
-    /** @constant {number} */
-    BezierPath.START_POINT = 0;
-    /** @constant {number} */
-    BezierPath.START_CONTROL_POINT = 1;
-    /** @constant {number} */
-    BezierPath.END_CONTROL_POINT = 2;
-    /** @constant {number} */
-    BezierPath.END_POINT = 3;
-    return BezierPath;
-}());
+}
 exports.BezierPath = BezierPath;
+// +---------------------------------------------------------------------------------
+// | These constants equal the values from CubicBezierCurve.
+// +-------------------------------
+/** @constant {number} */
+BezierPath.START_POINT = 0;
+/** @constant {number} */
+BezierPath.START_CONTROL_POINT = 1;
+/** @constant {number} */
+BezierPath.END_CONTROL_POINT = 2;
+/** @constant {number} */
+BezierPath.END_POINT = 3;
 //# sourceMappingURL=BezierPath.js.map
 
 /***/ }),
@@ -1227,8 +1224,8 @@ exports.BezierPath = BezierPath;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
-var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
  *
@@ -1236,7 +1233,7 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires Vertex
  * @requires IBounds
  **/
-var Bounds = /** @class */ (function () {
+class Bounds {
     /**
      * The constructor.
      *
@@ -1245,7 +1242,7 @@ var Bounds = /** @class */ (function () {
      * @param {XYCoords} min - The min values (x,y) as a XYCoords tuple.
      * @param {XYCoords} max - The max values (x,y) as a XYCoords tuple.
      **/
-    function Bounds(min, max) {
+    constructor(min, max) {
         this.min = min;
         this.max = max;
         this.width = max.x - min.x;
@@ -1260,14 +1257,14 @@ var Bounds = /** @class */ (function () {
      * @memberof Bounds
      * @return {Polygon} This bound rectangle as a polygon.
      */
-    Bounds.prototype.toPolygon = function () {
+    toPolygon() {
         return new Polygon_1.Polygon([
             new Vertex_1.Vertex(this.min),
             new Vertex_1.Vertex(this.max.x, this.min.y),
             new Vertex_1.Vertex(this.max),
             new Vertex_1.Vertex(this.min.x, this.max.y)
         ], false);
-    };
+    }
     ;
     /**
      * Compute the minimal bounding box for a given set of vertices.
@@ -1280,14 +1277,14 @@ var Bounds = /** @class */ (function () {
      * @param {Array<Vertex>} vertices - The set of vertices you want to get the bounding box for.
      * @return The minimal Bounds for the given vertices.
      **/
-    Bounds.computeFromVertices = function (vertices) {
+    static computeFromVertices(vertices) {
         if (vertices.length == 0)
             return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
-        var xMin = vertices[0].x;
-        var xMax = vertices[0].x;
-        var yMin = vertices[0].y;
-        var yMax = vertices[0].y;
-        var vert;
+        let xMin = vertices[0].x;
+        let xMax = vertices[0].x;
+        let yMin = vertices[0].y;
+        let yMax = vertices[0].y;
+        let vert;
         for (var i in vertices) {
             vert = vertices[i];
             xMin = Math.min(xMin, vert.x);
@@ -1296,10 +1293,9 @@ var Bounds = /** @class */ (function () {
             yMax = Math.max(yMax, vert.y);
         }
         return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
-    };
+    }
     ;
-    return Bounds;
-}()); // END class bounds
+} // END class bounds
 exports.Bounds = Bounds;
 //# sourceMappingURL=Bounds.js.map
 
@@ -1330,10 +1326,10 @@ exports.Bounds = Bounds;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Circle = void 0;
-var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -1345,7 +1341,7 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires UID
  * @requires UIDGenerator
  **/
-var Circle = /** @class */ (function () {
+class Circle {
     /**
      * Create a new circle with given center point and radius.
      *
@@ -1354,7 +1350,7 @@ var Circle = /** @class */ (function () {
      * @param {Vertex} center - The center point of the circle.
      * @param {number} radius - The radius of the circle.
      */
-    function Circle(center, radius) {
+    constructor(center, radius) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -1373,9 +1369,9 @@ var Circle = /** @class */ (function () {
      * @memberof Circle
      * @return {boolean} `true` if any only if the given circle is completely inside this circle.
      */
-    Circle.prototype.containsCircle = function (circle) {
+    containsCircle(circle) {
         return this.center.distance(circle.center) + circle.radius < this.radius;
-    };
+    }
     ;
     /**
      * Calculate the distance from this circle to the given line.
@@ -1391,10 +1387,10 @@ var Circle = /** @class */ (function () {
      * @instance
      * @memberof Circle
      */
-    Circle.prototype.lineDistance = function (line) {
-        var closestPointOnLine = line.getClosestPoint(this.center);
+    lineDistance(line) {
+        const closestPointOnLine = line.getClosestPoint(this.center);
         return closestPointOnLine.distance(this.center) - this.radius;
-    };
+    }
     ;
     /**
      * Get the vertex on the this circle for the given angle.
@@ -1405,10 +1401,10 @@ var Circle = /** @class */ (function () {
      * @instance
      * @memberof Circle
      **/
-    Circle.prototype.vertAt = function (angle) {
+    vertAt(angle) {
         // Find the point on the circle respective the angle. Then move relative to center.
         return Circle.circleUtils.vertAt(angle, this.radius).add(this.center);
-    };
+    }
     ;
     /**
      * Get a tangent line of this circle for a given angle.
@@ -1421,11 +1417,11 @@ var Circle = /** @class */ (function () {
      * @return {Line} The tangent line.
      * @memberof Circle
      **/
-    Circle.prototype.tangentAt = function (angle) {
-        var pointA = Circle.circleUtils.vertAt(angle, this.radius);
+    tangentAt(angle) {
+        const pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
         return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
-    };
+    }
     ;
     /**
      * Calculate the intersection points (if exists) with the given circle.
@@ -1436,7 +1432,7 @@ var Circle = /** @class */ (function () {
      * @param {Circle} circle
      * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
      **/
-    Circle.prototype.circleIntersection = function (circle) {
+    circleIntersection(circle) {
         // Circles do not intersect at all?
         if (this.center.distance(circle.center) > this.radius + circle.radius) {
             return null;
@@ -1478,7 +1474,7 @@ var Circle = /** @class */ (function () {
         var x4 = p2.x - h * (p1.y - p0.y) / d;
         var y4 = p2.y + h * (p1.x - p0.x) / d;
         return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
-    };
+    }
     ;
     /**
       * Create an SVG representation of this circle.
@@ -1490,7 +1486,7 @@ var Circle = /** @class */ (function () {
       * @instance
       * @memberof Circle
       */
-    Circle.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<circle');
@@ -1501,18 +1497,17 @@ var Circle = /** @class */ (function () {
         buffer.push(' r="' + this.radius + '"');
         buffer.push(' />');
         return buffer.join('');
-    };
+    }
     ;
-    Circle.circleUtils = {
-        vertAt: function (angle, radius) {
-            /* return new Vertex( Math.sin(angle) * radius,
-                       Math.cos(angle) * radius ); */
-            return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
-        }
-    };
-    return Circle;
-}()); // END class
+} // END class
 exports.Circle = Circle;
+Circle.circleUtils = {
+    vertAt: function (angle, radius) {
+        /* return new Vertex( Math.sin(angle) * radius,
+                   Math.cos(angle) * radius ); */
+        return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    }
+};
 //# sourceMappingURL=Circle.js.map
 
 /***/ }),
@@ -1537,7 +1532,7 @@ exports.Circle = Circle;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CircleSector = void 0;
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
@@ -1547,7 +1542,7 @@ var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGen
  * @requires UIDGenerator
  * @requires XYCoords
  **/
-var CircleSector = /** @class */ (function () {
+class CircleSector {
     /**
      * Create a new circle sector with given circle, start- and end-angle.
      *
@@ -1557,7 +1552,7 @@ var CircleSector = /** @class */ (function () {
      * @param {number} startAngle - The start angle of the sector.
      * @param {number} endAngle - The end angle of the sector.
      */
-    function CircleSector(circle, startAngle, endAngle) {
+    constructor(circle, startAngle, endAngle) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -1577,69 +1572,68 @@ var CircleSector = /** @class */ (function () {
       * @instance
       * @memberof Circle
       */
-    CircleSector.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<path ');
         if (options.className)
             buffer.push(' class="' + options.className + '"');
-        var data = CircleSector.circleSectorUtils.describeSVGArc(this.circle.center.x, this.circle.center.y, this.circle.radius, this.startAngle, this.endAngle);
+        const data = CircleSector.circleSectorUtils.describeSVGArc(this.circle.center.x, this.circle.center.y, this.circle.radius, this.startAngle, this.endAngle);
         buffer.push(' d="' + data.join(" ") + '" />');
         return buffer.join('');
-    };
+    }
     ;
-    CircleSector.circleSectorUtils = {
-        /**
-         * Helper function to convert polar circle coordinates to cartesian coordinates.
-         *
-         * TODO: generalize for ellipses (two radii).
-         *
-         * @param {number} angle - The angle in radians.
-        */
-        polarToCartesian: function (centerX, centerY, radius, angle) {
-            return {
-                x: centerX + (radius * Math.cos(angle)),
-                y: centerY + (radius * Math.sin(angle))
-            };
-        },
-        /**
-         * Helper function to convert a circle section as SVG arc params (for the `d` attribute).
-         * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
-         *
-         * TODO: generalize for ellipses (two radii).
-         *
-         * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
-         * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
-         */
-        describeSVGArc: function (x, y, radius, startAngle, endAngle, options) {
-            if (typeof options === 'undefined')
-                options = { moveToStart: true };
-            var end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
-            var start = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
-            // Split full circles into two halves.
-            // Some browsers have problems to render full circles (described by start==end).
-            if (Math.PI * 2 - Math.abs(startAngle - endAngle) < 0.001) {
-                var firstHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle, startAngle + (endAngle - startAngle) / 2, options);
-                var firstEndPoint = { x: firstHalf[firstHalf.length - 2],
-                    y: firstHalf[firstHalf.length - 1]
-                };
-                var secondHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle + (endAngle - startAngle) / 2, endAngle, options);
-                return firstHalf.concat(secondHalf);
-            }
-            // Boolean stored as integers (0|1).
-            var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
-            var sweepFlag = 1;
-            var pathData = [];
-            if (options.moveToStart) {
-                pathData.push('M', start.x, start.y);
-            }
-            pathData.push("A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y);
-            return pathData;
-        }
-    };
-    return CircleSector;
-}()); // END class
+} // END class
 exports.CircleSector = CircleSector;
+CircleSector.circleSectorUtils = {
+    /**
+     * Helper function to convert polar circle coordinates to cartesian coordinates.
+     *
+     * TODO: generalize for ellipses (two radii).
+     *
+     * @param {number} angle - The angle in radians.
+    */
+    polarToCartesian: (centerX, centerY, radius, angle) => {
+        return {
+            x: centerX + (radius * Math.cos(angle)),
+            y: centerY + (radius * Math.sin(angle))
+        };
+    },
+    /**
+     * Helper function to convert a circle section as SVG arc params (for the `d` attribute).
+     * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+     *
+     * TODO: generalize for ellipses (two radii).
+     *
+     * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
+     * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
+     */
+    describeSVGArc: (x, y, radius, startAngle, endAngle, options) => {
+        if (typeof options === 'undefined')
+            options = { moveToStart: true };
+        const end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
+        const start = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
+        // Split full circles into two halves.
+        // Some browsers have problems to render full circles (described by start==end).
+        if (Math.PI * 2 - Math.abs(startAngle - endAngle) < 0.001) {
+            const firstHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle, startAngle + (endAngle - startAngle) / 2, options);
+            const firstEndPoint = { x: firstHalf[firstHalf.length - 2],
+                y: firstHalf[firstHalf.length - 1]
+            };
+            const secondHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle + (endAngle - startAngle) / 2, endAngle, options);
+            return firstHalf.concat(secondHalf);
+        }
+        // Boolean stored as integers (0|1).
+        const largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
+        const sweepFlag = 1;
+        const pathData = [];
+        if (options.moveToStart) {
+            pathData.push('M', start.x, start.y);
+        }
+        pathData.push("A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y);
+        return pathData;
+    }
+};
 //# sourceMappingURL=CircleSector.js.map
 
 /***/ }),
@@ -1683,10 +1677,10 @@ exports.CircleSector = CircleSector;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CubicBezierCurve = void 0;
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
-var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
 /**
  * @classdesc A refactored cubic bezier curve class.
  *
@@ -1698,7 +1692,7 @@ var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
  * @requires UID
  * @requires UIDGenerator
  */
-var CubicBezierCurve = /** @class */ (function () {
+class CubicBezierCurve {
     /**
      * The constructor.
      *
@@ -1709,7 +1703,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @param {Vertex} startControlPoint - The Bézier curve's start control point.
      * @param {Vertex} endControlPoint   - The Bézier curve's end control point.
      **/
-    function CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint) {
+    constructor(startPoint, endPoint, startControlPoint, endControlPoint) {
         /** @constant {number} */
         this.START_POINT = CubicBezierCurve.START_POINT;
         /** @constant {number} */
@@ -1746,7 +1740,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {void}
      **/
-    CubicBezierCurve.prototype.moveCurvePoint = function (pointID, moveAmount, moveControlPoint, updateArcLengths) {
+    moveCurvePoint(pointID, moveAmount, moveControlPoint, updateArcLengths) {
         if (pointID == this.START_POINT) {
             this.getStartPoint().add(moveAmount);
             if (moveControlPoint)
@@ -1764,11 +1758,11 @@ var CubicBezierCurve = /** @class */ (function () {
                 this.getEndControlPoint().add(moveAmount);
         }
         else {
-            console.log("[CubicBezierCurve.moveCurvePoint] pointID '" + pointID + "' invalid.");
+            console.log(`[CubicBezierCurve.moveCurvePoint] pointID '${pointID}' invalid.`);
         }
         if (updateArcLengths)
             this.updateArcLengths();
-    };
+    }
     ;
     /**
      * Translate the whole curve by the given {x,y} amount: moves all four points.
@@ -1779,13 +1773,13 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} this (for chaining).
      **/
-    CubicBezierCurve.prototype.translate = function (amount) {
+    translate(amount) {
         this.startPoint.add(amount);
         this.startControlPoint.add(amount);
         this.endControlPoint.add(amount);
         this.endPoint.add(amount);
         return this;
-    };
+    }
     ;
     /**
      * Reverse this curve, means swapping start- and end-point and swapping
@@ -1796,15 +1790,15 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} this (for chaining).
      **/
-    CubicBezierCurve.prototype.reverse = function () {
-        var tmp = this.startPoint;
+    reverse() {
+        let tmp = this.startPoint;
         this.startPoint = this.endPoint;
         this.endPoint = tmp;
         tmp = this.startControlPoint;
         this.startControlPoint = this.endControlPoint;
         this.endControlPoint = tmp;
         return this;
-    };
+    }
     ;
     /**
      * Get the total curve length.<br>
@@ -1821,9 +1815,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {number} >= 0
      **/
-    CubicBezierCurve.prototype.getLength = function () {
+    getLength() {
         return this.arcLength;
-    };
+    }
     ;
     /**
      * Uptate the internal arc segment buffer and their lengths.<br>
@@ -1837,17 +1831,17 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {void}
      **/
-    CubicBezierCurve.prototype.updateArcLengths = function () {
-        var pointA = this.startPoint.clone(), pointB = new Vertex_1.Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
-        var u = curveStep;
+    updateArcLengths() {
+        let pointA = this.startPoint.clone(), pointB = new Vertex_1.Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
+        let u = curveStep;
         // Clear segment cache
         this.segmentCache = [];
         // Push start point into buffer
         this.segmentCache.push(this.startPoint);
         this.segmentLengths = [];
-        var newLength = 0.0;
+        let newLength = 0.0;
         var t = 0.0;
-        var tmpLength;
+        let tmpLength;
         while (t <= 1.0) {
             pointB = this.getPointAt(t);
             // Store point into cache
@@ -1860,7 +1854,7 @@ var CubicBezierCurve = /** @class */ (function () {
             t += curveStep;
         }
         this.arcLength = newLength;
-    };
+    }
     ;
     /**
      * Get a 't' (relative position on curve) with the closest distance to point 'p'.
@@ -1872,7 +1866,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @param {Vertex} p - The point to find the closest position ('t' on the curve).
      * @return {number}
      **/
-    CubicBezierCurve.prototype.getClosestT = function (p) {
+    getClosestT(p) {
         // We would like to have an error that's not larger than 1.0.
         var desiredEpsilon = 1.0;
         var t = 0.0;
@@ -1884,7 +1878,7 @@ var CubicBezierCurve = /** @class */ (function () {
             // Be sure: stop after 4 iterations
         } while (iteration < 4 && this.getPointAt(result.tPrev).distance(this.getPointAt(result.tNext)) > desiredEpsilon);
         return result.t;
-    };
+    }
     ;
     /**
      * This helper function locates the 't' on a fixed step interval with the minimal distance
@@ -1900,11 +1894,11 @@ var CubicBezierCurve = /** @class */ (function () {
      *
      * @return {object} - An object with t, tPrev and tNext (numbers).
      **/
-    CubicBezierCurve.prototype.locateIntervalByDistance = function (p, tStart, tEnd, stepCount) {
+    locateIntervalByDistance(p, tStart, tEnd, stepCount) {
         var minIndex = -1;
         var minDist = 0;
         var t = 0.0;
-        var tDiff = tEnd - tStart;
+        const tDiff = tEnd - tStart;
         for (var i = 0; i <= stepCount; i++) {
             t = tStart + tDiff * (i / stepCount);
             var vert = this.getPointAt(t);
@@ -1918,7 +1912,7 @@ var CubicBezierCurve = /** @class */ (function () {
             tPrev: tStart + tDiff * (Math.max(0, minIndex - 1) / stepCount),
             tNext: tStart + tDiff * (Math.min(stepCount, minIndex + 1) / stepCount)
         };
-    };
+    }
     ;
     /**
      * Get the bounds of this bezier curve.
@@ -1928,10 +1922,10 @@ var CubicBezierCurve = /** @class */ (function () {
      *
      * @return {Bounds} The bounds of this curve.
      **/
-    CubicBezierCurve.prototype.getBounds = function () {
+    getBounds() {
         var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
         var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-        var v;
+        let v;
         for (var i = 0; i < this.segmentCache.length; i++) {
             v = this.segmentCache[i];
             min.x = Math.min(min.x, v.x);
@@ -1940,7 +1934,7 @@ var CubicBezierCurve = /** @class */ (function () {
             max.y = Math.max(max.y, v.y);
         }
         return new Bounds_1.Bounds(min, max);
-    };
+    }
     ;
     /**
      * Get the start point of the curve.<br>
@@ -1952,9 +1946,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex} this.startPoint
      **/
-    CubicBezierCurve.prototype.getStartPoint = function () {
+    getStartPoint() {
         return this.startPoint;
-    };
+    }
     ;
     /**
      * Get the end point of the curve.<br>
@@ -1966,9 +1960,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex} this.endPoint
      **/
-    CubicBezierCurve.prototype.getEndPoint = function () {
+    getEndPoint() {
         return this.endPoint;
-    };
+    }
     ;
     /**
      * Get the start control point of the curve.<br>
@@ -1980,9 +1974,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex} this.startControlPoint
      **/
-    CubicBezierCurve.prototype.getStartControlPoint = function () {
+    getStartControlPoint() {
         return this.startControlPoint;
-    };
+    }
     ;
     /**
      * Get the end control point of the curve.<br>
@@ -1994,9 +1988,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex} this.endControlPoint
      **/
-    CubicBezierCurve.prototype.getEndControlPoint = function () {
+    getEndControlPoint() {
         return this.endControlPoint;
-    };
+    }
     ;
     /**
      * Get one of the four curve points specified by the passt point ID.
@@ -2007,7 +2001,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPointByID = function (id) {
+    getPointByID(id) {
         if (id == this.START_POINT)
             return this.startPoint;
         if (id == this.END_POINT)
@@ -2016,8 +2010,8 @@ var CubicBezierCurve = /** @class */ (function () {
             return this.startControlPoint;
         if (id == this.END_CONTROL_POINT)
             return this.endControlPoint;
-        throw new Error("Invalid point ID '" + id + "'.");
-    };
+        throw new Error(`Invalid point ID '${id}'.`);
+    }
     ;
     /**
      * Get the curve point at a given position t, where t is in [0,1].<br>
@@ -2031,14 +2025,14 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPointAt = function (t) {
+    getPointAt(t) {
         // Perform some powerful math magic
-        var x = this.startPoint.x * Math.pow(1.0 - t, 3) + this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2)
+        const x = this.startPoint.x * Math.pow(1.0 - t, 3) + this.startControlPoint.x * 3 * t * Math.pow(1.0 - t, 2)
             + this.endControlPoint.x * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.x * Math.pow(t, 3);
-        var y = this.startPoint.y * Math.pow(1.0 - t, 3) + this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2)
+        const y = this.startPoint.y * Math.pow(1.0 - t, 3) + this.startControlPoint.y * 3 * t * Math.pow(1.0 - t, 2)
             + this.endControlPoint.y * 3 * Math.pow(t, 2) * (1.0 - t) + this.endPoint.y * Math.pow(t, 3);
         return new Vertex_1.Vertex(x, y);
-    };
+    }
     ;
     /**
      * Get the curve point at a given position u, where u is in [0,arcLength].<br>
@@ -2052,9 +2046,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPoint = function (u) {
+    getPoint(u) {
         return this.getPointAt(u / this.arcLength);
-    };
+    }
     ;
     /**
      * Get the curve tangent vector at a given absolute curve position t in [0,1].<br>
@@ -2067,27 +2061,27 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getTangentAt = function (t) {
-        var a = this.getStartPoint();
-        var b = this.getStartControlPoint();
-        var c = this.getEndControlPoint();
-        var d = this.getEndPoint();
+    getTangentAt(t) {
+        const a = this.getStartPoint();
+        const b = this.getStartControlPoint();
+        const c = this.getEndControlPoint();
+        const d = this.getEndPoint();
         // This is the shortened one
-        var t2 = t * t;
-        var t3 = t * t2;
+        const t2 = t * t;
+        const t3 = t * t2;
         // (1 - t)^2 = (1-t)*(1-t) = 1 - t - t + t^2 = 1 - 2*t + t^2
-        var nt2 = 1 - 2 * t + t2;
-        var tX = -3 * a.x * nt2 +
+        const nt2 = 1 - 2 * t + t2;
+        const tX = -3 * a.x * nt2 +
             b.x * (3 * nt2 - 6 * (t - t2)) +
             c.x * (6 * (t - t2) - 3 * t2) +
             3 * d.x * t2;
-        var tY = -3 * a.y * nt2 +
+        const tY = -3 * a.y * nt2 +
             b.y * (3 * nt2 - 6 * (t - t2)) +
             c.y * (6 * (t - t2) - 3 * t2) +
             3 * d.y * t2;
         // Note: my implementation does NOT normalize tangent vectors!
         return new Vertex_1.Vertex(tX, tY);
-    };
+    }
     ;
     /**
      * Get a sub curve at the given start end end offsets (values between 0.0 and 1.0).
@@ -2101,9 +2095,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
-    CubicBezierCurve.prototype.getSubCurveAt = function (tStart, tEnd) {
-        var startVec = new Vector_1.Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        var endVec = new Vector_1.Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
+    getSubCurveAt(tStart, tEnd) {
+        const startVec = new Vector_1.Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
+        const endVec = new Vector_1.Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
         // Tangents are relative. Make absolute.
         startVec.b.add(startVec.a);
         endVec.b.add(endVec.a);
@@ -2113,7 +2107,7 @@ var CubicBezierCurve = /** @class */ (function () {
         // Draw the bezier curve
         // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
         return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
-    };
+    }
     ;
     /**
      * Convert a relative curve position u to the absolute curve position t.
@@ -2124,9 +2118,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {number}
      **/
-    CubicBezierCurve.prototype.convertU2T = function (u) {
+    convertU2T(u) {
         return Math.max(0.0, Math.min(1.0, (u / this.arcLength)));
-    };
+    }
     ;
     /**
      * Get the curve tangent vector at a given relative position u in [0,arcLength].<br>
@@ -2139,9 +2133,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getTangent = function (u) {
+    getTangent(u) {
         return this.getTangentAt(this.convertU2T(u));
-    };
+    }
     ;
     /**
      * Get the curve perpendicular at a given relative position u in [0,arcLength] as a vector.<br>
@@ -2154,9 +2148,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPerpendicular = function (u) {
+    getPerpendicular(u) {
         return this.getPerpendicularAt(this.convertU2T(u));
-    };
+    }
     ;
     /**
      * Get the curve perpendicular at a given absolute position t in [0,1] as a vector.<br>
@@ -2169,10 +2163,10 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {Vertex}
      **/
-    CubicBezierCurve.prototype.getPerpendicularAt = function (t) {
-        var tangentVector = this.getTangentAt(t);
+    getPerpendicularAt(t) {
+        const tangentVector = this.getTangentAt(t);
         return new Vertex_1.Vertex(tangentVector.y, -tangentVector.x);
-    };
+    }
     ;
     /**
      * Clone this Bézier curve (deep clone).
@@ -2182,9 +2176,9 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {CubicBezierCurve}
      **/
-    CubicBezierCurve.prototype.clone = function () {
+    clone() {
         return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
-    };
+    }
     ;
     /**
      * Check if this and the specified curve are equal.<br>
@@ -2199,7 +2193,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {boolean}
      **/
-    CubicBezierCurve.prototype.equals = function (curve) {
+    equals(curve) {
         // Note: in the earlier vanilla-JS version this was callable with plain objects.
         //       Let's see if this restricted version works out.
         if (!curve)
@@ -2213,7 +2207,7 @@ var CubicBezierCurve = /** @class */ (function () {
             && this.endPoint.equals(curve.endPoint)
             && this.startControlPoint.equals(curve.startControlPoint)
             && this.endControlPoint.equals(curve.endControlPoint);
-    };
+    }
     ;
     /**
      * Quick check for class instance.
@@ -2225,7 +2219,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {boolean}
      **/
-    CubicBezierCurve.isInstance = function (obj) {
+    static isInstance(obj) {
         // Note: check this again
         /* OLD VANILLA JS IMPLEMENTATION */
         /* if( typeof obj != "object" )
@@ -2239,7 +2233,7 @@ var CubicBezierCurve = /** @class */ (function () {
             && typeof obj.endControlPoint == "object" && hasXY(obj.endControlPoint);
         */
         return obj instanceof CubicBezierCurve;
-    };
+    }
     ;
     /**
      * Create an SVG path data representation of this bézier curve.
@@ -2254,7 +2248,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {string}  The SVG path data string.
      **/
-    CubicBezierCurve.prototype.toSVGPathData = function () {
+    toSVGPathData() {
         var buffer = [];
         buffer.push('M ');
         buffer.push(this.startPoint.x.toString());
@@ -2273,7 +2267,7 @@ var CubicBezierCurve = /** @class */ (function () {
         buffer.push(' ');
         buffer.push(this.endPoint.y.toString());
         return buffer.join('');
-    };
+    }
     ;
     /**
      * Convert this curve to a JSON string.
@@ -2284,7 +2278,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @memberof CubicBezierCurve
      * @return {string} The JSON data.
      **/
-    CubicBezierCurve.prototype.toJSON = function (prettyFormat) {
+    toJSON(prettyFormat) {
         var jsonString = "{ " + // begin object
             (prettyFormat ? "\n\t" : "") +
             "\"startPoint\" : [" + this.getStartPoint().x + "," + this.getStartPoint().y + "], " +
@@ -2297,7 +2291,7 @@ var CubicBezierCurve = /** @class */ (function () {
             (prettyFormat ? "\n\t" : "") +
             " }"; // end object
         return jsonString;
-    };
+    }
     ;
     /**
      * Parse a Bézier curve from the given JSON string.
@@ -2309,10 +2303,10 @@ var CubicBezierCurve = /** @class */ (function () {
      * @throws An exception if the JSON string is malformed.
      * @return {CubicBezierCurve}
      **/
-    CubicBezierCurve.fromJSON = function (jsonString) {
+    static fromJSON(jsonString) {
         var obj = JSON.parse(jsonString);
         return CubicBezierCurve.fromObject(obj);
-    };
+    }
     ;
     /**
      * Try to convert the passed object to a CubicBezierCurve.
@@ -2324,7 +2318,7 @@ var CubicBezierCurve = /** @class */ (function () {
      * @throws An exception if the passed object is malformed.
      * @return {CubicBezierCurve}
      **/
-    CubicBezierCurve.fromObject = function (obj) {
+    static fromObject(obj) {
         if (typeof obj !== "object")
             throw "Can only build from object.";
         if (!obj.startPoint)
@@ -2336,7 +2330,7 @@ var CubicBezierCurve = /** @class */ (function () {
         if (!obj.endControlPoint)
             throw "Object member \"endControlPoint\" missing.";
         return new CubicBezierCurve(new Vertex_1.Vertex(obj.startPoint[0], obj.startPoint[1]), new Vertex_1.Vertex(obj.endPoint[0], obj.endPoint[1]), new Vertex_1.Vertex(obj.startControlPoint[0], obj.startControlPoint[1]), new Vertex_1.Vertex(obj.endControlPoint[0], obj.endControlPoint[1]));
-    };
+    }
     ;
     /**
      * Convert a 4-element array of vertices to a cubic bézier curve.
@@ -2347,25 +2341,24 @@ var CubicBezierCurve = /** @class */ (function () {
      * @throws An exception if the passed array is malformed.
      * @return {CubicBezierCurve}
      **/
-    CubicBezierCurve.fromArray = function (arr) {
+    static fromArray(arr) {
         if (!Array.isArray(arr))
             throw "Can only build from object.";
         if (arr.length != 4)
             throw "Can only build from array with four elements.";
         return new CubicBezierCurve(arr[0], arr[1], arr[2], arr[3]);
-    };
+    }
     ;
-    /** @constant {number} */
-    CubicBezierCurve.START_POINT = 0;
-    /** @constant {number} */
-    CubicBezierCurve.START_CONTROL_POINT = 1;
-    /** @constant {number} */
-    CubicBezierCurve.END_CONTROL_POINT = 2;
-    /** @constant {number} */
-    CubicBezierCurve.END_POINT = 3;
-    return CubicBezierCurve;
-}());
+}
 exports.CubicBezierCurve = CubicBezierCurve;
+/** @constant {number} */
+CubicBezierCurve.START_POINT = 0;
+/** @constant {number} */
+CubicBezierCurve.START_CONTROL_POINT = 1;
+/** @constant {number} */
+CubicBezierCurve.END_CONTROL_POINT = 2;
+/** @constant {number} */
+CubicBezierCurve.END_POINT = 3;
 //# sourceMappingURL=CubicBezierCurve.js.map
 
 /***/ }),
@@ -2405,7 +2398,7 @@ exports.Grid = void 0;
  *
  * @requires Vertex
  */
-var Grid = /** @class */ (function () {
+class Grid {
     /**
      * The constructor.
      *
@@ -2414,63 +2407,62 @@ var Grid = /** @class */ (function () {
      * @param {Vertex} center - The offset of the grid (default is [0,0]).
      * @param {Vertex} size   - The x- and y-size of the grid.
      **/
-    function Grid(center, size) {
+    constructor(center, size) {
         this.center = center;
         this.size = size;
     }
     ;
-    /**
-     * @memberof Grid
-     **/
-    Grid.utils = {
-        /**
-         * Calculate the logarithm of the given number (num) to a given base.<br>
-         * <br>
-         * This function returns the number l with<br>
-         *  <pre>num == Math.pow(base,l)</pre>
-         *
-         * @member baseLog
-         * @function
-         * @memberof Grid
-         * @inner
-         * @param {number} base - The base to calculate the logarithm to.
-         * @param {number} num  - The number to calculate the logarithm for.
-         * @return {number} <pre>log(base)/log(num)</pre>
-         **/
-        baseLog: function (base, num) { return Math.log(base) / Math.log(num); },
-        /**
-         * Calculate the raster scale for a given logarithmic mapping.<br>
-         * <br>
-         * Example (with adjustFactor=2):<br>
-         * <pre>
-         * If scale is 4.33, then the mapping is 1/2 (because 2^2 <= 4.33 <= 2^3)<br>
-         * If scale is 0.33, then the mapping is 2 because (2^(1/2) >= 0.33 >= 2^(1/4)
-         * </pre>
-         *
-         * @member mapRasterScale
-         * @function
-         * @memberof Grid
-         * @inner
-         * @param {number} adjustFactor The base for the logarithmic raster scaling when zoomed.
-         * @param {number} scale        The currently used scale factor.
-         * @return {number}
-         **/
-        mapRasterScale: function (adjustFactor, scale) {
-            var gf = 1.0;
-            if (scale >= 1) {
-                gf = Math.abs(Math.floor(1 / Grid.utils.baseLog(adjustFactor, scale)));
-                gf = 1 / Math.pow(adjustFactor, gf);
-            }
-            else {
-                gf = Math.abs(Math.floor(Grid.utils.baseLog(1 / adjustFactor, 1 / (scale + 1))));
-                //gf = Math.pow( adjustFactor, gf );
-            }
-            return gf;
-        }
-    };
-    return Grid;
-}());
+}
 exports.Grid = Grid;
+/**
+ * @memberof Grid
+ **/
+Grid.utils = {
+    /**
+     * Calculate the logarithm of the given number (num) to a given base.<br>
+     * <br>
+     * This function returns the number l with<br>
+     *  <pre>num == Math.pow(base,l)</pre>
+     *
+     * @member baseLog
+     * @function
+     * @memberof Grid
+     * @inner
+     * @param {number} base - The base to calculate the logarithm to.
+     * @param {number} num  - The number to calculate the logarithm for.
+     * @return {number} <pre>log(base)/log(num)</pre>
+     **/
+    baseLog: (base, num) => { return Math.log(base) / Math.log(num); },
+    /**
+     * Calculate the raster scale for a given logarithmic mapping.<br>
+     * <br>
+     * Example (with adjustFactor=2):<br>
+     * <pre>
+     * If scale is 4.33, then the mapping is 1/2 (because 2^2 <= 4.33 <= 2^3)<br>
+     * If scale is 0.33, then the mapping is 2 because (2^(1/2) >= 0.33 >= 2^(1/4)
+     * </pre>
+     *
+     * @member mapRasterScale
+     * @function
+     * @memberof Grid
+     * @inner
+     * @param {number} adjustFactor The base for the logarithmic raster scaling when zoomed.
+     * @param {number} scale        The currently used scale factor.
+     * @return {number}
+     **/
+    mapRasterScale: (adjustFactor, scale) => {
+        var gf = 1.0;
+        if (scale >= 1) {
+            gf = Math.abs(Math.floor(1 / Grid.utils.baseLog(adjustFactor, scale)));
+            gf = 1 / Math.pow(adjustFactor, gf);
+        }
+        else {
+            gf = Math.abs(Math.floor(Grid.utils.baseLog(1 / adjustFactor, 1 / (scale + 1))));
+            //gf = Math.pow( adjustFactor, gf );
+        }
+        return gf;
+    }
+};
 //# sourceMappingURL=Grid.js.map
 
 /***/ }),
@@ -2518,7 +2510,7 @@ exports.KeyHandler = void 0;
  *	    .up('windows',function() { console.log('windows was released.'); } )
  *	;
  */
-var KeyHandler = /** @class */ (function () {
+class KeyHandler {
     /**
      * The constructor.
      *
@@ -2528,7 +2520,7 @@ var KeyHandler = /** @class */ (function () {
      * @param {HTMLElement} options.element (optional) The HTML element to listen on; if null then 'window' will be used.
      * @param {boolean} options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
     **/
-    function KeyHandler(options) {
+    constructor(options) {
         this.downListeners = [];
         this.pressListeners = [];
         this.upListeners = [];
@@ -2553,8 +2545,8 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyboardEvent} event - The key event to fire.
      * @param {Array<XKeyListener>} listener - The listeners to fire to.
      */
-    KeyHandler.prototype.fireEvent = function (event, listeners) {
-        var hasListener = false;
+    fireEvent(event, listeners) {
+        let hasListener = false;
         for (var i in listeners) {
             var lis = listeners[i];
             if (lis.keyCode != event.keyCode)
@@ -2563,7 +2555,7 @@ var KeyHandler = /** @class */ (function () {
             hasListener = true;
         }
         return hasListener;
-    };
+    }
     ;
     /**
      * Internal function to fire a new keydown event to all listeners.
@@ -2577,12 +2569,12 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      * @return {void}
      */
-    KeyHandler.prototype.fireDownEvent = function (e, handler) {
+    fireDownEvent(e, handler) {
         if (handler.fireEvent(e, handler.downListeners) || handler.trackAllKeys) {
             // Down event has listeners. Update key state.
             handler.keyStates[e.keyCode] = 'down';
         }
-    };
+    }
     ;
     /**
      * Internal function to fire a new keypress event to all listeners.
@@ -2596,9 +2588,9 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      * @return void
      */
-    KeyHandler.prototype.firePressEvent = function (e, handler) {
+    firePressEvent(e, handler) {
         handler.fireEvent(e, handler.pressListeners);
-    };
+    }
     ;
     /**
      * Internal function to fire a new keyup event to all listeners.
@@ -2612,17 +2604,17 @@ var KeyHandler = /** @class */ (function () {
      * @param {KeyHandler} handler
      * @return {void}
      */
-    KeyHandler.prototype.fireUpEvent = function (e, handler) {
+    fireUpEvent(e, handler) {
         if (handler.fireEvent(e, handler.upListeners) || handler.trackAllKeys) {
             // Up event has listeners. Clear key state.
             delete handler.keyStates[e.keyCode];
         }
-    };
+    }
     ;
     /**
      * Resolve the key/name code.
      */
-    KeyHandler.key2code = function (key) {
+    static key2code(key) {
         if (typeof key == 'number')
             return key;
         if (typeof key != 'string')
@@ -2630,7 +2622,7 @@ var KeyHandler = /** @class */ (function () {
         if (KeyHandler.KEY_CODES[key])
             return KeyHandler.KEY_CODES[key];
         throw "Unknown key (cannot resolve key code): " + key;
-    };
+    }
     ;
     /**
      * Install the required listeners into the initially passed element.
@@ -2638,21 +2630,21 @@ var KeyHandler = /** @class */ (function () {
      * By default the listeners are installed into the root element specified on
      * construction (or 'window').
      */
-    KeyHandler.prototype.installListeners = function () {
+    installListeners() {
         var _self = this;
-        this.element.addEventListener('keydown', this._keyDownListener = function (e) { _self.fireDownEvent(e, _self); });
-        this.element.addEventListener('keypress', this._keyPressListener = function (e) { _self.firePressEvent(e, _self); });
-        this.element.addEventListener('keyup', this._keyUpListener = function (e) { _self.fireUpEvent(e, _self); });
-    };
+        this.element.addEventListener('keydown', this._keyDownListener = (e) => { _self.fireDownEvent(e, _self); });
+        this.element.addEventListener('keypress', this._keyPressListener = (e) => { _self.firePressEvent(e, _self); });
+        this.element.addEventListener('keyup', this._keyUpListener = (e) => { _self.fireUpEvent(e, _self); });
+    }
     ;
     /**
      *  Remove all installed event listeners from the underlying element.
      */
-    KeyHandler.prototype.releaseListeners = function () {
+    releaseListeners() {
         this.element.removeEventListener('keydown', this._keyDownListener);
         this.element.removeEventListener('keypress', this._keyPressListener);
         this.element.removeEventListener('keyup', this._keyUpListener);
-    };
+    }
     ;
     /**
      * Listen for key down. This function allows chaining.
@@ -2666,10 +2658,10 @@ var KeyHandler = /** @class */ (function () {
      * @param {(e:KeyboardEvent)=>void} e -  The callback to be triggered.
      * @return {KeyHandler} this
      */
-    KeyHandler.prototype.down = function (key, listener) {
+    down(key, listener) {
         this.downListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
         return this;
-    };
+    }
     ;
     /**
      * Listen for key press.
@@ -2683,10 +2675,10 @@ var KeyHandler = /** @class */ (function () {
      * @param {(e:KeyboardEvent)=>void} listener - The callback to be triggered.
      * @return {KeyHandler} this
      */
-    KeyHandler.prototype.press = function (key, listener) {
+    press(key, listener) {
         this.pressListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
         return this;
-    };
+    }
     ;
     /**
      * Listen for key up.
@@ -2700,221 +2692,220 @@ var KeyHandler = /** @class */ (function () {
      * @param {(e:KeyboardEvent)=>void)} e - The callback to be triggered.
      * @return {KeyHandler} this
      */
-    KeyHandler.prototype.up = function (key, listener) {
+    up(key, listener) {
         this.upListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
         return this;
-    };
+    }
     ;
     /**
      * Check if a specific key is currently held pressed.
      *
      * @param {string|number} key - Any key identifier, key code or one from the KEY_CODES list.
      */
-    KeyHandler.prototype.isDown = function (key) {
+    isDown(key) {
         if (typeof key == 'number')
             return this.keyStates[key] ? true : false;
         else
             return this.keyStates[KeyHandler.key2code(key)] ? true : false;
-    };
-    /**
-     * Source:
-     * https://keycode.info/
-     */
-    KeyHandler.KEY_CODES = {
-        'break': 3,
-        'backspace': 8,
-        // 'delete'	 : 8, // alternate: 46
-        'tab': 9,
-        'clear': 12,
-        'enter': 13,
-        'shift': 16,
-        'ctrl': 17,
-        'alt': 18,
-        'pause': 19,
-        // 'break'	         : 19,
-        'capslock': 20,
-        'hangul': 21,
-        'hanja': 25,
-        'escape': 27,
-        'conversion': 28,
-        'non-conversion': 29,
-        'spacebar': 32,
-        'pageup': 33,
-        'pagedown': 34,
-        'end': 35,
-        'home': 36,
-        'leftarrow': 37,
-        'uparrow': 38,
-        'rightarrow': 39,
-        'downarrow': 40,
-        'select': 41,
-        'print': 42,
-        'execute': 43,
-        'printscreen': 44,
-        'insert': 45,
-        'delete': 46,
-        'help': 47,
-        '0': 48,
-        '1': 49,
-        '2': 50,
-        '3': 51,
-        '4': 52,
-        '5': 53,
-        '6': 54,
-        '7': 55,
-        '8': 56,
-        '9': 57,
-        ':': 58,
-        'semicolon (firefox)': 59,
-        'equals': 59,
-        '<': 60,
-        'equals (firefox)': 61,
-        'ß': 63,
-        '@ (firefox)': 64,
-        'a': 65,
-        'b': 66,
-        'c': 67,
-        'd': 68,
-        'e': 69,
-        'f': 70,
-        'g': 71,
-        'h': 72,
-        'i': 73,
-        'j': 74,
-        'k': 75,
-        'l': 76,
-        'm': 77,
-        'n': 78,
-        'o': 79,
-        'p': 80,
-        'q': 81,
-        'r': 82,
-        's': 83,
-        't': 84,
-        'u': 85,
-        'v': 86,
-        'w': 87,
-        'x': 88,
-        'y': 89,
-        'z': 90,
-        'windows': 91,
-        'leftcommand': 91,
-        'chromebooksearch': 91,
-        'rightwindowkey': 92,
-        'windowsmenu': 93,
-        'rightcommant': 93,
-        'sleep': 95,
-        'numpad0': 96,
-        'numpad1': 97,
-        'numpad2': 98,
-        'numpad3': 99,
-        'numpad4': 100,
-        'numpad5': 101,
-        'numpad6': 102,
-        'numpad7': 103,
-        'numpad8': 104,
-        'numpad9': 105,
-        'multiply': 106,
-        'add': 107,
-        'numpadperiod': 108,
-        'subtract': 109,
-        'decimalpoint': 110,
-        'divide': 111,
-        'f1': 112,
-        'f2': 113,
-        'f3': 114,
-        'f4': 115,
-        'f5': 116,
-        'f6': 117,
-        'f7': 118,
-        'f8': 119,
-        'f9': 120,
-        'f10': 121,
-        'f11': 122,
-        'f12': 123,
-        'f13': 124,
-        'f14': 125,
-        'f15': 126,
-        'f16': 127,
-        'f17': 128,
-        'f18': 129,
-        'f19': 130,
-        'f20': 131,
-        'f21': 132,
-        'f22': 133,
-        'f23': 134,
-        'f24': 135,
-        'numlock': 144,
-        'scrolllock': 145,
-        '^': 160,
-        '!': 161,
-        // '؛' 	 : 162 // (arabic semicolon)
-        '#': 163,
-        '$': 164,
-        'ù': 165,
-        'pagebackward': 166,
-        'pageforward': 167,
-        'refresh': 168,
-        'closingparen': 169,
-        '*': 170,
-        '~+*': 171,
-        // 'home'	         : 172,
-        'minus': 173,
-        // 'mute'           : 173,
-        // 'unmute'	 : 173,
-        'decreasevolumelevel': 174,
-        'increasevolumelevel': 175,
-        'next': 176,
-        'previous': 177,
-        'stop': 178,
-        'play/pause': 179,
-        'email': 180,
-        'mute': 181,
-        'unmute': 181,
-        //'decreasevolumelevel'	182 // firefox
-        //'increasevolumelevel'	183 // firefox
-        'semicolon': 186,
-        'ñ': 186,
-        'equal': 187,
-        'comma': 188,
-        'dash': 189,
-        'period': 190,
-        'forwardslash': 191,
-        'ç': 191,
-        'grave accent': 192,
-        //'ñ' 192,
-        'æ': 192,
-        'ö': 192,
-        '?': 193,
-        '/': 193,
-        '°': 193,
-        // 'numpadperiod'	 : 194, // chrome
-        'openbracket': 219,
-        'backslash': 220,
-        'closebracket': 221,
-        'å': 221,
-        'singlequote': 222,
-        'ø': 222,
-        'ä': 222,
-        '`': 223,
-        // 'left or right ⌘ key (firefox)'	224
-        'altgr': 225,
-        // '< /git >, left back slash'	226
-        'GNOME Compose Key': 230,
-        'XF86Forward': 233,
-        'XF86Back': 234,
-        'alphanumeric': 240,
-        'hiragana': 242,
-        'katakana': 242,
-        'half-width': 243,
-        'full-width': 243,
-        'kanji': 244,
-        'unlocktrackpad': 251,
-        'toggletouchpad': 255
-    };
-    return KeyHandler;
-}());
+    }
+}
 exports.KeyHandler = KeyHandler;
+/**
+ * Source:
+ * https://keycode.info/
+ */
+KeyHandler.KEY_CODES = {
+    'break': 3,
+    'backspace': 8,
+    // 'delete'	 : 8, // alternate: 46
+    'tab': 9,
+    'clear': 12,
+    'enter': 13,
+    'shift': 16,
+    'ctrl': 17,
+    'alt': 18,
+    'pause': 19,
+    // 'break'	         : 19,
+    'capslock': 20,
+    'hangul': 21,
+    'hanja': 25,
+    'escape': 27,
+    'conversion': 28,
+    'non-conversion': 29,
+    'spacebar': 32,
+    'pageup': 33,
+    'pagedown': 34,
+    'end': 35,
+    'home': 36,
+    'leftarrow': 37,
+    'uparrow': 38,
+    'rightarrow': 39,
+    'downarrow': 40,
+    'select': 41,
+    'print': 42,
+    'execute': 43,
+    'printscreen': 44,
+    'insert': 45,
+    'delete': 46,
+    'help': 47,
+    '0': 48,
+    '1': 49,
+    '2': 50,
+    '3': 51,
+    '4': 52,
+    '5': 53,
+    '6': 54,
+    '7': 55,
+    '8': 56,
+    '9': 57,
+    ':': 58,
+    'semicolon (firefox)': 59,
+    'equals': 59,
+    '<': 60,
+    'equals (firefox)': 61,
+    'ß': 63,
+    '@ (firefox)': 64,
+    'a': 65,
+    'b': 66,
+    'c': 67,
+    'd': 68,
+    'e': 69,
+    'f': 70,
+    'g': 71,
+    'h': 72,
+    'i': 73,
+    'j': 74,
+    'k': 75,
+    'l': 76,
+    'm': 77,
+    'n': 78,
+    'o': 79,
+    'p': 80,
+    'q': 81,
+    'r': 82,
+    's': 83,
+    't': 84,
+    'u': 85,
+    'v': 86,
+    'w': 87,
+    'x': 88,
+    'y': 89,
+    'z': 90,
+    'windows': 91,
+    'leftcommand': 91,
+    'chromebooksearch': 91,
+    'rightwindowkey': 92,
+    'windowsmenu': 93,
+    'rightcommant': 93,
+    'sleep': 95,
+    'numpad0': 96,
+    'numpad1': 97,
+    'numpad2': 98,
+    'numpad3': 99,
+    'numpad4': 100,
+    'numpad5': 101,
+    'numpad6': 102,
+    'numpad7': 103,
+    'numpad8': 104,
+    'numpad9': 105,
+    'multiply': 106,
+    'add': 107,
+    'numpadperiod': 108,
+    'subtract': 109,
+    'decimalpoint': 110,
+    'divide': 111,
+    'f1': 112,
+    'f2': 113,
+    'f3': 114,
+    'f4': 115,
+    'f5': 116,
+    'f6': 117,
+    'f7': 118,
+    'f8': 119,
+    'f9': 120,
+    'f10': 121,
+    'f11': 122,
+    'f12': 123,
+    'f13': 124,
+    'f14': 125,
+    'f15': 126,
+    'f16': 127,
+    'f17': 128,
+    'f18': 129,
+    'f19': 130,
+    'f20': 131,
+    'f21': 132,
+    'f22': 133,
+    'f23': 134,
+    'f24': 135,
+    'numlock': 144,
+    'scrolllock': 145,
+    '^': 160,
+    '!': 161,
+    // '؛' 	 : 162 // (arabic semicolon)
+    '#': 163,
+    '$': 164,
+    'ù': 165,
+    'pagebackward': 166,
+    'pageforward': 167,
+    'refresh': 168,
+    'closingparen': 169,
+    '*': 170,
+    '~+*': 171,
+    // 'home'	         : 172,
+    'minus': 173,
+    // 'mute'           : 173,
+    // 'unmute'	 : 173,
+    'decreasevolumelevel': 174,
+    'increasevolumelevel': 175,
+    'next': 176,
+    'previous': 177,
+    'stop': 178,
+    'play/pause': 179,
+    'email': 180,
+    'mute': 181,
+    'unmute': 181,
+    //'decreasevolumelevel'	182 // firefox
+    //'increasevolumelevel'	183 // firefox
+    'semicolon': 186,
+    'ñ': 186,
+    'equal': 187,
+    'comma': 188,
+    'dash': 189,
+    'period': 190,
+    'forwardslash': 191,
+    'ç': 191,
+    'grave accent': 192,
+    //'ñ' 192,
+    'æ': 192,
+    'ö': 192,
+    '?': 193,
+    '/': 193,
+    '°': 193,
+    // 'numpadperiod'	 : 194, // chrome
+    'openbracket': 219,
+    'backslash': 220,
+    'closebracket': 221,
+    'å': 221,
+    'singlequote': 222,
+    'ø': 222,
+    'ä': 222,
+    '`': 223,
+    // 'left or right ⌘ key (firefox)'	224
+    'altgr': 225,
+    // '< /git >, left back slash'	226
+    'GNOME Compose Key': 230,
+    'XF86Forward': 233,
+    'XF86Back': 234,
+    'alphanumeric': 240,
+    'hiragana': 242,
+    'katakana': 242,
+    'half-width': 243,
+    'full-width': 243,
+    'kanji': 244,
+    'unlocktrackpad': 251,
+    'toggletouchpad': 255
+};
 //# sourceMappingURL=KeyHandler.js.map
 
 /***/ }),
@@ -2923,10 +2914,12 @@ exports.KeyHandler = KeyHandler;
 /*!*************************!*\
   !*** ../src/js/Line.js ***!
   \*************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 21:17-21 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/*! flagged exports */
+/*! export Line [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 /**
@@ -2948,23 +2941,10 @@ exports.KeyHandler = KeyHandler;
  * @file Line
  * @public
  **/
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Line = void 0;
-var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
@@ -2973,8 +2953,7 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  *
  * @requires Vertex
  */
-var Line = /** @class */ (function (_super) {
-    __extends(Line, _super);
+class Line extends VertTuple_1.VertTuple {
     /**
      * Creates an instance of Line.
      *
@@ -2983,13 +2962,12 @@ var Line = /** @class */ (function (_super) {
      * @param {Vertex} a The line's first point.
      * @param {Vertex} b The line's second point.
      **/
-    function Line(a, b) {
-        var _this = _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
+    constructor(a, b) {
+        super(a, b, (a, b) => new Line(a, b));
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
-        _this.className = "Line";
-        return _this;
+        this.className = "Line";
     }
     /**
      * Get the intersection if this line and the specified line.
@@ -3001,25 +2979,25 @@ var Line = /** @class */ (function (_super) {
      * @memberof Line
      **/
     // !!! DO NOT MOVE TO VertTuple
-    Line.prototype.intersection = function (line) {
-        var denominator = this.denominator(line);
+    intersection(line) {
+        const denominator = this.denominator(line);
         if (denominator == 0)
             return null;
-        var a = this.a.y - line.a.y;
-        var b = this.a.x - line.a.x;
-        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+        let a = this.a.y - line.a.y;
+        let b = this.a.x - line.a.x;
+        const numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
+        const numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
         a = numerator1 / denominator; // NaN if parallel lines
         b = numerator2 / denominator;
         // Catch NaN?
-        var x = this.a.x + (a * (this.b.x - this.a.x));
-        var y = this.a.y + (a * (this.b.y - this.a.y));
+        const x = this.a.x + (a * (this.b.x - this.a.x));
+        const y = this.a.y + (a * (this.b.y - this.a.y));
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
             return undefined;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
-    };
+    }
     ;
     /**
      * Create an SVG representation of this line.
@@ -3032,7 +3010,7 @@ var Line = /** @class */ (function (_super) {
      * @instance
      * @memberof Line
      **/
-    Line.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<line');
@@ -3044,10 +3022,9 @@ var Line = /** @class */ (function (_super) {
         buffer.push(' y2="' + this.b.y + '"');
         buffer.push(' />');
         return buffer.join('');
-    };
+    }
     ;
-    return Line;
-}(VertTuple_1.VertTuple));
+}
 exports.Line = Line;
 //# sourceMappingURL=Line.js.map
 
@@ -3057,10 +3034,14 @@ exports.Line = Line;
 /*!*********************************!*\
   !*** ../src/js/MouseHandler.js ***!
   \*********************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__ */
-/*! CommonJS bailout: this is used directly at 26:17-21 */
-/***/ (function(__unused_webpack_module, exports) {
+/*! flagged exports */
+/*! export MouseHandler [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export XMouseEvent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export XWheelEvent [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__ */
+/***/ ((__unused_webpack_module, exports) => {
 
 
 /**
@@ -3087,36 +3068,13 @@ exports.Line = Line;
  * @file MouseHandler
  * @public
  **/
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MouseHandler = exports.XWheelEvent = exports.XMouseEvent = void 0;
-var XMouseEvent = /** @class */ (function (_super) {
-    __extends(XMouseEvent, _super);
-    function XMouseEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XMouseEvent;
-}(MouseEvent));
+class XMouseEvent extends MouseEvent {
+}
 exports.XMouseEvent = XMouseEvent;
-var XWheelEvent = /** @class */ (function (_super) {
-    __extends(XWheelEvent, _super);
-    function XWheelEvent() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return XWheelEvent;
-}(WheelEvent));
+class XWheelEvent extends WheelEvent {
+}
 exports.XWheelEvent = XWheelEvent;
 /**
  * @classdesc A simple mouse handler for demos.
@@ -3124,7 +3082,7 @@ exports.XWheelEvent = XWheelEvent;
  *
  * @requires XYCoords
  */
-var MouseHandler = /** @class */ (function () {
+class MouseHandler {
     /**
      * The constructor.
      *
@@ -3185,7 +3143,7 @@ var MouseHandler = /** @class */ (function () {
      * @memberof MouseHandler
      * @param {HTMLElement} element
      **/
-    function MouseHandler(element, name) {
+    constructor(element, name) {
         this.mouseDownPos = undefined;
         this.mouseDragPos = undefined;
         this.mousePos = undefined;
@@ -3211,8 +3169,8 @@ var MouseHandler = /** @class */ (function () {
         // | They will dispatch the modified event (relative mouse position,
         // | drag offset, ...) to the callbacks.
         // +-------------------------------------------------
-        var _self = this;
-        this.handlers['mousemove'] = function (e) {
+        const _self = this;
+        this.handlers['mousemove'] = (e) => {
             if (_self.listeners.mousemove)
                 _self.listeners.mousemove(_self.mkParams(e, 'mousemove'));
             if (_self.mouseDragPos && _self.listeners.drag)
@@ -3220,25 +3178,25 @@ var MouseHandler = /** @class */ (function () {
             if (_self.mouseDownPos)
                 _self.mouseDragPos = _self.relPos(e);
         };
-        this.handlers['mouseup'] = function (e) {
+        this.handlers['mouseup'] = (e) => {
             if (_self.listeners.mouseup)
                 _self.listeners.mouseup(_self.mkParams(e, 'mouseup'));
             _self.mouseDragPos = undefined;
             _self.mouseDownPos = undefined;
             _self.mouseButton = -1;
         };
-        this.handlers['mousedown'] = function (e) {
+        this.handlers['mousedown'] = (e) => {
             _self.mouseDragPos = _self.relPos(e);
             _self.mouseDownPos = _self.relPos(e);
             _self.mouseButton = e.button;
             if (_self.listeners.mousedown)
                 _self.listeners.mousedown(_self.mkParams(e, 'mousedown'));
         };
-        this.handlers['click'] = function (e) {
+        this.handlers['click'] = (e) => {
             if (_self.listeners.click)
                 _self.listeners.click(_self.mkParams(e, 'click'));
         };
-        this.handlers['wheel'] = function (e) {
+        this.handlers['wheel'] = (e) => {
             if (_self.listeners.wheel)
                 _self.listeners.wheel(_self.mkParams(e, 'wheel'));
         };
@@ -3258,11 +3216,11 @@ var MouseHandler = /** @class */ (function () {
      * @param {MouseEvent} e - The mouse event to get the relative position for.
      * @return {XYCoords} The relative mouse coordinates.
      */
-    MouseHandler.prototype.relPos = function (e) {
+    relPos(e) {
         return { x: e.offsetX,
             y: e.offsetY
         };
-    };
+    }
     ;
     /**
      * Build the extended event params.
@@ -3275,9 +3233,9 @@ var MouseHandler = /** @class */ (function () {
      * @param {string} eventName - The name of the firing event.
      * @return {XMouseEvent}
      */
-    MouseHandler.prototype.mkParams = function (e, eventName) {
-        var rel = this.relPos(e);
-        var xEvent = e;
+    mkParams(e, eventName) {
+        const rel = this.relPos(e);
+        const xEvent = e;
         xEvent.params = {
             element: this.element,
             name: eventName,
@@ -3293,7 +3251,7 @@ var MouseHandler = /** @class */ (function () {
             dragAmount: (this.mouseDownPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 })
         };
         return xEvent;
-    };
+    }
     /**
      * Install a new listener.
      * Please note that this mouse handler can only handle one listener per event type.
@@ -3305,12 +3263,12 @@ var MouseHandler = /** @class */ (function () {
      * @param {string} eventName - The name of the firing event to listen for.
      * @return {void}
      */
-    MouseHandler.prototype.listenFor = function (eventName) {
+    listenFor(eventName) {
         if (this.installed[eventName])
             return;
         // In the new version 1.1.0 has all internal listeners installed by default.
         this.installed[eventName] = true;
-    };
+    }
     /**
      * Un-install a new listener.
      *
@@ -3321,12 +3279,12 @@ var MouseHandler = /** @class */ (function () {
      * @param {string} eventName - The name of the firing event to unlisten for.
      * @return {void}
      */
-    MouseHandler.prototype.unlistenFor = function (eventName) {
+    unlistenFor(eventName) {
         if (!this.installed[eventName])
             return;
         // In the new version 1.1.0 has all internal listeners installed by default.
         delete this.installed[eventName];
-    };
+    }
     /**
      * Installer function to listen for a specific event: mouse-drag.
      * Pass your callbacks here.
@@ -3339,7 +3297,7 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The drag-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.drag = function (callback) {
+    drag(callback) {
         if (this.listeners.drag)
             this.throwAlreadyInstalled('drag');
         this.listeners.drag = callback;
@@ -3347,7 +3305,7 @@ var MouseHandler = /** @class */ (function () {
         this.listenFor('mousemove');
         this.listenFor('mouseup');
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-move.
@@ -3361,13 +3319,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The move-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.move = function (callback) {
+    move(callback) {
         if (this.listeners.mousemove)
             this.throwAlreadyInstalled('mousemove');
         this.listenFor('mousemove');
         this.listeners.mousemove = callback;
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-up.
@@ -3381,13 +3339,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The up-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.up = function (callback) {
+    up(callback) {
         if (this.listeners.mouseup)
             this.throwAlreadyInstalled('mouseup');
         this.listenFor('mouseup');
         this.listeners.mouseup = callback;
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-down.
@@ -3401,13 +3359,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The down-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.down = function (callback) {
+    down(callback) {
         if (this.listeners.mousedown)
             this.throwAlreadyInstalled('mousedown');
         this.listenFor('mousedown');
         this.listeners.mousedown = callback;
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-click.
@@ -3421,13 +3379,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XMouseCallback} callback - The click-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.click = function (callback) {
+    click(callback) {
         if (this.listeners.click)
             this.throwAlreadyInstalled('click');
         this.listenFor('click');
         this.listeners.click = callback;
         return this;
-    };
+    }
     ;
     /**
      * Installer function to listen for a specific event: mouse-wheel.
@@ -3441,13 +3399,13 @@ var MouseHandler = /** @class */ (function () {
      * @param {XWheelCallback} callback - The wheel-callback to listen for.
      * @return {MouseHandler} this
      */
-    MouseHandler.prototype.wheel = function (callback) {
+    wheel(callback) {
         if (this.listeners.wheel)
             this.throwAlreadyInstalled('wheel');
         this.listenFor('wheel');
         this.listeners.wheel = callback;
         return this;
-    };
+    }
     ;
     /**
      * An internal function to throw events.
@@ -3459,9 +3417,9 @@ var MouseHandler = /** @class */ (function () {
      * @param {string} name - The name of the event.
      * @return {void}
      */
-    MouseHandler.prototype.throwAlreadyInstalled = function (name) {
-        throw "This MouseHandler already has a '" + name + "' callback. To keep the code simple there is only room for one.";
-    };
+    throwAlreadyInstalled(name) {
+        throw `This MouseHandler already has a '${name}' callback. To keep the code simple there is only room for one.`;
+    }
     ;
     /**
      * Call this when your work is done.
@@ -3474,7 +3432,7 @@ var MouseHandler = /** @class */ (function () {
      * @private
      * @return {void}
      */
-    MouseHandler.prototype.destroy = function () {
+    destroy() {
         this.unlistenFor('mousedown');
         this.unlistenFor('mousemove');
         this.unlistenFor('moseup');
@@ -3485,9 +3443,8 @@ var MouseHandler = /** @class */ (function () {
         this.element.removeEventListener('mousedown', this.handlers['mousedown']);
         this.element.removeEventListener('click', this.handlers['click']);
         this.element.removeEventListener('wheel', this.handlers['wheel']);
-    };
-    return MouseHandler;
-}());
+    }
+}
 exports.MouseHandler = MouseHandler;
 //# sourceMappingURL=MouseHandler.js.map
 
@@ -3520,7 +3477,7 @@ exports.MouseHandler = MouseHandler;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PBImage = void 0;
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 /**
  * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
  *
@@ -3529,7 +3486,7 @@ var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGen
  * @requires UID
  * @requires UIDGenerator
  */
-var PBImage = /** @class */ (function () {
+class PBImage {
     /**
      * The constructor.
      *
@@ -3539,7 +3496,7 @@ var PBImage = /** @class */ (function () {
      * @param {Vertex} upperLeft - The upper left corner.
      * @param {Vertex} lowerRight - The lower right corner.
      **/
-    function PBImage(image, upperLeft, lowerRight) {
+    constructor(image, upperLeft, lowerRight) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -3560,13 +3517,12 @@ var PBImage = /** @class */ (function () {
      * @instance
      * @memberof PBImage
      **/
-    PBImage.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
         return "";
-    };
+    }
     ;
-    return PBImage;
-}());
+}
 exports.PBImage = PBImage;
 //# sourceMappingURL=PBImage.js.map
 
@@ -3659,26 +3615,27 @@ exports.PBImage = PBImage;
  * @fileoverview The main class.
  * @public
  **/
+var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PlotBoilerplate = void 0;
-var draw_1 = __webpack_require__(/*! ./draw */ "../src/js/draw.js");
-var drawgl_1 = __webpack_require__(/*! ./drawgl */ "../src/js/drawgl.js");
-var drawutilssvg_1 = __webpack_require__(/*! ./utils/helpers/drawutilssvg */ "../src/js/utils/helpers/drawutilssvg.js");
-var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-var Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
-var CircleSector_1 = __webpack_require__(/*! ./CircleSector */ "../src/js/CircleSector.js");
-var Grid_1 = __webpack_require__(/*! ./Grid */ "../src/js/Grid.js");
-var KeyHandler_1 = __webpack_require__(/*! ./KeyHandler */ "../src/js/KeyHandler.js");
-var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
-var MouseHandler_1 = __webpack_require__(/*! ./MouseHandler */ "../src/js/MouseHandler.js");
-var PBImage_1 = __webpack_require__(/*! ./PBImage */ "../src/js/PBImage.js");
-var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
-var Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
-var VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "../src/js/VEllipse.js");
-var Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
-var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
+const draw_1 = __webpack_require__(/*! ./draw */ "../src/js/draw.js");
+const drawgl_1 = __webpack_require__(/*! ./drawgl */ "../src/js/drawgl.js");
+const drawutilssvg_1 = __webpack_require__(/*! ./utils/helpers/drawutilssvg */ "../src/js/utils/helpers/drawutilssvg.js");
+const BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+const Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
+const CircleSector_1 = __webpack_require__(/*! ./CircleSector */ "../src/js/CircleSector.js");
+const Grid_1 = __webpack_require__(/*! ./Grid */ "../src/js/Grid.js");
+const KeyHandler_1 = __webpack_require__(/*! ./KeyHandler */ "../src/js/KeyHandler.js");
+const Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+const MouseHandler_1 = __webpack_require__(/*! ./MouseHandler */ "../src/js/MouseHandler.js");
+const PBImage_1 = __webpack_require__(/*! ./PBImage */ "../src/js/PBImage.js");
+const Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
+const Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
+const VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "../src/js/VEllipse.js");
+const Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -3705,7 +3662,7 @@ var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr
  * @requires XYCoords
  * @requires XYDimension
  */
-var PlotBoilerplate = /** @class */ (function () {
+class PlotBoilerplate {
     /**
      * The constructor.
      *
@@ -3766,7 +3723,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true).
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
      */
-    function PlotBoilerplate(config) {
+    constructor(config) {
         // This should be in some static block ...
         VertexAttr_1.VertexAttr.model = { bezierAutoAdjust: false,
             renderTime: 0,
@@ -3784,7 +3741,7 @@ var PlotBoilerplate = /** @class */ (function () {
          * @memberof PlotBoilerplate
          * @instance
          */
-        var f = PlotBoilerplate.utils.fetch;
+        const f = PlotBoilerplate.utils.fetch;
         this.config = {
             canvas: config.canvas,
             fullSize: f.val(config, 'fullSize', true),
@@ -3810,8 +3767,8 @@ var PlotBoilerplate = /** @class */ (function () {
             cssScaleX: f.num(config, 'cssScaleX', 1.0),
             cssScaleY: f.num(config, 'cssScaleY', 1.0),
             cssUniformScale: f.bool(config, 'cssUniformScale', true),
-            saveFile: function () { _self.hooks.saveFile(_self); },
-            setToRetina: function () { _self._setToRetina(); },
+            saveFile: () => { _self.hooks.saveFile(_self); },
+            setToRetina: () => { _self._setToRetina(); },
             autoDetectRetina: f.bool(config, 'autoDetectRetina', true),
             enableSVGExport: f.bool(config, 'enableSVGExport', true),
             // Listeners/observers
@@ -3894,7 +3851,7 @@ var PlotBoilerplate = /** @class */ (function () {
         // +-------------------------------
         this.grid = new Grid_1.Grid(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(50, 50));
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
-        var canvasElement = typeof config.canvas == 'string'
+        const canvasElement = typeof config.canvas == 'string'
             ? document.querySelector(config.canvas)
             : config.canvas;
         // Which renderer to use: Canvas2D, WebGL (experimental) or SVG?
@@ -3902,12 +3859,12 @@ var PlotBoilerplate = /** @class */ (function () {
             this.canvas = canvasElement;
             this.eventCatcher = this.canvas;
             if (this.config.enableGL && typeof drawgl_1.drawutilsgl === "undefined") {
-                console.warn("Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.");
-                console.warn("Disabling GL and falling back to Canvas2D.");
+                console.warn(`Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.`);
+                console.warn(`Disabling GL and falling back to Canvas2D.`);
                 this.config.enableGL = false;
             }
             if (this.config.enableGL) {
-                var ctx = this.canvas.getContext('webgl'); // webgl-experimental?
+                const ctx = this.canvas.getContext('webgl'); // webgl-experimental?
                 this.draw = new drawgl_1.drawutilsgl(ctx, false);
                 // PROBLEM: same instance of fill and draw when using WebGL.
                 //          Shader program cannot be duplicated on the same context.
@@ -3915,14 +3872,14 @@ var PlotBoilerplate = /** @class */ (function () {
                 console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
             }
             else {
-                var ctx = this.canvas.getContext('2d');
+                const ctx = this.canvas.getContext('2d');
                 this.draw = new draw_1.drawutils(ctx, false);
                 this.fill = new draw_1.drawutils(ctx, true);
             }
         }
         else if (canvasElement.tagName.toLowerCase() === 'svg') {
             if (typeof drawutilssvg_1.drawutilssvg === "undefined")
-                throw "The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.";
+                throw `The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.`;
             this.canvas = canvasElement;
             this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), // offset
             new Vertex_1.Vertex(), // scale
@@ -3958,7 +3915,7 @@ var PlotBoilerplate = /** @class */ (function () {
             saveFile: PlotBoilerplate._saveFile
         };
         var _self = this;
-        globalThis.addEventListener('resize', function () { return _self.resizeCanvas(); });
+        globalThis.addEventListener('resize', () => _self.resizeCanvas());
         this.resizeCanvas();
         if (config.autoDetectRetina) {
             this._setToRetina();
@@ -3984,13 +3941,13 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      * @private
      **/
-    PlotBoilerplate._saveFile = function (pb) {
+    static _saveFile(pb) {
         if (typeof drawutilssvg_1.drawutilssvg === "undefined") {
-            console.error("Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?");
+            console.error(`Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?`);
             return;
         }
         // Create fake SVG node
-        var svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        const svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         // var svgNode = document.getElementById('preview-svg');
         // Draw everything to fake node.
         var tosvgDraw = new drawutilssvg_1.drawutilssvg(svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, false, // fillShapes=false
@@ -4011,7 +3968,7 @@ var PlotBoilerplate = /** @class */ (function () {
             throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
-    };
+    }
     ;
     /**
      * This function sets the canvas resolution to factor 2.0 (or the preferred pixel ratio of your device) for retina displays.
@@ -4023,14 +3980,14 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      * @private
      **/
-    PlotBoilerplate.prototype._setToRetina = function () {
+    _setToRetina() {
         this.config.autoDetectRetina = true;
-        var pixelRatio = globalThis.devicePixelRatio || 1;
+        const pixelRatio = globalThis.devicePixelRatio || 1;
         this.config.cssScaleX = this.config.cssScaleY = 1.0 / pixelRatio; // 0.5;
         this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio; // 2.0;
         this.resizeCanvas();
         this.updateCSSscale();
-    };
+    }
     ;
     /**
      * Set the current zoom and draw offset to fit the given bounds.
@@ -4038,25 +3995,25 @@ var PlotBoilerplate = /** @class */ (function () {
      * This method currently restores the aspect zoom ratio.
      *
      **/
-    PlotBoilerplate.prototype.fitToView = function (bounds) {
-        var canvasCenter = new Vertex_1.Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
-        var canvasRatio = this.canvasSize.width / this.canvasSize.height;
-        var ratio = bounds.width / bounds.height;
+    fitToView(bounds) {
+        const canvasCenter = new Vertex_1.Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
+        const canvasRatio = this.canvasSize.width / this.canvasSize.height;
+        const ratio = bounds.width / bounds.height;
         // Find the new draw offset
-        var center = new Vertex_1.Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
+        const center = new Vertex_1.Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
             .inv()
             .addXY(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
         this.setOffset(center);
         if (canvasRatio < ratio) {
-            var newUniformZoom = this.canvasSize.width / bounds.width;
+            const newUniformZoom = this.canvasSize.width / bounds.width;
             this.setZoom(newUniformZoom, newUniformZoom, canvasCenter);
         }
         else {
-            var newUniformZoom = this.canvasSize.height / bounds.height;
+            const newUniformZoom = this.canvasSize.height / bounds.height;
             this.setZoom(newUniformZoom, newUniformZoom, canvasCenter);
         }
         this.redraw();
-    };
+    }
     ;
     /**
      * Set the console for this instance.
@@ -4067,9 +4024,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.setConsole = function (con) {
+    setConsole(con) {
         this.console = con;
-    };
+    }
     ;
     /**
      * Update the CSS scale for the canvas depending onf the cssScale{X,Y} settings.<br>
@@ -4082,14 +4039,14 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      * @private
      **/
-    PlotBoilerplate.prototype.updateCSSscale = function () {
+    updateCSSscale() {
         if (this.config.cssUniformScale) {
             PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleX);
         }
         else {
             PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleY);
         }
-    };
+    }
     ;
     /**
      * Add a drawable object.<br>
@@ -4114,9 +4071,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.add = function (drawable, redraw) {
+    add(drawable, redraw) {
         if (Array.isArray(drawable)) {
-            var arr = drawable;
+            const arr = drawable;
             // for( var i in arr )
             for (var i = 0; i < arr.length; i++) {
                 this.add(arr[i], false);
@@ -4167,7 +4124,7 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (drawable instanceof BezierPath_1.BezierPath) {
             this.drawables.push(drawable);
-            var bezierPath = drawable;
+            const bezierPath = drawable;
             for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
                 if (!drawable.adjustCircular && i == 0)
                     this.vertices.push(bezierPath.bezierCurves[i].startPoint);
@@ -4184,7 +4141,7 @@ var PlotBoilerplate = /** @class */ (function () {
             this.vertices.push(drawable.lowerRight);
             this.drawables.push(drawable);
             // Todo: think about a IDragEvent interface
-            drawable.upperLeft.listeners.addDragListener(function (e) {
+            drawable.upperLeft.listeners.addDragListener((e) => {
                 drawable.lowerRight.add(e.params.dragAmount);
             });
             drawable.lowerRight.attr.selectable = false;
@@ -4195,7 +4152,7 @@ var PlotBoilerplate = /** @class */ (function () {
         // This is a workaround for backwards compatibility when the 'redraw' param was not yet present.
         if (redraw || typeof redraw == 'undefined')
             this.redraw();
-    };
+    }
     ;
     /**
      * Remove a drawable object.<br>
@@ -4220,7 +4177,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.remove = function (drawable, redraw, removeWithVertices) {
+    remove(drawable, redraw, removeWithVertices) {
         if (drawable instanceof Vertex_1.Vertex)
             this.removeVertex(drawable, false);
         for (var i = 0; i < this.drawables.length; i++) {
@@ -4277,7 +4234,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 return;
             }
         }
-    };
+    }
     ;
     /**
      * Remove a vertex from the vertex list.<br>
@@ -4289,7 +4246,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.removeVertex = function (vert, redraw) {
+    removeVertex(vert, redraw) {
         for (var i = 0; i < this.vertices.length; i++) {
             if (this.vertices[i] === vert) {
                 this.vertices.splice(i, 1);
@@ -4298,7 +4255,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 return;
             }
         }
-    };
+    }
     ;
     /**
      * Remove all elements.
@@ -4311,13 +4268,13 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      */
-    PlotBoilerplate.prototype.removeAll = function (keepVertices) {
+    removeAll(keepVertices) {
         this.drawables = [];
         if (!Boolean(keepVertices)) {
             this.vertices = [];
         }
         this.redraw();
-    };
+    }
     ;
     /**
      * Find the vertex near the given position.
@@ -4329,12 +4286,12 @@ var PlotBoilerplate = /** @class */ (function () {
      *                                  Note that the tolerance will be scaled up/down when zoomed.
      * @return The vertex near the given position or undefined if none was found there.
      **/
-    PlotBoilerplate.prototype.getVertexNear = function (pixelPosition, pixelTolerance) {
+    getVertexNear(pixelPosition, pixelTolerance) {
         var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min(this.config.cssScaleX, this.config.cssScaleY));
         if (p && p.typeName == "vertex")
             return this.vertices[p.vindex];
         return undefined;
-    };
+    }
     ;
     /**
      * Draw the grid with the current config settings.<br>
@@ -4348,8 +4305,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawGrid = function (draw) {
-        var gScale = {
+    drawGrid(draw) {
+        const gScale = {
             x: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX / this.config.cssScaleX,
             y: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) * this.config.rasterScaleY / this.config.cssScaleY
         };
@@ -4368,7 +4325,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 draw.grid(offset, (this.canvasSize.width) / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.095)');
             }
         }
-    };
+    }
     ;
     /**
      * Draw the origin with the current config settings.<br>
@@ -4382,18 +4339,18 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawOrigin = function (draw) {
+    drawOrigin(draw) {
         // Add a crosshair to mark the origin
         draw.setCurrentId('origin');
         draw.crosshair({ x: 0, y: 0 }, 10, '#000000');
-    };
+    }
     ;
     /**
      * This is just a tiny helper function to determine the render color of vertices.
      **/
-    PlotBoilerplate.prototype._handleColor = function (h, color) {
+    _handleColor(h, color) {
         return h.attr.isSelected ? this.drawConfig.selectedVertex.color : (h.attr.draggable ? color : 'rgba(128,128,128,0.5)');
-    };
+    }
     /**
      * Draw all drawables.
      *
@@ -4408,7 +4365,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawDrawables = function (renderTime, draw, fill) {
+    drawDrawables(renderTime, draw, fill) {
         for (var i in this.drawables) {
             var d = this.drawables[i];
             this.draw.setCurrentId(d.uid);
@@ -4417,7 +4374,7 @@ var PlotBoilerplate = /** @class */ (function () {
             this.draw.setCurrentClassName(d.className);
             this.drawDrawable(d, renderTime, draw, fill);
         }
-    };
+    }
     ;
     /**
      * Draw the given drawable.
@@ -4434,35 +4391,35 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawDrawable = function (d, renderTime, draw, fill) {
+    drawDrawable(d, renderTime, draw, fill) {
         if (d instanceof BezierPath_1.BezierPath) {
             for (var c in d.bezierCurves) {
                 draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                 if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                     if (!d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
                         if (d.bezierCurves[c].startPoint.attr.visible) {
-                            draw.setCurrentId(d.uid + "_h0");
-                            draw.setCurrentClassName(d.className + "-start-handle");
+                            draw.setCurrentId(`${d.uid}_h0`);
+                            draw.setCurrentClassName(`${d.className}-start-handle`);
                             draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.vertex.color));
                         }
                         d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
                     }
                     if (!d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
                         if (d.bezierCurves[c].endPoint.attr.visible) {
-                            draw.setCurrentId(d.uid + "_h1");
-                            draw.setCurrentClassName(d.className + "-end-handle");
+                            draw.setCurrentId(`${d.uid}_h1`);
+                            draw.setCurrentClassName(`${d.className}-end-handle`);
                             draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.vertex.color));
                         }
                         d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
                     }
                     if (d.bezierCurves[c].startControlPoint.attr.visible) {
-                        draw.setCurrentId(d.uid + "_h2");
-                        draw.setCurrentClassName(d.className + "-start-control-handle");
+                        draw.setCurrentId(`${d.uid}_h2`);
+                        draw.setCurrentClassName(`${d.className}-start-control-handle`);
                         draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
                     }
                     if (d.bezierCurves[c].endControlPoint.attr.visible) {
-                        draw.setCurrentId(d.uid + "_h3");
-                        draw.setCurrentClassName(d.className + "-end-control-handle");
+                        draw.setCurrentId(`${d.uid}_h3`);
+                        draw.setCurrentClassName(`${d.className}-end-control-handle`);
                         draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
                     }
                     d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
@@ -4475,11 +4432,11 @@ var PlotBoilerplate = /** @class */ (function () {
                     d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                 }
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
-                    draw.setCurrentId(d.uid + "_l0");
-                    draw.setCurrentClassName(d.className + "-start-line");
+                    draw.setCurrentId(`${d.uid}_l0`);
+                    draw.setCurrentClassName(`${d.className}-start-line`);
                     draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
-                    draw.setCurrentId(d.uid + "_l1");
-                    draw.setCurrentClassName(d.className + "-end-line");
+                    draw.setCurrentId(`${d.uid}_l1`);
+                    draw.setCurrentClassName(`${d.className}-end-line`);
                     draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
                 }
             }
@@ -4499,15 +4456,15 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (d instanceof VEllipse_1.VEllipse) {
             if (this.drawConfig.drawHandleLines) {
-                draw.setCurrentId(d.uid + "_e0");
-                draw.setCurrentClassName(d.className + "-v-line");
+                draw.setCurrentId(`${d.uid}_e0`);
+                draw.setCurrentClassName(`${d.className}-v-line`);
                 draw.line(d.center.clone().add(0, d.axis.y - d.center.y), d.axis, '#c8c8c8');
-                draw.setCurrentId(d.uid + "_e1");
-                draw.setCurrentClassName(d.className + "-h-line");
+                draw.setCurrentId(`${d.uid}_e1`);
+                draw.setCurrentClassName(`${d.className}-h-line`);
                 draw.line(d.center.clone().add(d.axis.x - d.center.x, 0), d.axis, '#c8c8c8');
             }
             draw.setCurrentId(d.uid);
-            draw.setCurrentClassName("" + d.className);
+            draw.setCurrentClassName(`${d.className}`);
             draw.ellipse(d.center, Math.abs(d.axis.x - d.center.x), Math.abs(d.axis.y - d.center.y), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
             if (!this.drawConfig.drawHandlePoints) {
                 d.center.attr.renderTime = renderTime;
@@ -4538,8 +4495,8 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (d instanceof Vector_1.Vector) {
             draw.arrow(d.a, d.b, this.drawConfig.vector.color);
             if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
-                draw.setCurrentId(d.uid + "_h0");
-                draw.setCurrentClassName(d.className + "-handle");
+                draw.setCurrentId(`${d.uid}_h0`);
+                draw.setCurrentClassName(`${d.className}-handle`);
                 draw.circleHandle(d.b, 3, '#a8a8a8');
             }
             else {
@@ -4552,15 +4509,15 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (d instanceof PBImage_1.PBImage) {
             if (this.drawConfig.drawHandleLines) {
-                draw.setCurrentId(d.uid + "_l0");
-                draw.setCurrentClassName(d.className + "-line");
+                draw.setCurrentId(`${d.uid}_l0`);
+                draw.setCurrentClassName(`${d.className}-line`);
                 draw.line(d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth);
             }
             fill.setCurrentId(d.uid);
             fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
             if (this.drawConfig.drawHandlePoints) {
-                draw.setCurrentId(d.uid + "_h0");
-                draw.setCurrentClassName(d.className + "-lower-right");
+                draw.setCurrentId(`${d.uid}_h0`);
+                draw.setCurrentClassName(`${d.className}-lower-right`);
                 draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                 d.lowerRight.attr.renderTime = renderTime;
             }
@@ -4568,7 +4525,7 @@ var PlotBoilerplate = /** @class */ (function () {
         else {
             console.error('Cannot draw object. Unknown class.');
         }
-    };
+    }
     ;
     /**
      * Draw the select-polygon (if there is one).
@@ -4581,14 +4538,14 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawSelectPolygon = function (draw) {
+    drawSelectPolygon(draw) {
         // Draw select polygon?
         if (this.selectPolygon != null && this.selectPolygon.vertices.length > 0) {
             draw.setCurrentId(this.selectPolygon.uid);
             draw.polygon(this.selectPolygon, '#888888');
             draw.crosshair(this.selectPolygon.vertices[0], 3, '#008888');
         }
-    };
+    }
     ;
     /**
      * Draw all vertices that were not yet drawn with the given render time.<br>
@@ -4603,7 +4560,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawVertices = function (renderTime, draw) {
+    drawVertices(renderTime, draw) {
         // Draw all vertices as small squares if they were not already drawn by other objects
         for (var i in this.vertices) {
             if (this.drawConfig.drawVertices
@@ -4613,7 +4570,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], 'rgb(0,128,192)'));
             }
         }
-    };
+    }
     ;
     /**
      * Trigger redrawing of all objects.<br>
@@ -4625,7 +4582,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.redraw = function () {
+    redraw() {
         var renderTime = new Date().getTime();
         if (this.config.preClear)
             this.config.preClear();
@@ -4635,7 +4592,7 @@ var PlotBoilerplate = /** @class */ (function () {
         this.drawAll(renderTime, this.draw, this.fill);
         if (this.config.postDraw)
             this.config.postDraw();
-    };
+    }
     ;
     /**
      * Draw all: drawables, grid, select-polygon and vertices.
@@ -4645,7 +4602,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.drawAll = function (renderTime, draw, fill) {
+    drawAll(renderTime, draw, fill) {
         // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
         draw.beginDrawCycle(renderTime);
         fill.beginDrawCycle(renderTime);
@@ -4655,7 +4612,7 @@ var PlotBoilerplate = /** @class */ (function () {
         this.drawDrawables(renderTime, draw, fill);
         this.drawVertices(renderTime, draw);
         this.drawSelectPolygon(draw);
-    };
+    }
     ; // END redraw
     /**
      * This function clears the canvas with the configured background color.<br>
@@ -4668,10 +4625,10 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.clear = function () {
+    clear() {
         // Note that elements might have an alpha channel. Clear the scene first.
         this.draw.clear(this.config.backgroundColor);
-    };
+    }
     ;
     /**
      * Clear the selection.<br>
@@ -4685,13 +4642,13 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {PlotBoilerplate} this
      **/
-    PlotBoilerplate.prototype.clearSelection = function (redraw) {
+    clearSelection(redraw) {
         for (var i in this.vertices)
             this.vertices[i].attr.isSelected = false;
         if (redraw)
             this.redraw();
         return this;
-    };
+    }
     ;
     /**
      * Get the current view port.
@@ -4701,9 +4658,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {Bounds} The current viewport.
      **/
-    PlotBoilerplate.prototype.viewport = function () {
+    viewport() {
         return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY));
-    };
+    }
     ;
     /**
      * Trigger the saveFile.hook.
@@ -4713,25 +4670,25 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.saveFile = function () {
+    saveFile() {
         this.hooks.saveFile(this);
-    };
+    }
     ;
     /**
      * Internal helper function used to get 'float' properties from elements.
      * Used to determine border withs and paddings that were defined using CSS.
      */
-    PlotBoilerplate.prototype.getFProp = function (elem, propName) {
+    getFProp(elem, propName) {
         return parseFloat(globalThis.getComputedStyle(elem, null).getPropertyValue(propName));
-    };
+    }
     /**
      * Get the available inner space of the given container.
      *
      * Size minus padding minus border.
      **/
-    PlotBoilerplate.prototype.getAvailableContainerSpace = function () {
-        var _self = this;
-        var container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
+    getAvailableContainerSpace() {
+        const _self = this;
+        const container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
         // var canvas : HTMLCanvasElement = _self.canvas;
         _self.canvas.style.display = 'none';
         /* var
@@ -4751,7 +4708,7 @@ var PlotBoilerplate = /** @class */ (function () {
         var h = container.clientHeight;
         _self.canvas.style.display = 'block';
         return { width: (w - pl - pr - bl - br), height: (h - pt - pb - bt - bb) };
-    };
+    }
     ;
     /**
      * This function resizes the canvas to the required settings (toggles fullscreen).<br>
@@ -4763,10 +4720,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.resizeCanvas = function () {
-        var _this = this;
-        var _self = this;
-        var _setSize = function (w, h) {
+    resizeCanvas() {
+        const _self = this;
+        const _setSize = (w, h) => {
             w *= _self.config.canvasWidthFactor;
             h *= _self.config.canvasHeightFactor;
             _self.canvasSize.width = w;
@@ -4777,13 +4733,13 @@ var PlotBoilerplate = /** @class */ (function () {
                 _self.canvas.height = h;
             }
             else if (_self.canvas instanceof SVGElement) {
-                _this.canvas.setAttribute('viewBox', "0 0 " + w + " " + h);
-                _this.canvas.setAttribute('width', "" + w);
-                _this.canvas.setAttribute('height', "" + h);
-                _this.draw.setSize(_self.canvasSize); // No need to set size to this.fill (instance copy)
+                this.canvas.setAttribute('viewBox', `0 0 ${w} ${h}`);
+                this.canvas.setAttribute('width', `${w}`);
+                this.canvas.setAttribute('height', `${h}`);
+                this.draw.setSize(_self.canvasSize); // No need to set size to this.fill (instance copy)
                 // console.log(
-                _this.eventCatcher.style.width = w + "px";
-                _this.eventCatcher.style.height = h + "px";
+                this.eventCatcher.style.width = `${w}px`;
+                this.eventCatcher.style.height = `${h}px`;
             }
             else {
                 console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
@@ -4807,7 +4763,7 @@ var PlotBoilerplate = /** @class */ (function () {
         else if (_self.config.fitToParent) {
             // Set editor size
             _self.canvas.style.position = 'absolute';
-            var space = this.getAvailableContainerSpace();
+            const space = this.getAvailableContainerSpace();
             _self.canvas.style.width = (_self.config.canvasWidthFactor * space.width) + 'px';
             _self.canvas.style.height = (_self.config.canvasHeightFactor * space.height) + 'px';
             _self.canvas.style.top = null;
@@ -4821,7 +4777,7 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         if (_self.config.redrawOnResize)
             _self.redraw();
-    };
+    }
     ;
     /**
      *  Add all vertices inside the polygon to the current selection.<br>
@@ -4832,12 +4788,12 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    PlotBoilerplate.prototype.selectVerticesInPolygon = function (polygon) {
+    selectVerticesInPolygon(polygon) {
         for (var i in this.vertices) {
             if (this.vertices[i].attr.selectable && polygon.containsVert(this.vertices[i]))
                 this.vertices[i].attr.isSelected = true;
         }
-    };
+    }
     ;
     /**
      * (Helper) Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
@@ -4852,8 +4808,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      * @return {IDraggable} Or false if none found.
      **/
-    PlotBoilerplate.prototype.locatePointNear = function (point, tolerance) {
-        var _self = this;
+    locatePointNear(point, tolerance) {
+        const _self = this;
         if (typeof tolerance == 'undefined')
             tolerance = 7;
         // Apply the zoom (the tolerant area should not shrink or grow when zooming)
@@ -4868,7 +4824,7 @@ var PlotBoilerplate = /** @class */ (function () {
             }
         }
         return null;
-    };
+    }
     /**
      * Handle left-click event.<br>
      *
@@ -4878,8 +4834,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      * @return {void}
      **/
-    PlotBoilerplate.prototype.handleClick = function (e) {
-        var _self = this;
+    handleClick(e) {
+        const _self = this;
         // const x:number = e.params.pos.x;
         //const y:number = e.params.pos.y;
         var p = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
@@ -4887,12 +4843,12 @@ var PlotBoilerplate = /** @class */ (function () {
             _self.vertices[p.vindex].listeners.fireClickEvent(e);
             if (this.keyHandler && this.keyHandler.isDown('shift')) {
                 if (p.typeName == 'bpath') {
-                    var vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
+                    let vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
                     if (vert.attr.selectable)
                         vert.attr.isSelected = !vert.attr.isSelected;
                 }
                 else if (p.typeName == 'vertex') {
-                    var vert = _self.vertices[p.vindex];
+                    let vert = _self.vertices[p.vindex];
                     if (vert.attr.selectable)
                         vert.attr.isSelected = !vert.attr.isSelected;
                 }
@@ -4904,11 +4860,11 @@ var PlotBoilerplate = /** @class */ (function () {
             }
         }
         else if (_self.selectPolygon != null) {
-            var vert = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+            const vert = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
             _self.selectPolygon.vertices.push(new Vertex_1.Vertex(vert.x, vert.y));
             _self.redraw();
         }
-    };
+    }
     /**
      * Transforms the given x-y-(mouse-)point to coordinates respecting the view offset
      * and the zoom settings.
@@ -4920,13 +4876,13 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {XYCoords} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
      **/
-    PlotBoilerplate.prototype.transformMousePosition = function (x, y) {
+    transformMousePosition(x, y) {
         /* return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
            y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) }; */
         // console.log('offset', this.config.offsetX, this.config.offsetY, this.draw.offset );
         return { x: (x / this.config.cssScaleX - this.config.offsetX) / (this.config.scaleX),
             y: (y / this.config.cssScaleY - this.config.offsetY) / (this.config.scaleY) };
-    };
+    }
     ;
     /**
      * Revert a transformed mouse position back to canvas coordinates.
@@ -4940,10 +4896,10 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {XYCoords} The canvas coordinates for the given position.
      **/
-    PlotBoilerplate.prototype.revertMousePosition = function (x, y) {
+    revertMousePosition(x, y) {
         return { x: x / this.config.cssScaleX + this.config.offsetX,
             y: y / this.config.cssScaleY + this.config.offsetY };
-    };
+    }
     ;
     /**
      * Determine if any elements are currently being dragged (on mouse move or touch move).
@@ -4953,9 +4909,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {number} The number of elements that are currently being dragged.
      **/
-    PlotBoilerplate.prototype.getDraggedElementCount = function () {
+    getDraggedElementCount() {
         return this.draggedElements.length;
-    };
+    }
     ;
     /**
      * (Helper) The mouse-down handler.
@@ -4967,8 +4923,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      * @return {void}
      **/
-    PlotBoilerplate.prototype.mouseDownHandler = function (e) {
-        var _self = this;
+    mouseDownHandler(e) {
+        const _self = this;
         if (e.which != 1)
             return; // Only react on left mouse or touch events
         var p = _self.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
@@ -4996,7 +4952,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 _self.vertices[p.vindex].listeners.fireDragStartEvent(e);
         }
         _self.redraw();
-    };
+    }
     ;
     /**
      * The mouse-drag handler.
@@ -5009,9 +4965,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      * @return {void}
      **/
-    PlotBoilerplate.prototype.mouseDragHandler = function (e) {
-        var _self = this;
-        var oldDragAmount = { x: e.params.dragAmount.x, y: e.params.dragAmount.y };
+    mouseDragHandler(e) {
+        const _self = this;
+        const oldDragAmount = { x: e.params.dragAmount.x, y: e.params.dragAmount.y };
         e.params.dragAmount.x /= _self.config.cssScaleX;
         e.params.dragAmount.y /= _self.config.cssScaleY;
         // Important note to: this.keyHandler.isDown('ctrl')
@@ -5049,7 +5005,7 @@ var PlotBoilerplate = /** @class */ (function () {
         e.params.dragAmount.x = oldDragAmount.x;
         e.params.dragAmount.y = oldDragAmount.y;
         _self.redraw();
-    };
+    }
     ;
     /**
      * The mouse-up handler.
@@ -5061,8 +5017,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      * @return {void}
      **/
-    PlotBoilerplate.prototype.mouseUpHandler = function (e) {
-        var _self = this;
+    mouseUpHandler(e) {
+        const _self = this;
         if (e.which != 1)
             return; // Only react on left mouse;
         if (!e.params.wasDragged) {
@@ -5079,7 +5035,7 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         _self.draggedElements = [];
         _self.redraw();
-    };
+    }
     ;
     /**
      * The mouse-wheel handler.
@@ -5091,11 +5047,11 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      * @return {void}
      **/
-    PlotBoilerplate.prototype.mouseWheelHandler = function (e) {
+    mouseWheelHandler(e) {
         var zoomStep = 1.25; // Make configurable?
         // CHANGED replaced _self by this
-        var _self = this;
-        var we = e;
+        const _self = this;
+        const we = e;
         if (we.deltaY < 0) {
             _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex_1.Vertex(e.params.pos.x, e.params.pos.y));
         }
@@ -5104,7 +5060,7 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         e.preventDefault();
         _self.redraw();
-    };
+    }
     ;
     /**
      * Set the new draw offset.
@@ -5113,12 +5069,12 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      * @param {Vertex} newOffset - The new draw offset to use.
      **/
-    PlotBoilerplate.prototype.setOffset = function (newOffset) {
+    setOffset(newOffset) {
         this.draw.offset.set(newOffset);
         this.fill.offset.set(newOffset);
         this.config.offsetX = newOffset.x;
         this.config.offsetY = newOffset.y;
-    };
+    }
     ;
     /**
     * Set a new zoom value (and re-adjust the draw offset).
@@ -5129,23 +5085,23 @@ var PlotBoilerplate = /** @class */ (function () {
     * @param {number} zoomFactorY - The new vertical zoom value.
     * @param {Vertex} interactionPos - The position of mouse/touch interaction.
     **/
-    PlotBoilerplate.prototype.setZoom = function (zoomFactorX, zoomFactorY, interactionPos) {
-        var oldPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
+    setZoom(zoomFactorX, zoomFactorY, interactionPos) {
+        let oldPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
         this.draw.scale.x = this.fill.scale.x = this.config.scaleX = Math.max(zoomFactorX, 0.01);
         this.draw.scale.y = this.fill.scale.y = this.config.scaleY = Math.max(zoomFactorY, 0.01);
-        var newPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
-        var newOffsetX = this.draw.offset.x + (newPos.x - oldPos.x) * this.draw.scale.x;
-        var newOffsetY = this.draw.offset.y + (newPos.y - oldPos.y) * this.draw.scale.y;
+        let newPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
+        let newOffsetX = this.draw.offset.x + (newPos.x - oldPos.x) * this.draw.scale.x;
+        let newOffsetY = this.draw.offset.y + (newPos.y - oldPos.y) * this.draw.scale.y;
         this.setOffset({ x: newOffsetX, y: newOffsetY });
-    };
-    PlotBoilerplate.prototype.installInputListeners = function () {
+    }
+    installInputListeners() {
         var _self = this;
         if (this.config.enableMouse) {
             // Install a mouse handler on the canvas.
             new MouseHandler_1.MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
-                .down(function (e) { _self.mouseDownHandler(e); })
-                .drag(function (e) { _self.mouseDragHandler(e); })
-                .up(function (e) { _self.mouseUpHandler(e); });
+                .down((e) => { _self.mouseDownHandler(e); })
+                .drag((e) => { _self.mouseDragHandler(e); })
+                .up((e) => { _self.mouseUpHandler(e); });
         }
         else {
             _self.console.log('Mouse interaction disabled.');
@@ -5153,15 +5109,15 @@ var PlotBoilerplate = /** @class */ (function () {
         if (this.config.enableMouseWheel) {
             // Install a mouse handler on the canvas.
             new MouseHandler_1.MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
-                .wheel(function (e) { _self.mouseWheelHandler(e); });
+                .wheel((e) => { _self.mouseWheelHandler(e); });
         }
         else {
             _self.console.log('Mouse wheel interaction disabled.');
         }
         if (this.config.enableTouch) {
             // Install a touch handler on the canvas.
-            var relPos_1 = function (pos) {
-                var bounds = _self.canvas.getBoundingClientRect();
+            const relPos = (pos) => {
+                const bounds = _self.canvas.getBoundingClientRect();
                 return { x: pos.x - bounds.left,
                     y: pos.y - bounds.top // _self.canvas.offsetTop
                 };
@@ -5170,12 +5126,12 @@ var PlotBoilerplate = /** @class */ (function () {
                 try {
                     // Do not include AlloyFinger itself to the library
                     // (17kb, but we want to keep this lib as tiny as possible).
-                    var AF = globalThis["AlloyFinger"];
+                    const AF = globalThis["AlloyFinger"];
                     var touchMovePos = null;
                     var touchDownPos = null;
                     var draggedElement = null;
                     var multiTouchStartScale = null;
-                    var clearTouch_1 = function () {
+                    const clearTouch = () => {
                         touchMovePos = null;
                         touchDownPos = null;
                         draggedElement = null;
@@ -5185,8 +5141,8 @@ var PlotBoilerplate = /** @class */ (function () {
                     var af = new AF(this.eventCatcher ? this.eventCatcher : this.canvas, {
                         touchStart: function (e) {
                             if (e.touches.length == 1) {
-                                touchMovePos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
-                                touchDownPos = new Vertex_1.Vertex(relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
+                                touchMovePos = new Vertex_1.Vertex(relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
+                                touchDownPos = new Vertex_1.Vertex(relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
                                 if (draggedElement && draggedElement.typeName == 'vertex') {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
@@ -5200,7 +5156,7 @@ var PlotBoilerplate = /** @class */ (function () {
                             if (e.touches.length == 1 && draggedElement) {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                var rel = relPos_1({ x: e.touches[0].clientX, y: e.touches[0].clientY }); //  points[0] );
+                                var rel = relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }); //  points[0] );
                                 var trans = _self.transformMousePosition(rel.x, rel.y);
                                 var diff = new Vertex_1.Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
                                 if (draggedElement.typeName == 'vertex') {
@@ -5239,10 +5195,10 @@ var PlotBoilerplate = /** @class */ (function () {
                                     draggingVertex.listeners.fireDragEndEvent(fakeEvent);
                                 }
                             }
-                            clearTouch_1();
+                            clearTouch();
                         },
                         touchCancel: function (e) {
-                            clearTouch_1();
+                            clearTouch();
                         },
                         multipointStart: function (e) {
                             multiTouchStartScale = _self.draw.scale.clone();
@@ -5252,9 +5208,9 @@ var PlotBoilerplate = /** @class */ (function () {
                         },
                         pinch: function (e) {
                             // For pinching there must be at least two touch items
-                            var fingerA = new Vertex_1.Vertex(e.touches.item(0).clientX, e.touches.item(0).clientY);
-                            var fingerB = new Vertex_1.Vertex(e.touches.item(1).clientX, e.touches.item(1).clientY);
-                            var center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
+                            const fingerA = new Vertex_1.Vertex(e.touches.item(0).clientX, e.touches.item(0).clientY);
+                            const fingerB = new Vertex_1.Vertex(e.touches.item(1).clientX, e.touches.item(1).clientY);
+                            const center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
                             _self.setZoom(multiTouchStartScale.x * e.zoom, multiTouchStartScale.y * e.zoom, center);
                             _self.redraw();
                         }
@@ -5299,7 +5255,7 @@ var PlotBoilerplate = /** @class */ (function () {
         else {
             _self.console.log('Keyboard interaction disabled.');
         }
-    };
+    }
     /**
      * Creates a control GUI (a dat.gui instance) for this
      * plot boilerplate instance.
@@ -5309,225 +5265,222 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {dat.gui.GUI}
      **/
-    PlotBoilerplate.prototype.createGUI = function () {
+    createGUI() {
         // This function moved to the helper utils.
         // We do not want to include the whole dat.GUI package.
         if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
             return globalThis["utils"].createGUI(this);
         else
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
-    };
+    }
     ;
-    var _a;
-    /** @constant {number} */
-    PlotBoilerplate.DEFAULT_CANVAS_WIDTH = 1024;
-    /** @constant {number} */
-    PlotBoilerplate.DEFAULT_CANVAS_HEIGHT = 768;
-    /** @constant {number} */
-    PlotBoilerplate.DEFAULT_CLICK_TOLERANCE = 8;
-    /** @constant {number} */
-    PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE = 32;
-    /**
-     * A wrapper class for draggable items (mostly vertices).
-     * @private
-     **/
-    PlotBoilerplate.Draggable = (_a = /** @class */ (function () {
-            function class_1(item, typeName) {
-                this.item = item;
-                this.typeName = typeName;
-            }
-            ;
-            class_1.prototype.isVertex = function () { return this.typeName == PlotBoilerplate.Draggable.VERTEX; };
-            ;
-            class_1.prototype.setVIndex = function (vindex) { this.vindex = vindex; return this; };
-            ;
-            return class_1;
-        }()),
-        _a.VERTEX = 'vertex',
-        _a);
-    /**
-     * A set of helper functions.
-     **/
-    PlotBoilerplate.utils = {
-        /**
-         * Merge the elements in the 'extension' object into the 'base' object based on
-         * the keys of 'base'.
-         *
-         * @param {Object} base
-         * @param {Object} extension
-         * @return {Object} base extended by the new attributes.
-         **/
-        safeMergeByKeys: function (base, extension) {
-            for (var k in extension) {
-                if (!extension.hasOwnProperty(k))
-                    continue;
-                if (base.hasOwnProperty(k)) {
-                    var typ = typeof base[k];
-                    try {
-                        if (typ == 'boolean')
-                            base[k] = !!JSON.parse(extension[k]);
-                        else if (typ == 'number')
-                            base[k] = JSON.parse(extension[k]) * 1;
-                        else if (typ == 'function' && typeof extension[k] == 'function')
-                            base[k] = extension[k];
-                        else
-                            base[k] = extension[k];
-                    }
-                    catch (e) {
-                        console.error('error in key ', k, extension[k], e);
-                    }
-                }
-                else {
-                    base[k] = extension[k];
-                }
-            }
-            return base;
-        },
-        /**
-         * A helper function to scale elements (usually the canvas) using CSS.
-         *
-         * transform-origin is at (0,0).
-         *
-         * @param {HTMLElement} element - The DOM element to scale.
-         * @param {number} scaleX The - X scale factor.
-         * @param {number} scaleY The - Y scale factor.
-         * @return {void}
-         **/
-        setCSSscale: function (element, scaleX, scaleY) {
-            element.style['transform-origin'] = '0 0';
-            if (scaleX == 1.0 && scaleY == 1.0)
-                element.style.transform = null;
-            else
-                element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
-        },
-        // A helper for fetching data from objects.
-        fetch: {
-            /**
-             * A helper function to the the object property value specified by the given key.
-             *
-             * @param {any} object   - The object to get the property's value from. Must not be null.
-             * @param {string} key      - The key of the object property (the name).
-             * @param {any}    fallback - A default value if the key does not exist.
-             **/
-            val: function (obj, key, fallback) {
-                if (!obj.hasOwnProperty(key))
-                    return fallback;
-                if (typeof obj[key] == 'undefined')
-                    return fallback;
-                return obj[key];
-            },
-            /**
-             * A helper function to the the object property numeric value specified by the given key.
-             *
-             * @param {any}    object   - The object to get the property's value from. Must not be null.
-             * @param {string} key      - The key of the object property (the name).
-             * @param {number} fallback - A default value if the key does not exist.
-             * @return {number}
-             **/
-            num: function (obj, key, fallback) {
-                if (!obj.hasOwnProperty(key))
-                    return fallback;
-                if (typeof obj[key] === 'number')
-                    return obj[key];
-                else {
-                    try {
-                        return JSON.parse(obj[key]) * 1;
-                    }
-                    catch (e) {
-                        return fallback;
-                    }
-                }
-            },
-            /**
-             * A helper function to the the object property boolean value specified by the given key.
-             *
-             * @param {any}     object   - The object to get the property's value from. Must not be null.
-             * @param {string}  key      - The key of the object property (the name).
-             * @param {boolean} fallback - A default value if the key does not exist.
-             * @return {boolean}
-             **/
-            bool: function (obj, key, fallback) {
-                if (!obj.hasOwnProperty(key))
-                    return fallback;
-                if (typeof obj[key] == 'boolean')
-                    return obj[key];
-                else {
-                    try {
-                        return !!JSON.parse(obj[key]);
-                    }
-                    catch (e) {
-                        return fallback;
-                    }
-                }
-            },
-            /**
-             * A helper function to the the object property function-value specified by the given key.
-             *
-             * @param {any}      object   - The object to get the property's value from. Must not be null.
-             * @param {string}   key      - The key of the object property (the name).
-             * @param {function} fallback - A default value if the key does not exist.
-             * @return {function}
-             **/
-            func: function (obj, key, fallback) {
-                if (!obj.hasOwnProperty(key))
-                    return fallback;
-                if (typeof obj[key] !== 'function')
-                    return fallback;
-                return obj[key];
-            }
-        },
-        /**
-         * Installs vertex listeners to the path's vertices so that controlpoints
-         * move with their path points when dragged.
-         *
-         * Bézier path points with attr.bezierAutoAdjust==true will have their
-         * two control points audo-updated if moved, too (keep path connections smooth).
-         *
-         * @param {BezierPath} bezierPath - The path to use auto-adjustment for.
-         **/
-        enableBezierPathAutoAdjust: function (bezierPath) {
-            for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
-                // This should be wrapped into the BezierPath implementation.
-                bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
-                    var cindex = bezierPath.locateCurveByStartPoint(e.params.vertex);
-                    bezierPath.bezierCurves[cindex].startPoint.addXY(-e.params.dragAmount.x, -e.params.dragAmount.y);
-                    bezierPath.moveCurvePoint(cindex * 1, bezierPath.START_POINT, e.params.dragAmount);
-                    bezierPath.updateArcLengths();
-                });
-                bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {
-                    var cindex = bezierPath.locateCurveByStartControlPoint(e.params.vertex);
-                    if (!bezierPath.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust)
-                        return;
-                    bezierPath.adjustPredecessorControlPoint(cindex * 1, true, // obtain handle length?
-                    false // update arc lengths
-                    );
-                    bezierPath.updateArcLengths();
-                });
-                bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener(function (e) {
-                    var cindex = bezierPath.locateCurveByEndControlPoint(e.params.vertex);
-                    if (!bezierPath.bezierCurves[cindex % bezierPath.bezierCurves.length].endPoint.attr.bezierAutoAdjust)
-                        return;
-                    bezierPath.adjustSuccessorControlPoint(cindex * 1, true, // obtain handle length?
-                    false // update arc lengths
-                    );
-                    bezierPath.updateArcLengths();
-                });
-                if (i + 1 == bezierPath.bezierCurves.length) { // && !bezierPath.adjustCircular ) { 
-                    // Move last control point with the end point (if not circular)
-                    bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
-                        if (!bezierPath.adjustCircular) {
-                            var cindex = bezierPath.locateCurveByEndPoint(e.params.vertex);
-                            bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex_1.Vertex({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
-                        }
-                        bezierPath.updateArcLengths();
-                    });
-                }
-            } // END for
-        }
-    }; // END utils
-    return PlotBoilerplate;
-}()); // END class PlotBoilerplate
+} // END class PlotBoilerplate
 exports.PlotBoilerplate = PlotBoilerplate;
+/** @constant {number} */
+PlotBoilerplate.DEFAULT_CANVAS_WIDTH = 1024;
+/** @constant {number} */
+PlotBoilerplate.DEFAULT_CANVAS_HEIGHT = 768;
+/** @constant {number} */
+PlotBoilerplate.DEFAULT_CLICK_TOLERANCE = 8;
+/** @constant {number} */
+PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE = 32;
+/**
+ * A wrapper class for draggable items (mostly vertices).
+ * @private
+ **/
+PlotBoilerplate.Draggable = (_a = class {
+        constructor(item, typeName) {
+            this.item = item;
+            this.typeName = typeName;
+        }
+        ;
+        isVertex() { return this.typeName == PlotBoilerplate.Draggable.VERTEX; }
+        ;
+        setVIndex(vindex) { this.vindex = vindex; return this; }
+        ;
+    },
+    _a.VERTEX = 'vertex',
+    _a);
+/**
+ * A set of helper functions.
+ **/
+PlotBoilerplate.utils = {
+    /**
+     * Merge the elements in the 'extension' object into the 'base' object based on
+     * the keys of 'base'.
+     *
+     * @param {Object} base
+     * @param {Object} extension
+     * @return {Object} base extended by the new attributes.
+     **/
+    safeMergeByKeys: (base, extension) => {
+        for (var k in extension) {
+            if (!extension.hasOwnProperty(k))
+                continue;
+            if (base.hasOwnProperty(k)) {
+                var typ = typeof base[k];
+                try {
+                    if (typ == 'boolean')
+                        base[k] = !!JSON.parse(extension[k]);
+                    else if (typ == 'number')
+                        base[k] = JSON.parse(extension[k]) * 1;
+                    else if (typ == 'function' && typeof extension[k] == 'function')
+                        base[k] = extension[k];
+                    else
+                        base[k] = extension[k];
+                }
+                catch (e) {
+                    console.error('error in key ', k, extension[k], e);
+                }
+            }
+            else {
+                base[k] = extension[k];
+            }
+        }
+        return base;
+    },
+    /**
+     * A helper function to scale elements (usually the canvas) using CSS.
+     *
+     * transform-origin is at (0,0).
+     *
+     * @param {HTMLElement} element - The DOM element to scale.
+     * @param {number} scaleX The - X scale factor.
+     * @param {number} scaleY The - Y scale factor.
+     * @return {void}
+     **/
+    setCSSscale: (element, scaleX, scaleY) => {
+        element.style['transform-origin'] = '0 0';
+        if (scaleX == 1.0 && scaleY == 1.0)
+            element.style.transform = null;
+        else
+            element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
+    },
+    // A helper for fetching data from objects.
+    fetch: {
+        /**
+         * A helper function to the the object property value specified by the given key.
+         *
+         * @param {any} object   - The object to get the property's value from. Must not be null.
+         * @param {string} key      - The key of the object property (the name).
+         * @param {any}    fallback - A default value if the key does not exist.
+         **/
+        val: (obj, key, fallback) => {
+            if (!obj.hasOwnProperty(key))
+                return fallback;
+            if (typeof obj[key] == 'undefined')
+                return fallback;
+            return obj[key];
+        },
+        /**
+         * A helper function to the the object property numeric value specified by the given key.
+         *
+         * @param {any}    object   - The object to get the property's value from. Must not be null.
+         * @param {string} key      - The key of the object property (the name).
+         * @param {number} fallback - A default value if the key does not exist.
+         * @return {number}
+         **/
+        num: (obj, key, fallback) => {
+            if (!obj.hasOwnProperty(key))
+                return fallback;
+            if (typeof obj[key] === 'number')
+                return obj[key];
+            else {
+                try {
+                    return JSON.parse(obj[key]) * 1;
+                }
+                catch (e) {
+                    return fallback;
+                }
+            }
+        },
+        /**
+         * A helper function to the the object property boolean value specified by the given key.
+         *
+         * @param {any}     object   - The object to get the property's value from. Must not be null.
+         * @param {string}  key      - The key of the object property (the name).
+         * @param {boolean} fallback - A default value if the key does not exist.
+         * @return {boolean}
+         **/
+        bool: (obj, key, fallback) => {
+            if (!obj.hasOwnProperty(key))
+                return fallback;
+            if (typeof obj[key] == 'boolean')
+                return obj[key];
+            else {
+                try {
+                    return !!JSON.parse(obj[key]);
+                }
+                catch (e) {
+                    return fallback;
+                }
+            }
+        },
+        /**
+         * A helper function to the the object property function-value specified by the given key.
+         *
+         * @param {any}      object   - The object to get the property's value from. Must not be null.
+         * @param {string}   key      - The key of the object property (the name).
+         * @param {function} fallback - A default value if the key does not exist.
+         * @return {function}
+         **/
+        func: (obj, key, fallback) => {
+            if (!obj.hasOwnProperty(key))
+                return fallback;
+            if (typeof obj[key] !== 'function')
+                return fallback;
+            return obj[key];
+        }
+    },
+    /**
+     * Installs vertex listeners to the path's vertices so that controlpoints
+     * move with their path points when dragged.
+     *
+     * Bézier path points with attr.bezierAutoAdjust==true will have their
+     * two control points audo-updated if moved, too (keep path connections smooth).
+     *
+     * @param {BezierPath} bezierPath - The path to use auto-adjustment for.
+     **/
+    enableBezierPathAutoAdjust: (bezierPath) => {
+        for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
+            // This should be wrapped into the BezierPath implementation.
+            bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
+                var cindex = bezierPath.locateCurveByStartPoint(e.params.vertex);
+                bezierPath.bezierCurves[cindex].startPoint.addXY(-e.params.dragAmount.x, -e.params.dragAmount.y);
+                bezierPath.moveCurvePoint(cindex * 1, bezierPath.START_POINT, e.params.dragAmount);
+                bezierPath.updateArcLengths();
+            });
+            bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {
+                var cindex = bezierPath.locateCurveByStartControlPoint(e.params.vertex);
+                if (!bezierPath.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust)
+                    return;
+                bezierPath.adjustPredecessorControlPoint(cindex * 1, true, // obtain handle length?
+                false // update arc lengths
+                );
+                bezierPath.updateArcLengths();
+            });
+            bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener(function (e) {
+                var cindex = bezierPath.locateCurveByEndControlPoint(e.params.vertex);
+                if (!bezierPath.bezierCurves[cindex % bezierPath.bezierCurves.length].endPoint.attr.bezierAutoAdjust)
+                    return;
+                bezierPath.adjustSuccessorControlPoint(cindex * 1, true, // obtain handle length?
+                false // update arc lengths
+                );
+                bezierPath.updateArcLengths();
+            });
+            if (i + 1 == bezierPath.bezierCurves.length) { // && !bezierPath.adjustCircular ) { 
+                // Move last control point with the end point (if not circular)
+                bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
+                    if (!bezierPath.adjustCircular) {
+                        var cindex = bezierPath.locateCurveByEndPoint(e.params.vertex);
+                        bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex_1.Vertex({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
+                    }
+                    bezierPath.updateArcLengths();
+                });
+            }
+        } // END for
+    }
+}; // END utils
 //# sourceMappingURL=PlotBoilerplate.js.map
 
 /***/ }),
@@ -5572,10 +5525,10 @@ exports.PlotBoilerplate = PlotBoilerplate;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Polygon = void 0;
-var BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -5587,7 +5540,7 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires Vertex
  * @requires XYCoords
  */
-var Polygon = /** @class */ (function () {
+class Polygon {
     /**
      * The constructor.
      *
@@ -5596,7 +5549,7 @@ var Polygon = /** @class */ (function () {
      * @param {Vertex[]} vertices - An array of 2d vertices that shape the polygon.
      * @param {boolean} isOpen - Indicates if the polygon should be rendered as an open or closed shape.
      **/
-    function Polygon(vertices, isOpen) {
+    constructor(vertices, isOpen) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -5616,9 +5569,9 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.addVertex = function (vert) {
+    addVertex(vert) {
         this.vertices.push(vert);
-    };
+    }
     ;
     /**
      * Get the polygon vertex at the given position (index).
@@ -5636,12 +5589,12 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Vertex} At the given index.
      **/
-    Polygon.prototype.getVertexAt = function (index) {
+    getVertexAt(index) {
         if (index < 0)
             return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
         else
             return this.vertices[index % this.vertices.length];
-    };
+    }
     ;
     /**
      * Move the polygon's vertices by the given amount.
@@ -5652,12 +5605,12 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Polygon} this for chaining
      **/
-    Polygon.prototype.move = function (vert) {
+    move(vert) {
         for (var i in this.vertices) {
             this.vertices[i].add(vert);
         }
         return this;
-    };
+    }
     ;
     /**
      * Check if the given vertex is inside this polygon.<br>
@@ -5671,20 +5624,20 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.containsVert = function (vert) {
+    containsVert(vert) {
         // ray-casting algorithm based on
         //    http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
         var inside = false;
         for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
-            var xi = this.vertices[i].x, yi = this.vertices[i].y;
-            var xj = this.vertices[j].x, yj = this.vertices[j].y;
+            let xi = this.vertices[i].x, yi = this.vertices[i].y;
+            let xj = this.vertices[j].x, yj = this.vertices[j].y;
             var intersect = ((yi > vert.y) != (yj > vert.y))
                 && (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
             if (intersect)
                 inside = !inside;
         }
         return inside;
-    };
+    }
     ;
     /**
      * Calculate the area of the given polygon (unsigned).
@@ -5696,7 +5649,7 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {number}
      */
-    Polygon.prototype.area = function () {
+    area() {
         // Found at:
         //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
         /* let total : number = 0.0;
@@ -5712,7 +5665,7 @@ var Polygon = /** @class */ (function () {
         }
         return Math.abs(total); */
         return Polygon.utils.area(this.vertices);
-    };
+    }
     ;
     /**
      * Calulate the signed polyon area by interpreting the polygon as a matrix
@@ -5723,7 +5676,7 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {number}
      */
-    Polygon.prototype.signedArea = function () {
+    signedArea() {
         return Polygon.utils.signedArea(this.vertices);
         /* let sum : number = 0;
         const n = this.vertices.length;
@@ -5732,7 +5685,7 @@ var Polygon = /** @class */ (function () {
             sum += (this.vertices[j].x - this.vertices[i].x) * (this.vertices[i].y + this.vertices[j].y);
         }
         return sum; */
-    };
+    }
     ;
     /**
      * Get the winding order of this polgon: clockwise or counterclockwise.
@@ -5742,9 +5695,9 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {boolean}
      */
-    Polygon.prototype.isClockwise = function () {
+    isClockwise() {
         return Polygon.utils.signedArea(this.vertices) < 0;
-    };
+    }
     ;
     /**
      * Scale the polygon relative to the given center.
@@ -5756,7 +5709,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.scale = function (factor, center) {
+    scale(factor, center) {
         for (var i in this.vertices) {
             if (typeof this.vertices[i].scale == 'function')
                 this.vertices[i].scale(factor, center);
@@ -5764,7 +5717,7 @@ var Polygon = /** @class */ (function () {
                 console.log('There seems to be a null vertex!', this.vertices[i]);
         }
         return this;
-    };
+    }
     ;
     /**
      * Rotate the polygon around the given center.
@@ -5776,12 +5729,12 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Polygon} this, for chaining.
      **/
-    Polygon.prototype.rotate = function (angle, center) {
+    rotate(angle, center) {
         for (var i in this.vertices) {
             this.vertices[i].rotate(angle, center);
         }
         return this;
-    };
+    }
     ;
     /**
      * Get the bounding box (bounds) of this polygon.
@@ -5791,9 +5744,9 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Bounds} The rectangular bounds of this polygon.
      **/
-    Polygon.prototype.getBounds = function () {
+    getBounds() {
         return Bounds_1.Bounds.computeFromVertices(this.vertices);
-    };
+    }
     ;
     /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
@@ -5807,7 +5760,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toQuadraticBezierData = function () {
+    toQuadraticBezierData() {
         if (this.vertices.length < 3)
             return [];
         var qbezier = [];
@@ -5825,7 +5778,7 @@ var Polygon = /** @class */ (function () {
             cc0 = cc1;
         }
         return qbezier;
-    };
+    }
     ;
     /**
      * Convert this polygon to a quadratic bezier curve, represented as an SVG data string.
@@ -5835,7 +5788,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toQuadraticBezierSVGString = function () {
+    toQuadraticBezierSVGString() {
         var qdata = this.toQuadraticBezierData();
         if (qdata.length == 0)
             return "";
@@ -5844,7 +5797,7 @@ var Polygon = /** @class */ (function () {
             buffer.push('Q ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y);
         }
         return buffer.join(' ');
-    };
+    }
     ;
     /**
      * Convert this polygon to a sequence of cubic Bézier curves.<br>
@@ -5861,7 +5814,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toCubicBezierData = function (threshold) {
+    toCubicBezierData(threshold) {
         if (typeof threshold == 'undefined')
             threshold = 1.0;
         if (this.vertices.length < 3)
@@ -5885,7 +5838,7 @@ var Polygon = /** @class */ (function () {
             cbezier.push(bCenter);
         }
         return cbezier;
-    };
+    }
     ;
     /**
      * Convert this polygon to a cubic bezier curve, represented as an SVG data string.
@@ -5895,7 +5848,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toCubicBezierSVGString = function (threshold) {
+    toCubicBezierSVGString(threshold) {
         var qdata = this.toCubicBezierData(threshold);
         if (qdata.length == 0)
             return "";
@@ -5904,7 +5857,7 @@ var Polygon = /** @class */ (function () {
             buffer.push('C ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y + ', ' + qdata[i + 2].x + ' ' + qdata[i + 2].y);
         }
         return buffer.join(' ');
-    };
+    }
     ;
     /**
      * Convert this polygon to a cubic bezier path instance.
@@ -5915,7 +5868,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toCubicBezierPath = function (threshold) {
+    toCubicBezierPath(threshold) {
         var qdata = this.toCubicBezierData(threshold);
         // Conver the linear path vertices to a two-dimensional path array
         var pathdata = [];
@@ -5923,7 +5876,7 @@ var Polygon = /** @class */ (function () {
             pathdata.push([qdata[i], qdata[i + 3], qdata[i + 1], qdata[i + 2]]);
         }
         return BezierPath_1.BezierPath.fromArray(pathdata);
-    };
+    }
     ;
     /**
      * Create an SVG representation of this polygon.
@@ -5935,7 +5888,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<path');
@@ -5959,51 +5912,50 @@ var Polygon = /** @class */ (function () {
         }
         buffer.push('" />');
         return buffer.join('');
-    };
+    }
     ;
-    Polygon.utils = {
-        /**
-         * Calculate the area of the given polygon (unsigned).
-         *
-         * Note that this does not work for self-intersecting polygons.
-         *
-         * @name area
-         * @return {number}
-         */
-        area: function (vertices) {
-            // Found at:
-            //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
-            var total = 0.0;
-            for (var i = 0, l = vertices.length; i < l; i++) {
-                var addX = vertices[i].x;
-                var addY = vertices[(i + 1) % l].y;
-                var subX = vertices[(i + 1) % l].x;
-                var subY = vertices[i].y;
-                total += (addX * addY * 0.5);
-                total -= (subX * subY * 0.5);
-            }
-            return Math.abs(total);
-        },
-        /**
-         * Calulate the signed polyon area by interpreting the polygon as a matrix
-         * and calculating its determinant.
-         *
-         * @name signedArea
-         * @return {number}
-         */
-        signedArea: function (vertices) {
-            var sum = 0;
-            var n = vertices.length;
-            for (var i = 0; i < n; i++) {
-                var j = (i + 1) % n;
-                sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
-            }
-            return sum;
-        }
-    };
-    return Polygon;
-}());
+}
 exports.Polygon = Polygon;
+Polygon.utils = {
+    /**
+     * Calculate the area of the given polygon (unsigned).
+     *
+     * Note that this does not work for self-intersecting polygons.
+     *
+     * @name area
+     * @return {number}
+     */
+    area(vertices) {
+        // Found at:
+        //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
+        let total = 0.0;
+        for (var i = 0, l = vertices.length; i < l; i++) {
+            const addX = vertices[i].x;
+            const addY = vertices[(i + 1) % l].y;
+            const subX = vertices[(i + 1) % l].x;
+            const subY = vertices[i].y;
+            total += (addX * addY * 0.5);
+            total -= (subX * subY * 0.5);
+        }
+        return Math.abs(total);
+    },
+    /**
+     * Calulate the signed polyon area by interpreting the polygon as a matrix
+     * and calculating its determinant.
+     *
+     * @name signedArea
+     * @return {number}
+     */
+    signedArea(vertices) {
+        let sum = 0;
+        const n = vertices.length;
+        for (var i = 0; i < n; i++) {
+            const j = (i + 1) % n;
+            sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
+        }
+        return sum;
+    }
+};
 //# sourceMappingURL=Polygon.js.map
 
 /***/ }),
@@ -6049,13 +6001,13 @@ exports.Polygon = Polygon;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Triangle = void 0;
-var Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-var Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
-var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
-var Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
-var geomutils_1 = __webpack_require__(/*! ./geomutils */ "../src/js/geomutils.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
+const Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
+const Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+const Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const geomutils_1 = __webpack_require__(/*! ./geomutils */ "../src/js/geomutils.js");
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -6074,7 +6026,7 @@ var geomutils_1 = __webpack_require__(/*! ./geomutils */ "../src/js/geomutils.js
  * @requires geomutils
  *
  */
-var Triangle = /** @class */ (function () {
+class Triangle {
     /**
      * The constructor.
      *
@@ -6084,7 +6036,7 @@ var Triangle = /** @class */ (function () {
      * @param {Vertex} b - The second vertex of the triangle.
      * @param {Vertex} c - The third vertex of the triangle.
      **/
-    function Triangle(a, b, c) {
+    constructor(a, b, c) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -6107,11 +6059,11 @@ var Triangle = /** @class */ (function () {
      * @memberof Vertex
      * @return {Triangle}
      **/
-    Triangle.fromArray = function (arr) {
+    static fromArray(arr) {
         if (arr.length < 3)
-            throw "Cannot create triangle from array with less than three vertices (" + arr.length + ")";
+            throw `Cannot create triangle from array with less than three vertices (${arr.length})`;
         return new Triangle(arr[0], arr[1], arr[2]);
-    };
+    }
     ;
     /**
      * Get the area of this triangle. The returned area is never negative.
@@ -6125,9 +6077,9 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      * @return {number} The non-negative area of this triangle.
      */
-    Triangle.prototype.getArea = function () {
+    getArea() {
         return Math.abs(Triangle.utils.signedArea(this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y));
-    };
+    }
     ;
     /**
      * Get the centroid of this triangle.
@@ -6139,9 +6091,9 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      **/
-    Triangle.prototype.getCentroid = function () {
+    getCentroid() {
         return new Vertex_1.Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
-    };
+    }
     ;
     /**
      * Scale the triangle towards its centroid.
@@ -6152,13 +6104,13 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.scaleToCentroid = function (factor) {
-        var centroid = this.getCentroid();
+    scaleToCentroid(factor) {
+        let centroid = this.getCentroid();
         this.a.scale(factor, centroid);
         this.b.scale(factor, centroid);
         this.c.scale(factor, centroid);
         return this;
-    };
+    }
     ;
     /**
      * Get the circumcircle of this triangle.
@@ -6175,11 +6127,11 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.getCircumcircle = function () {
+    getCircumcircle() {
         // if( !this.center || !this.radius ) 
         this.calcCircumcircle();
         return new Circle_1.Circle(this.center.clone(), this.radius);
-    };
+    }
     ;
     /**
      * Check if this triangle and the passed triangle share an
@@ -6194,12 +6146,12 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.isAdjacent = function (tri) {
+    isAdjacent(tri) {
         var a = this.a.equals(tri.a) || this.a.equals(tri.b) || this.a.equals(tri.c);
         var b = this.b.equals(tri.a) || this.b.equals(tri.b) || this.b.equals(tri.c);
         var c = this.c.equals(tri.a) || this.c.equals(tri.b) || this.c.equals(tri.c);
         return (a && b) || (a && c) || (b && c);
-    };
+    }
     ;
     /**
      * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of
@@ -6212,14 +6164,14 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.getThirdVertex = function (vert1, vert2) {
+    getThirdVertex(vert1, vert2) {
         if (this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1))
             return this.c;
         if (this.b.equals(vert1) && this.c.equals(vert2) || this.b.equals(vert2) && this.c.equals(vert1))
             return this.a;
         //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
         return this.b;
-    };
+    }
     ;
     /**
      * Re-compute the circumcircle of this triangle (if the vertices
@@ -6233,34 +6185,34 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.calcCircumcircle = function () {
+    calcCircumcircle() {
         // From
         //    http://www.exaflop.org/docs/cgafaq/cga1.html
-        var A = this.b.x - this.a.x;
-        var B = this.b.y - this.a.y;
-        var C = this.c.x - this.a.x;
-        var D = this.c.y - this.a.y;
-        var E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
-        var F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
-        var G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
-        var dx, dy;
+        const A = this.b.x - this.a.x;
+        const B = this.b.y - this.a.y;
+        const C = this.c.x - this.a.x;
+        const D = this.c.y - this.a.y;
+        const E = A * (this.a.x + this.b.x) + B * (this.a.y + this.b.y);
+        const F = C * (this.a.x + this.c.x) + D * (this.a.y + this.c.y);
+        const G = 2.0 * (A * (this.c.y - this.b.y) - B * (this.c.x - this.b.x));
+        let dx, dy;
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
-            var bounds = this.bounds();
+            const bounds = this.bounds();
             this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
             dx = this.center.x - bounds.min.x;
             dy = this.center.y - bounds.min.y;
         }
         else {
-            var cx = (D * E - B * F) / G;
-            var cy = (A * F - C * E) / G;
+            const cx = (D * E - B * F) / G;
+            const cy = (A * F - C * E) / G;
             this.center = new Vertex_1.Vertex(cx, cy);
             dx = this.center.x - this.a.x;
             dy = this.center.y - this.a.y;
         }
         this.radius_squared = dx * dx + dy * dy;
         this.radius = Math.sqrt(this.radius_squared);
-    };
+    }
     ; // END calcCircumcircle
     /**
      * Check if the passed vertex is inside this triangle's
@@ -6272,12 +6224,12 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.inCircumcircle = function (v) {
-        var dx = this.center.x - v.x;
-        var dy = this.center.y - v.y;
-        var dist_squared = dx * dx + dy * dy;
+    inCircumcircle(v) {
+        const dx = this.center.x - v.x;
+        const dy = this.center.y - v.y;
+        const dist_squared = dx * dx + dy * dy;
         return (dist_squared <= this.radius_squared);
-    };
+    }
     ;
     /**
      * Get the rectangular bounds for this triangle.
@@ -6287,9 +6239,9 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.bounds = function () {
+    bounds() {
         return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
-    };
+    }
     ;
     /**
      * Convert this triangle to a polygon instance.
@@ -6301,9 +6253,9 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      **/
-    Triangle.prototype.toPolygon = function () {
+    toPolygon() {
         return new Polygon_1.Polygon([this.a, this.b, this.c]);
-    };
+    }
     ;
     /**
      * Get the determinant of this triangle.
@@ -6313,10 +6265,10 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.determinant = function () {
+    determinant() {
         // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
         return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
-    };
+    }
     ;
     /**
      * Checks if the passed vertex (p) is inside this triangle.
@@ -6329,28 +6281,28 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.containsPoint = function (p) {
+    containsPoint(p) {
         return Triangle.utils.pointIsInTriangle(p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y);
-    };
+    }
     ;
     /**
      * Get that inner triangle which defines the maximal incircle.
      *
      * @return {Triangle} The triangle of those points in this triangle that define the incircle.
      */
-    Triangle.prototype.getIncircularTriangle = function () {
-        var lineA = new Line_1.Line(this.a, this.b);
-        var lineB = new Line_1.Line(this.b, this.c);
-        var lineC = new Line_1.Line(this.c, this.a);
-        var bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
-        var bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
-        var intersection = bisector1.intersection(bisector2);
+    getIncircularTriangle() {
+        const lineA = new Line_1.Line(this.a, this.b);
+        const lineB = new Line_1.Line(this.b, this.c);
+        const lineC = new Line_1.Line(this.c, this.a);
+        const bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
+        const bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        const intersection = bisector1.intersection(bisector2);
         // Find the closest points on one of the polygon lines (all have same distance by construction)
-        var circleIntersA = lineA.getClosestPoint(intersection);
-        var circleIntersB = lineB.getClosestPoint(intersection);
-        var circleIntersC = lineC.getClosestPoint(intersection);
+        const circleIntersA = lineA.getClosestPoint(intersection);
+        const circleIntersB = lineB.getClosestPoint(intersection);
+        const circleIntersC = lineC.getClosestPoint(intersection);
         return new Triangle(circleIntersA, circleIntersB, circleIntersC);
-    };
+    }
     ;
     /**
      * Get the incircle of this triangle. That is the circle that touches each side
@@ -6360,9 +6312,9 @@ var Triangle = /** @class */ (function () {
      *
      * @return {Circle} The incircle of this triangle.
      */
-    Triangle.prototype.getIncircle = function () {
+    getIncircle() {
         return this.getIncircularTriangle().getCircumcircle();
-    };
+    }
     ;
     /**
      * Get the incenter of this triangle (which is the center of the circumcircle).
@@ -6372,11 +6324,11 @@ var Triangle = /** @class */ (function () {
      *       calcCircumcircle() function first, otherwise you might get wrong results.
      * @return Vertex The incenter of this triangle.
      **/
-    Triangle.prototype.getIncenter = function () {
+    getIncenter() {
         if (!this.center || !this.radius)
             this.calcCircumcircle();
         return this.center.clone();
-    };
+    }
     ;
     /**
      * Converts this triangle into a human-readable string.
@@ -6386,9 +6338,9 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      */
-    Triangle.prototype.toString = function () {
+    toString() {
         return '{ a : ' + this.a.toString() + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
-    };
+    }
     ;
     /**
      * Create an SVG representation of this triangle.
@@ -6400,7 +6352,7 @@ var Triangle = /** @class */ (function () {
      * @instance
      * @memberof Triangle
      **/
-    Triangle.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<path');
@@ -6425,45 +6377,44 @@ var Triangle = /** @class */ (function () {
         }
         buffer.push('" />');
         return buffer.join('');
-    };
+    }
     ;
+}
+exports.Triangle = Triangle;
+/**
+ * An epsilon for comparison.
+ * This should be the same epsilon as in Vertex.
+ *
+ * @private
+ **/
+Triangle.EPSILON = 1.0e-6;
+Triangle.utils = {
+    // Used in the bounds() function.
+    max3(a, b, c) {
+        return (a >= b && a >= c) ? a : (b >= a && b >= c) ? b : c;
+    },
+    min3(a, b, c) {
+        return (a <= b && a <= c) ? a : (b <= a && b <= c) ? b : c;
+    },
+    signedArea(p0x, p0y, p1x, p1y, p2x, p2y) {
+        return 0.5 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
+    },
     /**
-     * An epsilon for comparison.
-     * This should be the same epsilon as in Vertex.
+     * Used by the containsPoint() function.
      *
      * @private
      **/
-    Triangle.EPSILON = 1.0e-6;
-    Triangle.utils = {
-        // Used in the bounds() function.
-        max3: function (a, b, c) {
-            return (a >= b && a >= c) ? a : (b >= a && b >= c) ? b : c;
-        },
-        min3: function (a, b, c) {
-            return (a <= b && a <= c) ? a : (b <= a && b <= c) ? b : c;
-        },
-        signedArea: function (p0x, p0y, p1x, p1y, p2x, p2y) {
-            return 0.5 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
-        },
-        /**
-         * Used by the containsPoint() function.
-         *
-         * @private
-         **/
-        pointIsInTriangle: function (px, py, p0x, p0y, p1x, p1y, p2x, p2y) {
-            //
-            // Point-in-Triangle test found at
-            //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
-            // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
-            var area = Triangle.utils.signedArea(p0x, p0y, p1x, p1y, p2x, p2y);
-            var s = 1 / (2 * area) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
-            var t = 1 / (2 * area) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
-            return s > 0 && t > 0 && (1 - s - t) > 0;
-        }
-    };
-    return Triangle;
-}());
-exports.Triangle = Triangle;
+    pointIsInTriangle(px, py, p0x, p0y, p1x, p1y, p2x, p2y) {
+        //
+        // Point-in-Triangle test found at
+        //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
+        // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
+        var area = Triangle.utils.signedArea(p0x, p0y, p1x, p1y, p2x, p2y);
+        var s = 1 / (2 * area) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
+        var t = 1 / (2 * area) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
+        return s > 0 && t > 0 && (1 - s - t) > 0;
+    }
+};
 //# sourceMappingURL=Triangle.js.map
 
 /***/ }),
@@ -6489,15 +6440,12 @@ exports.Triangle = Triangle;
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UIDGenerator = void 0;
-var UIDGenerator = /** @class */ (function () {
-    function UIDGenerator() {
-    }
-    UIDGenerator.next = function () { return "" + UIDGenerator.current++; };
+class UIDGenerator {
+    static next() { return `${UIDGenerator.current++}`; }
     ;
-    UIDGenerator.current = 0;
-    return UIDGenerator;
-}());
+}
 exports.UIDGenerator = UIDGenerator;
+UIDGenerator.current = 0;
 ;
 //# sourceMappingURL=UIDGenerator.js.map
 
@@ -6528,7 +6476,7 @@ exports.UIDGenerator = UIDGenerator;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VEllipse = void 0;
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -6538,7 +6486,7 @@ var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGen
  * @requires Vertex
  * @requires XYCoords
  */
-var VEllipse = /** @class */ (function () {
+class VEllipse {
     /**
      * The constructor.
      *
@@ -6547,7 +6495,7 @@ var VEllipse = /** @class */ (function () {
      * @param {Vertex} axis The x- and y-axis.
      * @name VEllipse
      **/
-    function VEllipse(center, axis) {
+    constructor(center, axis) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -6564,7 +6512,7 @@ var VEllipse = /** @class */ (function () {
      * @param {object} options { className?:string }
      * @return string The SVG string
      */
-    VEllipse.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<ellipse');
@@ -6576,10 +6524,9 @@ var VEllipse = /** @class */ (function () {
         buffer.push(' ry="' + this.axis.y + '"');
         buffer.push(' />');
         return buffer.join('');
-    };
+    }
     ;
-    return VEllipse;
-}());
+}
 exports.VEllipse = VEllipse;
 //# sourceMappingURL=VEllipse.js.map
 
@@ -6589,10 +6536,12 @@ exports.VEllipse = VEllipse;
 /*!***************************!*\
   !*** ../src/js/Vector.js ***!
   \***************************/
-/*! unknown exports (runtime-defined) */
-/*! runtime requirements: top-level-this-exports, __webpack_exports__, __webpack_require__ */
-/*! CommonJS bailout: this is used directly at 18:17-21 */
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/*! flagged exports */
+/*! export Vector [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
+/*! other exports [not provided] [no usage info] */
+/*! runtime requirements: __webpack_exports__, __webpack_require__ */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 /**
@@ -6611,23 +6560,10 @@ exports.VEllipse = VEllipse;
  * @file Vector
  * @public
  **/
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Vector = void 0;
-var VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
  *            <br>
@@ -6636,8 +6572,7 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  *
  * @requires Vertex, Line
  **/
-var Vector = /** @class */ (function (_super) {
-    __extends(Vector, _super);
+class Vector extends VertTuple_1.VertTuple {
     /**
      * The constructor.
      *
@@ -6647,13 +6582,12 @@ var Vector = /** @class */ (function (_super) {
      * @param {Vertex} vertA - The start vertex of the vector.
      * @param {Vertex} vertB - The end vertex of the vector.
      **/
-    function Vector(vertA, vertB) {
-        var _this = _super.call(this, vertA, vertB, function (a, b) { return new Vector(a, b); }) || this;
+    constructor(vertA, vertB) {
+        super(vertA, vertB, (a, b) => new Vector(a, b));
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
-        _this.className = "Vector";
-        return _this;
+        this.className = "Vector";
     }
     ;
     /**
@@ -6662,14 +6596,14 @@ var Vector = /** @class */ (function (_super) {
      * @param {Number} t The position on the vector.
      * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
      **/
-    Vector.prototype.perp = function () {
+    perp() {
         var v = this.clone();
         v.sub(this.a);
         v = new Vector(new Vertex_1.Vertex(), new Vertex_1.Vertex(-v.b.y, v.b.x));
         v.a.add(this.a);
         v.b.add(this.a);
         return v;
-    };
+    }
     ;
     /**
      * The inverse of a vector is a vector witht the same magnitude but oppose direction.
@@ -6678,23 +6612,23 @@ var Vector = /** @class */ (function (_super) {
      *
      * @return {Vector}
      **/
-    Vector.prototype.inverse = function () {
+    inverse() {
         var tmp = this.a;
         this.a = this.b;
         this.b = tmp;
         return this;
-    };
+    }
     ;
     /**
      * This function computes the inverse of the vector, which means 'a' stays untouched.
      *
      * @return {Vector} this for chaining.
      **/
-    Vector.prototype.inv = function () {
+    inv() {
         this.b.x = this.a.x - (this.b.x - this.a.x);
         this.b.y = this.a.y - (this.b.y - this.a.y);
         return this;
-    };
+    }
     ;
     /**
      * Get the intersection if this vector and the specified vector.
@@ -6705,7 +6639,7 @@ var Vector = /** @class */ (function (_super) {
      * @instance
      * @memberof Line
      **/
-    Vector.prototype.intersection = function (line) {
+    intersection(line) {
         var denominator = this.denominator(line);
         if (denominator == 0)
             return null;
@@ -6719,7 +6653,7 @@ var Vector = /** @class */ (function (_super) {
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
-    };
+    }
     ;
     /**
      * Create an SVG representation of this line.
@@ -6732,7 +6666,7 @@ var Vector = /** @class */ (function (_super) {
      * @instance
      * @memberof Vector
      **/
-    Vector.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         var vertices = Vector.utils.buildArrowHead(this.a, this.b, 8, 1.0, 1.0);
@@ -6756,47 +6690,46 @@ var Vector = /** @class */ (function (_super) {
         buffer.push('"/>');
         buffer.push('</g>');
         return buffer.join('');
-    };
+    }
     ;
-    Vector.utils = {
-        /**
-         * Generate a four-point arrow head, starting at the vector end minus the
-         * arrow head length.
-         *
-         * The first vertex in the returned array is guaranteed to be the located
-         * at the vector line end minus the arrow head length.
-         *
-         *
-         * Due to performance all params are required.
-         *
-         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-         * scaling different). Arrow heads should not look distored on non-uniform scaling.
-         *
-         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-         * For headlen use 8, it's a good arrow head size.
-         *
-         * Example:
-         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-         *
-         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-         * @param {Vertex} zB - The end vertex of the vector.
-         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-         * @param {number} scaleX  - The horizontal scaling during draw.
-         * @param {number} scaleY  - the vertical scaling during draw.
-         **/
-        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
-            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-            var vertices = [];
-            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
-            vertices.push(new Vertex_1.Vertex(zB.x * scaleX, zB.y * scaleY));
-            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
-            return vertices;
-        }
-    };
-    return Vector;
-}(VertTuple_1.VertTuple));
+}
 exports.Vector = Vector;
+Vector.utils = {
+    /**
+     * Generate a four-point arrow head, starting at the vector end minus the
+     * arrow head length.
+     *
+     * The first vertex in the returned array is guaranteed to be the located
+     * at the vector line end minus the arrow head length.
+     *
+     *
+     * Due to performance all params are required.
+     *
+     * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+     * scaling different). Arrow heads should not look distored on non-uniform scaling.
+     *
+     * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+     * For headlen use 8, it's a good arrow head size.
+     *
+     * Example:
+     *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+     *
+     * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {Vertex} zB - The end vertex of the vector.
+     * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+     * @param {number} scaleX  - The horizontal scaling during draw.
+     * @param {number} scaleY  - the vertical scaling during draw.
+     **/
+    buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
+        var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+        var vertices = [];
+        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex_1.Vertex(zB.x * scaleX, zB.y * scaleY));
+        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+        return vertices;
+    }
+};
 //# sourceMappingURL=Vector.js.map
 
 /***/ }),
@@ -6827,8 +6760,8 @@ exports.Vector = Vector;
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
@@ -6837,7 +6770,7 @@ var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGen
  * @requires Vertex
  * @requires XYCoords
  */
-var VertTuple = /** @class */ (function () {
+class VertTuple {
     /**
      * Creates an instance.
      *
@@ -6846,7 +6779,7 @@ var VertTuple = /** @class */ (function () {
      * @param {Vertex} a The tuple's first point.
      * @param {Vertex} b The tuple's second point.
      **/
-    function VertTuple(a, b, factory) {
+    constructor(a, b, factory) {
         this.uid = UIDGenerator_1.UIDGenerator.next();
         this.a = a;
         this.b = b;
@@ -6859,9 +6792,9 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.length = function () {
+    length() {
         return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
-    };
+    }
     ;
     /**
      * Set the length of this vector to the given amount. This only works if this
@@ -6872,9 +6805,9 @@ var VertTuple = /** @class */ (function () {
      * @memberof VertTuple
      * @return {T} this (for chaining)
      **/
-    VertTuple.prototype.setLength = function (length) {
+    setLength(length) {
         return this.scale(length / this.length());
-    };
+    }
     ;
     /**
      * Substract the given vertex from this line's end points.
@@ -6885,11 +6818,11 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.sub = function (amount) {
+    sub(amount) {
         this.a.sub(amount);
         this.b.sub(amount);
         return this;
-    };
+    }
     ;
     /**
      * Add the given vertex to this line's end points.
@@ -6900,11 +6833,11 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.add = function (amount) {
+    add(amount) {
         this.a.add(amount);
         this.b.add(amount);
         return this;
-    };
+    }
     ;
     /**
      * Normalize this line (set to length 1).
@@ -6914,10 +6847,10 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.normalize = function () {
+    normalize() {
         this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
         return this;
-    };
+    }
     ;
     /**
      * Scale this line by the given factor.
@@ -6928,10 +6861,10 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.scale = function (factor) {
+    scale(factor) {
         this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
         return this;
-    };
+    }
     ;
     /**
      * Move this line to a new location.
@@ -6942,12 +6875,12 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.moveTo = function (newA) {
-        var diff = this.a.difference(newA);
+    moveTo(newA) {
+        let diff = this.a.difference(newA);
         this.a.add(diff);
         this.b.add(diff);
         return this;
-    };
+    }
     ;
     /**
      * Get the angle between this and the passed line (in radians).
@@ -6958,7 +6891,7 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.angle = function (line) {
+    angle(line) {
         if (line == null || typeof line == 'undefined') {
             line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0));
         }
@@ -6968,7 +6901,7 @@ var VertTuple = /** @class */ (function () {
         // Thank you, Javascript, for this second atan function. No additional math is needed here!
         // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
         return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
-    };
+    }
     ;
     /**
      * Get line point at position t in [0 ... 1]:<br>
@@ -6982,9 +6915,9 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.vertAt = function (t) {
+    vertAt(t) {
         return new Vertex_1.Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
-    };
+    }
     ;
     /**
      * Get the denominator of this and the given line.
@@ -6997,10 +6930,10 @@ var VertTuple = /** @class */ (function () {
      * @memberof VertTuple
      * @return {Number}
      **/
-    VertTuple.prototype.denominator = function (line) {
+    denominator(line) {
         // http://jsfiddle.net/justin_c_rounds/Gd2S2/
         return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
-    };
+    }
     ;
     /**
      * Checks if this and the given line are co-linear.
@@ -7013,9 +6946,9 @@ var VertTuple = /** @class */ (function () {
      * @memberof VertTuple
      * @return true if both lines are co-linear.
      */
-    VertTuple.prototype.colinear = function (line) {
+    colinear(line) {
         return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
-    };
+    }
     ;
     /**
      * Get the closest position T from this line to the specified point.
@@ -7029,7 +6962,7 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.getClosestT = function (p) {
+    getClosestT(p) {
         var l2 = VertTuple.vtutils.dist2(this.a, this.b);
         if (l2 === 0)
             return 0;
@@ -7038,7 +6971,7 @@ var VertTuple = /** @class */ (function () {
         // Other results are of interest, too.
         // t = Math.max(0, Math.min(1, t));
         return t;
-    };
+    }
     ;
     /**
      * Check if the given point is located on this line. Optionally also check if
@@ -7051,17 +6984,17 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      */
-    VertTuple.prototype.hasPoint = function (point, insideBoundsOnly) {
-        var t = this.getClosestT(point);
+    hasPoint(point, insideBoundsOnly) {
+        const t = this.getClosestT(point);
         // Compare to pointDistance?
         if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
-            var distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
+            const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
             return distance < Vertex_1.Vertex.EPSILON && t >= 0 && t <= 1;
         }
         else {
             return t >= 0 && t <= 1;
         }
-    };
+    }
     /**
      * Get the closest point on this line to the specified point.
      *
@@ -7071,10 +7004,10 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.getClosestPoint = function (p) {
+    getClosestPoint(p) {
         var t = this.getClosestT(p);
         return this.vertAt(t);
-    };
+    }
     ;
     /**
      * The the minimal distance between this line and the specified point.
@@ -7085,11 +7018,11 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.pointDistance = function (p) {
+    pointDistance(p) {
         // Taken From:
         // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
         return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
-    };
+    }
     ;
     /**
      * Create a deep clone of this instance.
@@ -7099,9 +7032,9 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.clone = function () {
+    clone() {
         return this.factory(this.a.clone(), this.b.clone());
-    };
+    }
     ;
     /**
      * Create a string representation of this line.
@@ -7111,21 +7044,20 @@ var VertTuple = /** @class */ (function () {
      * @instance
      * @memberof VertTuple
      **/
-    VertTuple.prototype.toString = function () {
+    toString() {
         return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
-    };
+    }
     ;
-    /**
-     * @private
-     **/
-    VertTuple.vtutils = {
-        dist2: function (v, w) {
-            return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
-        }
-    };
-    return VertTuple;
-}());
+}
 exports.VertTuple = VertTuple;
+/**
+ * @private
+ **/
+VertTuple.vtutils = {
+    dist2: function (v, w) {
+        return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+    }
+};
 //# sourceMappingURL=VertTuple.js.map
 
 /***/ }),
@@ -7172,9 +7104,9 @@ exports.VertTuple = VertTuple;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Vertex = void 0;
-var VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
-var UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-var VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "../src/js/VertexListeners.js");
+const VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "../src/js/VertexListeners.js");
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -7189,7 +7121,7 @@ var VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "../src/js/
  * @requires XYCoords
  *
  */
-var Vertex = /** @class */ (function () {
+class Vertex {
     /**
      * The constructor for the vertex class.
      *
@@ -7198,7 +7130,7 @@ var Vertex = /** @class */ (function () {
      * @param {number} x - The x-coordinate of the new vertex.
      * @param {number} y - The y-coordinate of the new vertex.
      **/
-    function Vertex(x, y) {
+    constructor(x, y) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -7213,7 +7145,7 @@ var Vertex = /** @class */ (function () {
             this.y = y;
         }
         else {
-            var tuple = x;
+            const tuple = x;
             if (typeof tuple.x == "number" && typeof tuple.y == "number") {
                 this.x = tuple.x;
                 this.y = tuple.y;
@@ -7247,13 +7179,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.set = function (x, y) {
+    set(x, y) {
         if (typeof x == 'number' && typeof y == 'number') {
             this.x = x;
             this.y = y;
         }
         else {
-            var tuple = x;
+            const tuple = x;
             if (typeof tuple.x == "number" && typeof tuple.y == "number") {
                 this.x = tuple.x;
                 this.y = tuple.y;
@@ -7274,7 +7206,7 @@ var Vertex = /** @class */ (function () {
             }
         }
         return this;
-    };
+    }
     ;
     /**
      * Set the x-component of this vertex.
@@ -7285,10 +7217,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.setX = function (x) {
+    setX(x) {
         this.x = x;
         return this;
-    };
+    }
     ;
     /**
      * Set the y-component of this vertex.
@@ -7299,10 +7231,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.setY = function (y) {
+    setY(y) {
         this.y = y;
         return this;
-    };
+    }
     ;
     /**
      * Set the x-component if this vertex to the inverse of its value.
@@ -7312,10 +7244,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.invX = function () {
+    invX() {
         this.x = -this.x;
         return this;
-    };
+    }
     ;
     /**
      * Set the y-component if this vertex to the inverse of its value.
@@ -7325,10 +7257,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.invY = function () {
+    invY() {
         this.y = -this.y;
         return this;
-    };
+    }
     ;
     /**
      * Add the passed amount to x- and y- component of this vertex.<br>
@@ -7343,13 +7275,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.add = function (x, y) {
+    add(x, y) {
         if (typeof x == 'number' && typeof y == 'number') {
             this.x += x;
             this.y += y;
         }
         else {
-            var tuple = x;
+            const tuple = x;
             if (typeof tuple.x == "number" && typeof tuple.y == "number") {
                 this.x += tuple.x;
                 this.y += tuple.y;
@@ -7358,15 +7290,15 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == 'number')
                     this.x += x;
                 else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
+                    throw `Cannot add ${typeof x} to numeric x component!`;
                 if (typeof y == 'number')
                     this.y += y;
                 else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
+                    throw `Cannot add ${typeof y} to numeric y component!`;
             }
         }
         return this;
-    };
+    }
     ;
     /**
      * Add the passed amounts to the x- and y- components of this vertex.
@@ -7378,11 +7310,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.addXY = function (amountX, amountY) {
+    addXY(amountX, amountY) {
         this.x += amountX;
         this.y += amountY;
         return this;
-    };
+    }
     ;
     /**
      * Add the passed amounts to the x-component of this vertex.
@@ -7393,10 +7325,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.addX = function (amountX) {
+    addX(amountX) {
         this.x += amountX;
         return this;
-    };
+    }
     ;
     /**
      * Add the passed amounts to the y-component of this vertex.
@@ -7407,10 +7339,10 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.addY = function (amountY) {
+    addY(amountY) {
         this.y += amountY;
         return this;
-    };
+    }
     ;
     /**
      * Substract the passed amount from x- and y- component of this vertex.<br>
@@ -7425,13 +7357,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.sub = function (x, y) {
+    sub(x, y) {
         if (typeof x == 'number' && typeof y == 'number') {
             this.x -= x;
             this.y -= y;
         }
         else {
-            var tuple = x;
+            const tuple = x;
             if (typeof tuple.x == "number" && typeof tuple.y == "number") {
                 this.x -= tuple.x;
                 this.y -= tuple.y;
@@ -7440,15 +7372,15 @@ var Vertex = /** @class */ (function () {
                 if (typeof x == 'number')
                     this.x -= x;
                 else
-                    throw "Cannot add " + typeof x + " to numeric x component!";
+                    throw `Cannot add ${typeof x} to numeric x component!`;
                 if (typeof y == 'number')
                     this.y -= y;
                 else
-                    throw "Cannot add " + typeof y + " to numeric y component!";
+                    throw `Cannot add ${typeof y} to numeric y component!`;
             }
         }
         return this;
-    };
+    }
     ;
     /**
      * Check if this vertex equals the passed one.
@@ -7461,12 +7393,12 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.equals = function (vertex) {
+    equals(vertex) {
         var eqX = (Math.abs(this.x - vertex.x) < Vertex.EPSILON);
         var eqY = (Math.abs(this.y - vertex.y) < Vertex.EPSILON);
         var result = eqX && eqY;
         return result;
-    };
+    }
     ;
     /**
      * Create a copy of this vertex.
@@ -7476,9 +7408,9 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.clone = function () {
+    clone() {
         return new Vertex(this.x, this.y);
-    };
+    }
     ;
     /**
      * Get the distance to the passed point (in euclidean metric)
@@ -7489,9 +7421,9 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.distance = function (vert) {
+    distance(vert) {
         return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
-    };
+    }
     ;
     /**
      * Get the angle of this point (relative to (0,0) or to the given other origin point).
@@ -7502,11 +7434,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.angle = function (origin) {
-        var a = (typeof origin === "undefined" ? Math.PI / 2 - Math.atan2(this.x, this.y) : Math.PI / 2 - Math.atan2(origin.x - this.x, origin.y - this.y));
+    angle(origin) {
+        const a = (typeof origin === "undefined" ? Math.PI / 2 - Math.atan2(this.x, this.y) : Math.PI / 2 - Math.atan2(origin.x - this.x, origin.y - this.y));
         // Map to positive value
         return a < 0 ? Math.PI * 2 + a : a;
-    };
+    }
     ;
     /**
      * Get the difference to the passed point.<br>
@@ -7519,9 +7451,9 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.difference = function (vert) {
+    difference(vert) {
         return new Vertex(vert.x - this.x, vert.y - this.y);
-    };
+    }
     ;
     /**
      * This is a vector-like behavior and 'scales' this vertex
@@ -7534,13 +7466,13 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.scale = function (factor, center) {
+    scale(factor, center) {
         if (!center || typeof center === "undefined")
             center = new Vertex(0, 0);
         this.x = center.x + (this.x - center.x) * factor;
         this.y = center.y + (this.y - center.y) * factor;
         return this;
-    };
+    }
     ;
     /**
      * This is a vector-like behavior and 'rotates' this vertex
@@ -7553,19 +7485,19 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.rotate = function (angle, center) {
+    rotate(angle, center) {
         if (!center || typeof center === "undefined")
             center = new Vertex(0, 0);
         this.sub(center);
         angle += Math.atan2(this.y, this.x);
-        var len = this.distance(Vertex.ZERO); // {x:0,y:0});
-        var lenX = this.x;
-        var lenY = this.y;
+        let len = this.distance(Vertex.ZERO); // {x:0,y:0});
+        let lenX = this.x;
+        let lenY = this.y;
         this.x = len * Math.cos(angle);
         this.y = len * Math.sin(angle);
         this.add(center);
         return this;
-    };
+    }
     ;
     /**
      * Multiply both components of this vertex with the given scalar.<br>
@@ -7579,11 +7511,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.multiplyScalar = function (scalar) {
+    multiplyScalar(scalar) {
         this.x *= scalar;
         this.y *= scalar;
         return this;
-    };
+    }
     ;
     /**
      * Round the two components x and y of this vertex.
@@ -7593,11 +7525,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.round = function () {
+    round() {
         this.x = Math.round(this.x);
         this.y = Math.round(this.y);
         return this;
-    };
+    }
     ;
     /**
      * Change this vertex (x,y) to its inverse (-x,-y).
@@ -7607,11 +7539,11 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.inv = function () {
+    inv() {
         this.x = -this.x;
         this.y = -this.y;
         return this;
-    };
+    }
     ;
     /**
      * Get a string representation of this vertex.
@@ -7621,9 +7553,9 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.toString = function () {
+    toString() {
         return '(' + this.x + ',' + this.y + ')';
-    };
+    }
     ;
     /**
      * Convert this vertex to SVG code.
@@ -7635,7 +7567,7 @@ var Vertex = /** @class */ (function () {
      * @instance
      * @memberof Vertex
      **/
-    Vertex.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<circle');
@@ -7646,7 +7578,7 @@ var Vertex = /** @class */ (function () {
         buffer.push(' r="2"');
         buffer.push(' />');
         return buffer.join('');
-    };
+    }
     ;
     // END Vertex
     /**
@@ -7655,59 +7587,58 @@ var Vertex = /** @class */ (function () {
      * @param {ViewPort} viewPort - A {min:Vertex, max:Vertex} viewport specifying the bounds.
      * @return A new vertex with a random position.
      **/
-    Vertex.randomVertex = function (viewPort) {
+    static randomVertex(viewPort) {
         return new Vertex(viewPort.min.x + Math.random() * (viewPort.max.x - viewPort.min.x), viewPort.min.y + Math.random() * (viewPort.max.y - viewPort.min.y));
-    };
+    }
     ;
-    Vertex.ZERO = new Vertex(0, 0);
-    /**
-     * An epsilon for comparison
-     *
-     * @private
-     * @readonly
-     **/
-    Vertex.EPSILON = 1.0e-6;
-    Vertex.utils = {
-        /**
-         * Generate a four-point arrow head, starting at the vector end minus the
-         * arrow head length.
-         *
-         * The first vertex in the returned array is guaranteed to be the located
-         * at the vector line end minus the arrow head length.
-         *
-         *
-         * Due to performance all params are required.
-         *
-         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-         * scaling different). Arrow heads should not look distored on non-uniform scaling.
-         *
-         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-         * For headlen use 8, it's a good arrow head size.
-         *
-         * Example:
-         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-         *
-         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-         * @param {Vertex} zB - The end vertex of the vector.
-         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-         * @param {number} scaleX  - The horizontal scaling during draw.
-         * @param {number} scaleY  - the vertical scaling during draw.
-         **/
-        // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
-        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
-            // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
-            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-            var vertices = [];
-            vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
-            vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-            vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
-            return vertices;
-        }
-    };
-    return Vertex;
-}());
+}
 exports.Vertex = Vertex;
+Vertex.ZERO = new Vertex(0, 0);
+/**
+ * An epsilon for comparison
+ *
+ * @private
+ * @readonly
+ **/
+Vertex.EPSILON = 1.0e-6;
+Vertex.utils = {
+    /**
+     * Generate a four-point arrow head, starting at the vector end minus the
+     * arrow head length.
+     *
+     * The first vertex in the returned array is guaranteed to be the located
+     * at the vector line end minus the arrow head length.
+     *
+     *
+     * Due to performance all params are required.
+     *
+     * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+     * scaling different). Arrow heads should not look distored on non-uniform scaling.
+     *
+     * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+     * For headlen use 8, it's a good arrow head size.
+     *
+     * Example:
+     *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+     *
+     * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {Vertex} zB - The end vertex of the vector.
+     * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+     * @param {number} scaleX  - The horizontal scaling during draw.
+     * @param {number} scaleY  - the vertical scaling during draw.
+     **/
+    // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
+    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
+        // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+        var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+        var vertices = [];
+        vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
+        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+        return vertices;
+    }
+};
 //# sourceMappingURL=Vertex.js.map
 
 /***/ }),
@@ -7746,7 +7677,7 @@ exports.VertexAttr = void 0;
  * This is some sort of 'userData' object, but the constructor uses a global model
  * to obtain a (configurable) default attribute set to all instances.<br>
  */
-var VertexAttr = /** @class */ (function () {
+class VertexAttr {
     /**
      * The constructor.
      *
@@ -7756,7 +7687,7 @@ var VertexAttr = /** @class */ (function () {
      * @constructor
      * @name VertexAttr
      **/
-    function VertexAttr() {
+    constructor() {
         this.draggable = true;
         this.selectable = true;
         this.isSelected = false;
@@ -7765,21 +7696,20 @@ var VertexAttr = /** @class */ (function () {
             this[key] = VertexAttr.model[key];
     }
     ;
-    /**
-     * This is the global attribute model. Set these object on the initialization
-     * of your app to gain all VertexAttr instances have these attributes.
-     *
-     * @type {object}
-     **/
-    VertexAttr.model = {
-        draggable: true,
-        selectable: true,
-        isSelected: false,
-        visible: true
-    };
-    return VertexAttr;
-}());
+}
 exports.VertexAttr = VertexAttr;
+/**
+ * This is the global attribute model. Set these object on the initialization
+ * of your app to gain all VertexAttr instances have these attributes.
+ *
+ * @type {object}
+ **/
+VertexAttr.model = {
+    draggable: true,
+    selectable: true,
+    isSelected: false,
+    visible: true
+};
 //# sourceMappingURL=VertexAttr.js.map
 
 /***/ }),
@@ -7817,7 +7747,7 @@ exports.VertexListeners = void 0;
  *              functions.
  *
  */
-var VertexListeners = /** @class */ (function () {
+class VertexListeners {
     /**
      * The constructor.
      *
@@ -7825,7 +7755,7 @@ var VertexListeners = /** @class */ (function () {
      * @name VertexListeners
      * @param {Vertex} vertex - The vertex to use these listeners on (just a backward reference).
      **/
-    function VertexListeners(vertex) {
+    constructor(vertex) {
         this.click = [];
         this.drag = [];
         this.dragStart = [];
@@ -7842,10 +7772,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.addClickListener = function (listener) {
+    addClickListener(listener) {
         VertexListeners._addListener(this.click, listener);
         return this;
-    };
+    }
     ;
     /**
      * The click listener is a function with a single drag event param.
@@ -7861,10 +7791,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.removeClickListener = function (listener) {
+    removeClickListener(listener) {
         this.click = VertexListeners._removeListener(this.click, listener);
         return this;
-    };
+    }
     ;
     /**
      * The click listener is a function with a single drag event param.
@@ -7880,10 +7810,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.addDragListener = function (listener) {
+    addDragListener(listener) {
         VertexListeners._addListener(this.drag, listener);
         return this;
-    };
+    }
     ;
     /**
      * The drag listener is a function with a single drag event param.
@@ -7899,10 +7829,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.removeDragListener = function (listener) {
+    removeDragListener(listener) {
         this.drag = VertexListeners._removeListener(this.drag, listener);
         return this;
-    };
+    }
     ;
     /**
      * Add a dragStart listener.
@@ -7913,10 +7843,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.addDragStartListener = function (listener) {
+    addDragStartListener(listener) {
         VertexListeners._addListener(this.dragStart, listener);
         return this;
-    };
+    }
     ;
     /**
      * The drag-start listener is a function with a single drag event param.
@@ -7932,10 +7862,10 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.removeDragStartListener = function (listener) {
+    removeDragStartListener(listener) {
         this.dragStart = VertexListeners._removeListener(this.dragStart, listener);
         return this;
-    };
+    }
     ;
     /**
      * Add a dragEnd listener.
@@ -7946,11 +7876,11 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.addDragEndListener = function (listener) {
+    addDragEndListener(listener) {
         // this.dragEnd.push( listener );
         VertexListeners._addListener(this.dragEnd, listener);
         return this;
-    };
+    }
     ;
     /**
      * The drag-end listener is a function with a single drag event param.
@@ -7966,11 +7896,11 @@ var VertexListeners = /** @class */ (function () {
     * @instance
     * @memberof VertexListeners
     **/
-    VertexListeners.prototype.removeDragEndListener = function (listener) {
+    removeDragEndListener(listener) {
         // this.drag.push( listener );
         this.dragEnd = VertexListeners._removeListener(this.dragEnd, listener);
         return this;
-    };
+    }
     ;
     /**
      * Fire a click event with the given event instance to all
@@ -7982,9 +7912,9 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireClickEvent = function (e) {
+    fireClickEvent(e) {
         VertexListeners._fireEvent(this, this.click, e);
-    };
+    }
     ;
     /**
      * Fire a drag event with the given event instance to all
@@ -7996,9 +7926,9 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireDragEvent = function (e) {
+    fireDragEvent(e) {
         VertexListeners._fireEvent(this, this.drag, e);
-    };
+    }
     ;
     /**
      * Fire a dragStart event with the given event instance to all
@@ -8010,9 +7940,9 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireDragStartEvent = function (e) {
+    fireDragStartEvent(e) {
         VertexListeners._fireEvent(this, this.dragStart, e);
-    };
+    }
     ;
     /**
      * Fire a dragEnd event with the given event instance to all
@@ -8024,15 +7954,15 @@ var VertexListeners = /** @class */ (function () {
      * @instance
      * @memberof VertexListeners
      **/
-    VertexListeners.prototype.fireDragEndEvent = function (e) {
+    fireDragEndEvent(e) {
         VertexListeners._fireEvent(this, this.dragEnd, e);
-    };
+    }
     ;
     /**
      * @private
      **/
-    VertexListeners._fireEvent = function (_self, listeners, e) {
-        var ve = e;
+    static _fireEvent(_self, listeners, e) {
+        const ve = e;
         if (typeof ve.params == 'undefined')
             ve.params = { vertex: _self.vertex };
         else
@@ -8040,33 +7970,32 @@ var VertexListeners = /** @class */ (function () {
         for (var i in listeners) {
             listeners[i](ve);
         }
-    };
+    }
     ;
     /**
      * @private
      */
-    VertexListeners._addListener = function (listeners, newListener) {
+    static _addListener(listeners, newListener) {
         for (var i in listeners) {
             if (listeners[i] == newListener)
                 return false;
         }
         listeners.push(newListener);
         return true;
-    };
+    }
     ;
     /**
      * @private
      */
-    VertexListeners._removeListener = function (listeners, oldListener) {
+    static _removeListener(listeners, oldListener) {
         for (var i = 0; i < listeners.length; i++) {
             if (listeners[i] == oldListener)
                 return listeners.splice(i, 1);
         }
         return listeners;
-    };
+    }
     ;
-    return VertexListeners;
-}());
+}
 exports.VertexListeners = VertexListeners;
 //# sourceMappingURL=VertexListeners.js.map
 
@@ -8124,8 +8053,8 @@ exports.VertexListeners = VertexListeners;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
-var CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 // Todo: rename this class to Drawutils
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -8136,7 +8065,7 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires Vertex
  * @requires XYCoords
  */
-var drawutils = /** @class */ (function () {
+class drawutils {
     /**
      * The constructor.
      *
@@ -8145,7 +8074,7 @@ var drawutils = /** @class */ (function () {
      * @param {anvasRenderingContext2D} context - The drawing context.
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    function drawutils(context, fillShapes) {
+    constructor(context, fillShapes) {
         this.ctx = context;
         this.offset = new Vertex_1.Vertex(0, 0);
         this.scale = new Vertex_1.Vertex(1, 1);
@@ -8156,9 +8085,9 @@ var drawutils = /** @class */ (function () {
      * Called before each draw cycle.
      * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      **/
-    drawutils.prototype.beginDrawCycle = function (renderTime) {
+    beginDrawCycle(renderTime) {
         // NOOP
-    };
+    }
     ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -8168,9 +8097,9 @@ var drawutils = /** @class */ (function () {
      * @method
      * @param {UID} uid - A UID identifying the currently drawn element(s).
      **/
-    drawutils.prototype.setCurrentId = function (uid) {
+    setCurrentId(uid) {
         // NOOP
-    };
+    }
     ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -8180,9 +8109,9 @@ var drawutils = /** @class */ (function () {
      * @method
      * @param {string} className - A class name for further custom use cases.
      **/
-    drawutils.prototype.setCurrentClassName = function (className) {
+    setCurrentClassName(className) {
         // NOOP
-    };
+    }
     ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
@@ -8196,7 +8125,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      **/
-    drawutils.prototype.line = function (zA, zB, color, lineWidth) {
+    line(zA, zB, color, lineWidth) {
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
@@ -8205,7 +8134,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this.ctx.stroke();
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
@@ -8219,7 +8148,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      **/
-    drawutils.prototype.arrow = function (zA, zB, color, lineWidth) {
+    arrow(zA, zB, color, lineWidth) {
         var headlen = 8; // length of head in pixels
         // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
         // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
@@ -8234,7 +8163,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw an image at the given position with the given size.<br>
@@ -8249,7 +8178,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      **/
-    drawutils.prototype.image = function (image, position, size) {
+    image(image, position, size) {
         if (!image.complete || !image.naturalWidth) {
             // Avoid drawing un-unloaded or broken images
             return;
@@ -8261,7 +8190,7 @@ var drawutils = /** @class */ (function () {
         image.naturalHeight - 1, // To avoid errors substract 1 here.
         this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw a rectangle.
@@ -8272,7 +8201,7 @@ var drawutils = /** @class */ (function () {
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
      **/
-    drawutils.prototype.rect = function (position, width, height, color, lineWidth) {
+    rect(position, width, height, color, lineWidth) {
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
@@ -8284,7 +8213,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
-    };
+    }
     ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
@@ -8298,7 +8227,7 @@ var drawutils = /** @class */ (function () {
     // | @param color A stroke/fill color to use.
     // +-------------------------------
     // TODO: convert this to a STATIC function.
-    drawutils.prototype._fillOrDraw = function (color) {
+    _fillOrDraw(color) {
         if (this.fillShapes) {
             this.ctx.fillStyle = color;
             this.ctx.fill();
@@ -8307,7 +8236,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.strokeStyle = color;
             this.ctx.stroke();
         }
-    };
+    }
     ;
     /**
      * Draw the given (cubic) bézier curve.
@@ -8323,7 +8252,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
+    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
         if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
             this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
             return;
@@ -8337,7 +8266,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 2;
         this._fillOrDraw(color);
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw the given (quadratic) bézier curve.
@@ -8352,7 +8281,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.quadraticBezier = function (startPoint, controlPoint, endPoint, color, lineWidth) {
+    quadraticBezier(startPoint, controlPoint, endPoint, color, lineWidth) {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
@@ -8361,7 +8290,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 2;
         this._fillOrDraw(color);
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw the given (cubic) Bézier path.
@@ -8378,7 +8307,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.cubicBezierPath = function (path, color, lineWidth) {
+    cubicBezierPath(path, color, lineWidth) {
         if (!path || path.length == 0)
             return;
         // Draw curve
@@ -8396,7 +8325,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
@@ -8410,12 +8339,12 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.handle = function (startPoint, endPoint) {
+    handle(startPoint, endPoint) {
         // Draw handles
         // (No need to save and restore here)
         this.point(startPoint, 'rgb(0,32,192)');
         this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
-    };
+    }
     ;
     /**
      * Draw a handle line (with a light grey).
@@ -8427,10 +8356,10 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.handleLine = function (startPoint, endPoint) {
+    handleLine(startPoint, endPoint) {
         // Draw handle lines
         this.line(startPoint, endPoint, 'rgb(192,192,192)');
-    };
+    }
     ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -8442,7 +8371,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.dot = function (p, color) {
+    dot(p, color) {
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
@@ -8451,7 +8380,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
@@ -8463,14 +8392,14 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.point = function (p, color) {
+    point(p, color) {
         var radius = 3;
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
-    };
+    }
     ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
@@ -8486,13 +8415,13 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.circle = function (center, radius, color, lineWidth) {
+    circle(center, radius, color, lineWidth) {
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
         this.ctx.closePath();
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
-    };
+    }
     ;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
@@ -8509,7 +8438,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth, options) {
+    circleArc(center, radius, startAngle, endAngle, color, lineWidth, options) {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
         }
@@ -8519,7 +8448,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.lineWidth = lineWidth || 1;
             this._fillOrDraw(color || '#000000');
         }
-    };
+    }
     ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
@@ -8534,13 +8463,13 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
+    ellipse(center, radiusX, radiusY, color, lineWidth) {
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, 0.0, 0.0, Math.PI * 2);
         this.ctx.closePath();
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
-    };
+    }
     ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
@@ -8556,13 +8485,13 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.square = function (center, size, color, lineWidth) {
+    square(center, size, color, lineWidth) {
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
         this.ctx.closePath();
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
-    };
+    }
     ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -8578,7 +8507,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
+    grid(center, width, height, sizeX, sizeY, color) {
         this.ctx.beginPath();
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
@@ -8596,7 +8525,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1.0;
         this.ctx.stroke();
         this.ctx.closePath();
-    };
+    }
     ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
@@ -8614,7 +8543,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
+    raster(center, width, height, sizeX, sizeY, color) {
         this.ctx.save();
         this.ctx.beginPath();
         var cx = 0, cy = 0;
@@ -8635,7 +8564,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.stroke();
         this.ctx.closePath();
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
@@ -8652,7 +8581,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.diamondHandle = function (center, size, color) {
+    diamondHandle(center, size, color) {
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - size / 2.0);
@@ -8661,7 +8590,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.closePath();
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
-    };
+    }
     ;
     /**
      * Draw a square handle with the given CSS color.<br>
@@ -8678,13 +8607,13 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.squareHandle = function (center, size, color) {
+    squareHandle(center, size, color) {
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y - size / 2.0, size, size);
         this.ctx.closePath();
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
-    };
+    }
     ;
     /**
      * Draw a circle handle with the given CSS color.<br>
@@ -8701,14 +8630,14 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.circleHandle = function (center, radius, color) {
+    circleHandle(center, radius, color) {
         radius = radius || 3;
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
-    };
+    }
     ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
@@ -8723,7 +8652,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.crosshair = function (center, radius, color) {
+    crosshair(center, radius, color) {
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
@@ -8735,7 +8664,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.stroke();
         this.ctx.closePath();
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw a polygon.
@@ -8748,9 +8677,9 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.polygon = function (polygon, color, lineWidth) {
+    polygon(polygon, color, lineWidth) {
         this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
-    };
+    }
     ;
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -8764,7 +8693,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
+    polyline(vertices, isOpen, color, lineWidth) {
         if (vertices.length <= 1)
             return;
         this.ctx.save();
@@ -8780,14 +8709,14 @@ var drawutils = /** @class */ (function () {
         this.ctx.closePath();
         this.ctx.setLineDash([]);
         this.ctx.restore();
-    };
+    }
     ;
-    drawutils.prototype.text = function (text, x, y, options) {
+    text(text, x, y, options) {
         options = options || {};
         this.ctx.save();
         x = this.offset.x + x * this.scale.x;
         y = this.offset.y + y * this.scale.y;
-        var color = options.color || 'black';
+        const color = options.color || 'black';
         if (this.fillShapes) {
             this.ctx.fillStyle = color;
             this.ctx.fillText(text, x, y);
@@ -8797,7 +8726,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.strokeText(text, x, y);
         }
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Draw a non-scaling text label at the given position.
@@ -8814,7 +8743,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.label = function (text, x, y, rotation, color) {
+    label(text, x, y, rotation, color) {
         this.ctx.save();
         this.ctx.translate(x, y);
         if (typeof rotation != 'undefined')
@@ -8827,7 +8756,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.strokeText(text, 0, 0);
         }
         this.ctx.restore();
-    };
+    }
     ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
@@ -8837,14 +8766,13 @@ var drawutils = /** @class */ (function () {
      *
      * @param {string} color - The color to clear with.
      **/
-    drawutils.prototype.clear = function (color) {
+    clear(color) {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.fillStyle = color;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    };
+    }
     ;
-    return drawutils;
-}());
+}
 exports.drawutils = drawutils;
 //# sourceMappingURL=draw.js.map
 
@@ -8873,7 +8801,7 @@ exports.drawutils = drawutils;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
-var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -8884,7 +8812,7 @@ var Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
  * @requires Vertex
  * @requires XYCoords
  */
-var drawutilsgl = /** @class */ (function () {
+class drawutilsgl {
     /**
      * The constructor.
      *
@@ -8893,7 +8821,7 @@ var drawutilsgl = /** @class */ (function () {
      * @param {WebGLRenderingContext} context - The drawing context.
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    function drawutilsgl(context, fillShapes) {
+    constructor(context, fillShapes) {
         this.gl = context;
         this.offset = new Vertex_1.Vertex(0, 0);
         this.scale = new Vertex_1.Vertex(1, 1);
@@ -8917,15 +8845,15 @@ var drawutilsgl = /** @class */ (function () {
         console.log('gl initialized');
     }
     ;
-    drawutilsgl.prototype._x2rel = function (x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; };
+    _x2rel(x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; }
     ;
-    drawutilsgl.prototype._y2rel = function (y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; };
+    _y2rel(y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; }
     ;
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
      */
-    drawutilsgl.prototype.copyInstance = function (fillShapes) {
+    copyInstance(fillShapes) {
         var copy = new drawutilsgl(null, fillShapes);
         copy.gl = this.gl;
         copy.glutils = this.glutils;
@@ -8933,16 +8861,16 @@ var drawutilsgl = /** @class */ (function () {
         copy._fragShader = this._fragShader;
         copy._program = this._program;
         return copy;
-    };
+    }
     ;
     /**
      * Called before each draw cycle.
      * @param {number} renderTime
      **/
-    drawutilsgl.prototype.beginDrawCycle = function (renderTime) {
+    beginDrawCycle(renderTime) {
         this._zindex = 0.0;
         this.renderTime = renderTime;
-    };
+    }
     ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -8952,10 +8880,10 @@ var drawutilsgl = /** @class */ (function () {
      * @method
      * @param {UID} uid - A UID identifying the currently drawn element(s).es.
      **/
-    drawutilsgl.prototype.setCurrentId = function (uid) {
+    setCurrentId(uid) {
         // NOOP
         this.curId = uid;
-    };
+    }
     ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -8965,9 +8893,9 @@ var drawutilsgl = /** @class */ (function () {
      * @method
      * @param {string} className - A class name for further custom use cases.
      **/
-    drawutilsgl.prototype.setCurrentClassName = function (className) {
+    setCurrentClassName(className) {
         // NOOP
-    };
+    }
     ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
@@ -8980,8 +8908,8 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      **/
-    drawutilsgl.prototype.line = function (zA, zB, color) {
-        var vertices = new Float32Array(6);
+    line(zA, zB, color) {
+        const vertices = new Float32Array(6);
         vertices[0] = this._x2rel(zA.x);
         vertices[1] = this._y2rel(zA.y);
         vertices[2] = this._zindex;
@@ -9007,9 +8935,9 @@ var drawutilsgl = /** @class */ (function () {
         //this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         // Set the view port
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
-        var uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
+        let uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
         // let radians = currentAngle * Math.PI / 180.0;
-        var currentRotation = [0.0, 1.0];
+        let currentRotation = [0.0, 1.0];
         //currentRotation[0] = Math.sin(radians);
         //currentRotation[1] = Math.cos(radians);
         this.gl.uniform2fv(uRotationVector, currentRotation);
@@ -9018,7 +8946,7 @@ var drawutilsgl = /** @class */ (function () {
         this.gl.drawArrays(this.gl.LINES, 0, vertices.length / 3);
         // POINTS, LINE_STRIP, LINE_LOOP, LINES,
         // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
-    };
+    }
     ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
@@ -9031,9 +8959,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      **/
-    drawutilsgl.prototype.arrow = function (zA, zB, color) {
+    arrow(zA, zB, color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw an image at the given position with the given size.<br>
@@ -9048,9 +8976,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      **/
-    drawutilsgl.prototype.image = function (image, position, size) {
+    image(image, position, size) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
@@ -9063,9 +8991,9 @@ var drawutilsgl = /** @class */ (function () {
     // |
     // | @param color A stroke/fill color to use.
     // +-------------------------------
-    drawutilsgl.prototype._fillOrDraw = function (color) {
+    _fillOrDraw(color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw the given (cubic) bézier curve.
@@ -9081,9 +9009,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
+    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw the given (cubic) Bézier path.
@@ -9100,9 +9028,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.cubicBezierPath = function (path, color, lineWidth) {
+    cubicBezierPath(path, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
@@ -9116,9 +9044,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.handle = function (startPoint, endPoint) {
+    handle(startPoint, endPoint) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a handle line (with a light grey).
@@ -9130,9 +9058,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.handleLine = function (startPoint, endPoint) {
+    handleLine(startPoint, endPoint) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -9144,9 +9072,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.dot = function (p, color) {
+    dot(p, color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
@@ -9158,9 +9086,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.point = function (p, color) {
+    point(p, color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
@@ -9176,9 +9104,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.circle = function (center, radius, color, lineWidth) {
+    circle(center, radius, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
@@ -9193,9 +9121,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
+    circleArc(center, radius, startAngle, endAngle, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
@@ -9210,9 +9138,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
+    ellipse(center, radiusX, radiusY, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
@@ -9228,9 +9156,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.square = function (center, size, color, lineWidth) {
+    square(center, size, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -9246,9 +9174,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
+    grid(center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
@@ -9266,9 +9194,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
+    raster(center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
@@ -9285,9 +9213,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.diamondHandle = function (center, size, color) {
+    diamondHandle(center, size, color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a square handle with the given CSS color.<br>
@@ -9304,9 +9232,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.squareHandle = function (center, size, color) {
+    squareHandle(center, size, color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a circle handle with the given CSS color.<br>
@@ -9323,9 +9251,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.circleHandle = function (center, size, color) {
+    circleHandle(center, size, color) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
@@ -9340,9 +9268,9 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.crosshair = function (center, radius, color) {
+    crosshair(center, radius, color) {
         // NOT YET IMPLEMENTED	
-    };
+    }
     ;
     /**
      * Draw a polygon.
@@ -9354,8 +9282,8 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.polygon = function (polygon, color, lineWidth) {
-        var vertices = new Float32Array(polygon.vertices.length * 3);
+    polygon(polygon, color, lineWidth) {
+        const vertices = new Float32Array(polygon.vertices.length * 3);
         for (var i = 0; i < polygon.vertices.length; i++) {
             vertices[i * 3 + 0] = this._x2rel(polygon.vertices[i].x);
             vertices[i * 3 + 1] = this._y2rel(polygon.vertices[i].y);
@@ -9381,9 +9309,9 @@ var drawutilsgl = /** @class */ (function () {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         // Set the view port
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
-        var uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
+        let uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
         // let radians = currentAngle * Math.PI / 180.0;
-        var currentRotation = [0.0, 1.0];
+        let currentRotation = [0.0, 1.0];
         //currentRotation[0] = Math.sin(radians);
         //currentRotation[1] = Math.cos(radians);
         this.gl.uniform2fv(uRotationVector, currentRotation);
@@ -9391,7 +9319,7 @@ var drawutilsgl = /** @class */ (function () {
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, vertices.length / 3);
         // POINTS, LINE_STRIP, LINE_LOOP, LINES,
         // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
-    };
+    }
     ;
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -9405,13 +9333,13 @@ var drawutilsgl = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
+    polyline(vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
-    drawutilsgl.prototype.text = function (text, x, y, options) {
+    text(text, x, y, options) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Draw a non-scaling text label at the given position.
@@ -9428,9 +9356,9 @@ var drawutilsgl = /** @class */ (function () {
     // +---------------------------------------------------------------------------------
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
-    drawutilsgl.prototype.label = function (text, x, y, rotation) {
+    label(text, x, y, rotation) {
         // NOT YET IMPLEMENTED
-    };
+    }
     ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
@@ -9440,7 +9368,7 @@ var drawutilsgl = /** @class */ (function () {
      *
      * @param {string} color - The color to clear with.
      **/
-    drawutilsgl.prototype.clear = function (color) {
+    clear(color) {
         // NOT YET IMPLEMENTED
         // if( typeof color == 'string' )
         // color = Color.parse(color); // Color class does not yet exist in TS
@@ -9450,24 +9378,44 @@ var drawutilsgl = /** @class */ (function () {
         this.gl.enable(this.gl.DEPTH_TEST);
         // Clear the color and depth buffer
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    };
+    }
     ;
-    // Vertex shader source code
-    drawutilsgl.vertCode = "\n    precision mediump float;\n\n    attribute vec3 position;\n\n    uniform vec2 uRotationVector;\n\n    void main(void) {\n\tvec2 rotatedPosition = vec2(\n\t    position.x * uRotationVector.y +\n\t\tposition.y * uRotationVector.x,\n\t    position.y * uRotationVector.y -\n\t\tposition.x * uRotationVector.x\n\t);\n\n\tgl_Position = vec4(rotatedPosition, position.z, 1.0);\n    }";
-    // Fragment shader source code
-    drawutilsgl.fragCode = "\n    precision highp float;\n\n    void main(void) {\n\tgl_FragColor = vec4(0.0,0.75,1.0,1.0);\n    }";
-    return drawutilsgl;
-}());
+}
 exports.drawutilsgl = drawutilsgl;
+// Vertex shader source code
+drawutilsgl.vertCode = `
+    precision mediump float;
+
+    attribute vec3 position;
+
+    uniform vec2 uRotationVector;
+
+    void main(void) {
+	vec2 rotatedPosition = vec2(
+	    position.x * uRotationVector.y +
+		position.y * uRotationVector.x,
+	    position.y * uRotationVector.y -
+		position.x * uRotationVector.x
+	);
+
+	gl_Position = vec4(rotatedPosition, position.z, 1.0);
+    }`;
+// Fragment shader source code
+drawutilsgl.fragCode = `
+    precision highp float;
+
+    void main(void) {
+	gl_FragColor = vec4(0.0,0.75,1.0,1.0);
+    }`;
 /**
  * Some GL helper utils.
  **/
-var GLU = /** @class */ (function () {
-    function GLU(gl) {
+class GLU {
+    constructor(gl) {
         this.gl = gl;
     }
     ;
-    GLU.prototype.bufferData = function (verts) {
+    bufferData(verts) {
         // Create an empty buffer object
         var vbuffer = this.gl.createBuffer();
         // Bind appropriate array buffer to it
@@ -9477,26 +9425,26 @@ var GLU = /** @class */ (function () {
         // Unbind the buffer
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         return vbuffer;
-    };
+    }
     ;
     /*=================== Shaders ====================*/
-    GLU.prototype.compileShader = function (shaderCode, shaderType) {
+    compileShader(shaderCode, shaderType) {
         // Create a vertex shader object
         var shader = this.gl.createShader(shaderType);
         // Attach vertex shader source code
         this.gl.shaderSource(shader, shaderCode);
         // Compile the vertex shader
         this.gl.compileShader(shader);
-        var vertStatus = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
+        const vertStatus = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
         if (!vertStatus) {
             console.warn("Error in shader:" + this.gl.getShaderInfoLog(shader));
             this.gl.deleteShader(shader);
             return null;
         }
         return shader;
-    };
+    }
     ;
-    GLU.prototype.makeProgram = function (vertShader, fragShader) {
+    makeProgram(vertShader, fragShader) {
         // Create a shader program object to store
         // the combined shader program
         var program = this.gl.createProgram();
@@ -9514,10 +9462,9 @@ var GLU = /** @class */ (function () {
         this.gl.deleteShader(vertShader);
         this.gl.deleteShader(fragShader);
         return program;
-    };
+    }
     ;
-    return GLU;
-}());
+}
 //# sourceMappingURL=drawgl.js.map
 
 /***/ }),
@@ -9541,8 +9488,8 @@ var GLU = /** @class */ (function () {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.geomutils = void 0;
-var Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
-var Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
+const Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
+const Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
 /**
  * A collection of usefull geometry utilities.
  *
@@ -9560,26 +9507,26 @@ exports.geomutils = {
      *
      * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
      */
-    nsectAngle: function (pA, pB, pC, n) {
-        var triangle = new Triangle_1.Triangle(pA, pB, pC);
-        var lineAB = new Line_1.Line(pA, pB);
-        var lineAC = new Line_1.Line(pA, pC);
+    nsectAngle(pA, pB, pC, n) {
+        const triangle = new Triangle_1.Triangle(pA, pB, pC);
+        const lineAB = new Line_1.Line(pA, pB);
+        const lineAC = new Line_1.Line(pA, pC);
         // Compute the slope (theta) of line AB and line AC
-        var thetaAB = lineAB.angle();
-        var thetaAC = lineAC.angle();
+        const thetaAB = lineAB.angle();
+        const thetaAC = lineAC.angle();
         // Compute the difference; this is the angle between AB and AC
         var insideAngle = lineAB.angle(lineAC);
         // We want the inner angles of the triangle, not the outer angle;
         //   which one is which depends on the triangle 'direction'
-        var clockwise = triangle.determinant() > 0;
+        const clockwise = triangle.determinant() > 0;
         // For convenience convert the angle [-PI,PI] to [0,2*PI]
         if (insideAngle < 0)
             insideAngle = 2 * Math.PI + insideAngle;
         if (!clockwise)
             insideAngle = (2 * Math.PI - insideAngle) * (-1);
         // Scale the rotated lines to the max leg length (looks better)
-        var lineLength = Math.max(lineAB.length(), lineAC.length());
-        var scaleFactor = lineLength / lineAB.length();
+        const lineLength = Math.max(lineAB.length(), lineAC.length());
+        const scaleFactor = lineLength / lineAB.length();
         var result = [];
         for (var i = 1; i < n; i++) {
             // Compute the i-th inner sector line
@@ -9619,9 +9566,9 @@ exports.geomutils = {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
-var CircleSector_1 = __webpack_require__(/*! ../../CircleSector */ "../src/js/CircleSector.js");
-var CubicBezierCurve_1 = __webpack_require__(/*! ../../CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
-var Vertex_1 = __webpack_require__(/*! ../../Vertex */ "../src/js/Vertex.js");
+const CircleSector_1 = __webpack_require__(/*! ../../CircleSector */ "../src/js/CircleSector.js");
+const CubicBezierCurve_1 = __webpack_require__(/*! ../../CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
+const Vertex_1 = __webpack_require__(/*! ../../Vertex */ "../src/js/Vertex.js");
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -9632,7 +9579,7 @@ var Vertex_1 = __webpack_require__(/*! ../../Vertex */ "../src/js/Vertex.js");
  * @requires Vertex
  * @requires XYCoords
  */
-var drawutilssvg = /** @class */ (function () {
+class drawutilssvg {
     /**
      * The constructor.
      *
@@ -9647,7 +9594,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
+    constructor(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
@@ -9665,12 +9612,12 @@ var drawutilssvg = /** @class */ (function () {
         }
     }
     ;
-    drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
-        var nodeStyle = this.createSVGNode('style');
+    addStyleDefs(drawConfig) {
+        const nodeStyle = this.createSVGNode('style');
         this.svgNode.appendChild(nodeStyle); // nodeDef);
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
-        var keys = {
+        const keys = {
             'polygon': 'Polygon',
             'triangle': 'Triangle',
             'ellipse': 'Ellipse',
@@ -9682,14 +9629,14 @@ var drawutilssvg = /** @class */ (function () {
             'image': 'Image'
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
-        var rules = [];
+        const rules = [];
         for (var k in keys) {
-            var className = keys[k];
-            var drawSettings = drawConfig[k];
-            rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; stroke-width: " + drawSettings.lineWidth + "px }");
+            const className = keys[k];
+            const drawSettings = drawConfig[k];
+            rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; stroke-width: ${drawSettings.lineWidth}px }`);
         }
         nodeStyle.innerHTML = rules.join("\n");
-    };
+    }
     ;
     /**
      * Retieve an old (cached) element.
@@ -9702,14 +9649,14 @@ var drawutilssvg = /** @class */ (function () {
      * @param {UID} key - The key of the desired element (used when re-drawing).
      * @param {string} nodeName - The expected node name.
      */
-    drawutilssvg.prototype.findElement = function (key, nodeName) {
+    findElement(key, nodeName) {
         var node = this.cache.get(key);
         if (node && node.nodeName.toUpperCase() === nodeName.toUpperCase()) {
             this.cache.delete(key);
             return node;
         }
         return null;
-    };
+    }
     /**
      * Create a new DOM node &lt;svg&gt; in the SVG namespace.
      *
@@ -9720,9 +9667,9 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} nodeName - The node name (tag-name).
      * @return {SVGElement} A new element in the SVG namespace with the given node name.
      */
-    drawutilssvg.prototype.createSVGNode = function (nodeName) {
+    createSVGNode(nodeName) {
         return document.createElementNS("http://www.w3.org/2000/svg", nodeName);
-    };
+    }
     ;
     /**
      * Make a new SVG node (or recycle an old one) with the given node name (circle, path, line, rect, ...).
@@ -9736,7 +9683,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} nodeName - The node name.
      * @return {SVGElement} The new node, which is not yet added to any document.
      */
-    drawutilssvg.prototype.makeNode = function (nodeName) {
+    makeNode(nodeName) {
         // Try to find node in current DOM cache.
         // Unique node keys are strictly necessary.
         // Try to recycle an old element from cache.
@@ -9747,7 +9694,7 @@ var drawutilssvg = /** @class */ (function () {
             node = this.createSVGNode(nodeName);
         }
         return node;
-    };
+    }
     ;
     /**
      * This is the final helper function for drawing and filling stuff and binding new
@@ -9769,25 +9716,25 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
      * @return {SVGElement} The node itself (for chaining).
      */
-    drawutilssvg.prototype._bindFillDraw = function (node, className, color, lineWidth) {
+    _bindFillDraw(node, className, color, lineWidth) {
         if (this.curClassName) {
-            node.setAttribute('class', this.curClassName + " " + className);
+            node.setAttribute('class', `${this.curClassName} ${className}`);
         }
         else {
             node.setAttribute('class', className);
         }
         node.setAttribute('fill', this.fillShapes ? color : 'none');
         node.setAttribute('stroke', this.fillShapes ? 'none' : color);
-        node.setAttribute('stroke-width', "" + (lineWidth || 1));
+        node.setAttribute('stroke-width', `${lineWidth || 1}`);
         if (this.curId) {
-            node.setAttribute('id', "" + this.curId); // Maybe React-style 'key' would be better?
+            node.setAttribute('id', `${this.curId}`); // Maybe React-style 'key' would be better?
         }
         if (!node.parentNode) {
             // Attach to DOM only if not already attached
             this.gNode.appendChild(node);
         }
         return node;
-    };
+    }
     ;
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.
@@ -9797,23 +9744,23 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      * @param {XYDimension} canvasSize - The new canvas size.
      */
-    drawutilssvg.prototype.setSize = function (canvasSize) {
+    setSize(canvasSize) {
         this.canvasSize = canvasSize;
-        this.svgNode.setAttribute('viewBox', "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
-        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
-        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
-    };
+        this.svgNode.setAttribute('viewBox', `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
+        this.svgNode.setAttribute('width', `${this.canvasSize.width}`);
+        this.svgNode.setAttribute('height', `${this.canvasSize.height}`);
+    }
     ;
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
      */
-    drawutilssvg.prototype.copyInstance = function (fillShapes) {
+    copyInstance(fillShapes) {
         var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
         true, // isSecondary
         this.gNode);
         return copy;
-    };
+    }
     ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -9825,9 +9772,9 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.setCurrentId = function (uid) {
+    setCurrentId(uid) {
         this.curId = uid;
-    };
+    }
     ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -9839,9 +9786,9 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.setCurrentClassName = function (className) {
+    setCurrentClassName(className) {
         this.curClassName = className;
-    };
+    }
     ;
     /**
      * Called before each draw cycle.
@@ -9853,13 +9800,13 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.beginDrawCycle = function (renderTime) {
+    beginDrawCycle(renderTime) {
         // Clear non-recycable elements from last draw cycle.
         this.cache.clear();
-    };
+    }
     ;
-    drawutilssvg.prototype._x = function (x) { return this.offset.x + this.scale.x * x; };
-    drawutilssvg.prototype._y = function (y) { return this.offset.y + this.scale.y * y; };
+    _x(x) { return this.offset.x + this.scale.x * x; }
+    _y(y) { return this.offset.y + this.scale.y * y; }
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -9872,14 +9819,14 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.line = function (zA, zB, color, lineWidth) {
-        var line = this.makeNode('line');
-        line.setAttribute('x1', "" + this._x(zA.x));
-        line.setAttribute('y1', "" + this._y(zA.y));
-        line.setAttribute('x2', "" + this._x(zB.x));
-        line.setAttribute('y2', "" + this._y(zB.y));
+    line(zA, zB, color, lineWidth) {
+        const line = this.makeNode('line');
+        line.setAttribute('x1', `${this._x(zA.x)}`);
+        line.setAttribute('y1', `${this._y(zA.y)}`);
+        line.setAttribute('x2', `${this._x(zB.x)}`);
+        line.setAttribute('y2', `${this._y(zB.y)}`);
         return this._bindFillDraw(line, 'line', color, lineWidth || 1);
-    };
+    }
     ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
@@ -9893,11 +9840,11 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.arrow = function (zA, zB, color, lineWidth) {
-        var node = this.makeNode('path');
+    arrow(zA, zB, color, lineWidth) {
+        const node = this.makeNode('path');
         var headlen = 8; // length of head in pixels
         var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
-        var d = [
+        const d = [
             'M', this._x(zA.x), this._y(zA.y)
         ];
         for (var i = 0; i <= vertices.length; i++) {
@@ -9908,7 +9855,7 @@ var drawutilssvg = /** @class */ (function () {
         }
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'arrow', color, lineWidth || 1);
-    };
+    }
     ;
     /**
      * Draw an image at the given position with the given size.<br>
@@ -9923,30 +9870,29 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.image = function (image, position, size) {
-        var _this = this;
-        var node = this.makeNode('image');
+    image(image, position, size) {
+        const node = this.makeNode('image');
         // We need to re-adjust the image if it was not yet fully loaded before.
-        var setImageSize = function (image) {
+        const setImageSize = (image) => {
             if (image.naturalWidth) {
-                var ratioX = size.x / image.naturalWidth;
-                var ratioY = size.y / image.naturalHeight;
-                node.setAttribute('width', "" + image.naturalWidth * _this.scale.x);
-                node.setAttribute('height', "" + image.naturalHeight * _this.scale.y);
+                const ratioX = size.x / image.naturalWidth;
+                const ratioY = size.y / image.naturalHeight;
+                node.setAttribute('width', `${image.naturalWidth * this.scale.x}`);
+                node.setAttribute('height', `${image.naturalHeight * this.scale.y}`);
                 node.setAttribute('display', null); // Dislay when loaded
-                node.setAttribute('transform', "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + (ratioX) + " " + (ratioY) + ")");
+                node.setAttribute('transform', `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${(ratioX)} ${(ratioY)})`);
             }
         };
-        image.addEventListener('load', function (event) { setImageSize(image); });
+        image.addEventListener('load', (event) => { setImageSize(image); });
         // Safari has a transform-origin bug.
         // Use x=0, y=0 and translate/scale instead (see above)
-        node.setAttribute('x', "" + 0);
-        node.setAttribute('y', "" + 0);
+        node.setAttribute('x', `${0}`);
+        node.setAttribute('y', `${0}`);
         node.setAttribute('display', 'none'); // Hide before loaded
         setImageSize(image);
         node.setAttribute('href', image.src);
         return this._bindFillDraw(node, 'image', null, null);
-    };
+    }
     ;
     /**
      * Draw the given (cubic) bézier curve.
@@ -9962,19 +9908,19 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
+    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
         if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
             return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
         }
-        var node = this.makeNode('path');
+        const node = this.makeNode('path');
         // Draw curve
-        var d = [
+        const d = [
             'M', this._x(startPoint.x), this._y(startPoint.y),
             'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y)
         ];
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'cubierBezier', color, lineWidth);
-    };
+    }
     ;
     /**
      * Draw the given (cubic) Bézier path.
@@ -9991,12 +9937,12 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.cubicBezierPath = function (path, color, lineWidth) {
-        var node = this.makeNode('path');
+    cubicBezierPath(path, color, lineWidth) {
+        const node = this.makeNode('path');
         if (!path || path.length == 0)
             return node;
         // Draw curve
-        var d = [
+        const d = [
             'M', this._x(path[0].x), this._y(path[0].y)
         ];
         // Draw curve path
@@ -10009,7 +9955,7 @@ var drawutilssvg = /** @class */ (function () {
         }
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'cubicBezierPath', color, lineWidth || 1);
-    };
+    }
     ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
@@ -10023,11 +9969,11 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.handle = function (startPoint, endPoint) {
+    handle(startPoint, endPoint) {
         // TODO: redefine methods like these into an abstract class?
         this.point(startPoint, 'rgb(0,32,192)');
         this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
-    };
+    }
     ;
     /**
      * Draw a handle line (with a light grey).
@@ -10039,9 +9985,9 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.handleLine = function (startPoint, endPoint) {
+    handleLine(startPoint, endPoint) {
         this.line(startPoint, endPoint, 'rgb(192,192,192)');
-    };
+    }
     ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -10053,14 +9999,14 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.dot = function (p, color) {
-        var node = this.makeNode('line');
-        var d = [
+    dot(p, color) {
+        const node = this.makeNode('line');
+        const d = [
             'M', this._x(p.x), this._y(p.y),
             'L', this._x(p.x + 1), this._y(p.y + 1)
         ];
         return this._bindFillDraw(node, 'dot', color, 1);
-    };
+    }
     ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
@@ -10072,14 +10018,14 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.point = function (p, color) {
+    point(p, color) {
         var radius = 3;
-        var node = this.makeNode('circle');
-        node.setAttribute('cx', "" + this._x(p.x));
-        node.setAttribute('cy', "" + this._y(p.y));
-        node.setAttribute('r', "" + radius);
+        const node = this.makeNode('circle');
+        node.setAttribute('cx', `${this._x(p.x)}`);
+        node.setAttribute('cy', `${this._y(p.y)}`);
+        node.setAttribute('r', `${radius}`);
         return this._bindFillDraw(node, 'point', color, 1);
-    };
+    }
     ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
@@ -10095,13 +10041,13 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.circle = function (center, radius, color, lineWidth) {
-        var node = this.makeNode('circle');
-        node.setAttribute('cx', "" + this._x(center.x));
-        node.setAttribute('cy', "" + this._y(center.y));
-        node.setAttribute('r', "" + radius * this.scale.x); // y?
+    circle(center, radius, color, lineWidth) {
+        const node = this.makeNode('circle');
+        node.setAttribute('cx', `${this._x(center.x)}`);
+        node.setAttribute('cy', `${this._y(center.y)}`);
+        node.setAttribute('r', `${radius * this.scale.x}`); // y?
         return this._bindFillDraw(node, 'circle', color, lineWidth || 1);
-    };
+    }
     ;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
@@ -10116,13 +10062,13 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
-        var node = this.makeNode('path');
-        var arcData = CircleSector_1.CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
+    circleArc(center, radius, startAngle, endAngle, color, lineWidth) {
+        const node = this.makeNode('path');
+        const arcData = CircleSector_1.CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
         startAngle, endAngle);
         node.setAttribute('d', arcData.join(' '));
         return this._bindFillDraw(node, 'circleArc', color, lineWidth || 1);
-    };
+    }
     ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
@@ -10137,14 +10083,14 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
-        var node = this.makeNode('ellipse');
-        node.setAttribute('cx', "" + this._x(center.x));
-        node.setAttribute('cy', "" + this._y(center.y));
-        node.setAttribute('rx', "" + radiusX * this.scale.x);
-        node.setAttribute('ry', "" + radiusY * this.scale.y);
+    ellipse(center, radiusX, radiusY, color, lineWidth) {
+        const node = this.makeNode('ellipse');
+        node.setAttribute('cx', `${this._x(center.x)}`);
+        node.setAttribute('cy', `${this._y(center.y)}`);
+        node.setAttribute('rx', `${radiusX * this.scale.x}`);
+        node.setAttribute('ry', `${radiusY * this.scale.y}`);
         return this._bindFillDraw(node, 'ellipse', color, lineWidth || 1);
-    };
+    }
     ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
@@ -10160,14 +10106,14 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.square = function (center, size, color, lineWidth) {
-        var node = this.makeNode('rectangle');
-        node.setAttribute('x', "" + this._x(center.x - size / 2.0));
-        node.setAttribute('y', "" + this._y(center.y - size / 2.0));
-        node.setAttribute('width', "" + size * this.scale.x);
-        node.setAttribute('height', "" + size * this.scale.y);
+    square(center, size, color, lineWidth) {
+        const node = this.makeNode('rectangle');
+        node.setAttribute('x', `${this._x(center.x - size / 2.0)}`);
+        node.setAttribute('y', `${this._y(center.y - size / 2.0)}`);
+        node.setAttribute('width', `${size * this.scale.x}`);
+        node.setAttribute('height', `${size * this.scale.y}`);
         return this._bindFillDraw(node, 'square', color, lineWidth || 1);
-    };
+    }
     ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -10183,9 +10129,9 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
-        var node = this.makeNode('path');
-        var d = [];
+    grid(center, width, height, sizeX, sizeY, color) {
+        const node = this.makeNode('path');
+        const d = [];
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
@@ -10200,7 +10146,7 @@ var drawutilssvg = /** @class */ (function () {
         }
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'grid', color, 1);
-    };
+    }
     ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
@@ -10218,9 +10164,9 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
-        var node = this.makeNode('path');
-        var d = [];
+    raster(center, width, height, sizeX, sizeY, color) {
+        const node = this.makeNode('path');
+        const d = [];
         var cx = 0, cy = 0;
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
             cx++;
@@ -10236,7 +10182,7 @@ var drawutilssvg = /** @class */ (function () {
         }
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'raster', color, 1);
-    };
+    }
     ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
@@ -10253,9 +10199,9 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.diamondHandle = function (center, size, color) {
-        var node = this.makeNode('path');
-        var d = [
+    diamondHandle(center, size, color) {
+        const node = this.makeNode('path');
+        const d = [
             'M', this._x(center.x) - size / 2.0, this._y(center.y),
             'L', this._x(center.x), this._y(center.y) - size / 2.0,
             'L', this._x(center.x) + size / 2.0, this._y(center.y),
@@ -10265,7 +10211,7 @@ var drawutilssvg = /** @class */ (function () {
         ;
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'diamondHandle', color, 1);
-    };
+    }
     ;
     /**
      * Draw a square handle with the given CSS color.<br>
@@ -10282,14 +10228,14 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.squareHandle = function (center, size, color) {
-        var node = this.makeNode('rect');
-        node.setAttribute('x', "" + (this._x(center.x) - size / 2.0));
-        node.setAttribute('y', "" + (this._y(center.y) - size / 2.0));
-        node.setAttribute('width', "" + size);
-        node.setAttribute('height', "" + size);
+    squareHandle(center, size, color) {
+        const node = this.makeNode('rect');
+        node.setAttribute('x', `${this._x(center.x) - size / 2.0}`);
+        node.setAttribute('y', `${this._y(center.y) - size / 2.0}`);
+        node.setAttribute('width', `${size}`);
+        node.setAttribute('height', `${size}`);
         return this._bindFillDraw(node, 'squareHandle', color, 1);
-    };
+    }
     ;
     /**
      * Draw a circle handle with the given CSS color.<br>
@@ -10306,14 +10252,14 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.circleHandle = function (center, radius, color) {
+    circleHandle(center, radius, color) {
         radius = radius || 3;
-        var node = this.makeNode('circle');
-        node.setAttribute('cx', "" + this._x(center.x));
-        node.setAttribute('cy', "" + this._y(center.y));
-        node.setAttribute('r', "" + radius);
+        const node = this.makeNode('circle');
+        node.setAttribute('cx', `${this._x(center.x)}`);
+        node.setAttribute('cy', `${this._y(center.y)}`);
+        node.setAttribute('r', `${radius}`);
         return this._bindFillDraw(node, 'circleHandle', color, 1);
-    };
+    }
     ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
@@ -10328,9 +10274,9 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.crosshair = function (center, radius, color) {
-        var node = this.makeNode('path');
-        var d = [
+    crosshair(center, radius, color) {
+        const node = this.makeNode('path');
+        const d = [
             'M', this._x(center.x) - radius, this._y(center.y),
             'L', this._x(center.x) + radius, this._y(center.y),
             'M', this._x(center.x), this._y(center.y) - radius,
@@ -10338,7 +10284,7 @@ var drawutilssvg = /** @class */ (function () {
         ];
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'crosshair', color, 0.5);
-    };
+    }
     ;
     /**
      * Draw a polygon.
@@ -10351,9 +10297,9 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.polygon = function (polygon, color, lineWidth) {
+    polygon(polygon, color, lineWidth) {
         return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
-    };
+    }
     ;
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -10367,12 +10313,12 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
-        var node = this.makeNode('path');
+    polyline(vertices, isOpen, color, lineWidth) {
+        const node = this.makeNode('path');
         if (vertices.length == 0)
             return node;
         // Draw curve
-        var d = [
+        const d = [
             'M', this._x(vertices[0].x), this._y(vertices[0].y)
         ];
         var n = vertices.length;
@@ -10383,7 +10329,7 @@ var drawutilssvg = /** @class */ (function () {
             d.push('Z');
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'polyline', color, lineWidth || 1);
-    };
+    }
     ;
     /**
      * Draw a text label at the given relative position.
@@ -10397,15 +10343,15 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.text = function (text, x, y, options) {
+    text(text, x, y, options) {
         options = options || {};
-        var color = options.color || 'black';
-        var node = this.makeNode('text');
-        node.setAttribute('x', "" + this._x(x));
-        node.setAttribute('y', "" + this._x(y));
+        const color = options.color || 'black';
+        const node = this.makeNode('text');
+        node.setAttribute('x', `${this._x(x)}`);
+        node.setAttribute('y', `${this._x(y)}`);
         node.innerHTML = text;
         return this._bindFillDraw(node, 'text', color, 1);
-    };
+    }
     ;
     /**
      * Draw a non-scaling text label at the given position.
@@ -10419,13 +10365,13 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.label = function (text, x, y, rotation) {
-        var node = this.makeNode('text');
+    label(text, x, y, rotation) {
+        const node = this.makeNode('text');
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute('transform', "translate(" + this.offset.x + "," + this.offset.y + "), rotate(" + rotation / Math.PI * 180 + ")");
+        node.setAttribute('transform', `translate(${this.offset.x},${this.offset.y}), rotate(${rotation / Math.PI * 180})`);
         node.innerHTML = text;
         return this._bindFillDraw(node, 'label', 'black', null);
-    };
+    }
     ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
@@ -10438,7 +10384,7 @@ var drawutilssvg = /** @class */ (function () {
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.clear = function (color) {
+    clear(color) {
         // If this isn't the primary handler then do not remove anything here.
         // The primary handler will do that (no double work).
         if (this.isSecondary) {
@@ -10454,31 +10400,31 @@ var drawutilssvg = /** @class */ (function () {
         this.removeAllChildNodes();
         // Add a covering rect with the given background color
         this.curId = 'background';
-        var node = this.makeNode('rect');
+        const node = this.makeNode('rect');
         // For some strange reason SVG rotation transforms use degrees instead of radians
         // Note that the background does not scale with the zoom level (always covers full element)
         node.setAttribute('x', '0');
         node.setAttribute('y', '0');
-        node.setAttribute('width', "" + this.canvasSize.width);
-        node.setAttribute('height', "" + this.canvasSize.height);
+        node.setAttribute('width', `${this.canvasSize.width}`);
+        node.setAttribute('height', `${this.canvasSize.height}`);
         // Bind this special element into the document
         this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
         // Clear the current ID again
         this.curId = null;
-        return node;
-    };
+        // return node;
+    }
     ;
     /**
      * A private helper function to clear all SVG nodes from the &gt;g> node.
      *
      * @private
      */
-    drawutilssvg.prototype.removeAllChildNodes = function () {
+    removeAllChildNodes() {
         while (this.gNode.firstChild) {
             this.gNode.removeChild(this.gNode.lastChild);
         }
-    };
+    }
     ;
     /**
      * Create a new and empty `SVGElement` &lt;svg&gt; in the svg-namespace.
@@ -10488,19 +10434,18 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      * @return SVGElement
      */
-    drawutilssvg.createSvg = function () {
+    static createSvg() {
         return document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    };
+    }
     ;
-    drawutilssvg.HEAD_XML = [
-        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
-        '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" ',
-        '         "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
-        ''
-    ].join("\n");
-    return drawutilssvg;
-}());
+}
 exports.drawutilssvg = drawutilssvg;
+drawutilssvg.HEAD_XML = [
+    '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+    '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" ',
+    '         "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
+    ''
+].join("\n");
 //# sourceMappingURL=drawutilssvg.js.map
 
 /***/ })
@@ -10524,7 +10469,7 @@ exports.drawutilssvg = drawutilssvg;
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;

@@ -24,10 +24,10 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoronoiCell = void 0;
-var Line_1 = require("../../Line");
-var Polygon_1 = require("../../Polygon");
-var Vertex_1 = require("../../Vertex");
-var VoronoiCell = /** @class */ (function () {
+const Line_1 = require("../../Line");
+const Polygon_1 = require("../../Polygon");
+const Vertex_1 = require("../../Vertex");
+class VoronoiCell {
     /**
      * The constructor.
      *
@@ -38,7 +38,7 @@ var VoronoiCell = /** @class */ (function () {
      * @param {Vertex}     sharedVertex This is the 'center' of the voronoi cell; all triangles must share
      *                                  that vertex.
      **/
-    function VoronoiCell(triangles, sharedVertex) {
+    constructor(triangles, sharedVertex) {
         if (typeof triangles === 'undefined')
             triangles = [];
         if (typeof sharedVertex === 'undefined')
@@ -55,10 +55,10 @@ var VoronoiCell = /** @class */ (function () {
      * @memberof VoronoiCell
      * @return {boolean}
      **/
-    VoronoiCell.prototype.isOpen = function () {
+    isOpen() {
         // There must be at least three triangles
         return this.triangles.length < 3 || !this.triangles[0].isAdjacent(this.triangles[this.triangles.length - 1]);
-    };
+    }
     ;
     /**
      * Convert this Voronoi cell to a path polygon, consisting of all Voronoi cell corner points.
@@ -71,9 +71,9 @@ var VoronoiCell = /** @class */ (function () {
      * @memberof VoronoiCell
      * @return {Polygon}
      **/
-    VoronoiCell.prototype.toPolygon = function () {
+    toPolygon() {
         return new Polygon_1.Polygon(this.toPathArray(), this.isOpen());
-    };
+    }
     ;
     /**
      * Convert the voronoi cell path data to an SVG polygon data string.
@@ -85,12 +85,12 @@ var VoronoiCell = /** @class */ (function () {
      * @memberof VoronoiCell
      * @return {string}
      **/
-    VoronoiCell.prototype.toPathSVGString = function () {
+    toPathSVGString() {
         if (this.triangles.length == 0)
             return "";
-        var arr = this.toPathArray();
-        return arr.map(function (vert) { return '' + vert.x + ',' + vert.y; }).join(' ');
-    };
+        const arr = this.toPathArray();
+        return arr.map((vert) => { return '' + vert.x + ',' + vert.y; }).join(' ');
+    }
     ;
     /**
      * Convert the voronoi cell path data to an array.
@@ -102,12 +102,12 @@ var VoronoiCell = /** @class */ (function () {
      * @memberof VoronoiCell
      * @return {Vertex[]}
      **/
-    VoronoiCell.prototype.toPathArray = function () {
+    toPathArray() {
         if (this.triangles.length == 0)
             return [];
         if (this.triangles.length == 1)
             return [this.triangles[0].getCircumcircle().center];
-        var arr = [];
+        const arr = [];
         // Working for path begin
         if (false && this.isOpen())
             arr.push(VoronoiCell._calcOpenEdgePoint(this.triangles[0], this.triangles[1], this.sharedVertex));
@@ -120,7 +120,7 @@ var VoronoiCell = /** @class */ (function () {
             arr.push( VoronoiCell._calcOpenEdgePoint( this.triangles[ this.triangles.length-1 ], this.triangles[ this.triangles.length-2 ], this.sharedVertex ) );
         */
         return arr;
-    };
+    }
     /**
      * A helper function.
      *
@@ -136,16 +136,16 @@ var VoronoiCell = /** @class */ (function () {
      * @memberof VoronoiCell
      * @return {Vertex}
      **/
-    VoronoiCell._calcOpenEdgePoint = function (tri, neigh, sharedVertex) {
-        var center = tri.getCircumcircle().center;
+    static _calcOpenEdgePoint(tri, neigh, sharedVertex) {
+        const center = tri.getCircumcircle().center;
         // Find non-adjacent edge (=outer edge)
-        var edgePoint = VoronoiCell._findOuterEdgePoint(tri, neigh, sharedVertex);
+        const edgePoint = VoronoiCell._findOuterEdgePoint(tri, neigh, sharedVertex);
         // const perpendicular : Vertex = VoronoiCell._perpendicularLinePoint( sharedVertex, edgePoint, center );
-        var perpendicular = new Line_1.Line(sharedVertex, edgePoint).getClosestPoint(center);
+        const perpendicular = new Line_1.Line(sharedVertex, edgePoint).getClosestPoint(center);
         // It is not necesary to make a difference on the determinant here
-        var openEdgePoint = new Vertex_1.Vertex(perpendicular.x + (center.x - perpendicular.x) * 1000, perpendicular.y + (center.y - perpendicular.y) * 1000);
+        const openEdgePoint = new Vertex_1.Vertex(perpendicular.x + (center.x - perpendicular.x) * 1000, perpendicular.y + (center.y - perpendicular.y) * 1000);
         return openEdgePoint;
-    };
+    }
     ;
     /**
      * A helper function.
@@ -156,7 +156,7 @@ var VoronoiCell = /** @class */ (function () {
      *
      * @return {Vertex}
      **/
-    VoronoiCell._findOuterEdgePoint = function (tri, neighbour, sharedVertex) {
+    static _findOuterEdgePoint(tri, neighbour, sharedVertex) {
         if (tri.a.equals(sharedVertex)) {
             if (neighbour.a.equals(tri.b) || neighbour.b.equals(tri.b) || neighbour.c.equals(tri.b))
                 return tri.c;
@@ -175,9 +175,8 @@ var VoronoiCell = /** @class */ (function () {
             return tri.b;
         else
             return tri.a;
-    };
+    }
     ;
-    return VoronoiCell;
-}());
+}
 exports.VoronoiCell = VoronoiCell;
 //# sourceMappingURL=VoronoiCell.js.map

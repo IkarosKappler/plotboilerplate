@@ -6,12 +6,12 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.matrixFill = void 0;
-var arrayFill_1 = require("./arrayFill");
+const arrayFill_1 = require("./arrayFill");
 /**
  * A matrix-fill helper function. Equivalent of lodash.array_fill(...).
  */
-var matrixFill = function (countA, countB, initialValue) {
-    var arr = Array(countA);
+const matrixFill = (countA, countB, initialValue) => {
+    const arr = Array(countA);
     for (var i = 0; i < countA; i++) {
         arr[i] = arrayFill_1.arrayFill(countB, initialValue);
     }

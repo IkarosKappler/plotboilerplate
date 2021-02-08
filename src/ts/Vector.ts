@@ -101,7 +101,7 @@ export class Vector extends VertTuple<Vector> implements SVGSerializable {
      * @instance
      * @memberof Line
      **/
-    intersection( line:Vector ):Vertex {
+    intersection( line:Vector ):Vertex|null {
 	var denominator = this.denominator(line);
 	if( denominator == 0 ) 
 	    return null;

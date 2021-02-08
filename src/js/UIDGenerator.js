@@ -8,14 +8,11 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UIDGenerator = void 0;
-var UIDGenerator = /** @class */ (function () {
-    function UIDGenerator() {
-    }
-    UIDGenerator.next = function () { return "" + UIDGenerator.current++; };
+class UIDGenerator {
+    static next() { return `${UIDGenerator.current++}`; }
     ;
-    UIDGenerator.current = 0;
-    return UIDGenerator;
-}());
+}
 exports.UIDGenerator = UIDGenerator;
+UIDGenerator.current = 0;
 ;
 //# sourceMappingURL=UIDGenerator.js.map

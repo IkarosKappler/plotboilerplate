@@ -23,22 +23,22 @@ exports.clearPolygonDuplicateVertices = void 0;
  * @param {number=0} epsilon - The epsilon area to use around each vertex to check equality.
  * @return {Array<Vertex>}
  */
-var clearPolygonDuplicateVertices = function (vertices, epsilon) {
-    var n = vertices.length;
+const clearPolygonDuplicateVertices = (vertices, epsilon) => {
+    const n = vertices.length;
     if (n === 0)
         return [];
     // Find following up sequence of vertices that are inside the epsilon sphere.
     if (typeof epsilon === "undefined")
         epsilon = 0;
     // Check if the verts a i and j are considered equal
-    var equalVerts = function (i, j) {
-        var vertA = vertices[i % n];
-        var vertB = vertices[j % n];
+    const equalVerts = (i, j) => {
+        const vertA = vertices[i % n];
+        const vertB = vertices[j % n];
         return (epsilon === 0 && vertA.x === vertB.x && vertA.y === vertB.y)
             || (epsilon !== 0 && vertA.distance(vertB) <= epsilon);
     };
     // Find the next vertex in the list, starting from 'index', that is different
-    var findEndOfRun = function (index) {
+    const findEndOfRun = (index) => {
         var b = index;
         while (equalVerts(index, b + 1) && b < index + n) {
             b++;
@@ -48,7 +48,7 @@ var clearPolygonDuplicateVertices = function (vertices, epsilon) {
     var start = findEndOfRun(0);
     // console.log('starting at', start );
     var i = 0;
-    var result = [];
+    const result = [];
     for (var j = i + 1; j <= n; j++) {
         if (!equalVerts(start + i, start + j)) {
             result.push(vertices[(start + j) % n]);

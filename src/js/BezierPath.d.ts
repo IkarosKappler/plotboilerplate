@@ -298,7 +298,7 @@ export declare class BezierPath implements SVGSerializable {
      * @memberof BezierPath
      * @return {Vertex} The point at the relative path position.
      **/
-    getPoint(u: number): Vertex | undefined;
+    getPoint(u: number): Vertex;
     /**
      * Get the point on the bézier path at the given path fraction.
      *

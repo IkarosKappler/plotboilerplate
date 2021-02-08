@@ -11,7 +11,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CircularIntervalSet = void 0;
-var CircularIntervalSet = /** @class */ (function () {
+class CircularIntervalSet {
     /**
      * Create a new CircularIntervalSet with the given lower and upperBound (start and end).
      *
@@ -22,7 +22,7 @@ var CircularIntervalSet = /** @class */ (function () {
      * @method clear
      * @memberof CircularIntervalSet
      **/
-    function CircularIntervalSet(start, end) {
+    constructor(start, end) {
         this.start = start;
         this.end = end;
         this.intervals = [[start, end]];
@@ -36,9 +36,9 @@ var CircularIntervalSet = /** @class */ (function () {
      * @memberof CircularIntervalSet
      * @return {void}
      **/
-    CircularIntervalSet.prototype.clear = function () {
+    clear() {
         this.intervals = [];
-    };
+    }
     ;
     /**
      * Remove the interval at given index.
@@ -50,11 +50,11 @@ var CircularIntervalSet = /** @class */ (function () {
      * @return {void}
      **/
     // Todo: remove? (not in use any more?)
-    CircularIntervalSet.prototype.removeAt = function (index) {
+    removeAt(index) {
         if (index < 0 || index >= this.intervals.length)
             return;
         this.intervals.splice(index, 1);
-    };
+    }
     ;
     /**
      * Intersect all sub intervalls with the given range (must be inside bounds).
@@ -66,7 +66,7 @@ var CircularIntervalSet = /** @class */ (function () {
      * @memberof CircularIntervalSet
      * @return {void}
      **/
-    CircularIntervalSet.prototype.intersect = function (start, end) {
+    intersect(start, end) {
         for (var i = 0; i < this.intervals.length;) {
             if (start <= end) {
                 if ((this.intervals[i][0] >= end || this.intervals[i][1] <= start)) {
@@ -143,7 +143,7 @@ var CircularIntervalSet = /** @class */ (function () {
                 }
             }
         }
-    };
+    }
     ;
     /**
      * Convert this set to a human readable string.
@@ -153,11 +153,10 @@ var CircularIntervalSet = /** @class */ (function () {
      * @memberof CircularIntervalSet
      * @return {string}
      **/
-    CircularIntervalSet.prototype.toString = function () {
+    toString() {
         return JSON.stringify(this.intervals);
-    };
+    }
     ;
-    return CircularIntervalSet;
-}());
+}
 exports.CircularIntervalSet = CircularIntervalSet;
 //# sourceMappingURL=CircularIntervalSet.js.map

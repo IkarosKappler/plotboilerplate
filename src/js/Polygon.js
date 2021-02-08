@@ -27,10 +27,10 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Polygon = void 0;
-var BezierPath_1 = require("./BezierPath");
-var Bounds_1 = require("./Bounds");
-var UIDGenerator_1 = require("./UIDGenerator");
-var Vertex_1 = require("./Vertex");
+const BezierPath_1 = require("./BezierPath");
+const Bounds_1 = require("./Bounds");
+const UIDGenerator_1 = require("./UIDGenerator");
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -42,7 +42,7 @@ var Vertex_1 = require("./Vertex");
  * @requires Vertex
  * @requires XYCoords
  */
-var Polygon = /** @class */ (function () {
+class Polygon {
     /**
      * The constructor.
      *
@@ -51,7 +51,7 @@ var Polygon = /** @class */ (function () {
      * @param {Vertex[]} vertices - An array of 2d vertices that shape the polygon.
      * @param {boolean} isOpen - Indicates if the polygon should be rendered as an open or closed shape.
      **/
-    function Polygon(vertices, isOpen) {
+    constructor(vertices, isOpen) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -71,9 +71,9 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.addVertex = function (vert) {
+    addVertex(vert) {
         this.vertices.push(vert);
-    };
+    }
     ;
     /**
      * Get the polygon vertex at the given position (index).
@@ -91,12 +91,12 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Vertex} At the given index.
      **/
-    Polygon.prototype.getVertexAt = function (index) {
+    getVertexAt(index) {
         if (index < 0)
             return this.vertices[this.vertices.length - (Math.abs(index) % this.vertices.length)];
         else
             return this.vertices[index % this.vertices.length];
-    };
+    }
     ;
     /**
      * Move the polygon's vertices by the given amount.
@@ -107,12 +107,12 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Polygon} this for chaining
      **/
-    Polygon.prototype.move = function (vert) {
+    move(vert) {
         for (var i in this.vertices) {
             this.vertices[i].add(vert);
         }
         return this;
-    };
+    }
     ;
     /**
      * Check if the given vertex is inside this polygon.<br>
@@ -126,20 +126,20 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.containsVert = function (vert) {
+    containsVert(vert) {
         // ray-casting algorithm based on
         //    http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
         var inside = false;
         for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
-            var xi = this.vertices[i].x, yi = this.vertices[i].y;
-            var xj = this.vertices[j].x, yj = this.vertices[j].y;
+            let xi = this.vertices[i].x, yi = this.vertices[i].y;
+            let xj = this.vertices[j].x, yj = this.vertices[j].y;
             var intersect = ((yi > vert.y) != (yj > vert.y))
                 && (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
             if (intersect)
                 inside = !inside;
         }
         return inside;
-    };
+    }
     ;
     /**
      * Calculate the area of the given polygon (unsigned).
@@ -151,7 +151,7 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {number}
      */
-    Polygon.prototype.area = function () {
+    area() {
         // Found at:
         //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
         /* let total : number = 0.0;
@@ -167,7 +167,7 @@ var Polygon = /** @class */ (function () {
         }
         return Math.abs(total); */
         return Polygon.utils.area(this.vertices);
-    };
+    }
     ;
     /**
      * Calulate the signed polyon area by interpreting the polygon as a matrix
@@ -178,7 +178,7 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {number}
      */
-    Polygon.prototype.signedArea = function () {
+    signedArea() {
         return Polygon.utils.signedArea(this.vertices);
         /* let sum : number = 0;
         const n = this.vertices.length;
@@ -187,7 +187,7 @@ var Polygon = /** @class */ (function () {
             sum += (this.vertices[j].x - this.vertices[i].x) * (this.vertices[i].y + this.vertices[j].y);
         }
         return sum; */
-    };
+    }
     ;
     /**
      * Get the winding order of this polgon: clockwise or counterclockwise.
@@ -197,9 +197,9 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {boolean}
      */
-    Polygon.prototype.isClockwise = function () {
+    isClockwise() {
         return Polygon.utils.signedArea(this.vertices) < 0;
-    };
+    }
     ;
     /**
      * Scale the polygon relative to the given center.
@@ -211,7 +211,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.scale = function (factor, center) {
+    scale(factor, center) {
         for (var i in this.vertices) {
             if (typeof this.vertices[i].scale == 'function')
                 this.vertices[i].scale(factor, center);
@@ -219,7 +219,7 @@ var Polygon = /** @class */ (function () {
                 console.log('There seems to be a null vertex!', this.vertices[i]);
         }
         return this;
-    };
+    }
     ;
     /**
      * Rotate the polygon around the given center.
@@ -231,12 +231,12 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Polygon} this, for chaining.
      **/
-    Polygon.prototype.rotate = function (angle, center) {
+    rotate(angle, center) {
         for (var i in this.vertices) {
             this.vertices[i].rotate(angle, center);
         }
         return this;
-    };
+    }
     ;
     /**
      * Get the bounding box (bounds) of this polygon.
@@ -246,9 +246,9 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Bounds} The rectangular bounds of this polygon.
      **/
-    Polygon.prototype.getBounds = function () {
+    getBounds() {
         return Bounds_1.Bounds.computeFromVertices(this.vertices);
-    };
+    }
     ;
     /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
@@ -262,7 +262,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toQuadraticBezierData = function () {
+    toQuadraticBezierData() {
         if (this.vertices.length < 3)
             return [];
         var qbezier = [];
@@ -280,7 +280,7 @@ var Polygon = /** @class */ (function () {
             cc0 = cc1;
         }
         return qbezier;
-    };
+    }
     ;
     /**
      * Convert this polygon to a quadratic bezier curve, represented as an SVG data string.
@@ -290,7 +290,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toQuadraticBezierSVGString = function () {
+    toQuadraticBezierSVGString() {
         var qdata = this.toQuadraticBezierData();
         if (qdata.length == 0)
             return "";
@@ -299,7 +299,7 @@ var Polygon = /** @class */ (function () {
             buffer.push('Q ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y);
         }
         return buffer.join(' ');
-    };
+    }
     ;
     /**
      * Convert this polygon to a sequence of cubic Bézier curves.<br>
@@ -316,7 +316,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toCubicBezierData = function (threshold) {
+    toCubicBezierData(threshold) {
         if (typeof threshold == 'undefined')
             threshold = 1.0;
         if (this.vertices.length < 3)
@@ -340,7 +340,7 @@ var Polygon = /** @class */ (function () {
             cbezier.push(bCenter);
         }
         return cbezier;
-    };
+    }
     ;
     /**
      * Convert this polygon to a cubic bezier curve, represented as an SVG data string.
@@ -350,7 +350,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toCubicBezierSVGString = function (threshold) {
+    toCubicBezierSVGString(threshold) {
         var qdata = this.toCubicBezierData(threshold);
         if (qdata.length == 0)
             return "";
@@ -359,7 +359,7 @@ var Polygon = /** @class */ (function () {
             buffer.push('C ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y + ', ' + qdata[i + 2].x + ' ' + qdata[i + 2].y);
         }
         return buffer.join(' ');
-    };
+    }
     ;
     /**
      * Convert this polygon to a cubic bezier path instance.
@@ -370,7 +370,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toCubicBezierPath = function (threshold) {
+    toCubicBezierPath(threshold) {
         var qdata = this.toCubicBezierData(threshold);
         // Conver the linear path vertices to a two-dimensional path array
         var pathdata = [];
@@ -378,7 +378,7 @@ var Polygon = /** @class */ (function () {
             pathdata.push([qdata[i], qdata[i + 3], qdata[i + 1], qdata[i + 2]]);
         }
         return BezierPath_1.BezierPath.fromArray(pathdata);
-    };
+    }
     ;
     /**
      * Create an SVG representation of this polygon.
@@ -390,7 +390,7 @@ var Polygon = /** @class */ (function () {
      * @instance
      * @memberof Polygon
      **/
-    Polygon.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<path');
@@ -414,49 +414,48 @@ var Polygon = /** @class */ (function () {
         }
         buffer.push('" />');
         return buffer.join('');
-    };
+    }
     ;
-    Polygon.utils = {
-        /**
-         * Calculate the area of the given polygon (unsigned).
-         *
-         * Note that this does not work for self-intersecting polygons.
-         *
-         * @name area
-         * @return {number}
-         */
-        area: function (vertices) {
-            // Found at:
-            //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
-            var total = 0.0;
-            for (var i = 0, l = vertices.length; i < l; i++) {
-                var addX = vertices[i].x;
-                var addY = vertices[(i + 1) % l].y;
-                var subX = vertices[(i + 1) % l].x;
-                var subY = vertices[i].y;
-                total += (addX * addY * 0.5);
-                total -= (subX * subY * 0.5);
-            }
-            return Math.abs(total);
-        },
-        /**
-         * Calulate the signed polyon area by interpreting the polygon as a matrix
-         * and calculating its determinant.
-         *
-         * @name signedArea
-         * @return {number}
-         */
-        signedArea: function (vertices) {
-            var sum = 0;
-            var n = vertices.length;
-            for (var i = 0; i < n; i++) {
-                var j = (i + 1) % n;
-                sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
-            }
-            return sum;
-        }
-    };
-    return Polygon;
-}());
+}
 exports.Polygon = Polygon;
+Polygon.utils = {
+    /**
+     * Calculate the area of the given polygon (unsigned).
+     *
+     * Note that this does not work for self-intersecting polygons.
+     *
+     * @name area
+     * @return {number}
+     */
+    area(vertices) {
+        // Found at:
+        //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
+        let total = 0.0;
+        for (var i = 0, l = vertices.length; i < l; i++) {
+            const addX = vertices[i].x;
+            const addY = vertices[(i + 1) % l].y;
+            const subX = vertices[(i + 1) % l].x;
+            const subY = vertices[i].y;
+            total += (addX * addY * 0.5);
+            total -= (subX * subY * 0.5);
+        }
+        return Math.abs(total);
+    },
+    /**
+     * Calulate the signed polyon area by interpreting the polygon as a matrix
+     * and calculating its determinant.
+     *
+     * @name signedArea
+     * @return {number}
+     */
+    signedArea(vertices) {
+        let sum = 0;
+        const n = vertices.length;
+        for (var i = 0; i < n; i++) {
+            const j = (i + 1) % n;
+            sum += (vertices[j].x - vertices[i].x) * (vertices[i].y + vertices[j].y);
+        }
+        return sum;
+    }
+};
 //# sourceMappingURL=Polygon.js.map

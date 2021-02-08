@@ -9,8 +9,8 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findPolygonSelfIntersections = void 0;
-var Line_1 = require("../../Line");
-var Vertex_1 = require("../../Vertex");
+const Line_1 = require("../../Line");
+const Vertex_1 = require("../../Vertex");
 /**
  * Collect all self-intersection points of the given polygon.
  *
@@ -20,11 +20,11 @@ var Vertex_1 = require("../../Vertex");
  * @param {Array<Vertex>} vertices - The vertices that form the polygon.
  * @return Array<Vertex>
  */
-var findPolygonSelfIntersections = function (vertices) {
-    var pointList = [];
-    var lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
-    var lineB = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
-    var n = vertices.length;
+const findPolygonSelfIntersections = (vertices) => {
+    const pointList = [];
+    const lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+    const lineB = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+    const n = vertices.length;
     for (var a = 0; a < n; a++) {
         lineA.a.set(vertices[a]);
         lineA.b.set(vertices[(a + 1) % n]);
@@ -37,7 +37,7 @@ var findPolygonSelfIntersections = function (vertices) {
             lineB.b.set(vertices[(b + 1) % n]);
             // Commpute the intersection point of the (infinite) lines.
             // The point is undefined if and only if both line are parallel (co-linear).
-            var intersectionPoint = lineA.intersection(lineB);
+            const intersectionPoint = lineA.intersection(lineB);
             // Check if the intersection point is on both (finite) edges of the polygon.
             if (intersectionPoint
                 && lineA.hasPoint(intersectionPoint) && lineB.hasPoint(intersectionPoint)) {

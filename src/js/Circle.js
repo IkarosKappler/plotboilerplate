@@ -12,10 +12,10 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Circle = void 0;
-var Line_1 = require("./Line");
-var UIDGenerator_1 = require("./UIDGenerator");
-var Vector_1 = require("./Vector");
-var Vertex_1 = require("./Vertex");
+const Line_1 = require("./Line");
+const UIDGenerator_1 = require("./UIDGenerator");
+const Vector_1 = require("./Vector");
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -27,7 +27,7 @@ var Vertex_1 = require("./Vertex");
  * @requires UID
  * @requires UIDGenerator
  **/
-var Circle = /** @class */ (function () {
+class Circle {
     /**
      * Create a new circle with given center point and radius.
      *
@@ -36,7 +36,7 @@ var Circle = /** @class */ (function () {
      * @param {Vertex} center - The center point of the circle.
      * @param {number} radius - The radius of the circle.
      */
-    function Circle(center, radius) {
+    constructor(center, radius) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -55,9 +55,9 @@ var Circle = /** @class */ (function () {
      * @memberof Circle
      * @return {boolean} `true` if any only if the given circle is completely inside this circle.
      */
-    Circle.prototype.containsCircle = function (circle) {
+    containsCircle(circle) {
         return this.center.distance(circle.center) + circle.radius < this.radius;
-    };
+    }
     ;
     /**
      * Calculate the distance from this circle to the given line.
@@ -73,10 +73,10 @@ var Circle = /** @class */ (function () {
      * @instance
      * @memberof Circle
      */
-    Circle.prototype.lineDistance = function (line) {
-        var closestPointOnLine = line.getClosestPoint(this.center);
+    lineDistance(line) {
+        const closestPointOnLine = line.getClosestPoint(this.center);
         return closestPointOnLine.distance(this.center) - this.radius;
-    };
+    }
     ;
     /**
      * Get the vertex on the this circle for the given angle.
@@ -87,10 +87,10 @@ var Circle = /** @class */ (function () {
      * @instance
      * @memberof Circle
      **/
-    Circle.prototype.vertAt = function (angle) {
+    vertAt(angle) {
         // Find the point on the circle respective the angle. Then move relative to center.
         return Circle.circleUtils.vertAt(angle, this.radius).add(this.center);
-    };
+    }
     ;
     /**
      * Get a tangent line of this circle for a given angle.
@@ -103,11 +103,11 @@ var Circle = /** @class */ (function () {
      * @return {Line} The tangent line.
      * @memberof Circle
      **/
-    Circle.prototype.tangentAt = function (angle) {
-        var pointA = Circle.circleUtils.vertAt(angle, this.radius);
+    tangentAt(angle) {
+        const pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
         return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
-    };
+    }
     ;
     /**
      * Calculate the intersection points (if exists) with the given circle.
@@ -118,7 +118,7 @@ var Circle = /** @class */ (function () {
      * @param {Circle} circle
      * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
      **/
-    Circle.prototype.circleIntersection = function (circle) {
+    circleIntersection(circle) {
         // Circles do not intersect at all?
         if (this.center.distance(circle.center) > this.radius + circle.radius) {
             return null;
@@ -160,7 +160,7 @@ var Circle = /** @class */ (function () {
         var x4 = p2.x - h * (p1.y - p0.y) / d;
         var y4 = p2.y + h * (p1.x - p0.x) / d;
         return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
-    };
+    }
     ;
     /**
       * Create an SVG representation of this circle.
@@ -172,7 +172,7 @@ var Circle = /** @class */ (function () {
       * @instance
       * @memberof Circle
       */
-    Circle.prototype.toSVGString = function (options) {
+    toSVGString(options) {
         options = options || {};
         var buffer = [];
         buffer.push('<circle');
@@ -183,16 +183,15 @@ var Circle = /** @class */ (function () {
         buffer.push(' r="' + this.radius + '"');
         buffer.push(' />');
         return buffer.join('');
-    };
+    }
     ;
-    Circle.circleUtils = {
-        vertAt: function (angle, radius) {
-            /* return new Vertex( Math.sin(angle) * radius,
-                       Math.cos(angle) * radius ); */
-            return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
-        }
-    };
-    return Circle;
-}()); // END class
+} // END class
 exports.Circle = Circle;
+Circle.circleUtils = {
+    vertAt: function (angle, radius) {
+        /* return new Vertex( Math.sin(angle) * radius,
+                   Math.cos(angle) * radius ); */
+        return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
+    }
+};
 //# sourceMappingURL=Circle.js.map

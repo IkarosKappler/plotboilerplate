@@ -70,7 +70,7 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
      * @instance
      * @memberof Line
      **/
-    intersection(line: Vector): Vertex;
+    intersection(line: Vector): Vertex | null;
     /**
      * Create an SVG representation of this line.
      *

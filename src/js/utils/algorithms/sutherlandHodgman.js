@@ -15,7 +15,7 @@ exports.sutherlandHodgman = void 0;
  * @param {XYCoords}
  * @param {XYCoords}
  **/
-var inside = function (cp1, cp2, p) {
+const inside = (cp1, cp2, p) => {
     return (cp2.x - cp1.x) * (p.y - cp1.y) > (cp2.y - cp1.y) * (p.x - cp1.x);
 };
 /**
@@ -24,18 +24,18 @@ var inside = function (cp1, cp2, p) {
  * @param {XYCoords}
  * @param {XYCoords}
  */
-var intersection = function (cp1, cp2, s, e) {
-    var dc = {
+const intersection = (cp1, cp2, s, e) => {
+    const dc = {
         x: cp1.x - cp2.x,
         y: cp1.y - cp2.y
     };
-    var dp = {
+    const dp = {
         x: s.x - e.x,
         y: s.y - e.y
     };
-    var n1 = cp1.x * cp2.y - cp1.y * cp2.x;
-    var n2 = s.x * e.y - s.y * e.x;
-    var n3 = 1.0 / (dc.x * dp.y - dc.y * dp.x);
+    const n1 = cp1.x * cp2.y - cp1.y * cp2.x;
+    const n2 = s.x * e.y - s.y * e.x;
+    const n3 = 1.0 / (dc.x * dp.y - dc.y * dp.x);
     return { x: (n1 * dp.x - n2 * dc.x) * n3,
         y: (n1 * dp.y - n2 * dc.y) * n3
     };
@@ -44,12 +44,12 @@ var intersection = function (cp1, cp2, s, e) {
  * @param {Array<XYCoords>} subjectPolygon - Can be any polygon.
  * @param {Array<XYCoords>} clipPolygon - Must be convex.
  */
-var sutherlandHodgman = function (subjectPolygon, clipPolygon) {
-    var cp1 = clipPolygon[clipPolygon.length - 1];
-    var cp2;
-    var s;
-    var e;
-    var outputList = subjectPolygon;
+const sutherlandHodgman = (subjectPolygon, clipPolygon) => {
+    let cp1 = clipPolygon[clipPolygon.length - 1];
+    let cp2;
+    let s;
+    let e;
+    let outputList = subjectPolygon;
     for (var j in clipPolygon) {
         cp2 = clipPolygon[j];
         var inputList = outputList;

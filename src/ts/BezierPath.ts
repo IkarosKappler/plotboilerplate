@@ -134,7 +134,7 @@ export class BezierPath implements SVGSerializable {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    private constructor( pathPoints:Array<Vertex> ) {
+    private constructor( pathPoints:Array<Vertex>|undefined|null ) {
 	this.uid = UIDGenerator.next();
 	    
 	if( !pathPoints )
@@ -634,8 +634,6 @@ export class BezierPath implements SVGSerializable {
      **/
     getClosestT( p:Vertex ) : number {
 	// Find the spline to extract the value from
-	// var i : number = 0;
-	var uTemp : number = 0.0;
 	var minIndex : number = -1;
 	var minDist : number = 0.0;
 	var dist : number = 0.0;
@@ -669,10 +667,10 @@ export class BezierPath implements SVGSerializable {
      * @memberof BezierPath
      * @return {Vertex} The point at the relative path position.
      **/
-    getPoint( u:number ) : Vertex|undefined {
+    getPoint( u:number ) : Vertex {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.log( "[BezierPath.getPoint(u)] u is out of bounds: " + u + "." );
-	    return null;
+	    u = Math.min( this.totalArcLength, Math.max(u,0) );
 	}
 	// Find the spline to extract the value from
 	var i : number = 0;
@@ -743,7 +741,8 @@ export class BezierPath implements SVGSerializable {
     getTangent( u:number ) : Vertex {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.warn( "[BezierPath.getTangent(u)] u is out of bounds: " + u + "." );
-	    return null;
+	    // return undefined;
+	    u = Math.min( this.totalArcLength, Math.max(0,u) );
 	}
 	// Find the spline to extract the value from
 	var i : number = 0;
@@ -792,12 +791,10 @@ export class BezierPath implements SVGSerializable {
     getPerpendicular( u:number ) : Vertex {
 	if( u < 0 || u > this.totalArcLength ) {
 	    console.log( "[BezierPath.getPerpendicular(u)] u is out of bounds: " + u + "." );
-	    return null;
+	    u = Math.min( this.totalArcLength, Math.max(0,u) );
 	}
 
 	// Find the spline to extract the value from
-	var i : number = 0;
-	var uTemp : number = 0.0;
 	var uResult : { i:number, uPart:number, uBefore:number } = BezierPath._locateUIndex( this, u );
 	var bCurve : CubicBezierCurve = this.bezierCurves[ uResult.i ];
 	var relativeU : number = u - uResult.uPart;
@@ -1041,15 +1038,14 @@ export class BezierPath implements SVGSerializable {
      * @memberof BezierPath
      * @return {void}
      **/
-    // !!! TODO: SHOULDNT THIS BE A STATIC FUNCTION ???
-    private static adjustNeighbourControlPoint( mainCurve:CubicBezierCurve,
+    private static adjustNeighbourControlPoint( _mainCurve:CubicBezierCurve,  // TODO: remove param
 						neighbourCurve:CubicBezierCurve,
 						mainPoint:Vertex,
 						mainControlPoint:Vertex,
 						neighbourPoint:Vertex,
 						neighbourControlPoint:Vertex,
 						obtainHandleLengths:boolean, 
-						updateArcLengths:boolean
+						_updateArcLengths:boolean  // TODO: remove param
 					      ) : void {
 
 	// Calculate start handle length
@@ -1111,7 +1107,7 @@ export class BezierPath implements SVGSerializable {
      * @return {BezierPath}
      **/
     clone() : BezierPath {
-	var path : BezierPath = new BezierPath( null );
+	var path : BezierPath = new BezierPath( undefined );
 	for( var i = 0; i < this.bezierCurves.length; i++ ) {
 	    path.bezierCurves.push( this.bezierCurves[i].clone() );
 	    // Connect splines
@@ -1248,12 +1244,12 @@ export class BezierPath implements SVGSerializable {
 	
 	
 	// Create an empty bezier path
-	var bPath : BezierPath = new BezierPath( null );
-	var lastCurve : CubicBezierCurve|undefined = null;
+	var bPath : BezierPath = new BezierPath( undefined);
+	var lastCurve : CubicBezierCurve|null = null;
 	for( var i = 0; i < arr.length; i++ ) {
 	    
 	    // Convert object (or array?) to bezier curve
-	    var bCurve : CubicBezierCurve = null;
+	    var bCurve : CubicBezierCurve;
 	    if( CubicBezierCurve.isInstance(arr[i]) ) { 
 		bCurve = arr[i].clone();
 	    } else if( 0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i] ) {
@@ -1363,16 +1359,16 @@ export class BezierPath implements SVGSerializable {
 	// Convert to object
 	var bezierPath : BezierPath = new BezierPath( null ); // No points yet
         
-	var startPoint : Vertex|undefined        = null;
-	var startControlPoint : Vertex|undefined = null;
-	var endControlPoint : Vertex|undefined   = null;
-	var endPoint : Vertex|undefined          = null;
+	var startPoint : Vertex;
+	var startControlPoint : Vertex;
+	var endControlPoint : Vertex;
+	var endPoint : Vertex;
 	var i : number = 0;
 
 	do {
 	    
-	    if( i == 0 )
-		startPoint        = new Vertex( pointArray[i], pointArray[i+1] );
+	    //if( i == 0 )
+	    startPoint        = new Vertex( pointArray[i], pointArray[i+1] );
 	    startControlPoint = new Vertex( pointArray[i+2], pointArray[i+3] );
 	    endControlPoint   = new Vertex( pointArray[i+4], pointArray[i+5] );
 	    endPoint          = new Vertex( pointArray[i+6], pointArray[i+7] );
