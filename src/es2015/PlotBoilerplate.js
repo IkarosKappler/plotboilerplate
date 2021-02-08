@@ -1585,6 +1585,7 @@ export class PlotBoilerplate {
                 try {
                     // Do not include AlloyFinger itself to the library
                     // (17kb, but we want to keep this lib as tiny as possible).
+                    // TODO: cc
                     // const AF : AlloyFinger = (globalThis["AlloyFinger"] as AlloyFinger);
                     var touchMovePos = null;
                     var touchDownPos = null;
@@ -1597,8 +1598,9 @@ export class PlotBoilerplate {
                         multiTouchStartScale = null;
                         _self.draggedElements = [];
                     };
+                    // TODO: cc
                     // var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
-                    var af = new AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
+                    new AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
                         touchStart: (evt) => {
                             if (evt.touches.length == 1) {
                                 touchMovePos = new Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));

@@ -21,7 +21,6 @@
  **/
 
 
-import { Bounds } from "../../Bounds";
 import { Circle } from "../../Circle";
 import { GirihTile, TileType } from "./GirihTile";
 import { Line } from "../../Line";

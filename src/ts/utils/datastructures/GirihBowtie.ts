@@ -18,7 +18,6 @@
  * @public
  **/
 
-import { Bounds } from "../../Bounds";
 import { GirihTile, TileType } from "./GirihTile";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
@@ -68,7 +67,6 @@ export class GirihBowtie extends GirihTile {
 	} // END for
 
 	// Move to center and position 
-	const bounds:Bounds = Bounds.computeFromVertices( this.vertices );
 	const move:Vertex   = new Vertex( (oppositePoint.x - startPoint.x)/2.0,
 					  (oppositePoint.y - startPoint.y)/2.0 
 					);

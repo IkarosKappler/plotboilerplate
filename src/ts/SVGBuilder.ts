@@ -19,7 +19,7 @@
 
 
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable } from "./interfaces";
+import { SVGSerializable } from "./interfaces";
 
 
 /**
@@ -27,7 +27,6 @@ import { XYCoords, SVGSerializable } from "./interfaces";
  *
  * @requires SVGSerializable
  * @requires Vertex
- * @requires XYCoords
  */ 
 export class SVGBuilder {
 

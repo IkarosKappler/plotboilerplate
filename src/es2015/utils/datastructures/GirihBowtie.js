@@ -17,7 +17,6 @@
  * @file GirihBowtie
  * @public
  **/
-import { Bounds } from "../../Bounds";
 import { GirihTile, TileType } from "./GirihTile";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
@@ -59,7 +58,6 @@ export class GirihBowtie extends GirihTile {
                 oppositePoint = pointB;
         } // END for
         // Move to center and position 
-        const bounds = Bounds.computeFromVertices(this.vertices);
         const move = new Vertex((oppositePoint.x - startPoint.x) / 2.0, (oppositePoint.y - startPoint.y) / 2.0);
         for (var i = 0; i < this.vertices.length; i++) {
             this.vertices[i].add(position).sub(move);

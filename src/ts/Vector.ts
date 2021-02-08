@@ -17,7 +17,7 @@
 
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable  } from "./interfaces";
+import { SVGSerializable  } from "./interfaces";
 
 /**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
@@ -25,7 +25,8 @@ import { XYCoords, SVGSerializable  } from "./interfaces";
  *            Vectors are drawn with an arrow at their end point.<br>
  *            <b>The Vector class extends the Line class.</b>
  *
- * @requires Vertex, Line
+ * @requires VertTuple
+ * @requires Vertex
  **/
 export class Vector extends VertTuple<Vector> implements SVGSerializable {  
 

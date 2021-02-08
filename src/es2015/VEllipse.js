@@ -17,7 +17,6 @@ import { UIDGenerator } from "./UIDGenerator";
  * @requires UID
  * @requires UIDGenerator
  * @requires Vertex
- * @requires XYCoords
  */
 export class VEllipse {
     /**

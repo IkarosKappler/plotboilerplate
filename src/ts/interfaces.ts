@@ -14,13 +14,10 @@ import { PBImage } from "./PBImage";
 import { VEllipse } from "./VEllipse";
 import { Circle } from "./Circle";
 import { CircleSector } from "./CircleSector";
-import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { BezierPath } from "./BezierPath";
 import { Line } from "./Line";
 import { PlotBoilerplate } from "./PlotBoilerplate";
-import { drawutils } from "./draw";
-import { drawutilsgl } from "./drawgl";
 
 
 /**

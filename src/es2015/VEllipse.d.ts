@@ -18,7 +18,6 @@ import { SVGSerializable, UID } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  * @requires Vertex
- * @requires XYCoords
  */
 export declare class VEllipse implements SVGSerializable {
     /**

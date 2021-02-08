@@ -143,9 +143,6 @@ export class CircleSector implements SVGSerializable {
 	    // Some browsers have problems to render full circles (described by start==end).
 	    if( Math.PI*2-Math.abs(startAngle-endAngle) < 0.001 ) {
 		const firstHalf : SVGPathParams = CircleSector.circleSectorUtils.describeSVGArc( x, y, radius, startAngle, startAngle+(endAngle-startAngle)/2, options );
-		const firstEndPoint : XYCoords = { x : firstHalf[firstHalf.length-2] as number,
-						   y : firstHalf[firstHalf.length-1] as number
-						 };
 		const secondHalf : SVGPathParams = CircleSector.circleSectorUtils.describeSVGArc( x, y, radius, startAngle+(endAngle-startAngle)/2, endAngle, options );
 		return firstHalf.concat( secondHalf );
 	    }

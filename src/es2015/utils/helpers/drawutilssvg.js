@@ -20,7 +20,6 @@ import { Vertex } from "../../Vertex";
  *
  * @requires CubicBzierCurvce
  * @requires Polygon
- * @requires SVGSerializable
  * @requires Vertex
  * @requires XYCoords
  */
@@ -391,7 +390,9 @@ export class drawutilssvg {
             'M', this._x(path[0].x), this._y(path[0].y)
         ];
         // Draw curve path
-        var startPoint, endPoint, startControlPoint, endControlPoint;
+        var endPoint;
+        var startControlPoint;
+        var endControlPoint;
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
             endControlPoint = path[i + 1];
@@ -446,10 +447,6 @@ export class drawutilssvg {
      */
     dot(p, color) {
         const node = this.makeNode('line');
-        const d = [
-            'M', this._x(p.x), this._y(p.y),
-            'L', this._x(p.x + 1), this._y(p.y + 1)
-        ];
         return this._bindFillDraw(node, 'dot', color, 1);
     }
     ;
@@ -612,12 +609,8 @@ export class drawutilssvg {
     raster(center, width, height, sizeX, sizeY, color) {
         const node = this.makeNode('path');
         const d = [];
-        var cx = 0, cy = 0;
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
-            cx++;
             for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
-                if (cx == 1)
-                    cy++;
                 // Draw a crosshair
                 d.push('M', this._x(center.x + x) - 4, this._y(center.y + y));
                 d.push('L', this._x(center.x + x) + 4, this._y(center.y + y));
@@ -856,7 +849,7 @@ export class drawutilssvg {
         this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
         // Clear the current ID again
-        this.curId = null;
+        this.curId = undefined;
         // return node;
     }
     ;
@@ -866,7 +859,7 @@ export class drawutilssvg {
      * @private
      */
     removeAllChildNodes() {
-        while (this.gNode.firstChild) {
+        while (this.gNode.lastChild) {
             this.gNode.removeChild(this.gNode.lastChild);
         }
     }

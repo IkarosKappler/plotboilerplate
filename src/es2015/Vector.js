@@ -22,7 +22,8 @@ import { Vertex } from "./Vertex";
  *            Vectors are drawn with an arrow at their end point.<br>
  *            <b>The Vector class extends the Line class.</b>
  *
- * @requires Vertex, Line
+ * @requires VertTuple
+ * @requires Vertex
  **/
 export class Vector extends VertTuple {
     /**

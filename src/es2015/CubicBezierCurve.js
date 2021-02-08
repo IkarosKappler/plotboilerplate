@@ -34,7 +34,6 @@ import { Vector } from "./Vector";
  * @requires Vertex
  * @requires Vector
  * @requires XYCoords
- * @requires SVGSerializable
  * @requires UID
  * @requires UIDGenerator
  */
@@ -178,8 +177,9 @@ export class CubicBezierCurve {
      * @return {void}
      **/
     updateArcLengths() {
-        let pointA = this.startPoint.clone(), pointB = new Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
-        let u = curveStep;
+        let pointA = this.startPoint.clone();
+        let pointB = new Vertex(0, 0);
+        let curveStep = 1.0 / this.curveIntervals;
         // Clear segment cache
         this.segmentCache = [];
         // Push start point into buffer
@@ -215,7 +215,6 @@ export class CubicBezierCurve {
     getClosestT(p) {
         // We would like to have an error that's not larger than 1.0.
         var desiredEpsilon = 1.0;
-        var t = 0.0;
         var result = { t: 0, tPrev: 0.0, tNext: 1.0 };
         var iteration = 0;
         do {
@@ -414,7 +413,6 @@ export class CubicBezierCurve {
         const d = this.getEndPoint();
         // This is the shortened one
         const t2 = t * t;
-        const t3 = t * t2;
         // (1 - t)^2 = (1-t)*(1-t) = 1 - t - t + t^2 = 1 - 2*t + t^2
         const nt2 = 1 - 2 * t + t2;
         const tX = -3 * a.x * nt2 +

@@ -21,7 +21,6 @@
  *
  * @requires SVGSerializable
  * @requires Vertex
- * @requires XYCoords
  */
 export class SVGBuilder {
     /**

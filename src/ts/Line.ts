@@ -18,10 +18,9 @@
  * @public
  **/
 
-import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { XYCoords, SVGSerializable} from "./interfaces";
+import { SVGSerializable} from "./interfaces";
 
 
 /**

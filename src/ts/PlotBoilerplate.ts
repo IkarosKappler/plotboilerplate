@@ -76,7 +76,7 @@
  **/
 
 // import { AlloyFinger } from "alloyfinger";
-import { AlloyFinger, TouchMoveEvent, TouchPinchEvent, TouchPressMoveEvent } from "../../lib/alloy_finger";
+import { AlloyFinger, TouchMoveEvent, TouchPinchEvent } from "../../lib/alloy_finger";
 // import { saveAs } from "file-saver";
 import { GUI } from "dat.gui";
 
@@ -87,9 +87,9 @@ import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
 import { Circle } from "./Circle";
 import { CircleSector } from "./CircleSector";
-import { CubicBezierCurve } from "./CubicBezierCurve";
+
 import { Grid } from "./Grid";
-import { KeyHandler, XKeyListener } from "./KeyHandler";
+import { KeyHandler } from "./KeyHandler";
 import { Line } from "./Line";
 import { MouseHandler, XMouseEvent, XWheelEvent } from "./MouseHandler";
 import { PBImage } from "./PBImage";
@@ -100,7 +100,7 @@ import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
 import { VertEvent } from "./VertexListeners";
-import { IBounds, IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, SVGSerializable, XYCoords, XYDimension } from "./interfaces";
+import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
 
 
 /**
@@ -1814,7 +1814,7 @@ export class PlotBoilerplate {
 		    };
 		    // TODO: cc
 		    // var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
-		    var af = new AlloyFinger( this.eventCatcher ? this.eventCatcher : this.canvas, {
+		    new AlloyFinger( this.eventCatcher ? this.eventCatcher : this.canvas, {
 			touchStart: ( evt : TouchEvent ) => {
 			    if( evt.touches.length == 1 ) {
 				touchMovePos = new Vertex( relPos( { x : evt.touches[0].clientX, y : evt.touches[0].clientY } ) );

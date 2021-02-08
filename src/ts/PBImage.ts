@@ -15,7 +15,7 @@
 
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { SVGSerializable, UID } from "./interfaces";
 
 
 /**

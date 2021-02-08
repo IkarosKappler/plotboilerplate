@@ -66,7 +66,8 @@ export class MouseHandler {
     private element        : HTMLElement | SVGElement;
     private mouseDownPos   : { x:number, y:number }|undefined = undefined;
     private mouseDragPos   : { x:number, y:number }|undefined = undefined;
-    private mousePos       : { x:number, y:number }|undefined = undefined;
+    // TODO: cc
+    // private mousePos       : { x:number, y:number }|undefined = undefined;
     private mouseButton    : number = -1;
     private listeners      : Record<string,XMouseCallback> = {};
     private installed      : Record<string,boolean> = {};
@@ -140,7 +141,7 @@ export class MouseHandler {
 	this.element      = element;
 	this.mouseDownPos = null;
 	this.mouseDragPos = null;
-	this.mousePos     = null;
+	// this.mousePos     = null;
 	this.mouseButton  = -1;
 	this.listeners    = {};
 	this.installed    = {};

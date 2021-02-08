@@ -26,9 +26,6 @@ export const geomutils = {
         const triangle = new Triangle(pA, pB, pC);
         const lineAB = new Line(pA, pB);
         const lineAC = new Line(pA, pC);
-        // Compute the slope (theta) of line AB and line AC
-        const thetaAB = lineAB.angle();
-        const thetaAC = lineAC.angle();
         // Compute the difference; this is the angle between AB and AC
         var insideAngle = lineAB.angle(lineAC);
         // We want the inner angles of the triangle, not the outer angle;

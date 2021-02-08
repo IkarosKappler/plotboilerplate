@@ -38,13 +38,12 @@
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
-// Todo: rename this class to Drawutils
+// Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
  *
  * @requires CubicBzierCurvce
  * @requires Polygon
- * @requires SVGSerializable
  * @requires Vertex
  * @requires XYCoords
  */
@@ -296,7 +295,9 @@ export class drawutils {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
-        var curve, startPoint, endPoint, startControlPoint, endControlPoint;
+        var endPoint;
+        var startControlPoint;
+        var endControlPoint;
         this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
@@ -529,12 +530,8 @@ export class drawutils {
     raster(center, width, height, sizeX, sizeY, color) {
         this.ctx.save();
         this.ctx.beginPath();
-        var cx = 0, cy = 0;
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
-            cx++;
             for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
-                if (cx == 1)
-                    cy++;
                 // Draw a crosshair
                 this.ctx.moveTo(this.offset.x + (center.x + x) * this.scale.x - 4, this.offset.y + (center.y + y) * this.scale.y);
                 this.ctx.lineTo(this.offset.x + (center.x + x) * this.scale.x + 4, this.offset.y + (center.y + y) * this.scale.y);

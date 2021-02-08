@@ -34,7 +34,7 @@ import { Polygon } from "./Polygon";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
 import { geomutils } from "./geomutils";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -51,7 +51,6 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires SVGSerializale
  * @requires UID
  * @requires UIDGenerator
- * @requires XYCoords
  * @requires geomutils
  *
  */

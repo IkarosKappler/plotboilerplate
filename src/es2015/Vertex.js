@@ -413,8 +413,6 @@ export class Vertex {
         this.sub(center);
         angle += Math.atan2(this.y, this.x);
         let len = this.distance(Vertex.ZERO); // {x:0,y:0});
-        let lenX = this.x;
-        let lenY = this.y;
         this.x = len * Math.cos(angle);
         this.y = len * Math.sin(angle);
         this.add(center);

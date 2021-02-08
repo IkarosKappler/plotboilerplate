@@ -17,7 +17,7 @@ export class CircularIntervalSet {
      * @type {number}
      * @instance
      */
-    private start:number;
+    readonly start:number;
 
     /**
      * @member {number} end
@@ -25,7 +25,7 @@ export class CircularIntervalSet {
      * @type {number}
      * @instance
      */
-    private end:number;
+    readonly end:number;
 
     /**
      * @member {Array<Array<number>>} intervals

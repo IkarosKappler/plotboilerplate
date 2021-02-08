@@ -15,14 +15,14 @@ export declare class CircularIntervalSet {
      * @type {number}
      * @instance
      */
-    private start;
+    readonly start: number;
     /**
      * @member {number} end
      * @memberof CircularIntervalSet
      * @type {number}
      * @instance
      */
-    private end;
+    readonly end: number;
     /**
      * @member {Array<Array<number>>} intervals
      * @memberof CircularIntervalSet

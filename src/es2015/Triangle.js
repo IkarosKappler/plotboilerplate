@@ -46,7 +46,6 @@ import { geomutils } from "./geomutils";
  * @requires SVGSerializale
  * @requires UID
  * @requires UIDGenerator
- * @requires XYCoords
  * @requires geomutils
  *
  */

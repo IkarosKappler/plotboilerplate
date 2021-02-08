@@ -8,6 +8,7 @@
  * @modified 2020-01-09 Fixed a bug in the parse(string) function. Hex colors with only three elements were considered faulty.
  * @modified 2020-10-23 Ported to Typescript.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @modified 2021-02-08 Added basic tsdoc/jsdoc comments.
  * @version 0.0.9
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -19,43 +20,144 @@ exports.Color = void 0;
  *    Thanks to neolitec
  */
 class Color {
+    /**
+     * Construct a new color with `r=0 g=0 b=0`.
+     *
+     * Consider using the `makeHex`, `makeRGB` or `makeHSL` functions.
+     *
+     * @constructor
+     * @instance
+     * @memberof Color
+     */
     constructor() {
         this.r = this.g = this.b = 0;
         this.h = this.s = this.l = 0;
         this.a = 1;
     }
     ;
-    /** RGB */
+    // --- RGB ---------------------------------- 
+    /**
+     * Get this color as a CSS `rgb` string.
+     *
+     * Consult this for details: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+     *
+     * @method cssRGB
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS rgb string.
+     */
     cssRGB() {
         return "rgb(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + ")";
     }
     ;
+    /**
+     * Get this color as a CSS `rgba` string.
+     *
+     * Consult this for details: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+     *
+     * @method cssRGBA
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS rgba string.
+     */
     cssRGBA() {
         return "rgba(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + "," + this.a + ")";
     }
     ;
+    /**
+     * Get the red component of this RGB(A)color. This method just returns the `r` color attribute.
+     *
+     * @method red
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
     red() { return this.r; }
     ;
+    /**
+    * Get the green component of this RGB(A) color. This method just returns the `g` color attribute.
+    *
+    * @method green
+    * @instance
+    * @memberof Color
+    * @return {number} A value between 0.0 and 1.0.
+    */
     green() { return this.g; }
     ;
+    /**
+     * Get the blue component of this RGB(A) color. This method just returns the `b` color attribute.
+     *
+     * @method blue
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
     blue() { return this.b; }
     ;
-    /** HSL */
+    // --- HSL ---------------------------------- 
+    /**
+     * Get this color as a CSS `hsl` string.
+     *
+     * @method cssHSL
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS hsl string.
+     */
     cssHSL() {
         return "hsl(" + Math.round(360 * this.h) + "," + Math.round(100 * this.s) + "%," + Math.round(100 * this.l) + "%)";
     }
     ;
+    /**
+     * Get this color as a CSS `hsla` string.
+     *
+     * @method cssHSLA
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS hsla string.
+     */
     cssHSLA() {
         return "hsla(" + Math.round(360 * this.h) + "," + Math.round(100 * this.s) + "%," + Math.round(100 * this.l) + "%," + Math.round(this.a) + ")";
     }
     ;
+    /**
+     * Get the hue component of this HSL(A) color. This method just returns the `h` color attribute.
+     *
+     * @method hue
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
     hue() { return this.h; }
     ;
+    /**
+     * Get the saturation component of this HSL(A) color. This method just returns the `s` color attribute.
+     *
+     * @method saturation
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
     saturation() { return this.s; }
     ;
+    /**
+     * Get the lightness component of this HSL(A) color. This method just returns the `l` color attribute.
+     *
+     * @method lightness
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
     lightness() { return this.l; }
     ;
-    /** HEX */
+    // --- HEX ----------------------------------
+    /**
+     * Get this color as a CSS-HEX string (non-alpha): #rrggbb
+     *
+     * @method cssHEX
+     * @instance
+     * @memberof Color
+     * @return {string} This color as a CSS-HEX string.
+     */
     cssHEX() {
         return "#" +
             (255 * this.r < 16 ? "0" : "") + Math.round(255 * this.r).toString(16) +
@@ -63,10 +165,18 @@ class Color {
             (255 * this.b < 16 ? "0" : "") + Math.round(255 * this.b).toString(16);
     }
     ;
-    /** Transparency */
+    // --- Transparency ---------------------------------- 
+    /**
+     * Get the alpha channel (transparency) of this color.
+     *
+     * @method alpha
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
     alpha() { return this.a; }
     ;
-    /** Modifiers */
+    // --- Modifiers ---------------------------------- 
     saturate(v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
             this.s += v / 100;

@@ -28,7 +28,7 @@ import { Bounds } from "./Bounds";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { XYCoords, UID } from "./interfaces";
 
 
 /**
@@ -38,7 +38,6 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires Vertex
  * @requires Vector
  * @requires XYCoords
- * @requires SVGSerializable
  * @requires UID
  * @requires UIDGenerator
  */
@@ -285,12 +284,10 @@ export class CubicBezierCurve {
      * @return {void}
      **/
     updateArcLengths() : void {
-	let
-	pointA : Vertex = this.startPoint.clone(),
-	pointB : Vertex = new Vertex( 0, 0 ),
-	curveStep : number = 1.0/this.curveIntervals;
+	let pointA : Vertex = this.startPoint.clone();
+	let pointB : Vertex = new Vertex( 0, 0 );
+	let curveStep : number = 1.0/this.curveIntervals;
 	
-	let u : number = curveStep; 
 	// Clear segment cache
 	this.segmentCache = [];
 	// Push start point into buffer
@@ -332,7 +329,6 @@ export class CubicBezierCurve {
 	// We would like to have an error that's not larger than 1.0.
 	var desiredEpsilon : number = 1.0;
 	
-	var t : number = 0.0;
 	var result : { t:number; tPrev:number; tNext:number} = { t: 0, tPrev : 0.0, tNext : 1.0 };
 	var iteration : number = 0;
 	do {
@@ -539,7 +535,6 @@ export class CubicBezierCurve {
 	
 	// This is the shortened one
 	const t2 : number = t * t;
-	const t3 : number = t * t2;
 	// (1 - t)^2 = (1-t)*(1-t) = 1 - t - t + t^2 = 1 - 2*t + t^2
 	const nt2 : number = 1 - 2*t + t2;
 

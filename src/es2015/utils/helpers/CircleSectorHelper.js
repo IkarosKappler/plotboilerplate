@@ -6,7 +6,7 @@
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-class CircleSectorHelper {
+export class CircleSectorHelper {
     /**
      * The constructor.
      *
@@ -35,5 +35,4 @@ class CircleSectorHelper {
     }
 }
 ;
-export {};
 //# sourceMappingURL=CircleSectorHelper.js.map

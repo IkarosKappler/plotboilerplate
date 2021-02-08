@@ -96,7 +96,8 @@ export class MouseHandler {
     constructor(element, name) {
         this.mouseDownPos = undefined;
         this.mouseDragPos = undefined;
-        this.mousePos = undefined;
+        // TODO: cc
+        // private mousePos       : { x:number, y:number }|undefined = undefined;
         this.mouseButton = -1;
         this.listeners = {};
         this.installed = {};
@@ -108,7 +109,7 @@ export class MouseHandler {
         this.element = element;
         this.mouseDownPos = null;
         this.mouseDragPos = null;
-        this.mousePos = null;
+        // this.mousePos     = null;
         this.mouseButton = -1;
         this.listeners = {};
         this.installed = {};

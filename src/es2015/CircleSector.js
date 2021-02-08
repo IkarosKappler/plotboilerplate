@@ -88,9 +88,6 @@ CircleSector.circleSectorUtils = {
         // Some browsers have problems to render full circles (described by start==end).
         if (Math.PI * 2 - Math.abs(startAngle - endAngle) < 0.001) {
             const firstHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle, startAngle + (endAngle - startAngle) / 2, options);
-            const firstEndPoint = { x: firstHalf[firstHalf.length - 2],
-                y: firstHalf[firstHalf.length - 1]
-            };
             const secondHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle + (endAngle - startAngle) / 2, endAngle, options);
             return firstHalf.concat(secondHalf);
         }

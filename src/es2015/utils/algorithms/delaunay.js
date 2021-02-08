@@ -8,7 +8,8 @@
 import { Triangle } from "../../Triangle";
 import { Vertex } from "../../Vertex";
 import { Line as Edge } from "../../Line";
-const EPSILON = 1.0e-6;
+// TODO: cleanup? This seems not to be used.
+// const EPSILON : number = 1.0e-6;
 /**
  * @classdesc A Delaunay pointset triangulation implementation.  Inspired by
  *    http://www.travellermap.com/tmp/delaunay.htm

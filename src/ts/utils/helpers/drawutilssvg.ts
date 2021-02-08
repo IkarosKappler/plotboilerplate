@@ -12,13 +12,11 @@
  * @version  1.0.0
  **/
 
-
-import { Bounds } from "../../Bounds";
 import { CircleSector } from "../../CircleSector";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams, SVGSerializable, UID } from "../../interfaces";
+import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams, UID } from "../../interfaces";
 
 
 /**
@@ -27,7 +25,6 @@ import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams
  *
  * @requires CubicBzierCurvce
  * @requires Polygon
- * @requires SVGSerializable
  * @requires Vertex
  * @requires XYCoords
  */
@@ -254,7 +251,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
      * @return {SVGElement} The node itself (for chaining).
      */
-    private _bindFillDraw( node:SVGElement, className:string, color:string, lineWidth?:number ) : SVGElement {
+    private _bindFillDraw( node:SVGElement, className:string, color?:string|null, lineWidth?:number|null ) : SVGElement {
 	if( this.curClassName ) {
 	    node.setAttribute('class', `${this.curClassName} ${className}`);
 	} else {
@@ -493,8 +490,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezierPath( path:Array<Vertex>, color:string, lineWidth?:number ) : SVGElement {
-	
+    cubicBezierPath( path:Array<Vertex>, color:string, lineWidth?:number ) : SVGElement {	
 	const node: SVGElement = this.makeNode('path');
 	if( !path || path.length == 0 )
 	    return node;
@@ -505,17 +501,14 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	];
 	
 	// Draw curve path
-	var 
-	startPoint:Vertex,
-	endPoint:Vertex,
-	startControlPoint:Vertex,
-	endControlPoint:Vertex;
+	var endPoint:Vertex;
+	var startControlPoint:Vertex;
+	var endControlPoint:Vertex;
 	for( var i = 1; i < path.length; i+=3 ) {
 	    startControlPoint = path[i];
 	    endControlPoint = path[i+1];
 	    endPoint = path[i+2];
 	    d.push( 'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y) );
-	    
 	}	
 	node.setAttribute( 'd', d.join(' ') );
 	return this._bindFillDraw( node, 'cubicBezierPath', color, lineWidth || 1 );
@@ -569,10 +562,6 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */
     dot( p:Vertex, color:string ) {
 	const node : SVGElement = this.makeNode('line');	
-	const d : Array<string|number> = [
-	    'M', this._x(p.x), this._y(p.y),
-	    'L', this._x(p.x+1), this._y(p.y+1)
-	];
 	return this._bindFillDraw( node, 'dot', color, 1 );
     };
 
@@ -752,14 +741,10 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      */
     raster( center:Vertex, width:number, height:number, sizeX:number, sizeY:number, color:string ) {	
 	const node : SVGElement = this.makeNode('path');
-	const d : SVGPathParams = [
-	];
-	
-	var cx : number = 0, cy : number = 0;
+	const d : SVGPathParams = [];
+
 	for( var x = -Math.ceil((width*0.5)/sizeX)*sizeX; x < width/2; x+=sizeX ) {
-	    cx++;
 	    for( var y = -Math.ceil((height*0.5)/sizeY)*sizeY; y < height/2; y+=sizeY ) {
-		if( cx == 1 ) cy++;
 		// Draw a crosshair
 		d.push( 'M', this._x(center.x+x)-4, this._y(center.y+y) );
 		d.push( 'L', this._x(center.x+x)+4, this._y(center.y+y) );
@@ -1012,7 +997,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	this._bindFillDraw( node, this.curId, null, null );
 	node.setAttribute( 'fill', typeof color === "undefined" ? 'none' : color );
 	// Clear the current ID again
-	this.curId = null;
+	this.curId = undefined;
 
 	// return node;
     };
@@ -1023,7 +1008,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @private
      */
     private removeAllChildNodes() {
-	while( this.gNode.firstChild ) {
+	while( this.gNode.lastChild ) {
 	    this.gNode.removeChild(this.gNode.lastChild);
 	}
     };

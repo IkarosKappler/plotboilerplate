@@ -15,7 +15,6 @@ import { UIDGenerator } from "./UIDGenerator";
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
- * @requires SVGSerializable
  * @requires UID
  * @requires Vertex
  * @requires XYCoords

@@ -44,7 +44,6 @@ import { SVGSerializable, UID } from "./interfaces";
  * @requires SVGSerializale
  * @requires UID
  * @requires UIDGenerator
- * @requires XYCoords
  * @requires geomutils
  *
  */

@@ -420,10 +420,10 @@ export class BezierPathInteractionHelper {
     // |
     // | @param {BezierPath} path - The path to add vertex listeners to.
     // +-------------------------------
-    _addDefaultPathListeners(path) {
-        BezierPathInteractionHelper.addPathVertexDragListeners(path, this._updateMinDistance);
-    }
-    ;
+    // TODO: THIS CAN BE REMOVED?
+    // private _addDefaultPathListeners( path:BezierPath ) : void {
+    //	BezierPathInteractionHelper.addPathVertexDragListeners( path, this._updateMinDistance );
+    // }; 
     // +---------------------------------------------------------------------------------
     // | Removes vertex listeners from all path points.
     // |

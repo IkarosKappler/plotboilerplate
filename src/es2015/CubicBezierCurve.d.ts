@@ -33,7 +33,6 @@ import { XYCoords, UID } from "./interfaces";
  * @requires Vertex
  * @requires Vector
  * @requires XYCoords
- * @requires SVGSerializable
  * @requires UID
  * @requires UIDGenerator
  */

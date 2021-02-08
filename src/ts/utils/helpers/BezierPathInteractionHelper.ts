@@ -34,7 +34,7 @@ import { CubicBezierCurve } from "../../CubicBezierCurve";
 import { KeyHandler } from "../../KeyHandler";
 import { MouseHandler } from "../../MouseHandler";
 import { PlotBoilerplate } from "../../PlotBoilerplate";
-import { VertEvent, VertListener } from "../../VertexListeners";
+import { VertListener } from "../../VertexListeners";
 import { Vertex } from "../../Vertex";
 import { XMouseEvent } from "../../MouseHandler";
 import { XYCoords } from "../../interfaces";
@@ -529,9 +529,10 @@ export class BezierPathInteractionHelper {
     // |
     // | @param {BezierPath} path - The path to add vertex listeners to.
     // +-------------------------------
-    private _addDefaultPathListeners( path:BezierPath ) : void {
-	BezierPathInteractionHelper.addPathVertexDragListeners( path, this._updateMinDistance );
-    }; 
+    // TODO: THIS CAN BE REMOVED?
+    // private _addDefaultPathListeners( path:BezierPath ) : void {
+    //	BezierPathInteractionHelper.addPathVertexDragListeners( path, this._updateMinDistance );
+    // }; 
 
     // +---------------------------------------------------------------------------------
     // | Removes vertex listeners from all path points.

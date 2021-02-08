@@ -20,7 +20,6 @@ import { DrawConfig, DrawLib, XYCoords, XYDimension, UID } from "../../interface
  *
  * @requires CubicBzierCurvce
  * @requires Polygon
- * @requires SVGSerializable
  * @requires Vertex
  * @requires XYCoords
  */

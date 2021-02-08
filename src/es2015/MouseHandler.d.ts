@@ -67,7 +67,6 @@ export declare class MouseHandler {
     private element;
     private mouseDownPos;
     private mouseDragPos;
-    private mousePos;
     private mouseButton;
     private listeners;
     private installed;

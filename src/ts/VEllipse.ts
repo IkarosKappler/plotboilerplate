@@ -13,7 +13,7 @@
 
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
-import { XYCoords, SVGSerializable, UID } from "./interfaces";
+import { SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -23,7 +23,6 @@ import { XYCoords, SVGSerializable, UID } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  * @requires Vertex
- * @requires XYCoords
  */
 export class VEllipse implements SVGSerializable {
 

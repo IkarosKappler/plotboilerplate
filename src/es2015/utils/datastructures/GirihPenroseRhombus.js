@@ -110,8 +110,8 @@ export class GirihPenroseRhombus extends GirihTile {
             const index = indices[i];
             const left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
             const right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
-            const innerA = this.getVertexAt(index + 1).clone().scale(0.28, this.position); // multiplyScalar( 0.28 );
-            const innerB = this.getVertexAt(index + 1).clone().scale(0.55, this.position); // multiplyScalar( 0.55 );
+            // const innerA:Vertex = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position );
+            const innerB = this.getVertexAt(index + 1).clone().scale(0.55, this.position);
             outerTile.addVertex(left.clone());
             outerTile.addVertex(this.getVertexAt(index + 1).clone());
             outerTile.addVertex(right.clone());

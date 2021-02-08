@@ -354,9 +354,6 @@ export class Color {
 	if( str.startsWith('#') ) 
 	    return Color.makeHEX(str.substring(1,str.length));
 	if( str.startsWith('rgb') ) {
-	    var open = str.indexOf('(');
-	    var close = str.indexOf(')');
-
 	    var parts = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(0\.\d+))?\)$/.exec(str);
 	    // [ str, r, g, b, a|undefined ]
 	    if( typeof parts[4] == 'undefined' )
