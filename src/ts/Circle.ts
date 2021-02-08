@@ -220,7 +220,7 @@ export class Circle implements SVGSerializable {
     };
 
     static circleUtils = {
-	vertAt : function(angle,radius) {
+	vertAt : (angle:number,radius:number) => {
 	    /* return new Vertex( Math.sin(angle) * radius,
 			       Math.cos(angle) * radius ); */
 	    return new Vertex( Math.cos(angle) * radius,

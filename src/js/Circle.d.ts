@@ -131,6 +131,6 @@ export declare class Circle implements SVGSerializable {
         className?: string;
     }): string;
     static circleUtils: {
-        vertAt: (angle: any, radius: any) => Vertex;
+        vertAt: (angle: number, radius: number) => Vertex;
     };
 }

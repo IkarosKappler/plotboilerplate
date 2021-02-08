@@ -184,7 +184,7 @@ export class Circle {
     ;
 } // END class
 Circle.circleUtils = {
-    vertAt: function (angle, radius) {
+    vertAt: (angle, radius) => {
         /* return new Vertex( Math.sin(angle) * radius,
                    Math.cos(angle) * radius ); */
         return new Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);

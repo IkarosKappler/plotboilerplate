@@ -1,9 +1,10 @@
 "use strict";
 /**
- * @author  mbostock, extended and ported to TypeScript by Ikaros Kappler
- * @date    2020-05-19
- * @version 1.0.1
- * @file    contextPolygonIncircle
+ * @author   mbostock, extended and ported to TypeScript by Ikaros Kappler
+ * @date     2020-05-19
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.0.2
+ * @file     contextPolygonIncircle
  * @public
  */
 Object.defineProperty(exports, "__esModule", { value: true });

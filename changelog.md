@@ -2,7 +2,9 @@
 
 # Changelog
 * 2021-02-08
+  * Added a rollup- and a typescript config to create es2015 modules (in ./src/es2015).
   * Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
+  * Ensure es2015 module compatibility of the Color class.
 * 2021-02-03
   * Added the static `drawusilssvg.createSvg` function.
   * Fixed the currentId='background' bug on the drawusilssvg.clear() function.

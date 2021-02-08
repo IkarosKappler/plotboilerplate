@@ -13,9 +13,9 @@
 	"allowJs": false,
 
 	"forceConsistentCasingInFileNames": true,
-	"noImplicitReturns": false,
-	"noImplicitThis": false,
-	"noImplicitAny": false,
+	"noImplicitReturns": true,
+	"noImplicitThis": true,
+	"noImplicitAny": true,
 	"strictNullChecks": false,
 	"suppressImplicitAnyIndexErrors": true,
 	"noUnusedLocals": false,

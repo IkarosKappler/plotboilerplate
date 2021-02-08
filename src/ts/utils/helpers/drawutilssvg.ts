@@ -425,7 +425,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	const node : SVGElement = this.makeNode('image');
 
 	// We need to re-adjust the image if it was not yet fully loaded before.
-	const setImageSize = (image) => {
+	const setImageSize = (image:HTMLImageElement) => {
 	    if( image.naturalWidth ) {
 		const ratioX = size.x/image.naturalWidth;
 		const ratioY = size.y/image.naturalHeight;

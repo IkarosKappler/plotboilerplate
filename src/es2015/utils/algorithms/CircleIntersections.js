@@ -1,7 +1,8 @@
 /**
  * @author   Ikaros Kappler
  * @date     2020-10-05
- * @version  1.0.0
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.0.1
  * @file CircleIntersections
  * @public
  **/

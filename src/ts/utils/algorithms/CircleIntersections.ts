@@ -1,7 +1,8 @@
 /**
  * @author   Ikaros Kappler
  * @date     2020-10-05
- * @version  1.0.0
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.0.1
  * @file CircleIntersections
  * @public
  **/
@@ -147,7 +148,7 @@ export class CircleIntersections {
      * @param {Array<Circle>} circles - The circles to find intersections for.
      * @return {Array<number>}
      **/
-    static findInnerCircles( circles ) : Array<number> {
+    static findInnerCircles( circles : Array<Circle> ) : Array<number> {
 	const innerCircleIndices : Array<number> = [];
 	for( var i = 0; i < circles.length; i++ ) {
 	    for( var j = 0; j < circles.length; j++ ) {
@@ -269,7 +270,7 @@ export class CircleIntersections {
      * @param {CircularIntervalSet} intervalSet - The CircularIntervalSet to use (must have left and right border: 0 and 2*PI).
      * @return {void}
      **/
-    private static handleCircleInterval( circle, radicalLine, intervalSet ) : void {
+    private static handleCircleInterval( circle : Circle, radicalLine : Line, intervalSet : CircularIntervalSet ) : void {
 	const interval : Interval = CircleIntersections.radicalLineToInterval( circle, radicalLine );
 	intervalSet.intersect( interval[1], interval[0] );
     };

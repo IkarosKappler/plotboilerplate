@@ -67,15 +67,17 @@
  * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
  * @modified 2021-01-26 Fixed SVG resizing.
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
- * @version  1.12.2
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.12.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
  * @public
  **/
 
-import { AlloyFinger } from "alloyfinger";
-import { saveAs } from "file-saver";
+// import { AlloyFinger } from "alloyfinger";
+import { AlloyFinger, TouchMoveEvent, TouchPinchEvent, TouchPressMoveEvent } from "../../lib/alloy_finger";
+// import { saveAs } from "file-saver";
 import { GUI } from "dat.gui";
 
 import { drawutils } from "./draw";
@@ -1797,7 +1799,8 @@ export class PlotBoilerplate {
 		try {
 		    // Do not include AlloyFinger itself to the library
 		    // (17kb, but we want to keep this lib as tiny as possible).
-		    const AF : AlloyFinger = globalThis["AlloyFinger"] as AlloyFinger;
+		    // TODO: cc
+		    // const AF : AlloyFinger = (globalThis["AlloyFinger"] as AlloyFinger);
 		    var touchMovePos : Vertex|undefined|null= null;
 		    var touchDownPos : Vertex|undefined|null = null;
 		    var draggedElement : IDraggable|undefined|null = null;
@@ -1809,11 +1812,13 @@ export class PlotBoilerplate {
 			multiTouchStartScale = null;
 			_self.draggedElements = [];
 		    };
-		    var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
-			touchStart: function (e) {
-			    if( e.touches.length == 1 ) {
-				touchMovePos = new Vertex( relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ) );
-				touchDownPos = new Vertex( relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ) );
+		    // TODO: cc
+		    // var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
+		    var af = new AlloyFinger( this.eventCatcher ? this.eventCatcher : this.canvas, {
+			touchStart: ( evt : TouchEvent ) => {
+			    if( evt.touches.length == 1 ) {
+				touchMovePos = new Vertex( relPos( { x : evt.touches[0].clientX, y : evt.touches[0].clientY } ) );
+				touchDownPos = new Vertex( relPos( { x : evt.touches[0].clientX, y : evt.touches[0].clientY } ) );
 				draggedElement = _self.locatePointNear( _self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE/Math.min(_self.config.cssScaleX,_self.config.cssScaleY) );
 				if( draggedElement && draggedElement.typeName == 'vertex' ) {
 				    var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
@@ -1823,11 +1828,11 @@ export class PlotBoilerplate {
 				}
 			    }
 			},
-			touchMove: function (e) {
-			    if( e.touches.length == 1 && draggedElement ) {
-				e.preventDefault();
-				e.stopPropagation(); 
-				var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
+			touchMove: ( evt : TouchEvent ) => {
+			    if( evt.touches.length == 1 && draggedElement ) {
+				evt.preventDefault();
+				evt.stopPropagation(); 
+				var rel : XYCoords = relPos( { x : evt.touches[0].clientX, y : evt.touches[0].clientY } );
 				var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
 				var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
 				if( draggedElement.typeName == 'vertex' ) {
@@ -1840,22 +1845,19 @@ export class PlotBoilerplate {
 				    _self.redraw();
 				}
 				touchMovePos = new Vertex(rel);
-			    } else if( e.touches.length == 2 ) {
+			    } else if( evt.touches.length == 2 ) {
 				// If at least two fingers touch and move, then change the draw offset (panning).
-				e.preventDefault();
-				e.stopPropagation();
-				_self.setOffset( _self.draw.offset.clone().addXY( e.deltaX, e.deltaY ) ); // Apply zoom?
+				evt.preventDefault();
+				evt.stopPropagation();
+				_self.setOffset( _self.draw.offset.clone().addXY( ((evt as unknown) as TouchMoveEvent).deltaX, ((evt as unknown) as TouchMoveEvent).deltaY ) ); // Apply zoom?
 				_self.redraw();
 			    }
 			},
-			touchEnd:  function (e) {
+			touchEnd: ( evt : TouchEvent ) => {
 			    // Note: e.touches.length is 0 here
 			    if( draggedElement && draggedElement.typeName == 'vertex' ) {
 				var draggingVertex : Vertex = _self.vertices[draggedElement.vindex];
 				var fakeEvent : VertEvent = ({ isTouchEvent : true, params : { dragAmount : { x: 0, y : 0 }, wasDragged : false, mouseDownPos : touchDownPos.clone(), mouseDragPos : touchDownPos.clone(), vertex : draggingVertex}} as unknown) as VertEvent;
-				// var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
-				// var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
-				// var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
 				// Check if vertex was moved
 				if( touchMovePos && touchDownPos && touchDownPos.distance(touchMovePos) < 0.001 ) {
 				// if( e.touches.length == 1 && diff.x == 0 && diff.y == 0 ) {
@@ -1866,21 +1868,21 @@ export class PlotBoilerplate {
 			    }
 			    clearTouch();
 			},
-			touchCancel: function (e) {
+			touchCancel: ( evt : TouchEvent ) => {
 			    clearTouch();
 			},
-			multipointStart: function (e) {
+			multipointStart: ( evt : TouchEvent ) => {
 			    multiTouchStartScale = _self.draw.scale.clone();
 			},
-			multipointEnd: function (e) {
+			multipointEnd: ( evt : TouchEvent ) => {
 			    multiTouchStartScale = null;
 			},
-			pinch: function (e) {
+			pinch: ( evt : TouchPinchEvent ) => {
 			    // For pinching there must be at least two touch items
-			    const fingerA : Vertex = new Vertex( e.touches.item(0).clientX, e.touches.item(0).clientY );
-			    const fingerB : Vertex = new Vertex( e.touches.item(1).clientX, e.touches.item(1).clientY );
+			    const fingerA : Vertex = new Vertex( evt.touches.item(0).clientX, evt.touches.item(0).clientY );
+			    const fingerB : Vertex = new Vertex( evt.touches.item(1).clientX, evt.touches.item(1).clientY );
 			    const center : Vertex = new Line( fingerA, fingerB ).vertAt( 0.5 );
-			    _self.setZoom( multiTouchStartScale.x*e.zoom, multiTouchStartScale.y*e.zoom, center );
+			    _self.setZoom( multiTouchStartScale.x*evt.zoom, multiTouchStartScale.y*evt.zoom, center );
 			    _self.redraw();
 			}
 		    });
@@ -2063,7 +2065,7 @@ export class PlotBoilerplate {
 	     * @param {function} fallback - A default value if the key does not exist.
 	     * @return {function}
 	     **/
-	    func : ( obj:any, key:string, fallback:((...args)=>any) ) => {
+	    func : ( obj:any, key:string, fallback:((...args:any[])=>any) ) => {
 		if( !obj.hasOwnProperty(key) )
 		    return fallback;
 		if( typeof obj[key] !== 'function' )

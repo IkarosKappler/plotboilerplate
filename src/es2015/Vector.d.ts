@@ -111,6 +111,6 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
          * @param {number} scaleX  - The horizontal scaling during draw.
          * @param {number} scaleY  - the vertical scaling during draw.
          **/
-        buildArrowHead: (zA: Vertex, zB: Vertex, headlen: number, scaleX: number, scaleY: number) => any[];
+        buildArrowHead: (zA: Vertex, zB: Vertex, headlen: number, scaleX: number, scaleY: number) => Vertex[];
     };
 }

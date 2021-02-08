@@ -27,7 +27,10 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BezierPathInteractionHelper = void 0;
-const alloyfinger_1 = require("alloyfinger"); // node_modules
+// import { AlloyFinger } from "alloyfinger"; // node_modules
+// I would like to use AlloyFinger from the node_modules, but it seems
+// AlloyTeam has forgotten to publish their d.ts file.
+const alloy_finger_1 = require("../../../../lib/alloy_finger");
 const BezierPath_1 = require("../../BezierPath");
 const KeyHandler_1 = require("../../KeyHandler");
 const MouseHandler_1 = require("../../MouseHandler");
@@ -326,7 +329,7 @@ class BezierPathInteractionHelper {
     // +-------------------------------
     _installTouchListener() {
         var _self = this;
-        new alloyfinger_1.AlloyFinger(this.pb.canvas, {
+        new alloy_finger_1.AlloyFinger(this.pb.canvas, {
             // Todo: which event types does AlloyFinger use?
             touchStart: function (e) {
                 _self.mouseIsOver = true;

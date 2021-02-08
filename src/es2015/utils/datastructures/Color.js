@@ -6,6 +6,8 @@
  * @modified 2019-11-18 Added a generic parse(string) function that detects the format.
  * @modified 2020-01-09 Fixed a bug in the parse(string) function. Hex colors with only three elements were considered faulty.
  * @modified 2020-10-23 Ported to Typescript.
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version 0.0.9
  **/
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.
@@ -73,7 +75,7 @@ export class Color {
             this.s = 1;
         else if (this.s < 0)
             this.s = 0;
-        Color.Convertor.HSLToRGB.apply(this);
+        Color.Converter.HSLToRGB.apply(this);
     }
     ;
     desaturate(v) {
@@ -91,7 +93,7 @@ export class Color {
             this.l = 1;
         else if (this.l < 0)
             this.l = 0;
-        Color.Convertor.HSLToRGB.apply(this);
+        Color.Converter.HSLToRGB.apply(this);
     }
     ;
     darken(v) {
@@ -109,7 +111,7 @@ export class Color {
             this.a = 1;
         else if (this.a < 0)
             this.a = 0;
-        Color.Convertor.HSLToRGB.apply(this);
+        Color.Converter.HSLToRGB.apply(this);
     }
     ;
     fadeout(v) {
@@ -127,15 +129,9 @@ export class Color {
             this.h = 1;
         else if (this.h < 0)
             this.h = 0;
-        Color.Convertor.HSLToRGB.apply(this);
+        Color.Converter.HSLToRGB.apply(this);
     }
     ;
-    /** Debug */
-    /*
-       toString() : void {
-       return "<span style=\"color: "+this.cssRGB()+"\">"+this.cssRGB()+"</span> / <span style=\"color: "+this.cssHSL()+"\">"+this.cssHSL()+"</span> / <span style=\"color: "+this.cssHEX()+"\">"+this.cssHEX()+"</span> / alpha: "+this.a+"";
-       };
-    */
     static makeRGB(...args) {
         const c = new Color();
         let sanitized;
@@ -147,7 +143,7 @@ export class Color {
         c.b = sanitized[2];
         if (arguments.length == 4)
             c.a = arguments[3];
-        Color.Convertor.RGBToHSL.apply(c);
+        Color.Converter.RGBToHSL.apply(c);
         return c;
     }
     ;
@@ -162,7 +158,7 @@ export class Color {
         c.l = sanitized[2];
         if (arguments.length == 4)
             c.a = arguments[3];
-        Color.Convertor.HSLToRGB.apply(c);
+        Color.Converter.HSLToRGB.apply(c);
         return c;
     }
     ;
@@ -184,10 +180,19 @@ export class Color {
         c.r = sanitized[0];
         c.g = sanitized[1];
         c.b = sanitized[2];
-        Color.Convertor.RGBToHSL.apply(c);
+        Color.Converter.RGBToHSL.apply(c);
         return c;
     }
     ;
+    /**
+     * Parse the given color string. Currently only these formate are recognized: hex, rgb, rgba.
+     *
+     * @method parse
+     * @static
+     * @memberof Color
+     * @param {string} str - The string representation to parse.
+     * @return {Color} The color instance that's represented by the given string.
+     */
     static parse(str) {
         if (typeof str == 'undefined')
             return null;
@@ -209,21 +214,28 @@ export class Color {
             throw "Unrecognized color format: " + str;
     }
     ;
-    // Check if all arguments are numbers in the range [0..1] (inclusive)
-    /* private static testFrac( args: IArguments ) : boolean {
-    for( var i in arguments ) {
-        const n:number = Number(arguments[i]);
-        if( n === NaN || n < 0 || n > 1 )
-        return false;
-    }
-    return true;
-    }; */
-    // Added by Ika 2017-0-19
+    /**
+     * Create a clone of this color (RGB).
+     *
+     * @method clone
+     * @instance
+     * @memberof Color
+     * @return {Color} A clone of this color (in RGB mode).
+     */
     clone() {
         return Color.makeRGB(this.r, this.g, this.b, this.a);
     }
     ;
-    // Added by Ika 2018-12-30
+    /**
+     * Interpolate this color on the RGB scale.
+     *
+     * @method interpolate
+     * @instance
+     * @memberof Color
+     * @param {Color} c - The color to interpolate to.
+     * @param {number} t - An interpolation value between 0.0 and 1.0.
+     * @return {Color} A clone of this color (in RGB mode).
+     */
     interpolate(c, t) {
         this.r += (c.r - c.r) * t;
         this.g += (c.g - c.g) * t;
@@ -236,8 +248,9 @@ export class Color {
 Color.Sanitizer = {
     RGB: function (...args) {
         var o = [];
-        if (arguments.length == 0)
-            return;
+        if (arguments.length == 0) {
+            return [];
+        }
         // const allAreFrac = Color.testFrac( arguments );
         for (var i = 0; i < arguments.length; i++) {
             var c = arguments[i];
@@ -302,78 +315,84 @@ Color.Validator = {
     /**
      * Check a hexa color (without #)
      */
-    checkHEX: function (value) {
+    checkHEX: (value) => {
         if (value.length != 6 && value.length != 3)
             throw new Error("Hexa color: bad length (" + value.length + ")," + value);
         value = value.toLowerCase();
-        for (var i in value) {
+        //for( var i in value ) {
+        for (var i = 0; i < value.length; i++) {
             var c = value.charCodeAt(i);
             if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102)))
-                throw new Error("Hexa color: out of range for " + value + " at position " + i);
+                throw new Error(`Hexa color: out of range for "${value}" at position ${i}.`);
         }
     }
 };
-Color.Convertor = {
+Color.Converter = {
     /**
-     * Calculates HSL Color
-     * RGB must be normalized
-     * Must be executed in a Color object context
+     * Calculates HSL Color.
+     * RGB must be normalized.
      * http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
      */
-    RGBToHSL: function () {
-        //     
-        var r = this.r, g = this.g, b = this.b, max = Math.max(r, g, b), min = Math.min(r, g, b);
-        this.l = (max + min) / 2;
+    RGBToHSL: (color) => {
+        var r = color.r;
+        var g = color.g;
+        var b = color.b;
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        color.l = (max + min) / 2;
         if (max == min) {
-            this.h = this.s = 0; // achromatic
+            color.h = color.s = 0; // achromatic
         }
         else {
             var d = max - min;
-            this.s = this.l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            color.s = color.l > 0.5 ? d / (2 - max - min) : d / (max + min);
             switch (max) {
                 case r:
-                    this.h = (g - b) / d + (g < b ? 6 : 0);
+                    color.h = (g - b) / d + (g < b ? 6 : 0);
                     break;
                 case g:
-                    this.h = (b - r) / d + 2;
+                    color.h = (b - r) / d + 2;
                     break;
                 case b:
-                    this.h = (r - g) / d + 4;
+                    color.h = (r - g) / d + 4;
                     break;
             }
-            this.h /= 6;
+            color.h /= 6;
         }
     },
     /**
-     * Calculates RGB color (nomalized)
-     * HSL must be normalized
-     * Must be executed in a Color object context
+     * Calculates RGB color (nomalized).
+     * HSL must be normalized.
+     *
      * http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
      */
-    HSLToRGB: function () {
-        var h = this.h, s = this.s, l = this.l, hue2rgb = function (p, q, t) {
-            if (t < 0)
-                t += 1;
-            if (t > 1)
-                t -= 1;
-            if (t < 1 / 6)
-                return p + (q - p) * 6 * t;
-            if (t < 1 / 2)
-                return q;
-            if (t < 2 / 3)
-                return p + (q - p) * (2 / 3 - t) * 6;
-            return p;
-        };
+    HSLToRGB: (color) => {
+        var h = color.h;
+        var s = color.s;
+        var l = color.l;
         if (s == 0) {
-            this.r = this.g = this.b = l; // achromatic
+            color.r = color.g = color.b = l; // achromatic
         }
         else {
             var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
             var p = 2 * l - q;
-            this.r = hue2rgb(p, q, h + 1 / 3);
-            this.g = hue2rgb(p, q, h);
-            this.b = hue2rgb(p, q, h - 1 / 3);
+            color.r = Color.Converter.hue2rgb(p, q, h + 1 / 3);
+            color.g = Color.Converter.hue2rgb(p, q, h);
+            color.b = Color.Converter.hue2rgb(p, q, h - 1 / 3);
         }
+    },
+    hue2rgb: (p, q, t) => {
+        if (t < 0)
+            t += 1;
+        if (t > 1)
+            t -= 1;
+        if (t < 1 / 6)
+            return p + (q - p) * 6 * t;
+        if (t < 1 / 2)
+            return q;
+        if (t < 2 / 3)
+            return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
     }
 };
 ; // END class

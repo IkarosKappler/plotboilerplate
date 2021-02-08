@@ -6184,6 +6184,19 @@ Grid.utils = {
 };
 
 /**
+ * @author Ikaros Kappler
+ * @modified 2021-01-10 Added the `CanvasWrapper` interface.
+ * @modified 2021-01-20 Added the `UID` type.
+ * @modified 2021-01-25 Added the `DrawLib.setCurrentId` and `DrawLib.setCurrentClassName` functions.
+ * @modified 2021-01-25 Fixed the `PBParams` interface (inluding DrawConfig).
+ * @modified 2021-02-08 Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
+ **/
+
+var interf = /*#__PURE__*/Object.freeze({
+    __proto__: null
+});
+
+/**
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
  * @modified 2020-03-28 Ported this class from vanilla-JS to Typescript.
@@ -6632,10 +6645,6 @@ KeyHandler.KEY_CODES = {
  * @file MouseHandler
  * @public
  **/
-class XMouseEvent extends MouseEvent {
-}
-class XWheelEvent extends WheelEvent {
-}
 /**
  * @classdesc A simple mouse handler for demos.
  * Use to avoid load massive libraries like jQuery.
@@ -10028,5 +10037,35 @@ class SVGBuilder {
     ;
 }
 
-export { BezierPath, Bounds, Circle, CircleSector, CubicBezierCurve, Grid, KeyHandler, Line, MouseHandler, PBImage, PlotBoilerplate, Polygon, SVGBuilder, Triangle, UIDGenerator, VEllipse, Vector, VertTuple, Vertex, VertexAttr, VertexListeners, XMouseEvent, XWheelEvent, drawutils, drawutilsgl, drawutilssvg, geomutils };
+// ? https://www.pluralsight.com/guides/react-typescript-module-create
+var module = {
+    BezierPath,
+    Bounds,
+    Circle,
+    CircleSector,
+    CubicBezierCurve,
+    drawutils,
+    drawutilsgl,
+    geomutils,
+    Grid,
+    ...interf,
+    KeyHandler,
+    Line,
+    MouseHandler,
+    PBImage,
+    PlotBoilerplate,
+    Polygon,
+    SVGBuilder,
+    Triangle,
+    UIDGenerator,
+    Vector,
+    VEllipse,
+    Vertex,
+    VertexAttr,
+    VertexListeners,
+    VertTuple,
+    drawutilssvg
+};
+
+export default module;
 //# sourceMappingURL=plotboilerplate.module.js.map

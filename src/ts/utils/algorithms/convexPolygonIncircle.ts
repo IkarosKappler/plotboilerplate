@@ -1,8 +1,9 @@
 /** 
- * @author  mbostock, extended and ported to TypeScript by Ikaros Kappler
- * @date    2020-05-19
- * @version 1.0.1
- * @file    contextPolygonIncircle
+ * @author   mbostock, extended and ported to TypeScript by Ikaros Kappler
+ * @date     2020-05-19
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.0.2
+ * @file     contextPolygonIncircle
  * @public
  */
 
@@ -113,7 +114,10 @@ export const convexPolygonIncircle = ( convexHull:Polygon ) : PolygonIncircle =>
  * @param {Vertex} vertD - The fourth point of the three connected lines.
  * @return {Triangle} The triangle of the circular tangential points with the given lines (3 or 4 of them).
  */
-const getTangentTriangle4 = ( vertA, vertB, vertC, vertD ) : Triangle => {
+const getTangentTriangle4 = ( vertA : Vertex,
+			      vertB : Vertex,
+			      vertC : Vertex,
+			      vertD : Vertex ) : Triangle => {
     const lineA : Line = new Line(vertA,vertB);
     const lineB : Line = new Line(vertB,vertC);
     const lineC : Line = new Line(vertC,vertD);

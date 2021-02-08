@@ -1,7 +1,8 @@
 /**
  * @author   Ikaros Kappler
  * @date     2020-10-05
- * @version  1.0.0
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.0.1
  * @file CircleIntersections
  * @public
  **/
@@ -78,7 +79,7 @@ export declare class CircleIntersections {
      * @param {Array<Circle>} circles - The circles to find intersections for.
      * @return {Array<number>}
      **/
-    static findInnerCircles(circles: any): Array<number>;
+    static findInnerCircles(circles: Array<Circle>): Array<number>;
     /**
      * Calculate all outer circle intervals (sections that belong to the outermost line), dermined by the given
      * circles and their radical lines.

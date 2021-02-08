@@ -175,7 +175,7 @@ Vector.utils = {
      * @param {number} scaleX  - The horizontal scaling during draw.
      * @param {number} scaleY  - the vertical scaling during draw.
      **/
-    buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
+    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
         var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         var vertices = [];
         vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));

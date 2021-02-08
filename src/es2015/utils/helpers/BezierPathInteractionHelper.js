@@ -24,7 +24,10 @@
  * @file BezierPathInteractionHelper
  * @public
  **/
-import { AlloyFinger } from "alloyfinger"; // node_modules
+// import { AlloyFinger } from "alloyfinger"; // node_modules
+// I would like to use AlloyFinger from the node_modules, but it seems
+// AlloyTeam has forgotten to publish their d.ts file.
+import { AlloyFinger } from "../../../../lib/alloy_finger";
 import { BezierPath } from "../../BezierPath";
 import { KeyHandler } from "../../KeyHandler";
 import { MouseHandler } from "../../MouseHandler";

@@ -68,7 +68,8 @@
  * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
  * @modified 2021-01-26 Fixed SVG resizing.
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
- * @version  1.12.2
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.12.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -77,6 +78,8 @@
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlotBoilerplate = void 0;
+// import { AlloyFinger } from "alloyfinger";
+const alloy_finger_1 = require("../../lib/alloy_finger");
 const draw_1 = require("./draw");
 const drawgl_1 = require("./drawgl");
 const drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
@@ -1585,7 +1588,7 @@ class PlotBoilerplate {
                 try {
                     // Do not include AlloyFinger itself to the library
                     // (17kb, but we want to keep this lib as tiny as possible).
-                    const AF = globalThis["AlloyFinger"];
+                    // const AF : AlloyFinger = (globalThis["AlloyFinger"] as AlloyFinger);
                     var touchMovePos = null;
                     var touchDownPos = null;
                     var draggedElement = null;
@@ -1597,11 +1600,12 @@ class PlotBoilerplate {
                         multiTouchStartScale = null;
                         _self.draggedElements = [];
                     };
-                    var af = new AF(this.eventCatcher ? this.eventCatcher : this.canvas, {
-                        touchStart: function (e) {
-                            if (e.touches.length == 1) {
-                                touchMovePos = new Vertex_1.Vertex(relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
-                                touchDownPos = new Vertex_1.Vertex(relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
+                    // var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
+                    var af = new alloy_finger_1.AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
+                        touchStart: (evt) => {
+                            if (evt.touches.length == 1) {
+                                touchMovePos = new Vertex_1.Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
+                                touchDownPos = new Vertex_1.Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
                                 if (draggedElement && draggedElement.typeName == 'vertex') {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
@@ -1611,11 +1615,11 @@ class PlotBoilerplate {
                                 }
                             }
                         },
-                        touchMove: function (e) {
-                            if (e.touches.length == 1 && draggedElement) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                var rel = relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }); //  points[0] );
+                        touchMove: (evt) => {
+                            if (evt.touches.length == 1 && draggedElement) {
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                var rel = relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY });
                                 var trans = _self.transformMousePosition(rel.x, rel.y);
                                 var diff = new Vertex_1.Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
                                 if (draggedElement.typeName == 'vertex') {
@@ -1629,22 +1633,19 @@ class PlotBoilerplate {
                                 }
                                 touchMovePos = new Vertex_1.Vertex(rel);
                             }
-                            else if (e.touches.length == 2) {
+                            else if (evt.touches.length == 2) {
                                 // If at least two fingers touch and move, then change the draw offset (panning).
-                                e.preventDefault();
-                                e.stopPropagation();
-                                _self.setOffset(_self.draw.offset.clone().addXY(e.deltaX, e.deltaY)); // Apply zoom?
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                _self.setOffset(_self.draw.offset.clone().addXY(evt.deltaX, evt.deltaY)); // Apply zoom?
                                 _self.redraw();
                             }
                         },
-                        touchEnd: function (e) {
+                        touchEnd: (evt) => {
                             // Note: e.touches.length is 0 here
                             if (draggedElement && draggedElement.typeName == 'vertex') {
                                 var draggingVertex = _self.vertices[draggedElement.vindex];
                                 var fakeEvent = { isTouchEvent: true, params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
-                                // var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
-                                // var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
-                                // var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
                                 // Check if vertex was moved
                                 if (touchMovePos && touchDownPos && touchDownPos.distance(touchMovePos) < 0.001) {
                                     // if( e.touches.length == 1 && diff.x == 0 && diff.y == 0 ) {
@@ -1656,21 +1657,21 @@ class PlotBoilerplate {
                             }
                             clearTouch();
                         },
-                        touchCancel: function (e) {
+                        touchCancel: (evt) => {
                             clearTouch();
                         },
-                        multipointStart: function (e) {
+                        multipointStart: (evt) => {
                             multiTouchStartScale = _self.draw.scale.clone();
                         },
-                        multipointEnd: function (e) {
+                        multipointEnd: (evt) => {
                             multiTouchStartScale = null;
                         },
-                        pinch: function (e) {
+                        pinch: (evt) => {
                             // For pinching there must be at least two touch items
-                            const fingerA = new Vertex_1.Vertex(e.touches.item(0).clientX, e.touches.item(0).clientY);
-                            const fingerB = new Vertex_1.Vertex(e.touches.item(1).clientX, e.touches.item(1).clientY);
+                            const fingerA = new Vertex_1.Vertex(evt.touches.item(0).clientX, evt.touches.item(0).clientY);
+                            const fingerB = new Vertex_1.Vertex(evt.touches.item(1).clientX, evt.touches.item(1).clientY);
                             const center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
-                            _self.setZoom(multiTouchStartScale.x * e.zoom, multiTouchStartScale.y * e.zoom, center);
+                            _self.setZoom(multiTouchStartScale.x * evt.zoom, multiTouchStartScale.y * evt.zoom, center);
                             _self.redraw();
                         }
                     });

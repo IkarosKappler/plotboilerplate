@@ -186,7 +186,7 @@ export class Vector extends VertTuple<Vector> implements SVGSerializable {
 	 * @param {number} scaleX  - The horizontal scaling during draw.
 	 * @param {number} scaleY  - the vertical scaling during draw.
 	 **/
-	buildArrowHead : function( zA:Vertex, zB:Vertex, headlen:number, scaleX:number, scaleY:number ) {
+	buildArrowHead : ( zA:Vertex, zB:Vertex, headlen:number, scaleX:number, scaleY:number ) => {
 	    var angle = Math.atan2( (zB.y-zA.y)*scaleY, (zB.x-zA.x)*scaleX );   
 	    var vertices = [];
 	    vertices.push( new Vertex(zB.x*scaleX-(headlen)*Math.cos(angle), zB.y*scaleY-(headlen)*Math.sin(angle)) );    

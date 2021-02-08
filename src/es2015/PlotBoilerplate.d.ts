@@ -67,7 +67,8 @@
  * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
  * @modified 2021-01-26 Fixed SVG resizing.
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
- * @version  1.12.2
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.12.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
