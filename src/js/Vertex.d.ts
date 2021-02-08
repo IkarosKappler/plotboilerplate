@@ -326,6 +326,7 @@ export declare class Vertex implements XYCoords, SVGSerializable {
     /**
      * Convert this vertex to SVG code.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} A string representing the SVG code for this vertex.

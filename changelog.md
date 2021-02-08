@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2021-02-08
+  * Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
 * 2021-02-03
   * Added the static `drawusilssvg.createSvg` function.
   * Fixed the currentId='background' bug on the drawusilssvg.clear() function.

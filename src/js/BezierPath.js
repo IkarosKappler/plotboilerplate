@@ -970,6 +970,7 @@ var BezierPath = /** @class */ (function () {
     /**
      * Create a <pre>&lt;path&gt;</pre> SVG representation of this bézier curve.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} [options={}] - Like options.className
      * @param {string=} [options.className] - The classname to use for the SVG item.

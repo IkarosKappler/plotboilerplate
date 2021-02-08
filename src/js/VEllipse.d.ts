@@ -58,6 +58,7 @@ export declare class VEllipse implements SVGSerializable {
     /**
      * Create an SVG representation of this ellipse.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @param {object} options { className?:string }
      * @return string The SVG string
      */

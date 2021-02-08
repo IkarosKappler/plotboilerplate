@@ -105,7 +105,7 @@ export interface Config {
 /**
  * For initialization the constructor needs a mix of config and draw-settings.
  */
-export interface PBParams extends Config, DrawConfig {
+export interface PBParams extends Config {
 }
 export interface DrawSettings {
     color: string;

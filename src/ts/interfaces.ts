@@ -4,6 +4,7 @@
  * @modified 2021-01-20 Added the `UID` type.
  * @modified 2021-01-25 Added the `DrawLib.setCurrentId` and `DrawLib.setCurrentClassName` functions.
  * @modified 2021-01-25 Fixed the `PBParams` interface (inluding DrawConfig).
+ * @modified 2021-02-08 Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
  **/
 
 import { Vertex } from "./Vertex";
@@ -138,7 +139,7 @@ export interface Config {
 /**
  * For initialization the constructor needs a mix of config and draw-settings.
  */
-export interface PBParams extends Config, DrawConfig { 
+export interface PBParams extends Config { // , DrawConfig { 
     // No additional attributes, just merge two interfaces.
 }
 

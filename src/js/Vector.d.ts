@@ -74,6 +74,7 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
     /**
      * Create an SVG representation of this line.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @override
      * @param {object=} options - A set of options, like 'className'.

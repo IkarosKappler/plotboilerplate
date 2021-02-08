@@ -985,6 +985,7 @@ var BezierPath = /** @class */ (function () {
     /**
      * Create a <pre>&lt;path&gt;</pre> SVG representation of this bézier curve.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} [options={}] - Like options.className
      * @param {string=} [options.className] - The classname to use for the SVG item.
@@ -1482,6 +1483,7 @@ var Circle = /** @class */ (function () {
     /**
       * Create an SVG representation of this circle.
       *
+      * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
       * @method toSVGString
       * @param {object=} options - An optional set of options, like 'className'.
       * @return {string} A string representing the SVG code for this vertex.
@@ -3022,6 +3024,7 @@ var Line = /** @class */ (function (_super) {
     /**
      * Create an SVG representation of this line.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {options} p - A set of options, like the 'classname' to use
      *                      for the line object.
@@ -3547,10 +3550,10 @@ var PBImage = /** @class */ (function () {
         this.lowerRight = lowerRight;
     }
     ;
-    // Implement SVGSerializable
     /**
      * Convert this vertex to SVG code.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} A string representing the SVG code for this vertex.
@@ -5925,6 +5928,7 @@ var Polygon = /** @class */ (function () {
     /**
      * Create an SVG representation of this polygon.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} The SVG string.
@@ -6389,6 +6393,7 @@ var Triangle = /** @class */ (function () {
     /**
      * Create an SVG representation of this triangle.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} The SVG string.
@@ -6555,6 +6560,7 @@ var VEllipse = /** @class */ (function () {
     /**
      * Create an SVG representation of this ellipse.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @param {object} options { className?:string }
      * @return string The SVG string
      */
@@ -6718,6 +6724,7 @@ var Vector = /** @class */ (function (_super) {
     /**
      * Create an SVG representation of this line.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @override
      * @param {object=} options - A set of options, like 'className'.
@@ -7621,6 +7628,7 @@ var Vertex = /** @class */ (function () {
     /**
      * Convert this vertex to SVG code.
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGString
      * @param {object=} options - An optional set of options, like 'className'.
      * @return {string} A string representing the SVG code for this vertex.
