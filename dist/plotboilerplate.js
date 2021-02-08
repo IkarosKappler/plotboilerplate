@@ -2,10 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../src/js/BezierPath.js":
-/*!*******************************!*\
-  !*** ../src/js/BezierPath.js ***!
-  \*******************************/
+/***/ "./src/js/BezierPath.js":
+/*!******************************!*\
+  !*** ./src/js/BezierPath.js ***!
+  \******************************/
 /*! flagged exports */
 /*! export BezierPath [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -42,10 +42,10 @@
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BezierPath = void 0;
-const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-const CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+const CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "./src/js/CubicBezierCurve.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 /**
  * @classdesc A BezierPath class.
  *
@@ -1202,10 +1202,10 @@ BezierPath.END_POINT = 3;
 
 /***/ }),
 
-/***/ "../src/js/Bounds.js":
-/*!***************************!*\
-  !*** ../src/js/Bounds.js ***!
-  \***************************/
+/***/ "./src/js/Bounds.js":
+/*!**************************!*\
+  !*** ./src/js/Bounds.js ***!
+  \**************************/
 /*! flagged exports */
 /*! export Bounds [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -1224,8 +1224,8 @@ BezierPath.END_POINT = 3;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
-const Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Polygon_1 = __webpack_require__(/*! ./Polygon */ "./src/js/Polygon.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
  *
@@ -1301,10 +1301,10 @@ exports.Bounds = Bounds;
 
 /***/ }),
 
-/***/ "../src/js/Circle.js":
-/*!***************************!*\
-  !*** ../src/js/Circle.js ***!
-  \***************************/
+/***/ "./src/js/Circle.js":
+/*!**************************!*\
+  !*** ./src/js/Circle.js ***!
+  \**************************/
 /*! flagged exports */
 /*! export Circle [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -1326,10 +1326,10 @@ exports.Bounds = Bounds;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Circle = void 0;
-const Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-const Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
+const Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -1512,10 +1512,10 @@ Circle.circleUtils = {
 
 /***/ }),
 
-/***/ "../src/js/CircleSector.js":
-/*!*********************************!*\
-  !*** ../src/js/CircleSector.js ***!
-  \*********************************/
+/***/ "./src/js/CircleSector.js":
+/*!********************************!*\
+  !*** ./src/js/CircleSector.js ***!
+  \********************************/
 /*! flagged exports */
 /*! export CircleSector [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -1532,7 +1532,7 @@ Circle.circleUtils = {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CircleSector = void 0;
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
@@ -1638,10 +1638,10 @@ CircleSector.circleSectorUtils = {
 
 /***/ }),
 
-/***/ "../src/js/CubicBezierCurve.js":
-/*!*************************************!*\
-  !*** ../src/js/CubicBezierCurve.js ***!
-  \*************************************/
+/***/ "./src/js/CubicBezierCurve.js":
+/*!************************************!*\
+  !*** ./src/js/CubicBezierCurve.js ***!
+  \************************************/
 /*! flagged exports */
 /*! export CubicBezierCurve [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -1677,10 +1677,10 @@ CircleSector.circleSectorUtils = {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CubicBezierCurve = void 0;
-const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
-const Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+const Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
 /**
  * @classdesc A refactored cubic bezier curve class.
  *
@@ -2363,10 +2363,10 @@ CubicBezierCurve.END_POINT = 3;
 
 /***/ }),
 
-/***/ "../src/js/Grid.js":
-/*!*************************!*\
-  !*** ../src/js/Grid.js ***!
-  \*************************/
+/***/ "./src/js/Grid.js":
+/*!************************!*\
+  !*** ./src/js/Grid.js ***!
+  \************************/
 /*! flagged exports */
 /*! export Grid [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -2467,10 +2467,10 @@ Grid.utils = {
 
 /***/ }),
 
-/***/ "../src/js/KeyHandler.js":
-/*!*******************************!*\
-  !*** ../src/js/KeyHandler.js ***!
-  \*******************************/
+/***/ "./src/js/KeyHandler.js":
+/*!******************************!*\
+  !*** ./src/js/KeyHandler.js ***!
+  \******************************/
 /*! flagged exports */
 /*! export KeyHandler [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -2910,10 +2910,10 @@ KeyHandler.KEY_CODES = {
 
 /***/ }),
 
-/***/ "../src/js/Line.js":
-/*!*************************!*\
-  !*** ../src/js/Line.js ***!
-  \*************************/
+/***/ "./src/js/Line.js":
+/*!************************!*\
+  !*** ./src/js/Line.js ***!
+  \************************/
 /*! flagged exports */
 /*! export Line [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -2943,8 +2943,8 @@ KeyHandler.KEY_CODES = {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Line = void 0;
-const VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "./src/js/VertTuple.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 /**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
@@ -3030,10 +3030,10 @@ exports.Line = Line;
 
 /***/ }),
 
-/***/ "../src/js/MouseHandler.js":
-/*!*********************************!*\
-  !*** ../src/js/MouseHandler.js ***!
-  \*********************************/
+/***/ "./src/js/MouseHandler.js":
+/*!********************************!*\
+  !*** ./src/js/MouseHandler.js ***!
+  \********************************/
 /*! flagged exports */
 /*! export MouseHandler [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export XMouseEvent [provided] [no usage info] [missing usage info prevents renaming] */
@@ -3450,10 +3450,10 @@ exports.MouseHandler = MouseHandler;
 
 /***/ }),
 
-/***/ "../src/js/PBImage.js":
-/*!****************************!*\
-  !*** ../src/js/PBImage.js ***!
-  \****************************/
+/***/ "./src/js/PBImage.js":
+/*!***************************!*\
+  !*** ./src/js/PBImage.js ***!
+  \***************************/
 /*! flagged exports */
 /*! export PBImage [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -3477,7 +3477,7 @@ exports.MouseHandler = MouseHandler;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PBImage = void 0;
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
 /**
  * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
  *
@@ -3528,10 +3528,10 @@ exports.PBImage = PBImage;
 
 /***/ }),
 
-/***/ "../src/js/PlotBoilerplate.js":
-/*!************************************!*\
-  !*** ../src/js/PlotBoilerplate.js ***!
-  \************************************/
+/***/ "./src/js/PlotBoilerplate.js":
+/*!***********************************!*\
+  !*** ./src/js/PlotBoilerplate.js ***!
+  \***********************************/
 /*! flagged exports */
 /*! export PlotBoilerplate [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -3618,24 +3618,24 @@ exports.PBImage = PBImage;
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.PlotBoilerplate = void 0;
-const draw_1 = __webpack_require__(/*! ./draw */ "../src/js/draw.js");
-const drawgl_1 = __webpack_require__(/*! ./drawgl */ "../src/js/drawgl.js");
-const drawutilssvg_1 = __webpack_require__(/*! ./utils/helpers/drawutilssvg */ "../src/js/utils/helpers/drawutilssvg.js");
-const BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
-const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-const Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
-const CircleSector_1 = __webpack_require__(/*! ./CircleSector */ "../src/js/CircleSector.js");
-const Grid_1 = __webpack_require__(/*! ./Grid */ "../src/js/Grid.js");
-const KeyHandler_1 = __webpack_require__(/*! ./KeyHandler */ "../src/js/KeyHandler.js");
-const Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
-const MouseHandler_1 = __webpack_require__(/*! ./MouseHandler */ "../src/js/MouseHandler.js");
-const PBImage_1 = __webpack_require__(/*! ./PBImage */ "../src/js/PBImage.js");
-const Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
-const Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
-const VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "../src/js/VEllipse.js");
-const Vector_1 = __webpack_require__(/*! ./Vector */ "../src/js/Vector.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
-const VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
+const draw_1 = __webpack_require__(/*! ./draw */ "./src/js/draw.js");
+const drawgl_1 = __webpack_require__(/*! ./drawgl */ "./src/js/drawgl.js");
+const drawutilssvg_1 = __webpack_require__(/*! ./utils/helpers/drawutilssvg */ "./src/js/utils/helpers/drawutilssvg.js");
+const BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "./src/js/BezierPath.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+const Circle_1 = __webpack_require__(/*! ./Circle */ "./src/js/Circle.js");
+const CircleSector_1 = __webpack_require__(/*! ./CircleSector */ "./src/js/CircleSector.js");
+const Grid_1 = __webpack_require__(/*! ./Grid */ "./src/js/Grid.js");
+const KeyHandler_1 = __webpack_require__(/*! ./KeyHandler */ "./src/js/KeyHandler.js");
+const Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
+const MouseHandler_1 = __webpack_require__(/*! ./MouseHandler */ "./src/js/MouseHandler.js");
+const PBImage_1 = __webpack_require__(/*! ./PBImage */ "./src/js/PBImage.js");
+const Polygon_1 = __webpack_require__(/*! ./Polygon */ "./src/js/Polygon.js");
+const Triangle_1 = __webpack_require__(/*! ./Triangle */ "./src/js/Triangle.js");
+const VEllipse_1 = __webpack_require__(/*! ./VEllipse */ "./src/js/VEllipse.js");
+const Vector_1 = __webpack_require__(/*! ./Vector */ "./src/js/Vector.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+const VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "./src/js/VertexAttr.js");
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -5485,10 +5485,10 @@ PlotBoilerplate.utils = {
 
 /***/ }),
 
-/***/ "../src/js/Polygon.js":
-/*!****************************!*\
-  !*** ../src/js/Polygon.js ***!
-  \****************************/
+/***/ "./src/js/Polygon.js":
+/*!***************************!*\
+  !*** ./src/js/Polygon.js ***!
+  \***************************/
 /*! flagged exports */
 /*! export Polygon [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -5525,10 +5525,10 @@ PlotBoilerplate.utils = {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Polygon = void 0;
-const BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "../src/js/BezierPath.js");
-const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const BezierPath_1 = __webpack_require__(/*! ./BezierPath */ "./src/js/BezierPath.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 /**
  * @classdesc A polygon class. Any polygon consists of an array of vertices; polygons can be open or closed.
  *
@@ -5960,10 +5960,10 @@ Polygon.utils = {
 
 /***/ }),
 
-/***/ "../src/js/Triangle.js":
-/*!*****************************!*\
-  !*** ../src/js/Triangle.js ***!
-  \*****************************/
+/***/ "./src/js/Triangle.js":
+/*!****************************!*\
+  !*** ./src/js/Triangle.js ***!
+  \****************************/
 /*! flagged exports */
 /*! export Triangle [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -6001,13 +6001,13 @@ Polygon.utils = {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Triangle = void 0;
-const Bounds_1 = __webpack_require__(/*! ./Bounds */ "../src/js/Bounds.js");
-const Circle_1 = __webpack_require__(/*! ./Circle */ "../src/js/Circle.js");
-const Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
-const Polygon_1 = __webpack_require__(/*! ./Polygon */ "../src/js/Polygon.js");
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
-const geomutils_1 = __webpack_require__(/*! ./geomutils */ "../src/js/geomutils.js");
+const Bounds_1 = __webpack_require__(/*! ./Bounds */ "./src/js/Bounds.js");
+const Circle_1 = __webpack_require__(/*! ./Circle */ "./src/js/Circle.js");
+const Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
+const Polygon_1 = __webpack_require__(/*! ./Polygon */ "./src/js/Polygon.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+const geomutils_1 = __webpack_require__(/*! ./geomutils */ "./src/js/geomutils.js");
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -6419,10 +6419,10 @@ Triangle.utils = {
 
 /***/ }),
 
-/***/ "../src/js/UIDGenerator.js":
-/*!*********************************!*\
-  !*** ../src/js/UIDGenerator.js ***!
-  \*********************************/
+/***/ "./src/js/UIDGenerator.js":
+/*!********************************!*\
+  !*** ./src/js/UIDGenerator.js ***!
+  \********************************/
 /*! flagged exports */
 /*! export UIDGenerator [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -6451,10 +6451,10 @@ UIDGenerator.current = 0;
 
 /***/ }),
 
-/***/ "../src/js/VEllipse.js":
-/*!*****************************!*\
-  !*** ../src/js/VEllipse.js ***!
-  \*****************************/
+/***/ "./src/js/VEllipse.js":
+/*!****************************!*\
+  !*** ./src/js/VEllipse.js ***!
+  \****************************/
 /*! flagged exports */
 /*! export VEllipse [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -6476,7 +6476,7 @@ UIDGenerator.current = 0;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VEllipse = void 0;
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -6532,10 +6532,10 @@ exports.VEllipse = VEllipse;
 
 /***/ }),
 
-/***/ "../src/js/Vector.js":
-/*!***************************!*\
-  !*** ../src/js/Vector.js ***!
-  \***************************/
+/***/ "./src/js/Vector.js":
+/*!**************************!*\
+  !*** ./src/js/Vector.js ***!
+  \**************************/
 /*! flagged exports */
 /*! export Vector [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -6562,8 +6562,8 @@ exports.VEllipse = VEllipse;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Vector = void 0;
-const VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "../src/js/VertTuple.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const VertTuple_1 = __webpack_require__(/*! ./VertTuple */ "./src/js/VertTuple.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 /**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
  *            <br>
@@ -6734,10 +6734,10 @@ Vector.utils = {
 
 /***/ }),
 
-/***/ "../src/js/VertTuple.js":
-/*!******************************!*\
-  !*** ../src/js/VertTuple.js ***!
-  \******************************/
+/***/ "./src/js/VertTuple.js":
+/*!*****************************!*\
+  !*** ./src/js/VertTuple.js ***!
+  \*****************************/
 /*! flagged exports */
 /*! export VertTuple [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -6760,8 +6760,8 @@ Vector.utils = {
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VertTuple = void 0;
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
@@ -7062,10 +7062,10 @@ VertTuple.vtutils = {
 
 /***/ }),
 
-/***/ "../src/js/Vertex.js":
-/*!***************************!*\
-  !*** ../src/js/Vertex.js ***!
-  \***************************/
+/***/ "./src/js/Vertex.js":
+/*!**************************!*\
+  !*** ./src/js/Vertex.js ***!
+  \**************************/
 /*! flagged exports */
 /*! export Vertex [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -7104,9 +7104,9 @@ VertTuple.vtutils = {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Vertex = void 0;
-const VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "../src/js/VertexAttr.js");
-const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "../src/js/UIDGenerator.js");
-const VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "../src/js/VertexListeners.js");
+const VertexAttr_1 = __webpack_require__(/*! ./VertexAttr */ "./src/js/VertexAttr.js");
+const UIDGenerator_1 = __webpack_require__(/*! ./UIDGenerator */ "./src/js/UIDGenerator.js");
+const VertexListeners_1 = __webpack_require__(/*! ./VertexListeners */ "./src/js/VertexListeners.js");
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -7643,10 +7643,10 @@ Vertex.utils = {
 
 /***/ }),
 
-/***/ "../src/js/VertexAttr.js":
-/*!*******************************!*\
-  !*** ../src/js/VertexAttr.js ***!
-  \*******************************/
+/***/ "./src/js/VertexAttr.js":
+/*!******************************!*\
+  !*** ./src/js/VertexAttr.js ***!
+  \******************************/
 /*! flagged exports */
 /*! export VertexAttr [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -7714,10 +7714,10 @@ VertexAttr.model = {
 
 /***/ }),
 
-/***/ "../src/js/VertexListeners.js":
-/*!************************************!*\
-  !*** ../src/js/VertexListeners.js ***!
-  \************************************/
+/***/ "./src/js/VertexListeners.js":
+/*!***********************************!*\
+  !*** ./src/js/VertexListeners.js ***!
+  \***********************************/
 /*! flagged exports */
 /*! export VertexListeners [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
@@ -8001,10 +8001,10 @@ exports.VertexListeners = VertexListeners;
 
 /***/ }),
 
-/***/ "../src/js/draw.js":
-/*!*************************!*\
-  !*** ../src/js/draw.js ***!
-  \*************************/
+/***/ "./src/js/draw.js":
+/*!************************!*\
+  !*** ./src/js/draw.js ***!
+  \************************/
 /*! flagged exports */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export drawutils [provided] [no usage info] [missing usage info prevents renaming] */
@@ -8053,8 +8053,8 @@ exports.VertexListeners = VertexListeners;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
-const CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const CubicBezierCurve_1 = __webpack_require__(/*! ./CubicBezierCurve */ "./src/js/CubicBezierCurve.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 // Todo: rename this class to Drawutils
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -8778,10 +8778,10 @@ exports.drawutils = drawutils;
 
 /***/ }),
 
-/***/ "../src/js/drawgl.js":
-/*!***************************!*\
-  !*** ../src/js/drawgl.js ***!
-  \***************************/
+/***/ "./src/js/drawgl.js":
+/*!**************************!*\
+  !*** ./src/js/drawgl.js ***!
+  \**************************/
 /*! flagged exports */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export drawutilsgl [provided] [no usage info] [missing usage info prevents renaming] */
@@ -8801,7 +8801,7 @@ exports.drawutils = drawutils;
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
-const Vertex_1 = __webpack_require__(/*! ./Vertex */ "../src/js/Vertex.js");
+const Vertex_1 = __webpack_require__(/*! ./Vertex */ "./src/js/Vertex.js");
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -9469,10 +9469,10 @@ class GLU {
 
 /***/ }),
 
-/***/ "../src/js/geomutils.js":
-/*!******************************!*\
-  !*** ../src/js/geomutils.js ***!
-  \******************************/
+/***/ "./src/js/geomutils.js":
+/*!*****************************!*\
+  !*** ./src/js/geomutils.js ***!
+  \*****************************/
 /*! flagged exports */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export geomutils [provided] [no usage info] [missing usage info prevents renaming] */
@@ -9488,8 +9488,8 @@ class GLU {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.geomutils = void 0;
-const Line_1 = __webpack_require__(/*! ./Line */ "../src/js/Line.js");
-const Triangle_1 = __webpack_require__(/*! ./Triangle */ "../src/js/Triangle.js");
+const Line_1 = __webpack_require__(/*! ./Line */ "./src/js/Line.js");
+const Triangle_1 = __webpack_require__(/*! ./Triangle */ "./src/js/Triangle.js");
 /**
  * A collection of usefull geometry utilities.
  *
@@ -9539,10 +9539,10 @@ exports.geomutils = {
 
 /***/ }),
 
-/***/ "../src/js/utils/helpers/drawutilssvg.js":
-/*!***********************************************!*\
-  !*** ../src/js/utils/helpers/drawutilssvg.js ***!
-  \***********************************************/
+/***/ "./src/js/utils/helpers/drawutilssvg.js":
+/*!**********************************************!*\
+  !*** ./src/js/utils/helpers/drawutilssvg.js ***!
+  \**********************************************/
 /*! flagged exports */
 /*! export __esModule [provided] [no usage info] [missing usage info prevents renaming] */
 /*! export drawutilssvg [provided] [no usage info] [missing usage info prevents renaming] */
@@ -9566,9 +9566,9 @@ exports.geomutils = {
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
-const CircleSector_1 = __webpack_require__(/*! ../../CircleSector */ "../src/js/CircleSector.js");
-const CubicBezierCurve_1 = __webpack_require__(/*! ../../CubicBezierCurve */ "../src/js/CubicBezierCurve.js");
-const Vertex_1 = __webpack_require__(/*! ../../Vertex */ "../src/js/Vertex.js");
+const CircleSector_1 = __webpack_require__(/*! ../../CircleSector */ "./src/js/CircleSector.js");
+const CubicBezierCurve_1 = __webpack_require__(/*! ../../CubicBezierCurve */ "./src/js/CubicBezierCurve.js");
+const Vertex_1 = __webpack_require__(/*! ../../Vertex */ "./src/js/Vertex.js");
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -10477,39 +10477,39 @@ drawutilssvg.HEAD_XML = [
 /******/ 	
 /************************************************************************/
 (() => {
-/*!**************************!*\
-  !*** ../src/js/entry.js ***!
-  \**************************/
+/*!*************************!*\
+  !*** ./src/js/entry.js ***!
+  \*************************/
 /*! unknown exports (runtime-defined) */
 /*! runtime requirements: __webpack_require__ */
 
 /* Imports for webpack */
 
-globalThis.UIDGenerator = __webpack_require__(/*! ./UIDGenerator.js */ "../src/js/UIDGenerator.js").geomutils;
-globalThis.VertexAttr = __webpack_require__(/*! ./VertexAttr.js */ "../src/js/VertexAttr.js").VertexAttr;
-globalThis.VertexListeners = __webpack_require__(/*! ./VertexListeners.js */ "../src/js/VertexListeners.js").VertexListeners;
-globalThis.Vertex = __webpack_require__(/*! ./Vertex.js */ "../src/js/Vertex.js").Vertex;
+globalThis.UIDGenerator = __webpack_require__(/*! ./UIDGenerator.js */ "./src/js/UIDGenerator.js").geomutils;
+globalThis.VertexAttr = __webpack_require__(/*! ./VertexAttr.js */ "./src/js/VertexAttr.js").VertexAttr;
+globalThis.VertexListeners = __webpack_require__(/*! ./VertexListeners.js */ "./src/js/VertexListeners.js").VertexListeners;
+globalThis.Vertex = __webpack_require__(/*! ./Vertex.js */ "./src/js/Vertex.js").Vertex;
 
-globalThis.Bounds = __webpack_require__(/*! ./Bounds.js */ "../src/js/Bounds.js").Bounds;
-globalThis.Grid = __webpack_require__(/*! ./Grid.js */ "../src/js/Grid.js").Grid;
-globalThis.Line = __webpack_require__(/*! ./Line.js */ "../src/js/Line.js").Line;
-globalThis.Vector = __webpack_require__(/*! ./Vector.js */ "../src/js/Vector.js").Vector;
-globalThis.CubicBezierCurve = __webpack_require__(/*! ./CubicBezierCurve.js */ "../src/js/CubicBezierCurve.js").CubicBezierCurve;
-globalThis.BezierPath = __webpack_require__(/*! ./BezierPath.js */ "../src/js/BezierPath.js").BezierPath;
-globalThis.Polygon = __webpack_require__(/*! ./Polygon.js */ "../src/js/Polygon.js").Polygon;
-globalThis.Triangle = __webpack_require__(/*! ./Triangle.js */ "../src/js/Triangle.js").Triangle;
-globalThis.VEllipse = __webpack_require__(/*! ./VEllipse.js */ "../src/js/VEllipse.js").VEllipse;
-globalThis.Circle = __webpack_require__(/*! ./Circle.js */ "../src/js/Circle.js").Circle;
-globalThis.CircleSector = __webpack_require__(/*! ./CircleSector.js */ "../src/js/CircleSector.js").CircleSector;
-globalThis.PBImage = __webpack_require__(/*! ./PBImage.js */ "../src/js/PBImage.js").PBImage;
-globalThis.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "../src/js/MouseHandler.js").MouseHandler;
-globalThis.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "../src/js/KeyHandler.js").KeyHandler;
-globalThis.drawutils = __webpack_require__(/*! ./draw.js */ "../src/js/draw.js").drawutils;
+globalThis.Bounds = __webpack_require__(/*! ./Bounds.js */ "./src/js/Bounds.js").Bounds;
+globalThis.Grid = __webpack_require__(/*! ./Grid.js */ "./src/js/Grid.js").Grid;
+globalThis.Line = __webpack_require__(/*! ./Line.js */ "./src/js/Line.js").Line;
+globalThis.Vector = __webpack_require__(/*! ./Vector.js */ "./src/js/Vector.js").Vector;
+globalThis.CubicBezierCurve = __webpack_require__(/*! ./CubicBezierCurve.js */ "./src/js/CubicBezierCurve.js").CubicBezierCurve;
+globalThis.BezierPath = __webpack_require__(/*! ./BezierPath.js */ "./src/js/BezierPath.js").BezierPath;
+globalThis.Polygon = __webpack_require__(/*! ./Polygon.js */ "./src/js/Polygon.js").Polygon;
+globalThis.Triangle = __webpack_require__(/*! ./Triangle.js */ "./src/js/Triangle.js").Triangle;
+globalThis.VEllipse = __webpack_require__(/*! ./VEllipse.js */ "./src/js/VEllipse.js").VEllipse;
+globalThis.Circle = __webpack_require__(/*! ./Circle.js */ "./src/js/Circle.js").Circle;
+globalThis.CircleSector = __webpack_require__(/*! ./CircleSector.js */ "./src/js/CircleSector.js").CircleSector;
+globalThis.PBImage = __webpack_require__(/*! ./PBImage.js */ "./src/js/PBImage.js").PBImage;
+globalThis.MouseHandler = __webpack_require__(/*! ./MouseHandler.js */ "./src/js/MouseHandler.js").MouseHandler;
+globalThis.KeyHandler = __webpack_require__(/*! ./KeyHandler.js */ "./src/js/KeyHandler.js").KeyHandler;
+globalThis.drawutils = __webpack_require__(/*! ./draw.js */ "./src/js/draw.js").drawutils;
 // globalThis.drawutilsgl = require("./drawgl.js").drawutilsgl;
 // globalThis.drawutilsgl = {};
-globalThis.drawutilssvg = __webpack_require__(/*! ./utils/helpers/drawutilssvg.js */ "../src/js/utils/helpers/drawutilssvg.js").drawutilssvg;
-globalThis.geomutils = __webpack_require__(/*! ./geomutils.js */ "../src/js/geomutils.js").geomutils;
-globalThis.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "../src/js/PlotBoilerplate.js").PlotBoilerplate;
+globalThis.drawutilssvg = __webpack_require__(/*! ./utils/helpers/drawutilssvg.js */ "./src/js/utils/helpers/drawutilssvg.js").drawutilssvg;
+globalThis.geomutils = __webpack_require__(/*! ./geomutils.js */ "./src/js/geomutils.js").geomutils;
+globalThis.PlotBoilerplate = __webpack_require__(/*! ./PlotBoilerplate.js */ "./src/js/PlotBoilerplate.js").PlotBoilerplate;
 
 
 })();

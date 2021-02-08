@@ -1,4 +1,5 @@
 "use strict";
+// ? https://www.pluralsight.com/guides/react-typescript-module-create
 Object.defineProperty(exports, "__esModule", { value: true });
 const BezierPath_1 = require("./BezierPath");
 const Bounds_1 = require("./Bounds");

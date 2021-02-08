@@ -1,11 +1,3 @@
-/* export default {
-  input: 'src/js/entry.js',
-  output: {
-    file: 'dist/plotboilerplaet.module.min.js',
-    format: 'cjs'
-  }
-}; */
-
 import typescript from "rollup-plugin-typescript2";
 import commonjs from "rollup-plugin-commonjs";
 import external from "rollup-plugin-peer-deps-external";
@@ -14,7 +6,7 @@ import resolve from "rollup-plugin-node-resolve";
 import pkg from "./package.json";
 
 export default {
-  input: "src/ts/index.ts",
+  input: "src/es2015/module.js",
   output: [
     {
       file: pkg.main,
