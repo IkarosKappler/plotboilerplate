@@ -44,7 +44,6 @@ import { DrawLib, XYCoords, UID } from "./interfaces";
  *
  * @requires CubicBzierCurvce
  * @requires Polygon
- * @requires SVGSerializable
  * @requires Vertex
  * @requires XYCoords
  */

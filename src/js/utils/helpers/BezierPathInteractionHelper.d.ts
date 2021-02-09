@@ -167,7 +167,6 @@ export declare class BezierPathInteractionHelper {
     private _installTouchListener;
     private _installMouseListener;
     private _installKeyListener;
-    private _addDefaultPathListeners;
     private _removeDefaultPathListeners;
     private _updateMinDistance;
     static setPathAutoAdjust(path: BezierPath): void;

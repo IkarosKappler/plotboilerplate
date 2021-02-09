@@ -5,9 +5,9 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getContrastColor = void 0;
-const Color_1 = require("../datastructures/Color");
-const BLACK = Color_1.Color.makeRGB(0, 0, 0);
-const WHITE = Color_1.Color.makeRGB(255, 255, 255);
+var Color_1 = require("../datastructures/Color");
+var BLACK = Color_1.Color.makeRGB(0, 0, 0);
+var WHITE = Color_1.Color.makeRGB(255, 255, 255);
 /**
  * Contrast color algorithm by Martin Sojka's.
  * Found at
@@ -15,13 +15,13 @@ const WHITE = Color_1.Color.makeRGB(255, 255, 255);
  *
  * @requires Color
  */
-const getContrastColor = (color) => {
+var getContrastColor = function (color) {
     // r,g,b in [0..1]
-    const gamma = 2.2;
-    const L = 0.2126 * Math.pow(color.r, gamma)
+    var gamma = 2.2;
+    var L = 0.2126 * Math.pow(color.r, gamma)
         + 0.7152 * Math.pow(color.g, gamma)
         + 0.0722 * Math.pow(color.b, gamma);
-    const use_black = (L > Math.pow(0.5, gamma));
+    var use_black = (L > Math.pow(0.5, gamma));
     // console.log( 'use_black', use_black );
     return use_black ? BLACK : WHITE;
 };

@@ -9,15 +9,15 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convexPolygonIncircle = void 0;
-const Circle_1 = require("../../Circle");
-const geomutils_1 = require("../../geomutils");
-const Line_1 = require("../../Line");
-const Triangle_1 = require("../../Triangle");
+var Circle_1 = require("../../Circle");
+var geomutils_1 = require("../../geomutils");
+var Line_1 = require("../../Line");
+var Triangle_1 = require("../../Triangle");
 /**
  * For circle-polygon-intersection-count detection we need an epsilon to
  * eliminate smaller precision errors.
  */
-const EPS = 0.000001;
+var EPS = 0.000001;
 ;
 /**
  * Compute the max sized inlying circle in the given convex (!) polygon - also called the
@@ -43,7 +43,7 @@ const EPS = 0.000001;
  * @param {Polygon} convexHull - The actual convex polygon.
  * @return {PolygonIncircle} A pair of a circle (the incircle) and a triangle (the three points where the circle is touching the polygon).
  */
-const convexPolygonIncircle = (convexHull) => {
+var convexPolygonIncircle = function (convexHull) {
     var n = convexHull.vertices.length;
     var bestCircle = undefined;
     var bestTriangle = undefined;
@@ -53,18 +53,18 @@ const convexPolygonIncircle = (convexHull) => {
                 // As these lines are part of the convex hull, we know that
                 //  * line a preceeds line b and
                 //  * line b preceeds line c :)
-                let lineA = new Line_1.Line(convexHull.vertices[a], convexHull.vertices[(a + 1) % n]);
-                let lineB = new Line_1.Line(convexHull.vertices[b], convexHull.vertices[(b + 1) % n]);
-                let lineC = new Line_1.Line(convexHull.vertices[c], convexHull.vertices[(c + 1) % n]);
+                var lineA = new Line_1.Line(convexHull.vertices[a], convexHull.vertices[(a + 1) % n]);
+                var lineB = new Line_1.Line(convexHull.vertices[b], convexHull.vertices[(b + 1) % n]);
+                var lineC = new Line_1.Line(convexHull.vertices[c], convexHull.vertices[(c + 1) % n]);
                 // Find intersections by expanding the lines
-                let vertB = lineA.intersection(lineB);
-                let vertC = lineB.intersection(lineC);
+                var vertB = lineA.intersection(lineB);
+                var vertC = lineB.intersection(lineC);
                 // An object: { center: Vertex, radius: number }
-                let triangle = getTangentTriangle4(lineA.a, vertB, vertC, lineC.b);
+                var triangle = getTangentTriangle4(lineA.a, vertB, vertC, lineC.b);
                 // Workaround. There will be a future version where the 'getCircumCircle()' functions
                 // returns a real Circle instance.
-                let _circle = triangle.getCircumcircle();
-                let circle = new Circle_1.Circle(_circle.center, _circle.radius);
+                var _circle = triangle.getCircumcircle();
+                var circle = new Circle_1.Circle(_circle.center, _circle.radius);
                 // Count the number of intersections with the convex hull:
                 // If there are exactly three, we have found an in-lying circle.
                 //  * Check if this one is better (bigger) than the old one.
@@ -103,17 +103,17 @@ exports.convexPolygonIncircle = convexPolygonIncircle;
  * @param {Vertex} vertD - The fourth point of the three connected lines.
  * @return {Triangle} The triangle of the circular tangential points with the given lines (3 or 4 of them).
  */
-const getTangentTriangle4 = (vertA, vertB, vertC, vertD) => {
-    const lineA = new Line_1.Line(vertA, vertB);
-    const lineB = new Line_1.Line(vertB, vertC);
-    const lineC = new Line_1.Line(vertC, vertD);
-    const bisector1 = geomutils_1.geomutils.nsectAngle(vertB, vertA, vertC, 2)[0]; // bisector of first triangle
-    const bisector2 = geomutils_1.geomutils.nsectAngle(vertC, vertB, vertD, 2)[0]; // bisector of second triangle
-    const intersection = bisector1.intersection(bisector2);
+var getTangentTriangle4 = function (vertA, vertB, vertC, vertD) {
+    var lineA = new Line_1.Line(vertA, vertB);
+    var lineB = new Line_1.Line(vertB, vertC);
+    var lineC = new Line_1.Line(vertC, vertD);
+    var bisector1 = geomutils_1.geomutils.nsectAngle(vertB, vertA, vertC, 2)[0]; // bisector of first triangle
+    var bisector2 = geomutils_1.geomutils.nsectAngle(vertC, vertB, vertD, 2)[0]; // bisector of second triangle
+    var intersection = bisector1.intersection(bisector2);
     // Find the closest points on one of the polygon lines (all have same distance by construction)
-    const circleIntersA = lineA.getClosestPoint(intersection);
-    const circleIntersB = lineB.getClosestPoint(intersection);
-    const circleIntersC = lineC.getClosestPoint(intersection);
+    var circleIntersA = lineA.getClosestPoint(intersection);
+    var circleIntersB = lineB.getClosestPoint(intersection);
+    var circleIntersC = lineC.getClosestPoint(intersection);
     return new Triangle_1.Triangle(circleIntersA, circleIntersB, circleIntersC);
 };
 /**
@@ -123,7 +123,7 @@ const getTangentTriangle4 = (vertA, vertB, vertC, vertD) => {
  * @param {Circle} circle - The circle to detect the intersections with.
  * @return {Array<number>} The indices of those lines that intersect (or touch) the circle.
  **/
-const findCircleIntersections = (convexHull, circle) => {
+var findCircleIntersections = function (convexHull, circle) {
     var result = [];
     for (var i = 0; i < convexHull.vertices.length; i++) {
         var line = new Line_1.Line(convexHull.vertices[i], convexHull.vertices[(i + 1) % convexHull.vertices.length]);

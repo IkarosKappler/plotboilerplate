@@ -22,13 +22,27 @@
  * @file GirihPenroseRhombus
  * @public
  **/
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GirihPenroseRhombus = void 0;
-const Bounds_1 = require("../../Bounds");
-const GirihTile_1 = require("./GirihTile");
-const Polygon_1 = require("../../Polygon");
-const Vertex_1 = require("../../Vertex");
-class GirihPenroseRhombus extends GirihTile_1.GirihTile {
+var Bounds_1 = require("../../Bounds");
+var GirihTile_1 = require("./GirihTile");
+var Polygon_1 = require("../../Polygon");
+var Vertex_1 = require("../../Vertex");
+var GirihPenroseRhombus = /** @class */ (function (_super) {
+    __extends(GirihPenroseRhombus, _super);
     /**
      * @constructor
      * @extends GirihTile
@@ -36,63 +50,64 @@ class GirihPenroseRhombus extends GirihTile_1.GirihTile {
      * @param {Vertex} position
      * @param {number} edgeLength
      */
-    constructor(position, edgeLength, addCenterPolygon) {
-        super(position, edgeLength, GirihTile_1.TileType.PENROSE_RHOMBUS);
+    function GirihPenroseRhombus(position, edgeLength, addCenterPolygon) {
+        var _this = _super.call(this, position, edgeLength, GirihTile_1.TileType.PENROSE_RHOMBUS) || this;
         // Overwrite the default symmetries:
         //    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
-        this.uniqueSymmetries = 5;
+        _this.uniqueSymmetries = 5;
         if (typeof addCenterPolygon == "undefined")
             addCenterPolygon = true; // Add by default
         // Init the actual decahedron shape with the passed size
-        let pointA = new Vertex_1.Vertex(0, 0);
-        let pointB = pointA;
-        this.addVertex(pointB);
-        const angles = [0.0,
+        var pointA = new Vertex_1.Vertex(0, 0);
+        var pointB = pointA;
+        _this.addVertex(pointB);
+        var angles = [0.0,
             36.0,
             144.0 // 108.0
         ];
-        let theta = 0.0;
+        var theta = 0.0;
         for (var i = 0; i < angles.length; i++) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x += this.edgeLength;
+            pointB.x += _this.edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
-            this.addVertex(pointB);
+            _this.addVertex(pointB);
         }
         // Move to center and position
-        const bounds = Bounds_1.Bounds.computeFromVertices(this.vertices);
-        const move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - this.edgeLength), bounds.height / 2.0);
-        for (var i = 0; i < this.vertices.length; i++) {
-            this.vertices[i].add(move).add(position);
+        var bounds = Bounds_1.Bounds.computeFromVertices(_this.vertices);
+        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - _this.edgeLength), bounds.height / 2.0);
+        for (var i = 0; i < _this.vertices.length; i++) {
+            _this.vertices[i].add(move).add(position);
         }
-        this.textureSource.min.x = 2 / 500.0,
-            this.textureSource.min.y = 8 / 460.0;
-        this.textureSource.max.x = this.textureSource.min.x + 173 / 500.0;
-        this.textureSource.max.y = this.textureSource.min.y + 56 / 460.0;
+        _this.textureSource.min.x = 2 / 500.0,
+            _this.textureSource.min.y = 8 / 460.0;
+        _this.textureSource.max.x = _this.textureSource.min.x + 173 / 500.0;
+        _this.textureSource.max.y = _this.textureSource.min.y + 56 / 460.0;
         ;
-        this.baseBounds = this.getBounds();
-        this._buildInnerPolygons(this.edgeLength, addCenterPolygon);
-        this._buildOuterPolygons(this.edgeLength, addCenterPolygon);
+        _this.baseBounds = _this.getBounds();
+        _this._buildInnerPolygons(_this.edgeLength, addCenterPolygon);
+        _this._buildOuterPolygons(_this.edgeLength, addCenterPolygon);
+        return _this;
     }
     ;
     /**
      * @override
      */
-    clone() {
+    GirihPenroseRhombus.prototype.clone = function () {
         return new GirihPenroseRhombus(this.position.clone(), this.edgeLength, true).rotate(this.rotation);
-    }
+    };
     ;
-    _buildInnerPolygons(edgeLength, addCenterPolygon) {
-        const indices = [0, 2];
-        const centerTile = new Polygon_1.Polygon();
+    GirihPenroseRhombus.prototype._buildInnerPolygons = function (edgeLength, addCenterPolygon) {
+        var indices = [0, 2];
+        var centerTile = new Polygon_1.Polygon();
         for (var i = 0; i < indices.length; i++) {
-            const innerTile = new Polygon_1.Polygon();
-            const index = indices[i];
-            const left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
-            const right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
-            const innerA = this.getVertexAt(index + 1).clone().scale(0.28, this.position);
-            const innerB = this.getVertexAt(index + 1).clone().scale(0.55, this.position);
+            var innerTile = new Polygon_1.Polygon();
+            var index = indices[i];
+            var left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
+            var right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
+            var innerA = this.getVertexAt(index + 1).clone().scale(0.28, this.position);
+            var innerB = this.getVertexAt(index + 1).clone().scale(0.55, this.position);
             innerTile.addVertex(left);
             innerTile.addVertex(innerA);
             innerTile.addVertex(right);
@@ -103,18 +118,18 @@ class GirihPenroseRhombus extends GirihTile_1.GirihTile {
         }
         if (addCenterPolygon)
             this.innerTilePolygons.push(centerTile);
-    }
+    };
     ;
-    _buildOuterPolygons(edgeLength, centerPolygonExists) {
+    GirihPenroseRhombus.prototype._buildOuterPolygons = function (edgeLength, centerPolygonExists) {
         // Add left and right 'spikes'.
-        const indices = [0, 2];
+        var indices = [0, 2];
         for (var i = 0; i < indices.length; i++) {
-            const outerTile = new Polygon_1.Polygon();
-            const index = indices[i];
-            const left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
-            const right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
-            const innerA = this.getVertexAt(index + 1).clone().scale(0.28, this.position); // multiplyScalar( 0.28 );
-            const innerB = this.getVertexAt(index + 1).clone().scale(0.55, this.position); // multiplyScalar( 0.55 );
+            var outerTile = new Polygon_1.Polygon();
+            var index = indices[i];
+            var left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
+            var right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
+            // const innerA:Vertex = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position );
+            var innerB = this.getVertexAt(index + 1).clone().scale(0.55, this.position);
             outerTile.addVertex(left.clone());
             outerTile.addVertex(this.getVertexAt(index + 1).clone());
             outerTile.addVertex(right.clone());
@@ -124,10 +139,10 @@ class GirihPenroseRhombus extends GirihTile_1.GirihTile {
         // If the center polygon exists then the last outer polygon is split into two.
         if (centerPolygonExists) {
             // Two polygons
-            const indices = [0, 2];
-            for (var i = 0; i < indices.length; i++) {
-                const outerTile = new Polygon_1.Polygon();
-                const index = indices[i];
+            var indices_1 = [0, 2];
+            for (var i = 0; i < indices_1.length; i++) {
+                var outerTile = new Polygon_1.Polygon();
+                var index = indices_1[i];
                 outerTile.addVertex(this.getVertexAt(index).clone());
                 outerTile.addVertex(this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1)));
                 outerTile.addVertex(this.innerTilePolygons[i].getVertexAt(1).clone());
@@ -137,18 +152,19 @@ class GirihPenroseRhombus extends GirihTile_1.GirihTile {
                 this.outerTilePolygons.push(outerTile);
             }
         }
-    }
+    };
     ;
     /**
      * If you want the center polygon not to be drawn the canvas handler needs to
      * know the respective polygon index (inside the this.innerTilePolygons array).
      **/
     // TODO: IS THIS STILL REQUIRED
-    getCenterPolygonIndex() {
+    GirihPenroseRhombus.prototype.getCenterPolygonIndex = function () {
         return 2;
-    }
+    };
     ;
-}
+    return GirihPenroseRhombus;
+}(GirihTile_1.GirihTile));
 exports.GirihPenroseRhombus = GirihPenroseRhombus;
 ;
 //# sourceMappingURL=GirihPenroseRhombus.js.map

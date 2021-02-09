@@ -23,7 +23,8 @@ import { SVGSerializable } from "./interfaces";
  *            Vectors are drawn with an arrow at their end point.<br>
  *            <b>The Vector class extends the Line class.</b>
  *
- * @requires Vertex, Line
+ * @requires VertTuple
+ * @requires Vertex
  **/
 export declare class Vector extends VertTuple<Vector> implements SVGSerializable {
     /**

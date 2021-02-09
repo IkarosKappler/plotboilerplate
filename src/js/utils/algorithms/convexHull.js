@@ -22,16 +22,16 @@ exports.getConvexHull = void 0;
  * @param {Array<XYCoords>} points - The points on the 2D plane to find the convex hull for.
  * @return {Array<XYCoords>} A ordered array of points defining the convex hull.
  **/
-const getConvexHull = (points) => {
+var getConvexHull = function (points) {
     points.sort(comparison);
-    const L = [];
+    var L = [];
     for (var i = 0; i < points.length; i++) {
         while (L.length >= 2 && cross(L[L.length - 2], L[L.length - 1], points[i]) <= 0) {
             L.pop();
         }
         L.push(points[i]);
     }
-    const U = [];
+    var U = [];
     for (var i = points.length - 1; i >= 0; i--) {
         while (U.length >= 2 && cross(U[U.length - 2], U[U.length - 1], points[i]) <= 0) {
             U.pop();
@@ -52,7 +52,7 @@ exports.getConvexHull = getConvexHull;
  * @param {XYCoords} b - The second of the two points to compare.
  * @return {number} A number indicating the order (negative if `a` is 'smaller', 0 if both are equal, positive if `a` is 'larger').
  **/
-const comparison = (a, b) => {
+var comparison = function (a, b) {
     return a.x == b.x ? a.y - b.y : a.x - b.x;
 };
 /**
@@ -65,7 +65,7 @@ const comparison = (a, b) => {
  * @param {XYCoords} o
  * @return {number} The cross product of the three 'vectors'.
  **/
-const cross = (a, b, o) => {
+var cross = function (a, b, o) {
     return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
 };
 //# sourceMappingURL=convexHull.js.map

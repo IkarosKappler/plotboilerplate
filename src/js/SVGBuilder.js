@@ -24,13 +24,12 @@ exports.SVGBuilder = void 0;
  *
  * @requires SVGSerializable
  * @requires Vertex
- * @requires XYCoords
  */
-class SVGBuilder {
+var SVGBuilder = /** @class */ (function () {
     /**
      * @constructor
      **/
-    constructor() {
+    function SVGBuilder() {
         console.warn("THIS CLASS IS DEPRECATED. Please use the new 'drawutilssvg' instead.");
     }
     ;
@@ -41,7 +40,7 @@ class SVGBuilder {
      * @param {object}   options  - { canvasSize, zoom, offset }
      * @return {string}
      **/
-    build(drawables, options) {
+    SVGBuilder.prototype.build = function (drawables, options) {
         var nl = '\n';
         var indent = '  ';
         var buffer = [];
@@ -93,8 +92,9 @@ class SVGBuilder {
         buffer.push(indent + '</g>' + nl);
         buffer.push('</svg>' + nl);
         return buffer.join('');
-    }
+    };
     ;
-}
+    return SVGBuilder;
+}());
 exports.SVGBuilder = SVGBuilder;
 //# sourceMappingURL=SVGBuilder.js.map

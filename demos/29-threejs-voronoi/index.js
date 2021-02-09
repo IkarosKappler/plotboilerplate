@@ -73,35 +73,27 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		// outlineSegmentCount   : 128,
-		// shapeSegmentCount     : 64,
 		showNormals           : false,
 		normalsLength         : 10.0,
 		useTextureImage       : true,
 		textureImagePath      : 'wood.png',
 		wireframe             : false,
 		exportSTL             : function() { exportSTL(); },
-		// showPathJSON          : function() { showPathJSON(); },
-		// insertPathJSON        : function() { insertPathJSON(); },
 
 		makeVoronoiDiagram    : true,
 		drawPoints            : true,
-		// drawTriangles         : true,
-		// drawCircumCircles     : false,
 		drawCubicCurves       : false,
-		// fillVoronoiCells      : true,
 		voronoiOutlineColor   : 'rgba(0,168,40, 1.0)',
 		voronoiCellColor      : 'rgba(0,128,192, 0.5)',
 		voronoiCubicThreshold : 1.0,
 		voronoiCellScale      : 0.8,
-		// drawVoronoiIncircles  : false,
+		clipVoronoiCells      : true,
 		drawVoronoiOutlines   : true,
+		
 		pointCount            : 32,
 		rebuild               : function() { rebuildVoronoi(); },
 		randomize             : function() { randomPoints(true,false,false); trianglesPointCount = -1; rebuildVoronoi(); },
-		fullCover             : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuildVoronoi(); },
-		// animate               : false,
-		// animationType         : 'linear' // 'linear' or 'radial'
+		fullCover             : function() { randomPoints(true,true,false); trianglesPointCount = -1; rebuildVoronoi(); }
 	    }, GUP );
 
 
@@ -146,15 +138,7 @@
 	    /**
 	     * The re-drawing function.
 	     */
-	    var redraw = function() {
-		// Draw triangles
-		// if( config.drawTriangles )
-		//    drawTriangles();
-
-		// Draw circumcircles
-		if( config.drawCircumCircles )
-		    drawCircumCircles();
-		
+	    var redraw = function() {	
 		// Draw voronoi diagram?
 		if( config.makeVoronoiDiagram )
 		    drawVoronoiDiagram();
@@ -162,25 +146,34 @@
 
 	    
 	    /**
-	     * A function for drawing the triangles.
-	     */
-	    var drawTriangles = function() {
-		for( var i in triangles ) {
-		    var t = triangles[i];
-		    drawTriangle( t, config.makeVoronoiDiagram ? 'rgba(0,128,224,0.33)' : '#0088d8' );
-		}
-	    };
-	    
-	    /**
 	     * Draw the stored voronoi diagram.
 	     */
 	    var drawVoronoiDiagram = function() {
+		var clipBoxPolygon = Bounds.computeFromVertices( pointList ).toPolygon();
 		for( var v in voronoiDiagram ) {
 		    var cell = voronoiDiagram[v];
 		    var polygon = cell.toPolygon();
 		    polygon.scale( config.voronoiCellScale, cell.sharedVertex );
-		    if( config.drawVoronoiOutlines )
-			pb.draw.polygon( polygon, config.voronoiOutlineColor ); 
+
+		    // Draw large (unclipped) Voronoi cell
+		    if( config.drawVoronoiOutlines ) { 
+			pb.draw.polyline( polygon.vertices, false,
+					  config.clipVoronoiCells ? 'rgba(128,128,128,0.333)' : config.voronoiOutlineColor
+					);
+		    }
+
+		    // Apply clipping?
+		    if( config.clipVoronoiCells ) {
+			// Clone the array here: convert Array<XYCoords> to Array<Vertex>
+			polygon = new Polygon(
+			    cloneVertexArray(sutherlandHodgman(polygon.vertices, clipBoxPolygon.vertices)),
+			    false
+			);
+		    }
+
+		    if( config.drawVoronoiOutlines && config.clipVoronoiCells ) {
+			pb.draw.polygon( polygon, config.voronoiOutlineColor );
+		    }
 
 		    if( !cell.isOpen() && cell.triangles.length >= 3 ) {
 			if( config.drawCubicCurves ) {
@@ -241,7 +234,6 @@
 		triangles  = delau.triangulate();
 		trianglesPointCount = pointList.length;
 		voronoiDiagram = [];
-		// redraw();
 	    };
 
 
@@ -368,34 +360,6 @@
 		}
 	    };
 
-
-	    var showPathJSON = function() {
-		/* modal.setTitle( "Show Path JSON" );
-		modal.setFooter( "" );
-		modal.setActions( [ Modal.ACTION_CLOSE ] );
-		modal.setBody( outline.toJSON(true) ); 
-		modal.open(); */
-	    };
-
-
-	    var insertPathJSON = function() {
-		/* var textarea = document.createElement('textarea');
-		textarea.style.width = "100%";
-		textarea.style.height = "50vh";
-		textarea.innerHTML = outline.toJSON(true);
-		modal.setTitle( "Insert Path JSON" );
-		modal.setFooter( "" );
-		modal.setActions( [ Modal.ACTION_CANCEL, { label : "Load JSON", action : function() { loadPathJSON(textarea.value); modal.close(); } }] );
-		modal.setBody( textarea ); 
-		modal.open(); */
-	    };
-
-	    var loadPathJSON = function( jsonData ) {
-		/* var newOutline = BezierPath.fromJSON( jsonData );
-		setPathInstance( newOutline );
-		rebuild(); */
-	    };
-
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | Delay the build a bit. And cancel stale builds.
@@ -403,65 +367,13 @@
 	    // +-------------------------------
 	    var buildId = null;
 	    var rebuildVoronoiMesh = function() {
-		// rebuildVoronoi();
 		var buildId = new Date().getTime();
-		// window.setTimeout( (function(bId) {
-		//    return function() {
-		//	if( bId == buildId ) {
-			    // voronoiGeneration.rebuild( Object.assign( { outline : outline }, config ) );
-			    voronoiGeneration.rebuild( Object.assign( { voronoiDiagram : voronoiDiagram }, config ) );
-		//	}
-		//    };
-		//})(buildId), 50 );
+		var clipBoxPolygon =
+		    config.clipVoronoiCells
+		    ? Bounds.computeFromVertices( pointList ).toPolygon()
+		    : null;
+		voronoiGeneration.rebuild( Object.assign( { voronoiDiagram : voronoiDiagram, clipPolygon : clipBoxPolygon }, config ) );
 	    };
-	    
-	    // new DoubleclickHandler( pb, handleDoubleclick );
-
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | Each outline vertex requires a drag (end) listener. Wee need this to update
-	    // | the 3d mesh on changes.
-	    // +-------------------------------
-	    /* var dragListener = function( dragEvent ) {
-		// Uhm, well, some curve point moved.
-		rebuild();
-	    };
-	    var addPathListeners = function( path ) {
-		BezierPathInteractionHelper.addPathVertexDragEndListeners( path, dragListener );
-	    };
-	    var removePathListeners = function( path ) {
-		BezierPathInteractionHelper.removePathVertexDragEndListeners( path, dragListener );
-	    }; */
-	    
-	    // +---------------------------------------------------------------------------------
-	    // | Draw some stuff before rendering?
-	    // +-------------------------------
-	    /* var preDraw = function() { 
-		// Draw bounds
-		var pathBounds = outline.getBounds();
-		pb.draw.rect( pathBounds.min, pathBounds.width, pathBounds.height, 'rgba(0,0,0,0.5)', 1 );
-
-		// Fill inner area
-		var polyline = [ new Vertex( pathBounds.max.x, pathBounds.min.y ),
-				 new Vertex( pathBounds.max.x, pathBounds.max.y ),
-				 new Vertex( pathBounds.min.x, pathBounds.max.y ) ];
-		var pathSteps = 50;
-		for( var i = 0; i < pathSteps; i++ ) {
-		    polyline.push( outline.getPointAt(i/pathSteps) );
-		}
-		pb.fill.polyline( polyline, false, 'rgba(0,0,0,0.25)' );		
-	    }; */
-
-	    // +---------------------------------------------------------------------------------
-	    // | Draw the split-indicator (if split position ready).
-	    // +-------------------------------
-	    /* var postDraw = function() {
-		if( bezierDistanceLine != null ) {
-		    pb.draw.line( bezierDistanceLine.a, bezierDistanceLine.b, 'rgb(255,192,0)', 2 );
-		    pb.fill.circleHandle( bezierDistanceLine.a, 3.0, 'rgb(255,192,0)' );
-		}
-	    }; */
-	    
 
 
 	    // +---------------------------------------------------------------------------------
@@ -483,10 +395,10 @@
             {
 		var gui = pb.createGUI();
 		var fold0 = gui.addFolder("Mesh");
-		fold0.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
-		fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
-		fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image.');
-		fold0.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model.');
+		fold0.add(config, "showNormals").onChange( function() { rebuildVoronoi() } ).name('showNormals').title('Show the vertex normals.');
+		fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuildVoronoi() } ).name('normalsLength').title('The length of rendered normals.');
+		fold0.add(config, "useTextureImage").onChange( function() { rebuildVoronoi() } ).name('useTextureImage').title('Use a texture image.');
+		fold0.add(config, "wireframe").onChange( function() { rebuildVoronoi() } ).name('wireframe').title('Display the mesh as a wireframe model.');
 
 		var fold1 = gui.addFolder("Export");
 		fold1.add(config, "exportSTL").name('STL').title('Export an STL file.');
@@ -506,6 +418,7 @@
 		f5.addColor(config, 'voronoiCellColor').onChange( function() { pb.redraw() } ).title("Choose Voronoi cell color.");
 		f5.add(config, 'voronoiCubicThreshold').min(0.0).max(1.0).onChange( function() { pb.redraw() } ).title("(Experimental) Specifiy the cubic or cell coefficients.");
 		f5.add(config, 'voronoiCellScale').min(-1.0).max(2.0).onChange( function() { pb.redraw(); rebuildVoronoi() } ).title("Scale each voronoi cell before rendering.");
+		f5.add(config, 'clipVoronoiCells').onChange( function() { pb.redraw(); rebuildVoronoi(); } ).title("Clip Voronoi cells?");
 	    }
 
 	    pb.config.postDraw = redraw;

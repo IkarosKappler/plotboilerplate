@@ -41,6 +41,9 @@
 	"suppressImplicitAnyIndexErrors": true,
 	"noUnusedLocals": false,
 	"noUnusedParameters": false
+  * Remove SVGBuilder from Girih-demo.
+
+
 
 ### Todos for future Version 2
  * Remove class member `PlotBoilerplate.ctx` (SVG renderes don't have such a context).

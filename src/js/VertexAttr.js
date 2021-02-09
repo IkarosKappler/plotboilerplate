@@ -21,7 +21,7 @@ exports.VertexAttr = void 0;
  * This is some sort of 'userData' object, but the constructor uses a global model
  * to obtain a (configurable) default attribute set to all instances.<br>
  */
-class VertexAttr {
+var VertexAttr = /** @class */ (function () {
     /**
      * The constructor.
      *
@@ -31,7 +31,7 @@ class VertexAttr {
      * @constructor
      * @name VertexAttr
      **/
-    constructor() {
+    function VertexAttr() {
         this.draggable = true;
         this.selectable = true;
         this.isSelected = false;
@@ -40,18 +40,19 @@ class VertexAttr {
             this[key] = VertexAttr.model[key];
     }
     ;
-}
+    /**
+     * This is the global attribute model. Set these object on the initialization
+     * of your app to gain all VertexAttr instances have these attributes.
+     *
+     * @type {object}
+     **/
+    VertexAttr.model = {
+        draggable: true,
+        selectable: true,
+        isSelected: false,
+        visible: true
+    };
+    return VertexAttr;
+}());
 exports.VertexAttr = VertexAttr;
-/**
- * This is the global attribute model. Set these object on the initialization
- * of your app to gain all VertexAttr instances have these attributes.
- *
- * @type {object}
- **/
-VertexAttr.model = {
-    draggable: true,
-    selectable: true,
-    isSelected: false,
-    visible: true
-};
 //# sourceMappingURL=VertexAttr.js.map

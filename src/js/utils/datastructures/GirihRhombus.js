@@ -19,14 +19,28 @@
  * @file GirihRhombus
  * @public
  **/
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GirihRhombus = void 0;
-const Bounds_1 = require("../../Bounds");
-const Circle_1 = require("../../Circle");
-const GirihTile_1 = require("./GirihTile");
-const Polygon_1 = require("../../Polygon");
-const Vertex_1 = require("../../Vertex");
-class GirihRhombus extends GirihTile_1.GirihTile {
+var Bounds_1 = require("../../Bounds");
+var Circle_1 = require("../../Circle");
+var GirihTile_1 = require("./GirihTile");
+var Polygon_1 = require("../../Polygon");
+var Vertex_1 = require("../../Vertex");
+var GirihRhombus = /** @class */ (function (_super) {
+    __extends(GirihRhombus, _super);
     /**
      * @constructor
      * @extends GirihTile
@@ -34,61 +48,62 @@ class GirihRhombus extends GirihTile_1.GirihTile {
      * @param {Vertex} position
      * @param {number} edgeLength
      */
-    constructor(position, edgeLength) {
-        super(position, edgeLength, GirihTile_1.TileType.RHOMBUS);
+    function GirihRhombus(position, edgeLength) {
+        var _this = _super.call(this, position, edgeLength, GirihTile_1.TileType.RHOMBUS) || this;
         // Overwrite the default symmetries:
         //    the rhombus tile has a 180° symmetry (5/10 * 360°)
-        this.uniqueSymmetries = 5;
+        _this.uniqueSymmetries = 5;
         // Init the actual rhombus shape with the passed size
-        let pointA = new Vertex_1.Vertex(0, 0);
-        let pointB = pointA;
-        this.addVertex(pointB);
-        const angles = [0.0,
+        var pointA = new Vertex_1.Vertex(0, 0);
+        var pointB = pointA;
+        _this.addVertex(pointB);
+        var angles = [0.0,
             72.0,
             108.0
             // 72.0
         ];
-        let theta = 0.0;
+        var theta = 0.0;
         for (var i = 0; i < angles.length; i++) {
             theta += (180.0 - angles[i]);
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
-            pointB.x += this.edgeLength;
+            pointB.x += _this.edgeLength;
             pointB.rotate(theta * (Math.PI / 180.0), pointA);
-            this.addVertex(pointB);
+            _this.addVertex(pointB);
         }
         // Move to center    
-        const bounds = Bounds_1.Bounds.computeFromVertices(this.vertices);
-        const move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - this.edgeLength), bounds.height / 2.0);
-        for (var i = 0; i < this.vertices.length; i++) {
-            this.vertices[i].add(move).add(this.position);
+        var bounds = Bounds_1.Bounds.computeFromVertices(_this.vertices);
+        var move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - _this.edgeLength), bounds.height / 2.0);
+        for (var i = 0; i < _this.vertices.length; i++) {
+            _this.vertices[i].add(move).add(_this.position);
         }
-        this.textureSource.min.x = 32 / 500.0;
-        this.textureSource.min.y = 188 / 460.0;
-        this.textureSource.max.x = this.textureSource.min.x + 127 / 500.0;
-        this.textureSource.max.y = this.textureSource.min.y + 92 / 460.0;
-        this.baseBounds = this.getBounds();
-        this._buildInnerPolygons();
-        this._buildOuterPolygons(); // Call only AFTER the inner polygons were built!
+        _this.textureSource.min.x = 32 / 500.0;
+        _this.textureSource.min.y = 188 / 460.0;
+        _this.textureSource.max.x = _this.textureSource.min.x + 127 / 500.0;
+        _this.textureSource.max.y = _this.textureSource.min.y + 92 / 460.0;
+        _this.baseBounds = _this.getBounds();
+        _this._buildInnerPolygons();
+        _this._buildOuterPolygons(); // Call only AFTER the inner polygons were built!
+        return _this;
     }
     ;
     /**
      * @override
      */
-    clone() {
+    GirihRhombus.prototype.clone = function () {
         return new GirihRhombus(this.position.clone(), this.edgeLength).rotate(this.rotation);
-    }
+    };
     ;
-    _buildInnerPolygons() {
+    GirihRhombus.prototype._buildInnerPolygons = function () {
         // Connect all edges half-the-way
-        const innerTile = new Polygon_1.Polygon(); // [];
+        var innerTile = new Polygon_1.Polygon(); // [];
         innerTile.addVertex(this.vertices[0].clone().scale(0.5, this.vertices[1]));
         innerTile.addVertex(this.vertices[1].clone().scale(0.5, this.vertices[2]));
         // Compute the next inner polygon vertex by the intersection of two circles
-        const circleA = new Circle_1.Circle(innerTile.vertices[1], innerTile.vertices[0].distance(innerTile.vertices[1]) * 0.73);
-        const circleB = new Circle_1.Circle(this.vertices[2].clone().scale(0.5, this.vertices[3]), circleA.radius);
+        var circleA = new Circle_1.Circle(innerTile.vertices[1], innerTile.vertices[0].distance(innerTile.vertices[1]) * 0.73);
+        var circleB = new Circle_1.Circle(this.vertices[2].clone().scale(0.5, this.vertices[3]), circleA.radius);
         // There is definitely an intersection
-        let intersection = circleA.circleIntersection(circleB);
+        var intersection = circleA.circleIntersection(circleB);
         // One of the two points is inside the tile, the other is outside.
         // Locate the inside point.
         if (this.containsVert(intersection.a))
@@ -108,30 +123,31 @@ class GirihRhombus extends GirihTile_1.GirihTile {
         else
             innerTile.addVertex(intersection.a);
         this.innerTilePolygons.push(innerTile);
-    }
+    };
     ;
-    _buildOuterPolygons() {
-        const indicesA = [0, 2]; // 4:2
-        const indicesB = [0, 3]; // 6:2
+    GirihRhombus.prototype._buildOuterPolygons = function () {
+        var indicesA = [0, 2]; // 4:2
+        var indicesB = [0, 3]; // 6:2
         for (var i = 0; i < indicesA.length; i++) {
-            const indexA = indicesA[i];
-            const indexB = indicesB[i];
+            var indexA = indicesA[i];
+            var indexB = indicesB[i];
             // The triangle
-            const outerTileX = new Polygon_1.Polygon();
+            var outerTileX = new Polygon_1.Polygon();
             outerTileX.addVertex(this.getVertexAt(indexA + 1).clone());
             outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB).clone());
             outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
             this.outerTilePolygons.push(outerTileX);
             // The first 'kite'
-            const outerTileY = new Polygon_1.Polygon();
+            var outerTileY = new Polygon_1.Polygon();
             outerTileY.addVertex(this.getVertexAt(indexA + 2).clone());
             outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
             outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 2).clone());
             outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 3).clone());
             this.outerTilePolygons.push(outerTileY);
         }
-    }
+    };
     ;
-}
+    return GirihRhombus;
+}(GirihTile_1.GirihTile));
 exports.GirihRhombus = GirihRhombus;
 //# sourceMappingURL=GirihRhombus.js.map

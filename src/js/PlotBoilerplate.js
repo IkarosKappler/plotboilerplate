@@ -75,29 +75,28 @@
  * @fileoverview The main class.
  * @public
  **/
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlotBoilerplate = void 0;
 // import { AlloyFinger } from "alloyfinger";
-const alloy_finger_1 = require("../../lib/alloy_finger");
-const draw_1 = require("./draw");
-const drawgl_1 = require("./drawgl");
-const drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
-const BezierPath_1 = require("./BezierPath");
-const Bounds_1 = require("./Bounds");
-const Circle_1 = require("./Circle");
-const CircleSector_1 = require("./CircleSector");
-const Grid_1 = require("./Grid");
-const KeyHandler_1 = require("./KeyHandler");
-const Line_1 = require("./Line");
-const MouseHandler_1 = require("./MouseHandler");
-const PBImage_1 = require("./PBImage");
-const Polygon_1 = require("./Polygon");
-const Triangle_1 = require("./Triangle");
-const VEllipse_1 = require("./VEllipse");
-const Vector_1 = require("./Vector");
-const Vertex_1 = require("./Vertex");
-const VertexAttr_1 = require("./VertexAttr");
+var alloy_finger_1 = require("../../lib/alloy_finger");
+var draw_1 = require("./draw");
+var drawgl_1 = require("./drawgl");
+var drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
+var BezierPath_1 = require("./BezierPath");
+var Bounds_1 = require("./Bounds");
+var Circle_1 = require("./Circle");
+var CircleSector_1 = require("./CircleSector");
+var Grid_1 = require("./Grid");
+var KeyHandler_1 = require("./KeyHandler");
+var Line_1 = require("./Line");
+var MouseHandler_1 = require("./MouseHandler");
+var PBImage_1 = require("./PBImage");
+var Polygon_1 = require("./Polygon");
+var Triangle_1 = require("./Triangle");
+var VEllipse_1 = require("./VEllipse");
+var Vector_1 = require("./Vector");
+var Vertex_1 = require("./Vertex");
+var VertexAttr_1 = require("./VertexAttr");
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -124,7 +123,7 @@ const VertexAttr_1 = require("./VertexAttr");
  * @requires XYCoords
  * @requires XYDimension
  */
-class PlotBoilerplate {
+var PlotBoilerplate = /** @class */ (function () {
     /**
      * The constructor.
      *
@@ -185,7 +184,7 @@ class PlotBoilerplate {
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true).
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
      */
-    constructor(config) {
+    function PlotBoilerplate(config) {
         // This should be in some static block ...
         VertexAttr_1.VertexAttr.model = { bezierAutoAdjust: false,
             renderTime: 0,
@@ -203,7 +202,7 @@ class PlotBoilerplate {
          * @memberof PlotBoilerplate
          * @instance
          */
-        const f = PlotBoilerplate.utils.fetch;
+        var f = PlotBoilerplate.utils.fetch;
         this.config = {
             canvas: config.canvas,
             fullSize: f.val(config, 'fullSize', true),
@@ -229,8 +228,8 @@ class PlotBoilerplate {
             cssScaleX: f.num(config, 'cssScaleX', 1.0),
             cssScaleY: f.num(config, 'cssScaleY', 1.0),
             cssUniformScale: f.bool(config, 'cssUniformScale', true),
-            saveFile: () => { _self.hooks.saveFile(_self); },
-            setToRetina: () => { _self._setToRetina(); },
+            saveFile: function () { _self.hooks.saveFile(_self); },
+            setToRetina: function () { _self._setToRetina(); },
             autoDetectRetina: f.bool(config, 'autoDetectRetina', true),
             enableSVGExport: f.bool(config, 'enableSVGExport', true),
             // Listeners/observers
@@ -313,7 +312,7 @@ class PlotBoilerplate {
         // +-------------------------------
         this.grid = new Grid_1.Grid(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(50, 50));
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
-        const canvasElement = typeof config.canvas == 'string'
+        var canvasElement = typeof config.canvas == 'string'
             ? document.querySelector(config.canvas)
             : config.canvas;
         // Which renderer to use: Canvas2D, WebGL (experimental) or SVG?
@@ -321,12 +320,12 @@ class PlotBoilerplate {
             this.canvas = canvasElement;
             this.eventCatcher = this.canvas;
             if (this.config.enableGL && typeof drawgl_1.drawutilsgl === "undefined") {
-                console.warn(`Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.`);
-                console.warn(`Disabling GL and falling back to Canvas2D.`);
+                console.warn("Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.");
+                console.warn("Disabling GL and falling back to Canvas2D.");
                 this.config.enableGL = false;
             }
             if (this.config.enableGL) {
-                const ctx = this.canvas.getContext('webgl'); // webgl-experimental?
+                var ctx = this.canvas.getContext('webgl'); // webgl-experimental?
                 this.draw = new drawgl_1.drawutilsgl(ctx, false);
                 // PROBLEM: same instance of fill and draw when using WebGL.
                 //          Shader program cannot be duplicated on the same context.
@@ -334,14 +333,14 @@ class PlotBoilerplate {
                 console.warn('Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.');
             }
             else {
-                const ctx = this.canvas.getContext('2d');
+                var ctx = this.canvas.getContext('2d');
                 this.draw = new draw_1.drawutils(ctx, false);
                 this.fill = new draw_1.drawutils(ctx, true);
             }
         }
         else if (canvasElement.tagName.toLowerCase() === 'svg') {
             if (typeof drawutilssvg_1.drawutilssvg === "undefined")
-                throw `The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.`;
+                throw "The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.";
             this.canvas = canvasElement;
             this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), // offset
             new Vertex_1.Vertex(), // scale
@@ -377,7 +376,7 @@ class PlotBoilerplate {
             saveFile: PlotBoilerplate._saveFile
         };
         var _self = this;
-        globalThis.addEventListener('resize', () => _self.resizeCanvas());
+        globalThis.addEventListener('resize', function () { return _self.resizeCanvas(); });
         this.resizeCanvas();
         if (config.autoDetectRetina) {
             this._setToRetina();
@@ -403,13 +402,13 @@ class PlotBoilerplate {
      * @return {void}
      * @private
      **/
-    static _saveFile(pb) {
+    PlotBoilerplate._saveFile = function (pb) {
         if (typeof drawutilssvg_1.drawutilssvg === "undefined") {
-            console.error(`Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?`);
+            console.error("Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?");
             return;
         }
         // Create fake SVG node
-        const svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        var svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         // var svgNode = document.getElementById('preview-svg');
         // Draw everything to fake node.
         var tosvgDraw = new drawutilssvg_1.drawutilssvg(svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, false, // fillShapes=false
@@ -430,7 +429,7 @@ class PlotBoilerplate {
             throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
-    }
+    };
     ;
     /**
      * This function sets the canvas resolution to factor 2.0 (or the preferred pixel ratio of your device) for retina displays.
@@ -442,14 +441,14 @@ class PlotBoilerplate {
      * @return {void}
      * @private
      **/
-    _setToRetina() {
+    PlotBoilerplate.prototype._setToRetina = function () {
         this.config.autoDetectRetina = true;
-        const pixelRatio = globalThis.devicePixelRatio || 1;
+        var pixelRatio = globalThis.devicePixelRatio || 1;
         this.config.cssScaleX = this.config.cssScaleY = 1.0 / pixelRatio; // 0.5;
         this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio; // 2.0;
         this.resizeCanvas();
         this.updateCSSscale();
-    }
+    };
     ;
     /**
      * Set the current zoom and draw offset to fit the given bounds.
@@ -457,25 +456,25 @@ class PlotBoilerplate {
      * This method currently restores the aspect zoom ratio.
      *
      **/
-    fitToView(bounds) {
-        const canvasCenter = new Vertex_1.Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
-        const canvasRatio = this.canvasSize.width / this.canvasSize.height;
-        const ratio = bounds.width / bounds.height;
+    PlotBoilerplate.prototype.fitToView = function (bounds) {
+        var canvasCenter = new Vertex_1.Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
+        var canvasRatio = this.canvasSize.width / this.canvasSize.height;
+        var ratio = bounds.width / bounds.height;
         // Find the new draw offset
-        const center = new Vertex_1.Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
+        var center = new Vertex_1.Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
             .inv()
             .addXY(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
         this.setOffset(center);
         if (canvasRatio < ratio) {
-            const newUniformZoom = this.canvasSize.width / bounds.width;
+            var newUniformZoom = this.canvasSize.width / bounds.width;
             this.setZoom(newUniformZoom, newUniformZoom, canvasCenter);
         }
         else {
-            const newUniformZoom = this.canvasSize.height / bounds.height;
+            var newUniformZoom = this.canvasSize.height / bounds.height;
             this.setZoom(newUniformZoom, newUniformZoom, canvasCenter);
         }
         this.redraw();
-    }
+    };
     ;
     /**
      * Set the console for this instance.
@@ -486,9 +485,9 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    setConsole(con) {
+    PlotBoilerplate.prototype.setConsole = function (con) {
         this.console = con;
-    }
+    };
     ;
     /**
      * Update the CSS scale for the canvas depending onf the cssScale{X,Y} settings.<br>
@@ -501,14 +500,14 @@ class PlotBoilerplate {
      * @return {void}
      * @private
      **/
-    updateCSSscale() {
+    PlotBoilerplate.prototype.updateCSSscale = function () {
         if (this.config.cssUniformScale) {
             PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleX);
         }
         else {
             PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleY);
         }
-    }
+    };
     ;
     /**
      * Add a drawable object.<br>
@@ -533,9 +532,9 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    add(drawable, redraw) {
+    PlotBoilerplate.prototype.add = function (drawable, redraw) {
         if (Array.isArray(drawable)) {
-            const arr = drawable;
+            var arr = drawable;
             // for( var i in arr )
             for (var i = 0; i < arr.length; i++) {
                 this.add(arr[i], false);
@@ -586,7 +585,7 @@ class PlotBoilerplate {
         }
         else if (drawable instanceof BezierPath_1.BezierPath) {
             this.drawables.push(drawable);
-            const bezierPath = drawable;
+            var bezierPath = drawable;
             for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
                 if (!drawable.adjustCircular && i == 0)
                     this.vertices.push(bezierPath.bezierCurves[i].startPoint);
@@ -603,7 +602,7 @@ class PlotBoilerplate {
             this.vertices.push(drawable.lowerRight);
             this.drawables.push(drawable);
             // Todo: think about a IDragEvent interface
-            drawable.upperLeft.listeners.addDragListener((e) => {
+            drawable.upperLeft.listeners.addDragListener(function (e) {
                 drawable.lowerRight.add(e.params.dragAmount);
             });
             drawable.lowerRight.attr.selectable = false;
@@ -614,7 +613,7 @@ class PlotBoilerplate {
         // This is a workaround for backwards compatibility when the 'redraw' param was not yet present.
         if (redraw || typeof redraw == 'undefined')
             this.redraw();
-    }
+    };
     ;
     /**
      * Remove a drawable object.<br>
@@ -639,7 +638,7 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    remove(drawable, redraw, removeWithVertices) {
+    PlotBoilerplate.prototype.remove = function (drawable, redraw, removeWithVertices) {
         if (drawable instanceof Vertex_1.Vertex)
             this.removeVertex(drawable, false);
         for (var i = 0; i < this.drawables.length; i++) {
@@ -696,7 +695,7 @@ class PlotBoilerplate {
                 return;
             }
         }
-    }
+    };
     ;
     /**
      * Remove a vertex from the vertex list.<br>
@@ -708,7 +707,7 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    removeVertex(vert, redraw) {
+    PlotBoilerplate.prototype.removeVertex = function (vert, redraw) {
         for (var i = 0; i < this.vertices.length; i++) {
             if (this.vertices[i] === vert) {
                 this.vertices.splice(i, 1);
@@ -717,7 +716,7 @@ class PlotBoilerplate {
                 return;
             }
         }
-    }
+    };
     ;
     /**
      * Remove all elements.
@@ -730,13 +729,13 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      */
-    removeAll(keepVertices) {
+    PlotBoilerplate.prototype.removeAll = function (keepVertices) {
         this.drawables = [];
         if (!Boolean(keepVertices)) {
             this.vertices = [];
         }
         this.redraw();
-    }
+    };
     ;
     /**
      * Find the vertex near the given position.
@@ -748,12 +747,12 @@ class PlotBoilerplate {
      *                                  Note that the tolerance will be scaled up/down when zoomed.
      * @return The vertex near the given position or undefined if none was found there.
      **/
-    getVertexNear(pixelPosition, pixelTolerance) {
+    PlotBoilerplate.prototype.getVertexNear = function (pixelPosition, pixelTolerance) {
         var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min(this.config.cssScaleX, this.config.cssScaleY));
         if (p && p.typeName == "vertex")
             return this.vertices[p.vindex];
         return undefined;
-    }
+    };
     ;
     /**
      * Draw the grid with the current config settings.<br>
@@ -767,8 +766,8 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawGrid(draw) {
-        const gScale = {
+    PlotBoilerplate.prototype.drawGrid = function (draw) {
+        var gScale = {
             x: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX / this.config.cssScaleX,
             y: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) * this.config.rasterScaleY / this.config.cssScaleY
         };
@@ -787,7 +786,7 @@ class PlotBoilerplate {
                 draw.grid(offset, (this.canvasSize.width) / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.095)');
             }
         }
-    }
+    };
     ;
     /**
      * Draw the origin with the current config settings.<br>
@@ -801,18 +800,18 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawOrigin(draw) {
+    PlotBoilerplate.prototype.drawOrigin = function (draw) {
         // Add a crosshair to mark the origin
         draw.setCurrentId('origin');
         draw.crosshair({ x: 0, y: 0 }, 10, '#000000');
-    }
+    };
     ;
     /**
      * This is just a tiny helper function to determine the render color of vertices.
      **/
-    _handleColor(h, color) {
+    PlotBoilerplate.prototype._handleColor = function (h, color) {
         return h.attr.isSelected ? this.drawConfig.selectedVertex.color : (h.attr.draggable ? color : 'rgba(128,128,128,0.5)');
-    }
+    };
     /**
      * Draw all drawables.
      *
@@ -827,7 +826,7 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawDrawables(renderTime, draw, fill) {
+    PlotBoilerplate.prototype.drawDrawables = function (renderTime, draw, fill) {
         for (var i in this.drawables) {
             var d = this.drawables[i];
             this.draw.setCurrentId(d.uid);
@@ -836,7 +835,7 @@ class PlotBoilerplate {
             this.draw.setCurrentClassName(d.className);
             this.drawDrawable(d, renderTime, draw, fill);
         }
-    }
+    };
     ;
     /**
      * Draw the given drawable.
@@ -853,35 +852,35 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawDrawable(d, renderTime, draw, fill) {
+    PlotBoilerplate.prototype.drawDrawable = function (d, renderTime, draw, fill) {
         if (d instanceof BezierPath_1.BezierPath) {
             for (var c in d.bezierCurves) {
                 draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                 if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                     if (!d.bezierCurves[c].startPoint.attr.bezierAutoAdjust) {
                         if (d.bezierCurves[c].startPoint.attr.visible) {
-                            draw.setCurrentId(`${d.uid}_h0`);
-                            draw.setCurrentClassName(`${d.className}-start-handle`);
+                            draw.setCurrentId(d.uid + "_h0");
+                            draw.setCurrentClassName(d.className + "-start-handle");
                             draw.diamondHandle(d.bezierCurves[c].startPoint, 7, this._handleColor(d.bezierCurves[c].startPoint, this.drawConfig.vertex.color));
                         }
                         d.bezierCurves[c].startPoint.attr.renderTime = renderTime;
                     }
                     if (!d.bezierCurves[c].endPoint.attr.bezierAutoAdjust) {
                         if (d.bezierCurves[c].endPoint.attr.visible) {
-                            draw.setCurrentId(`${d.uid}_h1`);
-                            draw.setCurrentClassName(`${d.className}-end-handle`);
+                            draw.setCurrentId(d.uid + "_h1");
+                            draw.setCurrentClassName(d.className + "-end-handle");
                             draw.diamondHandle(d.bezierCurves[c].endPoint, 7, this._handleColor(d.bezierCurves[c].endPoint, this.drawConfig.vertex.color));
                         }
                         d.bezierCurves[c].endPoint.attr.renderTime = renderTime;
                     }
                     if (d.bezierCurves[c].startControlPoint.attr.visible) {
-                        draw.setCurrentId(`${d.uid}_h2`);
-                        draw.setCurrentClassName(`${d.className}-start-control-handle`);
+                        draw.setCurrentId(d.uid + "_h2");
+                        draw.setCurrentClassName(d.className + "-start-control-handle");
                         draw.circleHandle(d.bezierCurves[c].startControlPoint, 3, this._handleColor(d.bezierCurves[c].startControlPoint, '#008888'));
                     }
                     if (d.bezierCurves[c].endControlPoint.attr.visible) {
-                        draw.setCurrentId(`${d.uid}_h3`);
-                        draw.setCurrentClassName(`${d.className}-end-control-handle`);
+                        draw.setCurrentId(d.uid + "_h3");
+                        draw.setCurrentClassName(d.className + "-end-control-handle");
                         draw.circleHandle(d.bezierCurves[c].endControlPoint, 3, this._handleColor(d.bezierCurves[c].endControlPoint, '#008888'));
                     }
                     d.bezierCurves[c].startControlPoint.attr.renderTime = renderTime;
@@ -894,11 +893,11 @@ class PlotBoilerplate {
                     d.bezierCurves[c].endControlPoint.attr.renderTime = renderTime;
                 }
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
-                    draw.setCurrentId(`${d.uid}_l0`);
-                    draw.setCurrentClassName(`${d.className}-start-line`);
+                    draw.setCurrentId(d.uid + "_l0");
+                    draw.setCurrentClassName(d.className + "-start-line");
                     draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
-                    draw.setCurrentId(`${d.uid}_l1`);
-                    draw.setCurrentClassName(`${d.className}-end-line`);
+                    draw.setCurrentId(d.uid + "_l1");
+                    draw.setCurrentClassName(d.className + "-end-line");
                     draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
                 }
             }
@@ -918,15 +917,15 @@ class PlotBoilerplate {
         }
         else if (d instanceof VEllipse_1.VEllipse) {
             if (this.drawConfig.drawHandleLines) {
-                draw.setCurrentId(`${d.uid}_e0`);
-                draw.setCurrentClassName(`${d.className}-v-line`);
+                draw.setCurrentId(d.uid + "_e0");
+                draw.setCurrentClassName(d.className + "-v-line");
                 draw.line(d.center.clone().add(0, d.axis.y - d.center.y), d.axis, '#c8c8c8');
-                draw.setCurrentId(`${d.uid}_e1`);
-                draw.setCurrentClassName(`${d.className}-h-line`);
+                draw.setCurrentId(d.uid + "_e1");
+                draw.setCurrentClassName(d.className + "-h-line");
                 draw.line(d.center.clone().add(d.axis.x - d.center.x, 0), d.axis, '#c8c8c8');
             }
             draw.setCurrentId(d.uid);
-            draw.setCurrentClassName(`${d.className}`);
+            draw.setCurrentClassName("" + d.className);
             draw.ellipse(d.center, Math.abs(d.axis.x - d.center.x), Math.abs(d.axis.y - d.center.y), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
             if (!this.drawConfig.drawHandlePoints) {
                 d.center.attr.renderTime = renderTime;
@@ -957,8 +956,8 @@ class PlotBoilerplate {
         else if (d instanceof Vector_1.Vector) {
             draw.arrow(d.a, d.b, this.drawConfig.vector.color);
             if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
-                draw.setCurrentId(`${d.uid}_h0`);
-                draw.setCurrentClassName(`${d.className}-handle`);
+                draw.setCurrentId(d.uid + "_h0");
+                draw.setCurrentClassName(d.className + "-handle");
                 draw.circleHandle(d.b, 3, '#a8a8a8');
             }
             else {
@@ -971,15 +970,15 @@ class PlotBoilerplate {
         }
         else if (d instanceof PBImage_1.PBImage) {
             if (this.drawConfig.drawHandleLines) {
-                draw.setCurrentId(`${d.uid}_l0`);
-                draw.setCurrentClassName(`${d.className}-line`);
+                draw.setCurrentId(d.uid + "_l0");
+                draw.setCurrentClassName(d.className + "-line");
                 draw.line(d.upperLeft, d.lowerRight, this.drawConfig.image.color, this.drawConfig.image.lineWidth);
             }
             fill.setCurrentId(d.uid);
             fill.image(d.image, d.upperLeft, d.lowerRight.clone().sub(d.upperLeft));
             if (this.drawConfig.drawHandlePoints) {
-                draw.setCurrentId(`${d.uid}_h0`);
-                draw.setCurrentClassName(`${d.className}-lower-right`);
+                draw.setCurrentId(d.uid + "_h0");
+                draw.setCurrentClassName(d.className + "-lower-right");
                 draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                 d.lowerRight.attr.renderTime = renderTime;
             }
@@ -987,7 +986,7 @@ class PlotBoilerplate {
         else {
             console.error('Cannot draw object. Unknown class.');
         }
-    }
+    };
     ;
     /**
      * Draw the select-polygon (if there is one).
@@ -1000,14 +999,14 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawSelectPolygon(draw) {
+    PlotBoilerplate.prototype.drawSelectPolygon = function (draw) {
         // Draw select polygon?
         if (this.selectPolygon != null && this.selectPolygon.vertices.length > 0) {
             draw.setCurrentId(this.selectPolygon.uid);
             draw.polygon(this.selectPolygon, '#888888');
             draw.crosshair(this.selectPolygon.vertices[0], 3, '#008888');
         }
-    }
+    };
     ;
     /**
      * Draw all vertices that were not yet drawn with the given render time.<br>
@@ -1022,7 +1021,7 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawVertices(renderTime, draw) {
+    PlotBoilerplate.prototype.drawVertices = function (renderTime, draw) {
         // Draw all vertices as small squares if they were not already drawn by other objects
         for (var i in this.vertices) {
             if (this.drawConfig.drawVertices
@@ -1032,7 +1031,7 @@ class PlotBoilerplate {
                 draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], 'rgb(0,128,192)'));
             }
         }
-    }
+    };
     ;
     /**
      * Trigger redrawing of all objects.<br>
@@ -1044,7 +1043,7 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    redraw() {
+    PlotBoilerplate.prototype.redraw = function () {
         var renderTime = new Date().getTime();
         if (this.config.preClear)
             this.config.preClear();
@@ -1054,7 +1053,7 @@ class PlotBoilerplate {
         this.drawAll(renderTime, this.draw, this.fill);
         if (this.config.postDraw)
             this.config.postDraw();
-    }
+    };
     ;
     /**
      * Draw all: drawables, grid, select-polygon and vertices.
@@ -1064,7 +1063,7 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    drawAll(renderTime, draw, fill) {
+    PlotBoilerplate.prototype.drawAll = function (renderTime, draw, fill) {
         // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
         draw.beginDrawCycle(renderTime);
         fill.beginDrawCycle(renderTime);
@@ -1074,7 +1073,7 @@ class PlotBoilerplate {
         this.drawDrawables(renderTime, draw, fill);
         this.drawVertices(renderTime, draw);
         this.drawSelectPolygon(draw);
-    }
+    };
     ; // END redraw
     /**
      * This function clears the canvas with the configured background color.<br>
@@ -1087,10 +1086,10 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    clear() {
+    PlotBoilerplate.prototype.clear = function () {
         // Note that elements might have an alpha channel. Clear the scene first.
         this.draw.clear(this.config.backgroundColor);
-    }
+    };
     ;
     /**
      * Clear the selection.<br>
@@ -1104,13 +1103,13 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {PlotBoilerplate} this
      **/
-    clearSelection(redraw) {
+    PlotBoilerplate.prototype.clearSelection = function (redraw) {
         for (var i in this.vertices)
             this.vertices[i].attr.isSelected = false;
         if (redraw)
             this.redraw();
         return this;
-    }
+    };
     ;
     /**
      * Get the current view port.
@@ -1120,9 +1119,9 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {Bounds} The current viewport.
      **/
-    viewport() {
+    PlotBoilerplate.prototype.viewport = function () {
         return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY));
-    }
+    };
     ;
     /**
      * Trigger the saveFile.hook.
@@ -1132,25 +1131,25 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    saveFile() {
+    PlotBoilerplate.prototype.saveFile = function () {
         this.hooks.saveFile(this);
-    }
+    };
     ;
     /**
      * Internal helper function used to get 'float' properties from elements.
      * Used to determine border withs and paddings that were defined using CSS.
      */
-    getFProp(elem, propName) {
+    PlotBoilerplate.prototype.getFProp = function (elem, propName) {
         return parseFloat(globalThis.getComputedStyle(elem, null).getPropertyValue(propName));
-    }
+    };
     /**
      * Get the available inner space of the given container.
      *
      * Size minus padding minus border.
      **/
-    getAvailableContainerSpace() {
-        const _self = this;
-        const container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
+    PlotBoilerplate.prototype.getAvailableContainerSpace = function () {
+        var _self = this;
+        var container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
         // var canvas : HTMLCanvasElement = _self.canvas;
         _self.canvas.style.display = 'none';
         /* var
@@ -1170,7 +1169,7 @@ class PlotBoilerplate {
         var h = container.clientHeight;
         _self.canvas.style.display = 'block';
         return { width: (w - pl - pr - bl - br), height: (h - pt - pb - bt - bb) };
-    }
+    };
     ;
     /**
      * This function resizes the canvas to the required settings (toggles fullscreen).<br>
@@ -1182,9 +1181,10 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    resizeCanvas() {
-        const _self = this;
-        const _setSize = (w, h) => {
+    PlotBoilerplate.prototype.resizeCanvas = function () {
+        var _this = this;
+        var _self = this;
+        var _setSize = function (w, h) {
             w *= _self.config.canvasWidthFactor;
             h *= _self.config.canvasHeightFactor;
             _self.canvasSize.width = w;
@@ -1195,13 +1195,13 @@ class PlotBoilerplate {
                 _self.canvas.height = h;
             }
             else if (_self.canvas instanceof SVGElement) {
-                this.canvas.setAttribute('viewBox', `0 0 ${w} ${h}`);
-                this.canvas.setAttribute('width', `${w}`);
-                this.canvas.setAttribute('height', `${h}`);
-                this.draw.setSize(_self.canvasSize); // No need to set size to this.fill (instance copy)
+                _this.canvas.setAttribute('viewBox', "0 0 " + w + " " + h);
+                _this.canvas.setAttribute('width', "" + w);
+                _this.canvas.setAttribute('height', "" + h);
+                _this.draw.setSize(_self.canvasSize); // No need to set size to this.fill (instance copy)
                 // console.log(
-                this.eventCatcher.style.width = `${w}px`;
-                this.eventCatcher.style.height = `${h}px`;
+                _this.eventCatcher.style.width = w + "px";
+                _this.eventCatcher.style.height = h + "px";
             }
             else {
                 console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
@@ -1225,7 +1225,7 @@ class PlotBoilerplate {
         else if (_self.config.fitToParent) {
             // Set editor size
             _self.canvas.style.position = 'absolute';
-            const space = this.getAvailableContainerSpace();
+            var space = this.getAvailableContainerSpace();
             _self.canvas.style.width = (_self.config.canvasWidthFactor * space.width) + 'px';
             _self.canvas.style.height = (_self.config.canvasHeightFactor * space.height) + 'px';
             _self.canvas.style.top = null;
@@ -1239,7 +1239,7 @@ class PlotBoilerplate {
         }
         if (_self.config.redrawOnResize)
             _self.redraw();
-    }
+    };
     ;
     /**
      *  Add all vertices inside the polygon to the current selection.<br>
@@ -1250,12 +1250,12 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    selectVerticesInPolygon(polygon) {
+    PlotBoilerplate.prototype.selectVerticesInPolygon = function (polygon) {
         for (var i in this.vertices) {
             if (this.vertices[i].attr.selectable && polygon.containsVert(this.vertices[i]))
                 this.vertices[i].attr.isSelected = true;
         }
-    }
+    };
     ;
     /**
      * (Helper) Locates the point (index) at the passed position. Using an internal tolerance of 7 pixels.
@@ -1270,8 +1270,8 @@ class PlotBoilerplate {
      * @private
      * @return {IDraggable} Or false if none found.
      **/
-    locatePointNear(point, tolerance) {
-        const _self = this;
+    PlotBoilerplate.prototype.locatePointNear = function (point, tolerance) {
+        var _self = this;
         if (typeof tolerance == 'undefined')
             tolerance = 7;
         // Apply the zoom (the tolerant area should not shrink or grow when zooming)
@@ -1286,7 +1286,7 @@ class PlotBoilerplate {
             }
         }
         return null;
-    }
+    };
     /**
      * Handle left-click event.<br>
      *
@@ -1296,8 +1296,8 @@ class PlotBoilerplate {
      * @private
      * @return {void}
      **/
-    handleClick(e) {
-        const _self = this;
+    PlotBoilerplate.prototype.handleClick = function (e) {
+        var _self = this;
         // const x:number = e.params.pos.x;
         //const y:number = e.params.pos.y;
         var p = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
@@ -1305,12 +1305,12 @@ class PlotBoilerplate {
             _self.vertices[p.vindex].listeners.fireClickEvent(e);
             if (this.keyHandler && this.keyHandler.isDown('shift')) {
                 if (p.typeName == 'bpath') {
-                    let vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
+                    var vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
                     if (vert.attr.selectable)
                         vert.attr.isSelected = !vert.attr.isSelected;
                 }
                 else if (p.typeName == 'vertex') {
-                    let vert = _self.vertices[p.vindex];
+                    var vert = _self.vertices[p.vindex];
                     if (vert.attr.selectable)
                         vert.attr.isSelected = !vert.attr.isSelected;
                 }
@@ -1322,11 +1322,11 @@ class PlotBoilerplate {
             }
         }
         else if (_self.selectPolygon != null) {
-            const vert = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
+            var vert = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
             _self.selectPolygon.vertices.push(new Vertex_1.Vertex(vert.x, vert.y));
             _self.redraw();
         }
-    }
+    };
     /**
      * Transforms the given x-y-(mouse-)point to coordinates respecting the view offset
      * and the zoom settings.
@@ -1338,13 +1338,13 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {XYCoords} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
      **/
-    transformMousePosition(x, y) {
+    PlotBoilerplate.prototype.transformMousePosition = function (x, y) {
         /* return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
            y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) }; */
         // console.log('offset', this.config.offsetX, this.config.offsetY, this.draw.offset );
         return { x: (x / this.config.cssScaleX - this.config.offsetX) / (this.config.scaleX),
             y: (y / this.config.cssScaleY - this.config.offsetY) / (this.config.scaleY) };
-    }
+    };
     ;
     /**
      * Revert a transformed mouse position back to canvas coordinates.
@@ -1358,10 +1358,10 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {XYCoords} The canvas coordinates for the given position.
      **/
-    revertMousePosition(x, y) {
+    PlotBoilerplate.prototype.revertMousePosition = function (x, y) {
         return { x: x / this.config.cssScaleX + this.config.offsetX,
             y: y / this.config.cssScaleY + this.config.offsetY };
-    }
+    };
     ;
     /**
      * Determine if any elements are currently being dragged (on mouse move or touch move).
@@ -1371,9 +1371,9 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {number} The number of elements that are currently being dragged.
      **/
-    getDraggedElementCount() {
+    PlotBoilerplate.prototype.getDraggedElementCount = function () {
         return this.draggedElements.length;
-    }
+    };
     ;
     /**
      * (Helper) The mouse-down handler.
@@ -1385,8 +1385,8 @@ class PlotBoilerplate {
      * @private
      * @return {void}
      **/
-    mouseDownHandler(e) {
-        const _self = this;
+    PlotBoilerplate.prototype.mouseDownHandler = function (e) {
+        var _self = this;
         if (e.which != 1)
             return; // Only react on left mouse or touch events
         var p = _self.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
@@ -1414,7 +1414,7 @@ class PlotBoilerplate {
                 _self.vertices[p.vindex].listeners.fireDragStartEvent(e);
         }
         _self.redraw();
-    }
+    };
     ;
     /**
      * The mouse-drag handler.
@@ -1427,9 +1427,9 @@ class PlotBoilerplate {
      * @private
      * @return {void}
      **/
-    mouseDragHandler(e) {
-        const _self = this;
-        const oldDragAmount = { x: e.params.dragAmount.x, y: e.params.dragAmount.y };
+    PlotBoilerplate.prototype.mouseDragHandler = function (e) {
+        var _self = this;
+        var oldDragAmount = { x: e.params.dragAmount.x, y: e.params.dragAmount.y };
         e.params.dragAmount.x /= _self.config.cssScaleX;
         e.params.dragAmount.y /= _self.config.cssScaleY;
         // Important note to: this.keyHandler.isDown('ctrl')
@@ -1467,7 +1467,7 @@ class PlotBoilerplate {
         e.params.dragAmount.x = oldDragAmount.x;
         e.params.dragAmount.y = oldDragAmount.y;
         _self.redraw();
-    }
+    };
     ;
     /**
      * The mouse-up handler.
@@ -1479,8 +1479,8 @@ class PlotBoilerplate {
      * @private
      * @return {void}
      **/
-    mouseUpHandler(e) {
-        const _self = this;
+    PlotBoilerplate.prototype.mouseUpHandler = function (e) {
+        var _self = this;
         if (e.which != 1)
             return; // Only react on left mouse;
         if (!e.params.wasDragged) {
@@ -1497,7 +1497,7 @@ class PlotBoilerplate {
         }
         _self.draggedElements = [];
         _self.redraw();
-    }
+    };
     ;
     /**
      * The mouse-wheel handler.
@@ -1509,11 +1509,11 @@ class PlotBoilerplate {
      * @private
      * @return {void}
      **/
-    mouseWheelHandler(e) {
+    PlotBoilerplate.prototype.mouseWheelHandler = function (e) {
         var zoomStep = 1.25; // Make configurable?
         // CHANGED replaced _self by this
-        const _self = this;
-        const we = e;
+        var _self = this;
+        var we = e;
         if (we.deltaY < 0) {
             _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex_1.Vertex(e.params.pos.x, e.params.pos.y));
         }
@@ -1522,7 +1522,7 @@ class PlotBoilerplate {
         }
         e.preventDefault();
         _self.redraw();
-    }
+    };
     ;
     /**
      * Set the new draw offset.
@@ -1531,12 +1531,12 @@ class PlotBoilerplate {
      *
      * @param {Vertex} newOffset - The new draw offset to use.
      **/
-    setOffset(newOffset) {
+    PlotBoilerplate.prototype.setOffset = function (newOffset) {
         this.draw.offset.set(newOffset);
         this.fill.offset.set(newOffset);
         this.config.offsetX = newOffset.x;
         this.config.offsetY = newOffset.y;
-    }
+    };
     ;
     /**
     * Set a new zoom value (and re-adjust the draw offset).
@@ -1547,23 +1547,23 @@ class PlotBoilerplate {
     * @param {number} zoomFactorY - The new vertical zoom value.
     * @param {Vertex} interactionPos - The position of mouse/touch interaction.
     **/
-    setZoom(zoomFactorX, zoomFactorY, interactionPos) {
-        let oldPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
+    PlotBoilerplate.prototype.setZoom = function (zoomFactorX, zoomFactorY, interactionPos) {
+        var oldPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
         this.draw.scale.x = this.fill.scale.x = this.config.scaleX = Math.max(zoomFactorX, 0.01);
         this.draw.scale.y = this.fill.scale.y = this.config.scaleY = Math.max(zoomFactorY, 0.01);
-        let newPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
-        let newOffsetX = this.draw.offset.x + (newPos.x - oldPos.x) * this.draw.scale.x;
-        let newOffsetY = this.draw.offset.y + (newPos.y - oldPos.y) * this.draw.scale.y;
+        var newPos = this.transformMousePosition(interactionPos.x, interactionPos.y);
+        var newOffsetX = this.draw.offset.x + (newPos.x - oldPos.x) * this.draw.scale.x;
+        var newOffsetY = this.draw.offset.y + (newPos.y - oldPos.y) * this.draw.scale.y;
         this.setOffset({ x: newOffsetX, y: newOffsetY });
-    }
-    installInputListeners() {
+    };
+    PlotBoilerplate.prototype.installInputListeners = function () {
         var _self = this;
         if (this.config.enableMouse) {
             // Install a mouse handler on the canvas.
             new MouseHandler_1.MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
-                .down((e) => { _self.mouseDownHandler(e); })
-                .drag((e) => { _self.mouseDragHandler(e); })
-                .up((e) => { _self.mouseUpHandler(e); });
+                .down(function (e) { _self.mouseDownHandler(e); })
+                .drag(function (e) { _self.mouseDragHandler(e); })
+                .up(function (e) { _self.mouseUpHandler(e); });
         }
         else {
             _self.console.log('Mouse interaction disabled.');
@@ -1571,15 +1571,15 @@ class PlotBoilerplate {
         if (this.config.enableMouseWheel) {
             // Install a mouse handler on the canvas.
             new MouseHandler_1.MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
-                .wheel((e) => { _self.mouseWheelHandler(e); });
+                .wheel(function (e) { _self.mouseWheelHandler(e); });
         }
         else {
             _self.console.log('Mouse wheel interaction disabled.');
         }
         if (this.config.enableTouch) {
             // Install a touch handler on the canvas.
-            const relPos = (pos) => {
-                const bounds = _self.canvas.getBoundingClientRect();
+            var relPos_1 = function (pos) {
+                var bounds = _self.canvas.getBoundingClientRect();
                 return { x: pos.x - bounds.left,
                     y: pos.y - bounds.top // _self.canvas.offsetTop
                 };
@@ -1594,7 +1594,7 @@ class PlotBoilerplate {
                     var touchDownPos = null;
                     var draggedElement = null;
                     var multiTouchStartScale = null;
-                    const clearTouch = () => {
+                    var clearTouch_1 = function () {
                         touchMovePos = null;
                         touchDownPos = null;
                         draggedElement = null;
@@ -1603,11 +1603,11 @@ class PlotBoilerplate {
                     };
                     // TODO: cc
                     // var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
-                    var af = new alloy_finger_1.AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
-                        touchStart: (evt) => {
+                    new alloy_finger_1.AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
+                        touchStart: function (evt) {
                             if (evt.touches.length == 1) {
-                                touchMovePos = new Vertex_1.Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
-                                touchDownPos = new Vertex_1.Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
+                                touchMovePos = new Vertex_1.Vertex(relPos_1({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
+                                touchDownPos = new Vertex_1.Vertex(relPos_1({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
                                 if (draggedElement && draggedElement.typeName == 'vertex') {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
@@ -1617,11 +1617,11 @@ class PlotBoilerplate {
                                 }
                             }
                         },
-                        touchMove: (evt) => {
+                        touchMove: function (evt) {
                             if (evt.touches.length == 1 && draggedElement) {
                                 evt.preventDefault();
                                 evt.stopPropagation();
-                                var rel = relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY });
+                                var rel = relPos_1({ x: evt.touches[0].clientX, y: evt.touches[0].clientY });
                                 var trans = _self.transformMousePosition(rel.x, rel.y);
                                 var diff = new Vertex_1.Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
                                 if (draggedElement.typeName == 'vertex') {
@@ -1643,7 +1643,7 @@ class PlotBoilerplate {
                                 _self.redraw();
                             }
                         },
-                        touchEnd: (evt) => {
+                        touchEnd: function (evt) {
                             // Note: e.touches.length is 0 here
                             if (draggedElement && draggedElement.typeName == 'vertex') {
                                 var draggingVertex = _self.vertices[draggedElement.vindex];
@@ -1657,22 +1657,22 @@ class PlotBoilerplate {
                                     draggingVertex.listeners.fireDragEndEvent(fakeEvent);
                                 }
                             }
-                            clearTouch();
+                            clearTouch_1();
                         },
-                        touchCancel: (evt) => {
-                            clearTouch();
+                        touchCancel: function (evt) {
+                            clearTouch_1();
                         },
-                        multipointStart: (evt) => {
+                        multipointStart: function (evt) {
                             multiTouchStartScale = _self.draw.scale.clone();
                         },
-                        multipointEnd: (evt) => {
+                        multipointEnd: function (evt) {
                             multiTouchStartScale = null;
                         },
-                        pinch: (evt) => {
+                        pinch: function (evt) {
                             // For pinching there must be at least two touch items
-                            const fingerA = new Vertex_1.Vertex(evt.touches.item(0).clientX, evt.touches.item(0).clientY);
-                            const fingerB = new Vertex_1.Vertex(evt.touches.item(1).clientX, evt.touches.item(1).clientY);
-                            const center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
+                            var fingerA = new Vertex_1.Vertex(evt.touches.item(0).clientX, evt.touches.item(0).clientY);
+                            var fingerB = new Vertex_1.Vertex(evt.touches.item(1).clientX, evt.touches.item(1).clientY);
+                            var center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
                             _self.setZoom(multiTouchStartScale.x * evt.zoom, multiTouchStartScale.y * evt.zoom, center);
                             _self.redraw();
                         }
@@ -1717,7 +1717,7 @@ class PlotBoilerplate {
         else {
             _self.console.log('Keyboard interaction disabled.');
         }
-    }
+    };
     /**
      * Creates a control GUI (a dat.gui instance) for this
      * plot boilerplate instance.
@@ -1727,220 +1727,223 @@ class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @return {dat.gui.GUI}
      **/
-    createGUI() {
+    PlotBoilerplate.prototype.createGUI = function () {
         // This function moved to the helper utils.
         // We do not want to include the whole dat.GUI package.
         if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
             return globalThis["utils"].createGUI(this);
         else
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
-    }
+    };
     ;
-} // END class PlotBoilerplate
-exports.PlotBoilerplate = PlotBoilerplate;
-/** @constant {number} */
-PlotBoilerplate.DEFAULT_CANVAS_WIDTH = 1024;
-/** @constant {number} */
-PlotBoilerplate.DEFAULT_CANVAS_HEIGHT = 768;
-/** @constant {number} */
-PlotBoilerplate.DEFAULT_CLICK_TOLERANCE = 8;
-/** @constant {number} */
-PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE = 32;
-/**
- * A wrapper class for draggable items (mostly vertices).
- * @private
- **/
-PlotBoilerplate.Draggable = (_a = class {
-        constructor(item, typeName) {
-            this.item = item;
-            this.typeName = typeName;
-        }
-        ;
-        isVertex() { return this.typeName == PlotBoilerplate.Draggable.VERTEX; }
-        ;
-        setVIndex(vindex) { this.vindex = vindex; return this; }
-        ;
-    },
-    _a.VERTEX = 'vertex',
-    _a);
-/**
- * A set of helper functions.
- **/
-PlotBoilerplate.utils = {
+    var _a;
+    /** @constant {number} */
+    PlotBoilerplate.DEFAULT_CANVAS_WIDTH = 1024;
+    /** @constant {number} */
+    PlotBoilerplate.DEFAULT_CANVAS_HEIGHT = 768;
+    /** @constant {number} */
+    PlotBoilerplate.DEFAULT_CLICK_TOLERANCE = 8;
+    /** @constant {number} */
+    PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE = 32;
     /**
-     * Merge the elements in the 'extension' object into the 'base' object based on
-     * the keys of 'base'.
-     *
-     * @param {Object} base
-     * @param {Object} extension
-     * @return {Object} base extended by the new attributes.
+     * A wrapper class for draggable items (mostly vertices).
+     * @private
      **/
-    safeMergeByKeys: (base, extension) => {
-        for (var k in extension) {
-            if (!extension.hasOwnProperty(k))
-                continue;
-            if (base.hasOwnProperty(k)) {
-                var typ = typeof base[k];
-                try {
-                    if (typ == 'boolean')
-                        base[k] = !!JSON.parse(extension[k]);
-                    else if (typ == 'number')
-                        base[k] = JSON.parse(extension[k]) * 1;
-                    else if (typ == 'function' && typeof extension[k] == 'function')
-                        base[k] = extension[k];
-                    else
-                        base[k] = extension[k];
-                }
-                catch (e) {
-                    console.error('error in key ', k, extension[k], e);
-                }
+    PlotBoilerplate.Draggable = (_a = /** @class */ (function () {
+            function class_1(item, typeName) {
+                this.item = item;
+                this.typeName = typeName;
             }
-            else {
-                base[k] = extension[k];
-            }
-        }
-        return base;
-    },
+            ;
+            class_1.prototype.isVertex = function () { return this.typeName == PlotBoilerplate.Draggable.VERTEX; };
+            ;
+            class_1.prototype.setVIndex = function (vindex) { this.vindex = vindex; return this; };
+            ;
+            return class_1;
+        }()),
+        _a.VERTEX = 'vertex',
+        _a);
     /**
-     * A helper function to scale elements (usually the canvas) using CSS.
-     *
-     * transform-origin is at (0,0).
-     *
-     * @param {HTMLElement} element - The DOM element to scale.
-     * @param {number} scaleX The - X scale factor.
-     * @param {number} scaleY The - Y scale factor.
-     * @return {void}
+     * A set of helper functions.
      **/
-    setCSSscale: (element, scaleX, scaleY) => {
-        element.style['transform-origin'] = '0 0';
-        if (scaleX == 1.0 && scaleY == 1.0)
-            element.style.transform = null;
-        else
-            element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
-    },
-    // A helper for fetching data from objects.
-    fetch: {
+    PlotBoilerplate.utils = {
         /**
-         * A helper function to the the object property value specified by the given key.
+         * Merge the elements in the 'extension' object into the 'base' object based on
+         * the keys of 'base'.
          *
-         * @param {any} object   - The object to get the property's value from. Must not be null.
-         * @param {string} key      - The key of the object property (the name).
-         * @param {any}    fallback - A default value if the key does not exist.
+         * @param {Object} base
+         * @param {Object} extension
+         * @return {Object} base extended by the new attributes.
          **/
-        val: (obj, key, fallback) => {
-            if (!obj.hasOwnProperty(key))
-                return fallback;
-            if (typeof obj[key] == 'undefined')
-                return fallback;
-            return obj[key];
-        },
-        /**
-         * A helper function to the the object property numeric value specified by the given key.
-         *
-         * @param {any}    object   - The object to get the property's value from. Must not be null.
-         * @param {string} key      - The key of the object property (the name).
-         * @param {number} fallback - A default value if the key does not exist.
-         * @return {number}
-         **/
-        num: (obj, key, fallback) => {
-            if (!obj.hasOwnProperty(key))
-                return fallback;
-            if (typeof obj[key] === 'number')
-                return obj[key];
-            else {
-                try {
-                    return JSON.parse(obj[key]) * 1;
-                }
-                catch (e) {
-                    return fallback;
-                }
-            }
-        },
-        /**
-         * A helper function to the the object property boolean value specified by the given key.
-         *
-         * @param {any}     object   - The object to get the property's value from. Must not be null.
-         * @param {string}  key      - The key of the object property (the name).
-         * @param {boolean} fallback - A default value if the key does not exist.
-         * @return {boolean}
-         **/
-        bool: (obj, key, fallback) => {
-            if (!obj.hasOwnProperty(key))
-                return fallback;
-            if (typeof obj[key] == 'boolean')
-                return obj[key];
-            else {
-                try {
-                    return !!JSON.parse(obj[key]);
-                }
-                catch (e) {
-                    return fallback;
-                }
-            }
-        },
-        /**
-         * A helper function to the the object property function-value specified by the given key.
-         *
-         * @param {any}      object   - The object to get the property's value from. Must not be null.
-         * @param {string}   key      - The key of the object property (the name).
-         * @param {function} fallback - A default value if the key does not exist.
-         * @return {function}
-         **/
-        func: (obj, key, fallback) => {
-            if (!obj.hasOwnProperty(key))
-                return fallback;
-            if (typeof obj[key] !== 'function')
-                return fallback;
-            return obj[key];
-        }
-    },
-    /**
-     * Installs vertex listeners to the path's vertices so that controlpoints
-     * move with their path points when dragged.
-     *
-     * Bézier path points with attr.bezierAutoAdjust==true will have their
-     * two control points audo-updated if moved, too (keep path connections smooth).
-     *
-     * @param {BezierPath} bezierPath - The path to use auto-adjustment for.
-     **/
-    enableBezierPathAutoAdjust: (bezierPath) => {
-        for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
-            // This should be wrapped into the BezierPath implementation.
-            bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
-                var cindex = bezierPath.locateCurveByStartPoint(e.params.vertex);
-                bezierPath.bezierCurves[cindex].startPoint.addXY(-e.params.dragAmount.x, -e.params.dragAmount.y);
-                bezierPath.moveCurvePoint(cindex * 1, bezierPath.START_POINT, e.params.dragAmount);
-                bezierPath.updateArcLengths();
-            });
-            bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {
-                var cindex = bezierPath.locateCurveByStartControlPoint(e.params.vertex);
-                if (!bezierPath.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust)
-                    return;
-                bezierPath.adjustPredecessorControlPoint(cindex * 1, true, // obtain handle length?
-                false // update arc lengths
-                );
-                bezierPath.updateArcLengths();
-            });
-            bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener(function (e) {
-                var cindex = bezierPath.locateCurveByEndControlPoint(e.params.vertex);
-                if (!bezierPath.bezierCurves[cindex % bezierPath.bezierCurves.length].endPoint.attr.bezierAutoAdjust)
-                    return;
-                bezierPath.adjustSuccessorControlPoint(cindex * 1, true, // obtain handle length?
-                false // update arc lengths
-                );
-                bezierPath.updateArcLengths();
-            });
-            if (i + 1 == bezierPath.bezierCurves.length) { // && !bezierPath.adjustCircular ) { 
-                // Move last control point with the end point (if not circular)
-                bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
-                    if (!bezierPath.adjustCircular) {
-                        var cindex = bezierPath.locateCurveByEndPoint(e.params.vertex);
-                        bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex_1.Vertex({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
+        safeMergeByKeys: function (base, extension) {
+            for (var k in extension) {
+                if (!extension.hasOwnProperty(k))
+                    continue;
+                if (base.hasOwnProperty(k)) {
+                    var typ = typeof base[k];
+                    try {
+                        if (typ == 'boolean')
+                            base[k] = !!JSON.parse(extension[k]);
+                        else if (typ == 'number')
+                            base[k] = JSON.parse(extension[k]) * 1;
+                        else if (typ == 'function' && typeof extension[k] == 'function')
+                            base[k] = extension[k];
+                        else
+                            base[k] = extension[k];
                     }
+                    catch (e) {
+                        console.error('error in key ', k, extension[k], e);
+                    }
+                }
+                else {
+                    base[k] = extension[k];
+                }
+            }
+            return base;
+        },
+        /**
+         * A helper function to scale elements (usually the canvas) using CSS.
+         *
+         * transform-origin is at (0,0).
+         *
+         * @param {HTMLElement} element - The DOM element to scale.
+         * @param {number} scaleX The - X scale factor.
+         * @param {number} scaleY The - Y scale factor.
+         * @return {void}
+         **/
+        setCSSscale: function (element, scaleX, scaleY) {
+            element.style['transform-origin'] = '0 0';
+            if (scaleX == 1.0 && scaleY == 1.0)
+                element.style.transform = null;
+            else
+                element.style.transform = 'scale(' + scaleX + ',' + scaleY + ')';
+        },
+        // A helper for fetching data from objects.
+        fetch: {
+            /**
+             * A helper function to the the object property value specified by the given key.
+             *
+             * @param {any} object   - The object to get the property's value from. Must not be null.
+             * @param {string} key      - The key of the object property (the name).
+             * @param {any}    fallback - A default value if the key does not exist.
+             **/
+            val: function (obj, key, fallback) {
+                if (!obj.hasOwnProperty(key))
+                    return fallback;
+                if (typeof obj[key] == 'undefined')
+                    return fallback;
+                return obj[key];
+            },
+            /**
+             * A helper function to the the object property numeric value specified by the given key.
+             *
+             * @param {any}    object   - The object to get the property's value from. Must not be null.
+             * @param {string} key      - The key of the object property (the name).
+             * @param {number} fallback - A default value if the key does not exist.
+             * @return {number}
+             **/
+            num: function (obj, key, fallback) {
+                if (!obj.hasOwnProperty(key))
+                    return fallback;
+                if (typeof obj[key] === 'number')
+                    return obj[key];
+                else {
+                    try {
+                        return JSON.parse(obj[key]) * 1;
+                    }
+                    catch (e) {
+                        return fallback;
+                    }
+                }
+            },
+            /**
+             * A helper function to the the object property boolean value specified by the given key.
+             *
+             * @param {any}     object   - The object to get the property's value from. Must not be null.
+             * @param {string}  key      - The key of the object property (the name).
+             * @param {boolean} fallback - A default value if the key does not exist.
+             * @return {boolean}
+             **/
+            bool: function (obj, key, fallback) {
+                if (!obj.hasOwnProperty(key))
+                    return fallback;
+                if (typeof obj[key] == 'boolean')
+                    return obj[key];
+                else {
+                    try {
+                        return !!JSON.parse(obj[key]);
+                    }
+                    catch (e) {
+                        return fallback;
+                    }
+                }
+            },
+            /**
+             * A helper function to the the object property function-value specified by the given key.
+             *
+             * @param {any}      object   - The object to get the property's value from. Must not be null.
+             * @param {string}   key      - The key of the object property (the name).
+             * @param {function} fallback - A default value if the key does not exist.
+             * @return {function}
+             **/
+            func: function (obj, key, fallback) {
+                if (!obj.hasOwnProperty(key))
+                    return fallback;
+                if (typeof obj[key] !== 'function')
+                    return fallback;
+                return obj[key];
+            }
+        },
+        /**
+         * Installs vertex listeners to the path's vertices so that controlpoints
+         * move with their path points when dragged.
+         *
+         * Bézier path points with attr.bezierAutoAdjust==true will have their
+         * two control points audo-updated if moved, too (keep path connections smooth).
+         *
+         * @param {BezierPath} bezierPath - The path to use auto-adjustment for.
+         **/
+        enableBezierPathAutoAdjust: function (bezierPath) {
+            for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
+                // This should be wrapped into the BezierPath implementation.
+                bezierPath.bezierCurves[i].startPoint.listeners.addDragListener(function (e) {
+                    var cindex = bezierPath.locateCurveByStartPoint(e.params.vertex);
+                    bezierPath.bezierCurves[cindex].startPoint.addXY(-e.params.dragAmount.x, -e.params.dragAmount.y);
+                    bezierPath.moveCurvePoint(cindex * 1, bezierPath.START_POINT, e.params.dragAmount);
                     bezierPath.updateArcLengths();
                 });
-            }
-        } // END for
-    }
-}; // END utils
+                bezierPath.bezierCurves[i].startControlPoint.listeners.addDragListener(function (e) {
+                    var cindex = bezierPath.locateCurveByStartControlPoint(e.params.vertex);
+                    if (!bezierPath.bezierCurves[cindex].startPoint.attr.bezierAutoAdjust)
+                        return;
+                    bezierPath.adjustPredecessorControlPoint(cindex * 1, true, // obtain handle length?
+                    false // update arc lengths
+                    );
+                    bezierPath.updateArcLengths();
+                });
+                bezierPath.bezierCurves[i].endControlPoint.listeners.addDragListener(function (e) {
+                    var cindex = bezierPath.locateCurveByEndControlPoint(e.params.vertex);
+                    if (!bezierPath.bezierCurves[cindex % bezierPath.bezierCurves.length].endPoint.attr.bezierAutoAdjust)
+                        return;
+                    bezierPath.adjustSuccessorControlPoint(cindex * 1, true, // obtain handle length?
+                    false // update arc lengths
+                    );
+                    bezierPath.updateArcLengths();
+                });
+                if (i + 1 == bezierPath.bezierCurves.length) { // && !bezierPath.adjustCircular ) { 
+                    // Move last control point with the end point (if not circular)
+                    bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
+                        if (!bezierPath.adjustCircular) {
+                            var cindex = bezierPath.locateCurveByEndPoint(e.params.vertex);
+                            bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex_1.Vertex({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
+                        }
+                        bezierPath.updateArcLengths();
+                    });
+                }
+            } // END for
+        }
+    }; // END utils
+    return PlotBoilerplate;
+}()); // END class PlotBoilerplate
+exports.PlotBoilerplate = PlotBoilerplate;
 //# sourceMappingURL=PlotBoilerplate.js.map

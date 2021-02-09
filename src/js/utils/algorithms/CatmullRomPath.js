@@ -10,8 +10,8 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CatmullRomPath = void 0;
-const CubicBezierCurve_1 = require("../../CubicBezierCurve");
-const Vertex_1 = require("../../Vertex");
+var CubicBezierCurve_1 = require("../../CubicBezierCurve");
+var Vertex_1 = require("../../Vertex");
 /**
  * @classdesc Compute the Catmull-Rom spline path from a sequence of points (vertices).
  *
@@ -24,13 +24,13 @@ const Vertex_1 = require("../../Vertex");
  * @requires CubicBezierCurve
  * @requires Vertex
  */
-class CatmullRomPath {
+var CatmullRomPath = /** @class */ (function () {
     /**
      * @constructor
      * @name CatmullRomPath
      * @param {Array<Vertex>=} vertices? - An optional array of vertices to initialize the path with.
      **/
-    constructor(vertices) {
+    function CatmullRomPath(vertices) {
         this.vertices = vertices ? vertices : [];
     }
     ;
@@ -42,9 +42,9 @@ class CatmullRomPath {
      * @instance
      * @param {Vertex} p - The vertex (point) to add.
      **/
-    addPoint(p) {
+    CatmullRomPath.prototype.addPoint = function (p) {
         this.vertices.push(p);
-    }
+    };
     ;
     /**
      * Generate a sequence of cubic Bézier curves from the point set.
@@ -56,16 +56,16 @@ class CatmullRomPath {
      * @param {number=1} tension - (default=0) An optional tension parameter.
      * @return Array<CubicBezierCurve>
      **/
-    generateCurve(circular, tension) {
+    CatmullRomPath.prototype.generateCurve = function (circular, tension) {
         if (typeof tension === 'undefined')
             tension = 1.0;
         if (circular)
             return this.solveClosed(tension);
         else
             return this.solveOpen(tension);
-    }
+    };
     ;
-    solveOpen(k) {
+    CatmullRomPath.prototype.solveOpen = function (k) {
         var curves = [];
         if (k == null || typeof k === 'undefined')
             k = 1;
@@ -81,9 +81,9 @@ class CatmullRomPath {
             curves.push(new CubicBezierCurve_1.CubicBezierCurve(p1, p2, cp1, cp2));
         }
         return curves;
-    }
+    };
     ; // END solveOpen
-    solveClosed(k) {
+    CatmullRomPath.prototype.solveClosed = function (k) {
         var curves = [];
         if (k == null || typeof k === 'undefined')
             k = 1;
@@ -99,9 +99,10 @@ class CatmullRomPath {
             curves.push(new CubicBezierCurve_1.CubicBezierCurve(p1, p2, cp1, cp2));
         }
         return curves;
-    }
+    };
     ; // END solveClosed
-}
+    return CatmullRomPath;
+}());
 exports.CatmullRomPath = CatmullRomPath;
 ; // END class
 //# sourceMappingURL=CatmullRomPath.js.map

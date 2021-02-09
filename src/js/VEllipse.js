@@ -12,7 +12,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipse = void 0;
-const UIDGenerator_1 = require("./UIDGenerator");
+var UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -20,9 +20,8 @@ const UIDGenerator_1 = require("./UIDGenerator");
  * @requires UID
  * @requires UIDGenerator
  * @requires Vertex
- * @requires XYCoords
  */
-class VEllipse {
+var VEllipse = /** @class */ (function () {
     /**
      * The constructor.
      *
@@ -31,7 +30,7 @@ class VEllipse {
      * @param {Vertex} axis The x- and y-axis.
      * @name VEllipse
      **/
-    constructor(center, axis) {
+    function VEllipse(center, axis) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -48,7 +47,7 @@ class VEllipse {
      * @param {object} options { className?:string }
      * @return string The SVG string
      */
-    toSVGString(options) {
+    VEllipse.prototype.toSVGString = function (options) {
         options = options || {};
         var buffer = [];
         buffer.push('<ellipse');
@@ -60,8 +59,9 @@ class VEllipse {
         buffer.push(' ry="' + this.axis.y + '"');
         buffer.push(' />');
         return buffer.join('');
-    }
+    };
     ;
-}
+    return VEllipse;
+}());
 exports.VEllipse = VEllipse;
 //# sourceMappingURL=VEllipse.js.map

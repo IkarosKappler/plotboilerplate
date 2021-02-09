@@ -15,19 +15,34 @@
  * @file Vector
  * @public
  **/
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Vector = void 0;
-const VertTuple_1 = require("./VertTuple");
-const Vertex_1 = require("./Vertex");
+var VertTuple_1 = require("./VertTuple");
+var Vertex_1 = require("./Vertex");
 /**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
  *            <br>
  *            Vectors are drawn with an arrow at their end point.<br>
  *            <b>The Vector class extends the Line class.</b>
  *
- * @requires Vertex, Line
+ * @requires VertTuple
+ * @requires Vertex
  **/
-class Vector extends VertTuple_1.VertTuple {
+var Vector = /** @class */ (function (_super) {
+    __extends(Vector, _super);
     /**
      * The constructor.
      *
@@ -37,12 +52,13 @@ class Vector extends VertTuple_1.VertTuple {
      * @param {Vertex} vertA - The start vertex of the vector.
      * @param {Vertex} vertB - The end vertex of the vector.
      **/
-    constructor(vertA, vertB) {
-        super(vertA, vertB, (a, b) => new Vector(a, b));
+    function Vector(vertA, vertB) {
+        var _this = _super.call(this, vertA, vertB, function (a, b) { return new Vector(a, b); }) || this;
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
-        this.className = "Vector";
+        _this.className = "Vector";
+        return _this;
     }
     ;
     /**
@@ -51,14 +67,14 @@ class Vector extends VertTuple_1.VertTuple {
      * @param {Number} t The position on the vector.
      * @return {Vector} A new vector being the perpendicular of this vector sitting on a.
      **/
-    perp() {
+    Vector.prototype.perp = function () {
         var v = this.clone();
         v.sub(this.a);
         v = new Vector(new Vertex_1.Vertex(), new Vertex_1.Vertex(-v.b.y, v.b.x));
         v.a.add(this.a);
         v.b.add(this.a);
         return v;
-    }
+    };
     ;
     /**
      * The inverse of a vector is a vector witht the same magnitude but oppose direction.
@@ -67,23 +83,23 @@ class Vector extends VertTuple_1.VertTuple {
      *
      * @return {Vector}
      **/
-    inverse() {
+    Vector.prototype.inverse = function () {
         var tmp = this.a;
         this.a = this.b;
         this.b = tmp;
         return this;
-    }
+    };
     ;
     /**
      * This function computes the inverse of the vector, which means 'a' stays untouched.
      *
      * @return {Vector} this for chaining.
      **/
-    inv() {
+    Vector.prototype.inv = function () {
         this.b.x = this.a.x - (this.b.x - this.a.x);
         this.b.y = this.a.y - (this.b.y - this.a.y);
         return this;
-    }
+    };
     ;
     /**
      * Get the intersection if this vector and the specified vector.
@@ -94,7 +110,7 @@ class Vector extends VertTuple_1.VertTuple {
      * @instance
      * @memberof Line
      **/
-    intersection(line) {
+    Vector.prototype.intersection = function (line) {
         var denominator = this.denominator(line);
         if (denominator == 0)
             return null;
@@ -108,7 +124,7 @@ class Vector extends VertTuple_1.VertTuple {
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
-    }
+    };
     ;
     /**
      * Create an SVG representation of this line.
@@ -121,7 +137,7 @@ class Vector extends VertTuple_1.VertTuple {
      * @instance
      * @memberof Vector
      **/
-    toSVGString(options) {
+    Vector.prototype.toSVGString = function (options) {
         options = options || {};
         var buffer = [];
         var vertices = Vector.utils.buildArrowHead(this.a, this.b, 8, 1.0, 1.0);
@@ -145,44 +161,45 @@ class Vector extends VertTuple_1.VertTuple {
         buffer.push('"/>');
         buffer.push('</g>');
         return buffer.join('');
-    }
+    };
     ;
-}
+    Vector.utils = {
+        /**
+         * Generate a four-point arrow head, starting at the vector end minus the
+         * arrow head length.
+         *
+         * The first vertex in the returned array is guaranteed to be the located
+         * at the vector line end minus the arrow head length.
+         *
+         *
+         * Due to performance all params are required.
+         *
+         * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
+         * scaling different). Arrow heads should not look distored on non-uniform scaling.
+         *
+         * If unsure use 1.0 for scaleX and scaleY (=no distortion).
+         * For headlen use 8, it's a good arrow head size.
+         *
+         * Example:
+         *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
+         *
+         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
+         * @param {Vertex} zB - The end vertex of the vector.
+         * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
+         * @param {number} scaleX  - The horizontal scaling during draw.
+         * @param {number} scaleY  - the vertical scaling during draw.
+         **/
+        buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
+            var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+            var vertices = [];
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX, zB.y * scaleY));
+            vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+            return vertices;
+        }
+    };
+    return Vector;
+}(VertTuple_1.VertTuple));
 exports.Vector = Vector;
-Vector.utils = {
-    /**
-     * Generate a four-point arrow head, starting at the vector end minus the
-     * arrow head length.
-     *
-     * The first vertex in the returned array is guaranteed to be the located
-     * at the vector line end minus the arrow head length.
-     *
-     *
-     * Due to performance all params are required.
-     *
-     * The params scaleX and scaleY are required for the case that the scaling is not uniform (x and y
-     * scaling different). Arrow heads should not look distored on non-uniform scaling.
-     *
-     * If unsure use 1.0 for scaleX and scaleY (=no distortion).
-     * For headlen use 8, it's a good arrow head size.
-     *
-     * Example:
-     *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
-     *
-     * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-     * @param {Vertex} zB - The end vertex of the vector.
-     * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
-     * @param {number} scaleX  - The horizontal scaling during draw.
-     * @param {number} scaleY  - the vertical scaling during draw.
-     **/
-    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
-        var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-        var vertices = [];
-        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
-        vertices.push(new Vertex_1.Vertex(zB.x * scaleX, zB.y * scaleY));
-        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
-        return vertices;
-    }
-};
 //# sourceMappingURL=Vector.js.map

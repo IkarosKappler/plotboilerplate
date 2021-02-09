@@ -11,7 +11,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CircularIntervalSet = void 0;
-class CircularIntervalSet {
+var CircularIntervalSet = /** @class */ (function () {
     /**
      * Create a new CircularIntervalSet with the given lower and upperBound (start and end).
      *
@@ -22,7 +22,7 @@ class CircularIntervalSet {
      * @method clear
      * @memberof CircularIntervalSet
      **/
-    constructor(start, end) {
+    function CircularIntervalSet(start, end) {
         this.start = start;
         this.end = end;
         this.intervals = [[start, end]];
@@ -36,9 +36,9 @@ class CircularIntervalSet {
      * @memberof CircularIntervalSet
      * @return {void}
      **/
-    clear() {
+    CircularIntervalSet.prototype.clear = function () {
         this.intervals = [];
-    }
+    };
     ;
     /**
      * Remove the interval at given index.
@@ -50,11 +50,11 @@ class CircularIntervalSet {
      * @return {void}
      **/
     // Todo: remove? (not in use any more?)
-    removeAt(index) {
+    CircularIntervalSet.prototype.removeAt = function (index) {
         if (index < 0 || index >= this.intervals.length)
             return;
         this.intervals.splice(index, 1);
-    }
+    };
     ;
     /**
      * Intersect all sub intervalls with the given range (must be inside bounds).
@@ -66,7 +66,7 @@ class CircularIntervalSet {
      * @memberof CircularIntervalSet
      * @return {void}
      **/
-    intersect(start, end) {
+    CircularIntervalSet.prototype.intersect = function (start, end) {
         for (var i = 0; i < this.intervals.length;) {
             if (start <= end) {
                 if ((this.intervals[i][0] >= end || this.intervals[i][1] <= start)) {
@@ -143,7 +143,7 @@ class CircularIntervalSet {
                 }
             }
         }
-    }
+    };
     ;
     /**
      * Convert this set to a human readable string.
@@ -153,10 +153,11 @@ class CircularIntervalSet {
      * @memberof CircularIntervalSet
      * @return {string}
      **/
-    toString() {
+    CircularIntervalSet.prototype.toString = function () {
         return JSON.stringify(this.intervals);
-    }
+    };
     ;
-}
+    return CircularIntervalSet;
+}());
 exports.CircularIntervalSet = CircularIntervalSet;
 //# sourceMappingURL=CircularIntervalSet.js.map

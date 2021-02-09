@@ -23,7 +23,6 @@ import { SVGSerializable } from "./interfaces";
  *
  * @requires SVGSerializable
  * @requires Vertex
- * @requires XYCoords
  */
 export declare class SVGBuilder {
     /**

@@ -8,8 +8,8 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arrayFill = void 0;
-const arrayFill = (count, initialValue) => {
-    const arr = Array(count);
+var arrayFill = function (count, initialValue) {
+    var arr = Array(count);
     for (var i = 0; i < count; i++)
         arr[i] = initialValue;
     return arr;

@@ -27,10 +27,10 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BezierPath = void 0;
-const Bounds_1 = require("./Bounds");
-const CubicBezierCurve_1 = require("./CubicBezierCurve");
-const UIDGenerator_1 = require("./UIDGenerator");
-const Vertex_1 = require("./Vertex");
+var Bounds_1 = require("./Bounds");
+var CubicBezierCurve_1 = require("./CubicBezierCurve");
+var UIDGenerator_1 = require("./UIDGenerator");
+var Vertex_1 = require("./Vertex");
 /**
  * @classdesc A BezierPath class.
  *
@@ -44,7 +44,7 @@ const Vertex_1 = require("./Vertex");
  * @requires UID
  * @requires UIDGenerator
  **/
-class BezierPath {
+var BezierPath = /** @class */ (function () {
     /**
      * The constructor.<br>
      * <br>
@@ -57,7 +57,7 @@ class BezierPath {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    constructor(pathPoints) {
+    function BezierPath(pathPoints) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -89,7 +89,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {void}
      **/
-    addCurve(curve) {
+    BezierPath.prototype.addCurve = function (curve) {
         if (curve == null || typeof curve == 'undefined')
             throw "Cannot add null curve to bézier path.";
         this.bezierCurves.push(curve);
@@ -103,7 +103,7 @@ class BezierPath {
         else {
             this.totalArcLength += curve.getLength();
         }
-    }
+    };
     ;
     /**
      * Locate the curve with the given start point (function returns the index).
@@ -114,14 +114,14 @@ class BezierPath {
      * @memberof BezierPath
      * @return {number} The curve index or -1 if curve (start-) point not found
      **/
-    locateCurveByStartPoint(point) {
+    BezierPath.prototype.locateCurveByStartPoint = function (point) {
         // for( var i in this.bezierCurves ) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             if (this.bezierCurves[i].startPoint.equals(point))
                 return i;
         }
         return -1;
-    }
+    };
     ;
     /**
      * Locate the curve with the given end point (function returns the index).
@@ -132,14 +132,14 @@ class BezierPath {
      * @memberof BezierPath
      * @return {number} The curve index or -1 if curve (end-) point not found
      **/
-    locateCurveByEndPoint(point) {
+    BezierPath.prototype.locateCurveByEndPoint = function (point) {
         // for( var i in this.bezierCurves ) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             if (this.bezierCurves[i].endPoint.equals(point))
                 return i;
         }
         return -1;
-    }
+    };
     ;
     /**
      * Locate the curve with the given start point (function returns the index).
@@ -150,14 +150,14 @@ class BezierPath {
      * @memberof BezierPath
      * @return {number} The curve index or -1 if curve (end-) point not found
      **/
-    locateCurveByStartControlPoint(point) {
+    BezierPath.prototype.locateCurveByStartControlPoint = function (point) {
         // for( var i in this.bezierCurves ) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             if (this.bezierCurves[i].startControlPoint.equals(point))
                 return i;
         }
         return -1;
-    }
+    };
     ;
     // +---------------------------------------------------------------------------------
     // | Locate the curve with the given end control point.
@@ -165,14 +165,14 @@ class BezierPath {
     // | @param point:Vertex The point to look for.
     // | @return Number The index or -1 if not found.
     // +-------------------------------
-    locateCurveByEndControlPoint(point) {
+    BezierPath.prototype.locateCurveByEndControlPoint = function (point) {
         // for( var i in this.bezierCurves ) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             if (this.bezierCurves[i].endControlPoint.equals(point))
                 return i;
         }
         return -1;
-    }
+    };
     ;
     /**
      * Get the total length of this path.<br>
@@ -185,9 +185,9 @@ class BezierPath {
      * @memberof BezierPath
      * @return {number} The (buffered) length of the path.
      **/
-    getLength() {
+    BezierPath.prototype.getLength = function () {
         return this.totalArcLength;
-    }
+    };
     ;
     /**
      * This function is internally called whenever the curve or path configuration
@@ -202,13 +202,13 @@ class BezierPath {
      * @memberof BezierPath
      * @return {void}
      **/
-    updateArcLengths() {
+    BezierPath.prototype.updateArcLengths = function () {
         this.totalArcLength = 0.0;
         for (var i = 0; i < this.bezierCurves.length; i++) {
             this.bezierCurves[i].updateArcLengths();
             this.totalArcLength += this.bezierCurves[i].getLength();
         }
-    }
+    };
     ;
     /**
      * Get the number of curves in this path.
@@ -218,9 +218,9 @@ class BezierPath {
      * @memberof BezierPath
      * @return {number} The number of curves in this path.
      **/
-    getCurveCount() {
+    BezierPath.prototype.getCurveCount = function () {
         return this.bezierCurves.length;
-    }
+    };
     ;
     /**
      * Get the cubic bezier curve at the given index.
@@ -231,9 +231,9 @@ class BezierPath {
      * @memberof BezierPath
      * @return {CubicBezierCurve} The curve at the specified index.
      **/
-    getCurveAt(curveIndex) {
+    BezierPath.prototype.getCurveAt = function (curveIndex) {
         return this.bezierCurves[curveIndex];
-    }
+    };
     ;
     /**
      * Remove the end point of this path (which removes the last curve from this path).<br>
@@ -454,7 +454,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {BezierPath} this for chaining
      **/
-    translate(amount) {
+    BezierPath.prototype.translate = function (amount) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
             curve.getStartPoint().add(amount);
@@ -466,7 +466,7 @@ class BezierPath {
         curve.getEndPoint().add(amount);
         this.updateArcLengths();
         return this;
-    }
+    };
     ;
     /**
      * Scale the whole bezier path by the given (x,y)-factors.
@@ -478,7 +478,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {BezierPath} this for chaining.
      **/
-    scale(anchor, scaling) {
+    BezierPath.prototype.scale = function (anchor, scaling) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
             curve.getStartPoint().scale(scaling, anchor);
@@ -494,7 +494,7 @@ class BezierPath {
         }
         this.updateArcLengths();
         return this;
-    }
+    };
     ;
     /**
      * Rotate the whole bezier path around a point..
@@ -506,7 +506,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {void}
      **/
-    rotate(angle, center) {
+    BezierPath.prototype.rotate = function (angle, center) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
             curve.getStartPoint().rotate(angle, center);
@@ -520,7 +520,7 @@ class BezierPath {
         if (this.bezierCurves.length > 0 && !this.adjustCircular) {
             this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().rotate(angle, center);
         }
-    }
+    };
     ;
     /**
      * Get the 't' position on this curve with the minimal distance to point p.
@@ -528,7 +528,7 @@ class BezierPath {
      * @param {Vertex} p - The point to find the closest curve point for.
      * @return {number} A value t with 0.0 <= t <= 1.0.
      **/
-    getClosestT(p) {
+    BezierPath.prototype.getClosestT = function (p) {
         // Find the spline to extract the value from
         var minIndex = -1;
         var minDist = 0.0;
@@ -547,7 +547,7 @@ class BezierPath {
             u += this.bezierCurves[i].getLength();
         }
         return Math.max(0.0, Math.min(1.0, uMin / this.totalArcLength));
-    }
+    };
     ;
     /**
      * Get the point on the bézier path at the given relative path location.
@@ -558,7 +558,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {Vertex} The point at the relative path position.
      **/
-    getPoint(u) {
+    BezierPath.prototype.getPoint = function (u) {
         if (u < 0 || u > this.totalArcLength) {
             console.log("[BezierPath.getPoint(u)] u is out of bounds: " + u + ".");
             u = Math.min(this.totalArcLength, Math.max(u, 0));
@@ -578,7 +578,7 @@ class BezierPath {
         var bCurve = this.bezierCurves[i];
         var relativeU = u - uTemp;
         return bCurve.getPoint(relativeU);
-    }
+    };
     ;
     /**
      * Get the point on the bézier path at the given path fraction.
@@ -589,9 +589,9 @@ class BezierPath {
      * @memberof BezierPath
      * @return {Vertex} The point at the absolute path position.
      **/
-    getPointAt(t) {
+    BezierPath.prototype.getPointAt = function (t) {
         return this.getPoint(t * this.totalArcLength);
-    }
+    };
     ;
     /**
      * Get the tangent of the bézier path at the given path fraction.<br>
@@ -604,9 +604,9 @@ class BezierPath {
      * @memberof BezierPath
      * @return {Vertex} The tangent vector at the absolute path position.
      **/
-    getTangentAt(t) {
+    BezierPath.prototype.getTangentAt = function (t) {
         return this.getTangent(t * this.totalArcLength);
-    }
+    };
     ;
     /**
      *  Get the tangent of the bézier path at the given path location.<br>
@@ -619,7 +619,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {Vertex} The tangent vector at the relative path position.
      **/
-    getTangent(u) {
+    BezierPath.prototype.getTangent = function (u) {
         if (u < 0 || u > this.totalArcLength) {
             console.warn("[BezierPath.getTangent(u)] u is out of bounds: " + u + ".");
             // return undefined;
@@ -636,7 +636,7 @@ class BezierPath {
         var bCurve = this.bezierCurves[i];
         var relativeU = u - uTemp;
         return bCurve.getTangent(relativeU);
-    }
+    };
     ;
     /**
      * Get the perpendicular of the bézier path at the given absolute path location (fraction).<br>
@@ -649,9 +649,9 @@ class BezierPath {
      * @memberof BezierPath
      * @return {Vertex} The perpendicluar vector at the absolute path position.
      **/
-    getPerpendicularAt(t) {
+    BezierPath.prototype.getPerpendicularAt = function (t) {
         return this.getPerpendicular(t * this.totalArcLength);
-    }
+    };
     ;
     /**
      * Get the perpendicular of the bézier path at the given relative path location.<br>
@@ -664,7 +664,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {Vertex} The perpendicluar vector at the relative path position.
      **/
-    getPerpendicular(u) {
+    BezierPath.prototype.getPerpendicular = function (u) {
         if (u < 0 || u > this.totalArcLength) {
             console.log("[BezierPath.getPerpendicular(u)] u is out of bounds: " + u + ".");
             u = Math.min(this.totalArcLength, Math.max(0, u));
@@ -674,7 +674,7 @@ class BezierPath {
         var bCurve = this.bezierCurves[uResult.i];
         var relativeU = u - uResult.uPart;
         return bCurve.getPerpendicular(relativeU);
-    }
+    };
     ;
     /**
      * This is a helper function to locate the curve index for a given
@@ -688,7 +688,7 @@ class BezierPath {
      * - {number} uPart - the absolute curve length sum (length from the beginning to u, should equal u itself).
      * - {number} uBefore - the absolute curve length for all segments _before_ the matched curve (usually uBefore <= uPart).
      **/
-    static _locateUIndex(path, u) {
+    BezierPath._locateUIndex = function (path, u) {
         var i = 0;
         var uTemp = 0.0;
         var uBefore = 0.0;
@@ -700,7 +700,7 @@ class BezierPath {
             i++;
         }
         return { i: i, uPart: uTemp, uBefore: uBefore };
-    }
+    };
     ;
     /**
      * Get a specific sub path from this path. The start and end position are specified by
@@ -720,11 +720,11 @@ class BezierPath {
      * @memberof BezierPath
      * @return {BezierPath} The desired sub path in the bounds [startT..endT].
      **/
-    getSubPathAt(startT, endT) {
+    BezierPath.prototype.getSubPathAt = function (startT, endT) {
         startT = Math.max(0, startT);
         endT = Math.min(1.0, endT);
-        let startU = startT * this.totalArcLength;
-        let endU = endT * this.totalArcLength;
+        var startU = startT * this.totalArcLength;
+        var endU = endT * this.totalArcLength;
         var uStartResult = BezierPath._locateUIndex(this, startU); // { i:int, uPart:float, uBefore:float }
         var uEndResult = BezierPath._locateUIndex(this, endU); // { i:int, uPart:float, uBefore:float }
         var firstT = (startU - uStartResult.uBefore) / this.bezierCurves[uStartResult.i].getLength();
@@ -758,7 +758,7 @@ class BezierPath {
             }
             return BezierPath.fromArray(curves);
         }
-    }
+    };
     ;
     /**
      * This function moves the addressed curve point (or control point) with
@@ -775,7 +775,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {void}
      **/
-    moveCurvePoint(curveIndex, pointID, moveAmount) {
+    BezierPath.prototype.moveCurvePoint = function (curveIndex, pointID, moveAmount) {
         var bCurve = this.getCurveAt(curveIndex);
         bCurve.moveCurvePoint(pointID, moveAmount, true, // move control point, too
         true // updateArcLengths
@@ -809,7 +809,7 @@ class BezierPath {
         // Don't forget to update the arc lengths!
         // Note: this can be optimized as only two curves have changed their lengths!
         this.updateArcLengths();
-    }
+    };
     ;
     /**
      * This helper function adjusts the given point's predecessor's control point.
@@ -823,7 +823,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {void}
      **/
-    adjustPredecessorControlPoint(curveIndex, obtainHandleLength, updateArcLengths) {
+    BezierPath.prototype.adjustPredecessorControlPoint = function (curveIndex, obtainHandleLength, updateArcLengths) {
         if (!this.adjustCircular && curveIndex <= 0)
             return; // false;
         var mainCurve = this.getCurveAt(curveIndex);
@@ -833,7 +833,7 @@ class BezierPath {
         neighbourCurve.getEndPoint(), // the neighbour's point
         neighbourCurve.getEndControlPoint(), // the neighbour's control point to adjust
         obtainHandleLength, updateArcLengths);
-    }
+    };
     ;
     /**
      * This helper function adjusts the given point's successor's control point.
@@ -847,7 +847,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {void}
      **/
-    adjustSuccessorControlPoint(curveIndex, obtainHandleLength, updateArcLengths) {
+    BezierPath.prototype.adjustSuccessorControlPoint = function (curveIndex, obtainHandleLength, updateArcLengths) {
         if (!this.adjustCircular && curveIndex + 1 > this.getCurveCount())
             return; //  false; 
         var mainCurve = this.getCurveAt(curveIndex);
@@ -857,7 +857,7 @@ class BezierPath {
         neighbourCurve.getStartPoint(), // the neighbour's point
         neighbourCurve.getStartControlPoint(), // the neighbour's control point to adjust
         obtainHandleLength, updateArcLengths);
-    }
+    };
     ;
     /**
      * This helper function adjusts the given point's successor's control point.
@@ -876,7 +876,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {void}
      **/
-    static adjustNeighbourControlPoint(_mainCurve, // TODO: remove param
+    BezierPath.adjustNeighbourControlPoint = function (_mainCurve, // TODO: remove param
     neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, _updateArcLengths // TODO: remove param
     ) {
         // Calculate start handle length
@@ -894,7 +894,7 @@ class BezierPath {
             neighbourControlPoint.set(neighbourPoint.x - mainHandleBounds.x, neighbourPoint.y - mainHandleBounds.y);
         }
         neighbourCurve.updateArcLengths();
-    }
+    };
     ;
     /**
      * Get the bounds of this Bézier path.
@@ -904,9 +904,9 @@ class BezierPath {
      *
      * @return {Bounds} The bounds of this Bézier path.
      **/
-    getBounds() {
-        const min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-        const max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+    BezierPath.prototype.getBounds = function () {
+        var min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        var max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
         var b;
         for (var i = 0; i < this.bezierCurves.length; i++) {
             b = this.bezierCurves[i].getBounds();
@@ -916,7 +916,7 @@ class BezierPath {
             max.y = Math.max(max.y, b.max.y);
         }
         return new Bounds_1.Bounds(min, max);
-    }
+    };
     ;
     /**
      * Clone this BezierPath (deep clone).
@@ -926,7 +926,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {BezierPath}
      **/
-    clone() {
+    BezierPath.prototype.clone = function () {
         var path = new BezierPath(undefined);
         for (var i = 0; i < this.bezierCurves.length; i++) {
             path.bezierCurves.push(this.bezierCurves[i].clone());
@@ -937,7 +937,7 @@ class BezierPath {
         path.updateArcLengths();
         path.adjustCircular = this.adjustCircular;
         return path;
-    }
+    };
     ;
     /**
      * Compare this and the passed Bézier path.
@@ -948,7 +948,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {boolean}
      **/
-    equals(path) {
+    BezierPath.prototype.equals = function (path) {
         if (!path)
             return false;
         // Check if path contains the credentials
@@ -963,7 +963,7 @@ class BezierPath {
                 return false;
         }
         return true;
-    }
+    };
     ;
     /**
      * Create a <pre>&lt;path&gt;</pre> SVG representation of this bézier curve.
@@ -976,7 +976,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {string} The SVG string.
      **/
-    toSVGString(options) {
+    BezierPath.prototype.toSVGString = function (options) {
         options = options || {};
         var buffer = [];
         buffer.push('<path');
@@ -990,7 +990,7 @@ class BezierPath {
         }
         buffer.push('" />');
         return buffer.join('');
-    }
+    };
     ;
     /**
      * Create a JSON string representation of this bézier curve.
@@ -1001,7 +1001,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {string} The JSON string.
      **/
-    toJSON(prettyFormat) {
+    BezierPath.prototype.toJSON = function (prettyFormat) {
         var buffer = [];
         buffer.push("["); // array begin
         for (var i = 0; i < this.bezierCurves.length; i++) {
@@ -1017,7 +1017,7 @@ class BezierPath {
             buffer.push(" ");
         buffer.push("]"); // array end
         return buffer.join(""); // Convert to string, with empty separator.
-    }
+    };
     ;
     /**
      * Parse a BezierPath from the given JSON string.
@@ -1029,10 +1029,10 @@ class BezierPath {
      * @memberof BezierPath
      * @return {BezierPath} The parsed bezier path instance.
      **/
-    static fromJSON(jsonString) {
+    BezierPath.fromJSON = function (jsonString) {
         var obj = JSON.parse(jsonString);
         return BezierPath.fromArray(obj);
-    }
+    };
     ;
     /**
      * Create a BezierPath instance from the given array.
@@ -1044,10 +1044,10 @@ class BezierPath {
      * @memberof BezierPath
      * @return {BezierPath} The bezier path instance retrieved from the array data.
      **/
-    static fromArray(obj) {
+    BezierPath.fromArray = function (obj) {
         if (!Array.isArray(obj))
             throw "[BezierPath.fromArray] Passed object must be an array.";
-        const arr = obj; // FORCE?
+        var arr = obj; // FORCE?
         if (arr.length < 1)
             throw "[BezierPath.fromArray] Passed array must contain at least one bezier curve (has " + arr.length + ").";
         // Create an empty bezier path
@@ -1079,7 +1079,7 @@ class BezierPath {
         bPath.updateArcLengths();
         // Bezier segments added. Done
         return bPath;
-    }
+    };
     ;
     /**
      * This function converts the bezier path into a string containing
@@ -1095,7 +1095,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {string} The reduced list representation of this path.
      **/
-    toReducedListRepresentation(digits) {
+    BezierPath.prototype.toReducedListRepresentation = function (digits) {
         if (typeof digits == "undefined")
             digits = 1;
         var buffer = [];
@@ -1123,7 +1123,7 @@ class BezierPath {
         }
         buffer.push("]"); // array end
         return buffer.join(""); // Convert to string, with empty separator.
-    }
+    };
     ;
     /**
      * Parse a BezierPath instance from the reduced list representation.<br>
@@ -1137,7 +1137,7 @@ class BezierPath {
      * @memberof BezierPath
      * @return {BezierPath} The bezier path instance retrieved from the string.
      **/
-    static fromReducedListRepresentation(listJSON) {
+    BezierPath.fromReducedListRepresentation = function (listJSON) {
         // Parse the array
         var pointArray = JSON.parse(listJSON);
         if (!pointArray.length) {
@@ -1168,19 +1168,20 @@ class BezierPath {
         } while (i + 2 < pointArray.length);
         bezierPath.updateArcLengths();
         return bezierPath;
-    }
+    };
     ;
-}
+    // +---------------------------------------------------------------------------------
+    // | These constants equal the values from CubicBezierCurve.
+    // +-------------------------------
+    /** @constant {number} */
+    BezierPath.START_POINT = 0;
+    /** @constant {number} */
+    BezierPath.START_CONTROL_POINT = 1;
+    /** @constant {number} */
+    BezierPath.END_CONTROL_POINT = 2;
+    /** @constant {number} */
+    BezierPath.END_POINT = 3;
+    return BezierPath;
+}());
 exports.BezierPath = BezierPath;
-// +---------------------------------------------------------------------------------
-// | These constants equal the values from CubicBezierCurve.
-// +-------------------------------
-/** @constant {number} */
-BezierPath.START_POINT = 0;
-/** @constant {number} */
-BezierPath.START_CONTROL_POINT = 1;
-/** @constant {number} */
-BezierPath.END_CONTROL_POINT = 2;
-/** @constant {number} */
-BezierPath.END_POINT = 3;
 //# sourceMappingURL=BezierPath.js.map

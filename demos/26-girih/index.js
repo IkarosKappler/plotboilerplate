@@ -465,9 +465,7 @@
 		var intersections = findPreviewIntersectionsFor( currentPreviewTile, girih.tiles[i] );
 		for( var j = 0; j < intersections.length; j++ ) {
 		    var poly = new Polygon(cloneVertexArray(intersections[j]), false);
-		    var area = calculatePolygonArea( poly.vertices );
-		    // if( area === NaN )
-		    //	area = 0.0;
+		    var area = poly.area();
 		    previewIntersectionAreas.push( area );
 		    previewIntersectionPolygons.push( poly );
 		    totalArea += area;

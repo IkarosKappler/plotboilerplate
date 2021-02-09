@@ -18,10 +18,23 @@
  * @file Line
  * @public
  **/
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Line = void 0;
-const VertTuple_1 = require("./VertTuple");
-const Vertex_1 = require("./Vertex");
+var VertTuple_1 = require("./VertTuple");
+var Vertex_1 = require("./Vertex");
 /**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
@@ -30,7 +43,8 @@ const Vertex_1 = require("./Vertex");
  *
  * @requires Vertex
  */
-class Line extends VertTuple_1.VertTuple {
+var Line = /** @class */ (function (_super) {
+    __extends(Line, _super);
     /**
      * Creates an instance of Line.
      *
@@ -39,12 +53,13 @@ class Line extends VertTuple_1.VertTuple {
      * @param {Vertex} a The line's first point.
      * @param {Vertex} b The line's second point.
      **/
-    constructor(a, b) {
-        super(a, b, (a, b) => new Line(a, b));
+    function Line(a, b) {
+        var _this = _super.call(this, a, b, function (a, b) { return new Line(a, b); }) || this;
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
-        this.className = "Line";
+        _this.className = "Line";
+        return _this;
     }
     /**
      * Get the intersection if this line and the specified line.
@@ -56,25 +71,25 @@ class Line extends VertTuple_1.VertTuple {
      * @memberof Line
      **/
     // !!! DO NOT MOVE TO VertTuple
-    intersection(line) {
-        const denominator = this.denominator(line);
+    Line.prototype.intersection = function (line) {
+        var denominator = this.denominator(line);
         if (denominator == 0)
             return null;
-        let a = this.a.y - line.a.y;
-        let b = this.a.x - line.a.x;
-        const numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-        const numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+        var a = this.a.y - line.a.y;
+        var b = this.a.x - line.a.x;
+        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
+        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
         a = numerator1 / denominator; // NaN if parallel lines
         b = numerator2 / denominator;
         // Catch NaN?
-        const x = this.a.x + (a * (this.b.x - this.a.x));
-        const y = this.a.y + (a * (this.b.y - this.a.y));
+        var x = this.a.x + (a * (this.b.x - this.a.x));
+        var y = this.a.y + (a * (this.b.y - this.a.y));
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
             return undefined;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
-    }
+    };
     ;
     /**
      * Create an SVG representation of this line.
@@ -87,7 +102,7 @@ class Line extends VertTuple_1.VertTuple {
      * @instance
      * @memberof Line
      **/
-    toSVGString(options) {
+    Line.prototype.toSVGString = function (options) {
         options = options || {};
         var buffer = [];
         buffer.push('<line');
@@ -99,8 +114,9 @@ class Line extends VertTuple_1.VertTuple {
         buffer.push(' y2="' + this.b.y + '"');
         buffer.push(' />');
         return buffer.join('');
-    }
+    };
     ;
-}
+    return Line;
+}(VertTuple_1.VertTuple));
 exports.Line = Line;
 //# sourceMappingURL=Line.js.map

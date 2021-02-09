@@ -6,8 +6,8 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.geomutils = void 0;
-const Line_1 = require("./Line");
-const Triangle_1 = require("./Triangle");
+var Line_1 = require("./Line");
+var Triangle_1 = require("./Triangle");
 /**
  * A collection of usefull geometry utilities.
  *
@@ -25,26 +25,23 @@ exports.geomutils = {
      *
      * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
      */
-    nsectAngle(pA, pB, pC, n) {
-        const triangle = new Triangle_1.Triangle(pA, pB, pC);
-        const lineAB = new Line_1.Line(pA, pB);
-        const lineAC = new Line_1.Line(pA, pC);
-        // Compute the slope (theta) of line AB and line AC
-        const thetaAB = lineAB.angle();
-        const thetaAC = lineAC.angle();
+    nsectAngle: function (pA, pB, pC, n) {
+        var triangle = new Triangle_1.Triangle(pA, pB, pC);
+        var lineAB = new Line_1.Line(pA, pB);
+        var lineAC = new Line_1.Line(pA, pC);
         // Compute the difference; this is the angle between AB and AC
         var insideAngle = lineAB.angle(lineAC);
         // We want the inner angles of the triangle, not the outer angle;
         //   which one is which depends on the triangle 'direction'
-        const clockwise = triangle.determinant() > 0;
+        var clockwise = triangle.determinant() > 0;
         // For convenience convert the angle [-PI,PI] to [0,2*PI]
         if (insideAngle < 0)
             insideAngle = 2 * Math.PI + insideAngle;
         if (!clockwise)
             insideAngle = (2 * Math.PI - insideAngle) * (-1);
         // Scale the rotated lines to the max leg length (looks better)
-        const lineLength = Math.max(lineAB.length(), lineAC.length());
-        const scaleFactor = lineLength / lineAB.length();
+        var lineLength = Math.max(lineAB.length(), lineAC.length());
+        var scaleFactor = lineLength / lineAB.length();
         var result = [];
         for (var i = 1; i < n; i++) {
             // Compute the i-th inner sector line

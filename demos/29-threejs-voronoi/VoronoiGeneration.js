@@ -70,6 +70,7 @@
 
     /**
      * @param {VoronoiCell[]}   options.voronoiDiagram
+     * @param {Polygon}         options.clipPolygon
      * @param {boolean}         options.useTextureImage
      * @param {boolean?}        useTextureImage
      * @param {string?}         textureImagePath
@@ -80,6 +81,7 @@
 	this.removeCachedGeometries();
 
 	var voronoiDiagram   = options.voronoiDiagram;
+	var clipPolygon      = options.clipPolygon;
 	var geometry         = new VoronoiGeometry( Object.assign( { voronoiDiagram : voronoiDiagram }, options ) );
 	var useTextureImage  = options.useTextureImage && typeof options.textureImagePath != "undefined";
 	var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;

@@ -12,13 +12,13 @@
 (function() {
 
     /**
-     * @param {VoronoiCell[]} voronoiDiagram
+     * @param {VoronoiCell[]} options.voronoiDiagram
+     * @param {Polygon}       options.clipPolygon
      **/
     var VoronoiGeometry = function( options ) {
 
 	THREE.Geometry.call( this );
 
-	// interface CellIndices { bottomVertexIndices : number[], topVertexIndices : number[] }
 	this.voronoiCellIndices= [];
 	
 	this.buildVertices( options );
@@ -29,11 +29,20 @@
     VoronoiGeometry.prototype.buildVertices = function( options ) {
 
 	var voronoiDiagram = options.voronoiDiagram;
+	var clipPolygon = options.clipPolygon;
 	
 	for( var v in voronoiDiagram ) {
 	    var cell = voronoiDiagram[v];
 	    var polygon = cell.toPolygon();
 	    polygon.scale( options.voronoiCellScale, cell.sharedVertex );
+
+	    if( options.clipPolygon ) {
+		// Clone the array here: convert Array<XYCoords> to Array<Vertex>
+		polygon = new Polygon(
+		    cloneVertexArray(sutherlandHodgman(polygon.vertices, clipPolygon.vertices)),
+		    false
+		);
+	    }
 
 	    // Create a cell
 	    var bottomVertexIndices = [];

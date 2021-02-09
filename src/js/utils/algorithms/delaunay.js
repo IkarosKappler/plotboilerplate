@@ -8,10 +8,11 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Delaunay = void 0;
-const Triangle_1 = require("../../Triangle");
-const Vertex_1 = require("../../Vertex");
-const Line_1 = require("../../Line");
-const EPSILON = 1.0e-6;
+var Triangle_1 = require("../../Triangle");
+var Vertex_1 = require("../../Vertex");
+var Line_1 = require("../../Line");
+// TODO: cleanup? This seems not to be used.
+// const EPSILON : number = 1.0e-6;
 /**
  * @classdesc A Delaunay pointset triangulation implementation.  Inspired by
  *    http://www.travellermap.com/tmp/delaunay.htm
@@ -23,13 +24,13 @@ const EPSILON = 1.0e-6;
  * @requires Line
  * @requires Vertex
  */
-class Delaunay {
-    constructor(pointList) {
+var Delaunay = /** @class */ (function () {
+    function Delaunay(pointList) {
         this.pointList = pointList;
     }
-    triangulate() {
+    Delaunay.prototype.triangulate = function () {
         return this.Triangulate(this.pointList);
-    }
+    };
     ////////////////////////////////////////////////////////////////////////////////
     //
     // Delaunay Triangulation Code, by Joshua Bell
@@ -51,8 +52,8 @@ class Delaunay {
     //
     // returns: Array of Triangles
     //------------------------------------------------------------
-    Triangulate(vertices) {
-        const triangles = [];
+    Delaunay.prototype.Triangulate = function (vertices) {
+        var triangles = [];
         // First, create a "supertriangle" that bounds all vertices  
         var st = this.createBoundingTriangle(vertices);
         triangles.push(st);
@@ -73,10 +74,10 @@ class Delaunay {
             }
         }
         return triangles;
-    }
+    };
     ; // Triangulate
     // Internal: create a triangle that bounds the given vertices, with room to spare
-    createBoundingTriangle(vertices) {
+    Delaunay.prototype.createBoundingTriangle = function (vertices) {
         // NOTE: There's a bit of a heuristic here. If the bounding triangle 
         // is too large and you see overflow/underflow errors. If it is too small 
         // you end up with a non-convex hull.
@@ -102,10 +103,10 @@ class Delaunay {
         var stv1 = new Vertex_1.Vertex(minx - dx, maxy + dy);
         var stv2 = new Vertex_1.Vertex(maxx + dx * 3, maxy + dy);
         return new Triangle_1.Triangle(stv0, stv1, stv2);
-    }
+    };
     ; // END createBoundingTriangle
     // Internal: update triangulation with a vertex 
-    AddVertex(vertex, triangles) {
+    Delaunay.prototype.AddVertex = function (vertex, triangles) {
         var edges = [];
         // Remove triangles with circumcircles containing the vertex
         for (var i in triangles) {
@@ -124,18 +125,18 @@ class Delaunay {
             var edge = edges[i];
             triangles.push(new Triangle_1.Triangle(edge.a, edge.b, vertex));
         }
-    }
+    };
     ; // END AddVertex
     // Internal: remove duplicate edges from an array
-    mkUniqueEdges(edges) {
+    Delaunay.prototype.mkUniqueEdges = function (edges) {
         // TODO: This is O(n^2), make it O(n) with a hash or some such
-        const uniqueEdges = [];
+        var uniqueEdges = [];
         for (var i in edges) {
-            let edge1 = edges[i];
-            let unique = true;
+            var edge1 = edges[i];
+            var unique = true;
             for (var j in edges) {
                 if (i != j) {
-                    let edge2 = edges[j];
+                    var edge2 = edges[j];
                     if ((edge1.a == edge2.a && edge1.b == edge2.b) ||
                         (edge1.a == edge2.b && edge1.b == edge2.a)) {
                         unique = false;
@@ -148,9 +149,10 @@ class Delaunay {
             }
         }
         return uniqueEdges;
-    }
+    };
     ; // END mkUniqueEdges
-}
+    return Delaunay;
+}());
 exports.Delaunay = Delaunay;
 ; // END class
 //# sourceMappingURL=delaunay.js.map

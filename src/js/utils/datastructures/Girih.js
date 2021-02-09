@@ -8,13 +8,13 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Girih = void 0;
-const Vertex_1 = require("../../Vertex");
-const GirihBowtie_1 = require("./GirihBowtie");
-const GirihDecagon_1 = require("./GirihDecagon");
-const GirihHexagon_1 = require("./GirihHexagon");
-const GirihPenroseRhombus_1 = require("./GirihPenroseRhombus");
-const GirihPentagon_1 = require("./GirihPentagon");
-const GirihRhombus_1 = require("./GirihRhombus");
+var Vertex_1 = require("../../Vertex");
+var GirihBowtie_1 = require("./GirihBowtie");
+var GirihDecagon_1 = require("./GirihDecagon");
+var GirihHexagon_1 = require("./GirihHexagon");
+var GirihPenroseRhombus_1 = require("./GirihPenroseRhombus");
+var GirihPentagon_1 = require("./GirihPentagon");
+var GirihRhombus_1 = require("./GirihRhombus");
 /**
  * @classdesc The Girih datastructure for generating patterns.
  *
@@ -27,7 +27,7 @@ const GirihRhombus_1 = require("./GirihRhombus");
  * @requires GirihPentagon
  * @requires GirihRhombus
  */
-class Girih {
+var Girih = /** @class */ (function () {
     /**
      * Create a new empty Girih pattern.
      *
@@ -35,7 +35,7 @@ class Girih {
      * @memberof Girih
      * @param {number} edgeLength
      */
-    constructor(edgeLength) {
+    function Girih(edgeLength) {
         this.edgeLength = edgeLength;
         // Initialize templates, one for each Girih tile type.
         // The template array will be filled on initialization (see below).
@@ -55,7 +55,7 @@ class Girih {
      * @param {number} edgeLength - The edge length to use for the template tiles.
      * @return {void}
      */
-    initTemplates(edgeLength) {
+    Girih.prototype.initTemplates = function (edgeLength) {
         // Positions actually don't matter here.
         // Tiles will be moved to correct position conerning adjacency.
         var decagon = new GirihDecagon_1.GirihDecagon(new Vertex_1.Vertex(0, 0), edgeLength);
@@ -71,7 +71,7 @@ class Girih {
         this.TILE_TEMPLATES.push(penrose.transformTilePositionToAdjacency(3, hexagon));
         this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(5, bowtie));
         this.TILE_TEMPLATES.push(pentagon.transformTilePositionToAdjacency(4, rhombus));
-    }
+    };
     ;
     /**
      * Add a new tile to this Girih pattern.
@@ -82,9 +82,9 @@ class Girih {
      * @param {GirihTile} tile - The tile to add (instance must not already be part of this pattern).
      * @return {void}
      */
-    addTile(tile) {
+    Girih.prototype.addTile = function (tile) {
         this.tiles.push(tile);
-    }
+    };
     ;
     /**
      * Remove the tile at given array position. The index must be inside valid bounds.
@@ -95,9 +95,9 @@ class Girih {
      * @param {number} index - The index in the `tiles` Array.
      * @return {void}
      */
-    removeTileAt(index) {
+    Girih.prototype.removeTileAt = function (index) {
         this.tiles.splice(index, 1);
-    }
+    };
     ;
     /**
      * Find that tile (index) which contains the given position. First match will be returned.
@@ -108,13 +108,13 @@ class Girih {
      * @param {Vertex} position
      * @return {number} The index of the containing tile or -1 if none was found.
      **/
-    locateConatiningTile(position) {
+    Girih.prototype.locateConatiningTile = function (position) {
         for (var i = 0; i < this.tiles.length; i++) {
             if (this.tiles[i].containsVert(position))
                 return i;
         }
         return -1;
-    }
+    };
     ;
     /**
      * Turn the tile the mouse is hovering over.
@@ -129,12 +129,12 @@ class Girih {
      * @param {number} turnCount - A discrete number indicating the number of turn steps.
      * @return {void}
      */
-    turnTile(tileIndex, turnCount) {
+    Girih.prototype.turnTile = function (tileIndex, turnCount) {
         if (tileIndex == -1) // TODO: still required?
             return;
-        const tile = this.tiles[tileIndex];
+        var tile = this.tiles[tileIndex];
         tile.rotate(turnCount * Math.PI * 2 / tile.symmetry);
-    }
+    };
     ;
     /**
      * Move that tile the mouse is hovering over.
@@ -148,12 +148,12 @@ class Girih {
      * @param {number} moveYAmount - The amount to move along the y axis (in pixels).
      * @return {void}
      */
-    moveTile(tileIndex, moveXAmount, moveYAmount) {
+    Girih.prototype.moveTile = function (tileIndex, moveXAmount, moveYAmount) {
         if (tileIndex == -1) // TODO: still required?
             return;
-        const tile = this.tiles[tileIndex];
+        var tile = this.tiles[tileIndex];
         tile.move({ x: moveXAmount * 10, y: moveYAmount * 10 });
-    }
+    };
     ;
     /**
      * Find all possible adjadent tiles and their locations (type, rotation and offset). The
@@ -166,15 +166,15 @@ class Girih {
      * @param {number} edgeIndex - The index of the tile's edge.
      * @return {Array<GirihTile>} - An array of possible adjecent tiles (already positioned and rotated).
      */
-    findPossibleAdjacentTiles(tileIndex, edgeIndex) {
+    Girih.prototype.findPossibleAdjacentTiles = function (tileIndex, edgeIndex) {
         var adjTiles = [];
         if (tileIndex == -1 || edgeIndex == -1) // TODO: still required?
             return [];
-        let template = null;
+        var template = null;
         for (var i in this.TILE_TEMPLATES) {
             template = this.TILE_TEMPLATES[i].clone();
             // Find all rotations and positions for that tile to match
-            const foundTiles = this.tiles[tileIndex].transformTileToAdjacencies(edgeIndex, template);
+            var foundTiles = this.tiles[tileIndex].transformTileToAdjacencies(edgeIndex, template);
             if (foundTiles.length != 0) {
                 adjTiles = adjTiles.concat(foundTiles);
             }
@@ -182,9 +182,10 @@ class Girih {
         // Set pointer to save range.
         // previewTilePointer = Math.min( adjTiles.length-1, previewTiilePointer );
         return adjTiles;
-    }
+    };
     ;
-}
+    return Girih;
+}());
 exports.Girih = Girih;
 ; // END class Girih
 //# sourceMappingURL=Girih.js.map

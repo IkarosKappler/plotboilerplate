@@ -15,7 +15,7 @@ exports.CircleHelper = void 0;
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-class CircleHelper {
+var CircleHelper = /** @class */ (function () {
     /**
      * The constructor.
      *
@@ -25,17 +25,18 @@ class CircleHelper {
      * @param {Vertex} radiusPoint - A point to define the radius (distance from center).
      * @param {PlotBoilerplate} pb - The PlotBoilerplate which contains the circle and point.
      **/
-    constructor(circle, radiusPoint, pb) {
-        circle.center.listeners.addDragListener((e) => {
+    function CircleHelper(circle, radiusPoint, pb) {
+        circle.center.listeners.addDragListener(function (e) {
             radiusPoint.add(e.params.dragAmount);
             // pb.redraw();
         });
-        radiusPoint.listeners.addDragListener((e) => {
+        radiusPoint.listeners.addDragListener(function (e) {
             circle.radius = circle.center.distance(radiusPoint);
             // pb.redraw();
         });
     }
     ;
-}
+    return CircleHelper;
+}());
 exports.CircleHelper = CircleHelper;
 //# sourceMappingURL=CircleHelper.js.map

@@ -19,7 +19,7 @@ exports.Color = void 0;
  *      https://gist.github.com/neolitec/1344610
  *    Thanks to neolitec
  */
-class Color {
+var Color = /** @class */ (function () {
     /**
      * Construct a new color with `r=0 g=0 b=0`.
      *
@@ -29,7 +29,7 @@ class Color {
      * @instance
      * @memberof Color
      */
-    constructor() {
+    function Color() {
         this.r = this.g = this.b = 0;
         this.h = this.s = this.l = 0;
         this.a = 1;
@@ -46,9 +46,9 @@ class Color {
      * @memberof Color
      * @return {string} This color as a CSS rgb string.
      */
-    cssRGB() {
+    Color.prototype.cssRGB = function () {
         return "rgb(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + ")";
-    }
+    };
     ;
     /**
      * Get this color as a CSS `rgba` string.
@@ -60,9 +60,9 @@ class Color {
      * @memberof Color
      * @return {string} This color as a CSS rgba string.
      */
-    cssRGBA() {
+    Color.prototype.cssRGBA = function () {
         return "rgba(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + "," + this.a + ")";
-    }
+    };
     ;
     /**
      * Get the red component of this RGB(A)color. This method just returns the `r` color attribute.
@@ -72,7 +72,7 @@ class Color {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    red() { return this.r; }
+    Color.prototype.red = function () { return this.r; };
     ;
     /**
     * Get the green component of this RGB(A) color. This method just returns the `g` color attribute.
@@ -82,7 +82,7 @@ class Color {
     * @memberof Color
     * @return {number} A value between 0.0 and 1.0.
     */
-    green() { return this.g; }
+    Color.prototype.green = function () { return this.g; };
     ;
     /**
      * Get the blue component of this RGB(A) color. This method just returns the `b` color attribute.
@@ -92,7 +92,7 @@ class Color {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    blue() { return this.b; }
+    Color.prototype.blue = function () { return this.b; };
     ;
     // --- HSL ---------------------------------- 
     /**
@@ -103,9 +103,9 @@ class Color {
      * @memberof Color
      * @return {string} This color as a CSS hsl string.
      */
-    cssHSL() {
+    Color.prototype.cssHSL = function () {
         return "hsl(" + Math.round(360 * this.h) + "," + Math.round(100 * this.s) + "%," + Math.round(100 * this.l) + "%)";
-    }
+    };
     ;
     /**
      * Get this color as a CSS `hsla` string.
@@ -115,9 +115,9 @@ class Color {
      * @memberof Color
      * @return {string} This color as a CSS hsla string.
      */
-    cssHSLA() {
+    Color.prototype.cssHSLA = function () {
         return "hsla(" + Math.round(360 * this.h) + "," + Math.round(100 * this.s) + "%," + Math.round(100 * this.l) + "%," + Math.round(this.a) + ")";
-    }
+    };
     ;
     /**
      * Get the hue component of this HSL(A) color. This method just returns the `h` color attribute.
@@ -127,7 +127,7 @@ class Color {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    hue() { return this.h; }
+    Color.prototype.hue = function () { return this.h; };
     ;
     /**
      * Get the saturation component of this HSL(A) color. This method just returns the `s` color attribute.
@@ -137,7 +137,7 @@ class Color {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    saturation() { return this.s; }
+    Color.prototype.saturation = function () { return this.s; };
     ;
     /**
      * Get the lightness component of this HSL(A) color. This method just returns the `l` color attribute.
@@ -147,7 +147,7 @@ class Color {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    lightness() { return this.l; }
+    Color.prototype.lightness = function () { return this.l; };
     ;
     // --- HEX ----------------------------------
     /**
@@ -158,12 +158,12 @@ class Color {
      * @memberof Color
      * @return {string} This color as a CSS-HEX string.
      */
-    cssHEX() {
+    Color.prototype.cssHEX = function () {
         return "#" +
             (255 * this.r < 16 ? "0" : "") + Math.round(255 * this.r).toString(16) +
             (255 * this.g < 16 ? "0" : "") + Math.round(255 * this.g).toString(16) +
             (255 * this.b < 16 ? "0" : "") + Math.round(255 * this.b).toString(16);
-    }
+    };
     ;
     // --- Transparency ---------------------------------- 
     /**
@@ -174,10 +174,10 @@ class Color {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    alpha() { return this.a; }
+    Color.prototype.alpha = function () { return this.a; };
     ;
     // --- Modifiers ---------------------------------- 
-    saturate(v) {
+    Color.prototype.saturate = function (v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
             this.s += v / 100;
         else if ("number" == typeof v) // range 255 
@@ -188,14 +188,14 @@ class Color {
             this.s = 1;
         else if (this.s < 0)
             this.s = 0;
-        Color.Converter.HSLToRGB.apply(this);
-    }
+        Color.Converter.HSLToRGB(this);
+    };
     ;
-    desaturate(v) {
+    Color.prototype.desaturate = function (v) {
         this.saturate("-" + v);
-    }
+    };
     ;
-    lighten(v) {
+    Color.prototype.lighten = function (v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
             this.l += v / 100;
         else if ("number" == typeof v) // range 255 
@@ -206,14 +206,14 @@ class Color {
             this.l = 1;
         else if (this.l < 0)
             this.l = 0;
-        Color.Converter.HSLToRGB.apply(this);
-    }
+        Color.Converter.HSLToRGB(this);
+    };
     ;
-    darken(v) {
+    Color.prototype.darken = function (v) {
         this.lighten("-" + v);
-    }
+    };
     ;
-    fadein(v) {
+    Color.prototype.fadein = function (v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
             this.a += v / 100;
         else if ("number" == typeof v) // range 255 
@@ -224,14 +224,14 @@ class Color {
             this.a = 1;
         else if (this.a < 0)
             this.a = 0;
-        Color.Converter.HSLToRGB.apply(this);
-    }
+        Color.Converter.HSLToRGB(this);
+    };
     ;
-    fadeout(v) {
+    Color.prototype.fadeout = function (v) {
         this.fadein("-" + v);
-    }
+    };
     ;
-    spin(v) {
+    Color.prototype.spin = function (v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
             this.h += v / 100;
         else if ("number" == typeof v) // range 360 
@@ -242,12 +242,16 @@ class Color {
             this.h = 1;
         else if (this.h < 0)
             this.h = 0;
-        Color.Converter.HSLToRGB.apply(this);
-    }
+        Color.Converter.HSLToRGB(this);
+    };
     ;
-    static makeRGB(...args) {
-        const c = new Color();
-        let sanitized;
+    Color.makeRGB = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var c = new Color();
+        var sanitized;
         if (arguments.length < 3 || arguments.length > 4)
             throw new Error("error: 3 or 4 arguments");
         sanitized = Color.Sanitizer.RGB(arguments[0], arguments[1], arguments[2]);
@@ -256,13 +260,17 @@ class Color {
         c.b = sanitized[2];
         if (arguments.length == 4)
             c.a = arguments[3];
-        Color.Converter.RGBToHSL.apply(c);
+        Color.Converter.RGBToHSL(c);
         return c;
-    }
+    };
     ;
-    static makeHSL(...args) {
-        const c = new Color();
-        let sanitized;
+    Color.makeHSL = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var c = new Color();
+        var sanitized;
         if (arguments.length < 3 || arguments.length > 4)
             throw new Error("error: 3 or 4 arguments");
         sanitized = Color.Sanitizer.HSL(arguments[0], arguments[1], arguments[2]);
@@ -271,11 +279,11 @@ class Color {
         c.l = sanitized[2];
         if (arguments.length == 4)
             c.a = arguments[3];
-        Color.Converter.HSLToRGB.apply(c);
+        Color.Converter.HSLToRGB(c);
         return c;
-    }
+    };
     ;
-    static makeHEX(value) {
+    Color.makeHEX = function (value) {
         var c = new Color(), sanitized;
         // Edit Ika 2018-0308
         // Allow leading '#'
@@ -293,9 +301,9 @@ class Color {
         c.r = sanitized[0];
         c.g = sanitized[1];
         c.b = sanitized[2];
-        Color.Converter.RGBToHSL.apply(c);
+        Color.Converter.RGBToHSL(c);
         return c;
-    }
+    };
     ;
     /**
      * Parse the given color string. Currently only these formate are recognized: hex, rgb, rgba.
@@ -306,7 +314,7 @@ class Color {
      * @param {string} str - The string representation to parse.
      * @return {Color} The color instance that's represented by the given string.
      */
-    static parse(str) {
+    Color.parse = function (str) {
         if (typeof str == 'undefined')
             return null;
         if ((str = str.trim().toLowerCase()).length == 0)
@@ -314,8 +322,6 @@ class Color {
         if (str.startsWith('#'))
             return Color.makeHEX(str.substring(1, str.length));
         if (str.startsWith('rgb')) {
-            var open = str.indexOf('(');
-            var close = str.indexOf(')');
             var parts = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(0\.\d+))?\)$/.exec(str);
             // [ str, r, g, b, a|undefined ]
             if (typeof parts[4] == 'undefined')
@@ -325,7 +331,7 @@ class Color {
         }
         else
             throw "Unrecognized color format: " + str;
-    }
+    };
     ;
     /**
      * Create a clone of this color (RGB).
@@ -335,9 +341,9 @@ class Color {
      * @memberof Color
      * @return {Color} A clone of this color (in RGB mode).
      */
-    clone() {
+    Color.prototype.clone = function () {
         return Color.makeRGB(this.r, this.g, this.b, this.a);
-    }
+    };
     ;
     /**
      * Interpolate this color on the RGB scale.
@@ -349,165 +355,174 @@ class Color {
      * @param {number} t - An interpolation value between 0.0 and 1.0.
      * @return {Color} A clone of this color (in RGB mode).
      */
-    interpolate(c, t) {
+    Color.prototype.interpolate = function (c, t) {
         this.r += (c.r - c.r) * t;
         this.g += (c.g - c.g) * t;
         this.b += (c.b - c.b) * t;
         this.a += (c.a - c.a) * t;
         return this;
-    }
+    };
     ;
-}
-exports.Color = Color;
-Color.Sanitizer = {
-    RGB: function (...args) {
-        var o = [];
-        if (arguments.length == 0) {
-            return [];
+    Color.Sanitizer = {
+        RGB: function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            var o = [];
+            if (arguments.length == 0) {
+                return [];
+            }
+            // const allAreFrac = Color.testFrac( arguments );
+            for (var i = 0; i < arguments.length; i++) {
+                var c = arguments[i];
+                if ("string" == typeof c && c.indexOf("%") > -1) {
+                    if ((c = parseInt(c)) == NaN)
+                        throw new Error("Bad format");
+                    if (c < 0 || c > 100)
+                        throw new Error("Bad format");
+                    o[i] = c / 100;
+                }
+                else {
+                    // console.log( 'allAreFrac', allAreFrac, arguments );
+                    if ("string" == typeof c && (c = parseInt(c)) == NaN)
+                        throw new Error("Bad format");
+                    if (c < 0)
+                        throw new Error("Bad format");
+                    //else if( allAreFrac ) o[i] = c; // c >= 0 && c <= 1 (all)
+                    else if (c >= 0 && c < 1)
+                        o[i] = c;
+                    // else if(c >= 0.0 && c <= 1.0) o[i] = c;
+                    else if (c >= 1 && c < 256)
+                        o[i] = c / 255; // ???
+                    // else if(c >= 0 && c < 256) o[i] = c/255;
+                    else
+                        throw new Error("Bad format (" + c + ")");
+                }
+            }
+            return o;
+        },
+        HSL: function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            if (arguments.length < 3 || arguments.length > 4)
+                throw new Error("3 or 4 arguments required");
+            var h = arguments[0], s = arguments[1], l = arguments[2];
+            if ("string" == typeof h && (h = parseFloat(h)) == NaN)
+                throw new Error("Bad format for hue");
+            if (h < 0 || h > 360)
+                throw new Error("Hue out of range (0..360)");
+            else if ((("" + h).indexOf(".") > -1 && h > 1) || ("" + h).indexOf(".") == -1)
+                h /= 360;
+            if ("string" == typeof s && s.indexOf("%") > -1) {
+                if ((s = parseInt(s)) == NaN)
+                    throw new Error("Bad format for saturation");
+                if (s < 0 || s > 100)
+                    throw new Error("Bad format for saturation");
+                s /= 100;
+            }
+            else if (s < 0 || s > 1)
+                throw new Error("Bad format for saturation");
+            if ("string" == typeof l && l.indexOf("%") > -1) {
+                if ((l = parseInt(l)) == NaN)
+                    throw new Error("Bad format for lightness");
+                if (l < 0 || l > 100)
+                    throw new Error("Bad format for lightness");
+                l /= 100;
+            }
+            else if (l < 0 || l > 1)
+                throw new Error("Bad format for lightness");
+            return [h, s, l];
         }
-        // const allAreFrac = Color.testFrac( arguments );
-        for (var i = 0; i < arguments.length; i++) {
-            var c = arguments[i];
-            if ("string" == typeof c && c.indexOf("%") > -1) {
-                if ((c = parseInt(c)) == NaN)
-                    throw new Error("Bad format");
-                if (c < 0 || c > 100)
-                    throw new Error("Bad format");
-                o[i] = c / 100;
+    }; // ENd sanitizer
+    Color.Validator = {
+        /**
+         * Check a hexa color (without #)
+         */
+        checkHEX: function (value) {
+            if (value.length != 6 && value.length != 3)
+                throw new Error("Hexa color: bad length (" + value.length + ")," + value);
+            value = value.toLowerCase();
+            //for( var i in value ) {
+            for (var i = 0; i < value.length; i++) {
+                var c = value.charCodeAt(i);
+                if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102)))
+                    throw new Error("Hexa color: out of range for \"" + value + "\" at position " + i + ".");
+            }
+        }
+    };
+    Color.Converter = {
+        /**
+         * Calculates HSL Color.
+         * RGB must be normalized.
+         * http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+         */
+        RGBToHSL: function (color) {
+            var r = color.r;
+            var g = color.g;
+            var b = color.b;
+            var max = Math.max(r, g, b);
+            var min = Math.min(r, g, b);
+            color.l = (max + min) / 2;
+            if (max == min) {
+                color.h = color.s = 0; // achromatic
             }
             else {
-                // console.log( 'allAreFrac', allAreFrac, arguments );
-                if ("string" == typeof c && (c = parseInt(c)) == NaN)
-                    throw new Error("Bad format");
-                if (c < 0)
-                    throw new Error("Bad format");
-                //else if( allAreFrac ) o[i] = c; // c >= 0 && c <= 1 (all)
-                else if (c >= 0 && c < 1)
-                    o[i] = c;
-                // else if(c >= 0.0 && c <= 1.0) o[i] = c;
-                else if (c >= 1 && c < 256)
-                    o[i] = c / 255; // ???
-                // else if(c >= 0 && c < 256) o[i] = c/255;
-                else
-                    throw new Error("Bad format (" + c + ")");
+                var d = max - min;
+                color.s = color.l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r:
+                        color.h = (g - b) / d + (g < b ? 6 : 0);
+                        break;
+                    case g:
+                        color.h = (b - r) / d + 2;
+                        break;
+                    case b:
+                        color.h = (r - g) / d + 4;
+                        break;
+                }
+                color.h /= 6;
             }
-        }
-        return o;
-    },
-    HSL: function (...args) {
-        if (arguments.length < 3 || arguments.length > 4)
-            throw new Error("3 or 4 arguments required");
-        var h = arguments[0], s = arguments[1], l = arguments[2];
-        if ("string" == typeof h && (h = parseFloat(h)) == NaN)
-            throw new Error("Bad format for hue");
-        if (h < 0 || h > 360)
-            throw new Error("Hue out of range (0..360)");
-        else if ((("" + h).indexOf(".") > -1 && h > 1) || ("" + h).indexOf(".") == -1)
-            h /= 360;
-        if ("string" == typeof s && s.indexOf("%") > -1) {
-            if ((s = parseInt(s)) == NaN)
-                throw new Error("Bad format for saturation");
-            if (s < 0 || s > 100)
-                throw new Error("Bad format for saturation");
-            s /= 100;
-        }
-        else if (s < 0 || s > 1)
-            throw new Error("Bad format for saturation");
-        if ("string" == typeof l && l.indexOf("%") > -1) {
-            if ((l = parseInt(l)) == NaN)
-                throw new Error("Bad format for lightness");
-            if (l < 0 || l > 100)
-                throw new Error("Bad format for lightness");
-            l /= 100;
-        }
-        else if (l < 0 || l > 1)
-            throw new Error("Bad format for lightness");
-        return [h, s, l];
-    }
-}; // ENd sanitizer
-Color.Validator = {
-    /**
-     * Check a hexa color (without #)
-     */
-    checkHEX: (value) => {
-        if (value.length != 6 && value.length != 3)
-            throw new Error("Hexa color: bad length (" + value.length + ")," + value);
-        value = value.toLowerCase();
-        //for( var i in value ) {
-        for (var i = 0; i < value.length; i++) {
-            var c = value.charCodeAt(i);
-            if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102)))
-                throw new Error(`Hexa color: out of range for "${value}" at position ${i}.`);
-        }
-    }
-};
-Color.Converter = {
-    /**
-     * Calculates HSL Color.
-     * RGB must be normalized.
-     * http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-     */
-    RGBToHSL: (color) => {
-        var r = color.r;
-        var g = color.g;
-        var b = color.b;
-        var max = Math.max(r, g, b);
-        var min = Math.min(r, g, b);
-        color.l = (max + min) / 2;
-        if (max == min) {
-            color.h = color.s = 0; // achromatic
-        }
-        else {
-            var d = max - min;
-            color.s = color.l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch (max) {
-                case r:
-                    color.h = (g - b) / d + (g < b ? 6 : 0);
-                    break;
-                case g:
-                    color.h = (b - r) / d + 2;
-                    break;
-                case b:
-                    color.h = (r - g) / d + 4;
-                    break;
+        },
+        /**
+         * Calculates RGB color (nomalized).
+         * HSL must be normalized.
+         *
+         * http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+         */
+        HSLToRGB: function (color) {
+            var h = color.h;
+            var s = color.s;
+            var l = color.l;
+            if (s == 0) {
+                color.r = color.g = color.b = l; // achromatic
             }
-            color.h /= 6;
+            else {
+                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                var p = 2 * l - q;
+                color.r = Color.Converter.hue2rgb(p, q, h + 1 / 3);
+                color.g = Color.Converter.hue2rgb(p, q, h);
+                color.b = Color.Converter.hue2rgb(p, q, h - 1 / 3);
+            }
+        },
+        hue2rgb: function (p, q, t) {
+            if (t < 0)
+                t += 1;
+            if (t > 1)
+                t -= 1;
+            if (t < 1 / 6)
+                return p + (q - p) * 6 * t;
+            if (t < 1 / 2)
+                return q;
+            if (t < 2 / 3)
+                return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
         }
-    },
-    /**
-     * Calculates RGB color (nomalized).
-     * HSL must be normalized.
-     *
-     * http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-     */
-    HSLToRGB: (color) => {
-        var h = color.h;
-        var s = color.s;
-        var l = color.l;
-        if (s == 0) {
-            color.r = color.g = color.b = l; // achromatic
-        }
-        else {
-            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            var p = 2 * l - q;
-            color.r = Color.Converter.hue2rgb(p, q, h + 1 / 3);
-            color.g = Color.Converter.hue2rgb(p, q, h);
-            color.b = Color.Converter.hue2rgb(p, q, h - 1 / 3);
-        }
-    },
-    hue2rgb: (p, q, t) => {
-        if (t < 0)
-            t += 1;
-        if (t > 1)
-            t -= 1;
-        if (t < 1 / 6)
-            return p + (q - p) * 6 * t;
-        if (t < 1 / 2)
-            return q;
-        if (t < 2 / 3)
-            return p + (q - p) * (2 / 3 - t) * 6;
-        return p;
-    }
-};
+    };
+    return Color;
+}());
+exports.Color = Color;
 ; // END class
 //# sourceMappingURL=Color.js.map

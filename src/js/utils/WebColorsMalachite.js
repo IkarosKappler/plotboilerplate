@@ -6,7 +6,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebColorsMalachite = void 0;
-const Color_1 = require("./datastructures/Color");
+var Color_1 = require("./datastructures/Color");
 /**
  * A mix of green shades.
  *

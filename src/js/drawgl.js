@@ -10,7 +10,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilsgl = void 0;
-const Vertex_1 = require("./Vertex");
+var Vertex_1 = require("./Vertex");
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -21,7 +21,7 @@ const Vertex_1 = require("./Vertex");
  * @requires Vertex
  * @requires XYCoords
  */
-class drawutilsgl {
+var drawutilsgl = /** @class */ (function () {
     /**
      * The constructor.
      *
@@ -30,7 +30,7 @@ class drawutilsgl {
      * @param {WebGLRenderingContext} context - The drawing context.
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
-    constructor(context, fillShapes) {
+    function drawutilsgl(context, fillShapes) {
         this.gl = context;
         this.offset = new Vertex_1.Vertex(0, 0);
         this.scale = new Vertex_1.Vertex(1, 1);
@@ -54,15 +54,15 @@ class drawutilsgl {
         console.log('gl initialized');
     }
     ;
-    _x2rel(x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; }
+    drawutilsgl.prototype._x2rel = function (x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; };
     ;
-    _y2rel(y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; }
+    drawutilsgl.prototype._y2rel = function (y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; };
     ;
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
      */
-    copyInstance(fillShapes) {
+    drawutilsgl.prototype.copyInstance = function (fillShapes) {
         var copy = new drawutilsgl(null, fillShapes);
         copy.gl = this.gl;
         copy.glutils = this.glutils;
@@ -70,16 +70,16 @@ class drawutilsgl {
         copy._fragShader = this._fragShader;
         copy._program = this._program;
         return copy;
-    }
+    };
     ;
     /**
      * Called before each draw cycle.
      * @param {number} renderTime
      **/
-    beginDrawCycle(renderTime) {
+    drawutilsgl.prototype.beginDrawCycle = function (renderTime) {
         this._zindex = 0.0;
         this.renderTime = renderTime;
-    }
+    };
     ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -89,10 +89,10 @@ class drawutilsgl {
      * @method
      * @param {UID} uid - A UID identifying the currently drawn element(s).es.
      **/
-    setCurrentId(uid) {
+    drawutilsgl.prototype.setCurrentId = function (uid) {
         // NOOP
         this.curId = uid;
-    }
+    };
     ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -102,9 +102,9 @@ class drawutilsgl {
      * @method
      * @param {string} className - A class name for further custom use cases.
      **/
-    setCurrentClassName(className) {
+    drawutilsgl.prototype.setCurrentClassName = function (className) {
         // NOOP
-    }
+    };
     ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
@@ -117,8 +117,8 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      **/
-    line(zA, zB, color) {
-        const vertices = new Float32Array(6);
+    drawutilsgl.prototype.line = function (zA, zB, color) {
+        var vertices = new Float32Array(6);
         vertices[0] = this._x2rel(zA.x);
         vertices[1] = this._y2rel(zA.y);
         vertices[2] = this._zindex;
@@ -144,9 +144,9 @@ class drawutilsgl {
         //this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         // Set the view port
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
-        let uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
+        var uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
         // let radians = currentAngle * Math.PI / 180.0;
-        let currentRotation = [0.0, 1.0];
+        var currentRotation = [0.0, 1.0];
         //currentRotation[0] = Math.sin(radians);
         //currentRotation[1] = Math.cos(radians);
         this.gl.uniform2fv(uRotationVector, currentRotation);
@@ -155,7 +155,7 @@ class drawutilsgl {
         this.gl.drawArrays(this.gl.LINES, 0, vertices.length / 3);
         // POINTS, LINE_STRIP, LINE_LOOP, LINES,
         // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
-    }
+    };
     ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
@@ -168,9 +168,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      **/
-    arrow(zA, zB, color) {
+    drawutilsgl.prototype.arrow = function (zA, zB, color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw an image at the given position with the given size.<br>
@@ -185,9 +185,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      **/
-    image(image, position, size) {
+    drawutilsgl.prototype.image = function (image, position, size) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
@@ -200,9 +200,9 @@ class drawutilsgl {
     // |
     // | @param color A stroke/fill color to use.
     // +-------------------------------
-    _fillOrDraw(color) {
+    drawutilsgl.prototype._fillOrDraw = function (color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw the given (cubic) bézier curve.
@@ -218,9 +218,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
+    drawutilsgl.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw the given (cubic) Bézier path.
@@ -237,9 +237,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path, color, lineWidth) {
+    drawutilsgl.prototype.cubicBezierPath = function (path, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
@@ -253,9 +253,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    handle(startPoint, endPoint) {
+    drawutilsgl.prototype.handle = function (startPoint, endPoint) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a handle line (with a light grey).
@@ -267,9 +267,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    handleLine(startPoint, endPoint) {
+    drawutilsgl.prototype.handleLine = function (startPoint, endPoint) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -281,9 +281,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    dot(p, color) {
+    drawutilsgl.prototype.dot = function (p, color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
@@ -295,9 +295,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    point(p, color) {
+    drawutilsgl.prototype.point = function (p, color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
@@ -313,9 +313,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    circle(center, radius, color, lineWidth) {
+    drawutilsgl.prototype.circle = function (center, radius, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
@@ -330,9 +330,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    circleArc(center, radius, startAngle, endAngle, color, lineWidth) {
+    drawutilsgl.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
@@ -347,9 +347,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    ellipse(center, radiusX, radiusY, color, lineWidth) {
+    drawutilsgl.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
@@ -365,9 +365,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    square(center, size, color, lineWidth) {
+    drawutilsgl.prototype.square = function (center, size, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -383,9 +383,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    grid(center, width, height, sizeX, sizeY, color) {
+    drawutilsgl.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
@@ -403,9 +403,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    raster(center, width, height, sizeX, sizeY, color) {
+    drawutilsgl.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
@@ -422,9 +422,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    diamondHandle(center, size, color) {
+    drawutilsgl.prototype.diamondHandle = function (center, size, color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a square handle with the given CSS color.<br>
@@ -441,9 +441,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    squareHandle(center, size, color) {
+    drawutilsgl.prototype.squareHandle = function (center, size, color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a circle handle with the given CSS color.<br>
@@ -460,9 +460,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    circleHandle(center, size, color) {
+    drawutilsgl.prototype.circleHandle = function (center, size, color) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
@@ -477,9 +477,9 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    crosshair(center, radius, color) {
+    drawutilsgl.prototype.crosshair = function (center, radius, color) {
         // NOT YET IMPLEMENTED	
-    }
+    };
     ;
     /**
      * Draw a polygon.
@@ -491,8 +491,8 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    polygon(polygon, color, lineWidth) {
-        const vertices = new Float32Array(polygon.vertices.length * 3);
+    drawutilsgl.prototype.polygon = function (polygon, color, lineWidth) {
+        var vertices = new Float32Array(polygon.vertices.length * 3);
         for (var i = 0; i < polygon.vertices.length; i++) {
             vertices[i * 3 + 0] = this._x2rel(polygon.vertices[i].x);
             vertices[i * 3 + 1] = this._y2rel(polygon.vertices[i].y);
@@ -518,9 +518,9 @@ class drawutilsgl {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         // Set the view port
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
-        let uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
+        var uRotationVector = this.gl.getUniformLocation(this._program, "uRotationVector");
         // let radians = currentAngle * Math.PI / 180.0;
-        let currentRotation = [0.0, 1.0];
+        var currentRotation = [0.0, 1.0];
         //currentRotation[0] = Math.sin(radians);
         //currentRotation[1] = Math.cos(radians);
         this.gl.uniform2fv(uRotationVector, currentRotation);
@@ -528,7 +528,7 @@ class drawutilsgl {
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, vertices.length / 3);
         // POINTS, LINE_STRIP, LINE_LOOP, LINES,
         // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
-    }
+    };
     ;
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -542,13 +542,13 @@ class drawutilsgl {
      * @instance
      * @memberof drawutils
      */
-    polyline(vertices, isOpen, color, lineWidth) {
+    drawutilsgl.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
-    text(text, x, y, options) {
+    drawutilsgl.prototype.text = function (text, x, y, options) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Draw a non-scaling text label at the given position.
@@ -565,9 +565,9 @@ class drawutilsgl {
     // +---------------------------------------------------------------------------------
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
-    label(text, x, y, rotation) {
+    drawutilsgl.prototype.label = function (text, x, y, rotation) {
         // NOT YET IMPLEMENTED
-    }
+    };
     ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
@@ -577,7 +577,7 @@ class drawutilsgl {
      *
      * @param {string} color - The color to clear with.
      **/
-    clear(color) {
+    drawutilsgl.prototype.clear = function (color) {
         // NOT YET IMPLEMENTED
         // if( typeof color == 'string' )
         // color = Color.parse(color); // Color class does not yet exist in TS
@@ -587,44 +587,24 @@ class drawutilsgl {
         this.gl.enable(this.gl.DEPTH_TEST);
         // Clear the color and depth buffer
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    }
+    };
     ;
-}
+    // Vertex shader source code
+    drawutilsgl.vertCode = "\n    precision mediump float;\n\n    attribute vec3 position;\n\n    uniform vec2 uRotationVector;\n\n    void main(void) {\n\tvec2 rotatedPosition = vec2(\n\t    position.x * uRotationVector.y +\n\t\tposition.y * uRotationVector.x,\n\t    position.y * uRotationVector.y -\n\t\tposition.x * uRotationVector.x\n\t);\n\n\tgl_Position = vec4(rotatedPosition, position.z, 1.0);\n    }";
+    // Fragment shader source code
+    drawutilsgl.fragCode = "\n    precision highp float;\n\n    void main(void) {\n\tgl_FragColor = vec4(0.0,0.75,1.0,1.0);\n    }";
+    return drawutilsgl;
+}());
 exports.drawutilsgl = drawutilsgl;
-// Vertex shader source code
-drawutilsgl.vertCode = `
-    precision mediump float;
-
-    attribute vec3 position;
-
-    uniform vec2 uRotationVector;
-
-    void main(void) {
-	vec2 rotatedPosition = vec2(
-	    position.x * uRotationVector.y +
-		position.y * uRotationVector.x,
-	    position.y * uRotationVector.y -
-		position.x * uRotationVector.x
-	);
-
-	gl_Position = vec4(rotatedPosition, position.z, 1.0);
-    }`;
-// Fragment shader source code
-drawutilsgl.fragCode = `
-    precision highp float;
-
-    void main(void) {
-	gl_FragColor = vec4(0.0,0.75,1.0,1.0);
-    }`;
 /**
  * Some GL helper utils.
  **/
-class GLU {
-    constructor(gl) {
+var GLU = /** @class */ (function () {
+    function GLU(gl) {
         this.gl = gl;
     }
     ;
-    bufferData(verts) {
+    GLU.prototype.bufferData = function (verts) {
         // Create an empty buffer object
         var vbuffer = this.gl.createBuffer();
         // Bind appropriate array buffer to it
@@ -634,26 +614,26 @@ class GLU {
         // Unbind the buffer
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         return vbuffer;
-    }
+    };
     ;
     /*=================== Shaders ====================*/
-    compileShader(shaderCode, shaderType) {
+    GLU.prototype.compileShader = function (shaderCode, shaderType) {
         // Create a vertex shader object
         var shader = this.gl.createShader(shaderType);
         // Attach vertex shader source code
         this.gl.shaderSource(shader, shaderCode);
         // Compile the vertex shader
         this.gl.compileShader(shader);
-        const vertStatus = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
+        var vertStatus = this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS);
         if (!vertStatus) {
             console.warn("Error in shader:" + this.gl.getShaderInfoLog(shader));
             this.gl.deleteShader(shader);
             return null;
         }
         return shader;
-    }
+    };
     ;
-    makeProgram(vertShader, fragShader) {
+    GLU.prototype.makeProgram = function (vertShader, fragShader) {
         // Create a shader program object to store
         // the combined shader program
         var program = this.gl.createProgram();
@@ -671,7 +651,8 @@ class GLU {
         this.gl.deleteShader(vertShader);
         this.gl.deleteShader(fragShader);
         return program;
-    }
+    };
     ;
-}
+    return GLU;
+}());
 //# sourceMappingURL=drawgl.js.map
