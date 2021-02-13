@@ -77,8 +77,8 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlotBoilerplate = void 0;
-// import { AlloyFinger } from "alloyfinger";
-var alloy_finger_1 = require("../../lib/alloy_finger");
+// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/dist/types";
+var alloyfinger_typescript_1 = require("alloyfinger-typescript");
 var draw_1 = require("./draw");
 var drawgl_1 = require("./drawgl");
 var drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
@@ -1581,15 +1581,14 @@ var PlotBoilerplate = /** @class */ (function () {
             var relPos_1 = function (pos) {
                 var bounds = _self.canvas.getBoundingClientRect();
                 return { x: pos.x - bounds.left,
-                    y: pos.y - bounds.top // _self.canvas.offsetTop
+                    y: pos.y - bounds.top
                 };
             };
             if (globalThis["AlloyFinger"] && typeof globalThis["AlloyFinger"] == "function") {
                 try {
                     // Do not include AlloyFinger itself to the library
                     // (17kb, but we want to keep this lib as tiny as possible).
-                    // TODO: cc
-                    // const AF : AlloyFinger = (globalThis["AlloyFinger"] as AlloyFinger);
+                    // Solution: only import type defintions from AlloyFinger.
                     var touchMovePos = null;
                     var touchDownPos = null;
                     var draggedElement = null;
@@ -1601,9 +1600,7 @@ var PlotBoilerplate = /** @class */ (function () {
                         multiTouchStartScale = null;
                         _self.draggedElements = [];
                     };
-                    // TODO: cc
-                    // var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
-                    new alloy_finger_1.AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
+                    new alloyfinger_typescript_1.default(this.eventCatcher ? this.eventCatcher : this.canvas, {
                         touchStart: function (evt) {
                             if (evt.touches.length == 1) {
                                 touchMovePos = new Vertex_1.Vertex(relPos_1({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));

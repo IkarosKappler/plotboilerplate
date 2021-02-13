@@ -60,7 +60,6 @@
     "@types/dat.gui": "^0.7.5",
     "@typescript-eslint/eslint-plugin": "^4.7.0",
     "@typescript-eslint/parser": "^4.7.0",
-    "alloyfinger": "^0.1.16",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.1.0",
     "eslint": "^7.13.0",
@@ -83,6 +82,7 @@
     "webpack-uglify-harmony-plugin": "^1.0.0"
   },
   "dependencies": {
+    "alloyfinger-typescript": "file:../AlloyFinger-Typescript",
     "path2d-polyfill": "^1.1.0"
   }
 }

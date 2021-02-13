@@ -1,3 +1,5 @@
+import AlloyFinger from 'alloyfinger-typescript/src/ts';
+
 /**
  * @classdesc A static UIDGenerator.
  *
@@ -745,8 +747,6 @@ class Vertex {
         this.sub(center);
         angle += Math.atan2(this.y, this.x);
         let len = this.distance(Vertex.ZERO); // {x:0,y:0});
-        this.x;
-        this.y;
         this.x = len * Math.cos(angle);
         this.y = len * Math.sin(angle);
         this.add(center);
@@ -1040,20 +1040,6 @@ class Polygon {
      * @return {number}
      */
     area() {
-        // Found at:
-        //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
-        /* let total : number = 0.0;
-        
-        for (var i = 0, l = this.vertices.length; i < l; i++) {
-            const addX = vertices[i].x;
-            const addY = vertices[(i + 1)%l].y;
-            const subX = vertices[(i + 1)%l].x;
-            const subY = vertices[i].y;
-    
-            total += (addX * addY * 0.5);
-            total -= (subX * subY * 0.5);
-        }
-        return Math.abs(total); */
         return Polygon.utils.area(this.vertices);
     }
     ;
@@ -1068,13 +1054,6 @@ class Polygon {
      */
     signedArea() {
         return Polygon.utils.signedArea(this.vertices);
-        /* let sum : number = 0;
-        const n = this.vertices.length;
-        for (var i = 0; i < n; i++ ) {
-            const j = (i+1) % n;
-            sum += (this.vertices[j].x - this.vertices[i].x) * (this.vertices[i].y + this.vertices[j].y);
-        }
-        return sum; */
     }
     ;
     /**
@@ -1440,7 +1419,6 @@ class Bounds {
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
- * @requires SVGSerializable
  * @requires UID
  * @requires Vertex
  * @requires XYCoords
@@ -1755,7 +1733,8 @@ VertTuple.vtutils = {
  *            Vectors are drawn with an arrow at their end point.<br>
  *            <b>The Vector class extends the Line class.</b>
  *
- * @requires Vertex, Line
+ * @requires VertTuple
+ * @requires Vertex
  **/
 class Vector extends VertTuple {
     /**
@@ -1904,7 +1883,7 @@ Vector.utils = {
      * @param {number} scaleX  - The horizontal scaling during draw.
      * @param {number} scaleY  - the vertical scaling during draw.
      **/
-    buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
+    buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
         var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         var vertices = [];
         vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
@@ -1947,7 +1926,6 @@ Vector.utils = {
  * @requires Vertex
  * @requires Vector
  * @requires XYCoords
- * @requires SVGSerializable
  * @requires UID
  * @requires UIDGenerator
  */
@@ -2091,7 +2069,9 @@ class CubicBezierCurve {
      * @return {void}
      **/
     updateArcLengths() {
-        let pointA = this.startPoint.clone(), pointB = new Vertex(0, 0), curveStep = 1.0 / this.curveIntervals;
+        let pointA = this.startPoint.clone();
+        let pointB = new Vertex(0, 0);
+        let curveStep = 1.0 / this.curveIntervals;
         // Clear segment cache
         this.segmentCache = [];
         // Push start point into buffer
@@ -4073,7 +4053,7 @@ class Circle {
     ;
 } // END class
 Circle.circleUtils = {
-    vertAt: function (angle, radius) {
+    vertAt: (angle, radius) => {
         /* return new Vertex( Math.sin(angle) * radius,
                    Math.cos(angle) * radius ); */
         return new Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
@@ -4169,9 +4149,6 @@ CircleSector.circleSectorUtils = {
         // Some browsers have problems to render full circles (described by start==end).
         if (Math.PI * 2 - Math.abs(startAngle - endAngle) < 0.001) {
             const firstHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle, startAngle + (endAngle - startAngle) / 2, options);
-            ({ x: firstHalf[firstHalf.length - 2],
-                y: firstHalf[firstHalf.length - 1]
-            });
             const secondHalf = CircleSector.circleSectorUtils.describeSVGArc(x, y, radius, startAngle + (endAngle - startAngle) / 2, endAngle, options);
             return firstHalf.concat(secondHalf);
         }
@@ -4225,13 +4202,12 @@ CircleSector.circleSectorUtils = {
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
  * @version  1.8.3
  **/
-// Todo: rename this class to Drawutils
+// Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
  *
  * @requires CubicBzierCurvce
  * @requires Polygon
- * @requires SVGSerializable
  * @requires Vertex
  * @requires XYCoords
  */
@@ -4483,7 +4459,9 @@ class drawutils {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
-        var endPoint, startControlPoint, endControlPoint;
+        var endPoint;
+        var startControlPoint;
+        var endControlPoint;
         this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
@@ -5653,7 +5631,6 @@ class GLU {
  * @requires SVGSerializale
  * @requires UID
  * @requires UIDGenerator
- * @requires XYCoords
  * @requires geomutils
  *
  */
@@ -6072,9 +6049,6 @@ const geomutils = {
         const triangle = new Triangle(pA, pB, pC);
         const lineAB = new Line(pA, pB);
         const lineAC = new Line(pA, pC);
-        // Compute the slope (theta) of line AB and line AC
-        lineAB.angle();
-        lineAC.angle();
         // Compute the difference; this is the angle between AB and AC
         var insideAngle = lineAB.angle(lineAC);
         // We want the inner angles of the triangle, not the outer angle;
@@ -6715,7 +6689,8 @@ class MouseHandler {
     constructor(element, name) {
         this.mouseDownPos = undefined;
         this.mouseDragPos = undefined;
-        this.mousePos = undefined;
+        // TODO: cc
+        // private mousePos       : { x:number, y:number }|undefined = undefined;
         this.mouseButton = -1;
         this.listeners = {};
         this.installed = {};
@@ -6727,7 +6702,7 @@ class MouseHandler {
         this.element = element;
         this.mouseDownPos = null;
         this.mouseDragPos = null;
-        this.mousePos = null;
+        // this.mousePos     = null;
         this.mouseButton = -1;
         this.listeners = {};
         this.installed = {};
@@ -7093,7 +7068,6 @@ class PBImage {
  *
  * @requires CubicBzierCurvce
  * @requires Polygon
- * @requires SVGSerializable
  * @requires Vertex
  * @requires XYCoords
  */
@@ -7464,7 +7438,9 @@ class drawutilssvg {
             'M', this._x(path[0].x), this._y(path[0].y)
         ];
         // Draw curve path
-        var endPoint, startControlPoint, endControlPoint;
+        var endPoint;
+        var startControlPoint;
+        var endControlPoint;
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
             endControlPoint = path[i + 1];
@@ -7519,10 +7495,6 @@ class drawutilssvg {
      */
     dot(p, color) {
         const node = this.makeNode('line');
-        [
-            'M', this._x(p.x), this._y(p.y),
-            'L', this._x(p.x + 1), this._y(p.y + 1)
-        ];
         return this._bindFillDraw(node, 'dot', color, 1);
     }
     ;
@@ -7924,7 +7896,7 @@ class drawutilssvg {
         this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
         // Clear the current ID again
-        this.curId = null;
+        this.curId = undefined;
         // return node;
     }
     ;
@@ -7934,7 +7906,7 @@ class drawutilssvg {
      * @private
      */
     removeAllChildNodes() {
-        while (this.gNode.firstChild) {
+        while (this.gNode.lastChild) {
             this.gNode.removeChild(this.gNode.lastChild);
         }
     }
@@ -7977,7 +7949,6 @@ drawutilssvg.HEAD_XML = [
  * @requires UID
  * @requires UIDGenerator
  * @requires Vertex
- * @requires XYCoords
  */
 class VEllipse {
     /**
@@ -8090,7 +8061,8 @@ class VEllipse {
  * @modified 2021-01-10 Added the `eventCatcher` element (used to track mouse events on SVGs).
  * @modified 2021-01-26 Fixed SVG resizing.
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
- * @version  1.12.2
+ * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
+ * @version  1.12.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -9580,14 +9552,14 @@ class PlotBoilerplate {
             const relPos = (pos) => {
                 const bounds = _self.canvas.getBoundingClientRect();
                 return { x: pos.x - bounds.left,
-                    y: pos.y - bounds.top // _self.canvas.offsetTop
+                    y: pos.y - bounds.top
                 };
             };
             if (globalThis["AlloyFinger"] && typeof globalThis["AlloyFinger"] == "function") {
                 try {
                     // Do not include AlloyFinger itself to the library
                     // (17kb, but we want to keep this lib as tiny as possible).
-                    const AF = globalThis["AlloyFinger"];
+                    // Solution: only import type defintions from AlloyFinger.
                     var touchMovePos = null;
                     var touchDownPos = null;
                     var draggedElement = null;
@@ -9599,11 +9571,11 @@ class PlotBoilerplate {
                         multiTouchStartScale = null;
                         _self.draggedElements = [];
                     };
-                    var af = new AF(this.eventCatcher ? this.eventCatcher : this.canvas, {
-                        touchStart: function (e) {
-                            if (e.touches.length == 1) {
-                                touchMovePos = new Vertex(relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
-                                touchDownPos = new Vertex(relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }));
+                    new AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
+                        touchStart: (evt) => {
+                            if (evt.touches.length == 1) {
+                                touchMovePos = new Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
+                                touchDownPos = new Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
                                 if (draggedElement && draggedElement.typeName == 'vertex') {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
@@ -9613,11 +9585,11 @@ class PlotBoilerplate {
                                 }
                             }
                         },
-                        touchMove: function (e) {
-                            if (e.touches.length == 1 && draggedElement) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                var rel = relPos({ x: e.touches[0].clientX, y: e.touches[0].clientY }); //  points[0] );
+                        touchMove: (evt) => {
+                            if (evt.touches.length == 1 && draggedElement) {
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                var rel = relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY });
                                 var trans = _self.transformMousePosition(rel.x, rel.y);
                                 var diff = new Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
                                 if (draggedElement.typeName == 'vertex') {
@@ -9631,22 +9603,19 @@ class PlotBoilerplate {
                                 }
                                 touchMovePos = new Vertex(rel);
                             }
-                            else if (e.touches.length == 2) {
+                            else if (evt.touches.length == 2) {
                                 // If at least two fingers touch and move, then change the draw offset (panning).
-                                e.preventDefault();
-                                e.stopPropagation();
-                                _self.setOffset(_self.draw.offset.clone().addXY(e.deltaX, e.deltaY)); // Apply zoom?
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                _self.setOffset(_self.draw.offset.clone().addXY(evt.deltaX, evt.deltaY)); // Apply zoom?
                                 _self.redraw();
                             }
                         },
-                        touchEnd: function (e) {
+                        touchEnd: (evt) => {
                             // Note: e.touches.length is 0 here
                             if (draggedElement && draggedElement.typeName == 'vertex') {
                                 var draggingVertex = _self.vertices[draggedElement.vindex];
                                 var fakeEvent = { isTouchEvent: true, params: { dragAmount: { x: 0, y: 0 }, wasDragged: false, mouseDownPos: touchDownPos.clone(), mouseDragPos: touchDownPos.clone(), vertex: draggingVertex } };
-                                // var rel : XYCoords = relPos( { x : e.touches[0].clientX, y : e.touches[0].clientY } ); //  points[0] );
-                                // var trans : XYCoords = _self.transformMousePosition( rel.x, rel.y ); 
-                                // var diff : Vertex = new Vertex(_self.transformMousePosition( touchMovePos.x, touchMovePos.y )).difference(trans);
                                 // Check if vertex was moved
                                 if (touchMovePos && touchDownPos && touchDownPos.distance(touchMovePos) < 0.001) {
                                     // if( e.touches.length == 1 && diff.x == 0 && diff.y == 0 ) {
@@ -9658,21 +9627,21 @@ class PlotBoilerplate {
                             }
                             clearTouch();
                         },
-                        touchCancel: function (e) {
+                        touchCancel: (evt) => {
                             clearTouch();
                         },
-                        multipointStart: function (e) {
+                        multipointStart: (evt) => {
                             multiTouchStartScale = _self.draw.scale.clone();
                         },
-                        multipointEnd: function (e) {
+                        multipointEnd: (evt) => {
                             multiTouchStartScale = null;
                         },
-                        pinch: function (e) {
+                        pinch: (evt) => {
                             // For pinching there must be at least two touch items
-                            const fingerA = new Vertex(e.touches.item(0).clientX, e.touches.item(0).clientY);
-                            const fingerB = new Vertex(e.touches.item(1).clientX, e.touches.item(1).clientY);
+                            const fingerA = new Vertex(evt.touches.item(0).clientX, evt.touches.item(0).clientY);
+                            const fingerB = new Vertex(evt.touches.item(1).clientX, evt.touches.item(1).clientY);
                             const center = new Line(fingerA, fingerB).vertAt(0.5);
-                            _self.setZoom(multiTouchStartScale.x * e.zoom, multiTouchStartScale.y * e.zoom, center);
+                            _self.setZoom(multiTouchStartScale.x * evt.zoom, multiTouchStartScale.y * evt.zoom, center);
                             _self.redraw();
                         }
                     });
@@ -9964,7 +9933,6 @@ PlotBoilerplate.utils = {
  *
  * @requires SVGSerializable
  * @requires Vertex
- * @requires XYCoords
  */
 class SVGBuilder {
     /**

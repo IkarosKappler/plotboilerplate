@@ -149,20 +149,6 @@ export class Polygon {
      * @return {number}
      */
     area() {
-        // Found at:
-        //    https://stackoverflow.com/questions/16285134/calculating-polygon-area
-        /* let total : number = 0.0;
-        
-        for (var i = 0, l = this.vertices.length; i < l; i++) {
-            const addX = vertices[i].x;
-            const addY = vertices[(i + 1)%l].y;
-            const subX = vertices[(i + 1)%l].x;
-            const subY = vertices[i].y;
-    
-            total += (addX * addY * 0.5);
-            total -= (subX * subY * 0.5);
-        }
-        return Math.abs(total); */
         return Polygon.utils.area(this.vertices);
     }
     ;
@@ -177,13 +163,6 @@ export class Polygon {
      */
     signedArea() {
         return Polygon.utils.signedArea(this.vertices);
-        /* let sum : number = 0;
-        const n = this.vertices.length;
-        for (var i = 0; i < n; i++ ) {
-            const j = (i+1) % n;
-            sum += (this.vertices[j].x - this.vertices[i].x) * (this.vertices[i].y + this.vertices[j].y);
-        }
-        return sum; */
     }
     ;
     /**

@@ -185,7 +185,7 @@ export class Color {
             this.s = 1;
         else if (this.s < 0)
             this.s = 0;
-        Color.Converter.HSLToRGB.apply(this);
+        Color.Converter.HSLToRGB(this);
     }
     ;
     desaturate(v) {
@@ -203,7 +203,7 @@ export class Color {
             this.l = 1;
         else if (this.l < 0)
             this.l = 0;
-        Color.Converter.HSLToRGB.apply(this);
+        Color.Converter.HSLToRGB(this);
     }
     ;
     darken(v) {
@@ -221,7 +221,7 @@ export class Color {
             this.a = 1;
         else if (this.a < 0)
             this.a = 0;
-        Color.Converter.HSLToRGB.apply(this);
+        Color.Converter.HSLToRGB(this);
     }
     ;
     fadeout(v) {
@@ -239,7 +239,7 @@ export class Color {
             this.h = 1;
         else if (this.h < 0)
             this.h = 0;
-        Color.Converter.HSLToRGB.apply(this);
+        Color.Converter.HSLToRGB(this);
     }
     ;
     static makeRGB(...args) {
@@ -253,7 +253,7 @@ export class Color {
         c.b = sanitized[2];
         if (arguments.length == 4)
             c.a = arguments[3];
-        Color.Converter.RGBToHSL.apply(c);
+        Color.Converter.RGBToHSL(c);
         return c;
     }
     ;
@@ -268,7 +268,7 @@ export class Color {
         c.l = sanitized[2];
         if (arguments.length == 4)
             c.a = arguments[3];
-        Color.Converter.HSLToRGB.apply(c);
+        Color.Converter.HSLToRGB(c);
         return c;
     }
     ;
@@ -290,7 +290,7 @@ export class Color {
         c.r = sanitized[0];
         c.g = sanitized[1];
         c.b = sanitized[2];
-        Color.Converter.RGBToHSL.apply(c);
+        Color.Converter.RGBToHSL(c);
         return c;
     }
     ;

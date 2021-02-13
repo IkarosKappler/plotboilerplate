@@ -1,6 +1,8 @@
 "use strict";
 /* Imports for webpack */
 
+// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript";
+
 globalThis.UIDGenerator = require("./UIDGenerator.js").geomutils;
 globalThis.VertexAttr = require("./VertexAttr.js").VertexAttr;
 globalThis.VertexListeners = require("./VertexListeners.js").VertexListeners;

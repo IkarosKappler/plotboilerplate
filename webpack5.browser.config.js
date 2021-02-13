@@ -10,6 +10,11 @@ module.exports = [
 	    path: path.resolve(__dirname, './dist'),
 	    filename: 'plotboilerplate.browser.min.js'
 	},
+	module: {
+            rules: [
+		{test: /\.ts$/, use: 'ts-loader'}
+            ]
+	},
 	devtool: 'source-map',
 	optimization: {
             minimize: true

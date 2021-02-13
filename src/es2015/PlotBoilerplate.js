@@ -75,8 +75,9 @@
  * @public
  **/
 var _a;
-// import { AlloyFinger } from "alloyfinger";
-import { AlloyFinger } from "../../lib/alloy_finger";
+// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/dist/types";
+// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript";
+import AlloyFinger from "alloyfinger-typescript/src/ts";
 import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
 import { drawutilssvg } from "./utils/helpers/drawutilssvg";
@@ -1578,15 +1579,14 @@ export class PlotBoilerplate {
             const relPos = (pos) => {
                 const bounds = _self.canvas.getBoundingClientRect();
                 return { x: pos.x - bounds.left,
-                    y: pos.y - bounds.top // _self.canvas.offsetTop
+                    y: pos.y - bounds.top
                 };
             };
             if (globalThis["AlloyFinger"] && typeof globalThis["AlloyFinger"] == "function") {
                 try {
                     // Do not include AlloyFinger itself to the library
                     // (17kb, but we want to keep this lib as tiny as possible).
-                    // TODO: cc
-                    // const AF : AlloyFinger = (globalThis["AlloyFinger"] as AlloyFinger);
+                    // Solution: only import type defintions from AlloyFinger.
                     var touchMovePos = null;
                     var touchDownPos = null;
                     var draggedElement = null;
@@ -1598,8 +1598,6 @@ export class PlotBoilerplate {
                         multiTouchStartScale = null;
                         _self.draggedElements = [];
                     };
-                    // TODO: cc
-                    // var af = new AF( this.eventCatcher ? this.eventCatcher : this.canvas, {
                     new AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
                         touchStart: (evt) => {
                             if (evt.touches.length == 1) {
