@@ -76,6 +76,7 @@
  **/
 var _a;
 // import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/dist/types";
+//import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/ts";
 import AlloyFinger from "alloyfinger-typescript";
 import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
