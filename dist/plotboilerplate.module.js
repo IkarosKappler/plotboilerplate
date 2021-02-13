@@ -1,4 +1,4 @@
-import AlloyFinger from 'alloyfinger-typescript/src/ts';
+import AlloyFinger from 'alloyfinger-typescript';
 
 /**
  * @classdesc A static UIDGenerator.
