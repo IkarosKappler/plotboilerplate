@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2018-08-26
@@ -11,6 +12,8 @@
  * @file VertexAttr
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.VertexAttr = void 0;
 /**
  * @classdesc The VertexAttr is a helper class to wrap together additional attributes
  * to vertices that do not belong to the 'standard canonical' vertex implementation.<br>
@@ -18,7 +21,7 @@
  * This is some sort of 'userData' object, but the constructor uses a global model
  * to obtain a (configurable) default attribute set to all instances.<br>
  */
-export class VertexAttr {
+class VertexAttr {
     /**
      * The constructor.
      *
@@ -38,6 +41,7 @@ export class VertexAttr {
     }
     ;
 }
+exports.VertexAttr = VertexAttr;
 /**
  * This is the global attribute model. Set these object on the initialization
  * of your app to gain all VertexAttr instances have these attributes.

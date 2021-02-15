@@ -10,6 +10,13 @@ module.exports = [
 	    path: path.resolve(__dirname, './dist'),
 	    filename: 'plotboilerplate.browser.min.js'
 	},
+	resolve: {
+            symlinks: true
+	},
+	/* resolve: {
+	    extensions: ['.js'],
+	    fallback: [ path.resolve(__dirname, './node_modules') ]
+	}, */
 	/* module: {
             rules: [
 		{test: /\.ts$/, use: 'ts-loader'}

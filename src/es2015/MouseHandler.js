@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2018-03-19
@@ -22,17 +23,21 @@
  * @file MouseHandler
  * @public
  **/
-export class XMouseEvent extends MouseEvent {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MouseHandler = exports.XWheelEvent = exports.XMouseEvent = void 0;
+class XMouseEvent extends MouseEvent {
 }
-export class XWheelEvent extends WheelEvent {
+exports.XMouseEvent = XMouseEvent;
+class XWheelEvent extends WheelEvent {
 }
+exports.XWheelEvent = XWheelEvent;
 /**
  * @classdesc A simple mouse handler for demos.
  * Use to avoid load massive libraries like jQuery.
  *
  * @requires XYCoords
  */
-export class MouseHandler {
+class MouseHandler {
     /**
      * The constructor.
      *
@@ -396,4 +401,5 @@ export class MouseHandler {
         this.element.removeEventListener('wheel', this.handlers['wheel']);
     }
 }
+exports.MouseHandler = MouseHandler;
 //# sourceMappingURL=MouseHandler.js.map

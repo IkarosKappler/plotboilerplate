@@ -1,9 +1,12 @@
+"use strict";
 /**
  * @requires Vertex
  *
  * @author Ikaros Kappler
  * @date 2020-12-20
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.clearPolygonDuplicateVertices = void 0;
 /**
  * Remove all duplicate neighbours from the given polygon.
  *
@@ -20,7 +23,7 @@
  * @param {number=0} epsilon - The epsilon area to use around each vertex to check equality.
  * @return {Array<Vertex>}
  */
-export const clearPolygonDuplicateVertices = (vertices, epsilon) => {
+const clearPolygonDuplicateVertices = (vertices, epsilon) => {
     const n = vertices.length;
     if (n === 0)
         return [];
@@ -54,4 +57,5 @@ export const clearPolygonDuplicateVertices = (vertices, epsilon) => {
     }
     return result;
 };
+exports.clearPolygonDuplicateVertices = clearPolygonDuplicateVertices;
 //# sourceMappingURL=clearPolygonDuplicateVertices.js.map

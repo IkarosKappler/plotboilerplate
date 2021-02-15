@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2019-09-18
@@ -7,7 +8,9 @@
  * @modified 2021-01-24 Added the `setCurrentId` function.
  * @version  0.0.5
  **/
-import { Vertex } from "./Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.drawutilsgl = void 0;
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -18,7 +21,7 @@ import { Vertex } from "./Vertex";
  * @requires Vertex
  * @requires XYCoords
  */
-export class drawutilsgl {
+class drawutilsgl {
     /**
      * The constructor.
      *
@@ -29,8 +32,8 @@ export class drawutilsgl {
      **/
     constructor(context, fillShapes) {
         this.gl = context;
-        this.offset = new Vertex(0, 0);
-        this.scale = new Vertex(1, 1);
+        this.offset = new Vertex_1.Vertex(0, 0);
+        this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
         this._zindex = 0.0;
         if (context == null || typeof context === 'undefined')
@@ -587,6 +590,7 @@ export class drawutilsgl {
     }
     ;
 }
+exports.drawutilsgl = drawutilsgl;
 // Vertex shader source code
 drawutilsgl.vertCode = `
     precision mediump float;

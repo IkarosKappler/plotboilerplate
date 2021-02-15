@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc The decagon tile from the Girih set.
  *
@@ -16,9 +17,11 @@
  * @file GirihDecacon
  * @public
  **/
-import { GirihTile, TileType } from "./GirihTile";
-import { Polygon } from "../../Polygon";
-export class GirihDecagon extends GirihTile {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GirihDecagon = void 0;
+const GirihTile_1 = require("./GirihTile");
+const Polygon_1 = require("../../Polygon");
+class GirihDecagon extends GirihTile_1.GirihTile {
     /**
      * @constructor
      * @extends GirihTile
@@ -27,7 +30,7 @@ export class GirihDecagon extends GirihTile {
      * @param {number} edgeLength
      */
     constructor(position, edgeLength) {
-        super(position, edgeLength, TileType.DECAGON);
+        super(position, edgeLength, GirihTile_1.TileType.DECAGON);
         // Overwrite the default symmetries:
         //    the decagon tile has a 36° symmetry (1/10 * 360°)
         this.uniqueSymmetries = 1;
@@ -66,9 +69,9 @@ export class GirihDecagon extends GirihTile {
      * @param {number} edgeLength
      */
     _buildInnerPolygons(edgeLength) {
-        const centralStar = new Polygon();
+        const centralStar = new Polygon_1.Polygon();
         for (var i = 0; i < 10; i++) {
-            const innerTile = new Polygon();
+            const innerTile = new Polygon_1.Polygon();
             // Make polygon
             const topPoint = this.getVertexAt(i).clone().scale(0.5, this.getVertexAt(i + 1));
             const bottomPoint = topPoint.clone().scale(0.615, this.position);
@@ -96,7 +99,7 @@ export class GirihDecagon extends GirihTile {
     _buildOuterPolygons(edgeLength) {
         // DON'T include the inner star here!
         for (var i = 0; i < 10; i++) {
-            const outerTile = new Polygon();
+            const outerTile = new Polygon_1.Polygon();
             outerTile.addVertex(this.getVertexAt(i).clone());
             outerTile.addVertex(this.innerTilePolygons[i].vertices[0].clone());
             outerTile.addVertex(this.innerTilePolygons[i].vertices[3].clone());
@@ -106,5 +109,6 @@ export class GirihDecagon extends GirihTile {
     }
     ;
 }
+exports.GirihDecagon = GirihDecagon;
 ;
 //# sourceMappingURL=GirihDecagon.js.map

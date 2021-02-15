@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2018-11-11 (Alaaf)
@@ -10,6 +11,8 @@
  * @file KeyHandler
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KeyHandler = void 0;
 /**
  * @classdesc A generic key handler.
  *
@@ -27,7 +30,7 @@
  *	    .up('windows',function() { console.log('windows was released.'); } )
  *	;
  */
-export class KeyHandler {
+class KeyHandler {
     /**
      * The constructor.
      *
@@ -226,6 +229,7 @@ export class KeyHandler {
             return this.keyStates[KeyHandler.key2code(key)] ? true : false;
     }
 }
+exports.KeyHandler = KeyHandler;
 /**
  * Source:
  * https://keycode.info/

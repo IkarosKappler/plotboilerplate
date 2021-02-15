@@ -1,3 +1,4 @@
+"use strict";
 /**
  * The Sutherland-Hodgman convex polygon clipping algorithm.
  *
@@ -8,6 +9,8 @@
  * @date    2021-01-29
  * @version 1.0.0
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sutherlandHodgman = void 0;
 /**
  * @param {XYCoords}
  * @param {XYCoords}
@@ -41,7 +44,7 @@ const intersection = (cp1, cp2, s, e) => {
  * @param {Array<XYCoords>} subjectPolygon - Can be any polygon.
  * @param {Array<XYCoords>} clipPolygon - Must be convex.
  */
-export const sutherlandHodgman = (subjectPolygon, clipPolygon) => {
+const sutherlandHodgman = (subjectPolygon, clipPolygon) => {
     let cp1 = clipPolygon[clipPolygon.length - 1];
     let cp2;
     let s;
@@ -69,4 +72,5 @@ export const sutherlandHodgman = (subjectPolygon, clipPolygon) => {
     }
     return outputList;
 };
+exports.sutherlandHodgman = sutherlandHodgman;
 //# sourceMappingURL=sutherlandHodgman.js.map

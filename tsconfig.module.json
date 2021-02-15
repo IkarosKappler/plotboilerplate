@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
 	"outDir": "./src/es2015",
-	"module": "es2015",
+	"module": "commonjs",
 	
 	"target": "esnext",
 	"lib": [ "esnext", "es6", "dom", "es2015", "es2016", "es2017" ],

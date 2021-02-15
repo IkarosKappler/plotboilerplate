@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc The irregular hexagon tile from the Girih set.
  *
@@ -19,11 +20,13 @@
  * @file GirihHexagon
  * @public
  **/
-import { Circle } from "../../Circle";
-import { GirihTile, TileType } from "./GirihTile";
-import { Polygon } from "../../Polygon";
-import { Vertex } from "../../Vertex";
-export class GirihHexagon extends GirihTile {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GirihHexagon = void 0;
+const Circle_1 = require("../../Circle");
+const GirihTile_1 = require("./GirihTile");
+const Polygon_1 = require("../../Polygon");
+const Vertex_1 = require("../../Vertex");
+class GirihHexagon extends GirihTile_1.GirihTile {
     /**
      * @constructor
      * @extends GirihTile
@@ -32,12 +35,12 @@ export class GirihHexagon extends GirihTile {
      * @param {number} edgeLength
      */
     constructor(position, edgeLength) {
-        super(position, edgeLength, TileType.IRREGULAR_HEXAGON);
+        super(position, edgeLength, GirihTile_1.TileType.IRREGULAR_HEXAGON);
         // Overwrite the default symmetries:
         //    the hexagon tile has a 180° symmetry (5/10 * 360°)
         this.uniqueSymmetries = 5;
         // Init the actual decahedron shape with the passed size
-        let pointA = new Vertex(0, 0);
+        let pointA = new Vertex_1.Vertex(0, 0);
         let pointB = pointA;
         const startPoint = pointA;
         let oppositePoint = null;
@@ -62,7 +65,7 @@ export class GirihHexagon extends GirihTile {
                 oppositePoint = pointB;
         }
         // Center and move to desired position    
-        const move = new Vertex((oppositePoint.x - startPoint.x) / 2.0, (oppositePoint.y - startPoint.y) / 2.0);
+        const move = new Vertex_1.Vertex((oppositePoint.x - startPoint.x) / 2.0, (oppositePoint.y - startPoint.y) / 2.0);
         for (var i = 0; i < this.vertices.length; i++) {
             this.vertices[i].add(position).sub(move);
         }
@@ -84,12 +87,12 @@ export class GirihHexagon extends GirihTile {
     ;
     _buildInnerPolygons(edgeLength) {
         // Connect all edges half-the-way
-        const innerTile = new Polygon();
+        const innerTile = new Polygon_1.Polygon();
         innerTile.addVertex(this.vertices[0].clone().scale(0.5, this.vertices[1]));
         innerTile.addVertex(this.vertices[1].clone().scale(0.5, this.vertices[2]));
         // Compute the next inner polygon vertex by the intersection of two circles
-        const circleA = new Circle(innerTile.vertices[1], innerTile.vertices[0].distance(innerTile.vertices[1]));
-        const circleB = new Circle(this.vertices[2].clone().scale(0.5, this.vertices[3]), circleA.radius);
+        const circleA = new Circle_1.Circle(innerTile.vertices[1], innerTile.vertices[0].distance(innerTile.vertices[1]));
+        const circleB = new Circle_1.Circle(this.vertices[2].clone().scale(0.5, this.vertices[3]), circleA.radius);
         // TODO: the following piece of code occurs exactly four times.
         // -> refactor! (DRY)
         // There is definitely an intersection
@@ -152,20 +155,20 @@ export class GirihHexagon extends GirihTile {
             const indexA = indicesA[i];
             const indexB = indicesB[i];
             // The triangle
-            const outerTileX = new Polygon();
+            const outerTileX = new Polygon_1.Polygon();
             outerTileX.addVertex(this.getVertexAt(indexA + 1).clone());
             outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB).clone());
             outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
             this.outerTilePolygons.push(outerTileX);
             // The first 'kite'
-            const outerTileY = new Polygon();
+            const outerTileY = new Polygon_1.Polygon();
             outerTileY.addVertex(this.getVertexAt(indexA + 2).clone());
             outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
             outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 2).clone());
             outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 3).clone());
             this.outerTilePolygons.push(outerTileY);
             // The second 'kite'
-            const outerTileZ = new Polygon();
+            const outerTileZ = new Polygon_1.Polygon();
             outerTileZ.addVertex(this.getVertexAt(indexA + 3).clone());
             outerTileZ.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 3).clone());
             outerTileZ.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 4).clone());
@@ -175,4 +178,5 @@ export class GirihHexagon extends GirihTile {
     }
     ;
 }
+exports.GirihHexagon = GirihHexagon;
 //# sourceMappingURL=GirihHexagon.js.map

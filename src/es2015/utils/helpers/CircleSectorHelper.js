@@ -1,12 +1,15 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @modified 2021-01-22
  * @version  1.0.0
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircleSectorHelper = void 0;
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-export class CircleSectorHelper {
+class CircleSectorHelper {
     /**
      * The constructor.
      *
@@ -34,5 +37,6 @@ export class CircleSectorHelper {
         });
     }
 }
+exports.CircleSectorHelper = CircleSectorHelper;
 ;
 //# sourceMappingURL=CircleSectorHelper.js.map

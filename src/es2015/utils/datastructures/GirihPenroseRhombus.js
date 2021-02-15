@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc The penrose rhombus tile from the Girih set.
  * The penrose rhombus (angles 36° and 144°) is NOT part of the actual girih tile set!
@@ -21,11 +22,13 @@
  * @file GirihPenroseRhombus
  * @public
  **/
-import { Bounds } from "../../Bounds";
-import { GirihTile, TileType } from "./GirihTile";
-import { Polygon } from "../../Polygon";
-import { Vertex } from "../../Vertex";
-export class GirihPenroseRhombus extends GirihTile {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GirihPenroseRhombus = void 0;
+const Bounds_1 = require("../../Bounds");
+const GirihTile_1 = require("./GirihTile");
+const Polygon_1 = require("../../Polygon");
+const Vertex_1 = require("../../Vertex");
+class GirihPenroseRhombus extends GirihTile_1.GirihTile {
     /**
      * @constructor
      * @extends GirihTile
@@ -34,14 +37,14 @@ export class GirihPenroseRhombus extends GirihTile {
      * @param {number} edgeLength
      */
     constructor(position, edgeLength, addCenterPolygon) {
-        super(position, edgeLength, TileType.PENROSE_RHOMBUS);
+        super(position, edgeLength, GirihTile_1.TileType.PENROSE_RHOMBUS);
         // Overwrite the default symmetries:
         //    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
         this.uniqueSymmetries = 5;
         if (typeof addCenterPolygon == "undefined")
             addCenterPolygon = true; // Add by default
         // Init the actual decahedron shape with the passed size
-        let pointA = new Vertex(0, 0);
+        let pointA = new Vertex_1.Vertex(0, 0);
         let pointB = pointA;
         this.addVertex(pointB);
         const angles = [0.0,
@@ -58,8 +61,8 @@ export class GirihPenroseRhombus extends GirihTile {
             this.addVertex(pointB);
         }
         // Move to center and position
-        const bounds = Bounds.computeFromVertices(this.vertices);
-        const move = new Vertex(bounds.width / 2.0 - (bounds.width - this.edgeLength), bounds.height / 2.0);
+        const bounds = Bounds_1.Bounds.computeFromVertices(this.vertices);
+        const move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - this.edgeLength), bounds.height / 2.0);
         for (var i = 0; i < this.vertices.length; i++) {
             this.vertices[i].add(move).add(position);
         }
@@ -82,9 +85,9 @@ export class GirihPenroseRhombus extends GirihTile {
     ;
     _buildInnerPolygons(edgeLength, addCenterPolygon) {
         const indices = [0, 2];
-        const centerTile = new Polygon();
+        const centerTile = new Polygon_1.Polygon();
         for (var i = 0; i < indices.length; i++) {
-            const innerTile = new Polygon();
+            const innerTile = new Polygon_1.Polygon();
             const index = indices[i];
             const left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
             const right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
@@ -106,7 +109,7 @@ export class GirihPenroseRhombus extends GirihTile {
         // Add left and right 'spikes'.
         const indices = [0, 2];
         for (var i = 0; i < indices.length; i++) {
-            const outerTile = new Polygon();
+            const outerTile = new Polygon_1.Polygon();
             const index = indices[i];
             const left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
             const right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
@@ -123,7 +126,7 @@ export class GirihPenroseRhombus extends GirihTile {
             // Two polygons
             const indices = [0, 2];
             for (var i = 0; i < indices.length; i++) {
-                const outerTile = new Polygon();
+                const outerTile = new Polygon_1.Polygon();
                 const index = indices[i];
                 outerTile.addVertex(this.getVertexAt(index).clone());
                 outerTile.addVertex(this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1)));
@@ -146,5 +149,6 @@ export class GirihPenroseRhombus extends GirihTile {
     }
     ;
 }
+exports.GirihPenroseRhombus = GirihPenroseRhombus;
 ;
 //# sourceMappingURL=GirihPenroseRhombus.js.map

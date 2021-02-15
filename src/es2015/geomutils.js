@@ -1,16 +1,19 @@
+"use strict";
 /**
  * @author  Ikaros Kappler
  * @date    2019-02-03
  * @version 1.0.0
  **/
-import { Line } from "./Line";
-import { Triangle } from "./Triangle";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.geomutils = void 0;
+const Line_1 = require("./Line");
+const Triangle_1 = require("./Triangle");
 /**
  * A collection of usefull geometry utilities.
  *
  * @global
  **/
-export const geomutils = {
+exports.geomutils = {
     /**
      * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
      *
@@ -23,9 +26,9 @@ export const geomutils = {
      * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
      */
     nsectAngle(pA, pB, pC, n) {
-        const triangle = new Triangle(pA, pB, pC);
-        const lineAB = new Line(pA, pB);
-        const lineAC = new Line(pA, pC);
+        const triangle = new Triangle_1.Triangle(pA, pB, pC);
+        const lineAB = new Line_1.Line(pA, pB);
+        const lineAC = new Line_1.Line(pA, pC);
         // Compute the difference; this is the angle between AB and AC
         var insideAngle = lineAB.angle(lineAC);
         // We want the inner angles of the triangle, not the outer angle;
@@ -42,7 +45,7 @@ export const geomutils = {
         var result = [];
         for (var i = 1; i < n; i++) {
             // Compute the i-th inner sector line
-            result.push(new Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
+            result.push(new Line_1.Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
         }
         return result;
     }

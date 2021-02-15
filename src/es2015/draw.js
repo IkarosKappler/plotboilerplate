@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2018-04-22
@@ -36,8 +37,10 @@
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
  * @version  1.8.3
  **/
-import { CubicBezierCurve } from "./CubicBezierCurve";
-import { Vertex } from "./Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.drawutils = void 0;
+const CubicBezierCurve_1 = require("./CubicBezierCurve");
+const Vertex_1 = require("./Vertex");
 // Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -47,7 +50,7 @@ import { Vertex } from "./Vertex";
  * @requires Vertex
  * @requires XYCoords
  */
-export class drawutils {
+class drawutils {
     /**
      * The constructor.
      *
@@ -58,8 +61,8 @@ export class drawutils {
      **/
     constructor(context, fillShapes) {
         this.ctx = context;
-        this.offset = new Vertex(0, 0);
-        this.scale = new Vertex(1, 1);
+        this.offset = new Vertex_1.Vertex(0, 0);
+        this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
     }
     ;
@@ -136,7 +139,7 @@ export class drawutils {
         // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
         this.ctx.save();
         this.ctx.beginPath();
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
+        var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
@@ -235,7 +238,7 @@ export class drawutils {
      * @memberof drawutils
      */
     cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
-        if (startPoint instanceof CubicBezierCurve) {
+        if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
             this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
             return;
         }
@@ -753,4 +756,5 @@ export class drawutils {
     }
     ;
 }
+exports.drawutils = drawutils;
 //# sourceMappingURL=draw.js.map

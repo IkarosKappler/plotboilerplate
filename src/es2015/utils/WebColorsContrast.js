@@ -1,9 +1,12 @@
+"use strict";
 /**
  * @requires Color
  *
  * @date 2020-10-27
  **/
-import { shuffleWebColors } from "./WebColors";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.WebColorsContrast = void 0;
+const WebColors_1 = require("./WebColors");
 const ORDER_CONTRAST = [8, 0, 6, 4, 1, 9, 2, 10, 3, 7, 5];
-export const WebColorsContrast = shuffleWebColors(ORDER_CONTRAST);
+exports.WebColorsContrast = WebColors_1.shuffleWebColors(ORDER_CONTRAST);
 //# sourceMappingURL=WebColorsContrast.js.map

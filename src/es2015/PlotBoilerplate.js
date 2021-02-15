@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2018-10-23
@@ -75,27 +76,27 @@
  * @public
  **/
 var _a;
-// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/dist/types";
-//import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/ts";
-import AlloyFinger from "alloyfinger-typescript";
-import { drawutils } from "./draw";
-import { drawutilsgl } from "./drawgl";
-import { drawutilssvg } from "./utils/helpers/drawutilssvg";
-import { BezierPath } from "./BezierPath";
-import { Bounds } from "./Bounds";
-import { Circle } from "./Circle";
-import { CircleSector } from "./CircleSector";
-import { Grid } from "./Grid";
-import { KeyHandler } from "./KeyHandler";
-import { Line } from "./Line";
-import { MouseHandler } from "./MouseHandler";
-import { PBImage } from "./PBImage";
-import { Polygon } from "./Polygon";
-import { Triangle } from "./Triangle";
-import { VEllipse } from "./VEllipse";
-import { Vector } from "./Vector";
-import { Vertex } from "./Vertex";
-import { VertexAttr } from "./VertexAttr";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PlotBoilerplate = void 0;
+const alloyfinger_typescript_1 = require("alloyfinger-typescript");
+const draw_1 = require("./draw");
+const drawgl_1 = require("./drawgl");
+const drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
+const BezierPath_1 = require("./BezierPath");
+const Bounds_1 = require("./Bounds");
+const Circle_1 = require("./Circle");
+const CircleSector_1 = require("./CircleSector");
+const Grid_1 = require("./Grid");
+const KeyHandler_1 = require("./KeyHandler");
+const Line_1 = require("./Line");
+const MouseHandler_1 = require("./MouseHandler");
+const PBImage_1 = require("./PBImage");
+const Polygon_1 = require("./Polygon");
+const Triangle_1 = require("./Triangle");
+const VEllipse_1 = require("./VEllipse");
+const Vector_1 = require("./Vector");
+const Vertex_1 = require("./Vertex");
+const VertexAttr_1 = require("./VertexAttr");
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -122,7 +123,7 @@ import { VertexAttr } from "./VertexAttr";
  * @requires XYCoords
  * @requires XYDimension
  */
-export class PlotBoilerplate {
+class PlotBoilerplate {
     /**
      * The constructor.
      *
@@ -185,7 +186,7 @@ export class PlotBoilerplate {
      */
     constructor(config) {
         // This should be in some static block ...
-        VertexAttr.model = { bezierAutoAdjust: false,
+        VertexAttr_1.VertexAttr.model = { bezierAutoAdjust: false,
             renderTime: 0,
             selectable: true,
             isSelected: false,
@@ -309,7 +310,7 @@ export class PlotBoilerplate {
         // +---------------------------------------------------------------------------------
         // | Object members.
         // +-------------------------------
-        this.grid = new Grid(new Vertex(0, 0), new Vertex(50, 50));
+        this.grid = new Grid_1.Grid(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(50, 50));
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
         const canvasElement = typeof config.canvas == 'string'
             ? document.querySelector(config.canvas)
@@ -318,14 +319,14 @@ export class PlotBoilerplate {
         if (canvasElement.tagName.toLowerCase() === 'canvas') {
             this.canvas = canvasElement;
             this.eventCatcher = this.canvas;
-            if (this.config.enableGL && typeof drawutilsgl === "undefined") {
+            if (this.config.enableGL && typeof drawgl_1.drawutilsgl === "undefined") {
                 console.warn(`Cannot use webgl. Package was compiled without experimental gl support. Please use plotboilerplate-glsupport.min.js instead.`);
                 console.warn(`Disabling GL and falling back to Canvas2D.`);
                 this.config.enableGL = false;
             }
             if (this.config.enableGL) {
                 const ctx = this.canvas.getContext('webgl'); // webgl-experimental?
-                this.draw = new drawutilsgl(ctx, false);
+                this.draw = new drawgl_1.drawutilsgl(ctx, false);
                 // PROBLEM: same instance of fill and draw when using WebGL.
                 //          Shader program cannot be duplicated on the same context.
                 this.fill = this.draw.copyInstance(true);
@@ -333,16 +334,16 @@ export class PlotBoilerplate {
             }
             else {
                 const ctx = this.canvas.getContext('2d');
-                this.draw = new drawutils(ctx, false);
-                this.fill = new drawutils(ctx, true);
+                this.draw = new draw_1.drawutils(ctx, false);
+                this.fill = new draw_1.drawutils(ctx, true);
             }
         }
         else if (canvasElement.tagName.toLowerCase() === 'svg') {
-            if (typeof drawutilssvg === "undefined")
+            if (typeof drawutilssvg_1.drawutilssvg === "undefined")
                 throw `The svg draw library is not yet integrated part of PlotBoilerplate. Please include ./src/js/utils/helpers/drawutils.svg into your document.`;
             this.canvas = canvasElement;
-            this.draw = new drawutilssvg(this.canvas, new Vertex(), // offset
-            new Vertex(), // scale
+            this.draw = new drawutilssvg_1.drawutilssvg(this.canvas, new Vertex_1.Vertex(), // offset
+            new Vertex_1.Vertex(), // scale
             this.canvasSize, false, // fillShapes=false
             this.drawConfig, false // isSecondary=false
             );
@@ -402,7 +403,7 @@ export class PlotBoilerplate {
      * @private
      **/
     static _saveFile(pb) {
-        if (typeof drawutilssvg === "undefined") {
+        if (typeof drawutilssvg_1.drawutilssvg === "undefined") {
             console.error(`Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?`);
             return;
         }
@@ -410,7 +411,7 @@ export class PlotBoilerplate {
         const svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         // var svgNode = document.getElementById('preview-svg');
         // Draw everything to fake node.
-        var tosvgDraw = new drawutilssvg(svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, false, // fillShapes=false
+        var tosvgDraw = new drawutilssvg_1.drawutilssvg(svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, false, // fillShapes=false
         pb.drawConfig);
         var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
         tosvgDraw.beginDrawCycle(0);
@@ -456,11 +457,11 @@ export class PlotBoilerplate {
      *
      **/
     fitToView(bounds) {
-        const canvasCenter = new Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
+        const canvasCenter = new Vertex_1.Vertex(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
         const canvasRatio = this.canvasSize.width / this.canvasSize.height;
         const ratio = bounds.width / bounds.height;
         // Find the new draw offset
-        const center = new Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
+        const center = new Vertex_1.Vertex(bounds.max.x - bounds.width / 2.0, bounds.max.y - bounds.height / 2.0)
             .inv()
             .addXY(this.canvasSize.width / 2.0, this.canvasSize.height / 2.0);
         this.setOffset(center);
@@ -539,22 +540,22 @@ export class PlotBoilerplate {
                 this.add(arr[i], false);
             }
         }
-        else if (drawable instanceof Vertex) {
+        else if (drawable instanceof Vertex_1.Vertex) {
             this.drawables.push(drawable);
             this.vertices.push(drawable);
         }
-        else if (drawable instanceof Line) {
+        else if (drawable instanceof Line_1.Line) {
             // Add some lines
             this.drawables.push(drawable);
             this.vertices.push(drawable.a);
             this.vertices.push(drawable.b);
         }
-        else if (drawable instanceof Vector) {
+        else if (drawable instanceof Vector_1.Vector) {
             this.drawables.push(drawable);
             this.vertices.push(drawable.a);
             this.vertices.push(drawable.b);
         }
-        else if (drawable instanceof VEllipse) {
+        else if (drawable instanceof VEllipse_1.VEllipse) {
             this.vertices.push(drawable.center);
             this.vertices.push(drawable.axis);
             this.drawables.push(drawable);
@@ -562,27 +563,27 @@ export class PlotBoilerplate {
                 drawable.axis.add(e.params.dragAmount);
             });
         }
-        else if (drawable instanceof Circle) {
+        else if (drawable instanceof Circle_1.Circle) {
             this.vertices.push(drawable.center);
             this.drawables.push(drawable);
         }
-        else if (drawable instanceof CircleSector) {
+        else if (drawable instanceof CircleSector_1.CircleSector) {
             this.vertices.push(drawable.circle.center);
             this.drawables.push(drawable);
         }
-        else if (drawable instanceof Polygon) {
+        else if (drawable instanceof Polygon_1.Polygon) {
             this.drawables.push(drawable);
             // for( var i in drawable.vertices )
             for (var i = 0; i < drawable.vertices.length; i++)
                 this.vertices.push(drawable.vertices[i]);
         }
-        else if (drawable instanceof Triangle) {
+        else if (drawable instanceof Triangle_1.Triangle) {
             this.drawables.push(drawable);
             this.vertices.push(drawable.a);
             this.vertices.push(drawable.b);
             this.vertices.push(drawable.c);
         }
-        else if (drawable instanceof BezierPath) {
+        else if (drawable instanceof BezierPath_1.BezierPath) {
             this.drawables.push(drawable);
             const bezierPath = drawable;
             for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
@@ -596,7 +597,7 @@ export class PlotBoilerplate {
             }
             PlotBoilerplate.utils.enableBezierPathAutoAdjust(drawable);
         }
-        else if (drawable instanceof PBImage) {
+        else if (drawable instanceof PBImage_1.PBImage) {
             this.vertices.push(drawable.upperLeft);
             this.vertices.push(drawable.lowerRight);
             this.drawables.push(drawable);
@@ -638,43 +639,43 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     remove(drawable, redraw, removeWithVertices) {
-        if (drawable instanceof Vertex)
+        if (drawable instanceof Vertex_1.Vertex)
             this.removeVertex(drawable, false);
         for (var i = 0; i < this.drawables.length; i++) {
             if (this.drawables[i] === drawable) {
                 this.drawables.splice(i, 1);
                 if (removeWithVertices) {
                     // Check if some listeners need to be removed
-                    if (drawable instanceof Line) {
+                    if (drawable instanceof Line_1.Line) {
                         // Add some lines
                         this.removeVertex(drawable.a, false);
                         this.removeVertex(drawable.b, false);
                     }
-                    else if (drawable instanceof Vector) {
+                    else if (drawable instanceof Vector_1.Vector) {
                         this.removeVertex(drawable.a, false);
                         this.removeVertex(drawable.b, false);
                     }
-                    else if (drawable instanceof VEllipse) {
+                    else if (drawable instanceof VEllipse_1.VEllipse) {
                         this.removeVertex(drawable.center, false);
                         this.removeVertex(drawable.axis, false);
                     }
-                    else if (drawable instanceof Circle) {
+                    else if (drawable instanceof Circle_1.Circle) {
                         this.removeVertex(drawable.center, false);
                     }
-                    else if (drawable instanceof CircleSector) {
+                    else if (drawable instanceof CircleSector_1.CircleSector) {
                         this.removeVertex(drawable.circle.center, false);
                     }
-                    else if (drawable instanceof Polygon) {
+                    else if (drawable instanceof Polygon_1.Polygon) {
                         // for( var i in drawable.vertices )
                         for (var i = 0; i < drawable.vertices.length; i++)
                             this.removeVertex(drawable.vertices[i], false);
                     }
-                    else if (drawable instanceof Triangle) {
+                    else if (drawable instanceof Triangle_1.Triangle) {
                         this.removeVertex(drawable.a, false);
                         this.removeVertex(drawable.b, false);
                         this.removeVertex(drawable.c, false);
                     }
-                    else if (drawable instanceof BezierPath) {
+                    else if (drawable instanceof BezierPath_1.BezierPath) {
                         for (var i = 0; i < drawable.bezierCurves.length; i++) {
                             this.removeVertex(drawable.bezierCurves[i].startPoint, false);
                             this.removeVertex(drawable.bezierCurves[i].startControlPoint, false);
@@ -684,7 +685,7 @@ export class PlotBoilerplate {
                             }
                         }
                     }
-                    else if (drawable instanceof PBImage) {
+                    else if (drawable instanceof PBImage_1.PBImage) {
                         this.removeVertex(drawable.upperLeft, false);
                         this.removeVertex(drawable.lowerRight, false);
                     }
@@ -767,8 +768,8 @@ export class PlotBoilerplate {
      **/
     drawGrid(draw) {
         const gScale = {
-            x: Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX / this.config.cssScaleX,
-            y: Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) * this.config.rasterScaleY / this.config.cssScaleY
+            x: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX / this.config.cssScaleX,
+            y: Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.y) * this.config.rasterScaleY / this.config.cssScaleY
         };
         var gSize = { width: this.grid.size.x * gScale.x, height: this.grid.size.y * gScale.y };
         var cs = { width: this.canvasSize.width / 2, height: this.canvasSize.height / 2 };
@@ -852,7 +853,7 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     drawDrawable(d, renderTime, draw, fill) {
-        if (d instanceof BezierPath) {
+        if (d instanceof BezierPath_1.BezierPath) {
             for (var c in d.bezierCurves) {
                 draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                 if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
@@ -901,7 +902,7 @@ export class PlotBoilerplate {
                 }
             }
         }
-        else if (d instanceof Polygon) {
+        else if (d instanceof Polygon_1.Polygon) {
             draw.polygon(d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth);
             if (!this.drawConfig.drawHandlePoints) {
                 for (var i in d.vertices) {
@@ -909,12 +910,12 @@ export class PlotBoilerplate {
                 }
             }
         }
-        else if (d instanceof Triangle) {
+        else if (d instanceof Triangle_1.Triangle) {
             draw.polyline([d.a, d.b, d.c], false, this.drawConfig.triangle.color, this.drawConfig.triangle.lineWidth);
             if (!this.drawConfig.drawHandlePoints)
                 d.a.attr.renderTime = d.b.attr.renderTime = d.c.attr.renderTime = renderTime;
         }
-        else if (d instanceof VEllipse) {
+        else if (d instanceof VEllipse_1.VEllipse) {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId(`${d.uid}_e0`);
                 draw.setCurrentClassName(`${d.className}-v-line`);
@@ -931,13 +932,13 @@ export class PlotBoilerplate {
                 d.axis.attr.renderTime = renderTime;
             }
         }
-        else if (d instanceof Circle) {
+        else if (d instanceof Circle_1.Circle) {
             draw.circle(d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth);
         }
-        else if (d instanceof CircleSector) {
+        else if (d instanceof CircleSector_1.CircleSector) {
             draw.circleArc(d.circle.center, d.circle.radius, d.startAngle, d.endAngle, this.drawConfig.circleSector.color, this.drawConfig.circleSector.lineWidth);
         }
-        else if (d instanceof Vertex) {
+        else if (d instanceof Vertex_1.Vertex) {
             if (this.drawConfig.drawVertices &&
                 (!d.attr.selectable || !d.attr.draggable) && d.attr.visible) {
                 // Draw as special point (grey)		
@@ -945,14 +946,14 @@ export class PlotBoilerplate {
                 d.attr.renderTime = renderTime;
             }
         }
-        else if (d instanceof Line) {
+        else if (d instanceof Line_1.Line) {
             draw.line(d.a, d.b, this.drawConfig.line.color, this.drawConfig.line.lineWidth);
             if (!this.drawConfig.drawHandlePoints || !d.a.attr.selectable)
                 d.a.attr.renderTime = renderTime;
             if (!this.drawConfig.drawHandlePoints || !d.b.attr.selectable)
                 d.b.attr.renderTime = renderTime;
         }
-        else if (d instanceof Vector) {
+        else if (d instanceof Vector_1.Vector) {
             draw.arrow(d.a, d.b, this.drawConfig.vector.color);
             if (this.drawConfig.drawHandlePoints && d.b.attr.selectable && d.b.attr.visible) {
                 draw.setCurrentId(`${d.uid}_h0`);
@@ -967,7 +968,7 @@ export class PlotBoilerplate {
             if (!this.drawConfig.drawHandlePoints || !d.b.attr.selectable)
                 d.b.attr.renderTime = renderTime;
         }
-        else if (d instanceof PBImage) {
+        else if (d instanceof PBImage_1.PBImage) {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId(`${d.uid}_l0`);
                 draw.setCurrentClassName(`${d.className}-line`);
@@ -1119,7 +1120,7 @@ export class PlotBoilerplate {
      * @return {Bounds} The current viewport.
      **/
     viewport() {
-        return new Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY));
+        return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY));
     }
     ;
     /**
@@ -1321,7 +1322,7 @@ export class PlotBoilerplate {
         }
         else if (_self.selectPolygon != null) {
             const vert = _self.transformMousePosition(e.params.pos.x, e.params.pos.y);
-            _self.selectPolygon.vertices.push(new Vertex(vert.x, vert.y));
+            _self.selectPolygon.vertices.push(new Vertex_1.Vertex(vert.x, vert.y));
             _self.redraw();
         }
     }
@@ -1450,7 +1451,7 @@ export class PlotBoilerplate {
             for (var i in _self.draggedElements) {
                 var p = _self.draggedElements[i];
                 if (p.typeName == 'bpath') {
-                    _self.paths[p.pindex].moveCurvePoint(p.cindex, p.pid, new Vertex(e.params.dragAmount.x, e.params.dragAmount.y));
+                    _self.paths[p.pindex].moveCurvePoint(p.cindex, p.pid, new Vertex_1.Vertex(e.params.dragAmount.x, e.params.dragAmount.y));
                     _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragEvent(e);
                 }
                 else if (p.typeName == 'vertex') {
@@ -1513,10 +1514,10 @@ export class PlotBoilerplate {
         const _self = this;
         const we = e;
         if (we.deltaY < 0) {
-            _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex(e.params.pos.x, e.params.pos.y));
+            _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex_1.Vertex(e.params.pos.x, e.params.pos.y));
         }
         else if (we.deltaY > 0) {
-            _self.setZoom(_self.config.scaleX / zoomStep, _self.config.scaleY / zoomStep, new Vertex(e.params.pos.x, e.params.pos.y));
+            _self.setZoom(_self.config.scaleX / zoomStep, _self.config.scaleY / zoomStep, new Vertex_1.Vertex(e.params.pos.x, e.params.pos.y));
         }
         e.preventDefault();
         _self.redraw();
@@ -1558,7 +1559,7 @@ export class PlotBoilerplate {
         var _self = this;
         if (this.config.enableMouse) {
             // Install a mouse handler on the canvas.
-            new MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
+            new MouseHandler_1.MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
                 .down((e) => { _self.mouseDownHandler(e); })
                 .drag((e) => { _self.mouseDragHandler(e); })
                 .up((e) => { _self.mouseUpHandler(e); });
@@ -1568,7 +1569,7 @@ export class PlotBoilerplate {
         }
         if (this.config.enableMouseWheel) {
             // Install a mouse handler on the canvas.
-            new MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
+            new MouseHandler_1.MouseHandler(this.eventCatcher ? this.eventCatcher : this.canvas)
                 .wheel((e) => { _self.mouseWheelHandler(e); });
         }
         else {
@@ -1598,11 +1599,11 @@ export class PlotBoilerplate {
                         multiTouchStartScale = null;
                         _self.draggedElements = [];
                     };
-                    new AlloyFinger(this.eventCatcher ? this.eventCatcher : this.canvas, {
+                    new alloyfinger_typescript_1.default(this.eventCatcher ? this.eventCatcher : this.canvas, {
                         touchStart: (evt) => {
                             if (evt.touches.length == 1) {
-                                touchMovePos = new Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
-                                touchDownPos = new Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
+                                touchMovePos = new Vertex_1.Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
+                                touchDownPos = new Vertex_1.Vertex(relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
                                 draggedElement = _self.locatePointNear(_self.transformMousePosition(touchMovePos.x, touchMovePos.y), PlotBoilerplate.DEFAULT_TOUCH_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
                                 if (draggedElement && draggedElement.typeName == 'vertex') {
                                     var draggingVertex = _self.vertices[draggedElement.vindex];
@@ -1618,7 +1619,7 @@ export class PlotBoilerplate {
                                 evt.stopPropagation();
                                 var rel = relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY });
                                 var trans = _self.transformMousePosition(rel.x, rel.y);
-                                var diff = new Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
+                                var diff = new Vertex_1.Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
                                 if (draggedElement.typeName == 'vertex') {
                                     if (!_self.vertices[draggedElement.vindex].attr.draggable)
                                         return;
@@ -1628,7 +1629,7 @@ export class PlotBoilerplate {
                                     draggingVertex.listeners.fireDragEvent(fakeEvent);
                                     _self.redraw();
                                 }
-                                touchMovePos = new Vertex(rel);
+                                touchMovePos = new Vertex_1.Vertex(rel);
                             }
                             else if (evt.touches.length == 2) {
                                 // If at least two fingers touch and move, then change the draw offset (panning).
@@ -1665,9 +1666,9 @@ export class PlotBoilerplate {
                         },
                         pinch: (evt) => {
                             // For pinching there must be at least two touch items
-                            const fingerA = new Vertex(evt.touches.item(0).clientX, evt.touches.item(0).clientY);
-                            const fingerB = new Vertex(evt.touches.item(1).clientX, evt.touches.item(1).clientY);
-                            const center = new Line(fingerA, fingerB).vertAt(0.5);
+                            const fingerA = new Vertex_1.Vertex(evt.touches.item(0).clientX, evt.touches.item(0).clientY);
+                            const fingerB = new Vertex_1.Vertex(evt.touches.item(1).clientX, evt.touches.item(1).clientY);
+                            const center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
                             _self.setZoom(multiTouchStartScale.x * evt.zoom, multiTouchStartScale.y * evt.zoom, center);
                             _self.redraw();
                         }
@@ -1692,12 +1693,12 @@ export class PlotBoilerplate {
         }
         if (this.config.enableKeys) {
             // Install key handler
-            this.keyHandler = new KeyHandler({ trackAll: true })
+            this.keyHandler = new KeyHandler_1.KeyHandler({ trackAll: true })
                 .down('escape', function () {
                 _self.clearSelection(true);
             })
                 .down('shift', function () {
-                _self.selectPolygon = new Polygon();
+                _self.selectPolygon = new Polygon_1.Polygon();
                 _self.redraw();
             })
                 .up('shift', function () {
@@ -1732,6 +1733,7 @@ export class PlotBoilerplate {
     }
     ;
 } // END class PlotBoilerplate
+exports.PlotBoilerplate = PlotBoilerplate;
 /** @constant {number} */
 PlotBoilerplate.DEFAULT_CANVAS_WIDTH = 1024;
 /** @constant {number} */
@@ -1929,7 +1931,7 @@ PlotBoilerplate.utils = {
                 bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint.listeners.addDragListener(function (e) {
                     if (!bezierPath.adjustCircular) {
                         var cindex = bezierPath.locateCurveByEndPoint(e.params.vertex);
-                        bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
+                        bezierPath.moveCurvePoint(cindex * 1, bezierPath.END_CONTROL_POINT, new Vertex_1.Vertex({ x: e.params.dragAmount.x, y: e.params.dragAmount.y }));
                     }
                     bezierPath.updateArcLengths();
                 });

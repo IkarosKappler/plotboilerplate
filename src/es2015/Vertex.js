@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2012-10-17
@@ -26,9 +27,11 @@
  * @file Vertex
  * @public
  **/
-import { VertexAttr } from "./VertexAttr";
-import { UIDGenerator } from "./UIDGenerator";
-import { VertexListeners } from "./VertexListeners";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Vertex = void 0;
+const VertexAttr_1 = require("./VertexAttr");
+const UIDGenerator_1 = require("./UIDGenerator");
+const VertexListeners_1 = require("./VertexListeners");
 /**
  * @classdesc A vertex is a pair of two numbers.<br>
  * <br>
@@ -43,7 +46,7 @@ import { VertexListeners } from "./VertexListeners";
  * @requires XYCoords
  *
  */
-export class Vertex {
+class Vertex {
     /**
      * The constructor for the vertex class.
      *
@@ -57,7 +60,7 @@ export class Vertex {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Vertex";
-        this.uid = UIDGenerator.next();
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         if (typeof x == 'undefined') {
             this.x = 0;
             this.y = 0;
@@ -87,8 +90,8 @@ export class Vertex {
                     this.y = NaN;
             }
         }
-        this.attr = new VertexAttr();
-        this.listeners = new VertexListeners(this);
+        this.attr = new VertexAttr_1.VertexAttr();
+        this.listeners = new VertexListeners_1.VertexListeners(this);
     }
     ;
     /**
@@ -512,6 +515,7 @@ export class Vertex {
     }
     ;
 }
+exports.Vertex = Vertex;
 Vertex.ZERO = new Vertex(0, 0);
 /**
  * An epsilon for comparison

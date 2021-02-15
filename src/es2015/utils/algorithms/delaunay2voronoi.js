@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2018-04-07
@@ -5,14 +6,16 @@
  * @modified 2020-08-15 Ported from vanilla JS to TypeScript.
  * @version  1.0.2
  **/
-import { VoronoiCell } from "../datastructures/VoronoiCell";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.delaunay2voronoi = void 0;
+const VoronoiCell_1 = require("../datastructures/VoronoiCell");
 /**
  * @classdesc Create the voronoi diagram from the given delaunay triangulation (they are dual graphs).
  *
  * @requires VoronoiCell
  * @requires Triangle
  */
-export class delaunay2voronoi {
+class delaunay2voronoi {
     constructor(pointList, triangles) {
         this.failedTriangleSets = [];
         this.hasErrors = false;
@@ -35,7 +38,7 @@ export class delaunay2voronoi {
             }
             var path = this.subsetToPath(adjacentSubset);
             if (path) // There may be errors
-                voronoiDiagram.push(new VoronoiCell(path, point));
+                voronoiDiagram.push(new VoronoiCell_1.VoronoiCell(path, point));
         }
         return voronoiDiagram;
     }
@@ -95,5 +98,6 @@ export class delaunay2voronoi {
     }
     ;
 }
+exports.delaunay2voronoi = delaunay2voronoi;
 ; // END delaunay2voronoi
 //# sourceMappingURL=delaunay2voronoi.js.map

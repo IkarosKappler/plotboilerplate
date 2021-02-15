@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2018-11-28
@@ -9,7 +10,9 @@
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
-import { UIDGenerator } from "./UIDGenerator";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.VEllipse = void 0;
+const UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -18,7 +21,7 @@ import { UIDGenerator } from "./UIDGenerator";
  * @requires UIDGenerator
  * @requires Vertex
  */
-export class VEllipse {
+class VEllipse {
     /**
      * The constructor.
      *
@@ -32,7 +35,7 @@ export class VEllipse {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "VEllipse";
-        this.uid = UIDGenerator.next();
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.center = center;
         this.axis = axis;
     }
@@ -59,4 +62,5 @@ export class VEllipse {
     }
     ;
 }
+exports.VEllipse = VEllipse;
 //# sourceMappingURL=VEllipse.js.map

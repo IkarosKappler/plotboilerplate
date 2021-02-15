@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Interfaces and class for automatically handling Bézier curves.
  *
@@ -24,15 +25,17 @@
  * @file BezierPathInteractionHelper
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BezierPathInteractionHelper = void 0;
 // import { AlloyFinger } from "alloyfinger"; // node_modules
 // I would like to use AlloyFinger from the node_modules, but it seems
 // AlloyTeam has forgotten to publish their d.ts file.
-import { AlloyFinger } from "../../../../lib/alloy_finger";
-import { BezierPath } from "../../BezierPath";
-import { KeyHandler } from "../../KeyHandler";
-import { MouseHandler } from "../../MouseHandler";
-import { PlotBoilerplate } from "../../PlotBoilerplate";
-import { Vertex } from "../../Vertex";
+const alloy_finger_1 = require("../../../../lib/alloy_finger");
+const BezierPath_1 = require("../../BezierPath");
+const KeyHandler_1 = require("../../KeyHandler");
+const MouseHandler_1 = require("../../MouseHandler");
+const PlotBoilerplate_1 = require("../../PlotBoilerplate");
+const Vertex_1 = require("../../Vertex");
 ;
 /**
  * @classdesc A helper for adding vertices to and remove vertices from Bézier paths.
@@ -45,7 +48,7 @@ import { Vertex } from "../../Vertex";
  *
  * @public
  **/
-export class BezierPathInteractionHelper {
+class BezierPathInteractionHelper {
     /**
      * Pre: all paths must have been added to the PlotBoilerplate's drawable buffer (use the add(Drawable) function).
      *
@@ -90,8 +93,8 @@ export class BezierPathInteractionHelper {
         this.currentPathIndex = -1;
         this.currentDistance = Number.MAX_VALUE;
         this.currentT = 0.0;
-        this.currentA = new Vertex(0, 0); // Position on the curve
-        this.currentB = new Vertex(0, 0); // Mouse/Touch position
+        this.currentA = new Vertex_1.Vertex(0, 0); // Position on the curve
+        this.currentB = new Vertex_1.Vertex(0, 0); // Mouse/Touch position
         // Rebuild the array to avoid outside manipulations.
         for (var i = 0; i < paths.length; i++) {
             this.addPath(paths[i]);
@@ -267,7 +270,7 @@ export class BezierPathInteractionHelper {
         // Do not remove the whole path.
         // Do not replace the path if no vertices were deleted.
         if (newCurves.length != 0 && newCurves.length != path.bezierCurves.length) {
-            const newPath = BezierPath.fromArray(newCurves);
+            const newPath = BezierPath_1.BezierPath.fromArray(newCurves);
             const oldPath = this.paths[pathIndex];
             this._replacePathAt(pathIndex, newPath);
             this.onVerticesDeleted(pathIndex, deletedVertIndices, newPath, oldPath);
@@ -326,7 +329,7 @@ export class BezierPathInteractionHelper {
     // +-------------------------------
     _installTouchListener() {
         var _self = this;
-        new AlloyFinger(this.pb.canvas, {
+        new alloy_finger_1.AlloyFinger(this.pb.canvas, {
             // Todo: which event types does AlloyFinger use?
             touchStart: function (e) {
                 _self.mouseIsOver = true;
@@ -349,7 +352,7 @@ export class BezierPathInteractionHelper {
     // +-------------------------------
     _installMouseListener() {
         var _self = this;
-        new MouseHandler(this.pb.canvas)
+        new MouseHandler_1.MouseHandler(this.pb.canvas)
             .up(function (e) {
             if (e.params.wasDragged)
                 return;
@@ -358,7 +361,7 @@ export class BezierPathInteractionHelper {
             if (_self.currentDistance > _self.maxDetectDistance || !_self.mouseIsOver)
                 return;
             const path = _self.paths[_self.currentPathIndex];
-            const vertex = _self.pb.getVertexNear(e.params.pos, PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
+            const vertex = _self.pb.getVertexNear(e.params.pos, PlotBoilerplate_1.PlotBoilerplate.DEFAULT_CLICK_TOLERANCE);
             if (vertex)
                 return;
             // Check if there is already a path point at the given split position
@@ -382,7 +385,7 @@ export class BezierPathInteractionHelper {
             for (var i = 0; i < rightPath.bezierCurves.length; i++) {
                 newCurves.push(rightPath.bezierCurves[i]);
             }
-            const newPath = BezierPath.fromArray(newCurves);
+            const newPath = BezierPath_1.BezierPath.fromArray(newCurves);
             const oldPath = _self.paths[_self.currentPathIndex];
             _self._replacePathAt(_self.currentPathIndex, newPath);
             _self.onVertexInserted(_self.currentPathIndex, leftPath.bezierCurves.length, newPath, oldPath);
@@ -409,7 +412,7 @@ export class BezierPathInteractionHelper {
     // +-------------------------------
     _installKeyListener() {
         var _self = this;
-        return new KeyHandler({ trackAll: true })
+        return new KeyHandler_1.KeyHandler({ trackAll: true })
             .down('delete', function () {
             _self._handleDelete();
         });
@@ -627,5 +630,6 @@ export class BezierPathInteractionHelper {
     }
     ;
 }
+exports.BezierPathInteractionHelper = BezierPathInteractionHelper;
 ;
 //# sourceMappingURL=BezierPathInteractionHelper.js.map

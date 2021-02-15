@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2019-01-30
@@ -11,7 +12,9 @@
  *               and height thei are not suitable for UI dragging interfaces.
  * @public
  **/
-import { UIDGenerator } from "./UIDGenerator";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PBImage = void 0;
+const UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc A wrapper for image objects. Has an upper left and a lower right corner point.
  *
@@ -20,7 +23,7 @@ import { UIDGenerator } from "./UIDGenerator";
  * @requires UID
  * @requires UIDGenerator
  */
-export class PBImage {
+class PBImage {
     /**
      * The constructor.
      *
@@ -35,7 +38,7 @@ export class PBImage {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "PBImage";
-        this.uid = UIDGenerator.next();
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.image = image;
         this.upperLeft = upperLeft;
         this.lowerRight = lowerRight;
@@ -57,4 +60,5 @@ export class PBImage {
     }
     ;
 }
+exports.PBImage = PBImage;
 //# sourceMappingURL=PBImage.js.map

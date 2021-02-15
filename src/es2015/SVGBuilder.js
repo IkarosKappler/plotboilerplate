@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Todos:
  *  + use a Drawable interface
@@ -16,13 +17,15 @@
  * @modified 2021-01-26 DEPRECATION
  * @version  1.0.5
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SVGBuilder = void 0;
 /**
  * @classdesc A default SVG builder.
  *
  * @requires SVGSerializable
  * @requires Vertex
  */
-export class SVGBuilder {
+class SVGBuilder {
     /**
      * @constructor
      **/
@@ -92,4 +95,5 @@ export class SVGBuilder {
     }
     ;
 }
+exports.SVGBuilder = SVGBuilder;
 //# sourceMappingURL=SVGBuilder.js.map

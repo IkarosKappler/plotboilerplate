@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler (ported from basic script to class).
  * @date     2020-04-15
@@ -7,9 +8,11 @@
  * @file CubicSplinePath
  * @public
  **/
-import { CubicBezierCurve } from "../../CubicBezierCurve";
-import { HobbyPath } from "./HobbyPath";
-import { Vertex } from "../../Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CubicSplinePath = void 0;
+const CubicBezierCurve_1 = require("../../CubicBezierCurve");
+const HobbyPath_1 = require("./HobbyPath");
+const Vertex_1 = require("../../Vertex");
 ;
 /**
  * @classdesc Compute a natural cubic Bézier spline path from a given sequence of points/vertices.
@@ -20,7 +23,7 @@ import { Vertex } from "../../Vertex";
  * @requires HobbyPath
  * @requires Vertex
  */
-export class CubicSplinePath {
+class CubicSplinePath {
     /**
      * @constructor
      * @name CubicSplinePath
@@ -63,7 +66,7 @@ export class CubicSplinePath {
         if (n > 1) {
             if (n == 2) {
                 // for two points, just draw a straight line
-                curves.push(new CubicBezierCurve(this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1]));
+                curves.push(new CubicBezierCurve_1.CubicBezierCurve(this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1]));
             }
             else {
                 if (!circular) {
@@ -74,8 +77,8 @@ export class CubicSplinePath {
                     const controlsY = CubicSplinePath.utils.naturalControlsOpen(ys);
                     for (let i = 1; i < n; i++) {
                         // add Bézier segment - two control points and next node
-                        curves.push(new CubicBezierCurve(this.vertices[i - 1], this.vertices[i], new Vertex(controlsX.start[i - 1], controlsY.start[i - 1]), // x1[i-1], y1[i-1]), // new Vertex(x1[i-1], y1[i-1]),
-                        new Vertex(controlsX.end[i - 1], controlsY.end[i - 1]) // new Vertex(x2[i-1], y2[i-1])
+                        curves.push(new CubicBezierCurve_1.CubicBezierCurve(this.vertices[i - 1], this.vertices[i], new Vertex_1.Vertex(controlsX.start[i - 1], controlsY.start[i - 1]), // x1[i-1], y1[i-1]), // new Vertex(x1[i-1], y1[i-1]),
+                        new Vertex_1.Vertex(controlsX.end[i - 1], controlsY.end[i - 1]) // new Vertex(x2[i-1], y2[i-1])
                         ));
                     }
                 }
@@ -87,8 +90,8 @@ export class CubicSplinePath {
                     for (let i = 0; i < n; i++) {
                         // if i is n-1, the "next" point is the first one
                         let j = (i + 1) % n;
-                        curves.push(new CubicBezierCurve(this.vertices[i], this.vertices[j], new Vertex(controlsX.start[i], controlsY.start[i]), // new Vertex(x1[i], y1[i]),
-                        new Vertex(controlsX.end[i], controlsY.end[i]) // new Vertex(x2[i], y2[i])
+                        curves.push(new CubicBezierCurve_1.CubicBezierCurve(this.vertices[i], this.vertices[j], new Vertex_1.Vertex(controlsX.start[i], controlsY.start[i]), // new Vertex(x1[i], y1[i]),
+                        new Vertex_1.Vertex(controlsX.end[i], controlsY.end[i]) // new Vertex(x2[i], y2[i])
                         ));
                     }
                 }
@@ -98,6 +101,7 @@ export class CubicSplinePath {
     }
     ;
 }
+exports.CubicSplinePath = CubicSplinePath;
 CubicSplinePath.utils = {
     naturalControlsClosed: (coords) => {
         const n = coords.length;
@@ -122,7 +126,7 @@ CubicSplinePath.utils = {
         }
         // add a one to the two empty corners and solve the system for the
         // first control points
-        const x1 = HobbyPath.utils.sherman(a, b, c, d, 1, 1);
+        const x1 = HobbyPath_1.HobbyPath.utils.sherman(a, b, c, d, 1, 1);
         // compute second controls points from first
         const x2 = new Array(n);
         for (let i = 0; i < n - 1; i++)
@@ -156,7 +160,7 @@ CubicSplinePath.utils = {
             d[i] = 4 * coords[i] + 2 * coords[i + 1];
         }
         // solve the system to get the first control points
-        const x1 = HobbyPath.utils.thomas(a, b, c, d);
+        const x1 = HobbyPath_1.HobbyPath.utils.thomas(a, b, c, d);
         // compute second controls points from first
         const x2 = new Array(n);
         for (let i = 0; i < n - 1; i++) {

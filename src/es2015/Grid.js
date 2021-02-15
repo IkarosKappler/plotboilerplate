@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2018-11-28
@@ -10,6 +11,8 @@
  *               rather than a drawable object.
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Grid = void 0;
 /**
  * @classdesc A grid class with vertical and horizontal lines (or a raster).
  *
@@ -19,7 +22,7 @@
  *
  * @requires Vertex
  */
-export class Grid {
+class Grid {
     /**
      * The constructor.
      *
@@ -34,6 +37,7 @@ export class Grid {
     }
     ;
 }
+exports.Grid = Grid;
 /**
  * @memberof Grid
  **/

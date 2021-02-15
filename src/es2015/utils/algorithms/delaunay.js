@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @modified_by Ikaros Kappler
  * @date_init   2012-10-17
@@ -5,9 +6,11 @@
  * @modified    2020-08-17 Ported from vanilla JS to TypeScript.
  * @version     2.0.1
  **/
-import { Triangle } from "../../Triangle";
-import { Vertex } from "../../Vertex";
-import { Line as Edge } from "../../Line";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Delaunay = void 0;
+const Triangle_1 = require("../../Triangle");
+const Vertex_1 = require("../../Vertex");
+const Line_1 = require("../../Line");
 // TODO: cleanup? This seems not to be used.
 // const EPSILON : number = 1.0e-6;
 /**
@@ -21,7 +24,7 @@ import { Line as Edge } from "../../Line";
  * @requires Line
  * @requires Vertex
  */
-export class Delaunay {
+class Delaunay {
     constructor(pointList) {
         this.pointList = pointList;
     }
@@ -96,10 +99,10 @@ export class Delaunay {
         }
         var dx = (maxx - minx) * 10;
         var dy = (maxy - miny) * 10;
-        var stv0 = new Vertex(minx - dx, miny - dy * 3);
-        var stv1 = new Vertex(minx - dx, maxy + dy);
-        var stv2 = new Vertex(maxx + dx * 3, maxy + dy);
-        return new Triangle(stv0, stv1, stv2);
+        var stv0 = new Vertex_1.Vertex(minx - dx, miny - dy * 3);
+        var stv1 = new Vertex_1.Vertex(minx - dx, maxy + dy);
+        var stv2 = new Vertex_1.Vertex(maxx + dx * 3, maxy + dy);
+        return new Triangle_1.Triangle(stv0, stv1, stv2);
     }
     ; // END createBoundingTriangle
     // Internal: update triangulation with a vertex 
@@ -109,9 +112,9 @@ export class Delaunay {
         for (var i in triangles) {
             var triangle = triangles[i];
             if (triangle.inCircumcircle(vertex)) {
-                edges.push(new Edge(triangle.a, triangle.b));
-                edges.push(new Edge(triangle.b, triangle.c));
-                edges.push(new Edge(triangle.c, triangle.a));
+                edges.push(new Line_1.Line(triangle.a, triangle.b));
+                edges.push(new Line_1.Line(triangle.b, triangle.c));
+                edges.push(new Line_1.Line(triangle.c, triangle.a));
                 delete triangles[i];
             }
         }
@@ -120,7 +123,7 @@ export class Delaunay {
         for (var i in edges) {
             // console.log( 'adding triangle' );
             var edge = edges[i];
-            triangles.push(new Triangle(edge.a, edge.b, vertex));
+            triangles.push(new Triangle_1.Triangle(edge.a, edge.b, vertex));
         }
     }
     ; // END AddVertex
@@ -149,5 +152,6 @@ export class Delaunay {
     }
     ; // END mkUniqueEdges
 }
+exports.Delaunay = Delaunay;
 ; // END class
 //# sourceMappingURL=delaunay.js.map

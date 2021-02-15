@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2020-11-24
@@ -5,13 +6,15 @@
  * @version  1.0.1
  * @file     Girih
  **/
-import { Vertex } from "../../Vertex";
-import { GirihBowtie } from "./GirihBowtie";
-import { GirihDecagon } from "./GirihDecagon";
-import { GirihHexagon } from "./GirihHexagon";
-import { GirihPenroseRhombus } from "./GirihPenroseRhombus";
-import { GirihPentagon } from "./GirihPentagon";
-import { GirihRhombus } from "./GirihRhombus";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Girih = void 0;
+const Vertex_1 = require("../../Vertex");
+const GirihBowtie_1 = require("./GirihBowtie");
+const GirihDecagon_1 = require("./GirihDecagon");
+const GirihHexagon_1 = require("./GirihHexagon");
+const GirihPenroseRhombus_1 = require("./GirihPenroseRhombus");
+const GirihPentagon_1 = require("./GirihPentagon");
+const GirihRhombus_1 = require("./GirihRhombus");
 /**
  * @classdesc The Girih datastructure for generating patterns.
  *
@@ -24,7 +27,7 @@ import { GirihRhombus } from "./GirihRhombus";
  * @requires GirihPentagon
  * @requires GirihRhombus
  */
-export class Girih {
+class Girih {
     /**
      * Create a new empty Girih pattern.
      *
@@ -55,12 +58,12 @@ export class Girih {
     initTemplates(edgeLength) {
         // Positions actually don't matter here.
         // Tiles will be moved to correct position conerning adjacency.
-        var decagon = new GirihDecagon(new Vertex(0, 0), edgeLength);
-        var pentagon = new GirihPentagon(new Vertex(0, 0), edgeLength);
-        var hexagon = new GirihHexagon(new Vertex(0, 0), edgeLength);
-        var bowtie = new GirihBowtie(new Vertex(0, 0), edgeLength);
-        var rhombus = new GirihRhombus(new Vertex(0, 0), edgeLength);
-        var penrose = new GirihPenroseRhombus(new Vertex(0, 0), edgeLength, true); // Add center polygon
+        var decagon = new GirihDecagon_1.GirihDecagon(new Vertex_1.Vertex(0, 0), edgeLength);
+        var pentagon = new GirihPentagon_1.GirihPentagon(new Vertex_1.Vertex(0, 0), edgeLength);
+        var hexagon = new GirihHexagon_1.GirihHexagon(new Vertex_1.Vertex(0, 0), edgeLength);
+        var bowtie = new GirihBowtie_1.GirihBowtie(new Vertex_1.Vertex(0, 0), edgeLength);
+        var rhombus = new GirihRhombus_1.GirihRhombus(new Vertex_1.Vertex(0, 0), edgeLength);
+        var penrose = new GirihPenroseRhombus_1.GirihPenroseRhombus(new Vertex_1.Vertex(0, 0), edgeLength, true); // Add center polygon
         // Add tiles to array and put them in the correct adjacency position.
         this.TILE_TEMPLATES.push(decagon);
         this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(2, pentagon));
@@ -182,5 +185,6 @@ export class Girih {
     }
     ;
 }
+exports.Girih = Girih;
 ; // END class Girih
 //# sourceMappingURL=Girih.js.map

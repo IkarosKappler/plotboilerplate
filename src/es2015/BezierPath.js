@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author Ikaros Kappler
  * @date 2013-08-19
@@ -24,10 +25,12 @@
  * @file BezierPath
  * @public
  **/
-import { Bounds } from "./Bounds";
-import { CubicBezierCurve } from "./CubicBezierCurve";
-import { UIDGenerator } from "./UIDGenerator";
-import { Vertex } from "./Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BezierPath = void 0;
+const Bounds_1 = require("./Bounds");
+const CubicBezierCurve_1 = require("./CubicBezierCurve");
+const UIDGenerator_1 = require("./UIDGenerator");
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A BezierPath class.
  *
@@ -41,7 +44,7 @@ import { Vertex } from "./Vertex";
  * @requires UID
  * @requires UIDGenerator
  **/
-export class BezierPath {
+class BezierPath {
     /**
      * The constructor.<br>
      * <br>
@@ -67,7 +70,7 @@ export class BezierPath {
         this.END_CONTROL_POINT = 2;
         /** @constant {number} */
         this.END_POINT = 3;
-        this.uid = UIDGenerator.next();
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         if (!pathPoints)
             pathPoints = [];
         this.totalArcLength = 0.0;
@@ -877,8 +880,8 @@ export class BezierPath {
     neighbourCurve, mainPoint, mainControlPoint, neighbourPoint, neighbourControlPoint, obtainHandleLengths, _updateArcLengths // TODO: remove param
     ) {
         // Calculate start handle length
-        var mainHandleBounds = new Vertex(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
-        var neighbourHandleBounds = new Vertex(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
+        var mainHandleBounds = new Vertex_1.Vertex(mainControlPoint.x - mainPoint.x, mainControlPoint.y - mainPoint.y);
+        var neighbourHandleBounds = new Vertex_1.Vertex(neighbourControlPoint.x - neighbourPoint.x, neighbourControlPoint.y - neighbourPoint.y);
         var mainHandleLength = Math.sqrt(Math.pow(mainHandleBounds.x, 2) + Math.pow(mainHandleBounds.y, 2));
         var neighbourHandleLength = Math.sqrt(Math.pow(neighbourHandleBounds.x, 2) + Math.pow(neighbourHandleBounds.y, 2));
         if (mainHandleLength <= 0.1)
@@ -902,8 +905,8 @@ export class BezierPath {
      * @return {Bounds} The bounds of this Bézier path.
      **/
     getBounds() {
-        const min = new Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-        const max = new Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
+        const min = new Vertex_1.Vertex(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+        const max = new Vertex_1.Vertex(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
         var b;
         for (var i = 0; i < this.bezierCurves.length; i++) {
             b = this.bezierCurves[i].getBounds();
@@ -912,7 +915,7 @@ export class BezierPath {
             max.x = Math.max(max.x, b.max.x);
             max.y = Math.max(max.y, b.max.y);
         }
-        return new Bounds(min, max);
+        return new Bounds_1.Bounds(min, max);
     }
     ;
     /**
@@ -1053,16 +1056,16 @@ export class BezierPath {
         for (var i = 0; i < arr.length; i++) {
             // Convert object (or array?) to bezier curve
             var bCurve;
-            if (CubicBezierCurve.isInstance(arr[i])) {
+            if (CubicBezierCurve_1.CubicBezierCurve.isInstance(arr[i])) {
                 bCurve = arr[i].clone();
             }
             else if (0 in arr[i] && 1 in arr[i] && 2 in arr[i] && 3 in arr[i]) {
                 if (!arr[i][0] || !arr[i][1] || !arr[i][2] || !arr[i][3])
                     throw "Cannot convert path data to BezierPath instance. At least one element is undefined (index=" + i + "): " + arr[i];
-                bCurve = CubicBezierCurve.fromArray(arr[i]);
+                bCurve = CubicBezierCurve_1.CubicBezierCurve.fromArray(arr[i]);
             }
             else {
-                bCurve = CubicBezierCurve.fromObject(arr[i]);
+                bCurve = CubicBezierCurve_1.CubicBezierCurve.fromObject(arr[i]);
             }
             // Set curve start point?
             // (avoid duplicate point instances!)
@@ -1154,11 +1157,11 @@ export class BezierPath {
         var i = 0;
         do {
             //if( i == 0 )
-            startPoint = new Vertex(pointArray[i], pointArray[i + 1]);
-            startControlPoint = new Vertex(pointArray[i + 2], pointArray[i + 3]);
-            endControlPoint = new Vertex(pointArray[i + 4], pointArray[i + 5]);
-            endPoint = new Vertex(pointArray[i + 6], pointArray[i + 7]);
-            var bCurve = new CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint);
+            startPoint = new Vertex_1.Vertex(pointArray[i], pointArray[i + 1]);
+            startControlPoint = new Vertex_1.Vertex(pointArray[i + 2], pointArray[i + 3]);
+            endControlPoint = new Vertex_1.Vertex(pointArray[i + 4], pointArray[i + 5]);
+            endPoint = new Vertex_1.Vertex(pointArray[i + 6], pointArray[i + 7]);
+            var bCurve = new CubicBezierCurve_1.CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint);
             bezierPath.bezierCurves.push(bCurve);
             startPoint = endPoint;
             i += 6;
@@ -1168,6 +1171,7 @@ export class BezierPath {
     }
     ;
 }
+exports.BezierPath = BezierPath;
 // +---------------------------------------------------------------------------------
 // | These constants equal the values from CubicBezierCurve.
 // +-------------------------------

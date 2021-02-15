@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author Extended, bugfixed and ported to TypeScript by Ikaros Kappler.
  * @modified 2018-xx-xx Added a clone() function.
@@ -10,13 +11,15 @@
  * @modified 2021-02-08 Added basic tsdoc/jsdoc comments.
  * @version 0.0.9
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Color = void 0;
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.
  *    Original found at
  *      https://gist.github.com/neolitec/1344610
  *    Thanks to neolitec
  */
-export class Color {
+class Color {
     /**
      * Construct a new color with `r=0 g=0 b=0`.
      *
@@ -353,6 +356,7 @@ export class Color {
     }
     ;
 }
+exports.Color = Color;
 Color.Sanitizer = {
     RGB: function (...args) {
         var o = [];

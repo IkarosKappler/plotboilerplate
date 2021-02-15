@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2020-05-11
@@ -6,8 +7,10 @@
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @version  1.2.0
  **/
-import { Polygon } from "./Polygon";
-import { Vertex } from "./Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Bounds = void 0;
+const Polygon_1 = require("./Polygon");
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
  *
@@ -15,7 +18,7 @@ import { Vertex } from "./Vertex";
  * @requires Vertex
  * @requires IBounds
  **/
-export class Bounds {
+class Bounds {
     /**
      * The constructor.
      *
@@ -40,11 +43,11 @@ export class Bounds {
      * @return {Polygon} This bound rectangle as a polygon.
      */
     toPolygon() {
-        return new Polygon([
-            new Vertex(this.min),
-            new Vertex(this.max.x, this.min.y),
-            new Vertex(this.max),
-            new Vertex(this.min.x, this.max.y)
+        return new Polygon_1.Polygon([
+            new Vertex_1.Vertex(this.min),
+            new Vertex_1.Vertex(this.max.x, this.min.y),
+            new Vertex_1.Vertex(this.max),
+            new Vertex_1.Vertex(this.min.x, this.max.y)
         ], false);
     }
     ;
@@ -61,7 +64,7 @@ export class Bounds {
      **/
     static computeFromVertices(vertices) {
         if (vertices.length == 0)
-            return new Bounds(new Vertex(0, 0), new Vertex(0, 0));
+            return new Bounds(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(0, 0));
         let xMin = vertices[0].x;
         let xMax = vertices[0].x;
         let yMin = vertices[0].y;
@@ -74,8 +77,9 @@ export class Bounds {
             yMin = Math.min(yMin, vert.y);
             yMax = Math.max(yMax, vert.y);
         }
-        return new Bounds(new Vertex(xMin, yMin), new Vertex(xMax, yMax));
+        return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
     }
     ;
 } // END class bounds
+exports.Bounds = Bounds;
 //# sourceMappingURL=Bounds.js.map

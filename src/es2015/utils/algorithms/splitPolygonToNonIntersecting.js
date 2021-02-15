@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @requires Line
  * @requires Vertex
@@ -7,8 +8,10 @@
  * @modified 2020-12-07 Ported from vanilla JS to typescript.
  * @version  1.0.1
  */
-import { Line } from "../../Line";
-import { Vertex } from "../../Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.splitPolygonToNonIntersecting = void 0;
+const Line_1 = require("../../Line");
+const Vertex_1 = require("../../Vertex");
 /**
  * This function cuts a given self-intersecting polygon into non-self-intersecting
  * sub polygons.
@@ -25,7 +28,7 @@ import { Vertex } from "../../Vertex";
  * @param {number=10} maxDepth - Number of max recursive steps (default is 10).
  * @return {Array<Array<Vertex>>} A sequence of non-self-intersecting sub polygons.
  */
-export const splitPolygonToNonIntersecting = (() => {
+exports.splitPolygonToNonIntersecting = (() => {
     /**
      * @param {Array<Vertex>} vertices
      * @param {number=10} maxDepth
@@ -45,8 +48,8 @@ export const splitPolygonToNonIntersecting = (() => {
             return [vertices];
         }
         const n = vertices.length;
-        const lineA = new Line(new Vertex(), new Vertex());
-        const lineB = new Line(new Vertex(), new Vertex());
+        const lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+        const lineB = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
         for (var a = 0; a < vertices.length; a++) {
             lineA.a.set(vertices[a]);
             lineA.b.set(vertices[(a + 1) % n]);

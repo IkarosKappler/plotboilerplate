@@ -1,56 +1,58 @@
+"use strict";
 // ? https://www.pluralsight.com/guides/react-typescript-module-create
-import { BezierPath } from "./BezierPath";
-import { Bounds } from "./Bounds";
-import { Circle } from "./Circle";
-import { CircleSector } from "./CircleSector";
-import { CubicBezierCurve } from "./CubicBezierCurve";
-import { drawutils } from "./draw";
-import { drawutilsgl } from "./drawgl";
-import { geomutils } from "./geomutils";
-import { Grid } from "./Grid";
-import * as interf from "./interfaces";
-import { KeyHandler } from "./KeyHandler";
-import { Line } from "./Line";
-import { MouseHandler } from "./MouseHandler";
-import { PBImage } from "./PBImage";
-import { PlotBoilerplate } from "./PlotBoilerplate";
-import { Polygon } from "./Polygon";
-import { SVGBuilder } from "./SVGBuilder";
-import { Triangle } from "./Triangle";
-import { UIDGenerator } from "./UIDGenerator";
-import { Vector } from "./Vector";
-import { VEllipse } from "./VEllipse";
-import { Vertex } from "./Vertex";
-import { VertexAttr } from "./VertexAttr";
-import { VertexListeners } from "./VertexListeners";
-import { VertTuple } from "./VertTuple";
-import { drawutilssvg } from "./utils/helpers/drawutilssvg";
-export default {
-    BezierPath,
-    Bounds,
-    Circle,
-    CircleSector,
-    CubicBezierCurve,
-    drawutils,
-    drawutilsgl,
-    geomutils,
-    Grid,
+Object.defineProperty(exports, "__esModule", { value: true });
+const BezierPath_1 = require("./BezierPath");
+const Bounds_1 = require("./Bounds");
+const Circle_1 = require("./Circle");
+const CircleSector_1 = require("./CircleSector");
+const CubicBezierCurve_1 = require("./CubicBezierCurve");
+const draw_1 = require("./draw");
+const drawgl_1 = require("./drawgl");
+const geomutils_1 = require("./geomutils");
+const Grid_1 = require("./Grid");
+const interf = require("./interfaces");
+const KeyHandler_1 = require("./KeyHandler");
+const Line_1 = require("./Line");
+const MouseHandler_1 = require("./MouseHandler");
+const PBImage_1 = require("./PBImage");
+const PlotBoilerplate_1 = require("./PlotBoilerplate");
+const Polygon_1 = require("./Polygon");
+const SVGBuilder_1 = require("./SVGBuilder");
+const Triangle_1 = require("./Triangle");
+const UIDGenerator_1 = require("./UIDGenerator");
+const Vector_1 = require("./Vector");
+const VEllipse_1 = require("./VEllipse");
+const Vertex_1 = require("./Vertex");
+const VertexAttr_1 = require("./VertexAttr");
+const VertexListeners_1 = require("./VertexListeners");
+const VertTuple_1 = require("./VertTuple");
+const drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
+exports.default = {
+    BezierPath: BezierPath_1.BezierPath,
+    Bounds: Bounds_1.Bounds,
+    Circle: Circle_1.Circle,
+    CircleSector: CircleSector_1.CircleSector,
+    CubicBezierCurve: CubicBezierCurve_1.CubicBezierCurve,
+    drawutils: draw_1.drawutils,
+    drawutilsgl: drawgl_1.drawutilsgl,
+    geomutils: geomutils_1.geomutils,
+    Grid: Grid_1.Grid,
     ...interf,
-    KeyHandler,
-    Line,
-    MouseHandler,
-    PBImage,
-    PlotBoilerplate,
-    Polygon,
-    SVGBuilder,
-    Triangle,
-    UIDGenerator,
-    Vector,
-    VEllipse,
-    Vertex,
-    VertexAttr,
-    VertexListeners,
-    VertTuple,
-    drawutilssvg
+    KeyHandler: KeyHandler_1.KeyHandler,
+    Line: Line_1.Line,
+    MouseHandler: MouseHandler_1.MouseHandler,
+    PBImage: PBImage_1.PBImage,
+    PlotBoilerplate: PlotBoilerplate_1.PlotBoilerplate,
+    Polygon: Polygon_1.Polygon,
+    SVGBuilder: SVGBuilder_1.SVGBuilder,
+    Triangle: Triangle_1.Triangle,
+    UIDGenerator: UIDGenerator_1.UIDGenerator,
+    Vector: Vector_1.Vector,
+    VEllipse: VEllipse_1.VEllipse,
+    Vertex: Vertex_1.Vertex,
+    VertexAttr: VertexAttr_1.VertexAttr,
+    VertexListeners: VertexListeners_1.VertexListeners,
+    VertTuple: VertTuple_1.VertTuple,
+    drawutilssvg: drawutilssvg_1.drawutilssvg
 };
 //# sourceMappingURL=module.js.map

@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @requires Line
  * @requires Vertex
@@ -6,8 +7,10 @@
  * @date     2020-12-04
  * @modified 2020-12-09 Ported from vanilla JS to Typescript.
  */
-import { Line } from "../../Line";
-import { Vertex } from "../../Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.findPolygonSelfIntersections = void 0;
+const Line_1 = require("../../Line");
+const Vertex_1 = require("../../Vertex");
 /**
  * Collect all self-intersection points of the given polygon.
  *
@@ -17,10 +20,10 @@ import { Vertex } from "../../Vertex";
  * @param {Array<Vertex>} vertices - The vertices that form the polygon.
  * @return Array<Vertex>
  */
-export const findPolygonSelfIntersections = (vertices) => {
+const findPolygonSelfIntersections = (vertices) => {
     const pointList = [];
-    const lineA = new Line(new Vertex(), new Vertex());
-    const lineB = new Line(new Vertex(), new Vertex());
+    const lineA = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
+    const lineB = new Line_1.Line(new Vertex_1.Vertex(), new Vertex_1.Vertex());
     const n = vertices.length;
     for (var a = 0; a < n; a++) {
         lineA.a.set(vertices[a]);
@@ -44,4 +47,5 @@ export const findPolygonSelfIntersections = (vertices) => {
     }
     return pointList;
 };
+exports.findPolygonSelfIntersections = findPolygonSelfIntersections;
 //# sourceMappingURL=findPolygonSelfIntersections.js.map

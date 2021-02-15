@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author    Ikaros Kappler
  * @date_init 2012-10-17 (Wrote a first version of this in that year).
@@ -25,13 +26,15 @@
  * @fileoverview A simple triangle class: three vertices.
  * @public
  **/
-import { Bounds } from "./Bounds";
-import { Circle } from "./Circle";
-import { Line } from "./Line";
-import { Polygon } from "./Polygon";
-import { UIDGenerator } from "./UIDGenerator";
-import { Vertex } from "./Vertex";
-import { geomutils } from "./geomutils";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Triangle = void 0;
+const Bounds_1 = require("./Bounds");
+const Circle_1 = require("./Circle");
+const Line_1 = require("./Line");
+const Polygon_1 = require("./Polygon");
+const UIDGenerator_1 = require("./UIDGenerator");
+const Vertex_1 = require("./Vertex");
+const geomutils_1 = require("./geomutils");
 /**
  * @classdesc A triangle class for triangulations.
  *
@@ -49,7 +52,7 @@ import { geomutils } from "./geomutils";
  * @requires geomutils
  *
  */
-export class Triangle {
+class Triangle {
     /**
      * The constructor.
      *
@@ -64,7 +67,7 @@ export class Triangle {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Triangle";
-        this.uid = UIDGenerator.next();
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.a = a;
         this.b = b;
         this.c = c;
@@ -115,7 +118,7 @@ export class Triangle {
      * @memberof Triangle
      **/
     getCentroid() {
-        return new Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
+        return new Vertex_1.Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
     }
     ;
     /**
@@ -153,7 +156,7 @@ export class Triangle {
     getCircumcircle() {
         // if( !this.center || !this.radius ) 
         this.calcCircumcircle();
-        return new Circle(this.center.clone(), this.radius);
+        return new Circle_1.Circle(this.center.clone(), this.radius);
     }
     ;
     /**
@@ -222,14 +225,14 @@ export class Triangle {
         if (Math.abs(G) < Triangle.EPSILON) {
             // Collinear - find extremes and use the midpoint
             const bounds = this.bounds();
-            this.center = new Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
+            this.center = new Vertex_1.Vertex((bounds.min.x + bounds.max.x) / 2, (bounds.min.y + bounds.max.y) / 2);
             dx = this.center.x - bounds.min.x;
             dy = this.center.y - bounds.min.y;
         }
         else {
             const cx = (D * E - B * F) / G;
             const cy = (A * F - C * E) / G;
-            this.center = new Vertex(cx, cy);
+            this.center = new Vertex_1.Vertex(cx, cy);
             dx = this.center.x - this.a.x;
             dy = this.center.y - this.a.y;
         }
@@ -263,7 +266,7 @@ export class Triangle {
      * @memberof Triangle
      */
     bounds() {
-        return new Bounds(new Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
+        return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
     }
     ;
     /**
@@ -277,7 +280,7 @@ export class Triangle {
      * @memberof Triangle
      **/
     toPolygon() {
-        return new Polygon([this.a, this.b, this.c]);
+        return new Polygon_1.Polygon([this.a, this.b, this.c]);
     }
     ;
     /**
@@ -314,11 +317,11 @@ export class Triangle {
      * @return {Triangle} The triangle of those points in this triangle that define the incircle.
      */
     getIncircularTriangle() {
-        const lineA = new Line(this.a, this.b);
-        const lineB = new Line(this.b, this.c);
-        const lineC = new Line(this.c, this.a);
-        const bisector1 = geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
-        const bisector2 = geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        const lineA = new Line_1.Line(this.a, this.b);
+        const lineB = new Line_1.Line(this.b, this.c);
+        const lineC = new Line_1.Line(this.c, this.a);
+        const bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
+        const bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
         const intersection = bisector1.intersection(bisector2);
         // Find the closest points on one of the polygon lines (all have same distance by construction)
         const circleIntersA = lineA.getClosestPoint(intersection);
@@ -403,6 +406,7 @@ export class Triangle {
     }
     ;
 }
+exports.Triangle = Triangle;
 /**
  * An epsilon for comparison.
  * This should be the same epsilon as in Vertex.

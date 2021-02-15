@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc The pentagon tile from the Girih set.
  *
@@ -17,9 +18,11 @@
  * @file GirihPentagon
  * @public
  **/
-import { GirihTile, TileType } from "./GirihTile";
-import { Polygon } from "../../Polygon";
-export class GirihPentagon extends GirihTile {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GirihPentagon = void 0;
+const GirihTile_1 = require("./GirihTile");
+const Polygon_1 = require("../../Polygon");
+class GirihPentagon extends GirihTile_1.GirihTile {
     /**
      * @constructor
      * @extends GirihTile
@@ -28,7 +31,7 @@ export class GirihPentagon extends GirihTile {
      * @param {number} edgeLength
      */
     constructor(position, edgeLength) {
-        super(position, edgeLength, TileType.PENTAGON);
+        super(position, edgeLength, GirihTile_1.TileType.PENTAGON);
         // Overwrite the default symmetries:
         //    the pentagon tile has a 72° symmetry (2/10 * 360°)
         this.uniqueSymmetries = 2;
@@ -60,7 +63,7 @@ export class GirihPentagon extends GirihTile {
     ;
     _buildInnerPolygons(edgeLength) {
         // Connect all edges half-the-way
-        const innerTile = new Polygon();
+        const innerTile = new Polygon_1.Polygon();
         for (var i = 0; i < this.vertices.length; i++) {
             innerTile.addVertex(this.getVertexAt(i).clone().scale(0.5, this.getVertexAt(i + 1)));
             // ... make linear approximation instead
@@ -74,7 +77,7 @@ export class GirihPentagon extends GirihTile {
             const indexA = i;
             const indexB = i * 2;
             // The triangle
-            const outerTile = new Polygon();
+            const outerTile = new Polygon_1.Polygon();
             outerTile.addVertex(this.getVertexAt(indexA + 1).clone());
             outerTile.addVertex(this.innerTilePolygons[0].getVertexAt(indexB).clone());
             outerTile.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
@@ -84,4 +87,5 @@ export class GirihPentagon extends GirihTile {
     }
     ;
 }
+exports.GirihPentagon = GirihPentagon;
 //# sourceMappingURL=GirihPentagon.js.map

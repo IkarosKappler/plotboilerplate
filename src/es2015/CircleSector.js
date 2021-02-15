@@ -1,10 +1,13 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2020-12-17
  * @modified 2021-01-20 Added UID.
  * @version  1.1.0
  **/
-import { UIDGenerator } from "./UIDGenerator";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircleSector = void 0;
+const UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
  *
@@ -14,7 +17,7 @@ import { UIDGenerator } from "./UIDGenerator";
  * @requires UIDGenerator
  * @requires XYCoords
  **/
-export class CircleSector {
+class CircleSector {
     /**
      * Create a new circle sector with given circle, start- and end-angle.
      *
@@ -29,7 +32,7 @@ export class CircleSector {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "CircleSector";
-        this.uid = UIDGenerator.next();
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.circle = circle;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
@@ -56,6 +59,7 @@ export class CircleSector {
     }
     ;
 } // END class
+exports.CircleSector = CircleSector;
 CircleSector.circleSectorUtils = {
     /**
      * Helper function to convert polar circle coordinates to cartesian coordinates.

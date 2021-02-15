@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2016-03-12
@@ -17,8 +18,10 @@
  * @file Line
  * @public
  **/
-import { VertTuple } from "./VertTuple";
-import { Vertex } from "./Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Line = void 0;
+const VertTuple_1 = require("./VertTuple");
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
@@ -27,7 +30,7 @@ import { Vertex } from "./Vertex";
  *
  * @requires Vertex
  */
-export class Line extends VertTuple {
+class Line extends VertTuple_1.VertTuple {
     /**
      * Creates an instance of Line.
      *
@@ -70,7 +73,7 @@ export class Line extends VertTuple {
             return undefined;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(x, y);
+        return new Vertex_1.Vertex(x, y);
     }
     ;
     /**
@@ -99,4 +102,5 @@ export class Line extends VertTuple {
     }
     ;
 }
+exports.Line = Line;
 //# sourceMappingURL=Line.js.map

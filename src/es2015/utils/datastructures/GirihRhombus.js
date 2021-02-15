@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc The rhombus tile from the Girih set.
  *
@@ -18,12 +19,14 @@
  * @file GirihRhombus
  * @public
  **/
-import { Bounds } from "../../Bounds";
-import { Circle } from "../../Circle";
-import { GirihTile, TileType } from "./GirihTile";
-import { Polygon } from "../../Polygon";
-import { Vertex } from "../../Vertex";
-export class GirihRhombus extends GirihTile {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GirihRhombus = void 0;
+const Bounds_1 = require("../../Bounds");
+const Circle_1 = require("../../Circle");
+const GirihTile_1 = require("./GirihTile");
+const Polygon_1 = require("../../Polygon");
+const Vertex_1 = require("../../Vertex");
+class GirihRhombus extends GirihTile_1.GirihTile {
     /**
      * @constructor
      * @extends GirihTile
@@ -32,12 +35,12 @@ export class GirihRhombus extends GirihTile {
      * @param {number} edgeLength
      */
     constructor(position, edgeLength) {
-        super(position, edgeLength, TileType.RHOMBUS);
+        super(position, edgeLength, GirihTile_1.TileType.RHOMBUS);
         // Overwrite the default symmetries:
         //    the rhombus tile has a 180° symmetry (5/10 * 360°)
         this.uniqueSymmetries = 5;
         // Init the actual rhombus shape with the passed size
-        let pointA = new Vertex(0, 0);
+        let pointA = new Vertex_1.Vertex(0, 0);
         let pointB = pointA;
         this.addVertex(pointB);
         const angles = [0.0,
@@ -55,8 +58,8 @@ export class GirihRhombus extends GirihTile {
             this.addVertex(pointB);
         }
         // Move to center    
-        const bounds = Bounds.computeFromVertices(this.vertices);
-        const move = new Vertex(bounds.width / 2.0 - (bounds.width - this.edgeLength), bounds.height / 2.0);
+        const bounds = Bounds_1.Bounds.computeFromVertices(this.vertices);
+        const move = new Vertex_1.Vertex(bounds.width / 2.0 - (bounds.width - this.edgeLength), bounds.height / 2.0);
         for (var i = 0; i < this.vertices.length; i++) {
             this.vertices[i].add(move).add(this.position);
         }
@@ -78,12 +81,12 @@ export class GirihRhombus extends GirihTile {
     ;
     _buildInnerPolygons() {
         // Connect all edges half-the-way
-        const innerTile = new Polygon(); // [];
+        const innerTile = new Polygon_1.Polygon(); // [];
         innerTile.addVertex(this.vertices[0].clone().scale(0.5, this.vertices[1]));
         innerTile.addVertex(this.vertices[1].clone().scale(0.5, this.vertices[2]));
         // Compute the next inner polygon vertex by the intersection of two circles
-        const circleA = new Circle(innerTile.vertices[1], innerTile.vertices[0].distance(innerTile.vertices[1]) * 0.73);
-        const circleB = new Circle(this.vertices[2].clone().scale(0.5, this.vertices[3]), circleA.radius);
+        const circleA = new Circle_1.Circle(innerTile.vertices[1], innerTile.vertices[0].distance(innerTile.vertices[1]) * 0.73);
+        const circleB = new Circle_1.Circle(this.vertices[2].clone().scale(0.5, this.vertices[3]), circleA.radius);
         // There is definitely an intersection
         let intersection = circleA.circleIntersection(circleB);
         // One of the two points is inside the tile, the other is outside.
@@ -114,13 +117,13 @@ export class GirihRhombus extends GirihTile {
             const indexA = indicesA[i];
             const indexB = indicesB[i];
             // The triangle
-            const outerTileX = new Polygon();
+            const outerTileX = new Polygon_1.Polygon();
             outerTileX.addVertex(this.getVertexAt(indexA + 1).clone());
             outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB).clone());
             outerTileX.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
             this.outerTilePolygons.push(outerTileX);
             // The first 'kite'
-            const outerTileY = new Polygon();
+            const outerTileY = new Polygon_1.Polygon();
             outerTileY.addVertex(this.getVertexAt(indexA + 2).clone());
             outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 1).clone());
             outerTileY.addVertex(this.innerTilePolygons[0].getVertexAt(indexB + 2).clone());
@@ -130,4 +133,5 @@ export class GirihRhombus extends GirihTile {
     }
     ;
 }
+exports.GirihRhombus = GirihRhombus;
 //# sourceMappingURL=GirihRhombus.js.map

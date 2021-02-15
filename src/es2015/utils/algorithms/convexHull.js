@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Rosettcode, rewritten and ported to TypeScript by Ikaros Kappler
  * @date     2020-05-04
@@ -7,6 +8,8 @@
  * @file convexHull
  * @public
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getConvexHull = void 0;
 /**
  * @description The Convex Hull algorithm, found at RosettaCode:
  *
@@ -19,7 +22,7 @@
  * @param {Array<XYCoords>} points - The points on the 2D plane to find the convex hull for.
  * @return {Array<XYCoords>} A ordered array of points defining the convex hull.
  **/
-export const getConvexHull = (points) => {
+const getConvexHull = (points) => {
     points.sort(comparison);
     const L = [];
     for (var i = 0; i < points.length; i++) {
@@ -39,6 +42,7 @@ export const getConvexHull = (points) => {
     U.pop();
     return L.concat(U);
 };
+exports.getConvexHull = getConvexHull;
 /**
  * Compare two vertices to create an order on the 2D plane.
  *

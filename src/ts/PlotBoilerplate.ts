@@ -75,16 +75,8 @@
  * @public
  **/
 
-// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/dist/types";
-//import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/ts";
-
- import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript";
-//import { AlloyFinger, TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript";
-
-// import * as AlloyFinger from "alloyfinger-typescript";
-// import { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript";
-
-// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/ts/index";
+import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript";
+//import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/js/index";
 
 import { GUI } from "dat.gui";
 

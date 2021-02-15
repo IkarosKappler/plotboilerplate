@@ -77,8 +77,6 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlotBoilerplate = void 0;
-// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/dist/types";
-//import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/ts";
 var alloyfinger_typescript_1 = require("alloyfinger-typescript");
 var draw_1 = require("./draw");
 var drawgl_1 = require("./drawgl");

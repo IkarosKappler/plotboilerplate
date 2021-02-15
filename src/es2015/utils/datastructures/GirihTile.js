@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2013-11-27
@@ -8,11 +9,13 @@
  * @version  2.0.1-alpha
  * @name GirihTile
  **/
-import { Bounds } from "../../Bounds";
-import { Line } from "../../Line";
-import { Polygon } from "../../Polygon";
-import { Vertex } from "../../Vertex";
-export var TileType;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GirihTile = exports.TileType = void 0;
+const Bounds_1 = require("../../Bounds");
+const Line_1 = require("../../Line");
+const Polygon_1 = require("../../Polygon");
+const Vertex_1 = require("../../Vertex");
+var TileType;
 (function (TileType) {
     TileType["UNKNOWN"] = "UNKNOWN";
     TileType["DECAGON"] = "DECAGON";
@@ -22,7 +25,7 @@ export var TileType;
     TileType["BOW_TIE"] = "BOW_TIE";
     // This is not part of the actual girih tile set!
     TileType["PENROSE_RHOMBUS"] = "PENROSE_RHOMBUS";
-})(TileType || (TileType = {}));
+})(TileType = exports.TileType || (exports.TileType = {}));
 ;
 ;
 /**
@@ -36,7 +39,7 @@ export var TileType;
  * @requires Vertex
  * @requires XYCoords
  */
-export class GirihTile extends Polygon {
+class GirihTile extends Polygon_1.Polygon {
     /**
      * @constructor
      * @memberof GirihTile
@@ -70,7 +73,7 @@ export class GirihTile extends Polygon {
         // tile polygon (length > 0).
         this.outerTilePolygons = [];
         // this.imageProperties      = null;
-        this.textureSource = new Bounds(new Vertex(), new Vertex());
+        this.textureSource = new Bounds_1.Bounds(new Vertex_1.Vertex(), new Vertex_1.Vertex());
         this.tileType = tileType;
     }
     ;
@@ -108,10 +111,10 @@ export class GirihTile extends Polygon {
      * @return {IAdjacency|null} Adjacency information or null if the passed tile does not match.
      */
     findAdjacentTilePosition(edgeIndex, tile) {
-        const edgeA = new Line(this.vertices[edgeIndex % this.vertices.length], this.vertices[(edgeIndex + 1) % this.vertices.length]);
+        const edgeA = new Line_1.Line(this.vertices[edgeIndex % this.vertices.length], this.vertices[(edgeIndex + 1) % this.vertices.length]);
         // Find adjacent edge
         for (var i = 0; i < tile.vertices.length; i++) {
-            const edgeB = new Line(tile.vertices[i % tile.vertices.length].clone(), tile.vertices[(i + 1) % tile.vertices.length].clone());
+            const edgeB = new Line_1.Line(tile.vertices[i % tile.vertices.length].clone(), tile.vertices[(i + 1) % tile.vertices.length].clone());
             // Goal: edgeA.a==edgeB.b && edgeA.b==edgeB.a
             // So move edgeB
             const offset = edgeB.b.difference(edgeA.a);
@@ -252,7 +255,7 @@ export class GirihTile extends Polygon {
     locateEdgeAtPoint(point, tolerance) {
         if (this.vertices.length == 0)
             return -1;
-        const middle = new Vertex(0, 0);
+        const middle = new Vertex_1.Vertex(0, 0);
         let tmpDistance = 0;
         let resultDistance = tolerance * 2; // definitely outside the tolerance :)
         let resultIndex = -1;
@@ -271,6 +274,7 @@ export class GirihTile extends Polygon {
         return resultIndex;
     }
 }
+exports.GirihTile = GirihTile;
 /**
  * An epsilon to use for detecting adjacent edges. 0.001 seems to be a good value.
  * Adjust if needed.

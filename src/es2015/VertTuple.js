@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author Ikaros Kappler
  * @date   2020-03-24
@@ -10,8 +11,10 @@
  * @modified 2021-01-20 Added UID.
  * @version 1.1.0
  */
-import { Vertex } from "./Vertex";
-import { UIDGenerator } from "./UIDGenerator";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.VertTuple = void 0;
+const Vertex_1 = require("./Vertex");
+const UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
  * @abstract
@@ -19,7 +22,7 @@ import { UIDGenerator } from "./UIDGenerator";
  * @requires Vertex
  * @requires XYCoords
  */
-export class VertTuple {
+class VertTuple {
     /**
      * Creates an instance.
      *
@@ -29,7 +32,7 @@ export class VertTuple {
      * @param {Vertex} b The tuple's second point.
      **/
     constructor(a, b, factory) {
-        this.uid = UIDGenerator.next();
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.a = a;
         this.b = b;
         this.factory = factory;
@@ -142,7 +145,7 @@ export class VertTuple {
      **/
     angle(line) {
         if (line == null || typeof line == 'undefined') {
-            line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
+            line = this.factory(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(100, 0));
         }
         // Compute the angle from x axis and the return the difference :)
         var v0 = this.b.clone().sub(this.a);
@@ -165,7 +168,7 @@ export class VertTuple {
      * @memberof VertTuple
      **/
     vertAt(t) {
-        return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
+        return new Vertex_1.Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
     }
     ;
     /**
@@ -196,7 +199,7 @@ export class VertTuple {
      * @return true if both lines are co-linear.
      */
     colinear(line) {
-        return Math.abs(this.denominator(line)) < Vertex.EPSILON;
+        return Math.abs(this.denominator(line)) < Vertex_1.Vertex.EPSILON;
     }
     ;
     /**
@@ -238,7 +241,7 @@ export class VertTuple {
         // Compare to pointDistance?
         if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
             const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
-            return distance < Vertex.EPSILON && t >= 0 && t <= 1;
+            return distance < Vertex_1.Vertex.EPSILON && t >= 0 && t <= 1;
         }
         else {
             return t >= 0 && t <= 1;
@@ -298,6 +301,7 @@ export class VertTuple {
     }
     ;
 }
+exports.VertTuple = VertTuple;
 /**
  * @private
  **/

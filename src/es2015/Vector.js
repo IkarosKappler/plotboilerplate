@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2019-01-30
@@ -14,8 +15,10 @@
  * @file Vector
  * @public
  **/
-import { VertTuple } from "./VertTuple";
-import { Vertex } from "./Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Vector = void 0;
+const VertTuple_1 = require("./VertTuple");
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
  *            <br>
@@ -25,7 +28,7 @@ import { Vertex } from "./Vertex";
  * @requires VertTuple
  * @requires Vertex
  **/
-export class Vector extends VertTuple {
+class Vector extends VertTuple_1.VertTuple {
     /**
      * The constructor.
      *
@@ -52,7 +55,7 @@ export class Vector extends VertTuple {
     perp() {
         var v = this.clone();
         v.sub(this.a);
-        v = new Vector(new Vertex(), new Vertex(-v.b.y, v.b.x));
+        v = new Vector(new Vertex_1.Vertex(), new Vertex_1.Vertex(-v.b.y, v.b.x));
         v.a.add(this.a);
         v.b.add(this.a);
         return v;
@@ -105,7 +108,7 @@ export class Vector extends VertTuple {
         // TODO:
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
+        return new Vertex_1.Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
     }
     ;
     /**
@@ -146,6 +149,7 @@ export class Vector extends VertTuple {
     }
     ;
 }
+exports.Vector = Vector;
 Vector.utils = {
     /**
      * Generate a four-point arrow head, starting at the vector end minus the
@@ -175,10 +179,10 @@ Vector.utils = {
     buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
         var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         var vertices = [];
-        vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
-        vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
+        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex_1.Vertex(zB.x * scaleX, zB.y * scaleY));
+        vertices.push(new Vertex_1.Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
         return vertices;
     }
 };

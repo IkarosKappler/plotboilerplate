@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Draws elements into an SVG node.
  *
@@ -11,9 +12,11 @@
  * @modified 2021-02-03 Added the static `HEAD_XML` attribute.
  * @version  1.0.0
  **/
-import { CircleSector } from "../../CircleSector";
-import { CubicBezierCurve } from "../../CubicBezierCurve";
-import { Vertex } from "../../Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.drawutilssvg = void 0;
+const CircleSector_1 = require("../../CircleSector");
+const CubicBezierCurve_1 = require("../../CubicBezierCurve");
+const Vertex_1 = require("../../Vertex");
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -23,7 +26,7 @@ import { Vertex } from "../../Vertex";
  * @requires Vertex
  * @requires XYCoords
  */
-export class drawutilssvg {
+class drawutilssvg {
     /**
      * The constructor.
      *
@@ -40,8 +43,8 @@ export class drawutilssvg {
      **/
     constructor(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
         this.svgNode = svgNode;
-        this.offset = new Vertex(0, 0).set(offset);
-        this.scale = new Vertex(1, 1).set(scale);
+        this.offset = new Vertex_1.Vertex(0, 0).set(offset);
+        this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = isSecondary;
         this.cache = new Map();
@@ -287,7 +290,7 @@ export class drawutilssvg {
     arrow(zA, zB, color, lineWidth) {
         const node = this.makeNode('path');
         var headlen = 8; // length of head in pixels
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
+        var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
         const d = [
             'M', this._x(zA.x), this._y(zA.y)
         ];
@@ -353,7 +356,7 @@ export class drawutilssvg {
      * @memberof drawutilssvg
      */
     cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
-        if (startPoint instanceof CubicBezierCurve) {
+        if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
             return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
         }
         const node = this.makeNode('path');
@@ -506,7 +509,7 @@ export class drawutilssvg {
      */
     circleArc(center, radius, startAngle, endAngle, color, lineWidth) {
         const node = this.makeNode('path');
-        const arcData = CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
+        const arcData = CircleSector_1.CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
         startAngle, endAngle);
         node.setAttribute('d', arcData.join(' '));
         return this._bindFillDraw(node, 'circleArc', color, lineWidth || 1);
@@ -877,6 +880,7 @@ export class drawutilssvg {
     }
     ;
 }
+exports.drawutilssvg = drawutilssvg;
 drawutilssvg.HEAD_XML = [
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" ',

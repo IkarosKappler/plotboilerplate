@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Easily handle circles (mouse or touch) with this circle helper.
  *
@@ -9,10 +10,12 @@
  * @modified 2021-01-22 Removed `pb.redraw()` call from update handlers (changed vertices already triggered redraw).
  * @version  1.0.1
  **/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircleHelper = void 0;
 /**
  * @classdesc A helper for handling circles with an additional radius-control-point.
  */
-export class CircleHelper {
+class CircleHelper {
     /**
      * The constructor.
      *
@@ -34,4 +37,5 @@ export class CircleHelper {
     }
     ;
 }
+exports.CircleHelper = CircleHelper;
 //# sourceMappingURL=CircleHelper.js.map

@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A circular interval set.
  *
@@ -8,7 +9,9 @@
  * @version  1.0.1
  * @name CircularIntervalSet
  **/
-export class CircularIntervalSet {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircularIntervalSet = void 0;
+class CircularIntervalSet {
     /**
      * Create a new CircularIntervalSet with the given lower and upperBound (start and end).
      *
@@ -155,4 +158,5 @@ export class CircularIntervalSet {
     }
     ;
 }
+exports.CircularIntervalSet = CircularIntervalSet;
 //# sourceMappingURL=CircularIntervalSet.js.map

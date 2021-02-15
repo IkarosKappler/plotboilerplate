@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Some often-used interfaces.
  *
@@ -5,5 +6,5 @@
  * @date    2020-10-23
  * @version 1.0.0
  **/
-export {};
+Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=interfaces.js.map

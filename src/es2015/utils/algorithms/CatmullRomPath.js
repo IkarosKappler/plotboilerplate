@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @date     2020-04-15
  * @author   Converted to a class by Ikaros Kappler
@@ -7,8 +8,10 @@
  * @file CatmullRomPath
  * @public
  **/
-import { CubicBezierCurve } from "../../CubicBezierCurve";
-import { Vertex } from "../../Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CatmullRomPath = void 0;
+const CubicBezierCurve_1 = require("../../CubicBezierCurve");
+const Vertex_1 = require("../../Vertex");
 /**
  * @classdesc Compute the Catmull-Rom spline path from a sequence of points (vertices).
  *
@@ -21,7 +24,7 @@ import { Vertex } from "../../Vertex";
  * @requires CubicBezierCurve
  * @requires Vertex
  */
-export class CatmullRomPath {
+class CatmullRomPath {
     /**
      * @constructor
      * @name CatmullRomPath
@@ -73,9 +76,9 @@ export class CatmullRomPath {
             var p1 = this.vertices[i + 0];
             var p2 = this.vertices[i + 1];
             var p3 = i !== last ? this.vertices[i + 2] : p2;
-            var cp1 = new Vertex(p1.x + (p2.x - p0.x) / 6 * k, p1.y + (p2.y - p0.y) / 6 * k);
-            var cp2 = new Vertex(p2.x - (p3.x - p1.x) / 6 * k, p2.y - (p3.y - p1.y) / 6 * k);
-            curves.push(new CubicBezierCurve(p1, p2, cp1, cp2));
+            var cp1 = new Vertex_1.Vertex(p1.x + (p2.x - p0.x) / 6 * k, p1.y + (p2.y - p0.y) / 6 * k);
+            var cp2 = new Vertex_1.Vertex(p2.x - (p3.x - p1.x) / 6 * k, p2.y - (p3.y - p1.y) / 6 * k);
+            curves.push(new CubicBezierCurve_1.CubicBezierCurve(p1, p2, cp1, cp2));
         }
         return curves;
     }
@@ -91,13 +94,14 @@ export class CatmullRomPath {
             var p1 = this.vertices[i + 0];
             var p2 = this.vertices[(i + 1) % size];
             var p3 = this.vertices[(i + 2) % size];
-            var cp1 = new Vertex(p1.x + (p2.x - p0.x) / 6 * k, p1.y + (p2.y - p0.y) / 6 * k);
-            var cp2 = new Vertex(p2.x - (p3.x - p1.x) / 6 * k, p2.y - (p3.y - p1.y) / 6 * k);
-            curves.push(new CubicBezierCurve(p1, p2, cp1, cp2));
+            var cp1 = new Vertex_1.Vertex(p1.x + (p2.x - p0.x) / 6 * k, p1.y + (p2.y - p0.y) / 6 * k);
+            var cp2 = new Vertex_1.Vertex(p2.x - (p3.x - p1.x) / 6 * k, p2.y - (p3.y - p1.y) / 6 * k);
+            curves.push(new CubicBezierCurve_1.CubicBezierCurve(p1, p2, cp1, cp2));
         }
         return curves;
     }
     ; // END solveClosed
 }
+exports.CatmullRomPath = CatmullRomPath;
 ; // END class
 //# sourceMappingURL=CatmullRomPath.js.map

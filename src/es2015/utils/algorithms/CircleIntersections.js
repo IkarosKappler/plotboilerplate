@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2020-10-05
@@ -6,11 +7,13 @@
  * @file CircleIntersections
  * @public
  **/
-import { arrayFill } from "./arrayFill";
-import { matrixFill } from "./matrixFill";
-import { CircleSector } from "../../CircleSector";
-import { Line } from "../../Line";
-import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CircleIntersections = void 0;
+const arrayFill_1 = require("./arrayFill");
+const matrixFill_1 = require("./matrixFill");
+const CircleSector_1 = require("../../CircleSector");
+const Line_1 = require("../../Line");
+const CircularIntervalSet_1 = require("../datastructures/CircularIntervalSet");
 /**
  * @classdesc A script for finding the intersection points of two or
  * multiple circles (the 'radical lines').
@@ -29,7 +32,7 @@ import { CircularIntervalSet } from "../datastructures/CircularIntervalSet";
  * @requires Line
  * @requires CirularIntervalSet
  */
-export class CircleIntersections {
+class CircleIntersections {
     /**
      * Find all connected outer path partitions.
      *
@@ -47,7 +50,7 @@ export class CircleIntersections {
         for (var i = 0; i < intervalSets.length; i++) {
             maxSetLength = Math.max(maxSetLength, intervalSets[i].intervals.length);
         }
-        const usedIntervals = matrixFill(intervalSets.length, maxSetLength, false);
+        const usedIntervals = matrixFill_1.matrixFill(intervalSets.length, maxSetLength, false);
         var path = null;
         var pathList = [];
         while ((path = CircleIntersections.findOuterPartition(circles, intervalSets, usedIntervals)) != null) {
@@ -77,7 +80,7 @@ export class CircleIntersections {
                 const circle = circles[circleIndex];
                 var interval = intervalSets[path[i].i].intervals[path[i].j];
                 // Params: circle, startAngle, endAngle
-                pathAsArcs.push(new CircleSector(circle, interval[0], interval[1]));
+                pathAsArcs.push(new CircleSector_1.CircleSector(circle, interval[0], interval[1]));
             } // END for
             partitionsAsArcs.push(pathAsArcs);
         } // END for
@@ -103,7 +106,7 @@ export class CircleIntersections {
         var radicalLines = [];
         for (var i = 0; i < circles.length; i++) {
             if (!radicalLines[i])
-                radicalLines[i] = arrayFill(circles.length, null); // Array<Line>( circles.length );
+                radicalLines[i] = arrayFill_1.arrayFill(circles.length, null); // Array<Line>( circles.length );
             for (var j = 0; j < circles.length; j++) {
                 if (i == j)
                     continue;
@@ -113,9 +116,9 @@ export class CircleIntersections {
                 // Build symmetrical matrix
                 if (radicalLines[i][j]) {
                     if (!radicalLines[j])
-                        radicalLines[j] = arrayFill(circles.length, null); // Array<Line>( circles.length );
+                        radicalLines[j] = arrayFill_1.arrayFill(circles.length, null); // Array<Line>( circles.length );
                     // Use reverse line
-                    radicalLines[j][i] = new Line(radicalLines[i][j].b, radicalLines[i][j].a);
+                    radicalLines[j][i] = new Line_1.Line(radicalLines[i][j].b, radicalLines[i][j].a);
                 }
             }
         }
@@ -163,7 +166,7 @@ export class CircleIntersections {
     static findOuterCircleIntervals(circles, intersectionMatrix) {
         const intervalSets = [];
         for (var i = 0; i < circles.length; i++) {
-            intervalSets[i] = new CircularIntervalSet(0, 2 * Math.PI);
+            intervalSets[i] = new CircularIntervalSet_1.CircularIntervalSet(0, 2 * Math.PI);
             for (var j = 0; j < circles.length; j++) {
                 if (i == j)
                     continue;
@@ -222,8 +225,8 @@ export class CircleIntersections {
      **/
     static radicalLineToInterval(circle, radicalLine) {
         // Get angle sections in the circles
-        const lineA = new Line(circle.center, radicalLine.a);
-        const lineB = new Line(circle.center, radicalLine.b);
+        const lineA = new Line_1.Line(circle.center, radicalLine.a);
+        const lineB = new Line_1.Line(circle.center, radicalLine.b);
         let angleA = lineA.angle();
         let angleB = lineB.angle();
         // Map angles to [0 ... 2*PI]
@@ -307,5 +310,6 @@ export class CircleIntersections {
     }
     ;
 }
+exports.CircleIntersections = CircleIntersections;
 ;
 //# sourceMappingURL=CircleIntersections.js.map

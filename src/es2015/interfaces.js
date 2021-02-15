@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author Ikaros Kappler
  * @modified 2021-01-10 Added the `CanvasWrapper` interface.
@@ -6,5 +7,5 @@
  * @modified 2021-01-25 Fixed the `PBParams` interface (inluding DrawConfig).
  * @modified 2021-02-08 Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
  **/
-export {};
+Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=interfaces.js.map

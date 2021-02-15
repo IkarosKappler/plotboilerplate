@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc The bow tie tile from the Girih set.
  *
@@ -17,10 +18,12 @@
  * @file GirihBowtie
  * @public
  **/
-import { GirihTile, TileType } from "./GirihTile";
-import { Polygon } from "../../Polygon";
-import { Vertex } from "../../Vertex";
-export class GirihBowtie extends GirihTile {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GirihBowtie = void 0;
+const GirihTile_1 = require("./GirihTile");
+const Polygon_1 = require("../../Polygon");
+const Vertex_1 = require("../../Vertex");
+class GirihBowtie extends GirihTile_1.GirihTile {
     /**
      * @constructor
      * @extends GirihTile
@@ -29,12 +32,12 @@ export class GirihBowtie extends GirihTile {
      * @param {number} edgeLength
      */
     constructor(position, edgeLength) {
-        super(position, edgeLength, TileType.BOW_TIE);
+        super(position, edgeLength, GirihTile_1.TileType.BOW_TIE);
         // Overwrite the default symmetries:
         //    the bow-tie tile has a 180° symmetry (5/10 * 360°)
         this.uniqueSymmetries = 5;
         // Init the actual decahedron shape with the passed size
-        let pointA = new Vertex(0, 0);
+        let pointA = new Vertex_1.Vertex(0, 0);
         let pointB = pointA;
         const startPoint = pointA;
         let oppositePoint = null;
@@ -58,7 +61,7 @@ export class GirihBowtie extends GirihTile {
                 oppositePoint = pointB;
         } // END for
         // Move to center and position 
-        const move = new Vertex((oppositePoint.x - startPoint.x) / 2.0, (oppositePoint.y - startPoint.y) / 2.0);
+        const move = new Vertex_1.Vertex((oppositePoint.x - startPoint.x) / 2.0, (oppositePoint.y - startPoint.y) / 2.0);
         for (var i = 0; i < this.vertices.length; i++) {
             this.vertices[i].add(position).sub(move);
         }
@@ -86,7 +89,7 @@ export class GirihBowtie extends GirihTile {
             const leftPoint = this.getVertexAt(index - 1).clone().scale(0.5, this.getVertexAt(index));
             const rightPoint = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
             const innerPoint = middlePoint.clone().scale(0.38, this.position); // multiplyScalar( 0.38 );
-            const innerTile = new Polygon([]);
+            const innerTile = new Polygon_1.Polygon([]);
             innerTile.addVertex(middlePoint);
             innerTile.addVertex(rightPoint);
             innerTile.addVertex(innerPoint);
@@ -101,20 +104,20 @@ export class GirihBowtie extends GirihTile {
         for (var i = 0; i < indices.length; i++) {
             const index = indices[i];
             // The first/third triangle
-            const outerTileA = new Polygon();
+            const outerTileA = new Polygon_1.Polygon();
             outerTileA.addVertex(this.innerTilePolygons[i].getVertexAt(0).clone());
             outerTileA.addVertex(this.getVertexAt(index + 2).clone());
             outerTileA.addVertex(this.innerTilePolygons[i].getVertexAt(1).clone());
             this.outerTilePolygons.push(outerTileA);
             // The second/fourth triangle
-            const outerTileB = new Polygon();
+            const outerTileB = new Polygon_1.Polygon();
             outerTileB.addVertex(this.innerTilePolygons[i].getVertexAt(0).clone());
             outerTileB.addVertex(this.getVertexAt(index + 1).clone());
             outerTileB.addVertex(this.innerTilePolygons[i].getVertexAt(3).clone());
             this.outerTilePolygons.push(outerTileB);
         }
         // Add the center polygon
-        const centerTile = new Polygon();
+        const centerTile = new Polygon_1.Polygon();
         centerTile.addVertex(this.getVertexAt(0).clone());
         centerTile.addVertex(this.innerTilePolygons[0].getVertexAt(3).clone());
         centerTile.addVertex(this.innerTilePolygons[0].getVertexAt(2).clone());
@@ -127,4 +130,5 @@ export class GirihBowtie extends GirihTile {
     }
     ;
 }
+exports.GirihBowtie = GirihBowtie;
 //# sourceMappingURL=GirihBowtie.js.map

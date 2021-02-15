@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A HobbyCurve/HobbyPath calculation class: compute a set of optimal
  *            cubic Bézier curves from a sequence of vertices.
@@ -15,8 +16,10 @@
  * @file HobbyPath
  * @public
  **/
-import { CubicBezierCurve } from "../../CubicBezierCurve";
-import { Vertex } from "../../Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HobbyPath = void 0;
+const CubicBezierCurve_1 = require("../../CubicBezierCurve");
+const Vertex_1 = require("../../Vertex");
 ;
 /**
  * @classdesc A HobbyCurve/HobbyPath calculation class: compute a set of optimal
@@ -25,7 +28,7 @@ import { Vertex } from "../../Vertex";
  * @requires CubicBezierCurve
  * @requires Vertex
  */
-export class HobbyPath {
+class HobbyPath {
     /**
      * @constructor
      * @name HobbyPath
@@ -62,7 +65,7 @@ export class HobbyPath {
         if (n > 1) {
             if (n == 2) {
                 // for two points, just draw a straight line
-                return [new CubicBezierCurve(this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1])];
+                return [new CubicBezierCurve_1.CubicBezierCurve(this.vertices[0], this.vertices[1], this.vertices[0], this.vertices[1])];
             }
             else {
                 const curves = [];
@@ -70,7 +73,7 @@ export class HobbyPath {
                 for (let i = 0; i < n - (circular ? 0 : 1); i++) {
                     // if i is n-1, the "next" point is the first one
                     let j = (i + 1) % n; // Use a succ function here?
-                    curves.push(new CubicBezierCurve(this.vertices[i], this.vertices[j], controlPoints.startControlPoints[i], controlPoints.endControlPoints[i]));
+                    curves.push(new CubicBezierCurve_1.CubicBezierCurve(this.vertices[i], this.vertices[j], controlPoints.startControlPoints[i], controlPoints.endControlPoints[i]));
                 }
                 return curves;
             }
@@ -174,20 +177,21 @@ export class HobbyPath {
             let a = HobbyPath.utils.rho(alpha[i], beta[i]) * D[i] / 3;
             let b = HobbyPath.utils.rho(beta[i], alpha[i]) * D[i] / 3;
             let v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], alpha[i]));
-            startControlPoints[i] = new Vertex(this.vertices[i].x + a * v.x, this.vertices[i].y + a * v.y);
+            startControlPoints[i] = new Vertex_1.Vertex(this.vertices[i].x + a * v.x, this.vertices[i].y + a * v.y);
             v = HobbyPath.utils.normalize(HobbyPath.utils.rotateAngle(ds[i], -beta[i]));
-            endControlPoints[i] = new Vertex(this.vertices[j].x - b * v.x, this.vertices[j].y - b * v.y);
+            endControlPoints[i] = new Vertex_1.Vertex(this.vertices[j].x - b * v.x, this.vertices[j].y - b * v.y);
         }
         return { startControlPoints: startControlPoints,
             endControlPoints: endControlPoints
         };
     }
 }
+exports.HobbyPath = HobbyPath;
 HobbyPath.utils = {
     // rotates a vector [x, y] about an angle; the angle is implicitly
     // determined by its sine and cosine
     rotate: (vert, sin, cos) => {
-        return new Vertex(vert.x * cos - vert.y * sin, vert.x * sin + vert.y * cos);
+        return new Vertex_1.Vertex(vert.x * cos - vert.y * sin, vert.x * sin + vert.y * cos);
     },
     // rotates a vector [x, y] about the angle alpha
     rotateAngle: (vert, alpha) => {
@@ -197,9 +201,9 @@ HobbyPath.utils = {
     normalize: (vec) => {
         let n = Math.hypot(vec.x, vec.y);
         if (n == 0)
-            return new Vertex(0, 0);
+            return new Vertex_1.Vertex(0, 0);
         else
-            return new Vertex(vec.x / n, vec.y / n); // TODO: do in-place
+            return new Vertex_1.Vertex(vec.x / n, vec.y / n); // TODO: do in-place
     },
     // the "velocity function" (also called rho in the video); a and b are
     // the angles alpha and beta, the return value is the distance between

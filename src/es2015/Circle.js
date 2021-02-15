@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2020-05-04
@@ -9,10 +10,12 @@
  * @modified 2021-01-20 Added UID.
  * @version  1.2.0
  **/
-import { Line } from "./Line";
-import { UIDGenerator } from "./UIDGenerator";
-import { Vector } from "./Vector";
-import { Vertex } from "./Vertex";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Circle = void 0;
+const Line_1 = require("./Line");
+const UIDGenerator_1 = require("./UIDGenerator");
+const Vector_1 = require("./Vector");
+const Vertex_1 = require("./Vertex");
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -24,7 +27,7 @@ import { Vertex } from "./Vertex";
  * @requires UID
  * @requires UIDGenerator
  **/
-export class Circle {
+class Circle {
     /**
      * Create a new circle with given center point and radius.
      *
@@ -38,7 +41,7 @@ export class Circle {
          * Required to generate proper CSS classes and other class related IDs.
          **/
         this.className = "Circle";
-        this.uid = UIDGenerator.next();
+        this.uid = UIDGenerator_1.UIDGenerator.next();
         this.center = center;
         this.radius = radius;
     }
@@ -103,7 +106,7 @@ export class Circle {
     tangentAt(angle) {
         const pointA = Circle.circleUtils.vertAt(angle, this.radius);
         // Construct the perpendicular of the line in point a. Then move relative to center.
-        return new Vector(pointA, new Vertex(0, 0)).add(this.center).perp();
+        return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
     }
     ;
     /**
@@ -156,7 +159,7 @@ export class Circle {
         var y3 = p2.y - h * (p1.x - p0.x) / d;
         var x4 = p2.x - h * (p1.y - p0.y) / d;
         var y4 = p2.y + h * (p1.x - p0.x) / d;
-        return new Line(new Vertex(x3, y3), new Vertex(x4, y4));
+        return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
     }
     ;
     /**
@@ -183,11 +186,12 @@ export class Circle {
     }
     ;
 } // END class
+exports.Circle = Circle;
 Circle.circleUtils = {
     vertAt: (angle, radius) => {
         /* return new Vertex( Math.sin(angle) * radius,
                    Math.cos(angle) * radius ); */
-        return new Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
+        return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
     }
 };
 //# sourceMappingURL=Circle.js.map

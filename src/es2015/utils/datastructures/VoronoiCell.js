@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @classdesc A simple voronoi cell (part of a voronoi diagram), stored as an array of
  * adjacent triangles.
@@ -21,10 +22,12 @@
  * @file VoronoiCell
  * @public
  **/
-import { Line } from "../../Line";
-import { Polygon } from "../../Polygon";
-import { Vertex } from "../../Vertex";
-export class VoronoiCell {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.VoronoiCell = void 0;
+const Line_1 = require("../../Line");
+const Polygon_1 = require("../../Polygon");
+const Vertex_1 = require("../../Vertex");
+class VoronoiCell {
     /**
      * The constructor.
      *
@@ -39,7 +42,7 @@ export class VoronoiCell {
         if (typeof triangles === 'undefined')
             triangles = [];
         if (typeof sharedVertex === 'undefined')
-            sharedVertex = new Vertex(0, 0);
+            sharedVertex = new Vertex_1.Vertex(0, 0);
         this.triangles = triangles;
         this.sharedVertex = sharedVertex;
     }
@@ -69,7 +72,7 @@ export class VoronoiCell {
      * @return {Polygon}
      **/
     toPolygon() {
-        return new Polygon(this.toPathArray(), this.isOpen());
+        return new Polygon_1.Polygon(this.toPathArray(), this.isOpen());
     }
     ;
     /**
@@ -138,9 +141,9 @@ export class VoronoiCell {
         // Find non-adjacent edge (=outer edge)
         const edgePoint = VoronoiCell._findOuterEdgePoint(tri, neigh, sharedVertex);
         // const perpendicular : Vertex = VoronoiCell._perpendicularLinePoint( sharedVertex, edgePoint, center );
-        const perpendicular = new Line(sharedVertex, edgePoint).getClosestPoint(center);
+        const perpendicular = new Line_1.Line(sharedVertex, edgePoint).getClosestPoint(center);
         // It is not necesary to make a difference on the determinant here
-        const openEdgePoint = new Vertex(perpendicular.x + (center.x - perpendicular.x) * 1000, perpendicular.y + (center.y - perpendicular.y) * 1000);
+        const openEdgePoint = new Vertex_1.Vertex(perpendicular.x + (center.x - perpendicular.x) * 1000, perpendicular.y + (center.y - perpendicular.y) * 1000);
         return openEdgePoint;
     }
     ;
@@ -175,4 +178,5 @@ export class VoronoiCell {
     }
     ;
 }
+exports.VoronoiCell = VoronoiCell;
 //# sourceMappingURL=VoronoiCell.js.map
