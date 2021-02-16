@@ -117,29 +117,32 @@
 		functionCache.push( function(x) { return parsed.evaluate({ x : x }) } );
 		return input;
 	    };
-	    addFunction('sin(x*10)');
-	    addFunction('sin(x*20)*2');
-	    addFunction('sin(x*2)');
 
-	    
-	    // Add input function
-	    var index = functionCache.length;
-	    var input = addFunction('x');
-	    input.addEventListener('change', function(e) {
-		console.log('new term', e.target.value );
-		var parsed = math.parse(e.target.value);
-		console.log( 'parsed', parsed );
-		if( !parsed ) {
-		    console.log("ERROR");
-		    return;
-		}
-		functionCache[index] = function(x) { return parsed.evaluate({ x : x }) };
-		pb.redraw();
-	    } );
-	    input.addEventListener('keyup', function(e) {
-		console.log('new term', e.target.value );
-		
-	    } );
+	    var installInputListeners = function( index, inputElement ) {
+		// Add input function
+		// var index = functionCache.length;
+		// var input = addFunction('x');
+		inputElement.addEventListener('change', function(e) {
+		    console.log('new term', e.target.value );
+		    var parsed = math.parse(e.target.value);
+		    console.log( 'parsed', parsed );
+		    if( !parsed ) {
+			console.log("ERROR");
+			return;
+		    }
+		    functionCache[index] = function(x) { return parsed.evaluate({ x : x }) };
+		    pb.redraw();
+		} );
+		inputElement.addEventListener('keyup', function(e) {
+		    console.log('new term', e.target.value );
+		    
+		} );
+	    };
+
+	    installInputListeners( 0, addFunction('sin(x*10)') );
+	    installInputListeners( 1, addFunction('sin(x*20)*2') );
+	    installInputListeners( 2, addFunction('sin(x*2)' ));
+	    installInputListeners( 3, addFunction('x') );
 	    
 	    
 	    // +---------------------------------------------------------------------------------
@@ -156,19 +159,6 @@
 		}
 
 		var dist = 0.2;
-		/* for( var i = 0; i < coordsA.length; i++ ) {
-		    var cA = coordsA[i];
-		    // console.log( cA );
-		    for( var j = i-10; j < i+10; j++ ) {
-			if( j < 0 || j >= coordsB.length )
-			    continue;
-			var cB = coordsB[j];
-
-			if( Math.sqrt( (cB.x-cA.x)*(cB.x-cA.x) + (cB.y-cA.y)*(cB.y-cA.y)) < 1 ) {
-			    pb.draw.line( cA, cB, 'rgba(192,192,192)', 1.0 ); 
-			}
-		    }
-		} */
 	    };
 
 	    var calcFunction = function( fn, inputRangeX, outputRangeX, color ) {
@@ -180,7 +170,7 @@
 		while( x < outputRangeX[1] ) {
 		    var xPct = (x-outputRangeX[0]) / (outputRangeX[1]-outputRangeX[0]);
 		    var xVal = config.phaseX + xPct * (inputRangeX[1]-inputRangeX[0]);
-		    var yVal = fn( xVal ) * config.scaleY;
+		    var yVal = -fn( xVal ) * config.scaleY;
 		    svgData.push( i==0 ? 'M' : 'L', x, _y(yVal) );
 		    coords.push( { x : x, y : _y(yVal) } );
 		    

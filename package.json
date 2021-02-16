@@ -3,8 +3,8 @@
   "version": "1.11.1",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
   "private": false,
-  "main": "dist/plotboilerplate.module.min.js",
-  "module": "dist/plotboilerplate.module.js",
+  "main": "src/js/index.js",
+  "module": "src/js/module.js",
   "jsnext:main": "dist/plotboilerplate.module.js",
   "types": "src/js/index.d.ts",
   "files": [
@@ -13,16 +13,16 @@
   ],
   "scripts": {
     "build": "npm run build-module && npm run build-browser",
+    "build-browser": "npm run compile-typescript-browser && npm run webpack-browser && cp dist/plotboilerplate.browser.min.js dist/plotboilerplate.min.js",
+    "build-module": "npm run compile-typescript-module && npm run rollup-module",
     "compile-typescript-browser": "tsc -p tsconfig.browser.json",
     "compile-typescript-module": "tsc -p tsconfig.module.json",
-    "build-browser": "npm run compile-typescript-browser && npm run webpack-browser",
-    "build-module": "npm run compile-typescript-module && npm run rollup-module",
     "xyz": "cd bin && ./run-build.sh",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack-browser": "npx webpack --mode production --config ./webpack5.browser.config.js",
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",
-    "rollup-module": "npx rollup -c && cp dist/plotboilerplate.browser.min.js dist/plotboilerplate.min.js",
+    "rollup-module": "npx rollup -c",
     "tslint": "npx eslint ./src/ts/"
   },
   "repository": {

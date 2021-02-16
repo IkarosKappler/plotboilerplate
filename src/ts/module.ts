@@ -9,7 +9,7 @@ import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
 import { geomutils } from "./geomutils";
 import { Grid } from "./Grid";
-import * as interf from "./interfaces";
+// import * as interf from "./interfaces";
 import { KeyHandler } from "./KeyHandler";
 import { Line } from "./Line";
 import { MouseHandler } from "./MouseHandler";
@@ -27,7 +27,7 @@ import { VertexListeners } from "./VertexListeners";
 import { VertTuple } from "./VertTuple";
 import { drawutilssvg } from "./utils/helpers/drawutilssvg";
 
-export default {
+export {
     BezierPath,
     Bounds,
     Circle,
@@ -37,7 +37,7 @@ export default {
     drawutilsgl,
     geomutils,
     Grid,
-    ...interf,
+    // ...interf,
     KeyHandler,
     Line,
     MouseHandler,
@@ -55,3 +55,4 @@ export default {
     VertTuple,
     drawutilssvg
 };
+export default PlotBoilerplate;

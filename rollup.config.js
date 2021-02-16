@@ -6,22 +6,28 @@ import {terser} from 'rollup-plugin-terser';
 
 import pkg from "./package.json";
 
+const moduleName = "plotboilerplate";
+
 export default {
-  input: "src/es2015/module.js",
-  context: "globalThis",
-  moduleContext: "globalThis",
+    // input: "src/es2015/module.js",
+    // input: "src/js/module.js",
+     input: "src/js/index.js",
+  // context: "globalThis",
+  // moduleContext: "globalThis",
   output: [
     {
-      file: pkg.main,
+      file: "dist/main.js", // pkg.main,
       format: "cjs",
-      exports: "named",
+	// exports: "named",
+	name: moduleName,
       sourcemap: true,
       plugins: [terser()]
     },
     {
-      file: pkg.module,
-      format: "es",
-      exports: "named",
+	file: "dist/plotboilerplate.module.js", // pkg.module,
+	format: "es",
+	name: moduleName,
+      // exports: "named",
       sourcemap: true
     }
   ],

@@ -821,3 +821,4 @@ export declare class PlotBoilerplate {
         enableBezierPathAutoAdjust: (bezierPath: BezierPath) => void;
     };
 }
+export default PlotBoilerplate;

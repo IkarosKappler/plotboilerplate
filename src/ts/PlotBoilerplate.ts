@@ -2128,4 +2128,7 @@ export class PlotBoilerplate {
 	    } // END for
 	}	
     }; // END utils
-} // END class PlotBoilerplate
+}; // END class PlotBoilerplate
+
+
+export default PlotBoilerplate;

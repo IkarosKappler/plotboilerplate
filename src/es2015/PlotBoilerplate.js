@@ -1732,7 +1732,7 @@ class PlotBoilerplate {
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
     }
     ;
-} // END class PlotBoilerplate
+}
 exports.PlotBoilerplate = PlotBoilerplate;
 /** @constant {number} */
 PlotBoilerplate.DEFAULT_CANVAS_WIDTH = 1024;
@@ -1939,4 +1939,6 @@ PlotBoilerplate.utils = {
         } // END for
     }
 }; // END utils
+; // END class PlotBoilerplate
+exports.default = PlotBoilerplate;
 //# sourceMappingURL=PlotBoilerplate.js.map
