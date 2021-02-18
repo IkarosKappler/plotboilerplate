@@ -15,6 +15,11 @@
  **/
 
 
+// TODOs:
+//  * colors for function inputs
+//  * crop renderer to visible area (performance)
+
+
 (function(_context) {
     "use strict";
 
@@ -61,12 +66,6 @@
 		redraw();
 	    };
 
-	    /* var colors = [
-		'rgb(0,192,192)',
-		'rgb(192,0,192)',
-		'rgb(192,192,0)'
-	    ]; */
-
 	    // +---------------------------------------------------------------------------------
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
@@ -74,7 +73,7 @@
 		animate               : true,
 		phaseX                : 0.0,
 		scaleY                : 25.0,
-		stepSizeX             : 2.0,
+		stepSizeX             : 0.5,
 		lineWidth             : 2.0
 	    }, GUP );
 
@@ -87,51 +86,56 @@
 	    var _x = function(x) { return pb.draw.offset.x + x * pb.draw.scale.x; };
 	    var _y = function(y) { return pb.draw.offset.y + y * pb.draw.scale.y; };
 
-	    var modal = new Modal();
+	    // var modal = new Modal();
 
-	    // +---------------------------------------------------------------------------------
-	    // | ...
-	    // +-------------------------------
-	    /* var showModal = function() {
-		function saveFile( data, filename ) {
-		    // saveAs( new Blob( [ data ], { type: 'application/sla' } ), filename );
-		    console.log('xxx');
-		}
-		modal.setTitle( "Export STL" );
-		modal.setFooter( "" );
-		modal.setActions( [ { label : 'Cancel', action : function() { modal.close(); console.log('canceled'); } } ] );
-		modal.setBody( "Loading ..." ); 
-		modal.open(); 
-		// modal.setActions( [ Modal.ACTION_CLOSE ] );
-	    }; */
-
+	    // Array of { color : string, inputElement : HTMLInputElement, parsedFunction : matjhs.function }
 	    var functionCache = [];
 
+	    // +---------------------------------------------------------------------------------
+	    // | Add a new function to the input panel.
+	    // +-------------------------------
 	    var addFunction = function( expression ) {
 		var input = document.createElement('input');
+		var index = functionCache.length;
+		var color = randColor(index);
+		input.style.borderLeft = "3px solid " + color;
 		input.setAttribute('value', expression );
 		var left = document.getElementById('function-wrapper');
 		left.appendChild( input );
 
 		var parsed = math.parse(expression);
-		functionCache.push( function(x) { return parsed.evaluate({ x : x }) } );
+		functionCache.push( {
+		    parsedFunction : function(x) { return parsed.evaluate({ x : x }) },
+		    color : color,
+		    inputElement : input
+		} );
 		return input;
 	    };
 
+
+	    // +---------------------------------------------------------------------------------
+	    // | Install input listeners to the given input element and function.
+	    // +-------------------------------
 	    var installInputListeners = function( index, inputElement ) {
 		// Add input function
-		// var index = functionCache.length;
-		// var input = addFunction('x');
-		inputElement.addEventListener('change', function(e) {
-		    console.log('new term', e.target.value );
-		    var parsed = math.parse(e.target.value);
-		    console.log( 'parsed', parsed );
-		    if( !parsed ) {
-			console.log("ERROR");
-			return;
+		inputElement.addEventListener('change', function(event) {
+		    var term = event.target.value;
+		    console.log('new term', term  );
+		    try {
+			var parsed = math.parse(term);
+			console.log( 'parsed', parsed );
+			if( !parsed ) {
+			    if( humane )
+				humane.log('Parse Error: ' + term );
+			    return;
+			}
+			functionCache[index].parsedFunction = function(x) { return parsed.evaluate({ x : x }) };
+			pb.redraw();
+		    } catch( err ) {
+			console.log( err.message );
+			if( humane )
+			    humane.log('Parse Error: "' + term + '". ' + err.message  );
 		    }
-		    functionCache[index] = function(x) { return parsed.evaluate({ x : x }) };
-		    pb.redraw();
 		} );
 		inputElement.addEventListener('keyup', function(e) {
 		    console.log('new term', e.target.value );
@@ -141,40 +145,49 @@
 
 	    installInputListeners( 0, addFunction('sin(x*10)') );
 	    installInputListeners( 1, addFunction('sin(x*20)*2') );
-	    installInputListeners( 2, addFunction('sin(x*2)' ));
+	    installInputListeners( 2, addFunction('sin(x)' ));
 	    installInputListeners( 3, addFunction('x') );
 	    
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | This is the part where the magic happens
 	    // +-------------------------------
-	    var inputRangeX = [0, Math.PI*2];
+	    var inputRangeX = new Interval(0, Math.PI*2); 
 	    var redraw = function() {
 
 		var viewport = pb.viewport();
-		var outputRangeX = [ _x( -pb.canvasSize.width/2 ), _x(  pb.canvasSize.width/2 ) ];
+		var drawRangeX = new Interval( _x( -pb.canvasSize.width/2 ), _x( pb.canvasSize.width/2 ) );
+		var tmpInput = new Interval( Math.max( viewport.min.x, inputRangeX.min ),
+					     Math.min( viewport.max.x, inputRangeX.max) );
+		
+		console.log( "input", tmpInput, "drawRangeX", drawRangeX );
 
 		for( var i = 0; i < functionCache.length; i++ ) {
-		    var coords = calcFunction( functionCache[i], inputRangeX, outputRangeX, randColor(i) );
+		    var coords = evalFunction( functionCache[i].parsedFunction,
+					       tmpInput,
+					       drawRangeX,
+					       functionCache[i].color
+					     );
 		}
-
-		var dist = 0.2;
+		// var dist = 0.2;
 	    };
 
-	    var calcFunction = function( fn, inputRangeX, outputRangeX, color ) {
-		var x = outputRangeX[0];
+	    var evalFunction = function( fn, inputRangeX, outputRangeX, color ) {
+		var x = inputRangeX.min; 
 		var svgData = [];
 		var coords = [];
 
+		var zoomedStepSize = (config.stepSizeX / inputRangeX.length()) / pb.draw.scale.x;
 		var i = 0;
-		while( x < outputRangeX[1] ) {
-		    var xPct = (x-outputRangeX[0]) / (outputRangeX[1]-outputRangeX[0]);
-		    var xVal = config.phaseX + xPct * (inputRangeX[1]-inputRangeX[0]);
+		while( x < inputRangeX.max ) {
+		    var xPct = (x-inputRangeX.min) / inputRangeX.length();
+		    var xVal = config.phaseX + x; 
 		    var yVal = -fn( xVal ) * config.scaleY;
-		    svgData.push( i==0 ? 'M' : 'L', x, _y(yVal) );
-		    coords.push( { x : x, y : _y(yVal) } );
+		    var xCoord = outputRangeX.min + xPct * outputRangeX.length();
+		    svgData.push( i==0 ? 'M' : 'L', xCoord, _y(yVal) );
+		    coords.push( { x : xCoord, y : _y(yVal) } );
 		    
-		    x += config.stepSizeX;
+		    x += zoomedStepSize;
 		    i++;
 		}
 		
@@ -230,7 +243,7 @@
 		var gui = pb.createGUI();
 		var f0 = gui.addFolder('Points');
 
-		f0.add(config, 'stepSizeX').min(0.25).max(12).step(0.25).title('Value step size on the x axis.').onChange( function() { pb.redraw(); } );
+		f0.add(config, 'stepSizeX').min(0.05).max(5.0).step(0.05).title('Value step size on the x axis.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'scaleY').min(0.25).max(200.0).step(0.25).title('Vertical scale.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'lineWidth').min(1).max(20).title('The line with to use.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'animate').title('Toggle phase animation on/off.').onChange( startAnimation );

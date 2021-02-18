@@ -3,6 +3,7 @@
   <head>
     <title>2D Plotting Boilerplate - Plotting function graphs</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
     <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, function, graph, plot">
     <meta name="author" content="Ikaros Kappler">
@@ -74,6 +75,7 @@
     <script src="../../src/js/utils/WebColorsContrast.js"></script>
     <script src="../getContrastColor.js"></script>
     <script src="../modal.js"></script>
+    <script src="Interval.js"></script>
     <script src="index.js"></script>
     
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script> -->
@@ -82,6 +84,13 @@
     <link rel="stylesheet" href="../../style.css">
     <link rel="stylesheet" href="../modal.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+      #function-wrapper input {
+      border : 0;
+      border-top : 1px solid lightgrey;
+      line-height: 1.6em;
+      }
+    </style>
   </head>
   <body>
     <div class="left" id="function-wrapper">
