@@ -72,7 +72,7 @@
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
 		animate               : true,
 		phaseX                : 0.0,
-		scaleY                : 25.0,
+		scaleY                : 0.25, // 25.0,
 		stepSizeX             : 0.05,
 		lineWidth             : 2.0,
 		fitToRange            : function() { setView( viewRangeX, viewRangeY ); }
@@ -145,7 +145,7 @@
 	    };
 
 	    installInputListeners( 0, addFunction('sin(x*10)') );
-	    installInputListeners( 1, addFunction('sin(x*20)*2') );
+	    installInputListeners( 1, addFunction('sin(x*20)*x') );
 	    installInputListeners( 2, addFunction('sin(x)' ));
 	    installInputListeners( 3, addFunction('x') );
 	    
@@ -181,7 +181,45 @@
 		rulerV.draw( pb.draw, 'white' );
 		rulerH.draw( pb.draw, 'green' );
 
-		return; 
+		functionDraw();
+	    };
+
+	    var functionDraw = function() {
+		var viewport = pb.viewport();
+		/* var drawRangeX = new Interval( _x( 0 ), // -pb.canvasSize.width/2 ),
+					       _x( pb.canvasSize.width ) //  pb.canvasSize.width/2 )
+					       ); */
+		// Crop the input range left and right (do not draw stuff outside the viewport)
+		var croppedInputRangeX = new Interval( Math.max(inputRangeX.min, viewport.min.x),
+						       Math.min(inputRangeX.max, viewport.max.x)
+						    );
+		for( var i = 0; i < functionCache.length; i++ ) {
+		    evalFunction( functionCache[i].parsedFunction,
+				  croppedInputRangeX, // inputRangeX,
+				  // drawRangeX,
+				  functionCache[i].color
+				);
+		}
+	    };
+
+	    var evalFunction = function( fn, inputRangeX, /*outputRangeX,*/ color ) {
+		var stepCount = 512;
+		var svgData = [];
+
+		for( var i = 0; i <= stepCount; i++ ) {
+		    var tX = i/stepCount;
+		    var xVal = inputRangeX.valueAt( tX );
+		    var yVal = -fn( xVal ) * config.scaleY;
+
+		    svgData.push( i==0 ? 'M' : 'L', _x(xVal), _y(yVal) );  
+		}
+
+		pb.draw.ctx.strokeStyle = color;
+		pb.draw.ctx.lineWidth = config.lineWidth;
+		pb.draw.ctx.stroke( new Path2D(svgData.join(" ")) );
+	    }
+
+	    var oldFunctionDraw = function() {
 		
 		var viewport = pb.viewport();
 		/* var drawRangeX = new Interval( _x( 0 ), // -pb.canvasSize.width/2 ),
@@ -205,7 +243,7 @@
 		// var dist = 0.2;
 	    };
 
-	    var evalFunction = function( fn, inputRangeX, outputRangeX, color ) {
+	    var old_evalFunction = function( fn, inputRangeX, outputRangeX, color ) {
 		var x = inputRangeX.min;
 		console.log('inputRangeX.min', inputRangeX.min);
 		var svgData = [];
@@ -278,7 +316,7 @@
 		var f0 = gui.addFolder('Points');
 
 		f0.add(config, 'stepSizeX').min(0.05).max(5.0).step(0.05).title('Value step size on the x axis.').onChange( function() { pb.redraw(); } );
-		f0.add(config, 'scaleY').min(0.25).max(200.0).step(0.25).title('Vertical scale.').onChange( function() { pb.redraw(); } );
+		f0.add(config, 'scaleY').min(0.25).max(2.0).step(0.05).title('Vertical scale.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'lineWidth').min(1).max(20).title('The line with to use.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'animate').title('Toggle phase animation on/off.').onChange( startAnimation );
 		f0.add(config, 'fitToRange').title('Reset view to best range fit.');

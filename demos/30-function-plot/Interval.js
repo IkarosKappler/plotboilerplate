@@ -7,4 +7,5 @@ var Interval = function( min, max ) {
     this.min = min;
     this.max = max;
     this.length = function() { return this.max-this.min; };
+    this.valueAt = function( t ) { return this.min + this.length()*t; };
 };

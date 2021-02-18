@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2021-02-18
+  * Adding `PlotBoilerplate.adjustOffset(boolean)` function.
 * 2021-02-08
   * Added a rollup- and a typescript config to create es2015 modules (in ./src/es2015).
   * Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
