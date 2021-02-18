@@ -69,7 +69,8 @@
  * @modified 2021-01-26 Fixed SVG resizing.
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
- * @version  1.12.3
+ * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
+ * @version  1.13.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -1206,8 +1207,9 @@ var PlotBoilerplate = /** @class */ (function () {
                 console.error('Error: cannot resize canvas element because it seems neither be a HTMLCanvasElement nor an SVGElement.');
             }
             if (_self.config.autoAdjustOffset) {
-                _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = w * (_self.config.offsetAdjustXPercent / 100);
-                _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = h * (_self.config.offsetAdjustYPercent / 100);
+                // _self.draw.offset.x = _self.fill.offset.x = _self.config.offsetX = w*(_self.config.offsetAdjustXPercent/100); 
+                // _self.draw.offset.y = _self.fill.offset.y = _self.config.offsetY = h*(_self.config.offsetAdjustYPercent/100);
+                _self.adjustOffset(false);
             }
         };
         if (_self.config.fullSize && !_self.config.fitToParent) {
@@ -1521,6 +1523,21 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         e.preventDefault();
         _self.redraw();
+    };
+    ;
+    /**
+     * Re-adjust the configured offset depending on the current canvas size and zoom (scaleX and scaleY).
+     *
+     * @method adjustOffset
+     * @param {boolean=false} redraw - [optional] If set the canvas will redraw with the new offset (default=false).
+     * @return {void}
+     **/
+    PlotBoilerplate.prototype.adjustOffset = function (redraw) {
+        this.draw.offset.x = this.fill.offset.x = this.config.offsetX = this.canvasSize.width * (this.config.offsetAdjustXPercent / 100);
+        this.draw.offset.y = this.fill.offset.y = this.config.offsetY = this.canvasSize.height * (this.config.offsetAdjustYPercent / 100);
+        if (redraw) {
+            this.redraw();
+        }
     };
     ;
     /**
@@ -1940,6 +1957,8 @@ var PlotBoilerplate = /** @class */ (function () {
         }
     }; // END utils
     return PlotBoilerplate;
-}()); // END class PlotBoilerplate
+}());
 exports.PlotBoilerplate = PlotBoilerplate;
+; // END class PlotBoilerplate
+exports.default = PlotBoilerplate;
 //# sourceMappingURL=PlotBoilerplate.js.map

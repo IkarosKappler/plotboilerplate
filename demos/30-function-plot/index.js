@@ -51,7 +51,7 @@
 		      drawBezierHandlePoints : true,
 		      cssUniformScale        : true,
 		      autoAdjustOffset       : true,
-		      offsetAdjustXPercent   : 50,
+		      offsetAdjustXPercent   : 2, // 2%
 		      offsetAdjustYPercent   : 50,
 		      backgroundColor        : '#ffffff',
 		      enableMouse            : true,
@@ -73,8 +73,9 @@
 		animate               : true,
 		phaseX                : 0.0,
 		scaleY                : 25.0,
-		stepSizeX             : 0.5,
-		lineWidth             : 2.0
+		stepSizeX             : 0.05,
+		lineWidth             : 2.0,
+		fitToRange            : function() { setView( viewRangeX, viewRangeY ); }
 	    }, GUP );
 
 	    var time = 0;
@@ -148,15 +149,47 @@
 	    installInputListeners( 2, addFunction('sin(x)' ));
 	    installInputListeners( 3, addFunction('x') );
 	    
+
+	    var inputRangeX = new Interval(0, Math.PI*2);
+	    var inputRangeY = new Interval(-1, 1);
+	    
+	    var viewRangeX = new Interval( inputRangeX.min -0.1, inputRangeX.max +0.1);
+	    var viewRangeY = new Interval( inputRangeY.min -0.1, inputRangeY.max +0.1);
+    
+	    var rulerV     = new Ruler( inputRangeX.min,
+					inputRangeY.min, inputRangeY.max,
+					0.0, 0.25, "vertical", 20 );
+	    var rulerH     = new Ruler( inputRangeY.min + inputRangeY.length()/2, // middle of interval?
+					inputRangeX.min, inputRangeX.max,
+					0.0, 0.25, "horizontal", 20 );
+	    
+	    // var mapX
+	    var setView = function( rangeX, rangeY ) {
+		pb.config.scaleX = pb.draw.scale.x = pb.fill.scale.x = pb.canvasSize.width / rangeX.length();
+		pb.config.scaleY = pb.draw.scale.y = pb.fill.scale.y = pb.canvasSize.height / rangeY.length();
+		console.log( "setView", pb.config.scaleX, pb.config.scaleY );
+		pb.adjustOffset( true ); // redraw=true
+		// pb.redraw();
+	    };
 	    
 	    // +---------------------------------------------------------------------------------
 	    // | This is the part where the magic happens
 	    // +-------------------------------
-	    var inputRangeX = new Interval(0, Math.PI*2); 
+	     
 	    var redraw = function() {
+		// Draw rulers
+		rulerV.draw( pb.draw, 'white' );
+		rulerH.draw( pb.draw, 'green' );
 
+		return; 
+		
 		var viewport = pb.viewport();
-		var drawRangeX = new Interval( _x( -pb.canvasSize.width/2 ), _x( pb.canvasSize.width/2 ) );
+		/* var drawRangeX = new Interval( _x( 0 ), // -pb.canvasSize.width/2 ),
+					       _x( pb.canvasSize.width ) //  pb.canvasSize.width/2 )
+					     ); */
+		var drawRangeX = new Interval( _x( 0 ), // -pb.canvasSize.width/2 ),
+					       _x( pb.canvasSize.width ) //  pb.canvasSize.width/2 )
+					     );
 		var tmpInput = new Interval( Math.max( viewport.min.x, inputRangeX.min ),
 					     Math.min( viewport.max.x, inputRangeX.max) );
 		
@@ -173,7 +206,8 @@
 	    };
 
 	    var evalFunction = function( fn, inputRangeX, outputRangeX, color ) {
-		var x = inputRangeX.min; 
+		var x = inputRangeX.min;
+		console.log('inputRangeX.min', inputRangeX.min);
 		var svgData = [];
 		var coords = [];
 
@@ -247,6 +281,7 @@
 		f0.add(config, 'scaleY').min(0.25).max(200.0).step(0.25).title('Vertical scale.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'lineWidth').min(1).max(20).title('The line with to use.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'animate').title('Toggle phase animation on/off.').onChange( startAnimation );
+		f0.add(config, 'fitToRange').title('Reset view to best range fit.');
 		
 		f0.open();
 
@@ -262,6 +297,7 @@
 	    if( config.animate ) {
 		startAnimation();
 	    } else {
+		setView( viewRangeX, viewRangeY );
 		pb.redraw();
 	    }
 	    

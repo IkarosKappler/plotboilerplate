@@ -68,7 +68,8 @@
  * @modified 2021-01-26 Fixed SVG resizing.
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
- * @version  1.12.3
+ * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
+ * @version  1.13.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -719,6 +720,14 @@ export declare class PlotBoilerplate {
      * @return {void}
      **/
     private mouseWheelHandler;
+    /**
+     * Re-adjust the configured offset depending on the current canvas size and zoom (scaleX and scaleY).
+     *
+     * @method adjustOffset
+     * @param {boolean=false} redraw - [optional] If set the canvas will redraw with the new offset (default=false).
+     * @return {void}
+     **/
+    adjustOffset(redraw?: boolean): void;
     /**
      * Set the new draw offset.
      *
