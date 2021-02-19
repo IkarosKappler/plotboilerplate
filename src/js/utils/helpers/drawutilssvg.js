@@ -854,7 +854,6 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
         // Clear the current ID again
         this.curId = undefined;
-        // return node;
     };
     ;
     /**
@@ -878,6 +877,181 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.createSvg = function () {
         return document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    };
+    ;
+    drawutilssvg.transformPathData = function (data, offset, scale) {
+        // Scale and translate {x,y}
+        var _stx = function (index) { data[index] = offset.x + scale.x * Number(data[index]); };
+        var _sty = function (index) { data[index] = offset.y + scale.y * Number(data[index]); };
+        // translate {x,y}
+        // const _tx = (index:number) : void => { data[index] = offset.x + Number(data[index]); }
+        // const _ty = (index:number) : void => { data[index] = offset.y + Number(data[index]); }
+        // scale only {x,y}
+        var _sx = function (index) { data[index] = scale.x * Number(data[index]); };
+        var _sy = function (index) { data[index] = scale.y * Number(data[index]); };
+        var i = 0;
+        while (i < data.length) {
+            var cmd = data[i];
+            switch (cmd) {
+                case 'M':
+                // MoveTo: M|m x y
+                case 'L':
+                // LineTo L|l x y
+                case 'T':
+                    // Shorthand/smooth quadratic Bézier curveto: T|t x y
+                    _stx(i + 1);
+                    _sty(i + 2);
+                    i += 3;
+                    break;
+                case 'm':
+                // MoveTo: M|m x y
+                case 'l':
+                // LineTo L|l x y
+                case 't':
+                    // Shorthand/smooth quadratic Bézier curveto: T|t x y
+                    _sx(i + 1);
+                    _sy(i + 2);
+                    i += 3;
+                    break;
+                case 'H':
+                    // HorizontalLineTo: H|h x
+                    _stx(i + 1);
+                    i += 2;
+                    break;
+                case 'h':
+                    // HorizontalLineTo: H|h x
+                    _sx(i + 1);
+                    i += 2;
+                    break;
+                case 'V':
+                    // VerticalLineTo: V|v y
+                    _sty(i + 1);
+                    i += 2;
+                    break;
+                case 'v':
+                    // VerticalLineTo: V|v y
+                    _sy(i + 1);
+                    i += 2;
+                    break;
+                case 'C':
+                    // CurveTo: C|c x1 y1 x2 y2 x y
+                    _stx(i + 1);
+                    _sty(i + 2);
+                    _stx(i + 3);
+                    _sty(i + 4);
+                    _stx(i + 5);
+                    _sty(i + 6);
+                    i += 7;
+                    break;
+                case 'c':
+                    // CurveTo: C|c x1 y1 x2 y2 x y
+                    _sx(i + 1);
+                    _sy(i + 2);
+                    _sx(i + 3);
+                    _sy(i + 4);
+                    _sx(i + 5);
+                    _sy(i + 6);
+                    i += 7;
+                    break;
+                case 'S':
+                case 'Q':
+                    // Shorthand-/SmoothCurveTo: S|s x2 y2 x y
+                    // QuadraticCurveTo: Q|q x1 y1 x y
+                    _stx(i + 1);
+                    _sty(i + 2);
+                    _stx(i + 3);
+                    _sty(i + 4);
+                    i += 5;
+                    break;
+                case 's':
+                case 'q':
+                    // Shorthand-/SmoothCurveTo: S|s x2 y2 x y
+                    // QuadraticCurveTo: Q|q x1 y1 x y
+                    _sx(i + 1);
+                    _sy(i + 2);
+                    _sx(i + 3);
+                    _sy(i + 4);
+                    i += 5;
+                    break;
+                case 'A':
+                    // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
+                    _sx(i + 1);
+                    _sy(i + 2);
+                    _stx(i + 6);
+                    _sty(i + 7);
+                    i += 8;
+                    break;
+                case 'a':
+                    // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
+                    _sx(i + 1);
+                    _sy(i + 2);
+                    _sx(i + 6);
+                    _sy(i + 7);
+                    i += 8;
+                    break;
+                case 'z':
+                case 'Z':
+                    // ClosePath: Z|z (no arguments)
+                    i++;
+                    break;
+                // Safepoint: continue reading token by token until something is recognized again
+                default: i++;
+            }
+            /*
+            var lastPos = [ 0, 0 ]; var pointOne, pointTwo;
+            commandList.forEach(function(command) {
+            if ((command.marker === 'z') || (command.marker === 'Z')) {
+                lastPos = [ 0, 0 ];
+                ctx.closePath();
+            } else if (command.marker === 'm') {
+                lastPos = [ lastPos[0] + command.values[0], lastPos[1] + command.values[1] ];
+                ctx.moveTo(lastPos[0], lastPos[1]);
+            } else if (command.marker === 'l') {
+                lastPos = [ lastPos[0] + command.values[0], lastPos[1] + command.values[1] ];
+                ctx.lineTo(lastPos[0], lastPos[1]);
+            } else if (command.marker === 'h') {
+                lastPos = [ lastPos[0] + command.values[0], lastPos[1] ];
+                ctx.lineTo(lastPos[0], lastPos[1]);
+            } else if (command.marker === 'v') {
+                lastPos = [ lastPos[0], lastPos[1] + command.values[0] ];
+                ctx.lineTo(lastPos[0], lastPos[1]);
+            } else if (command.marker === 'c') {
+                pointOne = [ lastPos[0] + command.values[0],
+                     lastPos[1] + command.values[1] ];
+                pointTwo = [ lastPos[0] + command.values[2],
+                     lastPos[1] + command.values[3] ];
+                lastPos  = [ lastPos[0] + command.values[4],
+                     lastPos[1] + command.values[5] ];
+                ctx.bezierCurveTo(
+                pointOne[0], pointOne[1],
+                pointTwo[0], pointTwo[1],
+                lastPos[0], lastPos[1]);
+            } else if (command.marker === 'M') {
+                lastPos = [ command.values[0], command.values[1] ];
+                ctx.moveTo(lastPos[0], lastPos[1]);
+            } else if (command.marker === 'L') {
+                lastPos = [ command.values[0], lastPos[1] ];
+                ctx.lineTo(lastPos[0], lastPos[1]);
+            } else if (command.marker === 'H') {
+                lastPos = [ command.values[0], lastPos[1] ];
+                ctx.lineTo(lastPos[0], lastPos[1]);
+            } else if (command.marker === 'V') {
+                lastPos = [ lastPos[0], command.values[0] ];
+                ctx.lineTo(lastPos[0], lastPos[1]);
+            } else if (command.marker === 'C') {
+                pointOne = [ command.values[0],
+                     command.values[1] ];
+                pointTwo = [ command.values[2],
+                     command.values[3] ];
+                lastPos  = [ command.values[4],
+                     command.values[5] ];
+                ctx.bezierCurveTo(
+                pointOne[0], pointOne[1],
+                pointTwo[0], pointTwo[1],
+                lastPos[0], lastPos[1]);
+            }
+            */
+        } // END while
     };
     ;
     drawutilssvg.HEAD_XML = [

@@ -82,7 +82,6 @@ Grid.utils = {
         }
         else {
             gf = Math.abs(Math.floor(Grid.utils.baseLog(1 / adjustFactor, 1 / (scale + 1))));
-            //gf = Math.pow( adjustFactor, gf );
         }
         return gf;
     }

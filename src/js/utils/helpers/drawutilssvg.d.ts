@@ -13,7 +13,7 @@
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
-import { DrawConfig, DrawLib, XYCoords, XYDimension, UID } from "../../interfaces";
+import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID } from "../../interfaces";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -550,4 +550,5 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @return SVGElement
      */
     static createSvg(): SVGElement;
+    static transformPathData(data: SVGPathParams, offset: XYCoords, scale: XYCoords): void;
 }

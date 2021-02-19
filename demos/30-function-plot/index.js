@@ -18,6 +18,7 @@
 // TODOs:
 //  * colors for function inputs
 //  * crop renderer to visible area (performance)
+//  * fix grid for extreme large zoom levels
 
 
 (function(_context) {
@@ -30,6 +31,7 @@
 	'load',
 	function() {
 	    // All config params are optional.
+	    // console.log( 'init. canvas: ', document.getElementById('my-canvas') );
 	    var pb = new PlotBoilerplate(
 		PlotBoilerplate.utils.safeMergeByKeys(
 		    { canvas                 : document.getElementById('my-canvas'),
@@ -178,10 +180,11 @@
 	     
 	    var redraw = function() {
 		// Draw rulers
-		rulerV.draw( pb.draw, 'white' );
-		rulerH.draw( pb.draw, 'green' );
+		// rulerV.draw( pb.draw, 'white' );
+		// rulerH.draw( pb.draw, 'green' );
 
-		functionDraw();
+		// functionDraw();
+		drawScalingTestPath();
 	    };
 
 	    var functionDraw = function() {
@@ -211,20 +214,68 @@
 		    var xVal = inputRangeX.valueAt( tX );
 		    var yVal = -fn( xVal ) * config.scaleY;
 
-		    svgData.push( i==0 ? 'M' : 'L', _x(xVal), _y(yVal) );  
+		    // svgData.push( i==0 ? 'M' : 'L', _x(xVal), _y(yVal) );
+		    svgData.push( i==0 ? 'M' : 'L', xVal, yVal ); 
 		}
 
+		drawutilssvg.transformPathData( svgData, pb.draw.offset, pb.draw.scale );
+		
 		pb.draw.ctx.strokeStyle = color;
 		pb.draw.ctx.lineWidth = config.lineWidth;
 		pb.draw.ctx.stroke( new Path2D(svgData.join(" ")) );
-	    }
+	    };
 
+	    var drawScalingTestPath = function() {
+		// Define a shape with SVG path data attributes only with _absolute_
+		// path commands.
+		var svgDataAbsolute = [
+		    'M', -10, -7.5,
+		    'V', -10, 
+		    'L', 0, -10,
+		    'C', -5, -15, 10, -15, 5, -10,
+		    'H', 10,
+		    'C', 5, -7.5, 5, -7.5, 10, -5,
+		    'S', 15, 0, 10, 0,
+		    'Q', 5, 5, 0, 0,
+		    'T', -10, 0,
+		    'A', 5, 4, 0, 1, 1, -10, -5,    
+		    'Z'
+		];
+		// Print and draw on the canvas.
+		console.log('svgTestData', svgDataAbsolute );	
+		drawutilssvg.transformPathData( svgDataAbsolute, pb.draw.offset, pb.draw.scale );
+		pb.draw.ctx.strokeStyle = 'rgb(255,0,0)';
+		pb.draw.ctx.lineWidth = 2;
+		pb.draw.ctx.stroke( new Path2D(svgDataAbsolute.join(" ")) );
+
+		// Now define the same shape. But only y with _relative_
+		// path commands.
+		var svgDataRelative = [
+		    'M', -10, -7.5,
+		    'v', -2.5, 
+		    'l', 10, 0,
+		    'c', -5, -5, 10, -5, 5, 0,
+		    'h', 5,
+		    'c', -5, 2.5, -5, 2.5, 0, 5,
+		    's', 5, 5, 0, 5,
+		    'q', -5, 5, -10, 0,
+		    't', -10, 0,
+		    'a', 5, 4, 0, 1, 1, 0, -5,    
+		    'z'
+		];
+		// Print and draw on the canvas (and move 25 units to see them better)
+		console.log('svgTestDataRelative', svgDataRelative );
+		drawutilssvg.transformPathData( svgDataRelative, {x:25,y:0}, {x:1,y:1} );
+		drawutilssvg.transformPathData( svgDataRelative, pb.draw.offset, pb.draw.scale );
+		pb.draw.ctx.strokeStyle = 'rgb(0,255,0)';
+		pb.draw.ctx.lineWidth = 2;
+		pb.draw.ctx.stroke( new Path2D(svgDataRelative.join(" ")) );
+	    };
+
+	    /* 
 	    var oldFunctionDraw = function() {
 		
 		var viewport = pb.viewport();
-		/* var drawRangeX = new Interval( _x( 0 ), // -pb.canvasSize.width/2 ),
-					       _x( pb.canvasSize.width ) //  pb.canvasSize.width/2 )
-					     ); */
 		var drawRangeX = new Interval( _x( 0 ), // -pb.canvasSize.width/2 ),
 					       _x( pb.canvasSize.width ) //  pb.canvasSize.width/2 )
 					     );
@@ -241,8 +292,9 @@
 					     );
 		}
 		// var dist = 0.2;
-	    };
+	    }; */
 
+	    /*
 	    var old_evalFunction = function( fn, inputRangeX, outputRangeX, color ) {
 		var x = inputRangeX.min;
 		console.log('inputRangeX.min', inputRangeX.min);
@@ -262,13 +314,14 @@
 		    x += zoomedStepSize;
 		    i++;
 		}
-		
+	
 		pb.draw.ctx.strokeStyle = color;
 		pb.draw.ctx.lineWidth = config.lineWidth;
 		pb.draw.ctx.stroke( new Path2D(svgData.join(" ")) );
 
 		return coords;
-	    };
+	    }; 
+	    */
 
 	
 	    var renderLoop = function(_time) {

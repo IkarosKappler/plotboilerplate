@@ -193,8 +193,9 @@ var PlotBoilerplate = /** @class */ (function () {
             draggable: true,
             visible: true
         };
-        if (typeof config.canvas == 'undefined')
+        if (typeof config.canvas == 'undefined') {
             throw "No canvas specified.";
+        }
         /**
          * A global config that's attached to the dat.gui control interface.
          *
@@ -1341,9 +1342,6 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {XYCoords} A simple object <pre>{ x : Number, y : Number }</pre> with the transformed coordinates.
      **/
     PlotBoilerplate.prototype.transformMousePosition = function (x, y) {
-        /* return { x : (x/this.config.cssScaleX-this.config.offsetX)/(this.config.scaleX),
-           y : (y/this.config.cssScaleY-this.config.offsetY)/(this.config.scaleY) }; */
-        // console.log('offset', this.config.offsetX, this.config.offsetY, this.draw.offset );
         return { x: (x / this.config.cssScaleX - this.config.offsetX) / (this.config.scaleX),
             y: (y / this.config.cssScaleY - this.config.offsetY) / (this.config.scaleY) };
     };

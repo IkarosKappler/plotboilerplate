@@ -357,8 +357,9 @@ export class PlotBoilerplate {
 			     visible : true
 			   };
 	
-	if( typeof config.canvas == 'undefined' )
+	if( typeof config.canvas == 'undefined' ) {
 	    throw "No canvas specified.";
+	}
 	
 	/** 
 	 * A global config that's attached to the dat.gui control interface.
@@ -1898,9 +1899,9 @@ export class PlotBoilerplate {
 			    _self.redraw();
 			}
 		    });
-		} catch( e ) {
-		    console.error("Failed to initialize AlloyFinger!");
-		    console.error(e);
+		 } catch( e ) {
+		     console.error("Failed to initialize AlloyFinger!");
+		     console.error(e);
 		};
 
 	    } else if( globalThis["Touchy"] && typeof globalThis["Touchy"] == "function" ) {
