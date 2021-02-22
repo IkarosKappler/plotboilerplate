@@ -93,13 +93,30 @@
       line-height: 1.6em;
       }
       #addFnBtn {
-      
+      width : 2em;
+      height : 2em;
+      border-radius : 1em;
+      align-self: flex-end;
+      }
+      .container {
+      width : 100%;
+      display: flex;
+      flex-direction: row;
+      }
+      .container input {
+      width : calc( 100% - 1em );
+      max-width : calc( 100% - 1em );
+      }
+      .container button {
+      width : 1em; 
+      max-width :  1em;
+      padding : 0;
       }
     </style>
   </head>
   <body>
     <div class="left" id="function-wrapper">
-      <button id="addFnBtn">Add new</button>
+      <button id="addFnBtn">+</button>
     </div>
     <div class="right">
       <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>

@@ -86,41 +86,73 @@
 	    var randColor = function( i ) {
 		return WebColorsContrast[ i % WebColorsContrast.length ].cssRGB();
 	    };
-	    
-	    // var _x = function(x) { return pb.draw.offset.x + x * pb.draw.scale.x; };
-	    // var _y = function(y) { return pb.draw.offset.y + y * pb.draw.scale.y; };
 
-	    // Array of { color : string, inputElement : HTMLInputElement, parsedFunction : matjhs.function }
+	    document.getElementById('addFnBtn').addEventListener( 'click', function() {
+		installInputListeners( addFunction('cos(x)') );
+		pb.redraw();
+	    } );
+
+	    // Array of { id : number, color : string, inputElement : HTMLInputElement, parsedFunction : matjhs.function }
 	    var functionCache = [];
+
+	    var locateFnById = function( id ) {
+		for( var i = 0; i < functionCache.length; i++ ) {
+		    if( functionCache[i].id == id )
+			return i;
+		}
+		return -1;
+	    };
 
 	    // +---------------------------------------------------------------------------------
 	    // | Add a new function to the input panel.
 	    // +-------------------------------
 	    var addFunction = function( expression ) {
 		var input = document.createElement('input');
-		var index = functionCache.length;
-		var color = randColor(index);
+		var id = functionCache.length;
+		var color = randColor(id);
 		input.style.borderLeft = "3px solid " + color;
 		input.setAttribute('value', expression );
 		var left = document.getElementById('function-wrapper');
-		left.appendChild( input );
+		// left.appendChild( input );
+
+		var container = document.createElement('div');
+		container.setAttribute('class','container');
+		container.setAttribute('id','container-'+id);
+		var button = document.createElement('button');
+		button.innerHTML = "-";
+		button.addEventListener( 'click', function() { removeFunction(id); } );
+		container.appendChild( input );
+		container.appendChild( button );
+		left.insertBefore( container, // input,
+				   document.getElementById('addFnBtn') );
+		
 
 		var parsed = math.parse(expression);
-		functionCache.push( {
+		var fnElement = {
+		    id : id,
 		    parsedFunction : function(x) { return parsed.evaluate({ x : x }) },
 		    color : color,
 		    inputElement : input
-		} );
-		return input;
+		};
+		functionCache.push( fnElement );
+		return fnElement; // input;
 	    };
 
+	    var removeFunction = function( id ) {
+		var index = locateFnById(id);
+		functionCache.splice(index,1);
+		var element = document.getElementById('container-'+id);
+		console.log(element);
+		element.remove();
+		pb.redraw();
+	    };
 
 	    // +---------------------------------------------------------------------------------
 	    // | Install input listeners to the given input element and function.
 	    // +-------------------------------
-	    var installInputListeners = function( index, inputElement ) {
+	    var installInputListeners = function( fnElement ) {
 		// Add input function
-		inputElement.addEventListener('change', function(event) {
+		fnElement.inputElement.addEventListener('change', function(event) {
 		    var term = event.target.value;
 		    console.log('new term', term  );
 		    try {
@@ -131,6 +163,7 @@
 				humane.log('Parse Error: ' + term );
 			    return;
 			}
+			var index = locateFnById( fnElement.id );
 			functionCache[index].parsedFunction = function(x) { return parsed.evaluate({ x : x }) };
 			pb.redraw();
 		    } catch( err ) {
@@ -139,16 +172,16 @@
 			    humane.log('Parse Error: "' + term + '". ' + err.message  );
 		    }
 		} );
-		inputElement.addEventListener('keyup', function(e) {
+		fnElement.inputElement.addEventListener('keyup', function(e) {
 		    console.log('new term', e.target.value );
 		    
 		} );
 	    };
 
-	    installInputListeners( 0, addFunction('sin(x*10)') );
-	    installInputListeners( 1, addFunction('sin(x*20)*x') );
-	    installInputListeners( 2, addFunction('sin(x)' ));
-	    installInputListeners( 3, addFunction('x') );
+	    installInputListeners( addFunction('sin(x*10)') );
+	    installInputListeners( addFunction('sin(x*20)*x') );
+	    installInputListeners( addFunction('sin(x)') );
+	    installInputListeners( addFunction('x') );
 	    
 
 	    var inputRangeX = new Interval(0, Math.PI*2);
@@ -187,32 +220,25 @@
 
 	    var functionDraw = function() {
 		var viewport = pb.viewport();
-		/* var drawRangeX = new Interval( _x( 0 ), // -pb.canvasSize.width/2 ),
-					       _x( pb.canvasSize.width ) //  pb.canvasSize.width/2 )
-					       ); */
 		// Crop the input range left and right (do not draw stuff outside the viewport)
 		var croppedInputRangeX = new Interval( Math.max(inputRangeX.min, viewport.min.x),
 						       Math.min(inputRangeX.max, viewport.max.x)
 						    );
 		for( var i = 0; i < functionCache.length; i++ ) { 
 		    evalFunction( functionCache[i].parsedFunction,
-				  croppedInputRangeX, // inputRangeX,
-				  // drawRangeX,
+				  croppedInputRangeX,
 				  functionCache[i].color
 				);
 		}
 	    };
 
-	    var evalFunction = function( fn, inputRangeX, /*outputRangeX,*/ color ) {
-		// var stepCount = 512;
+	    var evalFunction = function( fn, inputRangeX, color ) {
 		var svgData = [];
 
 		for( var i = 0; i <= config.stepCount; i++ ) {
 		    var tX = i/config.stepCount;
 		    var xVal = inputRangeX.valueAt( tX );
 		    var yVal = -fn( xVal ) * config.scaleY;
-
-		    // svgData.push( i==0 ? 'M' : 'L', _x(xVal), _y(yVal) );
 		    svgData.push( i==0 ? 'M' : 'L', xVal, yVal ); 
 		}
 
