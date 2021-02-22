@@ -74,8 +74,9 @@
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
 		animate               : true,
 		phaseX                : 0.0,
-		scaleY                : 0.25, // 25.0,
-		stepSizeX             : 0.05,
+		scaleY                : 0.25,
+		// stepSizeX             : 0.05,
+		stepCount             : 512,
 		lineWidth             : 2.0,
 		fitToRange            : function() { setView( viewRangeX, viewRangeY ); }
 	    }, GUP );
@@ -86,10 +87,8 @@
 		return WebColorsContrast[ i % WebColorsContrast.length ].cssRGB();
 	    };
 	    
-	    var _x = function(x) { return pb.draw.offset.x + x * pb.draw.scale.x; };
-	    var _y = function(y) { return pb.draw.offset.y + y * pb.draw.scale.y; };
-
-	    // var modal = new Modal();
+	    // var _x = function(x) { return pb.draw.offset.x + x * pb.draw.scale.x; };
+	    // var _y = function(y) { return pb.draw.offset.y + y * pb.draw.scale.y; };
 
 	    // Array of { color : string, inputElement : HTMLInputElement, parsedFunction : matjhs.function }
 	    var functionCache = [];
@@ -180,11 +179,10 @@
 	     
 	    var redraw = function() {
 		// Draw rulers
-		// rulerV.draw( pb.draw, 'white' );
-		// rulerH.draw( pb.draw, 'green' );
+		rulerV.draw( pb.draw, 'white' );
+		rulerH.draw( pb.draw, 'green' );
 
-		// functionDraw();
-		drawScalingTestPath();
+		functionDraw();
 	    };
 
 	    var functionDraw = function() {
@@ -196,7 +194,7 @@
 		var croppedInputRangeX = new Interval( Math.max(inputRangeX.min, viewport.min.x),
 						       Math.min(inputRangeX.max, viewport.max.x)
 						    );
-		for( var i = 0; i < functionCache.length; i++ ) {
+		for( var i = 0; i < functionCache.length; i++ ) { 
 		    evalFunction( functionCache[i].parsedFunction,
 				  croppedInputRangeX, // inputRangeX,
 				  // drawRangeX,
@@ -206,11 +204,11 @@
 	    };
 
 	    var evalFunction = function( fn, inputRangeX, /*outputRangeX,*/ color ) {
-		var stepCount = 512;
+		// var stepCount = 512;
 		var svgData = [];
 
-		for( var i = 0; i <= stepCount; i++ ) {
-		    var tX = i/stepCount;
+		for( var i = 0; i <= config.stepCount; i++ ) {
+		    var tX = i/config.stepCount;
 		    var xVal = inputRangeX.valueAt( tX );
 		    var yVal = -fn( xVal ) * config.scaleY;
 
@@ -218,111 +216,8 @@
 		    svgData.push( i==0 ? 'M' : 'L', xVal, yVal ); 
 		}
 
-		drawutilssvg.transformPathData( svgData, pb.draw.offset, pb.draw.scale );
-		
-		pb.draw.ctx.strokeStyle = color;
-		pb.draw.ctx.lineWidth = config.lineWidth;
-		pb.draw.ctx.stroke( new Path2D(svgData.join(" ")) );
+		pb.draw.path( svgData, color, config.lineWidth );
 	    };
-
-	    var drawScalingTestPath = function() {
-		// Define a shape with SVG path data attributes only with _absolute_
-		// path commands.
-		var svgDataAbsolute = [
-		    'M', -10, -7.5,
-		    'V', -10, 
-		    'L', 0, -10,
-		    'C', -5, -15, 10, -15, 5, -10,
-		    'H', 10,
-		    'C', 5, -7.5, 5, -7.5, 10, -5,
-		    'S', 15, 0, 10, 0,
-		    'Q', 5, 5, 0, 0,
-		    'T', -10, 0,
-		    'A', 5, 4, 0, 1, 1, -10, -5,    
-		    'Z'
-		];
-		// Print and draw on the canvas.
-		console.log('svgTestData', svgDataAbsolute );	
-		drawutilssvg.transformPathData( svgDataAbsolute, pb.draw.offset, pb.draw.scale );
-		pb.draw.ctx.strokeStyle = 'rgb(255,0,0)';
-		pb.draw.ctx.lineWidth = 2;
-		pb.draw.ctx.stroke( new Path2D(svgDataAbsolute.join(" ")) );
-
-		// Now define the same shape. But only y with _relative_
-		// path commands.
-		var svgDataRelative = [
-		    'M', -10, -7.5,
-		    'v', -2.5, 
-		    'l', 10, 0,
-		    'c', -5, -5, 10, -5, 5, 0,
-		    'h', 5,
-		    'c', -5, 2.5, -5, 2.5, 0, 5,
-		    's', 5, 5, 0, 5,
-		    'q', -5, 5, -10, 0,
-		    't', -10, 0,
-		    'a', 5, 4, 0, 1, 1, 0, -5,    
-		    'z'
-		];
-		// Print and draw on the canvas (and move 25 units to see them better)
-		console.log('svgTestDataRelative', svgDataRelative );
-		drawutilssvg.transformPathData( svgDataRelative, {x:25,y:0}, {x:1,y:1} );
-		drawutilssvg.transformPathData( svgDataRelative, pb.draw.offset, pb.draw.scale );
-		pb.draw.ctx.strokeStyle = 'rgb(0,255,0)';
-		pb.draw.ctx.lineWidth = 2;
-		pb.draw.ctx.stroke( new Path2D(svgDataRelative.join(" ")) );
-	    };
-
-	    /* 
-	    var oldFunctionDraw = function() {
-		
-		var viewport = pb.viewport();
-		var drawRangeX = new Interval( _x( 0 ), // -pb.canvasSize.width/2 ),
-					       _x( pb.canvasSize.width ) //  pb.canvasSize.width/2 )
-					     );
-		var tmpInput = new Interval( Math.max( viewport.min.x, inputRangeX.min ),
-					     Math.min( viewport.max.x, inputRangeX.max) );
-		
-		console.log( "input", tmpInput, "drawRangeX", drawRangeX );
-
-		for( var i = 0; i < functionCache.length; i++ ) {
-		    var coords = evalFunction( functionCache[i].parsedFunction,
-					       tmpInput,
-					       drawRangeX,
-					       functionCache[i].color
-					     );
-		}
-		// var dist = 0.2;
-	    }; */
-
-	    /*
-	    var old_evalFunction = function( fn, inputRangeX, outputRangeX, color ) {
-		var x = inputRangeX.min;
-		console.log('inputRangeX.min', inputRangeX.min);
-		var svgData = [];
-		var coords = [];
-
-		var zoomedStepSize = (config.stepSizeX / inputRangeX.length()) / pb.draw.scale.x;
-		var i = 0;
-		while( x < inputRangeX.max ) {
-		    var xPct = (x-inputRangeX.min) / inputRangeX.length();
-		    var xVal = config.phaseX + x; 
-		    var yVal = -fn( xVal ) * config.scaleY;
-		    var xCoord = outputRangeX.min + xPct * outputRangeX.length();
-		    svgData.push( i==0 ? 'M' : 'L', xCoord, _y(yVal) );
-		    coords.push( { x : xCoord, y : _y(yVal) } );
-		    
-		    x += zoomedStepSize;
-		    i++;
-		}
-	
-		pb.draw.ctx.strokeStyle = color;
-		pb.draw.ctx.lineWidth = config.lineWidth;
-		pb.draw.ctx.stroke( new Path2D(svgData.join(" ")) );
-
-		return coords;
-	    }; 
-	    */
-
 	
 	    var renderLoop = function(_time) {
 		if( !config.animate ) {
@@ -368,7 +263,7 @@
 		var gui = pb.createGUI();
 		var f0 = gui.addFolder('Points');
 
-		f0.add(config, 'stepSizeX').min(0.05).max(5.0).step(0.05).title('Value step size on the x axis.').onChange( function() { pb.redraw(); } );
+		f0.add(config, 'stepCount').min(1).max(1028).step(10).title('Number of steps on the x axis.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'scaleY').min(0.25).max(2.0).step(0.05).title('Vertical scale.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'lineWidth').min(1).max(20).title('The line with to use.').onChange( function() { pb.redraw(); } );
 		f0.add(config, 'animate').title('Toggle phase animation on/off.').onChange( startAnimation );

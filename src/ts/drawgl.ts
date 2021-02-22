@@ -12,7 +12,7 @@
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGSerializable, UID } from "./interfaces";
+import { DrawLib, XYCoords, SVGPathParams, SVGSerializable, UID } from "./interfaces";
 
 
 /**
@@ -656,6 +656,23 @@ export class drawutilsgl implements DrawLib<void> {
     // | Draw a non-scaling text label at the given position.
     // +-------------------------------
     label( text:string, x:number, y:number, rotation:number ) {
+	// NOT YET IMPLEMENTED
+    };
+
+
+     /**
+     * Draw an SVG-like path given by the specified path data.
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
+    path( pathData : SVGPathParams, color?:string, lineWidth?:number, inplace?:boolean ) {
 	// NOT YET IMPLEMENTED
     };
 

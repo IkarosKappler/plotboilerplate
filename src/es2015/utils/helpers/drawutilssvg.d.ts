@@ -9,7 +9,9 @@
  * @modified 2021-02-03 Fixed the currentId='background' bug on the clear() function.
  * @modified 2021-02-03 Fixed CSSProperty `stroke-width` (was line-width before, which is wrong).
  * @modified 2021-02-03 Added the static `HEAD_XML` attribute.
- * @version  1.0.0
+ * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
+ * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
+ * @version  1.0.1
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
@@ -524,6 +526,19 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     label(text: string, x: number, y: number, rotation: number): SVGElement;
     /**
+     * Draw an SVG-like path given by the specified path data.
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
+    path(pathData: SVGPathParams, color?: string, lineWidth?: number, inplace?: boolean): SVGElement;
+    /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
      *
@@ -550,5 +565,24 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @return SVGElement
      */
     static createSvg(): SVGElement;
+    /**
+     * Create a copy of the given path data. As path data only consists of strings and numbers,
+     * the copy will be shallow by definition.
+     *
+     * @name copyPathData
+     * @static
+     * @memberof drawutilssvg
+     */
+    static copyPathData(data: SVGPathParams): SVGPathParams;
+    /**
+     * Transform the given path data (translate and scale. rotating is not intended here).
+     *
+     * @name transformPathData
+     * @static
+     * @memberof drawutilssvg
+     * @param {SVGPathParams} data - The data to transform.
+     * @param {XYCoords} offset - The translation offset (neutral is x=0, y=0).
+     * @param {XYCoords} scale - The scale factors (neutral is x=1, y=1).
+     */
     static transformPathData(data: SVGPathParams, offset: XYCoords, scale: XYCoords): void;
 }

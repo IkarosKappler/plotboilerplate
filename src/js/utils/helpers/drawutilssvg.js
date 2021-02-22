@@ -10,7 +10,9 @@
  * @modified 2021-02-03 Fixed the currentId='background' bug on the clear() function.
  * @modified 2021-02-03 Fixed CSSProperty `stroke-width` (was line-width before, which is wrong).
  * @modified 2021-02-03 Added the static `HEAD_XML` attribute.
- * @version  1.0.0
+ * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
+ * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
+ * @version  1.0.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -816,6 +818,27 @@ var drawutilssvg = /** @class */ (function () {
     };
     ;
     /**
+     * Draw an SVG-like path given by the specified path data.
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
+    drawutilssvg.prototype.path = function (pathData, color, lineWidth, inplace) {
+        var node = this.makeNode('path');
+        // Transform the path: in-place (fast) or copy (slower)
+        var d = inplace ? pathData : drawutilssvg.copyPathData(pathData);
+        drawutilssvg.transformPathData(d, this.offset, this.scale);
+        node.setAttribute('d', d.join(' '));
+        return this._bindFillDraw(node, 'path', color, lineWidth);
+    };
+    ;
+    /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
      *
@@ -879,13 +902,36 @@ var drawutilssvg = /** @class */ (function () {
         return document.createElementNS("http://www.w3.org/2000/svg", "svg");
     };
     ;
+    /**
+     * Create a copy of the given path data. As path data only consists of strings and numbers,
+     * the copy will be shallow by definition.
+     *
+     * @name copyPathData
+     * @static
+     * @memberof drawutilssvg
+     */
+    drawutilssvg.copyPathData = function (data) {
+        var copy = new Array(data.length);
+        for (var i = 0, n = data.length; i < n; i++) {
+            copy[i] = data[i];
+        }
+        return copy;
+    };
+    ;
+    /**
+     * Transform the given path data (translate and scale. rotating is not intended here).
+     *
+     * @name transformPathData
+     * @static
+     * @memberof drawutilssvg
+     * @param {SVGPathParams} data - The data to transform.
+     * @param {XYCoords} offset - The translation offset (neutral is x=0, y=0).
+     * @param {XYCoords} scale - The scale factors (neutral is x=1, y=1).
+     */
     drawutilssvg.transformPathData = function (data, offset, scale) {
         // Scale and translate {x,y}
         var _stx = function (index) { data[index] = offset.x + scale.x * Number(data[index]); };
         var _sty = function (index) { data[index] = offset.y + scale.y * Number(data[index]); };
-        // translate {x,y}
-        // const _tx = (index:number) : void => { data[index] = offset.x + Number(data[index]); }
-        // const _ty = (index:number) : void => { data[index] = offset.y + Number(data[index]); }
         // scale only {x,y}
         var _sx = function (index) { data[index] = scale.x * Number(data[index]); };
         var _sy = function (index) { data[index] = scale.y * Number(data[index]); };
@@ -997,60 +1043,6 @@ var drawutilssvg = /** @class */ (function () {
                 // Safepoint: continue reading token by token until something is recognized again
                 default: i++;
             }
-            /*
-            var lastPos = [ 0, 0 ]; var pointOne, pointTwo;
-            commandList.forEach(function(command) {
-            if ((command.marker === 'z') || (command.marker === 'Z')) {
-                lastPos = [ 0, 0 ];
-                ctx.closePath();
-            } else if (command.marker === 'm') {
-                lastPos = [ lastPos[0] + command.values[0], lastPos[1] + command.values[1] ];
-                ctx.moveTo(lastPos[0], lastPos[1]);
-            } else if (command.marker === 'l') {
-                lastPos = [ lastPos[0] + command.values[0], lastPos[1] + command.values[1] ];
-                ctx.lineTo(lastPos[0], lastPos[1]);
-            } else if (command.marker === 'h') {
-                lastPos = [ lastPos[0] + command.values[0], lastPos[1] ];
-                ctx.lineTo(lastPos[0], lastPos[1]);
-            } else if (command.marker === 'v') {
-                lastPos = [ lastPos[0], lastPos[1] + command.values[0] ];
-                ctx.lineTo(lastPos[0], lastPos[1]);
-            } else if (command.marker === 'c') {
-                pointOne = [ lastPos[0] + command.values[0],
-                     lastPos[1] + command.values[1] ];
-                pointTwo = [ lastPos[0] + command.values[2],
-                     lastPos[1] + command.values[3] ];
-                lastPos  = [ lastPos[0] + command.values[4],
-                     lastPos[1] + command.values[5] ];
-                ctx.bezierCurveTo(
-                pointOne[0], pointOne[1],
-                pointTwo[0], pointTwo[1],
-                lastPos[0], lastPos[1]);
-            } else if (command.marker === 'M') {
-                lastPos = [ command.values[0], command.values[1] ];
-                ctx.moveTo(lastPos[0], lastPos[1]);
-            } else if (command.marker === 'L') {
-                lastPos = [ command.values[0], lastPos[1] ];
-                ctx.lineTo(lastPos[0], lastPos[1]);
-            } else if (command.marker === 'H') {
-                lastPos = [ command.values[0], lastPos[1] ];
-                ctx.lineTo(lastPos[0], lastPos[1]);
-            } else if (command.marker === 'V') {
-                lastPos = [ lastPos[0], command.values[0] ];
-                ctx.lineTo(lastPos[0], lastPos[1]);
-            } else if (command.marker === 'C') {
-                pointOne = [ command.values[0],
-                     command.values[1] ];
-                pointTwo = [ command.values[2],
-                     command.values[3] ];
-                lastPos  = [ command.values[4],
-                     command.values[5] ];
-                ctx.bezierCurveTo(
-                pointOne[0], pointOne[1],
-                pointTwo[0], pointTwo[1],
-                lastPos[0], lastPos[1]);
-            }
-            */
         } // END while
     };
     ;

@@ -65,7 +65,7 @@
     <!-- END for development -->
 
     <!-- For production -->
-    <!-- <script src="../../dist/plotboilerplate.browser.min.js"></script> -->
+    <script src="../../dist/plotboilerplate.browser.min.js"></script>
     <!-- END For production -->
 
     <!-- Load the thirdparty mathjs libray from https://mathjs.org/ -->
@@ -76,7 +76,7 @@
     <script src="../../src/js/utils/WebColorsContrast.js"></script>
     <script src="../getContrastColor.js"></script>
     <script src="../modal.js"></script>
-    <script src="Interval.js"></script>
+    <script src="../Interval.js"></script>
     <script src="Ruler.js"></script>
     <script src="index.js"></script>
     
@@ -92,11 +92,14 @@
       border-top : 1px solid lightgrey;
       line-height: 1.6em;
       }
+      #addFnBtn {
+      
+      }
     </style>
   </head>
   <body>
     <div class="left" id="function-wrapper">
-      
+      <button id="addFnBtn">Add new</button>
     </div>
     <div class="right">
       <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>

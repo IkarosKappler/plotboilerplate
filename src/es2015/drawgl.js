@@ -570,6 +570,22 @@ class drawutilsgl {
     }
     ;
     /**
+    * Draw an SVG-like path given by the specified path data.
+    *
+    * @method path
+    * @param {SVGPathData} pathData - An array of path commands and params.
+    * @param {string=null} color - (optional) The color to draw this path with (default is null).
+    * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+    * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+    * @instance
+    * @memberof drawutils
+    * @return {R} An instance representing the drawn path.
+    */
+    path(pathData, color, lineWidth, inplace) {
+        // NOT YET IMPLEMENTED
+    }
+    ;
+    /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
      *

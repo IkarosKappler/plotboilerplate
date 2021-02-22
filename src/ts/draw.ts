@@ -34,13 +34,15 @@
  * @modified 2020-12-28 Added the `singleSegment` mode (test).
  * @modified 2021-01-05 Added the image-loaded/broken check.
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
- * @version  1.8.3
+ * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
+ * @version  1.8.4
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, UID } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID } from "./interfaces";
+import { drawutilssvg } from "./utils/helpers/drawutilssvg";
 
 
 // Todo: rename this class to Drawutils?
@@ -813,7 +815,35 @@ export class drawutils implements DrawLib<void> {
 	}
 	this.ctx.restore();
     };
-   
+
+    
+    /**
+     * Draw an SVG-like path given by the specified path data.
+     *
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
+    path( pathData : SVGPathParams, color?:string, lineWidth?:number, inplace?:boolean ) {
+	const d : SVGPathParams = inplace ? pathData : drawutilssvg.copyPathData( pathData );
+	drawutilssvg.transformPathData( d, this.offset, this.scale );
+	this.ctx.strokeStyle = color;
+	this.ctx.lineWidth = lineWidth || 1;
+	if( this.fillShapes ) {
+	    this.ctx.fillStyle = color;
+	    this.ctx.fill( new Path2D(d.join(" ")) );
+	} else {
+	    this.ctx.strokeStyle = color;
+	    this.ctx.stroke( new Path2D(d.join(" ")) );
+	}
+    };
+    
 
     /**
      * Due to gl compatibility there is a generic 'clear' function required

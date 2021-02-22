@@ -38,7 +38,7 @@
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, UID } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID } from "./interfaces";
 /**
  * @classdesc A wrapper class for basic drawing operations.
  *
@@ -450,6 +450,20 @@ export declare class drawutils implements DrawLib<void> {
      * @memberof drawutils
      */
     label(text: string, x: number, y: number, rotation?: number, color?: string): void;
+    /**
+     * Draw an SVG-like path given by the specified path data.
+     *
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
+    path(pathData: SVGPathParams, color?: string, lineWidth?: number, inplace?: boolean): void;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.

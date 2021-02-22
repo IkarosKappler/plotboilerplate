@@ -10,6 +10,8 @@
  * @modified 2021-02-03 Fixed CSSProperty `stroke-width` (was line-width before, which is wrong).
  * @modified 2021-02-03 Added the static `HEAD_XML` attribute.
  * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
+ * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
+ * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @version  1.0.1
  **/
 
@@ -925,7 +927,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutilssvg
      */
-    text( text:string, x:number, y:number, options?:{color?:string}) {
+    text( text:string, x:number, y:number, options?:{color?:string}) : SVGElement {
 	options = options || {};
 	const color:string = options.color || 'black';
 	
@@ -949,12 +951,34 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
      * @instance
      * @memberof drawutilssvg
      */
-    label( text:string, x:number, y:number, rotation:number ) {
+    label( text:string, x:number, y:number, rotation:number ) : SVGElement {
 	const node : SVGElement = this.makeNode('text');
 	// For some strange reason SVG rotation transforms use degrees instead of radians
 	node.setAttribute('transform', `translate(${this.offset.x},${this.offset.y}), rotate(${rotation/Math.PI*180})` );
 	node.innerHTML = text;
 	return this._bindFillDraw( node, 'label', 'black', null );
+    };
+
+
+    /**
+     * Draw an SVG-like path given by the specified path data.
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
+    path( pathData : SVGPathParams, color?:string, lineWidth?:number, inplace?:boolean ) : SVGElement {
+	const node : SVGElement = this.makeNode('path');
+	// Transform the path: in-place (fast) or copy (slower)
+	const d : SVGPathParams = inplace ? pathData : drawutilssvg.copyPathData( pathData );
+	drawutilssvg.transformPathData( d, this.offset, this.scale ); 
+	node.setAttribute('d', d.join(' '));
+	return this._bindFillDraw( node, 'path', color, lineWidth );
     };
 
 
@@ -1024,13 +1048,36 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	return document.createElementNS("http://www.w3.org/2000/svg","svg");
     };
 
+    /**
+     * Create a copy of the given path data. As path data only consists of strings and numbers,
+     * the copy will be shallow by definition.
+     *
+     * @name copyPathData
+     * @static
+     * @memberof drawutilssvg
+     */
+    static copyPathData( data : SVGPathParams ) : SVGPathParams {
+	const copy : SVGPathParams = new Array(data.length);
+	for( var i = 0, n = data.length; i < n; i++ ) {
+	    copy[i] = data[i];
+	}
+	return copy;
+    };
+
+    /**
+     * Transform the given path data (translate and scale. rotating is not intended here).
+     *
+     * @name transformPathData
+     * @static
+     * @memberof drawutilssvg
+     * @param {SVGPathParams} data - The data to transform.
+     * @param {XYCoords} offset - The translation offset (neutral is x=0, y=0).
+     * @param {XYCoords} scale - The scale factors (neutral is x=1, y=1).
+     */
     static transformPathData( data : SVGPathParams, offset : XYCoords, scale : XYCoords ) : void {
 	// Scale and translate {x,y}
 	const _stx = (index:number) : void => { data[index] = offset.x + scale.x * Number(data[index]); }
 	const _sty = (index:number) : void => { data[index] = offset.y + scale.y * Number(data[index]); }
-	// translate {x,y}
-	// const _tx = (index:number) : void => { data[index] = offset.x + Number(data[index]); }
-	// const _ty = (index:number) : void => { data[index] = offset.y + Number(data[index]); }
 	// scale only {x,y}
 	const _sx = (index:number) : void => { data[index] = scale.x * Number(data[index]); }
 	const _sy = (index:number) : void => { data[index] = scale.y * Number(data[index]); }
@@ -1123,63 +1170,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 		// Safepoint: continue reading token by token until something is recognized again
 		default: i++;
 	    }
-	    
-
-	    /* 
-	    var lastPos = [ 0, 0 ]; var pointOne, pointTwo;
-	    commandList.forEach(function(command) {
-		if ((command.marker === 'z') || (command.marker === 'Z')) {
-		    lastPos = [ 0, 0 ];
-		    ctx.closePath();
-		} else if (command.marker === 'm') {
-		    lastPos = [ lastPos[0] + command.values[0], lastPos[1] + command.values[1] ];
-		    ctx.moveTo(lastPos[0], lastPos[1]);
-		} else if (command.marker === 'l') {
-		    lastPos = [ lastPos[0] + command.values[0], lastPos[1] + command.values[1] ];
-		    ctx.lineTo(lastPos[0], lastPos[1]);
-		} else if (command.marker === 'h') {
-		    lastPos = [ lastPos[0] + command.values[0], lastPos[1] ];
-		    ctx.lineTo(lastPos[0], lastPos[1]);
-		} else if (command.marker === 'v') {
-		    lastPos = [ lastPos[0], lastPos[1] + command.values[0] ];
-		    ctx.lineTo(lastPos[0], lastPos[1]);
-		} else if (command.marker === 'c') {
-		    pointOne = [ lastPos[0] + command.values[0],
-				 lastPos[1] + command.values[1] ];
-		    pointTwo = [ lastPos[0] + command.values[2],
-				 lastPos[1] + command.values[3] ];
-		    lastPos  = [ lastPos[0] + command.values[4],
-				 lastPos[1] + command.values[5] ];
-		    ctx.bezierCurveTo(
-			pointOne[0], pointOne[1],
-			pointTwo[0], pointTwo[1],
-			lastPos[0], lastPos[1]);
-		} else if (command.marker === 'M') {
-		    lastPos = [ command.values[0], command.values[1] ];
-		    ctx.moveTo(lastPos[0], lastPos[1]);
-		} else if (command.marker === 'L') {
-		    lastPos = [ command.values[0], lastPos[1] ];
-		    ctx.lineTo(lastPos[0], lastPos[1]);
-		} else if (command.marker === 'H') {
-		    lastPos = [ command.values[0], lastPos[1] ];
-		    ctx.lineTo(lastPos[0], lastPos[1]);
-		} else if (command.marker === 'V') {
-		    lastPos = [ lastPos[0], command.values[0] ];
-		    ctx.lineTo(lastPos[0], lastPos[1]);
-		} else if (command.marker === 'C') {
-		    pointOne = [ command.values[0],
-				 command.values[1] ];
-		    pointTwo = [ command.values[2],
-				 command.values[3] ];
-		    lastPos  = [ command.values[4],
-				 command.values[5] ];
-		    ctx.bezierCurveTo(
-			pointOne[0], pointOne[1],
-			pointTwo[0], pointTwo[1],
-			lastPos[0], lastPos[1]);
-		}
-	    */
-	    } // END while
+	} // END while
     };
     
 }

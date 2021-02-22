@@ -1,6 +1,9 @@
 
 
 # Changelog
+* 2021-02-22
+  * Added the static helper function `drawutilssvg.copyPathData(...)`.
+  * Added the `DrawLib.path` drawing function to draw SVG path data (canvas-draw, svg-draw [, gl-draw]).
 * 2021-02-19
   * Added the static helper function `drawutilssvg.transformPathData(...)` for svg path transformations (scale and translate).
 * 2021-02-18

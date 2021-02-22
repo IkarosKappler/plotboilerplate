@@ -41,6 +41,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutils = void 0;
 const CubicBezierCurve_1 = require("./CubicBezierCurve");
 const Vertex_1 = require("./Vertex");
+const drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
 // Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -739,6 +740,34 @@ class drawutils {
             this.ctx.strokeText(text, 0, 0);
         }
         this.ctx.restore();
+    }
+    ;
+    /**
+     * Draw an SVG-like path given by the specified path data.
+     *
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
+    path(pathData, color, lineWidth, inplace) {
+        const d = inplace ? pathData : drawutilssvg_1.drawutilssvg.copyPathData(pathData);
+        drawutilssvg_1.drawutilssvg.transformPathData(d, this.offset, this.scale);
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = lineWidth || 1;
+        if (this.fillShapes) {
+            this.ctx.fillStyle = color;
+            this.ctx.fill(new Path2D(d.join(" ")));
+        }
+        else {
+            this.ctx.strokeStyle = color;
+            this.ctx.stroke(new Path2D(d.join(" ")));
+        }
     }
     ;
     /**
