@@ -35,7 +35,8 @@
  * @modified 2020-12-28 Added the `singleSegment` mode (test).
  * @modified 2021-01-05 Added the image-loaded/broken check.
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
- * @version  1.8.3
+ * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
+ * @version  1.8.4
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutils = void 0;
@@ -750,13 +751,13 @@ var drawutils = /** @class */ (function () {
      * @param {SVGPathData} pathData - An array of path commands and params.
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
-     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
      */
-    drawutils.prototype.path = function (pathData, color, lineWidth, inplace) {
-        var d = inplace ? pathData : drawutilssvg_1.drawutilssvg.copyPathData(pathData);
+    drawutils.prototype.path = function (pathData, color, lineWidth, options) {
+        var d = options && options.inplace ? pathData : drawutilssvg_1.drawutilssvg.copyPathData(pathData);
         drawutilssvg_1.drawutilssvg.transformPathData(d, this.offset, this.scale);
         this.ctx.strokeStyle = color;
         this.ctx.lineWidth = lineWidth || 1;

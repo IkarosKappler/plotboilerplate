@@ -12,6 +12,7 @@
  * @modified 2021-02-03 Added the static `HEAD_XML` attribute.
  * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
+ * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @version  1.0.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -824,15 +825,15 @@ var drawutilssvg = /** @class */ (function () {
      * @param {SVGPathData} pathData - An array of path commands and params.
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
-     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
      */
-    drawutilssvg.prototype.path = function (pathData, color, lineWidth, inplace) {
+    drawutilssvg.prototype.path = function (pathData, color, lineWidth, options) {
         var node = this.makeNode('path');
         // Transform the path: in-place (fast) or copy (slower)
-        var d = inplace ? pathData : drawutilssvg.copyPathData(pathData);
+        var d = options && options.inplace ? pathData : drawutilssvg.copyPathData(pathData);
         drawutilssvg.transformPathData(d, this.offset, this.scale);
         node.setAttribute('d', d.join(' '));
         return this._bindFillDraw(node, 'path', color, lineWidth);

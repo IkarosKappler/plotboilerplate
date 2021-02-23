@@ -265,7 +265,7 @@
 	// | @param {drawutils} draw
 	// +-------------------------------
 	var drawConnectedPathAsSVGArcs = function( path, color, draw ) {
-	    var svgData = pathToSVGData( path, draw.offset, draw.scale );
+	    /* var svgData = pathToSVGData( path, draw.offset, draw.scale );
 	    draw.ctx.save();
 	    draw.ctx.beginPath();
 	    draw.ctx.lineWidth = config.lineWidth;
@@ -277,7 +277,15 @@
 		draw.ctx.strokeStyle = color;
 		draw.ctx.stroke( new Path2D(svgData.join(" ")) );
 	    }
-	    draw.ctx.restore();    
+	    draw.ctx.restore();
+	    */
+	    var svgData = pathToSVGData( path, { x : 0, y : 0 }, { x : 1, y : 1 } ); // draw.offset, draw.scale );
+	    draw.ctx.lineJoin = config.lineJoin;
+	    if( config.fillNestedCircles ) {
+		pb.fill.path( svgData, color, config.lineWidth );
+	    } else {
+		pb.draw.path( svgData, color, config.lineWidth );
+	    }
 	};
 
 	

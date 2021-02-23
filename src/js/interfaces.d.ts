@@ -5,6 +5,7 @@
  * @modified 2021-01-25 Added the `DrawLib.setCurrentId` and `DrawLib.setCurrentClassName` functions.
  * @modified 2021-01-25 Fixed the `PBParams` interface (inluding DrawConfig).
  * @modified 2021-02-08 Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
+ * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  **/
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
@@ -550,12 +551,14 @@ export interface DrawLib<R> {
      * @param {SVGPathData} pathData - An array of path commands and params.
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
-     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
      */
-    path: (pathData: SVGPathParams, color?: string, lineWidth?: number, inplace?: boolean) => R;
+    path: (pathData: SVGPathParams, color?: string, lineWidth?: number, options?: {
+        inplace?: boolean;
+    }) => R;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.

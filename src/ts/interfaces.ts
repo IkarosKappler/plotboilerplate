@@ -202,6 +202,23 @@ export interface SVGSerializable {
  */
 export type SVGPathParams = Array<string|number>;
 
+// TEST
+/*
+type SVGArcParams = [ 'A' | 'a', number, number, number, string|number, string|number, number, number ];
+type SVGLineParams = [ 'L' | 'l', number, number ];
+type SVGMoveParams = [ 'M' | 'm', number, number ];
+type SVGSmoothQuadraticParams = [ 'T' | 't', number, number ];
+type SVGHorizontalParams = [ 'H' | 'h', number ];
+type SVGVerticalParams = [ 'V' | 'v', number ];
+type SVGCurveParams = [ 'C' | 'c', number, number, number, number, number, number ];
+type SVGQuadraticCurveParams = [ 'Q' | 'q', number, number, number, number ];
+type SVGSmmothQuadraticParams = [ 'S' | 's', number, number, number, number ];
+type SVGCloseParams = [ 'Z' | 'Z' ];
+type SVGPathType = SVGArcParams | SVGLineParams | SVGMoveParams | SVGSmoothQuadraticParams | SVGHorizontalParams | SVGVerticalParams | SVGCurveParams | SVGQuadraticCurveParams | SVGSmmothQuadraticParams | SVGCloseParams;
+// export type SVGPathParams = SVGPathType | [ ...SVGPathType, ...Array<SVGPathType> ];
+export type SVGPathParams = SVGPathType | [ ...SVGPathType, ...Array<SVGPathType> ];
+*/
+
 export interface IHooks {
     saveFile: (pb:PlotBoilerplate)=>void;
 }
@@ -640,12 +657,12 @@ export interface DrawLib<R> {
      * @param {SVGPathData} pathData - An array of path commands and params.
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
-     * @param {boolean=false} inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
      */
-    path : ( pathData : SVGPathParams, color?:string, lineWidth?:number, inplace?:boolean ) => R;
+    path : ( pathData : SVGPathParams, color?:string, lineWidth?:number, options?:{ inplace?:boolean } ) => R;
         
 
     /**
