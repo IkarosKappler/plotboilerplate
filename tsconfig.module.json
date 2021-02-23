@@ -31,6 +31,6 @@
 
     },
     "include": ["./src/ts/**/*.ts"],
-    "exclude": ["./dist", "./tmp","./src/js","./src/vanilla", "./npm-package", "demos"],
+    "exclude": ["./dist", "./tmp","./src/js","./src/_js","./src/cjs","./src/esm","./src/vanilla", "./npm-package", "demos"],
     "removeComments": false
 }

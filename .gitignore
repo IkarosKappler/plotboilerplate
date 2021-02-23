@@ -30,3 +30,4 @@ demos/17-hobby-curves/hobby-weitz.js
 npm-package/
 typescript-example/node_modules/
 *-deprecated*
+src/js

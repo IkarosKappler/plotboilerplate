@@ -3,9 +3,9 @@
   "version": "1.11.1",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
   "private": false,
-  "main": "src/js/index.js",
+  "main": "src/cjs/index.js",
   "module": "src/esm/index.js",
-  "types": "src/js/index.d.ts",
+  "types": "src/cjs/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -16,13 +16,13 @@
     "build-module": "npm run compile-typescript-module && npm run rollup-module",
     "compile-typescript-browser": "tsc -p tsconfig.browser.json",
     "compile-typescript-module": "tsc -p tsconfig.module.json",
-    "xyz": "cd bin && ./run-build.sh",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack-browser": "npx webpack --mode production --config ./webpack5.browser.config.js",
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",
     "rollup-module": "npx rollup -c",
-    "tslint": "npx eslint ./src/ts/"
+    "tslint": "npx eslint ./src/ts/",
+    "create-js-symlink": "ln -s cjs ./src/js"
   },
   "repository": {
     "type": "git",

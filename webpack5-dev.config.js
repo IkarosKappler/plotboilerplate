@@ -5,7 +5,7 @@ module.exports = [
     {
 	// https://webpack.js.org/configuration/mode/
 	mode: 'development',
-	entry: './src/js/entry.js',
+	entry: './src/cjs/entry.js',
 	output: {
 	    path: path.resolve(__dirname, './dist'),
 	    filename: 'plotboilerplate.js'
@@ -18,7 +18,7 @@ module.exports = [
     {
 	// https://webpack.js.org/configuration/mode/
 	mode: 'development',
-	entry: './src/js/entry-glsupport.js',
+	entry: './src/cjs/entry-glsupport.js',
 	output: {
 	    path: path.resolve(__dirname, './dist'),
 	    filename: 'plotboilerplate-glsupport.js'

@@ -5,7 +5,7 @@ module.exports = [
     {
 	// https://webpack.js.org/configuration/mode/
 	mode: 'production',
-	entry: './src/js/entry.js',
+	entry: './src/cjs/entry.js',
 	output: {
 	    path: path.resolve(__dirname, './dist'),
 	    filename: 'plotboilerplate.browser.min.js'
