@@ -72,7 +72,7 @@
 	    // | A global config that's attached to the dat.gui control interface.
 	    // +-------------------------------
 	    var config = PlotBoilerplate.utils.safeMergeByKeys( {
-		animate               : true,
+		animate               : false,
 		phaseX                : 0.0,
 		scaleY                : 0.25,
 		// stepSizeX             : 0.05,
