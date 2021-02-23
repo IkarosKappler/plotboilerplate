@@ -474,7 +474,7 @@ The Vertex class has basic drag event support:
 * Cronholm144 for the [Girih texture](https://commons.wikimedia.org/wiki/File:Girih_tiles.svg "Girih texture")
 * [Mapbox's Earcut polygon algorithm](https://github.com/mapbox/earcut "Mapbox's Earcut polygon algorithm")
 * [Rosetta-Code for the Sutherland-Hodgman convex polygon clipping algorithm](https://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping#JavaScript "Rosetta-Code for the Sutherland-Hodgman convex polygon clipping algorithm")
-
+* https://github.com/josdejong/mathjs
 
 ## Todos
 [What needs to be done](https://github.com/IkarosKappler/plotboilerplate/blob/master/todos.md "Future To-Dos")

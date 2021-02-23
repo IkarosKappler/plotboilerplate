@@ -4,6 +4,19 @@ layout: page
 
 
 # Changelog
+* 2021-02-23 [v1.12.0]
+  * One step closer to use with React.
+* 2021-02-22
+  * Added the static helper function `drawutilssvg.copyPathData(...)`.
+  * Added the `DrawLib.path` drawing function to draw SVG path data (canvas-draw, svg-draw [, gl-draw]).
+* 2021-02-19
+  * Added the static helper function `drawutilssvg.transformPathData(...)` for svg path transformations (scale and translate).
+* 2021-02-18
+  * Adding `PlotBoilerplate.adjustOffset(boolean)` function.
+* 2021-02-08
+  * Added a rollup- and a typescript config to create es2015 modules (in ./src/es2015).
+  * Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
+  * Ensure es2015 module compatibility of the Color class.
 * 2021-02-03
   * Added the static `drawusilssvg.createSvg` function.
   * Fixed the currentId='background' bug on the drawusilssvg.clear() function.

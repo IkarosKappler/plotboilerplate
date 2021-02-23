@@ -1,6 +1,8 @@
 
 
 # Changelog
+* 2021-02-23 [v1.12.0]
+  * One step closer to use with React.
 * 2021-02-22
   * Added the static helper function `drawutilssvg.copyPathData(...)`.
   * Added the `DrawLib.path` drawing function to draw SVG path data (canvas-draw, svg-draw [, gl-draw]).
