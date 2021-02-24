@@ -54,6 +54,10 @@ export declare class VEllipse implements SVGSerializable {
      * @name VEllipse
      **/
     constructor(center: Vertex, axis: Vertex);
+    radiusH(): number;
+    radiusV(): number;
+    _vertAt(angle: number): Vertex;
+    vertAt(angle: number): Vertex;
     /**
      * Create an SVG representation of this ellipse.
      *

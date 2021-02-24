@@ -16,8 +16,6 @@
 
 
 // TODOs:
-//  * colors for function inputs
-//  * crop renderer to visible area (performance)
 //  * fix grid for extreme large zoom levels
 
 
@@ -111,19 +109,18 @@
 		var id = functionCache.length;
 		var color = randColor(id);
 		input.style.borderLeft = "3px solid " + color;
-		input.setAttribute('value', expression );
+		input.setAttribute( 'value', expression );
 		var left = document.getElementById('function-wrapper');
-		// left.appendChild( input );
 
 		var container = document.createElement('div');
 		container.setAttribute('class','container');
 		container.setAttribute('id','container-'+id);
-		var button = document.createElement('button');
-		button.innerHTML = "-";
-		button.addEventListener( 'click', function() { removeFunction(id); } );
+		var buttonDel = document.createElement('button');
+		buttonDel.innerHTML = "-";
+		buttonDel.addEventListener( 'click', function() { removeFunction(id); } );
 		container.appendChild( input );
-		container.appendChild( button );
-		left.insertBefore( container, // input,
+		container.appendChild( buttonDel );
+		left.insertBefore( container,
 				   document.getElementById('addFnBtn') );
 		
 
@@ -203,7 +200,6 @@
 		pb.config.scaleY = pb.draw.scale.y = pb.fill.scale.y = pb.canvasSize.height / rangeY.length();
 		console.log( "setView", pb.config.scaleX, pb.config.scaleY );
 		pb.adjustOffset( true ); // redraw=true
-		// pb.redraw();
 	    };
 	    
 	    // +---------------------------------------------------------------------------------

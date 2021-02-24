@@ -12,6 +12,7 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipse = void 0;
+var Vertex_1 = require("./Vertex");
 var UIDGenerator_1 = require("./UIDGenerator");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
@@ -39,6 +40,28 @@ var VEllipse = /** @class */ (function () {
         this.center = center;
         this.axis = axis;
     }
+    ;
+    VEllipse.prototype.radiusH = function () {
+        return this.axis.x - this.center.x;
+    };
+    ;
+    VEllipse.prototype.radiusV = function () {
+        return this.axis.y - this.center.y;
+    };
+    ;
+    VEllipse.prototype._vertAt = function (angle) {
+        return new Vertex_1.Vertex(this.center.x + this.radiusH() * Math.cos(angle), this.center.y + this.radiusV() * Math.sin(angle));
+    };
+    ;
+    VEllipse.prototype.vertAt = function (angle) {
+        // Tanks to Narasinham for the vertex-on-ellipse equations
+        // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
+        var a = this.radiusV();
+        var b = this.radiusH();
+        var s = Math.sin(Math.PI / 2 - angle);
+        var c = Math.cos(Math.PI / 2 - angle);
+        return new Vertex_1.Vertex(a * b * s / Math.sqrt(Math.pow(b * c, 2) + Math.pow(a * s, 2)), a * b * c / Math.sqrt(Math.pow(b * c, 2) + Math.pow(a * s, 2))).add(this.center);
+    };
     ;
     /**
      * Create an SVG representation of this ellipse.

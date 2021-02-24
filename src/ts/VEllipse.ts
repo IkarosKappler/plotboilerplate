@@ -73,7 +73,32 @@ export class VEllipse implements SVGSerializable {
 	this.axis = axis;
     };
 
+    radiusH() {
+	return this.axis.x - this.center.x;
+    };
 
+    radiusV() {
+	return this.axis.y - this.center.y;
+    };
+    
+    _vertAt( angle:number ) {
+	return new Vertex( this.center.x + this.radiusH() * Math.cos(angle),
+			   this.center.y + this.radiusV() * Math.sin(angle)
+			 );
+    };
+
+    vertAt( angle:number ) {
+	// Tanks to Narasinham for the vertex-on-ellipse equations
+	// https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
+	var a = this.radiusV();
+	var b = this.radiusH();
+	var s = Math.sin( Math.PI/2 - angle );
+	var c = Math.cos( Math.PI/2 - angle );
+	return new Vertex( a*b*s / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) ),
+			   a*b*c / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) )
+			 ).add( this.center );
+    };
+    
 
     /**
      * Create an SVG representation of this ellipse.
