@@ -71,6 +71,15 @@
 		// console.log( "newStartPoint", newStartPoint );
 		pb.draw.diamondHandle( newStartPoint, 7, 'rgba(128,64,128,0.5)' );
 		pb.draw.diamondHandle( newEndPoint, 7, 'rgba(128,64,128,0.5)' );
+
+		// Draw the arc
+		var pathData =
+		    VEllipseSector.ellipseSectorUtils.describeSVGArc(
+			ellipse.center.x, ellipse.center.y,
+			ellipse.radiusH(), ellipse.radiusV(), // radiusH, radiusV,
+			newStartAngle, newEndAngle,
+			{ moveToStart : true } );
+		pb.draw.path( pathData, 'rgba(255,0,0,0.5)', 1 );
 	    };
 	    pb.redraw();
 	    

@@ -10,7 +10,7 @@
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID } from "./interfaces";
+import { SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -56,7 +56,6 @@ export declare class VEllipse implements SVGSerializable {
     constructor(center: Vertex, axis: Vertex);
     radiusH(): number;
     radiusV(): number;
-    _vertAt(angle: number): Vertex;
     vertAt(angle: number): Vertex;
     /**
      * Create an SVG representation of this ellipse.
@@ -68,4 +67,7 @@ export declare class VEllipse implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     }): string;
+    static utils: {
+        polarToCartesian: (centerX: number, centerY: number, radiusH: number, radiusV: number, angle: number) => XYCoords;
+    };
 }

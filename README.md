@@ -481,6 +481,7 @@ The Vertex class has basic drag event support:
 * [Rosetta-Code for the Sutherland-Hodgman convex polygon clipping algorithm](https://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping#JavaScript "Rosetta-Code for the Sutherland-Hodgman convex polygon clipping algorithm")
 * [Jos de Jong](https://github.com/josdejong) for the very useful [math.js library](https://github.com/josdejong/mathjs)
 * Jack Franklin for the [howto-module-tutorial](https://blog.logrocket.com/publishing-node-modules-typescript-es-modules/)
+* Narasinham for the very useful [vertex-on-ellipse equations](https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle)
 
 ## Todos
 [What needs to be done](https://github.com/IkarosKappler/plotboilerplate/blob/master/todos.md "Future To-Dos")

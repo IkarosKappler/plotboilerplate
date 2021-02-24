@@ -49,18 +49,17 @@ var VEllipse = /** @class */ (function () {
         return this.axis.y - this.center.y;
     };
     ;
-    VEllipse.prototype._vertAt = function (angle) {
-        return new Vertex_1.Vertex(this.center.x + this.radiusH() * Math.cos(angle), this.center.y + this.radiusV() * Math.sin(angle));
-    };
-    ;
     VEllipse.prototype.vertAt = function (angle) {
         // Tanks to Narasinham for the vertex-on-ellipse equations
         // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
         var a = this.radiusV();
         var b = this.radiusH();
-        var s = Math.sin(Math.PI / 2 - angle);
-        var c = Math.cos(Math.PI / 2 - angle);
-        return new Vertex_1.Vertex(a * b * s / Math.sqrt(Math.pow(b * c, 2) + Math.pow(a * s, 2)), a * b * c / Math.sqrt(Math.pow(b * c, 2) + Math.pow(a * s, 2))).add(this.center);
+        /* var s = Math.sin( Math.PI/2 - angle );
+        var c = Math.cos( Math.PI/2 - angle );
+        return new Vertex( a*b*s / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) ),
+                   a*b*c / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) )
+                   ).add( this.center ); */
+        return new Vertex_1.Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle));
     };
     ;
     /**
@@ -84,7 +83,25 @@ var VEllipse = /** @class */ (function () {
         return buffer.join('');
     };
     ;
+    VEllipse.utils = {
+        polarToCartesian: function (centerX, centerY, radiusH, radiusV, angle) {
+            // Tanks to Narasinham for the vertex-on-ellipse equations
+            // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
+            // var a = this.radiusV();
+            // var b = this.radiusH();
+            var s = Math.sin(Math.PI / 2 - angle);
+            var c = Math.cos(Math.PI / 2 - angle);
+            return { x: centerX + radiusH * radiusV * s / Math.sqrt(Math.pow(radiusV * c, 2) + Math.pow(radiusH * s, 2)),
+                y: centerY + radiusH * radiusV * c / Math.sqrt(Math.pow(radiusV * c, 2) + Math.pow(radiusH * s, 2))
+            };
+            /* return {
+               x: centerX + (radius * Math.cos(angle)),
+               y: centerY + (radius * Math.sin(angle))
+               }; */
+        }
+    }; // END utils
     return VEllipse;
 }());
 exports.VEllipse = VEllipse;
+;
 //# sourceMappingURL=VEllipse.js.map
