@@ -1,4 +1,9 @@
+
+
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
+[![Release](https://img.shields.io/github/v/release/ikaroskappler/plotboilerplate)]
+
+<img src="https://img.shields.io/github/release/dewiedem/calcopp/all.svg" alt="GitHub Release" data-external="1" /> <img src="https://img.shields.io/github/release-date/dewiedem/calcopp.svg" alt="GitHub Release Date" data-external="1" /> [<img src="https://img.shields.io/github/license/dewiedem/calcopp.svg" alt="GitHub License" data-external="1" />](./LICENSE) [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.2530345-blue.svg)](https://doi.org/10.5281/zenodo.2530345)
 
 # An interactive Javascript Plotting Boilerplate
 For plotting visual 2D data with Javascript on HTML canvas (in 2d-context) or SVG nodes.
