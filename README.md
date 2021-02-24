@@ -8,6 +8,10 @@
 # An interactive Javascript Plotting Boilerplate
 For plotting visual 2D data with Javascript on HTML canvas (in 2d-context) or SVG nodes.
 
+
+![logo](logo-128.png)
+
+
 This is a simple collection of useful functions I am repetitively using for
 visualizing 2D geometries. Basic features are
  * adding elements like
