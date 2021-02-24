@@ -1,7 +1,7 @@
 
 
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
-
+[![Release](https://img.shields.io/github/v/release/ikaroskappler/plotboilerplate)]
 
 # An interactive Javascript Plotting Boilerplate
 For plotting visual 2D data with Javascript on HTML canvas (in 2d-context) or SVG nodes.
