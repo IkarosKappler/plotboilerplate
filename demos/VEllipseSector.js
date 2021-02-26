@@ -1,4 +1,6 @@
 /**
+ * Just for testing: please use the TS implementation.
+ *
  * @date 2021-02-24
  */
 

@@ -42,6 +42,7 @@
 	"noUnusedLocals": false,
 	"noUnusedParameters": false
   * Remove SVGBuilder from Girih-demo.
+  * Add function VEllipse.circumference() to calculate the circumference (approximation in n steps).
 
 
 

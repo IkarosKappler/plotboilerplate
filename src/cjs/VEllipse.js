@@ -5,7 +5,9 @@
  * @modified 2018-12-04 Added the toSVGString function.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2021-01-20 Added UID.
- * @version  1.1.0
+ * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
+ * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
+ * @version  1.2.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -41,38 +43,35 @@ var VEllipse = /** @class */ (function () {
         this.axis = axis;
     }
     ;
+    /**
+     * Get the non-negative horizonal radius of this ellipse.
+     *
+     * @method radiusH
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The horizontal radius of this ellipse.
+     */
     VEllipse.prototype.radiusH = function () {
-        return this.axis.x - this.center.x;
+        return Math.abs(this.axis.x - this.center.x);
     };
     ;
+    /**
+     * Get the non-negative vertical radius of this ellipse.
+     *
+     * @method radiusV
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The vertical radius of this ellipse.
+     */
     VEllipse.prototype.radiusV = function () {
-        return this.axis.y - this.center.y;
+        return Math.abs(this.axis.y - this.center.y);
     };
     ;
-    /*
-    _vertAt( angle:number ) : Vertex {
-    // Tanks to Narasinham for the vertex-on-ellipse equations
-    // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
-    var a = this.radiusV();
-    var b = this.radiusH();
-    // var s = Math.sin( Math.PI/2 - angle );
-    // var c = Math.cos( Math.PI/2 - angle );
-    // return new Vertex( a*b*s / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) ),
-    //		   a*b*c / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) )
-    //		   ).add( this.center );
-    return new Vertex( VEllipse.utils.polarToCartesian( this.center.x, this.center.y, a, b, angle ) );
-    };
-    */
     VEllipse.prototype.vertAt = function (angle) {
         // Tanks to Narasinham for the vertex-on-ellipse equations
         // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
         var a = this.radiusH();
         var b = this.radiusV();
-        /* var s = Math.sin( Math.PI/2 - angle );
-        var c = Math.cos( Math.PI/2 - angle );
-        return new Vertex( a*b*s / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) ),
-                   a*b*c / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) )
-                   ).add( this.center ); */
         return new Vertex_1.Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle));
     };
     ;
@@ -97,21 +96,30 @@ var VEllipse = /** @class */ (function () {
         return buffer.join('');
     };
     ;
+    /**
+     * A static collection of ellipse-related helper functions.
+     * @static
+     */
     VEllipse.utils = {
+        /**
+         * Calculate a particular point on the outline of the given ellipse (center plus two radii plus angle).
+         *
+         * @name polarToCartesian
+         * @param {number} centerX - The x coordinate of the elliptic center.
+         * @param {number} centerY - The y coordinate of the elliptic center.
+         * @param {number} radiusH - The horizontal radius of the ellipse.
+         * @param {number} radiusV - The vertical radius of the ellipse.
+         * @param {number} angle - The angle (in radians) to get the desired outline point for.
+         * @reutn {XYCoords} The outlont point in absolute x-y-coordinates.
+         */
         polarToCartesian: function (centerX, centerY, radiusH, radiusV, angle) {
             // Tanks to Narasinham for the vertex-on-ellipse equations
             // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
-            // var a = this.radiusV();
-            // var b = this.radiusH();
             var s = Math.sin(Math.PI / 2 - angle);
             var c = Math.cos(Math.PI / 2 - angle);
             return { x: centerX + radiusH * radiusV * s / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
                 y: centerY + radiusH * radiusV * c / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
             };
-            /* return {
-               x: centerX + (radius * Math.cos(angle)),
-               y: centerY + (radius * Math.sin(angle))
-               }; */
         }
     }; // END utils
     return VEllipse;

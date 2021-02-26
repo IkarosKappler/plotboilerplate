@@ -2,7 +2,8 @@
  * @author   Ikaros Kappler
  * @date     2020-12-17
  * @modified 2021-01-20 Added UID.
- * @version  1.1.0
+ * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
+ * @version  1.1.1
  **/
 import { Circle } from "./Circle";
 import { SVGPathParams, SVGSerializable, UID, XYCoords } from "./interfaces";

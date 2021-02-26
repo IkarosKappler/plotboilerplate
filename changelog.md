@@ -1,6 +1,12 @@
 
-
 # Changelog
+* 2021-02-26
+  * Adding first typescript implementation of VEllipseSector class.
+  * Added helper function `VEllipseSector.ellipseSectorUtils.decribeSVGArc(...)`.
+  * Fixed an error in the CircleSector's svg-arc-calculation (case angle<90deg and anti-clockwise).
+* 2021-02-14
+  * Added first test implementation of VEllipseSector (plus basic demo for testing).
+  * Added functions `VEllipse.radiusH` and `VEllipse.radiusV`.
 * 2021-02-23 [v1.12.0]
   * One step closer to use with React.
 * 2021-02-22

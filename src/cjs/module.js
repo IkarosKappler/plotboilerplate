@@ -1,8 +1,12 @@
 "use strict";
-// ? https://www.pluralsight.com/guides/react-typescript-module-create
-// ? https://blog.logrocket.com/publishing-node-modules-typescript-es-modules/
+// With the help of
+//    https://www.pluralsight.com/guides/react-typescript-module-create
+// and
+//    https://blog.logrocket.com/publishing-node-modules-typescript-es-modules/
+// 
+// @date 2021-02
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.drawutilssvg = exports.VertTuple = exports.VertexListeners = exports.VertexAttr = exports.Vertex = exports.VEllipse = exports.Vector = exports.UIDGenerator = exports.Triangle = exports.SVGBuilder = exports.Polygon = exports.PlotBoilerplate = exports.PBImage = exports.MouseHandler = exports.Line = exports.KeyHandler = exports.Grid = exports.geomutils = exports.drawutilsgl = exports.drawutils = exports.CubicBezierCurve = exports.CircleSector = exports.Circle = exports.Bounds = exports.BezierPath = void 0;
+exports.drawutilssvg = exports.VertTuple = exports.VertexListeners = exports.VertexAttr = exports.Vertex = exports.VEllipseSector = exports.VEllipse = exports.Vector = exports.UIDGenerator = exports.Triangle = exports.SVGBuilder = exports.Polygon = exports.PlotBoilerplate = exports.PBImage = exports.MouseHandler = exports.Line = exports.KeyHandler = exports.Grid = exports.geomutils = exports.drawutilsgl = exports.drawutils = exports.CubicBezierCurve = exports.CircleSector = exports.Circle = exports.Bounds = exports.BezierPath = void 0;
 var BezierPath_1 = require("./BezierPath");
 Object.defineProperty(exports, "BezierPath", { enumerable: true, get: function () { return BezierPath_1.BezierPath; } });
 var Bounds_1 = require("./Bounds");
@@ -44,6 +48,8 @@ var Vector_1 = require("./Vector");
 Object.defineProperty(exports, "Vector", { enumerable: true, get: function () { return Vector_1.Vector; } });
 var VEllipse_1 = require("./VEllipse");
 Object.defineProperty(exports, "VEllipse", { enumerable: true, get: function () { return VEllipse_1.VEllipse; } });
+var VEllipseSector_1 = require("./VEllipseSector");
+Object.defineProperty(exports, "VEllipseSector", { enumerable: true, get: function () { return VEllipseSector_1.VEllipseSector; } });
 var Vertex_1 = require("./Vertex");
 Object.defineProperty(exports, "Vertex", { enumerable: true, get: function () { return Vertex_1.Vertex; } });
 var VertexAttr_1 = require("./VertexAttr");
@@ -55,70 +61,4 @@ Object.defineProperty(exports, "VertTuple", { enumerable: true, get: function ()
 var drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
 Object.defineProperty(exports, "drawutilssvg", { enumerable: true, get: function () { return drawutilssvg_1.drawutilssvg; } });
 exports.default = PlotBoilerplate_1.PlotBoilerplate;
-// const parsePath = require('./parse-path');
-// const path2dPolyfill = require('./path2d-polyfill');
-// if (typeof window !== 'undefined') {
-//  path2dPolyfill(window);
-//}
-// module.exports = {
-//  path2dPolyfill,
-//  parsePath,
-//};
-/*
-const BezierPath = require( "./BezierPath" );
-const Bounds = require( "./Bounds" );
-const Circle = require( "./Circle" );
-const CircleSector = require( "./CircleSector" );
-const CubicBezierCurve = require( "./CubicBezierCurve" );
-const drawutils = require( "./draw" );
-const drawutilsgl = require( "./drawgl" );
-const geomutils = require( "./geomutils" );
-const Grid = require( "./Grid" );
-// import * as interf from "./interfaces";
-const KeyHandler = require( "./KeyHandler" );
-const Line = require( "./Line" );
-const MouseHandler = require( "./MouseHandler" );
-const PBImage = require( "./PBImage" );
-const PlotBoilerplate = require( "./PlotBoilerplate" );
-const Polygon  = require( "./Polygon" );
-const SVGBuilder = require( "./SVGBuilder" );
-const Triangle = require( "./Triangle" );
-const UIDGenerator = require( "./UIDGenerator" );
-const Vector  = require( "./Vector" );
-const VEllipse = require( "./VEllipse" );
-const Vertex = require( "./Vertex" );
-const VertexAttr = require( "./VertexAttr" );
-const VertexListeners = require( "./VertexListeners" );
-const VertTuple = require( "./VertTuple" );
-const drawutilssvg = require( "./utils/helpers/drawutilssvg" );
-
-module.exports = {
-    BezierPath,
-    Bounds,
-    Circle,
-    CircleSector,
-    CubicBezierCurve,
-    drawutils,
-    drawutilsgl,
-    geomutils,
-    Grid,
-    // ...interf,
-    KeyHandler,
-    Line,
-    MouseHandler,
-    PBImage,
-    PlotBoilerplate,
-    Polygon,
-    SVGBuilder,
-    Triangle,
-    UIDGenerator,
-    Vector,
-    VEllipse,
-    Vertex,
-    VertexAttr,
-    VertexListeners,
-    VertTuple,
-    drawutilssvg
-};
-*/
 //# sourceMappingURL=module.js.map

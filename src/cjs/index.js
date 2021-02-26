@@ -31,6 +31,7 @@ __exportStar(require("./Triangle"), exports);
 __exportStar(require("./UIDGenerator"), exports);
 __exportStar(require("./Vector"), exports);
 __exportStar(require("./VEllipse"), exports);
+__exportStar(require("./VEllipseSector"), exports);
 __exportStar(require("./Vertex"), exports);
 __exportStar(require("./VertexAttr"), exports);
 __exportStar(require("./VertexListeners"), exports);
