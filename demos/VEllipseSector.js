@@ -54,16 +54,26 @@ VEllipseSector.ellipseSectorUtils = {
 
 	// Split full circles into two halves.
 	// Some browsers have problems to render full circles (described by start==end).
-	/* if( Math.PI*2-Math.abs(startAngle-endAngle) < 0.001 ) {
+	/*if( Math.PI*2-Math.abs(startAngle-endAngle) < 0.001 ) {
 	    // SVGParams
 	    var firstHalf = VEllipseSector.ellipseSectorUtils.describeSVGArc( x, y, radiusH, radiusV, startAngle, startAngle+(endAngle-startAngle)/2, options );
 	    var secondHalf = VEllipseSector.ellipseSectorUtils.describeSVGArc( x, y, radiusH, radiusV, startAngle+(endAngle-startAngle)/2, endAngle, options );
 	    return firstHalf.concat( secondHalf );
-	} */
+	}*/
 
 	// Boolean stored as integers (0|1).
-	var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1; // number
-	var sweepFlag = 1; // number
+	console.log( endAngle, startAngle, "diff=" + (endAngle - startAngle) );
+	// var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1; // number
+	
+	var largeArcFlag =
+	    (endAngle - startAngle) >= 0
+	    || (endAngle - startAngle) <= -Math.PI
+	    // || (endAngle - startAngle) >= Math.PI
+	    ? 0 : 1; // number
+	var sweepFlag =
+	    (endAngle - startAngle) > Math.PI
+	    || (startAngle < 1.5*Math.PI && startAngle > 0.5*Math.PI)
+	    ? 0 : 1; // 1 number
 	var pathData = [];
 	if( options.moveToStart ) {
 	    pathData.push('M', start.x, start.y );

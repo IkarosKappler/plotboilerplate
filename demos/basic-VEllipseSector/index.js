@@ -58,12 +58,13 @@
 
 
 	    pb.config.postDraw = function() {
-		console.log('postDraw');
+		// console.log('postDraw');
 		pb.draw.line( startControlLine.a, startControlLine.b, 'rgba(128,128,128,0.5)', 1.0 );
 		pb.draw.line( endControlLine.a, endControlLine.b, 'rgba(128,128,128,0.5)', 1.0 );
 
 		var newStartAngle = startControlLine.angle();
 		var newEndAngle = endControlLine.angle();
+		// console.log( "newStartAngle", newStartAngle, "newEndAngle", newEndAngle );
 
 		var newStartPoint = ellipse.vertAt( newStartAngle );
 		var newEndPoint = ellipse.vertAt( newEndAngle );
