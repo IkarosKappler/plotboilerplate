@@ -49,11 +49,25 @@ var VEllipse = /** @class */ (function () {
         return this.axis.y - this.center.y;
     };
     ;
+    /*
+    _vertAt( angle:number ) : Vertex {
+    // Tanks to Narasinham for the vertex-on-ellipse equations
+    // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
+    var a = this.radiusV();
+    var b = this.radiusH();
+    // var s = Math.sin( Math.PI/2 - angle );
+    // var c = Math.cos( Math.PI/2 - angle );
+    // return new Vertex( a*b*s / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) ),
+    //		   a*b*c / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) )
+    //		   ).add( this.center );
+    return new Vertex( VEllipse.utils.polarToCartesian( this.center.x, this.center.y, a, b, angle ) );
+    };
+    */
     VEllipse.prototype.vertAt = function (angle) {
         // Tanks to Narasinham for the vertex-on-ellipse equations
         // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
-        var a = this.radiusV();
-        var b = this.radiusH();
+        var a = this.radiusH();
+        var b = this.radiusV();
         /* var s = Math.sin( Math.PI/2 - angle );
         var c = Math.cos( Math.PI/2 - angle );
         return new Vertex( a*b*s / Math.sqrt( Math.pow(b*c,2) + Math.pow(a*s,2) ),
@@ -91,8 +105,8 @@ var VEllipse = /** @class */ (function () {
             // var b = this.radiusH();
             var s = Math.sin(Math.PI / 2 - angle);
             var c = Math.cos(Math.PI / 2 - angle);
-            return { x: centerX + radiusH * radiusV * s / Math.sqrt(Math.pow(radiusV * c, 2) + Math.pow(radiusH * s, 2)),
-                y: centerY + radiusH * radiusV * c / Math.sqrt(Math.pow(radiusV * c, 2) + Math.pow(radiusH * s, 2))
+            return { x: centerX + radiusH * radiusV * s / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
+                y: centerY + radiusH * radiusV * c / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
             };
             /* return {
                x: centerX + (radius * Math.cos(angle)),

@@ -36,8 +36,8 @@
 	    var circle = new Circle( center, radius );
 
 	    // Now create a sector from the circle
-	    var startAngle   = Math.PI*0.3; // in radians
-	    var endAngle     = Math.PI*1.6;
+	    var startAngle   = 34 / 180 * Math.PI; // in radians
+	    var endAngle     = 330 / 180 * Math.PI;
 	    var circleSector = new CircleSector( circle, startAngle, endAngle );
 
 	    // Now add the sector to your canvas

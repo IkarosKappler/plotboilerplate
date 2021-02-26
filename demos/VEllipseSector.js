@@ -40,11 +40,119 @@ VEllipseSector.ellipseSectorUtils = {
 			       radiusV,
 			       startAngle,
 			       endAngle,
+			       options // ?:{moveToStart:boolean }
+			     ) { // : SVGPathParams => {
+	
+	if( typeof options === 'undefined' )
+	    options = { moveToStart : true };
+
+	/*
+	if( startAngle > endAngle ) {
+	    return VEllipseSector.ellipseSectorUtils.__describeSVGArc(
+		x, y, radiusH, radiusV, startAngle, endAngle, { moveToStart: options.moveToStart, reverseSweep : false }
+	    );
+	} else {
+	    return VEllipseSector.ellipseSectorUtils.__describeSVGArc(
+		x, y, radiusH, radiusV, endAngle, startAngle, { moveToStart: options.moveToStart, reverseSweep : true }
+	    );
+	}
+	*/
+	
+	var r2d = 180/Math.PI;
+	
+	// XYCoords
+	var end = VEllipse.utils.polarToCartesian( x, y, radiusH, radiusV, endAngle );
+	var start = VEllipse.utils.polarToCartesian( x, y, radiusH, radiusV, startAngle );
+	var diff = endAngle-startAngle;
+
+	// Boolean stored as integers (0|1).
+	console.log( "startAngle", (r2d*startAngle).toFixed(4),
+		     "endAngle", (r2d*endAngle).toFixed(4),
+		     "diff=" + (r2d*diff).toFixed(4) );
+	/*
+	var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1; // number
+	
+	//var sweepFlag = 1;
+	// var sweepFlag = (endAngle-startAngle) < -Math.PI ? (startAngle >= endAngle ? 1 : 0) : (startAngle < endAngle ? 1 : 0);
+	var sweepFlag = (endAngle-startAngle) < -Math.PI ? (startAngle >= endAngle ? 1 : 0) : (startAngle < endAngle ? 1 : 0);
+	*/
+	var largeArcFlag, sweepFlag;
+	if( diff < 0 ) {
+	    largeArcFlag = Math.abs(diff) < Math.PI ? 1 : 0;
+	    sweepFlag = 1;
+	} else { 
+	    largeArcFlag = Math.abs(diff) > Math.PI ? 1 : 0;
+	    sweepFlag = 1;
+	}
+	
+	var sweepFlag = 1;
+	var pathData = [];
+	if( options.moveToStart ) {
+	    pathData.push('M', start.x, start.y );
+	}
+	pathData.push("A", radiusH, radiusV, 0, largeArcFlag, sweepFlag, end.x, end.y );
+	return pathData;
+	
+    },
+
+    
+    __describeSVGArc : function( x, y,
+			       radiusH,
+			       radiusV,
+			       startAngle,
+			       endAngle,
+			       options // ?:{moveToStart:boolean, reverseSweep:boolean}
+			     ) { // : SVGPathParams => {
+	
+	if( typeof options === 'undefined' )
+	    options = { moveToStart : true, reverseSweep : false };
+
+	var r2d = 180/Math.PI;
+	
+	// XYCoords
+	var end = VEllipse.utils.polarToCartesian( x, y, radiusH, radiusV, endAngle );
+	var start = VEllipse.utils.polarToCartesian( x, y, radiusH, radiusV, startAngle );
+
+	// Boolean stored as integers (0|1).
+	console.log( "startAngle", (r2d*startAngle).toFixed(4),
+		     "endAngle", (r2d*endAngle).toFixed(4),
+		     "diff=" + (r2d*(endAngle - startAngle)).toFixed(4) );
+	var largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1; // number
+	
+	//var sweepFlag = 1;
+	//var sweepFlag = 0;
+	// var sweepFlag = (endAngle-startAngle) < -Math.PI ? (startAngle >= endAngle ? 1 : 0) : (startAngle < endAngle ? 1 : 0);
+	var sweepFlag =
+	    (end-startAngle < 0 )
+	    ? 1
+	    : ((endAngle-startAngle) < -Math.PI
+	       ? (startAngle >= endAngle ? 1 : 0)
+	       : (startAngle < endAngle ? 1 : 0));
+	if( options.reverseSweep ) {
+	    sweepFlag = sweepFlag == 0 ? 1 : 0;
+	    largeArcFlag = largeArcFlag == 0 ? 1 : 0;
+	}
+	var pathData = [];
+	if( options.moveToStart ) {
+	    pathData.push('M', start.x, start.y );
+	}
+	pathData.push("A", radiusH, radiusV, 0, largeArcFlag, sweepFlag, end.x, end.y );
+	return pathData;
+    }
+
+    /*
+    _describeSVGArc : function( x, y,
+			       radiusH,
+			       radiusV,
+			       startAngle,
+			       endAngle,
 			       options // ?:{moveToStart:boolean}
 			     ) { // : SVGPathParams => {
 	
 	if( typeof options === 'undefined' )
 	    options = { moveToStart : true };
+
+	if( end
 
 	// XYCoords
 	// var end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
@@ -54,12 +162,6 @@ VEllipseSector.ellipseSectorUtils = {
 
 	// Split full circles into two halves.
 	// Some browsers have problems to render full circles (described by start==end).
-	/*if( Math.PI*2-Math.abs(startAngle-endAngle) < 0.001 ) {
-	    // SVGParams
-	    var firstHalf = VEllipseSector.ellipseSectorUtils.describeSVGArc( x, y, radiusH, radiusV, startAngle, startAngle+(endAngle-startAngle)/2, options );
-	    var secondHalf = VEllipseSector.ellipseSectorUtils.describeSVGArc( x, y, radiusH, radiusV, startAngle+(endAngle-startAngle)/2, endAngle, options );
-	    return firstHalf.concat( secondHalf );
-	}*/
 
 	// Boolean stored as integers (0|1).
 	console.log( endAngle, startAngle, "diff=" + (endAngle - startAngle) );
@@ -81,4 +183,5 @@ VEllipseSector.ellipseSectorUtils = {
 	pathData.push("A", radiusH, radiusV, 0, largeArcFlag, sweepFlag, end.x, end.y );
 	return pathData;
     } 
+    */
 };
