@@ -69,7 +69,8 @@
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
- * @version  1.13.0
+ * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
+ * @version  1.13.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -77,7 +78,6 @@
  **/
 
 import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript";
-//import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/js/index";
 
 import { GUI } from "dat.gui";
 
@@ -960,8 +960,9 @@ export class PlotBoilerplate {
 	offset.x = (Math.round(offset.x+cs.width)/Math.round(gSize.width))*(gSize.width)/this.draw.scale.x + (((this.draw.offset.x-cs.width)/this.draw.scale.x)%gSize.width);
 	offset.y = (Math.round(offset.y+cs.height)/Math.round(gSize.height))*(gSize.height)/this.draw.scale.y + (((this.draw.offset.y-cs.height)/this.draw.scale.x)%gSize.height);
 	if( this.drawConfig.drawGrid ) {
+	    draw.setCurrentClassName(null);
 	    if( this.config.rasterGrid ) { // TODO: move config member to drawConfig
-		draw.setCurrentId('raster');
+		draw.setCurrentId('raster');	
 		draw.raster( offset, this.canvasSize.width/this.draw.scale.x, (this.canvasSize.height)/this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.125)' );
 	    } else {
 		draw.setCurrentId('grid');
@@ -1105,10 +1106,12 @@ export class PlotBoilerplate {
 	    if( this.drawConfig.drawHandleLines ) {
 		draw.setCurrentId(`${d.uid}_e0`);
 		draw.setCurrentClassName(`${d.className}-v-line`);
-		draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+		// draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+		draw.line( d.center.clone().add(0,d.signedRadiusV()).rotate(d.rotation,d.center), d.axis, '#c8c8c8' );
 		draw.setCurrentId(`${d.uid}_e1`);
 		draw.setCurrentClassName(`${d.className}-h-line`);
-		draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
+		// draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
+		draw.line( d.center.clone().add(d.signedRadiusH(),0).rotate(d.rotation,d.center), d.axis, '#c8c8c8' );
 	    }
 	    draw.setCurrentId(d.uid);
 	    draw.setCurrentClassName(`${d.className}`);
@@ -1266,6 +1269,11 @@ export class PlotBoilerplate {
 	this.drawDrawables(renderTime, draw, fill);
 	this.drawVertices(renderTime, draw);
 	this.drawSelectPolygon( draw );
+
+	// Clear IDs and classnames (postDraw hook might draw somthing and the do not want
+	// to interfered with that).
+	draw.setCurrentId(undefined);
+	draw.setCurrentClassName(undefined);
     }; // END redraw
 
 

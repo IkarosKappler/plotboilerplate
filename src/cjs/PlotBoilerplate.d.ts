@@ -69,7 +69,8 @@
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
- * @version  1.13.0
+ * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
+ * @version  1.13.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

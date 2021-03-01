@@ -5,6 +5,8 @@
   * Added attribute `VEllipse.rotation` to allow rotation of ellipses.
   * Added the `rotation` param to the DrawLib.ellipse(...) function.
   * Changed the second param `center` in the `rotate` function from Vertex to XYCoords.
+  * Fixed a bug in the `drawsvgutils.clear` function (curClassName was not cleared).
+  * Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
 * 2021-02-26
   * Adding first typescript implementation of VEllipseSector class.
   * Added helper function `VEllipseSector.ellipseSectorUtils.decribeSVGArc(...)`.

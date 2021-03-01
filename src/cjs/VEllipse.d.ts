@@ -70,18 +70,36 @@ export declare class VEllipse implements SVGSerializable {
      * @method radiusH
      * @instance
      * @memberof VEllipse
-     * @return {number} The horizontal radius of this ellipse.
+     * @return {number} The unsigned horizontal radius of this ellipse.
      */
     radiusH(): number;
+    /**
+     * Get the signed horizonal radius of this ellipse.
+     *
+     * @method signedRadiusH
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed horizontal radius of this ellipse.
+     */
+    signedRadiusH(): number;
     /**
      * Get the non-negative vertical radius of this ellipse.
      *
      * @method radiusV
      * @instance
      * @memberof VEllipse
-     * @return {number} The vertical radius of this ellipse.
+     * @return {number} The unsigned vertical radius of this ellipse.
      */
     radiusV(): number;
+    /**
+     * Get the signed vertical radius of this ellipse.
+     *
+     * @method radiusV
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed vertical radius of this ellipse.
+     */
+    signedRadiusV(): number;
     vertAt(angle: number): Vertex;
     /**
      * Create an SVG representation of this ellipse.

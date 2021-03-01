@@ -90,10 +90,28 @@ export class VEllipse implements SVGSerializable {
      * @method radiusH
      * @instance
      * @memberof VEllipse
-     * @return {number} The horizontal radius of this ellipse.
+     * @return {number} The unsigned horizontal radius of this ellipse.
      */
     radiusH() : number {
-	return Math.abs(this.axis.x - this.center.x);
+	// return Math.abs(this.axis.x - this.center.x);
+	// Rotate axis back to origin before calculating radius
+	// return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
+	return Math.abs( this.signedRadiusH() );
+    };
+
+    /**
+     * Get the signed horizonal radius of this ellipse.
+     *
+     * @method signedRadiusH
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed horizontal radius of this ellipse.
+     */
+    signedRadiusH() : number {
+	// return Math.abs(this.axis.x - this.center.x);
+	// Rotate axis back to origin before calculating radius
+	// return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
+	return new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x;
     };
 
     /**
@@ -102,10 +120,28 @@ export class VEllipse implements SVGSerializable {
      * @method radiusV
      * @instance
      * @memberof VEllipse
-     * @return {number} The vertical radius of this ellipse.
+     * @return {number} The unsigned vertical radius of this ellipse.
      */
     radiusV() : number {
-	return Math.abs(this.axis.y - this.center.y);
+	// return Math.abs(this.axis.y - this.center.y);
+	// Rotate axis back to origin before calculating radius
+	// return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
+	return Math.abs( this.signedRadiusV() );
+    };
+
+    /**
+     * Get the signed vertical radius of this ellipse.
+     *
+     * @method radiusV
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed vertical radius of this ellipse.
+     */
+    signedRadiusV() : number {
+	// return Math.abs(this.axis.y - this.center.y);
+	// Rotate axis back to origin before calculating radius
+	// return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
+	return new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y;
     };
 
     

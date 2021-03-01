@@ -53,8 +53,11 @@
 		    rotationControlPoint.add( event.params.dragAmount );
 		} );
 		rotationControlPoint.listeners.addDragListener( function(event) {
-		    ellipse.rotation = rotationLine.angle();
+		    var newRotation = rotationLine.angle();
+		    var rDiff = newRotation - ellipse.rotation;
+		    ellipse.rotation = newRotation;
 		    console.log('rotation', ellipse.rotation );
+		    ellipse.axis.rotate( rDiff, ellipse.center );
 		} );
 		pb.add( rotationControlPoint );
 		pb.config.postDraw = function() {

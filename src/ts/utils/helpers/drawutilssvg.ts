@@ -12,7 +12,8 @@
  * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
- * @version  1.0.1
+ * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
+ * @version  1.0.2
  **/
 
 import { CircleSector } from "../../CircleSector";
@@ -1016,6 +1017,7 @@ export class drawutilssvg implements DrawLib<void|SVGElement> {
 	
 	// Add a covering rect with the given background color
 	this.curId = 'background';
+	this.curClassName = undefined;
 	const node : SVGElement = this.makeNode('rect');
 	// For some strange reason SVG rotation transforms use degrees instead of radians
 	// Note that the background does not scale with the zoom level (always covers full element)

@@ -52,10 +52,28 @@ var VEllipse = /** @class */ (function () {
      * @method radiusH
      * @instance
      * @memberof VEllipse
-     * @return {number} The horizontal radius of this ellipse.
+     * @return {number} The unsigned horizontal radius of this ellipse.
      */
     VEllipse.prototype.radiusH = function () {
-        return Math.abs(this.axis.x - this.center.x);
+        // return Math.abs(this.axis.x - this.center.x);
+        // Rotate axis back to origin before calculating radius
+        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
+        return Math.abs(this.signedRadiusH());
+    };
+    ;
+    /**
+     * Get the signed horizonal radius of this ellipse.
+     *
+     * @method signedRadiusH
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed horizontal radius of this ellipse.
+     */
+    VEllipse.prototype.signedRadiusH = function () {
+        // return Math.abs(this.axis.x - this.center.x);
+        // Rotate axis back to origin before calculating radius
+        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
+        return new Vertex_1.Vertex(this.axis).rotate(-this.rotation, this.center).x - this.center.x;
     };
     ;
     /**
@@ -64,10 +82,28 @@ var VEllipse = /** @class */ (function () {
      * @method radiusV
      * @instance
      * @memberof VEllipse
-     * @return {number} The vertical radius of this ellipse.
+     * @return {number} The unsigned vertical radius of this ellipse.
      */
     VEllipse.prototype.radiusV = function () {
-        return Math.abs(this.axis.y - this.center.y);
+        // return Math.abs(this.axis.y - this.center.y);
+        // Rotate axis back to origin before calculating radius
+        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
+        return Math.abs(this.signedRadiusV());
+    };
+    ;
+    /**
+     * Get the signed vertical radius of this ellipse.
+     *
+     * @method radiusV
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed vertical radius of this ellipse.
+     */
+    VEllipse.prototype.signedRadiusV = function () {
+        // return Math.abs(this.axis.y - this.center.y);
+        // Rotate axis back to origin before calculating radius
+        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
+        return new Vertex_1.Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     };
     ;
     VEllipse.prototype.vertAt = function (angle) {

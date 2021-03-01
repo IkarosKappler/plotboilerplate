@@ -12,7 +12,8 @@
  * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
- * @version  1.0.1
+ * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
+ * @version  1.0.2
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";

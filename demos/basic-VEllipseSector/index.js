@@ -70,10 +70,11 @@
 	    rotationControlPoint.listeners.addDragListener( function(event) {
 		var newRotation = rotationControlLine.angle();
 		var rDiff = newRotation-rotation;
-		// ellipse.axis.rotate( rDiff, ellipseSector.ellipse.center );
+		ellipse.axis.rotate( rDiff, ellipseSector.ellipse.center );
 		startControlPoint.rotate( rDiff, ellipseSector.ellipse.center );
 		endControlPoint.rotate( rDiff, ellipseSector.ellipse.center );
 		rotation = newRotation;
+		ellipse.rotation = newRotation;
 		// console.log('newRotation', newRotation );
 	    } );
 	    
