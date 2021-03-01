@@ -1,5 +1,10 @@
 
 # Changelog
+* 2021-03-01
+  * Added `geomutils.wrapMax` function.
+  * Added attribute `VEllipse.rotation` to allow rotation of ellipses.
+  * Added the `rotation` param to the DrawLib.ellipse(...) function.
+  * Changed the second param `center` in the `rotate` function from Vertex to XYCoords.
 * 2021-02-26
   * Adding first typescript implementation of VEllipseSector class.
   * Added helper function `VEllipseSector.ellipseSectorUtils.decribeSVGArc(...)`.

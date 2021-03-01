@@ -1,7 +1,8 @@
 /**
- * @author  Ikaros Kappler
- * @date    2019-02-03
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2019-02-03
+ * @modified 2021-03-01 Added `wrapMax` function.
+ * @version  1.1.0
  **/
 import { Line } from "./Line";
 import { Vertex } from "./Vertex";
@@ -23,4 +24,5 @@ export declare const geomutils: {
      * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
      */
     nsectAngle(pA: Vertex, pB: Vertex, pC: Vertex, n: number): Array<Line>;
+    wrapMax(x: number, max: number): number;
 };

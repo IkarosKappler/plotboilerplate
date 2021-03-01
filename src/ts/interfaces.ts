@@ -6,6 +6,7 @@
  * @modified 2021-01-25 Fixed the `PBParams` interface (inluding DrawConfig).
  * @modified 2021-02-08 Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
+ * @modified 2021-03-01 Added the `rotation` param to the DrawLib.ellipse(...) function.
  **/
 
 import { Vertex } from "./Vertex";
@@ -462,11 +463,12 @@ export interface DrawLib<R> {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse : ( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number ) => R;
+    ellipse : ( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number, rotation?:number ) => R;
 
 
     /**

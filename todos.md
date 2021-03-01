@@ -41,9 +41,9 @@
 	"suppressImplicitAnyIndexErrors": true,
 	"noUnusedLocals": false,
 	"noUnusedParameters": false
-  * Remove SVGBuilder from Girih-demo.
-  * Add function VEllipse.circumference() to calculate the circumference (approximation in n steps).
-
+ * Remove SVGBuilder from Girih-demo.
+ * Add function VEllipse.circumference() to calculate the circumference (approximation in n steps).
+ * Change the order of the DrawLib.ellipse params: color, lineWidth, rotation (rotation first).
 
 
 ### Todos for future Version 2

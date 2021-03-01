@@ -1,7 +1,8 @@
 /**
- * @author  Ikaros Kappler
- * @date    2019-02-03
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2019-02-03
+ * @modified 2021-03-01 Added `wrapMax` function.
+ * @version  1.1.0
  **/
 
 
@@ -53,6 +54,16 @@ export const geomutils = {
 	    result.push( new Line( pA, pB.clone().rotate((-i*(insideAngle/n)), pA) ).scale(scaleFactor) as Line ); 
 	}
 	return result; 
+    },
+
+    // https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
+    wrapMax( x:number, max:number ) : number {
+	return (max + (x%max)) % max;
     }
+    /* Currently unused
+    wrapMinMax( x:number, min:number, max:number ) : number {		
+	return min + wrapMax( x - min, max -min );
+    }
+    */
 
 };

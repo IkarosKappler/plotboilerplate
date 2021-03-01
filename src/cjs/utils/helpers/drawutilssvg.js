@@ -528,16 +528,22 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth) {
+    drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth, rotation) {
+        if (typeof rotation === 'undefined') {
+            rotation = 0.0;
+        }
         var node = this.makeNode('ellipse');
         node.setAttribute('cx', "" + this._x(center.x));
         node.setAttribute('cy', "" + this._y(center.y));
         node.setAttribute('rx', "" + radiusX * this.scale.x);
         node.setAttribute('ry', "" + radiusY * this.scale.y);
+        // node.setAttribute( 'style', `transform: rotate(${rotation} ${center.x} ${center.y})` );
+        node.setAttribute('transform', "rotate(" + rotation * 180 / Math.PI + " " + this._x(center.x) + " " + this._y(center.y) + ")");
         return this._bindFillDraw(node, 'ellipse', color, lineWidth || 1);
     };
     ;

@@ -6,7 +6,8 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
- * @version  1.2.0
+ * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
+ * @version  1.2.1
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -48,14 +49,21 @@ export declare class VEllipse implements SVGSerializable {
      */
     axis: Vertex;
     /**
+     * @member {number}
+     * @memberof VEllipse
+     * @instance
+     */
+    rotation: number;
+    /**
      * The constructor.
      *
      * @constructor
-     * @param {Vertex} center The ellipses center.
-     * @param {Vertex} axis The x- and y-axis.
+     * @param {Vertex} center - The ellipses center.
+     * @param {Vertex} axis - The x- and y-axis (the two radii encoded in a control point).
+     * @param {Vertex} rotation - [optional, default=0] The rotation of this ellipse.
      * @name VEllipse
      **/
-    constructor(center: Vertex, axis: Vertex);
+    constructor(center: Vertex, axis: Vertex, rotation?: number);
     /**
      * Get the non-negative horizonal radius of this ellipse.
      *

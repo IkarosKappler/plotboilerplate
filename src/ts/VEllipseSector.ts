@@ -14,6 +14,7 @@
 import { VEllipse } from "./VEllipse";
 import { SVGPathParams, UID, XYCoords } from "./interfaces";
 import { UIDGenerator } from "./UIDGenerator";
+import { Vertex } from "./Vertex";
 
 /**
  * @classdesc A class for elliptic sectors.
@@ -101,16 +102,21 @@ export class VEllipseSector {
 			   radiusV : number,
 			   startAngle : number,
 			   endAngle : number,
+			   rotation?: number,
 			   options? : { moveToStart : boolean }
 			 ) : SVGPathParams => {
 	    
 	    if( typeof options === 'undefined' )
 		options = { moveToStart : true };
+	    if( typeof rotation === 'undefined' )
+		rotation = 0.0;
 	    
 	    
 	    // XYCoords
-	    var end : XYCoords = VEllipse.utils.polarToCartesian( x, y, radiusH, radiusV, endAngle );
-	    var start : XYCoords = VEllipse.utils.polarToCartesian( x, y, radiusH, radiusV, startAngle );
+	    var end : Vertex = new Vertex(VEllipse.utils.polarToCartesian( x, y, radiusH, radiusV, endAngle ));
+	    var start : Vertex = new Vertex(VEllipse.utils.polarToCartesian( x, y, radiusH, radiusV, startAngle ));
+	    end.rotate( rotation, { x:x, y:y } );
+	    start.rotate( rotation, { x:x, y:y } );
 	    var diff : number = endAngle-startAngle;
 
 	    /*
@@ -136,7 +142,7 @@ export class VEllipseSector {
 	    if( options.moveToStart ) {
 		pathData.push('M', start.x, start.y );
 	    }
-	    pathData.push("A", radiusH, radiusV, 0, largeArcFlag, sweepFlag, end.x, end.y );
+	    pathData.push("A", radiusH, radiusV, -rotation, largeArcFlag, sweepFlag, end.x, end.y );
 	    return pathData;
 	} // END function describeSVGArc
     } // END ellipseSectorUtils

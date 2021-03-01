@@ -510,13 +510,18 @@ export class drawutils implements DrawLib<void> {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number} lineWidth=1 - An optional line width param (default is 1).
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number ) {
+    ellipse( center:Vertex, radiusX:number, radiusY:number, color:string, lineWidth?:number, rotation?:number ) {
+	if( typeof rotation === 'undefined' ) {
+	    rotation = 0.0;
+	}
+	console.log( rotation );
 	this.ctx.beginPath();
-	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radiusX*this.scale.x, radiusY*this.scale.y, 0.0, 0.0, Math.PI*2 );
+	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radiusX*this.scale.x, radiusY*this.scale.y, rotation, 0.0, Math.PI*2 );
 	this.ctx.closePath();
 	this.ctx.lineWidth = lineWidth || 1;
 	this._fillOrDraw( color );

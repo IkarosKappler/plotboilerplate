@@ -33,15 +33,38 @@
 	    // Create two radii (a non-negative numbers) and store them in a vertex
 	    var radius_x = 150.0;
 	    var radius_y = 100.0;
+	    var rotation = 0.0;
 	    var radii = new Vertex( radius_x, radius_y );
 
 	    // Create the (vertex-based) ellipse
-	    var ellipse = new VEllipse( center, radii );
+	    var ellipse = new VEllipse( center, radii, rotation );
 
 	    // Now add the ellipse to your canvas
 	    pb.add( ellipse );
 
 	    // Note: the center point and radii are draggable now :)
+
+
+	    // Add a rotation control
+	    (function() {
+		var rotationControlPoint = ellipse.vertAt( rotation ).scale( 1.2, ellipse.center );
+		var rotationLine = new Line( ellipse.center, rotationControlPoint );
+		ellipse.center.listeners.addDragListener( function(event) {
+		    rotationControlPoint.add( event.params.dragAmount );
+		} );
+		rotationControlPoint.listeners.addDragListener( function(event) {
+		    ellipse.rotation = rotationLine.angle();
+		    console.log('rotation', ellipse.rotation );
+		} );
+		pb.add( rotationControlPoint );
+		pb.config.postDraw = function() {
+		    pb.draw.line( ellipse.center, rotationControlPoint, 'rgba(128,128,255,0.5)', 1 );
+		};
+
+
+
+		pb.redraw();
+	    })();
 
 	} );
     

@@ -7,7 +7,8 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
- * @version  1.2.0
+ * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
+ * @version  1.2.1
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -29,11 +30,12 @@ var VEllipse = /** @class */ (function () {
      * The constructor.
      *
      * @constructor
-     * @param {Vertex} center The ellipses center.
-     * @param {Vertex} axis The x- and y-axis.
+     * @param {Vertex} center - The ellipses center.
+     * @param {Vertex} axis - The x- and y-axis (the two radii encoded in a control point).
+     * @param {Vertex} rotation - [optional, default=0] The rotation of this ellipse.
      * @name VEllipse
      **/
-    function VEllipse(center, axis) {
+    function VEllipse(center, axis, rotation) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -41,6 +43,7 @@ var VEllipse = /** @class */ (function () {
         this.uid = UIDGenerator_1.UIDGenerator.next();
         this.center = center;
         this.axis = axis;
+        this.rotation = rotation | 0.0;
     }
     ;
     /**

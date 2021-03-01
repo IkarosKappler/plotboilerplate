@@ -1112,7 +1112,12 @@ export class PlotBoilerplate {
 	    }
 	    draw.setCurrentId(d.uid);
 	    draw.setCurrentClassName(`${d.className}`);
-	    draw.ellipse( d.center, Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y), this.drawConfig.ellipse.color,  this.drawConfig.ellipse.lineWidth );
+	    draw.ellipse( d.center,
+			  // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
+			  d.radiusH(), d.radiusV(),
+			  this.drawConfig.ellipse.color,
+			  this.drawConfig.ellipse.lineWidth,
+			  d.rotation );
 	    if( !this.drawConfig.drawHandlePoints ) {
 		d.center.attr.renderTime = renderTime;
 		d.axis.attr.renderTime = renderTime;

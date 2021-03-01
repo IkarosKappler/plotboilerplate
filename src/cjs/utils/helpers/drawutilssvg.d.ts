@@ -359,11 +359,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number): SVGElement;
+    ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number): SVGElement;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>

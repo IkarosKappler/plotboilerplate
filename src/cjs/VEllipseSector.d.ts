@@ -73,7 +73,7 @@ export declare class VEllipseSector {
          * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
          * @return [ 'A', radiusH, radiusV, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
-        describeSVGArc: (x: number, y: number, radiusH: number, radiusV: number, startAngle: number, endAngle: number, options?: {
+        describeSVGArc: (x: number, y: number, radiusH: number, radiusV: number, startAngle: number, endAngle: number, rotation?: number, options?: {
             moveToStart: boolean;
         }) => SVGPathParams;
     };
