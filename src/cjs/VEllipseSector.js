@@ -62,6 +62,7 @@ var VEllipseSector = /** @class */ (function () {
                 options = { moveToStart: true };
             if (typeof rotation === 'undefined')
                 rotation = 0.0;
+            console.log('rotation', rotation);
             // XYCoords
             var end = new Vertex_1.Vertex(VEllipse_1.VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, endAngle));
             var start = new Vertex_1.Vertex(VEllipse_1.VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, startAngle));
@@ -90,7 +91,7 @@ var VEllipseSector = /** @class */ (function () {
             if (options.moveToStart) {
                 pathData.push('M', start.x, start.y);
             }
-            pathData.push("A", radiusH, radiusV, -rotation, largeArcFlag, sweepFlag, end.x, end.y);
+            pathData.push("A", radiusH, radiusV, rotation, largeArcFlag, sweepFlag, end.x, end.y);
             return pathData;
         } // END function describeSVGArc
     }; // END ellipseSectorUtils

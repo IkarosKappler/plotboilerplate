@@ -519,7 +519,6 @@ export class drawutils implements DrawLib<void> {
 	if( typeof rotation === 'undefined' ) {
 	    rotation = 0.0;
 	}
-	console.log( rotation );
 	this.ctx.beginPath();
 	this.ctx.ellipse( this.offset.x + center.x*this.scale.x, this.offset.y + center.y*this.scale.y, radiusX*this.scale.x, radiusY*this.scale.y, rotation, 0.0, Math.PI*2 );
 	this.ctx.closePath();

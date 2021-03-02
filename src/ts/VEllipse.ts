@@ -150,7 +150,7 @@ export class VEllipse implements SVGSerializable {
 	// https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
 	const a : number = this.radiusH();
 	const b : number = this.radiusV();
-	return new Vertex( VEllipse.utils.polarToCartesian( this.center.x, this.center.y, a, b, angle ) );
+	return new Vertex( VEllipse.utils.polarToCartesian( this.center.x, this.center.y, a, b, angle) ).rotate( this.rotation, this.center );
     };
     
 

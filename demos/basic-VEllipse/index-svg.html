@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate – Test for generating leaf venation patterns</title>
+    <title>2D Plotting Boilerplate – How to use the VEllpise class</title>
     <meta charset="UTF-8">
-    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, leaf, venation, pattern">
+    <meta name="description" content="A demo about the usage of the VEllipse class in PlotBoilerplate.js">
+    <meta name="keywords" content="plotboilerplate, VEllipse, usage, howto, docs, documentation">
     <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2020-01-17">
+    <meta name="date" content="2020-05-18">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="A test for generating leaf venation patterns with PlotBoilerplate.js.">
-    <meta property="og:description" content="A test for generating leaf venation patterns with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20200317-leaf-venation-test.png">
+    <meta property="og:title" content="A demo about the usage of the VEllipse class in PlotBoilerplate.js.">
+    <meta property="og:description" content="A demo about the usage of the VEllipse class in PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20200518-basic-vellipse.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
     <script src="../../lib/path2d-polyfill.min.js"></script>
     
+    <!-- Load thirdparty libraries -->
     <script src="../../lib/dat.gui.min.js"></script>
     <script src="../../lib/FileSaver.min.js"></script>
     <script src="../../lib/Color.js"></script>
     <script src="../../lib/alloy_finger.js"></script>
 
+    <!-- Load helpers -->
     <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
     <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
     <script src="../../src/cjs/utils/creategui.js"></script>
@@ -33,7 +35,7 @@
     <script src="../../src/cjs/utils/module.js"></script>
 
     <!-- For development -->
-    <!-- 
+    
     <script src="../../src/cjs/UIDGenerator.js"></script>
     <script src="../../src/cjs/VertexAttr.js"></script>
     <script src="../../src/cjs/VertexListeners.js"></script>
@@ -48,6 +50,7 @@
     <script src="../../src/cjs/Polygon.js"></script>
     <script src="../../src/cjs/Triangle.js"></script>
     <script src="../../src/cjs/VEllipse.js"></script>
+    <script src="../../src/cjs/VEllipseSector.js"></script>
     <script src="../../src/cjs/Circle.js"></script>
     <script src="../../src/cjs/CircleSector.js"></script>
     <script src="../../src/cjs/PBImage.js"></script>
@@ -57,28 +60,24 @@
     <script src="../../src/cjs/utils/helpers/drawutilssvg.js"></script>
     <script src="../../src/cjs/geomutils.js"></script>
     <script src="../../src/cjs/SVGBuilder.js"></script>
-    <script src="../../src/cjs/PlotBoilerplate.js"></script> -->
+    <script src="../../src/cjs/PlotBoilerplate.js"></script>
+    
     <!-- END for development -->
 
     <!-- For production -->
-    <script src="../../dist/plotboilerplate.min.js"></script>
+    <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
     <!-- END For production -->
     
-    <script src="../pbutils.js"></script>
-    <script src="makeLeafShape.js"></script>
-    <script src="BoundingBox.js"></script>
-    <script src="GrowableShape.js"></script>
-    <script src="RandomRect.js"></script>
-    <!-- <script src="../CanvasPointList.js"></script> -->
-    <!-- <script src="dist/plotboilerplate.min.js"></script> -->
     <script src="index.js"></script>
-    <link rel="stylesheet" href="../style.css"> 
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
   </head>
   <body class="fullscreen">
-    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>      
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+
+    <svg id="my-canvas"></svg>
+
     <div class="info monospace">
       [<span id="cx">-</span>,<span id="cy">-</span>]
     </div>
-
   </body>
 </html>

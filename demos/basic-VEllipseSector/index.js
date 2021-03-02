@@ -109,7 +109,7 @@
 			ellipse.center.x, ellipse.center.y,
 			ellipse.radiusH(), ellipse.radiusV(),
 			newStartAngle, newEndAngle,
-			rotation,
+			ellipse.rotation,
 			{ moveToStart : true } );
 		pb.draw.path( pathData, 'rgba(255,0,0,0.5)', 2 );
 
