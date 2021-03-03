@@ -8,6 +8,7 @@
  * @modified 2021-02-08 Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-01 Added the `rotation` param to the DrawLib.ellipse(...) function.
+ * @modified 2021-03-02 Added the `VEllipseSector` as to the `Drawable` type.
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=interfaces.js.map

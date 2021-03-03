@@ -4,13 +4,17 @@
  * @modified 2018-12-04 Added the toSVGString function.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2021-01-20 Added UID.
- * @version  1.1.0
+ * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
+ * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
+ * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
+ * @modified 2021-03-04 Added the `vertAt` and `perimeter` functions.
+ * @version  1.2.2
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID } from "./interfaces";
+import { SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -46,14 +50,76 @@ export declare class VEllipse implements SVGSerializable {
      */
     axis: Vertex;
     /**
+     * @member {number}
+     * @memberof VEllipse
+     * @instance
+     */
+    rotation: number;
+    /**
      * The constructor.
      *
      * @constructor
-     * @param {Vertex} center The ellipses center.
-     * @param {Vertex} axis The x- and y-axis.
+     * @param {Vertex} center - The ellipses center.
+     * @param {Vertex} axis - The x- and y-axis (the two radii encoded in a control point).
+     * @param {Vertex} rotation - [optional, default=0] The rotation of this ellipse.
      * @name VEllipse
      **/
-    constructor(center: Vertex, axis: Vertex);
+    constructor(center: Vertex, axis: Vertex, rotation?: number);
+    /**
+     * Get the non-negative horizonal radius of this ellipse.
+     *
+     * @method radiusH
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The unsigned horizontal radius of this ellipse.
+     */
+    radiusH(): number;
+    /**
+     * Get the signed horizonal radius of this ellipse.
+     *
+     * @method signedRadiusH
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed horizontal radius of this ellipse.
+     */
+    signedRadiusH(): number;
+    /**
+     * Get the non-negative vertical radius of this ellipse.
+     *
+     * @method radiusV
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The unsigned vertical radius of this ellipse.
+     */
+    radiusV(): number;
+    /**
+     * Get the signed vertical radius of this ellipse.
+     *
+     * @method radiusV
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed vertical radius of this ellipse.
+     */
+    signedRadiusV(): number;
+    /**
+     * Get the vertex on the ellipse's outline at the given angle.
+     *
+     * @method vertAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to determine the vertex at.
+     * @return {Vertex} The vertex on the outline at the given angle.
+     */
+    vertAt(angle: number): Vertex;
+    /**
+     * Get the perimeter of this ellipse.
+     *
+     * @method perimeter
+     * @instance
+     * @memberof VEllipse
+     * @return {number}
+     */
+    perimeter(): number;
     /**
      * Create an SVG representation of this ellipse.
      *
@@ -64,4 +130,22 @@ export declare class VEllipse implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     }): string;
+    /**
+     * A static collection of ellipse-related helper functions.
+     * @static
+     */
+    static utils: {
+        /**
+         * Calculate a particular point on the outline of the given ellipse (center plus two radii plus angle).
+         *
+         * @name polarToCartesian
+         * @param {number} centerX - The x coordinate of the elliptic center.
+         * @param {number} centerY - The y coordinate of the elliptic center.
+         * @param {number} radiusH - The horizontal radius of the ellipse.
+         * @param {number} radiusV - The vertical radius of the ellipse.
+         * @param {number} angle - The angle (in radians) to get the desired outline point for.
+         * @reutn {XYCoords} The outlont point in absolute x-y-coordinates.
+         */
+        polarToCartesian: (centerX: number, centerY: number, radiusH: number, radiusV: number, angle: number) => XYCoords;
+    };
 }

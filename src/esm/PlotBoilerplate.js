@@ -69,7 +69,9 @@
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
- * @version  1.13.0
+ * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
+ * @modified 2021-03-03 Added the `VEllipseSector` drawable.
+ * @version  1.13.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -92,6 +94,7 @@ import { PBImage } from "./PBImage";
 import { Polygon } from "./Polygon";
 import { Triangle } from "./Triangle";
 import { VEllipse } from "./VEllipse";
+import { VEllipseSector } from "./VEllipseSector";
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
@@ -276,6 +279,10 @@ export class PlotBoilerplate {
             ellipse: {
                 color: '#2222a8',
                 lineWidth: 1
+            },
+            ellipseSector: {
+                color: '#a822a8',
+                lineWidth: 2
             },
             circle: {
                 color: '#22a8a8',
@@ -777,6 +784,7 @@ export class PlotBoilerplate {
         offset.x = (Math.round(offset.x + cs.width) / Math.round(gSize.width)) * (gSize.width) / this.draw.scale.x + (((this.draw.offset.x - cs.width) / this.draw.scale.x) % gSize.width);
         offset.y = (Math.round(offset.y + cs.height) / Math.round(gSize.height)) * (gSize.height) / this.draw.scale.y + (((this.draw.offset.y - cs.height) / this.draw.scale.x) % gSize.height);
         if (this.drawConfig.drawGrid) {
+            draw.setCurrentClassName(null);
             if (this.config.rasterGrid) { // TODO: move config member to drawConfig
                 draw.setCurrentId('raster');
                 draw.raster(offset, this.canvasSize.width / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.125)');
@@ -919,18 +927,34 @@ export class PlotBoilerplate {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId(`${d.uid}_e0`);
                 draw.setCurrentClassName(`${d.className}-v-line`);
-                draw.line(d.center.clone().add(0, d.axis.y - d.center.y), d.axis, '#c8c8c8');
+                // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+                draw.line(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis, '#c8c8c8');
                 draw.setCurrentId(`${d.uid}_e1`);
                 draw.setCurrentClassName(`${d.className}-h-line`);
-                draw.line(d.center.clone().add(d.axis.x - d.center.x, 0), d.axis, '#c8c8c8');
+                // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
+                draw.line(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis, '#c8c8c8');
             }
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName(`${d.className}`);
-            draw.ellipse(d.center, Math.abs(d.axis.x - d.center.x), Math.abs(d.axis.y - d.center.y), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
+            draw.ellipse(d.center, 
+            // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
+            d.radiusH(), d.radiusV(), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth, d.rotation);
             if (!this.drawConfig.drawHandlePoints) {
                 d.center.attr.renderTime = renderTime;
                 d.axis.attr.renderTime = renderTime;
             }
+        }
+        else if (d instanceof VEllipseSector) {
+            draw.setCurrentId(d.uid);
+            draw.setCurrentClassName(`${d.className}`);
+            /* draw.ellipse( d.center,
+                  // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
+                  d.radiusH(), d.radiusV(),
+                  this.drawConfig.ellipse.color,
+                  this.drawConfig.ellipse.lineWidth,
+                  d.rotation ); */
+            const data = VEllipseSector.ellipseSectorUtils.describeSVGArc(d.ellipse.center.x, d.ellipse.center.y, d.ellipse.radiusH(), d.ellipse.radiusV(), d.startAngle, d.endAngle, d.ellipse.rotation, { moveToStart: true });
+            draw.path(data, this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
         }
         else if (d instanceof Circle) {
             draw.circle(d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth);
@@ -1073,6 +1097,10 @@ export class PlotBoilerplate {
         this.drawDrawables(renderTime, draw, fill);
         this.drawVertices(renderTime, draw);
         this.drawSelectPolygon(draw);
+        // Clear IDs and classnames (postDraw hook might draw somthing and the do not want
+        // to interfered with that).
+        draw.setCurrentId(undefined);
+        draw.setCurrentClassName(undefined);
     }
     ; // END redraw
     /**

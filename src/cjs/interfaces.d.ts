@@ -7,12 +7,14 @@
  * @modified 2021-02-08 Changed the `PBParams` interface: no longer sub-interface of `DrawConfig` (all those attributes were un-used).
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-01 Added the `rotation` param to the DrawLib.ellipse(...) function.
+ * @modified 2021-03-02 Added the `VEllipseSector` as to the `Drawable` type.
  **/
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
 import { Triangle } from "./Triangle";
 import { PBImage } from "./PBImage";
 import { VEllipse } from "./VEllipse";
+import { VEllipseSector } from "./VEllipseSector";
 import { Circle } from "./Circle";
 import { CircleSector } from "./CircleSector";
 import { Polygon } from "./Polygon";
@@ -52,7 +54,7 @@ export interface IBounds {
 /**
  * The types that can be drawn and thus added to the draw queue.
  */
-export declare type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | VEllipse | Polygon | BezierPath | Line;
+export declare type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | VEllipse | VEllipseSector | Polygon | BezierPath | Line;
 /**
  * A unique identifier (UID) to tell drawables apart in a performant manner.
  */
@@ -129,6 +131,7 @@ export interface DrawConfig {
     polygon: DrawSettings;
     triangle: DrawSettings;
     ellipse: DrawSettings;
+    ellipseSector: DrawSettings;
     circle: DrawSettings;
     circleSector: DrawSettings;
     vertex: DrawSettings;

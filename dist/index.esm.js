@@ -355,8 +355,9 @@ class VertexListeners {
  * @modified 2020-03-06 Added functions invX() and invY().
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-05-26 Added functions addX(number) and addY(number).
- * @modifeid 2020-10-30 Change the warnings in `sub(...)` and `add(...)` into real errors.
- * @version  2.4.1
+ * @modified 2020-10-30 Changed the warnings in `sub(...)` and `add(...)` into real errors.
+ * @modified 2021-03-01 Changed the second param `center` in the `rotate` function from Vertex to XYCoords.
+ * @version  2.4.2
  *
  * @file Vertex
  * @public
@@ -734,14 +735,14 @@ class Vertex {
      *
      * @method rotate
      * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
-     * @param {Vertex=} center - The center of rotation; default is (0,0).
+     * @param {XYCoords=} center - The center of rotation; default is (0,0).
      * @return {Vertex} this
      * @instance
      * @memberof Vertex
      **/
     rotate(angle, center) {
         if (!center || typeof center === "undefined")
-            center = new Vertex(0, 0);
+            center = { x: 0, y: 0 };
         this.sub(center);
         angle += Math.atan2(this.y, this.x);
         let len = this.distance(Vertex.ZERO); // {x:0,y:0});
@@ -4062,7 +4063,8 @@ Circle.circleUtils = {
  * @author   Ikaros Kappler
  * @date     2020-12-17
  * @modified 2021-01-20 Added UID.
- * @version  1.1.0
+ * @modified 2021-02-26 Fixed an error in the svg-arc-calculation (case angle<90deg and anti-clockwise).
+ * @version  1.1.1
  **/
 /**
  * @classdesc A simple circle sector: circle, start- and end-angle.
@@ -4151,8 +4153,17 @@ CircleSector.circleSectorUtils = {
             return firstHalf.concat(secondHalf);
         }
         // Boolean stored as integers (0|1).
-        const largeArcFlag = endAngle - startAngle <= Math.PI ? 0 : 1;
-        const sweepFlag = 1;
+        const diff = endAngle - startAngle;
+        var largeArcFlag;
+        var sweepFlag;
+        if (diff < 0) {
+            largeArcFlag = Math.abs(diff) < Math.PI ? 1 : 0;
+            sweepFlag = 1;
+        }
+        else {
+            largeArcFlag = Math.abs(diff) > Math.PI ? 1 : 0;
+            sweepFlag = 1;
+        }
         const pathData = [];
         if (options.moveToStart) {
             pathData.push('M', start.x, start.y);
@@ -4176,7 +4187,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
- * @version  1.0.1
+ * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
+ * @version  1.0.2
  **/
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -4685,16 +4697,22 @@ class drawutilssvg {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    ellipse(center, radiusX, radiusY, color, lineWidth) {
+    ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
+        if (typeof rotation === 'undefined') {
+            rotation = 0.0;
+        }
         const node = this.makeNode('ellipse');
         node.setAttribute('cx', `${this._x(center.x)}`);
         node.setAttribute('cy', `${this._y(center.y)}`);
         node.setAttribute('rx', `${radiusX * this.scale.x}`);
         node.setAttribute('ry', `${radiusY * this.scale.y}`);
+        // node.setAttribute( 'style', `transform: rotate(${rotation} ${center.x} ${center.y})` );
+        node.setAttribute('transform', `rotate(${rotation * 180 / Math.PI} ${this._x(center.x)} ${this._y(center.y)})`);
         return this._bindFillDraw(node, 'ellipse', color, lineWidth || 1);
     }
     ;
@@ -5022,6 +5040,7 @@ class drawutilssvg {
         this.removeAllChildNodes();
         // Add a covering rect with the given background color
         this.curId = 'background';
+        this.curClassName = undefined;
         const node = this.makeNode('rect');
         // For some strange reason SVG rotation transforms use degrees instead of radians
         // Note that the background does not scale with the zoom level (always covers full element)
@@ -5655,13 +5674,17 @@ class drawutils {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number} lineWidth=1 - An optional line width param (default is 1).
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse(center, radiusX, radiusY, color, lineWidth) {
+    ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
+        if (typeof rotation === 'undefined') {
+            rotation = 0.0;
+        }
         this.ctx.beginPath();
-        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, 0.0, 0.0, Math.PI * 2);
+        this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, rotation, 0.0, Math.PI * 2);
         this.ctx.closePath();
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
@@ -6335,11 +6358,12 @@ class drawutilsgl {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse(center, radiusX, radiusY, color, lineWidth) {
+    ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
         // NOT YET IMPLEMENTED
     }
     ;
@@ -7116,9 +7140,10 @@ Triangle.utils = {
 };
 
 /**
- * @author  Ikaros Kappler
- * @date    2019-02-03
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2019-02-03
+ * @modified 2021-03-01 Added `wrapMax` function.
+ * @version  1.1.0
  **/
 /**
  * A collection of usefull geometry utilities.
@@ -7160,7 +7185,20 @@ const geomutils = {
             result.push(new Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
         }
         return result;
-    }
+    },
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [0,max).
+     *
+     * @name wrapMax
+     * @param {number} x - The value to wrap.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [0,max).
+     */
+    wrapMax(x, max) {
+        // Found at
+        //    https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
+        return (max + (x % max)) % max;
+    },
 };
 
 /**
@@ -8523,7 +8561,11 @@ class AlloyFinger {
  * @modified 2018-12-04 Added the toSVGString function.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2021-01-20 Added UID.
- * @version  1.1.0
+ * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
+ * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
+ * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
+ * @modified 2021-03-04 Added the `vertAt` and `perimeter` functions.
+ * @version  1.2.2
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -8541,11 +8583,12 @@ class VEllipse {
      * The constructor.
      *
      * @constructor
-     * @param {Vertex} center The ellipses center.
-     * @param {Vertex} axis The x- and y-axis.
+     * @param {Vertex} center - The ellipses center.
+     * @param {Vertex} axis - The x- and y-axis (the two radii encoded in a control point).
+     * @param {Vertex} rotation - [optional, default=0] The rotation of this ellipse.
      * @name VEllipse
      **/
-    constructor(center, axis) {
+    constructor(center, axis, rotation) {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -8553,6 +8596,96 @@ class VEllipse {
         this.uid = UIDGenerator.next();
         this.center = center;
         this.axis = axis;
+        this.rotation = rotation | 0.0;
+    }
+    ;
+    /**
+     * Get the non-negative horizonal radius of this ellipse.
+     *
+     * @method radiusH
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The unsigned horizontal radius of this ellipse.
+     */
+    radiusH() {
+        return Math.abs(this.signedRadiusH());
+    }
+    ;
+    /**
+     * Get the signed horizonal radius of this ellipse.
+     *
+     * @method signedRadiusH
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed horizontal radius of this ellipse.
+     */
+    signedRadiusH() {
+        // return Math.abs(this.axis.x - this.center.x);
+        // Rotate axis back to origin before calculating radius
+        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
+        return new Vertex(this.axis).rotate(-this.rotation, this.center).x - this.center.x;
+    }
+    ;
+    /**
+     * Get the non-negative vertical radius of this ellipse.
+     *
+     * @method radiusV
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The unsigned vertical radius of this ellipse.
+     */
+    radiusV() {
+        return Math.abs(this.signedRadiusV());
+    }
+    ;
+    /**
+     * Get the signed vertical radius of this ellipse.
+     *
+     * @method radiusV
+     * @instance
+     * @memberof VEllipse
+     * @return {number} The signed vertical radius of this ellipse.
+     */
+    signedRadiusV() {
+        // return Math.abs(this.axis.y - this.center.y);
+        // Rotate axis back to origin before calculating radius
+        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
+        return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
+    }
+    ;
+    /**
+     * Get the vertex on the ellipse's outline at the given angle.
+     *
+     * @method vertAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to determine the vertex at.
+     * @return {Vertex} The vertex on the outline at the given angle.
+     */
+    vertAt(angle) {
+        // Tanks to Narasinham for the vertex-on-ellipse equations
+        // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
+        const a = this.radiusH();
+        const b = this.radiusV();
+        return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
+    }
+    ;
+    /**
+     * Get the perimeter of this ellipse.
+     *
+     * @method perimeter
+     * @instance
+     * @memberof VEllipse
+     * @return {number}
+     */
+    perimeter() {
+        // This method does not use an iterative approximation to determine the perimeter, but it uses
+        // a wonderful closed approximation found by Srinivasa Ramanujan.
+        // Matt Parker made a neat video about it:
+        //    https://www.youtube.com/watch?v=5nW3nJhBHL0
+        const a = this.radiusH();
+        const b = this.radiusV();
+        return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
     }
     ;
     /**
@@ -8577,6 +8710,121 @@ class VEllipse {
     }
     ;
 }
+/**
+ * A static collection of ellipse-related helper functions.
+ * @static
+ */
+VEllipse.utils = {
+    /**
+     * Calculate a particular point on the outline of the given ellipse (center plus two radii plus angle).
+     *
+     * @name polarToCartesian
+     * @param {number} centerX - The x coordinate of the elliptic center.
+     * @param {number} centerY - The y coordinate of the elliptic center.
+     * @param {number} radiusH - The horizontal radius of the ellipse.
+     * @param {number} radiusV - The vertical radius of the ellipse.
+     * @param {number} angle - The angle (in radians) to get the desired outline point for.
+     * @reutn {XYCoords} The outlont point in absolute x-y-coordinates.
+     */
+    polarToCartesian: (centerX, centerY, radiusH, radiusV, angle) => {
+        // Tanks to Narasinham for the vertex-on-ellipse equations
+        // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
+        var s = Math.sin(Math.PI / 2 - angle);
+        var c = Math.cos(Math.PI / 2 - angle);
+        return { x: centerX + radiusH * radiusV * s / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
+            y: centerY + radiusH * radiusV * c / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
+        };
+    }
+}; // END utils
+
+/**
+ * Implementation of elliptic sectors.
+ * Note that sectors are constructed in clockwise direction.
+ *
+ * @author  Ikaros Kappler
+ * @date    2021-02-26
+ * @version 1.0.0
+ */
+/**
+ * @classdesc A class for elliptic sectors.
+ *
+ * @requires Line
+ * @requires Vector
+ * @requires VertTuple
+ * @requires Vertex
+ * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
+ **/
+class VEllipseSector {
+    /**
+     * Create a new elliptic sector from the given ellipse and two angles.
+     *
+     * Note that the direction from start to end goes clockwise.
+     *
+     * @constructor
+     * @name VEllipseSector
+     * @param {VEllipse} - The underlying ellipse to use.
+     * @param {number} startAngle - The start angle of the sector.
+     * @param {numner} endAngle - The end angle of the sector.
+     */
+    constructor(ellipse, startAngle, endAngle) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "VEllipseSector";
+        this.uid = UIDGenerator.next();
+        this.ellipse = ellipse;
+        this.startAngle = startAngle;
+        this.endAngle = endAngle;
+    }
+}
+VEllipseSector.ellipseSectorUtils = {
+    /**
+     * Helper function to convert an elliptic section to SVG arc params (for the `d` attribute).
+     * Inspiration found at:
+     *    https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
+     *
+     * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
+     * @return [ 'A', radiusH, radiusV, rotation, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
+     */
+    describeSVGArc: (x, y, radiusH, radiusV, startAngle, endAngle, rotation, options) => {
+        if (typeof options === 'undefined')
+            options = { moveToStart: true };
+        if (typeof rotation === 'undefined')
+            rotation = 0.0;
+        // Important note: this function only works if start- and end-angle are within
+        // one whole circle [x,x+2*PI].
+        // Revelations of more than 2*PI might result in unexpected arcs.
+        // -> Use the geomutils.wrapMax( angle, 2*PI )
+        startAngle = geomutils.wrapMax(startAngle, Math.PI * 2);
+        endAngle = geomutils.wrapMax(endAngle, Math.PI * 2);
+        // Find the start- and end-point on the rotated ellipse
+        // XYCoords to Vertex (for rotation)
+        var end = new Vertex(VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, endAngle));
+        var start = new Vertex(VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, startAngle));
+        end.rotate(rotation, { x: x, y: y });
+        start.rotate(rotation, { x: x, y: y });
+        var diff = endAngle - startAngle;
+        // Boolean stored as integers (0|1).
+        var largeArcFlag;
+        if (diff < 0) {
+            largeArcFlag = Math.abs(diff) < Math.PI ? 1 : 0;
+        }
+        else {
+            largeArcFlag = Math.abs(diff) > Math.PI ? 1 : 0;
+        }
+        const sweepFlag = 1;
+        const pathData = [];
+        if (options.moveToStart) {
+            pathData.push('M', start.x, start.y);
+        }
+        // Arc rotation in degrees, not radians.
+        const r2d = 180 / Math.PI;
+        pathData.push("A", radiusH, radiusV, rotation * r2d, largeArcFlag, sweepFlag, end.x, end.y);
+        return pathData;
+    } // END function describeSVGArc
+}; // END ellipseSectorUtils
 
 /**
  * @author   Ikaros Kappler
@@ -8649,7 +8897,9 @@ class VEllipse {
  * @modified 2021-01-26 Replaced the old SVGBuilder by the new `drawutilssvg` library.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
- * @version  1.13.0
+ * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
+ * @modified 2021-03-03 Added the `VEllipseSector` drawable.
+ * @version  1.13.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -8837,6 +9087,10 @@ class PlotBoilerplate {
             ellipse: {
                 color: '#2222a8',
                 lineWidth: 1
+            },
+            ellipseSector: {
+                color: '#a822a8',
+                lineWidth: 2
             },
             circle: {
                 color: '#22a8a8',
@@ -9338,6 +9592,7 @@ class PlotBoilerplate {
         offset.x = (Math.round(offset.x + cs.width) / Math.round(gSize.width)) * (gSize.width) / this.draw.scale.x + (((this.draw.offset.x - cs.width) / this.draw.scale.x) % gSize.width);
         offset.y = (Math.round(offset.y + cs.height) / Math.round(gSize.height)) * (gSize.height) / this.draw.scale.y + (((this.draw.offset.y - cs.height) / this.draw.scale.x) % gSize.height);
         if (this.drawConfig.drawGrid) {
+            draw.setCurrentClassName(null);
             if (this.config.rasterGrid) { // TODO: move config member to drawConfig
                 draw.setCurrentId('raster');
                 draw.raster(offset, this.canvasSize.width / this.draw.scale.x, (this.canvasSize.height) / this.draw.scale.y, gSize.width, gSize.height, 'rgba(0,128,255,0.125)');
@@ -9480,18 +9735,34 @@ class PlotBoilerplate {
             if (this.drawConfig.drawHandleLines) {
                 draw.setCurrentId(`${d.uid}_e0`);
                 draw.setCurrentClassName(`${d.className}-v-line`);
-                draw.line(d.center.clone().add(0, d.axis.y - d.center.y), d.axis, '#c8c8c8');
+                // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
+                draw.line(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis, '#c8c8c8');
                 draw.setCurrentId(`${d.uid}_e1`);
                 draw.setCurrentClassName(`${d.className}-h-line`);
-                draw.line(d.center.clone().add(d.axis.x - d.center.x, 0), d.axis, '#c8c8c8');
+                // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
+                draw.line(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis, '#c8c8c8');
             }
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName(`${d.className}`);
-            draw.ellipse(d.center, Math.abs(d.axis.x - d.center.x), Math.abs(d.axis.y - d.center.y), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
+            draw.ellipse(d.center, 
+            // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
+            d.radiusH(), d.radiusV(), this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth, d.rotation);
             if (!this.drawConfig.drawHandlePoints) {
                 d.center.attr.renderTime = renderTime;
                 d.axis.attr.renderTime = renderTime;
             }
+        }
+        else if (d instanceof VEllipseSector) {
+            draw.setCurrentId(d.uid);
+            draw.setCurrentClassName(`${d.className}`);
+            /* draw.ellipse( d.center,
+                  // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
+                  d.radiusH(), d.radiusV(),
+                  this.drawConfig.ellipse.color,
+                  this.drawConfig.ellipse.lineWidth,
+                  d.rotation ); */
+            const data = VEllipseSector.ellipseSectorUtils.describeSVGArc(d.ellipse.center.x, d.ellipse.center.y, d.ellipse.radiusH(), d.ellipse.radiusV(), d.startAngle, d.endAngle, d.ellipse.rotation, { moveToStart: true });
+            draw.path(data, this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth);
         }
         else if (d instanceof Circle) {
             draw.circle(d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth);
@@ -9634,6 +9905,10 @@ class PlotBoilerplate {
         this.drawDrawables(renderTime, draw, fill);
         this.drawVertices(renderTime, draw);
         this.drawSelectPolygon(draw);
+        // Clear IDs and classnames (postDraw hook might draw somthing and the do not want
+        // to interfered with that).
+        draw.setCurrentId(undefined);
+        draw.setCurrentClassName(undefined);
     }
     ; // END redraw
     /**
@@ -10607,5 +10882,5 @@ class SVGBuilder {
     ;
 }
 
-export { BezierPath, Bounds, Circle, CircleSector, CubicBezierCurve, Grid, KeyHandler, Line, MouseHandler, PBImage, PlotBoilerplate, Polygon, SVGBuilder, Triangle, UIDGenerator, VEllipse, Vector, VertTuple, Vertex, VertexAttr, VertexListeners, XMouseEvent, XWheelEvent, drawutils, drawutilsgl, drawutilssvg, geomutils };
+export { BezierPath, Bounds, Circle, CircleSector, CubicBezierCurve, Grid, KeyHandler, Line, MouseHandler, PBImage, PlotBoilerplate, Polygon, SVGBuilder, Triangle, UIDGenerator, VEllipse, VEllipseSector, Vector, VertTuple, Vertex, VertexAttr, VertexListeners, XMouseEvent, XWheelEvent, drawutils, drawutilsgl, drawutilssvg, geomutils };
 //# sourceMappingURL=index.esm.js.map

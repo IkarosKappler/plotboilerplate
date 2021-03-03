@@ -19,6 +19,7 @@ export * from "./Triangle";
 export * from "./UIDGenerator";
 export * from "./Vector";
 export * from "./VEllipse";
+export * from "./VEllipseSector";
 export * from "./Vertex";
 export * from "./VertexAttr";
 export * from "./VertexListeners";

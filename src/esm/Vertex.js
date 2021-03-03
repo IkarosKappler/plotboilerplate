@@ -20,8 +20,9 @@
  * @modified 2020-03-06 Added functions invX() and invY().
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-05-26 Added functions addX(number) and addY(number).
- * @modifeid 2020-10-30 Change the warnings in `sub(...)` and `add(...)` into real errors.
- * @version  2.4.1
+ * @modified 2020-10-30 Changed the warnings in `sub(...)` and `add(...)` into real errors.
+ * @modified 2021-03-01 Changed the second param `center` in the `rotate` function from Vertex to XYCoords.
+ * @version  2.4.2
  *
  * @file Vertex
  * @public
@@ -402,14 +403,14 @@ export class Vertex {
      *
      * @method rotate
      * @param {number} angle - The angle to 'rotate' this vertex; 0.0 means no change.
-     * @param {Vertex=} center - The center of rotation; default is (0,0).
+     * @param {XYCoords=} center - The center of rotation; default is (0,0).
      * @return {Vertex} this
      * @instance
      * @memberof Vertex
      **/
     rotate(angle, center) {
         if (!center || typeof center === "undefined")
-            center = new Vertex(0, 0);
+            center = { x: 0, y: 0 };
         this.sub(center);
         angle += Math.atan2(this.y, this.x);
         let len = this.distance(Vertex.ZERO); // {x:0,y:0});

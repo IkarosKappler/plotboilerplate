@@ -12,7 +12,8 @@
  * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
- * @version  1.0.1
+ * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
+ * @version  1.0.2
  **/
 import { CircleSector } from "../../CircleSector";
 import { CubicBezierCurve } from "../../CubicBezierCurve";
@@ -524,16 +525,22 @@ export class drawutilssvg {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    ellipse(center, radiusX, radiusY, color, lineWidth) {
+    ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
+        if (typeof rotation === 'undefined') {
+            rotation = 0.0;
+        }
         const node = this.makeNode('ellipse');
         node.setAttribute('cx', `${this._x(center.x)}`);
         node.setAttribute('cy', `${this._y(center.y)}`);
         node.setAttribute('rx', `${radiusX * this.scale.x}`);
         node.setAttribute('ry', `${radiusY * this.scale.y}`);
+        // node.setAttribute( 'style', `transform: rotate(${rotation} ${center.x} ${center.y})` );
+        node.setAttribute('transform', `rotate(${rotation * 180 / Math.PI} ${this._x(center.x)} ${this._y(center.y)})`);
         return this._bindFillDraw(node, 'ellipse', color, lineWidth || 1);
     }
     ;
@@ -862,6 +869,7 @@ export class drawutilssvg {
         this.removeAllChildNodes();
         // Add a covering rect with the given background color
         this.curId = 'background';
+        this.curClassName = undefined;
         const node = this.makeNode('rect');
         // For some strange reason SVG rotation transforms use degrees instead of radians
         // Note that the background does not scale with the zoom level (always covers full element)

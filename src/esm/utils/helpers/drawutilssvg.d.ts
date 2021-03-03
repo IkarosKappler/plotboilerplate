@@ -12,7 +12,8 @@
  * @modified 2021-02-19 Added the static helper function `transformPathData(...)` for svg path transformations (scale and translate).
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
- * @version  1.0.1
+ * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
+ * @version  1.0.2
  **/
 import { Polygon } from "../../Polygon";
 import { Vertex } from "../../Vertex";
@@ -359,11 +360,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number): SVGElement;
+    ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number): SVGElement;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>

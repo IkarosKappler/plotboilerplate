@@ -70,7 +70,8 @@
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
  * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
- * @version  1.13.1
+ * @modified 2021-03-03 Added the `VEllipseSector` drawable.
+ * @version  1.13.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -97,11 +98,12 @@ import { PBImage } from "./PBImage";
 import { Polygon } from "./Polygon";
 import { Triangle } from "./Triangle";
 import { VEllipse } from "./VEllipse";
+import { VEllipseSector } from "./VEllipseSector";
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
 import { VertEvent } from "./VertexListeners";
-import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, XYCoords, XYDimension } from "./interfaces";
+import { IDraggable, Config, DrawLib, Drawable, DrawConfig, IHooks, PBParams, SVGPathParams, XYCoords, XYDimension } from "./interfaces";
 
 
 /**
@@ -448,6 +450,10 @@ export class PlotBoilerplate {
 	    ellipse : {
 		color : '#2222a8',
 		lineWidth : 1
+	    },
+	    ellipseSector : {
+		color : '#a822a8',
+		lineWidth : 2
 	    },
 	    circle : {
 	    	color : '#22a8a8',
@@ -1125,6 +1131,23 @@ export class PlotBoilerplate {
 		d.center.attr.renderTime = renderTime;
 		d.axis.attr.renderTime = renderTime;
 	    }
+	} else if( d instanceof VEllipseSector ) {
+	    draw.setCurrentId(d.uid);
+	    draw.setCurrentClassName(`${d.className}`);
+	    /* draw.ellipse( d.center,
+			  // Math.abs(d.axis.x-d.center.x), Math.abs(d.axis.y-d.center.y),
+			  d.radiusH(), d.radiusV(),
+			  this.drawConfig.ellipse.color,
+			  this.drawConfig.ellipse.lineWidth,
+			  d.rotation ); */
+	    const data : SVGPathParams =
+		VEllipseSector.ellipseSectorUtils.describeSVGArc(
+		    d.ellipse.center.x, d.ellipse.center.y,
+		    d.ellipse.radiusH(), d.ellipse.radiusV(),
+		    d.startAngle, d.endAngle,
+		    d.ellipse.rotation,
+		    { moveToStart : true } );
+	    draw.path( data, this.drawConfig.ellipse.color, this.drawConfig.ellipse.lineWidth );
 	} else if( d instanceof Circle ) {
 	    draw.circle( d.center, d.radius, this.drawConfig.circle.color, this.drawConfig.circle.lineWidth );
 	} else if( d instanceof CircleSector ) {

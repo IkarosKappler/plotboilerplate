@@ -30,11 +30,11 @@
 	    
 	    // First create an ellipse to start with:
 	    //  center vertex, radius (a non-negative number) and rotation.
-	    // INPUT:
 	    var center   = new Vertex( 10, 10 );
 	    var radiusH  = 150.0;
 	    var radiusV  = 200.0;
 	    var rotation = 0.0;
+	    
 	    
 
 	    // Create the ellipse
@@ -56,8 +56,12 @@
 	    pb.add( [startControlPoint, endControlPoint] );
 	    pb.add( rotationControlPoint );
 
-	    var startControlLine = new Line( ellipse.center, startControlPoint );
-	    var endControlLine = new Line( ellipse.center, endControlPoint );
+
+	    // +---------------------------------------------------------------------
+	    // | Define some lines to read angles from.
+	    // +-------------------------------------------
+	    var startControlLine    = new Line( ellipse.center, startControlPoint );
+	    var endControlLine      = new Line( ellipse.center, endControlPoint );
 	    var rotationControlLine = new Line( ellipse.center, rotationControlPoint );
 
 	    
@@ -114,7 +118,7 @@
 			ellipseSector.startAngle, ellipseSector.endAngle,
 			ellipseSector.ellipse.rotation,
 			{ moveToStart : true } );
-		pb.draw.path( pathData, 'rgba(255,0,0,0.5)', 2 );
+		pb.draw.path( pathData, 'rgba(255,0,0,0.5)', 2 ); 
 
 		
 		// Draw intersection point and labels (start/end)
@@ -147,6 +151,9 @@
 	    };
 	    var _circle = new Circle( center, ((radiusH+radiusV)/2)*0.5 );
 	    pb.add( _circle );
+
+	    // Create a gui for testing with scale
+	    var gui = pb.createGUI();	    
 
 	    pb.redraw();
 	} );

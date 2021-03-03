@@ -1,7 +1,8 @@
 /**
- * @author  Ikaros Kappler
- * @date    2019-02-03
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2019-02-03
+ * @modified 2021-03-01 Added `wrapMax` function.
+ * @version  1.1.0
  **/
 import { Line } from "./Line";
 import { Triangle } from "./Triangle";
@@ -45,6 +46,19 @@ export const geomutils = {
             result.push(new Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
         }
         return result;
-    }
+    },
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [0,max).
+     *
+     * @name wrapMax
+     * @param {number} x - The value to wrap.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [0,max).
+     */
+    wrapMax(x, max) {
+        // Found at
+        //    https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
+        return (max + (x % max)) % max;
+    },
 };
 //# sourceMappingURL=geomutils.js.map
