@@ -30,10 +30,12 @@
 	    
 	    // First create an ellipse to start with:
 	    //  center vertex, radius (a non-negative number) and rotation.
+	    // INPUT:
 	    var center   = new Vertex( 10, 10 );
 	    var radiusH  = 150.0;
 	    var radiusV  = 200.0;
-	    var rotation = 0.0; 
+	    var rotation = 0.0;
+	    
 
 	    // Create the ellipse
 	    var ellipse = new VEllipse( center, new Vertex(center.x+radiusH, center.y+radiusV), rotation );
@@ -48,6 +50,7 @@
 	    var endControlPoint      = ellipse.vertAt( endAngle );
 	    var rotationControlPoint = ellipse.vertAt( rotation ).scale( 1.2, ellipse.center );
 
+	    
 	    // Now add the sector to your canvas
 	    pb.add( ellipse );
 	    pb.add( [startControlPoint, endControlPoint] );
@@ -57,45 +60,66 @@
 	    var endControlLine = new Line( ellipse.center, endControlPoint );
 	    var rotationControlLine = new Line( ellipse.center, rotationControlPoint );
 
+	    
+	    // +---------------------------------------------------------------------
+	    // | Listen for the center to be moved.
+	    // +-------------------------------------------
 	    ellipseSector.ellipse.center.listeners.addDragListener( function(event) {
 		startControlPoint.add( event.params.dragAmount );
 		endControlPoint.add( event.params.dragAmount );
 		rotationControlPoint.add( event.params.dragAmount );
 	    } );
 
+	    
+	    // +---------------------------------------------------------------------
+	    // | Listen for rotation changes.
+	    // +-------------------------------------------
 	    rotationControlPoint.listeners.addDragListener( function(event) {
 		var newRotation = rotationControlLine.angle();
-		var rDiff = newRotation-rotation;
-		ellipse.axis.rotate( rDiff, ellipseSector.ellipse.center );
+		var rDiff = newRotation-ellipse.rotation;
+		ellipse.rotation = newRotation;
+		ellipseSector.ellipse.axis.rotate( rDiff, ellipseSector.ellipse.center );
 		startControlPoint.rotate( rDiff, ellipseSector.ellipse.center );
 		endControlPoint.rotate( rDiff, ellipseSector.ellipse.center );
-		rotation = newRotation;
-		ellipse.rotation = newRotation;
+	    } );
+
+	    // +---------------------------------------------------------------------
+	    // | Listen for start angle changes.
+	    // +-------------------------------------------
+	    startControlPoint.listeners.addDragListener( function(event) {
+		ellipseSector.startAngle = startControlLine.angle() - ellipse.rotation;
+	    } );
+
+	    // +---------------------------------------------------------------------
+	    // | Listen for end angle changes.
+	    // +-------------------------------------------
+	    endControlPoint.listeners.addDragListener( function(event) {
+		ellipseSector.endAngle = endControlLine.angle() - ellipse.rotation;
 	    } );
 	    
-
+	    
+	    // +---------------------------------------------------------------------
+	    // | Draw additional lines to visualize what's happening.
+	    // +-------------------------------------------
 	    pb.config.postDraw = function() {
 		pb.draw.line( startControlLine.a, startControlLine.b, 'rgba(192,128,128,0.5)', 1.0 );
 		pb.draw.line( endControlLine.a, endControlLine.b, 'rgba(192,128,128,0.5)', 1.0 );
 		pb.draw.line( rotationControlLine.a, rotationControlLine.b, 'rgba(64,192,128,0.333)', 1.0 );
 
-		startAngle = startControlLine.angle() - rotation;
-		endAngle = endControlLine.angle() - rotation;
-
 		// Draw the arc
 		var pathData =
 		    VEllipseSector.ellipseSectorUtils.describeSVGArc(
-			ellipse.center.x, ellipse.center.y,
-			ellipse.radiusH(), ellipse.radiusV(),
-			startAngle, endAngle,
-			ellipse.rotation,
+			ellipseSector.ellipse.center.x, ellipseSector.ellipse.center.y,
+			ellipseSector.ellipse.radiusH(), ellipseSector.ellipse.radiusV(),
+			ellipseSector.startAngle, ellipseSector.endAngle,
+			ellipseSector.ellipse.rotation,
 			{ moveToStart : true } );
 		pb.draw.path( pathData, 'rgba(255,0,0,0.5)', 2 );
 
 		
 		// Draw intersection point and labels (start/end)
-		var newStartPoint = ellipse.vertAt( startAngle );
-		var newEndPoint = ellipse.vertAt( endAngle );
+		var newStartPoint = ellipse.vertAt( ellipseSector. startAngle );
+		var newEndPoint = ellipse.vertAt( ellipseSector.endAngle );
 		pb.draw.diamondHandle( newStartPoint, 7, 'rgba(128,64,128,0.5)' );
 		pb.draw.diamondHandle( newEndPoint, 7, 'rgba(128,64,128,0.5)' );
 		pb.fill.text( "start", newStartPoint.x, newStartPoint.y  );
@@ -109,15 +133,15 @@
 	     * For comparison draw a circle inside the ellipse.
 	     */
 	    var drawCircle = function(newStartAngle,newEndAngle) {
-		var a = _circle.vertAt( newStartAngle + ellipse.rotation );
-		var b = _circle.vertAt( newEndAngle + ellipse.rotation );
+		var a = _circle.vertAt( ellipseSector.startAngle + ellipse.rotation );
+		var b = _circle.vertAt( ellipseSector.endAngle + ellipse.rotation );
 		pb.draw.diamondHandle( a, 7, 'rgba(128,64,128,0.5)' );
 		pb.draw.diamondHandle( b, 7, 'rgba(128,64,128,0.5)' );
 
 		var sector = CircleSector.circleSectorUtils.describeSVGArc(
 		    _circle.center.x, _circle.center.y, _circle.radius,
-		    newStartAngle + ellipse.rotation,
-		    newEndAngle + ellipse.rotation
+		    ellipseSector.startAngle + ellipseSector.ellipse.rotation,
+		    ellipseSector.endAngle + ellipseSector.ellipse.rotation
 		);
 		pb.draw.path( sector, 'rgba(255,0,0,0.25)', 2 );
 	    };
