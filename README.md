@@ -482,6 +482,8 @@ The Vertex class has basic drag event support:
 * [Jos de Jong](https://github.com/josdejong) for the very useful [math.js library](https://github.com/josdejong/mathjs)
 * Jack Franklin for the [howto-module-tutorial](https://blog.logrocket.com/publishing-node-modules-typescript-es-modules/)
 * Narasinham for the very useful [vertex-on-ellipse equations](https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle)
+* [Tim Čas](https://stackoverflow.com/users/485088/tim-%c4%8cas "Tim Čas") for the [wrapMax/wrapMinMax functions](https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi "wrapMax/wrapMinMax functions")
+
 
 ## Todos
 [What needs to be done](https://github.com/IkarosKappler/plotboilerplate/blob/master/todos.md "Future To-Dos")

@@ -1,5 +1,7 @@
 
 # Changelog
+* 2021-03-04
+  * Added the `VEllipse.vertAt` and `VEllipse.perimeter` functions.
 * 2021-03-01
   * Added `geomutils.wrapMax` function.
   * Added attribute `VEllipse.rotation` to allow rotation of ellipses.

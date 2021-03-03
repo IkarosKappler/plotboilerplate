@@ -46,6 +46,7 @@
 
 
 	    // Add a rotation control
+	    // TODO: refactor this to an 'VEllipseRotationHelper'?
 	    (function() {
 		var rotationControlPoint = ellipse.vertAt( rotation ).scale( 1.2, ellipse.center );
 		var rotationLine = new Line( ellipse.center, rotationControlPoint );
@@ -56,7 +57,6 @@
 		    var newRotation = rotationLine.angle();
 		    var rDiff = newRotation - ellipse.rotation;
 		    ellipse.rotation = newRotation;
-		    console.log('rotation', ellipse.rotation );
 		    ellipse.axis.rotate( rDiff, ellipse.center );
 		} );
 		pb.add( rotationControlPoint );

@@ -21,8 +21,7 @@
     "webpack-browser": "npx webpack --mode production --config ./webpack5.browser.config.js",
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",
     "rollup-module": "npx rollup -c",
-    "tslint": "npx eslint ./src/ts/",
-    "create-js-symlink": "ln -s cjs ./src/js"
+    "tslint": "npx eslint ./src/ts/"
   },
   "repository": {
     "type": "git",
@@ -31,6 +30,7 @@
   "keywords": [
     "javascript",
     "canvas",
+    "svg",
     "plot",
     "2d",
     "context2d",
@@ -41,6 +41,8 @@
     "polygon",
     "circle",
     "ellipse",
+    "sector",
+    "arc",
     "curve",
     "bezier",
     "Bézier",

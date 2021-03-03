@@ -8,7 +8,8 @@
  * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
- * @version  1.2.1
+ * @modified 2021-03-04 Added the `vertAt` and `perimeter` functions.
+ * @version  1.2.2
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -55,9 +56,6 @@ var VEllipse = /** @class */ (function () {
      * @return {number} The unsigned horizontal radius of this ellipse.
      */
     VEllipse.prototype.radiusH = function () {
-        // return Math.abs(this.axis.x - this.center.x);
-        // Rotate axis back to origin before calculating radius
-        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
         return Math.abs(this.signedRadiusH());
     };
     ;
@@ -85,9 +83,6 @@ var VEllipse = /** @class */ (function () {
      * @return {number} The unsigned vertical radius of this ellipse.
      */
     VEllipse.prototype.radiusV = function () {
-        // return Math.abs(this.axis.y - this.center.y);
-        // Rotate axis back to origin before calculating radius
-        // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
         return Math.abs(this.signedRadiusV());
     };
     ;
@@ -106,12 +101,39 @@ var VEllipse = /** @class */ (function () {
         return new Vertex_1.Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     };
     ;
+    /**
+     * Get the vertex on the ellipse's outline at the given angle.
+     *
+     * @method vertAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to determine the vertex at.
+     * @return {Vertex} The vertex on the outline at the given angle.
+     */
     VEllipse.prototype.vertAt = function (angle) {
         // Tanks to Narasinham for the vertex-on-ellipse equations
         // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
         var a = this.radiusH();
         var b = this.radiusV();
         return new Vertex_1.Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
+    };
+    ;
+    /**
+     * Get the perimeter of this ellipse.
+     *
+     * @method perimeter
+     * @instance
+     * @memberof VEllipse
+     * @return {number}
+     */
+    VEllipse.prototype.perimeter = function () {
+        // This method does not use an iterative approximation to determine the perimeter, but it uses
+        // a wonderful closed approximation found by Srinivasa Ramanujan.
+        // Matt Parker made a neat video about it:
+        //    https://www.youtube.com/watch?v=5nW3nJhBHL0
+        var a = this.radiusH();
+        var b = this.radiusV();
+        return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
     };
     ;
     /**

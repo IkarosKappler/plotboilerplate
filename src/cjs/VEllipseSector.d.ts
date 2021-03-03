@@ -6,8 +6,8 @@
  * @date    2021-02-26
  * @version 1.0.0
  */
-import { VEllipse } from "./VEllipse";
 import { SVGPathParams, UID } from "./interfaces";
+import { VEllipse } from "./VEllipse";
 /**
  * @classdesc A class for elliptic sectors.
  *
@@ -65,13 +65,12 @@ export declare class VEllipseSector {
     constructor(ellipse: VEllipse, startAngle: number, endAngle: number);
     static ellipseSectorUtils: {
         /**
-         * Helper function to convert a circle section as SVG arc params (for the `d` attribute).
-         * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
-         *
-         * TODO: generalize for ellipses (two radii).
+         * Helper function to convert an elliptic section to SVG arc params (for the `d` attribute).
+         * Inspiration found at:
+         *    https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
          *
          * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
-         * @return [ 'A', radiusH, radiusV, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
+         * @return [ 'A', radiusH, radiusV, rotation, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
         describeSVGArc: (x: number, y: number, radiusH: number, radiusV: number, startAngle: number, endAngle: number, rotation?: number, options?: {
             moveToStart: boolean;

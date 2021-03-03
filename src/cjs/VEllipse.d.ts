@@ -7,7 +7,8 @@
  * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
- * @version  1.2.1
+ * @modified 2021-03-04 Added the `vertAt` and `perimeter` functions.
+ * @version  1.2.2
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -100,7 +101,25 @@ export declare class VEllipse implements SVGSerializable {
      * @return {number} The signed vertical radius of this ellipse.
      */
     signedRadiusV(): number;
+    /**
+     * Get the vertex on the ellipse's outline at the given angle.
+     *
+     * @method vertAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to determine the vertex at.
+     * @return {Vertex} The vertex on the outline at the given angle.
+     */
     vertAt(angle: number): Vertex;
+    /**
+     * Get the perimeter of this ellipse.
+     *
+     * @method perimeter
+     * @instance
+     * @memberof VEllipse
+     * @return {number}
+     */
+    perimeter(): number;
     /**
      * Create an SVG representation of this ellipse.
      *

@@ -11,8 +11,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipseSector = void 0;
 // TODO: add class to all demos
 // TODO: add to PlotBoilerplate.add(...)
-var VEllipse_1 = require("./VEllipse");
+var geomutils_1 = require("./geomutils");
 var UIDGenerator_1 = require("./UIDGenerator");
+var VEllipse_1 = require("./VEllipse");
 var Vertex_1 = require("./Vertex");
 /**
  * @classdesc A class for elliptic sectors.
@@ -49,49 +50,47 @@ var VEllipseSector = /** @class */ (function () {
     }
     VEllipseSector.ellipseSectorUtils = {
         /**
-         * Helper function to convert a circle section as SVG arc params (for the `d` attribute).
-         * Found at: https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
-         *
-         * TODO: generalize for ellipses (two radii).
+         * Helper function to convert an elliptic section to SVG arc params (for the `d` attribute).
+         * Inspiration found at:
+         *    https://stackoverflow.com/questions/5736398/how-to-calculate-the-svg-path-for-an-arc-of-a-circle
          *
          * @param {boolean} options.moveToStart - If false (default=true) the initial 'Move' command will not be used.
-         * @return [ 'A', radiusH, radiusV, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
+         * @return [ 'A', radiusH, radiusV, rotation, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
         describeSVGArc: function (x, y, radiusH, radiusV, startAngle, endAngle, rotation, options) {
             if (typeof options === 'undefined')
                 options = { moveToStart: true };
             if (typeof rotation === 'undefined')
                 rotation = 0.0;
-            console.log('rotation', rotation);
-            // XYCoords
+            // Important note: this function only works if start- and end-angle are within
+            // one whole circle [x,x+2*PI].
+            // Revelations of more than 2*PI might result in unexpected arcs.
+            // -> Use the geomutils.wrapMax( angle, 2*PI )
+            startAngle = geomutils_1.geomutils.wrapMax(startAngle, Math.PI * 2);
+            endAngle = geomutils_1.geomutils.wrapMax(endAngle, Math.PI * 2);
+            // Find the start- and end-point on the rotated ellipse
+            // XYCoords to Vertex (for rotation)
             var end = new Vertex_1.Vertex(VEllipse_1.VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, endAngle));
             var start = new Vertex_1.Vertex(VEllipse_1.VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, startAngle));
             end.rotate(rotation, { x: x, y: y });
             start.rotate(rotation, { x: x, y: y });
             var diff = endAngle - startAngle;
-            /*
-              var r2d = 180/Math.PI;
-              console.log( "startAngle", (r2d*startAngle).toFixed(4),
-              "endAngle", (r2d*endAngle).toFixed(4),
-              "diff=" + (r2d*diff).toFixed(4) );
-            */
             // Boolean stored as integers (0|1).
             var largeArcFlag;
-            // var sweepFlag : numner;
             if (diff < 0) {
                 largeArcFlag = Math.abs(diff) < Math.PI ? 1 : 0;
-                // sweepFlag = 1;
             }
             else {
                 largeArcFlag = Math.abs(diff) > Math.PI ? 1 : 0;
-                // sweepFlag = 1;
             }
             var sweepFlag = 1;
             var pathData = [];
             if (options.moveToStart) {
                 pathData.push('M', start.x, start.y);
             }
-            pathData.push("A", radiusH, radiusV, rotation, largeArcFlag, sweepFlag, end.x, end.y);
+            // Arc rotation in degrees, not radians.
+            var r2d = 180 / Math.PI;
+            pathData.push("A", radiusH, radiusV, rotation * r2d, largeArcFlag, sweepFlag, end.x, end.y);
             return pathData;
         } // END function describeSVGArc
     }; // END ellipseSectorUtils
