@@ -1627,11 +1627,10 @@ var PlotBoilerplate = /** @class */ (function () {
                     y: pos.y - bounds.top
                 };
             };
-            if (globalThis["AlloyFinger"] && typeof globalThis["AlloyFinger"] == "function") {
+            // Make PB work together with both, AlloyFinger as a esm module or a commonjs function.
+            if ((typeof globalThis["AlloyFinger"] === "function") ||
+                (typeof globalThis["createAlloyFinger"] === "function")) {
                 try {
-                    // Do not include AlloyFinger itself to the library
-                    // (17kb, but we want to keep this lib as tiny as possible).
-                    // Solution: only import type defintions from AlloyFinger.
                     var touchMovePos = null;
                     var touchDownPos = null;
                     var draggedElement = null;
@@ -1643,7 +1642,7 @@ var PlotBoilerplate = /** @class */ (function () {
                         multiTouchStartScale = null;
                         _self.draggedElements = [];
                     };
-                    new alloyfinger_typescript_1.default(this.eventCatcher ? this.eventCatcher : this.canvas, {
+                    var afProps = {
                         touchStart: function (evt) {
                             if (evt.touches.length == 1) {
                                 touchMovePos = new Vertex_1.Vertex(relPos_1({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
@@ -1716,7 +1715,11 @@ var PlotBoilerplate = /** @class */ (function () {
                             _self.setZoom(multiTouchStartScale.x * evt.zoom, multiTouchStartScale.y * evt.zoom, center);
                             _self.redraw();
                         }
-                    });
+                    }; // END afProps
+                    if (window["createAlloyFinger"])
+                        window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                    else
+                        new alloyfinger_typescript_1.default(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
                 }
                 catch (e) {
                     console.error("Failed to initialize AlloyFinger!");

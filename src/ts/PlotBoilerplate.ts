@@ -1846,12 +1846,11 @@ export class PlotBoilerplate {
 			 y : pos.y - bounds.top
 		       };
 	    }
-	    
-	    if( globalThis["AlloyFinger"] && typeof globalThis["AlloyFinger"] == "function" ) {		
+
+	    // Make PB work together with both, AlloyFinger as a esm module or a commonjs function.
+	    if( (typeof globalThis["AlloyFinger"] === "function") ||
+		(typeof globalThis["createAlloyFinger"] === "function")) {
 		try {
-		    // Do not include AlloyFinger itself to the library
-		    // (17kb, but we want to keep this lib as tiny as possible).
-		    // Solution: only import type defintions from AlloyFinger.
 		    var touchMovePos : Vertex|undefined|null= null;
 		    var touchDownPos : Vertex|undefined|null = null;
 		    var draggedElement : IDraggable|undefined|null = null;
@@ -1863,7 +1862,7 @@ export class PlotBoilerplate {
 			multiTouchStartScale = null;
 			_self.draggedElements = [];
 		    };
-		    new AlloyFinger( this.eventCatcher ? this.eventCatcher : this.canvas, {
+		    const afProps = {
 			touchStart: ( evt : TouchEvent ) => {
 			    if( evt.touches.length == 1 ) {
 				touchMovePos = new Vertex( relPos( { x : evt.touches[0].clientX, y : evt.touches[0].clientY } ) );
@@ -1934,7 +1933,11 @@ export class PlotBoilerplate {
 			    _self.setZoom( multiTouchStartScale.x*evt.zoom, multiTouchStartScale.y*evt.zoom, center );
 			    _self.redraw();
 			}
-		    });
+		    }; // END afProps
+		    if( window["createAlloyFinger"] )
+			window["createAlloyFinger"]( this.eventCatcher ? this.eventCatcher : this.canvas, afProps );
+		    else
+			new AlloyFinger( this.eventCatcher ? this.eventCatcher : this.canvas, afProps );
 		 } catch( e ) {
 		     console.error("Failed to initialize AlloyFinger!");
 		     console.error(e);
