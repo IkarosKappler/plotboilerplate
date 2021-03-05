@@ -63,5 +63,18 @@ exports.geomutils = {
         //    https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
         return (max + (x % max)) % max;
     },
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [min,max).
+     *
+     * @name wrapMinMax
+     * @param {number} x - The value to wrap.
+     * @param {number} min - The min bound to use for the range.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [min,max).
+     */
+    // Currently un-used
+    wrapMinMax: function (x, min, max) {
+        return min + exports.geomutils.wrapMax(x - min, max - min);
+    }
 };
 //# sourceMappingURL=geomutils.js.map

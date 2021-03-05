@@ -130,6 +130,10 @@
 		pb.fill.text( "end", newEndPoint.x, newEndPoint.y );
 
 		drawCircle( startAngle, endAngle );
+		drawNormal();
+		// drawTangent();
+		// normalAt( ellipse, ellipseSector.startAngle + ellipseSector.ellipse.rotation );
+		drawFoci();
 	    };
 
 
@@ -152,10 +156,93 @@
 	    var _circle = new Circle( center, ((radiusH+radiusV)/2)*0.5 );
 	    pb.add( _circle );
 
+	    function drawFoci() {
+		var foci = ellipse.getFoci();
+		pb.fill.circleHandle( foci[0], 3, 'orange' );
+		pb.fill.circleHandle( foci[1], 3, 'orange' );
+	    };
+	    
+	    /* function getFoci() {
+		// https://www.mathopenref.com/ellipsefoci.html
+		var rh = ellipse.radiusH();
+		var rv = ellipse.radiusV();
+		var sdiff = rh*rh - rv*rv;
+		var f = Math.sqrt( Math.abs(sdiff) );
+		// console.log( sdiff, f );
+		if( sdiff < 0 ) {
+		    return [
+			ellipse.center.clone().addY( f/2).rotate( ellipse.rotation, ellipse.center ),
+			ellipse.center.clone().addY(-f/2).rotate( ellipse.rotation, ellipse.center )
+		    ];
+		} else {
+		    return [
+			ellipse.center.clone().addX( f/2).rotate( ellipse.rotation, ellipse.center ),
+			ellipse.center.clone().addX(-f/2).rotate( ellipse.rotation, ellipse.center )
+		    ];
+		}
+		}; */
+
+	    function drawNormal() {
+		//var normal = normalAt( ellipseSector.startAngle ); // + ellipseSector.ellipse.rotation );
+		 var normal = ellipse.normalAt( ellipseSector.startAngle, 50 );
+		pb.draw.line( normal.a, normal.b, 'red', 1 );
+
+		// var tangent = ellipse.tangentAt( ellipseSector.startAngle, 50 );
+		// pb.draw.line( tangent.a, tangent.b, 'orange', 1 );
+
+		var foci = ellipse.getFoci();
+		pb.draw.line( normal.a, foci[0], 'rgba(192,192,0,0.5)', 1 );
+		pb.draw.line( normal.a, foci[1], 'rgba(192,192,0,0.5)', 1 );
+	    };
+
+	    function normalAt( angle ) {
+		var r2d = 180/Math.PI;
+		var point = ellipse.vertAt( angle );
+		var foci = ellipse.getFoci();
+		// Calculate the angle between [point,focusA] and [point,focusB]
+		var angleA = new Line(point,foci[0]).angle();
+		var angleB = new Line(point,foci[1]).angle();
+		// var angleA = geomutils.wrapMinMax(angleA, -Math.PI, Math.PI);
+		// var angleB = geomutils.wrapMinMax(angleB, -Math.PI, Math.PI);
+		//var angleA = geomutils.wrapMinMax(angleA, 0, Math.PI*2);
+		//var angleB = geomutils.wrapMinMax(angleB, 0, Math.PI*2)
+		var angle = angleA + (angleB-angleA)/2.0;
+		//var angle = Math.min(angleA,angleB) + Math.abs(angleB-angleA)/2.0;
+		//var angle = geomutils.wrapMinMax( angle, 0, Math.PI*2 );
+		console.log( angleA*r2d, angleB*r2d, angle * r2d );
+
+		pb.draw.line( point, foci[0], 'rgba(192,192,0,0.5)', 1 );
+		pb.draw.line( point, foci[1], 'rgba(192,192,0,0.5)', 1 );
+		
+		var endPointA = point.clone().addX(50).clone().rotate( angle, point );
+		var endPointB = point.clone().addX(50).clone().rotate( Math.PI+angle, point );
+		if( ellipse.center.distance(endPointA) < ellipse.center.distance(endPointB) ) {
+		    return new Vector( point, endPointB );
+		} else {
+		    return new Vector( point, endPointA );
+		}
+		// pb.draw.line( point, endPoint, 'red', 1 );
+		
+	    };
+	    
+	    function _normalAt( angle ) {
+		var point = ellipse.vertAt( angle );
+		var slope =
+		    (ellipse.radiusH() * Math.sin( angle )) / ( ellipse.radiusV() * Math.cos(angle));
+		console.log('slope', slope );
+
+		var len = 200;
+		var end = new Vertex( point.x + len, point.y + len*slope );
+		// if( 
+		pb.draw.line( point, end );
+	    };
 	    // Create a gui for testing with scale
 	    var gui = pb.createGUI();	    
 
 	    pb.redraw();
+
+
+
 	} );
     
 })(window); 

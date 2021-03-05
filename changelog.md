@@ -1,6 +1,8 @@
 
 # Changelog
-* 2021-03-04
+* 2021-03-05
+  * Added the `VEllipse.getFoci`, `.normalAt` and `.tangentAt` method.
+* 2021-03-03
   * Added the `VEllipse.vertAt` and `VEllipse.perimeter` functions.
 * 2021-03-01
   * Added `geomutils.wrapMax` function.

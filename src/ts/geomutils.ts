@@ -80,7 +80,7 @@ export const geomutils = {
      * @return {number} The wrapped value inside the range [min,max).
      */
     // Currently un-used
-    /* wrapMinMax( x:number, min:number, max:number ) : number {		
-	return min + wrapMax( x - min, max -min );
-    } */
+    wrapMinMax( x:number, min:number, max:number ) : number {		
+	return min + geomutils.wrapMax( x - min, max - min );
+    } 
 };

@@ -145,8 +145,8 @@ export class VertTuple {
             line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
         }
         // Compute the angle from x axis and the return the difference :)
-        var v0 = this.b.clone().sub(this.a);
-        var v1 = line.b.clone().sub(line.a);
+        const v0 = this.b.clone().sub(this.a);
+        const v1 = line.b.clone().sub(line.a);
         // Thank you, Javascript, for this second atan function. No additional math is needed here!
         // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
         return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
@@ -302,7 +302,7 @@ export class VertTuple {
  * @private
  **/
 VertTuple.vtutils = {
-    dist2: function (v, w) {
+    dist2: (v, w) => {
         return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
     }
 };

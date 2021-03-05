@@ -1548,8 +1548,8 @@ class VertTuple {
             line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
         }
         // Compute the angle from x axis and the return the difference :)
-        var v0 = this.b.clone().sub(this.a);
-        var v1 = line.b.clone().sub(line.a);
+        const v0 = this.b.clone().sub(this.a);
+        const v1 = line.b.clone().sub(line.a);
         // Thank you, Javascript, for this second atan function. No additional math is needed here!
         // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
         return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
@@ -1705,7 +1705,7 @@ class VertTuple {
  * @private
  **/
 VertTuple.vtutils = {
-    dist2: function (v, w) {
+    dist2: (v, w) => {
         return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
     }
 };
@@ -7199,6 +7199,19 @@ const geomutils = {
         //    https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
         return (max + (x % max)) % max;
     },
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [min,max).
+     *
+     * @name wrapMinMax
+     * @param {number} x - The value to wrap.
+     * @param {number} min - The min bound to use for the range.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [min,max).
+     */
+    // Currently un-used
+    wrapMinMax(x, min, max) {
+        return min + geomutils.wrapMax(x - min, max - min);
+    }
 };
 
 /**
@@ -8564,7 +8577,8 @@ class AlloyFinger {
  * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
- * @modified 2021-03-04 Added the `vertAt` and `perimeter` functions.
+ * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
+ * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` method.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -8671,6 +8685,58 @@ class VEllipse {
     }
     ;
     /**
+     * Get the normal vector at the given angle.
+     * The normal vector is the vector that intersects the ellipse in a 90 degree angle
+     * at the given point (speicified by the given angle).
+     *
+     * Length of desired normal vector can be specified, default is 1.0.
+     *
+     * @method normalAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to get the normal vector at.
+     * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
+     */
+    normalAt(angle, length) {
+        const point = this.vertAt(angle);
+        const foci = this.getFoci();
+        // Calculate the angle between [point,focusA] and [point,focusB]
+        const angleA = new Line(point, foci[0]).angle();
+        const angleB = new Line(point, foci[1]).angle();
+        const centerAngle = angleA + (angleB - angleA) / 2.0;
+        const endPointA = point.clone().addX(50).clone().rotate(centerAngle, point);
+        const endPointB = point.clone().addX(50).clone().rotate(Math.PI + centerAngle, point);
+        if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
+            return new Vector(point, endPointB);
+        }
+        else {
+            return new Vector(point, endPointA);
+        }
+    }
+    ;
+    /**
+     * Get the tangent vector at the given angle.
+     * The tangent vector is the vector that touches the ellipse exactly at the given given
+     * point (speicified by the given angle).
+     *
+     * Note that the tangent is just 90 degree rotated normal vector.
+     *
+     * Length of desired tangent vector can be specified, default is 1.0.
+     *
+     * @method tangentAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to get the tangent vector at.
+     * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
+     */
+    tangentAt(angle, length) {
+        const normal = this.normalAt(angle, length);
+        // Rotate the normal by 90 degrees, then it is the tangent.
+        normal.b.rotate(Math.PI / 2, normal.a);
+        return normal;
+    }
+    ;
+    /**
      * Get the perimeter of this ellipse.
      *
      * @method perimeter
@@ -8686,6 +8752,36 @@ class VEllipse {
         const a = this.radiusH();
         const b = this.radiusV();
         return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
+    }
+    ;
+    /**
+     * Get the two foci of this ellipse.
+     *
+     * @method getFoci
+     * @instance
+     * @memberof VEllipse
+     * @return {Array<Vertex>} An array with two elements, the two focal points of the ellipse (foci).
+     */
+    getFoci() {
+        // https://www.mathopenref.com/ellipsefoci.html
+        const rh = this.radiusH();
+        const rv = this.radiusV();
+        const sdiff = rh * rh - rv * rv;
+        // f is the distance of each focs to the center.
+        const f = Math.sqrt(Math.abs(sdiff));
+        // Foci on x- or y-axis?
+        if (sdiff < 0) {
+            return [
+                this.center.clone().addY(f).rotate(this.rotation, this.center),
+                this.center.clone().addY(-f).rotate(this.rotation, this.center)
+            ];
+        }
+        else {
+            return [
+                this.center.clone().addX(f).rotate(this.rotation, this.center),
+                this.center.clone().addX(-f).rotate(this.rotation, this.center)
+            ];
+        }
     }
     ;
     /**

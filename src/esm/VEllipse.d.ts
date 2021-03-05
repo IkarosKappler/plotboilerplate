@@ -7,12 +7,14 @@
  * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
- * @modified 2021-03-04 Added the `vertAt` and `perimeter` functions.
+ * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
+ * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` method.
  * @version  1.2.2
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
  **/
+import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
@@ -112,6 +114,36 @@ export declare class VEllipse implements SVGSerializable {
      */
     vertAt(angle: number): Vertex;
     /**
+     * Get the normal vector at the given angle.
+     * The normal vector is the vector that intersects the ellipse in a 90 degree angle
+     * at the given point (speicified by the given angle).
+     *
+     * Length of desired normal vector can be specified, default is 1.0.
+     *
+     * @method normalAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to get the normal vector at.
+     * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
+     */
+    normalAt(angle: number, length?: number): Vector;
+    /**
+     * Get the tangent vector at the given angle.
+     * The tangent vector is the vector that touches the ellipse exactly at the given given
+     * point (speicified by the given angle).
+     *
+     * Note that the tangent is just 90 degree rotated normal vector.
+     *
+     * Length of desired tangent vector can be specified, default is 1.0.
+     *
+     * @method tangentAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to get the tangent vector at.
+     * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
+     */
+    tangentAt(angle: number, length?: number): Vector;
+    /**
      * Get the perimeter of this ellipse.
      *
      * @method perimeter
@@ -120,6 +152,15 @@ export declare class VEllipse implements SVGSerializable {
      * @return {number}
      */
     perimeter(): number;
+    /**
+     * Get the two foci of this ellipse.
+     *
+     * @method getFoci
+     * @instance
+     * @memberof VEllipse
+     * @return {Array<Vertex>} An array with two elements, the two focal points of the ellipse (foci).
+     */
+    getFoci(): [Vertex, Vertex];
     /**
      * Create an SVG representation of this ellipse.
      *

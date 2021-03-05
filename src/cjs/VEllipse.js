@@ -8,7 +8,8 @@
  * @modified 2021-02-14 Added functions `radiusH` and `radiusV`.
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
- * @modified 2021-03-04 Added the `vertAt` and `perimeter` functions.
+ * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
+ * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` method.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -16,6 +17,8 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipse = void 0;
+var Line_1 = require("./Line");
+var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");
 var UIDGenerator_1 = require("./UIDGenerator");
 /**
@@ -119,6 +122,58 @@ var VEllipse = /** @class */ (function () {
     };
     ;
     /**
+     * Get the normal vector at the given angle.
+     * The normal vector is the vector that intersects the ellipse in a 90 degree angle
+     * at the given point (speicified by the given angle).
+     *
+     * Length of desired normal vector can be specified, default is 1.0.
+     *
+     * @method normalAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to get the normal vector at.
+     * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
+     */
+    VEllipse.prototype.normalAt = function (angle, length) {
+        var point = this.vertAt(angle);
+        var foci = this.getFoci();
+        // Calculate the angle between [point,focusA] and [point,focusB]
+        var angleA = new Line_1.Line(point, foci[0]).angle();
+        var angleB = new Line_1.Line(point, foci[1]).angle();
+        var centerAngle = angleA + (angleB - angleA) / 2.0;
+        var endPointA = point.clone().addX(50).clone().rotate(centerAngle, point);
+        var endPointB = point.clone().addX(50).clone().rotate(Math.PI + centerAngle, point);
+        if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
+            return new Vector_1.Vector(point, endPointB);
+        }
+        else {
+            return new Vector_1.Vector(point, endPointA);
+        }
+    };
+    ;
+    /**
+     * Get the tangent vector at the given angle.
+     * The tangent vector is the vector that touches the ellipse exactly at the given given
+     * point (speicified by the given angle).
+     *
+     * Note that the tangent is just 90 degree rotated normal vector.
+     *
+     * Length of desired tangent vector can be specified, default is 1.0.
+     *
+     * @method tangentAt
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to get the tangent vector at.
+     * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
+     */
+    VEllipse.prototype.tangentAt = function (angle, length) {
+        var normal = this.normalAt(angle, length);
+        // Rotate the normal by 90 degrees, then it is the tangent.
+        normal.b.rotate(Math.PI / 2, normal.a);
+        return normal;
+    };
+    ;
+    /**
      * Get the perimeter of this ellipse.
      *
      * @method perimeter
@@ -134,6 +189,36 @@ var VEllipse = /** @class */ (function () {
         var a = this.radiusH();
         var b = this.radiusV();
         return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
+    };
+    ;
+    /**
+     * Get the two foci of this ellipse.
+     *
+     * @method getFoci
+     * @instance
+     * @memberof VEllipse
+     * @return {Array<Vertex>} An array with two elements, the two focal points of the ellipse (foci).
+     */
+    VEllipse.prototype.getFoci = function () {
+        // https://www.mathopenref.com/ellipsefoci.html
+        var rh = this.radiusH();
+        var rv = this.radiusV();
+        var sdiff = rh * rh - rv * rv;
+        // f is the distance of each focs to the center.
+        var f = Math.sqrt(Math.abs(sdiff));
+        // Foci on x- or y-axis?
+        if (sdiff < 0) {
+            return [
+                this.center.clone().addY(f).rotate(this.rotation, this.center),
+                this.center.clone().addY(-f).rotate(this.rotation, this.center)
+            ];
+        }
+        else {
+            return [
+                this.center.clone().addX(f).rotate(this.rotation, this.center),
+                this.center.clone().addX(-f).rotate(this.rotation, this.center)
+            ];
+        }
     };
     ;
     /**

@@ -33,4 +33,14 @@ export declare const geomutils: {
      * @return {number} The wrapped value inside the range [0,max).
      */
     wrapMax(x: number, max: number): number;
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [min,max).
+     *
+     * @name wrapMinMax
+     * @param {number} x - The value to wrap.
+     * @param {number} min - The min bound to use for the range.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [min,max).
+     */
+    wrapMinMax(x: number, min: number, max: number): number;
 };
