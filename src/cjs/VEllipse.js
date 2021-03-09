@@ -9,7 +9,8 @@
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
  * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
- * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` method.
+ * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
+ * @modified 2021-03-09 Added the `clone` and `rotate` methods.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -49,7 +50,14 @@ var VEllipse = /** @class */ (function () {
         this.axis = axis;
         this.rotation = rotation | 0.0;
     }
-    ;
+    /**
+     * Clone this ellipse (deep clone).
+     *
+     * @return {VEllipse} A copy of this ellipse.s
+     */
+    VEllipse.prototype.clone = function () {
+        return new VEllipse(this.center.clone(), this.axis.clone(), this.rotation);
+    };
     /**
      * Get the non-negative horizonal radius of this ellipse.
      *
@@ -61,7 +69,6 @@ var VEllipse = /** @class */ (function () {
     VEllipse.prototype.radiusH = function () {
         return Math.abs(this.signedRadiusH());
     };
-    ;
     /**
      * Get the signed horizonal radius of this ellipse.
      *
@@ -76,7 +83,6 @@ var VEllipse = /** @class */ (function () {
         // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
         return new Vertex_1.Vertex(this.axis).rotate(-this.rotation, this.center).x - this.center.x;
     };
-    ;
     /**
      * Get the non-negative vertical radius of this ellipse.
      *
@@ -88,7 +94,6 @@ var VEllipse = /** @class */ (function () {
     VEllipse.prototype.radiusV = function () {
         return Math.abs(this.signedRadiusV());
     };
-    ;
     /**
      * Get the signed vertical radius of this ellipse.
      *
@@ -103,7 +108,6 @@ var VEllipse = /** @class */ (function () {
         // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
         return new Vertex_1.Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     };
-    ;
     /**
      * Get the vertex on the ellipse's outline at the given angle.
      *
@@ -120,7 +124,6 @@ var VEllipse = /** @class */ (function () {
         var b = this.radiusV();
         return new Vertex_1.Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
     };
-    ;
     /**
      * Get the normal vector at the given angle.
      * The normal vector is the vector that intersects the ellipse in a 90 degree angle
@@ -142,7 +145,11 @@ var VEllipse = /** @class */ (function () {
         var angleB = new Line_1.Line(point, foci[1]).angle();
         var centerAngle = angleA + (angleB - angleA) / 2.0;
         var endPointA = point.clone().addX(50).clone().rotate(centerAngle, point);
-        var endPointB = point.clone().addX(50).clone().rotate(Math.PI + centerAngle, point);
+        var endPointB = point
+            .clone()
+            .addX(50)
+            .clone()
+            .rotate(Math.PI + centerAngle, point);
         if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
             return new Vector_1.Vector(point, endPointB);
         }
@@ -150,7 +157,6 @@ var VEllipse = /** @class */ (function () {
             return new Vector_1.Vector(point, endPointA);
         }
     };
-    ;
     /**
      * Get the tangent vector at the given angle.
      * The tangent vector is the vector that touches the ellipse exactly at the given given
@@ -172,7 +178,14 @@ var VEllipse = /** @class */ (function () {
         normal.b.rotate(Math.PI / 2, normal.a);
         return normal;
     };
-    ;
+    /**
+     * Get the slope of the
+     * @param angle
+     * @returns
+     */
+    //   slopeAt(angle:number) : number {
+    //     return (this.radiusH() * Math.sin(angle)) / (this.radiusV() * Math.cos(angle));
+    //   }
     /**
      * Get the perimeter of this ellipse.
      *
@@ -190,7 +203,6 @@ var VEllipse = /** @class */ (function () {
         var b = this.radiusV();
         return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
     };
-    ;
     /**
      * Get the two foci of this ellipse.
      *
@@ -220,7 +232,10 @@ var VEllipse = /** @class */ (function () {
             ];
         }
     };
-    ;
+    //   rotate(angle: number) {
+    //     this.axis.rotate(angle, this.center);
+    //     this.rotation += angle;
+    //   }
     /**
      * Create an SVG representation of this ellipse.
      *
@@ -231,17 +246,16 @@ var VEllipse = /** @class */ (function () {
     VEllipse.prototype.toSVGString = function (options) {
         options = options || {};
         var buffer = [];
-        buffer.push('<ellipse');
+        buffer.push("<ellipse");
         if (options.className)
             buffer.push(' class="' + options.className + '"');
         buffer.push(' cx="' + this.center.x + '"');
         buffer.push(' cy="' + this.center.y + '"');
         buffer.push(' rx="' + this.axis.x + '"');
         buffer.push(' ry="' + this.axis.y + '"');
-        buffer.push(' />');
-        return buffer.join('');
+        buffer.push(" />");
+        return buffer.join("");
     };
-    ;
     /**
      * A static collection of ellipse-related helper functions.
      * @static
@@ -263,13 +277,13 @@ var VEllipse = /** @class */ (function () {
             // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
             var s = Math.sin(Math.PI / 2 - angle);
             var c = Math.cos(Math.PI / 2 - angle);
-            return { x: centerX + radiusH * radiusV * s / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
-                y: centerY + radiusH * radiusV * c / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
+            return {
+                x: centerX + (radiusH * radiusV * s) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
+                y: centerY + (radiusH * radiusV * c) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
             };
         }
     }; // END utils
     return VEllipse;
 }());
 exports.VEllipse = VEllipse;
-;
 //# sourceMappingURL=VEllipse.js.map

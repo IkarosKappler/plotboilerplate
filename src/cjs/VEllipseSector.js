@@ -58,9 +58,9 @@ var VEllipseSector = /** @class */ (function () {
          * @return [ 'A', radiusH, radiusV, rotation, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
         describeSVGArc: function (x, y, radiusH, radiusV, startAngle, endAngle, rotation, options) {
-            if (typeof options === 'undefined')
+            if (typeof options === "undefined")
                 options = { moveToStart: true };
-            if (typeof rotation === 'undefined')
+            if (typeof rotation === "undefined")
                 rotation = 0.0;
             // Important note: this function only works if start- and end-angle are within
             // one whole circle [x,x+2*PI].
@@ -86,7 +86,7 @@ var VEllipseSector = /** @class */ (function () {
             var sweepFlag = 1;
             var pathData = [];
             if (options.moveToStart) {
-                pathData.push('M', start.x, start.y);
+                pathData.push("M", start.x, start.y);
             }
             // Arc rotation in degrees, not radians.
             var r2d = 180 / Math.PI;
@@ -97,5 +97,4 @@ var VEllipseSector = /** @class */ (function () {
     return VEllipseSector;
 }());
 exports.VEllipseSector = VEllipseSector;
-;
 //# sourceMappingURL=VEllipseSector.js.map

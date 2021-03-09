@@ -8,7 +8,8 @@
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
  * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
- * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` method.
+ * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
+ * @modified 2021-03-09 Added the `clone` and `rotate` methods.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -67,6 +68,12 @@ export declare class VEllipse implements SVGSerializable {
      * @name VEllipse
      **/
     constructor(center: Vertex, axis: Vertex, rotation?: number);
+    /**
+     * Clone this ellipse (deep clone).
+     *
+     * @return {VEllipse} A copy of this ellipse.s
+     */
+    clone(): VEllipse;
     /**
      * Get the non-negative horizonal radius of this ellipse.
      *
@@ -143,6 +150,11 @@ export declare class VEllipse implements SVGSerializable {
      * @param {number=1.0} length - [optional, default=1] The length of the returned vector.
      */
     tangentAt(angle: number, length?: number): Vector;
+    /**
+     * Get the slope of the
+     * @param angle
+     * @returns
+     */
     /**
      * Get the perimeter of this ellipse.
      *
