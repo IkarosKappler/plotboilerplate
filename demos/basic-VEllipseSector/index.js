@@ -180,50 +180,6 @@
       pb.draw.line(normal.a, foci[1], "rgba(192,192,0,0.5)", 1);
     }
 
-    /* function normalAt(angle) {
-      var r2d = 180 / Math.PI;
-      var point = ellipse.vertAt(angle);
-      var foci = ellipse.getFoci();
-      // Calculate the angle between [point,focusA] and [point,focusB]
-      var angleA = new Line(point, foci[0]).angle();
-      var angleB = new Line(point, foci[1]).angle();
-      // var angleA = geomutils.wrapMinMax(angleA, -Math.PI, Math.PI);
-      // var angleB = geomutils.wrapMinMax(angleB, -Math.PI, Math.PI);
-      //var angleA = geomutils.wrapMinMax(angleA, 0, Math.PI*2);
-      //var angleB = geomutils.wrapMinMax(angleB, 0, Math.PI*2)
-      var angle = angleA + (angleB - angleA) / 2.0;
-      //var angle = Math.min(angleA,angleB) + Math.abs(angleB-angleA)/2.0;
-      //var angle = geomutils.wrapMinMax( angle, 0, Math.PI*2 );
-      console.log(angleA * r2d, angleB * r2d, angle * r2d);
-
-      pb.draw.line(point, foci[0], "rgba(192,192,0,0.5)", 1);
-      pb.draw.line(point, foci[1], "rgba(192,192,0,0.5)", 1);
-
-      var endPointA = point.clone().addX(50).clone().rotate(angle, point);
-      var endPointB = point
-        .clone()
-        .addX(50)
-        .clone()
-        .rotate(Math.PI + angle, point);
-      if (ellipse.center.distance(endPointA) < ellipse.center.distance(endPointB)) {
-        return new Vector(point, endPointB);
-      } else {
-        return new Vector(point, endPointA);
-      }
-      // pb.draw.line( point, endPoint, 'red', 1 );
-    } */
-
-    /* function _normalAt(angle) {
-      var point = ellipse.vertAt(angle);
-      var slope = (ellipse.radiusH() * Math.sin(angle)) / (ellipse.radiusV() * Math.cos(angle));
-      console.log("slope", slope);
-
-      var len = 200;
-      var end = new Vertex(point.x + len, point.y + len * slope);
-      // if(
-      pb.draw.line(point, end);
-    } */
-
     function drawBezier() {
       var bezierCurves = ellipseSector.ellipse.toCubicBezier(
         config.bezierSegments,
@@ -240,6 +196,20 @@
     }
 
     function drawEquidistantVertices() {
+      var vertices = ellipseSector.ellipse.getEquidistantVertices(
+        config.bezierSegments,
+        ellipseSector.startAngle,
+        ellipseSector.endAngle,
+        false
+      );
+      console.log("vertices", vertices);
+      for (var i = 0; i < vertices.length; i++) {
+        pb.draw.circleHandle(vertices[i], 5, "orange");
+        pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
+      }
+    }
+
+    function __drawEquidistantVertices() {
       // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
 
       var pointCount = config.bezierSegments;
@@ -247,25 +217,78 @@
       var b = ellipseSector.ellipse.radiusV();
       var startAngle = ellipseSector.startAngle;
       var endAngle = ellipseSector.endAngle;
-      var fullAngle = Math.PI * 2;
-      // var fullAngle = endAngle - startAngle; // Math.PI*2
-      // if (fullAngle < 0) {
-      //   fullAngle = Math.PI * 2 + fullAngle;
-      // }
+      // var fullAngle = Math.PI * 2;
+      var fullAngle = endAngle - startAngle; // Math.PI*2
+      if (fullAngle < 0) {
+        fullAngle = Math.PI * 2 + fullAngle;
+      }
 
-      var vertices = [];
-      for (var i = 0; i < pointCount; i++) {
-        var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
-
+      // As static helper function?
+      var phiToTheta = function (phi) {
         var tanPhi = Math.tan(phi);
         var tanPhi2 = tanPhi * tanPhi;
 
-        var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        // var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        return theta;
+      };
+
+      var vertices = [];
+      for (var i = 0; i < pointCount; i++) {
+        // var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
+        // var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
+        // var phi = Math.PI - startAngle + phiToTheta((fullAngle / pointCount) * i);
+        var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
+
+        // var tanPhi = Math.tan(phi);
+        // var tanPhi2 = tanPhi * tanPhi;
+
+        // var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        var theta = phiToTheta(phi);
 
         vertices[i] = ellipseSector.ellipse.vertAt(theta);
         pb.draw.circleHandle(vertices[i], 5, "orange");
         pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
       }
+      // Add the last vertice if not full circle
+      // if( fullAngle < Math.PI*2 )
+      // vertices.push[]
+    }
+
+    function _drawEquidistantVertices() {
+      // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+
+      var pointCount = config.bezierSegments;
+      var a = ellipseSector.ellipse.radiusH();
+      var b = ellipseSector.ellipse.radiusV();
+      var startAngle = ellipseSector.startAngle;
+      var endAngle = ellipseSector.endAngle;
+      // var fullAngle = Math.PI * 2;
+      var fullAngle = endAngle - startAngle; // Math.PI*2
+      if (fullAngle < 0) {
+        fullAngle = Math.PI * 2 + fullAngle;
+      }
+
+      var vertices = [];
+      for (var i = 0; i < pointCount; i++) {
+        // var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
+        var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
+
+        var tanPhi = Math.tan(phi);
+        var tanPhi2 = tanPhi * tanPhi;
+
+        // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        // var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+
+        vertices[i] = ellipseSector.ellipse.vertAt(theta);
+        pb.draw.circleHandle(vertices[i], 5, "orange");
+        pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
+      }
+      // Add the last vertice if not full circle
+      // if( fullAngle < Math.PI*2 )
+      // vertices.push[]
     }
 
     // function _drawBezier() {

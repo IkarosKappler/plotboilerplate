@@ -234,6 +234,75 @@ var VEllipse = /** @class */ (function () {
             ];
         }
     };
+    /**
+     * Get n equidistant points on the elliptic arc.
+     *
+     * @param pointCount
+     * @returns
+     */
+    VEllipse.prototype.getEquidistantVertices = function (pointCount) {
+        // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+        var a = this.radiusH();
+        var b = this.radiusV();
+        var vertices = [];
+        for (var i = 0; i < pointCount; i++) {
+            var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
+            // var tanPhi = Math.tan(phi);
+            // var tanPhi2 = tanPhi * tanPhi;
+            // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+            var theta = VEllipse.utils.phiToTheta(a, b, phi);
+            vertices[i] = this.vertAt(theta);
+        }
+        return vertices;
+    };
+    // getEquilateralSectors(sectorCount: number): Array<number> {
+    //   // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+    //   var a = this.radiusH();
+    //   var b = this.radiusV();
+    //   var sectorAngles = [];
+    //   for (var i = 0; i < sectorCount; i++) {
+    //     var phi = Math.PI / 2.0 + ((Math.PI * 2) / sectorCount) * i;
+    //     // var tanPhi = Math.tan(phi);
+    //     // var tanPhi2 = tanPhi * tanPhi;
+    //     // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+    //     var theta = VEllipse.utils.phiToTheta(a, b, phi);
+    //     // vertices[i] = this.vertAt(theta);
+    //     sectorAngles[i] = theta;
+    //   }
+    //   return sectorAngles;
+    // }
+    // getEquidistantVertices(pointCount: number, startAngle?: number, endAngle?: number, addEndPoint?: boolean): Array<Vertex> {
+    //   // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+    //   // var pointCount = config.bezierSegments;
+    //   // var startAngle = ellipseSector.startAngle;
+    //   // var endAngle = ellipseSector.endAngle;
+    //   startAngle = typeof startAngle === "undefined" ? 0 : startAngle;
+    //   endAngle = typeof endAngle === "undefined" ? 0 : endAngle;
+    //   var a = this.radiusH();
+    //   var b = this.radiusV();
+    //   // var fullAngle = Math.PI * 2;
+    //   var fullAngle = endAngle - startAngle; // Math.PI*2
+    //   if (fullAngle < 0) {
+    //     fullAngle = Math.PI * 2 + fullAngle;
+    //   }
+    //   var vertices = [];
+    //   for (var i = 0; i < pointCount + (addEndPoint ? 1 : 0); i++) {
+    //     // var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
+    //     var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
+    //     var tanPhi = Math.tan(phi);
+    //     var tanPhi2 = tanPhi * tanPhi;
+    //     // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+    //     // var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+    //     var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+    //     vertices[i] = this.vertAt(theta);
+    //     // pb.draw.circleHandle(vertices[i], 5, "orange");
+    //     // pb.draw.line(this.center, vertices[i], "grey", 1);
+    //   }
+    //   // Add the last vertice if not full circle
+    //   // if( fullAngle < Math.PI*2 )
+    //   // vertices.push[]
+    //   return vertices;
+    // }
     //   rotate(angle: number) {
     //     this.axis.rotate(angle, this.center);
     //     this.rotation += angle;
@@ -244,10 +313,16 @@ var VEllipse = /** @class */ (function () {
         // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
         // Return a single line here (as a Bézier curve)
         if (Math.abs(this.radiusV()) < 0.00001) {
-            return [];
+            var radiusH = this.radiusH();
+            return [
+                new CubicBezierCurve_1.CubicBezierCurve(this.center.clone().addX(radiusH), this.center.clone().addX(-radiusH), this.center.clone(), this.center.clone())
+            ]; // TODO: test horizontal line ellipse
         }
         if (Math.abs(this.radiusH()) < 0.00001) {
-            return [];
+            var radiusV = this.radiusV();
+            return [
+                new CubicBezierCurve_1.CubicBezierCurve(this.center.clone().addY(radiusV), this.center.clone().addY(-radiusV), this.center.clone(), this.center.clone())
+            ]; // TODO: test vertical line ellipse
         }
         segmentCount = Math.max(2, segmentCount || 12); // At least 2, but 12 seems to be a good value.
         threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
@@ -258,7 +333,7 @@ var VEllipse = /** @class */ (function () {
         var curAngle = startAngle;
         var startPoint = this.vertAt(curAngle);
         var curves = [];
-        var lastIntersection;
+        //let lastIntersection: Vertex | undefined;
         for (var i = 0; i < segmentCount; i++) {
             var nextAngle = startAngle + (fullAngle / segmentCount) * (i + 1);
             var endPoint = this.vertAt(nextAngle);
@@ -274,7 +349,7 @@ var VEllipse = /** @class */ (function () {
             curves.push(curve);
             startPoint = endPoint;
             curAngle = nextAngle;
-            lastIntersection = intersection;
+            //lastIntersection = intersection;
         }
         return curves;
     };
@@ -323,6 +398,14 @@ var VEllipse = /** @class */ (function () {
                 x: centerX + (radiusH * radiusV * s) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
                 y: centerY + (radiusH * radiusV * c) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
             };
+        },
+        phiToTheta: function (radiusH, radiusV, phi) {
+            // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+            // var phi = Math.PI / 2.0 + ((Math.PI * 2) / sectorCount) * i;
+            var tanPhi = Math.tan(phi);
+            var tanPhi2 = tanPhi * tanPhi;
+            var theta = -Math.PI / 2 + phi + Math.atan(((radiusH - radiusV) * tanPhi) / (radiusV + radiusH * tanPhi2));
+            return theta;
         }
     }; // END utils
     return VEllipse;

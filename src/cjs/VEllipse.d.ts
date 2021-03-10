@@ -175,6 +175,13 @@ export declare class VEllipse implements SVGSerializable {
      * @return {Array<Vertex>} An array with two elements, the two focal points of the ellipse (foci).
      */
     getFoci(): [Vertex, Vertex];
+    /**
+     * Get n equidistant points on the elliptic arc.
+     *
+     * @param pointCount
+     * @returns
+     */
+    getEquidistantVertices(pointCount: number): Array<Vertex>;
     toCubicBezier(segmentCount?: number, threshold?: number, startAngle?: number, endAngle?: number): Array<CubicBezierCurve>;
     /**
      * Create an SVG representation of this ellipse.
@@ -203,5 +210,6 @@ export declare class VEllipse implements SVGSerializable {
          * @reutn {XYCoords} The outlont point in absolute x-y-coordinates.
          */
         polarToCartesian: (centerX: number, centerY: number, radiusH: number, radiusV: number, angle: number) => XYCoords;
+        phiToTheta: (radiusH: number, radiusV: number, phi: number) => number;
     };
 }
