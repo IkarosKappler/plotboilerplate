@@ -58,26 +58,25 @@ var drawutilssvg = /** @class */ (function () {
         }
         else {
             this.addStyleDefs(drawConfig);
-            this.gNode = this.createSVGNode('g');
+            this.gNode = this.createSVGNode("g");
             this.svgNode.appendChild(this.gNode);
         }
     }
-    ;
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
-        var nodeStyle = this.createSVGNode('style');
+        var nodeStyle = this.createSVGNode("style");
         this.svgNode.appendChild(nodeStyle); // nodeDef);
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         var keys = {
-            'polygon': 'Polygon',
-            'triangle': 'Triangle',
-            'ellipse': 'Ellipse',
-            'circle': 'Circle',
-            'circleSector': 'CircleSector',
-            'vertex': 'Vertex',
-            'line': 'Line',
-            'vector': 'Vector',
-            'image': 'Image'
+            "polygon": "Polygon",
+            "triangle": "Triangle",
+            "ellipse": "Ellipse",
+            "circle": "Circle",
+            "circleSector": "CircleSector",
+            "vertex": "Vertex",
+            "line": "Line",
+            "vector": "Vector",
+            "image": "Image"
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
         var rules = [];
@@ -88,7 +87,6 @@ var drawutilssvg = /** @class */ (function () {
         }
         nodeStyle.innerHTML = rules.join("\n");
     };
-    ;
     /**
      * Retieve an old (cached) element.
      * Only if both – key and nodeName – match, the element will be returned (null otherwise).
@@ -121,7 +119,6 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.createSVGNode = function (nodeName) {
         return document.createElementNS("http://www.w3.org/2000/svg", nodeName);
     };
-    ;
     /**
      * Make a new SVG node (or recycle an old one) with the given node name (circle, path, line, rect, ...).
      *
@@ -146,7 +143,6 @@ var drawutilssvg = /** @class */ (function () {
         }
         return node;
     };
-    ;
     /**
      * This is the final helper function for drawing and filling stuff and binding new
      * nodes to the SVG document.
@@ -169,16 +165,16 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype._bindFillDraw = function (node, className, color, lineWidth) {
         if (this.curClassName) {
-            node.setAttribute('class', this.curClassName + " " + className);
+            node.setAttribute("class", this.curClassName + " " + className);
         }
         else {
-            node.setAttribute('class', className);
+            node.setAttribute("class", className);
         }
-        node.setAttribute('fill', this.fillShapes ? color : 'none');
-        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
-        node.setAttribute('stroke-width', "" + (lineWidth || 1));
+        node.setAttribute("fill", this.fillShapes ? color : "none");
+        node.setAttribute("stroke", this.fillShapes ? "none" : color);
+        node.setAttribute("stroke-width", "" + (lineWidth || 1));
         if (this.curId) {
-            node.setAttribute('id', "" + this.curId); // Maybe React-style 'key' would be better?
+            node.setAttribute("id", "" + this.curId); // Maybe React-style 'key' would be better?
         }
         if (!node.parentNode) {
             // Attach to DOM only if not already attached
@@ -186,7 +182,6 @@ var drawutilssvg = /** @class */ (function () {
         }
         return node;
     };
-    ;
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.
      *
@@ -197,11 +192,10 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.setSize = function (canvasSize) {
         this.canvasSize = canvasSize;
-        this.svgNode.setAttribute('viewBox', "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
-        this.svgNode.setAttribute('width', "" + this.canvasSize.width);
-        this.svgNode.setAttribute('height', "" + this.canvasSize.height);
+        this.svgNode.setAttribute("viewBox", "0 0 " + this.canvasSize.width + " " + this.canvasSize.height);
+        this.svgNode.setAttribute("width", "" + this.canvasSize.width);
+        this.svgNode.setAttribute("height", "" + this.canvasSize.height);
     };
-    ;
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
@@ -212,7 +206,6 @@ var drawutilssvg = /** @class */ (function () {
         this.gNode);
         return copy;
     };
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -226,7 +219,6 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.setCurrentId = function (uid) {
         this.curId = uid;
     };
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
@@ -240,7 +232,6 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.setCurrentClassName = function (className) {
         this.curClassName = className;
     };
-    ;
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
@@ -255,9 +246,12 @@ var drawutilssvg = /** @class */ (function () {
         // Clear non-recycable elements from last draw cycle.
         this.cache.clear();
     };
-    ;
-    drawutilssvg.prototype._x = function (x) { return this.offset.x + this.scale.x * x; };
-    drawutilssvg.prototype._y = function (y) { return this.offset.y + this.scale.y * y; };
+    drawutilssvg.prototype._x = function (x) {
+        return this.offset.x + this.scale.x * x;
+    };
+    drawutilssvg.prototype._y = function (y) {
+        return this.offset.y + this.scale.y * y;
+    };
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -271,14 +265,13 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.line = function (zA, zB, color, lineWidth) {
-        var line = this.makeNode('line');
-        line.setAttribute('x1', "" + this._x(zA.x));
-        line.setAttribute('y1', "" + this._y(zA.y));
-        line.setAttribute('x2', "" + this._x(zB.x));
-        line.setAttribute('y2', "" + this._y(zB.y));
-        return this._bindFillDraw(line, 'line', color, lineWidth || 1);
+        var line = this.makeNode("line");
+        line.setAttribute("x1", "" + this._x(zA.x));
+        line.setAttribute("y1", "" + this._y(zA.y));
+        line.setAttribute("x2", "" + this._x(zB.x));
+        line.setAttribute("y2", "" + this._y(zB.y));
+        return this._bindFillDraw(line, "line", color, lineWidth || 1);
     };
-    ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
@@ -292,22 +285,19 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.arrow = function (zA, zB, color, lineWidth) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         var headlen = 8; // length of head in pixels
         var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
-        var d = [
-            'M', this._x(zA.x), this._y(zA.y)
-        ];
+        var d = ["M", this._x(zA.x), this._y(zA.y)];
         for (var i = 0; i <= vertices.length; i++) {
-            d.push('L');
+            d.push("L");
             // Note: only use offset here (the vertices are already scaled)
             d.push(this.offset.x + vertices[i % vertices.length].x);
             d.push(this.offset.y + vertices[i % vertices.length].y);
         }
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'arrow', color, lineWidth || 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
     };
-    ;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -323,29 +313,30 @@ var drawutilssvg = /** @class */ (function () {
      **/
     drawutilssvg.prototype.image = function (image, position, size) {
         var _this = this;
-        var node = this.makeNode('image');
+        var node = this.makeNode("image");
         // We need to re-adjust the image if it was not yet fully loaded before.
         var setImageSize = function (image) {
             if (image.naturalWidth) {
                 var ratioX = size.x / image.naturalWidth;
                 var ratioY = size.y / image.naturalHeight;
-                node.setAttribute('width', "" + image.naturalWidth * _this.scale.x);
-                node.setAttribute('height', "" + image.naturalHeight * _this.scale.y);
-                node.setAttribute('display', null); // Dislay when loaded
-                node.setAttribute('transform', "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + (ratioX) + " " + (ratioY) + ")");
+                node.setAttribute("width", "" + image.naturalWidth * _this.scale.x);
+                node.setAttribute("height", "" + image.naturalHeight * _this.scale.y);
+                node.setAttribute("display", null); // Dislay when loaded
+                node.setAttribute("transform", "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + ratioX + " " + ratioY + ")");
             }
         };
-        image.addEventListener('load', function (event) { setImageSize(image); });
+        image.addEventListener("load", function (event) {
+            setImageSize(image);
+        });
         // Safari has a transform-origin bug.
         // Use x=0, y=0 and translate/scale instead (see above)
-        node.setAttribute('x', "" + 0);
-        node.setAttribute('y', "" + 0);
-        node.setAttribute('display', 'none'); // Hide before loaded
+        node.setAttribute("x", "" + 0);
+        node.setAttribute("y", "" + 0);
+        node.setAttribute("display", "none"); // Hide before loaded
         setImageSize(image);
-        node.setAttribute('href', image.src);
-        return this._bindFillDraw(node, 'image', null, null);
+        node.setAttribute("href", image.src);
+        return this._bindFillDraw(node, "image", null, null);
     };
-    ;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -364,16 +355,23 @@ var drawutilssvg = /** @class */ (function () {
         if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
             return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
         }
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         // Draw curve
         var d = [
-            'M', this._x(startPoint.x), this._y(startPoint.y),
-            'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y)
+            "M",
+            this._x(startPoint.x),
+            this._y(startPoint.y),
+            "C",
+            this._x(startControlPoint.x),
+            this._y(startControlPoint.y),
+            this._x(endControlPoint.x),
+            this._y(endControlPoint.y),
+            this._x(endPoint.x),
+            this._y(endPoint.y)
         ];
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'cubierBezier', color, lineWidth);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cubierBezier", color, lineWidth);
     };
-    ;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -390,13 +388,11 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.cubicBezierPath = function (path, color, lineWidth) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         if (!path || path.length == 0)
             return node;
         // Draw curve
-        var d = [
-            'M', this._x(path[0].x), this._y(path[0].y)
-        ];
+        var d = ["M", this._x(path[0].x), this._y(path[0].y)];
         // Draw curve path
         var endPoint;
         var startControlPoint;
@@ -405,12 +401,11 @@ var drawutilssvg = /** @class */ (function () {
             startControlPoint = path[i];
             endControlPoint = path[i + 1];
             endPoint = path[i + 2];
-            d.push('C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
+            d.push("C", this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
         }
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'cubicBezierPath', color, lineWidth || 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cubicBezierPath", color, lineWidth || 1);
     };
-    ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -425,10 +420,9 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.handle = function (startPoint, endPoint) {
         // TODO: redefine methods like these into an abstract class?
-        this.point(startPoint, 'rgb(0,32,192)');
-        this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
+        this.point(startPoint, "rgb(0,32,192)");
+        this.square(endPoint, 5, "rgba(0,128,192,0.5)");
     };
-    ;
     /**
      * Draw a handle line (with a light grey).
      *
@@ -440,9 +434,8 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.handleLine = function (startPoint, endPoint) {
-        this.line(startPoint, endPoint, 'rgb(192,192,192)');
+        this.line(startPoint, endPoint, "rgb(192,192,192)");
     };
-    ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
@@ -454,10 +447,9 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.dot = function (p, color) {
-        var node = this.makeNode('line');
-        return this._bindFillDraw(node, 'dot', color, 1);
+        var node = this.makeNode("line");
+        return this._bindFillDraw(node, "dot", color, 1);
     };
-    ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
@@ -470,13 +462,12 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.point = function (p, color) {
         var radius = 3;
-        var node = this.makeNode('circle');
-        node.setAttribute('cx', "" + this._x(p.x));
-        node.setAttribute('cy', "" + this._y(p.y));
-        node.setAttribute('r', "" + radius);
-        return this._bindFillDraw(node, 'point', color, 1);
+        var node = this.makeNode("circle");
+        node.setAttribute("cx", "" + this._x(p.x));
+        node.setAttribute("cy", "" + this._y(p.y));
+        node.setAttribute("r", "" + radius);
+        return this._bindFillDraw(node, "point", color, 1);
     };
-    ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
@@ -492,13 +483,13 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.circle = function (center, radius, color, lineWidth) {
-        var node = this.makeNode('circle');
-        node.setAttribute('cx', "" + this._x(center.x));
-        node.setAttribute('cy', "" + this._y(center.y));
-        node.setAttribute('r', "" + radius * this.scale.x); // y?
-        return this._bindFillDraw(node, 'circle', color, lineWidth || 1);
+        // Todo: draw ellipse when scalex!=scaley
+        var node = this.makeNode("circle");
+        node.setAttribute("cx", "" + this._x(center.x));
+        node.setAttribute("cy", "" + this._y(center.y));
+        node.setAttribute("r", "" + radius * this.scale.x); // y?
+        return this._bindFillDraw(node, "circle", color, lineWidth || 1);
     };
-    ;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
@@ -513,13 +504,12 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         var arcData = CircleSector_1.CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
         startAngle, endAngle);
-        node.setAttribute('d', arcData.join(' '));
-        return this._bindFillDraw(node, 'circleArc', color, lineWidth || 1);
+        node.setAttribute("d", arcData.join(" "));
+        return this._bindFillDraw(node, "circleArc", color, lineWidth || 1);
     };
-    ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -535,19 +525,18 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth, rotation) {
-        if (typeof rotation === 'undefined') {
+        if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
-        var node = this.makeNode('ellipse');
-        node.setAttribute('cx', "" + this._x(center.x));
-        node.setAttribute('cy', "" + this._y(center.y));
-        node.setAttribute('rx', "" + radiusX * this.scale.x);
-        node.setAttribute('ry', "" + radiusY * this.scale.y);
+        var node = this.makeNode("ellipse");
+        node.setAttribute("cx", "" + this._x(center.x));
+        node.setAttribute("cy", "" + this._y(center.y));
+        node.setAttribute("rx", "" + radiusX * this.scale.x);
+        node.setAttribute("ry", "" + radiusY * this.scale.y);
         // node.setAttribute( 'style', `transform: rotate(${rotation} ${center.x} ${center.y})` );
-        node.setAttribute('transform', "rotate(" + rotation * 180 / Math.PI + " " + this._x(center.x) + " " + this._y(center.y) + ")");
-        return this._bindFillDraw(node, 'ellipse', color, lineWidth || 1);
+        node.setAttribute("transform", "rotate(" + (rotation * 180) / Math.PI + " " + this._x(center.x) + " " + this._y(center.y) + ")");
+        return this._bindFillDraw(node, "ellipse", color, lineWidth || 1);
     };
-    ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -563,14 +552,13 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.square = function (center, size, color, lineWidth) {
-        var node = this.makeNode('rectangle');
-        node.setAttribute('x', "" + this._x(center.x - size / 2.0));
-        node.setAttribute('y', "" + this._y(center.y - size / 2.0));
-        node.setAttribute('width', "" + size * this.scale.x);
-        node.setAttribute('height', "" + size * this.scale.y);
-        return this._bindFillDraw(node, 'square', color, lineWidth || 1);
+        var node = this.makeNode("rectangle");
+        node.setAttribute("x", "" + this._x(center.x - size / 2.0));
+        node.setAttribute("y", "" + this._y(center.y - size / 2.0));
+        node.setAttribute("width", "" + size * this.scale.x);
+        node.setAttribute("height", "" + size * this.scale.y);
+        return this._bindFillDraw(node, "square", color, lineWidth || 1);
     };
-    ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -586,24 +574,23 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         var d = [];
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
-            d.push('M', this._x(center.x + x), this._y(center.y + yMin));
-            d.push('L', this._x(center.x + x), this._y(center.y + yMax));
+            d.push("M", this._x(center.x + x), this._y(center.y + yMin));
+            d.push("L", this._x(center.x + x), this._y(center.y + yMax));
         }
         var xMin = -Math.ceil((width * 0.5) / sizeX) * sizeX;
         var xMax = width / 2;
         for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
-            d.push('M', this._x(center.x + xMin), this._y(center.y + y));
-            d.push('L', this._x(center.x + xMax), this._y(center.y + y));
+            d.push("M", this._x(center.x + xMin), this._y(center.y + y));
+            d.push("L", this._x(center.x + xMax), this._y(center.y + y));
         }
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'grid', color, 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "grid", color, 1);
     };
-    ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
@@ -621,21 +608,20 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         var d = [];
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
             for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
                 // Draw a crosshair
-                d.push('M', this._x(center.x + x) - 4, this._y(center.y + y));
-                d.push('L', this._x(center.x + x) + 4, this._y(center.y + y));
-                d.push('M', this._x(center.x + x), this._y(center.y + y) - 4);
-                d.push('L', this._x(center.x + x), this._y(center.y + y) + 4);
+                d.push("M", this._x(center.x + x) - 4, this._y(center.y + y));
+                d.push("L", this._x(center.x + x) + 4, this._y(center.y + y));
+                d.push("M", this._x(center.x + x), this._y(center.y + y) - 4);
+                d.push("L", this._x(center.x + x), this._y(center.y + y) + 4);
             }
         }
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'raster', color, 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "raster", color, 1);
     };
-    ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
@@ -652,19 +638,25 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.diamondHandle = function (center, size, color) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         var d = [
-            'M', this._x(center.x) - size / 2.0, this._y(center.y),
-            'L', this._x(center.x), this._y(center.y) - size / 2.0,
-            'L', this._x(center.x) + size / 2.0, this._y(center.y),
-            'L', this._x(center.x), this._y(center.y) + size / 2.0,
-            'Z'
+            "M",
+            this._x(center.x) - size / 2.0,
+            this._y(center.y),
+            "L",
+            this._x(center.x),
+            this._y(center.y) - size / 2.0,
+            "L",
+            this._x(center.x) + size / 2.0,
+            this._y(center.y),
+            "L",
+            this._x(center.x),
+            this._y(center.y) + size / 2.0,
+            "Z"
         ];
-        ;
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'diamondHandle', color, 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "diamondHandle", color, 1);
     };
-    ;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -681,14 +673,13 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.squareHandle = function (center, size, color) {
-        var node = this.makeNode('rect');
-        node.setAttribute('x', "" + (this._x(center.x) - size / 2.0));
-        node.setAttribute('y', "" + (this._y(center.y) - size / 2.0));
-        node.setAttribute('width', "" + size);
-        node.setAttribute('height', "" + size);
-        return this._bindFillDraw(node, 'squareHandle', color, 1);
+        var node = this.makeNode("rect");
+        node.setAttribute("x", "" + (this._x(center.x) - size / 2.0));
+        node.setAttribute("y", "" + (this._y(center.y) - size / 2.0));
+        node.setAttribute("width", "" + size);
+        node.setAttribute("height", "" + size);
+        return this._bindFillDraw(node, "squareHandle", color, 1);
     };
-    ;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -706,13 +697,12 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.circleHandle = function (center, radius, color) {
         radius = radius || 3;
-        var node = this.makeNode('circle');
-        node.setAttribute('cx', "" + this._x(center.x));
-        node.setAttribute('cy', "" + this._y(center.y));
-        node.setAttribute('r', "" + radius);
-        return this._bindFillDraw(node, 'circleHandle', color, 1);
+        var node = this.makeNode("circle");
+        node.setAttribute("cx", "" + this._x(center.x));
+        node.setAttribute("cy", "" + this._y(center.y));
+        node.setAttribute("r", "" + radius);
+        return this._bindFillDraw(node, "circleHandle", color, 1);
     };
-    ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -727,17 +717,24 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.crosshair = function (center, radius, color) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         var d = [
-            'M', this._x(center.x) - radius, this._y(center.y),
-            'L', this._x(center.x) + radius, this._y(center.y),
-            'M', this._x(center.x), this._y(center.y) - radius,
-            'L', this._x(center.x), this._y(center.y) + radius
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y),
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y),
+            "M",
+            this._x(center.x),
+            this._y(center.y) - radius,
+            "L",
+            this._x(center.x),
+            this._y(center.y) + radius
         ];
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'crosshair', color, 0.5);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "crosshair", color, 0.5);
     };
-    ;
     /**
      * Draw a polygon.
      *
@@ -752,7 +749,6 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.polygon = function (polygon, color, lineWidth) {
         return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
     };
-    ;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -766,23 +762,20 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         if (vertices.length == 0)
             return node;
         // Draw curve
-        var d = [
-            'M', this._x(vertices[0].x), this._y(vertices[0].y)
-        ];
+        var d = ["M", this._x(vertices[0].x), this._y(vertices[0].y)];
         var n = vertices.length;
         for (var i = 1; i < n; i++) {
-            d.push('L', this._x(vertices[i].x), this._y(vertices[i].y));
+            d.push("L", this._x(vertices[i].x), this._y(vertices[i].y));
         }
         if (!isOpen)
-            d.push('Z');
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'polyline', color, lineWidth || 1);
+            d.push("Z");
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "polyline", color, lineWidth || 1);
     };
-    ;
     /**
      * Draw a text label at the given relative position.
      *
@@ -797,14 +790,13 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.text = function (text, x, y, options) {
         options = options || {};
-        var color = options.color || 'black';
-        var node = this.makeNode('text');
-        node.setAttribute('x', "" + this._x(x));
-        node.setAttribute('y', "" + this._x(y));
+        var color = options.color || "black";
+        var node = this.makeNode("text");
+        node.setAttribute("x", "" + this._x(x));
+        node.setAttribute("y", "" + this._x(y));
         node.innerHTML = text;
-        return this._bindFillDraw(node, 'text', color, 1);
+        return this._bindFillDraw(node, "text", color, 1);
     };
-    ;
     /**
      * Draw a non-scaling text label at the given position.
      *
@@ -818,13 +810,12 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.label = function (text, x, y, rotation) {
-        var node = this.makeNode('text');
+        var node = this.makeNode("text");
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute('transform', "translate(" + this.offset.x + "," + this.offset.y + "), rotate(" + rotation / Math.PI * 180 + ")");
+        node.setAttribute("transform", "translate(" + this.offset.x + "," + this.offset.y + "), rotate(" + (rotation / Math.PI) * 180 + ")");
         node.innerHTML = text;
-        return this._bindFillDraw(node, 'label', 'black', null);
+        return this._bindFillDraw(node, "label", "black", null);
     };
-    ;
     /**
      * Draw an SVG-like path given by the specified path data.
      *
@@ -838,14 +829,13 @@ var drawutilssvg = /** @class */ (function () {
      * @return {R} An instance representing the drawn path.
      */
     drawutilssvg.prototype.path = function (pathData, color, lineWidth, options) {
-        var node = this.makeNode('path');
+        var node = this.makeNode("path");
         // Transform the path: in-place (fast) or copy (slower)
         var d = options && options.inplace ? pathData : drawutilssvg.copyPathData(pathData);
         drawutilssvg.transformPathData(d, this.offset, this.scale);
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'path', color, lineWidth);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "path", color, lineWidth);
     };
-    ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
@@ -868,26 +858,25 @@ var drawutilssvg = /** @class */ (function () {
             // Hide all nodes here. Don't throw them away.
             // We can probably re-use them in the next draw cycle.
             var child = this.gNode.childNodes[i];
-            this.cache.set(child.getAttribute('id'), child);
+            this.cache.set(child.getAttribute("id"), child);
         }
         this.removeAllChildNodes();
         // Add a covering rect with the given background color
-        this.curId = 'background';
+        this.curId = "background";
         this.curClassName = undefined;
-        var node = this.makeNode('rect');
+        var node = this.makeNode("rect");
         // For some strange reason SVG rotation transforms use degrees instead of radians
         // Note that the background does not scale with the zoom level (always covers full element)
-        node.setAttribute('x', '0');
-        node.setAttribute('y', '0');
-        node.setAttribute('width', "" + this.canvasSize.width);
-        node.setAttribute('height', "" + this.canvasSize.height);
+        node.setAttribute("x", "0");
+        node.setAttribute("y", "0");
+        node.setAttribute("width", "" + this.canvasSize.width);
+        node.setAttribute("height", "" + this.canvasSize.height);
         // Bind this special element into the document
         this._bindFillDraw(node, this.curId, null, null);
-        node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
+        node.setAttribute("fill", typeof color === "undefined" ? "none" : color);
         // Clear the current ID again
         this.curId = undefined;
     };
-    ;
     /**
      * A private helper function to clear all SVG nodes from the &gt;g> node.
      *
@@ -898,7 +887,6 @@ var drawutilssvg = /** @class */ (function () {
             this.gNode.removeChild(this.gNode.lastChild);
         }
     };
-    ;
     /**
      * Create a new and empty `SVGElement` &lt;svg&gt; in the svg-namespace.
      *
@@ -910,7 +898,6 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.createSvg = function () {
         return document.createElementNS("http://www.w3.org/2000/svg", "svg");
     };
-    ;
     /**
      * Create a copy of the given path data. As path data only consists of strings and numbers,
      * the copy will be shallow by definition.
@@ -926,7 +913,6 @@ var drawutilssvg = /** @class */ (function () {
         }
         return copy;
     };
-    ;
     /**
      * Transform the given path data (translate and scale. rotating is not intended here).
      *
@@ -939,56 +925,64 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.transformPathData = function (data, offset, scale) {
         // Scale and translate {x,y}
-        var _stx = function (index) { data[index] = offset.x + scale.x * Number(data[index]); };
-        var _sty = function (index) { data[index] = offset.y + scale.y * Number(data[index]); };
+        var _stx = function (index) {
+            data[index] = offset.x + scale.x * Number(data[index]);
+        };
+        var _sty = function (index) {
+            data[index] = offset.y + scale.y * Number(data[index]);
+        };
         // scale only {x,y}
-        var _sx = function (index) { data[index] = scale.x * Number(data[index]); };
-        var _sy = function (index) { data[index] = scale.y * Number(data[index]); };
+        var _sx = function (index) {
+            data[index] = scale.x * Number(data[index]);
+        };
+        var _sy = function (index) {
+            data[index] = scale.y * Number(data[index]);
+        };
         var i = 0;
         while (i < data.length) {
             var cmd = data[i];
             switch (cmd) {
-                case 'M':
+                case "M":
                 // MoveTo: M|m x y
-                case 'L':
+                case "L":
                 // LineTo L|l x y
-                case 'T':
+                case "T":
                     // Shorthand/smooth quadratic Bézier curveto: T|t x y
                     _stx(i + 1);
                     _sty(i + 2);
                     i += 3;
                     break;
-                case 'm':
+                case "m":
                 // MoveTo: M|m x y
-                case 'l':
+                case "l":
                 // LineTo L|l x y
-                case 't':
+                case "t":
                     // Shorthand/smooth quadratic Bézier curveto: T|t x y
                     _sx(i + 1);
                     _sy(i + 2);
                     i += 3;
                     break;
-                case 'H':
+                case "H":
                     // HorizontalLineTo: H|h x
                     _stx(i + 1);
                     i += 2;
                     break;
-                case 'h':
+                case "h":
                     // HorizontalLineTo: H|h x
                     _sx(i + 1);
                     i += 2;
                     break;
-                case 'V':
+                case "V":
                     // VerticalLineTo: V|v y
                     _sty(i + 1);
                     i += 2;
                     break;
-                case 'v':
+                case "v":
                     // VerticalLineTo: V|v y
                     _sy(i + 1);
                     i += 2;
                     break;
-                case 'C':
+                case "C":
                     // CurveTo: C|c x1 y1 x2 y2 x y
                     _stx(i + 1);
                     _sty(i + 2);
@@ -998,7 +992,7 @@ var drawutilssvg = /** @class */ (function () {
                     _sty(i + 6);
                     i += 7;
                     break;
-                case 'c':
+                case "c":
                     // CurveTo: C|c x1 y1 x2 y2 x y
                     _sx(i + 1);
                     _sy(i + 2);
@@ -1008,8 +1002,8 @@ var drawutilssvg = /** @class */ (function () {
                     _sy(i + 6);
                     i += 7;
                     break;
-                case 'S':
-                case 'Q':
+                case "S":
+                case "Q":
                     // Shorthand-/SmoothCurveTo: S|s x2 y2 x y
                     // QuadraticCurveTo: Q|q x1 y1 x y
                     _stx(i + 1);
@@ -1018,8 +1012,8 @@ var drawutilssvg = /** @class */ (function () {
                     _sty(i + 4);
                     i += 5;
                     break;
-                case 's':
-                case 'q':
+                case "s":
+                case "q":
                     // Shorthand-/SmoothCurveTo: S|s x2 y2 x y
                     // QuadraticCurveTo: Q|q x1 y1 x y
                     _sx(i + 1);
@@ -1028,7 +1022,7 @@ var drawutilssvg = /** @class */ (function () {
                     _sy(i + 4);
                     i += 5;
                     break;
-                case 'A':
+                case "A":
                     // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
                     _sx(i + 1);
                     _sy(i + 2);
@@ -1036,7 +1030,7 @@ var drawutilssvg = /** @class */ (function () {
                     _sty(i + 7);
                     i += 8;
                     break;
-                case 'a':
+                case "a":
                     // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
                     _sx(i + 1);
                     _sy(i + 2);
@@ -1044,22 +1038,22 @@ var drawutilssvg = /** @class */ (function () {
                     _sy(i + 7);
                     i += 8;
                     break;
-                case 'z':
-                case 'Z':
+                case "z":
+                case "Z":
                     // ClosePath: Z|z (no arguments)
                     i++;
                     break;
                 // Safepoint: continue reading token by token until something is recognized again
-                default: i++;
+                default:
+                    i++;
             }
         } // END while
     };
-    ;
     drawutilssvg.HEAD_XML = [
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
         '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" ',
         '         "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
-        ''
+        ""
     ].join("\n");
     return drawutilssvg;
 }());

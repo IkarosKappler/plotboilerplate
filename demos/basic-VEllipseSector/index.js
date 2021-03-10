@@ -244,51 +244,66 @@
     }
 
     function drawBezier() {
-      var segmentCount = config.bezierSegments; // 2; // At least one
-      var threshold = config.bezierThreshold; // 0.666;
-
-      var sector = ellipseSector; // new VEllipseSector(ell, ellipseSector.startAngle, ellipseSector.endAngle);
-      var startPoint = sector.ellipse.vertAt(sector.startAngle);
-      var fullAngle = sector.endAngle - sector.startAngle;
-      if (fullAngle < 0) fullAngle = Math.PI * 2 + fullAngle;
-      // console.log(fullAngle, sector.startAngle, sector.endAngle);
-
-      var curAngle = sector.startAngle;
-      var startPoint = sector.ellipse.vertAt(curAngle);
-      var curves = [];
-      var lastIntersection;
-      for (var i = 0; i < segmentCount; i++) {
-        var nextAngle = sector.startAngle + (fullAngle / segmentCount) * (i + 1);
-        var endPoint = sector.ellipse.vertAt(nextAngle);
-
-        var startTangent = sector.ellipse.tangentAt(curAngle);
-        var endTangent = sector.ellipse.tangentAt(nextAngle);
-
-        // Find intersection
-        var intersection = startTangent.intersection(endTangent);
-        pb.draw.circleHandle(intersection, 5, "orange");
-        if (lastIntersection) pb.draw.line(lastIntersection, intersection, "grey", 1);
-
-        var startDiff = startPoint.difference(intersection);
-        var endDiff = endPoint.difference(intersection);
-        var curve = new CubicBezierCurve(
-          startPoint.clone(),
-          endPoint.clone(),
-          startPoint.clone().add(startDiff.scale(threshold)),
-          endPoint.clone().add(endDiff.scale(threshold))
-        );
-        //rotateUnconnectedCurve(curve, -ellipse.rotation, ellipse.center);
-        curves.push(curve);
+      var bezierCurves = ellipseSector.ellipse.toCubicBezier(
+        config.bezierSegments,
+        config.bezierThreshold,
+        ellipseSector.startAngle,
+        ellipseSector.endAngle
+      );
+      for (var i = 0; i < bezierCurves.length; i++) {
+        var curve = bezierCurves[i];
         pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
         pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
         pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
-
-        startPoint = endPoint;
-        curAngle = nextAngle;
-        // startSlope = endSlope;
-        lastIntersection = intersection;
       }
     }
+
+    // function _drawBezier() {
+    //   var segmentCount = config.bezierSegments; // 2; // At least one
+    //   var threshold = config.bezierThreshold; // 0.666;
+
+    //   var sector = ellipseSector; // new VEllipseSector(ell, ellipseSector.startAngle, ellipseSector.endAngle);
+    //   var startPoint = sector.ellipse.vertAt(sector.startAngle);
+    //   var fullAngle = sector.endAngle - sector.startAngle;
+    //   if (fullAngle < 0) fullAngle = Math.PI * 2 + fullAngle;
+    //   // console.log(fullAngle, sector.startAngle, sector.endAngle);
+
+    //   var curAngle = sector.startAngle;
+    //   var startPoint = sector.ellipse.vertAt(curAngle);
+    //   var curves = [];
+    //   var lastIntersection;
+    //   for (var i = 0; i < segmentCount; i++) {
+    //     var nextAngle = sector.startAngle + (fullAngle / segmentCount) * (i + 1);
+    //     var endPoint = sector.ellipse.vertAt(nextAngle);
+
+    //     var startTangent = sector.ellipse.tangentAt(curAngle);
+    //     var endTangent = sector.ellipse.tangentAt(nextAngle);
+
+    //     // Find intersection
+    //     var intersection = startTangent.intersection(endTangent);
+    //     pb.draw.circleHandle(intersection, 5, "orange");
+    //     if (lastIntersection) pb.draw.line(lastIntersection, intersection, "grey", 1);
+
+    //     var startDiff = startPoint.difference(intersection);
+    //     var endDiff = endPoint.difference(intersection);
+    //     var curve = new CubicBezierCurve(
+    //       startPoint.clone(),
+    //       endPoint.clone(),
+    //       startPoint.clone().add(startDiff.scale(threshold)),
+    //       endPoint.clone().add(endDiff.scale(threshold))
+    //     );
+    //     //rotateUnconnectedCurve(curve, -ellipse.rotation, ellipse.center);
+    //     curves.push(curve);
+    //     pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
+    //     pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
+    //     pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
+
+    //     startPoint = endPoint;
+    //     curAngle = nextAngle;
+    //     // startSlope = endSlope;
+    //     lastIntersection = intersection;
+    //   }
+    // }
 
     // function rotateUnconnectedCurve(curve, angle, center) {
     //   curve.startPoint.rotate(angle, center);
@@ -312,7 +327,7 @@
       });
     fold0
       .add(config, "bezierSegments")
-      .name("Bézier Steps")
+      .name("Bézier Segments")
       .min(2)
       .max(16)
       .step(1)

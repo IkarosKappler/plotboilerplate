@@ -18,6 +18,7 @@
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { CubicBezierCurve } from "./CubicBezierCurve";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -173,6 +174,7 @@ export declare class VEllipse implements SVGSerializable {
      * @return {Array<Vertex>} An array with two elements, the two focal points of the ellipse (foci).
      */
     getFoci(): [Vertex, Vertex];
+    toCubicBezier(segmentCount?: number, threshold?: number, startAngle?: number, endAngle?: number): Array<CubicBezierCurve>;
     /**
      * Create an SVG representation of this ellipse.
      *

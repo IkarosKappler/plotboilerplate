@@ -22,6 +22,7 @@ var Line_1 = require("./Line");
 var Vector_1 = require("./Vector");
 var Vertex_1 = require("./Vertex");
 var UIDGenerator_1 = require("./UIDGenerator");
+var CubicBezierCurve_1 = require("./CubicBezierCurve");
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -236,6 +237,45 @@ var VEllipse = /** @class */ (function () {
     //     this.axis.rotate(angle, this.center);
     //     this.rotation += angle;
     //   }
+    VEllipse.prototype.toCubicBezier = function (segmentCount, threshold, startAngle, endAngle) {
+        // var segmentCount = config.bezierSegments; // 2; // At least one
+        // var threshold = config.bezierThreshold; // 0.666;
+        segmentCount = segmentCount || 12; // 12 seems to be a good value.
+        threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
+        // var sector = ellipseSector; // new VEllipseSector(ell, ellipseSector.startAngle, ellipseSector.endAngle);
+        //var startPoint = this.vertAt(startAngle);
+        var fullAngle = endAngle - startAngle;
+        if (fullAngle < 0) {
+            fullAngle = Math.PI * 2 + fullAngle;
+        }
+        // console.log(fullAngle, sector.startAngle, sector.endAngle);
+        var curAngle = startAngle;
+        var startPoint = this.vertAt(curAngle);
+        var curves = [];
+        var lastIntersection;
+        for (var i = 0; i < segmentCount; i++) {
+            var nextAngle = startAngle + (fullAngle / segmentCount) * (i + 1);
+            var endPoint = this.vertAt(nextAngle);
+            var startTangent = this.tangentAt(curAngle);
+            var endTangent = this.tangentAt(nextAngle);
+            // Find intersection
+            var intersection = startTangent.intersection(endTangent);
+            // pb.draw.circleHandle(intersection, 5, "orange");
+            // if (lastIntersection) pb.draw.line(lastIntersection, intersection, "grey", 1);
+            var startDiff = startPoint.difference(intersection);
+            var endDiff = endPoint.difference(intersection);
+            var curve = new CubicBezierCurve_1.CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+            //rotateUnconnectedCurve(curve, -ellipse.rotation, ellipse.center);
+            curves.push(curve);
+            // pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
+            // pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
+            // pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
+            startPoint = endPoint;
+            curAngle = nextAngle;
+            lastIntersection = intersection;
+        }
+        return curves;
+    };
     /**
      * Create an SVG representation of this ellipse.
      *
