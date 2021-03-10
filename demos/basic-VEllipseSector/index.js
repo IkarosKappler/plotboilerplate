@@ -255,20 +255,11 @@
 
       var vertices = [];
       for (var i = 0; i < pointCount; i++) {
-        // console.log(i);
-        // var phi = ((Math.PI * 2) / pointCount) * i;
-
         var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
-        // var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
-        // var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
 
         var tanPhi = Math.tan(phi);
         var tanPhi2 = tanPhi * tanPhi;
-        // var theta = Math.PI / 2.0 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
 
-        // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-        // var theta = startAngle - Math.PI / 2.0 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-        // var theta = -Math.PI / 2.0 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
         var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
 
         vertices[i] = ellipseSector.ellipse.vertAt(theta);
