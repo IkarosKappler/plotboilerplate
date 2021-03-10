@@ -136,6 +136,7 @@
       drawFoci();
       if (config.approximateBezier) {
         drawBezier();
+        drawEquidistantVertices();
       }
     };
 
@@ -166,26 +167,6 @@
       pb.fill.circleHandle(foci[1], 3, "orange");
     }
 
-    /* function getFoci() {
-		// https://www.mathopenref.com/ellipsefoci.html
-		var rh = ellipse.radiusH();
-		var rv = ellipse.radiusV();
-		var sdiff = rh*rh - rv*rv;
-		var f = Math.sqrt( Math.abs(sdiff) );
-		// console.log( sdiff, f );
-		if( sdiff < 0 ) {
-		    return [
-			ellipse.center.clone().addY( f/2).rotate( ellipse.rotation, ellipse.center ),
-			ellipse.center.clone().addY(-f/2).rotate( ellipse.rotation, ellipse.center )
-		    ];
-		} else {
-		    return [
-			ellipse.center.clone().addX( f/2).rotate( ellipse.rotation, ellipse.center ),
-			ellipse.center.clone().addX(-f/2).rotate( ellipse.rotation, ellipse.center )
-		    ];
-		}
-		}; */
-
     function drawNormal() {
       //var normal = normalAt( ellipseSector.startAngle ); // + ellipseSector.ellipse.rotation );
       var normal = ellipse.normalAt(ellipseSector.startAngle, 50);
@@ -199,7 +180,7 @@
       pb.draw.line(normal.a, foci[1], "rgba(192,192,0,0.5)", 1);
     }
 
-    function normalAt(angle) {
+    /* function normalAt(angle) {
       var r2d = 180 / Math.PI;
       var point = ellipse.vertAt(angle);
       var foci = ellipse.getFoci();
@@ -230,9 +211,9 @@
         return new Vector(point, endPointA);
       }
       // pb.draw.line( point, endPoint, 'red', 1 );
-    }
+    } */
 
-    function _normalAt(angle) {
+    /* function _normalAt(angle) {
       var point = ellipse.vertAt(angle);
       var slope = (ellipse.radiusH() * Math.sin(angle)) / (ellipse.radiusV() * Math.cos(angle));
       console.log("slope", slope);
@@ -241,7 +222,7 @@
       var end = new Vertex(point.x + len, point.y + len * slope);
       // if(
       pb.draw.line(point, end);
-    }
+    } */
 
     function drawBezier() {
       var bezierCurves = ellipseSector.ellipse.toCubicBezier(
@@ -255,6 +236,44 @@
         pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
         pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
         pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
+      }
+    }
+
+    function drawEquidistantVertices() {
+      // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+
+      var pointCount = config.bezierSegments;
+      var a = ellipseSector.ellipse.radiusH();
+      var b = ellipseSector.ellipse.radiusV();
+      var startAngle = ellipseSector.startAngle;
+      var endAngle = ellipseSector.endAngle;
+      var fullAngle = Math.PI * 2;
+      // var fullAngle = endAngle - startAngle; // Math.PI*2
+      // if (fullAngle < 0) {
+      //   fullAngle = Math.PI * 2 + fullAngle;
+      // }
+
+      var vertices = [];
+      for (var i = 0; i < pointCount; i++) {
+        // console.log(i);
+        // var phi = ((Math.PI * 2) / pointCount) * i;
+
+        var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
+        // var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
+        // var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
+
+        var tanPhi = Math.tan(phi);
+        var tanPhi2 = tanPhi * tanPhi;
+        // var theta = Math.PI / 2.0 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+
+        // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        // var theta = startAngle - Math.PI / 2.0 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        // var theta = -Math.PI / 2.0 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+
+        vertices[i] = ellipseSector.ellipse.vertAt(theta);
+        pb.draw.circleHandle(vertices[i], 5, "orange");
+        pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
       }
     }
 

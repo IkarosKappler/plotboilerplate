@@ -11,6 +11,7 @@
  * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
  * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
  * @modified 2021-03-09 Added the `clone` and `rotate` methods.
+ * @modified 2021-03-10 Added the `toCubicBezier` method.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -238,17 +239,22 @@ var VEllipse = /** @class */ (function () {
     //     this.rotation += angle;
     //   }
     VEllipse.prototype.toCubicBezier = function (segmentCount, threshold, startAngle, endAngle) {
-        // var segmentCount = config.bezierSegments; // 2; // At least one
-        // var threshold = config.bezierThreshold; // 0.666;
-        segmentCount = segmentCount || 12; // 12 seems to be a good value.
+        // Math by Luc Maisonobe
+        //    http://www.spaceroots.org/documents/ellipse/node22.html
+        // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
+        // Return a single line here (as a Bézier curve)
+        if (Math.abs(this.radiusV()) < 0.00001) {
+            return [];
+        }
+        if (Math.abs(this.radiusH()) < 0.00001) {
+            return [];
+        }
+        segmentCount = Math.max(2, segmentCount || 12); // At least 2, but 12 seems to be a good value.
         threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
-        // var sector = ellipseSector; // new VEllipseSector(ell, ellipseSector.startAngle, ellipseSector.endAngle);
-        //var startPoint = this.vertAt(startAngle);
         var fullAngle = endAngle - startAngle;
         if (fullAngle < 0) {
             fullAngle = Math.PI * 2 + fullAngle;
         }
-        // console.log(fullAngle, sector.startAngle, sector.endAngle);
         var curAngle = startAngle;
         var startPoint = this.vertAt(curAngle);
         var curves = [];
@@ -260,16 +266,12 @@ var VEllipse = /** @class */ (function () {
             var endTangent = this.tangentAt(nextAngle);
             // Find intersection
             var intersection = startTangent.intersection(endTangent);
-            // pb.draw.circleHandle(intersection, 5, "orange");
-            // if (lastIntersection) pb.draw.line(lastIntersection, intersection, "grey", 1);
+            // What if intersection is undefined?
+            // --> This *can* not happen if segmentCount > 1 and height and width of the ellipse are not zero.
             var startDiff = startPoint.difference(intersection);
             var endDiff = endPoint.difference(intersection);
             var curve = new CubicBezierCurve_1.CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
-            //rotateUnconnectedCurve(curve, -ellipse.rotation, ellipse.center);
             curves.push(curve);
-            // pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
-            // pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
-            // pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
             startPoint = endPoint;
             curAngle = nextAngle;
             lastIntersection = intersection;

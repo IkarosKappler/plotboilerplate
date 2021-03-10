@@ -10,6 +10,7 @@
  * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
  * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
  * @modified 2021-03-09 Added the `clone` and `rotate` methods.
+ * @modified 2021-03-10 Added the `toCubicBezier` method.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -285,34 +286,42 @@ export class VEllipse implements SVGSerializable {
   //   }
 
   toCubicBezier(segmentCount?: number, threshold?: number, startAngle?: number, endAngle?: number): Array<CubicBezierCurve> {
-    // var segmentCount = config.bezierSegments; // 2; // At least one
-    // var threshold = config.bezierThreshold; // 0.666;
-    segmentCount = segmentCount || 12; // 12 seems to be a good value.
+    // Math by Luc Maisonobe
+    //    http://www.spaceroots.org/documents/ellipse/node22.html
+
+    // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
+    // Return a single line here (as a Bézier curve)
+    if (Math.abs(this.radiusV()) < 0.00001) {
+      return [];
+    }
+    if (Math.abs(this.radiusH()) < 0.00001) {
+      return [];
+    }
+
+    segmentCount = Math.max(2, segmentCount || 12); // At least 2, but 12 seems to be a good value.
     threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
 
-    // var sector = ellipseSector; // new VEllipseSector(ell, ellipseSector.startAngle, ellipseSector.endAngle);
-    //var startPoint = this.vertAt(startAngle);
-    var fullAngle = endAngle - startAngle;
+    let fullAngle: number = endAngle - startAngle;
     if (fullAngle < 0) {
       fullAngle = Math.PI * 2 + fullAngle;
     }
-    // console.log(fullAngle, sector.startAngle, sector.endAngle);
 
-    let curAngle = startAngle;
-    let startPoint = this.vertAt(curAngle);
+    let curAngle: number = startAngle;
+    let startPoint: Vertex = this.vertAt(curAngle);
     let curves: Array<CubicBezierCurve> = [];
-    let lastIntersection;
+    let lastIntersection: Vertex | undefined;
     for (var i = 0; i < segmentCount; i++) {
-      let nextAngle = startAngle + (fullAngle / segmentCount) * (i + 1);
-      let endPoint = this.vertAt(nextAngle);
+      let nextAngle: number = startAngle + (fullAngle / segmentCount) * (i + 1);
+      let endPoint: Vertex = this.vertAt(nextAngle);
 
-      let startTangent = this.tangentAt(curAngle);
-      let endTangent = this.tangentAt(nextAngle);
+      let startTangent: Vector = this.tangentAt(curAngle);
+      let endTangent: Vector = this.tangentAt(nextAngle);
 
       // Find intersection
-      let intersection = startTangent.intersection(endTangent);
-      // pb.draw.circleHandle(intersection, 5, "orange");
-      // if (lastIntersection) pb.draw.line(lastIntersection, intersection, "grey", 1);
+      let intersection: Vertex | undefined = startTangent.intersection(endTangent);
+
+      // What if intersection is undefined?
+      // --> This *can* not happen if segmentCount > 1 and height and width of the ellipse are not zero.
 
       let startDiff = startPoint.difference(intersection);
       let endDiff = endPoint.difference(intersection);
@@ -322,12 +331,7 @@ export class VEllipse implements SVGSerializable {
         startPoint.clone().add(startDiff.scale(threshold)),
         endPoint.clone().add(endDiff.scale(threshold))
       );
-      //rotateUnconnectedCurve(curve, -ellipse.rotation, ellipse.center);
       curves.push(curve);
-      // pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
-      // pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
-      // pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
-
       startPoint = endPoint;
       curAngle = nextAngle;
       lastIntersection = intersection;

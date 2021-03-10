@@ -1,6 +1,8 @@
 # Changelog
 
 - 2021-03-09
+  - Added the `VEllipse.toCubicBezier` method.
+- 2021-03-09
   - Added the `VEllipse.clone` and `VEllipse.rotate` methods.
 - 2021-03-05
   - Added the `VEllipse.getFoci`, `.normalAt` and `.tangentAt` methods.

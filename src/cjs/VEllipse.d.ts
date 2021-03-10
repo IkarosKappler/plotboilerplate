@@ -10,6 +10,7 @@
  * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
  * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
  * @modified 2021-03-09 Added the `clone` and `rotate` methods.
+ * @modified 2021-03-10 Added the `toCubicBezier` method.
  * @version  1.2.2
  *
  * @file VEllipse
