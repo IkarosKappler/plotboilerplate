@@ -11,6 +11,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipseSector = void 0;
 // TODO: add class to all demos
 // TODO: add to PlotBoilerplate.add(...)
+var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var geomutils_1 = require("./geomutils");
 var UIDGenerator_1 = require("./UIDGenerator");
 var VEllipse_1 = require("./VEllipse");
@@ -48,6 +49,65 @@ var VEllipseSector = /** @class */ (function () {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    VEllipseSector.prototype.toCubicBezier = function (segmentCount, threshold) {
+        segmentCount = Math.max(4, segmentCount || 12); // At least 4, but 12 seems to be a good value.
+        threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
+        var radiusH = this.ellipse.radiusH();
+        var radiusV = this.ellipse.radiusV();
+        // var mapAngle = angle => (angle < 0 ? Math.PI * 2 + angle : angle);
+        // var self = this;
+        var startAngle = this.startAngle; // mapAngle(this.startAngle); // this.startAngle; // < 0 ? Math.PI * 2 + this.startAngle : this.startAngle;
+        var endAngle = this.endAngle; // mapAngle(this.endAngle); // this.endAngle; // < 0 ? Math.PI * 2 + this.endAngle : this.endAngle;
+        var angleIsInRange = function (angle) {
+            // angle = mapAngle(angle);
+            console.log("isInside(", startAngle, "<", angle, "<", endAngle, ")", angle >= startAngle && angle <= endAngle ? "true" : "FALSE");
+            // return angle >= startAngle && angle <= endAngle;
+            // angle = mapAngle(angle);
+            if (startAngle < endAngle)
+                return angle >= startAngle && angle <= endAngle;
+            else
+                return !(angle >= startAngle && angle <= endAngle); //angle <= startAngle && angle >= endAngle;
+            // else return angle > startAngle && angle < endAngle;
+        };
+        // Find all angles inside start and end
+        var angles = VEllipse_1.VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
+        console.log("startAngle", this.startAngle, "endAngle", this.endAngle);
+        console.log(angles);
+        angles = angles.filter(angleIsInRange);
+        angles = [this.startAngle].concat(angles).concat([this.endAngle]);
+        // if (startAngle < endAngle) {
+        //   angles = [this.startAngle].concat(angles).concat([this.endAngle]);
+        // } else {
+        //   angles = [this.endAngle].concat(angles).concat([this.startAngle]);
+        // }
+        console.log("Using angles", angles);
+        var curves = [];
+        var curAngle = angles[0];
+        var startPoint = this.ellipse.vertAt(curAngle);
+        //let lastIntersection: Vertex | undefined;
+        // for (var i = 0; i < segmentCount; i++) {
+        for (var i = 0; i + 1 < angles.length; i++) {
+            // let nextAngle: number = ((Math.PI * 2) / segmentCount) * (i + 1);
+            // let nextAngle: number = VEllipse.utils.phiToTheta(radiusH, radiusV, Math.PI / 2.0 + ((Math.PI * 2) / segmentCount) * i);
+            // let curAngle: number = angles[i];
+            var nextAngle = angles[(i + 1) % angles.length];
+            var endPoint = this.ellipse.vertAt(nextAngle);
+            var startTangent = this.ellipse.tangentAt(curAngle);
+            var endTangent = this.ellipse.tangentAt(nextAngle);
+            // Find intersection
+            var intersection = startTangent.intersection(endTangent);
+            // What if intersection is undefined?
+            // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
+            var startDiff = startPoint.difference(intersection);
+            var endDiff = endPoint.difference(intersection);
+            var curve = new CubicBezierCurve_1.CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+            curves.push(curve);
+            startPoint = endPoint;
+            curAngle = nextAngle;
+            //lastIntersection = intersection;
+        }
+        return curves;
+    };
     VEllipseSector.ellipseSectorUtils = {
         /**
          * Helper function to convert an elliptic section to SVG arc params (for the `d` attribute).
@@ -93,48 +153,6 @@ var VEllipseSector = /** @class */ (function () {
             pathData.push("A", radiusH, radiusV, rotation * r2d, largeArcFlag, sweepFlag, end.x, end.y);
             return pathData;
         } // END function describeSVGArc
-        // toCubicBezier : ( ellipseCenter:Vertex, ellipseAxis:Vertex, ellipseRotation:number, segmentCount?:number, threshold?:number ) : Array<CubicBezierCurve> {
-        //   // var segmentCount = config.bezierSegments; // 2; // At least one
-        //   // var threshold = config.bezierThreshold; // 0.666;
-        //   segmentCount = segmentCount || 12; // 12 seems to be a good value.
-        //   threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
-        //   // var sector = ellipseSector; // new VEllipseSector(ell, ellipseSector.startAngle, ellipseSector.endAngle);
-        //   var startPoint = sector.ellipse.vertAt(sector.startAngle);
-        //   var fullAngle = sector.endAngle - sector.startAngle;
-        //   if (fullAngle < 0) fullAngle = Math.PI * 2 + fullAngle;
-        //   // console.log(fullAngle, sector.startAngle, sector.endAngle);
-        //   var curAngle = sector.startAngle;
-        //   var startPoint = sector.ellipse.vertAt(curAngle);
-        //   var curves = [];
-        //   var lastIntersection;
-        //   for (var i = 0; i < segmentCount; i++) {
-        //     var nextAngle = sector.startAngle + (fullAngle / segmentCount) * (i + 1);
-        //     var endPoint = sector.ellipse.vertAt(nextAngle);
-        //     var startTangent = sector.ellipse.tangentAt(curAngle);
-        //     var endTangent = sector.ellipse.tangentAt(nextAngle);
-        //     // Find intersection
-        //     var intersection = startTangent.intersection(endTangent);
-        //     pb.draw.circleHandle(intersection, 5, "orange");
-        //     if (lastIntersection) pb.draw.line(lastIntersection, intersection, "grey", 1);
-        //     var startDiff = startPoint.difference(intersection);
-        //     var endDiff = endPoint.difference(intersection);
-        //     var curve = new CubicBezierCurve(
-        //       startPoint.clone(),
-        //       endPoint.clone(),
-        //       startPoint.clone().add(startDiff.scale(threshold)),
-        //       endPoint.clone().add(endDiff.scale(threshold))
-        //     );
-        //     //rotateUnconnectedCurve(curve, -ellipse.rotation, ellipse.center);
-        //     curves.push(curve);
-        //     pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
-        //     pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
-        //     pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
-        //     startPoint = endPoint;
-        //     curAngle = nextAngle;
-        //     // startSlope = endSlope;
-        //     lastIntersection = intersection;
-        //   }
-        // }
     }; // END ellipseSectorUtils
     return VEllipseSector;
 }());

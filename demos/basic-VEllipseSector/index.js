@@ -27,10 +27,10 @@
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         fullApproximateBezier: false,
-        fullBezierSegments: 4,
+        fullBezierSegments: 8,
         fullBezierThreshold: 0.666,
         sectorApproximateBezier: false,
-        sectorBezierSegments: 4,
+        sectorBezierSegments: 8,
         sectorBezierThreshold: 0.666
       },
       GUP
@@ -138,8 +138,12 @@
       // normalAt( ellipse, ellipseSector.startAngle + ellipseSector.ellipse.rotation );
       drawFoci();
       if (config.fullApproximateBezier) {
-        drawBezier();
-        drawEquidistantVertices();
+        drawFullBezier();
+        drawFullEquidistantVertices();
+      }
+      if (config.sectorApproximateBezier) {
+        drawSectorBezier();
+        // drawSectorEquidistantVertices();
       }
     };
 
@@ -183,13 +187,8 @@
       pb.draw.line(normal.a, foci[1], "rgba(192,192,0,0.5)", 1);
     }
 
-    function drawBezier() {
-      var bezierCurves = ellipseSector.ellipse.toCubicBezier(
-        config.fullBezierSegments,
-        config.fullBezierThreshold,
-        ellipseSector.startAngle,
-        ellipseSector.endAngle
-      );
+    function drawFullBezier() {
+      var bezierCurves = ellipseSector.ellipse.toCubicBezier(config.fullBezierSegments, config.fullBezierThreshold);
       for (var i = 0; i < bezierCurves.length; i++) {
         var curve = bezierCurves[i];
         pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
@@ -198,159 +197,33 @@
       }
     }
 
-    function drawEquidistantVertices() {
+    function drawFullEquidistantVertices() {
       var vertices = ellipseSector.ellipse.getEquidistantVertices(
         config.fullBezierSegments,
         ellipseSector.startAngle,
         ellipseSector.endAngle,
         false
       );
-      console.log("vertices", vertices);
+      // console.log("vertices", vertices);
       for (var i = 0; i < vertices.length; i++) {
         pb.draw.circleHandle(vertices[i], 5, "orange");
         pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
       }
     }
 
-    function __drawEquidistantVertices() {
-      // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
-
-      var pointCount = config.bezierSegments;
-      var a = ellipseSector.ellipse.radiusH();
-      var b = ellipseSector.ellipse.radiusV();
-      var startAngle = ellipseSector.startAngle;
-      var endAngle = ellipseSector.endAngle;
-      // var fullAngle = Math.PI * 2;
-      var fullAngle = endAngle - startAngle; // Math.PI*2
-      if (fullAngle < 0) {
-        fullAngle = Math.PI * 2 + fullAngle;
+    function drawSectorBezier() {
+      var bezierCurves = ellipseSector.toCubicBezier(config.sectorBezierSegments, config.sectorBezierThreshold);
+      // console.log("bezierCurves", bezierCurves);
+      for (var i = 0; i < bezierCurves.length; i++) {
+        var curve = bezierCurves[i];
+        pb.draw.circleHandle(curve.startPoint, 5, "orange");
+        pb.draw.text("" + i, curve.startPoint.x, curve.startPoint.y, 0, "black");
+        pb.draw.line(ellipseSector.ellipse.center, curve.startPoint, "grey", 1);
+        pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
+        pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
+        pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
       }
-
-      // As static helper function?
-      var phiToTheta = function (phi) {
-        var tanPhi = Math.tan(phi);
-        var tanPhi2 = tanPhi * tanPhi;
-
-        // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-        // var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-        var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-        return theta;
-      };
-
-      var vertices = [];
-      for (var i = 0; i < pointCount; i++) {
-        // var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
-        // var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
-        // var phi = Math.PI - startAngle + phiToTheta((fullAngle / pointCount) * i);
-        var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
-
-        // var tanPhi = Math.tan(phi);
-        // var tanPhi2 = tanPhi * tanPhi;
-
-        // var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-        var theta = phiToTheta(phi);
-
-        vertices[i] = ellipseSector.ellipse.vertAt(theta);
-        pb.draw.circleHandle(vertices[i], 5, "orange");
-        pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
-      }
-      // Add the last vertice if not full circle
-      // if( fullAngle < Math.PI*2 )
-      // vertices.push[]
     }
-
-    function _drawEquidistantVertices() {
-      // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
-
-      var pointCount = config.bezierSegments;
-      var a = ellipseSector.ellipse.radiusH();
-      var b = ellipseSector.ellipse.radiusV();
-      var startAngle = ellipseSector.startAngle;
-      var endAngle = ellipseSector.endAngle;
-      // var fullAngle = Math.PI * 2;
-      var fullAngle = endAngle - startAngle; // Math.PI*2
-      if (fullAngle < 0) {
-        fullAngle = Math.PI * 2 + fullAngle;
-      }
-
-      var vertices = [];
-      for (var i = 0; i < pointCount; i++) {
-        // var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
-        var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
-
-        var tanPhi = Math.tan(phi);
-        var tanPhi2 = tanPhi * tanPhi;
-
-        // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-        // var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-        var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-
-        vertices[i] = ellipseSector.ellipse.vertAt(theta);
-        pb.draw.circleHandle(vertices[i], 5, "orange");
-        pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
-      }
-      // Add the last vertice if not full circle
-      // if( fullAngle < Math.PI*2 )
-      // vertices.push[]
-    }
-
-    // function _drawBezier() {
-    //   var segmentCount = config.bezierSegments; // 2; // At least one
-    //   var threshold = config.bezierThreshold; // 0.666;
-
-    //   var sector = ellipseSector; // new VEllipseSector(ell, ellipseSector.startAngle, ellipseSector.endAngle);
-    //   var startPoint = sector.ellipse.vertAt(sector.startAngle);
-    //   var fullAngle = sector.endAngle - sector.startAngle;
-    //   if (fullAngle < 0) fullAngle = Math.PI * 2 + fullAngle;
-    //   // console.log(fullAngle, sector.startAngle, sector.endAngle);
-
-    //   var curAngle = sector.startAngle;
-    //   var startPoint = sector.ellipse.vertAt(curAngle);
-    //   var curves = [];
-    //   var lastIntersection;
-    //   for (var i = 0; i < segmentCount; i++) {
-    //     var nextAngle = sector.startAngle + (fullAngle / segmentCount) * (i + 1);
-    //     var endPoint = sector.ellipse.vertAt(nextAngle);
-
-    //     var startTangent = sector.ellipse.tangentAt(curAngle);
-    //     var endTangent = sector.ellipse.tangentAt(nextAngle);
-
-    //     // Find intersection
-    //     var intersection = startTangent.intersection(endTangent);
-    //     pb.draw.circleHandle(intersection, 5, "orange");
-    //     if (lastIntersection) pb.draw.line(lastIntersection, intersection, "grey", 1);
-
-    //     var startDiff = startPoint.difference(intersection);
-    //     var endDiff = endPoint.difference(intersection);
-    //     var curve = new CubicBezierCurve(
-    //       startPoint.clone(),
-    //       endPoint.clone(),
-    //       startPoint.clone().add(startDiff.scale(threshold)),
-    //       endPoint.clone().add(endDiff.scale(threshold))
-    //     );
-    //     //rotateUnconnectedCurve(curve, -ellipse.rotation, ellipse.center);
-    //     curves.push(curve);
-    //     pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
-    //     pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
-    //     pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
-
-    //     startPoint = endPoint;
-    //     curAngle = nextAngle;
-    //     // startSlope = endSlope;
-    //     lastIntersection = intersection;
-    //   }
-    // }
-
-    // function rotateUnconnectedCurve(curve, angle, center) {
-    //   curve.startPoint.rotate(angle, center);
-    //   curve.endPoint.rotate(angle, center);
-    //   curve.startControlPoint.rotate(angle, center);
-    //   curve.endControlPoint.rotate(angle, center);
-    // }
-
-    //   var getSlope = function (elli, angle) {
-    //     return (elli.radiusH() * Math.sin(angle)) / (elli.radiusV() * Math.cos(angle));
-    //   };
 
     // Create a gui for testing with scale
     var gui = pb.createGUI();

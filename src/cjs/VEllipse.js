@@ -334,10 +334,6 @@ var VEllipse = /** @class */ (function () {
         threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
         var radiusH = this.radiusH();
         var radiusV = this.radiusV();
-        // let fullAngle: number = endAngle - startAngle;
-        // if (fullAngle < 0) {
-        //   fullAngle = Math.PI * 2 + fullAngle;
-        // }
         // let curAngle: number = 0;
         var curves = [];
         var angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);

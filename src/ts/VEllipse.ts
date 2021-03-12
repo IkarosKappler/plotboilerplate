@@ -408,11 +408,6 @@ export class VEllipse implements SVGSerializable {
     const radiusH = this.radiusH();
     const radiusV = this.radiusV();
 
-    // let fullAngle: number = endAngle - startAngle;
-    // if (fullAngle < 0) {
-    //   fullAngle = Math.PI * 2 + fullAngle;
-    // }
-
     // let curAngle: number = 0;
     const curves: Array<CubicBezierCurve> = [];
     const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);

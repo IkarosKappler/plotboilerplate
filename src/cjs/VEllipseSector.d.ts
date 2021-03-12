@@ -6,6 +6,7 @@
  * @date    2021-02-26
  * @version 1.0.0
  */
+import { CubicBezierCurve } from "./CubicBezierCurve";
 import { SVGPathParams, UID } from "./interfaces";
 import { VEllipse } from "./VEllipse";
 /**
@@ -63,6 +64,7 @@ export declare class VEllipseSector {
      * @param {numner} endAngle - The end angle of the sector.
      */
     constructor(ellipse: VEllipse, startAngle: number, endAngle: number);
+    toCubicBezier(segmentCount?: number, threshold?: number): CubicBezierCurve[];
     static ellipseSectorUtils: {
         /**
          * Helper function to convert an elliptic section to SVG arc params (for the `d` attribute).
