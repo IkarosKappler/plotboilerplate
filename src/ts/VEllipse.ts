@@ -367,7 +367,13 @@ export class VEllipse implements SVGSerializable {
   //     this.rotation += angle;
   //   }
 
-  toCubicBezier(segmentCount?: number, threshold?: number, startAngle?: number, endAngle?: number): Array<CubicBezierCurve> {
+  /**
+   *
+   * @param {number} segmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
+   * @param threshold
+   * @returns
+   */
+  toCubicBezier(segmentCount?: number, threshold?: number): Array<CubicBezierCurve> {
     // Math by Luc Maisonobe
     //    http://www.spaceroots.org/documents/ellipse/node22.html
 
@@ -396,20 +402,29 @@ export class VEllipse implements SVGSerializable {
       ]; // TODO: test vertical line ellipse
     }
 
-    segmentCount = Math.max(2, segmentCount || 12); // At least 2, but 12 seems to be a good value.
+    segmentCount = Math.max(4, segmentCount || 12); // At least 4, but 12 seems to be a good value.
     threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
 
-    let fullAngle: number = endAngle - startAngle;
-    if (fullAngle < 0) {
-      fullAngle = Math.PI * 2 + fullAngle;
-    }
+    const radiusH = this.radiusH();
+    const radiusV = this.radiusV();
 
-    let curAngle: number = startAngle;
+    // let fullAngle: number = endAngle - startAngle;
+    // if (fullAngle < 0) {
+    //   fullAngle = Math.PI * 2 + fullAngle;
+    // }
+
+    // let curAngle: number = 0;
+    const curves: Array<CubicBezierCurve> = [];
+    const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
+    let curAngle: number = angles[0];
     let startPoint: Vertex = this.vertAt(curAngle);
-    let curves: Array<CubicBezierCurve> = [];
     //let lastIntersection: Vertex | undefined;
-    for (var i = 0; i < segmentCount; i++) {
-      let nextAngle: number = startAngle + (fullAngle / segmentCount) * (i + 1);
+    // for (var i = 0; i < segmentCount; i++) {
+    for (var i = 0; i < angles.length; i++) {
+      // let nextAngle: number = ((Math.PI * 2) / segmentCount) * (i + 1);
+      // let nextAngle: number = VEllipse.utils.phiToTheta(radiusH, radiusV, Math.PI / 2.0 + ((Math.PI * 2) / segmentCount) * i);
+      // let curAngle: number = angles[i];
+      let nextAngle = angles[(i + 1) % angles.length];
       let endPoint: Vertex = this.vertAt(nextAngle);
 
       let startTangent: Vector = this.tangentAt(curAngle);
@@ -417,13 +432,12 @@ export class VEllipse implements SVGSerializable {
 
       // Find intersection
       let intersection: Vertex | undefined = startTangent.intersection(endTangent);
-
       // What if intersection is undefined?
-      // --> This *can* not happen if segmentCount > 1 and height and width of the ellipse are not zero.
+      // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
 
-      let startDiff = startPoint.difference(intersection);
-      let endDiff = endPoint.difference(intersection);
-      let curve = new CubicBezierCurve(
+      let startDiff: Vertex = startPoint.difference(intersection);
+      let endDiff: Vertex = endPoint.difference(intersection);
+      let curve: CubicBezierCurve = new CubicBezierCurve(
         startPoint.clone(),
         endPoint.clone(),
         startPoint.clone().add(startDiff.scale(threshold)),
@@ -484,13 +498,45 @@ export class VEllipse implements SVGSerializable {
       };
     },
 
+    /**
+     * Get the `theta` for a given `phi` (used to determine equidistant points on ellipse).
+     *
+     * @param radiusH
+     * @param radiusV
+     * @param phi
+     * @returns {number} theta
+     */
     phiToTheta: (radiusH: number, radiusV: number, phi: number): number => {
-      // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+      //  See https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
       // var phi = Math.PI / 2.0 + ((Math.PI * 2) / sectorCount) * i;
       var tanPhi = Math.tan(phi);
       var tanPhi2 = tanPhi * tanPhi;
       var theta = -Math.PI / 2 + phi + Math.atan(((radiusH - radiusV) * tanPhi) / (radiusV + radiusH * tanPhi2));
       return theta;
+    },
+
+    /**
+     * Get n equidistant points on the elliptic arc.
+     *
+     * @param pointCount
+     * @returns
+     */
+    equidistantVertAngles: (radiusH: number, radiusV: number, pointCount: number): Array<number> => {
+      // var a = this.radiusH();
+      // var b = this.radiusV();
+
+      const angles: Array<number> = [];
+      for (var i = 0; i < pointCount; i++) {
+        var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
+        // var tanPhi = Math.tan(phi);
+        // var tanPhi2 = tanPhi * tanPhi;
+        // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+        let theta = VEllipse.utils.phiToTheta(radiusH, radiusV, phi);
+
+        // vertices[i] = this.vertAt(theta);
+        angles[i] = theta;
+      }
+      return angles; // vertices;
     }
   }; // END utils
 }

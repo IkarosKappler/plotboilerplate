@@ -26,9 +26,12 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        approximateBezier: false,
-        bezierSegments: 4,
-        bezierThreshold: 0.666
+        fullApproximateBezier: false,
+        fullBezierSegments: 4,
+        fullBezierThreshold: 0.666,
+        sectorApproximateBezier: false,
+        sectorBezierSegments: 4,
+        sectorBezierThreshold: 0.666
       },
       GUP
     );
@@ -134,7 +137,7 @@
       // drawTangent();
       // normalAt( ellipse, ellipseSector.startAngle + ellipseSector.ellipse.rotation );
       drawFoci();
-      if (config.approximateBezier) {
+      if (config.fullApproximateBezier) {
         drawBezier();
         drawEquidistantVertices();
       }
@@ -182,8 +185,8 @@
 
     function drawBezier() {
       var bezierCurves = ellipseSector.ellipse.toCubicBezier(
-        config.bezierSegments,
-        config.bezierThreshold,
+        config.fullBezierSegments,
+        config.fullBezierThreshold,
         ellipseSector.startAngle,
         ellipseSector.endAngle
       );
@@ -197,7 +200,7 @@
 
     function drawEquidistantVertices() {
       var vertices = ellipseSector.ellipse.getEquidistantVertices(
-        config.bezierSegments,
+        config.fullBezierSegments,
         ellipseSector.startAngle,
         ellipseSector.endAngle,
         false
@@ -351,15 +354,15 @@
 
     // Create a gui for testing with scale
     var gui = pb.createGUI();
-    var fold0 = gui.addFolder("Bézier Approximation");
+    var fold0 = gui.addFolder("Full Bézier Approximation");
     fold0
-      .add(config, "approximateBezier")
+      .add(config, "fullApproximateBezier")
       .name("Approximate Bézier")
       .onChange(function () {
         pb.redraw();
       });
     fold0
-      .add(config, "bezierSegments")
+      .add(config, "fullBezierSegments")
       .name("Bézier Segments")
       .min(2)
       .max(16)
@@ -368,7 +371,7 @@
         pb.redraw();
       });
     fold0
-      .add(config, "bezierThreshold")
+      .add(config, "fullBezierThreshold")
       .name("Threshold")
       .min(0.0)
       .max(1.0)
@@ -376,6 +379,31 @@
         pb.redraw();
       });
     fold0.open();
+    var fold1 = gui.addFolder("Sector Bézier Approximation");
+    fold1
+      .add(config, "sectorApproximateBezier")
+      .name("Approximate Bézier")
+      .onChange(function () {
+        pb.redraw();
+      });
+    fold1
+      .add(config, "sectorBezierSegments")
+      .name("Bézier Segments")
+      .min(2)
+      .max(16)
+      .step(1)
+      .onChange(function () {
+        pb.redraw();
+      });
+    fold1
+      .add(config, "sectorBezierThreshold")
+      .name("Threshold")
+      .min(0.0)
+      .max(1.0)
+      .onChange(function () {
+        pb.redraw();
+      });
+    fold1.open();
 
     pb.redraw();
   });

@@ -182,7 +182,13 @@ export declare class VEllipse implements SVGSerializable {
      * @returns
      */
     getEquidistantVertices(pointCount: number): Array<Vertex>;
-    toCubicBezier(segmentCount?: number, threshold?: number, startAngle?: number, endAngle?: number): Array<CubicBezierCurve>;
+    /**
+     *
+     * @param {number} segmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
+     * @param threshold
+     * @returns
+     */
+    toCubicBezier(segmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
     /**
      * Create an SVG representation of this ellipse.
      *
@@ -210,6 +216,21 @@ export declare class VEllipse implements SVGSerializable {
          * @reutn {XYCoords} The outlont point in absolute x-y-coordinates.
          */
         polarToCartesian: (centerX: number, centerY: number, radiusH: number, radiusV: number, angle: number) => XYCoords;
+        /**
+         * Get the `theta` for a given `phi` (used to determine equidistant points on ellipse).
+         *
+         * @param radiusH
+         * @param radiusV
+         * @param phi
+         * @returns {number} theta
+         */
         phiToTheta: (radiusH: number, radiusV: number, phi: number) => number;
+        /**
+         * Get n equidistant points on the elliptic arc.
+         *
+         * @param pointCount
+         * @returns
+         */
+        equidistantVertAngles: (radiusH: number, radiusV: number, pointCount: number) => Array<number>;
     };
 }

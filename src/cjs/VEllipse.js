@@ -307,42 +307,56 @@ var VEllipse = /** @class */ (function () {
     //     this.axis.rotate(angle, this.center);
     //     this.rotation += angle;
     //   }
-    VEllipse.prototype.toCubicBezier = function (segmentCount, threshold, startAngle, endAngle) {
+    /**
+     *
+     * @param {number} segmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
+     * @param threshold
+     * @returns
+     */
+    VEllipse.prototype.toCubicBezier = function (segmentCount, threshold) {
         // Math by Luc Maisonobe
         //    http://www.spaceroots.org/documents/ellipse/node22.html
         // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
         // Return a single line here (as a Bézier curve)
         if (Math.abs(this.radiusV()) < 0.00001) {
-            var radiusH = this.radiusH();
+            var radiusH_1 = this.radiusH();
             return [
-                new CubicBezierCurve_1.CubicBezierCurve(this.center.clone().addX(radiusH), this.center.clone().addX(-radiusH), this.center.clone(), this.center.clone())
+                new CubicBezierCurve_1.CubicBezierCurve(this.center.clone().addX(radiusH_1), this.center.clone().addX(-radiusH_1), this.center.clone(), this.center.clone())
             ]; // TODO: test horizontal line ellipse
         }
         if (Math.abs(this.radiusH()) < 0.00001) {
-            var radiusV = this.radiusV();
+            var radiusV_1 = this.radiusV();
             return [
-                new CubicBezierCurve_1.CubicBezierCurve(this.center.clone().addY(radiusV), this.center.clone().addY(-radiusV), this.center.clone(), this.center.clone())
+                new CubicBezierCurve_1.CubicBezierCurve(this.center.clone().addY(radiusV_1), this.center.clone().addY(-radiusV_1), this.center.clone(), this.center.clone())
             ]; // TODO: test vertical line ellipse
         }
-        segmentCount = Math.max(2, segmentCount || 12); // At least 2, but 12 seems to be a good value.
+        segmentCount = Math.max(4, segmentCount || 12); // At least 4, but 12 seems to be a good value.
         threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
-        var fullAngle = endAngle - startAngle;
-        if (fullAngle < 0) {
-            fullAngle = Math.PI * 2 + fullAngle;
-        }
-        var curAngle = startAngle;
-        var startPoint = this.vertAt(curAngle);
+        var radiusH = this.radiusH();
+        var radiusV = this.radiusV();
+        // let fullAngle: number = endAngle - startAngle;
+        // if (fullAngle < 0) {
+        //   fullAngle = Math.PI * 2 + fullAngle;
+        // }
+        // let curAngle: number = 0;
         var curves = [];
+        var angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
+        var curAngle = angles[0];
+        var startPoint = this.vertAt(curAngle);
         //let lastIntersection: Vertex | undefined;
-        for (var i = 0; i < segmentCount; i++) {
-            var nextAngle = startAngle + (fullAngle / segmentCount) * (i + 1);
+        // for (var i = 0; i < segmentCount; i++) {
+        for (var i = 0; i < angles.length; i++) {
+            // let nextAngle: number = ((Math.PI * 2) / segmentCount) * (i + 1);
+            // let nextAngle: number = VEllipse.utils.phiToTheta(radiusH, radiusV, Math.PI / 2.0 + ((Math.PI * 2) / segmentCount) * i);
+            // let curAngle: number = angles[i];
+            var nextAngle = angles[(i + 1) % angles.length];
             var endPoint = this.vertAt(nextAngle);
             var startTangent = this.tangentAt(curAngle);
             var endTangent = this.tangentAt(nextAngle);
             // Find intersection
             var intersection = startTangent.intersection(endTangent);
             // What if intersection is undefined?
-            // --> This *can* not happen if segmentCount > 1 and height and width of the ellipse are not zero.
+            // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
             var startDiff = startPoint.difference(intersection);
             var endDiff = endPoint.difference(intersection);
             var curve = new CubicBezierCurve_1.CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
@@ -399,13 +413,42 @@ var VEllipse = /** @class */ (function () {
                 y: centerY + (radiusH * radiusV * c) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
             };
         },
+        /**
+         * Get the `theta` for a given `phi` (used to determine equidistant points on ellipse).
+         *
+         * @param radiusH
+         * @param radiusV
+         * @param phi
+         * @returns {number} theta
+         */
         phiToTheta: function (radiusH, radiusV, phi) {
-            // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+            //  See https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
             // var phi = Math.PI / 2.0 + ((Math.PI * 2) / sectorCount) * i;
             var tanPhi = Math.tan(phi);
             var tanPhi2 = tanPhi * tanPhi;
             var theta = -Math.PI / 2 + phi + Math.atan(((radiusH - radiusV) * tanPhi) / (radiusV + radiusH * tanPhi2));
             return theta;
+        },
+        /**
+         * Get n equidistant points on the elliptic arc.
+         *
+         * @param pointCount
+         * @returns
+         */
+        equidistantVertAngles: function (radiusH, radiusV, pointCount) {
+            // var a = this.radiusH();
+            // var b = this.radiusV();
+            var angles = [];
+            for (var i = 0; i < pointCount; i++) {
+                var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
+                // var tanPhi = Math.tan(phi);
+                // var tanPhi2 = tanPhi * tanPhi;
+                // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+                var theta = VEllipse.utils.phiToTheta(radiusH, radiusV, phi);
+                // vertices[i] = this.vertAt(theta);
+                angles[i] = theta;
+            }
+            return angles; // vertices;
         }
     }; // END utils
     return VEllipse;
