@@ -11,6 +11,7 @@
  * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
  * @modified 2021-03-09 Added the `clone` and `rotate` methods.
  * @modified 2021-03-10 Added the `toCubicBezier` method.
+ * @modified 2021-03-15 Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -113,6 +114,13 @@ export declare class VEllipse implements SVGSerializable {
      */
     signedRadiusV(): number;
     /**
+     * Scale this ellipse by the given factor. The factor will be applied to both radii.
+     *
+     * @param {number} factor
+     * @return {VEllipse} this for chaining.
+     */
+    scale(factor: number): VEllipse;
+    /**
      * Get the vertex on the ellipse's outline at the given angle.
      *
      * @method vertAt
@@ -153,11 +161,6 @@ export declare class VEllipse implements SVGSerializable {
      */
     tangentAt(angle: number, length?: number): Vector;
     /**
-     * Get the slope of the
-     * @param angle
-     * @returns
-     */
-    /**
      * Get the perimeter of this ellipse.
      *
      * @method perimeter
@@ -176,16 +179,19 @@ export declare class VEllipse implements SVGSerializable {
      */
     getFoci(): [Vertex, Vertex];
     /**
-     * Get n equidistant points on the elliptic arc.
+     * Get equally distributed points on the outline of this ellipse.
      *
-     * @param pointCount
-     * @returns
+     * @param {number} pointCount - The number of points.
+     * @returns {Array<Vertex>}
      */
+    getEquidistantVertices(pointCount: number): Array<Vertex>;
     /**
+     * Convert this ellipse into cubic Bézier curves.
      *
-     * @param {number} quarterSegmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
-     * @param threshold
-     * @returns
+     * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+     * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+     * but you might wish to use other values)
+     * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing this ellipse.
      */
     toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
     /**

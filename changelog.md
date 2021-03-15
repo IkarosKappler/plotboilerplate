@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-03-15
+  - Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
 - 2021-03-09
   - Added the `VEllipse.toCubicBezier` method.
 - 2021-03-09

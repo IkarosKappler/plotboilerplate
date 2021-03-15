@@ -84,42 +84,50 @@ export class VEllipseSector {
     this.endAngle = endAngle;
   }
 
-  toCubicBezier(quarterSegmentCount?: number, threshold?: number) {
+  /**
+   * Convert this elliptic sector into cubic Bézier curves.
+   *
+   * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+   * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+   * but you might wish to use other values)
+   * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing the elliptic sector.
+   */
+  toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve> {
     // There are at least 4 segments required (dour quarters) to approximate a whole
     // ellipse with Bézier curves.
     // A visually 'good' approximation should have 12; this seems to be a good value (anything multiple of 4).
-    const segmentCount = Math.max(1, quarterSegmentCount || 3);
+    const segmentCount = Math.max(1, quarterSegmentCount || 3) * 4;
     threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
 
-    const radiusH = this.ellipse.radiusH();
-    const radiusV = this.ellipse.radiusV();
+    const radiusH: number = this.ellipse.radiusH();
+    const radiusV: number = this.ellipse.radiusV();
 
-    // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
-    // Return a single line here (as a Bézier curve)
-    if (Math.abs(radiusV) < 0.00001) {
-      return [
-        // TODO: construct linear approximations for both cases
-        // new CubicBezierCurve(
-        //   this.center.clone().addX(radiusH),
-        //   this.center.clone().addX(-radiusH),
-        //   this.center.clone(),
-        //   this.center.clone()
-        // )
-      ]; // TODO: test horizontal line ellipse
-    }
-    if (Math.abs(radiusH) < 0.00001) {
-      return [
-        // new CubicBezierCurve(
-        //   this.center.clone().addY(radiusV),
-        //   this.center.clone().addY(-radiusV),
-        //   this.center.clone(),
-        //   this.center.clone()
-        // )
-      ]; // TODO: test vertical line ellipse
-    }
+    // // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
+    // // Return a single line here (as a Bézier curve)
+    // if (Math.abs(radiusV) < 0.00001) {
+    //   return [
+    //     // TODO: construct linear approximations for both cases
+    //     // new CubicBezierCurve(
+    //     //   this.center.clone().addX(radiusH),
+    //     //   this.center.clone().addX(-radiusH),
+    //     //   this.center.clone(),
+    //     //   this.center.clone()
+    //     // )
+    //   ]; // TODO: test horizontal line ellipse
+    // }
+    // if (Math.abs(radiusH) < 0.00001) {
+    //   return [
+    //     // new CubicBezierCurve(
+    //     //   this.center.clone().addY(radiusV),
+    //     //   this.center.clone().addY(-radiusV),
+    //     //   this.center.clone(),
+    //     //   this.center.clone()
+    //     // )
+    //   ]; // TODO: test vertical line ellipse
+    // }
 
-    var startAngle = VEllipseSector.ellipseSectorUtils.mapAngle(this.startAngle);
-    var endAngle = VEllipseSector.ellipseSectorUtils.mapAngle(this.endAngle);
+    var startAngle = VEllipseSector.ellipseSectorUtils.normalizeAngle(this.startAngle);
+    var endAngle = VEllipseSector.ellipseSectorUtils.normalizeAngle(this.endAngle);
 
     // Find all angles inside start and end
     var angles = VEllipseSector.ellipseSectorUtils.equidistantVertAngles(radiusH, radiusV, startAngle, endAngle, segmentCount);
@@ -135,20 +143,32 @@ export class VEllipseSector {
       let startTangent: Vector = this.ellipse.tangentAt(curAngle);
       let endTangent: Vector = this.ellipse.tangentAt(nextAngle);
 
-      // Find intersection
-      let intersection: Vertex | undefined = startTangent.intersection(endTangent);
-      // What if intersection is undefined?
-      // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
+      if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
+        // Distorted ellipses can only be approximated by linear Bézier segments
+        let diff = startPoint.difference(endPoint);
+        let curve: CubicBezierCurve = new CubicBezierCurve(
+          startPoint.clone(),
+          endPoint.clone(),
+          startPoint.clone().addXY(diff.x * 0.333, diff.y * 0.333),
+          endPoint.clone().addXY(-diff.x * 0.333, -diff.y * 0.333)
+        );
+        curves.push(curve);
+      } else {
+        // Find intersection
+        let intersection: Vertex | undefined = startTangent.intersection(endTangent);
+        // What if intersection is undefined?
+        // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
 
-      let startDiff: Vertex = startPoint.difference(intersection);
-      let endDiff: Vertex = endPoint.difference(intersection);
-      let curve: CubicBezierCurve = new CubicBezierCurve(
-        startPoint.clone(),
-        endPoint.clone(),
-        startPoint.clone().add(startDiff.scale(threshold)),
-        endPoint.clone().add(endDiff.scale(threshold))
-      );
-      curves.push(curve);
+        let startDiff: Vertex = startPoint.difference(intersection);
+        let endDiff: Vertex = endPoint.difference(intersection);
+        let curve: CubicBezierCurve = new CubicBezierCurve(
+          startPoint.clone(),
+          endPoint.clone(),
+          startPoint.clone().add(startDiff.scale(threshold)),
+          endPoint.clone().add(endDiff.scale(threshold))
+        );
+        curves.push(curve);
+      }
       startPoint = endPoint;
       curAngle = nextAngle;
     }
@@ -191,9 +211,8 @@ export class VEllipseSector {
       end.rotate(rotation, { x: x, y: y });
       start.rotate(rotation, { x: x, y: y });
 
-      var diff: number = endAngle - startAngle;
-
       // Boolean stored as integers (0|1).
+      var diff: number = endAngle - startAngle;
       var largeArcFlag: number;
       if (diff < 0) {
         largeArcFlag = Math.abs(diff) < Math.PI ? 1 : 0;
@@ -240,7 +259,7 @@ export class VEllipseSector {
       fullEllipsePointCount: number
     ): Array<number> => {
       var ellipseAngles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, fullEllipsePointCount);
-      ellipseAngles = ellipseAngles.map((angle: number) => VEllipseSector.ellipseSectorUtils.mapAngle(angle));
+      ellipseAngles = ellipseAngles.map((angle: number) => VEllipseSector.ellipseSectorUtils.normalizeAngle(angle));
 
       var angleIsInRange = (angle: number) => {
         if (startAngle < endAngle) return angle >= startAngle && angle <= endAngle;
@@ -266,21 +285,10 @@ export class VEllipseSector {
 
       // Now we need to sort the angles to the first one in the array is the closest to startAngle.
       // --> find the angle that is closest to the start angle
-      // var startIndex = 0;
-      // if (startAngle > endAngle) {
-      //   for (var i = 0; i < ellipseAngles.length; i++) {
-      //     var diff = ellipseAngles[i] - startAngle;
-      //     var curDiff = ellipseAngles[startIndex] - startAngle;
-      //     if (startAngle < ellipseAngles[i] && diff < curDiff) {
-      //       startIndex = i;
-      //     }
-      //   }
-      // }
-      // if (startIndex == -1) startIndex = ellipseAngles.length - 1;
       var startIndex = findClosestToStartAngle();
 
       // Bring all angles into the correct order
-      // Use splice or slice here?
+      //    Idea: use splice or slice here?
       var angles = [];
       for (var i = 0; i < ellipseAngles.length; i++) {
         angles.push(ellipseAngles[(startIndex + i) % ellipseAngles.length]);
@@ -289,6 +297,6 @@ export class VEllipseSector {
       return angles;
     },
 
-    mapAngle: (angle: number): number => (angle < 0 ? Math.PI * 2 + angle : angle)
+    normalizeAngle: (angle: number): number => (angle < 0 ? Math.PI * 2 + angle : angle)
   }; // END ellipseSectorUtils
 }

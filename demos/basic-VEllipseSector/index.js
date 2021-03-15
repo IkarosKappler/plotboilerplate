@@ -27,10 +27,10 @@
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         fullApproximateBezier: false,
-        fullBezierSegments: 8,
+        fullBezierQuarterSegments: 4,
         fullBezierThreshold: 0.666,
         sectorApproximateBezier: false,
-        sectorBezierSegments: 8,
+        sectorBezierQuarterSegments: 4,
         sectorBezierThreshold: 0.666
       },
       GUP
@@ -191,19 +191,21 @@
 
     //---drawFullBezier-----------------------------------------------------
     function drawFullBezier() {
-      var bezierCurves = ellipseSector.ellipse.toCubicBezier(config.fullBezierSegments, config.fullBezierThreshold);
+      var bezierCurves = ellipseSector.ellipse
+        .clone()
+        .scale(1.05)
+        .toCubicBezier(config.fullBezierQuarterSegments, config.fullBezierThreshold);
       for (var i = 0; i < bezierCurves.length; i++) {
         var curve = bezierCurves[i];
         pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
-        pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
-        pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
+        // pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
+        // pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
       }
     }
 
     //---drawFullEquidistantVertices-----------------------------------------------------
     function drawFullEquidistantVertices() {
-      var vertices = ellipseSector.ellipse.getEquidistantVertices(config.fullBezierSegments);
-      // console.log("vertices", vertices);
+      var vertices = ellipseSector.ellipse.getEquidistantVertices(config.QuarterSegments);
       for (var i = 0; i < vertices.length; i++) {
         pb.draw.circleHandle(vertices[i], 5, "orange");
         pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
@@ -212,7 +214,12 @@
 
     //---drawSectorBezier-----------------------------------------------------
     function drawSectorBezier() {
-      var bezierCurves = ellipseSector.toCubicBezier(config.sectorBezierSegments, config.sectorBezierThreshold);
+      // ellipseSector.toCubicBezier(config.sectorBezierQuarterSegments, config.sectorBezierThreshold);
+      var bezierCurves = new VEllipseSector(
+        ellipseSector.ellipse.clone().scale(0.95),
+        ellipseSector.startAngle,
+        ellipseSector.endAngle
+      ).toCubicBezier(config.sectorBezierQuarterSegments, config.sectorBezierThreshold);
       // console.log("bezierCurves", bezierCurves);
       for (var i = 0; i < bezierCurves.length; i++) {
         var curve = bezierCurves[i];
@@ -229,20 +236,6 @@
       }
     }
 
-    // function drawSectorEquidistantVertices() {
-    //   var vertices = ellipseSector.ellipse.getEquidistantVertices(
-    //     config.fullBezierSegments,
-    //     ellipseSector.startAngle,
-    //     ellipseSector.endAngle,
-    //     false
-    //   );
-    //   // console.log("vertices", vertices);
-    //   for (var i = 0; i < vertices.length; i++) {
-    //     pb.draw.circleHandle(vertices[i], 5, "orange");
-    //     pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
-    //   }
-    // }
-
     // Create a gui for testing with scale
     var gui = pb.createGUI();
     var fold0 = gui.addFolder("Full Bézier Approximation");
@@ -253,10 +246,10 @@
         pb.redraw();
       });
     fold0
-      .add(config, "fullBezierSegments")
+      .add(config, "fullBezierQuarterSegments")
       .name("Bézier Segments")
-      .min(2)
-      .max(16)
+      .min(1)
+      .max(8)
       .step(1)
       .onChange(function () {
         pb.redraw();
@@ -278,10 +271,10 @@
         pb.redraw();
       });
     fold1
-      .add(config, "sectorBezierSegments")
+      .add(config, "sectorBezierQuarterSegments")
       .name("Bézier Segments")
-      .min(2)
-      .max(16)
+      .min(1)
+      .max(8)
       .step(1)
       .onChange(function () {
         pb.redraw();

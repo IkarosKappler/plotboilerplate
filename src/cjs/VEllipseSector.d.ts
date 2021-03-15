@@ -64,7 +64,15 @@ export declare class VEllipseSector {
      * @param {numner} endAngle - The end angle of the sector.
      */
     constructor(ellipse: VEllipse, startAngle: number, endAngle: number);
-    toCubicBezier(quarterSegmentCount?: number, threshold?: number): CubicBezierCurve[];
+    /**
+     * Convert this elliptic sector into cubic Bézier curves.
+     *
+     * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+     * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+     * but you might wish to use other values)
+     * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing the elliptic sector.
+     */
+    toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
     static ellipseSectorUtils: {
         /**
          * Helper function to convert an elliptic section to SVG arc params (for the `d` attribute).
@@ -98,6 +106,6 @@ export declare class VEllipseSector {
          * @return {Array<number>} An array of n angles inside startAngle and endAngle (where n <= fullEllipsePointCount).
          */
         equidistantVertAngles: (radiusH: number, radiusV: number, startAngle: number, endAngle: number, fullEllipsePointCount: number) => Array<number>;
-        mapAngle: (angle: number) => number;
+        normalizeAngle: (angle: number) => number;
     };
 }

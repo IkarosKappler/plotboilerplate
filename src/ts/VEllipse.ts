@@ -11,6 +11,7 @@
  * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
  * @modified 2021-03-09 Added the `clone` and `rotate` methods.
  * @modified 2021-03-10 Added the `toCubicBezier` method.
+ * @modified 2021-03-15 Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -82,7 +83,7 @@ export class VEllipse implements SVGSerializable {
     this.uid = UIDGenerator.next();
     this.center = center;
     this.axis = axis;
-    this.rotation = rotation | 0.0;
+    this.rotation = rotation || 0.0;
   }
 
   /**
@@ -146,6 +147,17 @@ export class VEllipse implements SVGSerializable {
     // Rotate axis back to origin before calculating radius
     // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
     return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
+  }
+
+  /**
+   * Scale this ellipse by the given factor. The factor will be applied to both radii.
+   *
+   * @param {number} factor
+   * @return {VEllipse} this for chaining.
+   */
+  scale(factor: number): VEllipse {
+    this.axis.scale(factor, this.center);
+    return this;
   }
 
   /**
@@ -225,15 +237,6 @@ export class VEllipse implements SVGSerializable {
   }
 
   /**
-   * Get the slope of the
-   * @param angle
-   * @returns
-   */
-  //   slopeAt(angle:number) : number {
-  //     return (this.radiusH() * Math.sin(angle)) / (this.radiusV() * Math.cos(angle));
-  //   }
-
-  /**
    * Get the perimeter of this ellipse.
    *
    * @method perimeter
@@ -281,97 +284,27 @@ export class VEllipse implements SVGSerializable {
   }
 
   /**
-   * Get n equidistant points on the elliptic arc.
+   * Get equally distributed points on the outline of this ellipse.
    *
-   * @param pointCount
-   * @returns
+   * @param {number} pointCount - The number of points.
+   * @returns {Array<Vertex>}
    */
-  // getEquidistantVertices(pointCount: number): Array<Vertex> {
-  //   // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
-  //   var a = this.radiusH();
-  //   var b = this.radiusV();
-
-  //   var vertices = [];
-  //   for (var i = 0; i < pointCount; i++) {
-  //     var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
-  //     // var tanPhi = Math.tan(phi);
-  //     // var tanPhi2 = tanPhi * tanPhi;
-  //     // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-  //     let theta = VEllipse.utils.phiToTheta(a, b, phi);
-
-  //     vertices[i] = this.vertAt(theta);
-  //   }
-  //   return vertices;
-  // }
-
-  // getEquilateralSectors(sectorCount: number): Array<number> {
-  //   // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
-  //   var a = this.radiusH();
-  //   var b = this.radiusV();
-
-  //   var sectorAngles = [];
-  //   for (var i = 0; i < sectorCount; i++) {
-  //     var phi = Math.PI / 2.0 + ((Math.PI * 2) / sectorCount) * i;
-  //     // var tanPhi = Math.tan(phi);
-  //     // var tanPhi2 = tanPhi * tanPhi;
-  //     // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-  //     var theta = VEllipse.utils.phiToTheta(a, b, phi);
-
-  //     // vertices[i] = this.vertAt(theta);
-  //     sectorAngles[i] = theta;
-  //   }
-  //   return sectorAngles;
-  // }
-
-  // getEquidistantVertices(pointCount: number, startAngle?: number, endAngle?: number, addEndPoint?: boolean): Array<Vertex> {
-  //   // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
-
-  //   // var pointCount = config.bezierSegments;
-  //   // var startAngle = ellipseSector.startAngle;
-  //   // var endAngle = ellipseSector.endAngle;
-  //   startAngle = typeof startAngle === "undefined" ? 0 : startAngle;
-  //   endAngle = typeof endAngle === "undefined" ? 0 : endAngle;
-  //   var a = this.radiusH();
-  //   var b = this.radiusV();
-  //   // var fullAngle = Math.PI * 2;
-  //   var fullAngle = endAngle - startAngle; // Math.PI*2
-  //   if (fullAngle < 0) {
-  //     fullAngle = Math.PI * 2 + fullAngle;
-  //   }
-
-  //   var vertices = [];
-  //   for (var i = 0; i < pointCount + (addEndPoint ? 1 : 0); i++) {
-  //     // var phi = Math.PI / 2.0 + startAngle + (fullAngle / pointCount) * i;
-  //     var phi = Math.PI / 2.0 + (fullAngle / pointCount) * i;
-
-  //     var tanPhi = Math.tan(phi);
-  //     var tanPhi2 = tanPhi * tanPhi;
-
-  //     // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-  //     // var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-  //     var theta = startAngle - Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-
-  //     vertices[i] = this.vertAt(theta);
-  //     // pb.draw.circleHandle(vertices[i], 5, "orange");
-  //     // pb.draw.line(this.center, vertices[i], "grey", 1);
-  //   }
-  //   // Add the last vertice if not full circle
-  //   // if( fullAngle < Math.PI*2 )
-  //   // vertices.push[]
-
-  //   return vertices;
-  // }
-
-  //   rotate(angle: number) {
-  //     this.axis.rotate(angle, this.center);
-  //     this.rotation += angle;
-  //   }
+  getEquidistantVertices(pointCount: number): Array<Vertex> {
+    const angles: Array<number> = VEllipse.utils.equidistantVertAngles(this.radiusH(), this.radiusV(), pointCount);
+    const result: Array<Vertex> = [];
+    for (var i = 0; i < angles.length; i++) {
+      result.push(this.vertAt(angles[i]));
+    }
+    return result;
+  }
 
   /**
+   * Convert this ellipse into cubic Bézier curves.
    *
-   * @param {number} quarterSegmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
-   * @param threshold
-   * @returns
+   * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+   * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+   * but you might wish to use other values)
+   * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing this ellipse.
    */
   toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve> {
     // Math by Luc Maisonobe
@@ -379,69 +312,74 @@ export class VEllipse implements SVGSerializable {
 
     // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
     // Return a single line here (as a Bézier curve)
-    if (Math.abs(this.radiusV()) < 0.00001) {
-      const radiusH = this.radiusH();
-      return [
-        new CubicBezierCurve(
-          this.center.clone().addX(radiusH),
-          this.center.clone().addX(-radiusH),
-          this.center.clone(),
-          this.center.clone()
-        )
-      ]; // TODO: test horizontal line ellipse
-    }
-    if (Math.abs(this.radiusH()) < 0.00001) {
-      const radiusV = this.radiusV();
-      return [
-        new CubicBezierCurve(
-          this.center.clone().addY(radiusV),
-          this.center.clone().addY(-radiusV),
-          this.center.clone(),
-          this.center.clone()
-        )
-      ]; // TODO: test vertical line ellipse
-    }
+    // if (Math.abs(this.radiusV()) < 0.00001) {
+    //   const radiusH = this.radiusH();
+    //   return [
+    //     new CubicBezierCurve(
+    //       this.center.clone().addX(radiusH),
+    //       this.center.clone().addX(-radiusH),
+    //       this.center.clone(),
+    //       this.center.clone()
+    //     )
+    //   ]; // TODO: test horizontal line ellipse
+    // }
+    // if (Math.abs(this.radiusH()) < 0.00001) {
+    //   const radiusV = this.radiusV();
+    //   return [
+    //     new CubicBezierCurve(
+    //       this.center.clone().addY(radiusV),
+    //       this.center.clone().addY(-radiusV),
+    //       this.center.clone(),
+    //       this.center.clone()
+    //     )
+    //   ]; // TODO: test vertical line ellipse
+    // }
 
-    const segmentCount = Math.max(1, quarterSegmentCount || 3) * 4; // At least 4, but 16 seems to be a good value.
+    // At least 4, but 16 seems to be a good value.
+    const segmentCount = Math.max(1, quarterSegmentCount || 3) * 4;
     threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
-
     const radiusH = this.radiusH();
     const radiusV = this.radiusV();
 
-    // let curAngle: number = 0;
     const curves: Array<CubicBezierCurve> = [];
-    const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
+    const angles: Array<number> = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
     let curAngle: number = angles[0];
     let startPoint: Vertex = this.vertAt(curAngle);
-    //let lastIntersection: Vertex | undefined;
-    // for (var i = 0; i < segmentCount; i++) {
     for (var i = 0; i < angles.length; i++) {
-      // let nextAngle: number = ((Math.PI * 2) / segmentCount) * (i + 1);
-      // let nextAngle: number = VEllipse.utils.phiToTheta(radiusH, radiusV, Math.PI / 2.0 + ((Math.PI * 2) / segmentCount) * i);
-      // let curAngle: number = angles[i];
       let nextAngle = angles[(i + 1) % angles.length];
       let endPoint: Vertex = this.vertAt(nextAngle);
 
-      let startTangent: Vector = this.tangentAt(curAngle);
-      let endTangent: Vector = this.tangentAt(nextAngle);
+      if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
+        // Distorted ellipses can only be approximated by linear Bézier segments
+        let diff: XYCoords = startPoint.difference(endPoint);
+        let curve: CubicBezierCurve = new CubicBezierCurve(
+          startPoint.clone(),
+          endPoint.clone(),
+          startPoint.clone().addXY(diff.x * 0.333, diff.y * 0.333),
+          endPoint.clone().addXY(-diff.x * 0.333, -diff.y * 0.333)
+        );
+        curves.push(curve);
+      } else {
+        let startTangent: Vector = this.tangentAt(curAngle);
+        let endTangent: Vector = this.tangentAt(nextAngle);
 
-      // Find intersection
-      let intersection: Vertex | undefined = startTangent.intersection(endTangent);
-      // What if intersection is undefined?
-      // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
+        // Find intersection
+        let intersection: Vertex | undefined = startTangent.intersection(endTangent);
+        // What if intersection is undefined?
+        // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
 
-      let startDiff: Vertex = startPoint.difference(intersection);
-      let endDiff: Vertex = endPoint.difference(intersection);
-      let curve: CubicBezierCurve = new CubicBezierCurve(
-        startPoint.clone(),
-        endPoint.clone(),
-        startPoint.clone().add(startDiff.scale(threshold)),
-        endPoint.clone().add(endDiff.scale(threshold))
-      );
-      curves.push(curve);
+        let startDiff: Vertex = startPoint.difference(intersection);
+        let endDiff: Vertex = endPoint.difference(intersection);
+        let curve: CubicBezierCurve = new CubicBezierCurve(
+          startPoint.clone(),
+          endPoint.clone(),
+          startPoint.clone().add(startDiff.scale(threshold)),
+          endPoint.clone().add(endDiff.scale(threshold))
+        );
+        curves.push(curve);
+      }
       startPoint = endPoint;
       curAngle = nextAngle;
-      //lastIntersection = intersection;
     }
     return curves;
   }
@@ -503,7 +441,6 @@ export class VEllipse implements SVGSerializable {
      */
     phiToTheta: (radiusH: number, radiusV: number, phi: number): number => {
       //  See https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
-      // var phi = Math.PI / 2.0 + ((Math.PI * 2) / sectorCount) * i;
       var tanPhi = Math.tan(phi);
       var tanPhi2 = tanPhi * tanPhi;
       var theta = -Math.PI / 2 + phi + Math.atan(((radiusH - radiusV) * tanPhi) / (radiusV + radiusH * tanPhi2));
@@ -517,21 +454,13 @@ export class VEllipse implements SVGSerializable {
      * @returns
      */
     equidistantVertAngles: (radiusH: number, radiusV: number, pointCount: number): Array<number> => {
-      // var a = this.radiusH();
-      // var b = this.radiusV();
-
       const angles: Array<number> = [];
       for (var i = 0; i < pointCount; i++) {
         var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
-        // var tanPhi = Math.tan(phi);
-        // var tanPhi2 = tanPhi * tanPhi;
-        // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
         let theta = VEllipse.utils.phiToTheta(radiusH, radiusV, phi);
-
-        // vertices[i] = this.vertAt(theta);
         angles[i] = theta;
       }
-      return angles; // vertices;
+      return angles;
     }
   }; // END utils
 }
