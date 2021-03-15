@@ -181,14 +181,13 @@ export declare class VEllipse implements SVGSerializable {
      * @param pointCount
      * @returns
      */
-    getEquidistantVertices(pointCount: number): Array<Vertex>;
     /**
      *
-     * @param {number} segmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
+     * @param {number} quarterSegmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
      * @param threshold
      * @returns
      */
-    toCubicBezier(segmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
+    toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
     /**
      * Create an SVG representation of this ellipse.
      *

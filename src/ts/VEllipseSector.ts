@@ -84,58 +84,51 @@ export class VEllipseSector {
     this.endAngle = endAngle;
   }
 
-  toCubicBezier(segmentCount?: number, threshold?: number) {
-    segmentCount = Math.max(4, segmentCount || 12); // At least 4, but 12 seems to be a good value.
+  toCubicBezier(quarterSegmentCount?: number, threshold?: number) {
+    // There are at least 4 segments required (dour quarters) to approximate a whole
+    // ellipse with Bézier curves.
+    // A visually 'good' approximation should have 12; this seems to be a good value (anything multiple of 4).
+    const segmentCount = Math.max(1, quarterSegmentCount || 3);
     threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
 
     const radiusH = this.ellipse.radiusH();
     const radiusV = this.ellipse.radiusV();
 
-    // var mapAngle = angle => (angle < 0 ? Math.PI * 2 + angle : angle);
-    // var self = this;
-    var startAngle = this.startAngle; // mapAngle(this.startAngle); // this.startAngle; // < 0 ? Math.PI * 2 + this.startAngle : this.startAngle;
-    var endAngle = this.endAngle; // mapAngle(this.endAngle); // this.endAngle; // < 0 ? Math.PI * 2 + this.endAngle : this.endAngle;
-    var angleIsInRange = function (angle) {
-      // angle = mapAngle(angle);
-      console.log(
-        "isInside(",
-        startAngle,
-        "<",
-        angle,
-        "<",
-        endAngle,
-        ")",
-        angle >= startAngle && angle <= endAngle ? "true" : "FALSE"
-      );
-      // return angle >= startAngle && angle <= endAngle;
-      // angle = mapAngle(angle);
-      if (startAngle < endAngle) return angle >= startAngle && angle <= endAngle;
-      else return !(angle >= startAngle && angle <= endAngle); //angle <= startAngle && angle >= endAngle;
-      // else return angle > startAngle && angle < endAngle;
-    };
-    // Find all angles inside start and end
-    let angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
-    console.log("startAngle", this.startAngle, "endAngle", this.endAngle);
-    console.log(angles);
-    angles = angles.filter(angleIsInRange);
-    angles = [this.startAngle].concat(angles).concat([this.endAngle]);
+    // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
+    // Return a single line here (as a Bézier curve)
+    if (Math.abs(radiusV) < 0.00001) {
+      return [
+        // TODO: construct linear approximations for both cases
+        // new CubicBezierCurve(
+        //   this.center.clone().addX(radiusH),
+        //   this.center.clone().addX(-radiusH),
+        //   this.center.clone(),
+        //   this.center.clone()
+        // )
+      ]; // TODO: test horizontal line ellipse
+    }
+    if (Math.abs(radiusH) < 0.00001) {
+      return [
+        // new CubicBezierCurve(
+        //   this.center.clone().addY(radiusV),
+        //   this.center.clone().addY(-radiusV),
+        //   this.center.clone(),
+        //   this.center.clone()
+        // )
+      ]; // TODO: test vertical line ellipse
+    }
 
-    // if (startAngle < endAngle) {
-    //   angles = [this.startAngle].concat(angles).concat([this.endAngle]);
-    // } else {
-    //   angles = [this.endAngle].concat(angles).concat([this.startAngle]);
-    // }
-    console.log("Using angles", angles);
+    var startAngle = VEllipseSector.ellipseSectorUtils.mapAngle(this.startAngle);
+    var endAngle = VEllipseSector.ellipseSectorUtils.mapAngle(this.endAngle);
+
+    // Find all angles inside start and end
+    var angles = VEllipseSector.ellipseSectorUtils.equidistantVertAngles(radiusH, radiusV, startAngle, endAngle, segmentCount);
+    angles = [startAngle].concat(angles).concat([endAngle]);
 
     const curves: Array<CubicBezierCurve> = [];
     let curAngle: number = angles[0];
     let startPoint: Vertex = this.ellipse.vertAt(curAngle);
-    //let lastIntersection: Vertex | undefined;
-    // for (var i = 0; i < segmentCount; i++) {
     for (var i = 0; i + 1 < angles.length; i++) {
-      // let nextAngle: number = ((Math.PI * 2) / segmentCount) * (i + 1);
-      // let nextAngle: number = VEllipse.utils.phiToTheta(radiusH, radiusV, Math.PI / 2.0 + ((Math.PI * 2) / segmentCount) * i);
-      // let curAngle: number = angles[i];
       let nextAngle = angles[(i + 1) % angles.length];
       let endPoint: Vertex = this.ellipse.vertAt(nextAngle);
 
@@ -158,7 +151,6 @@ export class VEllipseSector {
       curves.push(curve);
       startPoint = endPoint;
       curAngle = nextAngle;
-      //lastIntersection = intersection;
     }
     return curves;
   }
@@ -218,6 +210,85 @@ export class VEllipseSector {
       const r2d: number = 180 / Math.PI;
       pathData.push("A", radiusH, radiusV, rotation * r2d, largeArcFlag, sweepFlag, end.x, end.y);
       return pathData;
-    } // END function describeSVGArc
+    }, // END function describeSVGArc
+
+    /**
+     * Helper function to find second-kind elliptic angles, so that the euclidean distance along the the
+     * elliptic sector is the same for all.
+     *
+     * Note that this is based on the full ellipse calculuation and start and end will be cropped; so the
+     * distance from the start angle to the first angle and/or the distance from the last angle to
+     * the end angle may be different to the others.
+     *
+     * Furthermore the computation is only possible on un-rotated ellipses; if your source ellipse has
+     * a rotation on the plane please 'rotate' the result angles afterwards to find matching angles.
+     *
+     * Returned angles are normalized to the interval `[ 0, PI*2 ]`.
+     *
+     * @param {number} radiusH - The first (horizonal) radius of the ellipse.
+     * @param {number} radiusV - The second (vertical) radius of the ellipse.
+     * @param {number} startAngle - The opening angle of your elliptic sector (please use normalized angles).
+     * @param {number} endAngle - The closing angle of your elliptic sector (please use normalized angles).
+     * @param {number} fullEllipsePointCount - The number of base segments to use from the source ellipse (12 or 16 are good numbers).
+     * @return {Array<number>} An array of n angles inside startAngle and endAngle (where n <= fullEllipsePointCount).
+     */
+    equidistantVertAngles: (
+      radiusH: number,
+      radiusV: number,
+      startAngle: number,
+      endAngle: number,
+      fullEllipsePointCount: number
+    ): Array<number> => {
+      var ellipseAngles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, fullEllipsePointCount);
+      ellipseAngles = ellipseAngles.map((angle: number) => VEllipseSector.ellipseSectorUtils.mapAngle(angle));
+
+      var angleIsInRange = (angle: number) => {
+        if (startAngle < endAngle) return angle >= startAngle && angle <= endAngle;
+        else return (angle >= startAngle && angle <= Math.PI * 2) || (angle <= endAngle && angle >= 0);
+      };
+      // Drop all angles outside the sector
+      var ellipseAngles = ellipseAngles.filter(angleIsInRange);
+
+      var findClosestToStartAngle = (): number => {
+        var startIndex = 0;
+        if (startAngle > endAngle) {
+          for (var i = 0; i < ellipseAngles.length; i++) {
+            var diff = ellipseAngles[i] - startAngle;
+            var curDiff = ellipseAngles[startIndex] - startAngle;
+            if (startAngle < ellipseAngles[i] && diff < curDiff) {
+              startIndex = i;
+            }
+          }
+        }
+        if (startIndex == -1) startIndex = ellipseAngles.length - 1;
+        return startIndex;
+      };
+
+      // Now we need to sort the angles to the first one in the array is the closest to startAngle.
+      // --> find the angle that is closest to the start angle
+      // var startIndex = 0;
+      // if (startAngle > endAngle) {
+      //   for (var i = 0; i < ellipseAngles.length; i++) {
+      //     var diff = ellipseAngles[i] - startAngle;
+      //     var curDiff = ellipseAngles[startIndex] - startAngle;
+      //     if (startAngle < ellipseAngles[i] && diff < curDiff) {
+      //       startIndex = i;
+      //     }
+      //   }
+      // }
+      // if (startIndex == -1) startIndex = ellipseAngles.length - 1;
+      var startIndex = findClosestToStartAngle();
+
+      // Bring all angles into the correct order
+      // Use splice or slice here?
+      var angles = [];
+      for (var i = 0; i < ellipseAngles.length; i++) {
+        angles.push(ellipseAngles[(startIndex + i) % ellipseAngles.length]);
+      }
+
+      return angles;
+    },
+
+    mapAngle: (angle: number): number => (angle < 0 ? Math.PI * 2 + angle : angle)
   }; // END ellipseSectorUtils
 }

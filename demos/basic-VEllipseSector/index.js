@@ -168,12 +168,14 @@
     var _circle = new Circle(center, ((radiusH + radiusV) / 2) * 0.5);
     pb.add(_circle);
 
+    //---drawFoci-----------------------------------------------------
     function drawFoci() {
       var foci = ellipse.getFoci();
       pb.fill.circleHandle(foci[0], 3, "orange");
       pb.fill.circleHandle(foci[1], 3, "orange");
     }
 
+    //---drawNormal-----------------------------------------------------
     function drawNormal() {
       //var normal = normalAt( ellipseSector.startAngle ); // + ellipseSector.ellipse.rotation );
       var normal = ellipse.normalAt(ellipseSector.startAngle, 50);
@@ -187,6 +189,7 @@
       pb.draw.line(normal.a, foci[1], "rgba(192,192,0,0.5)", 1);
     }
 
+    //---drawFullBezier-----------------------------------------------------
     function drawFullBezier() {
       var bezierCurves = ellipseSector.ellipse.toCubicBezier(config.fullBezierSegments, config.fullBezierThreshold);
       for (var i = 0; i < bezierCurves.length; i++) {
@@ -197,13 +200,9 @@
       }
     }
 
+    //---drawFullEquidistantVertices-----------------------------------------------------
     function drawFullEquidistantVertices() {
-      var vertices = ellipseSector.ellipse.getEquidistantVertices(
-        config.fullBezierSegments,
-        ellipseSector.startAngle,
-        ellipseSector.endAngle,
-        false
-      );
+      var vertices = ellipseSector.ellipse.getEquidistantVertices(config.fullBezierSegments);
       // console.log("vertices", vertices);
       for (var i = 0; i < vertices.length; i++) {
         pb.draw.circleHandle(vertices[i], 5, "orange");
@@ -211,19 +210,38 @@
       }
     }
 
+    //---drawSectorBezier-----------------------------------------------------
     function drawSectorBezier() {
       var bezierCurves = ellipseSector.toCubicBezier(config.sectorBezierSegments, config.sectorBezierThreshold);
       // console.log("bezierCurves", bezierCurves);
       for (var i = 0; i < bezierCurves.length; i++) {
         var curve = bezierCurves[i];
-        pb.draw.circleHandle(curve.startPoint, 5, "orange");
+        pb.draw.circleHandle(curve.startPoint.clone().scale(1.1, ellipseSector.ellipse.center), 5, "orange");
         pb.draw.text("" + i, curve.startPoint.x, curve.startPoint.y, 0, "black");
+        if (i + 1 == bezierCurves.length) {
+          pb.draw.circleHandle(curve.endPoint.clone().scale(1.1, ellipseSector.ellipse.center), 5, "orange");
+          pb.draw.text("" + (i + 1), curve.endPoint.x, curve.endPoint.y, 0, "green");
+        }
         pb.draw.line(ellipseSector.ellipse.center, curve.startPoint, "grey", 1);
         pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
         pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
         pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
       }
     }
+
+    // function drawSectorEquidistantVertices() {
+    //   var vertices = ellipseSector.ellipse.getEquidistantVertices(
+    //     config.fullBezierSegments,
+    //     ellipseSector.startAngle,
+    //     ellipseSector.endAngle,
+    //     false
+    //   );
+    //   // console.log("vertices", vertices);
+    //   for (var i = 0; i < vertices.length; i++) {
+    //     pb.draw.circleHandle(vertices[i], 5, "orange");
+    //     pb.draw.line(ellipseSector.ellipse.center, vertices[i], "grey", 1);
+    //   }
+    // }
 
     // Create a gui for testing with scale
     var gui = pb.createGUI();

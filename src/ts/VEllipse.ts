@@ -286,23 +286,23 @@ export class VEllipse implements SVGSerializable {
    * @param pointCount
    * @returns
    */
-  getEquidistantVertices(pointCount: number): Array<Vertex> {
-    // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
-    var a = this.radiusH();
-    var b = this.radiusV();
+  // getEquidistantVertices(pointCount: number): Array<Vertex> {
+  //   // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+  //   var a = this.radiusH();
+  //   var b = this.radiusV();
 
-    var vertices = [];
-    for (var i = 0; i < pointCount; i++) {
-      var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
-      // var tanPhi = Math.tan(phi);
-      // var tanPhi2 = tanPhi * tanPhi;
-      // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
-      let theta = VEllipse.utils.phiToTheta(a, b, phi);
+  //   var vertices = [];
+  //   for (var i = 0; i < pointCount; i++) {
+  //     var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
+  //     // var tanPhi = Math.tan(phi);
+  //     // var tanPhi2 = tanPhi * tanPhi;
+  //     // var theta = -Math.PI / 2 + phi + Math.atan(((a - b) * tanPhi) / (b + a * tanPhi2));
+  //     let theta = VEllipse.utils.phiToTheta(a, b, phi);
 
-      vertices[i] = this.vertAt(theta);
-    }
-    return vertices;
-  }
+  //     vertices[i] = this.vertAt(theta);
+  //   }
+  //   return vertices;
+  // }
 
   // getEquilateralSectors(sectorCount: number): Array<number> {
   //   // https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
@@ -369,11 +369,11 @@ export class VEllipse implements SVGSerializable {
 
   /**
    *
-   * @param {number} segmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
+   * @param {number} quarterSegmentCount - The desired segment count (should be a nultiple of 4, but at least 4).
    * @param threshold
    * @returns
    */
-  toCubicBezier(segmentCount?: number, threshold?: number): Array<CubicBezierCurve> {
+  toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve> {
     // Math by Luc Maisonobe
     //    http://www.spaceroots.org/documents/ellipse/node22.html
 
@@ -402,7 +402,7 @@ export class VEllipse implements SVGSerializable {
       ]; // TODO: test vertical line ellipse
     }
 
-    segmentCount = Math.max(4, segmentCount || 12); // At least 4, but 12 seems to be a good value.
+    const segmentCount = Math.max(1, quarterSegmentCount || 3) * 4; // At least 4, but 16 seems to be a good value.
     threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
 
     const radiusH = this.radiusH();
