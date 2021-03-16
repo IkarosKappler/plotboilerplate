@@ -263,18 +263,21 @@ export class VEllipseSector {
 
       var angleIsInRange = (angle: number) => {
         if (startAngle < endAngle) return angle >= startAngle && angle <= endAngle;
-        else return (angle >= startAngle && angle <= Math.PI * 2) || (angle <= endAngle && angle >= 0);
+        // else return (angle >= startAngle && angle <= Math.PI * 2) || (angle <= endAngle && angle >= 0);
+        else return (angle >= startAngle) || (angle <= endAngle && angle >= 0);
       };
       // Drop all angles outside the sector
       var ellipseAngles = ellipseAngles.filter(angleIsInRange);
 
       var findClosestToStartAngle = (): number => {
-        var startIndex = 0;
+        var startIndex = -1; // 0;
         if (startAngle > endAngle) {
           for (var i = 0; i < ellipseAngles.length; i++) {
             var diff = ellipseAngles[i] - startAngle;
             var curDiff = ellipseAngles[startIndex] - startAngle;
-            if (startAngle < ellipseAngles[i] && diff < curDiff) {
+            //if (startAngle < ellipseAngles[i] && diff < curDiff) {
+            // if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) || (startAngle >= ellipseAngles[i] && Math.abs(diff) <= Math.abs(curDiff)) ) {
+              if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) && ellipseAngles[i] > endAngle ) {
               startIndex = i;
             }
           }
@@ -286,6 +289,7 @@ export class VEllipseSector {
       // Now we need to sort the angles to the first one in the array is the closest to startAngle.
       // --> find the angle that is closest to the start angle
       var startIndex = findClosestToStartAngle();
+      console.log("startIndex", startIndex, "startAngle", startAngle, "endAngle", endAngle, 'ellipseAngles', ellipseAngles )
 
       // Bring all angles into the correct order
       //    Idea: use splice or slice here?
