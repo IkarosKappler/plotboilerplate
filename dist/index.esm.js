@@ -391,11 +391,11 @@ class Vertex {
          **/
         this.className = "Vertex";
         this.uid = UIDGenerator.next();
-        if (typeof x == 'undefined') {
+        if (typeof x == "undefined") {
             this.x = 0;
             this.y = 0;
         }
-        else if (typeof x == 'number' && typeof y == 'number') {
+        else if (typeof x == "number" && typeof y == "number") {
             this.x = x;
             this.y = y;
         }
@@ -406,15 +406,15 @@ class Vertex {
                 this.y = tuple.y;
             }
             else {
-                if (typeof x == 'number')
+                if (typeof x == "number")
                     this.x = x;
-                else if (typeof x == 'undefined')
+                else if (typeof x == "undefined")
                     this.x = 0;
                 else
                     this.x = NaN;
-                if (typeof y == 'number')
+                if (typeof y == "number")
                     this.y = y;
-                else if (typeof y == 'undefined')
+                else if (typeof y == "undefined")
                     this.y = 0;
                 else
                     this.y = NaN;
@@ -423,7 +423,6 @@ class Vertex {
         this.attr = new VertexAttr();
         this.listeners = new VertexListeners(this);
     }
-    ;
     /**
      * Set the x- and y- component of this vertex.
      *
@@ -435,7 +434,7 @@ class Vertex {
      * @memberof Vertex
      **/
     set(x, y) {
-        if (typeof x == 'number' && typeof y == 'number') {
+        if (typeof x == "number" && typeof y == "number") {
             this.x = x;
             this.y = y;
         }
@@ -446,15 +445,15 @@ class Vertex {
                 this.y = tuple.y;
             }
             else {
-                if (typeof x == 'number')
+                if (typeof x == "number")
                     this.x = x;
-                else if (typeof x == 'undefined')
+                else if (typeof x == "undefined")
                     this.x = 0;
                 else
                     this.x = NaN;
-                if (typeof y == 'number')
+                if (typeof y == "number")
                     this.y = y;
-                else if (typeof y == 'undefined')
+                else if (typeof y == "undefined")
                     this.y = 0;
                 else
                     this.y = NaN;
@@ -462,7 +461,6 @@ class Vertex {
         }
         return this;
     }
-    ;
     /**
      * Set the x-component of this vertex.
      *
@@ -476,7 +474,6 @@ class Vertex {
         this.x = x;
         return this;
     }
-    ;
     /**
      * Set the y-component of this vertex.
      *
@@ -490,7 +487,6 @@ class Vertex {
         this.y = y;
         return this;
     }
-    ;
     /**
      * Set the x-component if this vertex to the inverse of its value.
      *
@@ -503,7 +499,6 @@ class Vertex {
         this.x = -this.x;
         return this;
     }
-    ;
     /**
      * Set the y-component if this vertex to the inverse of its value.
      *
@@ -516,7 +511,6 @@ class Vertex {
         this.y = -this.y;
         return this;
     }
-    ;
     /**
      * Add the passed amount to x- and y- component of this vertex.<br>
      * <br>
@@ -531,7 +525,7 @@ class Vertex {
      * @memberof Vertex
      **/
     add(x, y) {
-        if (typeof x == 'number' && typeof y == 'number') {
+        if (typeof x == "number" && typeof y == "number") {
             this.x += x;
             this.y += y;
         }
@@ -542,11 +536,11 @@ class Vertex {
                 this.y += tuple.y;
             }
             else {
-                if (typeof x == 'number')
+                if (typeof x == "number")
                     this.x += x;
                 else
                     throw `Cannot add ${typeof x} to numeric x component!`;
-                if (typeof y == 'number')
+                if (typeof y == "number")
                     this.y += y;
                 else
                     throw `Cannot add ${typeof y} to numeric y component!`;
@@ -554,7 +548,6 @@ class Vertex {
         }
         return this;
     }
-    ;
     /**
      * Add the passed amounts to the x- and y- components of this vertex.
      *
@@ -570,7 +563,6 @@ class Vertex {
         this.y += amountY;
         return this;
     }
-    ;
     /**
      * Add the passed amounts to the x-component of this vertex.
      *
@@ -584,7 +576,6 @@ class Vertex {
         this.x += amountX;
         return this;
     }
-    ;
     /**
      * Add the passed amounts to the y-component of this vertex.
      *
@@ -598,7 +589,6 @@ class Vertex {
         this.y += amountY;
         return this;
     }
-    ;
     /**
      * Substract the passed amount from x- and y- component of this vertex.<br>
      * <br>
@@ -613,7 +603,7 @@ class Vertex {
      * @memberof Vertex
      **/
     sub(x, y) {
-        if (typeof x == 'number' && typeof y == 'number') {
+        if (typeof x == "number" && typeof y == "number") {
             this.x -= x;
             this.y -= y;
         }
@@ -624,11 +614,11 @@ class Vertex {
                 this.y -= tuple.y;
             }
             else {
-                if (typeof x == 'number')
+                if (typeof x == "number")
                     this.x -= x;
                 else
                     throw `Cannot add ${typeof x} to numeric x component!`;
-                if (typeof y == 'number')
+                if (typeof y == "number")
                     this.y -= y;
                 else
                     throw `Cannot add ${typeof y} to numeric y component!`;
@@ -636,7 +626,6 @@ class Vertex {
         }
         return this;
     }
-    ;
     /**
      * Check if this vertex equals the passed one.
      * <br>
@@ -649,12 +638,11 @@ class Vertex {
      * @memberof Vertex
      **/
     equals(vertex) {
-        var eqX = (Math.abs(this.x - vertex.x) < Vertex.EPSILON);
-        var eqY = (Math.abs(this.y - vertex.y) < Vertex.EPSILON);
+        var eqX = Math.abs(this.x - vertex.x) < Vertex.EPSILON;
+        var eqY = Math.abs(this.y - vertex.y) < Vertex.EPSILON;
         var result = eqX && eqY;
         return result;
     }
-    ;
     /**
      * Create a copy of this vertex.
      *
@@ -666,7 +654,6 @@ class Vertex {
     clone() {
         return new Vertex(this.x, this.y);
     }
-    ;
     /**
      * Get the distance to the passed point (in euclidean metric)
      *
@@ -679,7 +666,6 @@ class Vertex {
     distance(vert) {
         return Math.sqrt(Math.pow(vert.x - this.x, 2) + Math.pow(vert.y - this.y, 2));
     }
-    ;
     /**
      * Get the angle of this point (relative to (0,0) or to the given other origin point).
      *
@@ -690,11 +676,12 @@ class Vertex {
      * @memberof Vertex
      **/
     angle(origin) {
-        const a = (typeof origin === "undefined" ? Math.PI / 2 - Math.atan2(this.x, this.y) : Math.PI / 2 - Math.atan2(origin.x - this.x, origin.y - this.y));
+        const a = typeof origin === "undefined"
+            ? Math.PI / 2 - Math.atan2(this.x, this.y)
+            : Math.PI / 2 - Math.atan2(origin.x - this.x, origin.y - this.y);
         // Map to positive value
         return a < 0 ? Math.PI * 2 + a : a;
     }
-    ;
     /**
      * Get the difference to the passed point.<br>
      * <br>
@@ -709,7 +696,6 @@ class Vertex {
     difference(vert) {
         return new Vertex(vert.x - this.x, vert.y - this.y);
     }
-    ;
     /**
      * This is a vector-like behavior and 'scales' this vertex
      * towards/from a given center.
@@ -728,7 +714,6 @@ class Vertex {
         this.y = center.y + (this.y - center.y) * factor;
         return this;
     }
-    ;
     /**
      * This is a vector-like behavior and 'rotates' this vertex
      * around given center.
@@ -741,8 +726,9 @@ class Vertex {
      * @memberof Vertex
      **/
     rotate(angle, center) {
-        if (!center || typeof center === "undefined")
+        if (!center || typeof center === "undefined") {
             center = { x: 0, y: 0 };
+        }
         this.sub(center);
         angle += Math.atan2(this.y, this.x);
         let len = this.distance(Vertex.ZERO); // {x:0,y:0});
@@ -751,7 +737,6 @@ class Vertex {
         this.add(center);
         return this;
     }
-    ;
     /**
      * Multiply both components of this vertex with the given scalar.<br>
      * <br>
@@ -769,7 +754,6 @@ class Vertex {
         this.y *= scalar;
         return this;
     }
-    ;
     /**
      * Round the two components x and y of this vertex.
      *
@@ -783,7 +767,6 @@ class Vertex {
         this.y = Math.round(this.y);
         return this;
     }
-    ;
     /**
      * Change this vertex (x,y) to its inverse (-x,-y).
      *
@@ -797,7 +780,6 @@ class Vertex {
         this.y = -this.y;
         return this;
     }
-    ;
     /**
      * Get a string representation of this vertex.
      *
@@ -807,9 +789,8 @@ class Vertex {
      * @memberof Vertex
      **/
     toString() {
-        return '(' + this.x + ',' + this.y + ')';
+        return "(" + this.x + "," + this.y + ")";
     }
-    ;
     /**
      * Convert this vertex to SVG code.
      *
@@ -823,16 +804,15 @@ class Vertex {
     toSVGString(options) {
         options = options || {};
         var buffer = [];
-        buffer.push('<circle');
+        buffer.push("<circle");
         if (options.className)
             buffer.push(' class="' + options.className + '"');
         buffer.push(' cx="' + this.x + '"');
         buffer.push(' cy="' + this.y + '"');
         buffer.push(' r="2"');
-        buffer.push(' />');
-        return buffer.join('');
+        buffer.push(" />");
+        return buffer.join("");
     }
-    ;
     // END Vertex
     /**
      * Create a new random vertex inside the given viewport.
@@ -843,7 +823,6 @@ class Vertex {
     static randomVertex(viewPort) {
         return new Vertex(viewPort.min.x + Math.random() * (viewPort.max.x - viewPort.min.x), viewPort.min.y + Math.random() * (viewPort.max.y - viewPort.min.y));
     }
-    ;
 }
 Vertex.ZERO = new Vertex(0, 0);
 /**
@@ -884,10 +863,10 @@ Vertex.utils = {
         // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
         var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         var vertices = [];
-        vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
         vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
         return vertices;
     }
 };
@@ -4227,26 +4206,25 @@ class drawutilssvg {
         }
         else {
             this.addStyleDefs(drawConfig);
-            this.gNode = this.createSVGNode('g');
+            this.gNode = this.createSVGNode("g");
             this.svgNode.appendChild(this.gNode);
         }
     }
-    ;
     addStyleDefs(drawConfig) {
-        const nodeStyle = this.createSVGNode('style');
+        const nodeStyle = this.createSVGNode("style");
         this.svgNode.appendChild(nodeStyle); // nodeDef);
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         const keys = {
-            'polygon': 'Polygon',
-            'triangle': 'Triangle',
-            'ellipse': 'Ellipse',
-            'circle': 'Circle',
-            'circleSector': 'CircleSector',
-            'vertex': 'Vertex',
-            'line': 'Line',
-            'vector': 'Vector',
-            'image': 'Image'
+            "polygon": "Polygon",
+            "triangle": "Triangle",
+            "ellipse": "Ellipse",
+            "circle": "Circle",
+            "circleSector": "CircleSector",
+            "vertex": "Vertex",
+            "line": "Line",
+            "vector": "Vector",
+            "image": "Image"
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
         const rules = [];
@@ -4257,7 +4235,6 @@ class drawutilssvg {
         }
         nodeStyle.innerHTML = rules.join("\n");
     }
-    ;
     /**
      * Retieve an old (cached) element.
      * Only if both – key and nodeName – match, the element will be returned (null otherwise).
@@ -4290,7 +4267,6 @@ class drawutilssvg {
     createSVGNode(nodeName) {
         return document.createElementNS("http://www.w3.org/2000/svg", nodeName);
     }
-    ;
     /**
      * Make a new SVG node (or recycle an old one) with the given node name (circle, path, line, rect, ...).
      *
@@ -4315,7 +4291,6 @@ class drawutilssvg {
         }
         return node;
     }
-    ;
     /**
      * This is the final helper function for drawing and filling stuff and binding new
      * nodes to the SVG document.
@@ -4338,16 +4313,16 @@ class drawutilssvg {
      */
     _bindFillDraw(node, className, color, lineWidth) {
         if (this.curClassName) {
-            node.setAttribute('class', `${this.curClassName} ${className}`);
+            node.setAttribute("class", `${this.curClassName} ${className}`);
         }
         else {
-            node.setAttribute('class', className);
+            node.setAttribute("class", className);
         }
-        node.setAttribute('fill', this.fillShapes ? color : 'none');
-        node.setAttribute('stroke', this.fillShapes ? 'none' : color);
-        node.setAttribute('stroke-width', `${lineWidth || 1}`);
+        node.setAttribute("fill", this.fillShapes ? color : "none");
+        node.setAttribute("stroke", this.fillShapes ? "none" : color);
+        node.setAttribute("stroke-width", `${lineWidth || 1}`);
         if (this.curId) {
-            node.setAttribute('id', `${this.curId}`); // Maybe React-style 'key' would be better?
+            node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
         }
         if (!node.parentNode) {
             // Attach to DOM only if not already attached
@@ -4355,7 +4330,6 @@ class drawutilssvg {
         }
         return node;
     }
-    ;
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.
      *
@@ -4366,11 +4340,10 @@ class drawutilssvg {
      */
     setSize(canvasSize) {
         this.canvasSize = canvasSize;
-        this.svgNode.setAttribute('viewBox', `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
-        this.svgNode.setAttribute('width', `${this.canvasSize.width}`);
-        this.svgNode.setAttribute('height', `${this.canvasSize.height}`);
+        this.svgNode.setAttribute("viewBox", `0 0 ${this.canvasSize.width} ${this.canvasSize.height}`);
+        this.svgNode.setAttribute("width", `${this.canvasSize.width}`);
+        this.svgNode.setAttribute("height", `${this.canvasSize.height}`);
     }
-    ;
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
@@ -4381,7 +4354,6 @@ class drawutilssvg {
         this.gNode);
         return copy;
     }
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -4395,7 +4367,6 @@ class drawutilssvg {
     setCurrentId(uid) {
         this.curId = uid;
     }
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
@@ -4409,7 +4380,6 @@ class drawutilssvg {
     setCurrentClassName(className) {
         this.curClassName = className;
     }
-    ;
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.
@@ -4424,9 +4394,12 @@ class drawutilssvg {
         // Clear non-recycable elements from last draw cycle.
         this.cache.clear();
     }
-    ;
-    _x(x) { return this.offset.x + this.scale.x * x; }
-    _y(y) { return this.offset.y + this.scale.y * y; }
+    _x(x) {
+        return this.offset.x + this.scale.x * x;
+    }
+    _y(y) {
+        return this.offset.y + this.scale.y * y;
+    }
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -4440,14 +4413,13 @@ class drawutilssvg {
      * @memberof drawutilssvg
      **/
     line(zA, zB, color, lineWidth) {
-        const line = this.makeNode('line');
-        line.setAttribute('x1', `${this._x(zA.x)}`);
-        line.setAttribute('y1', `${this._y(zA.y)}`);
-        line.setAttribute('x2', `${this._x(zB.x)}`);
-        line.setAttribute('y2', `${this._y(zB.y)}`);
-        return this._bindFillDraw(line, 'line', color, lineWidth || 1);
+        const line = this.makeNode("line");
+        line.setAttribute("x1", `${this._x(zA.x)}`);
+        line.setAttribute("y1", `${this._y(zA.y)}`);
+        line.setAttribute("x2", `${this._x(zB.x)}`);
+        line.setAttribute("y2", `${this._y(zB.y)}`);
+        return this._bindFillDraw(line, "line", color, lineWidth || 1);
     }
-    ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
@@ -4461,22 +4433,19 @@ class drawutilssvg {
      * @memberof drawutilssvg
      **/
     arrow(zA, zB, color, lineWidth) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         var headlen = 8; // length of head in pixels
         var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
-        const d = [
-            'M', this._x(zA.x), this._y(zA.y)
-        ];
+        const d = ["M", this._x(zA.x), this._y(zA.y)];
         for (var i = 0; i <= vertices.length; i++) {
-            d.push('L');
+            d.push("L");
             // Note: only use offset here (the vertices are already scaled)
             d.push(this.offset.x + vertices[i % vertices.length].x);
             d.push(this.offset.y + vertices[i % vertices.length].y);
         }
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'arrow', color, lineWidth || 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
     }
-    ;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -4491,29 +4460,30 @@ class drawutilssvg {
      * @memberof drawutilssvg
      **/
     image(image, position, size) {
-        const node = this.makeNode('image');
+        const node = this.makeNode("image");
         // We need to re-adjust the image if it was not yet fully loaded before.
         const setImageSize = (image) => {
             if (image.naturalWidth) {
                 const ratioX = size.x / image.naturalWidth;
                 const ratioY = size.y / image.naturalHeight;
-                node.setAttribute('width', `${image.naturalWidth * this.scale.x}`);
-                node.setAttribute('height', `${image.naturalHeight * this.scale.y}`);
-                node.setAttribute('display', null); // Dislay when loaded
-                node.setAttribute('transform', `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${(ratioX)} ${(ratioY)})`);
+                node.setAttribute("width", `${image.naturalWidth * this.scale.x}`);
+                node.setAttribute("height", `${image.naturalHeight * this.scale.y}`);
+                node.setAttribute("display", null); // Dislay when loaded
+                node.setAttribute("transform", `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${ratioX} ${ratioY})`);
             }
         };
-        image.addEventListener('load', (event) => { setImageSize(image); });
+        image.addEventListener("load", event => {
+            setImageSize(image);
+        });
         // Safari has a transform-origin bug.
         // Use x=0, y=0 and translate/scale instead (see above)
-        node.setAttribute('x', `${0}`);
-        node.setAttribute('y', `${0}`);
-        node.setAttribute('display', 'none'); // Hide before loaded
+        node.setAttribute("x", `${0}`);
+        node.setAttribute("y", `${0}`);
+        node.setAttribute("display", "none"); // Hide before loaded
         setImageSize(image);
-        node.setAttribute('href', image.src);
-        return this._bindFillDraw(node, 'image', null, null);
+        node.setAttribute("href", image.src);
+        return this._bindFillDraw(node, "image", null, null);
     }
-    ;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -4532,16 +4502,23 @@ class drawutilssvg {
         if (startPoint instanceof CubicBezierCurve) {
             return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
         }
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         // Draw curve
         const d = [
-            'M', this._x(startPoint.x), this._y(startPoint.y),
-            'C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y)
+            "M",
+            this._x(startPoint.x),
+            this._y(startPoint.y),
+            "C",
+            this._x(startControlPoint.x),
+            this._y(startControlPoint.y),
+            this._x(endControlPoint.x),
+            this._y(endControlPoint.y),
+            this._x(endPoint.x),
+            this._y(endPoint.y)
         ];
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'cubierBezier', color, lineWidth);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cubierBezier", color, lineWidth);
     }
-    ;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -4558,13 +4535,11 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     cubicBezierPath(path, color, lineWidth) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         if (!path || path.length == 0)
             return node;
         // Draw curve
-        const d = [
-            'M', this._x(path[0].x), this._y(path[0].y)
-        ];
+        const d = ["M", this._x(path[0].x), this._y(path[0].y)];
         // Draw curve path
         var endPoint;
         var startControlPoint;
@@ -4573,12 +4548,11 @@ class drawutilssvg {
             startControlPoint = path[i];
             endControlPoint = path[i + 1];
             endPoint = path[i + 2];
-            d.push('C', this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
+            d.push("C", this._x(startControlPoint.x), this._y(startControlPoint.y), this._x(endControlPoint.x), this._y(endControlPoint.y), this._x(endPoint.x), this._y(endPoint.y));
         }
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'cubicBezierPath', color, lineWidth || 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cubicBezierPath", color, lineWidth || 1);
     }
-    ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -4593,10 +4567,9 @@ class drawutilssvg {
      */
     handle(startPoint, endPoint) {
         // TODO: redefine methods like these into an abstract class?
-        this.point(startPoint, 'rgb(0,32,192)');
-        this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
+        this.point(startPoint, "rgb(0,32,192)");
+        this.square(endPoint, 5, "rgba(0,128,192,0.5)");
     }
-    ;
     /**
      * Draw a handle line (with a light grey).
      *
@@ -4608,9 +4581,8 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     handleLine(startPoint, endPoint) {
-        this.line(startPoint, endPoint, 'rgb(192,192,192)');
+        this.line(startPoint, endPoint, "rgb(192,192,192)");
     }
-    ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
@@ -4622,10 +4594,9 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     dot(p, color) {
-        const node = this.makeNode('line');
-        return this._bindFillDraw(node, 'dot', color, 1);
+        const node = this.makeNode("line");
+        return this._bindFillDraw(node, "dot", color, 1);
     }
-    ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
@@ -4638,13 +4609,12 @@ class drawutilssvg {
      */
     point(p, color) {
         var radius = 3;
-        const node = this.makeNode('circle');
-        node.setAttribute('cx', `${this._x(p.x)}`);
-        node.setAttribute('cy', `${this._y(p.y)}`);
-        node.setAttribute('r', `${radius}`);
-        return this._bindFillDraw(node, 'point', color, 1);
+        const node = this.makeNode("circle");
+        node.setAttribute("cx", `${this._x(p.x)}`);
+        node.setAttribute("cy", `${this._y(p.y)}`);
+        node.setAttribute("r", `${radius}`);
+        return this._bindFillDraw(node, "point", color, 1);
     }
-    ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
@@ -4660,13 +4630,13 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     circle(center, radius, color, lineWidth) {
-        const node = this.makeNode('circle');
-        node.setAttribute('cx', `${this._x(center.x)}`);
-        node.setAttribute('cy', `${this._y(center.y)}`);
-        node.setAttribute('r', `${radius * this.scale.x}`); // y?
-        return this._bindFillDraw(node, 'circle', color, lineWidth || 1);
+        // Todo: draw ellipse when scalex!=scaley
+        const node = this.makeNode("circle");
+        node.setAttribute("cx", `${this._x(center.x)}`);
+        node.setAttribute("cy", `${this._y(center.y)}`);
+        node.setAttribute("r", `${radius * this.scale.x}`); // y?
+        return this._bindFillDraw(node, "circle", color, lineWidth || 1);
     }
-    ;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
@@ -4681,13 +4651,12 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     circleArc(center, radius, startAngle, endAngle, color, lineWidth) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         const arcData = CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
         startAngle, endAngle);
-        node.setAttribute('d', arcData.join(' '));
-        return this._bindFillDraw(node, 'circleArc', color, lineWidth || 1);
+        node.setAttribute("d", arcData.join(" "));
+        return this._bindFillDraw(node, "circleArc", color, lineWidth || 1);
     }
-    ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -4703,19 +4672,18 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
-        if (typeof rotation === 'undefined') {
+        if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
-        const node = this.makeNode('ellipse');
-        node.setAttribute('cx', `${this._x(center.x)}`);
-        node.setAttribute('cy', `${this._y(center.y)}`);
-        node.setAttribute('rx', `${radiusX * this.scale.x}`);
-        node.setAttribute('ry', `${radiusY * this.scale.y}`);
+        const node = this.makeNode("ellipse");
+        node.setAttribute("cx", `${this._x(center.x)}`);
+        node.setAttribute("cy", `${this._y(center.y)}`);
+        node.setAttribute("rx", `${radiusX * this.scale.x}`);
+        node.setAttribute("ry", `${radiusY * this.scale.y}`);
         // node.setAttribute( 'style', `transform: rotate(${rotation} ${center.x} ${center.y})` );
-        node.setAttribute('transform', `rotate(${rotation * 180 / Math.PI} ${this._x(center.x)} ${this._y(center.y)})`);
-        return this._bindFillDraw(node, 'ellipse', color, lineWidth || 1);
+        node.setAttribute("transform", `rotate(${(rotation * 180) / Math.PI} ${this._x(center.x)} ${this._y(center.y)})`);
+        return this._bindFillDraw(node, "ellipse", color, lineWidth || 1);
     }
-    ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -4731,14 +4699,13 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     square(center, size, color, lineWidth) {
-        const node = this.makeNode('rectangle');
-        node.setAttribute('x', `${this._x(center.x - size / 2.0)}`);
-        node.setAttribute('y', `${this._y(center.y - size / 2.0)}`);
-        node.setAttribute('width', `${size * this.scale.x}`);
-        node.setAttribute('height', `${size * this.scale.y}`);
-        return this._bindFillDraw(node, 'square', color, lineWidth || 1);
+        const node = this.makeNode("rectangle");
+        node.setAttribute("x", `${this._x(center.x - size / 2.0)}`);
+        node.setAttribute("y", `${this._y(center.y - size / 2.0)}`);
+        node.setAttribute("width", `${size * this.scale.x}`);
+        node.setAttribute("height", `${size * this.scale.y}`);
+        return this._bindFillDraw(node, "square", color, lineWidth || 1);
     }
-    ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -4754,24 +4721,23 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     grid(center, width, height, sizeX, sizeY, color) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         const d = [];
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
-            d.push('M', this._x(center.x + x), this._y(center.y + yMin));
-            d.push('L', this._x(center.x + x), this._y(center.y + yMax));
+            d.push("M", this._x(center.x + x), this._y(center.y + yMin));
+            d.push("L", this._x(center.x + x), this._y(center.y + yMax));
         }
         var xMin = -Math.ceil((width * 0.5) / sizeX) * sizeX;
         var xMax = width / 2;
         for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
-            d.push('M', this._x(center.x + xMin), this._y(center.y + y));
-            d.push('L', this._x(center.x + xMax), this._y(center.y + y));
+            d.push("M", this._x(center.x + xMin), this._y(center.y + y));
+            d.push("L", this._x(center.x + xMax), this._y(center.y + y));
         }
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'grid', color, 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "grid", color, 1);
     }
-    ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
@@ -4789,21 +4755,20 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     raster(center, width, height, sizeX, sizeY, color) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         const d = [];
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
             for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
                 // Draw a crosshair
-                d.push('M', this._x(center.x + x) - 4, this._y(center.y + y));
-                d.push('L', this._x(center.x + x) + 4, this._y(center.y + y));
-                d.push('M', this._x(center.x + x), this._y(center.y + y) - 4);
-                d.push('L', this._x(center.x + x), this._y(center.y + y) + 4);
+                d.push("M", this._x(center.x + x) - 4, this._y(center.y + y));
+                d.push("L", this._x(center.x + x) + 4, this._y(center.y + y));
+                d.push("M", this._x(center.x + x), this._y(center.y + y) - 4);
+                d.push("L", this._x(center.x + x), this._y(center.y + y) + 4);
             }
         }
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'raster', color, 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "raster", color, 1);
     }
-    ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
@@ -4820,18 +4785,25 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     diamondHandle(center, size, color) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         const d = [
-            'M', this._x(center.x) - size / 2.0, this._y(center.y),
-            'L', this._x(center.x), this._y(center.y) - size / 2.0,
-            'L', this._x(center.x) + size / 2.0, this._y(center.y),
-            'L', this._x(center.x), this._y(center.y) + size / 2.0,
-            'Z'
+            "M",
+            this._x(center.x) - size / 2.0,
+            this._y(center.y),
+            "L",
+            this._x(center.x),
+            this._y(center.y) - size / 2.0,
+            "L",
+            this._x(center.x) + size / 2.0,
+            this._y(center.y),
+            "L",
+            this._x(center.x),
+            this._y(center.y) + size / 2.0,
+            "Z"
         ];
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'diamondHandle', color, 1);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "diamondHandle", color, 1);
     }
-    ;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -4848,14 +4820,13 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     squareHandle(center, size, color) {
-        const node = this.makeNode('rect');
-        node.setAttribute('x', `${this._x(center.x) - size / 2.0}`);
-        node.setAttribute('y', `${this._y(center.y) - size / 2.0}`);
-        node.setAttribute('width', `${size}`);
-        node.setAttribute('height', `${size}`);
-        return this._bindFillDraw(node, 'squareHandle', color, 1);
+        const node = this.makeNode("rect");
+        node.setAttribute("x", `${this._x(center.x) - size / 2.0}`);
+        node.setAttribute("y", `${this._y(center.y) - size / 2.0}`);
+        node.setAttribute("width", `${size}`);
+        node.setAttribute("height", `${size}`);
+        return this._bindFillDraw(node, "squareHandle", color, 1);
     }
-    ;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -4873,13 +4844,12 @@ class drawutilssvg {
      */
     circleHandle(center, radius, color) {
         radius = radius || 3;
-        const node = this.makeNode('circle');
-        node.setAttribute('cx', `${this._x(center.x)}`);
-        node.setAttribute('cy', `${this._y(center.y)}`);
-        node.setAttribute('r', `${radius}`);
-        return this._bindFillDraw(node, 'circleHandle', color, 1);
+        const node = this.makeNode("circle");
+        node.setAttribute("cx", `${this._x(center.x)}`);
+        node.setAttribute("cy", `${this._y(center.y)}`);
+        node.setAttribute("r", `${radius}`);
+        return this._bindFillDraw(node, "circleHandle", color, 1);
     }
-    ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -4894,17 +4864,24 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     crosshair(center, radius, color) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         const d = [
-            'M', this._x(center.x) - radius, this._y(center.y),
-            'L', this._x(center.x) + radius, this._y(center.y),
-            'M', this._x(center.x), this._y(center.y) - radius,
-            'L', this._x(center.x), this._y(center.y) + radius
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y),
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y),
+            "M",
+            this._x(center.x),
+            this._y(center.y) - radius,
+            "L",
+            this._x(center.x),
+            this._y(center.y) + radius
         ];
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'crosshair', color, 0.5);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "crosshair", color, 0.5);
     }
-    ;
     /**
      * Draw a polygon.
      *
@@ -4919,7 +4896,6 @@ class drawutilssvg {
     polygon(polygon, color, lineWidth) {
         return this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
     }
-    ;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -4933,23 +4909,20 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     polyline(vertices, isOpen, color, lineWidth) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         if (vertices.length == 0)
             return node;
         // Draw curve
-        const d = [
-            'M', this._x(vertices[0].x), this._y(vertices[0].y)
-        ];
+        const d = ["M", this._x(vertices[0].x), this._y(vertices[0].y)];
         var n = vertices.length;
         for (var i = 1; i < n; i++) {
-            d.push('L', this._x(vertices[i].x), this._y(vertices[i].y));
+            d.push("L", this._x(vertices[i].x), this._y(vertices[i].y));
         }
         if (!isOpen)
-            d.push('Z');
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'polyline', color, lineWidth || 1);
+            d.push("Z");
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "polyline", color, lineWidth || 1);
     }
-    ;
     /**
      * Draw a text label at the given relative position.
      *
@@ -4964,14 +4937,13 @@ class drawutilssvg {
      */
     text(text, x, y, options) {
         options = options || {};
-        const color = options.color || 'black';
-        const node = this.makeNode('text');
-        node.setAttribute('x', `${this._x(x)}`);
-        node.setAttribute('y', `${this._x(y)}`);
+        const color = options.color || "black";
+        const node = this.makeNode("text");
+        node.setAttribute("x", `${this._x(x)}`);
+        node.setAttribute("y", `${this._x(y)}`);
         node.innerHTML = text;
-        return this._bindFillDraw(node, 'text', color, 1);
+        return this._bindFillDraw(node, "text", color, 1);
     }
-    ;
     /**
      * Draw a non-scaling text label at the given position.
      *
@@ -4985,13 +4957,12 @@ class drawutilssvg {
      * @memberof drawutilssvg
      */
     label(text, x, y, rotation) {
-        const node = this.makeNode('text');
+        const node = this.makeNode("text");
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute('transform', `translate(${this.offset.x},${this.offset.y}), rotate(${rotation / Math.PI * 180})`);
+        node.setAttribute("transform", `translate(${this.offset.x},${this.offset.y}), rotate(${(rotation / Math.PI) * 180})`);
         node.innerHTML = text;
-        return this._bindFillDraw(node, 'label', 'black', null);
+        return this._bindFillDraw(node, "label", "black", null);
     }
-    ;
     /**
      * Draw an SVG-like path given by the specified path data.
      *
@@ -5005,14 +4976,13 @@ class drawutilssvg {
      * @return {R} An instance representing the drawn path.
      */
     path(pathData, color, lineWidth, options) {
-        const node = this.makeNode('path');
+        const node = this.makeNode("path");
         // Transform the path: in-place (fast) or copy (slower)
         const d = options && options.inplace ? pathData : drawutilssvg.copyPathData(pathData);
         drawutilssvg.transformPathData(d, this.offset, this.scale);
-        node.setAttribute('d', d.join(' '));
-        return this._bindFillDraw(node, 'path', color, lineWidth);
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "path", color, lineWidth);
     }
-    ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
@@ -5035,26 +5005,25 @@ class drawutilssvg {
             // Hide all nodes here. Don't throw them away.
             // We can probably re-use them in the next draw cycle.
             var child = this.gNode.childNodes[i];
-            this.cache.set(child.getAttribute('id'), child);
+            this.cache.set(child.getAttribute("id"), child);
         }
         this.removeAllChildNodes();
         // Add a covering rect with the given background color
-        this.curId = 'background';
+        this.curId = "background";
         this.curClassName = undefined;
-        const node = this.makeNode('rect');
+        const node = this.makeNode("rect");
         // For some strange reason SVG rotation transforms use degrees instead of radians
         // Note that the background does not scale with the zoom level (always covers full element)
-        node.setAttribute('x', '0');
-        node.setAttribute('y', '0');
-        node.setAttribute('width', `${this.canvasSize.width}`);
-        node.setAttribute('height', `${this.canvasSize.height}`);
+        node.setAttribute("x", "0");
+        node.setAttribute("y", "0");
+        node.setAttribute("width", `${this.canvasSize.width}`);
+        node.setAttribute("height", `${this.canvasSize.height}`);
         // Bind this special element into the document
         this._bindFillDraw(node, this.curId, null, null);
-        node.setAttribute('fill', typeof color === "undefined" ? 'none' : color);
+        node.setAttribute("fill", typeof color === "undefined" ? "none" : color);
         // Clear the current ID again
         this.curId = undefined;
     }
-    ;
     /**
      * A private helper function to clear all SVG nodes from the &gt;g> node.
      *
@@ -5065,7 +5034,6 @@ class drawutilssvg {
             this.gNode.removeChild(this.gNode.lastChild);
         }
     }
-    ;
     /**
      * Create a new and empty `SVGElement` &lt;svg&gt; in the svg-namespace.
      *
@@ -5077,7 +5045,6 @@ class drawutilssvg {
     static createSvg() {
         return document.createElementNS("http://www.w3.org/2000/svg", "svg");
     }
-    ;
     /**
      * Create a copy of the given path data. As path data only consists of strings and numbers,
      * the copy will be shallow by definition.
@@ -5093,7 +5060,6 @@ class drawutilssvg {
         }
         return copy;
     }
-    ;
     /**
      * Transform the given path data (translate and scale. rotating is not intended here).
      *
@@ -5106,56 +5072,64 @@ class drawutilssvg {
      */
     static transformPathData(data, offset, scale) {
         // Scale and translate {x,y}
-        const _stx = (index) => { data[index] = offset.x + scale.x * Number(data[index]); };
-        const _sty = (index) => { data[index] = offset.y + scale.y * Number(data[index]); };
+        const _stx = (index) => {
+            data[index] = offset.x + scale.x * Number(data[index]);
+        };
+        const _sty = (index) => {
+            data[index] = offset.y + scale.y * Number(data[index]);
+        };
         // scale only {x,y}
-        const _sx = (index) => { data[index] = scale.x * Number(data[index]); };
-        const _sy = (index) => { data[index] = scale.y * Number(data[index]); };
+        const _sx = (index) => {
+            data[index] = scale.x * Number(data[index]);
+        };
+        const _sy = (index) => {
+            data[index] = scale.y * Number(data[index]);
+        };
         var i = 0;
         while (i < data.length) {
             const cmd = data[i];
             switch (cmd) {
-                case 'M':
+                case "M":
                 // MoveTo: M|m x y
-                case 'L':
+                case "L":
                 // LineTo L|l x y
-                case 'T':
+                case "T":
                     // Shorthand/smooth quadratic Bézier curveto: T|t x y
                     _stx(i + 1);
                     _sty(i + 2);
                     i += 3;
                     break;
-                case 'm':
+                case "m":
                 // MoveTo: M|m x y
-                case 'l':
+                case "l":
                 // LineTo L|l x y
-                case 't':
+                case "t":
                     // Shorthand/smooth quadratic Bézier curveto: T|t x y
                     _sx(i + 1);
                     _sy(i + 2);
                     i += 3;
                     break;
-                case 'H':
+                case "H":
                     // HorizontalLineTo: H|h x
                     _stx(i + 1);
                     i += 2;
                     break;
-                case 'h':
+                case "h":
                     // HorizontalLineTo: H|h x
                     _sx(i + 1);
                     i += 2;
                     break;
-                case 'V':
+                case "V":
                     // VerticalLineTo: V|v y
                     _sty(i + 1);
                     i += 2;
                     break;
-                case 'v':
+                case "v":
                     // VerticalLineTo: V|v y
                     _sy(i + 1);
                     i += 2;
                     break;
-                case 'C':
+                case "C":
                     // CurveTo: C|c x1 y1 x2 y2 x y
                     _stx(i + 1);
                     _sty(i + 2);
@@ -5165,7 +5139,7 @@ class drawutilssvg {
                     _sty(i + 6);
                     i += 7;
                     break;
-                case 'c':
+                case "c":
                     // CurveTo: C|c x1 y1 x2 y2 x y
                     _sx(i + 1);
                     _sy(i + 2);
@@ -5175,8 +5149,8 @@ class drawutilssvg {
                     _sy(i + 6);
                     i += 7;
                     break;
-                case 'S':
-                case 'Q':
+                case "S":
+                case "Q":
                     // Shorthand-/SmoothCurveTo: S|s x2 y2 x y
                     // QuadraticCurveTo: Q|q x1 y1 x y
                     _stx(i + 1);
@@ -5185,8 +5159,8 @@ class drawutilssvg {
                     _sty(i + 4);
                     i += 5;
                     break;
-                case 's':
-                case 'q':
+                case "s":
+                case "q":
                     // Shorthand-/SmoothCurveTo: S|s x2 y2 x y
                     // QuadraticCurveTo: Q|q x1 y1 x y
                     _sx(i + 1);
@@ -5195,7 +5169,7 @@ class drawutilssvg {
                     _sy(i + 4);
                     i += 5;
                     break;
-                case 'A':
+                case "A":
                     // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
                     _sx(i + 1);
                     _sy(i + 2);
@@ -5203,7 +5177,7 @@ class drawutilssvg {
                     _sty(i + 7);
                     i += 8;
                     break;
-                case 'a':
+                case "a":
                     // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
                     _sx(i + 1);
                     _sy(i + 2);
@@ -5211,23 +5185,23 @@ class drawutilssvg {
                     _sy(i + 7);
                     i += 8;
                     break;
-                case 'z':
-                case 'Z':
+                case "z":
+                case "Z":
                     // ClosePath: Z|z (no arguments)
                     i++;
                     break;
                 // Safepoint: continue reading token by token until something is recognized again
-                default: i++;
+                default:
+                    i++;
             }
         } // END while
     }
-    ;
 }
 drawutilssvg.HEAD_XML = [
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
     '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" ',
     '         "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">',
-    ''
+    ""
 ].join("\n");
 
 /**
@@ -8578,7 +8552,10 @@ class AlloyFinger {
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
  * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
- * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` method.
+ * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
+ * @modified 2021-03-09 Added the `clone` and `rotate` methods.
+ * @modified 2021-03-10 Added the `toCubicBezier` method.
+ * @modified 2021-03-15 Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -8610,9 +8587,16 @@ class VEllipse {
         this.uid = UIDGenerator.next();
         this.center = center;
         this.axis = axis;
-        this.rotation = rotation | 0.0;
+        this.rotation = rotation || 0.0;
     }
-    ;
+    /**
+     * Clone this ellipse (deep clone).
+     *
+     * @return {VEllipse} A copy of this ellipse.s
+     */
+    clone() {
+        return new VEllipse(this.center.clone(), this.axis.clone(), this.rotation);
+    }
     /**
      * Get the non-negative horizonal radius of this ellipse.
      *
@@ -8624,7 +8608,6 @@ class VEllipse {
     radiusH() {
         return Math.abs(this.signedRadiusH());
     }
-    ;
     /**
      * Get the signed horizonal radius of this ellipse.
      *
@@ -8639,7 +8622,6 @@ class VEllipse {
         // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
         return new Vertex(this.axis).rotate(-this.rotation, this.center).x - this.center.x;
     }
-    ;
     /**
      * Get the non-negative vertical radius of this ellipse.
      *
@@ -8651,7 +8633,6 @@ class VEllipse {
     radiusV() {
         return Math.abs(this.signedRadiusV());
     }
-    ;
     /**
      * Get the signed vertical radius of this ellipse.
      *
@@ -8666,7 +8647,16 @@ class VEllipse {
         // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
         return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     }
-    ;
+    /**
+     * Scale this ellipse by the given factor. The factor will be applied to both radii.
+     *
+     * @param {number} factor
+     * @return {VEllipse} this for chaining.
+     */
+    scale(factor) {
+        this.axis.scale(factor, this.center);
+        return this;
+    }
     /**
      * Get the vertex on the ellipse's outline at the given angle.
      *
@@ -8683,7 +8673,6 @@ class VEllipse {
         const b = this.radiusV();
         return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
     }
-    ;
     /**
      * Get the normal vector at the given angle.
      * The normal vector is the vector that intersects the ellipse in a 90 degree angle
@@ -8705,7 +8694,11 @@ class VEllipse {
         const angleB = new Line(point, foci[1]).angle();
         const centerAngle = angleA + (angleB - angleA) / 2.0;
         const endPointA = point.clone().addX(50).clone().rotate(centerAngle, point);
-        const endPointB = point.clone().addX(50).clone().rotate(Math.PI + centerAngle, point);
+        const endPointB = point
+            .clone()
+            .addX(50)
+            .clone()
+            .rotate(Math.PI + centerAngle, point);
         if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
             return new Vector(point, endPointB);
         }
@@ -8713,7 +8706,6 @@ class VEllipse {
             return new Vector(point, endPointA);
         }
     }
-    ;
     /**
      * Get the tangent vector at the given angle.
      * The tangent vector is the vector that touches the ellipse exactly at the given given
@@ -8735,7 +8727,6 @@ class VEllipse {
         normal.b.rotate(Math.PI / 2, normal.a);
         return normal;
     }
-    ;
     /**
      * Get the perimeter of this ellipse.
      *
@@ -8753,7 +8744,6 @@ class VEllipse {
         const b = this.radiusV();
         return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
     }
-    ;
     /**
      * Get the two foci of this ellipse.
      *
@@ -8783,7 +8773,90 @@ class VEllipse {
             ];
         }
     }
-    ;
+    /**
+     * Get equally distributed points on the outline of this ellipse.
+     *
+     * @param {number} pointCount - The number of points.
+     * @returns {Array<Vertex>}
+     */
+    getEquidistantVertices(pointCount) {
+        const angles = VEllipse.utils.equidistantVertAngles(this.radiusH(), this.radiusV(), pointCount);
+        const result = [];
+        for (var i = 0; i < angles.length; i++) {
+            result.push(this.vertAt(angles[i]));
+        }
+        return result;
+    }
+    /**
+     * Convert this ellipse into cubic Bézier curves.
+     *
+     * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+     * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+     * but you might wish to use other values)
+     * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing this ellipse.
+     */
+    toCubicBezier(quarterSegmentCount, threshold) {
+        // Math by Luc Maisonobe
+        //    http://www.spaceroots.org/documents/ellipse/node22.html
+        // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
+        // Return a single line here (as a Bézier curve)
+        // if (Math.abs(this.radiusV()) < 0.00001) {
+        //   const radiusH = this.radiusH();
+        //   return [
+        //     new CubicBezierCurve(
+        //       this.center.clone().addX(radiusH),
+        //       this.center.clone().addX(-radiusH),
+        //       this.center.clone(),
+        //       this.center.clone()
+        //     )
+        //   ]; // TODO: test horizontal line ellipse
+        // }
+        // if (Math.abs(this.radiusH()) < 0.00001) {
+        //   const radiusV = this.radiusV();
+        //   return [
+        //     new CubicBezierCurve(
+        //       this.center.clone().addY(radiusV),
+        //       this.center.clone().addY(-radiusV),
+        //       this.center.clone(),
+        //       this.center.clone()
+        //     )
+        //   ]; // TODO: test vertical line ellipse
+        // }
+        // At least 4, but 16 seems to be a good value.
+        const segmentCount = Math.max(1, quarterSegmentCount || 3) * 4;
+        threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
+        const radiusH = this.radiusH();
+        const radiusV = this.radiusV();
+        const curves = [];
+        const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
+        let curAngle = angles[0];
+        let startPoint = this.vertAt(curAngle);
+        for (var i = 0; i < angles.length; i++) {
+            let nextAngle = angles[(i + 1) % angles.length];
+            let endPoint = this.vertAt(nextAngle);
+            if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
+                // Distorted ellipses can only be approximated by linear Bézier segments
+                let diff = startPoint.difference(endPoint);
+                let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().addXY(diff.x * 0.333, diff.y * 0.333), endPoint.clone().addXY(-diff.x * 0.333, -diff.y * 0.333));
+                curves.push(curve);
+            }
+            else {
+                let startTangent = this.tangentAt(curAngle);
+                let endTangent = this.tangentAt(nextAngle);
+                // Find intersection
+                let intersection = startTangent.intersection(endTangent);
+                // What if intersection is undefined?
+                // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
+                let startDiff = startPoint.difference(intersection);
+                let endDiff = endPoint.difference(intersection);
+                let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+                curves.push(curve);
+            }
+            startPoint = endPoint;
+            curAngle = nextAngle;
+        }
+        return curves;
+    }
     /**
      * Create an SVG representation of this ellipse.
      *
@@ -8794,17 +8867,16 @@ class VEllipse {
     toSVGString(options) {
         options = options || {};
         var buffer = [];
-        buffer.push('<ellipse');
+        buffer.push("<ellipse");
         if (options.className)
             buffer.push(' class="' + options.className + '"');
         buffer.push(' cx="' + this.center.x + '"');
         buffer.push(' cy="' + this.center.y + '"');
         buffer.push(' rx="' + this.axis.x + '"');
         buffer.push(' ry="' + this.axis.y + '"');
-        buffer.push(' />');
-        return buffer.join('');
+        buffer.push(" />");
+        return buffer.join("");
     }
-    ;
 }
 /**
  * A static collection of ellipse-related helper functions.
@@ -8827,9 +8899,40 @@ VEllipse.utils = {
         // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
         var s = Math.sin(Math.PI / 2 - angle);
         var c = Math.cos(Math.PI / 2 - angle);
-        return { x: centerX + radiusH * radiusV * s / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
-            y: centerY + radiusH * radiusV * c / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
+        return {
+            x: centerX + (radiusH * radiusV * s) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
+            y: centerY + (radiusH * radiusV * c) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
         };
+    },
+    /**
+     * Get the `theta` for a given `phi` (used to determine equidistant points on ellipse).
+     *
+     * @param radiusH
+     * @param radiusV
+     * @param phi
+     * @returns {number} theta
+     */
+    phiToTheta: (radiusH, radiusV, phi) => {
+        //  See https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+        var tanPhi = Math.tan(phi);
+        var tanPhi2 = tanPhi * tanPhi;
+        var theta = -Math.PI / 2 + phi + Math.atan(((radiusH - radiusV) * tanPhi) / (radiusV + radiusH * tanPhi2));
+        return theta;
+    },
+    /**
+     * Get n equidistant points on the elliptic arc.
+     *
+     * @param pointCount
+     * @returns
+     */
+    equidistantVertAngles: (radiusH, radiusV, pointCount) => {
+        const angles = [];
+        for (var i = 0; i < pointCount; i++) {
+            var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
+            let theta = VEllipse.utils.phiToTheta(radiusH, radiusV, phi);
+            angles[i] = theta;
+        }
+        return angles;
     }
 }; // END utils
 
@@ -8874,6 +8977,79 @@ class VEllipseSector {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
+    /**
+     * Convert this elliptic sector into cubic Bézier curves.
+     *
+     * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+     * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+     * but you might wish to use other values)
+     * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing the elliptic sector.
+     */
+    toCubicBezier(quarterSegmentCount, threshold) {
+        // There are at least 4 segments required (dour quarters) to approximate a whole
+        // ellipse with Bézier curves.
+        // A visually 'good' approximation should have 12; this seems to be a good value (anything multiple of 4).
+        const segmentCount = Math.max(1, quarterSegmentCount || 3) * 4;
+        threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
+        const radiusH = this.ellipse.radiusH();
+        const radiusV = this.ellipse.radiusV();
+        // // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
+        // // Return a single line here (as a Bézier curve)
+        // if (Math.abs(radiusV) < 0.00001) {
+        //   return [
+        //     // TODO: construct linear approximations for both cases
+        //     // new CubicBezierCurve(
+        //     //   this.center.clone().addX(radiusH),
+        //     //   this.center.clone().addX(-radiusH),
+        //     //   this.center.clone(),
+        //     //   this.center.clone()
+        //     // )
+        //   ]; // TODO: test horizontal line ellipse
+        // }
+        // if (Math.abs(radiusH) < 0.00001) {
+        //   return [
+        //     // new CubicBezierCurve(
+        //     //   this.center.clone().addY(radiusV),
+        //     //   this.center.clone().addY(-radiusV),
+        //     //   this.center.clone(),
+        //     //   this.center.clone()
+        //     // )
+        //   ]; // TODO: test vertical line ellipse
+        // }
+        var startAngle = VEllipseSector.ellipseSectorUtils.normalizeAngle(this.startAngle);
+        var endAngle = VEllipseSector.ellipseSectorUtils.normalizeAngle(this.endAngle);
+        // Find all angles inside start and end
+        var angles = VEllipseSector.ellipseSectorUtils.equidistantVertAngles(radiusH, radiusV, startAngle, endAngle, segmentCount);
+        angles = [startAngle].concat(angles).concat([endAngle]);
+        const curves = [];
+        let curAngle = angles[0];
+        let startPoint = this.ellipse.vertAt(curAngle);
+        for (var i = 0; i + 1 < angles.length; i++) {
+            let nextAngle = angles[(i + 1) % angles.length];
+            let endPoint = this.ellipse.vertAt(nextAngle);
+            let startTangent = this.ellipse.tangentAt(curAngle);
+            let endTangent = this.ellipse.tangentAt(nextAngle);
+            if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
+                // Distorted ellipses can only be approximated by linear Bézier segments
+                let diff = startPoint.difference(endPoint);
+                let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().addXY(diff.x * 0.333, diff.y * 0.333), endPoint.clone().addXY(-diff.x * 0.333, -diff.y * 0.333));
+                curves.push(curve);
+            }
+            else {
+                // Find intersection
+                let intersection = startTangent.intersection(endTangent);
+                // What if intersection is undefined?
+                // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
+                let startDiff = startPoint.difference(intersection);
+                let endDiff = endPoint.difference(intersection);
+                let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+                curves.push(curve);
+            }
+            startPoint = endPoint;
+            curAngle = nextAngle;
+        }
+        return curves;
+    }
 }
 VEllipseSector.ellipseSectorUtils = {
     /**
@@ -8885,9 +9061,9 @@ VEllipseSector.ellipseSectorUtils = {
      * @return [ 'A', radiusH, radiusV, rotation, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
      */
     describeSVGArc: (x, y, radiusH, radiusV, startAngle, endAngle, rotation, options) => {
-        if (typeof options === 'undefined')
+        if (typeof options === "undefined")
             options = { moveToStart: true };
-        if (typeof rotation === 'undefined')
+        if (typeof rotation === "undefined")
             rotation = 0.0;
         // Important note: this function only works if start- and end-angle are within
         // one whole circle [x,x+2*PI].
@@ -8901,8 +9077,8 @@ VEllipseSector.ellipseSectorUtils = {
         var start = new Vertex(VEllipse.utils.polarToCartesian(x, y, radiusH, radiusV, startAngle));
         end.rotate(rotation, { x: x, y: y });
         start.rotate(rotation, { x: x, y: y });
-        var diff = endAngle - startAngle;
         // Boolean stored as integers (0|1).
+        var diff = endAngle - startAngle;
         var largeArcFlag;
         if (diff < 0) {
             largeArcFlag = Math.abs(diff) < Math.PI ? 1 : 0;
@@ -8913,13 +9089,86 @@ VEllipseSector.ellipseSectorUtils = {
         const sweepFlag = 1;
         const pathData = [];
         if (options.moveToStart) {
-            pathData.push('M', start.x, start.y);
+            pathData.push("M", start.x, start.y);
         }
         // Arc rotation in degrees, not radians.
         const r2d = 180 / Math.PI;
         pathData.push("A", radiusH, radiusV, rotation * r2d, largeArcFlag, sweepFlag, end.x, end.y);
         return pathData;
-    } // END function describeSVGArc
+    },
+    /**
+     * Helper function to find second-kind elliptic angles, so that the euclidean distance along the the
+     * elliptic sector is the same for all.
+     *
+     * Note that this is based on the full ellipse calculuation and start and end will be cropped; so the
+     * distance from the start angle to the first angle and/or the distance from the last angle to
+     * the end angle may be different to the others.
+     *
+     * Furthermore the computation is only possible on un-rotated ellipses; if your source ellipse has
+     * a rotation on the plane please 'rotate' the result angles afterwards to find matching angles.
+     *
+     * Returned angles are normalized to the interval `[ 0, PI*2 ]`.
+     *
+     * @param {number} radiusH - The first (horizonal) radius of the ellipse.
+     * @param {number} radiusV - The second (vertical) radius of the ellipse.
+     * @param {number} startAngle - The opening angle of your elliptic sector (please use normalized angles).
+     * @param {number} endAngle - The closing angle of your elliptic sector (please use normalized angles).
+     * @param {number} fullEllipsePointCount - The number of base segments to use from the source ellipse (12 or 16 are good numbers).
+     * @return {Array<number>} An array of n angles inside startAngle and endAngle (where n <= fullEllipsePointCount).
+     */
+    equidistantVertAngles: (radiusH, radiusV, startAngle, endAngle, fullEllipsePointCount) => {
+        var ellipseAngles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, fullEllipsePointCount);
+        ellipseAngles = ellipseAngles.map((angle) => VEllipseSector.ellipseSectorUtils.normalizeAngle(angle));
+        var angleIsInRange = (angle) => {
+            if (startAngle < endAngle)
+                return angle >= startAngle && angle <= endAngle;
+            // else return (angle >= startAngle && angle <= Math.PI * 2) || (angle <= endAngle && angle >= 0);
+            else
+                return (angle >= startAngle) || (angle <= endAngle && angle >= 0);
+        };
+        // Drop all angles outside the sector
+        var ellipseAngles = ellipseAngles.filter(angleIsInRange);
+        var findClosestToStartAngle = () => {
+            // endAngle > 0 && startAngle > 0
+            if (startAngle > endAngle) {
+                var startIndex = -1; // 0;
+                const n = ellipseAngles.length;
+                for (var i = 0; i < n; i++) {
+                    const ea = geomutils.wrapMinMax(ellipseAngles[i], 0, Math.PI * 2);
+                    geomutils.wrapMinMax(ellipseAngles[(i + 1) % n], 0, Math.PI * 2);
+                    ellipseAngles[startIndex] - startAngle;
+                    // console.log(i, ea, en)
+                    //if (startAngle < ellipseAngles[i] && diff < curDiff) {
+                    // if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) || (startAngle >= ellipseAngles[i] && Math.abs(diff) <= Math.abs(curDiff)) ) {
+                    // if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) && ellipseAngles[i] > endAngle ) {
+                    //if (ea > endAngle && en > endAngle && startIndex == -1 && ea < startAngle && en >= startAngle ) {
+                    if (ea >= startAngle && ea >= endAngle) {
+                        // startIndex = i+1;
+                        return i; //+1;
+                    }
+                }
+                // console.log('startIndex',startIndex);
+                if (startIndex == -1)
+                    startIndex = 0; // ellipseAngles.length - 1;
+                return startIndex;
+            }
+            else {
+                return 0;
+            }
+        };
+        // Now we need to sort the angles to the first one in the array is the closest to startAngle.
+        // --> find the angle that is closest to the start angle
+        var startIndex = findClosestToStartAngle();
+        console.log("startIndex", startIndex, "startAngle", startAngle, "endAngle", endAngle, 'ellipseAngles', ellipseAngles);
+        // Bring all angles into the correct order
+        //    Idea: use splice or slice here?
+        var angles = [];
+        for (var i = 0; i < ellipseAngles.length; i++) {
+            angles.push(ellipseAngles[(startIndex + i) % ellipseAngles.length]);
+        }
+        return angles;
+    },
+    normalizeAngle: (angle) => (angle < 0 ? Math.PI * 2 + angle : angle)
 }; // END ellipseSectorUtils
 
 /**

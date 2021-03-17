@@ -8,7 +8,10 @@
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
  * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
- * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` method.
+ * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
+ * @modified 2021-03-09 Added the `clone` and `rotate` methods.
+ * @modified 2021-03-10 Added the `toCubicBezier` method.
+ * @modified 2021-03-15 Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -18,6 +21,7 @@ import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
+import { CubicBezierCurve } from "./CubicBezierCurve";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -44,9 +48,16 @@ export class VEllipse {
         this.uid = UIDGenerator.next();
         this.center = center;
         this.axis = axis;
-        this.rotation = rotation | 0.0;
+        this.rotation = rotation || 0.0;
     }
-    ;
+    /**
+     * Clone this ellipse (deep clone).
+     *
+     * @return {VEllipse} A copy of this ellipse.s
+     */
+    clone() {
+        return new VEllipse(this.center.clone(), this.axis.clone(), this.rotation);
+    }
     /**
      * Get the non-negative horizonal radius of this ellipse.
      *
@@ -58,7 +69,6 @@ export class VEllipse {
     radiusH() {
         return Math.abs(this.signedRadiusH());
     }
-    ;
     /**
      * Get the signed horizonal radius of this ellipse.
      *
@@ -73,7 +83,6 @@ export class VEllipse {
         // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).x - this.center.x);
         return new Vertex(this.axis).rotate(-this.rotation, this.center).x - this.center.x;
     }
-    ;
     /**
      * Get the non-negative vertical radius of this ellipse.
      *
@@ -85,7 +94,6 @@ export class VEllipse {
     radiusV() {
         return Math.abs(this.signedRadiusV());
     }
-    ;
     /**
      * Get the signed vertical radius of this ellipse.
      *
@@ -100,7 +108,16 @@ export class VEllipse {
         // return Math.abs(new Vertex(this.axis).rotate(-this.rotation,this.center).y - this.center.y);
         return new Vertex(this.axis).rotate(-this.rotation, this.center).y - this.center.y;
     }
-    ;
+    /**
+     * Scale this ellipse by the given factor. The factor will be applied to both radii.
+     *
+     * @param {number} factor
+     * @return {VEllipse} this for chaining.
+     */
+    scale(factor) {
+        this.axis.scale(factor, this.center);
+        return this;
+    }
     /**
      * Get the vertex on the ellipse's outline at the given angle.
      *
@@ -117,7 +134,6 @@ export class VEllipse {
         const b = this.radiusV();
         return new Vertex(VEllipse.utils.polarToCartesian(this.center.x, this.center.y, a, b, angle)).rotate(this.rotation, this.center);
     }
-    ;
     /**
      * Get the normal vector at the given angle.
      * The normal vector is the vector that intersects the ellipse in a 90 degree angle
@@ -139,7 +155,11 @@ export class VEllipse {
         const angleB = new Line(point, foci[1]).angle();
         const centerAngle = angleA + (angleB - angleA) / 2.0;
         const endPointA = point.clone().addX(50).clone().rotate(centerAngle, point);
-        const endPointB = point.clone().addX(50).clone().rotate(Math.PI + centerAngle, point);
+        const endPointB = point
+            .clone()
+            .addX(50)
+            .clone()
+            .rotate(Math.PI + centerAngle, point);
         if (this.center.distance(endPointA) < this.center.distance(endPointB)) {
             return new Vector(point, endPointB);
         }
@@ -147,7 +167,6 @@ export class VEllipse {
             return new Vector(point, endPointA);
         }
     }
-    ;
     /**
      * Get the tangent vector at the given angle.
      * The tangent vector is the vector that touches the ellipse exactly at the given given
@@ -169,7 +188,6 @@ export class VEllipse {
         normal.b.rotate(Math.PI / 2, normal.a);
         return normal;
     }
-    ;
     /**
      * Get the perimeter of this ellipse.
      *
@@ -187,7 +205,6 @@ export class VEllipse {
         const b = this.radiusV();
         return Math.PI * (3 * (a + b) - Math.sqrt((3 * a + b) * (a + 3 * b)));
     }
-    ;
     /**
      * Get the two foci of this ellipse.
      *
@@ -217,7 +234,90 @@ export class VEllipse {
             ];
         }
     }
-    ;
+    /**
+     * Get equally distributed points on the outline of this ellipse.
+     *
+     * @param {number} pointCount - The number of points.
+     * @returns {Array<Vertex>}
+     */
+    getEquidistantVertices(pointCount) {
+        const angles = VEllipse.utils.equidistantVertAngles(this.radiusH(), this.radiusV(), pointCount);
+        const result = [];
+        for (var i = 0; i < angles.length; i++) {
+            result.push(this.vertAt(angles[i]));
+        }
+        return result;
+    }
+    /**
+     * Convert this ellipse into cubic Bézier curves.
+     *
+     * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+     * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+     * but you might wish to use other values)
+     * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing this ellipse.
+     */
+    toCubicBezier(quarterSegmentCount, threshold) {
+        // Math by Luc Maisonobe
+        //    http://www.spaceroots.org/documents/ellipse/node22.html
+        // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
+        // Return a single line here (as a Bézier curve)
+        // if (Math.abs(this.radiusV()) < 0.00001) {
+        //   const radiusH = this.radiusH();
+        //   return [
+        //     new CubicBezierCurve(
+        //       this.center.clone().addX(radiusH),
+        //       this.center.clone().addX(-radiusH),
+        //       this.center.clone(),
+        //       this.center.clone()
+        //     )
+        //   ]; // TODO: test horizontal line ellipse
+        // }
+        // if (Math.abs(this.radiusH()) < 0.00001) {
+        //   const radiusV = this.radiusV();
+        //   return [
+        //     new CubicBezierCurve(
+        //       this.center.clone().addY(radiusV),
+        //       this.center.clone().addY(-radiusV),
+        //       this.center.clone(),
+        //       this.center.clone()
+        //     )
+        //   ]; // TODO: test vertical line ellipse
+        // }
+        // At least 4, but 16 seems to be a good value.
+        const segmentCount = Math.max(1, quarterSegmentCount || 3) * 4;
+        threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
+        const radiusH = this.radiusH();
+        const radiusV = this.radiusV();
+        const curves = [];
+        const angles = VEllipse.utils.equidistantVertAngles(radiusH, radiusV, segmentCount);
+        let curAngle = angles[0];
+        let startPoint = this.vertAt(curAngle);
+        for (var i = 0; i < angles.length; i++) {
+            let nextAngle = angles[(i + 1) % angles.length];
+            let endPoint = this.vertAt(nextAngle);
+            if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
+                // Distorted ellipses can only be approximated by linear Bézier segments
+                let diff = startPoint.difference(endPoint);
+                let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().addXY(diff.x * 0.333, diff.y * 0.333), endPoint.clone().addXY(-diff.x * 0.333, -diff.y * 0.333));
+                curves.push(curve);
+            }
+            else {
+                let startTangent = this.tangentAt(curAngle);
+                let endTangent = this.tangentAt(nextAngle);
+                // Find intersection
+                let intersection = startTangent.intersection(endTangent);
+                // What if intersection is undefined?
+                // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
+                let startDiff = startPoint.difference(intersection);
+                let endDiff = endPoint.difference(intersection);
+                let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+                curves.push(curve);
+            }
+            startPoint = endPoint;
+            curAngle = nextAngle;
+        }
+        return curves;
+    }
     /**
      * Create an SVG representation of this ellipse.
      *
@@ -228,17 +328,16 @@ export class VEllipse {
     toSVGString(options) {
         options = options || {};
         var buffer = [];
-        buffer.push('<ellipse');
+        buffer.push("<ellipse");
         if (options.className)
             buffer.push(' class="' + options.className + '"');
         buffer.push(' cx="' + this.center.x + '"');
         buffer.push(' cy="' + this.center.y + '"');
         buffer.push(' rx="' + this.axis.x + '"');
         buffer.push(' ry="' + this.axis.y + '"');
-        buffer.push(' />');
-        return buffer.join('');
+        buffer.push(" />");
+        return buffer.join("");
     }
-    ;
 }
 /**
  * A static collection of ellipse-related helper functions.
@@ -261,10 +360,40 @@ VEllipse.utils = {
         // https://math.stackexchange.com/questions/22064/calculating-a-point-that-lies-on-an-ellipse-given-an-angle
         var s = Math.sin(Math.PI / 2 - angle);
         var c = Math.cos(Math.PI / 2 - angle);
-        return { x: centerX + radiusH * radiusV * s / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
-            y: centerY + radiusH * radiusV * c / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
+        return {
+            x: centerX + (radiusH * radiusV * s) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2)),
+            y: centerY + (radiusH * radiusV * c) / Math.sqrt(Math.pow(radiusH * c, 2) + Math.pow(radiusV * s, 2))
         };
+    },
+    /**
+     * Get the `theta` for a given `phi` (used to determine equidistant points on ellipse).
+     *
+     * @param radiusH
+     * @param radiusV
+     * @param phi
+     * @returns {number} theta
+     */
+    phiToTheta: (radiusH, radiusV, phi) => {
+        //  See https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc
+        var tanPhi = Math.tan(phi);
+        var tanPhi2 = tanPhi * tanPhi;
+        var theta = -Math.PI / 2 + phi + Math.atan(((radiusH - radiusV) * tanPhi) / (radiusV + radiusH * tanPhi2));
+        return theta;
+    },
+    /**
+     * Get n equidistant points on the elliptic arc.
+     *
+     * @param pointCount
+     * @returns
+     */
+    equidistantVertAngles: (radiusH, radiusV, pointCount) => {
+        const angles = [];
+        for (var i = 0; i < pointCount; i++) {
+            var phi = Math.PI / 2.0 + ((Math.PI * 2) / pointCount) * i;
+            let theta = VEllipse.utils.phiToTheta(radiusH, radiusV, phi);
+            angles[i] = theta;
+        }
+        return angles;
     }
 }; // END utils
-;
 //# sourceMappingURL=VEllipse.js.map

@@ -271,7 +271,7 @@ export declare class Vertex implements XYCoords, SVGSerializable {
      * @instance
      * @memberof Vertex
      **/
-    scale(factor: number, center: Vertex): Vertex;
+    scale(factor: number, center?: Vertex): Vertex;
     /**
      * This is a vector-like behavior and 'rotates' this vertex
      * around given center.

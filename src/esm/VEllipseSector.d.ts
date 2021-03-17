@@ -6,6 +6,7 @@
  * @date    2021-02-26
  * @version 1.0.0
  */
+import { CubicBezierCurve } from "./CubicBezierCurve";
 import { SVGPathParams, UID } from "./interfaces";
 import { VEllipse } from "./VEllipse";
 /**
@@ -63,6 +64,15 @@ export declare class VEllipseSector {
      * @param {numner} endAngle - The end angle of the sector.
      */
     constructor(ellipse: VEllipse, startAngle: number, endAngle: number);
+    /**
+     * Convert this elliptic sector into cubic Bézier curves.
+     *
+     * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+     * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+     * but you might wish to use other values)
+     * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing the elliptic sector.
+     */
+    toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
     static ellipseSectorUtils: {
         /**
          * Helper function to convert an elliptic section to SVG arc params (for the `d` attribute).
@@ -75,5 +85,27 @@ export declare class VEllipseSector {
         describeSVGArc: (x: number, y: number, radiusH: number, radiusV: number, startAngle: number, endAngle: number, rotation?: number, options?: {
             moveToStart: boolean;
         }) => SVGPathParams;
+        /**
+         * Helper function to find second-kind elliptic angles, so that the euclidean distance along the the
+         * elliptic sector is the same for all.
+         *
+         * Note that this is based on the full ellipse calculuation and start and end will be cropped; so the
+         * distance from the start angle to the first angle and/or the distance from the last angle to
+         * the end angle may be different to the others.
+         *
+         * Furthermore the computation is only possible on un-rotated ellipses; if your source ellipse has
+         * a rotation on the plane please 'rotate' the result angles afterwards to find matching angles.
+         *
+         * Returned angles are normalized to the interval `[ 0, PI*2 ]`.
+         *
+         * @param {number} radiusH - The first (horizonal) radius of the ellipse.
+         * @param {number} radiusV - The second (vertical) radius of the ellipse.
+         * @param {number} startAngle - The opening angle of your elliptic sector (please use normalized angles).
+         * @param {number} endAngle - The closing angle of your elliptic sector (please use normalized angles).
+         * @param {number} fullEllipsePointCount - The number of base segments to use from the source ellipse (12 or 16 are good numbers).
+         * @return {Array<number>} An array of n angles inside startAngle and endAngle (where n <= fullEllipsePointCount).
+         */
+        equidistantVertAngles: (radiusH: number, radiusV: number, startAngle: number, endAngle: number, fullEllipsePointCount: number) => Array<number>;
+        normalizeAngle: (angle: number) => number;
     };
 }

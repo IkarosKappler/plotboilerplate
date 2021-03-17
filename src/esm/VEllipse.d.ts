@@ -8,7 +8,10 @@
  * @modified 2021-02-26 Added helper function `decribeSVGArc(...)`.
  * @modified 2021-03-01 Added attribute `rotation` to allow rotation of ellipses.
  * @modified 2021-03-03 Added the `vertAt` and `perimeter` methods.
- * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` method.
+ * @modified 2021-03-05 Added the `getFoci`, `normalAt` and `tangentAt` methods.
+ * @modified 2021-03-09 Added the `clone` and `rotate` methods.
+ * @modified 2021-03-10 Added the `toCubicBezier` method.
+ * @modified 2021-03-15 Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -17,6 +20,7 @@
 import { Vector } from "./Vector";
 import { Vertex } from "./Vertex";
 import { SVGSerializable, UID, XYCoords } from "./interfaces";
+import { CubicBezierCurve } from "./CubicBezierCurve";
 /**
  * @classdesc An ellipse class based on two vertices [centerX,centerY] and [radiusX,radiusY].
  *
@@ -68,6 +72,12 @@ export declare class VEllipse implements SVGSerializable {
      **/
     constructor(center: Vertex, axis: Vertex, rotation?: number);
     /**
+     * Clone this ellipse (deep clone).
+     *
+     * @return {VEllipse} A copy of this ellipse.s
+     */
+    clone(): VEllipse;
+    /**
      * Get the non-negative horizonal radius of this ellipse.
      *
      * @method radiusH
@@ -103,6 +113,13 @@ export declare class VEllipse implements SVGSerializable {
      * @return {number} The signed vertical radius of this ellipse.
      */
     signedRadiusV(): number;
+    /**
+     * Scale this ellipse by the given factor. The factor will be applied to both radii.
+     *
+     * @param {number} factor
+     * @return {VEllipse} this for chaining.
+     */
+    scale(factor: number): VEllipse;
     /**
      * Get the vertex on the ellipse's outline at the given angle.
      *
@@ -162,6 +179,22 @@ export declare class VEllipse implements SVGSerializable {
      */
     getFoci(): [Vertex, Vertex];
     /**
+     * Get equally distributed points on the outline of this ellipse.
+     *
+     * @param {number} pointCount - The number of points.
+     * @returns {Array<Vertex>}
+     */
+    getEquidistantVertices(pointCount: number): Array<Vertex>;
+    /**
+     * Convert this ellipse into cubic Bézier curves.
+     *
+     * @param {number=3} quarterSegmentCount - The number of segments per base elliptic quarter (default is 3, min is 1).
+     * @param {number=0.666666} threshold - The Bézier threshold (default value 0.666666 approximates the ellipse with best results
+     * but you might wish to use other values)
+     * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing this ellipse.
+     */
+    toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
+    /**
      * Create an SVG representation of this ellipse.
      *
      * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
@@ -188,5 +221,21 @@ export declare class VEllipse implements SVGSerializable {
          * @reutn {XYCoords} The outlont point in absolute x-y-coordinates.
          */
         polarToCartesian: (centerX: number, centerY: number, radiusH: number, radiusV: number, angle: number) => XYCoords;
+        /**
+         * Get the `theta` for a given `phi` (used to determine equidistant points on ellipse).
+         *
+         * @param radiusH
+         * @param radiusV
+         * @param phi
+         * @returns {number} theta
+         */
+        phiToTheta: (radiusH: number, radiusV: number, phi: number) => number;
+        /**
+         * Get n equidistant points on the elliptic arc.
+         *
+         * @param pointCount
+         * @returns
+         */
+        equidistantVertAngles: (radiusH: number, radiusV: number, pointCount: number) => Array<number>;
     };
 }
