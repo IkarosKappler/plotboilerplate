@@ -200,21 +200,33 @@ var VEllipseSector = /** @class */ (function () {
             // Drop all angles outside the sector
             var ellipseAngles = ellipseAngles.filter(angleIsInRange);
             var findClosestToStartAngle = function () {
-                var startIndex = 0; // 0;
+                // endAngle > 0 && startAngle > 0
                 if (startAngle > endAngle) {
-                    for (var i = 0; i < ellipseAngles.length; i++) {
-                        var diff = ellipseAngles[i] - startAngle;
+                    var startIndex = -1; // 0;
+                    var n = ellipseAngles.length;
+                    for (var i = 0; i < n; i++) {
+                        var ea = geomutils_1.geomutils.wrapMinMax(ellipseAngles[i], 0, Math.PI * 2);
+                        var en = geomutils_1.geomutils.wrapMinMax(ellipseAngles[(i + 1) % n], 0, Math.PI * 2);
+                        var diff = ea - startAngle;
                         var curDiff = ellipseAngles[startIndex] - startAngle;
+                        // console.log(i, ea, en)
                         //if (startAngle < ellipseAngles[i] && diff < curDiff) {
                         // if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) || (startAngle >= ellipseAngles[i] && Math.abs(diff) <= Math.abs(curDiff)) ) {
-                        if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) && ellipseAngles[i] > endAngle) {
-                            startIndex = i;
+                        // if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) && ellipseAngles[i] > endAngle ) {
+                        //if (ea > endAngle && en > endAngle && startIndex == -1 && ea < startAngle && en >= startAngle ) {
+                        if (ea >= startAngle && ea >= endAngle) {
+                            // startIndex = i+1;
+                            return i; //+1;
                         }
                     }
+                    // console.log('startIndex',startIndex);
+                    if (startIndex == -1)
+                        startIndex = 0; // ellipseAngles.length - 1;
+                    return startIndex;
                 }
-                if (startIndex == -1)
-                    startIndex = ellipseAngles.length - 1;
-                return startIndex;
+                else {
+                    return 0;
+                }
             };
             // Now we need to sort the angles to the first one in the array is the closest to startAngle.
             // --> find the angle that is closest to the start angle
