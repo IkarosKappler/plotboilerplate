@@ -106,6 +106,7 @@ export declare class VEllipseSector {
          * @return {Array<number>} An array of n angles inside startAngle and endAngle (where n <= fullEllipsePointCount).
          */
         equidistantVertAngles: (radiusH: number, radiusV: number, startAngle: number, endAngle: number, fullEllipsePointCount: number) => Array<number>;
+        findClosestToStartAngle: (startAngle: number, endAngle: number, ellipseAngles: Array<number>) => number;
         normalizeAngle: (angle: number) => number;
     };
 }
