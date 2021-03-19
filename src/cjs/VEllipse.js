@@ -121,6 +121,11 @@ var VEllipse = /** @class */ (function () {
         this.axis.scale(factor, this.center);
         return this;
     };
+    VEllipse.prototype.rotate = function (angle) {
+        this.axis.rotate(angle, this.center);
+        this.rotation += angle;
+        return this;
+    };
     /**
      * Get the vertex on the ellipse's outline at the given angle.
      *

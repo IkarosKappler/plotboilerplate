@@ -1,5 +1,9 @@
 # Changelog
 
+- 2021-03-19
+  - Added the `VEllipse.rotate` function.
+  - Preparing a conversion function in the the draw-path demo: SVG-Arc to VEllipseSector.
+  - Fixed the entry/export for the UIDGenerator (was broken in cjs module).
 - 2021-03-15
   - Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
 - 2021-03-09

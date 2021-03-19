@@ -6,8 +6,9 @@
  * @version 1.0.0
  */
 class UIDGenerator {
-    static next() { return `${UIDGenerator.current++}`; }
-    ;
+    static next() {
+        return `${UIDGenerator.current++}`;
+    }
 }
 UIDGenerator.current = 0;
 
@@ -8657,6 +8658,11 @@ class VEllipse {
         this.axis.scale(factor, this.center);
         return this;
     }
+    rotate(angle) {
+        this.axis.rotate(angle, this.center);
+        this.rotation += angle;
+        return this;
+    }
     /**
      * Get the vertex on the ellipse's outline at the given angle.
      *
@@ -8993,29 +8999,6 @@ class VEllipseSector {
         threshold = typeof threshold === "undefined" ? 0.666666 : threshold;
         const radiusH = this.ellipse.radiusH();
         const radiusV = this.ellipse.radiusV();
-        // // Note that ellipses with radiusH=0 or radiusV=0 cannot be represented as Bézier curves.
-        // // Return a single line here (as a Bézier curve)
-        // if (Math.abs(radiusV) < 0.00001) {
-        //   return [
-        //     // TODO: construct linear approximations for both cases
-        //     // new CubicBezierCurve(
-        //     //   this.center.clone().addX(radiusH),
-        //     //   this.center.clone().addX(-radiusH),
-        //     //   this.center.clone(),
-        //     //   this.center.clone()
-        //     // )
-        //   ]; // TODO: test horizontal line ellipse
-        // }
-        // if (Math.abs(radiusH) < 0.00001) {
-        //   return [
-        //     // new CubicBezierCurve(
-        //     //   this.center.clone().addY(radiusV),
-        //     //   this.center.clone().addY(-radiusV),
-        //     //   this.center.clone(),
-        //     //   this.center.clone()
-        //     // )
-        //   ]; // TODO: test vertical line ellipse
-        // }
         var startAngle = VEllipseSector.ellipseSectorUtils.normalizeAngle(this.startAngle);
         var endAngle = VEllipseSector.ellipseSectorUtils.normalizeAngle(this.endAngle);
         // Find all angles inside start and end
@@ -9029,8 +9012,8 @@ class VEllipseSector {
             let endPoint = this.ellipse.vertAt(nextAngle);
             let startTangent = this.ellipse.tangentAt(curAngle);
             let endTangent = this.ellipse.tangentAt(nextAngle);
+            // Distorted ellipses can only be approximated by linear Bézier segments
             if (Math.abs(radiusV) < 0.0001 || Math.abs(radiusH) < 0.0001) {
-                // Distorted ellipses can only be approximated by linear Bézier segments
                 let diff = startPoint.difference(endPoint);
                 let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().addXY(diff.x * 0.333, diff.y * 0.333), endPoint.clone().addXY(-diff.x * 0.333, -diff.y * 0.333));
                 curves.push(curve);
@@ -9122,44 +9105,14 @@ VEllipseSector.ellipseSectorUtils = {
         var angleIsInRange = (angle) => {
             if (startAngle < endAngle)
                 return angle >= startAngle && angle <= endAngle;
-            // else return (angle >= startAngle && angle <= Math.PI * 2) || (angle <= endAngle && angle >= 0);
             else
-                return (angle >= startAngle) || (angle <= endAngle && angle >= 0);
+                return angle >= startAngle || (angle <= endAngle && angle >= 0);
         };
         // Drop all angles outside the sector
         var ellipseAngles = ellipseAngles.filter(angleIsInRange);
-        var findClosestToStartAngle = () => {
-            // endAngle > 0 && startAngle > 0
-            if (startAngle > endAngle) {
-                var startIndex = -1; // 0;
-                const n = ellipseAngles.length;
-                for (var i = 0; i < n; i++) {
-                    const ea = geomutils.wrapMinMax(ellipseAngles[i], 0, Math.PI * 2);
-                    geomutils.wrapMinMax(ellipseAngles[(i + 1) % n], 0, Math.PI * 2);
-                    ellipseAngles[startIndex] - startAngle;
-                    // console.log(i, ea, en)
-                    //if (startAngle < ellipseAngles[i] && diff < curDiff) {
-                    // if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) || (startAngle >= ellipseAngles[i] && Math.abs(diff) <= Math.abs(curDiff)) ) {
-                    // if ((startAngle < ellipseAngles[i] && Math.abs(diff) < Math.abs(curDiff)) && ellipseAngles[i] > endAngle ) {
-                    //if (ea > endAngle && en > endAngle && startIndex == -1 && ea < startAngle && en >= startAngle ) {
-                    if (ea >= startAngle && ea >= endAngle) {
-                        // startIndex = i+1;
-                        return i; //+1;
-                    }
-                }
-                // console.log('startIndex',startIndex);
-                if (startIndex == -1)
-                    startIndex = 0; // ellipseAngles.length - 1;
-                return startIndex;
-            }
-            else {
-                return 0;
-            }
-        };
         // Now we need to sort the angles to the first one in the array is the closest to startAngle.
         // --> find the angle that is closest to the start angle
-        var startIndex = findClosestToStartAngle();
-        console.log("startIndex", startIndex, "startAngle", startAngle, "endAngle", endAngle, 'ellipseAngles', ellipseAngles);
+        var startIndex = VEllipseSector.ellipseSectorUtils.findClosestToStartAngle(startAngle, endAngle, ellipseAngles);
         // Bring all angles into the correct order
         //    Idea: use splice or slice here?
         var angles = [];
@@ -9167,6 +9120,19 @@ VEllipseSector.ellipseSectorUtils = {
             angles.push(ellipseAngles[(startIndex + i) % ellipseAngles.length]);
         }
         return angles;
+    },
+    findClosestToStartAngle: (startAngle, endAngle, ellipseAngles) => {
+        // Note: endAngle > 0 && startAngle > 0
+        if (startAngle > endAngle) {
+            const n = ellipseAngles.length;
+            for (var i = 0; i < n; i++) {
+                const ea = geomutils.wrapMinMax(ellipseAngles[i], 0, Math.PI * 2);
+                if (ea >= startAngle && ea >= endAngle) {
+                    return i;
+                }
+            }
+        }
+        return 0;
     },
     normalizeAngle: (angle) => (angle < 0 ? Math.PI * 2 + angle : angle)
 }; // END ellipseSectorUtils

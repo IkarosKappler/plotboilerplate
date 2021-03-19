@@ -120,6 +120,7 @@ export declare class VEllipse implements SVGSerializable {
      * @return {VEllipse} this for chaining.
      */
     scale(factor: number): VEllipse;
+    rotate(angle: number): VEllipse;
     /**
      * Get the vertex on the ellipse's outline at the given angle.
      *

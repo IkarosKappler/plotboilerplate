@@ -1,10 +1,9 @@
 "use strict";
 /* Imports for webpack */
 
-// import path from "path";
 // import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/js/index";
 
-globalThis.UIDGenerator = require("./UIDGenerator.js").geomutils;
+globalThis.UIDGenerator = require("./UIDGenerator.js").UIDGenerator;
 globalThis.VertexAttr = require("./VertexAttr.js").VertexAttr;
 globalThis.VertexListeners = require("./VertexListeners.js").VertexListeners;
 globalThis.Vertex = require("./Vertex.js").Vertex;
@@ -29,4 +28,3 @@ globalThis.drawutils = require("./draw.js").drawutils;
 globalThis.drawutilssvg = require("./utils/helpers/drawutilssvg.js").drawutilssvg;
 globalThis.geomutils = require("./geomutils.js").geomutils;
 globalThis.PlotBoilerplate = require("./PlotBoilerplate.js").PlotBoilerplate;
-

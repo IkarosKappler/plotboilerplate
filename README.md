@@ -473,6 +473,7 @@ vert.listeners.addDragListener(function (e) {
 - [Tim Čas](https://stackoverflow.com/users/485088/tim-%c4%8cas "Tim Čas") for the [wrapMax/wrapMinMax functions](https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi "wrapMax/wrapMinMax functions")
 - Luc Maisonobe for the [Ellipse to cubic Bézier math](http://www.spaceroots.org/documents/ellipse/node22.html "Ellipse to cubic Bézier math")
 - Dr. Martin von Gagern for the [equidistant points on ellipse math](https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc "equidistant points on ellipse math")
+- [Torben Jansen](https://twitter.com/torbenjansen_ "Torben Jansen") for the [SVG-Arc to elliptic-sector conversion](https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion "SVG-Arc to elliptic-sector conversion")
 
 ## Todos
 

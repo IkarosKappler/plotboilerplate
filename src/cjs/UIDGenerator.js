@@ -11,11 +11,11 @@ exports.UIDGenerator = void 0;
 var UIDGenerator = /** @class */ (function () {
     function UIDGenerator() {
     }
-    UIDGenerator.next = function () { return "" + UIDGenerator.current++; };
-    ;
+    UIDGenerator.next = function () {
+        return "" + UIDGenerator.current++;
+    };
     UIDGenerator.current = 0;
     return UIDGenerator;
 }());
 exports.UIDGenerator = UIDGenerator;
-;
 //# sourceMappingURL=UIDGenerator.js.map

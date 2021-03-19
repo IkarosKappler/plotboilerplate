@@ -6,9 +6,9 @@
  * @version 1.0.0
  */
 export class UIDGenerator {
-    static next() { return `${UIDGenerator.current++}`; }
-    ;
+    static next() {
+        return `${UIDGenerator.current++}`;
+    }
 }
 UIDGenerator.current = 0;
-;
 //# sourceMappingURL=UIDGenerator.js.map

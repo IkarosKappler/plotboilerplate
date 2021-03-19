@@ -9,6 +9,8 @@
 import { UID } from "./interfaces";
 
 export abstract class UIDGenerator {
-    private static current : number = 0;
-    public static next() : UID { return `${UIDGenerator.current++}`; };
-};
+  private static current: number = 0;
+  public static next(): UID {
+    return `${UIDGenerator.current++}`;
+  }
+}
