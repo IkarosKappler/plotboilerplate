@@ -7,7 +7,6 @@
  * @version 1.0.0
  */
 
-// TODO: add class to all demos
 // TODO: add to PlotBoilerplate.add(...)
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -69,7 +68,8 @@ export class VEllipseSector {
   /**
    * Create a new elliptic sector from the given ellipse and two angles.
    *
-   * Note that the direction from start to end goes clockwise.
+   * Note that the direction from start to end goes clockwise, and that start and end angle
+   * will be wrapped to [0,PI*2).
    *
    * @constructor
    * @name VEllipseSector
