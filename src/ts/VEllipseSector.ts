@@ -80,8 +80,8 @@ export class VEllipseSector {
   constructor(ellipse: VEllipse, startAngle: number, endAngle: number) {
     this.uid = UIDGenerator.next();
     this.ellipse = ellipse;
-    this.startAngle = startAngle;
-    this.endAngle = endAngle;
+    this.startAngle = geomutils.wrapMinMax(startAngle, 0, Math.PI * 2);
+    this.endAngle = geomutils.wrapMinMax(endAngle, 0, Math.PI * 2);
   }
 
   /**

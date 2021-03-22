@@ -46,8 +46,8 @@ var VEllipseSector = /** @class */ (function () {
         this.className = "VEllipseSector";
         this.uid = UIDGenerator_1.UIDGenerator.next();
         this.ellipse = ellipse;
-        this.startAngle = startAngle;
-        this.endAngle = endAngle;
+        this.startAngle = geomutils_1.geomutils.wrapMinMax(startAngle, 0, Math.PI * 2);
+        this.endAngle = geomutils_1.geomutils.wrapMinMax(endAngle, 0, Math.PI * 2);
     }
     /**
      * Convert this elliptic sector into cubic Bézier curves.

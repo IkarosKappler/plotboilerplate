@@ -12,6 +12,7 @@
  * @modified 2021-03-09 Added the `clone` and `rotate` methods.
  * @modified 2021-03-10 Added the `toCubicBezier` method.
  * @modified 2021-03-15 Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
+ * @modified 2021-03-19 Added the `VEllipse.rotate` function.
  * @version  1.2.2
  *
  * @file VEllipse
@@ -114,12 +115,24 @@ export declare class VEllipse implements SVGSerializable {
      */
     signedRadiusV(): number;
     /**
-     * Scale this ellipse by the given factor. The factor will be applied to both radii.
+     * Scale this ellipse by the given factor from the center point. The factor will be applied to both radii.
      *
-     * @param {number} factor
+     * @method scale
+     * @instance
+     * @memberof VEllipse
+     * @param {number} factor - The factor to scale by.
      * @return {VEllipse} this for chaining.
      */
     scale(factor: number): VEllipse;
+    /**
+     * Rotate this ellipse around its center.
+     *
+     * @method rotate
+     * @instance
+     * @memberof VEllipse
+     * @param {number} angle - The angle to rotate by.
+     * @returns {VEllipse} this for chaining.
+     */
     rotate(angle: number): VEllipse;
     /**
      * Get the vertex on the ellipse's outline at the given angle.
