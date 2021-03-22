@@ -65,6 +65,11 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
+        customScaleX: 1.0,
+        customScaleY: 1.0,
+        customRotation: 0.0,
+
+        drawArc: false,
         lineWidth: 2.0,
         arcRotation: 0.0,
         fitToRange: function () {
@@ -74,17 +79,17 @@
       GUP
     );
 
-    var time = 0;
-
-    var randColor = function (i) {
-      return WebColorsContrast[i % WebColorsContrast.length].cssRGB();
+    var arrayCopy = function (arr) {
+      const result = [];
+      for (var i = 0; i < arr.length; i++) result.push(arr[i]);
+      return result;
     };
 
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
     // prettier-ignore
     var svgDataAbsolute = [
-		'M', -10, -7.5,
+		    'M', -10, -7.5,
 		    'V', -10, 
 		    'L', 0, -10,
 		    'C', -5, -15, 10, -15, 5, -10,
@@ -101,18 +106,19 @@
     // path commands.
     // prettier-ignore
     var svgDataRelative = [
-		'M', -10, -7.5,
-		'v', -2.5, 
-		'l', 10, 0,
-		'c', -5, -5, 10, -5, 5, 0,
-		'h', 5,
-		'c', -5, 2.5, -5, 2.5, 0, 5,
-		's', 5, 5, 0, 5,
-		'q', -5, 5, -10, 0,
-		't', -10, 0,
-		'a', 5, 4, 0, 1, 1, 0, -5,    
-		'z'
+        'M', -10, -7.5,
+        'v', -2.5, 
+        'l', 10, 0,
+        'c', -5, -5, 10, -5, 5, 0,
+        'h', 5,
+        'c', -5, 2.5, -5, 2.5, 0, 5,
+        's', 5, 5, 0, 5,
+        'q', -5, 5, -10, 0,
+        't', -10, 0,
+        'a', 5, 4, 0, 1, 1, 0, -5,    
+        'z'
 	    ];
+    // Move relative path 25 units to the right
     drawutilssvg.transformPathData(svgDataRelative, { x: 25, y: 0 }, { x: 1, y: 1 });
 
     var viewRangeX = new Interval(-11, 52);
@@ -131,37 +137,44 @@
     // +-------------------------------
 
     var redraw = function () {
-      var D2R = Math.PI / 180;
       // Print and draw on the canvas.
-      // console.log("svgTestData", svgDataAbsolute);
       // drawutilssvg.transformPathData( svgDataAbsolute, pb.draw.offset, pb.draw.scale );
-      pb.draw.path(svgDataAbsolute, "rgb(255,0,0)", config.lineWidth, false);
+      var pathA = arrayCopy(svgDataAbsolute);
+      drawutilssvg.transformPathData(pathA, { x: 0, y: 0 }, { x: config.customScaleX, y: config.customScaleY });
+      pb.draw.path(pathA, "rgb(255,0,0)", config.lineWidth, false);
 
       // Print and draw on the canvas (and move 25 units to see them better)
-      // console.log("svgTestDataRelative", svgDataRelative);
       // drawutilssvg.transformPathData( svgDataRelative, pb.draw.offset, pb.draw.scale );
-      pb.draw.path(svgDataRelative, "rgb(0,255,0)", config.lineWidth, false);
+      var pathR = arrayCopy(svgDataRelative);
+      pb.draw.path(pathR, "rgb(0,255,0)", config.lineWidth, false);
 
+      if (config.drawArc) {
+        drawArc();
+      }
+    };
+
+    var drawArc = function () {
+      var D2R = Math.PI / 180;
       var axisRotation = config.arcRotation; // (config.arcRotation / 180) * Math.PI;
+      var fa = 1;
+      var fs = 1;
       // prettier-ignore
-      var arcOnly = ["M", -10, 0, "A", 5, 4, axisRotation, 1, 1, -10, -5];
+      var arcOnly = ["M", -10, 0, "A", 5, 4, axisRotation, fa, fs, -10, -5];
       drawutilssvg.transformPathData(arcOnly, { x: 25, y: 10 }, { x: 1, y: 1 });
       pb.draw.path(arcOnly, "rgb(0,255,255)", config.lineWidth, false);
       pb.draw.circleHandle({ x: arcOnly[1], y: arcOnly[2] }, 3, "green");
       pb.draw.circleHandle({ x: arcOnly[9], y: arcOnly[10] }, 3, "green");
       // var sector = svgArcToEllipseSector(arcOnly[1], arcOnly[2], 5, 4, axisRouation, true, true, -10, -5);
-      var fa = 1;
-      var fs = 1;
-      var sector = getCenterParameters(
+      var sector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
         arcOnly[1], // x1
         arcOnly[2], // y1
-        arcOnly[9], // x2
-        arcOnly[10], // y2
-        fa,
-        fs,
+        arcOnly[6] * D2R, // rotation (phi)
         arcOnly[4], // rx
         arcOnly[5], // ry
-        arcOnly[6] * D2R // arcOnly[6] // rotation
+        arcOnly[7] == 1, // fa
+        arcOnly[8] == 1, // fs
+        arcOnly[9], // x2
+        arcOnly[10] // y2
       );
       // console.log("sector", sector);
       pb.draw.crosshair(sector.ellipse.center, 5, "blue");
@@ -179,65 +192,6 @@
         );
       }
     };
-
-    /** phi in radians! */
-    function getCenterParameters(x1, y1, x2, y2, fa, fs, rx, ry, phi) {
-      // https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion
-      // https://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
-      var abs = Math.abs;
-      var sin = Math.sin;
-      var cos = Math.cos;
-      var sqrt = Math.sqrt;
-      // const pow = n => Math.pow(n, 2);
-      const pow = function (n) {
-        return Math.pow(n, 2);
-      };
-
-      const sinphi = sin(phi),
-        cosphi = cos(phi);
-
-      // Step 1: simplify through translation/rotation
-      const x = (cosphi * (x1 - x2)) / 2 + (sinphi * (y1 - y2)) / 2,
-        y = (-sinphi * (x1 - x2)) / 2 + (cosphi * (y1 - y2)) / 2;
-
-      const px = pow(x),
-        py = pow(y),
-        prx = pow(rx),
-        pry = pow(ry);
-
-      // correct of out-of-range radii
-      const L = px / prx + py / pry;
-
-      if (L > 1) {
-        rx = sqrt(L) * abs(rx);
-        ry = sqrt(L) * abs(ry);
-      } else {
-        rx = abs(rx);
-        ry = abs(ry);
-      }
-
-      // Step 2 + 3: compute center
-      const sign = fa === fs ? -1 : 1;
-      const M = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
-
-      const _cx = (M * (rx * y)) / ry,
-        _cy = (M * (-ry * x)) / rx;
-
-      const cx = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2,
-        cy = sinphi * _cx + cosphi * _cy + (y1 + y2) / 2;
-
-      // Step 4: Compute start and end angle
-      var center = new Vertex(cx, cy);
-      var axis = center.clone().addXY(rx, ry);
-      var ellipse = new VEllipse(center, axis, 0);
-      ellipse.rotate(phi);
-
-      var startAngle = new Line(ellipse.center, new Vertex(x1, y1)).angle();
-      var endAngle = new Line(ellipse.center, new Vertex(x2, y2)).angle();
-
-      // return ellipse;
-      return new VEllipseSector(ellipse, startAngle - phi, endAngle - phi);
-    }
 
     // +---------------------------------------------------------------------------------
     // | Install a mouse handler to display current pointer position.
@@ -258,17 +212,37 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
-      var f0 = gui.addFolder("Points");
+      var f0 = gui.addFolder("Path draw settings");
 
+      // prettier-ignore
+      f0.add(config, "customScaleX").min(-4).max(4).title("A custom horizontal scale.").onChange(function () {
+        pb.redraw();
+      });
+      // prettier-ignore
+      f0.add(config, "customScaleY").min(-4).max(4).title("A custom vertical scale.").onChange(function () {
+        pb.redraw();
+      });
+      // prettier-ignore
+      f0.add(config, "customRotation").min(0).max(360).title("A custom rotation.").onChange(function () {
+        pb.redraw();
+      });
       // prettier-ignore
       f0.add(config, "lineWidth").min(1).max(20).title("The line with to use.").onChange(function () {
           pb.redraw();
         });
+      var f1 = gui.addFolder("Arc draw settings");
       // prettier-ignore
-      f0.add(config, "arcRotation").min(0).max(360).title("The test rotation to use.").onChange(function () {
+      f1.add(config, "drawArc").title("Draw the single arc segment?").onChange(function () {
+        pb.redraw();
+      });
+      f1.add(config, "arcRotation")
+        .min(0)
+        .max(360)
+        .title("The test rotation to use.")
+        .onChange(function () {
           pb.redraw();
         });
-      f0.add(config, "fitToRange").title("Reset view to best range fit.");
+      gui.add(config, "fitToRange").title("Reset view to best range fit.");
       f0.open();
 
       // Add stats

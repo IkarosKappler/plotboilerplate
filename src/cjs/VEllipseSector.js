@@ -9,10 +9,10 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipseSector = void 0;
-// TODO: add class to all demos
 // TODO: add to PlotBoilerplate.add(...)
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var geomutils_1 = require("./geomutils");
+var Line_1 = require("./Line");
 var UIDGenerator_1 = require("./UIDGenerator");
 var VEllipse_1 = require("./VEllipse");
 var Vertex_1 = require("./Vertex");
@@ -31,7 +31,8 @@ var VEllipseSector = /** @class */ (function () {
     /**
      * Create a new elliptic sector from the given ellipse and two angles.
      *
-     * Note that the direction from start to end goes clockwise.
+     * Note that the direction from start to end goes clockwise, and that start and end angle
+     * will be wrapped to [0,PI*2).
      *
      * @constructor
      * @name VEllipseSector
@@ -199,7 +200,68 @@ var VEllipseSector = /** @class */ (function () {
             }
             return 0;
         },
-        normalizeAngle: function (angle) { return (angle < 0 ? Math.PI * 2 + angle : angle); }
+        normalizeAngle: function (angle) { return (angle < 0 ? Math.PI * 2 + angle : angle); },
+        /**
+         * Convert the elliptic arc from endpoint parameters to center parameters as described
+         * in the w3c svg arc implementation note.
+         *
+         * https://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
+         *
+         * @param {number} x1 - The x component of the start point (end of last SVG command).
+         * @param {number} y1 - The y component of the start point (end of last SVG command).
+         * @param {number} phi - The ellipse's rotational angle (angle of axis rotation) in radians (not in degrees as the SVG command uses!)
+         * @param {number} rx - The first (horizontal) radius of the ellipse.
+         * @param {number} ry - The second (vertical) radius of the ellipse.
+         * @param {boolean} fa - The large-arc-flag (boolean, not 0 or 1).
+         * @param {boolean} fs - The sweep-flag (boolean, not 0 or 1).
+         * @param {number} x2 - The x component of the end point (end of last SVG command).
+         * @param {number} y2 - The y component of the end point (end of last SVG command).
+         * @returns
+         */
+        endpointToCenterParameters: function (x1, y1, phi, rx, ry, fa, fs, x2, y2) {
+            console.log("endpointToCenterParameters", x1, y1, phi, rx, ry, fa, fs, x2, y2);
+            // Thanks to
+            //    https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion
+            var abs = Math.abs;
+            var sin = Math.sin;
+            var cos = Math.cos;
+            var sqrt = Math.sqrt;
+            // const pow = n => Math.pow(n, 2);
+            var pow = function (n) {
+                return n * n; // Math.pow(n, 2);
+            };
+            var sinphi = sin(phi);
+            var cosphi = cos(phi);
+            // Step 1: simplify through translation/rotation
+            var x = (cosphi * (x1 - x2)) / 2 + (sinphi * (y1 - y2)) / 2;
+            var y = (-sinphi * (x1 - x2)) / 2 + (cosphi * (y1 - y2)) / 2;
+            var px = pow(x), py = pow(y), prx = pow(rx), pry = pow(ry);
+            // correct of out-of-range radii
+            var L = px / prx + py / pry;
+            if (L > 1) {
+                rx = sqrt(L) * abs(rx);
+                ry = sqrt(L) * abs(ry);
+            }
+            else {
+                rx = abs(rx);
+                ry = abs(ry);
+            }
+            // Step 2 + 3: compute center
+            var sign = fa === fs ? -1 : 1;
+            var M = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+            var _cx = (M * (rx * y)) / ry;
+            var _cy = (M * (-ry * x)) / rx;
+            var cx = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2;
+            var cy = sinphi * _cx + cosphi * _cy + (y1 + y2) / 2;
+            // Step 4: Compute start and end angle
+            var center = new Vertex_1.Vertex(cx, cy);
+            var axis = center.clone().addXY(rx, ry);
+            var ellipse = new VEllipse_1.VEllipse(center, axis, 0);
+            ellipse.rotate(phi);
+            var startAngle = new Line_1.Line(ellipse.center, new Vertex_1.Vertex(x1, y1)).angle();
+            var endAngle = new Line_1.Line(ellipse.center, new Vertex_1.Vertex(x2, y2)).angle();
+            return new VEllipseSector(ellipse, startAngle - phi, endAngle - phi);
+        }
     }; // END ellipseSectorUtils
     return VEllipseSector;
 }());

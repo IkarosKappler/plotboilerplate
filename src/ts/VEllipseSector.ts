@@ -12,6 +12,7 @@
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { geomutils } from "./geomutils";
 import { SVGPathParams, UID, XYCoords } from "./interfaces";
+import { Line } from "./Line";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
 import { VEllipse } from "./VEllipse";
@@ -272,6 +273,89 @@ export class VEllipseSector {
       return 0;
     },
 
-    normalizeAngle: (angle: number): number => (angle < 0 ? Math.PI * 2 + angle : angle)
+    normalizeAngle: (angle: number): number => (angle < 0 ? Math.PI * 2 + angle : angle),
+
+    /**
+     * Convert the elliptic arc from endpoint parameters to center parameters as described
+     * in the w3c svg arc implementation note.
+     *
+     * https://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
+     *
+     * @param {number} x1 - The x component of the start point (end of last SVG command).
+     * @param {number} y1 - The y component of the start point (end of last SVG command).
+     * @param {number} phi - The ellipse's rotational angle (angle of axis rotation) in radians (not in degrees as the SVG command uses!)
+     * @param {number} rx - The first (horizontal) radius of the ellipse.
+     * @param {number} ry - The second (vertical) radius of the ellipse.
+     * @param {boolean} fa - The large-arc-flag (boolean, not 0 or 1).
+     * @param {boolean} fs - The sweep-flag (boolean, not 0 or 1).
+     * @param {number} x2 - The x component of the end point (end of last SVG command).
+     * @param {number} y2 - The y component of the end point (end of last SVG command).
+     * @returns
+     */
+    endpointToCenterParameters(
+      x1: number,
+      y1: number,
+      phi: number,
+      rx: number,
+      ry: number,
+      fa: boolean,
+      fs: boolean,
+      x2: number,
+      y2: number
+    ): VEllipseSector {
+      console.log("endpointToCenterParameters", x1, y1, phi, rx, ry, fa, fs, x2, y2);
+      // Thanks to
+      //    https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion
+      const abs = Math.abs;
+      const sin = Math.sin;
+      const cos = Math.cos;
+      const sqrt = Math.sqrt;
+      // const pow = n => Math.pow(n, 2);
+      const pow = function (n: number) {
+        return n * n; // Math.pow(n, 2);
+      };
+
+      const sinphi: number = sin(phi);
+      const cosphi: number = cos(phi);
+
+      // Step 1: simplify through translation/rotation
+      const x: number = (cosphi * (x1 - x2)) / 2 + (sinphi * (y1 - y2)) / 2;
+      const y: number = (-sinphi * (x1 - x2)) / 2 + (cosphi * (y1 - y2)) / 2;
+
+      const px: number = pow(x),
+        py: number = pow(y),
+        prx: number = pow(rx),
+        pry: number = pow(ry);
+
+      // correct of out-of-range radii
+      const L: number = px / prx + py / pry;
+      if (L > 1) {
+        rx = sqrt(L) * abs(rx);
+        ry = sqrt(L) * abs(ry);
+      } else {
+        rx = abs(rx);
+        ry = abs(ry);
+      }
+
+      // Step 2 + 3: compute center
+      const sign: number = fa === fs ? -1 : 1;
+      const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+
+      const _cx: number = (M * (rx * y)) / ry;
+      const _cy: number = (M * (-ry * x)) / rx;
+
+      const cx: number = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2;
+      const cy: number = sinphi * _cx + cosphi * _cy + (y1 + y2) / 2;
+
+      // Step 4: Compute start and end angle
+      const center: Vertex = new Vertex(cx, cy);
+      const axis: Vertex = center.clone().addXY(rx, ry);
+      const ellipse: VEllipse = new VEllipse(center, axis, 0);
+      ellipse.rotate(phi);
+
+      const startAngle: number = new Line(ellipse.center, new Vertex(x1, y1)).angle();
+      const endAngle: number = new Line(ellipse.center, new Vertex(x2, y2)).angle();
+      return new VEllipseSector(ellipse, startAngle - phi, endAngle - phi);
+    }
   }; // END ellipseSectorUtils
 }
