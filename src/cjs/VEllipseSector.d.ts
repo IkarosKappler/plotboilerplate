@@ -117,15 +117,15 @@ export declare class VEllipseSector {
          *
          * @param {number} x1 - The x component of the start point (end of last SVG command).
          * @param {number} y1 - The y component of the start point (end of last SVG command).
-         * @param {number} phi - The ellipse's rotational angle (angle of axis rotation) in radians (not in degrees as the SVG command uses!)
          * @param {number} rx - The first (horizontal) radius of the ellipse.
          * @param {number} ry - The second (vertical) radius of the ellipse.
+         * @param {number} phi - The ellipse's rotational angle (angle of axis rotation) in radians (not in degrees as the SVG command uses!)
          * @param {boolean} fa - The large-arc-flag (boolean, not 0 or 1).
          * @param {boolean} fs - The sweep-flag (boolean, not 0 or 1).
          * @param {number} x2 - The x component of the end point (end of last SVG command).
          * @param {number} y2 - The y component of the end point (end of last SVG command).
          * @returns
          */
-        endpointToCenterParameters(x1: number, y1: number, phi: number, rx: number, ry: number, fa: boolean, fs: boolean, x2: number, y2: number): VEllipseSector;
+        endpointToCenterParameters(x1: number, y1: number, rx: number, ry: number, phi: number, fa: boolean, fs: boolean, x2: number, y2: number): VEllipseSector;
     };
 }

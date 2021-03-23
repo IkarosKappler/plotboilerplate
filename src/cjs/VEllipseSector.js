@@ -209,16 +209,16 @@ var VEllipseSector = /** @class */ (function () {
          *
          * @param {number} x1 - The x component of the start point (end of last SVG command).
          * @param {number} y1 - The y component of the start point (end of last SVG command).
-         * @param {number} phi - The ellipse's rotational angle (angle of axis rotation) in radians (not in degrees as the SVG command uses!)
          * @param {number} rx - The first (horizontal) radius of the ellipse.
          * @param {number} ry - The second (vertical) radius of the ellipse.
+         * @param {number} phi - The ellipse's rotational angle (angle of axis rotation) in radians (not in degrees as the SVG command uses!)
          * @param {boolean} fa - The large-arc-flag (boolean, not 0 or 1).
          * @param {boolean} fs - The sweep-flag (boolean, not 0 or 1).
          * @param {number} x2 - The x component of the end point (end of last SVG command).
          * @param {number} y2 - The y component of the end point (end of last SVG command).
          * @returns
          */
-        endpointToCenterParameters: function (x1, y1, phi, rx, ry, fa, fs, x2, y2) {
+        endpointToCenterParameters: function (x1, y1, rx, ry, phi, fa, fs, x2, y2) {
             console.log("endpointToCenterParameters", x1, y1, phi, rx, ry, fa, fs, x2, y2);
             // Thanks to
             //    https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion

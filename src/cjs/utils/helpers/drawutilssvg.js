@@ -16,19 +16,11 @@
  * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
  * @version  1.0.2
  **/
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
 var CircleSector_1 = require("../../CircleSector");
 var CubicBezierCurve_1 = require("../../CubicBezierCurve");
 var Vertex_1 = require("../../Vertex");
-var VEllipseSector_1 = require("../../VEllipseSector");
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -946,13 +938,26 @@ var drawutilssvg = /** @class */ (function () {
         var _sy = function (index) {
             data[index] = scale.y * Number(data[index]);
         };
+        var stx = function (value) {
+            return offset.x + scale.x * value;
+        };
+        var sty = function (value) {
+            return offset.y + scale.y * value;
+        };
+        // scale only {x,y}
+        var sx = function (value) {
+            return scale.x * value;
+        };
+        var sy = function (value) {
+            return scale.y * value;
+        };
         var i = 0;
         // var firstPoint: XYCoords = { x: NaN, y: NaN };
         var lastPoint = { x: NaN, y: NaN };
         // "save last point"
         var _slp = function (index) {
-            lastPoint.x = Number(data[i]);
-            lastPoint.y = Number(data[i + 1]);
+            lastPoint.x = Number(data[index]);
+            lastPoint.y = Number(data[index + 1]);
         };
         while (i < data.length) {
             var cmd = data[i];
@@ -1057,49 +1062,52 @@ var drawutilssvg = /** @class */ (function () {
                     break;
                 case "A":
                     // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
-                    if (scale.x === scale.y) {
-                        // Uniform scale: just scale
-                        _sx(i + 1);
-                        _sy(i + 2);
-                        _stx(i + 6);
-                        _sty(i + 7);
-                        _slp(i + 6);
-                        // Update the arc flag when x _or_ y scale is negative
-                        if ((scale.x < 0 && scale.y >= 0) || (scale.x >= 0 && scale.y < 0)) {
-                            data[i + 5] = data[i + 5] ? 0 : 1;
-                        }
-                        i += 8;
+                    // if (scale.x === scale.y) {
+                    // Uniform scale: just scale
+                    _sx(i + 1);
+                    _sy(i + 2);
+                    _stx(i + 6);
+                    _sty(i + 7);
+                    _slp(i + 6);
+                    // Update the arc flag when x _or_ y scale is negative
+                    if ((scale.x < 0 && scale.y >= 0) || (scale.x >= 0 && scale.y < 0)) {
+                        data[i + 5] = data[i + 5] ? 0 : 1;
                     }
-                    else {
-                        // Non-uniform scale: convert to Bézier approximation
-                        var sector = VEllipseSector_1.VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(lastPoint.x, // x1
-                        lastPoint.y, // y1
-                        (Number(data[i + 3]) * Math.PI) / 180, // rotation (phi, in radians)
-                        Number(data[i + 1]), // rx
-                        Number(data[i + 2]), // ry
-                        data[i + 4] != 0, // fa
-                        data[i + 5] != 0, // fs
-                        Number(data[i + 6]), // x2
-                        Number(data[i + 7]) // y2
-                        );
-                        console.log("sector", sector);
-                        var curves = sector.toCubicBezier(4);
-                        var curveData = curves.reduce(function (accu, curve) {
-                            return accu.concat([
-                                "C",
-                                _stx(curve.startControlPoint.x),
-                                _sty(curve.startControlPoint.y),
-                                _stx(curve.endControlPoint.x),
-                                _sty(curve.endControlPoint.y),
-                                _stx(curve.endPoint.x),
-                                _sty(curve.endPoint.y)
-                            ]);
-                        }, []);
-                        console.log("CURVE DATA", curveData);
-                        // Replace the 'A' command with a sequence of 'C' commands
-                        data.splice.apply(data, __spreadArrays([i, 8], curveData));
-                        i += data.length;
-                    }
+                    i += 8;
+                    // } else {
+                    //   // Non-uniform scale: convert to Bézier approximation
+                    //   let sector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
+                    //     lastPoint.x, // x1
+                    //     lastPoint.y, // y1
+                    //     (Number(data[i + 3]) * Math.PI) / 180, // rotation (phi, in radians)
+                    //     Number(data[i + 1]), // rx
+                    //     Number(data[i + 2]), // ry
+                    //     data[i + 4] != 0, // fa
+                    //     data[i + 5] != 0, // fs
+                    //     Number(data[i + 6]), // x2
+                    //     Number(data[i + 7]) // y2
+                    //   );
+                    //   console.log('lastPoint.x', lastPoint.x, "lastPoint.y", lastPoint.y )
+                    //   console.log("sector", sector);
+                    //   let curves = sector.toCubicBezier(4);
+                    //   let curveData = curves.reduce(
+                    //     (accu, curve: CubicBezierCurve) =>
+                    //       accu.concat([
+                    //         "C",
+                    //         stx(curve.startControlPoint.x),
+                    //         sty(curve.startControlPoint.y),
+                    //         stx(curve.endControlPoint.x),
+                    //         sty(curve.endControlPoint.y),
+                    //         stx(curve.endPoint.x),
+                    //         sty(curve.endPoint.y)
+                    //       ]),
+                    //     []
+                    //   );
+                    //   console.log("CURVE DATA", curveData);
+                    //   // Replace the 'A' command with a sequence of 'C' commands
+                    //   data.splice(i, 8, ...curveData);
+                    //   i += data.length;
+                    // }
                     break;
                 case "a":
                     // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
