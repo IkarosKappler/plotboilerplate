@@ -484,4 +484,5 @@ vert.listeners.addDragListener(function (e) {
 - SVG resizing does not work in Firefox (aspect ratio is always kept, even if clip box changes). Please use PNGs until this is fixed.
 - The BBTree.iterator() fails if the tree is empty! (Demos)
 - The minifid BBTree and BBTreeCollection files do not export anything. The un-minified does. Why that?
+- Arcs and ellipses break when non-uniform scaling (scalex!=scaley) is applied. Convert them to Bézier curves before drawing.
 - Currently no more known. Please report bugs.

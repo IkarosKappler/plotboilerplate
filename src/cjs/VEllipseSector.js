@@ -10,6 +10,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipseSector = void 0;
 // TODO: add to PlotBoilerplate.add(...)
+// Extend drawArc-demo (make arc points movale)
+// Make ellipse helper lines hide-able
+// Check demo-00 if alloy-finger works
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var geomutils_1 = require("./geomutils");
 var Line_1 = require("./Line");
@@ -219,16 +222,15 @@ var VEllipseSector = /** @class */ (function () {
          * @returns
          */
         endpointToCenterParameters: function (x1, y1, rx, ry, phi, fa, fs, x2, y2) {
-            console.log("endpointToCenterParameters", x1, y1, phi, rx, ry, fa, fs, x2, y2);
+            // console.log("endpointToCenterParameters", x1, y1, phi, rx, ry, fa, fs, x2, y2);
             // Thanks to
             //    https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion
             var abs = Math.abs;
             var sin = Math.sin;
             var cos = Math.cos;
             var sqrt = Math.sqrt;
-            // const pow = n => Math.pow(n, 2);
             var pow = function (n) {
-                return n * n; // Math.pow(n, 2);
+                return n * n;
             };
             var sinphi = sin(phi);
             var cosphi = cos(phi);

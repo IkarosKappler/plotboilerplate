@@ -1122,7 +1122,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       return scale.y * value;
     };
     var i: number = 0;
-    // var firstPoint: XYCoords = { x: NaN, y: NaN };
     var lastPoint: XYCoords = { x: NaN, y: NaN };
     // "save last point"
     var _slp = (index: number) => {
@@ -1134,11 +1133,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       switch (cmd) {
         case "M":
         // MoveTo: M|m x y
-        // if (firstPoint.x === NaN) {
-
-        //   firstPoint.x = Number(data[i + 1]);
-        //   firstPoint.y = Number(data[i + 2]);
-        // }
         case "L":
         // LineTo L|l x y
         case "T":
@@ -1150,10 +1144,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
           break;
         case "m":
         // MoveTo: M|m x y
-        // if (firstPoint.x === NaN) {
-        //   firstPoint.x = Number(data[i + 1]);
-        //   firstPoint.y = Number(data[i + 2]);
-        // }
         case "l":
         // LineTo L|l x y
         case "t":
@@ -1234,52 +1224,20 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
           break;
         case "A":
           // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
-          // if (scale.x === scale.y) {
-            // Uniform scale: just scale
-            _sx(i + 1);
-            _sy(i + 2);
-            _stx(i + 6);
-            _sty(i + 7);
-            _slp(i + 6);
-            // Update the arc flag when x _or_ y scale is negative
-            if ((scale.x < 0 && scale.y >= 0) || (scale.x >= 0 && scale.y < 0)) {
-              data[i + 5] = data[i + 5] ? 0 : 1;
-            }
-            i += 8;
-          // } else {
-          //   // Non-uniform scale: convert to Bézier approximation
-          //   let sector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
-          //     lastPoint.x, // x1
-          //     lastPoint.y, // y1
-          //     (Number(data[i + 3]) * Math.PI) / 180, // rotation (phi, in radians)
-          //     Number(data[i + 1]), // rx
-          //     Number(data[i + 2]), // ry
-          //     data[i + 4] != 0, // fa
-          //     data[i + 5] != 0, // fs
-          //     Number(data[i + 6]), // x2
-          //     Number(data[i + 7]) // y2
-          //   );
-          //   console.log('lastPoint.x', lastPoint.x, "lastPoint.y", lastPoint.y )
-          //   console.log("sector", sector);
-          //   let curves = sector.toCubicBezier(4);
-          //   let curveData = curves.reduce(
-          //     (accu, curve: CubicBezierCurve) =>
-          //       accu.concat([
-          //         "C",
-          //         stx(curve.startControlPoint.x),
-          //         sty(curve.startControlPoint.y),
-          //         stx(curve.endControlPoint.x),
-          //         sty(curve.endControlPoint.y),
-          //         stx(curve.endPoint.x),
-          //         sty(curve.endPoint.y)
-          //       ]),
-          //     []
-          //   );
-          //   console.log("CURVE DATA", curveData);
-          //   // Replace the 'A' command with a sequence of 'C' commands
-          //   data.splice(i, 8, ...curveData);
-          //   i += data.length;
-          // }
+          // Uniform scale: just scale
+          // NOTE: here is something TODO
+          //  * if scalex!=scaleY this won't work
+          //  * Arcs have to be converted to Bézier curves here in that case
+          _sx(i + 1);
+          _sy(i + 2);
+          _stx(i + 6);
+          _sty(i + 7);
+          _slp(i + 6);
+          // Update the arc flag when x _or_ y scale is negative
+          if ((scale.x < 0 && scale.y >= 0) || (scale.x >= 0 && scale.y < 0)) {
+            data[i + 5] = data[i + 5] ? 0 : 1;
+          }
+          i += 8;
           break;
         case "a":
           // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y

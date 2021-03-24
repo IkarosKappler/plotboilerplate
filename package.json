@@ -17,6 +17,7 @@
     "compile-typescript-browser": "tsc -p tsconfig.browser.json",
     "compile-typescript-module": "tsc -p tsconfig.module.json",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
+    "server": "npx http-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack-browser": "npx webpack --mode production --config ./webpack5.browser.config.js",
     "webpack-dev": "npx webpack --mode development --config ./webpack5-dev.config.js",

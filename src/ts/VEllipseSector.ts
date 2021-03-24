@@ -8,6 +8,9 @@
  */
 
 // TODO: add to PlotBoilerplate.add(...)
+// Extend drawArc-demo (make arc points movale)
+// Make ellipse helper lines hide-able
+// Check demo-00 if alloy-finger works
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { geomutils } from "./geomutils";
@@ -303,16 +306,15 @@ export class VEllipseSector {
       x2: number,
       y2: number
     ): VEllipseSector {
-      console.log("endpointToCenterParameters", x1, y1, phi, rx, ry, fa, fs, x2, y2);
+      // console.log("endpointToCenterParameters", x1, y1, phi, rx, ry, fa, fs, x2, y2);
       // Thanks to
       //    https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion
       const abs = Math.abs;
       const sin = Math.sin;
       const cos = Math.cos;
       const sqrt = Math.sqrt;
-      // const pow = n => Math.pow(n, 2);
-      const pow = function (n: number) {
-        return n * n; // Math.pow(n, 2);
+      const pow = (n: number): number => {
+        return n * n;
       };
 
       const sinphi: number = sin(phi);
