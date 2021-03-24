@@ -934,7 +934,26 @@ export class drawutilssvg {
         const _sy = (index) => {
             data[index] = scale.y * Number(data[index]);
         };
+        const stx = (value) => {
+            return offset.x + scale.x * value;
+        };
+        const sty = (value) => {
+            return offset.y + scale.y * value;
+        };
+        // scale only {x,y}
+        const sx = (value) => {
+            return scale.x * value;
+        };
+        const sy = (value) => {
+            return scale.y * value;
+        };
         var i = 0;
+        var lastPoint = { x: NaN, y: NaN };
+        // "save last point"
+        var _slp = (index) => {
+            lastPoint.x = Number(data[index]);
+            lastPoint.y = Number(data[index + 1]);
+        };
         while (i < data.length) {
             const cmd = data[i];
             switch (cmd) {
@@ -946,6 +965,7 @@ export class drawutilssvg {
                     // Shorthand/smooth quadratic Bézier curveto: T|t x y
                     _stx(i + 1);
                     _sty(i + 2);
+                    _slp(i + 1);
                     i += 3;
                     break;
                 case "m":
@@ -956,26 +976,31 @@ export class drawutilssvg {
                     // Shorthand/smooth quadratic Bézier curveto: T|t x y
                     _sx(i + 1);
                     _sy(i + 2);
+                    _slp(i + 1);
                     i += 3;
                     break;
                 case "H":
                     // HorizontalLineTo: H|h x
                     _stx(i + 1);
+                    lastPoint.x = Number(data[i + 1]);
                     i += 2;
                     break;
                 case "h":
                     // HorizontalLineTo: H|h x
                     _sx(i + 1);
+                    lastPoint.x = Number(data[i + 1]);
                     i += 2;
                     break;
                 case "V":
                     // VerticalLineTo: V|v y
                     _sty(i + 1);
+                    lastPoint.y = Number(data[i + 1]);
                     i += 2;
                     break;
                 case "v":
                     // VerticalLineTo: V|v y
                     _sy(i + 1);
+                    lastPoint.y = Number(data[i + 1]);
                     i += 2;
                     break;
                 case "C":
@@ -986,6 +1011,7 @@ export class drawutilssvg {
                     _sty(i + 4);
                     _stx(i + 5);
                     _sty(i + 6);
+                    _slp(i + 5);
                     i += 7;
                     break;
                 case "c":
@@ -996,6 +1022,7 @@ export class drawutilssvg {
                     _sy(i + 4);
                     _sx(i + 5);
                     _sy(i + 6);
+                    _slp(i + 5);
                     i += 7;
                     break;
                 case "S":
@@ -1006,6 +1033,7 @@ export class drawutilssvg {
                     _sty(i + 2);
                     _stx(i + 3);
                     _sty(i + 4);
+                    _slp(i + 3);
                     i += 5;
                     break;
                 case "s":
@@ -1016,14 +1044,24 @@ export class drawutilssvg {
                     _sy(i + 2);
                     _sx(i + 3);
                     _sy(i + 4);
+                    _slp(i + 3);
                     i += 5;
                     break;
                 case "A":
                     // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
+                    // Uniform scale: just scale
+                    // NOTE: here is something TODO
+                    //  * if scalex!=scaleY this won't work
+                    //  * Arcs have to be converted to Bézier curves here in that case
                     _sx(i + 1);
                     _sy(i + 2);
                     _stx(i + 6);
                     _sty(i + 7);
+                    _slp(i + 6);
+                    // Update the arc flag when x _or_ y scale is negative
+                    if ((scale.x < 0 && scale.y >= 0) || (scale.x >= 0 && scale.y < 0)) {
+                        data[i + 5] = data[i + 5] ? 0 : 1;
+                    }
                     i += 8;
                     break;
                 case "a":
@@ -1032,11 +1070,14 @@ export class drawutilssvg {
                     _sy(i + 2);
                     _sx(i + 6);
                     _sy(i + 7);
+                    _slp(i + 6);
                     i += 8;
                     break;
                 case "z":
                 case "Z":
                     // ClosePath: Z|z (no arguments)
+                    // lastPoint.x = firstPoint.x;
+                    // lastPoint.y = firstPoint.y;
                     i++;
                     break;
                 // Safepoint: continue reading token by token until something is recognized again
@@ -1044,7 +1085,7 @@ export class drawutilssvg {
                     i++;
             }
         } // END while
-    }
+    } // END transformPathData
 }
 drawutilssvg.HEAD_XML = [
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',

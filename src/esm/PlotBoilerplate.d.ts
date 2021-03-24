@@ -364,6 +364,7 @@ export declare class PlotBoilerplate {
      *  * a Line
      *  * a Vector
      *  * a VEllipse
+     *  * a VEllipseSector
      *  * a Circle
      *  * a Polygon
      *  * a Triangle
@@ -739,14 +740,14 @@ export declare class PlotBoilerplate {
      **/
     private setOffset;
     /**
-    * Set a new zoom value (and re-adjust the draw offset).
-    *
-    * Note: the function will not trigger any redraws.
-    *
-    * @param {number} zoomFactorX - The new horizontal zoom value.
-    * @param {number} zoomFactorY - The new vertical zoom value.
-    * @param {Vertex} interactionPos - The position of mouse/touch interaction.
-    **/
+     * Set a new zoom value (and re-adjust the draw offset).
+     *
+     * Note: the function will not trigger any redraws.
+     *
+     * @param {number} zoomFactorX - The new horizontal zoom value.
+     * @param {number} zoomFactorY - The new vertical zoom value.
+     * @param {Vertex} interactionPos - The position of mouse/touch interaction.
+     **/
     private setZoom;
     private installInputListeners;
     /**

@@ -52,19 +52,20 @@
       pb.draw.line(sector.ellipse.center, rotationControlPoint, "rgba(64,192,128,0.333)", 1.0);
 
       // Draw radii (axis helper)
-      // var axisPointA = sector.ellipse.vertAt(0.0);
-      // var axisPointB = sector.ellipse.vertAt(Math.PI / 2.0);
-      // pb.draw.line(sector.ellipse.axis, axisPointA, "rgba(192,192,192,0.5)", 1.0);
-      // pb.draw.line(sector.ellipse.axis, axisPointB, "rgba(192,192,192,0.5)", 1.0);
-
       pb.draw.line(
-        sector.ellipse.center.clone().add(0, d.signedRadiusV()).rotate(sector.ellipse.rotation, sector.ellipse.center),
-        d.axis,
+        sector.ellipse.center
+          .clone()
+          .add(0, sector.ellipse.signedRadiusV())
+          .rotate(sector.ellipse.rotation, sector.ellipse.center),
+        sector.ellipse.axis,
         "rgba(192,192,192,0.5)"
       );
       pb.draw.line(
-        sector.ellipse.center.clone().add(d.signedRadiusH(), 0).rotate(sector.ellipse.rotation, sector.ellipse.center),
-        d.axis,
+        sector.ellipse.center
+          .clone()
+          .add(sector.ellipse.signedRadiusH(), 0)
+          .rotate(sector.ellipse.rotation, sector.ellipse.center),
+        sector.ellipse.axis,
         "rgba(192,192,192,0.5)"
       );
     };
