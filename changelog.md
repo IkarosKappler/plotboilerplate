@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-03-24
+  - Added the `VEllipseSectorHelper` class.
 - 2021-03-19
   - Added the `VEllipse.rotate` function.
   - Preparing a conversion function in the the draw-path demo: SVG-Arc to VEllipseSector.

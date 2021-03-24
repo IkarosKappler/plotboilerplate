@@ -20,7 +20,7 @@
       PlotBoilerplate.utils.safeMergeByKeys({ canvas: document.getElementById("my-canvas"), fullSize: true }, GUP)
     );
     pb.drawConfig.circle.lineWidth = 1;
-    pb.drawConfig.ellipse.color = "rgba(192,192,192,0.75)";
+    // pb.drawConfig.ellipse.color = "rgba(192,192,192,0.75)";
 
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
@@ -67,6 +67,20 @@
     // | Draw additional lines to visualize what's happening.
     // +-------------------------------------------
     pb.config.postDraw = function () {
+      // Draw the basic ellipse first
+      // (... there is a proper draw.ellipse function in the making ...)
+      var data = VEllipseSector.ellipseSectorUtils.describeSVGArc(
+        sector.ellipse.center.x,
+        sector.ellipse.center.y,
+        sector.ellipse.radiusH(),
+        sector.ellipse.radiusV(),
+        sector.startAngle,
+        sector.endAngle,
+        sector.ellipse.rotation,
+        { moveToStart: true }
+      );
+      pb.draw.path(data, "rgba(192,192,192,0.75)", 1.0);
+
       pb.draw.line(sector.ellipse.center, startControlPoint, "rgba(192,128,128,0.5)", 1.0);
       pb.draw.line(sector.ellipse.center, endControlPoint, "rgba(192,128,128,0.5)", 1.0);
       pb.draw.line(sector.ellipse.center, rotationControlPoint, "rgba(64,192,128,0.333)", 1.0);
@@ -189,7 +203,7 @@
     };
 
     // Now add the sector to your canvas
-    pb.add(ellipse);
+    // pb.add(ellipse);
     pb.add(sector);
     pb.add([startControlPoint, endControlPoint, rotationControlPoint]);
     pb.add(_circle);

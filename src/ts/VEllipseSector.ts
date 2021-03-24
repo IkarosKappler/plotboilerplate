@@ -7,11 +7,6 @@
  * @version 1.0.0
  */
 
-// TODO: add to PlotBoilerplate.add(...)
-// Extend drawArc-demo (make arc points movale)
-// Make ellipse helper lines hide-able
-// Check demo-00 if alloy-finger works
-
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { geomutils } from "./geomutils";
 import { SVGPathParams, UID, XYCoords } from "./interfaces";
