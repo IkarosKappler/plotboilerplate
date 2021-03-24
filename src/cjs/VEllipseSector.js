@@ -9,10 +9,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VEllipseSector = void 0;
-// TODO: add to PlotBoilerplate.add(...)
-// Extend drawArc-demo (make arc points movale)
-// Make ellipse helper lines hide-able
-// Check demo-00 if alloy-finger works
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var geomutils_1 = require("./geomutils");
 var Line_1 = require("./Line");

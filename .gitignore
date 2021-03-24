@@ -31,3 +31,4 @@ npm-package/
 typescript-example/node_modules/
 *-deprecated*
 src/js
+dist/plotboilerplate.browser.min.js.LICENSE.txt

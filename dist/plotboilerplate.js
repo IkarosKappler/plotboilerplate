@@ -7306,10 +7306,6 @@ exports.VEllipse = VEllipse;
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VEllipseSector = void 0;
-// TODO: add to PlotBoilerplate.add(...)
-// Extend drawArc-demo (make arc points movale)
-// Make ellipse helper lines hide-able
-// Check demo-00 if alloy-finger works
 var CubicBezierCurve_1 = __webpack_require__(510);
 var geomutils_1 = __webpack_require__(22);
 var Line_1 = __webpack_require__(831);

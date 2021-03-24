@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2021-03-17
+date: 2021-03-24
 ---
 
 <div class="full-width">
@@ -163,6 +163,11 @@ date: 2021-03-17
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/31-path-draw/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210219-0-path-data-transformation.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/32-ellipse-to-bezier/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210324-0-elliptic-sectors-to-bezier.png');"></div>
    </a>
 </div>
 </div>
