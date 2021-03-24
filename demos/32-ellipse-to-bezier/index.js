@@ -20,6 +20,7 @@
       PlotBoilerplate.utils.safeMergeByKeys({ canvas: document.getElementById("my-canvas"), fullSize: true }, GUP)
     );
     pb.drawConfig.circle.lineWidth = 1;
+    pb.drawConfig.ellipse.color = "rgba(192,192,192,0.75)";
 
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
@@ -70,18 +71,18 @@
       pb.draw.line(sector.ellipse.center, endControlPoint, "rgba(192,128,128,0.5)", 1.0);
       pb.draw.line(sector.ellipse.center, rotationControlPoint, "rgba(64,192,128,0.333)", 1.0);
 
-      // Draw the arc
-      var pathData = VEllipseSector.ellipseSectorUtils.describeSVGArc(
-        sector.ellipse.center.x,
-        sector.ellipse.center.y,
-        sector.ellipse.radiusH(),
-        sector.ellipse.radiusV(),
-        sector.startAngle,
-        sector.endAngle,
-        sector.ellipse.rotation,
-        { moveToStart: true }
-      );
-      pb.draw.path(pathData, "rgba(255,0,0,0.5)", 2);
+      // // Draw the arc
+      // var pathData = VEllipseSector.ellipseSectorUtils.describeSVGArc(
+      //   sector.ellipse.center.x,
+      //   sector.ellipse.center.y,
+      //   sector.ellipse.radiusH(),
+      //   sector.ellipse.radiusV(),
+      //   sector.startAngle,
+      //   sector.endAngle,
+      //   sector.ellipse.rotation,
+      //   { moveToStart: true }
+      // );
+      // pb.draw.path(pathData, "rgba(255,0,0,0.5)", 2);
 
       // Draw intersection point and labels (start/end)
       var pointA = sector.ellipse.vertAt(sector.startAngle);
@@ -151,7 +152,14 @@
         .toCubicBezier(config.fullBezierQuarterSegments, config.fullBezierThreshold);
       for (var i = 0; i < bezierCurves.length; i++) {
         var curve = bezierCurves[i];
-        pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
+        pb.draw.cubicBezier(
+          curve.startPoint,
+          curve.endPoint,
+          curve.startControlPoint,
+          curve.endControlPoint,
+          "rgb(255,128,0)",
+          2
+        );
       }
     }
 
@@ -185,7 +193,7 @@
         if (config.sectorBezierDrawIntervals) {
           pb.draw.line(sector.ellipse.center, curve.startPoint, "grey", 1);
         }
-        pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "grey", 2);
+        pb.draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "teal", 2);
         if (config.sectorBezierDrawHandles) {
           pb.draw.diamondHandle(curve.startControlPoint, 3, "blue");
           pb.draw.diamondHandle(curve.endControlPoint, 3, "blue");
@@ -195,8 +203,8 @@
 
     // Now add the sector to your canvas
     pb.add(ellipse);
-    pb.add([startControlPoint, endControlPoint]);
-    pb.add(rotationControlPoint);
+    pb.add(sector);
+    pb.add([startControlPoint, endControlPoint, rotationControlPoint]);
     pb.add(_circle);
 
     // Create a gui for testing with scale
