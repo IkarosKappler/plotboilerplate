@@ -2,7 +2,7 @@
 //    https://www.pluralsight.com/guides/react-typescript-module-create
 // and
 //    https://blog.logrocket.com/publishing-node-modules-typescript-es-modules/
-// 
+//
 // @date 2021-02
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
@@ -13,7 +13,6 @@ import { drawutils } from "./draw";
 import { drawutilsgl } from "./drawgl";
 import { geomutils } from "./geomutils";
 import { Grid } from "./Grid";
-// import * as interf from "./interfaces";
 import { KeyHandler } from "./KeyHandler";
 import { Line } from "./Line";
 import { MouseHandler } from "./MouseHandler";
@@ -30,7 +29,7 @@ import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
 import { VertexListeners } from "./VertexListeners";
 import { VertTuple } from "./VertTuple";
-import { drawutilssvg } from "./utils/helpers/drawutilssvg";
+import { drawutilssvg } from "./drawutilssvg";
 export { BezierPath, Bounds, Circle, CircleSector, CubicBezierCurve, drawutils, drawutilsgl, geomutils, Grid, 
 // ...interf,
 KeyHandler, Line, MouseHandler, PBImage, PlotBoilerplate, Polygon, SVGBuilder, Triangle, UIDGenerator, Vector, VEllipse, VEllipseSector, Vertex, VertexAttr, VertexListeners, VertTuple, drawutilssvg };

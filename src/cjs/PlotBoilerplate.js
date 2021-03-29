@@ -72,7 +72,8 @@
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
  * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
- * @version  1.13.2
+ * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
+ * @version  1.13.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -83,7 +84,7 @@ exports.PlotBoilerplate = void 0;
 var alloyfinger_typescript_1 = require("alloyfinger-typescript");
 var draw_1 = require("./draw");
 var drawgl_1 = require("./drawgl");
-var drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
+var drawutilssvg_1 = require("./drawutilssvg");
 var BezierPath_1 = require("./BezierPath");
 var Bounds_1 = require("./Bounds");
 var Circle_1 = require("./Circle");
@@ -1020,6 +1021,10 @@ var PlotBoilerplate = /** @class */ (function () {
         else {
             console.error("Cannot draw object. Unknown class.");
         }
+        draw.setCurrentClassName(null);
+        draw.setCurrentId(null);
+        fill.setCurrentClassName(null);
+        fill.setCurrentId(null);
     };
     /**
      * Draw the select-polygon (if there is one).

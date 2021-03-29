@@ -267,20 +267,20 @@ export declare class drawutils implements DrawLib<void> {
      */
     circle(center: Vertex, radius: number, color: string, lineWidth?: number): void;
     /**
-     * Draw a circular arc (section of a circle) with the given CSS color.
-     *
-     * @method circleArc
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {number} startAngle - The angle to start at.
-     * @param {number} endAngle - The angle to end at.
-     * @param {string=#000000} color - The CSS color to draw the circle with.
-     * @param {number=1} lineWidth - The line width to use
-     // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
+       * Draw a circular arc (section of a circle) with the given CSS color.
+       *
+       * @method circleArc
+       * @param {Vertex} center - The center of the circle.
+       * @param {number} radius - The radius of the circle.
+       * @param {number} startAngle - The angle to start at.
+       * @param {number} endAngle - The angle to end at.
+       * @param {string=#000000} color - The CSS color to draw the circle with.
+       * @param {number=1} lineWidth - The line width to use
+       // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+       * @return {void}
+       * @instance
+       * @memberof drawutils
+       */
     circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color?: string, lineWidth?: number, options?: {
         asSegment?: boolean;
     }): void;

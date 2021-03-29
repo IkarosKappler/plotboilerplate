@@ -93,6 +93,24 @@
       pb.fill.text("start", pointA.x, pointA.y);
       pb.fill.text("end", pointB.x, pointB.y);
 
+      // Draw radii (axis helper)
+      pb.draw.line(
+        sector.ellipse.center
+          .clone()
+          .add(0, sector.ellipse.signedRadiusV())
+          .rotate(sector.ellipse.rotation, sector.ellipse.center),
+        sector.ellipse.axis,
+        "rgba(192,192,192,0.5)"
+      );
+      pb.draw.line(
+        sector.ellipse.center
+          .clone()
+          .add(sector.ellipse.signedRadiusH(), 0)
+          .rotate(sector.ellipse.rotation, sector.ellipse.center),
+        sector.ellipse.axis,
+        "rgba(192,192,192,0.5)"
+      );
+
       drawCircle(sector.startAngle, sector.endAngle);
       if (config.drawNormal) {
         drawNormal();

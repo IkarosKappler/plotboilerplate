@@ -3,7 +3,7 @@
 //    https://www.pluralsight.com/guides/react-typescript-module-create
 // and
 //    https://blog.logrocket.com/publishing-node-modules-typescript-es-modules/
-// 
+//
 // @date 2021-02
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = exports.VertTuple = exports.VertexListeners = exports.VertexAttr = exports.Vertex = exports.VEllipseSector = exports.VEllipse = exports.Vector = exports.UIDGenerator = exports.Triangle = exports.SVGBuilder = exports.Polygon = exports.PlotBoilerplate = exports.PBImage = exports.MouseHandler = exports.Line = exports.KeyHandler = exports.Grid = exports.geomutils = exports.drawutilsgl = exports.drawutils = exports.CubicBezierCurve = exports.CircleSector = exports.Circle = exports.Bounds = exports.BezierPath = void 0;
@@ -25,7 +25,6 @@ var geomutils_1 = require("./geomutils");
 Object.defineProperty(exports, "geomutils", { enumerable: true, get: function () { return geomutils_1.geomutils; } });
 var Grid_1 = require("./Grid");
 Object.defineProperty(exports, "Grid", { enumerable: true, get: function () { return Grid_1.Grid; } });
-// import * as interf from "./interfaces";
 var KeyHandler_1 = require("./KeyHandler");
 Object.defineProperty(exports, "KeyHandler", { enumerable: true, get: function () { return KeyHandler_1.KeyHandler; } });
 var Line_1 = require("./Line");
@@ -58,7 +57,7 @@ var VertexListeners_1 = require("./VertexListeners");
 Object.defineProperty(exports, "VertexListeners", { enumerable: true, get: function () { return VertexListeners_1.VertexListeners; } });
 var VertTuple_1 = require("./VertTuple");
 Object.defineProperty(exports, "VertTuple", { enumerable: true, get: function () { return VertTuple_1.VertTuple; } });
-var drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
+var drawutilssvg_1 = require("./drawutilssvg");
 Object.defineProperty(exports, "drawutilssvg", { enumerable: true, get: function () { return drawutilssvg_1.drawutilssvg; } });
 exports.default = PlotBoilerplate_1.PlotBoilerplate;
 //# sourceMappingURL=module.js.map

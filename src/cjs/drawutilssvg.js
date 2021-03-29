@@ -14,13 +14,15 @@
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
- * @version  1.0.2
+ * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
+ * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
+ * @version  1.1.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
-var CircleSector_1 = require("../../CircleSector");
-var CubicBezierCurve_1 = require("../../CubicBezierCurve");
-var Vertex_1 = require("../../Vertex");
+var CircleSector_1 = require("./CircleSector");
+var CubicBezierCurve_1 = require("./CubicBezierCurve");
+var Vertex_1 = require("./Vertex");
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -793,7 +795,7 @@ var drawutilssvg = /** @class */ (function () {
         var color = options.color || "black";
         var node = this.makeNode("text");
         node.setAttribute("x", "" + this._x(x));
-        node.setAttribute("y", "" + this._x(y));
+        node.setAttribute("y", "" + this._y(y));
         node.innerHTML = text;
         return this._bindFillDraw(node, "text", color, 1);
     };

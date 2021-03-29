@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutils = void 0;
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Vertex_1 = require("./Vertex");
-var drawutilssvg_1 = require("./utils/helpers/drawutilssvg");
+var drawutilssvg_1 = require("./drawutilssvg");
 // Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -67,7 +67,6 @@ var drawutils = /** @class */ (function () {
         this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
     }
-    ;
     /**
      * Called before each draw cycle.
      * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
@@ -75,7 +74,6 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.beginDrawCycle = function (renderTime) {
         // NOOP
     };
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -87,7 +85,6 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.setCurrentId = function (uid) {
         // NOOP
     };
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
@@ -99,7 +96,6 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.setCurrentClassName = function (className) {
         // NOOP
     };
-    ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -122,7 +118,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.stroke();
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
@@ -151,7 +146,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -178,7 +172,6 @@ var drawutils = /** @class */ (function () {
         this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a rectangle.
      *
@@ -201,7 +194,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
     // | intended to be used from the outside.
@@ -224,7 +216,6 @@ var drawutils = /** @class */ (function () {
             this.ctx.stroke();
         }
     };
-    ;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -254,7 +245,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw the given (quadratic) bézier curve.
      *
@@ -278,7 +268,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -315,7 +304,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -331,10 +319,9 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.handle = function (startPoint, endPoint) {
         // Draw handles
         // (No need to save and restore here)
-        this.point(startPoint, 'rgb(0,32,192)');
-        this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
+        this.point(startPoint, "rgb(0,32,192)");
+        this.square(endPoint, 5, "rgba(0,128,192,0.5)");
     };
-    ;
     /**
      * Draw a handle line (with a light grey).
      *
@@ -347,9 +334,8 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.handleLine = function (startPoint, endPoint) {
         // Draw handle lines
-        this.line(startPoint, endPoint, 'rgb(192,192,192)');
+        this.line(startPoint, endPoint, "rgb(192,192,192)");
     };
-    ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
@@ -370,7 +356,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
@@ -389,7 +374,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
@@ -411,22 +395,21 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
-     * Draw a circular arc (section of a circle) with the given CSS color.
-     *
-     * @method circleArc
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {number} startAngle - The angle to start at.
-     * @param {number} endAngle - The angle to end at.
-     * @param {string=#000000} color - The CSS color to draw the circle with.
-     * @param {number=1} lineWidth - The line width to use
-     // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
+       * Draw a circular arc (section of a circle) with the given CSS color.
+       *
+       * @method circleArc
+       * @param {Vertex} center - The center of the circle.
+       * @param {number} radius - The radius of the circle.
+       * @param {number} startAngle - The angle to start at.
+       * @param {number} endAngle - The angle to end at.
+       * @param {string=#000000} color - The CSS color to draw the circle with.
+       * @param {number=1} lineWidth - The line width to use
+       // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+       * @return {void}
+       * @instance
+       * @memberof drawutils
+       */
     drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth, options) {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
@@ -435,10 +418,9 @@ var drawutils = /** @class */ (function () {
         if (!options || !options.asSegment) {
             // this.ctx.closePath();
             this.ctx.lineWidth = lineWidth || 1;
-            this._fillOrDraw(color || '#000000');
+            this._fillOrDraw(color || "#000000");
         }
     };
-    ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -454,7 +436,7 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth, rotation) {
-        if (typeof rotation === 'undefined') {
+        if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
         this.ctx.beginPath();
@@ -463,7 +445,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -485,7 +466,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -519,7 +499,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.stroke();
         this.ctx.closePath();
     };
-    ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
@@ -554,7 +533,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.closePath();
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
@@ -580,7 +558,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -603,7 +580,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -627,7 +603,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -654,7 +629,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.closePath();
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a polygon.
      *
@@ -669,7 +643,6 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.polygon = function (polygon, color, lineWidth) {
         this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
     };
-    ;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -692,20 +665,20 @@ var drawutils = /** @class */ (function () {
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
         }
-        if (!isOpen) // && vertices.length > 2 )
+        if (!isOpen)
+            // && vertices.length > 2 )
             this.ctx.closePath();
         this._fillOrDraw(color);
         this.ctx.closePath();
         this.ctx.setLineDash([]);
         this.ctx.restore();
     };
-    ;
     drawutils.prototype.text = function (text, x, y, options) {
         options = options || {};
         this.ctx.save();
         x = this.offset.x + x * this.scale.x;
         y = this.offset.y + y * this.scale.y;
-        var color = options.color || 'black';
+        var color = options.color || "black";
         if (this.fillShapes) {
             this.ctx.fillStyle = color;
             this.ctx.fillText(text, x, y);
@@ -716,7 +689,6 @@ var drawutils = /** @class */ (function () {
         }
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a non-scaling text label at the given position.
      *
@@ -735,9 +707,9 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.label = function (text, x, y, rotation, color) {
         this.ctx.save();
         this.ctx.translate(x, y);
-        if (typeof rotation != 'undefined')
+        if (typeof rotation != "undefined")
             this.ctx.rotate(rotation);
-        this.ctx.fillStyle = color || 'black';
+        this.ctx.fillStyle = color || "black";
         if (this.fillShapes) {
             this.ctx.fillText(text, 0, 0);
         }
@@ -746,7 +718,6 @@ var drawutils = /** @class */ (function () {
         }
         this.ctx.restore();
     };
-    ;
     /**
      * Draw an SVG-like path given by the specified path data.
      *
@@ -774,7 +745,6 @@ var drawutils = /** @class */ (function () {
             this.ctx.stroke(new Path2D(d.join(" ")));
         }
     };
-    ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
@@ -788,7 +758,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     };
-    ;
     return drawutils;
 }());
 exports.drawutils = drawutils;

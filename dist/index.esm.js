@@ -4168,7 +4168,9 @@ CircleSector.circleSectorUtils = {
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
- * @version  1.0.2
+ * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
+ * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
+ * @version  1.1.0
  **/
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -4941,7 +4943,7 @@ class drawutilssvg {
         const color = options.color || "black";
         const node = this.makeNode("text");
         node.setAttribute("x", `${this._x(x)}`);
-        node.setAttribute("y", `${this._x(y)}`);
+        node.setAttribute("y", `${this._y(y)}`);
         node.innerHTML = text;
         return this._bindFillDraw(node, "text", color, 1);
     }
@@ -5295,7 +5297,6 @@ class drawutils {
         this.scale = new Vertex(1, 1);
         this.fillShapes = fillShapes;
     }
-    ;
     /**
      * Called before each draw cycle.
      * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
@@ -5303,7 +5304,6 @@ class drawutils {
     beginDrawCycle(renderTime) {
         // NOOP
     }
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -5315,7 +5315,6 @@ class drawutils {
     setCurrentId(uid) {
         // NOOP
     }
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
@@ -5327,7 +5326,6 @@ class drawutils {
     setCurrentClassName(className) {
         // NOOP
     }
-    ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -5350,7 +5348,6 @@ class drawutils {
         this.ctx.stroke();
         this.ctx.restore();
     }
-    ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
@@ -5379,7 +5376,6 @@ class drawutils {
         this._fillOrDraw(color);
         this.ctx.restore();
     }
-    ;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -5406,7 +5402,6 @@ class drawutils {
         this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
         this.ctx.restore();
     }
-    ;
     /**
      * Draw a rectangle.
      *
@@ -5429,7 +5424,6 @@ class drawutils {
         this._fillOrDraw(color);
         this.ctx.restore();
     }
-    ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
     // | intended to be used from the outside.
@@ -5452,7 +5446,6 @@ class drawutils {
             this.ctx.stroke();
         }
     }
-    ;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -5482,7 +5475,6 @@ class drawutils {
         this._fillOrDraw(color);
         this.ctx.restore();
     }
-    ;
     /**
      * Draw the given (quadratic) bézier curve.
      *
@@ -5506,7 +5498,6 @@ class drawutils {
         this._fillOrDraw(color);
         this.ctx.restore();
     }
-    ;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -5543,7 +5534,6 @@ class drawutils {
         this._fillOrDraw(color);
         this.ctx.restore();
     }
-    ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -5559,10 +5549,9 @@ class drawutils {
     handle(startPoint, endPoint) {
         // Draw handles
         // (No need to save and restore here)
-        this.point(startPoint, 'rgb(0,32,192)');
-        this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
+        this.point(startPoint, "rgb(0,32,192)");
+        this.square(endPoint, 5, "rgba(0,128,192,0.5)");
     }
-    ;
     /**
      * Draw a handle line (with a light grey).
      *
@@ -5575,9 +5564,8 @@ class drawutils {
      */
     handleLine(startPoint, endPoint) {
         // Draw handle lines
-        this.line(startPoint, endPoint, 'rgb(192,192,192)');
+        this.line(startPoint, endPoint, "rgb(192,192,192)");
     }
-    ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
@@ -5598,7 +5586,6 @@ class drawutils {
         this._fillOrDraw(color);
         this.ctx.restore();
     }
-    ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
@@ -5617,7 +5604,6 @@ class drawutils {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     }
-    ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
@@ -5639,22 +5625,21 @@ class drawutils {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     }
-    ;
     /**
-     * Draw a circular arc (section of a circle) with the given CSS color.
-     *
-     * @method circleArc
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {number} startAngle - The angle to start at.
-     * @param {number} endAngle - The angle to end at.
-     * @param {string=#000000} color - The CSS color to draw the circle with.
-     * @param {number=1} lineWidth - The line width to use
-     // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
+       * Draw a circular arc (section of a circle) with the given CSS color.
+       *
+       * @method circleArc
+       * @param {Vertex} center - The center of the circle.
+       * @param {number} radius - The radius of the circle.
+       * @param {number} startAngle - The angle to start at.
+       * @param {number} endAngle - The angle to end at.
+       * @param {string=#000000} color - The CSS color to draw the circle with.
+       * @param {number=1} lineWidth - The line width to use
+       // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+       * @return {void}
+       * @instance
+       * @memberof drawutils
+       */
     circleArc(center, radius, startAngle, endAngle, color, lineWidth, options) {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
@@ -5663,10 +5648,9 @@ class drawutils {
         if (!options || !options.asSegment) {
             // this.ctx.closePath();
             this.ctx.lineWidth = lineWidth || 1;
-            this._fillOrDraw(color || '#000000');
+            this._fillOrDraw(color || "#000000");
         }
     }
-    ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -5682,7 +5666,7 @@ class drawutils {
      * @memberof drawutils
      */
     ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
-        if (typeof rotation === 'undefined') {
+        if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
         this.ctx.beginPath();
@@ -5691,7 +5675,6 @@ class drawutils {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     }
-    ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -5713,7 +5696,6 @@ class drawutils {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     }
-    ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -5747,7 +5729,6 @@ class drawutils {
         this.ctx.stroke();
         this.ctx.closePath();
     }
-    ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
@@ -5782,7 +5763,6 @@ class drawutils {
         this.ctx.closePath();
         this.ctx.restore();
     }
-    ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
@@ -5808,7 +5788,6 @@ class drawutils {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     }
-    ;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -5831,7 +5810,6 @@ class drawutils {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     }
-    ;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -5855,7 +5833,6 @@ class drawutils {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     }
-    ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -5882,7 +5859,6 @@ class drawutils {
         this.ctx.closePath();
         this.ctx.restore();
     }
-    ;
     /**
      * Draw a polygon.
      *
@@ -5897,7 +5873,6 @@ class drawutils {
     polygon(polygon, color, lineWidth) {
         this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
     }
-    ;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -5920,20 +5895,20 @@ class drawutils {
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
         }
-        if (!isOpen) // && vertices.length > 2 )
+        if (!isOpen)
+            // && vertices.length > 2 )
             this.ctx.closePath();
         this._fillOrDraw(color);
         this.ctx.closePath();
         this.ctx.setLineDash([]);
         this.ctx.restore();
     }
-    ;
     text(text, x, y, options) {
         options = options || {};
         this.ctx.save();
         x = this.offset.x + x * this.scale.x;
         y = this.offset.y + y * this.scale.y;
-        const color = options.color || 'black';
+        const color = options.color || "black";
         if (this.fillShapes) {
             this.ctx.fillStyle = color;
             this.ctx.fillText(text, x, y);
@@ -5944,7 +5919,6 @@ class drawutils {
         }
         this.ctx.restore();
     }
-    ;
     /**
      * Draw a non-scaling text label at the given position.
      *
@@ -5963,9 +5937,9 @@ class drawutils {
     label(text, x, y, rotation, color) {
         this.ctx.save();
         this.ctx.translate(x, y);
-        if (typeof rotation != 'undefined')
+        if (typeof rotation != "undefined")
             this.ctx.rotate(rotation);
-        this.ctx.fillStyle = color || 'black';
+        this.ctx.fillStyle = color || "black";
         if (this.fillShapes) {
             this.ctx.fillText(text, 0, 0);
         }
@@ -5974,7 +5948,6 @@ class drawutils {
         }
         this.ctx.restore();
     }
-    ;
     /**
      * Draw an SVG-like path given by the specified path data.
      *
@@ -6002,7 +5975,6 @@ class drawutils {
             this.ctx.stroke(new Path2D(d.join(" ")));
         }
     }
-    ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
@@ -6016,7 +5988,6 @@ class drawutils {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
-    ;
 }
 
 /**
@@ -9311,7 +9282,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
  * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
- * @version  1.13.2
+ * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
+ * @version  1.13.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -10238,6 +10210,10 @@ class PlotBoilerplate {
         else {
             console.error("Cannot draw object. Unknown class.");
         }
+        draw.setCurrentClassName(null);
+        draw.setCurrentId(null);
+        fill.setCurrentClassName(null);
+        fill.setCurrentId(null);
     }
     /**
      * Draw the select-polygon (if there is one).

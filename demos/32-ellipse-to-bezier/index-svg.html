@@ -1,39 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate - Drawing SVG path data</title>
+    <title>2D Plotting Boilerplate – How to convert elliptic sector to cubic Bézier curves</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, function, graph, plot">
+    <meta name="description" content="A demo about conversion of elliptic sectors to cubic Bézier curves in PlotBoilerplate.js">
+    <meta name="keywords" content="plotboilerplate, ellipse, elliptic, sector, Bézier, conversion">
     <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2021-01-27">
-    
+    <meta name="date" content="2021-03-21">
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.ico">
+
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Demo of drawing SVG path data with PlotBoilerplate.js.">
-    <meta property="og:description" content="Demo of drawing SVG path data with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20210219-0-path-data-transformation.png">
+    <meta property="og:title" content="Demo of drawing circle sectors and converting them to Bézier paths, foci, normals and equidistant ellipse vertices with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demo of drawing circle sectors and converting them to Bézier paths, foci, normals and equidistant ellipse vertices with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20210324-0-elliptic-sectors-to-bezier.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
     <script src="../../lib/path2d-polyfill.min.js"></script>
     
-    <script src="../../lib/humane.min.js"></script>
+    <!-- Load thirdparty libraries -->
     <script src="../../lib/dat.gui.min.js"></script>
     <script src="../../lib/FileSaver.min.js"></script>
     <script src="../../lib/Color.js"></script>
-    <script src="../../lib/alloy_finger.js"></script>
-    <script src="../../lib/uistats.min.js"></script>
+    <!-- script src="../../lib/alloy_finger.js"></script> -->
 
+    <!-- Load utils and helpers -->
     <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
     <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
     <script src="../../src/cjs/utils/creategui.js"></script>
     <script src="../../src/cjs/utils/gup.js"></script>
     <script src="../../src/cjs/utils/module.js"></script>
+    <script src="../../src/cjs/utils/helpers/VEllipseSectorHelper.js"></script>
 
     <!-- For development -->
     
@@ -64,26 +65,15 @@
     <script src="../../src/cjs/PlotBoilerplate.js"></script>
     
     <!-- END for development -->
-
-    <!-- For production -->
-    <script src="../../dist/plotboilerplate.browser.min.js"></script>
-    <!-- END For production -->
-
-
-    <script src="../VertexAnimator.Linear.js"></script>
-    <script src="../../src/cjs/utils/WebColors.js"></script>
-    <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
-    <script src="../getContrastColor.js"></script>
-    <script src="../modal.js"></script>
-    <script src="../Interval.js"></script>
-    <script src="index.js"></script>
     
-    <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
-    <link rel="stylesheet" href="../../style.css">
-    <link rel="stylesheet" href="../modal.css">
-    <link rel="stylesheet" href="styles.css">
+    <!-- For production -->
+    <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
+    <!-- END For production -->
+    <script src="../../lib/alloy_finger.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
   </head>
-  <body>
-      <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+  <body class="fullscreen">
+    <svg id="my-canvas" width="1024" height="768"></svg>
   </body>
 </html>

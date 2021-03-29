@@ -13,11 +13,13 @@
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
- * @version  1.0.2
+ * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
+ * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
+ * @version  1.1.0
  **/
-import { Polygon } from "../../Polygon";
-import { Vertex } from "../../Vertex";
-import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID } from "../../interfaces";
+import { Polygon } from "./Polygon";
+import { Vertex } from "./Vertex";
+import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID } from "./interfaces";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.

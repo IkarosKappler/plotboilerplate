@@ -71,7 +71,8 @@
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
  * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
- * @version  1.13.2
+ * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
+ * @version  1.13.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

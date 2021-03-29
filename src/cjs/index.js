@@ -17,6 +17,7 @@ __exportStar(require("./CircleSector"), exports);
 __exportStar(require("./CubicBezierCurve"), exports);
 __exportStar(require("./draw"), exports);
 __exportStar(require("./drawgl"), exports);
+__exportStar(require("./drawutilssvg"), exports);
 __exportStar(require("./geomutils"), exports);
 __exportStar(require("./Grid"), exports);
 __exportStar(require("./interfaces"), exports);
@@ -36,5 +37,4 @@ __exportStar(require("./Vertex"), exports);
 __exportStar(require("./VertexAttr"), exports);
 __exportStar(require("./VertexListeners"), exports);
 __exportStar(require("./VertTuple"), exports);
-__exportStar(require("./utils/helpers/drawutilssvg"), exports);
 //# sourceMappingURL=index.js.map

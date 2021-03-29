@@ -3994,7 +3994,8 @@ var __webpack_unused_export__;
  * @modified 2021-02-18 Adding `adjustOffset(boolean)` function.
  * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
- * @version  1.13.2
+ * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
+ * @version  1.13.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -4005,7 +4006,7 @@ exports.H4 = void 0;
 var alloyfinger_typescript_1 = __webpack_require__(318);
 var draw_1 = __webpack_require__(149);
 var drawgl_1 = __webpack_require__(349);
-var drawutilssvg_1 = __webpack_require__(274);
+var drawutilssvg_1 = __webpack_require__(829);
 var BezierPath_1 = __webpack_require__(126);
 var Bounds_1 = __webpack_require__(262);
 var Circle_1 = __webpack_require__(913);
@@ -4942,6 +4943,10 @@ var PlotBoilerplate = /** @class */ (function () {
         else {
             console.error("Cannot draw object. Unknown class.");
         }
+        draw.setCurrentClassName(null);
+        draw.setCurrentId(null);
+        fill.setCurrentClassName(null);
+        fill.setCurrentId(null);
     };
     /**
      * Draw the select-polygon (if there is one).
@@ -9039,7 +9044,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
 var CubicBezierCurve_1 = __webpack_require__(510);
 var Vertex_1 = __webpack_require__(421);
-var drawutilssvg_1 = __webpack_require__(274);
+var drawutilssvg_1 = __webpack_require__(829);
 // Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -9064,7 +9069,6 @@ var drawutils = /** @class */ (function () {
         this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
     }
-    ;
     /**
      * Called before each draw cycle.
      * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
@@ -9072,7 +9076,6 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.beginDrawCycle = function (renderTime) {
         // NOOP
     };
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -9084,7 +9087,6 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.setCurrentId = function (uid) {
         // NOOP
     };
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
@@ -9096,7 +9098,6 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.setCurrentClassName = function (className) {
         // NOOP
     };
-    ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -9119,7 +9120,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.stroke();
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
@@ -9148,7 +9148,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -9175,7 +9174,6 @@ var drawutils = /** @class */ (function () {
         this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a rectangle.
      *
@@ -9198,7 +9196,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
     // | intended to be used from the outside.
@@ -9221,7 +9218,6 @@ var drawutils = /** @class */ (function () {
             this.ctx.stroke();
         }
     };
-    ;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -9251,7 +9247,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw the given (quadratic) bézier curve.
      *
@@ -9275,7 +9270,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -9312,7 +9306,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -9328,10 +9321,9 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.handle = function (startPoint, endPoint) {
         // Draw handles
         // (No need to save and restore here)
-        this.point(startPoint, 'rgb(0,32,192)');
-        this.square(endPoint, 5, 'rgba(0,128,192,0.5)');
+        this.point(startPoint, "rgb(0,32,192)");
+        this.square(endPoint, 5, "rgba(0,128,192,0.5)");
     };
-    ;
     /**
      * Draw a handle line (with a light grey).
      *
@@ -9344,9 +9336,8 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.handleLine = function (startPoint, endPoint) {
         // Draw handle lines
-        this.line(startPoint, endPoint, 'rgb(192,192,192)');
+        this.line(startPoint, endPoint, "rgb(192,192,192)");
     };
-    ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
@@ -9367,7 +9358,6 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
         this.ctx.restore();
     };
-    ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
@@ -9386,7 +9376,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
@@ -9408,22 +9397,21 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
-     * Draw a circular arc (section of a circle) with the given CSS color.
-     *
-     * @method circleArc
-     * @param {Vertex} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {number} startAngle - The angle to start at.
-     * @param {number} endAngle - The angle to end at.
-     * @param {string=#000000} color - The CSS color to draw the circle with.
-     * @param {number=1} lineWidth - The line width to use
-     // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
+       * Draw a circular arc (section of a circle) with the given CSS color.
+       *
+       * @method circleArc
+       * @param {Vertex} center - The center of the circle.
+       * @param {number} radius - The radius of the circle.
+       * @param {number} startAngle - The angle to start at.
+       * @param {number} endAngle - The angle to end at.
+       * @param {string=#000000} color - The CSS color to draw the circle with.
+       * @param {number=1} lineWidth - The line width to use
+       // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+       * @return {void}
+       * @instance
+       * @memberof drawutils
+       */
     drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth, options) {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
@@ -9432,10 +9420,9 @@ var drawutils = /** @class */ (function () {
         if (!options || !options.asSegment) {
             // this.ctx.closePath();
             this.ctx.lineWidth = lineWidth || 1;
-            this._fillOrDraw(color || '#000000');
+            this._fillOrDraw(color || "#000000");
         }
     };
-    ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -9451,7 +9438,7 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth, rotation) {
-        if (typeof rotation === 'undefined') {
+        if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
         this.ctx.beginPath();
@@ -9460,7 +9447,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -9482,7 +9468,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -9516,7 +9501,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.stroke();
         this.ctx.closePath();
     };
-    ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
@@ -9551,7 +9535,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.closePath();
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
@@ -9577,7 +9560,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -9600,7 +9582,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -9624,7 +9605,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = 1;
         this._fillOrDraw(color);
     };
-    ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -9651,7 +9631,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.closePath();
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a polygon.
      *
@@ -9666,7 +9645,6 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.polygon = function (polygon, color, lineWidth) {
         this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
     };
-    ;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -9689,20 +9667,20 @@ var drawutils = /** @class */ (function () {
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
         }
-        if (!isOpen) // && vertices.length > 2 )
+        if (!isOpen)
+            // && vertices.length > 2 )
             this.ctx.closePath();
         this._fillOrDraw(color);
         this.ctx.closePath();
         this.ctx.setLineDash([]);
         this.ctx.restore();
     };
-    ;
     drawutils.prototype.text = function (text, x, y, options) {
         options = options || {};
         this.ctx.save();
         x = this.offset.x + x * this.scale.x;
         y = this.offset.y + y * this.scale.y;
-        var color = options.color || 'black';
+        var color = options.color || "black";
         if (this.fillShapes) {
             this.ctx.fillStyle = color;
             this.ctx.fillText(text, x, y);
@@ -9713,7 +9691,6 @@ var drawutils = /** @class */ (function () {
         }
         this.ctx.restore();
     };
-    ;
     /**
      * Draw a non-scaling text label at the given position.
      *
@@ -9732,9 +9709,9 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.label = function (text, x, y, rotation, color) {
         this.ctx.save();
         this.ctx.translate(x, y);
-        if (typeof rotation != 'undefined')
+        if (typeof rotation != "undefined")
             this.ctx.rotate(rotation);
-        this.ctx.fillStyle = color || 'black';
+        this.ctx.fillStyle = color || "black";
         if (this.fillShapes) {
             this.ctx.fillText(text, 0, 0);
         }
@@ -9743,7 +9720,6 @@ var drawutils = /** @class */ (function () {
         }
         this.ctx.restore();
     };
-    ;
     /**
      * Draw an SVG-like path given by the specified path data.
      *
@@ -9771,7 +9747,6 @@ var drawutils = /** @class */ (function () {
             this.ctx.stroke(new Path2D(d.join(" ")));
         }
     };
-    ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
@@ -9785,7 +9760,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     };
-    ;
     return drawutils;
 }());
 exports.drawutils = drawutils;
@@ -10474,93 +10448,7 @@ var GLU = /** @class */ (function () {
 
 /***/ }),
 
-/***/ 22:
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-/**
- * @author   Ikaros Kappler
- * @date     2019-02-03
- * @modified 2021-03-01 Added `wrapMax` function.
- * @version  1.1.0
- **/
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.geomutils = void 0;
-var Line_1 = __webpack_require__(831);
-var Triangle_1 = __webpack_require__(212);
-/**
- * A collection of usefull geometry utilities.
- *
- * @global
- **/
-exports.geomutils = {
-    /**
-     * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
-     *
-     * @param {Vertex} pA - The first triangle point.
-     * @param {Vertex} pB - The second triangle point.
-     * @param {Vertex} pC - The third triangle point.
-     * @param {number} n - The number of desired angle sections (example: 2 means the angle will be divided into two sections,
-     *                      means an returned array with length 1, the middle line).
-     *
-     * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
-     */
-    nsectAngle: function (pA, pB, pC, n) {
-        var triangle = new Triangle_1.Triangle(pA, pB, pC);
-        var lineAB = new Line_1.Line(pA, pB);
-        var lineAC = new Line_1.Line(pA, pC);
-        // Compute the difference; this is the angle between AB and AC
-        var insideAngle = lineAB.angle(lineAC);
-        // We want the inner angles of the triangle, not the outer angle;
-        //   which one is which depends on the triangle 'direction'
-        var clockwise = triangle.determinant() > 0;
-        // For convenience convert the angle [-PI,PI] to [0,2*PI]
-        if (insideAngle < 0)
-            insideAngle = 2 * Math.PI + insideAngle;
-        if (!clockwise)
-            insideAngle = (2 * Math.PI - insideAngle) * (-1);
-        // Scale the rotated lines to the max leg length (looks better)
-        var lineLength = Math.max(lineAB.length(), lineAC.length());
-        var scaleFactor = lineLength / lineAB.length();
-        var result = [];
-        for (var i = 1; i < n; i++) {
-            // Compute the i-th inner sector line
-            result.push(new Line_1.Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
-        }
-        return result;
-    },
-    /**
-     * Wrap the value (e.g. an angle) into the given range of [0,max).
-     *
-     * @name wrapMax
-     * @param {number} x - The value to wrap.
-     * @param {number} max - The max bound to use for the range.
-     * @return {number} The wrapped value inside the range [0,max).
-     */
-    wrapMax: function (x, max) {
-        // Found at
-        //    https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
-        return (max + (x % max)) % max;
-    },
-    /**
-     * Wrap the value (e.g. an angle) into the given range of [min,max).
-     *
-     * @name wrapMinMax
-     * @param {number} x - The value to wrap.
-     * @param {number} min - The min bound to use for the range.
-     * @param {number} max - The max bound to use for the range.
-     * @return {number} The wrapped value inside the range [min,max).
-     */
-    // Currently un-used
-    wrapMinMax: function (x, min, max) {
-        return min + exports.geomutils.wrapMax(x - min, max - min);
-    }
-};
-//# sourceMappingURL=geomutils.js.map
-
-/***/ }),
-
-/***/ 274:
+/***/ 829:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -10579,7 +10467,9 @@ exports.geomutils = {
  * @modified 2021-02-22 Added the static helper function `copyPathData(...)`.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
- * @version  1.0.2
+ * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
+ * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
+ * @version  1.1.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -11358,7 +11248,7 @@ var drawutilssvg = /** @class */ (function () {
         var color = options.color || "black";
         var node = this.makeNode("text");
         node.setAttribute("x", "" + this._x(x));
-        node.setAttribute("y", "" + this._x(y));
+        node.setAttribute("y", "" + this._y(y));
         node.innerHTML = text;
         return this._bindFillDraw(node, "text", color, 1);
     };
@@ -11666,6 +11556,92 @@ var drawutilssvg = /** @class */ (function () {
 exports.drawutilssvg = drawutilssvg;
 //# sourceMappingURL=drawutilssvg.js.map
 
+/***/ }),
+
+/***/ 22:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2019-02-03
+ * @modified 2021-03-01 Added `wrapMax` function.
+ * @version  1.1.0
+ **/
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.geomutils = void 0;
+var Line_1 = __webpack_require__(831);
+var Triangle_1 = __webpack_require__(212);
+/**
+ * A collection of usefull geometry utilities.
+ *
+ * @global
+ **/
+exports.geomutils = {
+    /**
+     * Compute the n-section of the angle – described as a triangle (A,B,C) – in point A.
+     *
+     * @param {Vertex} pA - The first triangle point.
+     * @param {Vertex} pB - The second triangle point.
+     * @param {Vertex} pC - The third triangle point.
+     * @param {number} n - The number of desired angle sections (example: 2 means the angle will be divided into two sections,
+     *                      means an returned array with length 1, the middle line).
+     *
+     * @return {Line[]} An array of n-1 lines secting the given angle in point A into n equal sized angle sections. The lines' first vertex is A.
+     */
+    nsectAngle: function (pA, pB, pC, n) {
+        var triangle = new Triangle_1.Triangle(pA, pB, pC);
+        var lineAB = new Line_1.Line(pA, pB);
+        var lineAC = new Line_1.Line(pA, pC);
+        // Compute the difference; this is the angle between AB and AC
+        var insideAngle = lineAB.angle(lineAC);
+        // We want the inner angles of the triangle, not the outer angle;
+        //   which one is which depends on the triangle 'direction'
+        var clockwise = triangle.determinant() > 0;
+        // For convenience convert the angle [-PI,PI] to [0,2*PI]
+        if (insideAngle < 0)
+            insideAngle = 2 * Math.PI + insideAngle;
+        if (!clockwise)
+            insideAngle = (2 * Math.PI - insideAngle) * (-1);
+        // Scale the rotated lines to the max leg length (looks better)
+        var lineLength = Math.max(lineAB.length(), lineAC.length());
+        var scaleFactor = lineLength / lineAB.length();
+        var result = [];
+        for (var i = 1; i < n; i++) {
+            // Compute the i-th inner sector line
+            result.push(new Line_1.Line(pA, pB.clone().rotate((-i * (insideAngle / n)), pA)).scale(scaleFactor));
+        }
+        return result;
+    },
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [0,max).
+     *
+     * @name wrapMax
+     * @param {number} x - The value to wrap.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [0,max).
+     */
+    wrapMax: function (x, max) {
+        // Found at
+        //    https://stackoverflow.com/questions/4633177/c-how-to-wrap-a-float-to-the-interval-pi-pi
+        return (max + (x % max)) % max;
+    },
+    /**
+     * Wrap the value (e.g. an angle) into the given range of [min,max).
+     *
+     * @name wrapMinMax
+     * @param {number} x - The value to wrap.
+     * @param {number} min - The min bound to use for the range.
+     * @param {number} max - The max bound to use for the range.
+     * @return {number} The wrapped value inside the range [min,max).
+     */
+    // Currently un-used
+    wrapMinMax: function (x, min, max) {
+        return min + exports.geomutils.wrapMax(x - min, max - min);
+    }
+};
+//# sourceMappingURL=geomutils.js.map
+
 /***/ })
 
 /******/ 	});
@@ -11727,8 +11703,6 @@ exports.drawutilssvg = drawutilssvg;
 
 /* Imports for webpack */
 
-// import AlloyFinger, { TouchMoveEvent, TouchPinchEvent } from "alloyfinger-typescript/src/js/index";
-
 globalThis.UIDGenerator = __webpack_require__(197).UIDGenerator;
 globalThis.VertexAttr = __webpack_require__(861).VertexAttr;
 globalThis.VertexListeners = __webpack_require__(76).VertexListeners;
@@ -11749,9 +11723,8 @@ globalThis.PBImage = __webpack_require__(699).PBImage;
 globalThis.MouseHandler = __webpack_require__(293).MouseHandler;
 globalThis.KeyHandler = __webpack_require__(909).KeyHandler;
 globalThis.drawutils = __webpack_require__(149).drawutils;
-// globalThis.drawutilsgl = require("./drawgl.js").drawutilsgl;
-// globalThis.drawutilsgl = {};
-globalThis.drawutilssvg = __webpack_require__(274).drawutilssvg;
+// globalThis.drawutilsgl = require("./drawgl.js").drawutilsgl;  // Unfinished
+globalThis.drawutilssvg = __webpack_require__(829).drawutilssvg;
 globalThis.geomutils = __webpack_require__(22).geomutils;
 globalThis.PlotBoilerplate = __webpack_require__(919)/* .PlotBoilerplate */ .H4;
 

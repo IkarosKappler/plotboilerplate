@@ -1,5 +1,10 @@
 # Changelog
 
+- 2021-03-29
+  - Fixed a bug in the `drawutilssvg.text` function (second y param was wrong, used x here).
+  - Clearing `currentClassName` and `currentId` after drawing each drawable.
+- 2021-03-26 [v1.12.1]
+  - Published version 1.12.1
 - 2021-03-24
   - Added the `VEllipseSectorHelper` class.
 - 2021-03-19

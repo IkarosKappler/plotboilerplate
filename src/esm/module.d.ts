@@ -23,6 +23,6 @@ import { Vertex } from "./Vertex";
 import { VertexAttr } from "./VertexAttr";
 import { VertexListeners } from "./VertexListeners";
 import { VertTuple } from "./VertTuple";
-import { drawutilssvg } from "./utils/helpers/drawutilssvg";
+import { drawutilssvg } from "./drawutilssvg";
 export { BezierPath, Bounds, Circle, CircleSector, CubicBezierCurve, drawutils, drawutilsgl, geomutils, Grid, KeyHandler, Line, MouseHandler, PBImage, PlotBoilerplate, Polygon, SVGBuilder, Triangle, UIDGenerator, Vector, VEllipse, VEllipseSector, Vertex, VertexAttr, VertexListeners, VertTuple, drawutilssvg };
 export default PlotBoilerplate;
