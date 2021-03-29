@@ -3,6 +3,7 @@
 - 2021-03-29
   - Fixed a bug in the `drawutilssvg.text` function (second y param was wrong, used x here).
   - Clearing `currentClassName` and `currentId` after drawing each drawable.
+  - Added the `draw` and `fill` params to the `preDraw` and `postDraw` functions (required for full svg export support).
 - 2021-03-26 [v1.12.1]
   - Published version 1.12.1
 - 2021-03-24

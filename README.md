@@ -312,14 +312,14 @@ var pb = new PlotBoilerplate({
   // function
   //   A callback function that will be triggered just before the
   //   draw function starts.
-  preDraw: function () {
+  preDraw: function (draw, fill) {
     console.log("after clearing and before drawing.");
   },
 
   // function
   //   A callback function that will be triggered right after the
   //   drawing process finished.
-  postDraw: function () {
+  postDraw: function (draw, fill) {
     console.log("after drawing.");
   },
 

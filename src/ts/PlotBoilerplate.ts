@@ -624,6 +624,7 @@ export class PlotBoilerplate {
     tosvgFill.beginDrawCycle(0);
     tosvgDraw.clear(pb.config.backgroundColor);
     pb.drawAll(0, tosvgDraw, tosvgFill);
+    if (pb.config.postDraw) pb.config.postDraw(tosvgDraw, tosvgFill);
 
     // Full support in all browsers \o/
     //    https://caniuse.com/xml-serializer
@@ -1328,11 +1329,11 @@ export class PlotBoilerplate {
 
     if (this.config.preClear) this.config.preClear();
     this.clear();
-    if (this.config.preDraw) this.config.preDraw();
+    if (this.config.preDraw) this.config.preDraw(this.draw, this.fill);
 
     this.drawAll(renderTime, this.draw, this.fill);
 
-    if (this.config.postDraw) this.config.postDraw();
+    if (this.config.postDraw) this.config.postDraw(this.draw, this.fill);
   }
 
   /**
@@ -1484,7 +1485,6 @@ export class PlotBoilerplate {
       h *= _self.config.canvasHeightFactor;
       _self.canvasSize.width = w;
       _self.canvasSize.height = h;
-      // TODO: use CanvasWrapper.setSize here?
       if (_self.canvas instanceof HTMLCanvasElement) {
         _self.canvas.width = w;
         _self.canvas.height = h;
@@ -1493,7 +1493,6 @@ export class PlotBoilerplate {
         this.canvas.setAttribute("width", `${w}`);
         this.canvas.setAttribute("height", `${h}`);
         (this.draw as drawutilssvg).setSize(_self.canvasSize); // No need to set size to this.fill (instance copy)
-        // console.log(
         this.eventCatcher.style.width = `${w}px`;
         this.eventCatcher.style.height = `${h}px`;
       } else {

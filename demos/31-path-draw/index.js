@@ -13,7 +13,6 @@
  * @version     1.0.0
  **/
 
-
 (function (_context) {
   "use strict";
 
@@ -22,7 +21,6 @@
 
   window.addEventListener("load", function () {
     // All config params are optional.
-    // console.log( 'init. canvas: ', document.getElementById('my-canvas') );
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
         {
@@ -165,12 +163,12 @@
       pb.draw.path(arcOnly, "rgb(0,255,255)", config.lineWidth, false);
       pb.draw.circleHandle({ x: arcOnly[1], y: arcOnly[2] }, 3, "green");
       pb.draw.circleHandle({ x: arcOnly[9], y: arcOnly[10] }, 3, "green");
-      var svgBezier = trasformSVGArcToBezier( new Vertex(arcOnly[1], arcOnly[2]), arcOnly, 3 );
-      console.log( "svgBezier", svgBezier);
-      pb.draw.path(svgBezier, "rgba(255,255,0,0.666)", config.lineWidth*2, false);
+      var svgBezier = trasformSVGArcToBezier(new Vertex(arcOnly[1], arcOnly[2]), arcOnly, 3);
+      console.log("svgBezier", svgBezier);
+      pb.draw.path(svgBezier, "rgba(255,255,0,0.666)", config.lineWidth * 2, false);
     };
 
-    var trasformSVGArcToBezier = function( lastPoint, data, startIndex) {
+    var trasformSVGArcToBezier = function (lastPoint, data, startIndex) {
       var D2R = Math.PI / 180;
       // pb.draw.path(arcOnly, "rgb(0,255,255)", config.lineWidth, false);
       // pb.draw.circleHandle({ x: arcOnly[1], y: arcOnly[2] }, 3, "green");
@@ -180,13 +178,13 @@
       var sector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
         lastPoint.x, // x1
         lastPoint.y, // y1
-        data[startIndex+1], // rx
-        data[startIndex+2], // ry
-        data[startIndex+3] * D2R, // rotation (phi)
-        data[startIndex+4] != 0, // fa
-        data[startIndex+5] != 0, // fs
-        data[startIndex+6], // x2
-        data[startIndex+7] // y2
+        data[startIndex + 1], // rx
+        data[startIndex + 2], // ry
+        data[startIndex + 3] * D2R, // rotation (phi)
+        data[startIndex + 4] != 0, // fa
+        data[startIndex + 5] != 0, // fs
+        data[startIndex + 6], // x2
+        data[startIndex + 7] // y2
       );
       // console.log("sector", sector);
       pb.draw.crosshair(sector.ellipse.center, 5, "blue");
@@ -208,10 +206,15 @@
           "purple",
           1
         );
-        svgBezier.push('C', 
-        bezier[i].endPoint.x, bezier[i].endPoint.y,
-        bezier[i].startControlPoint.x, bezier[i].startControlPoint.y,
-        bezier[i].endControlPoint.x, bezier[i].endControlPoint.y);
+        svgBezier.push(
+          "C",
+          bezier[i].endPoint.x,
+          bezier[i].endPoint.y,
+          bezier[i].startControlPoint.x,
+          bezier[i].startControlPoint.y,
+          bezier[i].endControlPoint.x,
+          bezier[i].endControlPoint.y
+        );
       }
       return svgBezier;
     };

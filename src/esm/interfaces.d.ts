@@ -95,8 +95,8 @@ export interface Config {
     backgroundColor?: string;
     redrawOnResize?: boolean;
     preClear?: () => void;
-    preDraw?: () => void;
-    postDraw?: () => void;
+    preDraw?: (draw: DrawLib<any>, fill: DrawLib<any>) => void;
+    postDraw?: (draw: DrawLib<any>, fill: DrawLib<any>) => void;
     enableMouse?: boolean;
     enableTouch?: boolean;
     enableKeys?: boolean;
