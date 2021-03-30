@@ -65,30 +65,39 @@
       };
     };
 
-    // var lats = 6;
-    // var longs = 6;
-    // var radius = 100;
-    // var vertices = [];
-    // var edges = [];
-    // for( var lat = 0; lat < lats; lat++) {
-    //   var theta = (lat/lats)*Math.PI;
-    //   for( var long = 0; long < longs; long++) {
-    //     var alpha = (long/longs) * Math.PI*2;
-    //     var x = x0 + radius*Math.cos(theta)*Math.sin(alpha)
-    //     var y = y0 + radius*Math.sin(theta)*Math.sin(alpha)
-    //     var z = z0 + radius*Math.cos(alpha)
-    //     var vert = new Vert3( x, y, z);
-    //     var
-    //     vertices.push( vert );
-    //     if( lat > 0 && long > 0 ) {
-    //       edges.push( [] );
-    //     }
-    //   }
-    // }
+    var makeSphereGeometry = function () {
+      var lats = 6;
+      var longs = 6;
+      var radius = 1;
+      var vertices = [];
+      var edges = [];
+      for (var lat = 0; lat < lats; lat++) {
+        var theta = (lat / lats) * Math.PI;
+        for (var long = 0; long < longs; long++) {
+          var alpha = (long / longs) * Math.PI * 2;
+          // var x = x0 + radius * Math.cos(theta) * Math.sin(alpha);
+          // var y = y0 + radius * Math.sin(theta) * Math.sin(alpha);
+          // var z = z0 + radius * Math.cos(alpha);
+          // var vert = new Vert3(x, y, z);
+          var vert = new Vert3(radius, 0, 0);
+          vert = rotatePoint(vert, alpha, 0, theta, 0);
+          vertices.push(vert);
+          if (lat > 0 && long > 0) {
+            edges.push([lat * longs + long - 1, lat * longs + long]);
+            if (long + 1 == longs) {
+              edges.push([lat * longs, lat * longs + long]);
+            }
+          }
+        }
+      }
+      console.log(vertices);
+      return { vertices: vertices, edges: edges };
+    };
 
-    // Box
-    // prettier-ignore
-    var vertices = [
+    var makeBoxGeometry = function () {
+      // Box
+      // prettier-ignore
+      var vertices = [
       new Vert3(-1, -1, -1), 
       new Vert3(-1, -1,  1),
       new Vert3(1, -1, 1),
@@ -99,8 +108,8 @@
       new Vert3(1, 1, 1),
       new Vert3(1, 1, -1)
     ];
-    // prettier-ignore
-    var edges = [
+      // prettier-ignore
+      var edges = [
       // front
       [0,1], [1,2], [2,3], [3,0],
       // back
@@ -108,40 +117,66 @@
       // sides
       [0,4], [1,5], [2,6], [3,7]
     ];
+      return { vertices: vertices, edges: edges };
+    };
+
+    // var geometry = makeBoxGeometry();
+    var geometry = makeSphereGeometry();
 
     // +---------------------------------------------------------------------------------
     // | This is the part where the magic happens
     // +-------------------------------
     pb.config.postDraw = function (draw, fill) {
       // console.log("postDraw", draw);
-      for (var e in edges) {
-        var a = projectPoint(rotatePoint(scalePoint(vertices[edges[e][0]].clone())));
-        var b = projectPoint(rotatePoint(scalePoint(vertices[edges[e][1]].clone())));
-        draw.line(a, b, "rgba(192,192,192,0.75)", 1);
+      for (var e in geometry.edges) {
+        var a3 = applyRotation(applyScale(geometry.vertices[geometry.edges[e][0]].clone()));
+        var b3 = applyRotation(applyScale(geometry.vertices[geometry.edges[e][1]].clone()));
+        var a2 = applyProjection(a3);
+        var b2 = applyProjection(b3);
+        var tA = getThreshold(a3, -config.scale, config.scale);
+        var tB = getThreshold(b3, -config.scale, config.scale);
+        var threshold = Math.max(0, Math.min(1, Math.min(tA, tB)));
+        // console.log("tA", tA, "tB", tB, "threshold", threshold);
+        draw.line(a2, b2, "rgba(92,92,92," + threshold + ")", 2);
+      }
+      for (var v in geometry.vertices) {
+        draw.squareHandle(applyProjection(applyRotation(applyScale(geometry.vertices[v].clone()))), 2, "grey", 1);
       }
     };
 
-    var projectPoint = function (p) {
+    var getThreshold = function (p, far, close) {
+      return (far - p.z) / (far - close);
+    };
+
+    var applyProjection = function (p) {
       // Project
-      var threshold = (config.far - p.z) / (config.far - config.close);
+      var threshold = getThreshold(p, config.far, config.close); //  (config.far - p.z) / (config.far - config.close);
       threshold = Math.max(0, threshold);
       return { x: p.x * threshold, y: p.y * threshold };
     };
 
-    var scalePoint = function (p) {
+    var applyScale = function (p) {
       p.x *= config.scale;
       p.y *= config.scale;
       p.z *= config.scale;
       return p;
     };
 
-    function rotatePoint(point) {
-      // , pitch, roll, yaw) {
+    function applyRotation(point) {
+      return rotatePoint(
+        point,
+        (config.rotationX * Math.PI) / 180,
+        (config.rotationY * Math.PI) / 180,
+        (config.rotationZ * Math.PI) / 180
+      );
+    }
+
+    function rotatePoint(point, pitch, roll, yaw) {
       // https://stackoverflow.com/questions/34050929/3d-point-rotation-algorithm/34060479
 
-      var pitch = (config.rotationX * Math.PI) / 180;
-      var roll = (config.rotationY * Math.PI) / 180;
-      var yaw = (config.rotationZ * Math.PI) / 180;
+      // var pitch = (config.rotationX * Math.PI) / 180;
+      // var roll = (config.rotationY * Math.PI) / 180;
+      // var yaw = (config.rotationZ * Math.PI) / 180;
 
       var cosa = Math.cos(yaw);
       var sina = Math.sin(yaw);
