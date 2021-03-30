@@ -30,6 +30,7 @@
 - For convenience add an "Info" button to the UI of all demos with a short explanation about what's happening here.
 - Remove all <div id="dialog-wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
 - Remove SVGBuilder from Girih-demo.
+- Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
 
 ### Todos for future Version 2
 

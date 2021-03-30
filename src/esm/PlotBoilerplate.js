@@ -425,8 +425,13 @@ export class PlotBoilerplate {
         var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
         tosvgDraw.beginDrawCycle(0);
         tosvgFill.beginDrawCycle(0);
+        if (pb.config.preClear)
+            pb.config.preClear();
         tosvgDraw.clear(pb.config.backgroundColor);
+        if (pb.config.preDraw)
+            pb.config.preDraw(tosvgDraw, tosvgFill);
         pb.drawAll(0, tosvgDraw, tosvgFill);
+        pb.drawVertices(0, tosvgDraw);
         if (pb.config.postDraw)
             pb.config.postDraw(tosvgDraw, tosvgFill);
         // Full support in all browsers \o/

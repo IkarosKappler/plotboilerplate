@@ -414,21 +414,21 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      **/
     PlotBoilerplate._saveFile = function (pb) {
-        if (typeof drawutilssvg_1.drawutilssvg === "undefined") {
-            console.error("Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?");
-            return;
-        }
         // Create fake SVG node
         var svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        // var svgNode = document.getElementById('preview-svg');
         // Draw everything to fake node.
         var tosvgDraw = new drawutilssvg_1.drawutilssvg(svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, false, // fillShapes=false
         pb.drawConfig);
         var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
         tosvgDraw.beginDrawCycle(0);
         tosvgFill.beginDrawCycle(0);
+        if (pb.config.preClear)
+            pb.config.preClear();
         tosvgDraw.clear(pb.config.backgroundColor);
+        if (pb.config.preDraw)
+            pb.config.preDraw(tosvgDraw, tosvgFill);
         pb.drawAll(0, tosvgDraw, tosvgFill);
+        pb.drawVertices(0, tosvgDraw);
         if (pb.config.postDraw)
             pb.config.postDraw(tosvgDraw, tosvgFill);
         // Full support in all browsers \o/
@@ -1066,6 +1066,7 @@ var PlotBoilerplate = /** @class */ (function () {
             if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible) {
                 draw.setCurrentId(this.vertices[i].uid);
                 draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], "rgb(0,128,192)"));
+                this.vertices[i].attr.renderTime = renderTime;
             }
         }
     };
