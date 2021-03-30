@@ -9,6 +9,7 @@
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-01 Added the `rotation` param to the DrawLib.ellipse(...) function.
  * @modified 2021-03-02 Added the `VEllipseSector` as to the `Drawable` type.
+ * @modified 2021-03-29 Added the `draw` and `fill` params to the `preDraw` and `postDraw` function (required for full svg export support).
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=interfaces.js.map

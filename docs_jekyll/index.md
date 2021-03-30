@@ -42,6 +42,9 @@ visualizing 2D geometries. Basic features are
   - ellipses
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class"),
     [example](https://plotboilerplate.io/repo/demos/basic-VEllipse "VEllipse example"))
+  - ellipse sectors
+    ([docs](https://plotboilerplate.io/docs_typedoc/classes/vellipsesector.html "VEllipseSector class"),
+    [example](https://plotboilerplate.io/repo/demos/basic-VEllipseSector "VEllipseSector example"))
   - images
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class"),
     [example](https://plotboilerplate.io/repo/demos/basic-PBImage "PBImage example"))
@@ -316,14 +319,14 @@ var pb = new PlotBoilerplate({
   // function
   //   A callback function that will be triggered just before the
   //   draw function starts.
-  preDraw: function () {
+  preDraw: function (draw, fill) {
     console.log("after clearing and before drawing.");
   },
 
   // function
   //   A callback function that will be triggered right after the
   //   drawing process finished.
-  postDraw: function () {
+  postDraw: function (draw, fill) {
     console.log("after drawing.");
   },
 

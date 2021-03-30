@@ -3,7 +3,10 @@ layout: base
 ---
 
     <div class="site-headerdemo">
+      {% comment %}
       <canvas id="my-canvas" style="border: 1px solid #e8e8e8;">Your browser does not support the canvas tag.</canvas>
+      {% endcomment %}
+      <svg id="my-canvas" style="border: 1px solid #e8e8e8;"></svg>
     </div>
 
     <div class="page-content">
@@ -12,13 +15,6 @@ layout: base
       </div>
     </div>
 
-    {% comment %}
-    <!--
-    <script src="https://int2byte.de/public/plotboilerplate/lib/Touchy-updated.min.js"></script>
-    <script src="https://int2byte.de/public/plotboilerplate/dist/plotboilerplate.min.js"></script>
-    <script src="https://int2byte.de/public/plotboilerplate/demos/02-line-point-distance/barkbeetles.js"></script>
-    -->
-    {% endcomment %}
      
     <script src="https://plotboilerplate.io/repo/lib/alloy_finger.js"></script>
     <script src="https://plotboilerplate.io/repo/dist/plotboilerplate.min.js"></script>

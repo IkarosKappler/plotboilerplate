@@ -38,6 +38,9 @@ visualizing 2D geometries. Basic features are
   - ellipses
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/vellipse.html "VEllipse class"),
     [example](https://plotboilerplate.io/repo/demos/basic-VEllipse "VEllipse example"))
+  - ellipse sectors
+    ([docs](https://plotboilerplate.io/docs_typedoc/classes/vellipsesector.html "VEllipseSector class"),
+    [example](https://plotboilerplate.io/repo/demos/basic-VEllipseSector "VEllipseSector example"))
   - images
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class"),
     [example](https://plotboilerplate.io/repo/demos/basic-PBImage "PBImage example"))
