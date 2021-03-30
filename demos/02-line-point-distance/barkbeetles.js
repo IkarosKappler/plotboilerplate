@@ -73,8 +73,8 @@ var BarkBeetles = function (pb, line, draw, fill) {
       .add(tipVec.b);
     let tipHandleA = perpEnd.clone().setLength(2 * pdist);
 
-    draw.cubicBezier(perpEnd.b, tipVec.b, tipHandleA.b, tipPerp.b, "grey");
-    draw.cubicBezier(perpEnd.clone().inv().b, tipVec.b, tipHandleA.clone().inv().b, tipPerp.clone().inv().b, "grey");
+    draw.cubicBezier(perpEnd.b, tipVec.b, tipHandleA.b, tipPerp.b, "grey", 2);
+    draw.cubicBezier(perpEnd.clone().inv().b, tipVec.b, tipHandleA.clone().inv().b, tipPerp.clone().inv().b, "grey", 2);
 
     return { perpStart: perpStart, perpEnd: perpEnd };
   };

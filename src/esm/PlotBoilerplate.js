@@ -412,13 +412,8 @@ export class PlotBoilerplate {
      * @private
      **/
     static _saveFile(pb) {
-        if (typeof drawutilssvg === "undefined") {
-            console.error(`Cannot convert image to SVG. The svg renderer 'drawutilssvg' is missing. Did you load it?`);
-            return;
-        }
         // Create fake SVG node
         const svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        // var svgNode = document.getElementById('preview-svg');
         // Draw everything to fake node.
         var tosvgDraw = new drawutilssvg(svgNode, pb.draw.offset, pb.draw.scale, pb.canvasSize, false, // fillShapes=false
         pb.drawConfig);
@@ -1069,6 +1064,7 @@ export class PlotBoilerplate {
             if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible) {
                 draw.setCurrentId(this.vertices[i].uid);
                 draw.squareHandle(this.vertices[i], 5, this._handleColor(this.vertices[i], "rgb(0,128,192)"));
+                this.vertices[i].attr.renderTime = renderTime;
             }
         }
     }

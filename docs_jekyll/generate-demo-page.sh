@@ -28,6 +28,8 @@ function mkDemoPage() {
     # With trailing slash
     demoDir="../demos/"
     outFile='demos.md'
+	basicOutFileName='basic-demos.html'
+	basicOutFile="_includes/$basicOutFileName"
     echo "Building demo page from $demoDir directory ..."
 
     echo '---' > $outFile
@@ -36,7 +38,15 @@ function mkDemoPage() {
     date +'date: %Y-%m-%d' >> $outFile
     echo '---' >> $outFile
     echo '' >> $outFile
+
+	echo '' > $basicOutFile
     
+	echo '<h3>Basics</h3>' >> $outFile
+	echo '<div class="full-width basic-demos">' >> $outFile
+	echo "   {% include $basicOutFileName %}" >> $outFile
+	echo '</div>' >> $outFile
+
+	echo '<h3>Enhanced</h3>' >> $outFile
     echo '<div class="full-width">' >> $outFile
     for d in "$demoDir"*; do
 	if [ -d "$d" ]; then
@@ -59,7 +69,12 @@ function mkDemoPage() {
 		if [[ $baseName == _* ]]; then
 		    echo "Ignoring underscore directory $d"
 		elif [[ $baseName == basic-* ]]; then
-		    echo "Ignoring the 'basics' directory $d"
+		    echo "Processing the 'basics' directory $d"
+			echo "<div class=\"demo-box-basic\">" >> $basicOutFile
+		    echo "   <a class=\"no-decoration\" href=\"{{ '/repo/demos/$baseName/index.html' | prepend: site.url }}\">" >> $basicOutFile
+		    echo "      <div style=\"background-image: url('$imgSrc');\"></div>" >> $basicOutFile
+		    echo "   </a>" >> $basicOutFile
+		    echo "</div>" >> $basicOutFile
 		else
 		    # href="{{ my_page.url | prepend: site.baseurl }}"
 		    echo "<div class=\"demo-box\">" >> $outFile

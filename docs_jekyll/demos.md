@@ -4,6 +4,11 @@ permalink: /demos/
 date: 2021-03-30
 ---
 
+<h3>Basics</h3>
+<div class="full-width basic-demos">
+   {% include basic-demos.html %}
+</div>
+<h3>Enhanced</h3>
 <div class="full-width">
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/00-simple/index.html' | prepend: site.url }}">
@@ -172,7 +177,7 @@ date: 2021-03-30
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/33-depth-mesh/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210329-0-depth-mesh.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210329-0-depth-meshNein.png');"></div>
    </a>
 </div>
 </div>
