@@ -49,12 +49,13 @@ visualizing 2D geometries. Basic features are
 - keyboard interaction
 - touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
 
-The compressed library has 106kb.
+The compressed library has 123kb.
 
 ## Install the package via npm
 
 ```sh
-   $ npm i plotboilerplate # Installs the package
+   # Installs the package
+   $ npm i plotboilerplate
 ```
 
 ## The HTML file
