@@ -16,7 +16,8 @@
  * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
  * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
- * @version  1.1.0
+ * @modified 2021-03-31 Added 'ellipseSector' the the class names.
+ * @version  1.1.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -45,7 +46,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      * @param {DrawConfig} drawConfig - The default draw config to use for CSS fallback styles.
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
-     * @param {SVGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
+     * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
     function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
         this.svgNode = svgNode;
@@ -73,6 +74,7 @@ var drawutilssvg = /** @class */ (function () {
             "polygon": "Polygon",
             "triangle": "Triangle",
             "ellipse": "Ellipse",
+            "ellipseSector": "EllipseSector",
             "circle": "Circle",
             "circleSector": "CircleSector",
             "vertex": "Vertex",

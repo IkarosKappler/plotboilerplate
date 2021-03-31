@@ -15,7 +15,8 @@
  * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
  * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
- * @version  1.1.0
+ * @modified 2021-03-31 Added 'ellipseSector' the the class names.
+ * @version  1.1.1
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -42,7 +43,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   ].join("\n");
 
   /**
-   * @member {SVGElement}
+   * @member {SVGGElement}
    * @memberof drawutilssvg
    * @instance
    */
@@ -51,7 +52,16 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   /**
    * The root elements container <g> in the svgNode.
    */
-  private gNode: SVGElement;
+  private gNode: SVGGElement;
+
+  /**
+   * To avoid flickering the lib draws on a buffer, which is replacing the old <g> node at the end of the draw cycle.
+   * @member {SVGGelement}
+   * @memberof drawutilssvg
+   * @instance
+   * @private
+   */
+  private bufferGNode: SVGGElement;
 
   /**
    * @member {Vertex}
@@ -117,7 +127,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
    * @param {DrawConfig} drawConfig - The default draw config to use for CSS fallback styles.
    * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
-   * @param {SVGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
+   * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
    **/
   constructor(
     svgNode: SVGElement,
@@ -127,7 +137,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     fillShapes: boolean,
     drawConfig: DrawConfig,
     isSecondary?: boolean,
-    gNode?: SVGElement
+    gNode?: SVGGElement
   ) {
     this.svgNode = svgNode;
     this.offset = new Vertex(0, 0).set(offset);
@@ -141,7 +151,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       this.gNode = gNode;
     } else {
       this.addStyleDefs(drawConfig);
-      this.gNode = this.createSVGNode("g");
+      this.gNode = this.createSVGNode("g") as SVGGElement;
       this.svgNode.appendChild(this.gNode);
     }
   }
@@ -156,6 +166,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       "polygon": "Polygon",
       "triangle": "Triangle",
       "ellipse": "Ellipse",
+      "ellipseSector": "EllipseSector",
       "circle": "Circle",
       "circleSector": "CircleSector",
       "vertex": "Vertex",
@@ -346,6 +357,20 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   beginDrawCycle(renderTime: number) {
     // Clear non-recycable elements from last draw cycle.
     this.cache.clear();
+  }
+
+  /**
+   * Called after each draw cycle.
+   *
+   * This is required for compatibility with other draw classes in the library (like drawgl).
+   *
+   * @name endDrawCycle
+   * @method
+   * @param {number} renderTime
+   * @instance
+   **/
+  endDrawCycle(renderTime: number) {
+    // NOOP
   }
 
   private _x(x: number): number {

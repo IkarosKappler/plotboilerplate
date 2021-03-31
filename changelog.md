@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-03-30
+  - Added `DrawLib.endDrawCycle(renderTime)`.
 - 2021-03-29
   - Fixed a bug in the `drawutilssvg.text` function (second y param was wrong, used x here).
   - Clearing `currentClassName` and `currentId` after drawing each drawable.

@@ -9,6 +9,7 @@
  * @modified 2021-03-01 Added the `rotation` param to the DrawLib.ellipse(...) function.
  * @modified 2021-03-02 Added the `VEllipseSector` as to the `Drawable` type.
  * @modified 2021-03-29 Added the `draw` and `fill` params to the `preDraw` and `postDraw` function (required for full svg export support).
+ * @modified 2021-03-30 Added the `endDrawCycle` function to `DrawLib`.
  **/
 
 import { Vertex } from "./Vertex";
@@ -269,11 +270,24 @@ export interface DrawLib<R> {
    *
    * This is required for compatibility with other draw classes in the library (like drawgl).
    *
+   * @name beginDrawCycle
    * @method
    * @param {number} renderTime
    * @instance
    **/
   beginDrawCycle: (renderTime: number) => R;
+
+  /**
+   * Called after each draw cycle.
+   *
+   * This is required for compatibility with other draw classes in the library (like drawgl).
+   *
+   * @name endDrawCycle
+   * @method
+   * @param {number} renderTime
+   * @instance
+   **/
+  endDrawCycle: (renderTime: number) => R;
 
   /**
    * Draw the line between the given two points with the specified (CSS-) color.

@@ -15,7 +15,8 @@
  * @modified 2021-03-01 Fixed a bug in the `clear` function (curClassName was not cleared).
  * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
- * @version  1.1.0
+ * @modified 2021-03-31 Added 'ellipseSector' the the class names.
+ * @version  1.1.1
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -32,7 +33,7 @@ import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID } from "
 export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     static HEAD_XML: string;
     /**
-     * @member {SVGElement}
+     * @member {SVGGElement}
      * @memberof drawutilssvg
      * @instance
      */
@@ -41,6 +42,14 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * The root elements container <g> in the svgNode.
      */
     private gNode;
+    /**
+     * To avoid flickering the lib draws on a buffer, which is replacing the old <g> node at the end of the draw cycle.
+     * @member {SVGGelement}
+     * @memberof drawutilssvg
+     * @instance
+     * @private
+     */
+    private bufferGNode;
     /**
      * @member {Vertex}
      * @memberof drawutilssvg
@@ -97,9 +106,9 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean} fillShapes - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      * @param {DrawConfig} drawConfig - The default draw config to use for CSS fallback styles.
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
-     * @param {SVGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
+     * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGElement);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement);
     private addStyleDefs;
     /**
      * Retieve an old (cached) element.

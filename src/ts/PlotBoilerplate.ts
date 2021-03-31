@@ -622,6 +622,8 @@ export class PlotBoilerplate {
     pb.drawAll(0, tosvgDraw, tosvgFill);
     pb.drawVertices(0, tosvgDraw);
     if (pb.config.postDraw) pb.config.postDraw(tosvgDraw, tosvgFill);
+    tosvgDraw.endDrawCycle(0);
+    tosvgFill.endDrawCycle(0);
 
     // Full support in all browsers \o/
     //    https://caniuse.com/xml-serializer
@@ -1357,6 +1359,9 @@ export class PlotBoilerplate {
     // to interfered with that).
     draw.setCurrentId(undefined);
     draw.setCurrentClassName(undefined);
+
+    draw.endDrawCycle(renderTime);
+    fill.endDrawCycle(renderTime);
   } // END redraw
 
   /**
