@@ -35,7 +35,8 @@
  * @modified 2021-01-05 Added the image-loaded/broken check.
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
- * @version  1.8.4
+ * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
+ * @version  1.8.5
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
@@ -69,6 +70,19 @@ export class drawutils {
      * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      **/
     beginDrawCycle(renderTime) {
+        // NOOP
+    }
+    /**
+     * Called after each draw cycle.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @name endDrawCycle
+     * @method
+     * @param {number} renderTime
+     * @instance
+     **/
+    endDrawCycle(renderTime) {
         // NOOP
     }
     /**

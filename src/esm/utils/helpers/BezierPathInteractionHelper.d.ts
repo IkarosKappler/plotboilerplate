@@ -19,7 +19,8 @@
  * @modified 2020-08-12 Added a distance check before handling the click/tap event.
  * @modified 2021-01-03 Changed property to `autoAdjustPaths` in the HandlerOptions interface (typo).
  * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
- * @version  1.1.0
+ * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
+ * @version  1.1.1
  *
  * @file BezierPathInteractionHelper
  * @public

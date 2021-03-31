@@ -4156,6 +4156,14 @@ CircleSector.circleSectorUtils = {
 /**
  * Draws elements into an SVG node.
  *
+ * Note that this library uses buffers and draw cycles. To draw onto an SVG canvas, do this:
+ *   const drawLib = new drawutilssvg( svgNode, ... );
+ *   const fillLib = drawLib.copyInstance(true);
+ *   // Begin draw cycle
+ *   drawLib.beginDrawCycle(time);
+ *   // ... draw or fill your stuff ...
+ *   drawLib.endDrawCycle(time); // Here the elements become visible
+ *
  * @author   Ikaros Kappler
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
@@ -4171,7 +4179,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
- * @version  1.1.1
+ * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
+ * @version  1.2.0
  **/
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -4197,7 +4206,7 @@ class drawutilssvg {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    constructor(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
+    constructor(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode) {
         this.svgNode = svgNode;
         this.offset = new Vertex(0, 0).set(offset);
         this.scale = new Vertex(1, 1).set(scale);
@@ -4207,10 +4216,12 @@ class drawutilssvg {
         this.setSize(canvasSize);
         if (isSecondary) {
             this.gNode = gNode;
+            this.bufferGNode = bufferGNode;
         }
         else {
             this.addStyleDefs(drawConfig);
             this.gNode = this.createSVGNode("g");
+            this.bufferGNode = this.createSVGNode("g");
             this.svgNode.appendChild(this.gNode);
         }
     }
@@ -4331,7 +4342,7 @@ class drawutilssvg {
         }
         if (!node.parentNode) {
             // Attach to DOM only if not already attached
-            this.gNode.appendChild(node);
+            this.bufferGNode.appendChild(node);
         }
         return node;
     }
@@ -4356,7 +4367,7 @@ class drawutilssvg {
     copyInstance(fillShapes) {
         var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
         true, // isSecondary
-        this.gNode);
+        this.gNode, this.bufferGNode);
         return copy;
     }
     /**
@@ -4398,6 +4409,36 @@ class drawutilssvg {
     beginDrawCycle(renderTime) {
         // Clear non-recycable elements from last draw cycle.
         this.cache.clear();
+        // Clearing an SVG is equivalent to removing all its child elements.
+        for (var i = 0; i < this.bufferGNode.childNodes.length; i++) {
+            // Hide all nodes here. Don't throw them away.
+            // We can probably re-use them in the next draw cycle.
+            var child = this.bufferGNode.childNodes[i];
+            this.cache.set(child.getAttribute("id"), child);
+        }
+        this.removeAllChildNodes();
+    }
+    /**
+     * Called after each draw cycle.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @name endDrawCycle
+     * @method
+     * @param {number} renderTime
+     * @instance
+     **/
+    endDrawCycle(renderTime) {
+        if (!this.isSecondary) {
+            // All elements are drawn into the buffer; they are NOT yet visible, not did the browser perform any
+            // layout updates.
+            // Replace the old <g>-node with the buffer node.
+            //   https://stackoverflow.com/questions/27442464/how-to-update-a-svg-image-without-seeing-a-blinking
+            this.svgNode.replaceChild(this.bufferGNode, this.gNode);
+        }
+        let tmp = this.gNode;
+        this.gNode = this.bufferGNode;
+        this.bufferGNode = tmp;
     }
     _x(x) {
         return this.offset.x + this.scale.x * x;
@@ -5005,14 +5046,14 @@ class drawutilssvg {
         if (this.isSecondary) {
             return;
         }
-        // Clearing an SVG is equivalent to removing all its child elements.
-        for (var i = 0; i < this.gNode.childNodes.length; i++) {
-            // Hide all nodes here. Don't throw them away.
-            // We can probably re-use them in the next draw cycle.
-            var child = this.gNode.childNodes[i];
-            this.cache.set(child.getAttribute("id"), child);
-        }
-        this.removeAllChildNodes();
+        // // Clearing an SVG is equivalent to removing all its child elements.
+        // for (var i = 0; i < this.gNode.childNodes.length; i++) {
+        //   // Hide all nodes here. Don't throw them away.
+        //   // We can probably re-use them in the next draw cycle.
+        //   var child: SVGElement = this.gNode.childNodes[i] as SVGElement;
+        //   this.cache.set(child.getAttribute("id"), child);
+        // }
+        // this.removeAllChildNodes();
         // Add a covering rect with the given background color
         this.curId = "background";
         this.curClassName = undefined;
@@ -5035,8 +5076,8 @@ class drawutilssvg {
      * @private
      */
     removeAllChildNodes() {
-        while (this.gNode.lastChild) {
-            this.gNode.removeChild(this.gNode.lastChild);
+        while (this.bufferGNode.lastChild) {
+            this.bufferGNode.removeChild(this.bufferGNode.lastChild);
         }
     }
     /**
@@ -5273,7 +5314,8 @@ drawutilssvg.HEAD_XML = [
  * @modified 2021-01-05 Added the image-loaded/broken check.
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
- * @version  1.8.4
+ * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
+ * @version  1.8.5
  **/
 // Todo: rename this class to Drawutils?
 /**
@@ -5304,6 +5346,19 @@ class drawutils {
      * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      **/
     beginDrawCycle(renderTime) {
+        // NOOP
+    }
+    /**
+     * Called after each draw cycle.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @name endDrawCycle
+     * @method
+     * @param {number} renderTime
+     * @instance
+     **/
+    endDrawCycle(renderTime) {
         // NOOP
     }
     /**
@@ -6026,7 +6081,7 @@ class drawutilsgl {
         this.scale = new Vertex(1, 1);
         this.fillShapes = fillShapes;
         this._zindex = 0.0;
-        if (context == null || typeof context === 'undefined')
+        if (context == null || typeof context === "undefined")
             return;
         this.glutils = new GLU(context);
         // PROBLEM: CANNOT USE MULTIPLE SHADER PROGRAM INSTANCES ON THE SAME CONTEXT!
@@ -6041,13 +6096,14 @@ class drawutilsgl {
         this.vertex_buffer = this.gl.createBuffer();
         // Bind appropriate array buffer to it
         // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
-        console.log('gl initialized');
+        console.log("gl initialized");
     }
-    ;
-    _x2rel(x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; }
-    ;
-    _y2rel(y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; }
-    ;
+    _x2rel(x) {
+        return ((this.scale.x * x + this.offset.x) / this.gl.canvas.width) * 2.0 - 1.0;
+    }
+    _y2rel(y) {
+        return ((this.offset.y - this.scale.y * y) / this.gl.canvas.height) * 2.0 - 1.0;
+    }
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
@@ -6061,7 +6117,6 @@ class drawutilsgl {
         copy._program = this._program;
         return copy;
     }
-    ;
     /**
      * Called before each draw cycle.
      * @param {number} renderTime
@@ -6070,7 +6125,19 @@ class drawutilsgl {
         this._zindex = 0.0;
         this.renderTime = renderTime;
     }
-    ;
+    /**
+     * Called after each draw cycle.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @name endDrawCycle
+     * @method
+     * @param {number} renderTime
+     * @instance
+     **/
+    endDrawCycle(renderTime) {
+        // NOOP
+    }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -6083,7 +6150,6 @@ class drawutilsgl {
         // NOOP
         this.curId = uid;
     }
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
@@ -6095,7 +6161,6 @@ class drawutilsgl {
     setCurrentClassName(className) {
         // NOOP
     }
-    ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -6146,7 +6211,6 @@ class drawutilsgl {
         // POINTS, LINE_STRIP, LINE_LOOP, LINES,
         // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
     }
-    ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
@@ -6161,7 +6225,6 @@ class drawutilsgl {
     arrow(zA, zB, color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -6178,7 +6241,6 @@ class drawutilsgl {
     image(image, position, size) {
         // NOT YET IMPLEMENTED
     }
-    ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
     // | intended to be used from the outside.
@@ -6193,7 +6255,6 @@ class drawutilsgl {
     _fillOrDraw(color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -6211,7 +6272,6 @@ class drawutilsgl {
     cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -6230,7 +6290,6 @@ class drawutilsgl {
     cubicBezierPath(path, color, lineWidth) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -6246,7 +6305,6 @@ class drawutilsgl {
     handle(startPoint, endPoint) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a handle line (with a light grey).
      *
@@ -6260,7 +6318,6 @@ class drawutilsgl {
     handleLine(startPoint, endPoint) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
@@ -6274,7 +6331,6 @@ class drawutilsgl {
     dot(p, color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
@@ -6288,7 +6344,6 @@ class drawutilsgl {
     point(p, color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
@@ -6306,7 +6361,6 @@ class drawutilsgl {
     circle(center, radius, color, lineWidth) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
@@ -6323,7 +6377,6 @@ class drawutilsgl {
     circleArc(center, radius, startAngle, endAngle, color, lineWidth) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -6341,7 +6394,6 @@ class drawutilsgl {
     ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -6359,7 +6411,6 @@ class drawutilsgl {
     square(center, size, color, lineWidth) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -6377,7 +6428,6 @@ class drawutilsgl {
     grid(center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
@@ -6397,7 +6447,6 @@ class drawutilsgl {
     raster(center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
@@ -6416,7 +6465,6 @@ class drawutilsgl {
     diamondHandle(center, size, color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -6435,7 +6483,6 @@ class drawutilsgl {
     squareHandle(center, size, color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -6454,7 +6501,6 @@ class drawutilsgl {
     circleHandle(center, size, color) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -6469,9 +6515,8 @@ class drawutilsgl {
      * @memberof drawutils
      */
     crosshair(center, radius, color) {
-        // NOT YET IMPLEMENTED	
+        // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a polygon.
      *
@@ -6520,7 +6565,6 @@ class drawutilsgl {
         // POINTS, LINE_STRIP, LINE_LOOP, LINES,
         // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
     }
-    ;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -6536,11 +6580,9 @@ class drawutilsgl {
     polyline(vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
     }
-    ;
     text(text, x, y, options) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Draw a non-scaling text label at the given position.
      *
@@ -6559,23 +6601,21 @@ class drawutilsgl {
     label(text, x, y, rotation) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
-    * Draw an SVG-like path given by the specified path data.
-    *
-    * @method path
-    * @param {SVGPathData} pathData - An array of path commands and params.
-    * @param {string=null} color - (optional) The color to draw this path with (default is null).
-    * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
-    * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
-    * @instance
-    * @memberof drawutils
-    * @return {R} An instance representing the drawn path.
-    */
+     * Draw an SVG-like path given by the specified path data.
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
     path(pathData, color, lineWidth, options) {
         // NOT YET IMPLEMENTED
     }
-    ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
@@ -6595,7 +6635,6 @@ class drawutilsgl {
         // Clear the color and depth buffer
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     }
-    ;
 }
 // Vertex shader source code
 drawutilsgl.vertCode = `
@@ -6629,7 +6668,6 @@ class GLU {
     constructor(gl) {
         this.gl = gl;
     }
-    ;
     bufferData(verts) {
         // Create an empty buffer object
         var vbuffer = this.gl.createBuffer();
@@ -6641,7 +6679,6 @@ class GLU {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         return vbuffer;
     }
-    ;
     /*=================== Shaders ====================*/
     compileShader(shaderCode, shaderType) {
         // Create a vertex shader object
@@ -6658,7 +6695,6 @@ class GLU {
         }
         return shader;
     }
-    ;
     makeProgram(vertShader, fragShader) {
         // Create a shader program object to store
         // the combined shader program
@@ -6678,7 +6714,6 @@ class GLU {
         this.gl.deleteShader(fragShader);
         return program;
     }
-    ;
 }
 
 /**
@@ -9622,6 +9657,8 @@ class PlotBoilerplate {
         pb.drawVertices(0, tosvgDraw);
         if (pb.config.postDraw)
             pb.config.postDraw(tosvgDraw, tosvgFill);
+        tosvgDraw.endDrawCycle(0);
+        tosvgFill.endDrawCycle(0);
         // Full support in all browsers \o/
         //    https://caniuse.com/xml-serializer
         var serializer = new XMLSerializer();
@@ -10273,6 +10310,9 @@ class PlotBoilerplate {
      **/
     redraw() {
         var renderTime = new Date().getTime();
+        // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+        this.draw.beginDrawCycle(renderTime);
+        this.fill.beginDrawCycle(renderTime);
         if (this.config.preClear)
             this.config.preClear();
         this.clear();
@@ -10281,6 +10321,8 @@ class PlotBoilerplate {
         this.drawAll(renderTime, this.draw, this.fill);
         if (this.config.postDraw)
             this.config.postDraw(this.draw, this.fill);
+        this.draw.endDrawCycle(renderTime);
+        this.fill.endDrawCycle(renderTime);
     }
     /**
      * Draw all: drawables, grid, select-polygon and vertices.
@@ -10291,9 +10333,9 @@ class PlotBoilerplate {
      * @return {void}
      **/
     drawAll(renderTime, draw, fill) {
-        // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
-        draw.beginDrawCycle(renderTime);
-        fill.beginDrawCycle(renderTime);
+        // // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+        // draw.beginDrawCycle(renderTime);
+        // fill.beginDrawCycle(renderTime);
         this.drawGrid(draw);
         if (this.config.drawOrigin)
             this.drawOrigin(draw);
@@ -10304,6 +10346,8 @@ class PlotBoilerplate {
         // to interfered with that).
         draw.setCurrentId(undefined);
         draw.setCurrentClassName(undefined);
+        // draw.endDrawCycle(renderTime);
+        // fill.endDrawCycle(renderTime);
     } // END redraw
     /**
      * This function clears the canvas with the configured background color.<br>
