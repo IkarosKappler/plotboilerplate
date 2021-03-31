@@ -1,7 +1,8 @@
 /**
- * Drawing bark beetle tunnels
+ * Drawing bark beetle tunnels.
+ *
  * @date 2019-12-15
- * @modified 2021-03-30
+ * @modified 2021-03-30 Added 'draw' and 'fill' params.
  */
 
 var BarkBeetles = function (pb, line, draw, fill) {
@@ -49,7 +50,7 @@ var BarkBeetles = function (pb, line, draw, fill) {
    * Draws the tunnel lines and a round end.
    **/
   var _drawRoundEnd = function (vec, pdist, drawTunnelLines) {
-    // line.a is the end point, line.b is the intersection point
+    // vec.a is the end point, vec.b is the intersection point
     let perpStart = vec.perp().setLength(pdist);
     perpStart.add(vec.clone().setLength(pdist).sub(vec.a).b);
     let perpEnd = perpStart.clone().add(
@@ -73,8 +74,23 @@ var BarkBeetles = function (pb, line, draw, fill) {
       .add(tipVec.b);
     let tipHandleA = perpEnd.clone().setLength(2 * pdist);
 
-    draw.cubicBezier(perpEnd.b, tipVec.b, tipHandleA.b, tipPerp.b, "grey", 2);
-    draw.cubicBezier(perpEnd.clone().inv().b, tipVec.b, tipHandleA.clone().inv().b, tipPerp.clone().inv().b, "grey", 2);
+    var radius = pdist * 1.6;
+    var endAngle = new Line(vec.b, perpEnd.b).angle();
+    var startAngle = new Line(vec.b, perpEnd.b.clone().inv()).angle();
+
+    // Option 1: draw as Bézier curves
+    // draw.cubicBezier(perpEnd.b, tipVec.b, tipHandleA.b, tipPerp.b, "grey", 2);
+    // draw.cubicBezier(perpEnd.clone().inv().b, tipVec.b, tipHandleA.clone().inv().b, tipPerp.clone().inv().b, "grey", 2);
+
+    // Option 2: draw as circle arc
+    // draw.circleArc(vec.b, radius, endAngle + Math.PI / 2, endAngle, "grey", 2);
+
+    // Option 3: draw as svg-arc
+    draw.path(
+      ["M", perpEnd.b.x, perpEnd.b.y, "A", radius, radius, 0.0, 1, 0, perpEnd.clone().inv().b.x, perpEnd.clone().inv().b.y],
+      "grey",
+      2
+    );
 
     return { perpStart: perpStart, perpEnd: perpEnd };
   };
