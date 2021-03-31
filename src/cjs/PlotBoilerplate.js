@@ -431,6 +431,8 @@ var PlotBoilerplate = /** @class */ (function () {
         pb.drawVertices(0, tosvgDraw);
         if (pb.config.postDraw)
             pb.config.postDraw(tosvgDraw, tosvgFill);
+        tosvgDraw.endDrawCycle(0);
+        tosvgFill.endDrawCycle(0);
         // Full support in all browsers \o/
         //    https://caniuse.com/xml-serializer
         var serializer = new XMLSerializer();
@@ -1082,6 +1084,9 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.redraw = function () {
         var renderTime = new Date().getTime();
+        // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+        this.draw.beginDrawCycle(renderTime);
+        this.fill.beginDrawCycle(renderTime);
         if (this.config.preClear)
             this.config.preClear();
         this.clear();
@@ -1090,6 +1095,8 @@ var PlotBoilerplate = /** @class */ (function () {
         this.drawAll(renderTime, this.draw, this.fill);
         if (this.config.postDraw)
             this.config.postDraw(this.draw, this.fill);
+        this.draw.endDrawCycle(renderTime);
+        this.fill.endDrawCycle(renderTime);
     };
     /**
      * Draw all: drawables, grid, select-polygon and vertices.
@@ -1100,9 +1107,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.drawAll = function (renderTime, draw, fill) {
-        // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
-        draw.beginDrawCycle(renderTime);
-        fill.beginDrawCycle(renderTime);
+        // // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+        // draw.beginDrawCycle(renderTime);
+        // fill.beginDrawCycle(renderTime);
         this.drawGrid(draw);
         if (this.config.drawOrigin)
             this.drawOrigin(draw);
@@ -1113,6 +1120,8 @@ var PlotBoilerplate = /** @class */ (function () {
         // to interfered with that).
         draw.setCurrentId(undefined);
         draw.setCurrentClassName(undefined);
+        // draw.endDrawCycle(renderTime);
+        // fill.endDrawCycle(renderTime);
     }; // END redraw
     /**
      * This function clears the canvas with the configured background color.<br>

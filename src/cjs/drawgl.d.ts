@@ -57,6 +57,17 @@ export declare class drawutilsgl implements DrawLib<void> {
      **/
     beginDrawCycle(renderTime: number): void;
     /**
+     * Called after each draw cycle.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @name endDrawCycle
+     * @method
+     * @param {number} renderTime
+     * @instance
+     **/
+    endDrawCycle(renderTime: number): void;
+    /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
      *
@@ -384,17 +395,17 @@ export declare class drawutilsgl implements DrawLib<void> {
      */
     label(text: string, x: number, y: number, rotation: number): void;
     /**
-    * Draw an SVG-like path given by the specified path data.
-    *
-    * @method path
-    * @param {SVGPathData} pathData - An array of path commands and params.
-    * @param {string=null} color - (optional) The color to draw this path with (default is null).
-    * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
-    * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
-    * @instance
-    * @memberof drawutils
-    * @return {R} An instance representing the drawn path.
-    */
+     * Draw an SVG-like path given by the specified path data.
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
     path(pathData: SVGPathParams, color?: string, lineWidth?: number, options?: {
         inplace?: boolean;
     }): void;

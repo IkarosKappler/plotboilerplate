@@ -1327,6 +1327,10 @@ export class PlotBoilerplate {
   redraw() {
     var renderTime: number = new Date().getTime();
 
+    // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+    this.draw.beginDrawCycle(renderTime);
+    this.fill.beginDrawCycle(renderTime);
+
     if (this.config.preClear) this.config.preClear();
     this.clear();
     if (this.config.preDraw) this.config.preDraw(this.draw, this.fill);
@@ -1334,6 +1338,9 @@ export class PlotBoilerplate {
     this.drawAll(renderTime, this.draw, this.fill);
 
     if (this.config.postDraw) this.config.postDraw(this.draw, this.fill);
+
+    this.draw.endDrawCycle(renderTime);
+    this.fill.endDrawCycle(renderTime);
   }
 
   /**
@@ -1345,9 +1352,9 @@ export class PlotBoilerplate {
    * @return {void}
    **/
   drawAll(renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>) {
-    // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
-    draw.beginDrawCycle(renderTime);
-    fill.beginDrawCycle(renderTime);
+    // // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
+    // draw.beginDrawCycle(renderTime);
+    // fill.beginDrawCycle(renderTime);
 
     this.drawGrid(draw);
     if (this.config.drawOrigin) this.drawOrigin(draw);
@@ -1360,8 +1367,8 @@ export class PlotBoilerplate {
     draw.setCurrentId(undefined);
     draw.setCurrentClassName(undefined);
 
-    draw.endDrawCycle(renderTime);
-    fill.endDrawCycle(renderTime);
+    // draw.endDrawCycle(renderTime);
+    // fill.endDrawCycle(renderTime);
   } // END redraw
 
   /**

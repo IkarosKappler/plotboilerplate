@@ -36,7 +36,7 @@ var drawutilsgl = /** @class */ (function () {
         this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
         this._zindex = 0.0;
-        if (context == null || typeof context === 'undefined')
+        if (context == null || typeof context === "undefined")
             return;
         this.glutils = new GLU(context);
         // PROBLEM: CANNOT USE MULTIPLE SHADER PROGRAM INSTANCES ON THE SAME CONTEXT!
@@ -51,13 +51,14 @@ var drawutilsgl = /** @class */ (function () {
         this.vertex_buffer = this.gl.createBuffer();
         // Bind appropriate array buffer to it
         // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
-        console.log('gl initialized');
+        console.log("gl initialized");
     }
-    ;
-    drawutilsgl.prototype._x2rel = function (x) { return (this.scale.x * x + this.offset.x) / this.gl.canvas.width * 2.0 - 1.0; };
-    ;
-    drawutilsgl.prototype._y2rel = function (y) { return (this.offset.y - this.scale.y * y) / this.gl.canvas.height * 2.0 - 1.0; };
-    ;
+    drawutilsgl.prototype._x2rel = function (x) {
+        return ((this.scale.x * x + this.offset.x) / this.gl.canvas.width) * 2.0 - 1.0;
+    };
+    drawutilsgl.prototype._y2rel = function (y) {
+        return ((this.offset.y - this.scale.y * y) / this.gl.canvas.height) * 2.0 - 1.0;
+    };
     /**
      * Creates a 'shallow' (non deep) copy of this instance. This implies
      * that under the hood the same gl context and gl program will be used.
@@ -71,7 +72,6 @@ var drawutilsgl = /** @class */ (function () {
         copy._program = this._program;
         return copy;
     };
-    ;
     /**
      * Called before each draw cycle.
      * @param {number} renderTime
@@ -80,7 +80,19 @@ var drawutilsgl = /** @class */ (function () {
         this._zindex = 0.0;
         this.renderTime = renderTime;
     };
-    ;
+    /**
+     * Called after each draw cycle.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @name endDrawCycle
+     * @method
+     * @param {number} renderTime
+     * @instance
+     **/
+    drawutilsgl.prototype.endDrawCycle = function (renderTime) {
+        // NOOP
+    };
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -93,7 +105,6 @@ var drawutilsgl = /** @class */ (function () {
         // NOOP
         this.curId = uid;
     };
-    ;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
@@ -105,7 +116,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.setCurrentClassName = function (className) {
         // NOOP
     };
-    ;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *
@@ -156,7 +166,6 @@ var drawutilsgl = /** @class */ (function () {
         // POINTS, LINE_STRIP, LINE_LOOP, LINES,
         // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
     };
-    ;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
@@ -171,7 +180,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.arrow = function (zA, zB, color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -188,7 +196,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.image = function (image, position, size) {
         // NOT YET IMPLEMENTED
     };
-    ;
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
     // | intended to be used from the outside.
@@ -203,7 +210,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype._fillOrDraw = function (color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -221,7 +227,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -240,7 +245,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.cubicBezierPath = function (path, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -256,7 +260,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.handle = function (startPoint, endPoint) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a handle line (with a light grey).
      *
@@ -270,7 +273,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.handleLine = function (startPoint, endPoint) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
@@ -284,7 +286,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.dot = function (p, color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
@@ -298,7 +299,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.point = function (p, color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
@@ -316,7 +316,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.circle = function (center, radius, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
@@ -333,7 +332,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -351,7 +349,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth, rotation) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -369,7 +366,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.square = function (center, size, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -387,7 +383,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
@@ -407,7 +402,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
@@ -426,7 +420,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.diamondHandle = function (center, size, color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -445,7 +438,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.squareHandle = function (center, size, color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -464,7 +456,6 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.circleHandle = function (center, size, color) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -479,9 +470,8 @@ var drawutilsgl = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilsgl.prototype.crosshair = function (center, radius, color) {
-        // NOT YET IMPLEMENTED	
+        // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a polygon.
      *
@@ -530,7 +520,6 @@ var drawutilsgl = /** @class */ (function () {
         // POINTS, LINE_STRIP, LINE_LOOP, LINES,
         // TRIANGLE_STRIP,TRIANGLE_FAN, TRIANGLES
     };
-    ;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
@@ -546,11 +535,9 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
-    ;
     drawutilsgl.prototype.text = function (text, x, y, options) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Draw a non-scaling text label at the given position.
      *
@@ -569,23 +556,21 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.label = function (text, x, y, rotation) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
-    * Draw an SVG-like path given by the specified path data.
-    *
-    * @method path
-    * @param {SVGPathData} pathData - An array of path commands and params.
-    * @param {string=null} color - (optional) The color to draw this path with (default is null).
-    * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
-    * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
-    * @instance
-    * @memberof drawutils
-    * @return {R} An instance representing the drawn path.
-    */
+     * Draw an SVG-like path given by the specified path data.
+     *
+     * @method path
+     * @param {SVGPathData} pathData - An array of path commands and params.
+     * @param {string=null} color - (optional) The color to draw this path with (default is null).
+     * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
+     * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @instance
+     * @memberof drawutils
+     * @return {R} An instance representing the drawn path.
+     */
     drawutilsgl.prototype.path = function (pathData, color, lineWidth, options) {
         // NOT YET IMPLEMENTED
     };
-    ;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.
@@ -605,7 +590,6 @@ var drawutilsgl = /** @class */ (function () {
         // Clear the color and depth buffer
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     };
-    ;
     // Vertex shader source code
     drawutilsgl.vertCode = "\n    precision mediump float;\n\n    attribute vec3 position;\n\n    uniform vec2 uRotationVector;\n\n    void main(void) {\n\tvec2 rotatedPosition = vec2(\n\t    position.x * uRotationVector.y +\n\t\tposition.y * uRotationVector.x,\n\t    position.y * uRotationVector.y -\n\t\tposition.x * uRotationVector.x\n\t);\n\n\tgl_Position = vec4(rotatedPosition, position.z, 1.0);\n    }";
     // Fragment shader source code
@@ -620,7 +604,6 @@ var GLU = /** @class */ (function () {
     function GLU(gl) {
         this.gl = gl;
     }
-    ;
     GLU.prototype.bufferData = function (verts) {
         // Create an empty buffer object
         var vbuffer = this.gl.createBuffer();
@@ -632,7 +615,6 @@ var GLU = /** @class */ (function () {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
         return vbuffer;
     };
-    ;
     /*=================== Shaders ====================*/
     GLU.prototype.compileShader = function (shaderCode, shaderType) {
         // Create a vertex shader object
@@ -649,7 +631,6 @@ var GLU = /** @class */ (function () {
         }
         return shader;
     };
-    ;
     GLU.prototype.makeProgram = function (vertShader, fragShader) {
         // Create a shader program object to store
         // the combined shader program
@@ -669,7 +650,6 @@ var GLU = /** @class */ (function () {
         this.gl.deleteShader(fragShader);
         return program;
     };
-    ;
     return GLU;
 }());
 //# sourceMappingURL=drawgl.js.map

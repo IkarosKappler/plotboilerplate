@@ -98,8 +98,8 @@ var BarkBeetles = function (pb, line, draw, fill) {
     for (var k = 0; k < keys.length; k++) {
       var next = elements[keys[k]];
       if (last != null) {
-        if (l2r) pb.draw.line(last.tri.b, next.tri.a, "grey", 2);
-        else pb.draw.line(next.tri.a, last.tri.b, "grey", 2);
+        if (l2r) draw.line(last.tri.b, next.tri.a, "grey", 2);
+        else draw.line(next.tri.a, last.tri.b, "grey", 2);
       }
       if (firstKey == null) {
         firstKey = keys[k];

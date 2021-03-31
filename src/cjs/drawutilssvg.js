@@ -2,6 +2,14 @@
 /**
  * Draws elements into an SVG node.
  *
+ * Note that this library uses buffers and draw cycles. To draw onto an SVG canvas, do this:
+ *   const drawLib = new drawutilssvg( svgNode, ... );
+ *   const fillLib = drawLib.copyInstance(true);
+ *   // Begin draw cycle
+ *   drawLib.beginDrawCycle(time);
+ *   // ... draw or fill your stuff ...
+ *   drawLib.endDrawCycle(time); // Here the elements become visible
+ *
  * @author   Ikaros Kappler
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
@@ -17,7 +25,8 @@
  * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
- * @version  1.1.1
+ * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
+ * @version  1.2.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -48,7 +57,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
@@ -58,10 +67,12 @@ var drawutilssvg = /** @class */ (function () {
         this.setSize(canvasSize);
         if (isSecondary) {
             this.gNode = gNode;
+            this.bufferGNode = bufferGNode;
         }
         else {
             this.addStyleDefs(drawConfig);
             this.gNode = this.createSVGNode("g");
+            this.bufferGNode = this.createSVGNode("g");
             this.svgNode.appendChild(this.gNode);
         }
     }
@@ -182,7 +193,7 @@ var drawutilssvg = /** @class */ (function () {
         }
         if (!node.parentNode) {
             // Attach to DOM only if not already attached
-            this.gNode.appendChild(node);
+            this.bufferGNode.appendChild(node);
         }
         return node;
     };
@@ -207,7 +218,7 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
         var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
         true, // isSecondary
-        this.gNode);
+        this.gNode, this.bufferGNode);
         return copy;
     };
     /**
@@ -249,6 +260,36 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.beginDrawCycle = function (renderTime) {
         // Clear non-recycable elements from last draw cycle.
         this.cache.clear();
+        // Clearing an SVG is equivalent to removing all its child elements.
+        for (var i = 0; i < this.bufferGNode.childNodes.length; i++) {
+            // Hide all nodes here. Don't throw them away.
+            // We can probably re-use them in the next draw cycle.
+            var child = this.bufferGNode.childNodes[i];
+            this.cache.set(child.getAttribute("id"), child);
+        }
+        this.removeAllChildNodes();
+    };
+    /**
+     * Called after each draw cycle.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @name endDrawCycle
+     * @method
+     * @param {number} renderTime
+     * @instance
+     **/
+    drawutilssvg.prototype.endDrawCycle = function (renderTime) {
+        if (!this.isSecondary) {
+            // All elements are drawn into the buffer; they are NOT yet visible, not did the browser perform any
+            // layout updates.
+            // Replace the old <g>-node with the buffer node.
+            //   https://stackoverflow.com/questions/27442464/how-to-update-a-svg-image-without-seeing-a-blinking
+            this.svgNode.replaceChild(this.bufferGNode, this.gNode);
+        }
+        var tmp = this.gNode;
+        this.gNode = this.bufferGNode;
+        this.bufferGNode = tmp;
     };
     drawutilssvg.prototype._x = function (x) {
         return this.offset.x + this.scale.x * x;
@@ -857,14 +898,14 @@ var drawutilssvg = /** @class */ (function () {
         if (this.isSecondary) {
             return;
         }
-        // Clearing an SVG is equivalent to removing all its child elements.
-        for (var i = 0; i < this.gNode.childNodes.length; i++) {
-            // Hide all nodes here. Don't throw them away.
-            // We can probably re-use them in the next draw cycle.
-            var child = this.gNode.childNodes[i];
-            this.cache.set(child.getAttribute("id"), child);
-        }
-        this.removeAllChildNodes();
+        // // Clearing an SVG is equivalent to removing all its child elements.
+        // for (var i = 0; i < this.gNode.childNodes.length; i++) {
+        //   // Hide all nodes here. Don't throw them away.
+        //   // We can probably re-use them in the next draw cycle.
+        //   var child: SVGElement = this.gNode.childNodes[i] as SVGElement;
+        //   this.cache.set(child.getAttribute("id"), child);
+        // }
+        // this.removeAllChildNodes();
         // Add a covering rect with the given background color
         this.curId = "background";
         this.curClassName = undefined;
@@ -887,8 +928,8 @@ var drawutilssvg = /** @class */ (function () {
      * @private
      */
     drawutilssvg.prototype.removeAllChildNodes = function () {
-        while (this.gNode.lastChild) {
-            this.gNode.removeChild(this.gNode.lastChild);
+        while (this.bufferGNode.lastChild) {
+            this.bufferGNode.removeChild(this.bufferGNode.lastChild);
         }
     };
     /**

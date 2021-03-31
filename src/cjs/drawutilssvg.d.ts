@@ -1,6 +1,14 @@
 /**
  * Draws elements into an SVG node.
  *
+ * Note that this library uses buffers and draw cycles. To draw onto an SVG canvas, do this:
+ *   const drawLib = new drawutilssvg( svgNode, ... );
+ *   const fillLib = drawLib.copyInstance(true);
+ *   // Begin draw cycle
+ *   drawLib.beginDrawCycle(time);
+ *   // ... draw or fill your stuff ...
+ *   drawLib.endDrawCycle(time); // Here the elements become visible
+ *
  * @author   Ikaros Kappler
  * @date     2021-01-03
  * @modified 2021-01-24 Fixed the `fillShapes` attribute in the copyInstance function.
@@ -16,7 +24,8 @@
  * @modified 2021-03-29 Fixed a bug in the `text` function (second y param was wrong, used x here).
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
- * @version  1.1.1
+ * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
+ * @version  1.2.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -108,7 +117,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement);
     private addStyleDefs;
     /**
      * Retieve an old (cached) element.
@@ -214,6 +223,17 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @memberof drawutilssvg
      **/
     beginDrawCycle(renderTime: number): void;
+    /**
+     * Called after each draw cycle.
+     *
+     * This is required for compatibility with other draw classes in the library (like drawgl).
+     *
+     * @name endDrawCycle
+     * @method
+     * @param {number} renderTime
+     * @instance
+     **/
+    endDrawCycle(renderTime: number): void;
     private _x;
     private _y;
     /**
