@@ -66,26 +66,32 @@
     };
 
     var makeSphereGeometry = function () {
-      var lats = 6;
       var longs = 6;
+      var lats = 12;
       var radius = 1;
       var vertices = [];
       var edges = [];
-      for (var lat = 0; lat < lats; lat++) {
-        var theta = (lat / lats) * Math.PI;
-        for (var long = 0; long < longs; long++) {
-          var alpha = (long / longs) * Math.PI * 2;
+      for (var long = 0; long < longs; long++) {
+        var theta = Math.PI / 2 + (long / longs) * Math.PI;
+        for (var lat = 0; lat < lats; lat++) {
+          var alpha = (lat / lats) * Math.PI * 2;
           // var x = x0 + radius * Math.cos(theta) * Math.sin(alpha);
           // var y = y0 + radius * Math.sin(theta) * Math.sin(alpha);
           // var z = z0 + radius * Math.cos(alpha);
           // var vert = new Vert3(x, y, z);
           var vert = new Vert3(radius, 0, 0);
-          vert = rotatePoint(vert, alpha, 0, theta, 0);
+          vert = rotatePoint(vert, theta, 0, alpha, 0);
           vertices.push(vert);
-          if (lat > 0 && long > 0) {
-            edges.push([lat * longs + long - 1, lat * longs + long]);
-            if (long + 1 == longs) {
-              edges.push([lat * longs, lat * longs + long]);
+          // if (lat > 0 && long > 0) {
+          if (lat > 0) {
+            edges.push([long * lats + lat - 1, long * lats + lat]);
+            if (lat + 1 == lats) {
+              edges.push([long * lats, long * lats + lat]);
+            }
+            // edges.push([lat * longs + long - 1, lat * longs + long - 1]);
+            if (long > 0) {
+              // && long + 1 < longs) {
+              edges.push([long * lats + lat - 1, (long - 1) * lats + lat - 1]);
             }
           }
         }
@@ -150,7 +156,7 @@
 
     var applyProjection = function (p) {
       // Project
-      var threshold = getThreshold(p, config.far, config.close); //  (config.far - p.z) / (config.far - config.close);
+      var threshold = getThreshold(p, config.far, config.close);
       threshold = Math.max(0, threshold);
       return { x: p.x * threshold, y: p.y * threshold };
     };
