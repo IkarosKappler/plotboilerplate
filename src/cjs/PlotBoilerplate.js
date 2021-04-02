@@ -1074,8 +1074,6 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.drawVertices = function (renderTime, draw) {
         // Draw all vertices as small squares if they were not already drawn by other objects
-        if (this.vertices.length)
-            console.log("vert 0", this.vertices[0].attr.renderTime, renderTime);
         for (var i in this.vertices) {
             if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible) {
                 draw.setCurrentId(this.vertices[i].uid);
