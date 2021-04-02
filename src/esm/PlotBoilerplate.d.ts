@@ -243,6 +243,16 @@ export declare class PlotBoilerplate {
      */
     private keyHandler;
     /**
+     * A discrete timestamp to identify single render cycles.
+     * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
+     * multiple frames might be rendered within each millisecond.
+     * @member {number}
+     * @memberof plotboilerplate
+     * @instance
+     * @private
+     */
+    private renderTime;
+    /**
      * The constructor.
      *
      * @constructor

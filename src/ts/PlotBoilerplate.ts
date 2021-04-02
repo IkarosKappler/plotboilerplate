@@ -302,6 +302,17 @@ export class PlotBoilerplate {
   private keyHandler: KeyHandler | undefined;
 
   /**
+   * A discrete timestamp to identify single render cycles.
+   * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
+   * multiple frames might be rendered within each millisecond.
+   * @member {number}
+   * @memberof plotboilerplate
+   * @instance
+   * @private
+   */
+  private renderTime: number = 0;
+
+  /**
    * The constructor.
    *
    * @constructor
@@ -1305,6 +1316,7 @@ export class PlotBoilerplate {
    **/
   drawVertices(renderTime: number, draw: DrawLib<any>) {
     // Draw all vertices as small squares if they were not already drawn by other objects
+    if (this.vertices.length) console.log("vert 0", this.vertices[0].attr.renderTime, renderTime);
     for (var i in this.vertices) {
       if (this.drawConfig.drawVertices && this.vertices[i].attr.renderTime != renderTime && this.vertices[i].attr.visible) {
         draw.setCurrentId(this.vertices[i].uid);
@@ -1325,7 +1337,7 @@ export class PlotBoilerplate {
    * @return {void}
    **/
   redraw() {
-    var renderTime: number = new Date().getTime();
+    const renderTime: number = this.renderTime++;
 
     // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
     this.draw.beginDrawCycle(renderTime);
@@ -1352,10 +1364,6 @@ export class PlotBoilerplate {
    * @return {void}
    **/
   drawAll(renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>) {
-    // // Tell the drawing library that a new drawing cycle begins (required for the GL lib).
-    // draw.beginDrawCycle(renderTime);
-    // fill.beginDrawCycle(renderTime);
-
     this.drawGrid(draw);
     if (this.config.drawOrigin) this.drawOrigin(draw);
     this.drawDrawables(renderTime, draw, fill);
@@ -1366,9 +1374,6 @@ export class PlotBoilerplate {
     // to interfered with that).
     draw.setCurrentId(undefined);
     draw.setCurrentClassName(undefined);
-
-    // draw.endDrawCycle(renderTime);
-    // fill.endDrawCycle(renderTime);
   } // END redraw
 
   /**
