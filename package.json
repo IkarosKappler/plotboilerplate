@@ -1,6 +1,6 @@
 {
   "name": "plotboilerplate",
-  "version": "1.12.1",
+  "version": "1.12.2",
   "description": "A simple javascript plotting boilerplate for 2d stuff.",
   "private": false,
   "main": "src/cjs/index.js",
