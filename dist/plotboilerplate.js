@@ -10,11 +10,11 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "AlloyFinger": () => (/* reexport */ AlloyFinger),
-  "default": () => (/* binding */ esm)
+  "AlloyFinger": () => /* reexport */ AlloyFinger,
+  "default": () => /* binding */ esm
 });
 
-;// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/alloy_finger.js
+// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/alloy_finger.js
 /* Port from AlloyFinger v0.1.15
  * Original by dntzhang
  * Typescript port by Ikaros Kappler
@@ -404,7 +404,7 @@ class AlloyFinger {
 ;
 /* harmony default export */ const alloy_finger = ((/* unused pure expression or super */ null && (AlloyFinger)));
 //# sourceMappingURL=alloy_finger.js.map
-;// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/index.js
+// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/index.js
 /**
  * TypeScript port by Ikaros Kappler.
  *
@@ -3313,8 +3313,6 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3448,8 +3446,6 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -7617,8 +7613,6 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -11710,9 +11704,8 @@ exports.geomutils = {
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
+/******/ 		if(__webpack_module_cache__[moduleId]) {
+/******/ 			return __webpack_module_cache__[moduleId].exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
@@ -11743,7 +11736,7 @@ exports.geomutils = {
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
@@ -11758,8 +11751,6 @@ exports.geomutils = {
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
 /* Imports for webpack */
