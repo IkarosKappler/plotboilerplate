@@ -51,7 +51,7 @@ cp ../example-image.png "$TARGET_DIR"example-image.png
 cp ../LICENSE "$TARGET_DIR"LICENSE
 
 BUILDDATE=$(date)
-echo -e "$BUILDDATE" >> "$TARGET_DIRbuilddate"
+echo -e "$BUILDDATE" > "$TARGET_DIRbuilddate"
 
 
 echo -e "${_PURPLE} *** Commiting the files to the new package${_NC}"
