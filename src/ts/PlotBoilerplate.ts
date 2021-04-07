@@ -1694,7 +1694,7 @@ export class PlotBoilerplate {
    **/
   private mouseDownHandler(e: XMouseEvent) {
     const _self = this;
-    if (e.button != 1) return; // Only react on left mouse or touch events
+    if (e.button != 0) return; // Only react on left mouse or touch events
     var p: IDraggable = _self.locatePointNear(
       _self.transformMousePosition(e.params.pos.x, e.params.pos.y),
       PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY)
@@ -1784,7 +1784,7 @@ export class PlotBoilerplate {
    **/
   private mouseUpHandler(e: XMouseEvent) {
     const _self: PlotBoilerplate = this;
-    if (e.button != 1) return; // Only react on left mouse;
+    if (e.button != 0) return; // Only react on left mouse;
     if (!e.params.wasDragged) {
       _self.handleClick(e); // e.params.pos.x, e.params.pos.y );
     }

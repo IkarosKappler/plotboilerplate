@@ -5353,7 +5353,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.mouseDownHandler = function (e) {
         var _self = this;
-        if (e.button != 1)
+        if (e.button != 0)
             return; // Only react on left mouse or touch events
         var p = _self.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
         if (!p)
@@ -5445,7 +5445,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.mouseUpHandler = function (e) {
         var _self = this;
-        if (e.button != 1)
+        if (e.button != 0)
             return; // Only react on left mouse;
         if (!e.params.wasDragged) {
             _self.handleClick(e); // e.params.pos.x, e.params.pos.y );
