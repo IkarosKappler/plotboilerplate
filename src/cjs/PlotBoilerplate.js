@@ -795,6 +795,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.drawGrid = function (draw) {
+        if (typeof draw === "undefined") {
+            draw = this.draw;
+        }
         var gScale = {
             x: (Grid_1.Grid.utils.mapRasterScale(this.config.rasterAdjustFactor, this.draw.scale.x) * this.config.rasterScaleX) /
                 this.config.cssScaleX,
@@ -1428,7 +1431,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.mouseDownHandler = function (e) {
         var _self = this;
-        if (e.which != 1)
+        if (e.button != 1)
             return; // Only react on left mouse or touch events
         var p = _self.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
         if (!p)
@@ -1520,7 +1523,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.mouseUpHandler = function (e) {
         var _self = this;
-        if (e.which != 1)
+        if (e.button != 1)
             return; // Only react on left mouse;
         if (!e.params.wasDragged) {
             _self.handleClick(e); // e.params.pos.x, e.params.pos.y );
