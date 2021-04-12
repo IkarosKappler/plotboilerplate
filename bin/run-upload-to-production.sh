@@ -67,6 +67,7 @@ rsync -avH ../screenshots          -e ssh $user@$server:"$destination/repo/"
 rsync -avH ../src                  -e ssh $user@$server:"$destination/repo/"
 rsync -avH ../tests                -e ssh $user@$server:"$destination/repo/"
 rsync -avH ../*.*                  -e ssh $user@$server:"$destination/repo/"
+rsync -avH ../releases/*           -e ssh $user@$server:"$destination/releases/"
 
 # Clear demos with tracker dir
 rm -rf ../demos_with_tracker

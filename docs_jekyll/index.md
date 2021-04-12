@@ -10,10 +10,10 @@ date: 2019-03-11
 
 For plotting visual 2D data with Javascript on HTML canvas (in 2d-context) or SVG nodes.
 
-![logo](logo-128.png)
+![logo](https://plotboilerplate.io/repo/logo-128.png)
 
-This is a simple collection of useful functions I am repetitively using for
-visualizing 2D geometries. Basic features are
+This is a simple collection of useful functions, methods, classes, algorithms and concepts which I
+often use for the visualization of 2D geometries. Basic features are
 
 - adding elements like
   - vertices

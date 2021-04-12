@@ -14,6 +14,7 @@ docs_jekyll/.sass-cache
 docs_jekyll/docs
 docs_jekyll/docs_md
 *.lock
+releases/
 package-lock.json
 .env
 .env-testing

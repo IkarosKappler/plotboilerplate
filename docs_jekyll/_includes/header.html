@@ -15,19 +15,21 @@
 
       <div class="trigger">
 
-        <a class="page-link" href="{{ site.baseurl }}/docs.html">Docs</a>
+        <a class="page-link" href="{{ site.baseurl }}/docs.html" title="Docs"><span class="icon icon--github">{% include icon-docs.svg %}</span></a>
 
-        <a class="page-link" href="{{ site.baseurl }}/demos">Demos</a>
+        <a class="page-link" href="{{ site.baseurl }}/demos" title="Examples"><span class="icon icon--github" >{% include icon-examples.svg %}</span></a>
         
-        <a class="page-link" href="https://github.com/IkarosKappler/plotboilerplate/archive/master.zip"><span class="icon icon--github">{% include icon-github.svg %}</span>Download</a>
+        <a class="page-link" href="{{ site.baseurl }}/releases/plotboilerplate-latest.tar.gz" title="Download"><span class="icon icon--github">{% include icon-download.svg %}</span></a>
 
-        <a class="page-link" href="https://github.com/IkarosKappler/plotboilerplate/"><span class="icon icon--github">{% include icon-github.svg %}</span>Github</a>
+        <a class="page-link" href="https://github.com/IkarosKappler/plotboilerplate/" title="Github"><span class="icon icon--github">{% include icon-github.svg %}</span></a>
 
+        {% comment %}
         {% for my_page in site.pages %}
           {% if my_page.title=='About' %}
-          <a class="page-link" href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title }}</a>
+          <a class="page-link" href="{{ my_page.url | prepend: site.baseurl }}" title="About"><span class="icon icon--github">{% include icon-about.svg %}</span>my_page.title</a>
           {% endif %}
         {% endfor %}
+        {% endcomment %}
       </div>
     </nav>
 
