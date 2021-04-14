@@ -55,99 +55,81 @@
       )
     );
 
-    var Vert3 = function (x, y, z) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
+    var boxGeometry = makeBoxGeometry();
+    var shpereGeometry = makeSphereGeometry();
+    var dodecahedronGeometry = makeDodecahedronGeometry();
+    var rhombicDodecahedronGeometry = makeRhombicDodecahedronGeometry();
+    var tetrahedronGeometry = makeTetrahedronGeometry();
+    var isocahedronGeometry = makeIsocahedronGeometry();
+    var octahedronGeometry = makeOctahedronGeometry();
 
-      this.clone = function () {
-        return new Vert3(this.x, this.y, this.z);
-      };
-    };
-
-    var makeSphereGeometry = function () {
-      var longs = 7;
-      var lats = 12;
-      var radius = 1;
-      var vertices = [];
-      var edges = [];
-      for (var long = 0; long < longs; long++) {
-        var theta = Math.PI / 2 + (long / (longs - 1)) * Math.PI;
-        for (var lat = 0; lat < lats; lat++) {
-          var alpha = (lat / lats) * Math.PI * 2;
-          var vert = new Vert3(radius, 0, 0);
-          vert = rotatePoint(vert, theta, 0, alpha, 0);
-          vertices.push(vert);
-          if (lat > 0) {
-            // Make longitudes
-            edges.push([long * lats + lat - 1, long * lats + lat]);
-            if (lat + 1 === lats) {
-              edges.push([long * lats, long * lats + lat]);
-            }
-            // Make latitudes
-            if (long > 0) {
-              edges.push([long * lats + lat - 1, (long - 1) * lats + lat - 1]);
-              if (long + 1 === longs) {
-                //edges.push([long * lats, (long - 1) * lats + lat - 1]);
-              }
-            }
-          } else if (long > 0) {
-            edges.push([long * lats + lats - 1, (long - 1) * lats + lats - 1]);
-          }
-        }
+    var getGeometry = function () {
+      switch (config.geometryType) {
+        case "box":
+          return boxGeometry;
+        case "sphere":
+          return shpereGeometry;
+        case "rhombicdodecahedron":
+          return rhombicDodecahedronGeometry;
+        case "tetrahedron":
+          return tetrahedronGeometry;
+        case "isocahedron":
+          return isocahedronGeometry;
+        case "octahedron":
+          return octahedronGeometry;
+        default:
+          return dodecahedronGeometry;
       }
-      console.log(vertices);
-      return { vertices: vertices, edges: edges };
     };
-
-    var makeBoxGeometry = function () {
-      // Box
-      // prettier-ignore
-      var vertices = [
-      new Vert3(-1, -1, -1), 
-      new Vert3(-1, -1,  1),
-      new Vert3(1, -1, 1),
-      new Vert3(1, -1, -1),
-      
-      new Vert3(-1, 1, -1), 
-      new Vert3(-1, 1,  1),
-      new Vert3(1, 1, 1),
-      new Vert3(1, 1, -1)
-    ];
-      // prettier-ignore
-      var edges = [
-      // front
-      [0,1], [1,2], [2,3], [3,0],
-      // back
-      [4,5], [5,6], [6,7], [7,4],
-      // sides
-      [0,4], [1,5], [2,6], [3,7]
-    ];
-      return { vertices: vertices, edges: edges };
-    };
-
-    // var geometry = makeBoxGeometry();
-    var geometry = makeSphereGeometry();
 
     // +---------------------------------------------------------------------------------
     // | This is the part where the magic happens
     // +-------------------------------
     pb.config.postDraw = function (draw, fill) {
+      var geometry = getGeometry();
+
       // console.log("postDraw", draw);
+      var minMax = getMinMax(geometry.vertices);
+      // minMax.min = applyRotation(applyScale(minMax.min));
+      // minMax.max = applyRotation(applyScale(minMax.max));
+      minMax.min = applyScale(minMax.min);
+      minMax.max = applyScale(minMax.max);
       for (var e in geometry.edges) {
         var a3 = applyRotation(applyScale(geometry.vertices[geometry.edges[e][0]].clone()));
         var b3 = applyRotation(applyScale(geometry.vertices[geometry.edges[e][1]].clone()));
         var a2 = applyProjection(a3);
         var b2 = applyProjection(b3);
-        var tA = getThreshold(a3, -config.scale, config.scale);
-        var tB = getThreshold(b3, -config.scale, config.scale);
-        var threshold = Math.max(0, Math.min(1, Math.min(tA, tB)));
+        // var tA = getThreshold(a3, -config.scale, config.scale);
+        // var tB = getThreshold(b3, -config.scale, config.scale);
+        var tA = getThreshold(a3, minMax.min.z, minMax.max.z);
+        var tB = getThreshold(b3, minMax.min.z, minMax.max.z);
+        var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
+        // var threshold = config.useDistanceThreshold ? Math.max(minMax.max.z, Math.min(minMax.min.z, Math.min(tA, tB))) : 1.0;
         // console.log("tA", tA, "tB", tB, "threshold", threshold);
         draw.line(a2, b2, "rgba(92,92,92," + threshold + ")", 2);
       }
       for (var v in geometry.vertices) {
-        draw.squareHandle(applyProjection(applyRotation(applyScale(geometry.vertices[v].clone()))), 2, "grey", 1);
+        var projected = applyProjection(applyRotation(applyScale(geometry.vertices[v].clone())));
+        draw.squareHandle(projected, 2, "grey", 1);
+        if (config.drawVertNumbers) {
+          fill.text("" + v, projected.x + 3, projected.y + 3, "black");
+        }
       }
+    };
+
+    var getMinMax = function (vertices) {
+      var min = new Vert3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      var max = new Vert3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+      for (var v in vertices) {
+        var vert = vertices[v];
+        min.x = Math.min(min.x, vert.x);
+        min.y = Math.min(min.y, vert.y);
+        min.z = Math.min(min.z, vert.z);
+        max.x = Math.max(max.x, vert.x);
+        max.y = Math.max(max.y, vert.y);
+        max.z = Math.max(max.z, vert.z);
+      }
+      return { min: min, max: max };
     };
 
     var getThreshold = function (p, far, close) {
@@ -177,53 +159,21 @@
       );
     }
 
-    function rotatePoint(point, pitch, roll, yaw) {
-      // https://stackoverflow.com/questions/34050929/3d-point-rotation-algorithm/34060479
-
-      // var pitch = (config.rotationX * Math.PI) / 180;
-      // var roll = (config.rotationY * Math.PI) / 180;
-      // var yaw = (config.rotationZ * Math.PI) / 180;
-
-      var cosa = Math.cos(yaw);
-      var sina = Math.sin(yaw);
-
-      var cosb = Math.cos(pitch);
-      var sinb = Math.sin(pitch);
-
-      var cosc = Math.cos(roll);
-      var sinc = Math.sin(roll);
-
-      var Axx = cosa * cosb;
-      var Axy = cosa * sinb * sinc - sina * cosc;
-      var Axz = cosa * sinb * cosc + sina * sinc;
-
-      var Ayx = sina * cosb;
-      var Ayy = sina * sinb * sinc + cosa * cosc;
-      var Ayz = sina * sinb * cosc - cosa * sinc;
-
-      var Azx = -sinb;
-      var Azy = cosb * sinc;
-      var Azz = cosb * cosc;
-
-      return new Vert3(
-        Axx * point.x + Axy * point.y + Axz * point.z,
-        Ayx * point.x + Ayy * point.y + Ayz * point.z,
-        Azx * point.x + Azy * point.y + Azz * point.z
-      );
-    }
-
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        far: -600,
+        far: -1000,
         close: 0,
         scale: 100,
         rotationX: 0.0,
         rotationY: 0.0,
         rotationZ: 0.0,
-        animate: false
+        animate: false,
+        useDistanceThreshold: false,
+        drawVertNumbers: false,
+        geometryType: "dodecahedron"
       },
       GUP
     );
@@ -249,8 +199,19 @@
       var gui = pb.createGUI();
       var f0 = gui.addFolder("Path draw settings");
 
+      var GEOMETRY_SHAPES = {
+        // "△"   :"T",
+        "◯": "sphere",
+        "□": "box", // ⚃?
+        "⬠": "dodecahedron",
+        "◊": "rhombicdodecahedron",
+        "△4": "tetrahedron",
+        "△8": "octahedron",
+        "△20": "isocahedron"
+      };
+
       // prettier-ignore
-      f0.add(config, "far").min(-1000).max(1000).title("The 'far' field.").onChange(function () { pb.redraw(); });
+      f0.add(config, "far").min(-2000).max(1000).title("The 'far' field.").onChange(function () { pb.redraw(); });
       // prettier-ignore
       f0.add(config, "close").min(-1000).max(1000).title("The 'close' field.").onChange(function () { pb.redraw(); });
       // prettier-ignore
@@ -263,6 +224,12 @@
       f0.add(config, "rotationZ").min(0).max(360).title("The mesh rotationz.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f0.add(config, "animate").title("Animate?").onChange(function () { startAnimation(0) });
+      // prettier-ignore
+      f0.add(config, "useDistanceThreshold").title("Use distance threshold?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "geometryType", GEOMETRY_SHAPES).title("Geometry type").onChange(function () { pb.redraw(); });
 
       f0.open();
 
