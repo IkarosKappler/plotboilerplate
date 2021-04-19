@@ -62,6 +62,7 @@
     var tetrahedronGeometry = makeTetrahedronGeometry();
     var isocahedronGeometry = makeIsocahedronGeometry();
     var octahedronGeometry = makeOctahedronGeometry();
+    var importedGeometry = null;
 
     var getGeometry = function () {
       switch (config.geometryType) {
@@ -77,6 +78,8 @@
           return isocahedronGeometry;
         case "octahedron":
           return octahedronGeometry;
+        case "file":
+          if (importedGeometry) return importedGeometry;
         default:
           return dodecahedronGeometry;
       }
@@ -188,29 +191,64 @@
     // | Install a mouse handler to display current pointer position.
     // +-------------------------------
     var handleImportStl = function (e) {
-      // var fileInputElement = document.getElementById("input_file");
-      // console.log("fileInputElement", fileInputElement);
-      // fileInputElement.click();
       console.log(e);
       if (!e.target.files || e.target.files.length === 0) {
         console.log("No file selected.");
+        return;
       }
       var reader = new FileReader();
       reader.onload = function () {
         var data = reader.result;
-        // var output = document.getElementById('output');
-        // output.src = dataURL;
-        // console.log(data);
-        new STLParser(function (v1, v2, v3) {
-          console.log("facet", v1, v2, v3);
+        var stlGeometry = { vertices: [], edges: [] };
+        new STLParser(function (v1, v2, v3, normal) {
+          console.log("facet", v1, v2, v3, normal);
+          var index1 = stlGeometry.vertices.length;
+          stlGeometry.vertices.push(new Vert3(v1.x, v1.y, v1.z));
+          var index2 = stlGeometry.vertices.length;
+          stlGeometry.vertices.push(new Vert3(v2.x, v2.y, v2.z));
+          var index3 = stlGeometry.vertices.length;
+          stlGeometry.vertices.push(new Vert3(v3.x, v3.y, v3.z));
+          stlGeometry.edges.push([index1, index2], [index2, index3], [index3, index1]);
         }).parse(data);
+        console.log("stlGeometry", stlGeometry);
+        // normalizeGeometry(stlGeometry);
+        importedGeometry = stlGeometry;
+        config.geometryType = "file";
       };
-      // reader.readAsDataURL(e.target.files[0]);
-      // reader.readAsArrayBuffer(e.target.files[0]);
-      // reader.readAsText(e.target.files[0]);
       reader.readAsBinaryString(e.target.files[0]);
     };
     document.getElementById("input_file").addEventListener("change", handleImportStl);
+
+    var normalizeGeometry = function (geometry) {
+      var desiredBounds = { min: { x: -1, y: -1, z: -1 }, max: { x: 1, y: 1, z: 1 } };
+      var desiredSizeX = 2;
+      var desiredSizeY = 2;
+      var desiredSizeZ = 2;
+      var bounds = getGeometryBounds(geometry);
+      var sizeX = bounds.max.x - bounds.min.x;
+      var sizeY = bounds.max.y - bounds.min.y;
+      var sizeZ = bounds.max.z - bounds.min.z;
+      for (var i in geometry.vertices) {
+        var vert = geometry.vertices[i];
+        vert.x = desiredBounds.x + ((bounds.x - vert.x) / sizeX) * desiredSizeX;
+        vert.y = desiredBounds.y + ((bounds.y - vert.y) / sizeY) * desiredSizeY;
+        vert.z = desiredBounds.x + ((bounds.z - vert.z) / sizeZ) * desiredSizeZ;
+      }
+    };
+
+    var getGeometryBounds = function (geometry) {
+      var min = new Vertex(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      var max = new Vertex(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+      for (var i in geometry.vertices) {
+        min.x = Math.min(geometry.vertices[i].x, min.x);
+        min.y = Math.min(geometry.vertices[i].y, min.y);
+        min.z = Math.min(geometry.vertices[i].z, min.z);
+        max.x = Math.max(geometry.vertices[i].x, max.x);
+        max.y = Math.max(geometry.vertices[i].y, max.y);
+        max.z = Math.max(geometry.vertices[i].z, max.z);
+      }
+      return { min: min, max: max };
+    };
 
     // +---------------------------------------------------------------------------------
     // | Install a mouse handler to display current pointer position.
@@ -277,11 +315,8 @@
     }
 
     var startAnimation = function (time) {
-      // console.log(time);
       config.rotationX = (time / 50) % 360;
       config.rotationY = (time / 70) % 360;
-      // if (config.rotationX > 360) config.rotationX = 0;
-      // console.log(config.rotationX);
       pb.redraw();
 
       if (config.animate) window.requestAnimationFrame(startAnimation);
