@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2021-04-13
+date: 2021-04-16
 ---
 
 <h3>Basics</h3>
@@ -177,7 +177,7 @@ date: 2021-04-13
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/33-depth-mesh/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210329-0-depth-meshNein.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210414-0-rhombicdodecahedron.png');"></div>
    </a>
 </div>
 </div>

@@ -16,7 +16,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Demo of drawing 3d mesh data with PlotBoilerplate.js.">
     <meta property="og:description" content="Demo of drawing 3d mesh data with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20210329-0-depth-meshNein.png">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20210414-0-rhombicdodecahedron.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
@@ -76,6 +76,16 @@
     <script src="../getContrastColor.js"></script>
     <script src="../modal.js"></script>
     <script src="../Interval.js"></script>
+    <script src="STLParser.js"></script>
+    <script src="Vert3.js"></script>
+    <script src="rotatePoint.js"></script>
+    <script src="makeSphereGeometry.js"></script>
+    <script src="makeBoxGeometry.js"></script>
+    <script src="makeDodecahedronGeometry.js"></script>
+    <script src="makeRhombicDodecahedronGeometry.js"></script>
+    <script src="makeTetrahedronGeometry.js"></script>
+    <script src="makeIsocahedronGeometry.js"></script>
+    <script src="makeOctahedronGeometry.js"></script>
     <script src="index.js"></script>
     
     <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
@@ -84,6 +94,7 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <input type="file" style="display: none" id="input_file" />
       <svg id="my-canvas" width="1024" height="768"></svg>
   </body>
 </html>

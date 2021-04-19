@@ -103,7 +103,10 @@
         // var tB = getThreshold(b3, -config.scale, config.scale);
         var tA = getThreshold(a3, minMax.min.z, minMax.max.z);
         var tB = getThreshold(b3, minMax.min.z, minMax.max.z);
-        var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
+        var median = new Vert3(a3.x + (b3.x - a3.x) * 0.5, a3.y + (b3.y - a3.y) * 0.5, a3.z + (b3.z - a3.z) * 0.5);
+        var tMedian = getThreshold(median, minMax.min.z, minMax.max.z); // (tA * tB) / (tA + tB);
+        // var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
+        var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, tMedian)) : 1.0;
         // var threshold = config.useDistanceThreshold ? Math.max(minMax.max.z, Math.min(minMax.min.z, Math.min(tA, tB))) : 1.0;
         // console.log("tA", tA, "tB", tB, "threshold", threshold);
         draw.line(a2, b2, "rgba(92,92,92," + threshold + ")", 2);
@@ -173,10 +176,41 @@
         animate: false,
         useDistanceThreshold: false,
         drawVertNumbers: false,
-        geometryType: "dodecahedron"
+        geometryType: "dodecahedron",
+        importStl: function () {
+          document.getElementById("input_file").click();
+        }
       },
       GUP
     );
+
+    // +---------------------------------------------------------------------------------
+    // | Install a mouse handler to display current pointer position.
+    // +-------------------------------
+    var handleImportStl = function (e) {
+      // var fileInputElement = document.getElementById("input_file");
+      // console.log("fileInputElement", fileInputElement);
+      // fileInputElement.click();
+      console.log(e);
+      if (!e.target.files || e.target.files.length === 0) {
+        console.log("No file selected.");
+      }
+      var reader = new FileReader();
+      reader.onload = function () {
+        var data = reader.result;
+        // var output = document.getElementById('output');
+        // output.src = dataURL;
+        // console.log(data);
+        new STLParser(function (v1, v2, v3) {
+          console.log("facet", v1, v2, v3);
+        }).parse(data);
+      };
+      // reader.readAsDataURL(e.target.files[0]);
+      // reader.readAsArrayBuffer(e.target.files[0]);
+      // reader.readAsText(e.target.files[0]);
+      reader.readAsBinaryString(e.target.files[0]);
+    };
+    document.getElementById("input_file").addEventListener("change", handleImportStl);
 
     // +---------------------------------------------------------------------------------
     // | Install a mouse handler to display current pointer position.
@@ -230,6 +264,8 @@
       f0.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f0.add(config, "geometryType", GEOMETRY_SHAPES).title("Geometry type").onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "importStl").title("Import STL").onChange(function () { pb.redraw(); });
 
       f0.open();
 
