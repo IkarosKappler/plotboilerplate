@@ -10,44 +10,45 @@
  * @version 0.0.1
  */
 
-(function (context) {
-  function Vertex(v1, v2, v3) {
-    this.v1 = Number(v1);
-    this.v2 = Number(v2);
-    this.v3 = Number(v3);
+function Vertex(v1, v2, v3) {
+  this.v1 = Number(v1);
+  this.v2 = Number(v2);
+  this.v3 = Number(v3);
+}
+
+// Vertex Holder
+//class VertexHolder
+function VertexHolder(vertex1?, vertex2?, vertex3?) {
+  this.vert1 = vertex1;
+  this.vert2 = vertex2;
+  this.vert3 = vertex3;
+}
+
+// transforming a Node.js Buffer into a V8 array buffer
+function _toArrayBuffer(buffer) {
+  var ab = new ArrayBuffer(buffer.length),
+    view = new Uint8Array(ab);
+
+  for (var i = 0; i < buffer.length; ++i) {
+    // for (var i = 0; i < buffer.byteLength; ++i) {
+    // if (i < 32) console.log(buffer[i]);
+    view[i] = buffer.charCodeAt(i); // buffer[i];
   }
+  return ab;
+}
 
-  // Vertex Holder
-  function VertexHolder(vertex1, vertex2, vertex3) {
-    this.vert1 = vertex1;
-    this.vert2 = vertex2;
-    this.vert3 = vertex3;
-  }
+// function _toUin8Array(buffer) {
+//   var ab = new ArrayBuffer(buffer.length),
+//     view = new Uint8Array(ab);
 
-  // transforming a Node.js Buffer into a V8 array buffer
-  function _toArrayBuffer(buffer) {
-    var ab = new ArrayBuffer(buffer.length),
-      view = new Uint8Array(ab);
+//   for (var i = 0; i < buffer.length; ++i) {
+//     // for (var i = 0; i < buffer.byteLength; ++i) {
+//     view[i] = buffer[i];
+//   }
+//   return view; // ab;
+// }
 
-    for (var i = 0; i < buffer.length; ++i) {
-      // for (var i = 0; i < buffer.byteLength; ++i) {
-      // if (i < 32) console.log(buffer[i]);
-      view[i] = buffer.charCodeAt(i); // buffer[i];
-    }
-    return ab;
-  }
-
-  function _toUin8Array(buffer) {
-    var ab = new ArrayBuffer(buffer.length),
-      view = new Uint8Array(ab);
-
-    for (var i = 0; i < buffer.length; ++i) {
-      // for (var i = 0; i < buffer.byteLength; ++i) {
-      view[i] = buffer[i];
-    }
-    return view; // ab;
-  }
-
+export class STLParser {
   // calculation of the triangle volume
   // source: http://stackoverflow.com/questions/6518404/how-do-i-calculate-the-volume-of-an-object-stored-in-stl-files
   // function _triangleVolume(vertexHolder) {
@@ -60,19 +61,20 @@
   //   return Number(1.0 / 6.0) * (-v321 + v231 + v312 - v132 - v213 + v123);
   // }
 
+  handleFacet: (v1, v2, v3) => void;
+
   /**
-   * @param {function} handleVert function(x,y,z)
-   * @param {function} handleFace function(i,j,k)
+   * @param {function} handleFacet function(x,y,z)
    * */
   // var STLParser = function (handleVert, handleFace) {
-  var STLParser = function (handleFacet) {
+  constructor(handleFacet: (v1, v2, v3) => void) {
     // this.handleVert = handleVert;
     // this.handleFace = handleFace;
     this.handleFacet = handleFacet;
-  };
+  }
 
   // parsing an STL ASCII string
-  STLParser.prototype._parseSTLString = function (stl) {
+  _parseSTLString(stl) {
     var totalVol = 0;
     // yes, this is the regular expression, matching the vertexes
     // it was kind of tricky but it is fast and does the job
@@ -103,11 +105,11 @@
     //     weight: volumeTotal * 1.04  // gm
     // }
     console.log("ASCII:", volumeTotal * 1.25);
-  };
+  }
 
   // parsing an STL Binary File
   // (borrowed some code from here: https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/STLLoader.js)
-  STLParser.prototype._parseSTLBinary = function (buf) {
+  _parseSTLBinary(buf) {
     // buf = _toArrayBuffer(buf);
     // console.log(buf);
 
@@ -139,14 +141,14 @@
     //     weight: volumeTotal * 1.04  // gm
     // }
     // console.log("BINARY:", volumeTotal * 1.25);
-  };
+  }
 
   /**
    *
    * @param {ArrayBuffer} buf
    * @returns
    */
-  STLParser.prototype.parse = function (buf) {
+  parse(buf) {
     var isAscii = true;
 
     // var buf = _toArrayBuffer(buf);
@@ -179,7 +181,7 @@
       this._parseSTLBinary(buf);
     }
     console.log("isAscii", isAscii);
-  };
+  }
 
   // function NodeStl(stlPath) {
   //   var buf = fs.readFileSync(stlPath),
@@ -203,5 +205,4 @@
   // app.listen(port, () => {
   //   console.log("Server listening on port " + port);
   // });
-  context.STLParser = STLParser;
-})(globalThis || window);
+}
