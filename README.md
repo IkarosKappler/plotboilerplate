@@ -479,6 +479,7 @@ vert.listeners.addDragListener(function (e) {
 - Dr. Martin von Gagern for the [equidistant points on ellipse math](https://math.stackexchange.com/questions/172766/calculating-equidistant-points-around-an-ellipse-arc "equidistant points on ellipse math")
 - [Torben Jansen](https://twitter.com/torbenjansen_ "Torben Jansen") for the [SVG-Arc to elliptic-sector conversion](https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion "SVG-Arc to elliptic-sector conversion")
 - [3daddict](https://github.com/3daddict) for the [js-stl-parser inspiration](https://github.com/3daddict/js-stl-parser/blob/master/index.js "js-stl-parser inspiration")
+- [jburkardt](https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html "jburkardt") for the obj test files.
 
 ## Todos
 

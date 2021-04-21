@@ -10,6 +10,13 @@
  * @version 0.0.1
  */
 
+/**
+ * Process a facet. Normals are not guaranteed to be present (binary yes, ascii no).
+ */
+type FacetHandler = (v1: Vertex, v2: Vertex, v3: Vertex, normal?: Vertex) => void;
+
+type Vert3 = { x: number; y: number; z: number };
+
 class Vertex {
   x: number;
   y: number;
@@ -22,27 +29,26 @@ class Vertex {
 }
 
 // Vertex Holder
-function VertexHolder(vertex1?: Vertex, vertex2?: Vertex, vertex3?: Vertex) {
-  this.vert1 = vertex1;
-  this.vert2 = vertex2;
-  this.vert3 = vertex3;
+class VertexHolder {
+  vert1: Vert3;
+  vert2: Vert3;
+  vert3: Vert3;
+  constructor(vertex1?: Vertex, vertex2?: Vertex, vertex3?: Vertex) {
+    this.vert1 = vertex1;
+    this.vert2 = vertex2;
+    this.vert3 = vertex3;
+  }
 }
 
 // transforming a Node.js Buffer into a V8 array buffer
-function _toArrayBuffer(buffer): ArrayBuffer {
+const _toArrayBuffer = (buffer: string): ArrayBuffer => {
   const ab: ArrayBuffer = new ArrayBuffer(buffer.length);
   const view: Uint8Array = new Uint8Array(ab);
-
   for (var i = 0; i < buffer.length; ++i) {
     view[i] = buffer.charCodeAt(i);
   }
   return ab;
-}
-
-/**
- * Process a facet. Normals are not guaranteed to be present (binary yes, ascii no).
- */
-type FacetHandler = (v1: Vertex, v2: Vertex, v3: Vertex, normal?: Vertex) => void;
+};
 
 /**
  * @classdesc STLParser
