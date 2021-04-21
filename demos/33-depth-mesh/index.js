@@ -229,7 +229,10 @@
         }).parse(data);
         // console.log("stlGeometry", stlGeometry);
         normalizeGeometry(stlGeometry.vertices);
-        importedGeometry = stlGeometry;
+        console.log("old stl vertices", stlGeometry.vertices.length);
+        // importedGeometry = stlGeometry;
+        importedGeometry = reduceGeometryDuplicateVertices(stlGeometry);
+        console.log("new stl vertices", importedGeometry.vertices.length);
         config.geometryType = "file";
         pb.redraw();
       };
@@ -255,6 +258,7 @@
             objGeometry.vertices.push(new Vert3(x, y, z));
           },
           function (a, b, c) {
+            // Note that OBJ indices start at 1 (not 0)
             a--;
             b--;
             c--;
@@ -264,9 +268,16 @@
             objGeometry.edges.push([c, a]);
           }
         ).parse(data);
-        console.log("stlGeometry", objGeometry);
+        // console.log("stlGeometry", objGeometry);
         normalizeGeometry(objGeometry.vertices);
-        importedGeometry = objGeometry;
+        console.log("old obj vertices", objGeometry.vertices.length);
+        // Usually it is not required to reduce OBJ geometries, as vertices and edges/faces
+        // are stored separately. But even smal, optimizations are ok.
+        importedGeometry = reduceGeometryDuplicateVertices(objGeometry, 0.0001);
+        console.log("new obj vertices", importedGeometry.vertices.length);
+        console.log("old obj edges", importedGeometry.edges.length);
+        importedGeometry.edges = reduceGeometryDuplicateEdges(importedGeometry.edges);
+        console.log("new obj edges", importedGeometry.edges.length);
         config.geometryType = "file";
         pb.redraw();
       };
