@@ -72,7 +72,8 @@
  * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
  * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
- * @version  1.13.3
+ * @modified 2021-04-25 Extending `remove` to accept arrays, too.
+ * @version  1.14.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -407,14 +408,14 @@ export declare class PlotBoilerplate {
      *  * a Triangle
      * </pre>
      *
-     * @param {Object} drawable - The drawable (of one of the allowed class instance) to remove.
+     * @param {Drawable|Array<Drawable>} drawable - The drawable (of one of the allowed class instance) to remove.
      * @param {boolean} [redraw=false]
      * @method remove
      * @instance
      * @memberof PlotBoilerplate
      * @return {void}
      **/
-    remove(drawable: Drawable, redraw?: boolean, removeWithVertices?: boolean): void;
+    remove(drawable: Drawable | Array<Drawable>, redraw?: boolean, removeWithVertices?: boolean): void;
     /**
      * Remove a vertex from the vertex list.<br>
      *

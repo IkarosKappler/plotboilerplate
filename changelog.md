@@ -1,5 +1,8 @@
 # Changelog
 
+- 2021-04-25
+  - Extended `PlotBoilerplate.remove` to accept arrays of drawables.
+  - Added the polynomial-interpolation demo.
 - 2021-03-30
   - Added `DrawLib.endDrawCycle(renderTime)`.
   - Added buffering to the SVG drawing library `drawutilssvg` (this avoids flickering on redraws).
