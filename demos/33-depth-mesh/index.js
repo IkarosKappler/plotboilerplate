@@ -238,11 +238,11 @@
       // prettier-ignore
       f0.add(config, "rotationZ").min(0).max(360).title("The mesh rotationz.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "translateX").min(-100).max(360).title("The mesh translation X.").listen().onChange(function () { pb.redraw(); });
+      f0.add(config, "translateX").min(-1.0).max(1.0).title("The mesh translation X.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "translateY").min(-100).max(360).title("The mesh translation Y.").listen().onChange(function () { pb.redraw(); });
+      f0.add(config, "translateY").min(-1.0).max(1.0).title("The mesh translation Y.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "translateZ").min(-100).max(360).title("The mesh translation Z.").listen().onChange(function () { pb.redraw(); });
+      f0.add(config, "translateZ").min(-1.0).max(1.0).title("The mesh translation Z.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f0.add(config, "animate").title("Animate?").onChange(function () { startAnimation(0) });
       // prettier-ignore

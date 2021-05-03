@@ -264,9 +264,14 @@ Matrix4x4.prototype.set_scaling = function (x, y, z) {
 Matrix4x4.prototype.set_translation = function (x, y, z) {
   this.set_identity();
 
-  this.wx = x;
-  this.wy = y;
-  this.wz = z;
+  // This was wrong in the original implementation
+  //    See https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/geometry/geo-tran.html
+  // this.wx = x;
+  // this.wy = y;
+  // this.wz = z;
+  this.xw = x;
+  this.yw = y;
+  this.zw = z;
 
   return this;
 };
