@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>2D Plotting Boilerplate - Drawing depth meshs</title>
+    <title>2D Plotting Boilerplate - Drawing SVG path data</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
     <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, mesh, depth, pseudo 3d">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, function, graph, plot">
     <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2021-03-29">
+    <meta name="date" content="2021-01-27">
     
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Demo of drawing 3d mesh data with PlotBoilerplate.js.">
-    <meta property="og:description" content="Demo of drawing 3d mesh data with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20210414-0-rhombicdodecahedron.png">
+    <meta property="og:title" content="Demo of drawing SVG path data with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demo of drawing SVG path data with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20210219-0-path-data-transformation.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
@@ -76,23 +76,11 @@
     <script src="../getContrastColor.js"></script>
     <script src="../modal.js"></script>
     <script src="../Interval.js"></script>
-    <script src="../../src/cjs/utils/parsers/STLParser.js"></script>
-    <script src="../../src/cjs/utils/parsers/OBJParser.js"></script>
-    <script src="Vert3.js"></script>
-    <script src="rotatePoint.js"></script>
-    <script src="Matrix4x4.js"></script>
-    <script src="makeSphereGeometry.js"></script>
-    <script src="makeBoxGeometry.js"></script>
-    <script src="makeDodecahedronGeometry.js"></script>
-    <script src="makeRhombicDodecahedronGeometry.js"></script>
-    <script src="makeTetrahedronGeometry.js"></script>
-    <script src="makeIsocahedronGeometry.js"></script>
-    <script src="makeOctahedronGeometry.js"></script>
-    <script src="getGeometryBounds.js"></script>
-    <script src="normalizeGeometry.js"></script>
-    <script src="reduceGeometryDuplicateEdges.js"></script>
-    <script src="reduceGeometryDuplicateVertices.js"></script>
-
+    <script src="LagrangePolynomial.js"></script>
+    <script src="MultiplyScalarFunction.js"></script>
+    <script src="SumFunction.js"></script>
+    <script src="NewtonInterpolation.js"></script>
+    <script src="cfft.js"></script>
     <script src="index.js"></script>
     
     <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
@@ -101,7 +89,6 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-      <input type="file" style="display: none" id="input_file" />
       <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
   </body>
 </html>

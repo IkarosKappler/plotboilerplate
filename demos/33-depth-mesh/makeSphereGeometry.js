@@ -41,6 +41,5 @@ var makeSphereGeometry = function () {
       }
     }
   }
-  console.log(vertices);
   return { vertices: vertices, edges: edges };
 };

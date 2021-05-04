@@ -12,10 +12,6 @@
 function rotatePoint(point, pitch, roll, yaw) {
   // https://stackoverflow.com/questions/34050929/3d-point-rotation-algorithm/34060479
 
-  // var pitch = (config.rotationX * Math.PI) / 180;
-  // var roll = (config.rotationY * Math.PI) / 180;
-  // var yaw = (config.rotationZ * Math.PI) / 180;
-
   var cosa = Math.cos(yaw);
   var sina = Math.sin(yaw);
 

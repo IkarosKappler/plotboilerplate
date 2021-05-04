@@ -20,6 +20,7 @@
 
   // Fetch the GET params
   let GUP = gup();
+  let D2R = Math.PI / 180;
 
   window.addEventListener("load", function () {
     // All config params are optional.
@@ -93,36 +94,99 @@
     pb.config.postDraw = function (draw, fill) {
       var geometry = getGeometry();
 
-      // console.log("postDraw", draw);
       var minMax = getMinMax(geometry.vertices);
-      // minMax.min = applyRotation(applyScale(minMax.min));
-      // minMax.max = applyRotation(applyScale(minMax.max));
+
+      var transformMatrix0 = makeTransformToMatrix(
+        config.rotationX * D2R,
+        config.rotationY * D2R,
+        config.rotationZ * D2R,
+        config.scale,
+        config.scale,
+        config.scale,
+        config.translateX,
+        config.translateY,
+        config.translateZ
+      );
+      var transformMatrix1 = makeTransformToMatrix(
+        config.rotationX * D2R,
+        config.rotationY * D2R,
+        config.rotationZ * D2R,
+        config.scale,
+        config.scale,
+        config.scale,
+        config.translateX,
+        config.translateY,
+        config.translateZ + 0.1
+      );
+      var transformMatrix2 = makeTransformToMatrix(
+        config.rotationX * D2R,
+        config.rotationY * D2R,
+        config.rotationZ * D2R,
+        config.scale,
+        config.scale,
+        config.scale,
+        config.translateX,
+        config.translateY,
+        config.translateZ - 0.1
+      );
+
+      // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
+
+      if (draw.ctx) {
+        draw.ctx.globalCompositeOperation = "difference"; // xor
+      }
+      // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
+      // drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
+      // drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(255, 0, 0));
+      drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 0, 255));
+      drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(255, 255, 0));
+      drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(0, 255, 255));
+      if (draw.ctx) {
+        draw.ctx.globalCompositeOperation = "source-over";
+      }
+    };
+
+    var drawGeometry = function (draw, fill, geometry, minMax, transformMatrix, colorObject) {
       minMax.min = applyScale(minMax.min);
       minMax.max = applyScale(minMax.max);
       for (var e in geometry.edges) {
-        var a3 = applyRotation(applyScale(geometry.vertices[geometry.edges[e][0]].clone()));
-        var b3 = applyRotation(applyScale(geometry.vertices[geometry.edges[e][1]].clone()));
+        var a3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][0]]);
+        var b3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][1]]);
+
         var a2 = applyProjection(a3);
         var b2 = applyProjection(b3);
-        // var tA = getThreshold(a3, -config.scale, config.scale);
-        // var tB = getThreshold(b3, -config.scale, config.scale);
+
         var tA = getThreshold(a3, minMax.min.z, minMax.max.z);
         var tB = getThreshold(b3, minMax.min.z, minMax.max.z);
-        var median = new Vert3(a3.x + (b3.x - a3.x) * 0.5, a3.y + (b3.y - a3.y) * 0.5, a3.z + (b3.z - a3.z) * 0.5);
-        var tMedian = getThreshold(median, minMax.min.z, minMax.max.z); // (tA * tB) / (tA + tB);
-        // var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
-        var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, tMedian)) : 1.0;
-        // var threshold = config.useDistanceThreshold ? Math.max(minMax.max.z, Math.min(minMax.min.z, Math.min(tA, tB))) : 1.0;
-        // console.log("tA", tA, "tB", tB, "threshold", threshold);
-        draw.line(a2, b2, "rgba(92,92,92," + threshold + ")", 2);
+        var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
+
+        colorObject.a = threshold;
+        draw.line(a2, b2, colorObject.cssRGBA(), 2);
       }
       for (var v in geometry.vertices) {
-        var projected = applyProjection(applyRotation(applyScale(geometry.vertices[v].clone())));
+        var projected = applyProjection(transformMatrix.apply3(geometry.vertices[v]));
         draw.squareHandle(projected, 2, "grey", 1);
         if (config.drawVertNumbers) {
           fill.text("" + v, projected.x + 3, projected.y + 3, "black");
         }
       }
+    };
+
+    var makeTransformToMatrix = function (rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ, translateX, translateY, translateZ) {
+      var matrixRx = new Matrix4x4().set_rotation({ x: 1, y: 0, z: 0 }, rotateX);
+      var matrixRy = new Matrix4x4().set_rotation({ x: 0, y: 1, z: 0 }, rotateY);
+      var matrixRz = new Matrix4x4().set_rotation({ x: 0, y: 0, z: 1 }, rotateZ);
+      var matrixS = new Matrix4x4().set_scaling(scaleX, scaleY, scaleZ);
+      var matrixT0 = new Matrix4x4().set_translation(translateX, translateY, translateZ);
+
+      var transformMatrix = new Matrix4x4()
+        .multiply(matrixRx)
+        .multiply(matrixRy)
+        .multiply(matrixRz)
+        .multiply(matrixS)
+        .multiply(matrixT0);
+
+      return transformMatrix;
     };
 
     var getMinMax = function (vertices) {
@@ -145,7 +209,6 @@
     };
 
     var applyProjection = function (p) {
-      // Project
       var threshold = getThreshold(p, config.far, config.close);
       threshold = Math.max(0, threshold);
       return { x: p.x * threshold, y: p.y * threshold };
@@ -158,15 +221,6 @@
       return p;
     };
 
-    function applyRotation(point) {
-      return rotatePoint(
-        point,
-        (config.rotationX * Math.PI) / 180,
-        (config.rotationY * Math.PI) / 180,
-        (config.rotationZ * Math.PI) / 180
-      );
-    }
-
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
     // +-------------------------------
@@ -178,9 +232,13 @@
         rotationX: 0.0,
         rotationY: 0.0,
         rotationZ: 0.0,
+        translateX: 0,
+        translateY: 0,
+        translateZ: 0,
         animate: false,
         useDistanceThreshold: false,
         drawVertNumbers: false,
+        useBlendMode: false,
         geometryType: "dodecahedron",
         importStl: function () {
           document.getElementById("input_file").setAttribute("data-filetype", "stl");
@@ -254,7 +312,6 @@
         var objGeometry = { vertices: [], edges: [] };
         new OBJParser(
           function (x, y, z) {
-            // console.log("vertex", x, y, z);
             objGeometry.vertices.push(new Vert3(x, y, z));
           },
           function (a, b, c) {
@@ -262,7 +319,6 @@
             a--;
             b--;
             c--;
-            // console.log("facet", a, b, c);
             objGeometry.edges.push([a, b]);
             objGeometry.edges.push([b, c]);
             objGeometry.edges.push([c, a]);
@@ -306,9 +362,8 @@
       var f0 = gui.addFolder("Path draw settings");
 
       var GEOMETRY_SHAPES = {
-        // "△"   :"T",
         "◯": "sphere",
-        "□": "box", // ⚃?
+        "□": "box",
         "⬠": "dodecahedron",
         "◊": "rhombicdodecahedron",
         "△4": "tetrahedron",
@@ -328,6 +383,12 @@
       f0.add(config, "rotationY").min(0).max(360).title("The mesh rotationY.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f0.add(config, "rotationZ").min(0).max(360).title("The mesh rotationz.").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "translateX").min(-1.0).max(1.0).title("The mesh translation X.").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "translateY").min(-1.0).max(1.0).title("The mesh translation Y.").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "translateZ").min(-1.0).max(1.0).title("The mesh translation Z.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f0.add(config, "animate").title("Animate?").onChange(function () { startAnimation(0) });
       // prettier-ignore
