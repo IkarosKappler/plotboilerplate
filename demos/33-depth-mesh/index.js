@@ -130,19 +130,23 @@
         config.translateZ - 0.1
       );
 
-      // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
-
-      if (draw.ctx) {
-        draw.ctx.globalCompositeOperation = "difference"; // xor
-      }
-      // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
-      // drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
-      // drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(255, 0, 0));
-      drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 0, 255));
-      drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(255, 255, 0));
-      drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(0, 255, 255));
-      if (draw.ctx) {
-        draw.ctx.globalCompositeOperation = "source-over";
+      if (config.useBlendMode) {
+        if (draw.ctx) {
+          draw.ctx.globalCompositeOperation = "difference"; // xor
+        }
+        // Use this on black
+        drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
+        drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
+        drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(255, 0, 0));
+        // Use this on white
+        // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 0, 255));
+        // drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(255, 255, 0));
+        // drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(0, 255, 255));
+        if (draw.ctx) {
+          draw.ctx.globalCompositeOperation = "source-over";
+        }
+      } else {
+        drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
       }
     };
 
@@ -165,7 +169,9 @@
       }
       for (var v in geometry.vertices) {
         var projected = applyProjection(transformMatrix.apply3(geometry.vertices[v]));
-        draw.squareHandle(projected, 2, "grey", 1);
+        if (config.drawVertices) {
+          draw.squareHandle(projected, 2, "grey", 1);
+        }
         if (config.drawVertNumbers) {
           fill.text("" + v, projected.x + 3, projected.y + 3, "black");
         }
@@ -237,6 +243,7 @@
         translateZ: 0,
         animate: false,
         useDistanceThreshold: false,
+        drawVertices: true,
         drawVertNumbers: false,
         useBlendMode: false,
         geometryType: "dodecahedron",
@@ -254,6 +261,9 @@
       GUP
     );
 
+    // +---------------------------------------------------------------------------------
+    // | Handle a triggered file import (obj and stl supported).
+    // +-------------------------------
     var handleImport = function (e) {
       var fileType = document.getElementById("input_file").getAttribute("data-filetype");
       if (fileType === "stl") handleImportStl(e);
@@ -276,7 +286,6 @@
         var data = reader.result;
         var stlGeometry = { vertices: [], edges: [] };
         new STLParser(function (v1, v2, v3, normal) {
-          // console.log("facet", v1, v2, v3, normal);
           var index1 = stlGeometry.vertices.length;
           stlGeometry.vertices.push(new Vert3(v1.x, v1.y, v1.z));
           var index2 = stlGeometry.vertices.length;
@@ -285,12 +294,8 @@
           stlGeometry.vertices.push(new Vert3(v3.x, v3.y, v3.z));
           stlGeometry.edges.push([index1, index2], [index2, index3], [index3, index1]);
         }).parse(data);
-        // console.log("stlGeometry", stlGeometry);
         normalizeGeometry(stlGeometry.vertices);
-        console.log("old stl vertices", stlGeometry.vertices.length);
-        // importedGeometry = stlGeometry;
         importedGeometry = reduceGeometryDuplicateVertices(stlGeometry);
-        console.log("new stl vertices", importedGeometry.vertices.length);
         config.geometryType = "file";
         pb.redraw();
       };
@@ -324,16 +329,11 @@
             objGeometry.edges.push([c, a]);
           }
         ).parse(data);
-        // console.log("stlGeometry", objGeometry);
         normalizeGeometry(objGeometry.vertices);
-        console.log("old obj vertices", objGeometry.vertices.length);
         // Usually it is not required to reduce OBJ geometries, as vertices and edges/faces
         // are stored separately. But even smal, optimizations are ok.
         importedGeometry = reduceGeometryDuplicateVertices(objGeometry, 0.0001);
-        console.log("new obj vertices", importedGeometry.vertices.length);
-        console.log("old obj edges", importedGeometry.edges.length);
         importedGeometry.edges = reduceGeometryDuplicateEdges(importedGeometry.edges);
-        console.log("new obj edges", importedGeometry.edges.length);
         config.geometryType = "file";
         pb.redraw();
       };
@@ -394,7 +394,11 @@
       // prettier-ignore
       f0.add(config, "useDistanceThreshold").title("Use distance threshold?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
+      f0.add(config, "drawVertices").title("Draw vertices?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
       f0.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "useBlendMode").title("Use blend mode?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f0.add(config, "geometryType", GEOMETRY_SHAPES).title("Geometry type").onChange(function () { pb.redraw(); });
       // prettier-ignore

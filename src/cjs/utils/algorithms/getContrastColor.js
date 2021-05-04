@@ -18,11 +18,8 @@ var WHITE = Color_1.Color.makeRGB(255, 255, 255);
 var getContrastColor = function (color) {
     // r,g,b in [0..1]
     var gamma = 2.2;
-    var L = 0.2126 * Math.pow(color.r, gamma)
-        + 0.7152 * Math.pow(color.g, gamma)
-        + 0.0722 * Math.pow(color.b, gamma);
-    var use_black = (L > Math.pow(0.5, gamma));
-    // console.log( 'use_black', use_black );
+    var L = 0.2126 * Math.pow(color.r, gamma) + 0.7152 * Math.pow(color.g, gamma) + 0.0722 * Math.pow(color.b, gamma);
+    var use_black = L > Math.pow(0.5, gamma);
     return use_black ? BLACK : WHITE;
 };
 exports.getContrastColor = getContrastColor;

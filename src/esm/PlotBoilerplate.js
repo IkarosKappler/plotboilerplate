@@ -72,7 +72,7 @@
  * @modified 2021-03-01 Updated the `PlotBoilerplate.draw(...)` function: ellipses are now rotate-able.
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
  * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
- * @modified 2021-04-25 Extending `remove` to accept arrays, too.
+ * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @version  1.14.0
  *
  * @file PlotBoilerplate

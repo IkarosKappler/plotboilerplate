@@ -15,11 +15,8 @@ const WHITE = Color.makeRGB(255, 255, 255);
 export const getContrastColor = (color) => {
     // r,g,b in [0..1]
     const gamma = 2.2;
-    const L = 0.2126 * Math.pow(color.r, gamma)
-        + 0.7152 * Math.pow(color.g, gamma)
-        + 0.0722 * Math.pow(color.b, gamma);
-    const use_black = (L > Math.pow(0.5, gamma));
-    // console.log( 'use_black', use_black );
+    const L = 0.2126 * Math.pow(color.r, gamma) + 0.7152 * Math.pow(color.g, gamma) + 0.0722 * Math.pow(color.b, gamma);
+    const use_black = L > Math.pow(0.5, gamma);
     return use_black ? BLACK : WHITE;
 };
 //# sourceMappingURL=getContrastColor.js.map

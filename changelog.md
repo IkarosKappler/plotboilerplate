@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-05-04
+  - Added Matrix4x4 datastructure for 3d transformations.
 - 2021-04-25
   - Extended `PlotBoilerplate.remove` to accept arrays of drawables.
   - Added the polynomial-interpolation demo.
