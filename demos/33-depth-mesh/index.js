@@ -89,28 +89,64 @@
     pb.config.postDraw = function (draw, fill) {
       var geometry = getGeometry();
 
-      // console.log("postDraw", draw);
       var minMax = getMinMax(geometry.vertices);
 
-      var matrixRx = new Matrix4x4().set_rotation({ x: 1, y: 0, z: 0 }, config.rotationX * D2R);
-      var matrixRy = new Matrix4x4().set_rotation({ x: 0, y: 1, z: 0 }, config.rotationY * D2R);
-      var matrixRz = new Matrix4x4().set_rotation({ x: 0, y: 0, z: 1 }, config.rotationZ * D2R);
-      var matrixS = new Matrix4x4().set_scaling(config.scale, config.scale, config.scale);
-      var matrixT = new Matrix4x4().set_translation(config.translateX, config.translateY, config.translateZ);
+      var transformMatrix0 = makeTransformToMatrix(
+        config.rotationX * D2R,
+        config.rotationY * D2R,
+        config.rotationZ * D2R,
+        config.scale,
+        config.scale,
+        config.scale,
+        config.translateX,
+        config.translateY,
+        config.translateZ
+      );
+      var transformMatrix1 = makeTransformToMatrix(
+        config.rotationX * D2R,
+        config.rotationY * D2R,
+        config.rotationZ * D2R,
+        config.scale,
+        config.scale,
+        config.scale,
+        config.translateX,
+        config.translateY,
+        config.translateZ + 0.1
+      );
+      var transformMatrix2 = makeTransformToMatrix(
+        config.rotationX * D2R,
+        config.rotationY * D2R,
+        config.rotationZ * D2R,
+        config.scale,
+        config.scale,
+        config.scale,
+        config.translateX,
+        config.translateY,
+        config.translateZ - 0.1
+      );
 
-      var transformMatrix = new Matrix4x4()
-        .multiply(matrixRx)
-        .multiply(matrixRy)
-        .multiply(matrixRz)
-        .multiply(matrixS)
-        .multiply(matrixT);
+      // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
 
+      if (draw.ctx) {
+        draw.ctx.globalCompositeOperation = "difference"; // xor
+      }
+      // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
+      // drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
+      // drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(255, 0, 0));
+      drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 0, 255));
+      drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(255, 255, 0));
+      drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(0, 255, 255));
+      if (draw.ctx) {
+        draw.ctx.globalCompositeOperation = "source-over";
+      }
+    };
+
+    var drawGeometry = function (draw, fill, geometry, minMax, transformMatrix, colorObject) {
       minMax.min = applyScale(minMax.min);
       minMax.max = applyScale(minMax.max);
       for (var e in geometry.edges) {
         var a3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][0]]);
         var b3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][1]]);
-        // console.log(a3, b3);
 
         var a2 = applyProjection(a3);
         var b2 = applyProjection(b3);
@@ -119,7 +155,9 @@
         var tB = getThreshold(b3, minMax.min.z, minMax.max.z);
         var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
 
-        draw.line(a2, b2, "rgba(92,92,92," + threshold + ")", 2);
+        // draw.line(a2, b2, "rgba(92,92,92," + threshold + ")", 2);
+        colorObject.a = threshold;
+        draw.line(a2, b2, colorObject.cssRGBA(), 2);
       }
       for (var v in geometry.vertices) {
         var projected = applyProjection(transformMatrix.apply3(geometry.vertices[v]));
@@ -128,6 +166,23 @@
           fill.text("" + v, projected.x + 3, projected.y + 3, "black");
         }
       }
+    };
+
+    var makeTransformToMatrix = function (rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ, translateX, translateY, translateZ) {
+      var matrixRx = new Matrix4x4().set_rotation({ x: 1, y: 0, z: 0 }, rotateX);
+      var matrixRy = new Matrix4x4().set_rotation({ x: 0, y: 1, z: 0 }, rotateY);
+      var matrixRz = new Matrix4x4().set_rotation({ x: 0, y: 0, z: 1 }, rotateZ);
+      var matrixS = new Matrix4x4().set_scaling(scaleX, scaleY, scaleZ);
+      var matrixT0 = new Matrix4x4().set_translation(translateX, translateY, translateZ);
+
+      var transformMatrix = new Matrix4x4()
+        .multiply(matrixRx)
+        .multiply(matrixRy)
+        .multiply(matrixRz)
+        .multiply(matrixS)
+        .multiply(matrixT0);
+
+      return transformMatrix;
     };
 
     var getMinMax = function (vertices) {
@@ -163,14 +218,14 @@
       return p;
     };
 
-    function applyRotation(point) {
-      return rotatePoint(
-        point,
-        (config.rotationX * Math.PI) / 180,
-        (config.rotationY * Math.PI) / 180,
-        (config.rotationZ * Math.PI) / 180
-      );
-    }
+    // function applyRotation(point) {
+    //   return rotatePoint(
+    //     point,
+    //     (config.rotationX * Math.PI) / 180,
+    //     (config.rotationY * Math.PI) / 180,
+    //     (config.rotationZ * Math.PI) / 180
+    //   );
+    // }
 
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
