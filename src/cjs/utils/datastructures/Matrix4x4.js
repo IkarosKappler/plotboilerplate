@@ -35,34 +35,34 @@ var Matrix4x4 = /** @class */ (function () {
      */
     function Matrix4x4(matrix) {
         if (matrix) {
-            this.set_from_object(matrix);
+            this.setFromObject(matrix);
         }
         else {
-            this.set_identity();
+            this.setIdentity();
         }
     }
     /**
      * Set matrix components from object
-     * @param {Object} obj - Object with each component of the matrix, all components must be present.
+     * @param {Object} mat - Object with each component of the matrix, all components must be present.
      * @public
      */
-    Matrix4x4.prototype.set_from_object = function (obj) {
-        this.xx = obj.xx;
-        this.xy = obj.xy;
-        this.xz = obj.xz;
-        this.xw = obj.xw;
-        this.yx = obj.yx;
-        this.yy = obj.yy;
-        this.yz = obj.yz;
-        this.yw = obj.yw;
-        this.zx = obj.zx;
-        this.zy = obj.zy;
-        this.zz = obj.zz;
-        this.zw = obj.zw;
-        this.wx = obj.wx;
-        this.wy = obj.wy;
-        this.wz = obj.wz;
-        this.ww = obj.ww;
+    Matrix4x4.prototype.setFromObject = function (mat) {
+        this.xx = mat.xx;
+        this.xy = mat.xy;
+        this.xz = mat.xz;
+        this.xw = mat.xw;
+        this.yx = mat.yx;
+        this.yy = mat.yy;
+        this.yz = mat.yz;
+        this.yw = mat.yw;
+        this.zx = mat.zx;
+        this.zy = mat.zy;
+        this.zz = mat.zz;
+        this.zw = mat.zw;
+        this.wx = mat.wx;
+        this.wy = mat.wy;
+        this.wz = mat.wz;
+        this.ww = mat.ww;
     };
     // A vector {x,y,z,w=1}
     Matrix4x4.prototype.apply4 = function (vec4) {
@@ -90,7 +90,7 @@ var Matrix4x4 = /** @class */ (function () {
      * Set matrix to the identity matrix.
      * @public
      */
-    Matrix4x4.prototype.set_identity = function () {
+    Matrix4x4.prototype.setIdentity = function () {
         this.clear();
         this.xx = this.yy = this.zz = this.ww = 1;
         return this;
@@ -101,8 +101,8 @@ var Matrix4x4 = /** @class */ (function () {
      * @param {Number} angle - The angle to rotate in radians.
      * @public
      */
-    Matrix4x4.prototype.set_rotation = function (axis, angle) {
-        this.set_identity();
+    Matrix4x4.prototype.setRotation = function (axis, angle) {
+        this.setIdentity();
         var c = Math.cos(angle);
         var s = Math.sin(angle);
         var t = 1 - c;
@@ -127,8 +127,8 @@ var Matrix4x4 = /** @class */ (function () {
      * @param {Number} z - Scaling factor in the z axis.
      * @public
      */
-    Matrix4x4.prototype.set_scaling = function (x, y, z) {
-        this.set_identity();
+    Matrix4x4.prototype.setScaling = function (x, y, z) {
+        this.setIdentity();
         this.xx = x;
         this.yy = y;
         this.zz = z;
@@ -141,8 +141,8 @@ var Matrix4x4 = /** @class */ (function () {
      * @param {Number} y - Translation amount in the y axis.
      * @param {Number} z - Translation amount in the z axis.
      */
-    Matrix4x4.prototype.set_translation = function (x, y, z) {
-        this.set_identity();
+    Matrix4x4.prototype.setTranslation = function (x, y, z) {
+        this.setIdentity();
         // There was an error in the original implementation.
         //    See https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/geometry/geo-tran.html
         // This is fixed:
@@ -177,6 +177,66 @@ var Matrix4x4 = /** @class */ (function () {
         return this;
     };
     /**
+     * Create the rotation matrix from the given axis and angle.
+     *
+     * @param {Vec3} axis - The axis to rotate around.
+     * @param {number} angle - The angle to use for rotation (in radians).
+     * @returns Matrix4x4
+     */
+    Matrix4x4.makeRotationMatrix = function (axis, angle) {
+        return new Matrix4x4().setRotation(axis, angle);
+    };
+    /**
+     * Create the scaling matrix from the given x-, y- and z- scaling factors (use 1.0 for no scaling).
+     *
+     * @param {number} scaleX - The x scaling factor.
+     * @param {number} scaleY - The y scaling factor.
+     * @param {number} scaleZ - The z scaling factor.
+     * @returns Matrix4x4
+     */
+    Matrix4x4.makeScalingMatrix = function (scaleX, scaleY, scaleZ) {
+        return new Matrix4x4().setScaling(scaleX, scaleY, scaleZ);
+    };
+    /**
+     * Create the translation matrix from the given x-, y- and z- translation amounts (use 0.0 for no translation).
+     *
+     * @param {number} translateX - The x translation amount.
+     * @param {number} translateY - The y translation amount.
+     * @param {number} translateZ - The z translation amount.
+     * @returns Matrix4x4
+     */
+    Matrix4x4.makeTranslationMatrix = function (translateX, translateY, translateZ) {
+        return new Matrix4x4().setTranslation(translateX, translateY, translateZ);
+    };
+    /**
+     * Create a full transform matrix from the rotation, scaling and translation params.
+     *
+     * @param {number} rotateX - The rotation angle around the x axis.
+     * @param {number} rotateY - The rotation angle around the y axis.
+     * @param {number} rotateZ - The rotation angle around the z axis.
+     * @param {number} scaleX - The x scaling factor.
+     * @param {number} scaleY - The y scaling factor.
+     * @param {number} scaleZ - The z scaling factor.
+     * @param {number} translateX - The x translation amount.
+     * @param {number} translateY - The y translation amount.
+     * @param {number} translateZ - The z translation amount.
+     * @returns Matrix4x4
+     */
+    Matrix4x4.makeTransformationMatrix = function (rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ, translateX, translateY, translateZ) {
+        var matrixRx = new Matrix4x4().setRotation({ x: 1, y: 0, z: 0 }, rotateX);
+        var matrixRy = new Matrix4x4().setRotation({ x: 0, y: 1, z: 0 }, rotateY);
+        var matrixRz = new Matrix4x4().setRotation({ x: 0, y: 0, z: 1 }, rotateZ);
+        var matrixS = new Matrix4x4().setScaling(scaleX, scaleY, scaleZ);
+        var matrixT0 = new Matrix4x4().setTranslation(translateX, translateY, translateZ);
+        var transformMatrix = new Matrix4x4()
+            .multiply(matrixRx)
+            .multiply(matrixRy)
+            .multiply(matrixRz)
+            .multiply(matrixS)
+            .multiply(matrixT0);
+        return transformMatrix;
+    };
+    /**
      * Returns a deep copy of this matrix.
      * @return {Matrix4x4} A deep copy of this matrix.
      */
@@ -187,44 +247,13 @@ var Matrix4x4 = /** @class */ (function () {
      * Returns a pretty print string representation of the matrix.
      * @return {String} Pretty printed string of the matrix.
      */
-    Matrix4x4.prototype.to_string = function () {
+    Matrix4x4.prototype.toJSON = function () {
+        // prettier-ignore
         return ("{\n" +
-            '\t"xx": ' +
-            this.xx +
-            ', "xy": ' +
-            this.xy +
-            ', "xz": ' +
-            this.xz +
-            ', "xw": ' +
-            this.xw +
-            ",\n" +
-            '\t"yx": ' +
-            this.yx +
-            ', "yy": ' +
-            this.yy +
-            ', "yz": ' +
-            this.yz +
-            ', "yw": ' +
-            this.yw +
-            ",\n" +
-            '\t"zx": ' +
-            this.zx +
-            ', "zy": ' +
-            this.zy +
-            ', "zz": ' +
-            this.zz +
-            ', "zw": ' +
-            this.zw +
-            ",\n" +
-            '\t"wx": ' +
-            this.wx +
-            ', "wy": ' +
-            this.wy +
-            ', "wz": ' +
-            this.wz +
-            ', "ww": ' +
-            this.ww +
-            "\n" +
+            '\t"xx": ' + this.xx + ', "xy": ' + this.xy + ', "xz": ' + this.xz + ', "xw": ' + this.xw + ",\n" +
+            '\t"yx": ' + this.yx + ', "yy": ' + this.yy + ', "yz": ' + this.yz + ', "yw": ' + this.yw + ",\n" +
+            '\t"zx": ' + this.zx + ', "zy": ' + this.zy + ', "zz": ' + this.zz + ', "zw": ' + this.zw + ",\n" +
+            '\t"wx": ' + this.wx + ', "wy": ' + this.wy + ', "wz": ' + this.wz + ', "ww": ' + this.ww + "\n" +
             "}");
     };
     return Matrix4x4;

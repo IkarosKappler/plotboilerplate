@@ -13,8 +13,6 @@
  * @version     1.0.0
  **/
 
-// TODO: clear duplicates from geometries (stl or obj)
-
 (function (_context) {
   "use strict";
 
@@ -58,6 +56,10 @@
       )
     );
 
+    // +---------------------------------------------------------------------------------
+    // | Prepare all basic available geometries.
+    // | (Bad style to keep all in memory, I know.)
+    // +-------------------------------
     var boxGeometry = makeBoxGeometry();
     var shpereGeometry = makeSphereGeometry();
     var dodecahedronGeometry = makeDodecahedronGeometry();
@@ -67,6 +69,9 @@
     var octahedronGeometry = makeOctahedronGeometry();
     var importedGeometry = null;
 
+    // +---------------------------------------------------------------------------------
+    // | Get the currently selected geometry.
+    // +-------------------------------
     var getGeometry = function () {
       switch (config.geometryType) {
         case "box":
@@ -92,11 +97,14 @@
     // | This is the part where the magic happens
     // +-------------------------------
     pb.config.postDraw = function (draw, fill) {
+      var textColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
       var geometry = getGeometry();
 
       var minMax = getMinMax(geometry.vertices);
+      minMax.min = applyScale(minMax.min);
+      minMax.max = applyScale(minMax.max);
 
-      var transformMatrix0 = makeTransformToMatrix(
+      var transformMatrix0 = Matrix4x4.makeTransformationMatrix(
         config.rotationX * D2R,
         config.rotationY * D2R,
         config.rotationZ * D2R,
@@ -107,7 +115,7 @@
         config.translateY,
         config.translateZ
       );
-      var transformMatrix1 = makeTransformToMatrix(
+      var transformMatrix1 = Matrix4x4.makeTransformationMatrix(
         config.rotationX * D2R,
         config.rotationY * D2R,
         config.rotationZ * D2R,
@@ -118,7 +126,7 @@
         config.translateY,
         config.translateZ + 0.1
       );
-      var transformMatrix2 = makeTransformToMatrix(
+      var transformMatrix2 = Matrix4x4.makeTransformationMatrix(
         config.rotationX * D2R,
         config.rotationY * D2R,
         config.rotationZ * D2R,
@@ -135,9 +143,9 @@
           draw.ctx.globalCompositeOperation = "difference"; // xor
         }
         // Use this on black
-        drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
-        drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
-        drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(255, 0, 0));
+        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
+        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
+        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(255, 0, 0));
         // Use this on white
         // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 0, 255));
         // drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(255, 255, 0));
@@ -146,13 +154,19 @@
           draw.ctx.globalCompositeOperation = "source-over";
         }
       } else {
-        drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
+        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
       }
+
+      drawGeometryVertices(draw, fill, geometry, transformMatrix0, {
+        drawVertNumbers: config.drawVertNumbers,
+        textColor: textColor
+      });
     };
 
-    var drawGeometry = function (draw, fill, geometry, minMax, transformMatrix, colorObject) {
-      minMax.min = applyScale(minMax.min);
-      minMax.max = applyScale(minMax.max);
+    // +---------------------------------------------------------------------------------
+    // | Draw the edges of a geometry.
+    // +-------------------------------
+    var drawGeometryEdges = function (draw, fill, geometry, minMax, transformMatrix, colorObject) {
       for (var e in geometry.edges) {
         var a3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][0]]);
         var b3 = transformMatrix.apply3(geometry.vertices[geometry.edges[e][1]]);
@@ -167,59 +181,44 @@
         colorObject.a = threshold;
         draw.line(a2, b2, colorObject.cssRGBA(), 2);
       }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Draw the vertices and/or vertex number of a geometry.
+    // +-------------------------------
+    var drawGeometryVertices = function (draw, fill, geometry, transformMatrix, options) {
       for (var v in geometry.vertices) {
         var projected = applyProjection(transformMatrix.apply3(geometry.vertices[v]));
         if (config.drawVertices) {
           draw.squareHandle(projected, 2, "grey", 1);
         }
-        if (config.drawVertNumbers) {
-          fill.text("" + v, projected.x + 3, projected.y + 3, "black");
+        if (options.drawVertNumbers) {
+          fill.text("" + v, projected.x + 3, projected.y + 3, { color: options.textColor });
         }
       }
     };
 
-    var makeTransformToMatrix = function (rotateX, rotateY, rotateZ, scaleX, scaleY, scaleZ, translateX, translateY, translateZ) {
-      var matrixRx = new Matrix4x4().set_rotation({ x: 1, y: 0, z: 0 }, rotateX);
-      var matrixRy = new Matrix4x4().set_rotation({ x: 0, y: 1, z: 0 }, rotateY);
-      var matrixRz = new Matrix4x4().set_rotation({ x: 0, y: 0, z: 1 }, rotateZ);
-      var matrixS = new Matrix4x4().set_scaling(scaleX, scaleY, scaleZ);
-      var matrixT0 = new Matrix4x4().set_translation(translateX, translateY, translateZ);
-
-      var transformMatrix = new Matrix4x4()
-        .multiply(matrixRx)
-        .multiply(matrixRy)
-        .multiply(matrixRz)
-        .multiply(matrixS)
-        .multiply(matrixT0);
-
-      return transformMatrix;
-    };
-
-    var getMinMax = function (vertices) {
-      var min = new Vert3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-      var max = new Vert3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
-      for (var v in vertices) {
-        var vert = vertices[v];
-        min.x = Math.min(min.x, vert.x);
-        min.y = Math.min(min.y, vert.y);
-        min.z = Math.min(min.z, vert.z);
-        max.x = Math.max(max.x, vert.x);
-        max.y = Math.max(max.y, vert.y);
-        max.z = Math.max(max.z, vert.z);
-      }
-      return { min: min, max: max };
-    };
-
+    // +---------------------------------------------------------------------------------
+    // | Determine the threshold in [0,1] of the given point.
+    // | 1: at camera plane (no distance)
+    // | 0: at max distance (as configured)
+    // +-------------------------------
     var getThreshold = function (p, far, close) {
       return (far - p.z) / (far - close);
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Projects the given 3d point to the 2d plane (just before being rendered).
+    // +-------------------------------
     var applyProjection = function (p) {
       var threshold = getThreshold(p, config.far, config.close);
       threshold = Math.max(0, threshold);
       return { x: p.x * threshold, y: p.y * threshold };
     };
 
+    // +---------------------------------------------------------------------------------
+    // | We could also do this via a transformation matrix.
+    // +-------------------------------
     var applyScale = function (p) {
       p.x *= config.scale;
       p.y *= config.scale;

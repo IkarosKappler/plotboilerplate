@@ -144,10 +144,10 @@ export declare class Matrix4x4 {
     constructor(matrix?: Matrix4x4);
     /**
      * Set matrix components from object
-     * @param {Object} obj - Object with each component of the matrix, all components must be present.
+     * @param {Object} mat - Object with each component of the matrix, all components must be present.
      * @public
      */
-    set_from_object(obj: Matrix4x4 | IMatrix4x4): void;
+    setFromObject(mat: Matrix4x4 | IMatrix4x4): void;
     apply4(vec4: Vec4): Vec4;
     apply3(vec3: Vec3): Vec3;
     /**
@@ -159,14 +159,14 @@ export declare class Matrix4x4 {
      * Set matrix to the identity matrix.
      * @public
      */
-    set_identity(): Matrix4x4;
+    setIdentity(): Matrix4x4;
     /**
      * Sets this matrix to a rotation matrix.
      * @param {Vec3} axis - The vector to rotate around.
      * @param {Number} angle - The angle to rotate in radians.
      * @public
      */
-    set_rotation(axis: Vec3, angle: number): Matrix4x4;
+    setRotation(axis: Vec3, angle: number): Matrix4x4;
     /**
      * Sets this matrix to a rotation matrix.
      * @param {Number} x - Scaling factor in the x axis.
@@ -174,7 +174,7 @@ export declare class Matrix4x4 {
      * @param {Number} z - Scaling factor in the z axis.
      * @public
      */
-    set_scaling(x: number, y: number, z: number): Matrix4x4;
+    setScaling(x: number, y: number, z: number): Matrix4x4;
     /**
      * Sets the translation elements of this matrix while leaving the
      * rest of the matrix untouched.
@@ -182,13 +182,54 @@ export declare class Matrix4x4 {
      * @param {Number} y - Translation amount in the y axis.
      * @param {Number} z - Translation amount in the z axis.
      */
-    set_translation(x: number, y: number, z: number): Matrix4x4;
+    setTranslation(x: number, y: number, z: number): Matrix4x4;
     /**
      * Sets this matrix to the dot product between this matrix and the
      * matrix specified by rhs.
      * @param {Matrix4x4} matrix - The matrix on the right hand side of the dot product.
      */
     multiply(matrix: Matrix4x4): Matrix4x4;
+    /**
+     * Create the rotation matrix from the given axis and angle.
+     *
+     * @param {Vec3} axis - The axis to rotate around.
+     * @param {number} angle - The angle to use for rotation (in radians).
+     * @returns Matrix4x4
+     */
+    static makeRotationMatrix(axis: Vec3, angle: number): Matrix4x4;
+    /**
+     * Create the scaling matrix from the given x-, y- and z- scaling factors (use 1.0 for no scaling).
+     *
+     * @param {number} scaleX - The x scaling factor.
+     * @param {number} scaleY - The y scaling factor.
+     * @param {number} scaleZ - The z scaling factor.
+     * @returns Matrix4x4
+     */
+    static makeScalingMatrix(scaleX: number, scaleY: number, scaleZ: number): Matrix4x4;
+    /**
+     * Create the translation matrix from the given x-, y- and z- translation amounts (use 0.0 for no translation).
+     *
+     * @param {number} translateX - The x translation amount.
+     * @param {number} translateY - The y translation amount.
+     * @param {number} translateZ - The z translation amount.
+     * @returns Matrix4x4
+     */
+    static makeTranslationMatrix(translateX: number, translateY: number, translateZ: number): Matrix4x4;
+    /**
+     * Create a full transform matrix from the rotation, scaling and translation params.
+     *
+     * @param {number} rotateX - The rotation angle around the x axis.
+     * @param {number} rotateY - The rotation angle around the y axis.
+     * @param {number} rotateZ - The rotation angle around the z axis.
+     * @param {number} scaleX - The x scaling factor.
+     * @param {number} scaleY - The y scaling factor.
+     * @param {number} scaleZ - The z scaling factor.
+     * @param {number} translateX - The x translation amount.
+     * @param {number} translateY - The y translation amount.
+     * @param {number} translateZ - The z translation amount.
+     * @returns Matrix4x4
+     */
+    static makeTransformationMatrix(rotateX: number, rotateY: number, rotateZ: number, scaleX: number, scaleY: number, scaleZ: number, translateX: number, translateY: number, translateZ: number): Matrix4x4;
     /**
      * Returns a deep copy of this matrix.
      * @return {Matrix4x4} A deep copy of this matrix.
@@ -198,6 +239,6 @@ export declare class Matrix4x4 {
      * Returns a pretty print string representation of the matrix.
      * @return {String} Pretty printed string of the matrix.
      */
-    to_string(): string;
+    toJSON(): string;
 }
 export {};

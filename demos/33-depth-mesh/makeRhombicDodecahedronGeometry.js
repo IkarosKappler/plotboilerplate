@@ -47,9 +47,9 @@ var makeRhombicDodecahedronGeometry = function () {
     [9,7], [7,12],
     [12,6], [6,8],
     [4,10], [10,7],
-    [7,10], [10,6],
+    [10,6],
     [6,10], [10,5],
-    [4,10], [10,7],
+    [10,7],
     [7,10], [10,6]
       ];
   return { vertices: vertices, edges: edges };
