@@ -61,6 +61,7 @@
     // | (Bad style to keep all in memory, I know.)
     // +-------------------------------
     var boxGeometry = makeBoxGeometry();
+    var buckminsterGeometry = makeBuckminsterGeometry();
     var shpereGeometry = makeSphereGeometry();
     var dodecahedronGeometry = makeDodecahedronGeometry();
     var rhombicDodecahedronGeometry = makeRhombicDodecahedronGeometry();
@@ -68,6 +69,10 @@
     var isocahedronGeometry = makeIsocahedronGeometry();
     var octahedronGeometry = makeOctahedronGeometry();
     var importedGeometry = null;
+
+    var rebuildBuckminster = function (lerpRatio) {
+      buckminsterGeometry = makeBuckminsterGeometry(lerpRatio);
+    };
 
     // +---------------------------------------------------------------------------------
     // | Get the currently selected geometry.
@@ -86,6 +91,8 @@
           return isocahedronGeometry;
         case "octahedron":
           return octahedronGeometry;
+        case "buckminster":
+          return buckminsterGeometry;
         case "file":
           if (importedGeometry) return importedGeometry;
         default:
@@ -246,6 +253,8 @@
         drawVertNumbers: false,
         useBlendMode: false,
         geometryType: "dodecahedron",
+        buckminsterLerpRatio: 1 / 3,
+        animateBuckminsterLerp: false,
         importStl: function () {
           document.getElementById("input_file").setAttribute("data-filetype", "stl");
           document.getElementById("input_file").setAttribute("accept", ".stl");
@@ -367,7 +376,8 @@
         "◊": "rhombicdodecahedron",
         "△4": "tetrahedron",
         "△8": "octahedron",
-        "△20": "isocahedron"
+        "△20": "isocahedron",
+        "⬠⬡": "buckminster"
       };
 
       // prettier-ignore
@@ -401,6 +411,10 @@
       // prettier-ignore
       f0.add(config, "geometryType", GEOMETRY_SHAPES).title("Geometry type").onChange(function () { pb.redraw(); });
       // prettier-ignore
+      f0.add(config, "buckminsterLerpRatio").min(0.0).max(0.5).step(0.01).listen().title("Buckminster Lerp Ratio (default=0.333)").onChange(function () { rebuildBuckminster(config.buckminsterLerpRatio); pb.redraw(); });
+      // prettier-ignore
+      f0.add(config, "animateBuckminsterLerp").title("Animate Buckminster Lerp?").onChange(function () { startAnimation(0) });
+      // prettier-ignore
       f0.add(config, "importStl").title("Import STL").onChange(function () { pb.redraw(); });
       // prettier-ignore
       f0.add(config, "importObj").title("Import OBJ").onChange(function () { pb.redraw(); });
@@ -415,15 +429,22 @@
     }
 
     var startAnimation = function (time) {
-      config.rotationX = (time / 50) % 360;
-      config.rotationY = (time / 70) % 360;
+      if (config.animate) {
+        config.rotationX = (time / 50) % 360;
+        config.rotationY = (time / 70) % 360;
+      }
+      if (config.animateBuckminsterLerp) {
+        // Swing back and forth between 0.0 and 0.5 :)
+        config.buckminsterLerpRatio = (Math.sin((time / 10000) * 2) + 1) * (1 / 4);
+        rebuildBuckminster(config.buckminsterLerpRatio);
+      }
       pb.redraw();
 
-      if (config.animate) window.requestAnimationFrame(startAnimation);
+      if (config.animate || config.animateBuckminsterLerp) window.requestAnimationFrame(startAnimation);
     };
 
     // Will stop after first draw if config.animate==false
-    if (config.animate) {
+    if (config.animate || config.animateBuckminsterLerp) {
       startAnimation(0);
     } else {
       pb.redraw();

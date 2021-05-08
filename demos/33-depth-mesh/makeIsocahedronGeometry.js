@@ -10,7 +10,6 @@
  **/
 
 var makeIsocahedronGeometry = function () {
-  // Dodecahedron
   var phi = (1 + Math.sqrt(5)) / 2; // Golden ratio
 
   //   (0, ±1, ±ϕ)
