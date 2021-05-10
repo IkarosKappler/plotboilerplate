@@ -26,14 +26,6 @@ var makeBuckminsterGeometry = function (lerpRatio) {
   var lerpIco = function (a, b) {
     return new Vert3(a.x + (b.x - a.x) * isoLerpRatio, a.y + (b.y - a.y) * isoLerpRatio, a.z + (b.z - a.z) * isoLerpRatio);
   };
-  // This function lerps 33% from one point to the other.
-  // var lerpIcosido = function (a, b) {
-  //   return new Vert3(
-  //     a.x + (b.x - a.x) * icosidodeLerpRatio,
-  //     a.y + (b.y - a.y) * icosidodeLerpRatio,
-  //     a.z + (b.z - a.z) * icosidodeLerpRatio
-  //   );
-  // };
 
   // First step: construct isocahedron vertices (compare to makeIsocahedronGeometry function)
   //   (0, ±1, ±ϕ)
@@ -202,104 +194,95 @@ var makeBuckminsterGeometry = function (lerpRatio) {
     [22,21]
   ];
 
-  // Add face centers? :)
-  // Note: there are 60 vertices now in the bucky vertex array.
-  for (var i in isoFaceCenters) {
-    verticesBucky.push(isoFaceCenters[i]);
-  }
-
-  if (ratio <= 0.5) {
-    return { vertices: verticesBucky, edges: edges };
-  } else {
-    var lerpIcosido = function (indexA, indexB) {
+  if (ratio > 0.5) {
+    var lerpIcosido = function (indexA, centerIndex) {
       var a = verticesBucky[indexA];
-      var b = verticesBucky[indexB];
+      // var b = verticesBucky[indexB];
+      var b = isoFaceCenters[centerIndex];
       a.x += (b.x - a.x) * icosidodeLerpRatio;
       a.y += (b.y - a.y) * icosidodeLerpRatio;
       a.z += (b.z - a.z) * icosidodeLerpRatio;
     };
-    lerpIcosido(1, 60);
-    lerpIcosido(11, 60);
-    lerpIcosido(40, 60);
 
-    lerpIcosido(0, 61);
-    lerpIcosido(41, 61);
-    lerpIcosido(20, 61);
+    lerpIcosido(1, 0);
+    lerpIcosido(11, 0);
+    lerpIcosido(40, 0);
 
-    lerpIcosido(4, 62);
-    lerpIcosido(21, 62);
-    lerpIcosido(30, 62);
+    lerpIcosido(0, 1);
+    lerpIcosido(41, 1);
+    lerpIcosido(20, 1);
 
-    lerpIcosido(3, 63);
-    lerpIcosido(34, 63);
-    lerpIcosido(50, 63);
+    lerpIcosido(4, 2);
+    lerpIcosido(21, 2);
+    lerpIcosido(30, 2);
 
-    lerpIcosido(2, 64);
-    lerpIcosido(51, 64);
-    lerpIcosido(10, 64);
+    lerpIcosido(3, 3);
+    lerpIcosido(34, 3);
+    lerpIcosido(50, 3);
 
-    lerpIcosido(12, 65);
-    lerpIcosido(26, 65);
-    lerpIcosido(44, 65);
+    lerpIcosido(2, 4);
+    lerpIcosido(51, 4);
+    lerpIcosido(10, 4);
 
-    lerpIcosido(27, 66);
-    lerpIcosido(48, 66);
-    lerpIcosido(43, 66);
+    lerpIcosido(12, 5);
+    lerpIcosido(26, 5);
+    lerpIcosido(44, 5);
 
-    lerpIcosido(24, 67);
-    lerpIcosido(42, 67);
-    lerpIcosido(49, 67);
+    lerpIcosido(27, 6);
+    lerpIcosido(48, 6);
+    lerpIcosido(43, 6);
 
-    lerpIcosido(7, 68);
-    lerpIcosido(23, 68);
-    lerpIcosido(45, 68);
+    lerpIcosido(24, 7);
+    lerpIcosido(42, 7);
+    lerpIcosido(49, 7);
 
-    lerpIcosido(8, 69);
-    lerpIcosido(31, 69);
-    lerpIcosido(22, 69);
+    lerpIcosido(7, 8);
+    lerpIcosido(23, 8);
+    lerpIcosido(45, 8);
 
-    lerpIcosido(9, 70);
-    lerpIcosido(56, 70);
-    lerpIcosido(32, 70);
+    lerpIcosido(8, 9);
+    lerpIcosido(31, 9);
+    lerpIcosido(22, 9);
 
-    lerpIcosido(33, 71);
-    lerpIcosido(57, 71);
-    lerpIcosido(54, 71);
+    lerpIcosido(9, 10);
+    lerpIcosido(56, 10);
+    lerpIcosido(32, 10);
 
-    lerpIcosido(39, 72);
-    lerpIcosido(53, 72);
-    lerpIcosido(58, 72);
+    lerpIcosido(33, 11);
+    lerpIcosido(57, 11);
+    lerpIcosido(54, 11);
 
-    lerpIcosido(14, 73);
-    lerpIcosido(52, 73);
-    lerpIcosido(35, 73);
+    lerpIcosido(39, 12);
+    lerpIcosido(53, 12);
+    lerpIcosido(58, 12);
 
-    lerpIcosido(13, 74);
-    lerpIcosido(36, 74);
-    lerpIcosido(25, 74);
+    lerpIcosido(14, 13);
+    lerpIcosido(52, 13);
+    lerpIcosido(35, 13);
 
-    lerpIcosido(6, 75);
-    lerpIcosido(46, 75);
-    lerpIcosido(15, 75);
+    lerpIcosido(13, 14);
+    lerpIcosido(36, 14);
+    lerpIcosido(25, 14);
 
-    lerpIcosido(19, 76);
-    lerpIcosido(47, 76);
-    lerpIcosido(28, 76);
+    lerpIcosido(6, 15);
+    lerpIcosido(46, 15);
+    lerpIcosido(15, 15);
 
-    lerpIcosido(18, 77);
-    lerpIcosido(29, 77);
-    lerpIcosido(37, 77);
+    lerpIcosido(19, 16);
+    lerpIcosido(47, 16);
+    lerpIcosido(28, 16);
 
-    lerpIcosido(17, 78);
-    lerpIcosido(38, 78);
-    lerpIcosido(59, 78);
+    lerpIcosido(18, 17);
+    lerpIcosido(29, 17);
+    lerpIcosido(37, 17);
 
-    lerpIcosido(5, 79);
-    lerpIcosido(16, 79);
-    lerpIcosido(55, 79);
+    lerpIcosido(17, 18);
+    lerpIcosido(38, 18);
+    lerpIcosido(59, 18);
 
-    return { vertices: verticesBucky, edges: edges };
+    lerpIcosido(5, 19);
+    lerpIcosido(16, 19);
+    lerpIcosido(55, 19);
   }
+  return { vertices: verticesBucky, edges: edges };
 };
-
-// function __lerpIsoToBuckminster( isoVertices, )

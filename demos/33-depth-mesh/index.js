@@ -63,13 +63,17 @@
       {
         far: -1000,
         close: 0,
-        scale: 100,
+        scaleX: 100,
+        scaleY: 100,
+        scaleZ: 100,
+        uniformScale: true,
         rotationX: 0.0,
         rotationY: 0.0,
         rotationZ: 0.0,
         translateX: 0,
         translateY: 0,
         translateZ: 0,
+        lineWidth: 2.0,
         animate: false,
         useDistanceThreshold: false,
         drawVertices: true,
@@ -78,6 +82,7 @@
         geometryType: "dodecahedron",
         buckminsterLerpRatio: 1 / 3,
         animateBuckminsterLerp: false,
+        animateBuckminsterOverride: false,
         importStl: function () {
           document.getElementById("input_file").setAttribute("data-filetype", "stl");
           document.getElementById("input_file").setAttribute("accept", ".stl");
@@ -102,8 +107,9 @@
     var dodecahedronGeometry = makeDodecahedronGeometry();
     var rhombicDodecahedronGeometry = makeRhombicDodecahedronGeometry();
     var tetrahedronGeometry = makeTetrahedronGeometry();
-    var isocahedronGeometry = makeIsocahedronGeometry();
+    var isocahedronGeometry = makeIcosahedronGeometry();
     var octahedronGeometry = makeOctahedronGeometry();
+    var augmentedTriDiminishedIcosahedronGeometry = makeAugmentedTriDiminishedIcosahedronGeometry();
     var importedGeometry = null;
 
     var rebuildBuckminster = function (lerpRatio) {
@@ -114,7 +120,7 @@
     // | Get the currently selected geometry.
     // +-------------------------------
     var getGeometry = function () {
-      switch (config.geometryType) {
+      switch (config.geometryType.toLowerCase()) {
         case "box":
           return boxGeometry;
         case "sphere":
@@ -129,6 +135,8 @@
           return octahedronGeometry;
         case "buckminster":
           return buckminsterGeometry;
+        case "augmentedTriDiminishedIcosahedronGeometry".toLowerCase():
+          return augmentedTriDiminishedIcosahedronGeometry;
         case "file":
           if (importedGeometry) return importedGeometry;
         default:
@@ -151,9 +159,9 @@
         config.rotationX * D2R,
         config.rotationY * D2R,
         config.rotationZ * D2R,
-        config.scale,
-        config.scale,
-        config.scale,
+        config.scaleX,
+        config.scaleY,
+        config.scaleZ,
         config.translateX,
         config.translateY,
         config.translateZ
@@ -162,23 +170,23 @@
         config.rotationX * D2R,
         config.rotationY * D2R,
         config.rotationZ * D2R,
-        config.scale,
-        config.scale,
-        config.scale,
-        config.translateX,
+        config.scaleX,
+        config.scaleY,
+        config.scaleZ,
+        config.translateX + minMax.width * 0.01,
         config.translateY,
-        config.translateZ + 0.1
+        config.translateZ + minMax.depth * 0.01
       );
       var transformMatrix2 = Matrix4x4.makeTransformationMatrix(
         config.rotationX * D2R,
         config.rotationY * D2R,
         config.rotationZ * D2R,
-        config.scale,
-        config.scale,
-        config.scale,
-        config.translateX,
+        config.scaleX,
+        config.scaleY,
+        config.scaleZ,
+        config.translateX - minMax.width * 0.01,
         config.translateY,
-        config.translateZ - 0.1
+        config.translateZ - minMax.depth * 0.01
       );
 
       if (config.useBlendMode) {
@@ -197,7 +205,8 @@
           draw.ctx.globalCompositeOperation = "source-over";
         }
       } else {
-        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
+        // drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
+        drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(192, 192, 192));
       }
 
       drawGeometryVertices(draw, fill, geometry, transformMatrix0, {
@@ -222,7 +231,7 @@
         var threshold = config.useDistanceThreshold ? Math.max(0, Math.min(1, Math.min(tA, tB))) : 1.0;
 
         colorObject.a = threshold;
-        draw.line(a2, b2, colorObject.cssRGBA(), 2);
+        draw.line(a2, b2, colorObject.cssRGBA(), config.lineWidth);
       }
     };
 
@@ -263,9 +272,9 @@
     // | We could also do this via a transformation matrix.
     // +-------------------------------
     var applyScale = function (p) {
-      p.x *= config.scale;
-      p.y *= config.scale;
-      p.z *= config.scale;
+      p.x *= config.scaleX;
+      p.y *= config.scaleY;
+      p.z *= config.scaleZ;
       return p;
     };
 
@@ -367,7 +376,11 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
-      var f0 = gui.addFolder("Path draw settings");
+      var f0 = gui.addFolder("Camera");
+      var f1 = gui.addFolder("Geometry");
+      var f2 = gui.addFolder("Path draw settings");
+      var f3 = gui.addFolder("Animation");
+      var f4 = gui.addFolder("Import");
 
       var GEOMETRY_SHAPES = {
         "◯": "sphere",
@@ -377,7 +390,8 @@
         "△4": "tetrahedron",
         "△8": "octahedron",
         "△20": "isocahedron",
-        "⬠⬡": "buckminster"
+        "⬠⬡": "buckminster",
+        "J64": "augmentedTriDiminishedIcosahedronGeometry"
       };
 
       // prettier-ignore
@@ -385,41 +399,51 @@
       // prettier-ignore
       f0.add(config, "close").min(-1000).max(1000).title("The 'close' field.").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "scale").min(0).max(500).title("The mesh scale.").onChange(function () { pb.redraw(); });
+      f1.add(config, "scaleX").min(0).max(500).title("The mesh scale X.").listen().onChange(function () { if( config.uniformScale ) { config.scaleY = config.scaleZ = config.scaleX; } pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "rotationX").min(0).max(360).title("The mesh rotationX.").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "scaleY").min(0).max(500).title("The mesh scale Y.").listen().onChange(function () { if( config.uniformScale ) { config.scaleX = config.scaleZ = config.scaleY; } pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "rotationY").min(0).max(360).title("The mesh rotationY.").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "scaleZ").min(0).max(500).title("The mesh scale Z.").listen().onChange(function () { if( config.uniformScale ) { config.scaleX = config.scaleY = config.scaleZ; } pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "rotationZ").min(0).max(360).title("The mesh rotationz.").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "uniformScale").title("Uniform scale?").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "translateX").min(-1.0).max(1.0).title("The mesh translation X.").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "rotationX").min(0).max(360).title("The mesh rotationX.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "translateY").min(-1.0).max(1.0).title("The mesh translation Y.").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "rotationY").min(0).max(360).title("The mesh rotationY.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "translateZ").min(-1.0).max(1.0).title("The mesh translation Z.").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "rotationZ").min(0).max(360).title("The mesh rotationz.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "animate").title("Animate?").onChange(function () { startAnimation(0) });
+      f1.add(config, "translateX").min(-1.0).max(1.0).title("The mesh translation X.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "useDistanceThreshold").title("Use distance threshold?").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "translateY").min(-1.0).max(1.0).title("The mesh translation Y.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "drawVertices").title("Draw vertices?").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "translateZ").min(-1.0).max(1.0).title("The mesh translation Z.").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "geometryType", GEOMETRY_SHAPES).title("Geometry type").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "useBlendMode").title("Use blend mode?").listen().onChange(function () { pb.redraw(); });
+      f1.add(config, "buckminsterLerpRatio").min(0.0).max(1.0).step(0.01).listen().title("Buckminster Lerp Ratio (default=0.333)").onChange(function () { rebuildBuckminster(config.buckminsterLerpRatio); pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "geometryType", GEOMETRY_SHAPES).title("Geometry type").onChange(function () { pb.redraw(); });
+      f2.add(config, "lineWidth").min(1).max(10).title("Line width").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "buckminsterLerpRatio").min(0.0).max(1.0).step(0.01).listen().title("Buckminster Lerp Ratio (default=0.333)").onChange(function () { rebuildBuckminster(config.buckminsterLerpRatio); pb.redraw(); });
+      f2.add(config, "useDistanceThreshold").title("Use distance threshold?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "animateBuckminsterLerp").title("Animate Buckminster Lerp?").onChange(function () { startAnimation(0) });
+      f2.add(config, "drawVertices").title("Draw vertices?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "importStl").title("Import STL").onChange(function () { pb.redraw(); });
+      f2.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "importObj").title("Import OBJ").onChange(function () { pb.redraw(); });
+      f2.add(config, "useBlendMode").title("Use blend mode?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f3.add(config, "animate").title("Animate?").onChange(function () { startAnimation(0) });
+      // prettier-ignore
+      f3.add(config, "animateBuckminsterLerp").title("Animate Buckminster Lerp?").onChange(function () { startAnimation(0) });
+      // prettier-ignore
+      f3.add(config, "animateBuckminsterOverride").title("Override Buckminster lerp?").onChange(function () { });
+      // prettier-ignore
+      f4.add(config, "importStl").title("Import STL").onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f4.add(config, "importObj").title("Import OBJ").onChange(function () { pb.redraw(); });
 
-      f0.open();
+      f2.open();
 
       // Add stats
       var uiStats = new UIStats(stats);
@@ -434,8 +458,13 @@
         config.rotationY = (time / 70) % 360;
       }
       if (config.animateBuckminsterLerp) {
-        // Swing back and forth between 0.0 and 0.5 :)
-        config.buckminsterLerpRatio = (Math.sin((time / 10000) * 2) + 1) * (1 / 4);
+        // Swing back and forth between 0.0 and .0 :)
+        if (config.animateBuckminsterOverride) {
+          config.buckminsterLerpRatio = (Math.sin((time / 10000) * 2) + 1) * (1 / 2);
+        } else {
+          // Swing back and forth between 0.0 and 0.5 :)
+          config.buckminsterLerpRatio = (Math.sin((time / 10000) * 2) + 1) * (1 / 4);
+        }
         rebuildBuckminster(config.buckminsterLerpRatio);
       }
       pb.redraw();

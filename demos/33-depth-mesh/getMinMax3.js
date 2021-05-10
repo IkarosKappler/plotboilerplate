@@ -8,7 +8,7 @@
  * Measure the min/max values of a set of 3D points.
  *
  * @param {Vert3[]} vertices
- * @returns { min : Vert3, max : Vert3 }
+ * @returns { min : Vert3, max : Vert3, width : number, height : number, depth: number }
  */
 var getMinMax = function (vertices) {
   var min = new Vert3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
@@ -22,5 +22,5 @@ var getMinMax = function (vertices) {
     max.y = Math.max(max.y, vert.y);
     max.z = Math.max(max.z, vert.z);
   }
-  return { min: min, max: max };
+  return { min: min, max: max, width: max.x - min.x, height: max.y - min.y, depth: max.z - min.z };
 };

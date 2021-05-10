@@ -1,5 +1,5 @@
 /**
- * Constructs a discrete rhombic dodecahedron geometry.
+ * Constructs a discrete icosahedron geometry.
  *
  * @requires Vert3
  *
@@ -9,7 +9,7 @@
  * @version     1.0.0
  **/
 
-var makeIsocahedronGeometry = function () {
+var makeIcosahedronGeometry = function () {
   var phi = (1 + Math.sqrt(5)) / 2; // Golden ratio
 
   //   (0, ±1, ±ϕ)
