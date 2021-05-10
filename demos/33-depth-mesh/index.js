@@ -57,11 +57,47 @@
     );
 
     // +---------------------------------------------------------------------------------
+    // | A global config that's attached to the dat.gui control interface.
+    // +-------------------------------
+    var config = PlotBoilerplate.utils.safeMergeByKeys(
+      {
+        far: -1000,
+        close: 0,
+        scale: 100,
+        rotationX: 0.0,
+        rotationY: 0.0,
+        rotationZ: 0.0,
+        translateX: 0,
+        translateY: 0,
+        translateZ: 0,
+        animate: false,
+        useDistanceThreshold: false,
+        drawVertices: true,
+        drawVertNumbers: false,
+        useBlendMode: false,
+        geometryType: "dodecahedron",
+        buckminsterLerpRatio: 1 / 3,
+        animateBuckminsterLerp: false,
+        importStl: function () {
+          document.getElementById("input_file").setAttribute("data-filetype", "stl");
+          document.getElementById("input_file").setAttribute("accept", ".stl");
+          document.getElementById("input_file").click();
+        },
+        importObj: function () {
+          document.getElementById("input_file").setAttribute("data-filetype", "obj");
+          document.getElementById("input_file").setAttribute("accept", ".obj");
+          document.getElementById("input_file").click();
+        }
+      },
+      GUP
+    );
+
+    // +---------------------------------------------------------------------------------
     // | Prepare all basic available geometries.
     // | (Bad style to keep all in memory, I know.)
     // +-------------------------------
     var boxGeometry = makeBoxGeometry();
-    var buckminsterGeometry = makeBuckminsterGeometry();
+    var buckminsterGeometry = makeBuckminsterGeometry(config.buckminsterLerpRatio);
     var shpereGeometry = makeSphereGeometry();
     var dodecahedronGeometry = makeDodecahedronGeometry();
     var rhombicDodecahedronGeometry = makeRhombicDodecahedronGeometry();
@@ -234,42 +270,6 @@
     };
 
     // +---------------------------------------------------------------------------------
-    // | A global config that's attached to the dat.gui control interface.
-    // +-------------------------------
-    var config = PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        far: -1000,
-        close: 0,
-        scale: 100,
-        rotationX: 0.0,
-        rotationY: 0.0,
-        rotationZ: 0.0,
-        translateX: 0,
-        translateY: 0,
-        translateZ: 0,
-        animate: false,
-        useDistanceThreshold: false,
-        drawVertices: true,
-        drawVertNumbers: false,
-        useBlendMode: false,
-        geometryType: "dodecahedron",
-        buckminsterLerpRatio: 1 / 3,
-        animateBuckminsterLerp: false,
-        importStl: function () {
-          document.getElementById("input_file").setAttribute("data-filetype", "stl");
-          document.getElementById("input_file").setAttribute("accept", ".stl");
-          document.getElementById("input_file").click();
-        },
-        importObj: function () {
-          document.getElementById("input_file").setAttribute("data-filetype", "obj");
-          document.getElementById("input_file").setAttribute("accept", ".obj");
-          document.getElementById("input_file").click();
-        }
-      },
-      GUP
-    );
-
-    // +---------------------------------------------------------------------------------
     // | Handle a triggered file import (obj and stl supported).
     // +-------------------------------
     var handleImport = function (e) {
@@ -411,7 +411,7 @@
       // prettier-ignore
       f0.add(config, "geometryType", GEOMETRY_SHAPES).title("Geometry type").onChange(function () { pb.redraw(); });
       // prettier-ignore
-      f0.add(config, "buckminsterLerpRatio").min(0.0).max(0.5).step(0.01).listen().title("Buckminster Lerp Ratio (default=0.333)").onChange(function () { rebuildBuckminster(config.buckminsterLerpRatio); pb.redraw(); });
+      f0.add(config, "buckminsterLerpRatio").min(0.0).max(1.0).step(0.01).listen().title("Buckminster Lerp Ratio (default=0.333)").onChange(function () { rebuildBuckminster(config.buckminsterLerpRatio); pb.redraw(); });
       // prettier-ignore
       f0.add(config, "animateBuckminsterLerp").title("Animate Buckminster Lerp?").onChange(function () { startAnimation(0) });
       // prettier-ignore
