@@ -102,6 +102,8 @@
     // | (Bad style to keep all in memory, I know.)
     // +-------------------------------
     var boxGeometry = makeBoxGeometry();
+    var cuboctahedronGeometry = makeCuboctahedronGeometry();
+    var coriolisGeometry = makeCuboctahedronGeometry(true);
     var buckminsterGeometry = makeBuckminsterGeometry(config.buckminsterLerpRatio);
     var shpereGeometry = makeSphereGeometry();
     var dodecahedronGeometry = makeDodecahedronGeometry();
@@ -123,6 +125,10 @@
       switch (config.geometryType.toLowerCase()) {
         case "box":
           return boxGeometry;
+        case "cuboctahedron":
+          return cuboctahedronGeometry;
+        case "coriolis":
+          return coriolisGeometry;
         case "sphere":
           return shpereGeometry;
         case "rhombicdodecahedron":
@@ -135,7 +141,7 @@
           return octahedronGeometry;
         case "buckminster":
           return buckminsterGeometry;
-        case "augmentedTriDiminishedIcosahedronGeometry".toLowerCase():
+        case "augmentedTriDiminishedIcosahedron".toLowerCase():
           return augmentedTriDiminishedIcosahedronGeometry;
         case "file":
           if (importedGeometry) return importedGeometry;
@@ -391,7 +397,9 @@
         "△8": "octahedron",
         "△20": "isocahedron",
         "⬠⬡": "buckminster",
-        "J64": "augmentedTriDiminishedIcosahedronGeometry"
+        "□△": "cuboctahedron",
+        "coriolis": "coriolis",
+        "J64": "augmentedTriDiminishedIcosahedron"
       };
 
       // prettier-ignore
@@ -443,6 +451,7 @@
       // prettier-ignore
       f4.add(config, "importObj").title("Import OBJ").onChange(function () { pb.redraw(); });
 
+      f1.open();
       f2.open();
 
       // Add stats
@@ -454,8 +463,9 @@
 
     var startAnimation = function (time) {
       if (config.animate) {
-        config.rotationX = (time / 50) % 360;
-        config.rotationY = (time / 70) % 360;
+        config.rotationX = (time / 80) % 360; // 50
+        //config.rotationY = (time / 60) % 360; // 70
+        config.rotationZ = (time / 30) % 360;
       }
       if (config.animateBuckminsterLerp) {
         // Swing back and forth between 0.0 and .0 :)

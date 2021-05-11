@@ -1,8 +1,7 @@
 /**
- * Constructs a discrete sphere geometry with latitues and longitudes.
+ * Constructs a box geometry with latitues and longitudes.
  *
  * @requires Vert3
- * @requires rotatePoint
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
