@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-05-21
+  - Ported gup (get-URI-params) to typescript.
 - 2021-05-04
   - Added Matrix4x4 datastructure for 3d transformations.
 - 2021-04-25
