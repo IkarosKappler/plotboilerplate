@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-05-25
+  - Added BezierPath.fromReducedList( Array<number >).
 - 2021-05-21
   - Ported gup (get-URI-params) to typescript.
 - 2021-05-04

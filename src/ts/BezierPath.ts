@@ -19,7 +19,8 @@
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
  * @modified 2020-07-24 Added the getClosestT(Vertex) function.
  * @modified 2020-12-29 Constructor is now private (no explicit use intended).
- * @version 2.3.0
+ * @modified 2021-05-25 Added BezierPath.fromReducedList( Array<number> ).
+ * @version 2.3.1
  *
  * @file BezierPath
  * @public
@@ -1233,7 +1234,7 @@ export class BezierPath implements SVGSerializable {
    * @memberof BezierPath
    * @return {BezierPath} The bezier path instance retrieved from the string.
    **/
-  static fromReducedListRepresentation(listJSON: string): BezierPath {
+  static fromReducedListRepresentation(listJSON: string, adjustCircular?: boolean): BezierPath {
     // Parse the array
     var pointArray: Array<number> = JSON.parse(listJSON) as Array<number>;
 
@@ -1247,9 +1248,25 @@ export class BezierPath implements SVGSerializable {
       throw "Cannot build bezier path. The passed array must contain at least 8 elements (numbers).";
     }
 
+    return BezierPath.fromReducedList(pointArray, adjustCircular);
+  }
+
+  /**
+   * Convert a reduced list representation (array of numeric coordinates) to a BezierPath instance.
+   *
+   * The array's length must be 6*n + 2:
+   *  - [sx, sy,  scx, scy,  ecx, ecy, ... , ex,  ey ]
+   *     |                               |   |     |
+   *     +--- sequence of curves --------+   +-end-+
+   *
+   * @param {number[]} pointArray
+   * @returns BezierPath
+   */
+  static fromReducedList(pointArray: Array<number>, adjustCircular?: boolean): BezierPath {
     // Convert to object
     var bezierPath: BezierPath = new BezierPath(null); // No points yet
 
+    // var firstStartPoint: Vertex;
     var startPoint: Vertex;
     var startControlPoint: Vertex;
     var endControlPoint: Vertex;
@@ -1257,11 +1274,17 @@ export class BezierPath implements SVGSerializable {
     var i: number = 0;
 
     do {
-      //if( i == 0 )
-      startPoint = new Vertex(pointArray[i], pointArray[i + 1]);
+      if (i == 0) {
+        // firstStartPoint =
+        startPoint = new Vertex(pointArray[i], pointArray[i + 1]);
+      }
       startControlPoint = new Vertex(pointArray[i + 2], pointArray[i + 3]);
       endControlPoint = new Vertex(pointArray[i + 4], pointArray[i + 5]);
+      // if (i + 8 >= pointArray.length) {
+      //   endPoint = firstStartPoint;
+      // } else {
       endPoint = new Vertex(pointArray[i + 6], pointArray[i + 7]);
+      // }
 
       var bCurve: CubicBezierCurve = new CubicBezierCurve(startPoint, endPoint, startControlPoint, endControlPoint);
       bezierPath.bezierCurves.push(bCurve);
@@ -1270,6 +1293,10 @@ export class BezierPath implements SVGSerializable {
 
       i += 6;
     } while (i + 2 < pointArray.length);
+    bezierPath.adjustCircular = adjustCircular;
+    if (adjustCircular) {
+      bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint = bezierPath.bezierCurves[0].startPoint;
+    }
     bezierPath.updateArcLengths();
     return bezierPath;
   }

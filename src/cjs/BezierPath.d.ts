@@ -19,7 +19,8 @@
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords).
  * @modified 2020-07-24 Added the getClosestT(Vertex) function.
  * @modified 2020-12-29 Constructor is now private (no explicit use intended).
- * @version 2.3.0
+ * @modified 2021-05-25 Added BezierPath.fromReducedList( Array<number> ).
+ * @version 2.3.1
  *
  * @file BezierPath
  * @public
@@ -550,5 +551,17 @@ export declare class BezierPath implements SVGSerializable {
      * @memberof BezierPath
      * @return {BezierPath} The bezier path instance retrieved from the string.
      **/
-    static fromReducedListRepresentation(listJSON: string): BezierPath;
+    static fromReducedListRepresentation(listJSON: string, adjustCircular?: boolean): BezierPath;
+    /**
+     * Convert a reduced list representation (array of numeric coordinates) to a BezierPath instance.
+     *
+     * The array's length must be 6*n + 2:
+     *  - [sx, sy,  scx, scy,  ecx, ecy, ... , ex,  ey ]
+     *     |                               |   |     |
+     *     +--- sequence of curves --------+   +-end-+
+     *
+     * @param {number[]} pointArray
+     * @returns BezierPath
+     */
+    static fromReducedList(pointArray: Array<number>, adjustCircular?: boolean): BezierPath;
 }
