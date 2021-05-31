@@ -56,6 +56,11 @@
       )
     );
 
+    // prettier-ignore
+    var blendModes = [
+      'source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'copy', 'xor', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity' 
+    ];
+
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
     // +-------------------------------
@@ -79,6 +84,7 @@
         drawVertices: true,
         drawVertNumbers: false,
         useBlendMode: false,
+        blendMode: "difference",
         geometryType: "dodecahedron",
         buckminsterLerpRatio: 1 / 3,
         animateBuckminsterLerp: false,
@@ -196,7 +202,7 @@
       );
 
       if (config.useBlendMode) {
-        draw.setConfiguration({ blendMode: "difference" });
+        draw.setConfiguration({ blendMode: config.blendMode });
         // Use this on black
         drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
         drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
@@ -435,6 +441,8 @@
       f2.add(config, "drawVertNumbers").title("Draw vertex numbers?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f2.add(config, "useBlendMode").title("Use blend mode?").listen().onChange(function () { pb.redraw(); });
+      // prettier-ignore
+      f2.add(config, "blendMode", blendModes).title("Which blend mode?").listen().onChange(function () { pb.redraw(); });
       // prettier-ignore
       f3.add(config, "animate").title("Animate?").onChange(function () { startAnimation(0) });
       // prettier-ignore

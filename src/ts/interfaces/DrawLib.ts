@@ -21,9 +21,10 @@ import { SVGPathParams, UID, XYCoords } from "./core";
 export interface DrawLibConfiguration {
   // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#types
   // compositeOperation: CanvasCompositing["globalCompositeOperation"] | null;
+  // TODO: check compatibility with
   // https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode
   // prettier-ignore
-  blendMode?: "source-over" | "source-atop" | "source-in" | "source-out" | "destination-over" | "destination-atop" | "destination-in" |"destination-out" | "lighter" | "copy" | "xor" | null;
+  blendMode?:  'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity' | null;
 }
 
 /**

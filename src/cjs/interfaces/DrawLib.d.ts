@@ -17,7 +17,7 @@ import { Polygon } from "../Polygon";
 import { Vertex } from "../Vertex";
 import { SVGPathParams, UID, XYCoords } from "./core";
 export interface DrawLibConfiguration {
-    blendMode?: "source-over" | "source-atop" | "source-in" | "source-out" | "destination-over" | "destination-atop" | "destination-in" | "destination-out" | "lighter" | "copy" | "xor" | null;
+    blendMode?: 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity' | null;
 }
 /**
  * An interface all drawing libraries must implement to be used with PlotBoilerplate.

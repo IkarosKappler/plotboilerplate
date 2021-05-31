@@ -55,17 +55,6 @@
       )
     );
 
-    /**
-     *
-     * @param {*} i
-     * @returns
-     */
-    // var randColor = function (i, alpha) {
-    //   var color = WebColorsContrast[i % WebColorsContrast.length].clone();
-    //   if (typeof alpha !== undefined) color.a = alpha;
-    //   return color.cssRGBA();
-    // };
-
     // +---------------------------------------------------------------------------------
     // | Create a random vertex inside the canvas viewport.
     // +-------------------------------
@@ -85,12 +74,9 @@
     };
 
     var postDraw = function (draw, fill) {
-      // console.log(path.bezierCurves);
       for (var i in path.bezierCurves) {
         var curve = path.bezierCurves[i];
-        //draw.cubicBezier(curve.startPoint, curve.endPoint, curve.startControlPoint, curve.endControlPoint, "#008888", 2);
         var p = curve.getPointAt(config.t);
-        // console.log(p);
         draw.point(p, "rgba(0,0,0,1)");
         // // var curvature = getCurvatureAt(curve, config.t);
         // var p0 = curve.getPointAt(config.t - config.t * 0.1);
