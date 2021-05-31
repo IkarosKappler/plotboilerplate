@@ -9111,6 +9111,16 @@ var drawutils = /** @class */ (function () {
         // NOOP
     };
     /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    drawutils.prototype.setConfiguration = function (configuration) {
+        this.ctx.globalCompositeOperation = configuration.blendMode;
+    };
+    /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
      *
@@ -9900,6 +9910,16 @@ var drawutilsgl = /** @class */ (function () {
         // NOOP
     };
     /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    drawutilsgl.prototype.setConfiguration = function (configuration) {
+        // TODO
+    };
+    /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
      *
@@ -10530,6 +10550,7 @@ var drawutilssvg = /** @class */ (function () {
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = isSecondary;
+        this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
         if (isSecondary) {
@@ -10623,6 +10644,9 @@ var drawutilssvg = /** @class */ (function () {
             // then create a new one.
             node = this.createSVGNode(nodeName);
         }
+        if (this.drawlibConfiguration.blendMode) {
+            node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+        }
         return node;
     };
     /**
@@ -10687,6 +10711,16 @@ var drawutilssvg = /** @class */ (function () {
         true, // isSecondary
         this.gNode, this.bufferGNode);
         return copy;
+    };
+    /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    drawutilssvg.prototype.setConfiguration = function (configuration) {
+        this.drawlibConfiguration = configuration;
     };
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.

@@ -4200,6 +4200,7 @@ class drawutilssvg {
         this.scale = new Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = isSecondary;
+        this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
         if (isSecondary) {
@@ -4293,6 +4294,9 @@ class drawutilssvg {
             // then create a new one.
             node = this.createSVGNode(nodeName);
         }
+        if (this.drawlibConfiguration.blendMode) {
+            node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+        }
         return node;
     }
     /**
@@ -4357,6 +4361,16 @@ class drawutilssvg {
         true, // isSecondary
         this.gNode, this.bufferGNode);
         return copy;
+    }
+    /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    setConfiguration(configuration) {
+        this.drawlibConfiguration = configuration;
     }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -5350,6 +5364,16 @@ class drawutils {
         // NOOP
     }
     /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    setConfiguration(configuration) {
+        this.ctx.globalCompositeOperation = configuration.blendMode;
+    }
+    /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
      *
@@ -6125,6 +6149,16 @@ class drawutilsgl {
      **/
     endDrawCycle(renderTime) {
         // NOOP
+    }
+    /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    setConfiguration(configuration) {
+        // TODO
     }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.

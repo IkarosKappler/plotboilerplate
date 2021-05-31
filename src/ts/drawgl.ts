@@ -5,13 +5,14 @@
  * @modified 2020-03-25 Ported stub to Typescript.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2021-01-24 Added the `setCurrentId` function.
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @version  0.0.5
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGPathParams, SVGSerializable, UID } from "./interfaces";
+import { DrawLib, XYCoords, SVGPathParams, SVGSerializable, UID, DrawLibConfiguration } from "./interfaces";
 
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
@@ -148,6 +149,17 @@ export class drawutilsgl implements DrawLib<void> {
    **/
   endDrawCycle(renderTime: number) {
     // NOOP
+  }
+
+  /**
+   * Set the current drawlib configuration.
+   *
+   * @name setConfiguration
+   * @method
+   * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+   */
+  setConfiguration(configuration: DrawLibConfiguration): void {
+    // TODO
   }
 
   /**

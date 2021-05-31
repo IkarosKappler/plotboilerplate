@@ -10,6 +10,7 @@
  * @modified 2021-03-02 Added the `VEllipseSector` as to the `Drawable` type.
  * @modified 2021-03-29 Added the `draw` and `fill` params to the `preDraw` and `postDraw` function (required for full svg export support).
  * @modified 2021-03-30 Added the `endDrawCycle` function to `DrawLib`.
+ * @modified 2021-05-31 Added the `drawLib.setConfiguration` function.
  **/
 
 import { Vertex } from "./Vertex";
@@ -232,6 +233,14 @@ export interface IDraggable {
   setVIndex(vindex: number): IDraggable;
 }
 
+export interface DrawLibConfiguration {
+  // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#types
+  // compositeOperation: CanvasCompositing["globalCompositeOperation"] | null;
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode
+  // prettier-ignore
+  blendMode?: "source-over" | "source-atop" | "source-in" | "source-out" | "destination-over" | "destination-atop" | "destination-in" |"destination-out" | "lighter" | "copy" | "xor" | null;
+}
+
 /**
  * An interface all drawing libraries must implement to be used with PlotBoilerplate.
  *
@@ -244,6 +253,15 @@ export interface DrawLib<R> {
   scale: Vertex;
   offset: Vertex;
   fillShapes: boolean;
+
+  /**
+   * Set the current drawlib configuration.
+   *
+   * @name setConfiguration
+   * @method
+   * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+   */
+  setConfiguration: (configuration: DrawLibConfiguration) => void;
 
   /**
    * This method shouled be called each time the currently drawn `Drawable` changes.

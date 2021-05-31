@@ -29,7 +29,7 @@
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID } from "./interfaces";
+import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration } from "./interfaces";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -83,6 +83,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      */
     canvasSize: XYDimension;
+    /**
+     * The current drawlib configuration to be used for all upcoming draw operations.
+     * @member {DrawLibConfiguration}
+     * @memberof drawutilssvg
+     * @instance
+     */
+    drawlibConfiguration: DrawLibConfiguration;
     /**
      * The current drawable-ID. This can be any unique ID identifying the following drawn element.
      *
@@ -190,6 +197,14 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * that under the hood the same gl context and gl program will be used.
      */
     copyInstance(fillShapes: boolean): drawutilssvg;
+    /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    setConfiguration(configuration: DrawLibConfiguration): void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.

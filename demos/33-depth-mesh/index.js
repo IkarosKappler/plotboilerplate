@@ -196,9 +196,7 @@
       );
 
       if (config.useBlendMode) {
-        if (draw.ctx) {
-          draw.ctx.globalCompositeOperation = "difference"; // xor
-        }
+        draw.setConfiguration({ blendMode: "difference" });
         // Use this on black
         drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 255, 0));
         drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(0, 0, 255));
@@ -207,9 +205,6 @@
         // drawGeometry(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(128, 0, 255));
         // drawGeometry(draw, fill, geometry, minMax, transformMatrix1, Color.makeRGB(255, 255, 0));
         // drawGeometry(draw, fill, geometry, minMax, transformMatrix2, Color.makeRGB(0, 255, 255));
-        if (draw.ctx) {
-          draw.ctx.globalCompositeOperation = "source-over";
-        }
       } else {
         // drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(92, 92, 92));
         drawGeometryEdges(draw, fill, geometry, minMax, transformMatrix0, Color.makeRGB(192, 192, 192));

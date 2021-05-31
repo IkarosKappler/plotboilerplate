@@ -91,6 +91,16 @@ export class drawutilsgl {
         // NOOP
     }
     /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    setConfiguration(configuration) {
+        // TODO
+    }
+    /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
      *

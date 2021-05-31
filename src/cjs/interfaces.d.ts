@@ -188,6 +188,9 @@ export interface IDraggable {
     isVertex(): boolean;
     setVIndex(vindex: number): IDraggable;
 }
+export interface DrawLibConfiguration {
+    blendMode?: "source-over" | "source-atop" | "source-in" | "source-out" | "destination-over" | "destination-atop" | "destination-in" | "destination-out" | "lighter" | "copy" | "xor" | null;
+}
 /**
  * An interface all drawing libraries must implement to be used with PlotBoilerplate.
  *
@@ -200,6 +203,14 @@ export interface DrawLib<R> {
     scale: Vertex;
     offset: Vertex;
     fillShapes: boolean;
+    /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    setConfiguration: (configuration: DrawLibConfiguration) => void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.

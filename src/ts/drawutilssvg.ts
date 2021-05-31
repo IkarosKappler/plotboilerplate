@@ -25,14 +25,15 @@
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
- * @version  1.2.0
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
+ * @version  1.3.0
  **/
 
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams, UID } from "./interfaces";
+import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration } from "./interfaces";
 
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -101,6 +102,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   canvasSize: XYDimension;
 
   /**
+   * The current drawlib configuration to be used for all upcoming draw operations.
+   * @member {DrawLibConfiguration}
+   * @memberof drawutilssvg
+   * @instance
+   */
+  drawlibConfiguration: DrawLibConfiguration;
+
+  /**
    * The current drawable-ID. This can be any unique ID identifying the following drawn element.
    *
    * @member {UID|undefined}
@@ -155,6 +164,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     this.fillShapes = fillShapes;
     this.isSecondary = isSecondary;
 
+    this.drawlibConfiguration = {} as DrawLibConfiguration;
     this.cache = new Map<UID, SVGElement>();
     this.setSize(canvasSize);
     if (isSecondary) {
@@ -253,6 +263,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       // then create a new one.
       node = this.createSVGNode(nodeName);
     }
+    if (this.drawlibConfiguration.blendMode) {
+      node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
+    }
     return node;
   }
 
@@ -327,6 +340,17 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       this.bufferGNode
     );
     return copy;
+  }
+
+  /**
+   * Set the current drawlib configuration.
+   *
+   * @name setConfiguration
+   * @method
+   * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+   */
+  setConfiguration(configuration: DrawLibConfiguration): void {
+    this.drawlibConfiguration = configuration;
   }
 
   /**

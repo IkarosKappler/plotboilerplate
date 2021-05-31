@@ -40,7 +40,7 @@
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, SVGPathParams, XYCoords, UID } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration } from "./interfaces";
 /**
  * @classdesc A wrapper class for basic drawing operations.
  *
@@ -103,6 +103,14 @@ export declare class drawutils implements DrawLib<void> {
      * @instance
      **/
     endDrawCycle(renderTime: number): void;
+    /**
+     * Set the current drawlib configuration.
+     *
+     * @name setConfiguration
+     * @method
+     * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+     */
+    setConfiguration(configuration: DrawLibConfiguration): void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.

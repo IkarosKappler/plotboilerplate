@@ -36,13 +36,14 @@
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
- * @version  1.8.5
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
+ * @version  1.9.0
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, SVGPathParams, XYCoords, UID } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration } from "./interfaces";
 import { drawutilssvg } from "./drawutilssvg";
 
 // Todo: rename this class to Drawutils?
@@ -122,6 +123,17 @@ export class drawutils implements DrawLib<void> {
    **/
   endDrawCycle(renderTime: number) {
     // NOOP
+  }
+
+  /**
+   * Set the current drawlib configuration.
+   *
+   * @name setConfiguration
+   * @method
+   * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
+   */
+  setConfiguration(configuration: DrawLibConfiguration): void {
+    this.ctx.globalCompositeOperation = configuration.blendMode;
   }
 
   /**

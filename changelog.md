@@ -1,5 +1,9 @@
 # Changelog
 
+- 2021-05-31
+  - Added the `DrawLib.setConfiguration` function`.
+  - Added the `drawutils.setConfiguration` function from `DrawLib`.
+  - Added the `drawutilssvg.setConfiguration` function from `DrawLib`.
 - 2021-05-25
   - Added BezierPath.fromReducedList( Array<number >).
 - 2021-05-21
