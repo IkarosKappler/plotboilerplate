@@ -25,7 +25,8 @@
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
- * @version  1.2.0
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
+ * @version  1.3.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

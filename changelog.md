@@ -4,6 +4,7 @@
   - Added the `DrawLib.setConfiguration` function`.
   - Added the `drawutils.setConfiguration` function from `DrawLib`.
   - Added the `drawutilssvg.setConfiguration` function from `DrawLib`.
+  - Splitted up the `interfaces.ts` into several smaller files.
 - 2021-05-25
   - Added BezierPath.fromReducedList( Array<number >).
 - 2021-05-21

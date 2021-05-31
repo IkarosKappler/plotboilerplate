@@ -37,7 +37,8 @@
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
- * @version  1.8.5
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
+ * @version  1.9.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutils = void 0;

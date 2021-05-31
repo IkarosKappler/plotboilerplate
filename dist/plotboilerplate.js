@@ -9059,7 +9059,8 @@ exports.VertexListeners = VertexListeners;
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
- * @version  1.8.5
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
+ * @version  1.9.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -9822,6 +9823,7 @@ exports.drawutils = drawutils;
  * @modified 2020-03-25 Ported stub to Typescript.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2021-01-24 Added the `setCurrentId` function.
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @version  0.0.5
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -10513,7 +10515,8 @@ var GLU = /** @class */ (function () {
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
- * @version  1.2.0
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
+ * @version  1.3.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;

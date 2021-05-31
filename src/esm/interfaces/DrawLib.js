@@ -10,6 +10,8 @@
  * @modified 2021-03-02 Added the `VEllipseSector` as to the `Drawable` type.
  * @modified 2021-03-29 Added the `draw` and `fill` params to the `preDraw` and `postDraw` function (required for full svg export support).
  * @modified 2021-03-30 Added the `endDrawCycle` function to `DrawLib`.
+ * @modified 2021-05-31 Added the `drawLib.setConfiguration` function.
+ * @modified 2021-05-31 Splitted the large interfaces.ts file into this one and others.
  **/
 export {};
-//# sourceMappingURL=interfaces.js.map
+//# sourceMappingURL=DrawLib.js.map

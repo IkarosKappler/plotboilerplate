@@ -5,6 +5,7 @@
  * @modified 2020-03-25 Ported stub to Typescript.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2021-01-24 Added the `setCurrentId` function.
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @version  0.0.5
  **/
 import { Polygon } from "./Polygon";

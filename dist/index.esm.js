@@ -4168,7 +4168,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2021-03-29 Moved this file from `src/ts/utils/helpers/` to `src/ts/`.
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
- * @version  1.2.0
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
+ * @version  1.3.0
  **/
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -5317,7 +5318,8 @@ drawutilssvg.HEAD_XML = [
  * @modified 2021-01-24 Added the `setCurrentId` function from the `DrawLib` interface.
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
- * @version  1.8.5
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
+ * @version  1.9.0
  **/
 // Todo: rename this class to Drawutils?
 /**
@@ -6066,6 +6068,7 @@ class drawutils {
  * @modified 2020-03-25 Ported stub to Typescript.
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2021-01-24 Added the `setCurrentId` function.
+ * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @version  0.0.5
  **/
 /**
