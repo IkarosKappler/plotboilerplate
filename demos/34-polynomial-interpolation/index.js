@@ -1,5 +1,5 @@
 /**
- * A demo about rendering SVG path data with PlotBoilerplate.
+ * A demo about rendering polynomials with PlotBoilerplate.
  *
  * @requires PlotBoilerplate
  * @requires MouseHandler
