@@ -547,7 +547,7 @@ var BezierPath = /** @class */ (function () {
      **/
     BezierPath.prototype.getPoint = function (u) {
         if (u < 0 || u > this.totalArcLength) {
-            console.log("[BezierPath.getPoint(u)] u is out of bounds: " + u + ".");
+            console.warn("[BezierPath.getPoint(u)] u is out of bounds: " + u + ".");
             u = Math.min(this.totalArcLength, Math.max(u, 0));
         }
         // Find the spline to extract the value from
