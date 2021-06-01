@@ -6,45 +6,40 @@
 # 'jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-title: plotboilerplate.js
+title: PlotBoilerplate.js
 email: info@plotboilerplate.io
 description: > # this means to ignore newlines until "baseurl:"
   A lightweight html5/javascript/canvas plotting boilerplate library: plotboilerplate.js.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://plotboilerplate.io" # the base hostname & protocol for your site
 twitter_username: kpplr
-github_username:  ikaroskappler
+github_username: ikaroskappler
 image: https://plotboilerplate.io/repo/screenshots/preview-image-large.png
 date: 2019-12-08
 
-
 exclude: [
-  "*~",
-  "#*#",
-  "docs/",
-  "docs_md", # Intermediate jsdoc markdown files are not needed any more
-  "docs_typedoc_md_wheaders",
-  "docs_typedoc_md",
-  "Gemfile",
-  "Gemfile.lock",
-  "generate-demo-page.sh",
-  "gulpfile.js",
-  "jsdoc_template/",
-  "node_modules",
-  "package.json",
-  "publish.sh",
-  "yarn-error.log",
-  "yarn.lock",
-  "__partials",
-  "__index.original.html",
-  "_site/repo"
-]
+    "*~",
+    "#*#",
+    "docs/",
+    "docs_md", # Intermediate jsdoc markdown files are not needed any more
+    "docs_typedoc_md_wheaders",
+    "docs_typedoc_md",
+    "Gemfile",
+    "Gemfile.lock",
+    "generate-demo-page.sh",
+    "gulpfile.js",
+    "jsdoc_template/",
+    "node_modules",
+    "package.json",
+    "publish.sh",
+    "yarn-error.log",
+    "yarn.lock",
+    "__partials",
+    "__index.original.html",
+    "_site/repo"
+  ]
 
-keep_files : [
-  "docs",
-  "repo",
-  "favicon.ico"
-]
+keep_files: ["docs", "repo", "favicon.ico"]
 
 # Build settings
 markdown: kramdown
@@ -52,5 +47,4 @@ markdown: kramdown
 markdown_ext: md
 
 kramdown:
-   tables: true
-
+  tables: true
