@@ -1,8 +1,23 @@
 ---
 layout: page
+title: Changelog
 ---
 # Changelog
 
+- 2021-05-31
+  - Added the `DrawLib.setConfiguration` function`.
+  - Added the `drawutils.setConfiguration` function from `DrawLib`.
+  - Added the `drawutilssvg.setConfiguration` function from `DrawLib`.
+  - Splitted up the `interfaces.ts` into several smaller files.
+- 2021-05-25
+  - Added BezierPath.fromReducedList( Array<number >).
+- 2021-05-21
+  - Ported gup (get-URI-params) to typescript.
+- 2021-05-04
+  - Added Matrix4x4 datastructure for 3d transformations.
+- 2021-04-25
+  - Extended `PlotBoilerplate.remove` to accept arrays of drawables.
+  - Added the polynomial-interpolation demo.
 - 2021-03-30
   - Added `DrawLib.endDrawCycle(renderTime)`.
   - Added buffering to the SVG drawing library `drawutilssvg` (this avoids flickering on redraws).

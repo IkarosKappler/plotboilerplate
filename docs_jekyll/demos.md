@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2021-04-16
+date: 2021-06-01
 ---
 
 <h3>Basics</h3>
@@ -178,6 +178,16 @@ date: 2021-04-16
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/33-depth-mesh/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210414-0-rhombicdodecahedron.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/34-polynomial-interpolation/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210531-polynom-interpolation.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/35-curvature-of-cubic-bezier/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210531-0-curvature-of-cubic-bezier-curve.png');"></div>
    </a>
 </div>
 </div>
