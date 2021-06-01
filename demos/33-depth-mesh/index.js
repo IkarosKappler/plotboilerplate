@@ -56,6 +56,12 @@
       )
     );
 
+    new DarkModeHandler(function (isDarkMode) {
+      console.log("isDarkMode", isDarkMode);
+      pb.config.backgroundColor = isDarkMode ? "#000000" : "#ffffff";
+      pb.redraw();
+    });
+
     // prettier-ignore
     var blendModes = [
       'source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'copy', 'xor', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity' 
