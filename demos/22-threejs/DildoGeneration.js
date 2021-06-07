@@ -2,7 +2,8 @@
  * @author   Ikaros Kappler
  * @date     2020-07-01
  * @modified 2020-09-11 Added proper texture loading.
- * @version  1.0.1
+ * @modified 2021-06-07 Fixing `removeCachedGeometries`. Adding bending of model.
+ * @version  1.2.0
  **/
 
 (function () {
@@ -82,12 +83,9 @@
   DildoGeneration.prototype.rebuild = function (options) {
     this.removeCachedGeometries();
 
-    var bendAngleRad = (options.bendAngle / 180) * Math.PI;
     var baseRadius = options.outline.getBounds().width;
     var baseShape = mkCircularPolygon(baseRadius, options.shapeSegmentCount);
     var geometry = new DildoGeometry(Object.assign({ baseShape: baseShape }, options));
-    // this.bendGeometry(geometry, bendAngleRad, options.outline.getBounds().width, options.outline.getBounds().height);
-
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath != "undefined";
     var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
     var wireframe = typeof options.wireframe != "undefined" ? options.wireframe : null;
@@ -105,7 +103,7 @@
           reflectivity: 1.0,
           refractionRatio: 0.89,
           // shading : THREE.LambertShading,
-          map: this.loadTextureImage(options.textureImagePath)
+          map: this.loadTextureImage(textureImagePath) // options.textureImagePath)
         })
       : new THREE.MeshPhongMaterial({
           color: 0x3838ff,
@@ -124,11 +122,7 @@
         });
     var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
     bufferedGeometry.computeVertexNormals();
-    // this.bendGeometry(bufferedGeometry, bendAngleRad, options.outline.getBounds().width, options.outline.getBounds().height);
     var latheMesh = new THREE.Mesh(bufferedGeometry, material);
-    // Try bend
-    // latheMesh = this.bendMesh(latheMesh, bendAngleRad, options.outline.getBounds().width, options.outline.getBounds().height);
-    // END try bend
     latheMesh.position.y = -100;
     latheMesh.rotation.x = Math.PI;
     this.camera.lookAt(new THREE.Vector3(20, 0, 150));
@@ -143,82 +137,6 @@
     }
   };
 
-  DildoGeneration.prototype.bendGeometry = function (geometry, bendAngle, shapeRadius, shapeHeight) {
-    var bendModifier = new THREE.BendModifier();
-    // var direction = new THREE.Vector3(0, 0, -1);
-    var direction = new THREE.Vector3(0, 0, -1);
-    bendAngle = Math.PI / 100;
-    var arcLength = shapeHeight * 1.5; // The path must not be shorter than the mesh height!
-    var radius = arcLength / bendAngle;
-    // var axis = new THREE.Vector3(0, 1, 0);
-    // var axis = new THREE.Vector3(0, shapeRadius, shapeHeight / 2); // 0, 0);
-    // var axis = new THREE.Vector3(shapeHeight / 2, shapeRadius, 0); // 0, 0);
-    // var axis = new THREE.Vector3(shapeHeight / 10, shapeRadius / 2, 0); //) / 0, 0);
-    // var axis = new THREE.Vector3(shapeRadius * 2, 0, shapeHeight * 0); //) / 0, 0);
-    var axis = new THREE.Vector3(radius * 2, shapeHeight, 0); //) / 0, 0);
-    // var axis = new THREE.Vector3(radius * 2, 0, 0);
-    // var angle = Math.PI / 2.6;
-    // var bendAngle = Math.PI / 100;
-    // console.log(geometry);
-
-    bendModifier.set(direction, axis, bendAngle).modify(geometry);
-
-    // return mesh;
-  };
-
-  DildoGeneration.prototype._bendMesh = function (mesh, bendAngle, shapeRadius, shapeHeight) {
-    // const points = [new Vector3(1, 0, -1), new Vector3(1, 0, 1), new Vector3(-1, 0, 1), new Vector3(-1, 0, -1)];
-    const pointCount = 20;
-    const points = [];
-    //   new THREE.Vector3(0, 0, -100),
-    //   new THREE.Vector3(10, 0, 0),
-    //   new THREE.Vector3(40, 0, 100),
-    //   new THREE.Vector3(0, 0, 150)
-    // ];
-    // var bendAngle = Math.PI / 4.0;
-    var arcLength = shapeHeight * 1.5; // The path must not be shorter than the mesh height!
-    var radius = arcLength / bendAngle;
-    mesh.geometry.rotateZ(Math.PI / 2);
-    for (var i = 0; i < pointCount; i++) {
-      var point = new THREE.Vector3(
-        0,
-        -Math.sin((bendAngle / pointCount) * i) * radius, //  + shapeRadius + radius,
-        -Math.cos((bendAngle / pointCount) * i) * radius //  + shapeRadius + radius
-      );
-      points.push(point);
-    }
-    const curve = new THREE.CatmullRomCurve3(points);
-    curve.curveType = "centripetal";
-    curve.closed = true;
-    // const mesh = // some mesh I made earlier;// You may need to tweak the geometry beforehand to get it to
-    // Display with the orientation you expect.
-    //  mesh.geometry.rotateX(Math.PI);
-    const flow = new THREE.Flow(mesh); // objectToCurve);
-    flow.updateCurve(0, curve);
-    // scene.add(flow.object3D);
-    // flow.object3D.geometry.center();
-    console.log(flow.object3D);
-    // return flow.object3D;
-    // new THREE.BufferGeometry().fromGeometry(
-    var resultMesh = flow.object3D.clone();
-    // resultMesh.geometry.center();
-
-    var center = new THREE.Vector3();
-    resultMesh.geometry.computeBoundingBox();
-    resultMesh.geometry.boundingBox.getCenter(center);
-    // resultMesh.geometry = new THREE.BufferGeometry().fromGeometry(resultMesh.geometry);
-    // resultMesh.geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, radius));
-    // resultMesh.geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(-center.x, -center.y, -center.z));
-    // resultMesh.geometry.center();
-    resultMesh.position.copy(center);
-
-    // resultMesh.geometry.rotateZ(Math.PI);
-
-    console.log(resultMesh);
-
-    return resultMesh;
-  };
-
   DildoGeneration.prototype.removeCachedGeometries = function () {
     for (var i = 0; i < this.geometries.length; i++) {
       var old = this.geometries[i];
@@ -228,7 +146,7 @@
       if (typeof old.dispose == "function") old.dispose();
       if (typeof old.material != "undefined" && typeof old.material.dispose == "function") old.material.dispose();
     }
-    this.cachedGeometries = [];
+    this.geometries = [];
   };
 
   DildoGeneration.prototype.loadTextureImage = function (path) {

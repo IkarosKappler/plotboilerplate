@@ -35,3 +35,4 @@ typescript-example/node_modules/
 src/js
 dist/plotboilerplate.browser.min.js.LICENSE.txt
 docs_jekyll/docs_typedoc/
+demos/22-threejs/dildomodels/

@@ -63,7 +63,7 @@
       {
         outlineSegmentCount: 128,
         shapeSegmentCount: 64,
-        bendAngle: 45,
+        bendAngle: 0,
         showNormals: false,
         normalsLength: 10.0,
         useTextureImage: true,
@@ -175,7 +175,7 @@
           return function () {
             if (bId == buildId) {
               // console.log('rebuild', outline );
-              dildoGeneration.rebuild(Object.assign({ outline: outline }, config));
+              dildoGeneration.rebuild(Object.assign({ outline: outline, isBending: config.bendAngle !== 0 }, config));
             }
           };
         })(buildId),

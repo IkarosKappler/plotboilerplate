@@ -29,69 +29,31 @@
   DildoGeometry.prototype.buildVertices = function (options) {
     var baseShape = options.baseShape;
     var outline = options.outline;
-    // var extrudePath = options.extrudePath;
     var outlineSegmentCount = options.outlineSegmentCount;
     var bendAngleRad = (options.bendAngle / 180) * Math.PI;
-
-    // var height = 200.0;
     var outlineBounds = outline.getBounds();
     var shapeHeight = outlineBounds.height;
-    // var baseRadius = outlineBounds.width;
-    // var bendAngle = Math.PI / 3.0;
-    // var yMin = -1;
-    // var yMax = -1;
 
-    // var topVertex = null; // new THREE.Vector3(0, yMin, 0);
-    // var bottomVertex = null; // new THREE.Vector3(0, yMax, 0);
-
-    var isBending = true;
+    // options.isBending = true;
+    var arcLength = shapeHeight;
+    var arcRadius = arcLength / bendAngleRad;
+    var isBending =
+      options.isBending &&
+      !isNaN(arcRadius) &&
+      arcRadius !== Number.POSITIVE_INFINITY &&
+      arcRadius !== Number.NEGATIVE_INFINITY &&
+      Math.abs(bendAngleRad) > 0.01;
 
     for (var s = 0; s < outlineSegmentCount; s++) {
       var t = Math.min(1.0, Math.max(0.0, s / (outlineSegmentCount - 1)));
-      // console.log("s", s, "t", t);
       this.vertexMatrix[s] = [];
       var outlineVert = outline.getPointAt(t);
-      // var heightT = outlineVert.y / shapeHeight;
       var heightT = (outlineBounds.max.y - outlineVert.y) / shapeHeight;
-      this.buildSlice(baseShape, outlineBounds, outlineVert, s, heightT, isBending, bendAngleRad);
-      // for (var i = 0; i < baseShape.vertices.length; i++) {
-      //   var shapeVert = baseShape.vertices[i];
-      //   var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
-      //   if (isBending) {
-      //     var arcLength = shapeHeight; // * 1.5; // The path must not be shorter than the mesh height!
-      //     var arcRadius = arcLength / bendAngle;
-      //     var vert = new THREE.Vector3(
-      //       shapeVert.x * outlineXPct,
-      //       0, // outlineBounds.max.y / 2 + outlineVert.y,
-      //       shapeVert.y * outlineXPct
-      //     );
-      //     var axis = new THREE.Vector3(0, 0, 1); // shapeHeight / 2, 0);
-      //     var angle = bendAngle * heightT;
-      //     vert.x -= arcRadius;
-      //     vert.applyAxisAngle(axis, angle);
-      //     vert.x += arcRadius;
-      //     // tempVert.rotateZ( )
-      //   } else {
-      //     var vert = new THREE.Vector3(
-      //       shapeVert.x * outlineXPct,
-      //       outlineBounds.max.y / 2 + outlineVert.y,
-      //       shapeVert.y * outlineXPct
-      //     );
-      //   }
-      //   this.vertexMatrix[s][i] = this.vertices.length;
-      //   this.vertices.push(vert);
-      //   if (s == 0) {
-      //     if (i == 0) yMin = vert.y;
-      //     if (i + 1 == baseShape.vertices.length) yMax = vert.y;
-      //   }
-      // } // END for
+      this.buildSlice(baseShape, outlineBounds, outlineVert, s, heightT, isBending, bendAngleRad, arcRadius);
     } // END for
 
-    // var topVertex = new THREE.Vector3(0, yMin, 0);
-    // var bottomVertex = new THREE.Vector3(0, yMax, 0);
-
-    var topVertex = this._getTopVertex(outlineBounds, isBending, bendAngleRad);
-    var bottomVertex = this._getBottomVertex(outlineBounds, isBending, bendAngleRad);
+    var topVertex = this._getTopVertex(outlineBounds, isBending, bendAngleRad, arcRadius);
+    var bottomVertex = this._getBottomVertex(outlineBounds, isBending, bendAngleRad, arcRadius);
 
     this.topIndex = this.vertices.length;
     this.vertices.push(topVertex);
@@ -103,12 +65,13 @@
   /**
    *
    * @param {*} baseShape
-   * @param {*} outlineBounds
-   * @param {*} outlineVert
-   * @param {*} sliceIndex
-   * @param {*} heightT
-   * @param {*} isBending
-   * @param {*} bendAngle
+   * @param {Bounds} outlineBounds
+   * @param {THREE.Vertex3} outlineVert
+   * @param {number} sliceIndex
+   * @param {number} heightT A value between 0.0 and 1.0 (inclusive) to indicate the height position.
+   * @param {boolean} isBending
+   * @param {number=} bendAngle Must not be null, NaN or infinity if `isBending==true`
+   * @param {number=} arcRadius
    * @return { yMin: number, yMax : number }
    */
   DildoGeometry.prototype.buildSlice = function (
@@ -118,37 +81,19 @@
     sliceIndex,
     heightT,
     isBending,
-    bendAngle
+    bendAngle,
+    arcRadius
   ) {
     for (var i = 0; i < baseShape.vertices.length; i++) {
       var shapeVert = baseShape.vertices[i];
       var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
-      var arcLength = outlineBounds.height; // * 1.5; // The path must not be shorter than the mesh height!
-      var arcRadius = arcLength / bendAngle;
-      if (isBending && !isNaN(arcRadius) && arcRadius !== Number.POSITIVE_INFINITY && bendAngle > 0.01) {
-        var vert = new THREE.Vector3(
-          shapeVert.x * outlineXPct,
-          0, // outlineBounds.max.y / 2 + outlineVert.y,
-          shapeVert.y * outlineXPct
-        );
-        // var axis = new THREE.Vector3(0, 0, 1); // shapeHeight / 2, 0);
-        // var angle = bendAngle * heightT;
-        // // Move slice point along radius, rotate, then move back
-        // // (equivalent to rotation around arc center)
-        // vert.x -= arcRadius;
-        // vert.applyAxisAngle(axis, angle);
-        // vert.x += arcRadius;
+      if (isBending) {
+        var vert = new THREE.Vector3(shapeVert.x * outlineXPct, 0, shapeVert.y * outlineXPct);
         this._bendVertex(vert, bendAngle, arcRadius, heightT);
-        // vert.y += outlineBounds.max.y / 2;
+        vert.y += outlineBounds.max.y;
       } else {
-        var vert = new THREE.Vector3(
-          shapeVert.x * outlineXPct,
-          outlineVert.y, // outlineBounds.max.y / 2 + outlineVert.y,
-          // outlineBounds.max.y / 2 + outlineVert.y,
-          shapeVert.y * outlineXPct
-        );
+        var vert = new THREE.Vector3(shapeVert.x * outlineXPct, outlineVert.y, shapeVert.y * outlineXPct);
       }
-      vert.y += outlineBounds.max.y / 2;
       this.vertexMatrix[sliceIndex][i] = this.vertices.length;
       this.vertices.push(vert);
       if (sliceIndex == 0) {
@@ -158,10 +103,7 @@
     } // END for
   };
 
-  DildoGeometry.prototype._getTopVertex = function (outlineBounds, isBending, bendAngle) {
-    // TODO: pass arcRadius as option?
-    var arcLength = outlineBounds.height;
-    var arcRadius = arcLength / bendAngle;
+  DildoGeometry.prototype._getTopVertex = function (outlineBounds, isBending, bendAngle, arcRadius) {
     var topPoint = new THREE.Vector3(outlineBounds.min.x, outlineBounds.height / 2, 0);
     if (isBending) {
       this._bendVertex(topPoint, bendAngle, arcRadius, 1.0);
@@ -169,10 +111,7 @@
     return topPoint;
   };
 
-  DildoGeometry.prototype._getBottomVertex = function (outlineBounds, isBending, bendAngle) {
-    // TODO: pass arcRadius as option?
-    var arcLength = outlineBounds.height;
-    var arcRadius = arcLength / bendAngle;
+  DildoGeometry.prototype._getBottomVertex = function (outlineBounds, isBending, bendAngle, arcRadius) {
     var bottomPoint = new THREE.Vector3(0, outlineBounds.max.y, 0);
     if (isBending) {
       this._bendVertex(bottomPoint, bendAngle, arcRadius, 0.0);
@@ -181,7 +120,7 @@
   };
 
   DildoGeometry.prototype._bendVertex = function (vert, bendAngle, arcRadius, heightT) {
-    var axis = new THREE.Vector3(0, 0, 1); // shapeHeight / 2, 0);
+    var axis = new THREE.Vector3(0, 0, 1);
     var angle = bendAngle * heightT;
     // Move slice point along radius, rotate, then move back
     // (equivalent to rotation around arc center)
