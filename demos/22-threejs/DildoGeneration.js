@@ -86,6 +86,8 @@
     var baseRadius = options.outline.getBounds().width;
     var baseShape = mkCircularPolygon(baseRadius, options.shapeSegmentCount);
     var geometry = new DildoGeometry(Object.assign({ baseShape: baseShape }, options));
+    // this.bendGeometry(geometry, bendAngleRad, options.outline.getBounds().width, options.outline.getBounds().height);
+
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath != "undefined";
     var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
     var wireframe = typeof options.wireframe != "undefined" ? options.wireframe : null;
@@ -122,9 +124,10 @@
         });
     var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
     bufferedGeometry.computeVertexNormals();
+    // this.bendGeometry(bufferedGeometry, bendAngleRad, options.outline.getBounds().width, options.outline.getBounds().height);
     var latheMesh = new THREE.Mesh(bufferedGeometry, material);
     // Try bend
-    latheMesh = this.bendMesh(latheMesh, bendAngleRad, options.outline.getBounds().width, options.outline.getBounds().height);
+    // latheMesh = this.bendMesh(latheMesh, bendAngleRad, options.outline.getBounds().width, options.outline.getBounds().height);
     // END try bend
     latheMesh.position.y = -100;
     latheMesh.rotation.x = Math.PI;
@@ -140,7 +143,30 @@
     }
   };
 
-  DildoGeneration.prototype.bendMesh = function (mesh, bendAngle, shapeRadius, shapeHeight) {
+  DildoGeneration.prototype.bendGeometry = function (geometry, bendAngle, shapeRadius, shapeHeight) {
+    var bendModifier = new THREE.BendModifier();
+    // var direction = new THREE.Vector3(0, 0, -1);
+    var direction = new THREE.Vector3(0, 0, -1);
+    bendAngle = Math.PI / 100;
+    var arcLength = shapeHeight * 1.5; // The path must not be shorter than the mesh height!
+    var radius = arcLength / bendAngle;
+    // var axis = new THREE.Vector3(0, 1, 0);
+    // var axis = new THREE.Vector3(0, shapeRadius, shapeHeight / 2); // 0, 0);
+    // var axis = new THREE.Vector3(shapeHeight / 2, shapeRadius, 0); // 0, 0);
+    // var axis = new THREE.Vector3(shapeHeight / 10, shapeRadius / 2, 0); //) / 0, 0);
+    // var axis = new THREE.Vector3(shapeRadius * 2, 0, shapeHeight * 0); //) / 0, 0);
+    var axis = new THREE.Vector3(radius * 2, shapeHeight, 0); //) / 0, 0);
+    // var axis = new THREE.Vector3(radius * 2, 0, 0);
+    // var angle = Math.PI / 2.6;
+    // var bendAngle = Math.PI / 100;
+    // console.log(geometry);
+
+    bendModifier.set(direction, axis, bendAngle).modify(geometry);
+
+    // return mesh;
+  };
+
+  DildoGeneration.prototype._bendMesh = function (mesh, bendAngle, shapeRadius, shapeHeight) {
     // const points = [new Vector3(1, 0, -1), new Vector3(1, 0, 1), new Vector3(-1, 0, 1), new Vector3(-1, 0, -1)];
     const pointCount = 20;
     const points = [];
