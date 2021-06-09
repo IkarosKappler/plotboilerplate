@@ -150,7 +150,7 @@
       } // END for
     } // END for
 
-    // Close at top (?) and bottom.
+    // Close at bottom.
     for (var i = 1; i < baseShapeSegmentCount; i++) {
       this.makeFace3(
         this.vertexMatrix[0][i - 1], // s=0
@@ -162,6 +162,22 @@
           this.vertexMatrix[0][0], // s=0
           this.vertexMatrix[0][i],
           this.bottomIndex
+        );
+      }
+    }
+    // Close at top.
+    for (var i = 1; i < baseShapeSegmentCount; i++) {
+      const lastIndex = this.vertexMatrix.length - 1;
+      this.makeFace3(
+        this.vertexMatrix[lastIndex][i - 1], // s=0
+        this.vertexMatrix[lastIndex][i],
+        this.topIndex
+      );
+      if (i + 1 == baseShapeSegmentCount) {
+        this.makeFace3(
+          this.vertexMatrix[lastIndex][0], // s=0
+          this.vertexMatrix[lastIndex][i],
+          this.topIndex
         );
       }
     }
@@ -189,6 +205,16 @@
       if (i + 1 == baseShapeSegmentCount) {
         // Close the gap on the shape
         this.addBaseUV3(0, 0, i, outlineSegmentCount, baseShapeSegmentCount);
+      }
+    }
+
+    // Build UV mapping for the top (closing element)
+    var lastIndex = outlineSegmentCount - 1;
+    for (var i = 1; i < baseShapeSegmentCount; i++) {
+      this.addBaseUV3(i - 1, i, lastIndex, outlineSegmentCount, baseShapeSegmentCount);
+      if (i + 1 == baseShapeSegmentCount) {
+        // Close the gap on the shape
+        this.addBaseUV3(lastIndex, lastIndex, i, outlineSegmentCount, baseShapeSegmentCount);
       }
     }
 

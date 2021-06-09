@@ -74,23 +74,91 @@
   /**
    * @param {BezierPath} options.outline
    * @param {number}     options.segmentCount
-   * @param {number}     outlineSegmentCount (>= 2).
-   * @param {number}     bendAngle The bending angle in degrees (!).
-   * @param {boolean?}   useTextureImage
-   * @param {string?}    textureImagePath
-   * @param {boolean?}   wireframe
+   * @param {number}     options.outlineSegmentCount (>= 2).
+   * @param {number}     options.bendAngle The bending angle in degrees (!).
+   * @param {boolean}    options.performSlice
+   * @param {boolean?}   options.useTextureImage
+   * @param {string?}    options.textureImagePath
+   * @param {boolean?}   options.wireframe
    **/
   DildoGeneration.prototype.rebuild = function (options) {
     this.removeCachedGeometries();
 
     var baseRadius = options.outline.getBounds().width;
+    var outlineHeight = options.outline.getBounds().height;
     var baseShape = mkCircularPolygon(baseRadius, options.shapeSegmentCount);
     var geometry = new DildoGeometry(Object.assign({ baseShape: baseShape }, options));
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath != "undefined";
     var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
     var wireframe = typeof options.wireframe != "undefined" ? options.wireframe : null;
+    var material = this._createMaterial(useTextureImage, wireframe, textureImagePath);
+    var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
+    bufferedGeometry.computeVertexNormals();
+    var latheMesh = new THREE.Mesh(bufferedGeometry, material);
+    // latheMesh.position.y = -100;
+    this.camera.lookAt(new THREE.Vector3(20, 0, 150));
+    this.camera.lookAt(latheMesh.position);
 
-    var material = useTextureImage
+    console.log(baseRadius);
+
+    if (options.performSlice) {
+      // Slice mesh into two
+      // See https://github.com/tdhooper/threejs-slice-geometry
+      var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      var slicedGeometry = sliceGeometry(geometry, plane, false); // closeHoles=true
+      var material = new THREE.MeshBasicMaterial({ wireframe: true });
+      var mesh = new THREE.Mesh(slicedGeometry, material);
+      this._addMesh(mesh);
+
+      /*
+      latheMesh.updateMatrix();
+      var bbox = new THREE.Box3().setFromObject(latheMesh);
+      console.log(bbox);
+      var box_material = new THREE.MeshBasicMaterial({ wireframe: true });
+      var cube_geometry = new THREE.CubeGeometry(
+        ((bbox.max.x - bbox.min.x) / 2) * 1.2 + 0.01,
+        (bbox.max.y - bbox.min.y) * 1.1,
+        (bbox.max.z - bbox.min.z) * 1.2
+      );
+      var cube_mesh = new THREE.Mesh(cube_geometry, box_material);
+      cube_mesh.updateMatrix();
+      // cube_mesh.position.x = (baseRadius * 1.2) / 2;
+      cube_mesh.position.x = latheMesh.position.x + (bbox.max.x - bbox.min.x) / 4; // bbox.min.x;
+      cube_mesh.position.y = bbox.min.y + (bbox.max.y - bbox.min.y) / 2 + -30;
+      cube_mesh.position.z = bbox.min.z + (bbox.max.z - bbox.min.z) / 2;
+      this._addMesh(cube_mesh);
+      var cube_bsp = new ThreeBSP(cube_mesh);
+      var mesh_bsp = new ThreeBSP(new THREE.Mesh(geometry, material));
+      var subtract_bsp = cube_bsp.subtract(mesh_bsp);
+      var result = subtract_bsp.toMesh(
+        material
+      );
+      this._addMesh(result);
+      */
+    } else {
+      latheMesh.position.y = -100;
+      this._addMesh(latheMesh);
+
+      if (options.showNormals) {
+        var vnHelper = new VertexNormalsHelper(latheMesh, options.normalsLength, 0x00ff00, 1);
+        this.scene.add(vnHelper);
+        this.geometries.push(vnHelper);
+      }
+    }
+  };
+
+  DildoGeneration.prototype._addMesh = function (mesh) {
+    //  var mesh = new THREE.Mesh(slicedGeometry, material);
+    // mesh.position.y = -100;
+    mesh.rotation.x = Math.PI;
+    // scene.add(mesh);
+
+    this.scene.add(mesh);
+    this.geometries.push(mesh);
+  };
+
+  DildoGeneration.prototype._createMaterial = function (useTextureImage, wireframe, textureImagePath) {
+    return useTextureImage
       ? new THREE.MeshLambertMaterial({
           color: 0xffffff,
           wireframe: wireframe,
@@ -102,8 +170,7 @@
           emissive: 0x0,
           reflectivity: 1.0,
           refractionRatio: 0.89,
-          // shading : THREE.LambertShading,
-          map: this.loadTextureImage(textureImagePath) // options.textureImagePath)
+          map: this.loadTextureImage(textureImagePath)
         })
       : new THREE.MeshPhongMaterial({
           color: 0x3838ff,
@@ -117,24 +184,8 @@
           reflectivity: 1.0,
           refractionRatio: 0.89,
           specular: 0x888888,
-          // shading : THREE.LambertShading,
           map: null
         });
-    var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
-    bufferedGeometry.computeVertexNormals();
-    var latheMesh = new THREE.Mesh(bufferedGeometry, material);
-    latheMesh.position.y = -100;
-    latheMesh.rotation.x = Math.PI;
-    this.camera.lookAt(new THREE.Vector3(20, 0, 150));
-    this.camera.lookAt(latheMesh.position);
-    this.scene.add(latheMesh);
-    this.geometries.push(latheMesh);
-
-    if (options.showNormals) {
-      var vnHelper = new VertexNormalsHelper(latheMesh, options.normalsLength, 0x00ff00, 1);
-      this.scene.add(vnHelper);
-      this.geometries.push(vnHelper);
-    }
   };
 
   DildoGeneration.prototype.removeCachedGeometries = function () {

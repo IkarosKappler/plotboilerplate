@@ -69,6 +69,7 @@
         useTextureImage: true,
         textureImagePath: "wood.png",
         wireframe: false,
+        performSlice: false,
         exportSTL: function () {
           exportSTL();
         },
@@ -153,12 +154,6 @@
 
     var loadPathJSON = function (jsonData) {
       var newOutline = BezierPath.fromJSON(jsonData);
-      // pb.remove( outline );
-      // TODO: add a removeVertices() function to PB
-      // pb.vertices = [];
-      // outline = newOutline;
-      // addPathListeners( outline );
-      // pb.add( newOutline );
       setPathInstance(newOutline);
       rebuild();
     };
@@ -169,12 +164,12 @@
     // +-------------------------------
     var buildId = null;
     var rebuild = function () {
-      var buildId = new Date().getTime();
+      buildId = new Date().getTime();
       window.setTimeout(
         (function (bId) {
           return function () {
             if (bId == buildId) {
-              // console.log('rebuild', outline );
+              // Set the bending flag if bendAngle is not zero.
               dildoGeneration.rebuild(Object.assign({ outline: outline, isBending: config.bendAngle !== 0 }, config));
             }
           };
@@ -182,8 +177,6 @@
         50
       );
     };
-
-    // new DoubleclickHandler( pb, handleDoubleclick );
 
     // +---------------------------------------------------------------------------------
     // | Each outline vertex requires a drag (end) listener. Wee need this to update
@@ -252,9 +245,7 @@
 
     var setPathInstance = function (newOutline) {
       if (typeof outline != "undefined") {
-        pb.remove(outline);
-        // TODO: add a removeVertices() function to PB
-        pb.vertices = [];
+        pb.removeAll(false); // Do not keep vertices
       }
       outline = newOutline;
       addPathListeners(outline);
@@ -263,7 +254,7 @@
       // +---------------------------------------------------------------------------------
       // | Install a Bézier interaction helper.
       // +-------------------------------
-      var helper = new BezierPathInteractionHelper(pb, [outline], {
+      new BezierPathInteractionHelper(pb, [outline], {
         maxDetectDistance: 32.0,
         autoAdjustPaths: true,
         allowPathRemoval: false, // It is not alowed to remove the outline path
@@ -318,9 +309,11 @@
       // prettier-ignore
       fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
       // prettier-ignore
-      fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image.');
+      fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image?');
       // prettier-ignore
-      fold0.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model.');
+      fold0.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model?');
+      // prettier-ignore
+      fold0.add(config, "performSlice").onChange( function() { rebuild() } ).name('performSlice').title('Slice the model along the x axis?');
 
       var fold1 = gui.addFolder("Export");
       // prettier-ignore
