@@ -1,9 +1,10 @@
 /**
  * @require THREE.Geometry
  *
- * @author  Ikaros Kappler
- * @version 1.0.0
- * @date    2020-07-08
+ * @author   Ikaros Kappler
+ * @date     2020-07-08
+ * @modified 2021-06-11 Fixing top and bottom points; preparing slicing of mesh.
+ * @version  1.0.1
  **/
 
 (function () {
@@ -105,17 +106,33 @@
 
   DildoGeometry.prototype._getTopVertex = function (outlineBounds, isBending, bendAngle, arcRadius) {
     // var topPoint = new THREE.Vector3(outlineBounds.min.x, outlineBounds.height / 2, 0);
-    var topPoint = new THREE.Vector3(0, outlineBounds.min.y, 0);
+    // var topPoint = new THREE.Vector3(0, outlineBounds.min.y, 0);
+    // var topPoint = new THREE.Vector3(0, 0, 0);
+    // var topPoint = new THREE.Vector3(0, outlineBounds.min.y + outlineBounds.height, 0);
+    // if (true) return new THREE.Vector3(0, outlineBounds.min.y, 0);
+    // var outlineVert = outline.getPointAt(1.0);
     if (isBending) {
+      // var topPoint = new THREE.Vector3(0, outlineBounds.min.y, 0);
+      // var topPoint = new THREE.Vector3(0, outlineBounds.max.y, 0);
+      // var heightT = 1.0; // (outlineBounds.max.y - outlineVert.y) / outlineBounds.height;
+      // var topPoint = new THREE.Vector3(0, outlineBounds.min.y + outlineBounds.height, 0);
+      var topPoint = new THREE.Vector3(0, 0, 0);
+      // console.log("bendAngle", bendAngle, "arcRadius", arcRadius);
       this._bendVertex(topPoint, bendAngle, arcRadius, 1.0);
+      topPoint.y += outlineBounds.max.y;
+      return topPoint;
+    } else {
+      // return new THREE.Vector3(0, outlineBounds.min.y + outlineBounds.height, 0);
+      return new THREE.Vector3(0, outlineBounds.min.y, 0);
     }
-    return topPoint;
+    // return topPoint;
   };
 
   DildoGeometry.prototype._getBottomVertex = function (outlineBounds, isBending, bendAngle, arcRadius) {
     var bottomPoint = new THREE.Vector3(0, outlineBounds.max.y, 0);
     if (isBending) {
-      this._bendVertex(bottomPoint, bendAngle, arcRadius, 0.0);
+      // No need to bend the bottom point (no effect)
+      // this._bendVertex(bottomPoint, bendAngle, arcRadius, 0.0);
     }
     return bottomPoint;
   };
