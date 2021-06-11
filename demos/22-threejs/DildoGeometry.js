@@ -104,7 +104,8 @@
   };
 
   DildoGeometry.prototype._getTopVertex = function (outlineBounds, isBending, bendAngle, arcRadius) {
-    var topPoint = new THREE.Vector3(outlineBounds.min.x, outlineBounds.height / 2, 0);
+    // var topPoint = new THREE.Vector3(outlineBounds.min.x, outlineBounds.height / 2, 0);
+    var topPoint = new THREE.Vector3(0, outlineBounds.min.y, 0);
     if (isBending) {
       this._bendVertex(topPoint, bendAngle, arcRadius, 1.0);
     }

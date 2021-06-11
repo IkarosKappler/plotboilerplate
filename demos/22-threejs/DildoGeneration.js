@@ -95,6 +95,7 @@
     var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
     bufferedGeometry.computeVertexNormals();
     var latheMesh = new THREE.Mesh(bufferedGeometry, material);
+    // var latheMesh = new THREE.Mesh(geometry, material);
     // latheMesh.position.y = -100;
     this.camera.lookAt(new THREE.Vector3(20, 0, 150));
     this.camera.lookAt(latheMesh.position);
@@ -104,37 +105,69 @@
     if (options.performSlice) {
       // Slice mesh into two
       // See https://github.com/tdhooper/threejs-slice-geometry
+      var closeHoles = false;
       var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-      var slicedGeometry = sliceGeometry(geometry, plane, false); // closeHoles=true
-      var material = new THREE.MeshBasicMaterial({ wireframe: true });
-      var mesh = new THREE.Mesh(slicedGeometry, material);
+      var slicedGeometry = sliceGeometry(geometry, plane, closeHoles);
+      var sliceMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
+      var mesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
       this._addMesh(mesh);
 
-      /*
-      latheMesh.updateMatrix();
-      var bbox = new THREE.Box3().setFromObject(latheMesh);
-      console.log(bbox);
-      var box_material = new THREE.MeshBasicMaterial({ wireframe: true });
-      var cube_geometry = new THREE.CubeGeometry(
-        ((bbox.max.x - bbox.min.x) / 2) * 1.2 + 0.01,
-        (bbox.max.y - bbox.min.y) * 1.1,
-        (bbox.max.z - bbox.min.z) * 1.2
+      var planeGeom = new THREE.PlaneGeometry(30, 30);
+      var planeMesh = new THREE.Mesh(
+        planeGeom,
+        new THREE.MeshBasicMaterial({
+          color: "lightgray",
+          transparent: true,
+          opacity: 0.75,
+          side: THREE.DoubleSide
+        })
       );
-      var cube_mesh = new THREE.Mesh(cube_geometry, box_material);
-      cube_mesh.updateMatrix();
-      // cube_mesh.position.x = (baseRadius * 1.2) / 2;
-      cube_mesh.position.x = latheMesh.position.x + (bbox.max.x - bbox.min.x) / 4; // bbox.min.x;
-      cube_mesh.position.y = bbox.min.y + (bbox.max.y - bbox.min.y) / 2 + -30;
-      cube_mesh.position.z = bbox.min.z + (bbox.max.z - bbox.min.z) / 2;
-      this._addMesh(cube_mesh);
-      var cube_bsp = new ThreeBSP(cube_mesh);
-      var mesh_bsp = new ThreeBSP(new THREE.Mesh(geometry, material));
-      var subtract_bsp = cube_bsp.subtract(mesh_bsp);
-      var result = subtract_bsp.toMesh(
-        material
+      // planeMesh.position.y = -3.14;
+      planeMesh.rotation.x = Math.PI / 5;
+      var planeMeshIntersection = new PlaneMeshIntersection();
+      // var intersectionObject = planeMeshIntersection.getIntersectionPoints(latheMesh, geometry, planeMesh);
+      var intersectionPoints = planeMeshIntersection.getIntersectionPoints(latheMesh, geometry, planeMesh);
+      var pointGeometry = new THREE.Geometry();
+      pointGeometry.vertices = intersectionPoints;
+      var pointsMaterial = new THREE.PointsMaterial({
+        size: 1,
+        color: 0xffff00
+      });
+      var points = new THREE.Points(pointGeometry, pointsMaterial);
+
+      var lines = new THREE.LineSegments(
+        pointGeometry,
+        new THREE.LineBasicMaterial({
+          color: 0xffffff
+        })
       );
-      this._addMesh(result);
-      */
+      // return { lines: lines, points: points };
+      // this._addMesh(intersectionObject.lines);
+      // this._addMesh(intersectionObject.points);
+      this._addMesh(lines);
+      this._addMesh(points);
+
+      // latheMesh.updateMatrix();
+      // var bbox = new THREE.Box3().setFromObject(latheMesh);
+      // console.log(bbox);
+      // var box_material = new THREE.MeshBasicMaterial({ wireframe: true });
+      // var cube_geometry = new THREE.CubeGeometry(
+      //   ((bbox.max.x - bbox.min.x) / 2) * 1.2 + 0.01,
+      //   (bbox.max.y - bbox.min.y) * 1.1,
+      //   (bbox.max.z - bbox.min.z) * 1.2
+      // );
+      // var cube_mesh = new THREE.Mesh(cube_geometry, box_material);
+      // cube_mesh.updateMatrix();
+      // // cube_mesh.position.x = (baseRadius * 1.2) / 2;
+      // cube_mesh.position.x = latheMesh.position.x + (bbox.max.x - bbox.min.x) / 4; // bbox.min.x;
+      // cube_mesh.position.y = bbox.min.y + (bbox.max.y - bbox.min.y) / 2 + -30;
+      // cube_mesh.position.z = bbox.min.z + (bbox.max.z - bbox.min.z) / 2;
+      // this._addMesh(cube_mesh);
+      // var cube_bsp = new ThreeBSP(cube_mesh);
+      // var mesh_bsp = new ThreeBSP(new THREE.Mesh(geometry, material));
+      // var subtract_bsp = cube_bsp.subtract(mesh_bsp);
+      // var result = subtract_bsp.toMesh(material);
+      // this._addMesh(result);
     } else {
       latheMesh.position.y = -100;
       this._addMesh(latheMesh);
@@ -146,6 +179,67 @@
       }
     }
   };
+
+  // // https://stackoverflow.com/questions/42348495/three-js-find-all-points-where-a-mesh-intersects-a-plane
+  // // https://jsfiddle.net/prisoner849/8uxw667m/
+  // var pointsOfIntersection = new THREE.Geometry();
+
+  // var a = new THREE.Vector3(),
+  //   b = new THREE.Vector3(),
+  //   c = new THREE.Vector3();
+  // var planePointA = new THREE.Vector3(),
+  //   planePointB = new THREE.Vector3(),
+  //   planePointC = new THREE.Vector3();
+  // var lineAB = new THREE.Line3(),
+  //   lineBC = new THREE.Line3(),
+  //   lineCA = new THREE.Line3();
+
+  // var pointOfIntersection = new THREE.Vector3();
+
+  // function getIntersectionPoints(obj, geometry, plane) {
+  //   var mathPlane = new THREE.Plane();
+  //   plane.localToWorld(planePointA.copy(plane.geometry.vertices[plane.geometry.faces[0].a]));
+  //   plane.localToWorld(planePointB.copy(plane.geometry.vertices[plane.geometry.faces[0].b]));
+  //   plane.localToWorld(planePointC.copy(plane.geometry.vertices[plane.geometry.faces[0].c]));
+  //   mathPlane.setFromCoplanarPoints(planePointA, planePointB, planePointC);
+
+  //   geometry.faces.forEach(function (face) {
+  //     obj.localToWorld(a.copy(geometry.vertices[face.a]));
+  //     obj.localToWorld(b.copy(geometry.vertices[face.b]));
+  //     obj.localToWorld(c.copy(geometry.vertices[face.c]));
+  //     lineAB = new THREE.Line3(a, b);
+  //     lineBC = new THREE.Line3(b, c);
+  //     lineCA = new THREE.Line3(c, a);
+  //     setPointOfIntersection(lineAB, mathPlane);
+  //     setPointOfIntersection(lineBC, mathPlane);
+  //     setPointOfIntersection(lineCA, mathPlane);
+  //   });
+
+  //   var pointsMaterial = new THREE.PointsMaterial({
+  //     size: 1,
+  //     color: 0xffff00
+  //   });
+  //   var points = new THREE.Points(pointsOfIntersection, pointsMaterial);
+  //   // scene.add(points);
+
+  //   var lines = new THREE.LineSegments(
+  //     pointsOfIntersection,
+  //     new THREE.LineBasicMaterial({
+  //       color: 0xffffff
+  //     })
+  //   );
+  //   // scene.add(lines);
+  //   return { lines: lines, points: points };
+  // }
+
+  // function setPointOfIntersection(line, plane) {
+  //   // pointOfIntersection = plane.intersectLine(line);
+  //   // pointOfIntersection = new THREE.Vector3();
+  //   pointOfIntersection = plane.intersectLine(line, new THREE.Vector3());
+  //   if (pointOfIntersection) {
+  //     pointsOfIntersection.vertices.push(pointOfIntersection.clone());
+  //   }
+  // }
 
   DildoGeneration.prototype._addMesh = function (mesh) {
     //  var mesh = new THREE.Mesh(slicedGeometry, material);
