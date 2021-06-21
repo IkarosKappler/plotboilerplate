@@ -99,13 +99,12 @@
     this.camera.lookAt(new THREE.Vector3(20, 0, 150));
     this.camera.lookAt(latheMesh.position);
 
-    console.log(baseRadius);
-
     if (options.performSlice) {
       this.__performPlaneSlice(latheMesh, geometry);
       // this.__performCsgSlice(latheMesh, geometry, material);
     } else {
       latheMesh.position.y = -100;
+      latheMesh.userData.isExportable = true;
       this._addMesh(latheMesh);
 
       if (options.showNormals) {
@@ -117,26 +116,14 @@
   };
 
   DildoGeneration.prototype.__performPlaneSlice = function (latheMesh, latheUnbufferedGeometry) {
-    // Slice mesh into two
-    // See https://github.com/tdhooper/threejs-slice-geometry
-    var closeHoles = false;
-    var sliceMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
-
     var leftPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    var leftSlicedGeometry = sliceGeometry(latheUnbufferedGeometry, leftPlane, closeHoles);
-    var leftMesh = new THREE.Mesh(leftSlicedGeometry, sliceMaterial);
-    leftMesh.position.y = -100;
-    leftMesh.position.z = -50;
-    this._addMesh(leftMesh);
+    makeAndAddSlice(this, latheUnbufferedGeometry, leftPlane, -50);
 
     var rightPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
-    var rightSlicedGeometry = sliceGeometry(latheUnbufferedGeometry, rightPlane, closeHoles);
-    var rightMesh = new THREE.Mesh(rightSlicedGeometry, sliceMaterial);
-    rightMesh.position.y = -100;
-    rightMesh.position.z = 50;
-    this._addMesh(rightMesh);
+    makeAndAddSlice(this, latheUnbufferedGeometry, rightPlane, 50);
 
-    var planeGeom = new THREE.PlaneGeometry(30, 30);
+    // Find points on intersection path (this is a single path in this configuration)
+    var planeGeom = new THREE.PlaneGeometry(300, 300);
     var planeMesh = new THREE.Mesh(
       planeGeom,
       new THREE.MeshBasicMaterial({
@@ -146,31 +133,10 @@
         side: THREE.DoubleSide
       })
     );
-    // planeMesh.position.y = -3.14;
     planeMesh.rotation.x = Math.PI / 5;
-    var planeMeshIntersection = new PlaneMeshIntersection();
-    // var intersectionObject = planeMeshIntersection.getIntersectionPoints(latheMesh, geometry, planeMesh);
-    var intersectionPoints = planeMeshIntersection.getIntersectionPoints(latheMesh, latheUnbufferedGeometry, planeMesh);
-    var pointGeometry = new THREE.Geometry();
-    pointGeometry.vertices = intersectionPoints;
-    var pointsMaterial = new THREE.PointsMaterial({
-      size: 1,
-      color: 0xffff00
-    });
-    var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
+    this._addMesh(planeMesh);
 
-    var linesMesh = new THREE.LineSegments(
-      pointGeometry,
-      new THREE.LineBasicMaterial({
-        color: 0xffffff
-      })
-    );
-    linesMesh.position.y = -100;
-    linesMesh.position.z = -50;
-    pointsMesh.position.y = -100;
-    pointsMesh.position.z = -50;
-    this._addMesh(linesMesh);
-    this._addMesh(pointsMesh);
+    makeAndAddPlaneIntersection(this, latheMesh, latheUnbufferedGeometry, planeMesh);
   };
 
   // NOT CURRENTLY IN USE (too unstable?)
@@ -186,8 +152,7 @@
     );
     var cube_mesh = new THREE.Mesh(cube_geometry, box_material);
     cube_mesh.updateMatrix();
-    // cube_mesh.position.x = (baseRadius * 1.2) / 2;
-    cube_mesh.position.x = latheMesh.position.x + (bbox.max.x - bbox.min.x) / 4; // bbox.min.x;
+    cube_mesh.position.x = latheMesh.position.x + (bbox.max.x - bbox.min.x) / 4;
     cube_mesh.position.y = bbox.min.y + (bbox.max.y - bbox.min.y) / 2 + -30;
     cube_mesh.position.z = bbox.min.z + (bbox.max.z - bbox.min.z) / 2;
     this._addMesh(cube_mesh);
@@ -199,11 +164,7 @@
   };
 
   DildoGeneration.prototype._addMesh = function (mesh) {
-    //  var mesh = new THREE.Mesh(slicedGeometry, material);
-    // mesh.position.y = -100;
     mesh.rotation.x = Math.PI;
-    // scene.add(mesh);
-
     this.scene.add(mesh);
     this.geometries.push(mesh);
   };
@@ -268,7 +229,9 @@
    **/
   DildoGeneration.prototype.generateSTL = function (options) {
     var exporter = new THREE.STLExporter();
+    // TODO: when splitted there is more than one geometry to export : )
     var stlData = exporter.parse(this.geometries[0]);
+    // var stlData = exporter.parse(this.geometries);
     if (typeof options.onComplete === "function") {
       options.onComplete(stlData);
     } else {
@@ -276,6 +239,13 @@
     }
   };
 
+  /**
+   * A helper function to create (discrete) circular shapes.
+   *
+   * @param {number} radius - The radius of the circle.
+   * @param {number} pointCount - The number of vertices to construct the circle with.
+   * @returns {Polygon}
+   */
   var mkCircularPolygon = function (radius, pointCount) {
     var vertices = [];
     var phi;
@@ -284,6 +254,46 @@
       vertices.push(new Vertex(Math.cos(phi) * radius, Math.sin(phi) * radius));
     }
     return new Polygon(vertices, false);
+  };
+
+  // @param {THREE.PlaneGeometry}
+  // var _self = this;
+  var makeAndAddSlice = function (thisGenerator, unbufferGeometry, plane, zOffset) {
+    // Slice mesh into two
+    // See https://github.com/tdhooper/threejs-slice-geometry
+    var closeHoles = false;
+    var sliceMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
+    var slicedGeometry = sliceGeometry(unbufferGeometry, plane, closeHoles);
+    var slicedMesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
+    slicedMesh.position.y = -100;
+    slicedMesh.position.z = zOffset;
+    slicedMesh.userData.isExportable = true;
+    thisGenerator._addMesh(slicedMesh);
+  };
+
+  var makeAndAddPlaneIntersection = function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
+    var planeMeshIntersection = new PlaneMeshIntersection();
+    var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
+    var pointGeometry = new THREE.Geometry();
+    pointGeometry.vertices = intersectionPoints;
+    var pointsMaterial = new THREE.PointsMaterial({
+      size: 1,
+      color: 0x00a8ff
+    });
+    var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
+
+    var linesMesh = new THREE.LineSegments(
+      pointGeometry,
+      new THREE.LineBasicMaterial({
+        color: 0xff8800
+      })
+    );
+    linesMesh.position.y = -100;
+    linesMesh.position.z = -50;
+    pointsMesh.position.y = -100;
+    pointsMesh.position.z = -50;
+    thisGenerator._addMesh(linesMesh);
+    thisGenerator._addMesh(pointsMesh);
   };
 
   window.DildoGeneration = DildoGeneration;

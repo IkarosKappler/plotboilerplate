@@ -10,6 +10,9 @@
  * @version 1.0.0
  */
 (function (context, THREE) {
+  /**
+   * Constructor.
+   */
   var PlaneMeshIntersection = function () {
     //   Vector3[]
     this.pointsOfIntersection = []; // new THREE.Geometry();
@@ -27,7 +30,15 @@
     this.pointOfIntersection = new THREE.Vector3();
   };
 
-  PlaneMeshIntersection.prototype.getIntersectionPoints = function (obj, geometry, plane) {
+  /**
+   *
+   * @param {THREE.Mesh} mesh
+   * @param {THREE.Geometry} geometry
+   * @param {THREE.PlaneGeometry} plane
+   * @returns
+   */
+  PlaneMeshIntersection.prototype.getIntersectionPoints = function (mesh, geometry, plane) {
+    // Note: this could also work with a directly passed Mesh.Plane object instead a THREE.PlaneGeometry.
     this.pointsOfIntersection = [];
     var mathPlane = new THREE.Plane();
     plane.localToWorld(this.planePointA.copy(plane.geometry.vertices[plane.geometry.faces[0].a]));
@@ -37,9 +48,9 @@
 
     var _self = this;
     geometry.faces.forEach(function (face) {
-      obj.localToWorld(_self.a.copy(geometry.vertices[face.a]));
-      obj.localToWorld(_self.b.copy(geometry.vertices[face.b]));
-      obj.localToWorld(_self.c.copy(geometry.vertices[face.c]));
+      mesh.localToWorld(_self.a.copy(geometry.vertices[face.a]));
+      mesh.localToWorld(_self.b.copy(geometry.vertices[face.b]));
+      mesh.localToWorld(_self.c.copy(geometry.vertices[face.c]));
       _self.lineAB = new THREE.Line3(_self.a, _self.b);
       _self.lineBC = new THREE.Line3(_self.b, _self.c);
       _self.lineCA = new THREE.Line3(_self.c, _self.a);
@@ -48,19 +59,6 @@
       _self.__setPointOfIntersection(_self.lineCA, mathPlane);
     });
 
-    // var pointsMaterial = new THREE.PointsMaterial({
-    //   size: 1,
-    //   color: 0xffff00
-    // });
-    // var points = new THREE.Points(this.pointsOfIntersection, pointsMaterial);
-
-    // var lines = new THREE.LineSegments(
-    //   this.pointsOfIntersection,
-    //   new THREE.LineBasicMaterial({
-    //     color: 0xffffff
-    //   })
-    // );
-    // return { lines: lines, points: points };
     return this.pointsOfIntersection;
   };
 
@@ -74,5 +72,5 @@
     }
   };
 
-  globalThis.PlaneMeshIntersection = PlaneMeshIntersection;
+  context.PlaneMeshIntersection = PlaneMeshIntersection;
 })(globalThis, THREE);
