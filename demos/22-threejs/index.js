@@ -53,7 +53,7 @@
       )
     );
 
-    var bezierDistanceT = 0.0;
+    var bezierDistanceT = 0;
     var bezierDistanceLine = null;
 
     // +---------------------------------------------------------------------------------
@@ -64,11 +64,14 @@
         outlineSegmentCount: 128,
         shapeSegmentCount: 64,
         bendAngle: 0,
+        closeTop: true,
+        closeBottom: true,
         showNormals: false,
         normalsLength: 10.0,
         useTextureImage: true,
         textureImagePath: "wood.png",
         wireframe: false,
+        addSpine: false,
         performSlice: false,
         exportSTL: function () {
           exportSTL();
@@ -305,6 +308,10 @@
       // prettier-ignore
       fold0.add(config, "bendAngle").min(0).max(180).onChange( function() { rebuild() } ).name('bendAngle').title('The bending angle in degrees.');
       // prettier-ignore
+      fold0.add(config, "closeTop").onChange( function() { rebuild() } ).name('closeTop').title('Close the geometry at the top point (recommended).');
+      // prettier-ignore
+      fold0.add(config, "closeBottom").onChange( function() { rebuild() } ).name('closeBottom').title('Close the geometry at the bottom point.');
+      // prettier-ignore
       fold0.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
       // prettier-ignore
       fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
@@ -312,6 +319,8 @@
       fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image?');
       // prettier-ignore
       fold0.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model?');
+      // prettier-ignore
+      fold0.add(config, "addSpine").onChange( function() { rebuild() } ).name('addSpine').title("Add the model's spine?");
       // prettier-ignore
       fold0.add(config, "performSlice").onChange( function() { rebuild() } ).name('performSlice').title('Slice the model along the x axis?');
 
@@ -332,5 +341,10 @@
     pb.config.postDraw = postDraw;
     pb.fitToView(scaleBounds(outline.getBounds(), 1.6));
     rebuild();
+
+    window.addEventListener("resize", function () {
+      var scaledBounds = scaleBounds(outline.getBounds(), 1.6);
+      pb.fitToView(scaledBounds);
+    });
   });
 })(window);

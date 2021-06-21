@@ -4,7 +4,8 @@
  * @modified 2020-10-30 Added the static computeFromVertices function.
  * @modified 2020-11-19 Set min, max, width and height to private.
  * @modified 2021-02-02 Added the `toPolygon` method.
- * @version  1.2.0
+ * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
+ * @version  1.3.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -63,6 +64,7 @@ export declare class Bounds implements IBounds, XYDimension {
      * @return {Polygon} This bound rectangle as a polygon.
      */
     toPolygon(): Polygon;
+    getCenter(): Vertex;
     /**
      * Compute the minimal bounding box for a given set of vertices.
      *

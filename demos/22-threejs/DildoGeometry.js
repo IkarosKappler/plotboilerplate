@@ -20,14 +20,15 @@
   var DildoGeometry = function (options) {
     THREE.Geometry.call(this);
 
-    // Array<Array<number>>
-    this.vertexMatrix = [];
+    this.vertexMatrix = []; // Array<Array<number>>
     this.topIndex = -1;
     this.bottomIndex = -1;
+    // this.spineIndices = []; // Array<number>
+    this.spineVertices = []; // Array<THREE.Vector>
 
-    this.buildVertices(options);
-    this.buildFaces(options);
-    this.buildUVMapping(options);
+    this._buildVertices(options);
+    this._buildFaces(options);
+    this._buildUVMapping(options);
   };
 
   /**
@@ -35,7 +36,7 @@
    *
    * @param {} options
    */
-  DildoGeometry.prototype.buildVertices = function (options) {
+  DildoGeometry.prototype._buildVertices = function (options) {
     var baseShape = options.baseShape;
     var outline = options.outline;
     var outlineSegmentCount = options.outlineSegmentCount;
@@ -43,7 +44,8 @@
     var outlineBounds = outline.getBounds();
     var shapeHeight = outlineBounds.height;
 
-    // options.isBending = true;
+    var shapeBounds = baseShape.getBounds();
+    var shapeCenter = shapeBounds.getCenter();
     var arcLength = shapeHeight;
     var arcRadius = arcLength / bendAngleRad;
     var isBending =
@@ -58,11 +60,11 @@
       this.vertexMatrix[s] = [];
       var outlineVert = outline.getPointAt(t);
       var heightT = (outlineBounds.max.y - outlineVert.y) / shapeHeight;
-      this.buildSlice(baseShape, outlineBounds, outlineVert, s, heightT, isBending, bendAngleRad, arcRadius);
+      this.buildSlice(baseShape, shapeCenter, outlineBounds, outlineVert, s, heightT, isBending, bendAngleRad, arcRadius);
     } // END for
 
     var topVertex = this._getTopVertex(outlineBounds, isBending, bendAngleRad, arcRadius);
-    var bottomVertex = this._getBottomVertex(outlineBounds, isBending, bendAngleRad, arcRadius);
+    var bottomVertex = this._getBottomVertex(outlineBounds);
 
     this.topIndex = this.vertices.length;
     this.vertices.push(topVertex);
@@ -74,6 +76,7 @@
   /**
    *
    * @param {Polygon} baseShape
+   * @param {Vertex} shapeCenter
    * @param {Bounds} outlineBounds
    * @param {THREE.Vertex3} outlineVert
    * @param {number} sliceIndex
@@ -85,6 +88,7 @@
    */
   DildoGeometry.prototype.buildSlice = function (
     baseShape,
+    shapeCenter,
     outlineBounds,
     outlineVert,
     sliceIndex,
@@ -93,9 +97,9 @@
     bendAngle,
     arcRadius
   ) {
+    var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
     for (var i = 0; i < baseShape.vertices.length; i++) {
       var shapeVert = baseShape.vertices[i];
-      var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
       if (isBending) {
         var vert = new THREE.Vector3(shapeVert.x * outlineXPct, 0, shapeVert.y * outlineXPct);
         this._bendVertex(vert, bendAngle, arcRadius, heightT);
@@ -110,8 +114,30 @@
         if (i + 1 == baseShape.vertices.length) yMax = vert.y;
       }
     } // END for
+
+    // Find shape's center point to construct a spine
+    var spineVert = shapeCenter.clone();
+    if (isBending) {
+      var vert = new THREE.Vector3(spineVert.x * outlineXPct, 0, spineVert.y * outlineXPct);
+      this._bendVertex(vert, bendAngle, arcRadius, heightT);
+      vert.y += outlineBounds.max.y;
+    } else {
+      var vert = new THREE.Vector3(spineVert.x * outlineXPct, outlineVert.y, spineVert.y * outlineXPct);
+    }
+    // var spineIndex = this.vertices.length;
+    this.spineVertices.push(vert);
+    // this.spineIndices.push(spineIndex);
   };
 
+  /**
+   * Construct the top vertex that's used to closed the cylinder geometry at the top.
+   *
+   * @param {plotboilerplate.Bounds} outlineBounds
+   * @param {boolean} isBending
+   * @param {number|NaN|undefined} bendAngle
+   * @param {number|undefined} arcRadius
+   * @returns THREE.Vector
+   */
   DildoGeometry.prototype._getTopVertex = function (outlineBounds, isBending, bendAngle, arcRadius) {
     if (isBending) {
       var topPoint = new THREE.Vector3(0, 0, 0);
@@ -123,12 +149,19 @@
     }
   };
 
-  DildoGeometry.prototype._getBottomVertex = function (outlineBounds, isBending, bendAngle, arcRadius) {
+  /**
+   * Construct the bottom vertex that's used to closed the cylinder geometry at the bottom.
+   *
+   * @param {plotboilerplate.Bounds} outlineBounds
+   * @param {boolean} isBending
+   * @returns THREE.Vector
+   */
+  DildoGeometry.prototype._getBottomVertex = function (outlineBounds) {
     var bottomPoint = new THREE.Vector3(0, outlineBounds.max.y, 0);
-    if (isBending) {
-      // No need to bend the bottom point (no effect)
-      // this._bendVertex(bottomPoint, bendAngle, arcRadius, 0.0);
-    }
+    // if (isBending) {
+    // No need to bend the bottom point (no effect)
+    // this._bendVertex(bottomPoint, bendAngle, arcRadius, 0.0);
+    // }
     return bottomPoint;
   };
 
@@ -154,11 +187,13 @@
    * Build up the faces for this geometry.
    * @param {*} options
    */
-  DildoGeometry.prototype.buildFaces = function (options) {
+  DildoGeometry.prototype._buildFaces = function (options) {
     var baseShape = options.baseShape;
     var outlineSegmentCount = options.outlineSegmentCount;
-    var baseShapeSegmentCount = baseShape.vertices.length;
+    var closeTop = Boolean(options.closeTop);
+    var closeBottom = Boolean(options.closeBottom);
 
+    var baseShapeSegmentCount = baseShape.vertices.length;
     this.faceVertexUvs[0] = [];
 
     for (var s = 0; s < outlineSegmentCount; s++) {
@@ -175,79 +210,9 @@
       } // END for
     } // END for
 
-    // // Close at bottom.
-    // for (var i = 1; i < baseShapeSegmentCount; i++) {
-    //   this.makeFace3(
-    //     this.vertexMatrix[0][i - 1], // s=0
-    //     this.vertexMatrix[0][i],
-    //     this.bottomIndex
-    //   );
-    //   if (i + 1 == baseShapeSegmentCount) {
-    //     this.makeFace3(
-    //       this.vertexMatrix[0][0], // s=0
-    //       this.vertexMatrix[0][i],
-    //       this.bottomIndex
-    //     );
-    //   }
-    // }
-    // this._buildBottomFaces(baseShapeSegmentCount);
-    // // Close at top.
-    // for (var i = 1; i < baseShapeSegmentCount; i++) {
-    //   const lastIndex = this.vertexMatrix.length - 1;
-    //   this.makeFace3(
-    //     this.vertexMatrix[lastIndex][i - 1], // s=0
-    //     this.vertexMatrix[lastIndex][i],
-    //     this.topIndex
-    //   );
-    //   if (i + 1 == baseShapeSegmentCount) {
-    //     this.makeFace3(
-    //       this.vertexMatrix[lastIndex][0], // s=0
-    //       this.vertexMatrix[lastIndex][i],
-    //       this.topIndex
-    //     );
-    //   }
-    // }
-    // this._buildTopFaces(baseShapeSegmentCount);
-    this._buildEndFaces(this.bottomIndex, 0, baseShapeSegmentCount);
-    this._buildEndFaces(this.topIndex, this.vertexMatrix.length - 1, baseShapeSegmentCount);
+    closeBottom && this._buildEndFaces(this.bottomIndex, 0, baseShapeSegmentCount);
+    closeTop && this._buildEndFaces(this.topIndex, this.vertexMatrix.length - 1, baseShapeSegmentCount);
   };
-
-  // DildoGeometry.prototype._buildBottomFaces = function (baseShapeSegmentCount) {
-  //   // Close at bottom.
-  //   for (var i = 1; i < baseShapeSegmentCount; i++) {
-  //     this.makeFace3(
-  //       this.vertexMatrix[0][i - 1], // s=0
-  //       this.vertexMatrix[0][i],
-  //       this.bottomIndex
-  //     );
-  //     if (i + 1 == baseShapeSegmentCount) {
-  //       this.makeFace3(
-  //         this.vertexMatrix[0][0], // s=0
-  //         this.vertexMatrix[0][i],
-  //         this.bottomIndex
-  //       );
-  //     }
-  //   }
-  // };
-
-  // DildoGeometry.prototype._buildTopFaces = function (baseShapeSegmentCount) {
-  //   // Close at top.
-  //   for (var i = 1; i < baseShapeSegmentCount; i++) {
-  //     const lastIndex = this.vertexMatrix.length - 1;
-  //     this.makeFace3(
-  //       this.vertexMatrix[lastIndex][i - 1], // s=0
-  //       this.vertexMatrix[lastIndex][i],
-  //       this.topIndex
-  //     );
-  //     if (i + 1 == baseShapeSegmentCount) {
-  //       this.makeFace3(
-  //         this.vertexMatrix[lastIndex][0], // s=0
-  //         this.vertexMatrix[lastIndex][i],
-  //         this.topIndex
-  //       );
-  //     }
-  //   }
-  // };
 
   /**
    * Build the face and the top or bottom end of the geometry. Imagine the dildo geometry
@@ -274,7 +239,7 @@
    * @param {number} options.outlineSegmentCount
    * @param {number} options.vertices.length
    */
-  DildoGeometry.prototype.buildUVMapping = function (options) {
+  DildoGeometry.prototype._buildUVMapping = function (options) {
     var baseShape = options.baseShape;
     var outlineSegmentCount = options.outlineSegmentCount;
     var baseShapeSegmentCount = baseShape.vertices.length;

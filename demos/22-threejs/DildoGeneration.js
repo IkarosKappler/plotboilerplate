@@ -94,10 +94,17 @@
     var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
     bufferedGeometry.computeVertexNormals();
     var latheMesh = new THREE.Mesh(bufferedGeometry, material);
-    // var latheMesh = new THREE.Mesh(geometry, material);
-    // latheMesh.position.y = -100;
     this.camera.lookAt(new THREE.Vector3(20, 0, 150));
     this.camera.lookAt(latheMesh.position);
+
+    var spineGeometry = new THREE.Geometry();
+    geometry.spineVertices.forEach(function (spineVert) {
+      spineGeometry.vertices.push(spineVert.clone());
+    });
+
+    if (options.addSpine) {
+      addSpine(this, spineGeometry);
+    }
 
     if (options.performSlice) {
       this.__performPlaneSlice(latheMesh, geometry);
@@ -258,12 +265,12 @@
 
   // @param {THREE.PlaneGeometry}
   // var _self = this;
-  var makeAndAddSlice = function (thisGenerator, unbufferGeometry, plane, zOffset) {
+  var makeAndAddSlice = function (thisGenerator, unbufferedGeometry, plane, zOffset) {
     // Slice mesh into two
     // See https://github.com/tdhooper/threejs-slice-geometry
     var closeHoles = false;
     var sliceMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
-    var slicedGeometry = sliceGeometry(unbufferGeometry, plane, closeHoles);
+    var slicedGeometry = sliceGeometry(unbufferedGeometry, plane, closeHoles);
     var slicedMesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
     slicedMesh.position.y = -100;
     slicedMesh.position.z = zOffset;
@@ -294,6 +301,17 @@
     pointsMesh.position.z = -50;
     thisGenerator._addMesh(linesMesh);
     thisGenerator._addMesh(pointsMesh);
+  };
+
+  var addSpine = function (thisGenerator, spineGeometry) {
+    var spineMesh = new THREE.LineSegments(
+      spineGeometry,
+      new THREE.LineBasicMaterial({
+        color: 0xff8800
+      })
+    );
+    spineMesh.position.y = -100;
+    thisGenerator._addMesh(spineMesh);
   };
 
   window.DildoGeneration = DildoGeneration;
