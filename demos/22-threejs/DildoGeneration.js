@@ -111,7 +111,7 @@
       // this.__performCsgSlice(latheMesh, geometry, material);
     } else {
       latheMesh.position.y = -100;
-      latheMesh.userData.isExportable = true;
+      latheMesh.userData["isExportable"] = true;
       this._addMesh(latheMesh);
 
       if (options.showNormals) {
@@ -236,11 +236,15 @@
    **/
   DildoGeneration.prototype.generateSTL = function (options) {
     var exporter = new THREE.STLExporter();
-    // TODO: when splitted there is more than one geometry to export : )
-    var stlData = exporter.parse(this.geometries[0]);
-    // var stlData = exporter.parse(this.geometries);
+    var stlBuffer = []; // Array<string>
+    for (var i in this.geometries) {
+      if (this.geometries[i].userData["isExportable"] === true) {
+        var stlData = exporter.parse(this.geometries[i]);
+        stlBuffer.push(stlData);
+      }
+    }
     if (typeof options.onComplete === "function") {
-      options.onComplete(stlData);
+      options.onComplete(stlBuffer.join("\n\n"));
     } else {
       console.warn("STL data was generated but no 'onComplete' callback was defined.");
     }
@@ -274,7 +278,7 @@
     var slicedMesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
     slicedMesh.position.y = -100;
     slicedMesh.position.z = zOffset;
-    slicedMesh.userData.isExportable = true;
+    slicedMesh.userData["isExportable"] = true;
     thisGenerator._addMesh(slicedMesh);
   };
 
