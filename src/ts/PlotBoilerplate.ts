@@ -664,8 +664,8 @@ export class PlotBoilerplate {
   private _setToRetina(): void {
     this.config.autoDetectRetina = true;
     const pixelRatio: number = globalThis.devicePixelRatio || 1;
-    this.config.cssScaleX = this.config.cssScaleY = 1.0 / pixelRatio; // 0.5;
-    this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio; // 2.0;
+    this.config.cssScaleX = this.config.cssScaleY = 1.0 / pixelRatio;
+    this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio;
     this.resizeCanvas();
     this.updateCSSscale();
   }
@@ -1470,7 +1470,7 @@ export class PlotBoilerplate {
    **/
   private getAvailableContainerSpace(): XYDimension {
     const _self: PlotBoilerplate = this;
-    const container: HTMLElement = (_self.canvas.parentNode as unknown) as HTMLElement; // Element | Document | DocumentFragment;
+    const container: HTMLElement = _self.canvas.parentNode as unknown as HTMLElement; // Element | Document | DocumentFragment;
     // var canvas : HTMLCanvasElement = _self.canvas;
     _self.canvas.style.display = "none";
     /* var
@@ -1830,7 +1830,7 @@ export class PlotBoilerplate {
     var zoomStep: number = 1.25; // Make configurable?
     // CHANGED replaced _self by this
     const _self: PlotBoilerplate = this;
-    const we: WheelEvent = (e as unknown) as WheelEvent;
+    const we: WheelEvent = e as unknown as WheelEvent;
     if (we.deltaY < 0) {
       _self.setZoom(_self.config.scaleX * zoomStep, _self.config.scaleY * zoomStep, new Vertex(e.params.pos.x, e.params.pos.y));
     } else if (we.deltaY > 0) {
@@ -1849,10 +1849,14 @@ export class PlotBoilerplate {
    * @return {void}
    **/
   adjustOffset(redraw?: boolean) {
-    this.draw.offset.x = this.fill.offset.x = this.config.offsetX =
-      this.canvasSize.width * (this.config.offsetAdjustXPercent / 100);
-    this.draw.offset.y = this.fill.offset.y = this.config.offsetY =
-      this.canvasSize.height * (this.config.offsetAdjustYPercent / 100);
+    this.draw.offset.x =
+      this.fill.offset.x =
+      this.config.offsetX =
+        this.canvasSize.width * (this.config.offsetAdjustXPercent / 100);
+    this.draw.offset.y =
+      this.fill.offset.y =
+      this.config.offsetY =
+        this.canvasSize.height * (this.config.offsetAdjustYPercent / 100);
     if (redraw) {
       this.redraw();
     }
@@ -1950,7 +1954,7 @@ export class PlotBoilerplate {
                 );
                 if (draggedElement && draggedElement.typeName == "vertex") {
                   var draggingVertex: Vertex = _self.vertices[draggedElement.vindex];
-                  var fakeEvent: VertEvent = ({
+                  var fakeEvent: VertEvent = {
                     params: {
                       isTouchEvent: true,
                       dragAmount: { x: 0, y: 0 },
@@ -1959,7 +1963,7 @@ export class PlotBoilerplate {
                       mouseDragPos: touchDownPos.clone(),
                       vertex: draggingVertex
                     }
-                  } as unknown) as VertEvent;
+                  } as unknown as VertEvent;
                   _self.draggedElements = [draggedElement];
                   draggingVertex.listeners.fireDragStartEvent(fakeEvent);
                 }
@@ -1976,7 +1980,7 @@ export class PlotBoilerplate {
                   if (!_self.vertices[draggedElement.vindex].attr.draggable) return;
                   _self.vertices[draggedElement.vindex].add(diff);
                   var draggingVertex: Vertex = _self.vertices[draggedElement.vindex];
-                  var fakeEvent: VertEvent = ({
+                  var fakeEvent: VertEvent = {
                     isTouchEvent: true,
                     params: {
                       dragAmount: diff.clone(),
@@ -1985,7 +1989,7 @@ export class PlotBoilerplate {
                       mouseDragPos: touchDownPos.clone().add(diff),
                       vertex: draggingVertex
                     }
-                  } as unknown) as VertEvent;
+                  } as unknown as VertEvent;
                   draggingVertex.listeners.fireDragEvent(fakeEvent);
                   _self.redraw();
                 }
@@ -1997,7 +2001,7 @@ export class PlotBoilerplate {
                 _self.setOffset(
                   _self.draw.offset
                     .clone()
-                    .addXY(((evt as unknown) as TouchMoveEvent).deltaX, ((evt as unknown) as TouchMoveEvent).deltaY)
+                    .addXY((evt as unknown as TouchMoveEvent).deltaX, (evt as unknown as TouchMoveEvent).deltaY)
                 ); // Apply zoom?
                 _self.redraw();
               }
@@ -2006,7 +2010,7 @@ export class PlotBoilerplate {
               // Note: e.touches.length is 0 here
               if (draggedElement && draggedElement.typeName == "vertex") {
                 var draggingVertex: Vertex = _self.vertices[draggedElement.vindex];
-                var fakeEvent: VertEvent = ({
+                var fakeEvent: VertEvent = {
                   isTouchEvent: true,
                   params: {
                     dragAmount: { x: 0, y: 0 },
@@ -2015,7 +2019,7 @@ export class PlotBoilerplate {
                     mouseDragPos: touchDownPos.clone(),
                     vertex: draggingVertex
                   }
-                } as unknown) as VertEvent;
+                } as unknown as VertEvent;
                 // Check if vertex was moved
                 if (touchMovePos && touchDownPos && touchDownPos.distance(touchMovePos) < 0.001) {
                   // if( e.touches.length == 1 && diff.x == 0 && diff.y == 0 ) {

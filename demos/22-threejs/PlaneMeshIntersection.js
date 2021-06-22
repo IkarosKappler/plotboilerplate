@@ -15,7 +15,7 @@
    */
   var PlaneMeshIntersection = function () {
     //   Vector3[]
-    this.pointsOfIntersection = []; // new THREE.Geometry();
+    this.pointsOfIntersection = [];
 
     this.a = new THREE.Vector3();
     this.b = new THREE.Vector3();
@@ -63,11 +63,8 @@
   };
 
   PlaneMeshIntersection.prototype.__setPointOfIntersection = function (line, plane) {
-    // this.pointOfIntersection = plane.intersectLine(line, new THREE.Vector3());
-    var intersectionPoint = plane.intersectLine(line, this.pointOfIntersection); // new THREE.Vector3());
+    var intersectionPoint = plane.intersectLine(line, this.pointOfIntersection);
     if (intersectionPoint) {
-      // this.pointOfIntersection) {
-      //   this.pointsOfIntersection.vertices.push(intersectionPoint.clone()); // this.pointOfIntersection.clone());
       this.pointsOfIntersection.push(intersectionPoint.clone());
     }
   };

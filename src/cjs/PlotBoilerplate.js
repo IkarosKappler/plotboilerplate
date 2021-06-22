@@ -469,8 +469,8 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype._setToRetina = function () {
         this.config.autoDetectRetina = true;
         var pixelRatio = globalThis.devicePixelRatio || 1;
-        this.config.cssScaleX = this.config.cssScaleY = 1.0 / pixelRatio; // 0.5;
-        this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio; // 2.0;
+        this.config.cssScaleX = this.config.cssScaleY = 1.0 / pixelRatio;
+        this.config.canvasWidthFactor = this.config.canvasHeightFactor = pixelRatio;
         this.resizeCanvas();
         this.updateCSSscale();
     };
@@ -1586,10 +1586,14 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.adjustOffset = function (redraw) {
-        this.draw.offset.x = this.fill.offset.x = this.config.offsetX =
-            this.canvasSize.width * (this.config.offsetAdjustXPercent / 100);
-        this.draw.offset.y = this.fill.offset.y = this.config.offsetY =
-            this.canvasSize.height * (this.config.offsetAdjustYPercent / 100);
+        this.draw.offset.x =
+            this.fill.offset.x =
+                this.config.offsetX =
+                    this.canvasSize.width * (this.config.offsetAdjustXPercent / 100);
+        this.draw.offset.y =
+            this.fill.offset.y =
+                this.config.offsetY =
+                    this.canvasSize.height * (this.config.offsetAdjustYPercent / 100);
         if (redraw) {
             this.redraw();
         }

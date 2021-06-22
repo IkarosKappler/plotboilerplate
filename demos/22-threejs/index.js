@@ -68,11 +68,14 @@
         closeBottom: true,
         showNormals: false,
         normalsLength: 10.0,
+        showPerpendiculars: false,
+        normalizePerpendiculars: true,
         useTextureImage: true,
         textureImagePath: "wood.png",
         wireframe: false,
         addSpine: false,
         performSlice: false,
+        makeHollow: false,
         exportSTL: function () {
           exportSTL();
         },
@@ -316,6 +319,10 @@
       // prettier-ignore
       fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
       // prettier-ignore
+      fold0.add(config, "showPerpendiculars").onChange( function() { rebuild() } ).name('showPerpendiculars').title('Show the meshes perpendicular on the XZ plane.');
+      // prettier-ignore
+      fold0.add(config, "normalizePerpendiculars").onChange( function() { rebuild() } ).name('normalizePerpendiculars').title('Normalize the XZ perpendiculars (recommended).');
+      // prettier-ignore
       fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image?');
       // prettier-ignore
       fold0.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model?');
@@ -323,6 +330,8 @@
       fold0.add(config, "addSpine").onChange( function() { rebuild() } ).name('addSpine').title("Add the model's spine?");
       // prettier-ignore
       fold0.add(config, "performSlice").onChange( function() { rebuild() } ).name('performSlice').title('Slice the model along the x axis?');
+      // prettier-ignore
+      fold0.add(config, "makeHollow").onChange( function() { rebuild() } ).name('makeHollow').title('Make a hollow mold?');
 
       var fold1 = gui.addFolder("Export");
       // prettier-ignore

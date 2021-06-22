@@ -86,19 +86,21 @@
 
     var baseRadius = options.outline.getBounds().width;
     var baseShape = mkCircularPolygon(baseRadius, options.shapeSegmentCount);
-    var geometry = new DildoGeometry(Object.assign({ baseShape: baseShape }, options));
-    var useTextureImage = options.useTextureImage && typeof options.textureImagePath != "undefined";
-    var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
-    var wireframe = typeof options.wireframe != "undefined" ? options.wireframe : null;
+    var dildoGeometry = new DildoGeometry(Object.assign({ baseShape: baseShape }, options));
+    var useTextureImage = options.useTextureImage && typeof options.textureImagePath !== "undefined";
+    var textureImagePath = typeof options.textureImagePath !== "undefined" ? options.textureImagePath : null;
+    var wireframe = typeof options.wireframe !== "undefined" ? options.wireframe : null;
+    // var normalizePerpendiculars = Boolean(options.normalizePerpendiculars);
+    // var normalsLength = typeof options.normalsLength !== "undefined" ? options.normalsLength : 10.0;
     var material = this._createMaterial(useTextureImage, wireframe, textureImagePath);
-    var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(geometry);
+    var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(dildoGeometry);
     bufferedGeometry.computeVertexNormals();
     var latheMesh = new THREE.Mesh(bufferedGeometry, material);
     this.camera.lookAt(new THREE.Vector3(20, 0, 150));
     this.camera.lookAt(latheMesh.position);
 
     var spineGeometry = new THREE.Geometry();
-    geometry.spineVertices.forEach(function (spineVert) {
+    dildoGeometry.spineVertices.forEach(function (spineVert) {
       spineGeometry.vertices.push(spineVert.clone());
     });
 
@@ -107,7 +109,7 @@
     }
 
     if (options.performSlice) {
-      this.__performPlaneSlice(latheMesh, geometry);
+      this.__performPlaneSlice(latheMesh, dildoGeometry);
       // this.__performCsgSlice(latheMesh, geometry, material);
     } else {
       latheMesh.position.y = -100;
@@ -119,6 +121,11 @@
         this.scene.add(vnHelper);
         this.geometries.push(vnHelper);
       }
+    }
+
+    // Add perpendicular path?
+    if (options.showPerpendiculars) {
+      addPerpendicularPath(this, dildoGeometry);
     }
   };
 
@@ -316,6 +323,34 @@
     );
     spineMesh.position.y = -100;
     thisGenerator._addMesh(spineMesh);
+  };
+
+  var addPerpendicularPath = function (thisGenerator, unbufferedLatheGeometry) {
+    var outerPerpGeometry = new THREE.Geometry();
+    unbufferedLatheGeometry.outerPerpVertices.forEach(function (perpVert) {
+      outerPerpGeometry.vertices.push(perpVert.clone());
+    });
+    var outerPerpMesh = new THREE.LineSegments(
+      outerPerpGeometry,
+      new THREE.LineBasicMaterial({
+        color: 0xff0000
+      })
+    );
+    outerPerpMesh.position.y = -100;
+    thisGenerator._addMesh(outerPerpMesh);
+
+    var innerPerpGeometry = new THREE.Geometry();
+    unbufferedLatheGeometry.innerPerpVertices.forEach(function (perpVert) {
+      innerPerpGeometry.vertices.push(perpVert.clone());
+    });
+    var innerPerpMesh = new THREE.LineSegments(
+      innerPerpGeometry,
+      new THREE.LineBasicMaterial({
+        color: 0x00ff00
+      })
+    );
+    innerPerpMesh.position.y = -100;
+    thisGenerator._addMesh(innerPerpMesh);
   };
 
   window.DildoGeneration = DildoGeneration;
