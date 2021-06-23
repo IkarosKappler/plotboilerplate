@@ -27,6 +27,8 @@
     this.spineVertices = []; // Array<THREE.Vector>
     this.outerPerps = []; // Array<Three.Line3>
     this.innerPerps = []; // Array<Three.Line3>
+    this.leftFlatIndices = []; // Array<number>
+    this.rightFlatIndices = []; // Array<number>
 
     this._buildVertices(options);
     this._buildFaces(options);
@@ -99,13 +101,9 @@
     this.vertices.push(bottomVertex);
 
     if (makeHollow) {
-      this._makeHollow(
-        outline,
-        outlineBounds,
-        outlineSegmentCount,
-        baseShape.vertices.length,
-        shapeBounds.width / 2.0 + hollowStrength
-      );
+      // Construct the left and the right flat bounds (used to make a casting mould)
+      this.__makeFlatSides(shapeBounds.width / 2.0 + hollowStrength);
+      this.__makeHollow();
     }
   };
 
@@ -254,16 +252,19 @@
   /**
    * Pre: perpLines are already built.
    *
+   * Note: the last indices in the array will show to the point equivalent to the bottom point.
+   *
    * @param {*} options
    */
-  DildoGeometry.prototype._makeHollow = function (
-    outline,
-    outlineBounds,
-    outlineSegmentCount,
-    baseShapeSegmentCount,
-    shapeRadius
-  ) {
-    // Use the earcut algorithm here
+  DildoGeometry.prototype.__makeFlatSides = function (shapeRadius) {
+    // We are using the earcut algorithm here
+    //  + create an outline of the perpendicular end points
+    //  + shift the outline to the left bound of the mesh
+    //  + run earcut
+    //  + add all triangle faces
+    //  + create a copy of the vertices and the triangulation the the right side
+
+    // Step 1: serialize the 2d vertex data along the perpendicular path
     var polygonData = [];
     for (var i = 0; i < this.innerPerps.length; i++) {
       polygonData.push(this.innerPerps[i].end.x);
@@ -273,32 +274,49 @@
       polygonData.push(this.outerPerps[i].end.x);
       polygonData.push(this.outerPerps[i].end.y);
     }
-    // Also add base point
+    // Also add base point at last index
     polygonData.push(this.vertices[this.bottomIndex].x);
     polygonData.push(this.vertices[this.bottomIndex].y);
 
-    var polygonIndices = [];
+    // Step 2: Add the 3d vertices to this geometry
     var _self = this;
     for (var i = 0; i < polygonData.length; i += 2) {
-      polygonIndices.push(_self.vertices.length);
+      this.leftFlatIndices.push(_self.vertices.length);
       _self.vertices.push(new THREE.Vector3(polygonData[i], polygonData[i + 1], shapeRadius));
     }
+    for (var i = 0; i < polygonData.length; i += 2) {
+      this.rightFlatIndices.push(_self.vertices.length);
+      _self.vertices.push(new THREE.Vector3(polygonData[i], polygonData[i + 1], -shapeRadius));
+    }
 
+    // Step 3: run Earcut
     var triangleIndices = earcut(polygonData);
-    console.log(triangleIndices, polygonData);
 
-    // var triangles = [];
+    // Step 4: process the earcut result;
+    //         add the retrieved triangles as geometry faces.
     for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
       var a = triangleIndices[i];
       var b = triangleIndices[i + 1];
       var c = triangleIndices[i + 2];
-      // var tri = new Triangle( intersectionPolygon.vertices[a],
-      //       intersectionPolygon.vertices[b],
-      //       intersectionPolygon.vertices[c] );
-      // triangles.push( tri );
-      // pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgba(0,128,255,0.5)', 1 );
-      this.makeFace3(polygonIndices[a], polygonIndices[b], polygonIndices[c]);
-      // this.faceVertexUvs[0].push([new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(0.5, 1)]);
+      this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
+      this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[b], this.rightFlatIndices[c]);
+    }
+  };
+
+  /**
+   * Pre: flatSides are made
+   *
+   * @param {*} options
+   */
+  DildoGeometry.prototype.__makeHollow = function () {
+    // Connect left and right side (important: ignore bottom vertex at last index)
+    for (var i = 1; i + 1 < this.leftFlatIndices.length; i++) {
+      this.makeFace4(
+        this.leftFlatIndices[i - 1],
+        this.leftFlatIndices[i],
+        this.rightFlatIndices[i - 1],
+        this.rightFlatIndices[i]
+      );
     }
   };
 
