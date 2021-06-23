@@ -25,12 +25,17 @@
     this.topIndex = -1;
     this.bottomIndex = -1;
     this.spineVertices = []; // Array<THREE.Vector>
-    this.outerPerpVertices = []; // Array<Three.V3>
-    this.innerPerpVertices = []; // Array<Three.V3>
+    this.outerPerps = []; // Array<Three.Line3>
+    this.innerPerps = []; // Array<Three.Line3>
 
     this._buildVertices(options);
     this._buildFaces(options);
     this._buildUVMapping(options);
+
+    // Fill up missing UVs to avoid warning
+    while (this.faceVertexUvs[0].length < this.faces.length) {
+      this.faceVertexUvs[0].push([new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(0.5, 1)]);
+    }
   };
 
   /**
@@ -84,6 +89,15 @@
       );
     } // END for
 
+    var topVertex = this._getTopVertex(outlineBounds, isBending, bendAngleRad, arcRadius);
+    var bottomVertex = this._getBottomVertex(outlineBounds);
+
+    this.topIndex = this.vertices.length;
+    this.vertices.push(topVertex);
+
+    this.bottomIndex = this.vertices.length;
+    this.vertices.push(bottomVertex);
+
     if (makeHollow) {
       this._makeHollow(
         outline,
@@ -93,15 +107,6 @@
         shapeBounds.width / 2.0 + hollowStrength
       );
     }
-
-    var topVertex = this._getTopVertex(outlineBounds, isBending, bendAngleRad, arcRadius);
-    var bottomVertex = this._getBottomVertex(outlineBounds);
-
-    this.topIndex = this.vertices.length;
-    this.vertices.push(topVertex);
-
-    this.bottomIndex = this.vertices.length;
-    this.vertices.push(bottomVertex);
   };
 
   /**
@@ -228,27 +233,26 @@
 
       var perpDifference = new THREE.Vector3(outlineVert.x - perpendicularVert.x, outlineVert.y - perpendicularVert.y, 0);
 
-      if (i == 0) var tmpVert = new THREE.Vector3(vert.x - perpendicularVert.x, vert.y + perpendicularVert.y, 0);
-      else var tmpVert = new THREE.Vector3(vert.x + perpendicularVert.x, vert.y + perpendicularVert.y, 0);
-      rotateVert(tmpVert, bendAngle * heightT, vert.x, vert.y);
+      if (i == 0) var endVert = new THREE.Vector3(vert.x - perpendicularVert.x, vert.y + perpendicularVert.y, 0);
+      else var endVert = new THREE.Vector3(vert.x + perpendicularVert.x, vert.y + perpendicularVert.y, 0);
+      rotateVert(endVert, bendAngle * heightT, vert.x, vert.y);
       var outerPerpVert = vert.clone();
       outerPerpVert.x += perpDifference.x;
       outerPerpVert.y += perpDifference.y;
       outerPerpVert.z += perpDifference.z;
       if (normalizePerpendiculars) {
-        normalizeVectorXY(vert, tmpVert, normalsLength);
+        normalizeVectorXY(vert, endVert, normalsLength);
       }
       if (i == 0) {
-        this.outerPerpVertices.push(vert.clone());
-        this.outerPerpVertices.push(tmpVert);
+        this.outerPerps.push(new THREE.Line3(vert, endVert));
       } else {
-        this.innerPerpVertices.push(vert.clone());
-        this.innerPerpVertices.push(tmpVert);
+        this.innerPerps.push(new THREE.Line3(vert, endVert));
       }
     } // END for
   };
 
   /**
+   * Pre: perpLines are already built.
    *
    * @param {*} options
    */
@@ -259,7 +263,43 @@
     baseShapeSegmentCount,
     shapeRadius
   ) {
-    // ...
+    // Use the earcut algorithm here
+    var polygonData = [];
+    for (var i = 0; i < this.innerPerps.length; i++) {
+      polygonData.push(this.innerPerps[i].end.x);
+      polygonData.push(this.innerPerps[i].end.y);
+    }
+    for (var i = this.outerPerps.length - 1; i >= 0; i--) {
+      polygonData.push(this.outerPerps[i].end.x);
+      polygonData.push(this.outerPerps[i].end.y);
+    }
+    // Also add base point
+    polygonData.push(this.vertices[this.bottomIndex].x);
+    polygonData.push(this.vertices[this.bottomIndex].y);
+
+    var polygonIndices = [];
+    var _self = this;
+    for (var i = 0; i < polygonData.length; i += 2) {
+      polygonIndices.push(_self.vertices.length);
+      _self.vertices.push(new THREE.Vector3(polygonData[i], polygonData[i + 1], shapeRadius));
+    }
+
+    var triangleIndices = earcut(polygonData);
+    console.log(triangleIndices, polygonData);
+
+    // var triangles = [];
+    for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
+      var a = triangleIndices[i];
+      var b = triangleIndices[i + 1];
+      var c = triangleIndices[i + 2];
+      // var tri = new Triangle( intersectionPolygon.vertices[a],
+      //       intersectionPolygon.vertices[b],
+      //       intersectionPolygon.vertices[c] );
+      // triangles.push( tri );
+      // pb.draw.polyline( [tri.a, tri.b, tri.c], false, 'rgba(0,128,255,0.5)', 1 );
+      this.makeFace3(polygonIndices[a], polygonIndices[b], polygonIndices[c]);
+      // this.faceVertexUvs[0].push([new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(0.5, 1)]);
+    }
   };
 
   /**

@@ -125,7 +125,7 @@
 
     // Add perpendicular path?
     if (options.showPerpendiculars) {
-      addPerpendicularPath(this, dildoGeometry);
+      addPerpendicularPaths(this, dildoGeometry);
     }
   };
 
@@ -325,32 +325,25 @@
     thisGenerator._addMesh(spineMesh);
   };
 
-  var addPerpendicularPath = function (thisGenerator, unbufferedLatheGeometry) {
+  var addPerpendicularPaths = function (thisGenerator, unbufferedLatheGeometry) {
+    addPerpendicularPath(thisGenerator, unbufferedLatheGeometry.outerPerps, 0xff0000);
+    addPerpendicularPath(thisGenerator, unbufferedLatheGeometry.innerPerps, 0x00ff00);
+  };
+
+  var addPerpendicularPath = function (thisGenerator, perpLines, materialColor) {
     var outerPerpGeometry = new THREE.Geometry();
-    unbufferedLatheGeometry.outerPerpVertices.forEach(function (perpVert) {
-      outerPerpGeometry.vertices.push(perpVert.clone());
+    perpLines.forEach(function (perpLine) {
+      outerPerpGeometry.vertices.push(perpLine.start.clone());
+      outerPerpGeometry.vertices.push(perpLine.end.clone());
     });
     var outerPerpMesh = new THREE.LineSegments(
       outerPerpGeometry,
       new THREE.LineBasicMaterial({
-        color: 0xff0000
+        color: materialColor
       })
     );
     outerPerpMesh.position.y = -100;
     thisGenerator._addMesh(outerPerpMesh);
-
-    var innerPerpGeometry = new THREE.Geometry();
-    unbufferedLatheGeometry.innerPerpVertices.forEach(function (perpVert) {
-      innerPerpGeometry.vertices.push(perpVert.clone());
-    });
-    var innerPerpMesh = new THREE.LineSegments(
-      innerPerpGeometry,
-      new THREE.LineBasicMaterial({
-        color: 0x00ff00
-      })
-    );
-    innerPerpMesh.position.y = -100;
-    thisGenerator._addMesh(innerPerpMesh);
   };
 
   window.DildoGeneration = DildoGeneration;
