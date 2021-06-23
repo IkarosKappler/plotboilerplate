@@ -25,8 +25,8 @@
     this.topIndex = -1;
     this.bottomIndex = -1;
     this.spineVertices = []; // Array<THREE.Vector>
-    this.outerPerpVertices = []; // Array<Three.Vector>
-    this.innerPerpVertices = []; // Array<Three.Vector>
+    this.outerPerpVertices = []; // Array<Three.V3>
+    this.innerPerpVertices = []; // Array<Three.V3>
 
     this._buildVertices(options);
     this._buildFaces(options);
@@ -68,13 +68,13 @@
       var outlineVert = outline.getPointAt(t);
       var perpendicularVert = outline.getPerpendicularAt(t);
       var heightT = (outlineBounds.max.y - outlineVert.y) / shapeHeight;
-      this.buildSlice(
+      this.__buildSlice(baseShape, outlineBounds, outlineVert, s, heightT, isBending, bendAngleRad, arcRadius);
+      this.__buildSpine(shapeCenter, outlineBounds, outlineVert, heightT, isBending, bendAngleRad, arcRadius);
+      this.__buildPerps(
         baseShape,
-        shapeCenter,
         outlineBounds,
         outlineVert,
         perpendicularVert,
-        s,
         heightT,
         isBending,
         bendAngleRad,
@@ -119,22 +119,17 @@
    * @param {number=} normalsLength
    * @return { yMin: number, yMax : number }
    */
-  DildoGeometry.prototype.buildSlice = function (
+  DildoGeometry.prototype.__buildSlice = function (
     baseShape,
-    shapeCenter,
     outlineBounds,
     outlineVert,
-    perpendicularVert,
     sliceIndex,
     heightT,
     isBending,
     bendAngle,
-    arcRadius,
-    normalizePerpendiculars,
-    normalsLength
+    arcRadius
   ) {
     var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
-    var baseHalfTurnIndex = Math.floor(baseShape.vertices.length / 2);
     for (var i = 0; i < baseShape.vertices.length; i++) {
       var shapeVert = baseShape.vertices[i];
       if (isBending) {
@@ -150,62 +145,34 @@
         if (i == 0) yMin = vert.y;
         if (i + 1 == baseShape.vertices.length) yMax = vert.y;
       }
-
-      // TODO: these two almost identical blocks can be hamonized
-      if (i == 0) {
-        var perpDifference = new THREE.Vector3(outlineVert.x - perpendicularVert.x, outlineVert.y - perpendicularVert.y, 0);
-        // console.log(perpDifference);
-
-        var tmpVert = new THREE.Vector3(vert.x - perpendicularVert.x, vert.y + perpendicularVert.y, 0);
-        rotateVert(tmpVert, bendAngle * heightT, vert.x, vert.y);
-        var outerPerpVert = vert.clone();
-        outerPerpVert.x += perpDifference.x;
-        outerPerpVert.y += perpDifference.y;
-        outerPerpVert.z += perpDifference.z;
-        if (normalizePerpendiculars) {
-          normalizeVectorXY(vert, tmpVert, normalsLength);
-        }
-        this.outerPerpVertices.push(vert.clone());
-        this.outerPerpVertices.push(tmpVert);
-        // console.log(vert, perpDifference, outerPerpVert, perpendicularVert);
-      }
-      if (i == baseHalfTurnIndex) {
-        var perpDifference = new THREE.Vector3(outlineVert.x - perpendicularVert.x, outlineVert.y - perpendicularVert.y, 0);
-        // console.log(perpDifference);
-
-        var tmpVert = new THREE.Vector3(vert.x + perpendicularVert.x, vert.y + perpendicularVert.y, 0);
-        rotateVert(tmpVert, bendAngle * heightT, vert.x, vert.y);
-        var outerPerpVert = vert.clone();
-        outerPerpVert.x += perpDifference.x;
-        outerPerpVert.y += perpDifference.y;
-        outerPerpVert.z += perpDifference.z;
-        if (normalizePerpendiculars) {
-          normalizeVectorXY(vert, tmpVert, normalsLength);
-        }
-        this.innerPerpVertices.push(vert.clone());
-        this.innerPerpVertices.push(tmpVert);
-        // console.log(vert, perpDifference, outerPerpVert, perpendicularVert);
-      }
     } // END for
+  };
 
-    // Build perpendicular path (inner and outer)
-    // var perpXPct = (outlineBounds.max.x - perpendicularVert.x) / outlineBounds.width;
-    // var shapeVert = baseShape.vertices[0];
-    // if (isBending) {
-    //   var perpVert = new THREE.Vector3(shapeVert.x * perpXPct, 0, shapeVert.y * perpXPct);
-    //   this._bendVertex(perpVert, bendAngle, arcRadius, heightT);
-    //   perpVert.y += outlineBounds.max.y;
-    // } else {
-    //   var perpVert = new THREE.Vector3(shapeVert.x * perpXPct, outlineVert.y, shapeVert.y * perpXPct);
-    // }
-    // this.outerPerpVertices.push(perpVert);
-
-    // var perpDifference = new THREE.Vector(
-    //   outlineVert.x - perpendicularVert.x,
-    //   outlineVert.y - perpendicularVert.y,
-    //   outlineVert.z - perpendicularVert.z
-    // );
-    // rotateVert(perpDifference, bendAngle);
+  /**
+   *
+   * @param {Polygon} baseShape
+   * @param {Vertex} shapeCenter
+   * @param {Bounds} outlineBounds
+   * @param {THREE.Vertex3} outlineVert
+   * @param {number} sliceIndex
+   * @param {number} heightT A value between 0.0 and 1.0 (inclusive) to indicate the height position.
+   * @param {boolean} isBending
+   * @param {number=} bendAngle Must not be null, NaN or infinity if `isBending==true`
+   * @param {number=} arcRadius
+   * @param {boolean=} normalizePerpendiculars
+   * @param {number=} normalsLength
+   * @return { yMin: number, yMax : number }
+   */
+  DildoGeometry.prototype.__buildSpine = function (
+    shapeCenter,
+    outlineBounds,
+    outlineVert,
+    heightT,
+    isBending,
+    bendAngle,
+    arcRadius
+  ) {
+    var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
 
     // Find shape's center point to construct a spine
     var spineVert = shapeCenter.clone();
@@ -216,9 +183,69 @@
     } else {
       var vert = new THREE.Vector3(spineVert.x * outlineXPct, outlineVert.y, spineVert.y * outlineXPct);
     }
-    // var spineIndex = this.vertices.length;
     this.spineVertices.push(vert);
-    // this.spineIndices.push(spineIndex);
+  };
+
+  /**
+   *
+   * @param {Polygon} baseShape
+   * @param {Vertex} shapeCenter
+   * @param {Bounds} outlineBounds
+   * @param {THREE.Vertex3} outlineVert
+   * @param {number} sliceIndex
+   * @param {number} heightT A value between 0.0 and 1.0 (inclusive) to indicate the height position.
+   * @param {boolean} isBending
+   * @param {number=} bendAngle Must not be null, NaN or infinity if `isBending==true`
+   * @param {number=} arcRadius
+   * @param {boolean=} normalizePerpendiculars
+   * @param {number=} normalsLength
+   * @return { yMin: number, yMax : number }
+   */
+  DildoGeometry.prototype.__buildPerps = function (
+    baseShape,
+    outlineBounds,
+    outlineVert,
+    perpendicularVert,
+    heightT,
+    isBending,
+    bendAngle,
+    arcRadius,
+    normalizePerpendiculars,
+    normalsLength
+  ) {
+    var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
+    var halfIndices = [0, Math.floor(baseShape.vertices.length / 2)];
+    for (var j = 0; j < halfIndices.length; j++) {
+      var i = halfIndices[j];
+      var shapeVert = baseShape.vertices[i];
+      if (isBending) {
+        var vert = new THREE.Vector3(shapeVert.x * outlineXPct, 0, shapeVert.y * outlineXPct);
+        this._bendVertex(vert, bendAngle, arcRadius, heightT);
+        vert.y += outlineBounds.max.y;
+      } else {
+        var vert = new THREE.Vector3(shapeVert.x * outlineXPct, outlineVert.y, shapeVert.y * outlineXPct);
+      }
+
+      var perpDifference = new THREE.Vector3(outlineVert.x - perpendicularVert.x, outlineVert.y - perpendicularVert.y, 0);
+
+      if (i == 0) var tmpVert = new THREE.Vector3(vert.x - perpendicularVert.x, vert.y + perpendicularVert.y, 0);
+      else var tmpVert = new THREE.Vector3(vert.x + perpendicularVert.x, vert.y + perpendicularVert.y, 0);
+      rotateVert(tmpVert, bendAngle * heightT, vert.x, vert.y);
+      var outerPerpVert = vert.clone();
+      outerPerpVert.x += perpDifference.x;
+      outerPerpVert.y += perpDifference.y;
+      outerPerpVert.z += perpDifference.z;
+      if (normalizePerpendiculars) {
+        normalizeVectorXY(vert, tmpVert, normalsLength);
+      }
+      if (i == 0) {
+        this.outerPerpVertices.push(vert.clone());
+        this.outerPerpVertices.push(tmpVert);
+      } else {
+        this.innerPerpVertices.push(vert.clone());
+        this.innerPerpVertices.push(tmpVert);
+      }
+    } // END for
   };
 
   /**
@@ -232,60 +259,8 @@
     baseShapeSegmentCount,
     shapeRadius
   ) {
-    // var halfShapeIndex = Math.floor(baseShapeSegmentCount / 2);
-    // for (var s = 0; s < outlineSegmentCount; s++) {
-    //   var t = Math.min(1.0, Math.max(0.0, s / (outlineSegmentCount - 1)));
-    //   var outlineVert = outline.getPointAt(t);
-    //   var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
-    //   var perpendicularVert = outline.getPerpendicularAt(t);
-    //   // var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
-    // }
+    // ...
   };
-  // DildoGeometry.prototype._x_makeHollow = function (
-  //   outline,
-  //   outlineBounds,
-  //   outlineSegmentCount,
-  //   baseShapeSegmentCount,
-  //   shapeRadius
-  // ) {
-  //   // var shapeRadius = 100;
-  //   var halfShapeIndex = Math.floor(baseShapeSegmentCount / 2);
-  //   var mouldOutlines = []; // Array<Array<THREE.Vector>>
-  //   var scaleFrom = function (vertex, factor, center) {
-  //     // vertex.x += (vertex.x - center.x) * factor;
-  //     // vertex.y += (vertex.y - center.y) * factor;
-  //     // vertex.z += (vertex.z - center.z) * factor;
-  //     return vertex;
-  //   };
-  //   for (var s = 0; s < this.spineVertices.length; s++) {
-  //     var centerVert = this.spineVertices[s];
-  //     var outerBendVert = this.vertices[this.vertexMatrix[s][0]];
-  //     var innerBendVert = this.vertices[this.vertexMatrix[s][halfShapeIndex]];
-
-  //     var leftOuterVert = scaleFrom(outerBendVert.clone(), 1.2, centerVert);
-  //     var rightOuterVert = scaleFrom(outerBendVert.clone(), 1.2, centerVert);
-  //     leftOuterVert.z += shapeRadius;
-  //     rightOuterVert.z -= shapeRadius;
-
-  //     var leftInnerVert = scaleFrom(innerBendVert.clone(), 1.2, centerVert);
-  //     var rightInnerVert = scaleFrom(innerBendVert.clone(), 1.2, centerVert);
-  //     leftInnerVert.z += shapeRadius;
-  //     rightInnerVert.z -= shapeRadius;
-
-  //     var baseIndex = this.vertices.length;
-  //     mouldOutlines.push([baseIndex, baseIndex + 1, baseIndex + 2, baseIndex + 3]);
-
-  //     this.vertices.push(leftOuterVert, rightOuterVert, leftInnerVert, rightInnerVert);
-
-  //     if (s > 0) {
-  //       // Outer
-  //       this.makeFace4(baseIndex, baseIndex - 4, baseIndex + 2, baseIndex - 4 + 2);
-
-  //       // Inner
-  //       this.makeFace4(baseIndex + 1, baseIndex - 4 + 1, baseIndex + 2 + 1, baseIndex - 4 + 2 + 1);
-  //     }
-  //   }
-  // };
 
   /**
    * Construct the top vertex that's used to closed the cylinder geometry at the top.
