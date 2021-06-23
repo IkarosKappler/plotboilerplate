@@ -299,7 +299,7 @@
       var b = triangleIndices[i + 1];
       var c = triangleIndices[i + 2];
       this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
-      this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[b], this.rightFlatIndices[c]);
+      this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[c], this.rightFlatIndices[b]);
     }
   };
 
@@ -312,10 +312,10 @@
     // Connect left and right side (important: ignore bottom vertex at last index)
     for (var i = 1; i + 1 < this.leftFlatIndices.length; i++) {
       this.makeFace4(
-        this.leftFlatIndices[i - 1],
         this.leftFlatIndices[i],
-        this.rightFlatIndices[i - 1],
-        this.rightFlatIndices[i]
+        this.leftFlatIndices[i - 1],
+        this.rightFlatIndices[i],
+        this.rightFlatIndices[i - 1]
       );
     }
   };
@@ -434,9 +434,9 @@
   DildoGeometry.prototype._buildEndFaces = function (endVertexIndex, shapeIndex, baseShapeSegmentCount) {
     // Close at top.
     for (var i = 1; i < baseShapeSegmentCount; i++) {
-      this.makeFace3(this.vertexMatrix[shapeIndex][i - 1], this.vertexMatrix[shapeIndex][i], endVertexIndex);
+      this.makeFace3(this.vertexMatrix[shapeIndex][i - 1], endVertexIndex, this.vertexMatrix[shapeIndex][i]);
       if (i + 1 == baseShapeSegmentCount) {
-        this.makeFace3(this.vertexMatrix[shapeIndex][0], this.vertexMatrix[shapeIndex][i], endVertexIndex);
+        this.makeFace3(this.vertexMatrix[shapeIndex][i], endVertexIndex, this.vertexMatrix[shapeIndex][0]);
       }
     }
   };
@@ -466,20 +466,20 @@
 
     // Build UV mapping for the base
     for (var i = 1; i < baseShapeSegmentCount; i++) {
-      this.addBaseUV3(i - 1, /* i, 0, outlineSegmentCount, */ baseShapeSegmentCount);
+      this.addBaseUV3(i - 1, baseShapeSegmentCount);
       if (i + 1 == baseShapeSegmentCount) {
         // Close the gap on the shape
-        this.addBaseUV3(0, /* 0, i, outlineSegmentCount, */ baseShapeSegmentCount);
+        this.addBaseUV3(0, baseShapeSegmentCount);
       }
     }
 
     // Build UV mapping for the top (closing element)
     var lastIndex = outlineSegmentCount - 1;
     for (var i = 1; i < baseShapeSegmentCount; i++) {
-      this.addBaseUV3(i - 1, /* i, lastIndex, outlineSegmentCount, */ baseShapeSegmentCount);
+      this.addBaseUV3(i - 1, baseShapeSegmentCount);
       if (i + 1 == baseShapeSegmentCount) {
         // Close the gap on the shape
-        this.addBaseUV3(lastIndex, /* lastIndex, i, outlineSegmentCount, */ baseShapeSegmentCount);
+        this.addBaseUV3(lastIndex, baseShapeSegmentCount);
       }
     }
 
@@ -572,11 +572,12 @@
    * @param {*} outlineSegmentCount
    * @param {*} baseShapeSegmentCount
    */
-  DildoGeometry.prototype.addBaseUV3 = function (a, /* b, center, outlineSegmentCount, */ baseShapeSegmentCount) {
+  DildoGeometry.prototype.addBaseUV3 = function (a, baseShapeSegmentCount) {
     // Create a mirrored texture to avoid hard visual cuts
     var ratioA = 1.0 - Math.abs(0.5 - a / baseShapeSegmentCount) * 2;
     var ratioB = 1.0 - Math.abs(0.5 - (a + 1) / baseShapeSegmentCount) * 2;
-    this.faceVertexUvs[0].push([new THREE.Vector2(ratioA, 0), new THREE.Vector2(ratioB, 0), new THREE.Vector2(0.5, 1)]);
+    // this.faceVertexUvs[0].push([new THREE.Vector2(ratioA, 0), new THREE.Vector2(ratioB, 0), new THREE.Vector2(0.5, 1)]);
+    this.faceVertexUvs[0].push([new THREE.Vector2(ratioA, 0), new THREE.Vector2(0.5, 1), new THREE.Vector2(ratioB, 0)]);
   };
 
   // Expose the constructor to the global context.

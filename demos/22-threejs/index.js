@@ -76,6 +76,7 @@
         addSpine: false,
         performSlice: false,
         makeHollow: false,
+        renderFaces: "double", // or "single" THREE.DoubleSide, // THREE.DoubleSide or THREE.SingleSide
         exportSTL: function () {
           exportSTL();
         },
@@ -332,6 +333,8 @@
       fold0.add(config, "performSlice").onChange( function() { rebuild() } ).name('performSlice').title('Slice the model along the x axis?');
       // prettier-ignore
       fold0.add(config, "makeHollow").onChange( function() { rebuild() } ).name('makeHollow').title('Make a hollow mold?');
+      // prettier-ignore
+      fold0.add(config, "renderFaces", ["double","single"]).onChange( function() { rebuild() } ).name('renderFaces').title('Render mesh faces double or single sided?');
 
       var fold1 = gui.addFolder("Export");
       // prettier-ignore

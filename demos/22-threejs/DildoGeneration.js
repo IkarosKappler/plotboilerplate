@@ -80,6 +80,7 @@
    * @param {boolean?}   options.useTextureImage
    * @param {string?}    options.textureImagePath
    * @param {boolean?}   options.wireframe
+   * @param {string}     options.renderFaces - "double" or "single" (default)
    **/
   DildoGeneration.prototype.rebuild = function (options) {
     this.removeCachedGeometries();
@@ -89,10 +90,10 @@
     var dildoGeometry = new DildoGeometry(Object.assign({ baseShape: baseShape }, options));
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath !== "undefined";
     var textureImagePath = typeof options.textureImagePath !== "undefined" ? options.textureImagePath : null;
+    var doubleSingleSide = options.renderFaces == "double" ? THREE.DoubleSide : THREE.SingleSide;
     var wireframe = typeof options.wireframe !== "undefined" ? options.wireframe : null;
-    // var normalizePerpendiculars = Boolean(options.normalizePerpendiculars);
-    // var normalsLength = typeof options.normalsLength !== "undefined" ? options.normalsLength : 10.0;
-    var material = this._createMaterial(useTextureImage, wireframe, textureImagePath);
+
+    var material = this._createMaterial(useTextureImage, wireframe, textureImagePath, doubleSingleSide);
     var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(dildoGeometry);
     bufferedGeometry.computeVertexNormals();
     var latheMesh = new THREE.Mesh(bufferedGeometry, material);
@@ -183,7 +184,15 @@
     this.geometries.push(mesh);
   };
 
-  DildoGeneration.prototype._createMaterial = function (useTextureImage, wireframe, textureImagePath) {
+  /**
+   *
+   * @param {*} useTextureImage
+   * @param {*} wireframe
+   * @param {*} textureImagePath
+   * @param {*} doubleSingleSide THREE.DoubleSide | THREE.SingleSide
+   * @returns
+   */
+  DildoGeneration.prototype._createMaterial = function (useTextureImage, wireframe, textureImagePath, doubleSingleSide) {
     return useTextureImage
       ? new THREE.MeshLambertMaterial({
           color: 0xffffff,
@@ -191,7 +200,8 @@
           flatShading: false,
           depthTest: true,
           opacity: 1.0,
-          side: THREE.DoubleSide,
+          // side: THREE.DoubleSide,
+          side: doubleSingleSide,
           visible: true,
           emissive: 0x0,
           reflectivity: 1.0,
@@ -204,7 +214,8 @@
           flatShading: false,
           depthTest: true,
           opacity: 1.0,
-          side: THREE.DoubleSide,
+          // side: THREE.DoubleSide,
+          side: doubleSingleSide,
           visible: true,
           emissive: 0x0,
           reflectivity: 1.0,
