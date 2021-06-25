@@ -451,7 +451,7 @@
 
     if (makeHollow) {
       this.__makeFlatSideFaces();
-      // this.__makeBackFrontFaces(); // TODO: restore
+      this.__makeBackFrontFaces();
     }
   };
 
@@ -480,7 +480,8 @@
    */
   DildoGeometry.prototype.__makeBackFrontFaces = function () {
     // Connect left and right side (important: ignore bottom vertex at last index)
-    for (var i = 1; i + 1 < this.leftFlatIndices.length; i++) {
+    // for (var i = 1; i + 1 < this.leftFlatIndices.length; i++) {
+    for (var i = 1; i + 1 < this.flatSidePolygon.vertices.length; i++) {
       this.makeFace4(
         this.leftFlatIndices[i],
         this.leftFlatIndices[i - 1],
@@ -559,8 +560,22 @@
         makeFlatTriangleUVs(this, this.flatSideBounds, rightA, rightB, rightC);
       }
 
-      // TODO: add these
-      // this.__makeBackFrontUVs();
+      // TODO: add these as function
+      for (var i = 1; i + 1 < this.flatSidePolygon.vertices.length; i++) {
+        var ratioI = (i - 1) / (this.flatSidePolygon.vertices.length - 1);
+        var ratioJ = i / (this.flatSidePolygon.vertices.length - 1);
+
+        this.faceVertexUvs[0].push([
+          new THREE.Vector2(0.0, ratioJ),
+          new THREE.Vector2(0.0, ratioI),
+          new THREE.Vector2(1.0, ratioJ)
+        ]);
+        this.faceVertexUvs[0].push([
+          new THREE.Vector2(0.0, ratioI),
+          new THREE.Vector2(1.0, ratioI),
+          new THREE.Vector2(1.0, ratioJ)
+        ]);
+      }
     }
 
     this.uvsNeedUpdate = true;
