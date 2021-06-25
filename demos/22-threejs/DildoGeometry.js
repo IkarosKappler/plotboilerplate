@@ -27,6 +27,7 @@
     this.spineVertices = []; // Array<THREE.Vector>
     this.outerPerpLines = []; // Array<Three.Line3>
     this.innerPerpLines = []; // Array<Three.Line3>
+    this.flatSidePolygon = null; // Polygon (2d)
     this.leftFlatIndices = []; // Array<number>
     this.rightFlatIndices = []; // Array<number>
     this.leftFlatTriangleIndices = []; // Array[[number,number,number]]
@@ -264,24 +265,23 @@
     // We are using the earcut algorithm later
     //  + create an outline of the perpendicular end points
     //  + shift the outline to the left bound of the mesh
-    //  + run earcut (later)
-    //  + add all triangle faces
-    //  + create a copy of the vertices and the triangulation the the right side
+    //  + [LATER] run earcut
+    //  + [LATER] add all triangle faces
+    //  + [LATER] create a copy of the vertices and the triangulation the the right side
 
     // Step 1: serialize the 2d vertex data along the perpendicular path
-    var polygon = new Polygon(this.getPerpendicularPathVertices(true), false);
-    var polygonData = flattenVert2dArray(polygon.vertices);
-    this.flatSideBounds = polygon.getBounds();
+    // var polygon = new Polygon(this.getPerpendicularPathVertices(true), false);
+    this.flatSidePolygon = new Polygon(this.getPerpendicularPathVertices(true), false);
+    this.flatSideBounds = this.flatSidePolygon.getBounds();
 
     // Step 2: Add the 3d vertices to this geometry (and store positions in left-/rightFlatIndices array)
-    var _self = this;
-    for (var i = 0; i < polygonData.length; i += 2) {
-      this.leftFlatIndices.push(_self.vertices.length);
-      _self.vertices.push(new THREE.Vector3(polygonData[i], polygonData[i + 1], shapeRadius));
+    for (var i = 0; i < this.flatSidePolygon.vertices.length; i++) {
+      this.leftFlatIndices.push(this.vertices.length);
+      this.vertices.push(new THREE.Vector3(this.flatSidePolygon.vertices[i].x, this.flatSidePolygon.vertices[i].y, shapeRadius));
     }
-    for (var i = 0; i < polygonData.length; i += 2) {
-      this.rightFlatIndices.push(_self.vertices.length);
-      _self.vertices.push(new THREE.Vector3(polygonData[i], polygonData[i + 1], -shapeRadius));
+    for (var i = 0; i < this.flatSidePolygon.vertices.length; i++) {
+      this.rightFlatIndices.push(this.vertices.length);
+      this.vertices.push(new THREE.Vector3(this.flatSidePolygon.vertices[i].x, this.flatSidePolygon.vertices[i].y, -shapeRadius));
     }
   };
 
@@ -290,9 +290,10 @@
    *
    * Note: the last indices in the array will show to the point equivalent to the bottom point.
    *
-   * @param {*} options
+   * @param {*}
    */
-  DildoGeometry.prototype.__makeFlatSideFaces = function (shapeRadius) {
+  DildoGeometry.prototype.__makeFlatSideFaces = function () {
+    console.log("__makeFlatSideFaces");
     // We are using the earcut algorithm here
     //  + [DONE before] create an outline of the perpendicular end points
     //  + [DONE before] shift the outline to the left bound of the mesh
@@ -301,7 +302,6 @@
     //  + create a copy of the vertices and the triangulation the the right side
 
     var _self = this;
-
     // Array<THREE.Vector3>  (compatible with XYCoords :)
     var polygonVertices = this.leftFlatIndices.map(function (flatSideIndex) {
       return _self.vertices[flatSideIndex];
@@ -317,60 +317,16 @@
       var a = triangleIndices[i];
       var b = triangleIndices[i + 1];
       var c = triangleIndices[i + 2];
-
       this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
       this.leftFlatTriangleIndices.push([this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]]);
-
-      // this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[c], this.rightFlatIndices[b]);
-      // this.rightFlatTriangleIndices.push([this.rightFlatIndices[a], this.rightFlatIndices[b], this.rightFlatIndices[c]]);
     }
     for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
       var a = triangleIndices[i];
       var b = triangleIndices[i + 1];
       var c = triangleIndices[i + 2];
-
-      // this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
-      // this.leftFlatTriangleIndices.push([this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]]);
-
       this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[c], this.rightFlatIndices[b]);
       this.rightFlatTriangleIndices.push([this.rightFlatIndices[a], this.rightFlatIndices[b], this.rightFlatIndices[c]]);
     }
-  };
-
-  /**
-   * Helper function to create triangular UV Mappings for a triangle.
-   * @param {*} thisGeometry
-   * @param {*} shapeBounds
-   * @param {*} vertIndexA
-   * @param {*} vertIndexB
-   * @param {*} vertIndexC
-   */
-  var makeFlatTriangleUVs = function (thisGeometry, shapeBounds, vertIndexA, vertIndexB, vertIndexC) {
-    var vertA = thisGeometry.vertices[vertIndexA];
-    var vertB = thisGeometry.vertices[vertIndexB];
-    var vertC = thisGeometry.vertices[vertIndexC];
-    var getUVRatios = function (vert) {
-      // console.log((vert.x - shapeBounds.min.x) / shapeBounds.width, (vert.y - shapeBounds.min.y) / shapeBounds.height);
-      return new THREE.Vector2(
-        (vert.x - shapeBounds.min.x) / shapeBounds.width,
-        (vert.y - shapeBounds.min.y) / shapeBounds.height
-      );
-    };
-    thisGeometry.faceVertexUvs[0].push([getUVRatios(vertA), getUVRatios(vertB)], getUVRatios(vertC));
-  };
-
-  /**
-   *
-   * @param {Array<XYCoords>} vertices2d
-   * @returns
-   */
-  var flattenVert2dArray = function (vertices2d) {
-    // Array<number>
-    var coordinates = [];
-    for (var i = 0; i < vertices2d.length; i++) {
-      coordinates.push(vertices2d[i].x, vertices2d[i].y);
-    }
-    return coordinates;
   };
 
   DildoGeometry.prototype.getPerpendicularPathVertices = function (includeBottomVert) {
@@ -388,23 +344,6 @@
       polygonVertices.push(this.vertices[this.bottomIndex]);
     }
     return polygonVertices;
-  };
-
-  /**
-   * Pre: flatSides are made
-   *
-   * @param {*} options
-   */
-  DildoGeometry.prototype.__makeBackFrontFaces = function () {
-    // Connect left and right side (important: ignore bottom vertex at last index)
-    for (var i = 1; i + 1 < this.leftFlatIndices.length; i++) {
-      this.makeFace4(
-        this.leftFlatIndices[i],
-        this.leftFlatIndices[i - 1],
-        this.rightFlatIndices[i],
-        this.rightFlatIndices[i - 1]
-      );
-    }
   };
 
   /**
@@ -535,6 +474,23 @@
   };
 
   /**
+   * Pre: flatSides are made
+   *
+   * @param {*} options
+   */
+  DildoGeometry.prototype.__makeBackFrontFaces = function () {
+    // Connect left and right side (important: ignore bottom vertex at last index)
+    for (var i = 1; i + 1 < this.leftFlatIndices.length; i++) {
+      this.makeFace4(
+        this.leftFlatIndices[i],
+        this.leftFlatIndices[i - 1],
+        this.rightFlatIndices[i],
+        this.rightFlatIndices[i - 1]
+      );
+    }
+  };
+
+  /**
    * Build the texture UV mapping for all faces.
    *
    * @param {Polygon} options.baseShape
@@ -585,8 +541,6 @@
 
     if (makeHollow) {
       // Make flat side UVS (left)
-      console.log("make left flatside UV mapping", this.leftFlatTriangleIndices.length, this.flatSideBounds);
-      // for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
       // Note: left flat side and right flat side have the same number of polygon vertices
       for (var i = 0; i < this.leftFlatTriangleIndices.length; i++) {
         var leftA = this.leftFlatTriangleIndices[i][0];
@@ -596,15 +550,14 @@
       }
 
       // Make flat side UVS (right)
-      console.log("make right flatside UV mapping", this.rightFlatTriangleIndices.length, this.flatSideBounds);
       for (var i = 0; i < this.rightFlatTriangleIndices.length; i++) {
+        // NOTE: as the triangles are computed on the left flat side -> for the right side
+        //          change the winding order!!!
         var rightA = this.rightFlatTriangleIndices[i][0];
-        var rightB = this.rightFlatTriangleIndices[i][1];
-        var rightC = this.rightFlatTriangleIndices[i][2];
+        var rightB = this.rightFlatTriangleIndices[i][2];
+        var rightC = this.rightFlatTriangleIndices[i][1];
         makeFlatTriangleUVs(this, this.flatSideBounds, rightA, rightB, rightC);
       }
-
-      console.log("#faces: ", this.faces.length, "#uvs", this.faceVertexUvs[0].length);
 
       // TODO: add these
       // this.__makeBackFrontUVs();
@@ -703,8 +656,48 @@
     // Create a mirrored texture to avoid hard visual cuts
     var ratioA = 1.0 - Math.abs(0.5 - a / baseShapeSegmentCount) * 2;
     var ratioB = 1.0 - Math.abs(0.5 - (a + 1) / baseShapeSegmentCount) * 2;
-    // this.faceVertexUvs[0].push([new THREE.Vector2(ratioA, 0), new THREE.Vector2(ratioB, 0), new THREE.Vector2(0.5, 1)]);
     this.faceVertexUvs[0].push([new THREE.Vector2(ratioA, 0), new THREE.Vector2(0.5, 1), new THREE.Vector2(ratioB, 0)]);
+  };
+
+  /**
+   * Helper function to create triangular UV Mappings for a triangle.
+   *
+   * TODO: move to helper class
+   *
+   * @param {THREE.Geometry} thisGeometry
+   * @param {Bounds} shapeBounds
+   * @param {number} vertIndexA - The index in the geometry's vertices array.
+   * @param {number} vertIndexB - ...
+   * @param {number} vertIndexC - ...
+   */
+  var makeFlatTriangleUVs = function (thisGeometry, shapeBounds, vertIndexA, vertIndexB, vertIndexC) {
+    var vertA = thisGeometry.vertices[vertIndexA];
+    var vertB = thisGeometry.vertices[vertIndexB];
+    var vertC = thisGeometry.vertices[vertIndexC];
+    // Convert a position vertex { x, y, * } to UV coordinates { u, v }
+    var getUVRatios = function (vert) {
+      // console.log((vert.x - shapeBounds.min.x) / shapeBounds.width, (vert.y - shapeBounds.min.y) / shapeBounds.height);
+      return new THREE.Vector2(
+        (vert.x - shapeBounds.min.x) / shapeBounds.width,
+        (vert.y - shapeBounds.min.y) / shapeBounds.height
+      );
+    };
+    thisGeometry.faceVertexUvs[0].push([getUVRatios(vertA), getUVRatios(vertB), getUVRatios(vertC)]);
+  };
+
+  /**
+   * TODO: move to helper class
+   *
+   * @param {Array<XYCoords>} vertices2d
+   * @returns
+   */
+  var flattenVert2dArray = function (vertices2d) {
+    // Array<number>
+    var coordinates = [];
+    for (var i = 0; i < vertices2d.length; i++) {
+      coordinates.push(vertices2d[i].x, vertices2d[i].y);
+    }
+    return coordinates;
   };
 
   // Expose the constructor to the global context.
