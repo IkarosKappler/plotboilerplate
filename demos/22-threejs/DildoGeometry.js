@@ -25,8 +25,8 @@
     this.topIndex = -1;
     this.bottomIndex = -1;
     this.spineVertices = []; // Array<THREE.Vector>
-    this.outerPerps = []; // Array<Three.Line3>
-    this.innerPerps = []; // Array<Three.Line3>
+    this.outerPerpLines = []; // Array<Three.Line3>
+    this.innerPerpLines = []; // Array<Three.Line3>
     this.leftFlatIndices = []; // Array<number>
     this.rightFlatIndices = []; // Array<number>
 
@@ -34,7 +34,8 @@
     this._buildFaces(options);
     this._buildUVMapping(options);
 
-    // Fill up missing UVs to avoid warning
+    // Fill up missing UVs to avoid warnings
+    // This is a bit dirty, but not in call cases it is useful to create UV mappings
     while (this.faceVertexUvs[0].length < this.faces.length) {
       this.faceVertexUvs[0].push([new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(0.5, 1)]);
     }
@@ -242,9 +243,9 @@
         normalizeVectorXY(vert, endVert, normalsLength);
       }
       if (i == 0) {
-        this.outerPerps.push(new THREE.Line3(vert, endVert));
+        this.outerPerpLines.push(new THREE.Line3(vert, endVert));
       } else {
-        this.innerPerps.push(new THREE.Line3(vert, endVert));
+        this.innerPerpLines.push(new THREE.Line3(vert, endVert));
       }
     } // END for
   };
@@ -265,20 +266,10 @@
     //  + create a copy of the vertices and the triangulation the the right side
 
     // Step 1: serialize the 2d vertex data along the perpendicular path
-    var polygonData = [];
-    for (var i = 0; i < this.innerPerps.length; i++) {
-      polygonData.push(this.innerPerps[i].end.x);
-      polygonData.push(this.innerPerps[i].end.y);
-    }
-    for (var i = this.outerPerps.length - 1; i >= 0; i--) {
-      polygonData.push(this.outerPerps[i].end.x);
-      polygonData.push(this.outerPerps[i].end.y);
-    }
-    // Also add base point at last index
-    polygonData.push(this.vertices[this.bottomIndex].x);
-    polygonData.push(this.vertices[this.bottomIndex].y);
+    var polygonVertices = this.getPerpendicularPathVertices(true);
+    var polygonData = flattenVert2dArray(polygonVertices);
 
-    // Step 2: Add the 3d vertices to this geometry
+    // Step 2: Add the 3d vertices to this geometry (and store positions in left-/rightFlatIndices array)
     var _self = this;
     for (var i = 0; i < polygonData.length; i += 2) {
       this.leftFlatIndices.push(_self.vertices.length);
@@ -301,6 +292,63 @@
       this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
       this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[c], this.rightFlatIndices[b]);
     }
+  };
+
+  /**
+   * Helper function to create triangular UV Mappings for a triangle.
+   * @param {*} thisGeometry
+   * @param {*} shapeBounds
+   * @param {*} vertIndexA
+   * @param {*} vertIndexB
+   * @param {*} vertIndexC
+   */
+  var makeFlatPolygonUVs = function (thisGeometry, shapeBounds, vertIndexA, vertIndexB, vertIndexC) {
+    // ...
+  };
+
+  /**
+   *
+   * @param {Array<XYCoords>} vertices2d
+   * @returns
+   */
+  var flattenVert2dArray = function (vertices2d) {
+    // Array<number>
+    var coordinates = [];
+    for (var i = 0; i < vertices2d.length; i++) {
+      coordinates.push(vertices2d[i].x, vertices2d[i].y);
+    }
+    return coordinates;
+  };
+
+  DildoGeometry.prototype.getPerpendicularPathVertices = function (includeBottomVert) {
+    // Array<XYCoords>
+    var polygonVertices = [];
+    for (var i = 0; i < this.innerPerpLines.length; i++) {
+      // polygonData.push(this.innerPerps[i].end.x);
+      // polygonData.push(this.innerPerps[i].end.y);
+      polygonVertices.push(this.innerPerpLines[i].end);
+    }
+    // Reverse the outer path segment (both begin at bottom and meet at the top)
+    for (var i = this.outerPerpLines.length - 1; i >= 0; i--) {
+      // polygonVertices.push(this.outerPerps[i].end.x);
+      // polygonVertices.push(this.outerPerps[i].end.y);
+      polygonVertices.push(this.outerPerpLines[i].end);
+    }
+    // Also add base point at last index
+    // polygonVertices.push(this.vertices[this.bottomIndex].x);
+    // polygonVertices.push(this.vertices[this.bottomIndex].y);
+    if (includeBottomVert) {
+      polygonVertices.push(this.vertices[this.bottomIndex]);
+    }
+    return polygonVertices;
+  };
+
+  var vertices2dToCoordinatesArray = function (vertices2d) {
+    var result = [];
+    for (var i = 0; i < vertices2d.length; i++) {
+      result.push(vertices2d[i].x, vertices2d[i].y);
+    }
+    return result;
   };
 
   /**

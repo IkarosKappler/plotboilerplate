@@ -337,8 +337,8 @@
   };
 
   var addPerpendicularPaths = function (thisGenerator, unbufferedLatheGeometry) {
-    addPerpendicularPath(thisGenerator, unbufferedLatheGeometry.outerPerps, 0xff0000);
-    addPerpendicularPath(thisGenerator, unbufferedLatheGeometry.innerPerps, 0x00ff00);
+    addPerpendicularPath(thisGenerator, unbufferedLatheGeometry.outerPerpLines, 0xff0000);
+    addPerpendicularPath(thisGenerator, unbufferedLatheGeometry.innerPerpLines, 0x00ff00);
   };
 
   var addPerpendicularPath = function (thisGenerator, perpLines, materialColor) {
