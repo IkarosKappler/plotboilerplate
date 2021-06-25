@@ -29,6 +29,9 @@
     this.innerPerpLines = []; // Array<Three.Line3>
     this.leftFlatIndices = []; // Array<number>
     this.rightFlatIndices = []; // Array<number>
+    this.leftFlatTriangleIndices = []; // Array[[number,number,number]]
+    this.rightFlatTriangleIndices = []; // Array[[number,number,number]]
+    this.flatSideBounds = null; // Bounds
 
     this._buildVertices(options);
     this._buildFaces(options);
@@ -36,9 +39,9 @@
 
     // Fill up missing UVs to avoid warnings
     // This is a bit dirty, but not in call cases it is useful to create UV mappings
-    while (this.faceVertexUvs[0].length < this.faces.length) {
-      this.faceVertexUvs[0].push([new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(0.5, 1)]);
-    }
+    // while (this.faceVertexUvs[0].length < this.faces.length) {
+    //   this.faceVertexUvs[0].push([new THREE.Vector2(0, 0), new THREE.Vector2(1, 0), new THREE.Vector2(0.5, 1)]);
+    // }
   };
 
   /**
@@ -50,7 +53,7 @@
     var baseShape = options.baseShape;
     var outline = options.outline;
     var outlineSegmentCount = options.outlineSegmentCount;
-    var makeHollow = options.makeHollow;
+    var makeHollow = Boolean(options.makeHollow);
     var bendAngleRad = (options.bendAngle / 180) * Math.PI;
     var hollowStrength = 15.0;
 
@@ -103,8 +106,8 @@
 
     if (makeHollow) {
       // Construct the left and the right flat bounds (used to make a casting mould)
-      this.__makeFlatSides(shapeBounds.width / 2.0 + hollowStrength);
-      this.__makeHollow();
+      this.__makeFlatSideVertices(shapeBounds.width / 2.0 + hollowStrength);
+      // this.__makeHollow();
     }
   };
 
@@ -257,17 +260,18 @@
    *
    * @param {*} options
    */
-  DildoGeometry.prototype.__makeFlatSides = function (shapeRadius) {
-    // We are using the earcut algorithm here
+  DildoGeometry.prototype.__makeFlatSideVertices = function (shapeRadius) {
+    // We are using the earcut algorithm later
     //  + create an outline of the perpendicular end points
     //  + shift the outline to the left bound of the mesh
-    //  + run earcut
+    //  + run earcut (later)
     //  + add all triangle faces
     //  + create a copy of the vertices and the triangulation the the right side
 
     // Step 1: serialize the 2d vertex data along the perpendicular path
-    var polygonVertices = this.getPerpendicularPathVertices(true);
-    var polygonData = flattenVert2dArray(polygonVertices);
+    var polygon = new Polygon(this.getPerpendicularPathVertices(true), false);
+    var polygonData = flattenVert2dArray(polygon.vertices);
+    this.flatSideBounds = polygon.getBounds();
 
     // Step 2: Add the 3d vertices to this geometry (and store positions in left-/rightFlatIndices array)
     var _self = this;
@@ -279,6 +283,30 @@
       this.rightFlatIndices.push(_self.vertices.length);
       _self.vertices.push(new THREE.Vector3(polygonData[i], polygonData[i + 1], -shapeRadius));
     }
+  };
+
+  /**
+   * Pre: perpLines are already built.
+   *
+   * Note: the last indices in the array will show to the point equivalent to the bottom point.
+   *
+   * @param {*} options
+   */
+  DildoGeometry.prototype.__makeFlatSideFaces = function (shapeRadius) {
+    // We are using the earcut algorithm here
+    //  + [DONE before] create an outline of the perpendicular end points
+    //  + [DONE before] shift the outline to the left bound of the mesh
+    //  + run earcut
+    //  + add all triangle faces
+    //  + create a copy of the vertices and the triangulation the the right side
+
+    var _self = this;
+
+    // Array<THREE.Vector3>  (compatible with XYCoords :)
+    var polygonVertices = this.leftFlatIndices.map(function (flatSideIndex) {
+      return _self.vertices[flatSideIndex];
+    });
+    var polygonData = flattenVert2dArray(polygonVertices);
 
     // Step 3: run Earcut
     var triangleIndices = earcut(polygonData);
@@ -289,8 +317,23 @@
       var a = triangleIndices[i];
       var b = triangleIndices[i + 1];
       var c = triangleIndices[i + 2];
+
       this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
+      this.leftFlatTriangleIndices.push([this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]]);
+
+      // this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[c], this.rightFlatIndices[b]);
+      // this.rightFlatTriangleIndices.push([this.rightFlatIndices[a], this.rightFlatIndices[b], this.rightFlatIndices[c]]);
+    }
+    for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
+      var a = triangleIndices[i];
+      var b = triangleIndices[i + 1];
+      var c = triangleIndices[i + 2];
+
+      // this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
+      // this.leftFlatTriangleIndices.push([this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]]);
+
       this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[c], this.rightFlatIndices[b]);
+      this.rightFlatTriangleIndices.push([this.rightFlatIndices[a], this.rightFlatIndices[b], this.rightFlatIndices[c]]);
     }
   };
 
@@ -302,8 +345,18 @@
    * @param {*} vertIndexB
    * @param {*} vertIndexC
    */
-  var makeFlatPolygonUVs = function (thisGeometry, shapeBounds, vertIndexA, vertIndexB, vertIndexC) {
-    // ...
+  var makeFlatTriangleUVs = function (thisGeometry, shapeBounds, vertIndexA, vertIndexB, vertIndexC) {
+    var vertA = thisGeometry.vertices[vertIndexA];
+    var vertB = thisGeometry.vertices[vertIndexB];
+    var vertC = thisGeometry.vertices[vertIndexC];
+    var getUVRatios = function (vert) {
+      // console.log((vert.x - shapeBounds.min.x) / shapeBounds.width, (vert.y - shapeBounds.min.y) / shapeBounds.height);
+      return new THREE.Vector2(
+        (vert.x - shapeBounds.min.x) / shapeBounds.width,
+        (vert.y - shapeBounds.min.y) / shapeBounds.height
+      );
+    };
+    thisGeometry.faceVertexUvs[0].push([getUVRatios(vertA), getUVRatios(vertB)], getUVRatios(vertC));
   };
 
   /**
@@ -324,31 +377,17 @@
     // Array<XYCoords>
     var polygonVertices = [];
     for (var i = 0; i < this.innerPerpLines.length; i++) {
-      // polygonData.push(this.innerPerps[i].end.x);
-      // polygonData.push(this.innerPerps[i].end.y);
       polygonVertices.push(this.innerPerpLines[i].end);
     }
     // Reverse the outer path segment (both begin at bottom and meet at the top)
     for (var i = this.outerPerpLines.length - 1; i >= 0; i--) {
-      // polygonVertices.push(this.outerPerps[i].end.x);
-      // polygonVertices.push(this.outerPerps[i].end.y);
       polygonVertices.push(this.outerPerpLines[i].end);
     }
     // Also add base point at last index
-    // polygonVertices.push(this.vertices[this.bottomIndex].x);
-    // polygonVertices.push(this.vertices[this.bottomIndex].y);
     if (includeBottomVert) {
       polygonVertices.push(this.vertices[this.bottomIndex]);
     }
     return polygonVertices;
-  };
-
-  var vertices2dToCoordinatesArray = function (vertices2d) {
-    var result = [];
-    for (var i = 0; i < vertices2d.length; i++) {
-      result.push(vertices2d[i].x, vertices2d[i].y);
-    }
-    return result;
   };
 
   /**
@@ -356,7 +395,7 @@
    *
    * @param {*} options
    */
-  DildoGeometry.prototype.__makeHollow = function () {
+  DildoGeometry.prototype.__makeBackFrontFaces = function () {
     // Connect left and right side (important: ignore bottom vertex at last index)
     for (var i = 1; i + 1 < this.leftFlatIndices.length; i++) {
       this.makeFace4(
@@ -449,6 +488,7 @@
     var outlineSegmentCount = options.outlineSegmentCount;
     var closeTop = Boolean(options.closeTop);
     var closeBottom = Boolean(options.closeBottom);
+    var makeHollow = Boolean(options.makeHollow);
 
     var baseShapeSegmentCount = baseShape.vertices.length;
     this.faceVertexUvs[0] = [];
@@ -469,6 +509,11 @@
 
     closeBottom && this._buildEndFaces(this.bottomIndex, 0, baseShapeSegmentCount);
     closeTop && this._buildEndFaces(this.topIndex, this.vertexMatrix.length - 1, baseShapeSegmentCount);
+
+    if (makeHollow) {
+      this.__makeFlatSideFaces();
+      // this.__makeBackFrontFaces(); // TODO: restore
+    }
   };
 
   /**
@@ -500,6 +545,9 @@
     var baseShape = options.baseShape;
     var outlineSegmentCount = options.outlineSegmentCount;
     var baseShapeSegmentCount = baseShape.vertices.length;
+    var closeTop = Boolean(options.closeTop);
+    var closeBottom = Boolean(options.closeBottom);
+    var makeHollow = Boolean(options.makeHollow);
 
     // https://stackoverflow.com/questions/20774648/three-js-generate-uv-coordinate
     for (var s = 1; s < outlineSegmentCount; s++) {
@@ -512,23 +560,54 @@
       }
     }
 
-    // Build UV mapping for the base
-    for (var i = 1; i < baseShapeSegmentCount; i++) {
-      this.addBaseUV3(i - 1, baseShapeSegmentCount);
-      if (i + 1 == baseShapeSegmentCount) {
-        // Close the gap on the shape
-        this.addBaseUV3(0, baseShapeSegmentCount);
+    // Build UV mapping for the bottom (base)
+    if (closeBottom) {
+      for (var i = 1; i < baseShapeSegmentCount; i++) {
+        this.addBaseUV3(i - 1, baseShapeSegmentCount);
+        if (i + 1 == baseShapeSegmentCount) {
+          // Close the gap on the shape
+          this.addBaseUV3(0, baseShapeSegmentCount);
+        }
       }
     }
 
     // Build UV mapping for the top (closing element)
-    var lastIndex = outlineSegmentCount - 1;
-    for (var i = 1; i < baseShapeSegmentCount; i++) {
-      this.addBaseUV3(i - 1, baseShapeSegmentCount);
-      if (i + 1 == baseShapeSegmentCount) {
-        // Close the gap on the shape
-        this.addBaseUV3(lastIndex, baseShapeSegmentCount);
+    if (closeTop) {
+      var lastIndex = outlineSegmentCount - 1;
+      for (var i = 1; i < baseShapeSegmentCount; i++) {
+        this.addBaseUV3(i - 1, baseShapeSegmentCount);
+        if (i + 1 == baseShapeSegmentCount) {
+          // Close the gap on the shape
+          this.addBaseUV3(lastIndex, baseShapeSegmentCount);
+        }
       }
+    }
+
+    if (makeHollow) {
+      // Make flat side UVS (left)
+      console.log("make left flatside UV mapping", this.leftFlatTriangleIndices.length, this.flatSideBounds);
+      // for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
+      // Note: left flat side and right flat side have the same number of polygon vertices
+      for (var i = 0; i < this.leftFlatTriangleIndices.length; i++) {
+        var leftA = this.leftFlatTriangleIndices[i][0];
+        var leftB = this.leftFlatTriangleIndices[i][1];
+        var leftC = this.leftFlatTriangleIndices[i][2];
+        makeFlatTriangleUVs(this, this.flatSideBounds, leftA, leftB, leftC);
+      }
+
+      // Make flat side UVS (right)
+      console.log("make right flatside UV mapping", this.rightFlatTriangleIndices.length, this.flatSideBounds);
+      for (var i = 0; i < this.rightFlatTriangleIndices.length; i++) {
+        var rightA = this.rightFlatTriangleIndices[i][0];
+        var rightB = this.rightFlatTriangleIndices[i][1];
+        var rightC = this.rightFlatTriangleIndices[i][2];
+        makeFlatTriangleUVs(this, this.flatSideBounds, rightA, rightB, rightC);
+      }
+
+      console.log("#faces: ", this.faces.length, "#uvs", this.faceVertexUvs[0].length);
+
+      // TODO: add these
+      // this.__makeBackFrontUVs();
     }
 
     this.uvsNeedUpdate = true;
