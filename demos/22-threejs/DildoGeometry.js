@@ -33,6 +33,9 @@
     this.leftFlatTriangleIndices = []; // Array[[number,number,number]]
     this.rightFlatTriangleIndices = []; // Array[[number,number,number]]
     this.flatSideBounds = null; // Bounds
+    // The four corner vertices from the hollow shell plus the bottom vertex indices left and right
+    this.hollowBottomEdgeVertIndices = []; // [number,number,number,number, number, number]
+    this.hollowBottomTriagles = []; // Array<[number,number,number]>
 
     this._buildVertices(options);
     this._buildFaces(options);
@@ -276,12 +279,22 @@
 
     // Step 2: Add the 3d vertices to this geometry (and store positions in left-/rightFlatIndices array)
     for (var i = 0; i < this.flatSidePolygon.vertices.length; i++) {
-      this.leftFlatIndices.push(this.vertices.length);
+      var nextIndex = this.vertices.length;
+      this.leftFlatIndices.push(nextIndex);
       this.vertices.push(new THREE.Vector3(this.flatSidePolygon.vertices[i].x, this.flatSidePolygon.vertices[i].y, shapeRadius));
+      if (i === 0 || i + 1 === this.flatSidePolygon.vertices.length || i + 2 === this.flatSidePolygon.vertices.length) {
+        // Keep track of the four corner points (two left, two right)
+        this.hollowBottomEdgeVertIndices.push(nextIndex);
+      }
     }
     for (var i = 0; i < this.flatSidePolygon.vertices.length; i++) {
-      this.rightFlatIndices.push(this.vertices.length);
+      var nextIndex = this.vertices.length;
+      this.rightFlatIndices.push(nextIndex);
       this.vertices.push(new THREE.Vector3(this.flatSidePolygon.vertices[i].x, this.flatSidePolygon.vertices[i].y, -shapeRadius));
+      if (i === 0 || i + 1 === this.flatSidePolygon.vertices.length || i + 2 === this.flatSidePolygon.vertices.length) {
+        // Keep track of the four corner points (two left, two right)
+        this.hollowBottomEdgeVertIndices.push(nextIndex);
+      }
     }
   };
 
@@ -293,7 +306,6 @@
    * @param {*}
    */
   DildoGeometry.prototype.__makeFlatSideFaces = function () {
-    console.log("__makeFlatSideFaces");
     // We are using the earcut algorithm here
     //  + [DONE before] create an outline of the perpendicular end points
     //  + [DONE before] shift the outline to the left bound of the mesh
@@ -446,12 +458,62 @@
       } // END for
     } // END for
 
-    closeBottom && this._buildEndFaces(this.bottomIndex, 0, baseShapeSegmentCount);
-    closeTop && this._buildEndFaces(this.topIndex, this.vertexMatrix.length - 1, baseShapeSegmentCount);
-
     if (makeHollow) {
       this.__makeFlatSideFaces();
       this.__makeBackFrontFaces();
+    }
+
+    if (closeBottom) {
+      if (makeHollow) this._buildHollowBottomFaces();
+      else this._buildEndFaces(this.bottomIndex, 0, baseShapeSegmentCount);
+    }
+    if (closeTop) {
+      this._buildEndFaces(this.topIndex, this.vertexMatrix.length - 1, baseShapeSegmentCount);
+    }
+  };
+
+  DildoGeometry.prototype._buildHollowBottomFaces = function () {
+    // var edgeVertIndices = [];
+    // hollowBottomEdgeVertIndices;
+
+    var _self = this;
+    var edgeVertices = this.hollowBottomEdgeVertIndices.map(function (edgeVertIndex) {
+      return _self.vertices[edgeVertIndex];
+    });
+
+    var findClosestEdgeIndex = function (vert) {
+      // THREE.Vector
+      var index = 0;
+      var distance = Number.MAX_VALUE;
+      var tmpDist;
+      for (var i = 0; i < edgeVertices.length; i++) {
+        var tmpIndex = _self.hollowBottomEdgeVertIndices[i];
+        if ((tmpDist = edgeVertices[i].distanceTo(vert)) < distance) {
+          index = tmpIndex;
+          distance = tmpDist;
+        }
+      }
+      return index;
+    };
+
+    // 'Last index' starts at last point at all : )
+    var n = this.vertexMatrix[0].length;
+    var lastIndex = findClosestEdgeIndex(this.vertices[n - 1]);
+    var triangleIndices = []; // [number,number,number]
+    // Use first slice (at bottom position)
+    for (var i = 0; i < n; i++) {
+      var curIndex = findClosestEdgeIndex(this.vertices[this.vertexMatrix[0][i]]);
+      // Close gap to last (different shell index)
+      triangleIndices = [lastIndex, this.vertexMatrix[0][i == 0 ? n - 1 : i - 1], this.vertexMatrix[0][i]];
+      this.faces.push(new THREE.Face3(triangleIndices[0], triangleIndices[1], triangleIndices[2])); // Same?
+      this.hollowBottomTriagles.push(triangleIndices);
+      if (lastIndex !== curIndex) {
+        // Add normal triangle to same shell index
+        triangleIndices = [curIndex, lastIndex, this.vertexMatrix[0][i]];
+        this.faces.push(new THREE.Face3(triangleIndices[0], triangleIndices[1], triangleIndices[2]));
+        this.hollowBottomTriagles.push(triangleIndices);
+      }
+      lastIndex = curIndex;
     }
   };
 
@@ -517,29 +579,6 @@
       }
     }
 
-    // Build UV mapping for the bottom (base)
-    if (closeBottom) {
-      for (var i = 1; i < baseShapeSegmentCount; i++) {
-        this.addBaseUV3(i - 1, baseShapeSegmentCount);
-        if (i + 1 == baseShapeSegmentCount) {
-          // Close the gap on the shape
-          this.addBaseUV3(0, baseShapeSegmentCount);
-        }
-      }
-    }
-
-    // Build UV mapping for the top (closing element)
-    if (closeTop) {
-      var lastIndex = outlineSegmentCount - 1;
-      for (var i = 1; i < baseShapeSegmentCount; i++) {
-        this.addBaseUV3(i - 1, baseShapeSegmentCount);
-        if (i + 1 == baseShapeSegmentCount) {
-          // Close the gap on the shape
-          this.addBaseUV3(lastIndex, baseShapeSegmentCount);
-        }
-      }
-    }
-
     if (makeHollow) {
       // Make flat side UVS (left)
       // Note: left flat side and right flat side have the same number of polygon vertices
@@ -575,6 +614,33 @@
           new THREE.Vector2(1.0, ratioI),
           new THREE.Vector2(1.0, ratioJ)
         ]);
+      }
+    } // END if[makeHollow]
+
+    // Build UV mapping for the bottom (base)
+    if (closeBottom) {
+      if (makeHollow) {
+        makeHollowBottomUVs(this, this.hollowBottomEdgeVertIndices, this.hollowBottomTriagles);
+      } else {
+        for (var i = 1; i < baseShapeSegmentCount; i++) {
+          this.addBaseUV3(i - 1, baseShapeSegmentCount);
+          if (i + 1 == baseShapeSegmentCount) {
+            // Close the gap on the shape
+            this.addBaseUV3(0, baseShapeSegmentCount);
+          }
+        }
+      }
+    }
+
+    // Build UV mapping for the top (closing element)
+    if (closeTop) {
+      var lastIndex = outlineSegmentCount - 1;
+      for (var i = 1; i < baseShapeSegmentCount; i++) {
+        this.addBaseUV3(i - 1, baseShapeSegmentCount);
+        if (i + 1 == baseShapeSegmentCount) {
+          // Close the gap on the shape
+          this.addBaseUV3(lastIndex, baseShapeSegmentCount);
+        }
       }
     }
 
@@ -698,6 +764,37 @@
       );
     };
     thisGeometry.faceVertexUvs[0].push([getUVRatios(vertA), getUVRatios(vertB), getUVRatios(vertC)]);
+  };
+
+  /**
+   *
+   * @param {THREE.Geometry} thisGeometry
+   * @param {Array<number>} containingPolygonIndices
+   * @param {Array<[number,number,number]>} triangles
+   */
+  var makeHollowBottomUVs = function (thisGeometry, containingPolygonIndices, triangles) {
+    // Compute polyon bounds
+    var polygonBounds = Bounds.computeFromVertices(
+      containingPolygonIndices.map(function (vertIndex) {
+        return new Vertex(thisGeometry.vertices[vertIndex].x, thisGeometry.vertices[vertIndex].z);
+      })
+    );
+
+    var getUVRatios = function (vert) {
+      // console.log((vert.x - shapeBounds.min.x) / shapeBounds.width, (vert.y - shapeBounds.min.y) / shapeBounds.height);
+      return new THREE.Vector2(
+        (vert.x - polygonBounds.min.x) / polygonBounds.width,
+        (vert.z - polygonBounds.min.y) / polygonBounds.height
+      );
+    };
+
+    // ON the x-z-plane {x, *, z}
+    for (var t = 0; t < triangles.length; t++) {
+      var vertA = thisGeometry.vertices[triangles[t][0]];
+      var vertB = thisGeometry.vertices[triangles[t][1]];
+      var vertC = thisGeometry.vertices[triangles[t][2]];
+      thisGeometry.faceVertexUvs[0].push([getUVRatios(vertA), getUVRatios(vertB), getUVRatios(vertC)]);
+    }
   };
 
   /**
