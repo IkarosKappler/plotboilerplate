@@ -7,6 +7,10 @@
  * @version  1.0.1
  **/
 
+// TODOs
+// + when hollow inverse inner faces
+// + port to typescript
+
 (function () {
   /**
    * Create a new dildo geometry from the passed options..
@@ -412,6 +416,15 @@
     vert.x += arcRadius;
   };
 
+  /**
+   * Rotate a 3d vector around the z axis.
+   *
+   * @param {THREE.Vector3} vert
+   * @param {THREE.Vector3} angle
+   * @param {number} xCenter
+   * @param {number} yCenter
+   * @returns
+   */
   var rotateVert = function (vert, angle, xCenter, yCenter) {
     var axis = new THREE.Vector3(0, 0, 1);
     vert.x -= xCenter;
@@ -422,6 +435,13 @@
     return vert;
   };
 
+  /**
+   * Normalize a 2D vector to a given length.
+   *
+   * @param {XYCoords} base - The start point.
+   * @param {XYCoords} extend - The end point.
+   * @param {number} normalLength - The desired length
+   */
   var normalizeVectorXY = function (base, extend, normalLength) {
     var diff = { x: extend.x - base.x, y: extend.y - base.y }; // XYCoords
     var length = Math.sqrt(diff.x * diff.x + diff.y * diff.y);
@@ -448,10 +468,10 @@
       for (var i = 0; i < baseShapeSegmentCount; i++) {
         if (s > 0) {
           if (i > 0) {
-            this.addFace4ByIndices(s, i - 1, s - 1, i, outlineSegmentCount, baseShape.vertices.length);
+            this.addFace4ByIndices(s, i - 1, s - 1, i, makeHollow);
             if (i + 1 == baseShape.vertices.length) {
               // Close the gap on the shape
-              this.addFace4ByIndices(s, i, s - 1, 0, outlineSegmentCount, baseShape.vertices.length);
+              this.addFace4ByIndices(s, i, s - 1, 0, makeHollow);
             }
           }
         }
@@ -465,10 +485,10 @@
 
     if (closeBottom) {
       if (makeHollow) this._buildHollowBottomFaces();
-      else this._buildEndFaces(this.bottomIndex, 0, baseShapeSegmentCount);
+      else this._buildEndFaces(this.bottomIndex, 0, baseShapeSegmentCount, false);
     }
     if (closeTop) {
-      this._buildEndFaces(this.topIndex, this.vertexMatrix.length - 1, baseShapeSegmentCount);
+      this._buildEndFaces(this.topIndex, this.vertexMatrix.length - 1, baseShapeSegmentCount, makeHollow);
     }
   };
 
@@ -524,13 +544,19 @@
    * @param {number} endVertexIndex - This should be `this.topIndex` or `this.bottomIndex`.
    * @param {number} shapeIndex - This should be `0` (top) or `outlineSegmentCount-1` (bottom).
    * @param {number} baseShapeSegmentCount - The number of shape segments.
+   * @param {boolean=false} inverseFaceDirection - If true then the face will have left winding order (instead of right which is the default).
    */
-  DildoGeometry.prototype._buildEndFaces = function (endVertexIndex, shapeIndex, baseShapeSegmentCount) {
+  DildoGeometry.prototype._buildEndFaces = function (endVertexIndex, shapeIndex, baseShapeSegmentCount, inverseFaceDirection) {
     // Close at top.
     for (var i = 1; i < baseShapeSegmentCount; i++) {
-      this.makeFace3(this.vertexMatrix[shapeIndex][i - 1], endVertexIndex, this.vertexMatrix[shapeIndex][i]);
+      this.makeFace3(
+        this.vertexMatrix[shapeIndex][i - 1],
+        endVertexIndex,
+        this.vertexMatrix[shapeIndex][i],
+        inverseFaceDirection
+      );
       if (i + 1 == baseShapeSegmentCount) {
-        this.makeFace3(this.vertexMatrix[shapeIndex][i], endVertexIndex, this.vertexMatrix[shapeIndex][0]);
+        this.makeFace3(this.vertexMatrix[shapeIndex][i], endVertexIndex, this.vertexMatrix[shapeIndex][0], inverseFaceDirection);
       }
     }
   };
@@ -571,10 +597,10 @@
     // https://stackoverflow.com/questions/20774648/three-js-generate-uv-coordinate
     for (var s = 1; s < outlineSegmentCount; s++) {
       for (var i = 1; i < baseShape.vertices.length; i++) {
-        this.addUV4(s, i - 1, s - 1, i, outlineSegmentCount, baseShapeSegmentCount);
+        this.addUV4(s, i - 1, s - 1, i, outlineSegmentCount, baseShapeSegmentCount, makeHollow);
         if (i + 1 == baseShape.vertices.length) {
           // Close the gap on the shape
-          this.addUV4(s, i, s - 1, 0, outlineSegmentCount, baseShapeSegmentCount);
+          this.addUV4(s, i, s - 1, 0, outlineSegmentCount, baseShapeSegmentCount, makeHollow);
         }
       }
     }
@@ -663,9 +689,16 @@
    * @param {number} b - The first seconday index in the `vertexMatrix[a]` array.
    * @param {number} c - The second primary index in the `vertexMatrix` array.
    * @param {number} d - The second seconday index in the `vertexMatrix[c]` array.
+   * @param {boolean=false} inverseFaceDirection - If true then the face will have left winding order (instead of right which is the default).
    */
-  DildoGeometry.prototype.addFace4ByIndices = function (a, b, c, d) {
-    this.makeFace4(this.vertexMatrix[a][b], this.vertexMatrix[c][b], this.vertexMatrix[a][d], this.vertexMatrix[c][d]);
+  DildoGeometry.prototype.addFace4ByIndices = function (a, b, c, d, inverseFaceDirection) {
+    this.makeFace4(
+      this.vertexMatrix[a][b],
+      this.vertexMatrix[c][b],
+      this.vertexMatrix[a][d],
+      this.vertexMatrix[c][d],
+      inverseFaceDirection
+    );
   };
 
   /**
@@ -684,10 +717,17 @@
    * @param {number} vertIndexB - The second vertex index.
    * @param {number} vertIndexC - The third vertex index.
    * @param {number} vertIndexD - The fourth vertex index.
+   * @param {boolean=false} inverseFaceDirection - If true then the face will have left winding order (instead of right which is the default).
    */
-  DildoGeometry.prototype.makeFace4 = function (vertIndexA, vertIndexB, vertIndexC, vertIndexD) {
-    this.makeFace3(vertIndexA, vertIndexB, vertIndexC);
-    this.makeFace3(vertIndexB, vertIndexD, vertIndexC);
+  DildoGeometry.prototype.makeFace4 = function (vertIndexA, vertIndexB, vertIndexC, vertIndexD, inverseFaceDirection) {
+    if (inverseFaceDirection) {
+      // Just inverse the winding order of both face3 elements
+      this.makeFace3(vertIndexA, vertIndexC, vertIndexB, false);
+      this.makeFace3(vertIndexC, vertIndexD, vertIndexB, false);
+    } else {
+      this.makeFace3(vertIndexA, vertIndexB, vertIndexC, false);
+      this.makeFace3(vertIndexB, vertIndexD, vertIndexC, false);
+    }
   };
 
   /**
@@ -696,9 +736,16 @@
    * @param {number} vertIndexA
    * @param {number} vertIndexB
    * @param {number} vertIndexC
+   * @param {boolean=false} inverseFaceDirection - If true then the face will have left winding order (instead of right which is the default).
    */
-  DildoGeometry.prototype.makeFace3 = function (vertIndexA, vertIndexB, vertIndexC) {
-    this.faces.push(new THREE.Face3(vertIndexA, vertIndexB, vertIndexC));
+  DildoGeometry.prototype.makeFace3 = function (vertIndexA, vertIndexB, vertIndexC, inverseFaceDirection) {
+    // console.log("inverseFaceDirection", inverseFaceDirection);
+    if (inverseFaceDirection) {
+      this.faces.push(new THREE.Face3(vertIndexC, vertIndexB, vertIndexA));
+      // this.faces.push(new THREE.Face3(vertIndexA, vertIndexB, vertIndexC));
+    } else {
+      this.faces.push(new THREE.Face3(vertIndexA, vertIndexB, vertIndexC));
+    }
   };
 
   /**
@@ -710,18 +757,34 @@
    * @param {number} d
    * @param {number} outlineSegmentCount - The total number of segments on the outline.
    * @param {number} baseShapeSegmentCount - The total number of segments on the base shape.
+   * @param {boolean=false} inverseFaceDirection - If true then the UV mapping is applied in left winding order (instead of right which is the default).
    */
-  DildoGeometry.prototype.addUV4 = function (a, b, c, d, outlineSegmentCount, baseShapeSegmentCount) {
-    this.faceVertexUvs[0].push([
-      new THREE.Vector2(a / outlineSegmentCount, b / baseShapeSegmentCount),
-      new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount),
-      new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount)
-    ]);
-    this.faceVertexUvs[0].push([
-      new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount),
-      new THREE.Vector2(c / outlineSegmentCount, d / baseShapeSegmentCount),
-      new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount)
-    ]);
+  DildoGeometry.prototype.addUV4 = function (a, b, c, d, outlineSegmentCount, baseShapeSegmentCount, inverseFaceDirection) {
+    if (inverseFaceDirection) {
+      // change: abc -> acb
+      // change: bdc -> cdb
+      this.faceVertexUvs[0].push([
+        new THREE.Vector2(a / outlineSegmentCount, b / baseShapeSegmentCount),
+        new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount),
+        new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount)
+      ]);
+      this.faceVertexUvs[0].push([
+        new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount),
+        new THREE.Vector2(c / outlineSegmentCount, d / baseShapeSegmentCount),
+        new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount)
+      ]);
+    } else {
+      this.faceVertexUvs[0].push([
+        new THREE.Vector2(a / outlineSegmentCount, b / baseShapeSegmentCount),
+        new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount),
+        new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount)
+      ]);
+      this.faceVertexUvs[0].push([
+        new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount),
+        new THREE.Vector2(c / outlineSegmentCount, d / baseShapeSegmentCount),
+        new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount)
+      ]);
+    }
   };
 
   /**
