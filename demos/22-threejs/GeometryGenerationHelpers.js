@@ -106,6 +106,51 @@
       var ratioA = 1.0 - Math.abs(0.5 - a / baseShapeSegmentCount) * 2;
       var ratioB = 1.0 - Math.abs(0.5 - (a + 1) / baseShapeSegmentCount) * 2;
       geometry.faceVertexUvs[0].push([new THREE.Vector2(ratioA, 0), new THREE.Vector2(0.5, 1), new THREE.Vector2(ratioB, 0)]);
+    },
+
+    /**
+     * TODO: move to helper class
+     *
+     * @param {Array<XYCoords>} vertices2d
+     * @returns
+     */
+    flattenVert2dArray: function (vertices2d) {
+      // Array<number>
+      var coordinates = [];
+      for (var i = 0; i < vertices2d.length; i++) {
+        coordinates.push(vertices2d[i].x, vertices2d[i].y);
+      }
+      return coordinates;
     }
+
+    /**
+     * Convert the triangles (array of vertex indices) from a triangulation result to face3 elements
+     * inside the geometry.
+     *
+     * It is required that the vertices were already added; the mapping from the triangles to the
+     * vertices must be in the `flatIndices` array.
+     *
+     * The `triangleIndices` is expected to be a flat mapping:
+     *  [t1a, t1b, t1c,   t2a, t2b, t2c,  ...,  tna, tnb, tnc]
+     *   -Triplet 1-      -Triplet 2-     ...   -Triplet n-
+     *
+     * @param {THREE.Geometry} geometry - The geometry to add the faces to.
+     * @param {Array<number>} triangleIndices - A flat sequence of index triplets.
+     * @param {Array<number>} flatIndices - A mapping of triangle vertex indices in [0...m] to vertex indices [0...k] inside the geometry.
+     * @param {Array<[number,number,number]>} resultTriangleIndices - Remember the result mapping of final triangle faces.
+     */
+    // addTriangleFaces: function (geometry, triangleIndices, flatIndices, resultTriangleIndices) {
+    //   // var resultTriangleIndices = [];
+    //   for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
+    //     var a = triangleIndices[i];
+    //     var b = triangleIndices[i + 1];
+    //     var c = triangleIndices[i + 2];
+    //     // this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
+    //     GeometryGenerationHelpers.makeFace3(geometry, flatIndices[a], flatIndices[b], flatIndices[c]);
+    //     // this.leftFlatTriangleIndices.push([this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]]);
+    //     resultTriangleIndices.push([flatIndices[a], flatIndices[b], flatIndices[c]]);
+    //   }
+    //   return resultTriangleIndices;
+    // }
   };
 })(globalThis);

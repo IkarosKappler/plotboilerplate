@@ -44,11 +44,8 @@
     this.hollowBottomEdgeVertIndices = []; // [number,number,number,number, number, number]
     this.hollowBottomTriagles = []; // Array<[number,number,number]>
 
-    // this._buildVertices(options);
     _buildVertices.call(this, options);
-    // this._buildFaces(options);
     _buildFaces.call(this, options);
-    // this._buildUVMapping(options);
     _buildUVMapping.call(this, options);
 
     // Fill up missing UVs to avoid warnings
@@ -261,7 +258,7 @@
     var polygonVertices = this.leftFlatIndices.map(function (flatSideIndex) {
       return _self.vertices[flatSideIndex];
     });
-    var polygonData = flattenVert2dArray(polygonVertices);
+    var polygonData = GeometryGenerationHelpers.flattenVert2dArray(polygonVertices);
 
     // Step 3: run Earcut
     var triangleIndices = earcut(polygonData);
@@ -272,7 +269,6 @@
       var a = triangleIndices[i];
       var b = triangleIndices[i + 1];
       var c = triangleIndices[i + 2];
-      // this.makeFace3(this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
       GeometryGenerationHelpers.makeFace3(this, this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]);
       this.leftFlatTriangleIndices.push([this.leftFlatIndices[a], this.leftFlatIndices[b], this.leftFlatIndices[c]]);
     }
@@ -280,27 +276,39 @@
       var a = triangleIndices[i];
       var b = triangleIndices[i + 1];
       var c = triangleIndices[i + 2];
-      // this.makeFace3(this.rightFlatIndices[a], this.rightFlatIndices[c], this.rightFlatIndices[b]);
       GeometryGenerationHelpers.makeFace3(this, this.rightFlatIndices[a], this.rightFlatIndices[c], this.rightFlatIndices[b]);
       this.rightFlatTriangleIndices.push([this.rightFlatIndices[a], this.rightFlatIndices[b], this.rightFlatIndices[c]]);
     }
   };
 
-  DildoGeometry.prototype.getPerpendicularPathVertices = function (includeBottomVert) {
+  DildoGeometry.prototype.getPerpendicularPathVertices = function (includeBottomVert, getInner) {
     // Array<XYCoords>
     var polygonVertices = [];
     for (var i = 0; i < this.innerPerpLines.length; i++) {
-      polygonVertices.push(this.innerPerpLines[i].end);
+      polygonVertices.push(getInner ? this.innerPerpLines[i].start : this.innerPerpLines[i].end);
     }
     // Reverse the outer path segment (both begin at bottom and meet at the top)
     for (var i = this.outerPerpLines.length - 1; i >= 0; i--) {
-      polygonVertices.push(this.outerPerpLines[i].end);
+      polygonVertices.push(getInner ? this.outerPerpLines[i].start : this.outerPerpLines[i].end);
     }
     // Also add base point at last index
     if (includeBottomVert) {
       polygonVertices.push(this.vertices[this.bottomIndex]);
     }
     return polygonVertices;
+  };
+
+  DildoGeometry.prototype.getPerpendicularHullLines = function () {
+    // Array<XYCoords>
+    var perpLines = [];
+    for (var i = 0; i < this.innerPerpLines.length; i++) {
+      perpLines.push(this.innerPerpLines[i]);
+    }
+    // Reverse the outer path segment (both begin at bottom and meet at the top)
+    for (var i = this.outerPerpLines.length - 1; i >= 0; i--) {
+      perpLines.push(this.outerPerpLines[i]);
+    }
+    return perpLines;
   };
 
   /**
@@ -435,9 +443,6 @@
   };
 
   DildoGeometry.prototype._buildHollowBottomFaces = function () {
-    // var edgeVertIndices = [];
-    // hollowBottomEdgeVertIndices;
-
     var _self = this;
     var edgeVertices = this.hollowBottomEdgeVertIndices.map(function (edgeVertIndex) {
       return _self.vertices[edgeVertIndex];
@@ -491,12 +496,6 @@
   DildoGeometry.prototype._buildEndFaces = function (endVertexIndex, shapeIndex, baseShapeSegmentCount, inverseFaceDirection) {
     // Close at top.
     for (var i = 1; i < baseShapeSegmentCount; i++) {
-      // this.makeFace3(
-      //   this.vertexMatrix[shapeIndex][i - 1],
-      //   endVertexIndex,
-      //   this.vertexMatrix[shapeIndex][i],
-      //   inverseFaceDirection
-      // );
       GeometryGenerationHelpers.makeFace3(
         this,
         this.vertexMatrix[shapeIndex][i - 1],
@@ -505,7 +504,6 @@
         inverseFaceDirection
       );
       if (i + 1 == baseShapeSegmentCount) {
-        // this.makeFace3(this.vertexMatrix[shapeIndex][i], endVertexIndex, this.vertexMatrix[shapeIndex][0], inverseFaceDirection);
         GeometryGenerationHelpers.makeFace3(
           this,
           this.vertexMatrix[shapeIndex][i],
@@ -524,14 +522,7 @@
    */
   DildoGeometry.prototype.__makeBackFrontFaces = function () {
     // Connect left and right side (important: ignore bottom vertex at last index)
-    // for (var i = 1; i + 1 < this.leftFlatIndices.length; i++) {
     for (var i = 1; i + 1 < this.flatSidePolygon.vertices.length; i++) {
-      // this.makeFace4(
-      //   this.leftFlatIndices[i],
-      //   this.leftFlatIndices[i - 1],
-      //   this.rightFlatIndices[i],
-      //   this.rightFlatIndices[i - 1]
-      // );
       GeometryGenerationHelpers.makeFace4(
         this,
         this.leftFlatIndices[i],
@@ -561,7 +552,6 @@
     // https://stackoverflow.com/questions/20774648/three-js-generate-uv-coordinate
     for (var s = 1; s < outlineSegmentCount; s++) {
       for (var i = 1; i < baseShape.vertices.length; i++) {
-        // this.addUV4(s, i - 1, s - 1, i, outlineSegmentCount, baseShapeSegmentCount, makeHollow);
         GeometryGenerationHelpers.addCylindricUV4(
           this,
           s,
@@ -574,7 +564,6 @@
         );
         if (i + 1 == baseShape.vertices.length) {
           // Close the gap on the shape
-          // this.addUV4(s, i, s - 1, 0, outlineSegmentCount, baseShapeSegmentCount, makeHollow);
           GeometryGenerationHelpers.addCylindricUV4(
             this,
             s,
@@ -633,11 +622,9 @@
         makeHollowBottomUVs(this, this.hollowBottomEdgeVertIndices, this.hollowBottomTriagles);
       } else {
         for (var i = 1; i < baseShapeSegmentCount; i++) {
-          // this.addBaseUV3(i - 1, baseShapeSegmentCount);
           GeometryGenerationHelpers.addPyramidalBaseUV3(this, i - 1, baseShapeSegmentCount);
           if (i + 1 == baseShapeSegmentCount) {
             // Close the gap on the shape
-            // this.addBaseUV3(0, baseShapeSegmentCount);
             GeometryGenerationHelpers.addPyramidalBaseUV3(this, i - 1, baseShapeSegmentCount);
           }
         }
@@ -648,11 +635,9 @@
     if (closeTop) {
       var lastIndex = outlineSegmentCount - 1;
       for (var i = 1; i < baseShapeSegmentCount; i++) {
-        // this.addBaseUV3(i - 1, baseShapeSegmentCount);
         GeometryGenerationHelpers.addPyramidalBaseUV3(this, i - 1, baseShapeSegmentCount);
         if (i + 1 == baseShapeSegmentCount) {
           // Close the gap on the shape
-          // this.addBaseUV3(lastIndex, baseShapeSegmentCount);
           GeometryGenerationHelpers.addPyramidalBaseUV3(this, lastIndex, baseShapeSegmentCount);
         }
       }
@@ -680,13 +665,6 @@
    * @param {boolean=false} inverseFaceDirection - If true then the face will have left winding order (instead of right which is the default).
    */
   DildoGeometry.prototype.addFace4ByIndices = function (a, b, c, d, inverseFaceDirection) {
-    // this.makeFace4(
-    //   this.vertexMatrix[a][b],
-    //   this.vertexMatrix[c][b],
-    //   this.vertexMatrix[a][d],
-    //   this.vertexMatrix[c][d],
-    //   inverseFaceDirection
-    // );
     GeometryGenerationHelpers.makeFace4(
       this,
       this.vertexMatrix[a][b],
@@ -697,119 +675,11 @@
     );
   };
 
-  // /**
-  //  * Build a triangulated face4 (two face3) for the given vertex indices. The method will create
-  //  * two right-turning triangles by default, or two left-turning triangles if `inverseFaceDirection`.
-  //  *
-  //  * <pre>
-  //  *         A-----B
-  //  *         |   / |
-  //  *         |  /  |
-  //  *         | /   |
-  //  *         C-----D
-  //  * </pre>
-  //  *
-  //  * @param {number} vertIndexA - The first vertex index.
-  //  * @param {number} vertIndexB - The second vertex index.
-  //  * @param {number} vertIndexC - The third vertex index.
-  //  * @param {number} vertIndexD - The fourth vertex index.
-  //  * @param {boolean=false} inverseFaceDirection - If true then the face will have left winding order (instead of right which is the default).
-  //  */
-  // DildoGeometry.prototype.makeFace4 = function (vertIndexA, vertIndexB, vertIndexC, vertIndexD, inverseFaceDirection) {
-  //   if (inverseFaceDirection) {
-  //     // Just inverse the winding order of both face3 elements
-  //     // this.makeFace3(vertIndexA, vertIndexC, vertIndexB, false);
-  //     // this.makeFace3(vertIndexC, vertIndexD, vertIndexB, false);
-  //     GeometryGenerationHelpers.makeFace3(this, vertIndexA, vertIndexC, vertIndexB, false);
-  //     GeometryGenerationHelpers.makeFace3(this, vertIndexC, vertIndexD, vertIndexB, false);
-  //   } else {
-  //     // this.makeFace3(vertIndexA, vertIndexB, vertIndexC, false);
-  //     // this.makeFace3(vertIndexB, vertIndexD, vertIndexC, false);
-  //     GeometryGenerationHelpers.makeFace3(this, vertIndexA, vertIndexB, vertIndexC, false);
-  //     GeometryGenerationHelpers.makeFace3(this, vertIndexB, vertIndexD, vertIndexC, false);
-  //   }
-  // };
-
-  // /**
-  //  * Create a (right-turning) triangle of the three vertices at index A, B and C.
-  //  *
-  //  * @param {number} vertIndexA
-  //  * @param {number} vertIndexB
-  //  * @param {number} vertIndexC
-  //  * @param {boolean=false} inverseFaceDirection - If true then the face will have left winding order (instead of right which is the default).
-  //  */
-  // DildoGeometry.prototype.makeFace3 = function (vertIndexA, vertIndexB, vertIndexC, inverseFaceDirection) {
-  //   // // console.log("inverseFaceDirection", inverseFaceDirection);
-  //   // if (inverseFaceDirection) {
-  //   //   this.faces.push(new THREE.Face3(vertIndexC, vertIndexB, vertIndexA));
-  //   //   // this.faces.push(new THREE.Face3(vertIndexA, vertIndexB, vertIndexC));
-  //   // } else {
-  //   //   this.faces.push(new THREE.Face3(vertIndexA, vertIndexB, vertIndexC));
-  //   // }
-  //   GeometryGenerationHelpers.makeFace3(this, vertIndexA, vertIndexB, vertIndexC, inverseFaceDirection);
-  // };
-
-  // /**
-  //  * Create texture UV coordinates for the rectangular two  triangles at matrix indices a, b, c and d.
-  //  *
-  //  * @param {number} a
-  //  * @param {number} b
-  //  * @param {number} c
-  //  * @param {number} d
-  //  * @param {number} outlineSegmentCount - The total number of segments on the outline.
-  //  * @param {number} baseShapeSegmentCount - The total number of segments on the base shape.
-  //  * @param {boolean=false} inverseFaceDirection - If true then the UV mapping is applied in left winding order (instead of right which is the default).
-  //  */
-  // DildoGeometry.prototype.addUV4 = function (a, b, c, d, outlineSegmentCount, baseShapeSegmentCount, inverseFaceDirection) {
-  //   if (inverseFaceDirection) {
-  //     // change: abc -> acb
-  //     // change: bdc -> cdb
-  //     this.faceVertexUvs[0].push([
-  //       new THREE.Vector2(a / outlineSegmentCount, b / baseShapeSegmentCount),
-  //       new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount),
-  //       new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount)
-  //     ]);
-  //     this.faceVertexUvs[0].push([
-  //       new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount),
-  //       new THREE.Vector2(c / outlineSegmentCount, d / baseShapeSegmentCount),
-  //       new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount)
-  //     ]);
-  //   } else {
-  //     this.faceVertexUvs[0].push([
-  //       new THREE.Vector2(a / outlineSegmentCount, b / baseShapeSegmentCount),
-  //       new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount),
-  //       new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount)
-  //     ]);
-  //     this.faceVertexUvs[0].push([
-  //       new THREE.Vector2(c / outlineSegmentCount, b / baseShapeSegmentCount),
-  //       new THREE.Vector2(c / outlineSegmentCount, d / baseShapeSegmentCount),
-  //       new THREE.Vector2(a / outlineSegmentCount, d / baseShapeSegmentCount)
-  //     ]);
-  //   }
-  // };
-
-  // /**
-  //  * Create texture UV coordinates for the triangle at matrix indices a, b and c.
-  //  *
-  //  * @param {*} a
-  //  * @param {*} b
-  //  * @param {*} center
-  //  * @param {*} outlineSegmentCount
-  //  * @param {*} baseShapeSegmentCount
-  //  */
-  // DildoGeometry.prototype.addBaseUV3 = function (a, baseShapeSegmentCount) {
-  //   // Create a mirrored texture to avoid hard visual cuts
-  //   var ratioA = 1.0 - Math.abs(0.5 - a / baseShapeSegmentCount) * 2;
-  //   var ratioB = 1.0 - Math.abs(0.5 - (a + 1) / baseShapeSegmentCount) * 2;
-  //   this.faceVertexUvs[0].push([new THREE.Vector2(ratioA, 0), new THREE.Vector2(0.5, 1), new THREE.Vector2(ratioB, 0)]);
-  // };
-
   /**
    * Build up the vertices in this geometry.
    *
    * @param {} options
    */
-  // DildoGeometry.prototype._buildVertices = function (options) {
   var _buildVertices = function (options) {
     var baseShape = options.baseShape;
     var outline = options.outline;
@@ -928,20 +798,20 @@
     }
   };
 
-  /**
-   * TODO: move to helper class
-   *
-   * @param {Array<XYCoords>} vertices2d
-   * @returns
-   */
-  var flattenVert2dArray = function (vertices2d) {
-    // Array<number>
-    var coordinates = [];
-    for (var i = 0; i < vertices2d.length; i++) {
-      coordinates.push(vertices2d[i].x, vertices2d[i].y);
-    }
-    return coordinates;
-  };
+  // /**
+  //  * TODO: move to helper class
+  //  *
+  //  * @param {Array<XYCoords>} vertices2d
+  //  * @returns
+  //  */
+  // var flattenVert2dArray = function (vertices2d) {
+  //   // Array<number>
+  //   var coordinates = [];
+  //   for (var i = 0; i < vertices2d.length; i++) {
+  //     coordinates.push(vertices2d[i].x, vertices2d[i].y);
+  //   }
+  //   return coordinates;
+  // };
 
   // Expose the constructor to the global context.
   window.DildoGeometry = DildoGeometry;

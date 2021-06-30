@@ -301,27 +301,134 @@
   };
 
   var makeAndAddPlaneIntersection = function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
-    var planeMeshIntersection = new PlaneMeshIntersection();
-    var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
+    // var planeMeshIntersection = new PlaneMeshIntersection();
+    // var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
+    // var pointGeometry = new THREE.Geometry();
+    // pointGeometry.vertices = intersectionPoints;
+    // var pointsMaterial = new THREE.PointsMaterial({
+    //   size: 1,
+    //   color: 0x00a8ff
+    // });
+    // var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
+
+    // var linesMesh = new THREE.LineSegments(
+    //   pointGeometry,
+    //   new THREE.LineBasicMaterial({
+    //     color: 0xff8800
+    //   })
+    // );
+    // linesMesh.position.y = -100;
+    // linesMesh.position.z = -50;
+    // pointsMesh.position.y = -100;
+    // pointsMesh.position.z = -50;
+    // thisGenerator._addMesh(linesMesh);
+    // thisGenerator._addMesh(pointsMesh);
+
+    makeAndAddMassivePlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
+    makeAndAddHollowPlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
+  };
+
+  var makeAndAddMassivePlaneIntersection = function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
+    // var planeMeshIntersection = new PlaneMeshIntersection();
+    // Array<THREE.Vector3>
+    // var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
+    var intersectionPoints = unbufferedGeometry.getPerpendicularPathVertices(true, true); // includeBottom=true, getInner=true
+
     var pointGeometry = new THREE.Geometry();
     pointGeometry.vertices = intersectionPoints;
-    var pointsMaterial = new THREE.PointsMaterial({
-      size: 1,
-      color: 0x00a8ff
-    });
-    var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
 
-    var linesMesh = new THREE.LineSegments(
-      pointGeometry,
-      new THREE.LineBasicMaterial({
-        color: 0xff8800
-      })
-    );
-    linesMesh.position.y = -100;
-    linesMesh.position.z = -50;
+    var pointsMaterial = new THREE.MeshBasicMaterial({
+      wireframe: false,
+      color: 0xff0000,
+      opacity: 0.5,
+      side: THREE.DoubleSide,
+      transparent: true
+    });
+
+    // Array<number,number,number,...>
+    var polygonData = GeometryGenerationHelpers.flattenVert2dArray(intersectionPoints); // polygonVertices);
+    console.log(intersectionPoints, polygonData);
+
+    // Step 3: run Earcut
+    var triangleIndices = earcut(polygonData);
+    console.log("triangleIndices", triangleIndices);
+
+    // Step 4: process the earcut result;
+    //         add the retrieved triangles as geometry faces.
+    for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
+      var a = triangleIndices[i];
+      var b = triangleIndices[i + 1];
+      var c = triangleIndices[i + 2];
+      console.log(intersectionPoints.length, a, b, c);
+      GeometryGenerationHelpers.makeFace3(pointGeometry, a, b, c);
+      // this.leftFlatTriangleIndices.push([a, b, c]);
+    }
+
+    // var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
+    var pointsMesh = new THREE.Mesh(pointGeometry, pointsMaterial);
+    // linesMesh.position.y = -100;
+    // linesMesh.position.z = -50;
+    pointsMesh.position.y = -100;
+    pointsMesh.position.z = 50;
+    // thisGenerator._addMesh(linesMesh);
+    thisGenerator._addMesh(pointsMesh);
+  };
+
+  var makeAndAddHollowPlaneIntersection = function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
+    // var planeMeshIntersection = new PlaneMeshIntersection();
+    // Array<THREE.Vector3>
+    // var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
+    // var intersectionPoints = unbufferedGeometry.getPerpendicularPathVertices(true, true); // includeBottom=true, getInner=true
+    var pointGeometry = new THREE.Geometry();
+
+    var perpLines = unbufferedGeometry.getPerpendicularHullLines();
+    for (var i = 0; i < perpLines.length; i++) {
+      var innerPoint = perpLines[i].start;
+      var outerPoint = perpLines[i].end;
+      pointGeometry.vertices.push(innerPoint, outerPoint);
+      var vertIndex = pointGeometry.vertices.length;
+      if (i > 0) {
+        pointGeometry.faces.push(new THREE.Face3(vertIndex - 4, vertIndex - 2, vertIndex - 3));
+        pointGeometry.faces.push(new THREE.Face3(vertIndex - 3, vertIndex - 2, vertIndex - 1));
+      }
+    }
+
+    // pointGeometry.vertices = intersectionPoints;
+
+    var pointsMaterial = new THREE.MeshBasicMaterial({
+      wireframe: false,
+      color: 0xff0000,
+      opacity: 0.5,
+      side: THREE.DoubleSide,
+      transparent: true
+    });
+
+    // Array<number,number,number,...>
+    // var polygonData = GeometryGenerationHelpers.flattenVert2dArray(intersectionPoints); // polygonVertices);
+    // console.log(intersectionPoints, polygonData);
+
+    // // Step 3: run Earcut
+    // var triangleIndices = earcut(polygonData);
+    // console.log("triangleIndices", triangleIndices);
+
+    // // Step 4: process the earcut result;
+    // //         add the retrieved triangles as geometry faces.
+    // for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
+    //   var a = triangleIndices[i];
+    //   var b = triangleIndices[i + 1];
+    //   var c = triangleIndices[i + 2];
+    //   console.log(intersectionPoints.length, a, b, c);
+    //   GeometryGenerationHelpers.makeFace3(pointGeometry, a, b, c);
+    //   // this.leftFlatTriangleIndices.push([a, b, c]);
+    // }
+
+    // var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
+    var pointsMesh = new THREE.Mesh(pointGeometry, pointsMaterial);
+    // linesMesh.position.y = -100;
+    // linesMesh.position.z = -50;
     pointsMesh.position.y = -100;
     pointsMesh.position.z = -50;
-    thisGenerator._addMesh(linesMesh);
+    // thisGenerator._addMesh(linesMesh);
     thisGenerator._addMesh(pointsMesh);
   };
 

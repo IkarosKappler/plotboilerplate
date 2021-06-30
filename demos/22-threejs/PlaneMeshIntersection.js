@@ -35,7 +35,7 @@
    * @param {THREE.Mesh} mesh
    * @param {THREE.Geometry} geometry
    * @param {THREE.PlaneGeometry} plane
-   * @returns
+   * @returns {Array<THREE.Vector3>}
    */
   PlaneMeshIntersection.prototype.getIntersectionPoints = function (mesh, geometry, plane) {
     // Note: this could also work with a directly passed Mesh.Plane object instead a THREE.PlaneGeometry.
