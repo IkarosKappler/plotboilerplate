@@ -1,4 +1,6 @@
 /**
+ * A class to manage 3d scenes and the generation of dildo models.
+ *
  * @author   Ikaros Kappler
  * @date     2020-07-01
  * @modified 2020-09-11 Added proper texture loading.
@@ -10,9 +12,6 @@
   var DildoGeneration = function (canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.parent = this.canvas.parentElement;
-
-    // Map<string,texture>
-    this.textureStore = new Map();
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
@@ -57,6 +56,9 @@
     animate();
   };
 
+  /**
+   * Resize the 3d canvas to fit its container.
+   */
   DildoGeneration.prototype.resizeCanvas = function () {
     let width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
     let height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
@@ -72,6 +74,9 @@
   };
 
   /**
+   * Clears the current scene and rebuilds everything from scratch according to the
+   * mesh options being passed.
+   *
    * @param {BezierPath} options.outline
    * @param {number}     options.segmentCount
    * @param {number}     options.outlineSegmentCount (>= 2).
@@ -86,14 +91,14 @@
     this.removeCachedGeometries();
 
     var baseRadius = options.outline.getBounds().width;
-    var baseShape = mkCircularPolygon(baseRadius, options.shapeSegmentCount);
+    var baseShape = GeometryGenerationHelpers.mkCircularPolygon(baseRadius, options.shapeSegmentCount);
     var dildoGeometry = new DildoGeometry(Object.assign({ baseShape: baseShape }, options));
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath !== "undefined";
     var textureImagePath = typeof options.textureImagePath !== "undefined" ? options.textureImagePath : null;
     var doubleSingleSide = options.renderFaces == "double" ? THREE.DoubleSide : THREE.SingleSide;
     var wireframe = typeof options.wireframe !== "undefined" ? options.wireframe : null;
 
-    var material = this._createMaterial(useTextureImage, wireframe, textureImagePath, doubleSingleSide);
+    var material = DildoMaterials.createMaterial(useTextureImage, wireframe, textureImagePath, doubleSingleSide);
     var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(dildoGeometry);
     bufferedGeometry.computeVertexNormals();
     var latheMesh = new THREE.Mesh(bufferedGeometry, material);
@@ -106,7 +111,7 @@
     });
 
     if (options.addSpine) {
-      addSpine(this, spineGeometry);
+      GeometryGenerationHelpers.addSpine(this, spineGeometry);
     }
 
     if (options.performSlice) {
@@ -115,7 +120,7 @@
     } else {
       latheMesh.position.y = -100;
       latheMesh.userData["isExportable"] = true;
-      this._addMesh(latheMesh);
+      this.addMesh(latheMesh);
 
       if (options.showNormals) {
         var vnHelper = new VertexNormalsHelper(latheMesh, options.normalsLength, 0x00ff00, 1);
@@ -126,16 +131,31 @@
 
     // Add perpendicular path?
     if (options.showPerpendiculars) {
-      addPerpendicularPaths(this, dildoGeometry);
+      GeometryGenerationHelpers.addPerpendicularPaths(this, dildoGeometry);
     }
   };
 
+  /**
+   * Perform the actual slice operation.
+   *
+   * This will create several new meshes:
+   *  * a left geometry slice (along the z- axis).
+   *  * a right geometry slice (along the z+ axis).
+   *  * an inner slice cut geometry (inside the dildo model, cutting it into two halves).
+   *  * an outer slice cut geometry (inside the mould model, cutting that one into two halves).
+   *
+   * These will always be generated, even if the options tell different; if so then they are set
+   * to be invisible.
+   *
+   * @param {THREE.Geometry} latheMesh - The buffered dildo geometry (required to perform the slice operation).
+   * @param {DildoGeometry} latheUnbufferedGeometry - The unbuffered dildo geometry (required to obtain the perpendicular path lines).
+   */
   DildoGeneration.prototype.__performPlaneSlice = function (latheMesh, latheUnbufferedGeometry) {
     var leftPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    makeAndAddSlice(this, latheUnbufferedGeometry, leftPlane, -50);
+    GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, leftPlane, -50);
 
     var rightPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
-    makeAndAddSlice(this, latheUnbufferedGeometry, rightPlane, 50);
+    GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, rightPlane, 50);
 
     // Find points on intersection path (this is a single path in this configuration)
     var planeGeom = new THREE.PlaneGeometry(300, 300);
@@ -149,12 +169,18 @@
       })
     );
     planeMesh.rotation.x = Math.PI / 5;
-    this._addMesh(planeMesh);
+    this.addMesh(planeMesh);
 
-    makeAndAddPlaneIntersection(this, latheMesh, latheUnbufferedGeometry, planeMesh);
+    GeometryGenerationHelpers.makeAndAddPlaneIntersection(this, latheMesh, latheUnbufferedGeometry, planeMesh);
   };
 
-  // NOT CURRENTLY IN USE (too unstable?)
+  /**
+   * NOT CURRENTLY IN USE (too unstable?)
+   *
+   * @param {*} latheMesh
+   * @param {*} latheUnbufferedGeometry
+   * @param {*} material
+   */
   DildoGeneration.prototype.__performCsgSlice = function (latheMesh, latheUnbufferedGeometry, material) {
     latheMesh.updateMatrix();
     var bbox = new THREE.Box3().setFromObject(latheMesh);
@@ -170,59 +196,24 @@
     cube_mesh.position.x = latheMesh.position.x + (bbox.max.x - bbox.min.x) / 4;
     cube_mesh.position.y = bbox.min.y + (bbox.max.y - bbox.min.y) / 2 + -30;
     cube_mesh.position.z = bbox.min.z + (bbox.max.z - bbox.min.z) / 2;
-    this._addMesh(cube_mesh);
+    this.addMesh(cube_mesh);
     var cube_bsp = new ThreeBSP(cube_mesh);
     var mesh_bsp = new ThreeBSP(new THREE.Mesh(latheUnbufferedGeometry, material));
     var subtract_bsp = cube_bsp.subtract(mesh_bsp);
     var result = subtract_bsp.toMesh(material);
-    this._addMesh(result);
-  };
-
-  DildoGeneration.prototype._addMesh = function (mesh) {
-    mesh.rotation.x = Math.PI;
-    this.scene.add(mesh);
-    this.geometries.push(mesh);
+    this.addMesh(result);
   };
 
   /**
+   * Add a mesh to the underlying scene.
    *
-   * @param {*} useTextureImage
-   * @param {*} wireframe
-   * @param {*} textureImagePath
-   * @param {*} doubleSingleSide THREE.DoubleSide | THREE.SingleSide
-   * @returns
+   * The function will make some modifications to the rotation of the meshes.
+   * @param {THREE.Mesh} mesh
    */
-  DildoGeneration.prototype._createMaterial = function (useTextureImage, wireframe, textureImagePath, doubleSingleSide) {
-    return useTextureImage
-      ? new THREE.MeshLambertMaterial({
-          color: 0xffffff,
-          wireframe: wireframe,
-          flatShading: false,
-          depthTest: true,
-          opacity: 1.0,
-          // side: THREE.DoubleSide,
-          side: doubleSingleSide,
-          visible: true,
-          emissive: 0x0,
-          reflectivity: 1.0,
-          refractionRatio: 0.89,
-          map: this.loadTextureImage(textureImagePath)
-        })
-      : new THREE.MeshPhongMaterial({
-          color: 0x3838ff,
-          wireframe: wireframe,
-          flatShading: false,
-          depthTest: true,
-          opacity: 1.0,
-          // side: THREE.DoubleSide,
-          side: doubleSingleSide,
-          visible: true,
-          emissive: 0x0,
-          reflectivity: 1.0,
-          refractionRatio: 0.89,
-          specular: 0x888888,
-          map: null
-        });
+  DildoGeneration.prototype.addMesh = function (mesh) {
+    mesh.rotation.x = Math.PI;
+    this.scene.add(mesh);
+    this.geometries.push(mesh);
   };
 
   DildoGeneration.prototype.removeCachedGeometries = function () {
@@ -237,20 +228,10 @@
     this.geometries = [];
   };
 
-  DildoGeneration.prototype.loadTextureImage = function (path) {
-    var texture = this.textureStore.get(path);
-    if (!texture) {
-      var loader = new THREE.TextureLoader();
-      var texture = loader.load(path);
-      this.textureStore.set(path, texture);
-    }
-    return texture;
-  };
-
   /**
-   * Generate an STL string.
+   * Generate an STL string from the (exportable) meshes that are currently stored inside this generator.
    *
-   * @param {function} options.onComplete
+   * @param {function(string)} options.onComplete
    **/
   DildoGeneration.prototype.generateSTL = function (options) {
     var exporter = new THREE.STLExporter();
@@ -266,202 +247,6 @@
     } else {
       console.warn("STL data was generated but no 'onComplete' callback was defined.");
     }
-  };
-
-  /**
-   * A helper function to create (discrete) circular shapes.
-   *
-   * @param {number} radius - The radius of the circle.
-   * @param {number} pointCount - The number of vertices to construct the circle with.
-   * @returns {Polygon}
-   */
-  var mkCircularPolygon = function (radius, pointCount) {
-    var vertices = [];
-    var phi;
-    for (var i = 0; i < pointCount; i++) {
-      phi = Math.PI * 2 * (i / pointCount);
-      vertices.push(new Vertex(Math.cos(phi) * radius, Math.sin(phi) * radius));
-    }
-    return new Polygon(vertices, false);
-  };
-
-  // @param {THREE.PlaneGeometry}
-  // var _self = this;
-  var makeAndAddSlice = function (thisGenerator, unbufferedGeometry, plane, zOffset) {
-    // Slice mesh into two
-    // See https://github.com/tdhooper/threejs-slice-geometry
-    var closeHoles = false;
-    var sliceMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
-    var slicedGeometry = sliceGeometry(unbufferedGeometry, plane, closeHoles);
-    var slicedMesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
-    slicedMesh.position.y = -100;
-    slicedMesh.position.z = zOffset;
-    slicedMesh.userData["isExportable"] = true;
-    thisGenerator._addMesh(slicedMesh);
-  };
-
-  var makeAndAddPlaneIntersection = function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
-    // var planeMeshIntersection = new PlaneMeshIntersection();
-    // var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
-    // var pointGeometry = new THREE.Geometry();
-    // pointGeometry.vertices = intersectionPoints;
-    // var pointsMaterial = new THREE.PointsMaterial({
-    //   size: 1,
-    //   color: 0x00a8ff
-    // });
-    // var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
-
-    // var linesMesh = new THREE.LineSegments(
-    //   pointGeometry,
-    //   new THREE.LineBasicMaterial({
-    //     color: 0xff8800
-    //   })
-    // );
-    // linesMesh.position.y = -100;
-    // linesMesh.position.z = -50;
-    // pointsMesh.position.y = -100;
-    // pointsMesh.position.z = -50;
-    // thisGenerator._addMesh(linesMesh);
-    // thisGenerator._addMesh(pointsMesh);
-
-    makeAndAddMassivePlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
-    makeAndAddHollowPlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
-  };
-
-  var makeAndAddMassivePlaneIntersection = function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
-    // var planeMeshIntersection = new PlaneMeshIntersection();
-    // Array<THREE.Vector3>
-    // var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
-    var intersectionPoints = unbufferedGeometry.getPerpendicularPathVertices(true, true); // includeBottom=true, getInner=true
-
-    var pointGeometry = new THREE.Geometry();
-    pointGeometry.vertices = intersectionPoints;
-
-    var pointsMaterial = new THREE.MeshBasicMaterial({
-      wireframe: false,
-      color: 0xff0000,
-      opacity: 0.5,
-      side: THREE.DoubleSide,
-      transparent: true
-    });
-
-    // Array<number,number,number,...>
-    var polygonData = GeometryGenerationHelpers.flattenVert2dArray(intersectionPoints); // polygonVertices);
-    console.log(intersectionPoints, polygonData);
-
-    // Step 3: run Earcut
-    var triangleIndices = earcut(polygonData);
-    console.log("triangleIndices", triangleIndices);
-
-    // Step 4: process the earcut result;
-    //         add the retrieved triangles as geometry faces.
-    for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
-      var a = triangleIndices[i];
-      var b = triangleIndices[i + 1];
-      var c = triangleIndices[i + 2];
-      console.log(intersectionPoints.length, a, b, c);
-      GeometryGenerationHelpers.makeFace3(pointGeometry, a, b, c);
-      // this.leftFlatTriangleIndices.push([a, b, c]);
-    }
-
-    // var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
-    var pointsMesh = new THREE.Mesh(pointGeometry, pointsMaterial);
-    // linesMesh.position.y = -100;
-    // linesMesh.position.z = -50;
-    pointsMesh.position.y = -100;
-    pointsMesh.position.z = 50;
-    // thisGenerator._addMesh(linesMesh);
-    thisGenerator._addMesh(pointsMesh);
-  };
-
-  var makeAndAddHollowPlaneIntersection = function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
-    // var planeMeshIntersection = new PlaneMeshIntersection();
-    // Array<THREE.Vector3>
-    // var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
-    // var intersectionPoints = unbufferedGeometry.getPerpendicularPathVertices(true, true); // includeBottom=true, getInner=true
-    var pointGeometry = new THREE.Geometry();
-
-    var perpLines = unbufferedGeometry.getPerpendicularHullLines();
-    for (var i = 0; i < perpLines.length; i++) {
-      var innerPoint = perpLines[i].start;
-      var outerPoint = perpLines[i].end;
-      pointGeometry.vertices.push(innerPoint, outerPoint);
-      var vertIndex = pointGeometry.vertices.length;
-      if (i > 0) {
-        pointGeometry.faces.push(new THREE.Face3(vertIndex - 4, vertIndex - 2, vertIndex - 3));
-        pointGeometry.faces.push(new THREE.Face3(vertIndex - 3, vertIndex - 2, vertIndex - 1));
-      }
-    }
-
-    // pointGeometry.vertices = intersectionPoints;
-
-    var pointsMaterial = new THREE.MeshBasicMaterial({
-      wireframe: false,
-      color: 0xff0000,
-      opacity: 0.5,
-      side: THREE.DoubleSide,
-      transparent: true
-    });
-
-    // Array<number,number,number,...>
-    // var polygonData = GeometryGenerationHelpers.flattenVert2dArray(intersectionPoints); // polygonVertices);
-    // console.log(intersectionPoints, polygonData);
-
-    // // Step 3: run Earcut
-    // var triangleIndices = earcut(polygonData);
-    // console.log("triangleIndices", triangleIndices);
-
-    // // Step 4: process the earcut result;
-    // //         add the retrieved triangles as geometry faces.
-    // for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
-    //   var a = triangleIndices[i];
-    //   var b = triangleIndices[i + 1];
-    //   var c = triangleIndices[i + 2];
-    //   console.log(intersectionPoints.length, a, b, c);
-    //   GeometryGenerationHelpers.makeFace3(pointGeometry, a, b, c);
-    //   // this.leftFlatTriangleIndices.push([a, b, c]);
-    // }
-
-    // var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
-    var pointsMesh = new THREE.Mesh(pointGeometry, pointsMaterial);
-    // linesMesh.position.y = -100;
-    // linesMesh.position.z = -50;
-    pointsMesh.position.y = -100;
-    pointsMesh.position.z = -50;
-    // thisGenerator._addMesh(linesMesh);
-    thisGenerator._addMesh(pointsMesh);
-  };
-
-  var addSpine = function (thisGenerator, spineGeometry) {
-    var spineMesh = new THREE.LineSegments(
-      spineGeometry,
-      new THREE.LineBasicMaterial({
-        color: 0xff8800
-      })
-    );
-    spineMesh.position.y = -100;
-    thisGenerator._addMesh(spineMesh);
-  };
-
-  var addPerpendicularPaths = function (thisGenerator, unbufferedLatheGeometry) {
-    addPerpendicularPath(thisGenerator, unbufferedLatheGeometry.outerPerpLines, 0xff0000);
-    addPerpendicularPath(thisGenerator, unbufferedLatheGeometry.innerPerpLines, 0x00ff00);
-  };
-
-  var addPerpendicularPath = function (thisGenerator, perpLines, materialColor) {
-    var outerPerpGeometry = new THREE.Geometry();
-    perpLines.forEach(function (perpLine) {
-      outerPerpGeometry.vertices.push(perpLine.start.clone());
-      outerPerpGeometry.vertices.push(perpLine.end.clone());
-    });
-    var outerPerpMesh = new THREE.LineSegments(
-      outerPerpGeometry,
-      new THREE.LineBasicMaterial({
-        color: materialColor
-      })
-    );
-    outerPerpMesh.position.y = -100;
-    thisGenerator._addMesh(outerPerpMesh);
   };
 
   window.DildoGeneration = DildoGeneration;
