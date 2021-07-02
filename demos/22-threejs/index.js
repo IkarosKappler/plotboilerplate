@@ -337,7 +337,7 @@
       // prettier-ignore
       fold0.add(config, "renderFaces", ["double","single"]).onChange( function() { rebuild() } ).name('renderFaces').title('Render mesh faces double or single sided?');
       // prettier-ignore
-      fold0.add(config, "twistAngle").min(-360.0).max(360.0).onChange( function() { rebuild() } ).name('twistAngle').title('Twist the mesh along its spine.');
+      fold0.add(config, "twistAngle").min(-360.0*3).max(360.0*3).onChange( function() { rebuild() } ).name('twistAngle').title('Twist the mesh along its spine.');
 
       var fold1 = gui.addFolder("Export");
       // prettier-ignore

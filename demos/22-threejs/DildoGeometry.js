@@ -15,6 +15,8 @@
 // + port to typescript
 
 (function () {
+  var DEG_TO_RAD = Math.PI / 180.0;
+
   /**
    * Create a new dildo geometry from the passed options..
    *
@@ -68,6 +70,7 @@
    * @param {number=} arcRadius
    * @param {boolean=} normalizePerpendiculars
    * @param {number=} normalsLength
+   * @param {number=0} shapeTwistAngle - The angle to twist this particular shape around the y axis.
    * @return { yMin: number, yMax : number }
    */
   DildoGeometry.prototype.__buildSlice = function (
@@ -78,17 +81,22 @@
     heightT,
     isBending,
     bendAngle,
-    arcRadius
+    arcRadius,
+    shapeTwistAngle
   ) {
     var outlineXPct = (outlineBounds.max.x - outlineVert.x) / outlineBounds.width;
     for (var i = 0; i < baseShape.vertices.length; i++) {
       var shapeVert = baseShape.vertices[i];
       if (isBending) {
         var vert = new THREE.Vector3(shapeVert.x * outlineXPct, 0, shapeVert.y * outlineXPct);
+        // Apply twist
+        rotateVertY(vert, shapeTwistAngle, 0, 0);
         this._bendVertex(vert, bendAngle, arcRadius, heightT);
         vert.y += outlineBounds.max.y;
       } else {
         var vert = new THREE.Vector3(shapeVert.x * outlineXPct, outlineVert.y, shapeVert.y * outlineXPct);
+        // Apply twist
+        rotateVertY(vert, shapeTwistAngle, 0, 0);
       }
       this.vertexMatrix[sliceIndex][i] = this.vertices.length;
       this.vertices.push(vert);
@@ -366,7 +374,7 @@
   };
 
   /**
-   * Rotate a 3d vector around the z axis.
+   * Rotate a 3d vector around the z axis (back-front-axis).
    *
    * @param {THREE.Vector3} vert
    * @param {THREE.Vector3} angle
@@ -374,6 +382,7 @@
    * @param {number} yCenter
    * @returns
    */
+  // TODO: move to helpers
   var rotateVert = function (vert, angle, xCenter, yCenter) {
     var axis = new THREE.Vector3(0, 0, 1);
     vert.x -= xCenter;
@@ -381,6 +390,26 @@
     vert.applyAxisAngle(axis, angle);
     vert.x += xCenter;
     vert.y += yCenter;
+    return vert;
+  };
+
+  /**
+   * Rotate a 3d vector around the y axis (up-down-axis).
+   *
+   * @param {THREE.Vector3} vert
+   * @param {THREE.Vector3} angle
+   * @param {number} xCenter
+   * @param {number} zCenter
+   * @returns
+   */
+  // TODO: move to helpers
+  var rotateVertY = function (vert, angle, xCenter, zCenter) {
+    var axis = new THREE.Vector3(0, 1, 0);
+    vert.x -= xCenter;
+    vert.z -= zCenter;
+    vert.applyAxisAngle(axis, angle);
+    vert.x += xCenter;
+    vert.z += zCenter;
     return vert;
   };
 
@@ -687,6 +716,7 @@
     var makeHollow = Boolean(options.makeHollow);
     var bendAngleRad = (options.bendAngle / 180) * Math.PI;
     var hollowStrength = 15.0;
+    var twistAngle = options.twistAngle * DEG_TO_RAD;
 
     var normalizePerpendiculars = Boolean(options.normalizePerpendiculars);
     var normalsLength = typeof options.normalsLength !== "undefined" ? options.normalsLength : 10.0;
@@ -710,7 +740,18 @@
       var outlineVert = outline.getPointAt(t);
       var perpendicularVert = outline.getPerpendicularAt(t);
       var heightT = (outlineBounds.max.y - outlineVert.y) / shapeHeight;
-      this.__buildSlice(baseShape, outlineBounds, outlineVert, s, heightT, isBending, bendAngleRad, arcRadius);
+      var outlineT = s / (outlineSegmentCount - 1);
+      this.__buildSlice(
+        baseShape,
+        outlineBounds,
+        outlineVert,
+        s,
+        heightT,
+        isBending,
+        bendAngleRad,
+        arcRadius,
+        twistAngle * outlineT
+      );
       this.__buildSpine(shapeCenter, outlineBounds, outlineVert, heightT, isBending, bendAngleRad, arcRadius);
       this.__buildPerps(
         baseShape,
