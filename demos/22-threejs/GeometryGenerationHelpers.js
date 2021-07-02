@@ -153,13 +153,15 @@
      * @param {THREE.PlaneGeometry} plane
      * @param {number} zOffset - The z offset to use for the slice result position.
      */
-    makeAndAddSlice: function (thisGenerator, unbufferedGeometry, plane, zOffset) {
+    makeAndAddSlice: function (thisGenerator, unbufferedGeometry, plane, zOffset, wireframe) {
       // Slice mesh into two
       // See https://github.com/tdhooper/threejs-slice-geometry
       var closeHoles = false;
-      var sliceMaterial = new THREE.MeshBasicMaterial({ wireframe: true });
+      var sliceMaterial = DildoMaterials.createSliceMaterial(wireframe); //  new THREE.MeshBasicMaterial({ wireframe: wireframe, color: 0xa8a8a8 });
       var slicedGeometry = sliceGeometry(unbufferedGeometry, plane, closeHoles);
+      slicedGeometry.computeFaceNormals();
       var slicedMesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
+      // var slicedMesh = new THREE.Mesh(new THREE.BufferGeometry().fromGeometry(slicedGeometry), sliceMaterial);
       slicedMesh.position.y = -100;
       slicedMesh.position.z = zOffset;
       slicedMesh.userData["isExportable"] = true;

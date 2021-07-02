@@ -76,7 +76,8 @@
         addSpine: false,
         performSlice: false,
         makeHollow: false,
-        renderFaces: "double", // or "single" THREE.DoubleSide, // THREE.DoubleSide or THREE.SingleSide
+        renderFaces: "double", // "double" or "single"
+        twistAngle: 0.0,
         exportSTL: function () {
           exportSTL();
         },
@@ -335,6 +336,8 @@
       fold0.add(config, "makeHollow").onChange( function() { rebuild() } ).name('makeHollow').title('Make a hollow mold?');
       // prettier-ignore
       fold0.add(config, "renderFaces", ["double","single"]).onChange( function() { rebuild() } ).name('renderFaces').title('Render mesh faces double or single sided?');
+      // prettier-ignore
+      fold0.add(config, "twistAngle").min(-360.0).max(360.0).onChange( function() { rebuild() } ).name('twistAngle').title('Twist the mesh along its spine.');
 
       var fold1 = gui.addFolder("Export");
       // prettier-ignore

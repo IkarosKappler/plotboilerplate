@@ -17,16 +17,25 @@
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
     this.camera.position.z = 500;
 
-    this.ambientLightA = new THREE.AmbientLight(0xffffff);
-    this.ambientLightA.position.set(350, 350, 50);
+    var lightDistanceFactor = 10.0;
+
+    // this.ambientLightA = new THREE.AmbientLight(0xffffff);
+    this.ambientLightA = new THREE.PointLight(0xffffff, 5.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
+    this.ambientLightA.position.set(350, 0, -350).multiplyScalar(lightDistanceFactor);
     this.scene.add(this.ambientLightA);
 
-    this.directionalLightA = new THREE.DirectionalLight(0xffffff, 1);
-    this.directionalLightA.position.set(350, 350, 50);
-    this.scene.add(this.directionalLightA);
+    this.ambientLightB = new THREE.PointLight(0xffffff, 5.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
+    this.ambientLightB.position.set(-350, 0, 350).multiplyScalar(lightDistanceFactor);
+    this.scene.add(this.ambientLightB);
 
-    this.directionalLightB = new THREE.DirectionalLight(0xffffff, 1);
-    this.directionalLightB.position.set(-350, -350, -50);
+    this.directionalLightA = new THREE.DirectionalLight(0xffffff, 2.0);
+    // this.directionalLightA = new THREE.PointLight(0xffffff, 1.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
+    this.directionalLightA.position.set(350, 350, 350).multiplyScalar(lightDistanceFactor);
+    this.scene.add(this.directionalLightA);
+    this.scene.add(this.directionalLightA.target);
+
+    this.directionalLightB = new THREE.DirectionalLight(0xffffff, 2.0);
+    this.directionalLightB.position.set(-350, -350, -50).multiplyScalar(lightDistanceFactor);
     this.scene.add(this.directionalLightB);
 
     this.renderer = new THREE.WebGLRenderer({
@@ -98,7 +107,7 @@
     var doubleSingleSide = options.renderFaces == "double" ? THREE.DoubleSide : THREE.SingleSide;
     var wireframe = typeof options.wireframe !== "undefined" ? options.wireframe : null;
 
-    var material = DildoMaterials.createMaterial(useTextureImage, wireframe, textureImagePath, doubleSingleSide);
+    var material = DildoMaterials.createMainMaterial(useTextureImage, wireframe, textureImagePath, doubleSingleSide);
     var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(dildoGeometry);
     bufferedGeometry.computeVertexNormals();
     var latheMesh = new THREE.Mesh(bufferedGeometry, material);
@@ -115,7 +124,7 @@
     }
 
     if (options.performSlice) {
-      this.__performPlaneSlice(latheMesh, dildoGeometry);
+      this.__performPlaneSlice(latheMesh, dildoGeometry, wireframe);
       // this.__performCsgSlice(latheMesh, geometry, material);
     } else {
       latheMesh.position.y = -100;
@@ -149,13 +158,14 @@
    *
    * @param {THREE.Geometry} latheMesh - The buffered dildo geometry (required to perform the slice operation).
    * @param {DildoGeometry} latheUnbufferedGeometry - The unbuffered dildo geometry (required to obtain the perpendicular path lines).
+   * @param {boolean} wireframe
    */
-  DildoGeneration.prototype.__performPlaneSlice = function (latheMesh, latheUnbufferedGeometry) {
+  DildoGeneration.prototype.__performPlaneSlice = function (latheMesh, latheUnbufferedGeometry, wireframe) {
     var leftPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, leftPlane, -50);
+    GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, leftPlane, -50, wireframe);
 
     var rightPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
-    GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, rightPlane, 50);
+    GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, rightPlane, 50, wireframe);
 
     // Find points on intersection path (this is a single path in this configuration)
     var planeGeom = new THREE.PlaneGeometry(300, 300);
@@ -164,13 +174,12 @@
       new THREE.MeshBasicMaterial({
         color: "lightgray",
         transparent: true,
-        opacity: 0.75,
+        opacity: 0.55,
         side: THREE.DoubleSide
       })
     );
     planeMesh.rotation.x = Math.PI / 5;
     this.addMesh(planeMesh);
-
     GeometryGenerationHelpers.makeAndAddPlaneIntersection(this, latheMesh, latheUnbufferedGeometry, planeMesh);
   };
 

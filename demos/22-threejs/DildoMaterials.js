@@ -24,7 +24,7 @@
      * @param {THREE.DoubleSide|THREE.SingleSide} doubleSingleSide - Wether to display one one or both face sides.
      * @returns
      */
-    createMaterial: function (useTextureImage, wireframe, textureImagePath, doubleSingleSide) {
+    createMainMaterial: function (useTextureImage, wireframe, textureImagePath, doubleSingleSide) {
       return useTextureImage
         ? new THREE.MeshLambertMaterial({
             color: 0xffffff,
@@ -55,6 +55,30 @@
             specular: 0x888888,
             map: null
           });
+    },
+
+    createSliceMaterial: function (wireframe) {
+      if (wireframe) {
+        return new THREE.MeshBasicMaterial({ wireframe: true });
+        // return new THREE.MeshStandardMaterial({ wireframe: true });
+      } else {
+        return new THREE.MeshLambertMaterial({
+          color: 0xa1848a8, // 0xff0000, // 0x3838ff,
+          wireframe: false, // wireframe,
+          flatShading: false,
+          depthTest: true,
+          opacity: 1.0,
+          side: THREE.DoubleSide,
+          // side: doubleSingleSide,
+          visible: true,
+          emissive: 0x0,
+          reflectivity: 1.0,
+          refractionRatio: 0.89,
+          specular: 0x888888,
+          map: null,
+          vertexColors: false
+        });
+      }
     },
 
     /**
