@@ -131,14 +131,18 @@
      *
      * @param {number} radius - The radius of the circle.
      * @param {number} pointCount - The number of vertices to construct the circle with.
+     * @param {number=1.0} excentricity - To create ellipses (default is 1.0).
      * @returns {Polygon}
      */
-    mkCircularPolygon: function (radius, pointCount) {
+    mkCircularPolygon: function (radius, pointCount, excentricity) {
+      if (typeof excentricity === "undefined") {
+        excentricity = 1.0;
+      }
       var vertices = [];
       var phi;
       for (var i = 0; i < pointCount; i++) {
         phi = Math.PI * 2 * (i / pointCount);
-        vertices.push(new Vertex(Math.cos(phi) * radius, Math.sin(phi) * radius));
+        vertices.push(new Vertex(Math.cos(phi) * radius * excentricity, Math.sin(phi) * radius));
       }
       return new Polygon(vertices, false);
     },

@@ -78,6 +78,7 @@
         makeHollow: false,
         renderFaces: "double", // "double" or "single"
         twistAngle: 0.0,
+        baseShapeExcentricity: 1.0,
         exportSTL: function () {
           exportSTL();
         },
@@ -338,6 +339,8 @@
       fold0.add(config, "renderFaces", ["double","single"]).onChange( function() { rebuild() } ).name('renderFaces').title('Render mesh faces double or single sided?');
       // prettier-ignore
       fold0.add(config, "twistAngle").min(-360.0*3).max(360.0*3).onChange( function() { rebuild() } ).name('twistAngle').title('Twist the mesh along its spine.');
+      // prettier-ignore
+      fold0.add(config, "baseShapeExcentricity").min(0.1).max(2.0).onChange( function() { rebuild() } ).name('baseShapeExcentricity').title('Make the base shape more elliptic.');
 
       var fold1 = gui.addFolder("Export");
       // prettier-ignore

@@ -100,7 +100,11 @@
     this.removeCachedGeometries();
 
     var baseRadius = options.outline.getBounds().width;
-    var baseShape = GeometryGenerationHelpers.mkCircularPolygon(baseRadius, options.shapeSegmentCount);
+    var baseShape = GeometryGenerationHelpers.mkCircularPolygon(
+      baseRadius,
+      options.shapeSegmentCount,
+      options.baseShapeExcentricity
+    );
     var dildoGeometry = new DildoGeometry(Object.assign({ baseShape: baseShape }, options));
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath !== "undefined";
     var textureImagePath = typeof options.textureImagePath !== "undefined" ? options.textureImagePath : null;
