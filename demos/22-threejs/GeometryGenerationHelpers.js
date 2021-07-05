@@ -173,6 +173,29 @@
     },
 
     makeAndAddPlaneIntersection: function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
+      var planeMeshIntersection = new PlaneMeshIntersection();
+      var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
+      var pointGeometry = new THREE.Geometry();
+      pointGeometry.vertices = intersectionPoints;
+      var pointsMaterial = new THREE.PointsMaterial({
+        size: 2,
+        color: 0x00ffff
+      });
+      var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
+
+      // var linesMesh = new THREE.LineSegments(
+      //   pointGeometry,
+      //   new THREE.LineBasicMaterial({
+      //     color: 0xff8800
+      //   })
+      // );
+      // linesMesh.position.y = -100;
+      // linesMesh.position.z = -50;
+      // thisGenerator.addMesh(linesMesh);
+      pointsMesh.position.y = -100;
+      pointsMesh.position.z = -50;
+      thisGenerator.addMesh(pointsMesh);
+
       GeometryGenerationHelpers.makeAndAddMassivePlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
       GeometryGenerationHelpers.makeAndAddHollowPlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
     },
