@@ -170,10 +170,13 @@
       slicedMesh.position.z = zOffset;
       slicedMesh.userData["isExportable"] = true;
       thisGenerator.addMesh(slicedMesh);
+      return slicedGeometry;
     },
 
     makeAndAddPlaneIntersection: function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
+      // Find the cut path
       var planeMeshIntersection = new PlaneMeshIntersection();
+      // Array<THREE.Vector3>  (compatible with XYCoords :)
       var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
       var pointGeometry = new THREE.Geometry();
       pointGeometry.vertices = intersectionPoints;
@@ -196,8 +199,44 @@
       pointsMesh.position.z = -50;
       thisGenerator.addMesh(pointsMesh);
 
+      // TODO: convert point set to path
+      // Test: make a triangulation to see what the path looks like
+      var polygonData = GeometryGenerationHelpers.flattenVert2dArray(intersectionPoints);
+      // Run Earcut
+      var triangleIndices = earcut(polygonData);
+      // Process the earcut result;
+      //         add the retrieved triangles as geometry faces.
+      var triangleGeometry = new THREE.Geometry();
+      for (var i = 0; i < intersectionPoints.length; i++) {
+        triangleGeometry.vertices.push(intersectionPoints[i].clone());
+      }
+      for (var i = 0; i + 2 < triangleIndices.length; i += 3) {
+        var a = triangleIndices[i];
+        var b = triangleIndices[i + 1];
+        var c = triangleIndices[i + 2];
+        GeometryGenerationHelpers.makeFace3(triangleGeometry, a, b, c);
+      }
+      var triangleMesh = new THREE.Mesh(
+        triangleGeometry,
+        new THREE.LineBasicMaterial({
+          color: 0xff8800
+        })
+      );
+      triangleMesh.position.y = -100;
+      triangleMesh.position.z = -50;
+      thisGenerator.addMesh(triangleMesh);
+
+      // // Find the connected path (there is only one if the choose the cut plane properly)
+      // // Array<number[]>
+      // var connectedPaths = new PathFinder().findAllPathsOnMesh(unbufferedGeometry, intersectionPoints);
+      // consolel.log("connectedPaths", connectedPaths);
+      // END Test
+
+      // Make the actual models
       GeometryGenerationHelpers.makeAndAddMassivePlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
       GeometryGenerationHelpers.makeAndAddHollowPlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
+
+      return intersectionPoints;
     },
 
     makeAndAddMassivePlaneIntersection: function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {

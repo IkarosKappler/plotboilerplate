@@ -166,10 +166,10 @@
    */
   DildoGeneration.prototype.__performPlaneSlice = function (latheMesh, latheUnbufferedGeometry, wireframe) {
     var leftPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, leftPlane, -50, wireframe);
+    var leftSliceGeometry = GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, leftPlane, -50, wireframe);
 
     var rightPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
-    GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, rightPlane, 50, wireframe);
+    var rightSliceGeometry = GeometryGenerationHelpers.makeAndAddSlice(this, latheUnbufferedGeometry, rightPlane, 50, wireframe);
 
     // Find points on intersection path (this is a single path in this configuration)
     var planeGeom = new THREE.PlaneGeometry(300, 300);
@@ -184,7 +184,20 @@
     );
     planeMesh.rotation.x = Math.PI / 5;
     this.addMesh(planeMesh);
-    GeometryGenerationHelpers.makeAndAddPlaneIntersection(this, latheMesh, latheUnbufferedGeometry, planeMesh);
+    // Array<Vector3>
+    var planeIntersectionPoints = GeometryGenerationHelpers.makeAndAddPlaneIntersection(
+      this,
+      latheMesh,
+      latheUnbufferedGeometry,
+      planeMesh
+    );
+    console.log("planeIntersectionPoints", planeIntersectionPoints);
+    console.log("leftSliceGeometry", leftSliceGeometry);
+
+    // Find the connected path (there is only one if the choose the cut plane properly)
+    // Array<number[]>
+    var connectedPaths = new PathFinder().findAllPathsOnMesh(leftSliceGeometry, planeIntersectionPoints);
+    console.log("connectedPaths", connectedPaths);
   };
 
   /**
