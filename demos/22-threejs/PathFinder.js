@@ -15,11 +15,13 @@
   };
 
   /**
+   * The pathVertices array should not contain duplicates.
    *
    * @param {THREE.Geometry} unbufferedGeometry - The geometry itself containing the path vertices.
    * @param {THREE.Vector3[]} pathVertices - The unsorted vertices (must form a connected path on the geometry).
    */
   PathFinder.prototype.findAllPathsOnMesh = function (unbufferedGeometry, pathVertices) {
+    console.log("pathVertices", pathVertices);
     var collectedPaths = []; // Array<number[]>
     this.visitedVertices.clear();
     this.unvisitedVertIndices.clear();
@@ -29,14 +31,21 @@
     // not be located in the geometry.
     //
     var pathVertIndices = mapVerticesToGeometryIndices(unbufferedGeometry, pathVertices);
+    for (var i = 0; i < pathVertIndices.length && i < 32; i++) {
+      console.log("i", i, pathVertIndices[i], unbufferedGeometry.vertices[pathVertIndices[i]], pathVertices[i]);
+    }
     var n = pathVertIndices.length;
     var _self = this;
     pathVertIndices.forEach(function (vertIndex) {
       _self.unvisitedVertIndices.add(vertIndex);
     });
     var c = 0;
-    while (this.numVisitedVertices < n && c++ < 100) {
-      var nextUnvisitedIndex = this.unvisitedVertIndices.entries().next().value;
+    while (this.numVisitedVertices < n && c++ < 32) {
+      // var nextUnvisitedIndex = this.unvisitedVertIndices.entries().next().value;
+      // var nextKey = this.unvisitedVertIndices.keys().next().value;
+      // var nextUnvisitedIndex = this.unvisitedVertIndices.get(nextKey); // this.unvisitedVertIndices.entries().next().value;
+      var nextUnvisitedIndex = this.unvisitedVertIndices.values().next().value;
+
       console.log("numVisitedVertices", this.numVisitedVertices, "nextUnvisitedIndex", nextUnvisitedIndex);
       // Array<number>
       var path = this.findUnvisitedPaths(unbufferedGeometry, pathVertIndices, nextUnvisitedIndex);
@@ -68,19 +77,19 @@
   };
 
   PathFinder.prototype.findAdjacentFace = function (unbufferedGeometry, pathVertIndices, unvisitedIndex) {
-    var n = unbufferedGeometry.faces.length;
-    for (var f = 0; f < n; f++) {
+    var faceCount = unbufferedGeometry.faces.length;
+    for (var f = 0; f < faceCount; f++) {
       // var face = unbufferedGeometry.faces[(startFaceIndex + f) % n];
       // Check if face contains the current un-visited vertex
       if (faceHasVertIndex(unbufferedGeometry, f, unvisitedIndex)) {
         // Face is a canditate to extend the path.
         // Check if there is a second un-visited path vertex
         for (var i = 0; i < pathVertIndices.length; i++) {
-          if (this.visitedVertices.has(i)) {
+          if (this.visitedVertices.has(pathVertIndices[i])) {
             continue;
           }
           if (faceHasVertIndex(unbufferedGeometry, f, pathVertIndices[i])) {
-            return { faceIndex: f, vertIndex: i };
+            return { faceIndex: f, vertIndex: pathVertIndices[i] };
           }
         }
       }
@@ -96,9 +105,11 @@
     var vertA = unbufferedGeometry.vertices[face.a];
     var vertB = unbufferedGeometry.vertices[face.b];
     var vertC = unbufferedGeometry.vertices[face.c];
-    if (vert.distanceTo(vertA) <= EPS || vert.distanceTo(vertB) <= EPS || vert.distanceTo(vertC) <= EPS) {
-      return;
-    }
+    return (
+      (!this.visitedVertices.has(face.a) && vert.distanceTo(vertA) <= EPS) ||
+      (!this.visitedVertices.has(face.b) && vert.distanceTo(vertB) <= EPS) ||
+      (!this.visitedVertices.has(face.c) && vert.distanceTo(vertC) <= EPS)
+    );
   };
 
   var faceHasVertIndex = function (unbufferedGeometry, f, unvisitedIndex) {
@@ -122,15 +133,17 @@
     for (var i = 0; i < pathVertices.length; i++) {
       var pathVert = pathVertices[i];
       var foundIndex = -1;
+      var foundDist = EPS;
       for (var j = 0; j < unbufferedGeometry.vertices.length; j++) {
         var curDist = unbufferedGeometry.vertices[j].distanceTo(pathVert);
-        if (curDist <= EPS) {
+        if (curDist < foundDist) {
           // Remember geometry index if closest to path vertex
           if (
             foundIndex === -1 ||
             (foundIndex !== -1 && unbufferedGeometry.vertices[foundIndex].distanceTo(pathVert) > curDist)
           ) {
             foundIndex = j;
+            foundDist = curDist;
           }
         }
       }

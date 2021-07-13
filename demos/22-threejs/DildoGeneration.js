@@ -193,11 +193,48 @@
     );
     console.log("planeIntersectionPoints", planeIntersectionPoints);
     console.log("leftSliceGeometry", leftSliceGeometry);
+    // var EPS = 0.000001;
+    // var uniquePlaneIntersectionPoints = clearDuplicateVertices3(planeIntersectionPoints, EPS);
+    // console.log(
+    //   "found #planeIntersectionPoints",
+    //   planeIntersectionPoints.length,
+    //   "# unique",
+    //   uniquePlaneIntersectionPoints.length
+    // );
 
     // Find the connected path (there is only one if the choose the cut plane properly)
     // Array<number[]>
     var connectedPaths = new PathFinder().findAllPathsOnMesh(leftSliceGeometry, planeIntersectionPoints);
-    console.log("connectedPaths", connectedPaths);
+    console.log("connectedPaths", connectedPaths.length, connectedPaths);
+    // TEST what the connected paths look like
+    for (var i in connectedPaths) {
+      var geometry = new THREE.Geometry();
+      geometry.vertices = connectedPaths[i].map(function (geometryVertexIndex) {
+        return leftSliceGeometry.vertices[geometryVertexIndex];
+      });
+      var linesMesh = new THREE.Line(
+        pointGeometry,
+        new THREE.LineBasicMaterial({
+          color: 0x8800a8
+        })
+      );
+      linesMesh.position.y = -100;
+      // linesMesh.position.z = -50;
+      this.addMesh(linesMesh);
+    }
+
+    // TEST what the line mesh looks like
+    var pointGeometry = new THREE.Geometry();
+    pointGeometry.vertices = planeIntersectionPoints;
+    var linesMesh = new THREE.Line(
+      pointGeometry,
+      new THREE.LineBasicMaterial({
+        color: 0x8800a8
+      })
+    );
+    linesMesh.position.y = -100;
+    // linesMesh.position.z = -50;
+    // this.addMesh(linesMesh);
   };
 
   /**
