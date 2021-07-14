@@ -31,19 +31,16 @@
     // not be located in the geometry.
     //
     var pathVertIndices = mapVerticesToGeometryIndices(unbufferedGeometry, pathVertices);
-    for (var i = 0; i < pathVertIndices.length && i < 32; i++) {
-      console.log("i", i, pathVertIndices[i], unbufferedGeometry.vertices[pathVertIndices[i]], pathVertices[i]);
-    }
+    // for (var i = 0; i < pathVertIndices.length && i < 32; i++) {
+    //   console.log("i", i, pathVertIndices[i], unbufferedGeometry.vertices[pathVertIndices[i]], pathVertices[i]);
+    // }
     var n = pathVertIndices.length;
     var _self = this;
     pathVertIndices.forEach(function (vertIndex) {
       _self.unvisitedVertIndices.add(vertIndex);
     });
-    var c = 0;
-    while (this.numVisitedVertices < n && c++ < 32) {
-      // var nextUnvisitedIndex = this.unvisitedVertIndices.entries().next().value;
-      // var nextKey = this.unvisitedVertIndices.keys().next().value;
-      // var nextUnvisitedIndex = this.unvisitedVertIndices.get(nextKey); // this.unvisitedVertIndices.entries().next().value;
+    var c = 128;
+    while (this.numVisitedVertices < n && c-- >= 0) {
       var nextUnvisitedIndex = this.unvisitedVertIndices.values().next().value;
 
       console.log("numVisitedVertices", this.numVisitedVertices, "nextUnvisitedIndex", nextUnvisitedIndex);
@@ -59,12 +56,13 @@
    */
   PathFinder.prototype.findUnvisitedPaths = function (unbufferedGeometry, pathVertIndices, unvisitedIndex) {
     var path = [unvisitedIndex]; // which elements?
-    this.numVisitedVertices++;
     this.visitedVertices.add(unvisitedIndex);
     this.unvisitedVertIndices.delete(unvisitedIndex);
+    this.numVisitedVertices++;
     // First: find the the face for this vertex index
     var faceAndVertIndex; // { faceIndex: number, vertIndex: number }
-    while ((faceAndVertIndex = this.findAdjacentFace(unbufferedGeometry, pathVertIndices, unvisitedIndex))) {
+    var count = 128;
+    while (count-- >= 0 && (faceAndVertIndex = this.findAdjacentFace(unbufferedGeometry, pathVertIndices, unvisitedIndex))) {
       var faceIndex = faceAndVertIndex.faceIndex;
       var vertIndex = faceAndVertIndex.vertIndex;
       // Retrieved face/vertex tuple represents the next element on the path
@@ -72,48 +70,76 @@
       this.visitedVertices.add(vertIndex);
       this.unvisitedVertIndices.delete(vertIndex);
       this.numVisitedVertices++;
+      // console.log("old unvisited vert index", unvisitedIndex, "new vert index", vertIndex);
+      unvisitedIndex = vertIndex;
     }
     return path;
   };
 
   PathFinder.prototype.findAdjacentFace = function (unbufferedGeometry, pathVertIndices, unvisitedIndex) {
     var faceCount = unbufferedGeometry.faces.length;
+    // console.log("xxxx #pathVertIndices", pathVertIndices.length, "faceCount", faceCount);
     for (var f = 0; f < faceCount; f++) {
       // var face = unbufferedGeometry.faces[(startFaceIndex + f) % n];
       // Check if face contains the current un-visited vertex
-      if (faceHasVertIndex(unbufferedGeometry, f, unvisitedIndex)) {
+      // TODO: this is never true. WHY?
+      if (this.faceHasVertIndex(unbufferedGeometry, f, unvisitedIndex)) {
         // Face is a canditate to extend the path.
         // Check if there is a second un-visited path vertex
         for (var i = 0; i < pathVertIndices.length; i++) {
-          if (this.visitedVertices.has(pathVertIndices[i])) {
+          if (i == 0) {
+            // console.log("######### inner for", i);
+          }
+          var pathVertIndex = pathVertIndices[i];
+          if (pathVertIndex === unvisitedIndex) {
             continue;
           }
-          if (faceHasVertIndex(unbufferedGeometry, f, pathVertIndices[i])) {
-            return { faceIndex: f, vertIndex: pathVertIndices[i] };
+          if (this.isVisited(pathVertIndex)) {
+            continue;
           }
+          if (!this.isVisited(pathVertIndex) && this.faceHasVertIndex(unbufferedGeometry, f, pathVertIndex)) {
+            return { faceIndex: f, vertIndex: pathVertIndex };
+          }
+          if (this.faceHasVertIndex(unbufferedGeometry, f, pathVertIndex)) {
+            // console.log("FOUND");
+            return { faceIndex: f, vertIndex: pathVertIndex };
+          }
+          // console.log("[1] No face found", "unvisitedIndex", unvisitedIndex);
         }
       }
+      //console.log("[0] No face found", "unvisitedIndex", unvisitedIndex);
     }
     // None found
     return null; // { faceIndex: -1, vertIndex: -1 };
   };
 
-  PathFinder.prototype.findFaceAdjacentVert = function (unbufferedGeometry, faceIndex, vertIndex) {
-    var face = unbufferedGeometry.faces[faceIndex];
-    console.log("face", face);
-    var vert = unbufferedGeometry.vertices[vertIndex];
-    var vertA = unbufferedGeometry.vertices[face.a];
-    var vertB = unbufferedGeometry.vertices[face.b];
-    var vertC = unbufferedGeometry.vertices[face.c];
-    return (
-      (!this.visitedVertices.has(face.a) && vert.distanceTo(vertA) <= EPS) ||
-      (!this.visitedVertices.has(face.b) && vert.distanceTo(vertB) <= EPS) ||
-      (!this.visitedVertices.has(face.c) && vert.distanceTo(vertC) <= EPS)
-    );
+  // PathFinder.prototype.findFaceAdjacentVert = function (unbufferedGeometry, faceIndex, vertIndex) {
+  //   var face = unbufferedGeometry.faces[faceIndex];
+  //   console.log("face", face);
+  //   var vert = unbufferedGeometry.vertices[vertIndex];
+  //   var vertA = unbufferedGeometry.vertices[face.a];
+  //   var vertB = unbufferedGeometry.vertices[face.b];
+  //   var vertC = unbufferedGeometry.vertices[face.c];
+  //   // return (
+  //   //   (!this.visitedVertices.has(face.a) && vert.distanceTo(vertA) <= EPS) ||
+  //   //   (!this.visitedVertices.has(face.b) && vert.distanceTo(vertB) <= EPS) ||
+  //   //   (!this.visitedVertices.has(face.c) && vert.distanceTo(vertC) <= EPS)
+  //   // );
+  //   return vert.distanceTo(vertA) <= EPS || vert.distanceTo(vertB) <= EPS || vert.distanceTo(vertC) <= EPS;
+  // };
+
+  PathFinder.prototype.isVisited = function (vertIndex) {
+    return this.visitedVertices.has(vertIndex);
   };
 
-  var faceHasVertIndex = function (unbufferedGeometry, f, unvisitedIndex) {
+  PathFinder.prototype.faceHasVertIndex = function (unbufferedGeometry, f, unvisitedIndex) {
     var face = unbufferedGeometry.faces[f];
+    // console.log("Checking face vert", face, f, unvisitedIndex);
+    // return (
+    //   (!this.isVisited(face.a) && face.a == unvisitedIndex) ||
+    //   (!this.isVisited(face.b) && face.b == unvisitedIndex) ||
+    //   (!this.isVisited(face.c) && face.c == unvisitedIndex)
+    // );
     return face.a === unvisitedIndex || face.b === unvisitedIndex || face.c === unvisitedIndex;
   };
 

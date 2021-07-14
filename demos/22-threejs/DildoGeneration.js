@@ -213,7 +213,7 @@
         return leftSliceGeometry.vertices[geometryVertexIndex];
       });
       var linesMesh = new THREE.Line(
-        pointGeometry,
+        geometry,
         new THREE.LineBasicMaterial({
           color: 0x8800a8
         })
