@@ -215,7 +215,7 @@
       var linesMesh = new THREE.Line(
         geometry,
         new THREE.LineBasicMaterial({
-          color: 0x8800a8
+          color: randomWebColor(i, "Mixed") // 0x8800a8
         })
       );
       linesMesh.position.y = -100;

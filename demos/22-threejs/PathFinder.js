@@ -39,7 +39,7 @@
     pathVertIndices.forEach(function (vertIndex) {
       _self.unvisitedVertIndices.add(vertIndex);
     });
-    var c = 128;
+    var c = 512;
     while (this.numVisitedVertices < n && c-- >= 0) {
       var nextUnvisitedIndex = this.unvisitedVertIndices.values().next().value;
 
@@ -162,11 +162,12 @@
       var foundDist = EPS;
       for (var j = 0; j < unbufferedGeometry.vertices.length; j++) {
         var curDist = unbufferedGeometry.vertices[j].distanceTo(pathVert);
-        if (curDist < foundDist) {
+        if (curDist <= foundDist) {
           // Remember geometry index if closest to path vertex
           if (
             foundIndex === -1 ||
-            (foundIndex !== -1 && unbufferedGeometry.vertices[foundIndex].distanceTo(pathVert) > curDist)
+            // By convention use smalled vertex index if multiple found
+            (foundIndex !== -1 && unbufferedGeometry.vertices[foundIndex].distanceTo(pathVert) >= curDist && foundIndex > j)
           ) {
             foundIndex = j;
             foundDist = curDist;
