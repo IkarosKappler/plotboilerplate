@@ -304,7 +304,10 @@
     // | Initialize dat.gui
     // +-------------------------------
     {
-      var gui = pb.createGUI();
+      // TODO: remove the DatGuiProps again from PB? Not Used? Not Working?
+      // See https://stackoverflow.com/questions/25653639/how-do-i-change-the-location-of-the-dat-gui-dropdown
+      var gui = pb.createGUI(); // { autoPlace: false });
+      gui.domElement.id = "gui";
       var fold0 = gui.addFolder("Mesh");
 
       // prettier-ignore

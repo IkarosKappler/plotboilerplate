@@ -115,7 +115,8 @@ import {
   PBParams,
   SVGPathParams,
   XYCoords,
-  XYDimension
+  XYDimension,
+  DatGuiProps
 } from "./interfaces";
 
 /**
@@ -2097,10 +2098,11 @@ export class PlotBoilerplate {
    * @memberof PlotBoilerplate
    * @return {dat.gui.GUI}
    **/
-  createGUI(): GUI {
+  createGUI(props?: DatGuiProps): GUI {
     // This function moved to the helper utils.
     // We do not want to include the whole dat.GUI package.
-    if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function") return globalThis["utils"].createGUI(this);
+    if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
+      return globalThis["utils"].createGUI(this, props);
     else throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
   }
 

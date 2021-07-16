@@ -5738,11 +5738,11 @@ var PlotBoilerplate = /** @class */ (function () {
      * @memberof PlotBoilerplate
      * @return {dat.gui.GUI}
      **/
-    PlotBoilerplate.prototype.createGUI = function () {
+    PlotBoilerplate.prototype.createGUI = function (props) {
         // This function moved to the helper utils.
         // We do not want to include the whole dat.GUI package.
         if (globalThis["utils"] && typeof globalThis["utils"].createGUI == "function")
-            return globalThis["utils"].createGUI(this);
+            return globalThis["utils"].createGUI(this, props);
         else
             throw "Cannot create dat.GUI instance; did you load the ./utils/creategui helper function an the dat.GUI library?";
     };
