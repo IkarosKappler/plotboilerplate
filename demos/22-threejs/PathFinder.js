@@ -85,35 +85,36 @@
     this.unvisitedVertIndices.delete(unvisitedIndex);
     this.numVisitedVertices++;
     // Find the the face for this vertex's index
-    var faceAndVertIndex; // { faceIndex: number, vertIndex: number }
-    while ((faceAndVertIndex = this.findAdjacentFace(unbufferedGeometry, pathVertIndices, unvisitedIndex))) {
-      var faceIndex = faceAndVertIndex.faceIndex;
-      var vertIndex = faceAndVertIndex.vertIndex;
+    // var faceAndVertIndex; // { faceIndex: number, vertIndex: number }
+    var adjacentVertIndex;
+    while ((adjacentVertIndex = this.findAdjacentFace(unbufferedGeometry, pathVertIndices, unvisitedIndex)) !== -1) {
+      // var faceIndex = faceAndVertIndex.faceIndex;
+      // var vertIndex = faceAndVertIndex.vertIndex;
       // Retrieved face/vertex tuple represents the next element on the path
-      path.push(vertIndex);
-      this.visitedVertices.add(vertIndex);
-      this.unvisitedVertIndices.delete(vertIndex);
+      path.push(adjacentVertIndex);
+      this.visitedVertices.add(adjacentVertIndex);
+      this.unvisitedVertIndices.delete(adjacentVertIndex);
       this.numVisitedVertices++;
-      unvisitedIndex = vertIndex;
+      unvisitedIndex = adjacentVertIndex;
     }
     return path;
   };
 
   /**
-   * Find the next pair of face index and vertex index that connects
+   * Find the next unvisited vertex index that connects the given (unvisited) vertex
+   * index of the path.
    *
-   * @param {*} unbufferedGeometry
-   * @param {*} pathVertIndices
-   * @param {*} unvisitedIndex
-   * @returns
+   * To find that the geometry's faces will be used.
+   *
+   * @param {THREE.Geometry} unbufferedGeometry
+   * @param {Array<number>} pathVertIndices
+   * @param {number} unvisitedIndex
+   * @returns {number} The next adjacent face index or -1 if none can be found.
    */
   PathFinder.prototype.findAdjacentFace = function (unbufferedGeometry, pathVertIndices, unvisitedIndex) {
     var faceCount = unbufferedGeometry.faces.length;
-    // console.log("xxxx #pathVertIndices", pathVertIndices.length, "faceCount", faceCount);
+
     for (var f = 0; f < faceCount; f++) {
-      // var face = unbufferedGeometry.faces[(startFaceIndex + f) % n];
-      // Check if face contains the current un-visited vertex
-      // TODO: this is never true. WHY?
       if (faceHasVertIndex(unbufferedGeometry, f, unvisitedIndex)) {
         // Face is a canditate to extend the path.
         // Check if there is a second un-visited path vertex
@@ -126,25 +127,41 @@
             continue;
           }
           if (!this.isVisited(pathVertIndex) && faceHasVertIndex(unbufferedGeometry, f, pathVertIndex)) {
-            return { faceIndex: f, vertIndex: pathVertIndex };
+            return pathVertIndex;
           }
           if (faceHasVertIndex(unbufferedGeometry, f, pathVertIndex)) {
-            return { faceIndex: f, vertIndex: pathVertIndex };
+            return pathVertIndex;
           }
         } // END for
       } // END if
     } // END for
     // At this point no matching face was found
-    return null; // { faceIndex: -1, vertIndex: -1 };
+    return -1;
   };
 
+  /**
+   * Checks if the given vertex index (one of the path vertices) was already
+   * marked as being visited.
+   *
+   * @param {number} vertIndex
+   * @returns {boolean}
+   */
   PathFinder.prototype.isVisited = function (vertIndex) {
     return this.visitedVertices.has(vertIndex);
   };
 
-  var faceHasVertIndex = function (unbufferedGeometry, f, unvisitedIndex) {
+  /**
+   * A simple check to determine if a face of the geometry (given by the face index)
+   * is adjacent to the given vertex index (a vertex index in the geometry.).
+   *
+   * @param {*} unbufferedGeometry
+   * @param {*} f
+   * @param {*} geometryVertexIndex
+   * @returns
+   */
+  var faceHasVertIndex = function (unbufferedGeometry, f, geometryVertexIndex) {
     var face = unbufferedGeometry.faces[f];
-    return face.a === unvisitedIndex || face.b === unvisitedIndex || face.c === unvisitedIndex;
+    return face.a === geometryVertexIndex || face.b === geometryVertexIndex || face.c === geometryVertexIndex;
   };
 
   /**
@@ -199,29 +216,25 @@
    * @param {Array<number[]>} collectedPaths
    * @param {THREE.Geometry} unbufferedGeometry
    * @param {THREE.Vector3[]} pathVertices
+   * @return {Array<number[]>} A new sequence of paths (a path is an array of vertex indices).
    */
   PathFinder.prototype.combineAdjacentPaths = function (collectedPaths, unbufferedGeometry, pathVertices) {
-    console.log("collectedPaths.length", collectedPaths.length, collectedPaths);
+    // Array<number[]>
     var resultPaths = [];
+    // First build up an unvisited path set (set of path indices)
+    // Set<number>
     var unvisitedPathIndexSet = new Set(
       collectedPaths.map(function (_path, index) {
         return index;
       })
     );
-    console.log("unvisitedPathIndexSet.size", unvisitedPathIndexSet.size, unvisitedPathIndexSet);
-    var count = 32;
-    while (count-- > 0 && unvisitedPathIndexSet.size > 0) {
+    // var count = 32;
+    while (/*count-- > 0 &&*/ unvisitedPathIndexSet.size > 0) {
       var currentPathIndex = unvisitedPathIndexSet.values().next().value;
       unvisitedPathIndexSet.delete(currentPathIndex);
       var currentPath = collectedPaths[currentPathIndex];
       var nextPath = null;
-      var c = 32;
-      // while (
-      //   c-- > 0 &&
-      //   (nextPath = findAdjacentPath(collectedPaths, currentPathIndex, unvisitedPathIndexSet, unbufferedGeometry, pathVertices))
-      // ) {
-      //   currentPath = currentPath.concat(nextPath);
-      // }
+      // var c = 32;
       do {
         nextPath = findAdjacentPath(
           collectedPaths,
@@ -243,7 +256,7 @@
         if (nextPath) {
           currentPath = currentPath.concat(nextPath);
         }
-      } while (c-- > 0 && nextPath);
+      } while (/*c-- > 0 &&*/ nextPath);
 
       // All adjacent paths found and connected.
       resultPaths.push(currentPath);
@@ -251,9 +264,27 @@
     return resultPaths;
   };
 
+  /**
+   * This is a helper function to find adjacent sub paths and connect them.
+   * It expects basic path segments already to be found and that they are
+   * somehow connected. Unconnected paths – which are possible in non-convex
+   * geometries – will stay unconnected.
+   *
+   * It locates the next path that connects to the given (current) path
+   * and returns the acual path indices in the correct order. Forward paths
+   * and backward paths are detected here and being brought into the correct
+   * order.
+   *
+   * Example: if a path connects with it's end vertex to the end of the given
+   * path, then it will be reversed.
+   *
+   * @param {Array<number[]>} collectedPaths - The array of paths (array of array)
+   * @param {number} currentVertIndex - The vertex index in the geometry to find the next adjacent path for.
+   * @param {Set<number>} unvisitedPathIndexSet - A set to keep track of unvisited vertex indices. Will be updated.
+   * @param {THREE.Geometry} unbufferedGeometry - The geometry to find the path on.
+   * @returns
+   */
   var findAdjacentPath = function (collectedPaths, currentVertIndex, unvisitedPathIndexSet, unbufferedGeometry) {
-    // var currentPath = collectedPaths[currentPathIndex];
-    // var pathVertIndex = currentPath[currentPath.length - 1]; // currentPath[useReversedPath ? currentPath[currentPath.length - 1] : 0];
     for (var f = 0; f < unbufferedGeometry.faces.length; f++) {
       if (faceHasVertIndex(unbufferedGeometry, f, currentVertIndex)) {
         // Now find any unvisited path (first or last point) that connects here.
