@@ -39,8 +39,8 @@
     pathVertIndices.forEach(function (vertIndex) {
       _self.unvisitedVertIndices.add(vertIndex);
     });
-    var c = 512;
-    while (this.numVisitedVertices < n && c-- >= 0) {
+    // var c = 4096;
+    while (this.numVisitedVertices < n /*&& c-- >= 0*/) {
       var nextUnvisitedIndex = this.unvisitedVertIndices.values().next().value;
 
       console.log("numVisitedVertices", this.numVisitedVertices, "nextUnvisitedIndex", nextUnvisitedIndex);
@@ -48,7 +48,11 @@
       var path = this.findUnvisitedPaths(unbufferedGeometry, pathVertIndices, nextUnvisitedIndex);
       collectedPaths.push(path);
     }
-    return collectedPaths;
+
+    // Try to find adjacent paths to connect them.
+    // this.visitedVertices.clear();
+    return this.combineAdjacentPaths(collectedPaths, unbufferedGeometry, pathVertices);
+    // return collectedPaths;
   };
 
   /**
@@ -61,8 +65,8 @@
     this.numVisitedVertices++;
     // First: find the the face for this vertex index
     var faceAndVertIndex; // { faceIndex: number, vertIndex: number }
-    var count = 128;
-    while (count-- >= 0 && (faceAndVertIndex = this.findAdjacentFace(unbufferedGeometry, pathVertIndices, unvisitedIndex))) {
+    // var count = 2048;
+    while (/*count-- >= 0 &&*/ (faceAndVertIndex = this.findAdjacentFace(unbufferedGeometry, pathVertIndices, unvisitedIndex))) {
       var faceIndex = faceAndVertIndex.faceIndex;
       var vertIndex = faceAndVertIndex.vertIndex;
       // Retrieved face/vertex tuple represents the next element on the path
@@ -83,13 +87,13 @@
       // var face = unbufferedGeometry.faces[(startFaceIndex + f) % n];
       // Check if face contains the current un-visited vertex
       // TODO: this is never true. WHY?
-      if (this.faceHasVertIndex(unbufferedGeometry, f, unvisitedIndex)) {
+      if (faceHasVertIndex(unbufferedGeometry, f, unvisitedIndex)) {
         // Face is a canditate to extend the path.
         // Check if there is a second un-visited path vertex
         for (var i = 0; i < pathVertIndices.length; i++) {
-          if (i == 0) {
-            // console.log("######### inner for", i);
-          }
+          // if (i == 0) {
+          //   // console.log("######### inner for", i);
+          // }
           var pathVertIndex = pathVertIndices[i];
           if (pathVertIndex === unvisitedIndex) {
             continue;
@@ -97,10 +101,10 @@
           if (this.isVisited(pathVertIndex)) {
             continue;
           }
-          if (!this.isVisited(pathVertIndex) && this.faceHasVertIndex(unbufferedGeometry, f, pathVertIndex)) {
+          if (!this.isVisited(pathVertIndex) && faceHasVertIndex(unbufferedGeometry, f, pathVertIndex)) {
             return { faceIndex: f, vertIndex: pathVertIndex };
           }
-          if (this.faceHasVertIndex(unbufferedGeometry, f, pathVertIndex)) {
+          if (faceHasVertIndex(unbufferedGeometry, f, pathVertIndex)) {
             // console.log("FOUND");
             return { faceIndex: f, vertIndex: pathVertIndex };
           }
@@ -113,33 +117,12 @@
     return null; // { faceIndex: -1, vertIndex: -1 };
   };
 
-  // PathFinder.prototype.findFaceAdjacentVert = function (unbufferedGeometry, faceIndex, vertIndex) {
-  //   var face = unbufferedGeometry.faces[faceIndex];
-  //   console.log("face", face);
-  //   var vert = unbufferedGeometry.vertices[vertIndex];
-  //   var vertA = unbufferedGeometry.vertices[face.a];
-  //   var vertB = unbufferedGeometry.vertices[face.b];
-  //   var vertC = unbufferedGeometry.vertices[face.c];
-  //   // return (
-  //   //   (!this.visitedVertices.has(face.a) && vert.distanceTo(vertA) <= EPS) ||
-  //   //   (!this.visitedVertices.has(face.b) && vert.distanceTo(vertB) <= EPS) ||
-  //   //   (!this.visitedVertices.has(face.c) && vert.distanceTo(vertC) <= EPS)
-  //   // );
-  //   return vert.distanceTo(vertA) <= EPS || vert.distanceTo(vertB) <= EPS || vert.distanceTo(vertC) <= EPS;
-  // };
-
   PathFinder.prototype.isVisited = function (vertIndex) {
     return this.visitedVertices.has(vertIndex);
   };
 
-  PathFinder.prototype.faceHasVertIndex = function (unbufferedGeometry, f, unvisitedIndex) {
+  var faceHasVertIndex = function (unbufferedGeometry, f, unvisitedIndex) {
     var face = unbufferedGeometry.faces[f];
-    // console.log("Checking face vert", face, f, unvisitedIndex);
-    // return (
-    //   (!this.isVisited(face.a) && face.a == unvisitedIndex) ||
-    //   (!this.isVisited(face.b) && face.b == unvisitedIndex) ||
-    //   (!this.isVisited(face.c) && face.c == unvisitedIndex)
-    // );
     return face.a === unvisitedIndex || face.b === unvisitedIndex || face.c === unvisitedIndex;
   };
 
@@ -187,6 +170,93 @@
     } // END for i
     console.log("pathVertIndices", pathVertIndices);
     return pathVertIndices;
+  };
+
+  /**
+   * Find adjacent paths and connect them.
+   *
+   * @param {Array<number[]>} collectedPaths
+   * @param {THREE.Geometry} unbufferedGeometry
+   * @param {THREE.Vector3[]} pathVertices
+   */
+  PathFinder.prototype.combineAdjacentPaths = function (collectedPaths, unbufferedGeometry, pathVertices) {
+    console.log("collectedPaths.length", collectedPaths.length, collectedPaths);
+    var resultPaths = [];
+    var unvisitedPathIndexSet = new Set(
+      collectedPaths.map(function (_path, index) {
+        return index;
+      })
+    );
+    console.log("unvisitedPathIndexSet.size", unvisitedPathIndexSet.size, unvisitedPathIndexSet);
+    var count = 32;
+    while (count-- > 0 && unvisitedPathIndexSet.size > 0) {
+      var currentPathIndex = unvisitedPathIndexSet.values().next().value;
+      unvisitedPathIndexSet.delete(currentPathIndex);
+      var currentPath = collectedPaths[currentPathIndex];
+      var nextPath = null;
+      var c = 32;
+      // while (
+      //   c-- > 0 &&
+      //   (nextPath = findAdjacentPath(collectedPaths, currentPathIndex, unvisitedPathIndexSet, unbufferedGeometry, pathVertices))
+      // ) {
+      //   currentPath = currentPath.concat(nextPath);
+      // }
+      do {
+        nextPath = findAdjacentPath(
+          collectedPaths,
+          currentPath[currentPath.length - 1],
+          unvisitedPathIndexSet,
+          unbufferedGeometry
+        );
+        if (!nextPath && currentPath.length > 1) {
+          // If path's end point has no connection try reversed path
+          currentPath = currentPath.reverse();
+          nextPath = findAdjacentPath(
+            collectedPaths,
+            currentPath[currentPath.length - 1],
+            unvisitedPathIndexSet,
+            unbufferedGeometry
+          );
+        }
+
+        if (nextPath) {
+          currentPath = currentPath.concat(nextPath);
+        }
+      } while (c-- > 0 && nextPath);
+
+      // All adjacent paths found and connected.
+      resultPaths.push(currentPath);
+    }
+
+    // TEST
+
+    return resultPaths;
+  };
+
+  var findAdjacentPath = function (collectedPaths, currentVertIndex, unvisitedPathIndexSet, unbufferedGeometry) {
+    // var currentPath = collectedPaths[currentPathIndex];
+    // var pathVertIndex = currentPath[currentPath.length - 1]; // currentPath[useReversedPath ? currentPath[currentPath.length - 1] : 0];
+    for (var f = 0; f < unbufferedGeometry.faces.length; f++) {
+      if (faceHasVertIndex(unbufferedGeometry, f, currentVertIndex)) {
+        // Now find any unvisited path (first or last point) that connects here.
+        for (var p = 0; p < collectedPaths.length; p++) {
+          if (!unvisitedPathIndexSet.has(p)) {
+            // Path already visited
+            continue;
+          }
+          var nextPath = collectedPaths[p];
+          if (faceHasVertIndex(unbufferedGeometry, f, nextPath[0])) {
+            // Concat forwards
+            unvisitedPathIndexSet.delete(p);
+            return nextPath;
+          } else if (faceHasVertIndex(unbufferedGeometry, f, nextPath[nextPath.length - 1])) {
+            // Concat backwards
+            unvisitedPathIndexSet.delete(p);
+            return nextPath.reverse();
+          }
+        }
+      }
+    }
   };
 
   _context.PathFinder = PathFinder;
