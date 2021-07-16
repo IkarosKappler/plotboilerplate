@@ -8,7 +8,6 @@
   var EPS = 0.000001;
 
   var PathFinder = function () {
-    // this.visitedVertices = new Map(); // <number,number>
     this.visitedVertices = new Set();
     this.unvisitedVertIndices = new Set(); // <number>
     this.numVisitedVertices = 0;
@@ -229,6 +228,23 @@
     }
 
     // TEST
+    // if (resultPaths.length === 2 && resultPaths[1].length === 1) {
+    //   console.log("Hmmmm, trying to find connecting face");
+    //   for (var f = 0; f < unbufferedGeometry.faces.length; f++) {
+    //     if (faceHasVertIndex(unbufferedGeometry, f, resultPaths[0][0])) {
+    //       console.log("path 0 is connecting at face ", f);
+    //       // for (var g = 0; g < unbufferedGeometry.faces.length; g++) {
+    //       if (faceHasVertIndex(unbufferedGeometry, f, resultPaths[1][0])) {
+    //         console.log("path 1 is TOO connecting at face ", f);
+    //       }
+    //       // }
+    //     }
+    //     if (faceHasVertIndex(unbufferedGeometry, f, resultPaths[1][0])) {
+    //       console.log("path 1 is connecting at face ", f);
+    //     }
+    //   }
+    // }
+    // END TEST
 
     return resultPaths;
   };

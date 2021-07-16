@@ -163,7 +163,13 @@
       var closeHoles = false;
       var sliceMaterial = DildoMaterials.createSliceMaterial(wireframe); //  new THREE.MeshBasicMaterial({ wireframe: wireframe, color: 0xa8a8a8 });
       var slicedGeometry = sliceGeometry(unbufferedGeometry, plane, closeHoles);
+      // Now note that it's possible that the result might contain multiple vertices
+      // at the same position, which makes further calculations quite difficult.
+      // -> Merge multiple vertices into one
+      slicedGeometry.mergeVertices();
+      // And don't forget to compute the normals.
       slicedGeometry.computeFaceNormals();
+
       var slicedMesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
       // var slicedMesh = new THREE.Mesh(new THREE.BufferGeometry().fromGeometry(slicedGeometry), sliceMaterial);
       slicedMesh.position.y = -100;
@@ -185,7 +191,7 @@
       var pointGeometry = new THREE.Geometry();
       pointGeometry.vertices = uniqueIntersectionPoints;
       var pointsMaterial = new THREE.PointsMaterial({
-        size: 2,
+        size: 1.4,
         color: 0x00ffff
       });
       var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
