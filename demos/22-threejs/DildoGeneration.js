@@ -9,6 +9,12 @@
  **/
 
 (function () {
+  var KEY_LEFT_SLICE_GEOMETRY = "KEY_LEFT_SLICE_GEOMETRY"; // THREE.Geometry
+  var KEY_RIGHT_SLICE_GEOMETRY = "KEY_RIGHT_SLICE_GEOMETRY"; // THREE.Geometry
+  var KEY_LEFT_SLICE_PLANE = "KEY_LEFT_SLICE_PLANE"; // THREE.Plane
+  var KEY_RIGHT_SLICE_PLANE = "KEY_RIGHT_SLICE_PLANE"; // THREE.Plane
+  var KEY_PLANE_INTERSECTION_POINTS = "KEY_PLANE_INTERSECTION_POINTS"; // Array<Vector3>
+
   var DildoGeneration = function (canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.parent = this.canvas.parentElement;
@@ -48,6 +54,9 @@
 
     // Cache all geometries for later removal
     this.geometries = [];
+    // Remember partial results
+    // Record<string,object>
+    this.partialResults = {};
 
     var _self = this;
     window.addEventListener("resize", function () {
@@ -202,7 +211,9 @@
     //   uniquePlaneIntersectionPoints.length
     // );
 
-    // Find the connected path (there is only one if the choose the cut plane properly)
+    // Find the connected path (there is only one if you choose the cut plane properly)
+    // Note that it doesn't matter which slice geometry we use as left and right match
+    // perfectly together at their cut plane.
     // Array<number[]>
     var connectedPaths = new PathFinder().findAllPathsOnMesh(leftSliceGeometry, planeIntersectionPoints);
     console.log("connectedPaths", connectedPaths.length, connectedPaths);
@@ -235,6 +246,65 @@
     linesMesh.position.y = -100;
     // linesMesh.position.z = -50;
     // this.addMesh(linesMesh);
+
+    // TODO: triangulate connected paths
+    // TODO: do this for both slices
+    var connectedPathsTriangles = [];
+    for (var i = 0; i < connectedPaths.length; i++) {
+      makePlaneTriangulation(this, leftSliceGeometry, connectedPaths[i]);
+    }
+
+    // Remember everything
+    this.partialResults[KEY_LEFT_SLICE_PLANE] = leftPlane;
+    this.partialResults[KEY_LEFT_SLICE_GEOMETRY] = leftSliceGeometry;
+    this.partialResults[KEY_RIGHT_SLICE_PLANE] = rightPlane;
+    this.partialResults[KEY_RIGHT_SLICE_GEOMETRY] = rightSliceGeometry;
+    this.partialResults[KEY_PLANE_INTERSECTION_POINTS] = planeIntersectionPoints;
+  };
+
+  /**
+   * Make a triangulation of the given path specified by the verted indices.
+   *
+   * @param {Array<number>} connectedPath - An array of vertex indices.
+   */
+  var makePlaneTriangulation = function (generator, sliceGeometry, connectedPath) {
+    // Convert the connected paths indices to [x, y, x, y, x, y, ...] coordinates (requied by earcut)
+    var currentPathXYData = connectedPath.reduce(function (earcutInput, vertIndex) {
+      var vert = sliceGeometry.vertices[vertIndex];
+      earcutInput.push(vert.x, vert.y);
+      return earcutInput;
+    }, []);
+    // Array<number> : triplets of vertex indices in the plain XY array
+    var triangles = earcut(currentPathXYData);
+    console.log("triangles", triangles);
+    // Convert triangle indices back to a geometry
+    var trianglesGeometry = new THREE.Geometry();
+    // We will merge the geometries in the end which will create clones of the vertices.
+    // No need to clone here.
+    // trianglesGeometry.vertices = leftSliceGeometry.vertices;
+    trianglesGeometry.vertices = connectedPath.map(function (geometryVertexIndex) {
+      return sliceGeometry.vertices[geometryVertexIndex];
+    });
+    console.log("trianglesGeometry", trianglesGeometry);
+    for (var t = 0; t < triangles.length; t += 3) {
+      trianglesGeometry.faces.push(new THREE.Face3(triangles[t], triangles[t + 1], triangles[t + 2]));
+      var a = triangles[t];
+      var b = triangles[t + 1];
+      var c = triangles[t + 2];
+      // trianglesGeometry.faces.push(new THREE.Face3(connectedPath[a], connectedPath[b], connectedPath[c]));
+    }
+    var trianglesMesh = new THREE.Mesh(
+      trianglesGeometry,
+      new THREE.MeshBasicMaterial({
+        color: "blue",
+        transparent: true,
+        opacity: 0.55,
+        side: THREE.DoubleSide
+      })
+    );
+    trianglesMesh.position.y = -100;
+    trianglesMesh.userData["isExportable"] = false;
+    generator.addMesh(trianglesMesh);
   };
 
   /**

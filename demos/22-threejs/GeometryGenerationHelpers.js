@@ -148,9 +148,12 @@
     },
 
     /**
-     * Slice a geometry at the given plane.
-     * Note that only the right half (on the positive z axis is kept. To obtain both you
+     * Slice a geometry at the given plane and add the remaining part(s).
+     *
+     * Note that only the right half (on the positive z axis) is kept. To obtain both you
      * need to run the algorithm twice with two flipped planes.
+     *
+     * Note also that the mesh is open at the cut plane.
      *
      * @param {DildoGeneration} thisGenerator - The generator to add the mesh to.
      * @param {THREE.Geometry} unbufferedGeometry - The geometry to slice.
@@ -179,6 +182,15 @@
       return slicedGeometry;
     },
 
+    /**
+     * This function creates the cut intersection elements to fill the (open) slice meshes.
+     *
+     * @param {DildoGeneration} thisGenerator
+     * @param {THREE.Mesh} mesh
+     * @param {THREE.Geometry} unbufferedGeometry
+     * @param {THREE.Plane} planeMesh
+     * @returns
+     */
     makeAndAddPlaneIntersection: function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
       // Find the cut path
       var planeMeshIntersection = new PlaneMeshIntersection();
@@ -280,6 +292,7 @@
       var pointsMesh = new THREE.Mesh(pointGeometry, pointsMaterial);
       pointsMesh.position.y = -100;
       pointsMesh.position.z = 50;
+      pointsMesh.userData["isExportable"] = false;
       thisGenerator.addMesh(pointsMesh);
     },
 
@@ -306,6 +319,7 @@
       var pointsMesh = new THREE.Mesh(pointGeometry, pointsMaterial);
       pointsMesh.position.y = -100;
       pointsMesh.position.z = -50;
+      pointsMesh.userData["isExportable"] = false;
       thisGenerator.addMesh(pointsMesh);
     },
 
