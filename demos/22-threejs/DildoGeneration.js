@@ -287,22 +287,24 @@
     });
     console.log("trianglesGeometry", trianglesGeometry);
     for (var t = 0; t < triangles.length; t += 3) {
-      trianglesGeometry.faces.push(new THREE.Face3(triangles[t], triangles[t + 1], triangles[t + 2]));
+      // trianglesGeometry.faces.push(new THREE.Face3(triangles[t], triangles[t + 1], triangles[t + 2]));
       var a = triangles[t];
       var b = triangles[t + 1];
       var c = triangles[t + 2];
       // trianglesGeometry.faces.push(new THREE.Face3(connectedPath[a], connectedPath[b], connectedPath[c]));
+      trianglesGeometry.faces.push(new THREE.Face3(a, b, c));
     }
     var trianglesMesh = new THREE.Mesh(
       trianglesGeometry,
       new THREE.MeshBasicMaterial({
-        color: "blue",
+        color: 0x0048ff,
         transparent: true,
         opacity: 0.55,
         side: THREE.DoubleSide
       })
     );
     trianglesMesh.position.y = -100;
+    trianglesMesh.position.z += 1.0; // Avoid Moiré with plane mesh
     trianglesMesh.userData["isExportable"] = false;
     generator.addMesh(trianglesMesh);
   };
