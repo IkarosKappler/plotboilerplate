@@ -68,17 +68,28 @@
         closeBottom: true,
         showNormals: false,
         normalsLength: 10.0,
-        showPerpendiculars: false,
         normalizePerpendiculars: true,
         useTextureImage: true,
         textureImagePath: "wood.png",
         wireframe: false,
-        addSpine: false,
         performSlice: false,
         makeHollow: false,
         renderFaces: "double", // "double" or "single"
         twistAngle: 0.0,
         baseShapeExcentricity: 1.0,
+        // Render settings
+        showBasicPerpendiculars: false,
+        addSpine: false,
+        showSplitPane: true,
+        showLeftSplit: true,
+        showRightSplit: true,
+        showSplitShape: true,
+        showSplitShapeTriangulation: true,
+        addPrecalculatedMassiveFaces: false,
+        addPrecalculatedHollowFaces: false,
+        addRawIntersectionTriangleMesh: false,
+        addPrecalculatedShapeOutlines: false,
+        // Functions
         exportSTL: function () {
           exportSTL();
         },
@@ -325,15 +336,11 @@
       // prettier-ignore
       fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
       // prettier-ignore
-      fold0.add(config, "showPerpendiculars").onChange( function() { rebuild() } ).name('showPerpendiculars').title('Show the meshes perpendicular on the XZ plane.');
-      // prettier-ignore
       fold0.add(config, "normalizePerpendiculars").onChange( function() { rebuild() } ).name('normalizePerpendiculars').title('Normalize the XZ perpendiculars (recommended).');
       // prettier-ignore
       fold0.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image?');
       // prettier-ignore
       fold0.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model?');
-      // prettier-ignore
-      fold0.add(config, "addSpine").onChange( function() { rebuild() } ).name('addSpine').title("Add the model's spine?");
       // prettier-ignore
       fold0.add(config, "performSlice").onChange( function() { rebuild() } ).name('performSlice').title('Slice the model along the x axis?');
       // prettier-ignore
@@ -345,15 +352,39 @@
       // prettier-ignore
       fold0.add(config, "baseShapeExcentricity").min(0.1).max(2.0).onChange( function() { rebuild() } ).name('baseShapeExcentricity').title('Make the base shape more elliptic.');
 
-      var fold1 = gui.addFolder("Export");
+      var fold1 = gui.addFolder("Render Settings");
       // prettier-ignore
-      fold1.add(config, "exportSTL").name('STL').title('Export an STL file.');
+      fold1.add(config, "showBasicPerpendiculars").onChange( function() { rebuild() } ).name('showBasicPerpendiculars').title('Show the meshes perpendicular on the XZ plane.');
       // prettier-ignore
-      fold1.add(config, "showPathJSON").name('Show Path JSON ...').title('Show the path data.');
+      fold1.add(config, "addSpine").onChange( function() { rebuild() } ).name('addSpine').title("Add the model's spine?");
+      // prettier-ignore
+      fold1.add(config, "addPrecalculatedMassiveFaces").onChange( function() { rebuild() } ).name('addPrecalculatedMassiveFaces').title("Add a pre-calculated massive intersection fill?");
+      // prettier-ignore
+      fold1.add(config, "addPrecalculatedHollowFaces").onChange( function() { rebuild() } ).name('addPrecalculatedHollowFaces').title("Add a pre-calculated hollow intersection fill?");
+      // prettier-ignore
+      fold1.add(config, "showSplitPane").onChange( function() { rebuild() } ).name('showSplitPane').title('Show split pane.');
+      // prettier-ignore
+      fold1.add(config, "showLeftSplit").onChange( function() { rebuild() } ).name('showLeftSplit').title('Show left split.');
+      // prettier-ignore
+      fold1.add(config, "showRightSplit").onChange( function() { rebuild() } ).name('showRightSplit').title('Show right split.');
+      // prettier-ignore
+      fold1.add(config, "showSplitShape").onChange( function() { rebuild() } ).name('showSplitShape').title('Show split shape.');
+      // prettier-ignore
+      fold1.add(config, "showSplitShapeTriangulation").onChange( function() { rebuild() } ).name('showSplitShapeTriangulation').title('Show split shape triangulation?');
+      // prettier-ignore
+      fold1.add(config, "addRawIntersectionTriangleMesh").onChange( function() { rebuild() } ).name('addRawIntersectionTriangleMesh').title('Show raw unoptimized split face triangulation?');
+      // prettier-ignore
+      fold1.add(config, "addPrecalculatedShapeOutlines").onChange( function() { rebuild() } ).name('addPrecalculatedShapeOutlines').title('Show raw unoptimized split shape outline(s)?');
 
-      var fold2 = gui.addFolder("Import");
+      var fold2 = gui.addFolder("Export");
       // prettier-ignore
-      fold2.add(config, "insertPathJSON").name('Insert Path JSON ...').title('Insert path data as JSON.');
+      fold2.add(config, "exportSTL").name('STL').title('Export an STL file.');
+      // prettier-ignore
+      fold2.add(config, "showPathJSON").name('Show Path JSON ...').title('Show the path data.');
+
+      var fold3 = gui.addFolder("Import");
+      // prettier-ignore
+      fold3.add(config, "insertPathJSON").name('Insert Path JSON ...').title('Insert path data as JSON.');
 
       fold0.open();
     }

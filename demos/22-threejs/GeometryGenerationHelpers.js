@@ -191,14 +191,14 @@
      * @param {THREE.Plane} planeMesh
      * @returns
      */
-    makeAndAddPlaneIntersection: function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
+    makeAndAddPlaneIntersection: function (thisGenerator, mesh, unbufferedGeometry, planeMesh, options) {
       // Find the cut path
       var planeMeshIntersection = new PlaneMeshIntersection();
       // Array<THREE.Vector3>  (compatible with XYCoords :)
       var intersectionPoints = planeMeshIntersection.getIntersectionPoints(mesh, unbufferedGeometry, planeMesh);
       var EPS = 0.000001;
       var uniqueIntersectionPoints = clearDuplicateVertices3(intersectionPoints, EPS);
-      console.log("found #intersectionPoints", intersectionPoints.length, "# unique", uniqueIntersectionPoints.length);
+      // console.log("found #intersectionPoints", intersectionPoints.length, "# unique", uniqueIntersectionPoints.length);
 
       var pointGeometry = new THREE.Geometry();
       pointGeometry.vertices = uniqueIntersectionPoints;
@@ -217,9 +217,11 @@
       // linesMesh.position.y = -100;
       // linesMesh.position.z = -50;
       // thisGenerator.addMesh(linesMesh);
-      pointsMesh.position.y = -100;
-      pointsMesh.position.z = -50;
-      thisGenerator.addMesh(pointsMesh);
+      if (options.showSplitShape) {
+        pointsMesh.position.y = -100;
+        pointsMesh.position.z = -50;
+        thisGenerator.addMesh(pointsMesh);
+      }
 
       // TODO: convert point set to path
       // Test: make a triangulation to see what the path looks like
@@ -238,15 +240,19 @@
         var c = triangleIndices[i + 2];
         GeometryGenerationHelpers.makeFace3(triangleGeometry, a, b, c);
       }
-      var triangleMesh = new THREE.Mesh(
-        triangleGeometry,
-        new THREE.LineBasicMaterial({
-          color: 0xff8800
-        })
-      );
-      triangleMesh.position.y = -100;
-      triangleMesh.position.z = -50;
-      thisGenerator.addMesh(triangleMesh);
+      if (options.addRawIntersectionTriangleMesh) {
+        // This is more a quick experimental preview feature.
+        // The data is often faulty and too unprecise.
+        var triangleMesh = new THREE.Mesh(
+          triangleGeometry,
+          new THREE.LineBasicMaterial({
+            color: 0xff8800
+          })
+        );
+        triangleMesh.position.y = -100;
+        triangleMesh.position.z = -50;
+        thisGenerator.addMesh(triangleMesh);
+      }
 
       // // Find the connected path (there is only one if the choose the cut plane properly)
       // // Array<number[]>
@@ -255,13 +261,19 @@
       // END Test
 
       // Make the actual models
-      GeometryGenerationHelpers.makeAndAddMassivePlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
-      GeometryGenerationHelpers.makeAndAddHollowPlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
+      // CURRENTLY NOT IN USE. THE UNDERLYING MODEL IS A NON-TWISTED ONE.
+      if (options.addPrecalculatedMassiveFaces) {
+        GeometryGenerationHelpers.makeAndAddMassivePlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
+      }
+      if (options.addPrecalculatedHollowFaces) {
+        GeometryGenerationHelpers.makeAndAddHollowPlaneIntersection(thisGenerator, mesh, unbufferedGeometry, planeMesh);
+      }
 
       return uniqueIntersectionPoints;
       // return pointGeometry;
     },
 
+    // CURRENTLY NOT REALLY IN USE. THE UNDERLYING MODEL IS A NON-TWISTED ONE.
     makeAndAddMassivePlaneIntersection: function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
       var intersectionPoints = unbufferedGeometry.getPerpendicularPathVertices(true, true); // includeBottom=true, getInner=true
       var pointGeometry = new THREE.Geometry();
@@ -296,6 +308,7 @@
       thisGenerator.addMesh(pointsMesh);
     },
 
+    // CURRENTLY NOT REALLY IN USE. THE UNDERLYING MODEL IS A NON-TWISTED ONE.
     makeAndAddHollowPlaneIntersection: function (thisGenerator, mesh, unbufferedGeometry, planeMesh) {
       var pointGeometry = new THREE.Geometry();
       var perpLines = unbufferedGeometry.getPerpendicularHullLines();
