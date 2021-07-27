@@ -208,16 +208,17 @@
       });
       var pointsMesh = new THREE.Points(pointGeometry, pointsMaterial);
 
-      // var linesMesh = new THREE.LineSegments(
-      //   pointGeometry,
-      //   new THREE.LineBasicMaterial({
-      //     color: 0xff8800
-      //   })
-      // );
-      // linesMesh.position.y = -100;
-      // linesMesh.position.z = -50;
-      // thisGenerator.addMesh(linesMesh);
       if (options.showSplitShape) {
+        // Also add triangulated mesh (is probably faulty)
+        // var linesMesh = new THREE.LineSegments(
+        //   pointGeometry,
+        //   new THREE.LineBasicMaterial({
+        //     color: 0xff8800
+        //   })
+        // );
+        // linesMesh.position.y = -100;
+        // linesMesh.position.z = -50;
+        // thisGenerator.addMesh(linesMesh);
         pointsMesh.position.y = -100;
         pointsMesh.position.z = -50;
         thisGenerator.addMesh(pointsMesh);
