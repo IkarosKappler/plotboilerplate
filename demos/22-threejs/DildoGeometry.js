@@ -715,7 +715,7 @@
     var outlineSegmentCount = options.outlineSegmentCount;
     var makeHollow = Boolean(options.makeHollow);
     var bendAngleRad = (options.bendAngle / 180) * Math.PI;
-    var hollowStrength = 15.0;
+    var hollowStrengthX = options.hollowStrengthX; // 15.0; // TODO: hollow strength as param
     var twistAngle = options.twistAngle * DEG_TO_RAD;
 
     var normalizePerpendiculars = Boolean(options.normalizePerpendiculars);
@@ -778,7 +778,7 @@
 
     if (makeHollow) {
       // Construct the left and the right flat bounds (used to make a casting mould)
-      this.__makeFlatSideVertices(shapeBounds.width / 2.0 + hollowStrength);
+      this.__makeFlatSideVertices(Math.max(shapeBounds.width, shapeBounds.height) / 2.0 + hollowStrengthX);
     }
   };
 

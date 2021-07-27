@@ -155,16 +155,14 @@
      *
      * Note also that the mesh is open at the cut plane.
      *
-     * @param {DildoGeneration} thisGenerator - The generator to add the mesh to.
      * @param {THREE.Geometry} unbufferedGeometry - The geometry to slice.
      * @param {THREE.PlaneGeometry} plane
-     * @param {number} zOffset - The z offset to use for the slice result position.
      */
-    makeAndAddSlice: function (thisGenerator, unbufferedGeometry, plane, zOffset, wireframe) {
+    makeSlice: function (unbufferedGeometry, plane) {
       // Slice mesh into two
       // See https://github.com/tdhooper/threejs-slice-geometry
       var closeHoles = false;
-      var sliceMaterial = DildoMaterials.createSliceMaterial(wireframe); //  new THREE.MeshBasicMaterial({ wireframe: wireframe, color: 0xa8a8a8 });
+      // var sliceMaterial = DildoMaterials.createSliceMaterial(wireframe);
       var slicedGeometry = sliceGeometry(unbufferedGeometry, plane, closeHoles);
       // Now note that it's possible that the result might contain multiple vertices
       // at the same position, which makes further calculations quite difficult.
@@ -173,12 +171,12 @@
       // And don't forget to compute the normals.
       slicedGeometry.computeFaceNormals();
 
-      var slicedMesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
+      // var slicedMesh = new THREE.Mesh(slicedGeometry, sliceMaterial);
       // var slicedMesh = new THREE.Mesh(new THREE.BufferGeometry().fromGeometry(slicedGeometry), sliceMaterial);
-      slicedMesh.position.y = -100;
-      slicedMesh.position.z = zOffset;
-      slicedMesh.userData["isExportable"] = true;
-      thisGenerator.addMesh(slicedMesh);
+      //   slicedMesh.position.y = -100;
+      //   slicedMesh.position.z = zOffset;
+      //   slicedMesh.userData["isExportable"] = true;
+      //   thisGenerator.addMesh(slicedMesh);
       return slicedGeometry;
     },
 

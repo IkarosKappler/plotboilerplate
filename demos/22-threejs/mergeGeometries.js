@@ -20,18 +20,36 @@
    * @param {THREE.Geometry} baseGeometry
    * @param {THREE.Geometry} mergeGeometry
    */
-  var mergeGemoetries = function (baseGeometry, mergeGeometry, epsilon) {
+  var mergeGeometries = function (baseGeometry, mergeGeometry, epsilon) {
     if (typeof epsilon === "undefined") {
       epsilon = EPS;
     }
     var vertexMap = mergeAndMapVertices(baseGeometry, mergeGeometry, epsilon);
+    // TODO: finished merge algorithm
+    // Merge faces
+    for (var f in mergeGeometry.faces) {
+      var face = mergeGeometry.faces[f];
+      var a = vertexMap[face.a];
+      var b = vertexMap[face.b];
+      var c = vertexMap[face.c];
+      baseGeometry.faces.push(new THREE.Face3(a, b, c));
+      if (mergeGeometry.faceVertexUvs.length > 0 && f < mergeGeometry.faceVertexUvs[0].length) {
+        baseGeometry.faceVertexUvs[0].push(mergeGeometry.faceVertexUvs[0][f]);
+      } else {
+        baseGeometry.faceVertexUvs[0].push([
+          new THREE.Vector2(0.0, 0.0),
+          new THREE.Vector2(0.0, 1.0),
+          new THREE.Vector2(1.0, 0.5)
+        ]);
+      }
+    }
   };
 
   var mergeAndMapVertices = function (baseGeometry, mergeGeometry, epsilon) {
     var vertexMap = []; // Array<number>
     for (var v = 0; v < mergeGeometry.vertices.length; v++) {
       var mergeVert = mergeGeometry.vertices[v];
-      var indexInBase = locateVertexInArray(baseGeometry, mergeVert);
+      var indexInBase = locateVertexInArray(baseGeometry.vertices, mergeVert, epsilon);
       if (indexInBase === -1) {
         // The current vertex cannot be found in the base geometry.
         //  -> add to geometry and remember new index.
@@ -44,5 +62,5 @@
     return vertexMap;
   };
 
-  _context.mergeGemoetries = mergeGemoetries;
+  _context.mergeGeometries = mergeGeometries;
 })(globalThis);

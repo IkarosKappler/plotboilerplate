@@ -74,9 +74,11 @@
         wireframe: false,
         performSlice: false,
         makeHollow: false,
+        hollowStrengthX: 15.0, // equivalent for Y is 'normalsLength'
         renderFaces: "double", // "double" or "single"
         twistAngle: 0.0,
         baseShapeExcentricity: 1.0,
+        closeCutAreas: true,
         // Render settings
         showBasicPerpendiculars: false,
         addSpine: false,
@@ -334,7 +336,7 @@
       // prettier-ignore
       fold0.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
       // prettier-ignore
-      fold0.add(config, "normalsLength").min(1.0).max(20.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
+      fold0.add(config, "normalsLength").min(1.0).max(50.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
       // prettier-ignore
       fold0.add(config, "normalizePerpendiculars").onChange( function() { rebuild() } ).name('normalizePerpendiculars').title('Normalize the XZ perpendiculars (recommended).');
       // prettier-ignore
@@ -346,11 +348,15 @@
       // prettier-ignore
       fold0.add(config, "makeHollow").onChange( function() { rebuild() } ).name('makeHollow').title('Make a hollow mold?');
       // prettier-ignore
+      fold0.add(config, "hollowStrengthX").min(0.0).max(50.0).onChange( function() { rebuild() } ).name('hollowStrengthX').title('How thick make the walls?');
+      // prettier-ignore
       fold0.add(config, "renderFaces", ["double","single"]).onChange( function() { rebuild() } ).name('renderFaces').title('Render mesh faces double or single sided?');
       // prettier-ignore
       fold0.add(config, "twistAngle").min(-360.0*3).max(360.0*3).onChange( function() { rebuild() } ).name('twistAngle').title('Twist the mesh along its spine.');
       // prettier-ignore
       fold0.add(config, "baseShapeExcentricity").min(0.1).max(2.0).onChange( function() { rebuild() } ).name('baseShapeExcentricity').title('Make the base shape more elliptic.');
+      // prettier-ignore
+      fold0.add(config, "closeCutAreas").onChange( function() { rebuild() } ).name('closeCutAreas').title('Close the open cut areas on the split.');
 
       var fold1 = gui.addFolder("Render Settings");
       // prettier-ignore
