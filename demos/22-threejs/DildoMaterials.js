@@ -57,7 +57,7 @@
           });
     },
 
-    createSliceMaterial: function (wireframe) {
+    createSliceMaterial: function (useTextureImage, wireframe, textureImagePath) {
       if (wireframe) {
         return new THREE.MeshBasicMaterial({ wireframe: true });
         // return new THREE.MeshStandardMaterial({ wireframe: true });
@@ -75,7 +75,7 @@
           reflectivity: 1.0,
           refractionRatio: 0.89,
           specular: 0x888888,
-          map: null,
+          map: useTextureImage ? DildoMaterials.loadTextureImage(textureImagePath) : null,
           vertexColors: false
         });
       }

@@ -142,7 +142,7 @@
     }
 
     if (options.performSlice) {
-      this.__performPlaneSlice(latheMesh, dildoGeometry, wireframe, options);
+      this.__performPlaneSlice(latheMesh, dildoGeometry, wireframe, useTextureImage, textureImagePath, options);
       // this.__performCsgSlice(latheMesh, geometry, material);
     } else {
       latheMesh.position.y = -100;
@@ -178,7 +178,14 @@
    * @param {DildoGeometry} latheUnbufferedGeometry - The unbuffered dildo geometry (required to obtain the perpendicular path lines).
    * @param {boolean} wireframe
    */
-  DildoGeneration.prototype.__performPlaneSlice = function (latheMesh, latheUnbufferedGeometry, wireframe, options) {
+  DildoGeneration.prototype.__performPlaneSlice = function (
+    latheMesh,
+    latheUnbufferedGeometry,
+    wireframe,
+    useTextureImage,
+    textureImagePath,
+    options
+  ) {
     var epsilon = 0.000001;
     var leftPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     var leftSliceGeometry = GeometryGenerationHelpers.makeSlice(latheUnbufferedGeometry, leftPlane);
@@ -186,7 +193,7 @@
     var rightPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
     var rightSliceGeometry = GeometryGenerationHelpers.makeSlice(latheUnbufferedGeometry, rightPlane);
 
-    var sliceMaterial = DildoMaterials.createSliceMaterial(wireframe);
+    var sliceMaterial = DildoMaterials.createSliceMaterial(useTextureImage, wireframe, textureImagePath); // wireframe);
     if (options.showLeftSplit) {
       var slicedMeshLeft = new THREE.Mesh(leftSliceGeometry, sliceMaterial);
       slicedMeshLeft.position.y = -100;
