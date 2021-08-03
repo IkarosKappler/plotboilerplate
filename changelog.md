@@ -1,5 +1,8 @@
 # Changelog
 
+- 2021-06-21 (mid-sommer)
+  - Added `Bounds.getCenter` method.
+  - Added `IBounds.getCenter`.
 - 2021-05-31
   - Added the `DrawLib.setConfiguration` function`.
   - Added the `drawutils.setConfiguration` function from `DrawLib`.

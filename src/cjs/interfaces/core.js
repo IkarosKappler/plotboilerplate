@@ -13,6 +13,7 @@
  * @modified 2021-03-30 Added the `endDrawCycle` function to `DrawLib`.
  * @modified 2021-05-31 Added the `drawLib.setConfiguration` function.
  * @modified 2021-05-31 Splitted the large interfaces.ts file into this one and others.
+ * @modified 2021-06-21 Added `IBounds.getCenter()`.
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=core.js.map

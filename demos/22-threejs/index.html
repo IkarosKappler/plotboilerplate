@@ -26,25 +26,40 @@
     <script src="../../lib/Color.js"></script>
     <!-- <script src="../../lib/alloy_finger.js"></script> -->
     <script src="../../lib/three-r118.min.js"></script>
-
+    <!-- https://github.com/tdhooper/threejs-slice-geometry -->
+    <script src="./lib/slice.min.js"></script>
+    <!-- https://raw.githubusercontent.com/chandlerprall/ThreeCSG/master/ThreeCSG.js -->
+    <script src="./lib/three-csg.js"></script>
+    
     <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
     <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
     <script src="../../src/cjs/utils/creategui.js"></script>
     <script src="../../src/cjs/utils/module.js"></script>
     <script src="../../src/cjs/utils/gup.js"></script>
-
+    
     <script src="OrbitControls.js"></script>
     <script src="STLExporter.js"></script>
     <script src="VertexNormalsHelper.js"></script>
-
-    <!-- <script src="../DoubleclickHandler.js"></script> -->
+    
     <script src="defaults.js"></script>
     <script src="DildoGeneration.js"></script>
     <script src="DildoGeometry.js"></script>
+    <script src="DildoMaterials.js"></script>
+    <script src="PlaneMeshIntersection.js"></script>
+    <script src="GeometryGenerationHelpers.js"></script>
+    <script src="PathFinder.js"></script>
+    <script src="clearDuplicateVertices3.js"></script>
+    <script src="locateVertexInArray.js"></script>
+    <script src="mergeGeometries.js"></script>
+    <script src="UVHelpers.js"></script>
     
     <script src="../../dist/plotboilerplate.min.js"></script>
     <script src="../../lib/alloy_finger.js"></script>
+    <script src="../../lib/earcut.min.js"></script>
     <script src="../../src/cjs/utils/helpers/BezierPathInteractionHelper.js"></script>
+    <script src="../../src/cjs/utils/WebColors.js"></script>
+    <script src="../../src/cjs/utils/WebColorsContrast.js"></script>
+    <script src="../randomWebColor.js"></script>
     <script src="../modal.js"></script>
     <script src="index.js"></script>
     <link rel="stylesheet" href="../style.css">
@@ -76,5 +91,6 @@
     .right {
        float : right;
     }
+    #gui { position: absolute; top: 2px; left: 2px }
   </style>
 </html>
