@@ -614,7 +614,7 @@
         var leftA = this.leftFlatTriangleIndices[i][0];
         var leftB = this.leftFlatTriangleIndices[i][1];
         var leftC = this.leftFlatTriangleIndices[i][2];
-        makeFlatTriangleUVs(this, this.flatSideBounds, leftA, leftB, leftC);
+        UVHelpers.makeFlatTriangleUVs(this, this.flatSideBounds, leftA, leftB, leftC);
       }
 
       // Make flat side UVS (right)
@@ -624,7 +624,7 @@
         var rightA = this.rightFlatTriangleIndices[i][0];
         var rightB = this.rightFlatTriangleIndices[i][2];
         var rightC = this.rightFlatTriangleIndices[i][1];
-        makeFlatTriangleUVs(this, this.flatSideBounds, rightA, rightB, rightC);
+        UVHelpers.makeFlatTriangleUVs(this, this.flatSideBounds, rightA, rightB, rightC);
       }
 
       // TODO: add these as function
@@ -782,31 +782,31 @@
     }
   };
 
-  /**
-   * Helper function to create triangular UV Mappings for a triangle.
-   *
-   * TODO: move to helper class
-   *
-   * @param {THREE.Geometry} thisGeometry
-   * @param {Bounds} shapeBounds
-   * @param {number} vertIndexA - The index in the geometry's vertices array.
-   * @param {number} vertIndexB - ...
-   * @param {number} vertIndexC - ...
-   */
-  var makeFlatTriangleUVs = function (thisGeometry, shapeBounds, vertIndexA, vertIndexB, vertIndexC) {
-    var vertA = thisGeometry.vertices[vertIndexA];
-    var vertB = thisGeometry.vertices[vertIndexB];
-    var vertC = thisGeometry.vertices[vertIndexC];
-    // Convert a position vertex { x, y, * } to UV coordinates { u, v }
-    var getUVRatios = function (vert) {
-      // console.log((vert.x - shapeBounds.min.x) / shapeBounds.width, (vert.y - shapeBounds.min.y) / shapeBounds.height);
-      return new THREE.Vector2(
-        (vert.x - shapeBounds.min.x) / shapeBounds.width,
-        (vert.y - shapeBounds.min.y) / shapeBounds.height
-      );
-    };
-    thisGeometry.faceVertexUvs[0].push([getUVRatios(vertA), getUVRatios(vertB), getUVRatios(vertC)]);
-  };
+  // /**
+  //  * Helper function to create triangular UV Mappings for a triangle.
+  //  *
+  //  * TODO: move to helper class
+  //  *
+  //  * @param {THREE.Geometry} thisGeometry
+  //  * @param {Bounds} shapeBounds
+  //  * @param {number} vertIndexA - The index in the geometry's vertices array.
+  //  * @param {number} vertIndexB - ...
+  //  * @param {number} vertIndexC - ...
+  //  */
+  // var makeFlatTriangleUVs = function (thisGeometry, shapeBounds, vertIndexA, vertIndexB, vertIndexC) {
+  //   var vertA = thisGeometry.vertices[vertIndexA];
+  //   var vertB = thisGeometry.vertices[vertIndexB];
+  //   var vertC = thisGeometry.vertices[vertIndexC];
+  //   // Convert a position vertex { x, y, * } to UV coordinates { u, v }
+  //   var getUVRatios = function (vert) {
+  //     // console.log((vert.x - shapeBounds.min.x) / shapeBounds.width, (vert.y - shapeBounds.min.y) / shapeBounds.height);
+  //     return new THREE.Vector2(
+  //       (vert.x - shapeBounds.min.x) / shapeBounds.width,
+  //       (vert.y - shapeBounds.min.y) / shapeBounds.height
+  //     );
+  //   };
+  //   thisGeometry.faceVertexUvs[0].push([getUVRatios(vertA), getUVRatios(vertB), getUVRatios(vertC)]);
+  // };
 
   /**
    *

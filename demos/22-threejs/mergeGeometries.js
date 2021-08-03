@@ -34,7 +34,9 @@
       var c = vertexMap[face.c];
       baseGeometry.faces.push(new THREE.Face3(a, b, c));
       if (mergeGeometry.faceVertexUvs.length > 0 && f < mergeGeometry.faceVertexUvs[0].length) {
-        baseGeometry.faceVertexUvs[0].push(mergeGeometry.faceVertexUvs[0][f]);
+        var uvData = mergeGeometry.faceVertexUvs[0][f]; // [Vector2,Vector2,Vector2]
+        baseGeometry.faceVertexUvs[0].push([uvData[0].clone(), uvData[1].clone(), uvData[2].clone()]);
+        // console.log(uvData);
       } else {
         baseGeometry.faceVertexUvs[0].push([
           new THREE.Vector2(0.0, 0.0),

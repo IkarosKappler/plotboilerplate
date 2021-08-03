@@ -21,7 +21,7 @@
      * @param {boolean} useTextureImage - Load and use the given texture (at `textureImagePath`) if set to true.
      * @param {boolean} wireframe - Create a wireframe material if true.
      * @param {string} textureImagePath - The texture path to use (if useTextureImage is set to true).
-     * @param {THREE.DoubleSide|THREE.SingleSide} doubleSingleSide - Wether to display one one or both face sides.
+     * @param {THREE.DoubleSide|THREE.FrontSide|THREE.Backside} doubleSingleSide - Wether to display one one or both face sides.
      * @returns
      */
     createMainMaterial: function (useTextureImage, wireframe, textureImagePath, doubleSingleSide) {

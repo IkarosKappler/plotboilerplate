@@ -29,23 +29,24 @@
     this.camera.position.z = 500;
 
     var lightDistanceFactor = 10.0;
+    var intensityFactor = 2.0;
 
-    // this.ambientLightA = new THREE.AmbientLight(0xffffff);
-    this.ambientLightA = new THREE.PointLight(0xffffff, 5.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
+    this.ambientLightA = new THREE.AmbientLight(0xffffff);
+    // this.ambientLightA = new THREE.PointLight(0xffffff, intensityFactor * 5.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
     this.ambientLightA.position.set(350, 0, -350).multiplyScalar(lightDistanceFactor);
     this.scene.add(this.ambientLightA);
 
-    this.ambientLightB = new THREE.PointLight(0xffffff, 5.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
+    this.ambientLightB = new THREE.PointLight(0xffffff, intensityFactor * 5.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
     this.ambientLightB.position.set(-350, 0, 350).multiplyScalar(lightDistanceFactor);
     this.scene.add(this.ambientLightB);
 
-    this.directionalLightA = new THREE.DirectionalLight(0xffffff, 2.0);
+    this.directionalLightA = new THREE.DirectionalLight(0xffffff, intensityFactor * 2.0);
     // this.directionalLightA = new THREE.PointLight(0xffffff, 1.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
     this.directionalLightA.position.set(350, 350, 350).multiplyScalar(lightDistanceFactor);
     this.scene.add(this.directionalLightA);
     this.scene.add(this.directionalLightA.target);
 
-    this.directionalLightB = new THREE.DirectionalLight(0xffffff, 2.0);
+    this.directionalLightB = new THREE.DirectionalLight(0xffffff, intensityFactor * 2.0);
     this.directionalLightB.position.set(-350, -350, -50).multiplyScalar(lightDistanceFactor);
     this.scene.add(this.directionalLightB);
 
@@ -143,6 +144,7 @@
 
     if (options.performSlice) {
       this.__performPlaneSlice(latheMesh, dildoGeometry, wireframe, useTextureImage, textureImagePath, options);
+      // The CSG operations are not reliable.
       // this.__performCsgSlice(latheMesh, geometry, material);
     } else {
       latheMesh.position.y = -100;
@@ -194,20 +196,20 @@
     var rightSliceGeometry = GeometryGenerationHelpers.makeSlice(latheUnbufferedGeometry, rightPlane);
 
     var sliceMaterial = DildoMaterials.createSliceMaterial(useTextureImage, wireframe, textureImagePath); // wireframe);
-    if (options.showLeftSplit) {
-      var slicedMeshLeft = new THREE.Mesh(leftSliceGeometry, sliceMaterial);
-      slicedMeshLeft.position.y = -100;
-      slicedMeshLeft.position.z = -50;
-      slicedMeshLeft.userData["isExportable"] = true;
-      this.addMesh(slicedMeshLeft);
-    }
-    if (options.showRightSplit) {
-      var slicedMeshRight = new THREE.Mesh(rightSliceGeometry, sliceMaterial);
-      slicedMeshRight.position.y = -100;
-      slicedMeshRight.position.z = 50;
-      slicedMeshRight.userData["isExportable"] = true;
-      this.addMesh(slicedMeshRight);
-    }
+    // if (options.showLeftSplit) {
+    //   var slicedMeshLeft = new THREE.Mesh(leftSliceGeometry, sliceMaterial);
+    //   slicedMeshLeft.position.y = -100;
+    //   slicedMeshLeft.position.z = -50;
+    //   slicedMeshLeft.userData["isExportable"] = true;
+    //   this.addMesh(slicedMeshLeft);
+    // }
+    // if (options.showRightSplit) {
+    //   var slicedMeshRight = new THREE.Mesh(rightSliceGeometry, sliceMaterial);
+    //   slicedMeshRight.position.y = -100;
+    //   slicedMeshRight.position.z = 50;
+    //   slicedMeshRight.userData["isExportable"] = true;
+    //   this.addMesh(slicedMeshRight);
+    // }
 
     // Find points on intersection path (this is a single path in this configuration)
     var planeGeom = new THREE.PlaneGeometry(300, 500);
@@ -278,13 +280,43 @@
     var triangulatedGeometries = [];
     for (var i = 0; i < connectedPaths.length; i++) {
       var triangulationGeometry = makePlaneTriangulation(this, leftSliceGeometry, connectedPaths[i], options);
+      console.log(
+        "triangulationGeometry.faces.length",
+        triangulationGeometry.faces.length,
+        "triangulationGeometry.faceVertexUvs[0].length",
+        triangulationGeometry.faceVertexUvs[0].length,
+        triangulationGeometry.faceVertexUvs[0]
+      );
       triangulatedGeometries.push(triangulationGeometry);
       // Merge together left and right slice geometry with the triangulated
       // cut faces.
       if (options.closeCutAreas) {
         mergeGeometries(leftSliceGeometry, triangulationGeometry, epsilon);
         mergeGeometries(rightSliceGeometry, triangulationGeometry, epsilon);
+        // leftSliceGeometry.uvsNeedUpdate = true;
+        // rightSliceGeometry.uvsNeedUpdate = true;
       }
+    }
+
+    if (options.showLeftSplit) {
+      leftSliceGeometry.uvsNeedUpdate = true;
+      leftSliceGeometry.buffersNeedUpdate = true;
+      leftSliceGeometry.computeVertexNormals();
+      var slicedMeshLeft = new THREE.Mesh(leftSliceGeometry, sliceMaterial);
+      slicedMeshLeft.position.y = -100;
+      slicedMeshLeft.position.z = -50;
+      slicedMeshLeft.userData["isExportable"] = true;
+      this.addMesh(slicedMeshLeft);
+    }
+    if (options.showRightSplit) {
+      rightSliceGeometry.uvsNeedUpdate = true;
+      rightSliceGeometry.buffersNeedUpdate = true;
+      rightSliceGeometry.computeVertexNormals();
+      var slicedMeshRight = new THREE.Mesh(rightSliceGeometry, sliceMaterial);
+      slicedMeshRight.position.y = -100;
+      slicedMeshRight.position.z = 50;
+      slicedMeshRight.userData["isExportable"] = true;
+      this.addMesh(slicedMeshRight);
     }
 
     // Remember everything
@@ -321,12 +353,27 @@
       return sliceGeometry.vertices[geometryVertexIndex];
     });
     // console.log("trianglesGeometry", trianglesGeometry);
+    // Array<{x,y}> is compatible with Array<{x,y,z}> here :)
+    var flatSideBounds = Bounds.computeFromVertices(trianglesGeometry.vertices);
+    console.log("flatSideBounds", flatSideBounds);
     for (var t = 0; t < triangles.length; t += 3) {
       var a = triangles[t];
       var b = triangles[t + 1];
       var c = triangles[t + 2];
       trianglesGeometry.faces.push(new THREE.Face3(a, b, c));
+      // TODO: add UV
+      // var leftA = this.leftFlatTriangleIndices[i][0];
+      // var leftB = this.leftFlatTriangleIndices[i][1];
+      // var leftC = this.leftFlatTriangleIndices[i][2];
+      UVHelpers.makeFlatTriangleUVs(trianglesGeometry, flatSideBounds, a, b, c);
+      // trianglesGeometry.faceVertexUvs[0].push([new THREE.Vector2(0, 0), new THREE.Vector2(1.0, 0), new THREE.Vector2(0, 1.0)]);
     }
+    // material.needsUpdate = true;
+    trianglesGeometry.uvsNeedUpdate = true;
+    trianglesGeometry.buffersNeedUpdate = true;
+    // var bufferedGeometry = new THREE.BufferGeometry().fromGeometry(dildoGeometry);
+    trianglesGeometry.computeVertexNormals();
+    // console.log("options.textureImagePath", options.textureImagePath);
     var trianglesMesh = new THREE.Mesh(
       trianglesGeometry,
       new THREE.MeshBasicMaterial({
@@ -335,6 +382,8 @@
         opacity: 0.55,
         side: THREE.DoubleSide
       })
+      // useTextureImage, wireframe, textureImagePath, doubleSingleSide
+      // DildoMaterials.createMainMaterial(true, false, "wood.png", THREE.DoubleSide)
     );
     trianglesMesh.position.y = -100;
     // trianglesMesh.position.z += 1.0; // Avoid Moiré with plane mesh?
