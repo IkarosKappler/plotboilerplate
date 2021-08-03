@@ -52,7 +52,6 @@
             emissive: 0x0,
             reflectivity: 1.0,
             refractionRatio: 0.89,
-            specular: 0x888888,
             map: null
           });
     },
@@ -74,7 +73,6 @@
           emissive: 0x0,
           reflectivity: 1.0,
           refractionRatio: 0.89,
-          specular: 0x888888,
           map: useTextureImage ? DildoMaterials.loadTextureImage(textureImagePath) : null,
           vertexColors: false
         });

@@ -36,7 +36,6 @@
    * @return {Array<number[]>} An array of paths; each path consists of an array of path vertex indices in the `pathVertices` param.
    */
   PathFinder.prototype.findAllPathsOnMesh = function (unbufferedGeometry, pathVertices) {
-    console.log("pathVertices", pathVertices);
     var collectedPaths = []; // Array<number[]>
     this.visitedVertices.clear();
     this.unvisitedVertIndices.clear();
@@ -88,8 +87,6 @@
     // var faceAndVertIndex; // { faceIndex: number, vertIndex: number }
     var adjacentVertIndex;
     while ((adjacentVertIndex = this.findAdjacentFace(unbufferedGeometry, pathVertIndices, unvisitedIndex)) !== -1) {
-      // var faceIndex = faceAndVertIndex.faceIndex;
-      // var vertIndex = faceAndVertIndex.vertIndex;
       // Retrieved face/vertex tuple represents the next element on the path
       path.push(adjacentVertIndex);
       this.visitedVertices.add(adjacentVertIndex);
@@ -206,7 +203,6 @@
         pathVertIndices.push(foundIndex);
       }
     } // END for i
-    console.log("pathVertIndices", pathVertIndices);
     return pathVertIndices;
   };
 
@@ -228,8 +224,8 @@
         return index;
       })
     );
-    // var count = 32;
-    while (/*count-- > 0 &&*/ unvisitedPathIndexSet.size > 0) {
+
+    while (unvisitedPathIndexSet.size > 0) {
       var currentPathIndex = unvisitedPathIndexSet.values().next().value;
       unvisitedPathIndexSet.delete(currentPathIndex);
       var currentPath = collectedPaths[currentPathIndex];
@@ -256,7 +252,7 @@
         if (nextPath) {
           currentPath = currentPath.concat(nextPath);
         }
-      } while (/*c-- > 0 &&*/ nextPath);
+      } while (nextPath);
 
       // All adjacent paths found and connected.
       resultPaths.push(currentPath);

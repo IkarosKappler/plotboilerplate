@@ -75,7 +75,7 @@
         performSlice: false,
         makeHollow: false,
         hollowStrengthX: 15.0, // equivalent for Y is 'normalsLength'
-        renderFaces: "double", // "double" or "single"
+        renderFaces: "double", // "double" or "front" or "back"
         twistAngle: 0.0,
         baseShapeExcentricity: 1.0,
         closeCutAreas: true,
@@ -330,71 +330,39 @@
       // prettier-ignore
       fold0.add(config, "bendAngle").min(0).max(180).onChange( function() { rebuild() } ).name('bendAngle').title('The bending angle in degrees.');
       // prettier-ignore
-      // fold0.add(config, "closeTop").onChange( function() { rebuild() } ).name('closeTop').title('Close the geometry at the top point (recommended).');
-      // // prettier-ignore
-      // fold0.add(config, "closeBottom").onChange( function() { rebuild() } ).name('closeBottom').title('Close the geometry at the bottom point.');
-      // prettier-ignore
-      fold0.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
-      // prettier-ignore
       fold0.add(config, "normalsLength").min(1.0).max(50.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
       // prettier-ignore
-      fold0.add(config, "normalizePerpendiculars").onChange( function() { rebuild() } ).name('normalizePerpendiculars').title('Normalize the XZ perpendiculars (recommended).');
-      // prettier-ignore
-      // fold0.add(config, "performSlice").onChange( function() { rebuild() } ).name('performSlice').title('Slice the model along the x axis?');
-      // prettier-ignore
-      // fold0.add(config, "makeHollow").onChange( function() { rebuild() } ).name('makeHollow').title('Make a hollow mold?');
-      // prettier-ignore
       fold0.add(config, "hollowStrengthX").min(0.0).max(50.0).onChange( function() { rebuild() } ).name('hollowStrengthX').title('How thick make the walls?');
-      // prettier-ignore
-      fold0.add(config, "renderFaces", ["double","single"]).onChange( function() { rebuild() } ).name('renderFaces').title('Render mesh faces double or single sided?');
       // prettier-ignore
       fold0.add(config, "twistAngle").min(-360.0*3).max(360.0*3).onChange( function() { rebuild() } ).name('twistAngle').title('Twist the mesh along its spine.');
       // prettier-ignore
       fold0.add(config, "baseShapeExcentricity").min(0.1).max(2.0).onChange( function() { rebuild() } ).name('baseShapeExcentricity').title('Make the base shape more elliptic.');
       // prettier-ignore
-      // fold0.add(config, "closeCutAreas").onChange( function() { rebuild() } ).name('closeCutAreas').title('Close the open cut areas on the split.');
+      fold0.add(config, "closeCutAreas").onChange( function() { rebuild() } ).name('closeCutAreas').title('Close the open cut areas on the split.');
 
       var fold1 = gui.addFolder("Slice & Hollow");
-      // prettier-ignore
-      // fold1.add(config, "outlineSegmentCount").min(3).max(512).onChange( function() { rebuild() } ).name('outlineSegmentCount').title('The number of segments on the outline.');
-      // // prettier-ignore
-      // fold1.add(config, "shapeSegmentCount").min(3).max(256).onChange( function() { rebuild() } ).name('shapeSegmentCount').title('The number of segments on the shape.');
-      // // prettier-ignore
-      // fold1.add(config, "bendAngle").min(0).max(180).onChange( function() { rebuild() } ).name('bendAngle').title('The bending angle in degrees.');
-      // // prettier-ignore
-      fold1.add(config, "closeTop").onChange( function() { rebuild() } ).name('closeTop').title('Close the geometry at the top point (recommended).');
-      // prettier-ignore
-      fold1.add(config, "closeBottom").onChange( function() { rebuild() } ).name('closeBottom').title('Close the geometry at the bottom point.');
-      // // prettier-ignore
-      // fold1.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
-      // // prettier-ignore
-      // fold1.add(config, "normalsLength").min(1.0).max(50.0).onChange( function() { rebuild() } ).name('normalsLength').title('The length of rendered normals.');
-      // // prettier-ignore
-      // fold1.add(config, "normalizePerpendiculars").onChange( function() { rebuild() } ).name('normalizePerpendiculars').title('Normalize the XZ perpendiculars (recommended).');
-      // // prettier-ignore
-      // fold1.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image?');
-      // // prettier-ignore
-      // fold1.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model?');
       // prettier-ignore
       fold1.add(config, "performSlice").onChange( function() { rebuild() } ).name('performSlice').title('Slice the model along the x axis?');
       // prettier-ignore
       fold1.add(config, "makeHollow").onChange( function() { rebuild() } ).name('makeHollow').title('Make a hollow mold?');
       // prettier-ignore
-      // fold1.add(config, "hollowStrengthX").min(0.0).max(50.0).onChange( function() { rebuild() } ).name('hollowStrengthX').title('How thick make the walls?');
-      // // prettier-ignore
-      // fold1.add(config, "renderFaces", ["double","single"]).onChange( function() { rebuild() } ).name('renderFaces').title('Render mesh faces double or single sided?');
-      // // prettier-ignore
-      // fold1.add(config, "twistAngle").min(-360.0*3).max(360.0*3).onChange( function() { rebuild() } ).name('twistAngle').title('Twist the mesh along its spine.');
-      // // prettier-ignore
-      // fold1.add(config, "baseShapeExcentricity").min(0.1).max(2.0).onChange( function() { rebuild() } ).name('baseShapeExcentricity').title('Make the base shape more elliptic.');
+      fold1.add(config, "closeTop").onChange( function() { rebuild() } ).name('closeTop').title('Close the geometry at the top point (recommended).');
+      // prettier-ignore
+      fold1.add(config, "closeBottom").onChange( function() { rebuild() } ).name('closeBottom').title('Close the geometry at the bottom point.');
       // prettier-ignore
       fold1.add(config, "closeCutAreas").onChange( function() { rebuild() } ).name('closeCutAreas').title('Close the open cut areas on the split.');
+      // prettier-ignore
+      fold1.add(config, "normalizePerpendiculars").onChange( function() { rebuild() } ).name('normalizePerpendiculars').title('Normalize the XZ perpendiculars (recommended).');
 
       var fold2 = gui.addFolder("Render Settings");
       // prettier-ignore
       fold2.add(config, "wireframe").onChange( function() { rebuild() } ).name('wireframe').title('Display the mesh as a wireframe model?');
       // prettier-ignore
       fold2.add(config, "useTextureImage").onChange( function() { rebuild() } ).name('useTextureImage').title('Use a texture image?');
+      // prettier-ignore
+      fold2.add(config, "renderFaces", ["double","front","back"]).onChange( function() { rebuild() } ).name('renderFaces').title('Render mesh faces double or single sided?');
+      // prettier-ignore
+      fold2.add(config, "showNormals").onChange( function() { rebuild() } ).name('showNormals').title('Show the vertex normals.');
       // prettier-ignore
       fold2.add(config, "showBasicPerpendiculars").onChange( function() { rebuild() } ).name('showBasicPerpendiculars').title('Show the meshes perpendicular on the XZ plane.');
       // prettier-ignore
