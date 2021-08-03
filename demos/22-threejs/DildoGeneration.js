@@ -31,9 +31,10 @@
     var lightDistanceFactor = 10.0;
     var intensityFactor = 1.0;
 
-    this.ambientLightA = new THREE.AmbientLight(0xffffff);
+    this.ambientLightA = new THREE.AmbientLight(0x444444);
+    this.ambientLightA.position.set(350, 0, -350).multiplyScalar(lightDistanceFactor * 5);
     // this.ambientLightA = new THREE.PointLight(0xffffff, intensityFactor * 5.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
-    this.ambientLightA.position.set(350, 0, -350).multiplyScalar(lightDistanceFactor);
+    // this.ambientLightA.position.set(350, 0, -350).multiplyScalar(lightDistanceFactor);
     this.scene.add(this.ambientLightA);
 
     this.ambientLightB = new THREE.PointLight(0xffffff, intensityFactor * 5.0, 350.0 * lightDistanceFactor, 0.5); // color, intensity, distance, decay);
@@ -203,7 +204,7 @@
     var planeMesh = new THREE.Mesh(
       planeGeom,
       new THREE.MeshBasicMaterial({
-        color: "lightgray",
+        color: 0x484848,
         transparent: true,
         opacity: 0.35,
         side: THREE.DoubleSide

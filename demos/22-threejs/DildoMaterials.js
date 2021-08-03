@@ -62,8 +62,8 @@
         // return new THREE.MeshStandardMaterial({ wireframe: true });
       } else {
         return new THREE.MeshLambertMaterial({
-          color: 0xa1848a8, // 0xff0000, // 0x3838ff,
-          wireframe: false, // wireframe,
+          color: useTextureImage ? 0x888888 : 0xa1848a8, // == blue
+          wireframe: false,
           flatShading: false,
           depthTest: true,
           opacity: 1.0,
