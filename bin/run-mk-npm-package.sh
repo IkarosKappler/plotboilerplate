@@ -38,6 +38,9 @@ if [ ! -f ".gitignore" ]; then
 fi
 
 echo -e "${_PURPLE} *** Copying files for minimal package ... ${_NC}"
+# Force delete the old src and dist folders to get rid of deprecated/deleted/renamed stuff.
+rm -rf "$TARGET_DIR"src
+rm -rf "$TARGET_DIR"dist
 # (no docs, no demos, no jekyll, no config files, no screenshots)
 cp ../README.md "$TARGET_DIR"README.md
 cp ../changelog.md "$TARGET_DIR"changelog.md
