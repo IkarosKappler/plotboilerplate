@@ -1203,6 +1203,7 @@ export class PlotBoilerplate {
      * Internal helper function used to get 'float' properties from elements.
      * Used to determine border withs and paddings that were defined using CSS.
      */
+    // TODO: this was moved to the DOM utils
     getFProp(elem, propName) {
         return parseFloat(globalThis.getComputedStyle(elem, null).getPropertyValue(propName));
     }
@@ -1211,23 +1212,11 @@ export class PlotBoilerplate {
      *
      * Size minus padding minus border.
      **/
+    // TODO: this was moved to the DOM utils
     getAvailableContainerSpace() {
         const _self = this;
         const container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        // var canvas : HTMLCanvasElement = _self.canvas;
         _self.canvas.style.display = "none";
-        /* var
-        padding : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
-        border : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-width') ) || 0,
-        pl : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
-        pr : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
-        pt : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
-        pb : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
-        bl : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-left-width') ) || border,
-        br : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-right-width') ) || border,
-        bt : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-top-width') ) || border,
-        bb : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-bottom-width') ) || border;
-        */
         var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(_self.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(_self.canvas, "border-left-width") || border, br = this.getFProp(_self.canvas, "border-right-width") || border, bt = this.getFProp(_self.canvas, "border-top-width") || border, bb = this.getFProp(_self.canvas, "border-bottom-width") || border;
         var w = container.clientWidth;
         var h = container.clientHeight;

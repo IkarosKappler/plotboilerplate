@@ -1,5 +1,12 @@
 # Changelog
 
+- 2021-10-04
+  - Adding the `DrawLib.rect` function to the interface.
+  - Adding a new demo: 31-lightning-alrorithm.
+  - Changing param `position` of the draw, drawsvg and drawgl library from `Vertex` to `XYCoords`.
+  - Adding `drawutilssvg.rect` function.
+  - Adding `drawutilsgl.rect` function.
+  - Adding config check to `drawutilssvg.addStyleDefs` (printing warnings if incomplete).
 - 2021-06-21 (mid-sommer)
   - Added `Bounds.getCenter` method.
   - Added `IBounds.getCenter`.

@@ -4233,7 +4233,12 @@ class drawutilssvg {
         for (var k in keys) {
             const className = keys[k];
             const drawSettings = drawConfig[k];
-            rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; stroke-width: ${drawSettings.lineWidth}px }`);
+            if (drawSettings) {
+                rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; stroke-width: ${drawSettings.lineWidth}px }`);
+            }
+            else {
+                console.warn(`Warning: your draw config is missing the key '${k}' which is required.`);
+            }
         }
         nodeStyle.innerHTML = rules.join("\n");
     }
@@ -4735,7 +4740,7 @@ class drawutilssvg {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
+     * @param {XYCoords} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -4750,6 +4755,23 @@ class drawutilssvg {
         node.setAttribute("width", `${size * this.scale.x}`);
         node.setAttribute("height", `${size * this.scale.y}`);
         return this._bindFillDraw(node, "square", color, lineWidth || 1);
+    }
+    /**
+     * Draw a rectangle.
+     *
+     * @param {XYCoords} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    rect(position, width, height, color, lineWidth) {
+        const node = this.makeNode("rect");
+        node.setAttribute("x", `${this._x(position.x)}`);
+        node.setAttribute("y", `${this._y(position.y)}`);
+        node.setAttribute("width", `${width * this.scale.x}`);
+        node.setAttribute("height", `${height * this.scale.y}`);
+        return this._bindFillDraw(node, "rect", color, lineWidth || 1);
     }
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -5472,7 +5494,7 @@ class drawutils {
     /**
      * Draw a rectangle.
      *
-     * @param {Vertex} position - The upper left corner of the rectangle.
+     * @param {XYCoords} position - The upper left corner of the rectangle.
      * @param {number} width - The width of the rectangle.
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
@@ -5748,8 +5770,8 @@ class drawutils {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number} lineWidth - The line with to use (optional, default is 1).
      * @return {void}
@@ -6421,7 +6443,7 @@ class drawutilsgl {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
+     * @param {XYCords} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -6430,6 +6452,18 @@ class drawutilsgl {
      * @memberof drawutils
      */
     square(center, size, color, lineWidth) {
+        // NOT YET IMPLEMENTED
+    }
+    /**
+     * Draw a rectangle.
+     *
+     * @param {XYCoords} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    rect(position, width, height, color, lineWidth) {
         // NOT YET IMPLEMENTED
     }
     /**
@@ -10452,6 +10486,7 @@ class PlotBoilerplate {
      * Internal helper function used to get 'float' properties from elements.
      * Used to determine border withs and paddings that were defined using CSS.
      */
+    // TODO: this was moved to the DOM utils
     getFProp(elem, propName) {
         return parseFloat(globalThis.getComputedStyle(elem, null).getPropertyValue(propName));
     }
@@ -10460,23 +10495,11 @@ class PlotBoilerplate {
      *
      * Size minus padding minus border.
      **/
+    // TODO: this was moved to the DOM utils
     getAvailableContainerSpace() {
         const _self = this;
         const container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        // var canvas : HTMLCanvasElement = _self.canvas;
         _self.canvas.style.display = "none";
-        /* var
-        padding : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
-        border : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-width') ) || 0,
-        pl : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
-        pr : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
-        pt : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
-        pb : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
-        bl : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-left-width') ) || border,
-        br : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-right-width') ) || border,
-        bt : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-top-width') ) || border,
-        bb : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-bottom-width') ) || border;
-        */
         var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(_self.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(_self.canvas, "border-left-width") || border, br = this.getFProp(_self.canvas, "border-right-width") || border, bt = this.getFProp(_self.canvas, "border-top-width") || border, bb = this.getFProp(_self.canvas, "border-bottom-width") || border;
         var w = container.clientWidth;
         var h = container.clientHeight;

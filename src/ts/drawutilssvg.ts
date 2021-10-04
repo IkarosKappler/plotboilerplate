@@ -200,8 +200,12 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     const rules = [];
     for (var k in keys) {
       const className: string = keys[k];
-      const drawSettings: DrawSettings = drawConfig[k];
-      rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; stroke-width: ${drawSettings.lineWidth}px }`);
+      const drawSettings: DrawSettings | undefined = drawConfig[k];
+      if( drawSettings ) {
+        rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; stroke-width: ${drawSettings.lineWidth}px }`);
+      } else {
+        console.warn(`Warning: your draw config is missing the key '${k}' which is required.`);
+      }
     }
     nodeStyle.innerHTML = rules.join("\n");
   }
@@ -770,7 +774,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
    *
    * @method square
-   * @param {Vertex} center - The center of the square.
+   * @param {XYCoords} center - The center of the square.
    * @param {Vertex} size - The size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -778,7 +782,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    * @memberof drawutilssvg
    */
-  square(center: Vertex, size: number, color: string, lineWidth?: number) {
+  square(center: XYCoords, size: number, color: string, lineWidth?: number) {
     const node: SVGElement = this.makeNode("rectangle");
     node.setAttribute("x", `${this._x(center.x - size / 2.0)}`);
     node.setAttribute("y", `${this._y(center.y - size / 2.0)}`);
@@ -786,6 +790,25 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     node.setAttribute("height", `${size * this.scale.y}`);
 
     return this._bindFillDraw(node, "square", color, lineWidth || 1);
+  }
+
+  /**
+   * Draw a rectangle.
+   *
+   * @param {XYCoords} position - The upper left corner of the rectangle.
+   * @param {number} width - The width of the rectangle.
+   * @param {number} height - The height of the rectangle.
+   * @param {string} color - The color to use.
+   * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+   **/
+  rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number) {
+    const node: SVGElement = this.makeNode("rect");
+    node.setAttribute("x", `${this._x(position.x)}`);
+    node.setAttribute("y", `${this._y(position.y)}`);
+    node.setAttribute("width", `${width * this.scale.x}`);
+    node.setAttribute("height", `${height * this.scale.y}`);
+
+    return this._bindFillDraw(node, "rect", color, lineWidth || 1);
   }
 
   /**

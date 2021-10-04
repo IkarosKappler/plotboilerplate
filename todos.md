@@ -1,5 +1,7 @@
 ## Todos
 
+- Removed `getAvailableContainerSpace` from main class. Is in dom-utils now.
+- Removed `getFProp` from main class. Is in dom-utils now.
 - Add a method to draw connected paths (different types of path segments: linear, curve, arc, ...). Useful for the circle intersections demo.
 - Use a sorted map in the line-point-distance demo.
 - The experimental WebGL support requires Color objects instead of color strings. Otherwise each color string will be parse on each roundtrip which is a nightmare for the performance.

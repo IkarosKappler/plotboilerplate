@@ -100,7 +100,12 @@ var drawutilssvg = /** @class */ (function () {
         for (var k in keys) {
             var className = keys[k];
             var drawSettings = drawConfig[k];
-            rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; stroke-width: " + drawSettings.lineWidth + "px }");
+            if (drawSettings) {
+                rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; stroke-width: " + drawSettings.lineWidth + "px }");
+            }
+            else {
+                console.warn("Warning: your draw config is missing the key '" + k + "' which is required.");
+            }
         }
         nodeStyle.innerHTML = rules.join("\n");
     };
@@ -603,7 +608,7 @@ var drawutilssvg = /** @class */ (function () {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
+     * @param {XYCoords} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -618,6 +623,23 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute("width", "" + size * this.scale.x);
         node.setAttribute("height", "" + size * this.scale.y);
         return this._bindFillDraw(node, "square", color, lineWidth || 1);
+    };
+    /**
+     * Draw a rectangle.
+     *
+     * @param {XYCoords} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    drawutilssvg.prototype.rect = function (position, width, height, color, lineWidth) {
+        var node = this.makeNode("rect");
+        node.setAttribute("x", "" + this._x(position.x));
+        node.setAttribute("y", "" + this._y(position.y));
+        node.setAttribute("width", "" + width * this.scale.x);
+        node.setAttribute("height", "" + height * this.scale.y);
+        return this._bindFillDraw(node, "rect", color, lineWidth || 1);
     };
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.

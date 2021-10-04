@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>2D Plotting Boilerplate - Plotting function graphs</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, function, graph, plot">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2021-01-27">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Demo of plotting function graphs with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demo of plotting function graphs with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-na.png">
+
+    <!-- Polyfills for IE -->
+    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/path2d-polyfill.min.js"></script>
+    
+    <script src="../../lib/humane.min.js"></script>
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/Color.js"></script>
+    <script src="../../lib/alloy_finger.js"></script>
+    <script src="../../lib/uistats.min.js"></script>
+
+    <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
+    <script src="../../src/cjs/utils/creategui.js"></script>
+    <script src="../../src/cjs/utils/module.js"></script>
+    <script src="../../src/cjs/utils/gup.js"></script>
+    <script src="../../src/cjs/utils/dom/getFProp.js"></script>
+    <script src="../../src/cjs/utils/dom/getAvailableContainerSpace.js"></script>
+
+    <!-- For development -->
+    <!--
+    <script src="../../src/js/UIDGenerator.js"></script>
+    <script src="../../src/js/VertexAttr.js"></script>
+    <script src="../../src/js/VertexListeners.js"></script>
+    <script src="../../src/js/VertTuple.js"></script>
+    <script src="../../src/js/Vertex.js"></script>
+    <script src="../../src/js/Bounds.js"></script>
+    <script src="../../src/js/Grid.js"></script>
+    <script src="../../src/js/Line.js"></script>
+    <script src="../../src/js/Vector.js"></script>
+    <script src="../../src/js/CubicBezierCurve.js"></script>
+    <script src="../../src/js/BezierPath.js"></script>
+    <script src="../../src/js/Polygon.js"></script>
+    <script src="../../src/js/Triangle.js"></script>
+    <script src="../../src/js/VEllipse.js"></script>
+    <script src="../../src/js/Circle.js"></script>
+    <script src="../../src/js/CircleSector.js"></script>
+    <script src="../../src/js/PBImage.js"></script>
+    <script src="../../src/js/MouseHandler.js"></script>
+    <script src="../../src/js/KeyHandler.js"></script>
+    <script src="../../src/js/draw.js"></script>
+    <script src="../../src/js/utils/helpers/drawutilssvg.js"></script>
+    <script src="../../src/js/geomutils.js"></script>
+    <script src="../../src/js/SVGBuilder.js"></script>
+    <script src="../../src/js/PlotBoilerplate.js"></script> -->
+    <!-- END for development -->
+
+    <!-- For production -->
+    <script src="../../dist/plotboilerplate.min.js"></script>
+    <!-- END For production -->
+
+    <!-- Load the thirdparty mathjs libray from https://mathjs.org/ -->
+    <script src="math.js"></script>
+
+    <script src="../VertexAnimator.Linear.js"></script>
+    <script src="../../src/js/utils/WebColors.js"></script>
+    <script src="../../src/js/utils/WebColorsContrast.js"></script>
+    <script src="../getContrastColor.js"></script>
+    <script src="../modal.js"></script>
+    <script src="index.js"></script>
+    
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script> -->
+    
+    <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../modal.css">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <svg id="my-canvas" width="1024" height="768"></svg>
+  </body>
+</html>

@@ -52,7 +52,7 @@ var CircleIntersections = /** @class */ (function () {
         for (var i = 0; i < intervalSets.length; i++) {
             maxSetLength = Math.max(maxSetLength, intervalSets[i].intervals.length);
         }
-        var usedIntervals = matrixFill_1.matrixFill(intervalSets.length, maxSetLength, false);
+        var usedIntervals = (0, matrixFill_1.matrixFill)(intervalSets.length, maxSetLength, false);
         var path = null;
         var pathList = [];
         while ((path = CircleIntersections.findOuterPartition(circles, intervalSets, usedIntervals)) != null) {
@@ -108,7 +108,7 @@ var CircleIntersections = /** @class */ (function () {
         var radicalLines = [];
         for (var i = 0; i < circles.length; i++) {
             if (!radicalLines[i])
-                radicalLines[i] = arrayFill_1.arrayFill(circles.length, null); // Array<Line>( circles.length );
+                radicalLines[i] = (0, arrayFill_1.arrayFill)(circles.length, null); // Array<Line>( circles.length );
             for (var j = 0; j < circles.length; j++) {
                 if (i == j)
                     continue;
@@ -118,7 +118,7 @@ var CircleIntersections = /** @class */ (function () {
                 // Build symmetrical matrix
                 if (radicalLines[i][j]) {
                     if (!radicalLines[j])
-                        radicalLines[j] = arrayFill_1.arrayFill(circles.length, null); // Array<Line>( circles.length );
+                        radicalLines[j] = (0, arrayFill_1.arrayFill)(circles.length, null); // Array<Line>( circles.length );
                     // Use reverse line
                     radicalLines[j][i] = new Line_1.Line(radicalLines[i][j].b, radicalLines[i][j].a);
                 }

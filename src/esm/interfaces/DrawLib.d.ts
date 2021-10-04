@@ -247,15 +247,29 @@ export interface DrawLib<R> {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    square: (center: Vertex, size: number, color: string, lineWidth?: number) => R;
+    square: (center: XYCoords, size: number, color: string, lineWidth?: number) => R;
+    /**
+     * Draw a rectangle at the given left upper corner, with, height; and with the specified line width and (CSS-) color.<br>
+     *
+     * @method rect
+     * @param {XYCoords} center - The center of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The CSS color to draw the rectangle with.
+     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    rect: (upperLeft: XYCoords, width: number, height: number, color: string, lineWidth?: number) => R;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *

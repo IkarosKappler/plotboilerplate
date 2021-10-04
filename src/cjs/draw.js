@@ -200,7 +200,7 @@ var drawutils = /** @class */ (function () {
     /**
      * Draw a rectangle.
      *
-     * @param {Vertex} position - The upper left corner of the rectangle.
+     * @param {XYCoords} position - The upper left corner of the rectangle.
      * @param {number} width - The width of the rectangle.
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
@@ -476,8 +476,8 @@ var drawutils = /** @class */ (function () {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number} lineWidth - The line with to use (optional, default is 1).
      * @return {void}

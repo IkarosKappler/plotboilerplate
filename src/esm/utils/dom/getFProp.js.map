@@ -1,0 +1,1 @@
+{"version":3,"file":"getFProp.js","sourceRoot":"","sources":["../../../ts/utils/dom/getFProp.ts"],"names":[],"mappings":"AAAA;;;GAGG;AACF,MAAM,CAAC,MAAM,QAAQ,GAAG,CAAC,IAA8B,EAAE,QAAgB,EAAU,EAAE;IAClF,OAAO,UAAU,CAAC,UAAU,CAAC,gBAAgB,CAAC,IAAI,EAAE,IAAI,CAAC,CAAC,gBAAgB,CAAC,QAAQ,CAAC,CAAC,CAAC;AACxF,CAAC,CAAA"}

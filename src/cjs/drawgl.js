@@ -366,7 +366,7 @@ var drawutilsgl = /** @class */ (function () {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
+     * @param {XYCords} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -375,6 +375,18 @@ var drawutilsgl = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilsgl.prototype.square = function (center, size, color, lineWidth) {
+        // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw a rectangle.
+     *
+     * @param {XYCoords} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    drawutilsgl.prototype.rect = function (position, width, height, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     /**

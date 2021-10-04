@@ -10,11 +10,11 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "AlloyFinger": () => /* reexport */ AlloyFinger,
-  "default": () => /* binding */ esm
+  "AlloyFinger": () => (/* reexport */ AlloyFinger),
+  "default": () => (/* binding */ esm)
 });
 
-// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/alloy_finger.js
+;// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/alloy_finger.js
 /* Port from AlloyFinger v0.1.15
  * Original by dntzhang
  * Typescript port by Ikaros Kappler
@@ -404,7 +404,7 @@ class AlloyFinger {
 ;
 /* harmony default export */ const alloy_finger = ((/* unused pure expression or super */ null && (AlloyFinger)));
 //# sourceMappingURL=alloy_finger.js.map
-// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/index.js
+;// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/index.js
 /**
  * TypeScript port by Ikaros Kappler.
  *
@@ -3297,6 +3297,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3430,6 +3432,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -5111,6 +5115,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * Internal helper function used to get 'float' properties from elements.
      * Used to determine border withs and paddings that were defined using CSS.
      */
+    // TODO: this was moved to the DOM utils
     PlotBoilerplate.prototype.getFProp = function (elem, propName) {
         return parseFloat(globalThis.getComputedStyle(elem, null).getPropertyValue(propName));
     };
@@ -5119,23 +5124,11 @@ var PlotBoilerplate = /** @class */ (function () {
      *
      * Size minus padding minus border.
      **/
+    // TODO: this was moved to the DOM utils
     PlotBoilerplate.prototype.getAvailableContainerSpace = function () {
         var _self = this;
         var container = _self.canvas.parentNode; // Element | Document | DocumentFragment;
-        // var canvas : HTMLCanvasElement = _self.canvas;
         _self.canvas.style.display = "none";
-        /* var
-        padding : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding') ) || 0,
-        border : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-width') ) || 0,
-        pl : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-left') ) || padding,
-        pr : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-right') ) || padding,
-        pt : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-top') ) || padding,
-        pb : number = parseFloat( globalThis.getComputedStyle(container, null).getPropertyValue('padding-bottom') ) || padding,
-        bl : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-left-width') ) || border,
-        br : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-right-width') ) || border,
-        bt : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-top-width') ) || border,
-        bb : number = parseFloat( globalThis.getComputedStyle(_self.canvas, null).getPropertyValue('border-bottom-width') ) || border;
-        */
         var padding = this.getFProp(container, "padding") || 0, border = this.getFProp(_self.canvas, "border-width") || 0, pl = this.getFProp(container, "padding-left") || padding, pr = this.getFProp(container, "padding-right") || padding, pt = this.getFProp(container, "padding-top") || padding, pb = this.getFProp(container, "padding-bottom") || padding, bl = this.getFProp(_self.canvas, "border-left-width") || border, br = this.getFProp(_self.canvas, "border-right-width") || border, bt = this.getFProp(_self.canvas, "border-top-width") || border, bb = this.getFProp(_self.canvas, "border-bottom-width") || border;
         var w = container.clientWidth;
         var h = container.clientHeight;
@@ -7618,6 +7611,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -9222,7 +9217,7 @@ var drawutils = /** @class */ (function () {
     /**
      * Draw a rectangle.
      *
-     * @param {Vertex} position - The upper left corner of the rectangle.
+     * @param {XYCoords} position - The upper left corner of the rectangle.
      * @param {number} width - The width of the rectangle.
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
@@ -9498,8 +9493,8 @@ var drawutils = /** @class */ (function () {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number} lineWidth - The line with to use (optional, default is 1).
      * @return {void}
@@ -10183,7 +10178,7 @@ var drawutilsgl = /** @class */ (function () {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
+     * @param {XYCords} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -10192,6 +10187,18 @@ var drawutilsgl = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilsgl.prototype.square = function (center, size, color, lineWidth) {
+        // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw a rectangle.
+     *
+     * @param {XYCoords} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    drawutilsgl.prototype.rect = function (position, width, height, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     /**
@@ -10589,7 +10596,12 @@ var drawutilssvg = /** @class */ (function () {
         for (var k in keys) {
             var className = keys[k];
             var drawSettings = drawConfig[k];
-            rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; stroke-width: " + drawSettings.lineWidth + "px }");
+            if (drawSettings) {
+                rules.push("." + className + " { fill : none; stroke: " + drawSettings.color + "; stroke-width: " + drawSettings.lineWidth + "px }");
+            }
+            else {
+                console.warn("Warning: your draw config is missing the key '" + k + "' which is required.");
+            }
         }
         nodeStyle.innerHTML = rules.join("\n");
     };
@@ -11092,7 +11104,7 @@ var drawutilssvg = /** @class */ (function () {
      * Note that if the x-scale and the y-scale are different the result will be a rectangle rather than a square.
      *
      * @method square
-     * @param {Vertex} center - The center of the square.
+     * @param {XYCoords} center - The center of the square.
      * @param {Vertex} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -11107,6 +11119,23 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute("width", "" + size * this.scale.x);
         node.setAttribute("height", "" + size * this.scale.y);
         return this._bindFillDraw(node, "square", color, lineWidth || 1);
+    };
+    /**
+     * Draw a rectangle.
+     *
+     * @param {XYCoords} position - The upper left corner of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {string} color - The color to use.
+     * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     **/
+    drawutilssvg.prototype.rect = function (position, width, height, color, lineWidth) {
+        var node = this.makeNode("rect");
+        node.setAttribute("x", "" + this._x(position.x));
+        node.setAttribute("y", "" + this._y(position.y));
+        node.setAttribute("width", "" + width * this.scale.x);
+        node.setAttribute("height", "" + height * this.scale.y);
+        return this._bindFillDraw(node, "rect", color, lineWidth || 1);
     };
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -11746,8 +11775,9 @@ exports.geomutils = {
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
@@ -11778,7 +11808,7 @@ exports.geomutils = {
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
@@ -11793,6 +11823,8 @@ exports.geomutils = {
 /******/ 	})();
 /******/ 	
 /************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
 /* Imports for webpack */
