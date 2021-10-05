@@ -1,8 +1,11 @@
 # Changelog
 
+- 2021-10-05
+  - Adding `drawutilssvg.addCustomStyleDefs`.
+  - Changing classname precedence in drawutilssvg: object classname first, then curClassName. by this curClassName can override the default behavior.
 - 2021-10-04
   - Adding the `DrawLib.rect` function to the interface.
-  - Adding a new demo: 31-lightning-alrorithm.
+  - Adding a new demo: 36-lightning-algorithm.
   - Changing param `position` of the draw, drawsvg and drawgl library from `Vertex` to `XYCoords`.
   - Adding `drawutilssvg.rect` function.
   - Adding `drawutilsgl.rect` function.

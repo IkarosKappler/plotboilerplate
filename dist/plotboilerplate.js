@@ -10,11 +10,11 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "AlloyFinger": () => (/* reexport */ AlloyFinger),
-  "default": () => (/* binding */ esm)
+  "AlloyFinger": () => /* reexport */ AlloyFinger,
+  "default": () => /* binding */ esm
 });
 
-;// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/alloy_finger.js
+// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/alloy_finger.js
 /* Port from AlloyFinger v0.1.15
  * Original by dntzhang
  * Typescript port by Ikaros Kappler
@@ -404,7 +404,7 @@ class AlloyFinger {
 ;
 /* harmony default export */ const alloy_finger = ((/* unused pure expression or super */ null && (AlloyFinger)));
 //# sourceMappingURL=alloy_finger.js.map
-;// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/index.js
+// CONCATENATED MODULE: ./node_modules/alloyfinger-typescript/src/esm/index.js
 /**
  * TypeScript port by Ikaros Kappler.
  *
@@ -3297,8 +3297,6 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3432,8 +3430,6 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -7611,8 +7607,6 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -10575,8 +10569,8 @@ var drawutilssvg = /** @class */ (function () {
         }
     }
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
-        var nodeStyle = this.createSVGNode("style");
-        this.svgNode.appendChild(nodeStyle); // nodeDef);
+        this.nodeStyle = this.createSVGNode("style");
+        this.svgNode.appendChild(this.nodeStyle);
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         var keys = {
@@ -10603,7 +10597,25 @@ var drawutilssvg = /** @class */ (function () {
                 console.warn("Warning: your draw config is missing the key '" + k + "' which is required.");
             }
         }
-        nodeStyle.innerHTML = rules.join("\n");
+        this.nodeStyle.innerHTML = rules.join("\n");
+    };
+    /**
+     * This is a simple way to include custom CSS class mappings to the style defs of the generated SVG.
+     *
+     * The mapping should be of the form
+     *   [style-class] -> [style-def-string]
+     *
+     * Example:
+     *   "rect.red" -> "fill: #ff0000; border: 1px solid red"
+     *
+     * @param {Map<string,string>} defs
+     */
+    drawutilssvg.prototype.addCustomStyleDefs = function (defs) {
+        var buffer = [];
+        defs.forEach(function (value, key) {
+            buffer.push(key + " { " + value + " }");
+        });
+        this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + buffer.join("\n");
     };
     /**
      * Retieve an old (cached) element.
@@ -10686,7 +10698,7 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype._bindFillDraw = function (node, className, color, lineWidth) {
         if (this.curClassName) {
-            node.setAttribute("class", this.curClassName + " " + className);
+            node.setAttribute("class", className + " " + this.curClassName);
         }
         else {
             node.setAttribute("class", className);
@@ -11775,9 +11787,8 @@ exports.geomutils = {
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
+/******/ 		if(__webpack_module_cache__[moduleId]) {
+/******/ 			return __webpack_module_cache__[moduleId].exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
@@ -11808,7 +11819,7 @@ exports.geomutils = {
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 		__webpack_require__.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
@@ -11823,8 +11834,6 @@ exports.geomutils = {
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
 /* Imports for webpack */

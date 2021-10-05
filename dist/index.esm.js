@@ -4212,8 +4212,8 @@ class drawutilssvg {
         }
     }
     addStyleDefs(drawConfig) {
-        const nodeStyle = this.createSVGNode("style");
-        this.svgNode.appendChild(nodeStyle); // nodeDef);
+        this.nodeStyle = this.createSVGNode("style");
+        this.svgNode.appendChild(this.nodeStyle);
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         const keys = {
@@ -4240,7 +4240,25 @@ class drawutilssvg {
                 console.warn(`Warning: your draw config is missing the key '${k}' which is required.`);
             }
         }
-        nodeStyle.innerHTML = rules.join("\n");
+        this.nodeStyle.innerHTML = rules.join("\n");
+    }
+    /**
+     * This is a simple way to include custom CSS class mappings to the style defs of the generated SVG.
+     *
+     * The mapping should be of the form
+     *   [style-class] -> [style-def-string]
+     *
+     * Example:
+     *   "rect.red" -> "fill: #ff0000; border: 1px solid red"
+     *
+     * @param {Map<string,string>} defs
+     */
+    addCustomStyleDefs(defs) {
+        const buffer = [];
+        defs.forEach((value, key) => {
+            buffer.push(key + " { " + value + " }");
+        });
+        this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + buffer.join("\n");
     }
     /**
      * Retieve an old (cached) element.
@@ -4323,7 +4341,7 @@ class drawutilssvg {
      */
     _bindFillDraw(node, className, color, lineWidth) {
         if (this.curClassName) {
-            node.setAttribute("class", `${this.curClassName} ${className}`);
+            node.setAttribute("class", `${className} ${this.curClassName}`);
         }
         else {
             node.setAttribute("class", className);

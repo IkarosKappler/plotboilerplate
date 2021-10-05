@@ -74,6 +74,15 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   private bufferGNode: SVGGElement;
 
   /**
+   * A style node of type `<style>`.
+   * @member {SVGGelement}
+   * @memberof drawutilssvg
+   * @instance
+   * @private
+   */
+  private nodeStyle: SVGStyleElement;
+
+  /**
    * @member {Vertex}
    * @memberof drawutilssvg
    * @instance
@@ -179,8 +188,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   }
 
   private addStyleDefs(drawConfig: DrawConfig) {
-    const nodeStyle: SVGElement = this.createSVGNode("style");
-    this.svgNode.appendChild(nodeStyle); // nodeDef);
+    this.nodeStyle = this.createSVGNode("style") as SVGStyleElement;
+    this.svgNode.appendChild(this.nodeStyle);
 
     // Which default styles to add? -> All from the DrawConfig.
     // Compare with DrawConfig interface
@@ -201,13 +210,32 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     for (var k in keys) {
       const className: string = keys[k];
       const drawSettings: DrawSettings | undefined = drawConfig[k];
-      if( drawSettings ) {
+      if (drawSettings) {
         rules.push(`.${className} { fill : none; stroke: ${drawSettings.color}; stroke-width: ${drawSettings.lineWidth}px }`);
       } else {
         console.warn(`Warning: your draw config is missing the key '${k}' which is required.`);
       }
     }
-    nodeStyle.innerHTML = rules.join("\n");
+    this.nodeStyle.innerHTML = rules.join("\n");
+  }
+
+  /**
+   * This is a simple way to include custom CSS class mappings to the style defs of the generated SVG.
+   *
+   * The mapping should be of the form
+   *   [style-class] -> [style-def-string]
+   *
+   * Example:
+   *   "rect.red" -> "fill: #ff0000; border: 1px solid red"
+   *
+   * @param {Map<string,string>} defs
+   */
+  addCustomStyleDefs(defs: Map<string, string>) {
+    const buffer: string[] = [];
+    defs.forEach((value: string, key: string) => {
+      buffer.push(key + " { " + value + " }");
+    });
+    this.nodeStyle.innerHTML += "\n/* Custom styles */\n" + buffer.join("\n");
   }
 
   /**
@@ -295,7 +323,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    */
   private _bindFillDraw(node: SVGElement, className: string, color?: string | null, lineWidth?: number | null): SVGElement {
     if (this.curClassName) {
-      node.setAttribute("class", `${this.curClassName} ${className}`);
+      node.setAttribute("class", `${className} ${this.curClassName}`);
     } else {
       node.setAttribute("class", className);
     }

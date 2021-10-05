@@ -61,6 +61,14 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     private bufferGNode;
     /**
+     * A style node of type `<style>`.
+     * @member {SVGGelement}
+     * @memberof drawutilssvg
+     * @instance
+     * @private
+     */
+    private nodeStyle;
+    /**
      * @member {Vertex}
      * @memberof drawutilssvg
      * @instance
@@ -127,6 +135,18 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      **/
     constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement);
     private addStyleDefs;
+    /**
+     * This is a simple way to include custom CSS class mappings to the style defs of the generated SVG.
+     *
+     * The mapping should be of the form
+     *   [style-class] -> [style-def-string]
+     *
+     * Example:
+     *   "rect.red" -> "fill: #ff0000; border: 1px solid red"
+     *
+     * @param {Map<string,string>} defs
+     */
+    addCustomStyleDefs(defs: Map<string, string>): void;
     /**
      * Retieve an old (cached) element.
      * Only if both – key and nodeName – match, the element will be returned (null otherwise).
