@@ -97,18 +97,13 @@
       w: canvasSize.width / config.mazeWidth,
       h: canvasSize.height / config.mazeHeight
     };
-    var borderSize = 6;
+    var borderSize = 2;
     var innerSquareSize = {
       w: squareSize.w - borderSize,
       h: squareSize.h - borderSize
     };
 
     var styleDefs = new Map();
-    // styleDefs.set("rect", "fill: black; stroke: purple;");
-    // styleDefs.set("rect.top", "stroke-dasharray: 0,50,150;");
-    // styleDefs.set("rect.left", "stroke-dasharray: 150,50;");
-    // styleDefs.set("rect.bottom", "stroke-dasharray: 100,50;");
-    // styleDefs.set("rect.right", "stroke-dasharray: 50,50,100;");
     styleDefs.set("rect", "fill: black;");
     styleDefs.set("rect.b-none-none-none-none", "stroke: none;");
     styleDefs.set(
@@ -125,7 +120,7 @@
     );
     styleDefs.set(
       "rect.b-top-none-bottom-left",
-      `stroke: green; stroke-dasharray: ${innerSquareSize.w},${innerSquareSize.h},${innerSquareSize.w + innerSquareSize.h};`
+      `stroke: purple; stroke-dasharray: ${innerSquareSize.w},${innerSquareSize.h},${innerSquareSize.w + innerSquareSize.h};`
     );
     styleDefs.set(
       "rect.b-top-right-none-none",
@@ -157,7 +152,7 @@
     );
     styleDefs.set(
       "rect.b-none-right-bottom-left",
-      `stroke: pruple; stroke-dasharray: 0,${innerSquareSize.w},${innerSquareSize.h + innerSquareSize.w + innerSquareSize.h};`
+      `stroke: orange; stroke-dasharray: 0,${innerSquareSize.w},${innerSquareSize.h + innerSquareSize.w + innerSquareSize.h};`
     );
     styleDefs.set(
       "rect.b-none-none-bottom-left",
@@ -165,20 +160,13 @@
     );
     styleDefs.set(
       "rect.b-none-none-none-left",
-      `stroke: pruple; stroke-dasharray: 0,${innerSquareSize.w * 2 + innerSquareSize.h},${innerSquareSize.h};`
+      `stroke: green; stroke-dasharray: 0,${innerSquareSize.w * 2 + innerSquareSize.h},${innerSquareSize.h};`
     );
     styleDefs.set(
       "rect.b-none-none-bottom-none",
       `stroke: purple; stroke-dasharray: 0,${innerSquareSize.w + innerSquareSize.h},${innerSquareSize.w},${innerSquareSize.h};`
     );
-    // styleDefs.set("rect.left", `stroke-dasharray: ${squareSize.w * 2 + squareSize.h},${squareSize.h};`);
-    // styleDefs.set("rect.bottom", `stroke-dasharray: ${squareSize.w + squareSize.h},${squareSize.w};`);
-    // styleDefs.set("rect.right", `stroke-dasharray: ${squareSize.w},${squareSize.h},${squareSize.w + squareSize.h};`);
     tosvgDraw.addCustomStyleDefs(styleDefs);
-
-    // tosvgDraw.beginDrawCycle(0);
-    // tosvgFill.beginDrawCycle(0);
-    // tosvgDraw.clear( pb.config.backgroundColor );
 
     var BORDER_NONE = 0;
     var BORDER_LEFT = 1;
@@ -187,7 +175,7 @@
     var BORDER_TOP = 8;
 
     // Array<number[]>
-    var matrix = [];
+    var mazeMatrix = [];
 
     var initMaze = function () {
       //   var squareSize = {
@@ -197,40 +185,35 @@
       tosvgDraw.beginDrawCycle();
       tosvgFill.beginDrawCycle();
       tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, "#888888", 0);
-      matrix = [];
+      mazeMatrix = [];
       for (var i = 0; i < config.mazeWidth; i++) {
-        matrix.push([]);
+        mazeMatrix.push([]);
         for (var j = 0; j < config.mazeHeight; j++) {
           // Define the square's borders
           var borders = BORDER_NONE;
-          if (i == 0 || Math.random() > 0.5) {
+          if (i == 0 || Math.random() > 0.66) {
             borders |= BORDER_LEFT;
           }
-          if (i + 1 == config.mazeWidth || Math.random() > 0.5) {
+          if (i + 1 == config.mazeWidth || (i - 1 >= 0 && mazeMatrix[i - 1][j] & BORDER_RIGHT)) {
             borders |= BORDER_RIGHT;
           }
           if (Math.random() > 0.75) {
             borders |= BORDER_BOTTOM;
           }
-          if (j - 1 >= 0 && matrix[i][j - 1] & BORDER_BOTTOM) {
+          if (j - 1 >= 0 && mazeMatrix[i][j - 1] & BORDER_BOTTOM) {
             borders |= BORDER_TOP;
           }
 
-          matrix[i].push(borders);
+          mazeMatrix[i].push(borders);
 
-          // Make square
+          // Make square and add respective classes to visualize the borders.
           tosvgFill.curClassName =
             "b" +
             (borders & BORDER_TOP ? "-top" : "-none") +
             (borders & BORDER_RIGHT ? "-right" : "-none") +
             (borders & BORDER_BOTTOM ? "-bottom" : "-none") +
-            (borders & BORDER_LEFT ? "-left" : "-none"); // +
-          // !(borders & BORDER_BOTTOM); // &&
-          // !(borders & BORDER_TOP) &&
-          // !(borders & BORDER_LEFT) &&
-          // !(borders & BORDER_RIGHT)
-          //   ? " none"
-          //   : "";
+            (borders & BORDER_LEFT ? "-left" : "-none");
+          tosvgFill.curId = "rect-" + i + "-" + j;
           tosvgFill.rect(
             { x: i * squareSize.w, y: j * squareSize.h },
             squareSize.w - borderSize,
@@ -245,6 +228,37 @@
     };
 
     var time = 0;
+
+    // Array<number[]>
+    // 0:              current positions
+    // larger numbers: older positions
+    var solutionMatrix = [];
+    var initSolutionMatrix = function () {
+      //   console.log("mazeMatrix", mazeMatrix);
+      solutionMatrix = [];
+      for (var i = 0; i < mazeMatrix.length; i++) {
+        // console.log("xyxy", i, mazeMatrix[i].length);
+        solutionMatrix.push([]);
+        for (var j = 0; j < mazeMatrix[i].length; j++) {
+          solutionMatrix[i].push(i === 0 ? 0 : Number.POSITIVE_INFINITY);
+        }
+      }
+    };
+
+    var visualizeSolution = function () {
+      console.log("Visualize", solutionMatrix);
+      var drawStepsBeyond = 10;
+      for (var i = 0; i < solutionMatrix.length; i++) {
+        for (var j = 0; j < solutionMatrix[i].length; j++) {
+          var ratio = Math.max(0, (drawStepsBeyond - solutionMatrix[i][j]) / drawStepsBeyond);
+          if (i == 0) {
+            console.log("ratio", ratio);
+          }
+          var rectangle = document.getElementById("rect-" + i + "-" + j);
+          rectangle.setAttribute("fill", "rgba(255,255,255," + ratio + ")");
+        }
+      }
+    };
 
     // var renderLoop = function(_time) {
     // 	if( !config.animate ) {
@@ -301,6 +315,8 @@
     // }
 
     initMaze();
+    initSolutionMatrix();
+    visualizeSolution();
 
     // // Will stop after first draw if config.animate==false
     // if( config.animate ) {
