@@ -1,7 +1,8 @@
 /**
- * A demo to render function graphs.
+ * A demo to visualize the 'lightning algorithm' as depicted in Numberphile's
+ * and Matt Henderson's video:
+ * https://www.youtube.com/watch?v=akZ8JJ4gGLs
  *
- * @requires PlotBoilerplate
  * @requires PlotBoilerplate
  * @requires MouseHandler
  * @requires gup
@@ -21,43 +22,9 @@
   let GUP = gup();
 
   window.addEventListener("load", function () {
-    // All config params are optional.
-    // var pb = new PlotBoilerplate(
-    // PlotBoilerplate.utils.safeMergeByKeys(
-    //     { canvas                 : document.getElementById('my-canvas'),
-    //       fullSize               : true,
-    //       fitToParent            : true,
-    //       scaleX                 : 1.0,
-    //       scaleY                 : 1.0,
-    //       rasterGrid             : true,
-    //       drawOrigin             : false,
-    //       rasterAdjustFactor     : 2.0,
-    //       redrawOnResize         : false, // !!! true,
-    //       defaultCanvasWidth     : 1024,
-    //       defaultCanvasHeight    : 768,
-    //       canvasWidthFactor      : 1.0,
-    //       canvasHeightFactor     : 1.0,
-    //       cssScaleX              : 1.0,
-    //       cssScaleY              : 1.0,
-    //       drawBezierHandleLines  : true,
-    //       drawBezierHandlePoints : true,
-    //       cssUniformScale        : true,
-    //       autoAdjustOffset       : true,
-    //       offsetAdjustXPercent   : 0,
-    //       offsetAdjustYPercent   : 0,
-    //       backgroundColor        : '#ffffff',
-    //       enableMouse            : true,
-    //       enableTouch            : true,
-    //       enableKeys             : true,
-    //       enableSVGExport        : false
-    //     }, GUP
-    // )
-    // );
-
-    // pb.config.postDraw = function() {
-    // 	console.log("Post draw");
-
-    // };
+    // THIS DEMO WORKS A BIT DIFFERENT THAN THE OTHERS.
+    // IT DOES NOT USE AN EXPLICIT INSTANCE OF PLOTBOILERPLATE
+    // BUT RATHER SOME SUB MODULES FOR SVG DRAWING.
 
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
@@ -65,111 +32,69 @@
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         animate: true,
-        phaseX: 0.0,
-        scaleY: 25.0,
-        stepSizeX: 2.0,
-        lineWidth: 2.0,
+        animationDelay: 150,
+        startPointDensity: 100.0, // percent
 
-        mazeWidth: 10,
-        mazeHeight: 7
+        verticalWallPropability: 0.33,
+        horizontalWallPropability: 0.55,
+
+        borderSize: 2,
+
+        mazeWidth: 60,
+        mazeHeight: 40,
+
+        drawPathTraces: true,
+        wallColor: "#880088",
+        deadEndWallColor: "#b84800",
+        traceColor: "#0088a8",
+
+        reset: function () {
+          config.animate = false;
+          removeTraces();
+          initQueue();
+        },
+        rebuildMaze: function () {
+          rebuildMaze();
+        }
       },
       GUP
     );
 
-    // Create fake SVG node
-    // const svgNode : SVGElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    // Fetch the SVG node
     var svgNode = document.getElementById("my-canvas");
-    // // var svgNode = document.getElementById('preview-svg');
-    // // Draw everything to fake node.
-    var canvasSize = getAvailableContainerSpace(svgNode);
-    console.log(getAvailableContainerSpace(svgNode));
-    var tosvgDraw = new drawutilssvg(
-      svgNode,
-      { x: 0, y: 0 }, // pb.draw.offset,
-      { x: 1, y: 1 }, // pb.draw.scale,
-      canvasSize, // pb.canvasSize,
-      false, // fillShapes=false
-      {} // pb.drawConfig
-    );
-    var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
+    var canvasSize = null; // getAvailableContainerSpace(svgNode);
+    var squareSize = null;
+    var tosvgDraw = null;
+    var tosvgFill = null;
 
-    var squareSize = {
-      w: canvasSize.width / config.mazeWidth,
-      h: canvasSize.height / config.mazeHeight
+    var initSvgCanvas = function () {
+      canvasSize = getAvailableContainerSpace(svgNode);
+      // console.log(getAvailableContainerSpace(svgNode));
+      tosvgDraw = new drawutilssvg(
+        svgNode,
+        { x: 0, y: 0 },
+        { x: 1, y: 1 },
+        canvasSize,
+        false, // fillShapes=false
+        {} // drawConfig
+      );
+      tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
+      squareSize = {
+        w: canvasSize.width / config.mazeWidth,
+        h: canvasSize.height / config.mazeHeight
+      };
+
+      // var borderSize = 6;
+      var innerSquareSize = {
+        w: squareSize.w - config.borderSize,
+        h: squareSize.h - config.borderSize
+      };
+
+      var styleDefs = makeCustomStyleDefs(config, innerSquareSize);
+      tosvgDraw.addCustomStyleDefs(styleDefs);
     };
-    var borderSize = 6;
-    var innerSquareSize = {
-      w: squareSize.w - borderSize,
-      h: squareSize.h - borderSize
-    };
 
-    var styleDefs = new Map();
-    // styleDefs.set("rect", "fill: black;");
-    styleDefs.set("rect.background", "fill: #000000;");
-    styleDefs.set("rect.b-none-none-none-none", "stroke: none;");
-    styleDefs.set(
-      "rect.b-top-none-none-none",
-      `stroke: purple; stroke-dasharray: ${innerSquareSize.w},${innerSquareSize.h * 2 + innerSquareSize.w};`
-    );
-    styleDefs.set(
-      "rect.b-top-none-bottom-none",
-      `stroke: purple; stroke-dasharray: ${innerSquareSize.w},${innerSquareSize.h},${innerSquareSize.w},${innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-top-none-none-left",
-      `stroke: purple; stroke-dasharray: ${innerSquareSize.w},${innerSquareSize.h + innerSquareSize.w},${innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-top-none-bottom-left",
-      `stroke: purple; stroke-dasharray: ${innerSquareSize.w},${innerSquareSize.h},${innerSquareSize.w + innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-top-right-none-none",
-      `stroke: purple; stroke-dasharray: ${innerSquareSize.w + innerSquareSize.h},${innerSquareSize.h + innerSquareSize.w};`
-    );
-    styleDefs.set(
-      "rect.b-top-right-bottom-none",
-      `stroke: purple; stroke-dasharray: ${innerSquareSize.w * 2 + innerSquareSize.h},${innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-top-right-none-left",
-      `stroke: purple; stroke-dasharray: ${innerSquareSize.w + innerSquareSize.h},${innerSquareSize.w},${innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-top-right-bottom-left",
-      `stroke: purple; stroke-dasharray: ${innerSquareSize.w * 2 + innerSquareSize.h * 2};`
-    );
-    styleDefs.set(
-      "rect.b-none-right-none-none",
-      `stroke: purple; stroke-dasharray: 0,${innerSquareSize.w},${innerSquareSize.h},${innerSquareSize.w + innerSquareSize.w};`
-    );
-    styleDefs.set(
-      "rect.b-none-right-bottom-none",
-      `stroke: purple; stroke-dasharray: 0,${innerSquareSize.w},${innerSquareSize.h + innerSquareSize.w},${innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-none-right-none-left",
-      `stroke: purple; stroke-dasharray: 0,${innerSquareSize.w},${innerSquareSize.h},${innerSquareSize.w},${innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-none-right-bottom-left",
-      `stroke: orange; stroke-dasharray: 0,${innerSquareSize.w},${innerSquareSize.h + innerSquareSize.w + innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-none-none-bottom-left",
-      `stroke: purple; stroke-dasharray: 0,${innerSquareSize.w + innerSquareSize.h},${innerSquareSize.h + innerSquareSize.w};`
-    );
-    styleDefs.set(
-      "rect.b-none-none-none-left",
-      `stroke: green; stroke-dasharray: 0,${innerSquareSize.w * 2 + innerSquareSize.h},${innerSquareSize.h};`
-    );
-    styleDefs.set(
-      "rect.b-none-none-bottom-none",
-      `stroke: purple; stroke-dasharray: 0,${innerSquareSize.w + innerSquareSize.h},${innerSquareSize.w},${innerSquareSize.h};`
-    );
-    styleDefs.set("line", `stroke: blue; stroke-color: blue;`);
-    tosvgDraw.addCustomStyleDefs(styleDefs);
-
+    // Some constants to define the borders.
     var BORDER_NONE = 0;
     var BORDER_LEFT = 1;
     var BORDER_RIGHT = 2;
@@ -179,11 +104,18 @@
     // Array<number[]>
     var mazeMatrix = [];
 
+    var rebuildMaze = function () {
+      config.animate = false;
+      // Just remove all child nodes from the SVG an re-initialize everything from scratch.
+      removeAllChildNodes(svgNode);
+      // This initializes the maze structure and draws the walls on the SVG canvas.
+      initMaze();
+      // This initializes the algorithm's queue.
+      initQueue();
+    };
+
     var initMaze = function () {
-      //   var squareSize = {
-      //     w: canvasSize.width / config.mazeWidth,
-      //     h: canvasSize.height / config.mazeHeight
-      //   };
+      initSvgCanvas();
       tosvgDraw.beginDrawCycle();
       tosvgFill.beginDrawCycle();
       tosvgFill.curClassName = "background";
@@ -196,16 +128,17 @@
         for (var i = 0; i < config.mazeWidth; i++) {
           // Define the square's borders
           var borders = BORDER_NONE;
-          if (i == 0 || Math.random() > 0.66) {
+          if (i == 0 || (i - 1 >= 0 && mazeMatrix[j][i - 1] & BORDER_RIGHT)) {
             borders |= BORDER_LEFT;
           }
-          if (i + 1 == config.mazeWidth || (i - 1 >= 0 && mazeMatrix[j][i - 1] & BORDER_RIGHT)) {
+          if (i + 1 == config.mazeWidth || Math.random() < config.verticalWallPropability) {
+            //} 0.66) {
             borders |= BORDER_RIGHT;
           }
-          if (Math.random() > 0.75) {
+          if (j + 1 >= config.mazeHeight || Math.random() < config.horizontalWallPropability) {
             borders |= BORDER_BOTTOM;
           }
-          if (j - 1 >= 0 && mazeMatrix[j - 1][i] & BORDER_BOTTOM) {
+          if (j === 0 || (j - 1 >= 0 && mazeMatrix[j - 1][i] & BORDER_BOTTOM)) {
             borders |= BORDER_TOP;
           }
 
@@ -221,8 +154,8 @@
           tosvgFill.curId = "rect-" + j + "-" + i;
           tosvgFill.rect(
             { x: i * squareSize.w, y: j * squareSize.h },
-            squareSize.w - borderSize,
-            squareSize.h - borderSize,
+            squareSize.w - config.borderSize,
+            squareSize.h - config.borderSize,
             "#000000",
             1
           );
@@ -232,83 +165,113 @@
       tosvgFill.endDrawCycle();
     };
 
-    var time = 0;
+    // interface MazeEntry {
+    //  i: number;
+    //  j: number;
+    // }
 
-    // Array<number[]>
-    // 0:              current positions
-    // larger numbers: older positions
-    var solutionBuffer = [];
+    // Array<MazeEntry>
+    var queue = [];
+    // Array<Array<{ step: number, predecessor: undefined | MazeEntry }>>
     var solutionMatrix = [];
-    var initSolutionMatrix = function () {
+    // number
+    var stepNumber = 1;
+    // MazeEntry
+    var terminationEntry = null;
+    var initQueue = function () {
       //   console.log("mazeMatrix", mazeMatrix);
       solutionMatrix = [];
+      queue = [];
+      stepNumber = 1;
+      terminationEntry = null;
       for (var j = 0; j < mazeMatrix.length; j++) {
         // console.log("xyxy", i, mazeMatrix[i].length);
         solutionMatrix.push([]);
         for (var i = 0; i < mazeMatrix[j].length; i++) {
-          solutionMatrix[j].push(j === 0 ? 0 : Number.POSITIVE_INFINITY);
-          if (j == 0) {
-            solutionBuffer.push({ i: i, j: j });
+          var isStartingPoint = j === 0 && Math.random() * 100 < config.startPointDensity;
+          solutionMatrix[j].push({ step: isStartingPoint ? stepNumber : 0 }); // 0); // j === 0 ? 1 : 0);
+          if (isStartingPoint) {
+            queue.push({ i: i, j: j });
           }
         }
       }
     };
 
     var visualizeSolution = function () {
-      console.log("Visualize", solutionMatrix);
-      var drawStepsBeyond = 10;
       for (var j = 0; j < solutionMatrix.length; j++) {
         for (var i = 0; i < solutionMatrix[j].length; i++) {
-          var ratio = Math.max(0, (drawStepsBeyond - solutionMatrix[j][i]) / drawStepsBeyond);
-          ratio *= 0.25;
-          if (i == 0) {
-            console.log("ratio", ratio);
-          }
+          var ratio = Math.max(0, solutionMatrix[j][i].step / stepNumber) * 0.5;
           var rectangle = document.getElementById("rect-" + j + "-" + i);
           rectangle.setAttribute("fill", "rgba(255,255,255," + ratio + ")");
         }
       }
     };
 
-    var currentLine = 0;
+    var visualizeTrace = function () {
+      // Visualize solution
+      while (terminationEntry) {
+        var i = terminationEntry.i;
+        var j = terminationEntry.j;
+
+        var ratio = 1.0;
+        var rectangle = document.getElementById("rect-" + j + "-" + i);
+        rectangle.setAttribute("fill", "rgba(255,255,255," + ratio + ")");
+
+        terminationEntry = solutionMatrix[j][i].predecessor;
+      }
+    };
+
     var nextStep = function () {
       // Calculate next iteration of the breadth-first-algorithm
+      stepNumber++;
       var newSolutionBuffer = [];
 
-      for (var k = 0; k < solutionBuffer.length; k++) {
+      for (var k = 0; k < queue.length; k++) {
         // Find ways that are not blocked
-        var tuple = solutionBuffer[k];
+        var tuple = queue[k];
         var i = tuple.i;
         var j = tuple.j;
-        // Increase the old matrix entry
-        solutionMatrix[j][i] += 1;
         var leftOrRight = false;
+        if (j - 1 >= 0 && !(mazeMatrix[j][i] & BORDER_TOP) && !visited(j - 1, i)) {
+          // Mark the next reachable entry to the top
+          solutionMatrix[j - 1][i].step = stepNumber;
+          solutionMatrix[j - 1][i].predecessor = { j: j, i: i };
+          newSolutionBuffer.push({ i: i, j: j - 1 });
+          config.drawPathTraces && makeTrace(j, i, j - 1, i);
+        }
         if (i - 1 >= 0 && !(mazeMatrix[j][i] & BORDER_LEFT) && !visited(j, i - 1)) {
           // Mark the next reachable entry
-          solutionMatrix[j][i - 1] = 0;
+          solutionMatrix[j][i - 1].step = stepNumber;
+          solutionMatrix[j][i - 1].predecessor = { j: j, i: i };
           newSolutionBuffer.push({ i: i - 1, j: j });
           leftOrRight = true;
-          makeArrow(j, i, j, i - 1);
+          config.drawPathTraces && makeTrace(j, i, j, i - 1);
         }
         if (i + 1 < mazeMatrix[j].length && !(mazeMatrix[j][i] & BORDER_RIGHT) && !visited(j, i + 1)) {
           // Mark the next reachable entry
-          solutionMatrix[j][i + 1] = 0;
+          solutionMatrix[j][i + 1].step = stepNumber;
+          solutionMatrix[j][i + 1].predecessor = { j: j, i: i };
           newSolutionBuffer.push({ i: i + 1, j: j });
           leftOrRight = true;
-          makeArrow(j, i, j, i + 1);
+          config.drawPathTraces && makeTrace(j, i, j, i + 1);
         }
-        if (!leftOrRight && j + 1 < mazeMatrix.length && !(mazeMatrix[j][i] & BORDER_BOTTOM) && !visited(j + 1, i)) {
+        if (j + 1 < mazeMatrix.length && !(mazeMatrix[j][i] & BORDER_BOTTOM) && !visited(j + 1, i)) {
           // Mark the next reachable entry
-          solutionMatrix[j + 1][i] = 0;
+          solutionMatrix[j + 1][i].step = stepNumber;
+          solutionMatrix[j + 1][i].predecessor = { j: j, i: i };
           newSolutionBuffer.push({ i: i, j: j + 1 });
-          makeArrow(j, i, j + 1, i);
+          config.drawPathTraces && makeTrace(j, i, j + 1, i);
+        }
+
+        if (j + 1 >= mazeMatrix.length) {
+          // This will terminate the search algorithm
+          terminationEntry = { j: j, i: i };
         }
       }
-      solutionBuffer = newSolutionBuffer;
+      queue = newSolutionBuffer;
     };
 
-    var makeArrow = function (fromJ, fromI, toJ, toI) {
-      var node = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    var makeTrace = function (fromJ, fromI, toJ, toI) {
       var fromRect = document.getElementById("rect-" + fromJ + "-" + fromI);
       var toRect = document.getElementById("rect-" + toJ + "-" + toI);
       var centerFrom = {
@@ -319,86 +282,81 @@
         x: parseFloat(toRect.getAttribute("x")) + parseFloat(toRect.getAttribute("width")) / 2,
         y: parseFloat(toRect.getAttribute("y")) + parseFloat(toRect.getAttribute("height")) / 2
       };
-      node.setAttribute("x1", centerFrom.x);
-      node.setAttribute("y1", centerFrom.y);
-      node.setAttribute("x2", centerTo.x);
-      node.setAttribute("y2", centerTo.y);
 
-      svgNode.getElementsByTagName("g")[0].appendChild(node);
+      tosvgDraw.curClassName = "trace";
+      // Note that outside draw cycles this will have no effect!
+      var lineNode = tosvgDraw.line(centerFrom, centerTo, config.traceColor, 1.0);
+      svgNode.getElementsByTagName("g")[0].appendChild(lineNode);
     };
 
     var visited = function (j, i) {
-      return solutionMatrix[j][i] !== Number.POSITIVE_INFINITY;
+      return solutionMatrix[j][i].step !== 0;
+    };
+
+    var removeTraces = function () {
+      removeChildNodesByClass(svgNode.getElementsByTagName("g")[0], "trace");
     };
 
     var renderLoop = function (_time) {
       if (!config.animate) {
-        time = 0;
         return;
       }
-      time = _time;
       // Animate here
-      // ...
-
-      //   pb.redraw();
-      window.setTimeout(function () {
-        console.log("renderLoop");
-        nextStep();
-        visualizeSolution();
-        window.requestAnimationFrame(renderLoop);
-      }, 1000);
+      if (terminationEntry) {
+        visualizeTrace();
+      } else if (queue.length === 0) {
+        // If the queue ran empty then there exists no path in the maze!
+        console.log("There exists no solution in the maze!");
+      } else {
+        window.setTimeout(function () {
+          nextStep();
+          visualizeSolution();
+          window.requestAnimationFrame(renderLoop);
+        }, config.animationDelay);
+      }
     };
 
     var startAnimation = function () {
+      if (!config.animate) {
+        return;
+      }
+      initQueue();
       renderLoop();
     };
 
     // +---------------------------------------------------------------------------------
-    // | Install a mouse handler to display current pointer position.
-    // +-------------------------------
-    // new MouseHandler(pb.eventCatcher,'drawsvg-demo')
-    // 	.move( function(e) {
-    // 		// Display the mouse position
-    // 		var relPos = pb.transformMousePosition( e.params.pos.x, e.params.pos.y );
-    // 		stats.mouseX = relPos.x;
-    // 		stats.mouseY = relPos.y;
-    // } );
-
-    var stats = {
-      mouseX: 0,
-      mouseY: 0
-    };
-    // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
-    // {
-    // 	var gui = pb.createGUI();
-    // 	var f0 = gui.addFolder('Points');
+    var gui = new dat.gui.GUI();
+    gui.remember(config);
+    var f0 = gui.addFolder("Lightning algorithm");
 
-    // 	f0.add(config, 'stepSizeX').min(0.25).max(12).step(0.25).title('Value step size on the x axis.').onChange( function() { pb.redraw(); } );
-    // 	f0.add(config, 'scaleY').min(0.25).max(200.0).step(0.25).title('Vertical scale.').onChange( function() { pb.redraw(); } );
-    // 	f0.add(config, 'lineWidth').min(1).max(20).title('The line with to use.').onChange( function() { pb.redraw(); } );
-    // 	f0.add(config, 'animate').title('Toggle phase animation on/off.').onChange( startAnimation );
+    f0.add(config, "animate").listen().title("Toggle animation on/off.").onChange(startAnimation);
+    f0.add(config, "animationDelay").min(10).max(1000).title("The delay in milliseconds between frames.");
+    f0.add(config, "startPointDensity").min(1).max(100).title("The propability that a point in the first row is a start point.");
 
-    // 	f0.open();
+    f0.add(config, "horizontalWallPropability").min(0.0).max(1.0).title("horizontalWallPropability").onChange(rebuildMaze);
+    f0.add(config, "verticalWallPropability").min(0.0).max(1.0).title("verticalWallPropability").onChange(rebuildMaze);
 
-    // 	// Add stats
-    // 	var uiStats = new UIStats( stats );
-    // 	stats = uiStats.proxy;
-    // 	uiStats.add( 'mouseX' );
-    // 	uiStats.add( 'mouseY' );
-    // }
+    f0.add(config, "borderSize").min(0).max(10).step(1).title("borderSize").onChange(rebuildMaze);
+    f0.add(config, "mazeWidth").min(2).max(100).title("mazeWidth").onChange(rebuildMaze);
+    f0.add(config, "mazeHeight").min(2).max(100).title("mazeHeight").onChange(rebuildMaze);
+
+    f0.add(config, "drawPathTraces").listen().title("Draw path traces?"); // onChange(startAnimation);
+    f0.addColor(config, "wallColor").title("The wall color.").onChange(rebuildMaze);
+    f0.addColor(config, "deadEndWallColor").title("The 'dead end' wall color.").onChange(rebuildMaze);
+    f0.addColor(config, "traceColor").title("The trace color.").onChange(rebuildMaze);
+
+    f0.add(config, "reset");
+    f0.add(config, "rebuildMaze");
+
+    rebuildMaze;
+    f0.open();
 
     initMaze();
-    initSolutionMatrix();
+    // printMazeMatrix();
+    initQueue();
     visualizeSolution();
     startAnimation();
-
-    // // Will stop after first draw if config.animate==false
-    // if( config.animate ) {
-    // 	startAnimation();
-    // } else {
-    // 	pb.redraw();
-    // }
   });
 })(window);

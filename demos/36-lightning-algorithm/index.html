@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>2D Plotting Boilerplate - Plotting function graphs</title>
+    <title>2D Plotting Boilerplate - Lightning Algorithm</title>
     <meta charset="UTF-8">
     <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
     <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, function, graph, plot">
     <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2021-01-27">
+    <meta name="date" content="2021-10-04">
     
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Demo of plotting function graphs with PlotBoilerplate.js.">
-    <meta property="og:description" content="Demo of plotting function graphs with PlotBoilerplate.js.">
+    <meta property="og:title" content="Demo of visualising the Lightning Algorithm with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demo of visualising the Lightning Algorithm with PlotBoilerplate.js.">
     <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-na.png">
 
     <!-- Polyfills for IE -->
@@ -68,17 +68,17 @@
     <script src="../../dist/plotboilerplate.min.js"></script>
     <!-- END For production -->
 
-    <!-- Load the thirdparty mathjs libray from https://mathjs.org/ -->
-    <!-- <script src="math.js"></script> -->
-
     <script src="../VertexAnimator.Linear.js"></script>
     <script src="../../src/js/utils/WebColors.js"></script>
     <script src="../../src/js/utils/WebColorsContrast.js"></script>
     <script src="../getContrastColor.js"></script>
+    <script src="../removeAllChildNodes.js"></script>
+    <script src="../removeChildNodesByClass.js"></script>
     <script src="../modal.js"></script>
+    <script src="makeCustomStyleDefs.js"></script>
+    <script src="printMazeMatrix.js"></script>
     <script src="index.js"></script>
     
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script> -->
     
     <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
     <link rel="stylesheet" href="../../style.css">
@@ -86,6 +86,7 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <!-- Please not that this particular demo only works with SVG canvas -->
     <svg id="my-canvas" width="1024" height="768"></svg>
   </body>
 </html>
