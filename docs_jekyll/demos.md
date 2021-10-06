@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2021-08-04
+date: 2021-10-06
 ---
 
 <h3>Basics</h3>
@@ -188,6 +188,11 @@ date: 2021-08-04
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/35-curvature-of-cubic-bezier/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20210531-0-curvature-of-cubic-bezier-curve.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/36-lightning-algorithm/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20211006-4-lightning-algorithm.png');"></div>
    </a>
 </div>
 </div>
