@@ -76,7 +76,7 @@
         { x: 1, y: 1 },
         canvasSize,
         false, // fillShapes=false
-        {} // drawConfig
+        drawConfig // see file drawConfig.js
       );
       tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
       squareSize = {
