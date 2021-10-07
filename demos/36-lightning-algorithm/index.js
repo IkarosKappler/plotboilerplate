@@ -52,6 +52,7 @@
           config.animate = false;
           removeTraces();
           initQueue();
+          visualizeSolution();
         },
         rebuildMaze: function () {
           rebuildMaze();
@@ -60,16 +61,20 @@
       GUP
     );
 
-    // Fetch the SVG node
+    // +---------------------------------------------------------------------------------
+    // | Fetch the SVG node.
+    // +-------------------------------
     var svgNode = document.getElementById("my-canvas");
-    var canvasSize = null; // getAvailableContainerSpace(svgNode);
+    var canvasSize = null;
     var squareSize = null;
     var tosvgDraw = null;
     var tosvgFill = null;
 
+    // +---------------------------------------------------------------------------------
+    // | Initialize the draw library for SVG rendering: width and height and style defs.
+    // +-------------------------------
     var initSvgCanvas = function () {
       canvasSize = getAvailableContainerSpace(svgNode);
-      // console.log(getAvailableContainerSpace(svgNode));
       tosvgDraw = new drawutilssvg(
         svgNode,
         { x: 0, y: 0 },
@@ -83,18 +88,17 @@
         w: canvasSize.width / config.mazeWidth,
         h: canvasSize.height / config.mazeHeight
       };
-
-      // var borderSize = 6;
       var innerSquareSize = {
         w: squareSize.w - config.borderSize,
         h: squareSize.h - config.borderSize
       };
-
       var styleDefs = makeCustomStyleDefs(config, innerSquareSize);
       tosvgDraw.addCustomStyleDefs(styleDefs);
     };
 
-    // Some constants to define the borders.
+    // +---------------------------------------------------------------------------------
+    // | Some constants to define the borders.
+    // +-------------------------------
     var BORDER_NONE = 0;
     var BORDER_LEFT = 1;
     var BORDER_RIGHT = 2;
@@ -104,6 +108,10 @@
     // Array<number[]>
     var mazeMatrix = [];
 
+    // +---------------------------------------------------------------------------------
+    // | This function rebuilds the maze and renders it onto the SVG canvas.
+    // | The old SVG data is cleared.
+    // +-------------------------------
     var rebuildMaze = function () {
       config.animate = false;
       // Just remove all child nodes from the SVG an re-initialize everything from scratch.
@@ -114,6 +122,9 @@
       initQueue();
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Ths function computes the maze based on random numbers and renders it.
+    // +-------------------------------
     var initMaze = function () {
       initSvgCanvas();
       tosvgDraw.beginDrawCycle();
@@ -178,14 +189,17 @@
     var stepNumber = 1;
     // MazeEntry
     var terminationEntry = null;
+
+    // +---------------------------------------------------------------------------------
+    // | This function initialzes the algorithm for running on the current maze.
+    // | The algorithms BFS can be run multiple times on the same generated maze.
+    // +-------------------------------
     var initQueue = function () {
-      //   console.log("mazeMatrix", mazeMatrix);
       solutionMatrix = [];
       queue = [];
       stepNumber = 1;
       terminationEntry = null;
       for (var j = 0; j < mazeMatrix.length; j++) {
-        // console.log("xyxy", i, mazeMatrix[i].length);
         solutionMatrix.push([]);
         for (var i = 0; i < mazeMatrix[j].length; i++) {
           var isStartingPoint = j === 0 && Math.random() * 100 < config.startPointDensity;
@@ -197,6 +211,11 @@
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Visualize the algorithms (partial) solution inside the SVG.
+    // | This just means that the rectangles are filled with different shades
+    // | to indicate the current frontiers.
+    // +-------------------------------
     var visualizeSolution = function () {
       for (var j = 0; j < solutionMatrix.length; j++) {
         for (var i = 0; i < solutionMatrix[j].length; i++) {
@@ -207,6 +226,11 @@
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | If a shortest path (the final solution) was found after the the algorithm
+    // | terminated then this function highlights that path by coloring the
+    // | affetced rectangles with a bright color.
+    // +-------------------------------
     var visualizeTrace = function () {
       // Visualize solution
       while (terminationEntry) {
@@ -221,6 +245,11 @@
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Calculates the next step of the BFS: all rectangles on the current frontier
+    // | checks for non-visited rectangles and marks them to use as the new frontier
+    // | in the next iteration.
+    // +-------------------------------
     var nextStep = function () {
       // Calculate next iteration of the breadth-first-algorithm
       stepNumber++;
@@ -271,6 +300,10 @@
       queue = newSolutionBuffer;
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Visualize a single trace from one maze position to the next.
+    // | The function adds new <line> elements to the SVG!
+    // +-------------------------------
     var makeTrace = function (fromJ, fromI, toJ, toI) {
       var fromRect = document.getElementById("rect-" + fromJ + "-" + fromI);
       var toRect = document.getElementById("rect-" + toJ + "-" + toI);
@@ -285,18 +318,30 @@
 
       tosvgDraw.curClassName = "trace";
       // Note that outside draw cycles this will have no effect!
+      // The elements are just stored inside the libraries internal buffer and would
+      // become visible on the next draw cycle ... but ... there is none: once
+      // the rectangles where drawn the draw cycle has ended.
       var lineNode = tosvgDraw.line(centerFrom, centerTo, config.traceColor, 1.0);
       svgNode.getElementsByTagName("g")[0].appendChild(lineNode);
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Checks if the maze position (j,i) has already been visited.
+    // +-------------------------------
     var visited = function (j, i) {
       return solutionMatrix[j][i].step !== 0;
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Removed the traces withour clearing the whole SVG.
+    // +-------------------------------
     var removeTraces = function () {
       removeChildNodesByClass(svgNode.getElementsByTagName("g")[0], "trace");
     };
 
+    // +---------------------------------------------------------------------------------
+    // | This function is called on each frame draw.
+    // +-------------------------------
     var renderLoop = function (_time) {
       if (!config.animate) {
         return;
@@ -316,10 +361,14 @@
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Starts the animation if it's not yet running.
+    // +-------------------------------
     var startAnimation = function () {
       if (!config.animate) {
         return;
       }
+      removeTraces();
       initQueue();
       renderLoop();
     };
@@ -350,11 +399,10 @@
     f0.add(config, "reset");
     f0.add(config, "rebuildMaze");
 
-    rebuildMaze;
     f0.open();
 
     initMaze();
-    // printMazeMatrix();
+    // printMazeMatrix(); // Used for debugging.
     initQueue();
     visualizeSolution();
     startAnimation();
