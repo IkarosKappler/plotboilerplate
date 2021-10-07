@@ -47,6 +47,9 @@
         wallColor: "#880088",
         deadEndWallColor: "#b84800",
         traceColor: "#0088a8",
+        lightningColor: "#ffffff",
+
+        falloff: 1,
 
         reset: function () {
           config.animate = false;
@@ -219,7 +222,9 @@
     var visualizeSolution = function () {
       for (var j = 0; j < solutionMatrix.length; j++) {
         for (var i = 0; i < solutionMatrix[j].length; i++) {
-          var ratio = Math.max(0, solutionMatrix[j][i].step / stepNumber) * 0.5;
+          // var ratio = Math.max(0, solutionMatrix[j][i].step / stepNumber) * 0.5;
+          var ratio =
+            Math.max(0, Math.pow(solutionMatrix[j][i].step, config.falloff) / Math.pow(stepNumber, config.falloff)) * 0.5;
           var rectangle = document.getElementById("rect-" + j + "-" + i);
           rectangle.setAttribute("fill", "rgba(255,255,255," + ratio + ")");
         }
@@ -233,15 +238,13 @@
     // +-------------------------------
     var visualizeTrace = function () {
       // Visualize solution
-      while (terminationEntry) {
-        var i = terminationEntry.i;
-        var j = terminationEntry.j;
-
-        var ratio = 1.0;
+      var entry = terminationEntry;
+      while (entry) {
+        var i = entry.i;
+        var j = entry.j;
         var rectangle = document.getElementById("rect-" + j + "-" + i);
-        rectangle.setAttribute("fill", "rgba(255,255,255," + ratio + ")");
-
-        terminationEntry = solutionMatrix[j][i].predecessor;
+        rectangle.setAttribute("fill", config.lightningColor);
+        entry = solutionMatrix[j][i].predecessor;
       }
     };
 
@@ -391,10 +394,13 @@
     f0.add(config, "mazeWidth").min(2).max(100).title("mazeWidth").onChange(rebuildMaze);
     f0.add(config, "mazeHeight").min(2).max(100).title("mazeHeight").onChange(rebuildMaze);
 
-    f0.add(config, "drawPathTraces").listen().title("Draw path traces?"); // onChange(startAnimation);
+    f0.add(config, "drawPathTraces").listen().title("Draw path traces?");
     f0.addColor(config, "wallColor").title("The wall color.").onChange(rebuildMaze);
     f0.addColor(config, "deadEndWallColor").title("The 'dead end' wall color.").onChange(rebuildMaze);
     f0.addColor(config, "traceColor").title("The trace color.").onChange(rebuildMaze);
+    f0.addColor(config, "lightningColor").title("The lightning color.").onChange(visualizeTrace);
+
+    f0.add(config, "falloff").min(1).max(10).step(0.25).title("falloff").onChange(visualizeSolution);
 
     f0.add(config, "reset");
     f0.add(config, "rebuildMaze");
