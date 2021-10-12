@@ -256,42 +256,39 @@
     var nextStep = function () {
       // Calculate next iteration of the breadth-first-algorithm
       stepNumber++;
-      var newSolutionBuffer = [];
+      var newQueue = [];
 
       for (var k = 0; k < queue.length; k++) {
         // Find ways that are not blocked
         var tuple = queue[k];
         var i = tuple.i;
         var j = tuple.j;
-        var leftOrRight = false;
         if (j - 1 >= 0 && !(mazeMatrix[j][i] & BORDER_TOP) && !visited(j - 1, i)) {
           // Mark the next reachable entry to the top
           solutionMatrix[j - 1][i].step = stepNumber;
           solutionMatrix[j - 1][i].predecessor = { j: j, i: i };
-          newSolutionBuffer.push({ i: i, j: j - 1 });
+          newQueue.push({ i: i, j: j - 1 });
           config.drawPathTraces && makeTrace(j, i, j - 1, i);
         }
         if (i - 1 >= 0 && !(mazeMatrix[j][i] & BORDER_LEFT) && !visited(j, i - 1)) {
           // Mark the next reachable entry
           solutionMatrix[j][i - 1].step = stepNumber;
           solutionMatrix[j][i - 1].predecessor = { j: j, i: i };
-          newSolutionBuffer.push({ i: i - 1, j: j });
-          leftOrRight = true;
+          newQueue.push({ i: i - 1, j: j });
           config.drawPathTraces && makeTrace(j, i, j, i - 1);
         }
         if (i + 1 < mazeMatrix[j].length && !(mazeMatrix[j][i] & BORDER_RIGHT) && !visited(j, i + 1)) {
           // Mark the next reachable entry
           solutionMatrix[j][i + 1].step = stepNumber;
           solutionMatrix[j][i + 1].predecessor = { j: j, i: i };
-          newSolutionBuffer.push({ i: i + 1, j: j });
-          leftOrRight = true;
+          newQueue.push({ i: i + 1, j: j });
           config.drawPathTraces && makeTrace(j, i, j, i + 1);
         }
         if (j + 1 < mazeMatrix.length && !(mazeMatrix[j][i] & BORDER_BOTTOM) && !visited(j + 1, i)) {
           // Mark the next reachable entry
           solutionMatrix[j + 1][i].step = stepNumber;
           solutionMatrix[j + 1][i].predecessor = { j: j, i: i };
-          newSolutionBuffer.push({ i: i, j: j + 1 });
+          newQueue.push({ i: i, j: j + 1 });
           config.drawPathTraces && makeTrace(j, i, j + 1, i);
         }
 
@@ -300,7 +297,7 @@
           terminationEntry = { j: j, i: i };
         }
       }
-      queue = newSolutionBuffer;
+      queue = newQueue;
     };
 
     // +---------------------------------------------------------------------------------
