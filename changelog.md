@@ -1,5 +1,9 @@
 # Changelog
 
+- 2021-10-12
+  - Added `DrawConfig.bezier.pathVertex` and `DrawConfig.bezier.controlVertex` attributes, both `DrawSettigs`.
+  - Added optional `fill:boolean` to `DrawSettings`. This is useful to give more control over the rendering of Bézier paths.
+  - Fixed a tiny init order error in the Bézier demo.
 - 2021-10-05
   - Adding `drawutilssvg.addCustomStyleDefs`.
   - Changing classname precedence in drawutilssvg: object classname first, then curClassName. by this curClassName can override the default behavior.

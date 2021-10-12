@@ -160,6 +160,7 @@ export interface PBParams extends Config {
 export interface DrawSettings {
   color: string;
   lineWidth: number;
+  fill?: boolean;
 }
 
 export interface DrawConfig {
@@ -174,6 +175,8 @@ export interface DrawConfig {
     color: string;
     lineWidth: number;
     handleLine: DrawSettings;
+    pathVertex: DrawSettings;
+    controlVertex: DrawSettings;
   };
   polygon: DrawSettings;
   triangle: DrawSettings;
