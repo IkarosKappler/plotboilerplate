@@ -299,6 +299,21 @@
     };
 
     // +---------------------------------------------------------------------------------
+    // | Add mouse interaction
+    // +-------------------------------
+    svgNode.addEventListener("click", function (event) {
+      var bounds = svgNode.getBoundingClientRect();
+      var pixelPosition = { x: event.offsetX - bounds.left, y: event.offsetY - bounds.top };
+      var j = Math.floor(pixelPosition.y / config.cellHeight);
+      var i = Math.floor(pixelPosition.x / config.cellWidth);
+      // console.log(pixelPosition, j, i);
+      if (j >= 0 && i >= 0 && j < biome.length && i < biome[j].length) {
+        setCellAlive({ j: j, i: i }, !biome[j][i]);
+        visualizeCreatures();
+      }
+    });
+
+    // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
     var gui = new dat.gui.GUI();
