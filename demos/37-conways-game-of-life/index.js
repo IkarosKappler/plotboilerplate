@@ -29,6 +29,8 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
+        guiDoubleSize: false,
+
         animate: true,
         animationDelay: 150,
 
@@ -37,7 +39,7 @@
         borderSize: 2,
 
         // randomizeBiome: false,
-        randomizationThreshold: 0.7,
+        randomizationThreshold: 0.5,
 
         preset_glider: function () {
           addGliderAt(0, 0);
@@ -299,14 +301,13 @@
     };
 
     // +---------------------------------------------------------------------------------
-    // | Add mouse interaction
+    // | Add mouse/touch interaction
     // +-------------------------------
     svgNode.addEventListener("click", function (event) {
       var bounds = svgNode.getBoundingClientRect();
       var pixelPosition = { x: event.offsetX - bounds.left, y: event.offsetY - bounds.top };
       var j = Math.floor(pixelPosition.y / config.cellHeight);
       var i = Math.floor(pixelPosition.x / config.cellWidth);
-      // console.log(pixelPosition, j, i);
       if (j >= 0 && i >= 0 && j < biome.length && i < biome[j].length) {
         setCellAlive({ j: j, i: i }, !biome[j][i]);
         visualizeCreatures();
@@ -318,9 +319,24 @@
     // +-------------------------------
     var gui = new dat.gui.GUI();
     gui.remember(config);
-    var f0 = gui.addFolder("Lightning algorithm");
+    var toggleGuiSize = function () {
+      gui.domElement.style["transform-origin"] = "100% 0%";
+      if (config.guiDoubleSize) {
+        gui.domElement.style["transform"] = "scale(2.0)";
+      } else {
+        gui.domElement.style["transform"] = "scale(1.0)";
+      }
+    };
+    if (isMobileDevice()) {
+      config.guiDoubleSize = true;
+      toggleGuiSize();
+    }
+    gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(toggleGuiSize);
 
-    f0.add(config, "animate").listen().title("Toggle animation on/off.").onChange(startAnimation);
+    var f0 = gui.addFolder("Biome");
+    f0.open();
+
+    f0.add(config, "animate").title("Toggle animation on/off.").onChange(startAnimation);
     f0.add(config, "animationDelay").min(10).max(1000).title("The delay in milliseconds between frames.");
 
     // prettier-ignore
@@ -338,7 +354,7 @@
       });
 
     // prettier-ignore
-    f0.add(config, "randomizationThreshold").min(2).max(100).title("The probabily that a new cell is alive.");
+    f0.add(config, "randomizationThreshold").min(0.0).max(1.0).title("The probabily that a new cell is alive.");
 
     var f1 = gui.addFolder("Biomes");
     f1.add(config, "preset_glider");
@@ -347,8 +363,6 @@
     f0.add(config, "clear");
     f0.add(config, "randomize");
     f0.add(config, "nextStep");
-
-    f0.open();
 
     initBiotope();
     visualizeCreatures();
