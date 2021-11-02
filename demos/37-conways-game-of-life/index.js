@@ -19,6 +19,8 @@
   // Fetch the GET params
   let GUP = gup();
 
+  // console.log("CONWAY_PRESETS", CONWAY_PRESETS);
+
   window.addEventListener("load", function () {
     // THIS DEMO WORKS A BIT DIFFERENT THAN THE OTHERS.
     // IT DOES NOT USE AN EXPLICIT INSTANCE OF PLOTBOILERPLATE
@@ -41,23 +43,39 @@
         // randomizeBiome: false,
         randomizationThreshold: 0.5,
 
+        directPaintMode: true,
+
         preset_glider: function () {
-          addGliderAt(0, 0);
+          currentPreset = CONWAY_PRESETS["glider"];
+          visualizeCreatures();
+        },
+        preset_lightweightGlider: function () {
+          currentPreset = CONWAY_PRESETS["lightweight_glider"];
+          visualizeCreatures();
+        },
+        preset_middleweightGlider: function () {
+          currentPreset = CONWAY_PRESETS["middleweight_glider"];
+          visualizeCreatures();
+        },
+        preset_heavyweightGlider: function () {
+          currentPreset = CONWAY_PRESETS["heavyweight_glider"];
+          visualizeCreatures();
+        },
+        preset_gliderGun: function () {
+          currentPreset = CONWAY_PRESETS["glider_gun"];
+          visualizeCreatures();
+        },
+        preset_pentaDecathlon: function () {
+          currentPreset = CONWAY_PRESETS["penta_decathlon"];
           visualizeCreatures();
         },
 
         clear: function () {
           rebuildBiotope(false);
-          // if (!config.randomizeBiome) {
-          //   initCreatures();
-          // }
           visualizeCreatures();
         },
         randomize: function () {
           rebuildBiotope(true);
-          // if (!config.randomizeBiome) {
-          //   initCreatures();
-          // }
           visualizeCreatures();
         },
         nextStep: function () {
@@ -73,10 +91,13 @@
     // +-------------------------------
     var svgNode = document.getElementById("my-canvas");
     var canvasSize = null;
-    // var squareSize = null;
     var tosvgDraw = null;
     var tosvgFill = null;
     var biotopeSize = { width: 0, height: 0 }; // Dimension
+
+    // Prepare a preset for placing by mouse/touch
+    var currentPreset = null;
+    var currentPresetPosition = { j: 0, i: 0 };
 
     // +---------------------------------------------------------------------------------
     // | Initialize the draw library for SVG rendering: width and height and style defs.
@@ -112,9 +133,6 @@
       removeAllChildNodes(svgNode);
       // This initializes the maze structure and draws the walls on the SVG canvas.
       initBiotope(randomizeBiome);
-
-      // TODO: initialize the creatures here
-      // initCreatues();
     };
 
     // +---------------------------------------------------------------------------------
@@ -159,7 +177,7 @@
     // | The old SVG data is cleared.
     // +-------------------------------
     var setCellAlive = function (position, alive) {
-      // console.log("setCellAlive", position);
+      // Check bounds before setting anything
       if (position.i >= 0 && position.j >= 0 && position.j < biome.length && position.i < biome[position.j].length) {
         biome[position.j][position.i] = alive;
       }
@@ -173,13 +191,25 @@
     var relPos = function (j, i) {
       return { j: relRow(j), i: relCol(i) };
     };
-    var addGliderAt = function (j, i) {
-      setCellAlive(relPos(j, i + 1), true);
-      setCellAlive(relPos(j + 1, i + 2), true);
-      setCellAlive(relPos(j + 2, i), true);
-      setCellAlive(relPos(j + 2, i + 1), true);
-      setCellAlive(relPos(j + 2, i + 2), true);
-      console.log("biome", biome);
+    var absCol = function (i) {
+      return i - Math.floor(biotopeSize.width / 2);
+    };
+    var absRow = function (j) {
+      return j - Math.floor(biotopeSize.height / 2);
+    };
+    var absPos = function (relPos) {
+      return { j: absRow(relPos.j), i: absCol(relPos.i) };
+    };
+
+    var addCurrentPreset = function () {
+      if (!currentPreset) {
+        return;
+      }
+      for (var j = 0; j < currentPreset.length; j++) {
+        for (var i = 0; i < currentPreset[j].length; i++) {
+          setCellAlive(relPos(currentPresetPosition.j + j, currentPresetPosition.i + i), Boolean(currentPreset[j][i]));
+        }
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -188,14 +218,27 @@
     // | to indicate the current frontiers.
     // +-------------------------------
     var visualizeCreatures = function () {
+      const relCurrentPresetPosition = relPos(currentPresetPosition.j, currentPresetPosition.i);
       for (var j = 0; j < biome.length; j++) {
         for (var i = 0; i < biome[j].length; i++) {
-          // var ratio = Math.max(0, solutionMatrix[j][i].step / stepNumber) * 0.5;
+          // Fetch the SVG rectangle
           var rectangle = document.getElementById("cell-" + j + "-" + i);
-          if (biome[j][i]) {
-            rectangle.setAttribute("fill", "rgba(0,0,0,1.0)");
+          // Visualize presets, too!
+          if (
+            currentPreset &&
+            j >= relCurrentPresetPosition.j &&
+            j < relCurrentPresetPosition.j + currentPreset.length &&
+            i >= relCurrentPresetPosition.i &&
+            i < relCurrentPresetPosition.i + currentPreset[0].length &&
+            currentPreset[j - relCurrentPresetPosition.j][i - relCurrentPresetPosition.i] !== 0
+          ) {
+            rectangle.setAttribute("fill", biome[j][i] ? "rgba(128,0,128,1.0)" : "rgba(255,0,255,1.0)");
           } else {
-            rectangle.setAttribute("fill", "rgba(255,255,255,1.0)");
+            if (biome[j][i]) {
+              rectangle.setAttribute("fill", "rgba(0,0,0,1.0)");
+            } else {
+              rectangle.setAttribute("fill", "rgba(255,255,255,1.0)");
+            }
           }
         }
       }
@@ -309,7 +352,16 @@
       var j = Math.floor(pixelPosition.y / config.cellHeight);
       var i = Math.floor(pixelPosition.x / config.cellWidth);
       if (j >= 0 && i >= 0 && j < biome.length && i < biome[j].length) {
-        setCellAlive({ j: j, i: i }, !biome[j][i]);
+        if (config.directPaintMode) {
+          setCellAlive({ j: j, i: i }, !biome[j][i]);
+        } else {
+          currentPresetPosition.j = absRow(j);
+          currentPresetPosition.i = absCol(i);
+          addCurrentPreset();
+          currentPreset = null;
+          currentPresetPosition.j = 0;
+          currentPresetPosition.i = 0;
+        }
         visualizeCreatures();
       }
     });
@@ -357,7 +409,13 @@
     f0.add(config, "randomizationThreshold").min(0.0).max(1.0).title("The probabily that a new cell is alive.");
 
     var f1 = gui.addFolder("Biomes");
+    f1.add(config, "directPaintMode").title("Paint directly without any presets.");
     f1.add(config, "preset_glider");
+    f1.add(config, "preset_lightweightGlider");
+    f1.add(config, "preset_middleweightGlider");
+    f1.add(config, "preset_heavyweightGlider");
+    // f1.add(config, "preset_gliderGun"); // Not yet working
+    f1.add(config, "preset_pentaDecathlon");
     f1.open();
 
     f0.add(config, "clear");
