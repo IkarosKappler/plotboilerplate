@@ -37,6 +37,7 @@
         cellWidth: 32,
         cellHeight: 32,
         borderSize: 2,
+        stepDrawFalloff: 10, // Draw n steps behind being alive
 
         randomizationThreshold: 0.5,
 
@@ -250,7 +251,9 @@
             if (biome[j][i].isAlive) {
               rectangle.setAttribute("fill", "rgba(0,0,0,1.0)");
             } else {
-              rectangle.setAttribute("fill", "rgba(255,255,255,1.0)");
+              var diff = stepNumber - biome[j][i].lastAliveStep;
+              var alpha = diff <= config.stepDrawFalloff ? diff / config.stepDrawFalloff : 1.0;
+              rectangle.setAttribute("fill", "rgba(255,255,255," + alpha + ")");
             }
           }
         }
@@ -272,33 +275,34 @@
         newBiotope.push(row);
         for (var i = 0; i < biome[j].length; i++) {
           var isAlive = biome[j][i].isAlive;
+          var latestAliveStep = biome[j][i].lastAliveStep;
           var neighbourCount = getNumberOfLivingNeighbours(j, i);
           if (isAlive) {
             if (neighbourCount < 2) {
               // Die of under-population
               // row.push(false);
-              row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
+              row.push({ isAlive: false, lastAliveStep: latestAliveStep });
             } else if (neighbourCount == 2 || neighbourCount == 3) {
               // Keep on living
               // row.push(true);
-              row.push({ isAlive: true, lastAliveStep: Number.NEGATIVE_INFINITY });
+              row.push({ isAlive: true, lastAliveStep: stepNumber });
             } else if (neighbourCount > 3) {
               // Die of under-population
               // row.push(false);
-              row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
+              row.push({ isAlive: false, lastAliveStep: latestAliveStep });
             } else {
               // row.push(false);
-              row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
+              row.push({ isAlive: false, lastAliveStep: latestAliveStep });
             }
           } else {
             if (neighbourCount === 3) {
               // Dead cell becomes alive dues to 3 living neighboures
               // row.push(true);
-              row.push({ isAlive: true, lastAliveStep: Number.NEGATIVE_INFINITY });
+              row.push({ isAlive: true, lastAliveStep: stepNumber });
             } else {
               // Dead cell stays dead due to under- or over-poulation
               // row.push(false);
-              row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
+              row.push({ isAlive: false, lastAliveStep: latestAliveStep });
             }
           }
         }
@@ -470,6 +474,7 @@
 
     f0.add(config, "animate").title("Toggle animation on/off.").onChange(startAnimation);
     f0.add(config, "animationDelay").min(10).max(1000).title("The delay in milliseconds between frames.");
+    f0.add(config, "stepDrawFalloff").min(1).max(32).title("How many steps into the past should life be visible?");
 
     // prettier-ignore
     f0.add(config, "borderSize").min(0).max(10).step(1).title("borderSize").onChange(function () {
