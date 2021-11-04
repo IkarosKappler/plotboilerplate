@@ -126,7 +126,12 @@
       // tosvgDraw.addCustomStyleDefs(styleDefs);
     };
 
-    // Array<boolean[]>
+    // interface CellState {
+    //    isAlive: boolean;
+    //    lastAliveStep: number;
+    // }
+
+    // Array<CellState[]>
     var biome = [];
     var stepNumber = 0;
 
@@ -169,9 +174,9 @@
 
           // Init with random pattern?
           if (randomizeBiome) {
-            row.push(Math.random() < config.randomizationThreshold);
+            row.push({ isAlive: Math.random() < config.randomizationThreshold, lastAliveStep: Number.NEGATIVE_INFINITY });
           } else {
-            row.push(false);
+            row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
           }
         }
       }
@@ -186,9 +191,10 @@
     var setCellAlive = function (position, alive) {
       // Check bounds before setting anything
       if (position.i >= 0 && position.j >= 0 && position.j < biome.length && position.i < biome[position.j].length) {
-        biome[position.j][position.i] = alive;
+        biome[position.j][position.i].isAlive = alive;
       }
     };
+
     var relCol = function (i) {
       return i + Math.floor(biotopeSize.width / 2);
     };
@@ -239,9 +245,9 @@
             i < relCurrentPresetPosition.i + currentPreset[0].length &&
             currentPreset[j - relCurrentPresetPosition.j][i - relCurrentPresetPosition.i] !== 0
           ) {
-            rectangle.setAttribute("fill", biome[j][i] ? "rgba(128,0,128,1.0)" : "rgba(255,0,255,1.0)");
+            rectangle.setAttribute("fill", biome[j][i].isAlive ? "rgba(128,0,128,1.0)" : "rgba(255,0,255,1.0)");
           } else {
-            if (biome[j][i]) {
+            if (biome[j][i].isAlive) {
               rectangle.setAttribute("fill", "rgba(0,0,0,1.0)");
             } else {
               rectangle.setAttribute("fill", "rgba(255,255,255,1.0)");
@@ -265,28 +271,34 @@
         var row = []; // TODO: check if new Array(n) is better here (we know the size)
         newBiotope.push(row);
         for (var i = 0; i < biome[j].length; i++) {
-          var isAlive = biome[j][i];
+          var isAlive = biome[j][i].isAlive;
           var neighbourCount = getNumberOfLivingNeighbours(j, i);
           if (isAlive) {
             if (neighbourCount < 2) {
               // Die of under-population
-              row.push(false);
+              // row.push(false);
+              row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
             } else if (neighbourCount == 2 || neighbourCount == 3) {
               // Keep on living
-              row.push(true);
+              // row.push(true);
+              row.push({ isAlive: true, lastAliveStep: Number.NEGATIVE_INFINITY });
             } else if (neighbourCount > 3) {
               // Die of under-population
-              row.push(false);
+              // row.push(false);
+              row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
             } else {
-              row.push(false);
+              // row.push(false);
+              row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
             }
           } else {
             if (neighbourCount === 3) {
               // Dead cell becomes alive dues to 3 living neighboures
-              row.push(true);
+              // row.push(true);
+              row.push({ isAlive: true, lastAliveStep: Number.NEGATIVE_INFINITY });
             } else {
               // Dead cell stays dead due to under- or over-poulation
-              row.push(false);
+              // row.push(false);
+              row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
             }
           }
         }
@@ -302,29 +314,29 @@
     // +-------------------------------
     var getNumberOfLivingNeighbours = function (j, i) {
       var count = 0;
-      if (j - 1 >= 0 && biome[j - 1][i]) {
+      if (j - 1 >= 0 && biome[j - 1][i].isAlive) {
         count++;
       }
-      if (j + 1 < biome.length && biome[j + 1][i]) {
+      if (j + 1 < biome.length && biome[j + 1][i].isAlive) {
         count++;
       }
-      if (i - 1 >= 0 && biome[j][i - 1]) {
+      if (i - 1 >= 0 && biome[j][i - 1].isAlive) {
         count++;
       }
-      if (i + 1 < biome[j].length && biome[j][i + 1]) {
+      if (i + 1 < biome[j].length && biome[j][i + 1].isAlive) {
         count++;
       }
       // Also look at diagoal neighbours
-      if (j - 1 >= 0 && i - 1 >= 0 && biome[j - 1][i - 1]) {
+      if (j - 1 >= 0 && i - 1 >= 0 && biome[j - 1][i - 1].isAlive) {
         count++;
       }
-      if (j + 1 < biome.length && i - 1 >= 0 && biome[j + 1][i - 1]) {
+      if (j + 1 < biome.length && i - 1 >= 0 && biome[j + 1][i - 1].isAlive) {
         count++;
       }
-      if (j + 1 < biome.length && i + 1 < biome[j].length && biome[j + 1][i + 1]) {
+      if (j + 1 < biome.length && i + 1 < biome[j].length && biome[j + 1][i + 1].isAlive) {
         count++;
       }
-      if (j - 1 >= 0 && i + 1 < biome[j].length && biome[j - 1][i + 1]) {
+      if (j - 1 >= 0 && i + 1 < biome[j].length && biome[j - 1][i + 1].isAlive) {
         count++;
       }
       return count;
@@ -388,7 +400,7 @@
       var i = Math.floor(pixelPosition.x / config.cellWidth);
       if (j >= 0 && i >= 0 && j < biome.length && i < biome[j].length) {
         if (config.directPaintMode) {
-          setCellAlive({ j: j, i: i }, !biome[j][i]);
+          setCellAlive({ j: j, i: i }, !biome[j][i].isAlive);
         } else {
           currentPresetPosition.j = absRow(j);
           currentPresetPosition.i = absCol(i);
