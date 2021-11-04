@@ -65,6 +65,10 @@
           currentPreset = CONWAY_PRESETS["glider_gun"];
           visualizeCreatures();
         },
+        preset_pulsar: function () {
+          currentPreset = CONWAY_PRESETS["pulsar"];
+          visualizeCreatures();
+        },
         preset_pentaDecathlon: function () {
           currentPreset = CONWAY_PRESETS["penta_decathlon"];
           visualizeCreatures();
@@ -414,7 +418,8 @@
     f1.add(config, "preset_lightweightGlider");
     f1.add(config, "preset_middleweightGlider");
     f1.add(config, "preset_heavyweightGlider");
-    // f1.add(config, "preset_gliderGun"); // Not yet working
+    f1.add(config, "preset_gliderGun");
+    f1.add(config, "preset_pulsar");
     f1.add(config, "preset_pentaDecathlon");
     f1.open();
 
