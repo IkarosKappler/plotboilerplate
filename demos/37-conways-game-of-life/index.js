@@ -9,7 +9,7 @@
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
- * @date        2021-10-04
+ * @date        2021-10-31
  * @version     1.0.0
  **/
 
@@ -18,8 +18,6 @@
 
   // Fetch the GET params
   let GUP = gup();
-
-  // console.log("CONWAY_PRESETS", CONWAY_PRESETS);
 
   window.addEventListener("load", function () {
     // THIS DEMO WORKS A BIT DIFFERENT THAN THE OTHERS.
@@ -40,11 +38,16 @@
         cellHeight: 32,
         borderSize: 2,
 
-        // randomizeBiome: false,
         randomizationThreshold: 0.5,
 
         directPaintMode: true,
 
+        turnLeft: function () {
+          turnCurrentPresetLeft();
+        },
+        turnRight: function () {
+          turnCurrentPresetRight();
+        },
         preset_glider: function () {
           currentPreset = CONWAY_PRESETS["glider"];
           visualizeCreatures();
@@ -265,7 +268,6 @@
           var isAlive = biome[j][i];
           var neighbourCount = getNumberOfLivingNeighbours(j, i);
           if (isAlive) {
-            // console.log("Cell j=" + j + " i=" + i + " is alive and has " + neighbourCount + " neighbours");
             if (neighbourCount < 2) {
               // Die of under-population
               row.push(false);
@@ -292,6 +294,12 @@
       biome = newBiotope;
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Get the number of neightbours for the given cell position.
+    // |
+    // | j is the row
+    // | i is the column
+    // +-------------------------------
     var getNumberOfLivingNeighbours = function (j, i) {
       var count = 0;
       if (j - 1 >= 0 && biome[j - 1][i]) {
@@ -323,6 +331,29 @@
     };
 
     // +---------------------------------------------------------------------------------
+    // | Turn the currently selected preset one 90 degree turn to the left and re-renders
+    // | the scene.
+    // +-------------------------------
+    var turnCurrentPresetLeft = function () {
+      if (currentPreset) {
+        currentPreset = turnMatrixLeft(currentPreset);
+        visualizeCreatures();
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | Turn the currently selected preset one 90 degree turn to the right and re-renders
+    // | the scene.
+    // +-------------------------------
+    var turnCurrentPresetRight = function () {
+      if (currentPreset) {
+        // Dirty hack, I know ;)
+        currentPreset = turnMatrixLeft(turnMatrixLeft(turnMatrixLeft(currentPreset)));
+        visualizeCreatures();
+      }
+    };
+
+    // +---------------------------------------------------------------------------------
     // | This function is called on each frame draw.
     // +-------------------------------
     var renderLoop = function (_time) {
@@ -348,7 +379,7 @@
     };
 
     // +---------------------------------------------------------------------------------
-    // | Add mouse/touch interaction
+    // | Add mouse/touch interaction on click.
     // +-------------------------------
     svgNode.addEventListener("click", function (event) {
       var bounds = svgNode.getBoundingClientRect();
@@ -367,6 +398,39 @@
           currentPresetPosition.i = 0;
         }
         visualizeCreatures();
+      }
+    });
+
+    // +---------------------------------------------------------------------------------
+    // | Add mouse/touch interaction on move.
+    // +-------------------------------
+    svgNode.addEventListener("mousemove", function (event) {
+      var bounds = svgNode.getBoundingClientRect();
+      var pixelPosition = { x: event.offsetX - bounds.left, y: event.offsetY - bounds.top };
+      var j = Math.floor(pixelPosition.y / config.cellHeight);
+      var i = Math.floor(pixelPosition.x / config.cellWidth);
+      if (j >= 0 && i >= 0 && j < biome.length && i < biome[j].length) {
+        if (currentPresetPosition) {
+          currentPresetPosition.j = absRow(j);
+          currentPresetPosition.i = absCol(i);
+          visualizeCreatures();
+        }
+      }
+    });
+
+    // +---------------------------------------------------------------------------------
+    // | Turn current preset on left/right arrow key press.
+    // +-------------------------------
+    window.addEventListener("keydown", function (event) {
+      switch (event.key) {
+        case "ArrowLeft":
+          // Left pressed
+          turnCurrentPresetLeft();
+          break;
+        case "ArrowRight":
+          // Right pressed
+          turnCurrentPresetRight();
+          break;
       }
     });
 
@@ -414,6 +478,8 @@
 
     var f1 = gui.addFolder("Biomes");
     f1.add(config, "directPaintMode").title("Paint directly without any presets.");
+    f1.add(config, "turnLeft").name("&#x21ba;").title("Left turn current preset.");
+    f1.add(config, "turnRight").name("&#x21bb;").title("Right turn current preset.");
     f1.add(config, "preset_glider");
     f1.add(config, "preset_lightweightGlider");
     f1.add(config, "preset_middleweightGlider");
