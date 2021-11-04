@@ -65,8 +65,8 @@
           currentPreset = CONWAY_PRESETS["heavyweight_glider"];
           visualizeCreatures();
         },
-        preset_gliderGun: function () {
-          currentPreset = CONWAY_PRESETS["glider_gun"];
+        preset_gliderSpawner: function () {
+          currentPreset = CONWAY_PRESETS["glider_spawner"];
           visualizeCreatures();
         },
         preset_pulsar: function () {
@@ -501,7 +501,7 @@
     f1.add(config, "preset_lightweightGlider");
     f1.add(config, "preset_middleweightGlider");
     f1.add(config, "preset_heavyweightGlider");
-    f1.add(config, "preset_gliderGun");
+    f1.add(config, "preset_gliderSpawner");
     f1.add(config, "preset_pulsar");
     f1.add(config, "preset_pentaDecathlon");
     f1.open();
@@ -511,6 +511,20 @@
     f0.add(config, "nextStep");
 
     initBiotope();
+
+    if (GUP["preset"]) {
+      var presetName = GUP["preset"];
+      if (CONWAY_PRESETS.hasOwnProperty(presetName)) {
+        currentPreset = CONWAY_PRESETS[presetName];
+        currentPresetPosition.j = GUP["j"] ? absRow(parseInt(GUP["j"])) : currentPresetPosition.j;
+        currentPresetPosition.i = GUP["i"] ? absCol(parseInt(GUP["i"])) : currentPresetPosition.i;
+        addCurrentPreset();
+        currentPresetPosition.j = 0;
+        currentPresetPosition.i = 0;
+        currentPreset = null;
+      }
+    }
+
     visualizeCreatures();
     startAnimation();
   });
