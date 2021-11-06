@@ -9,7 +9,9 @@
  * @modified 2020-10-23 Ported to Typescript.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
  * @modified 2021-02-08 Added basic tsdoc/jsdoc comments.
- * @version 0.0.9
+ * @modified 2021-11-05 Fixing the regex to parse rgba-strings.
+ * @modified 2021-11-05 Added return value `this` to all modifier functions (for chaining).
+ * @version 0.0.10
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Color = void 0;
@@ -34,8 +36,7 @@ var Color = /** @class */ (function () {
         this.h = this.s = this.l = 0;
         this.a = 1;
     }
-    ;
-    // --- RGB ---------------------------------- 
+    // --- RGB ----------------------------------
     /**
      * Get this color as a CSS `rgb` string.
      *
@@ -49,7 +50,6 @@ var Color = /** @class */ (function () {
     Color.prototype.cssRGB = function () {
         return "rgb(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + ")";
     };
-    ;
     /**
      * Get this color as a CSS `rgba` string.
      *
@@ -61,9 +61,8 @@ var Color = /** @class */ (function () {
      * @return {string} This color as a CSS rgba string.
      */
     Color.prototype.cssRGBA = function () {
-        return "rgba(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + "," + this.a + ")";
+        return "rgba(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + "," + (this.a ? this.a : 1.0) + ")";
     };
-    ;
     /**
      * Get the red component of this RGB(A)color. This method just returns the `r` color attribute.
      *
@@ -72,18 +71,20 @@ var Color = /** @class */ (function () {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    Color.prototype.red = function () { return this.r; };
-    ;
+    Color.prototype.red = function () {
+        return this.r;
+    };
     /**
-    * Get the green component of this RGB(A) color. This method just returns the `g` color attribute.
-    *
-    * @method green
-    * @instance
-    * @memberof Color
-    * @return {number} A value between 0.0 and 1.0.
-    */
-    Color.prototype.green = function () { return this.g; };
-    ;
+     * Get the green component of this RGB(A) color. This method just returns the `g` color attribute.
+     *
+     * @method green
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
+    Color.prototype.green = function () {
+        return this.g;
+    };
     /**
      * Get the blue component of this RGB(A) color. This method just returns the `b` color attribute.
      *
@@ -92,9 +93,10 @@ var Color = /** @class */ (function () {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    Color.prototype.blue = function () { return this.b; };
-    ;
-    // --- HSL ---------------------------------- 
+    Color.prototype.blue = function () {
+        return this.b;
+    };
+    // --- HSL ----------------------------------
     /**
      * Get this color as a CSS `hsl` string.
      *
@@ -106,7 +108,6 @@ var Color = /** @class */ (function () {
     Color.prototype.cssHSL = function () {
         return "hsl(" + Math.round(360 * this.h) + "," + Math.round(100 * this.s) + "%," + Math.round(100 * this.l) + "%)";
     };
-    ;
     /**
      * Get this color as a CSS `hsla` string.
      *
@@ -116,9 +117,16 @@ var Color = /** @class */ (function () {
      * @return {string} This color as a CSS hsla string.
      */
     Color.prototype.cssHSLA = function () {
-        return "hsla(" + Math.round(360 * this.h) + "," + Math.round(100 * this.s) + "%," + Math.round(100 * this.l) + "%," + Math.round(this.a) + ")";
+        return ("hsla(" +
+            Math.round(360 * this.h) +
+            "," +
+            Math.round(100 * this.s) +
+            "%," +
+            Math.round(100 * this.l) +
+            "%," +
+            Math.round(this.a) +
+            ")");
     };
-    ;
     /**
      * Get the hue component of this HSL(A) color. This method just returns the `h` color attribute.
      *
@@ -127,8 +135,9 @@ var Color = /** @class */ (function () {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    Color.prototype.hue = function () { return this.h; };
-    ;
+    Color.prototype.hue = function () {
+        return this.h;
+    };
     /**
      * Get the saturation component of this HSL(A) color. This method just returns the `s` color attribute.
      *
@@ -137,8 +146,9 @@ var Color = /** @class */ (function () {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    Color.prototype.saturation = function () { return this.s; };
-    ;
+    Color.prototype.saturation = function () {
+        return this.s;
+    };
     /**
      * Get the lightness component of this HSL(A) color. This method just returns the `l` color attribute.
      *
@@ -147,8 +157,9 @@ var Color = /** @class */ (function () {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    Color.prototype.lightness = function () { return this.l; };
-    ;
+    Color.prototype.lightness = function () {
+        return this.l;
+    };
     // --- HEX ----------------------------------
     /**
      * Get this color as a CSS-HEX string (non-alpha): #rrggbb
@@ -159,13 +170,15 @@ var Color = /** @class */ (function () {
      * @return {string} This color as a CSS-HEX string.
      */
     Color.prototype.cssHEX = function () {
-        return "#" +
-            (255 * this.r < 16 ? "0" : "") + Math.round(255 * this.r).toString(16) +
-            (255 * this.g < 16 ? "0" : "") + Math.round(255 * this.g).toString(16) +
-            (255 * this.b < 16 ? "0" : "") + Math.round(255 * this.b).toString(16);
+        return ("#" +
+            (255 * this.r < 16 ? "0" : "") +
+            Math.round(255 * this.r).toString(16) +
+            (255 * this.g < 16 ? "0" : "") +
+            Math.round(255 * this.g).toString(16) +
+            (255 * this.b < 16 ? "0" : "") +
+            Math.round(255 * this.b).toString(16));
     };
-    ;
-    // --- Transparency ---------------------------------- 
+    // --- Transparency ----------------------------------
     /**
      * Get the alpha channel (transparency) of this color.
      *
@@ -174,13 +187,15 @@ var Color = /** @class */ (function () {
      * @memberof Color
      * @return {number} A value between 0.0 and 1.0.
      */
-    Color.prototype.alpha = function () { return this.a; };
-    ;
-    // --- Modifiers ---------------------------------- 
+    Color.prototype.alpha = function () {
+        return this.a;
+    };
+    // --- Modifiers ----------------------------------
     Color.prototype.saturate = function (v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
             this.s += v / 100;
-        else if ("number" == typeof v) // range 255 
+        else if ("number" == typeof v)
+            // range 255
             this.s += v / 255;
         else
             throw new Error("error: bad modifier format (percent or number)");
@@ -189,34 +204,45 @@ var Color = /** @class */ (function () {
         else if (this.s < 0)
             this.s = 0;
         Color.Converter.HSLToRGB(this);
+        return this;
     };
-    ;
     Color.prototype.desaturate = function (v) {
         this.saturate("-" + v);
+        return this;
     };
-    ;
     Color.prototype.lighten = function (v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
+        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
             this.l += v / 100;
-        else if ("number" == typeof v) // range 255 
-            this.l += v / 255;
-        else
+        }
+        else if ("number" == typeof v) {
+            if (v >= -1.0 && v <= 1.0) {
+                // range 0.0...1.0
+                this.l += v;
+            }
+            else {
+                // range 255
+                this.l += v / 255;
+            }
+        }
+        else {
             throw new Error("error: bad modifier format (percent or number)");
+        }
         if (this.l > 1)
             this.l = 1;
         else if (this.l < 0)
             this.l = 0;
         Color.Converter.HSLToRGB(this);
+        return this;
     };
-    ;
     Color.prototype.darken = function (v) {
-        this.lighten("-" + v);
+        this.lighten(typeof v === "string" ? "-" + v : -v);
+        return this;
     };
-    ;
     Color.prototype.fadein = function (v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
             this.a += v / 100;
-        else if ("number" == typeof v) // range 255 
+        else if ("number" == typeof v)
+            // range 255
             this.a += v / 255;
         else
             throw new Error("error: bad modifier format (percent or number)");
@@ -225,16 +251,17 @@ var Color = /** @class */ (function () {
         else if (this.a < 0)
             this.a = 0;
         Color.Converter.HSLToRGB(this);
+        return this;
     };
-    ;
     Color.prototype.fadeout = function (v) {
         this.fadein("-" + v);
+        return this;
     };
-    ;
     Color.prototype.spin = function (v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
             this.h += v / 100;
-        else if ("number" == typeof v) // range 360 
+        else if ("number" == typeof v)
+            // range 360
             this.h += v / 360;
         else
             throw new Error("error: bad modifier format (percent or number)");
@@ -243,8 +270,8 @@ var Color = /** @class */ (function () {
         else if (this.h < 0)
             this.h = 0;
         Color.Converter.HSLToRGB(this);
+        return this;
     };
-    ;
     Color.makeRGB = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -255,6 +282,7 @@ var Color = /** @class */ (function () {
         if (arguments.length < 3 || arguments.length > 4)
             throw new Error("error: 3 or 4 arguments");
         sanitized = Color.Sanitizer.RGB(arguments[0], arguments[1], arguments[2]);
+        // console.log("sanitized", sanitized);
         c.r = sanitized[0];
         c.g = sanitized[1];
         c.b = sanitized[2];
@@ -263,7 +291,6 @@ var Color = /** @class */ (function () {
         Color.Converter.RGBToHSL(c);
         return c;
     };
-    ;
     Color.makeHSL = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -282,12 +309,11 @@ var Color = /** @class */ (function () {
         Color.Converter.HSLToRGB(c);
         return c;
     };
-    ;
     Color.makeHEX = function (value) {
         var c = new Color(), sanitized;
         // Edit Ika 2018-0308
         // Allow leading '#'
-        if (value && value.startsWith('#'))
+        if (value && value.startsWith("#"))
             value = value.substr(1);
         Color.Validator.checkHEX(value);
         if (value.length == 3) {
@@ -304,7 +330,6 @@ var Color = /** @class */ (function () {
         Color.Converter.RGBToHSL(c);
         return c;
     };
-    ;
     /**
      * Parse the given color string. Currently only these formate are recognized: hex, rgb, rgba.
      *
@@ -315,24 +340,27 @@ var Color = /** @class */ (function () {
      * @return {Color} The color instance that's represented by the given string.
      */
     Color.parse = function (str) {
-        if (typeof str == 'undefined')
+        if (typeof str == "undefined")
             return null;
         if ((str = str.trim().toLowerCase()).length == 0)
             return null;
-        if (str.startsWith('#'))
+        if (str.startsWith("#"))
             return Color.makeHEX(str.substring(1, str.length));
-        if (str.startsWith('rgb')) {
-            var parts = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(0\.\d+))?\)$/.exec(str);
+        if (str.startsWith("rgb")) {
+            var parts = str.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,?\s*(\d*(?:\.\d+\s*)?)\)$/);
+            if (!parts) {
+                throw "Unrecognized color format (2): " + str;
+            }
             // [ str, r, g, b, a|undefined ]
-            if (typeof parts[4] == 'undefined')
+            if (typeof parts[4] == "undefined")
                 return Color.makeRGB(parts[1], parts[2], parts[3]);
             else
                 return Color.makeRGB(parts[1], parts[2], parts[3], parts[4]);
         }
-        else
-            throw "Unrecognized color format: " + str;
+        else {
+            throw "Unrecognized color format (1): " + str;
+        }
     };
-    ;
     /**
      * Create a clone of this color (RGB).
      *
@@ -344,7 +372,6 @@ var Color = /** @class */ (function () {
     Color.prototype.clone = function () {
         return Color.makeRGB(this.r, this.g, this.b, this.a);
     };
-    ;
     /**
      * Interpolate this color on the RGB scale.
      *
@@ -362,7 +389,6 @@ var Color = /** @class */ (function () {
         this.a += (c.a - c.a) * t;
         return this;
     };
-    ;
     Color.Sanitizer = {
         RGB: function () {
             var args = [];
@@ -385,16 +411,21 @@ var Color = /** @class */ (function () {
                 }
                 else {
                     // console.log( 'allAreFrac', allAreFrac, arguments );
-                    if ("string" == typeof c && (c = parseInt(c)) == NaN)
+                    if ("string" == typeof c && (c = parseInt(c)) == NaN) {
                         throw new Error("Bad format");
-                    if (c < 0)
+                    }
+                    if (c < 0) {
                         throw new Error("Bad format");
+                    }
                     //else if( allAreFrac ) o[i] = c; // c >= 0 && c <= 1 (all)
-                    else if (c >= 0 && c < 1)
+                    else if (c >= 0 && c < 1) {
                         o[i] = c;
+                    }
                     // else if(c >= 0.0 && c <= 1.0) o[i] = c;
-                    else if (c >= 1 && c < 256)
-                        o[i] = c / 255; // ???
+                    else if (c >= 1 && c < 256) {
+                        o[i] = c / 255;
+                    }
+                    // ???
                     // else if(c >= 0 && c < 256) o[i] = c/255;
                     else
                         throw new Error("Bad format (" + c + ")");
@@ -522,7 +553,6 @@ var Color = /** @class */ (function () {
         }
     };
     return Color;
-}());
+}()); // END class
 exports.Color = Color;
-; // END class
 //# sourceMappingURL=Color.js.map

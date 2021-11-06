@@ -37,11 +37,19 @@
         cellWidth: 32,
         cellHeight: 32,
         borderSize: 2,
-        stepDrawFalloff: 10, // Draw n steps behind being alive
+        traceFalloff: 10, // Draw n steps behind being alive
+        drawTraces: true,
 
         randomizationThreshold: 0.5,
 
         directPaintMode: true,
+
+        // According to the prop name from PlotBoilerplate
+        backgroundColor: GUP["backgroundColor"] || (globalThis.isDarkMode ? "rgb(0,0,0)" : "rgb(255,255,255)"),
+        lifeColor: GUP["lifeColor"] || (globalThis.isDarkMode ? "rgb(162,0,253)" : "rgb(162,0,253)"),
+        traceColor: GUP["traceColor"] || "rgb(0,167,185)",
+        borderColor: GUP["borderColor"] || (globalThis.isDarkMode ? "rgb(32,32,32)" : "rgb(192,192,192)"),
+        presetColor: GUP["presetColor"] || "rgb(255,0,255)",
 
         turnLeft: function () {
           turnCurrentPresetLeft();
@@ -156,7 +164,10 @@
       tosvgDraw.beginDrawCycle();
       tosvgFill.beginDrawCycle();
       tosvgFill.curClassName = "background";
-      tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, "#888888", 0);
+      tosvgFill.curId = "background";
+      // tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, "#888888", 0);
+      // The 'borders' will just be the background shining through.
+      tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, config.borderColor, 0);
       biome = [];
       for (var j = 0; j < biotopeSize.height; j++) {
         var row = [];
@@ -232,7 +243,17 @@
     // | to indicate the current frontiers.
     // +-------------------------------
     var visualizeCreatures = function () {
-      const relCurrentPresetPosition = relPos(currentPresetPosition.j, currentPresetPosition.i);
+      var relCurrentPresetPosition = relPos(currentPresetPosition.j, currentPresetPosition.i);
+      // console.log("config.backgroundColor", config.backgroundColor);
+      var backgroundColor = Color.parse(config.backgroundColor);
+      var lifeColor = Color.parse(config.lifeColor);
+      var traceColor = Color.parse(config.traceColor);
+      var borderColor = Color.parse(config.borderColor);
+      var presetColor = Color.parse(config.presetColor);
+      var presetColorAlive = Color.makeRGB(presetColor.r * 128, presetColor.g * 128, presetColor.b * 128);
+      // var presetColorAlive = presetColor.clone().darken(0.5);
+      // console.log("presetColor", presetColor, presetColor.cssRGBA(), "config.presetColor", config.presetColor);
+      // console.log("presetColorAlive", presetColorAlive.cssRGBA());
       for (var j = 0; j < biome.length; j++) {
         for (var i = 0; i < biome[j].length; i++) {
           // Fetch the SVG rectangle
@@ -246,18 +267,53 @@
             i < relCurrentPresetPosition.i + currentPreset[0].length &&
             currentPreset[j - relCurrentPresetPosition.j][i - relCurrentPresetPosition.i] !== 0
           ) {
-            rectangle.setAttribute("fill", biome[j][i].isAlive ? "rgba(128,0,128,1.0)" : "rgba(255,0,255,1.0)");
+            // rectangle.setAttribute("fill", biome[j][i].isAlive ? "rgba(128,0,128,1.0)" : "rgba(255,0,255,1.0)");
+            rectangle.setAttribute("fill", biome[j][i].isAlive ? presetColorAlive.cssRGBA() : presetColor.cssRGBA());
           } else {
             if (biome[j][i].isAlive) {
-              rectangle.setAttribute("fill", "rgba(0,0,0,1.0)");
+              rectangle.setAttribute("fill", lifeColor.cssRGB()); // "rgba(0,0,0,1.0)");
             } else {
               var diff = stepNumber - biome[j][i].lastAliveStep;
-              var alpha = diff <= config.stepDrawFalloff ? diff / config.stepDrawFalloff : 1.0;
-              rectangle.setAttribute("fill", "rgba(255,255,255," + alpha + ")");
+              var alpha = diff <= config.traceFalloff ? diff / config.traceFalloff : 1.0;
+              // rectangle.setAttribute("fill", "rgba(255,255,255," + alpha + ")");
+              if (config.drawTraces && alpha < 0.9) {
+                traceColor.a = alpha * 0.5;
+                // rectangle.setAttribute("fill", traceColor.cssRGBA());
+                // rectangle.setAttribute("fill", traceColor.cssRGBA());
+                if (globalThis.isDarkMode) {
+                  rectangle.setAttribute(
+                    "fill",
+                    "rgb(" +
+                      traceColor.r * 128 * (1 - alpha) +
+                      "," +
+                      traceColor.g * 128 * (1 - alpha) +
+                      "," +
+                      traceColor.b * 128 * (1 - alpha) +
+                      ")"
+                  );
+                } else {
+                  // console.log("traceColor, ", traceColor);
+                  rectangle.setAttribute(
+                    "fill",
+                    "rgb(" +
+                      (127 + (1 - traceColor.r) * 127 * alpha) +
+                      "," +
+                      (127 + (1 - traceColor.g) * 127 * alpha) +
+                      "," +
+                      (127 + (1 - traceColor.b) * 127 * alpha) +
+                      ")"
+                  );
+                }
+              } else {
+                // backgroundColor.a = alpha;
+                rectangle.setAttribute("fill", backgroundColor.cssRGBA());
+              }
             }
           }
         }
       }
+      // Set the background rect's color to change the 'border' color
+      document.getElementById("background").setAttribute("fill", config.borderColor);
     };
 
     // +---------------------------------------------------------------------------------
@@ -426,9 +482,11 @@
       var j = Math.floor(pixelPosition.y / config.cellHeight);
       var i = Math.floor(pixelPosition.x / config.cellWidth);
       if (j >= 0 && i >= 0 && j < biome.length && i < biome[j].length) {
-        if (currentPresetPosition) {
-          currentPresetPosition.j = absRow(j);
-          currentPresetPosition.i = absCol(i);
+        var jAbs = absRow(j);
+        var iAbs = absCol(i);
+        if (currentPreset && currentPresetPosition && (currentPresetPosition.j !== j || currentPresetPosition.i !== i)) {
+          currentPresetPosition.j = jAbs;
+          currentPresetPosition.i = iAbs;
           visualizeCreatures();
         }
       }
@@ -474,7 +532,8 @@
 
     f0.add(config, "animate").title("Toggle animation on/off.").onChange(startAnimation);
     f0.add(config, "animationDelay").min(10).max(1000).title("The delay in milliseconds between frames.");
-    f0.add(config, "stepDrawFalloff").min(1).max(32).title("How many steps into the past should life be visible?");
+    f0.add(config, "drawTraces").title("Draw traces?");
+    f0.add(config, "traceFalloff").min(1).max(32).title("How many steps into the past should life be visible?");
 
     // prettier-ignore
     f0.add(config, "borderSize").min(0).max(10).step(1).title("borderSize").onChange(function () {
@@ -492,8 +551,11 @@
 
     // prettier-ignore
     f0.add(config, "randomizationThreshold").min(0.0).max(1.0).title("The probabily that a new cell is alive.");
+    f0.add(config, "clear");
+    f0.add(config, "randomize");
+    f0.add(config, "nextStep");
 
-    var f1 = gui.addFolder("Biomes");
+    var f1 = gui.addFolder("Biomes & Creatures");
     f1.add(config, "directPaintMode").title("Paint directly without any presets.");
     f1.add(config, "turnLeft").name("&#x21ba;").title("Left turn current preset.");
     f1.add(config, "turnRight").name("&#x21bb;").title("Right turn current preset.");
@@ -506,12 +568,15 @@
     f1.add(config, "preset_pentaDecathlon");
     f1.open();
 
-    f0.add(config, "clear");
-    f0.add(config, "randomize");
-    f0.add(config, "nextStep");
+    var f2 = gui.addFolder("Colors");
+    f2.addColor(config, "backgroundColor").title("The general background color.").onChange(visualizeCreatures);
+    f2.addColor(config, "lifeColor").title("The color of living cells").onChange(visualizeCreatures);
+    f2.addColor(config, "traceColor").title("The color of traces.").onChange(visualizeCreatures);
+    f2.addColor(config, "borderColor").title("The color of borders.").onChange(visualizeCreatures);
 
     initBiotope();
 
+    // Check if there is a preset specified to load.
     if (GUP["preset"]) {
       var presetName = GUP["preset"];
       if (CONWAY_PRESETS.hasOwnProperty(presetName)) {
@@ -524,6 +589,27 @@
         currentPreset = null;
       }
     }
+
+    // // Test Color:
+    // var colorStrings = [
+    //   "rgba(0,0,0,0.5)",
+    //   "rgba(255,255,255,1.0)",
+    //   "rgba(0,28,64,0)",
+    //   "rgba(1,2,3,1)",
+    //   "rgba( 1 , 2 , 3 , 0.5 )",
+    //   "rgba( 2, 3,4, .5)",
+
+    //   "rgb(0,0,0)",
+    //   "rgb(255,255,255)",
+    //   "rgb(0,28,64)",
+    //   "rgb(1,2,3)",
+    //   "rgb( 1 , 2 , 3  )",
+    //   "rgb( 2, 3,4)"
+    // ];
+    // for (var i = 0; i < colorStrings.length; i++) {
+    //   console.log("string: " + colorStrings[i]);
+    //   console.log("color:" + Color.parse(colorStrings[i]));
+    // }
 
     visualizeCreatures();
     startAnimation();

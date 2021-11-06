@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-11-05
+  - Fixing the regex in the Color.parse() function for parsing rgba-strings.
 - 2021-10-12
   - Added `DrawConfig.bezier.pathVertex` and `DrawConfig.bezier.controlVertex` attributes, both `DrawSettigs`.
   - Added optional `fill:boolean` to `DrawSettings`. This is useful to give more control over the rendering of Bézier paths.
