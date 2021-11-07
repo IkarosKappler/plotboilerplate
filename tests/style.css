@@ -1,0 +1,29 @@
+.color-wrapper {
+  width: 100%;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: row;
+}
+
+.color-wrapper div {
+  display: inline-flex;
+}
+
+.color-wrapper .color-display {
+  border: 1px solid white;
+  width: 33vw;
+  height: 33vw;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.color-wrapper .color-info {
+  flex-direction: column;
+}
+
+.color-wrapper .color-info * {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}

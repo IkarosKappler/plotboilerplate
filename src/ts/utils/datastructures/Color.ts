@@ -10,6 +10,7 @@
  * @modified 2021-02-08 Added basic tsdoc/jsdoc comments.
  * @modified 2021-11-05 Fixing the regex to parse rgba-strings.
  * @modified 2021-11-05 Added return value `this` to all modifier functions (for chaining).
+ * @modified 2021-11-07 Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
  * @version 0.0.10
  **/
 
@@ -272,16 +273,35 @@ export class Color {
     this.saturate("-" + v);
     return this;
   }
+  //   lighten(v: string | number): Color {
+  //     if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+  //       this.l += v / 100;
+  //     } else if ("number" == typeof v) {
+  //       if (v >= -1.0 && v <= 1.0) {
+  //         // range 0.0...1.0
+  //         this.l += v;
+  //       } else {
+  //         // range 255
+  //         this.l += v / 255;
+  //       }
+  //     } else {
+  //       throw new Error("error: bad modifier format (percent or number)");
+  //     }
+  //     if (this.l > 1) this.l = 1;
+  //     else if (this.l < 0) this.l = 0;
+  //     Color.Converter.HSLToRGB(this);
+  //     return this;
+  //   }
   lighten(v: string | number): Color {
     if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
-      this.l += v / 100;
+      this.l += (1 - this.l) * (v / 100);
     } else if ("number" == typeof v) {
       if (v >= -1.0 && v <= 1.0) {
         // range 0.0...1.0
-        this.l += v;
+        this.l += (1 - this.l) * v;
       } else {
         // range 255
-        this.l += v / 255;
+        this.l += (1 - this.l) * (v / 255);
       }
     } else {
       throw new Error("error: bad modifier format (percent or number)");
@@ -292,7 +312,22 @@ export class Color {
     return this;
   }
   darken(v: string | number): Color {
-    this.lighten(typeof v === "string" ? "-" + v : -v);
+    if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+      this.l -= this.l * (v / 100);
+    } else if ("number" == typeof v) {
+      if (v >= -1.0 && v <= 1.0) {
+        // range 0.0...1.0
+        this.l -= this.l * v;
+      } else {
+        // range 255
+        this.l -= this.l * (v / 255);
+      }
+    } else {
+      throw new Error("error: bad modifier format (percent or number)");
+    }
+    if (this.l > 1) this.l = 1;
+    else if (this.l < 0) this.l = 0;
+    Color.Converter.HSLToRGB(this);
     return this;
   }
   fadein(v: string | number): Color {

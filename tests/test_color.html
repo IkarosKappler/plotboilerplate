@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>2D Plotting Boilerplate - Lightning Algorithm</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, function, graph, plot">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2021-10-04">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Demo of visualising the Lightning Algorithm with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demo of visualising the Lightning Algorithm with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20211006-4-lightning-algorithm.png">
+
+    <!-- Polyfills for IE -->
+    <script src="../lib/globalthis-polyfill.min.js"></script> 
+    <!-- <script src="../../lib/path2d-polyfill.min.js"></script> -->
+    
+    <!-- <script src="../../lib/humane.min.js"></script> -->
+    <script src="../lib/dat.gui.min.js"></script>
+    <!-- <script src="../../lib/FileSaver.min.js"></script> -->
+    <!-- <script src="../../lib/Color.js"></script> -->
+    <!-- <script src="../../lib/alloy_finger.js"></script> -->
+    <!-- <script src="../../lib/uistats.min.js"></script> -->
+    
+    <script src="../src/cjs/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script> 
+    <!-- <script src="../../src/cjs/utils/creategui.js"></script> -->
+    <script src="../src/cjs/utils/module.js"></script>
+    <!-- <script src="../../src/cjs/utils/gup.js"></script>
+    <script src="../../src/cjs/utils/dom/getFProp.js"></script>
+    <script src="../../src/cjs/utils/dom/getAvailableContainerSpace.js"></script>
+     -->
+    <!-- For development -->
+    <!--
+      <script src="../../src/js/UIDGenerator.js"></script>
+      <script src="../../src/js/VertexAttr.js"></script>
+      <script src="../../src/js/VertexListeners.js"></script>
+      <script src="../../src/js/VertTuple.js"></script>
+      <script src="../../src/js/Vertex.js"></script>
+      <script src="../../src/js/Bounds.js"></script>
+      <script src="../../src/js/Grid.js"></script>
+      <script src="../../src/js/Line.js"></script>
+      <script src="../../src/js/Vector.js"></script>
+      <script src="../../src/js/CubicBezierCurve.js"></script>
+      <script src="../../src/js/BezierPath.js"></script>
+      <script src="../../src/js/Polygon.js"></script>
+      <script src="../../src/js/Triangle.js"></script>
+      <script src="../../src/js/VEllipse.js"></script>
+      <script src="../../src/js/Circle.js"></script>
+      <script src="../../src/js/CircleSector.js"></script>
+      <script src="../../src/js/PBImage.js"></script>
+      <script src="../../src/js/MouseHandler.js"></script>
+      <script src="../../src/js/KeyHandler.js"></script>
+      <script src="../../src/js/draw.js"></script>
+      <script src="../../src/js/utils/helpers/drawutilssvg.js"></script>
+      <script src="../../src/js/geomutils.js"></script>
+      <script src="../../src/js/SVGBuilder.js"></script>
+      <script src="../../src/js/PlotBoilerplate.js"></script> -->
+      <!-- END for development -->
+      
+      <!-- For production -->
+      <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
+      <!-- END For production -->
+      
+      <!-- <script src="../VertexAnimator.Linear.js"></script> -->
+      <script src="../src/cjs/utils/datastructures/Color.js"></script>
+      <!-- <script src="../../src/cjs/utils/WebColors.js"></script>
+      <script src="../../src/cjs/utils/WebColorsContrast.js"></script> -->
+      <!-- <script src="../demos/getContrastColor.js"></script> -->
+      <script src="../src/cjs/utils/algorithms/getContrastColor.js"></script>
+      <script src="../demos/isMobileDevice.js"></script>
+      <!-- <script src="../removeAllChildNodes.js"></script>
+      <script src="../removeChildNodesByClass.js"></script>
+      <script src="../modal.js"></script>
+      <script src="makeCustomStyleDefs.js"></script>
+      <script src="ConwayPresets.js"></script>
+      <script src="drawConfig.js"></script>
+      <script src="turnMatrixLeft.js"></script>
+      <script src="detectDarkMode.js"></script> -->
+      <script src="test_color.js"></script>
+    
+    
+    <!-- <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> -->
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="color-wrapper" data-modifier="lighten">
+        <div class="color-display"></div>
+        <div class="color-info">
+            <div>Lighten</div>
+            <div><input type="range" value="0" min="0" max="255" step="1"/> [0,255]</div>
+            <div><input type="range" value="0.0" min="0.0" max="1.0" step="0.1"/> [0.0,1.0]</div>
+        </div>
+    </div>
+    <div class="color-wrapper" data-modifier="darken">
+      <div class="color-display"></div>
+      <div class="color-info">
+          <div>Darken</div>
+          <div><input type="range" value="0" min="0" max="255" step="1"/> [0,255]</div>
+          <div><input type="range" value="0.0" min="0.0" max="1.0" step="0.1"/> [0.0,1.0]</div>
+      </div>
+  </div>
+  </body>
+</html>

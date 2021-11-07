@@ -1,5 +1,8 @@
 # Changelog
 
+- 2021-11.07
+  - Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
+  - Added tests for the Color class. There were some strange things happening the the `ligthen` and `darken` function.
 - 2021-11-05
   - Fixing the regex in the Color.parse() function for parsing rgba-strings.
 - 2021-10-12
