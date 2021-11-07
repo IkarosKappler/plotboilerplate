@@ -91,7 +91,7 @@
   </head>
   <body>
     <div class="color-wrapper" data-modifier="lighten">
-        <div class="color-display"></div>
+        <div class="color-display-wrapper"><div class="color-display"></div></div>
         <div class="color-info">
             <div>Lighten</div>
             <div><input type="range" value="0" min="0" max="255" step="1"/> [0,255]</div>
@@ -99,12 +99,44 @@
         </div>
     </div>
     <div class="color-wrapper" data-modifier="darken">
-      <div class="color-display"></div>
+      <div class="color-display-wrapper"><div class="color-display"></div></div>
       <div class="color-info">
           <div>Darken</div>
           <div><input type="range" value="0" min="0" max="255" step="1"/> [0,255]</div>
           <div><input type="range" value="0.0" min="0.0" max="1.0" step="0.1"/> [0.0,1.0]</div>
       </div>
-  </div>
+    </div>
+    <div class="color-wrapper" data-modifier="saturate">
+      <div class="color-display-wrapper"><div class="color-display"></div></div>
+      <div class="color-info">
+          <div>Saturate</div>
+          <div><input type="range" value="0" min="0" max="255" step="1"/> [0,255]</div>
+          <div><input type="range" value="0.0" min="0.0" max="1.0" step="0.1"/> [0.0,1.0]</div>
+      </div>
+    </div>
+    <div class="color-wrapper" data-modifier="desaturate">
+      <div class="color-display-wrapper"><div class="color-display"></div></div>
+      <div class="color-info">
+          <div>Desaturate</div>
+          <div><input type="range" value="0" min="0" max="255" step="1"/> [0,255]</div>
+          <div><input type="range" value="0.0" min="0.0" max="1.0" step="0.1"/> [0.0,1.0]</div>
+      </div>
+    </div>
+    <div class="color-wrapper" data-modifier="fadein">
+      <div class="color-display-wrapper"><div class="color-display"></div></div>
+      <div class="color-info">
+          <div>Fadein</div>
+          <div><input type="range" value="0" min="0" max="255" step="1"/> [0,255]</div>
+          <div><input type="range" value="0.0" min="0.0" max="1.0" step="0.1"/> [0.0,1.0]</div>
+      </div>
+    </div>
+    <div class="color-wrapper" data-modifier="fadeout">
+      <div class="color-display-wrapper"><div class="color-display"></div></div>
+      <div class="color-info">
+          <div>Fadeout</div>
+          <div><input type="range" value="0" min="0" max="255" step="1"/> [0,255]</div>
+          <div><input type="range" value="0.0" min="0.0" max="1.0" step="0.1"/> [0.0,1.0]</div>
+      </div>
+    </div>
   </body>
 </html>

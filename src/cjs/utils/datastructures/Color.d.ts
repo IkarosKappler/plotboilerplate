@@ -10,6 +10,10 @@
  * @modified 2021-02-08 Added basic tsdoc/jsdoc comments.
  * @modified 2021-11-05 Fixing the regex to parse rgba-strings.
  * @modified 2021-11-05 Added return value `this` to all modifier functions (for chaining).
+ * @modified 2021-11-07 Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
+ * @modified 2021-11-07 Did the same with `saturate` and `desaturate`.
+ * @modified 2021-11-07 Did the same with the `fadein` and `fadeout` functions.
+ * @modified 2021-11-07 Added setRed, setGreen, setBlue, setHue, setSaturation, setLiminance functions.
  * @version 0.0.10
  **/
 /**
@@ -120,6 +124,13 @@ export declare class Color {
      * @return {number} A value between 0.0 and 1.0.
      */
     blue(): number;
+    setRed(r: number): this;
+    setBlue(b: number): this;
+    setAlpha(a: number): this;
+    setGreen(g: number): this;
+    setHue(h: number): this;
+    setSaturation(s: number): this;
+    setLuminance(l: number): this;
     /**
      * Get this color as a CSS `hsl` string.
      *

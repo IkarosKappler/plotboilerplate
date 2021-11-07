@@ -18,6 +18,8 @@
 
   // Fetch the GET params
   let GUP = gup();
+  globalThis.isDarkMode = detectDarkMode(GUP); // After GUP was initalized
+  console.log("isDarkMode", isDarkMode);
 
   window.addEventListener("load", function () {
     // THIS DEMO WORKS A BIT DIFFERENT THAN THE OTHERS.
@@ -277,36 +279,21 @@
               var alpha = diff <= config.traceFalloff ? diff / config.traceFalloff : 1.0;
               // rectangle.setAttribute("fill", "rgba(255,255,255," + alpha + ")");
               if (config.drawTraces && alpha < 0.9) {
-                traceColor.a = alpha * 0.5;
-                // rectangle.setAttribute("fill", traceColor.cssRGBA());
-                // rectangle.setAttribute("fill", traceColor.cssRGBA());
-                if (globalThis.isDarkMode) {
-                  rectangle.setAttribute(
-                    "fill",
-                    "rgb(" +
-                      traceColor.r * 128 * (1 - alpha) +
-                      "," +
-                      traceColor.g * 128 * (1 - alpha) +
-                      "," +
-                      traceColor.b * 128 * (1 - alpha) +
-                      ")"
-                  );
-                } else {
-                  // console.log("traceColor, ", traceColor);
-                  rectangle.setAttribute(
-                    "fill",
-                    "rgb(" +
-                      (127 + (1 - traceColor.r) * 127 * alpha) +
-                      "," +
-                      (127 + (1 - traceColor.g) * 127 * alpha) +
-                      "," +
-                      (127 + (1 - traceColor.b) * 127 * alpha) +
-                      ")"
-                  );
+                if (stepNumber < 5) {
+                  console.log("alpha", alpha);
                 }
+                rectangle.setAttribute(
+                  "fill",
+                  traceColor
+                    .clone()
+                    // .fadeout(1 - alpha)
+                    .setAlpha(1 - alpha)
+                    .cssRGBA()
+                );
               } else {
                 // backgroundColor.a = alpha;
-                rectangle.setAttribute("fill", backgroundColor.cssRGBA());
+                // console.log("backgroundColor");
+                rectangle.setAttribute("fill", backgroundColor.cssRGB());
               }
             }
           }

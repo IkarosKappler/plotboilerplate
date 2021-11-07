@@ -15,7 +15,7 @@
   window.addEventListener("load", function () {
     var config = {
       guiDoubleSize: false,
-      color: "rgb(0,167,185)"
+      color: "rgba(0,167,185,1)"
     };
 
     var showColor = function () {
@@ -46,27 +46,6 @@
     // gui.addColor(config, "traceColor").title("The color of traces.").onChange(visualizeCreatures);
     // gui.addColor(config, "borderColor").title("The color of borders.").onChange(visualizeCreatures);
 
-    // // Test Color:
-    // var colorStrings = [
-    //   "rgba(0,0,0,0.5)",
-    //   "rgba(255,255,255,1.0)",
-    //   "rgba(0,28,64,0)",
-    //   "rgba(1,2,3,1)",
-    //   "rgba( 1 , 2 , 3 , 0.5 )",
-    //   "rgba( 2, 3,4, .5)",
-
-    //   "rgb(0,0,0)",
-    //   "rgb(255,255,255)",
-    //   "rgb(0,28,64)",
-    //   "rgb(1,2,3)",
-    //   "rgb( 1 , 2 , 3  )",
-    //   "rgb( 2, 3,4)"
-    // ];
-    // for (var i = 0; i < colorStrings.length; i++) {
-    //   console.log("string: " + colorStrings[i]);
-    //   console.log("color:" + Color.parse(colorStrings[i]));
-    // }
-
     var applyModifier = function (modifierName, value, colorDisplayElem) {
       // Convert color string to color instance.
       var color = Color.parse(config.color);
@@ -75,13 +54,15 @@
       if (!modifierFunction) {
         console.log(Color);
         console.warn("The modifier " + modifierName + " was not found in the Color class.");
-        // TODO: show an error indicator
+        // TODO: show an error indicator?
         return;
       }
+      console.log("Apply modifier", modifierName, value);
       modifierFunction.call(color, value);
       colorDisplayElem.innerHTML = color.cssRGBA();
       colorDisplayElem.style["background-color"] = color.cssRGBA();
       colorDisplayElem.style["color"] = getContrastColor(color).cssRGBA();
+      console.log("newColor", color.cssRGBA());
       console.log("contrastColor", getContrastColor(color).cssRGBA());
     };
 
@@ -93,7 +74,34 @@
       elem.addEventListener("change", function (event) {
         applyModifier(modifierName, Number(event.target.value), elem.getElementsByClassName("color-display")[0]);
       });
+      console.log("elem,", elem.value);
+      applyModifier(
+        modifierName,
+        Number(elem.getElementsByTagName("input")[0].value),
+        elem.getElementsByClassName("color-display")[0]
+      );
     });
+
+    // // Test Color parser:
+    var colorStrings = [
+      "rgba(0,0,0,0.5)",
+      "rgba(255,255,255,1.0)",
+      "rgba(0,28,64,0)",
+      "rgba(1,2,3,1)",
+      "rgba( 1 , 2 , 3 , 0.5 )",
+      "rgba( 2, 3,4, .5)",
+
+      "rgb(0,0,0)",
+      "rgb(255,255,255)",
+      "rgb(0,28,64)",
+      "rgb(1,2,3)",
+      "rgb( 1 , 2 , 3  )",
+      "rgb( 2, 3,4)"
+    ];
+    for (var i = 0; i < colorStrings.length; i++) {
+      console.log("string: " + colorStrings[i]);
+      console.log("color:" + Color.parse(colorStrings[i]));
+    }
 
     showColor();
   });

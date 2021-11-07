@@ -11,6 +11,10 @@
  * @modified 2021-02-08 Added basic tsdoc/jsdoc comments.
  * @modified 2021-11-05 Fixing the regex to parse rgba-strings.
  * @modified 2021-11-05 Added return value `this` to all modifier functions (for chaining).
+ * @modified 2021-11-07 Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
+ * @modified 2021-11-07 Did the same with `saturate` and `desaturate`.
+ * @modified 2021-11-07 Did the same with the `fadein` and `fadeout` functions.
+ * @modified 2021-11-07 Added setRed, setGreen, setBlue, setHue, setSaturation, setLiminance functions.
  * @version 0.0.10
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -61,7 +65,7 @@ var Color = /** @class */ (function () {
      * @return {string} This color as a CSS rgba string.
      */
     Color.prototype.cssRGBA = function () {
-        return "rgba(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + "," + (this.a ? this.a : 1.0) + ")";
+        return "rgba(" + Math.round(255 * this.r) + "," + Math.round(255 * this.g) + "," + Math.round(255 * this.b) + "," + this.a + ")";
     };
     /**
      * Get the red component of this RGB(A)color. This method just returns the `r` color attribute.
@@ -95,6 +99,34 @@ var Color = /** @class */ (function () {
      */
     Color.prototype.blue = function () {
         return this.b;
+    };
+    Color.prototype.setRed = function (r) {
+        this.r = r;
+        return this;
+    };
+    Color.prototype.setBlue = function (b) {
+        this.b = b;
+        return this;
+    };
+    Color.prototype.setAlpha = function (a) {
+        this.a = a;
+        return this;
+    };
+    Color.prototype.setGreen = function (g) {
+        this.g = g;
+        return this;
+    };
+    Color.prototype.setHue = function (h) {
+        this.h = h;
+        return this;
+    };
+    Color.prototype.setSaturation = function (s) {
+        this.s = s;
+        return this;
+    };
+    Color.prototype.setLuminance = function (l) {
+        this.l = l;
+        return this;
     };
     // --- HSL ----------------------------------
     /**
@@ -191,14 +223,37 @@ var Color = /** @class */ (function () {
         return this.a;
     };
     // --- Modifiers ----------------------------------
+    //   saturate(v: string | number): Color {
+    //     if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+    //       this.s += v / 100;
+    //     } else if ("number" == typeof v) {
+    //       // range 255
+    //       this.s += v / 255;
+    //     } else {
+    //       throw new Error("error: bad modifier format (percent or number)");
+    //     }
+    //     if (this.s > 1) this.s = 1;
+    //     else if (this.s < 0) this.s = 0;
+    //     Color.Converter.HSLToRGB(this);
+    //     return this;
+    //   }
     Color.prototype.saturate = function (v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
-            this.s += v / 100;
-        else if ("number" == typeof v)
-            // range 255
-            this.s += v / 255;
-        else
+        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+            this.s += (1 - this.s) * (v / 100);
+        }
+        else if ("number" == typeof v) {
+            if (v >= -0.0 && v <= 1.0) {
+                // range 255
+                this.s += (1 - this.s) * v;
+            }
+            else {
+                // range 0-1
+                this.s += (1 - this.s) * (v / 255);
+            }
+        }
+        else {
             throw new Error("error: bad modifier format (percent or number)");
+        }
         if (this.s > 1)
             this.s = 1;
         else if (this.s < 0)
@@ -207,7 +262,27 @@ var Color = /** @class */ (function () {
         return this;
     };
     Color.prototype.desaturate = function (v) {
-        this.saturate("-" + v);
+        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+            this.s -= v / 100;
+        }
+        else if ("number" == typeof v) {
+            if (v >= 0.0 && v <= 1.0) {
+                // range 255
+                this.s -= this.s * v;
+            }
+            else {
+                // range 0-1
+                this.s -= this.s * (v / 255);
+            }
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        if (this.s > 1)
+            this.s = 1;
+        else if (this.s < 0)
+            this.s = 0;
+        Color.Converter.HSLToRGB(this);
         return this;
     };
     //   lighten(v: string | number): Color {
@@ -234,7 +309,7 @@ var Color = /** @class */ (function () {
             this.l += (1 - this.l) * (v / 100);
         }
         else if ("number" == typeof v) {
-            if (v >= -1.0 && v <= 1.0) {
+            if (v >= 0.0 && v <= 1.0) {
                 // range 0.0...1.0
                 this.l += (1 - this.l) * v;
             }
@@ -253,16 +328,12 @@ var Color = /** @class */ (function () {
         Color.Converter.HSLToRGB(this);
         return this;
     };
-    //   darken(v: string | number): Color {
-    //     this.lighten(typeof v === "string" ? "-" + v : -v);
-    //     return this;
-    //   }
     Color.prototype.darken = function (v) {
         if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
             this.l -= this.l * (v / 100);
         }
         else if ("number" == typeof v) {
-            if (v >= -1.0 && v <= 1.0) {
+            if (v >= 0.0 && v <= 1.0) {
                 // range 0.0...1.0
                 this.l -= this.l * v;
             }
@@ -282,13 +353,22 @@ var Color = /** @class */ (function () {
         return this;
     };
     Color.prototype.fadein = function (v) {
-        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN)
-            this.a += v / 100;
-        else if ("number" == typeof v)
-            // range 255
-            this.a += v / 255;
-        else
+        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+            this.a += (1 - this.a) * (v / 100);
+        }
+        else if ("number" == typeof v) {
+            if (v >= 0.0 && v <= 1.0) {
+                // range 0-1
+                this.a += (1 - this.a) * v;
+            }
+            else {
+                // range 255
+                this.a += (1 - this.a) * (v / 255);
+            }
+        }
+        else {
             throw new Error("error: bad modifier format (percent or number)");
+        }
         if (this.a > 1)
             this.a = 1;
         else if (this.a < 0)
@@ -297,7 +377,27 @@ var Color = /** @class */ (function () {
         return this;
     };
     Color.prototype.fadeout = function (v) {
-        this.fadein("-" + v);
+        if ("string" == typeof v && v.indexOf("%") > -1 && (v = parseInt(v)) != NaN) {
+            this.a -= v / 100;
+        }
+        else if ("number" == typeof v) {
+            if (v >= 0.0 && v <= 1.0) {
+                // range 0-1
+                this.a -= v;
+            }
+            else {
+                // range 255
+                this.a -= v / 255;
+            }
+        }
+        else {
+            throw new Error("error: bad modifier format (percent or number)");
+        }
+        if (this.a > 1)
+            this.a = 1;
+        else if (this.a < 0)
+            this.a = 0;
+        Color.Converter.HSLToRGB(this);
         return this;
     };
     Color.prototype.spin = function (v) {
@@ -325,12 +425,13 @@ var Color = /** @class */ (function () {
         if (arguments.length < 3 || arguments.length > 4)
             throw new Error("error: 3 or 4 arguments");
         sanitized = Color.Sanitizer.RGB(arguments[0], arguments[1], arguments[2]);
-        // console.log("sanitized", sanitized);
         c.r = sanitized[0];
         c.g = sanitized[1];
         c.b = sanitized[2];
         if (arguments.length == 4)
             c.a = arguments[3];
+        else
+            c.a = 1.0;
         Color.Converter.RGBToHSL(c);
         return c;
     };
@@ -453,7 +554,6 @@ var Color = /** @class */ (function () {
                     o[i] = c / 100;
                 }
                 else {
-                    // console.log( 'allAreFrac', allAreFrac, arguments );
                     if ("string" == typeof c && (c = parseInt(c)) == NaN) {
                         throw new Error("Bad format");
                     }
