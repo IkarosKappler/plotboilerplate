@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2021-10-07
+date: 2021-11-08
 ---
 
 <h3>Basics</h3>
@@ -193,6 +193,11 @@ date: 2021-10-07
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/36-lightning-algorithm/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20211006-4-lightning-algorithm.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/37-conways-game-of-life/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20211108-1-conway.png');"></div>
    </a>
 </div>
 </div>
