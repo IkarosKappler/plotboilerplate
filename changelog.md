@@ -1,5 +1,13 @@
 # Changelog
 
+- 2021-11.07
+  - Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
+  - Added tests for the Color class. There were some strange things happening the the `ligthen` and `darken` function.
+  - Did the same with `saturate` and `desaturate`.
+  - Did the same with the `fadein` and `fadeout` functions.
+  - Added setR, setG, setB, setH, setS, setL functions to the Color class.
+- 2021-11-05
+  - Fixing the regex in the Color.parse() function for parsing rgba-strings.
 - 2021-10-12
   - Added `DrawConfig.bezier.pathVertex` and `DrawConfig.bezier.controlVertex` attributes, both `DrawSettigs`.
   - Added optional `fill:boolean` to `DrawSettings`. This is useful to give more control over the rendering of Bézier paths.

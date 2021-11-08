@@ -1,0 +1,40 @@
+.color-wrapper {
+  width: 100%;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: row;
+}
+
+.color-wrapper div {
+  display: inline-flex;
+}
+
+.color-wrapper .color-display-wrapper {
+  /* width: 100%; */
+  height: 100%;
+  background: #eee
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" fill-opacity=".25" ><rect x="200" width="200" height="200" /><rect y="200" width="200" height="200" /></svg>');
+  background-size: 30px 30px;
+}
+
+.color-wrapper .color-display-wrapper .color-display {
+  border: 1px solid white;
+  width: 16vh;
+  height: 16vh;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.color-wrapper .color-info {
+  flex-direction: column;
+}
+
+.color-wrapper .color-info * {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.background {
+}

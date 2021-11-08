@@ -33,6 +33,7 @@
 - Remove all <div id="dialog-wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
 - Remove SVGBuilder from Girih-demo.
 - Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
+- Port `addContrastColor` function to typescript and add to the helpers (in demos now are pure JS).
 
 ### Todos for future Version 2
 

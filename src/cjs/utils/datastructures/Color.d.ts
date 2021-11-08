@@ -8,7 +8,13 @@
  * @modified 2020-10-23 Ported to Typescript.
  * @modified 2021-02-08 Fixed a lot of es2015 compatibility issues.
  * @modified 2021-02-08 Added basic tsdoc/jsdoc comments.
- * @version 0.0.9
+ * @modified 2021-11-05 Fixing the regex to parse rgba-strings.
+ * @modified 2021-11-05 Added return value `this` to all modifier functions (for chaining).
+ * @modified 2021-11-07 Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
+ * @modified 2021-11-07 Did the same with `saturate` and `desaturate`.
+ * @modified 2021-11-07 Did the same with the `fadein` and `fadeout` functions.
+ * @modified 2021-11-07 Added setRed, setGreen, setBlue, setHue, setSaturation, setLiminance functions.
+ * @version 0.0.10
  **/
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.
@@ -101,13 +107,13 @@ export declare class Color {
      */
     red(): number;
     /**
-    * Get the green component of this RGB(A) color. This method just returns the `g` color attribute.
-    *
-    * @method green
-    * @instance
-    * @memberof Color
-    * @return {number} A value between 0.0 and 1.0.
-    */
+     * Get the green component of this RGB(A) color. This method just returns the `g` color attribute.
+     *
+     * @method green
+     * @instance
+     * @memberof Color
+     * @return {number} A value between 0.0 and 1.0.
+     */
     green(): number;
     /**
      * Get the blue component of this RGB(A) color. This method just returns the `b` color attribute.
@@ -118,6 +124,13 @@ export declare class Color {
      * @return {number} A value between 0.0 and 1.0.
      */
     blue(): number;
+    setRed(r: number): this;
+    setBlue(b: number): this;
+    setAlpha(a: number): this;
+    setGreen(g: number): this;
+    setHue(h: number): this;
+    setSaturation(s: number): this;
+    setLuminance(l: number): this;
     /**
      * Get this color as a CSS `hsl` string.
      *
@@ -181,13 +194,13 @@ export declare class Color {
      * @return {number} A value between 0.0 and 1.0.
      */
     alpha(): number;
-    saturate(v: string | number): void;
-    desaturate(v: string | number): void;
-    lighten(v: string | number): void;
-    darken(v: string | number): void;
-    fadein(v: string | number): void;
-    fadeout(v: string | number): void;
-    spin(v: string | number): void;
+    saturate(v: string | number): Color;
+    desaturate(v: string | number): Color;
+    lighten(v: string | number): Color;
+    darken(v: string | number): Color;
+    fadein(v: string | number): Color;
+    fadeout(v: string | number): Color;
+    spin(v: string | number): Color;
     static makeRGB(...args: any[]): Color;
     static makeHSL(...args: Array<number | string>): Color;
     static makeHEX(value: string): Color;

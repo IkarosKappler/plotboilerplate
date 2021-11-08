@@ -1,7 +1,5 @@
 /**
- * A demo to visualize the 'lightning algorithm' as depicted in Numberphile's
- * and Matt Henderson's video:
- * https://www.youtube.com/watch?v=akZ8JJ4gGLs
+ * Conway's game f life.
  *
  * @requires PlotBoilerplate
  * @requires MouseHandler
@@ -11,7 +9,7 @@
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
- * @date        2021-10-04
+ * @date        2021-10-16
  * @version     1.0.0
  **/
 
@@ -135,10 +133,8 @@
       tosvgFill.curClassName = "background";
       tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, "#888888", 0);
       mazeMatrix = [];
-      //   for (var i = 0; i < config.mazeWidth; i++) {
       for (var j = 0; j < config.mazeHeight; j++) {
         mazeMatrix.push([]);
-        // for (var j = 0; j < config.mazeHeight; j++) {
         for (var i = 0; i < config.mazeWidth; i++) {
           // Define the square's borders
           var borders = BORDER_NONE;
