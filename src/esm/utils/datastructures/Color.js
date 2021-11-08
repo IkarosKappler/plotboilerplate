@@ -103,26 +103,32 @@ export class Color {
     }
     setBlue(b) {
         this.b = b;
+        Color.Converter.RGBToHSL(this);
         return this;
     }
     setAlpha(a) {
         this.a = a;
+        Color.Converter.RGBToHSL(this);
         return this;
     }
     setGreen(g) {
         this.g = g;
+        Color.Converter.RGBToHSL(this);
         return this;
     }
     setHue(h) {
         this.h = h;
+        Color.Converter.HSLToRGB(this);
         return this;
     }
     setSaturation(s) {
         this.s = s;
+        Color.Converter.HSLToRGB(this);
         return this;
     }
     setLuminance(l) {
         this.l = l;
+        Color.Converter.HSLToRGB(this);
         return this;
     }
     // --- HSL ----------------------------------

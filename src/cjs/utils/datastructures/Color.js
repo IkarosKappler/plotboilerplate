@@ -106,26 +106,32 @@ var Color = /** @class */ (function () {
     };
     Color.prototype.setBlue = function (b) {
         this.b = b;
+        Color.Converter.RGBToHSL(this);
         return this;
     };
     Color.prototype.setAlpha = function (a) {
         this.a = a;
+        Color.Converter.RGBToHSL(this);
         return this;
     };
     Color.prototype.setGreen = function (g) {
         this.g = g;
+        Color.Converter.RGBToHSL(this);
         return this;
     };
     Color.prototype.setHue = function (h) {
         this.h = h;
+        Color.Converter.HSLToRGB(this);
         return this;
     };
     Color.prototype.setSaturation = function (s) {
         this.s = s;
+        Color.Converter.HSLToRGB(this);
         return this;
     };
     Color.prototype.setLuminance = function (l) {
         this.l = l;
+        Color.Converter.HSLToRGB(this);
         return this;
     };
     // --- HSL ----------------------------------

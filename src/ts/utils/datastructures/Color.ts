@@ -160,31 +160,37 @@ export class Color {
 
   setBlue(b: number) {
     this.b = b;
+    Color.Converter.RGBToHSL(this);
     return this;
   }
 
   setAlpha(a: number) {
     this.a = a;
+    Color.Converter.RGBToHSL(this);
     return this;
   }
 
   setGreen(g: number) {
     this.g = g;
+    Color.Converter.RGBToHSL(this);
     return this;
   }
 
   setHue(h: number) {
     this.h = h;
+    Color.Converter.HSLToRGB(this);
     return this;
   }
 
   setSaturation(s: number) {
     this.s = s;
+    Color.Converter.HSLToRGB(this);
     return this;
   }
 
   setLuminance(l: number) {
     this.l = l;
+    Color.Converter.HSLToRGB(this);
     return this;
   }
 
