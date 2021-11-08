@@ -1,11 +1,10 @@
 /**
  * A demo to visualize 'Conway's Game Of Life'.
  *
- * @requires PlotBoilerplate
- * @requires MouseHandler
+ * @requires getAvailableContainerSpace
+ * @requires drawutilssvg
  * @requires gup
  * @requires dat.gui
- * @requires draw
  *
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
@@ -19,7 +18,6 @@
   // Fetch the GET params
   var GUP = gup();
   globalThis.isDarkMode = detectDarkMode(GUP); // After GUP was initalized
-  console.log("isDarkMode", isDarkMode);
 
   window.addEventListener("load", function () {
     // THIS DEMO WORKS A BIT DIFFERENT THAN THE OTHERS.
@@ -38,8 +36,9 @@
 
         cellWidth: 32,
         cellHeight: 32,
-        borderSize: 2,
+        marginSize: 2,
         traceFalloff: 10, // Draw n steps behind being alive
+        traceAlpha: 0.3,
         drawTraces: true,
 
         randomizationThreshold: 0.5,
@@ -133,8 +132,6 @@
       tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
       biotopeSize.width = Math.floor(canvasSize.width / config.cellWidth);
       biotopeSize.height = Math.floor(canvasSize.height / config.cellHeight);
-      // var styleDefs = makeCustomStyleDefs(config, innerSquareSize);
-      // tosvgDraw.addCustomStyleDefs(styleDefs);
     };
 
     // interface CellState {
@@ -169,7 +166,8 @@
       tosvgFill.curId = "background";
       // tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, "#888888", 0);
       // The 'borders' will just be the background shining through.
-      tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, config.borderColor, 0);
+      // tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, config.borderColor, 0);
+      tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, config.backgroundColor, 0);
       biome = [];
       for (var j = 0; j < biotopeSize.height; j++) {
         var row = [];
@@ -180,8 +178,8 @@
           tosvgFill.curId = "cell-" + j + "-" + i;
           tosvgFill.rect(
             { x: i * config.cellWidth, y: j * config.cellHeight },
-            config.cellWidth - config.borderSize,
-            config.cellHeight - config.borderSize,
+            config.cellWidth - config.marginSize,
+            config.cellHeight - config.marginSize,
             "#ffffff",
             1
           );
@@ -253,10 +251,13 @@
       var borderColor = Color.parse(config.borderColor);
       var presetColor = Color.parse(config.presetColor);
       var presetColorAlive = Color.makeRGB(presetColor.r * 128, presetColor.g * 128, presetColor.b * 128);
+      // console.log("visualizeCreatures traceColor", traceColor);
       for (var j = 0; j < biome.length; j++) {
         for (var i = 0; i < biome[j].length; i++) {
           // Fetch the SVG rectangle
           var rectangle = document.getElementById("cell-" + j + "-" + i);
+          rectangle.setAttribute("stroke", config.borderColor);
+          rectangle.setAttribute("stroke-width", 0.5);
           // Visualize preset, if there currently is one
           // Checl if the current position is inside the selected preset
           if (
@@ -274,25 +275,12 @@
             } else {
               var diff = stepNumber - biome[j][i].lastAliveStep;
               var alpha = diff <= config.traceFalloff ? diff / config.traceFalloff : 1.0;
-              // alpha = Math.max(1.0, alpha * 2);
-              if (stepNumber < 5) {
-                console.log("color", traceColor);
-                console.log("alpha", alpha, "color", traceColor.cssRGBA());
-              }
-              // rectangle.setAttribute("fill", "rgba(255,255,255," + alpha + ")");
               if (config.drawTraces && alpha < 0.9) {
-                if (stepNumber < 10) {
-                  console.log("alpha", alpha, traceColor);
-                }
-                rectangle.setAttribute(
-                  "fill",
-                  traceColor
-                    .clone()
-                    // .fadeout(1 - alpha)
-                    // .setAlpha(1 - alpha)
-                    .fadeout(alpha)
-                    .cssRGBA()
-                );
+                var cellColor = traceColor.clone().fadeout(config.traceAlpha + (1 - config.traceAlpha) * alpha);
+                // if (stepNumber < 5) {
+                //   console.log("alpha", alpha, "traceColor", traceColor.cssRGBA(), "cellColor", cellColor.cssRGBA(), cellColor);
+                // }
+                rectangle.setAttribute("fill", cellColor.cssRGBA());
               } else {
                 // backgroundColor.a = alpha;
                 // console.log("backgroundColor");
@@ -303,7 +291,7 @@
         }
       }
       // Set the background rect's color to change the 'border' color
-      document.getElementById("background").setAttribute("fill", config.borderColor);
+      document.getElementById("background").setAttribute("fill", config.backgroundColor);
     };
 
     // +---------------------------------------------------------------------------------
@@ -523,20 +511,24 @@
     f0.add(config, "animate").title("Toggle animation on/off.").onChange(startAnimation);
     f0.add(config, "animationDelay").min(10).max(1000).title("The delay in milliseconds between frames.");
     f0.add(config, "drawTraces").title("Draw traces?");
+    f0.add(config, "traceAlpha").min(0.0).max(1.0).title("The all over alpha base value for traces.");
     f0.add(config, "traceFalloff").min(1).max(32).title("How many steps into the past should life be visible?");
 
     // prettier-ignore
-    f0.add(config, "borderSize").min(0).max(10).step(1).title("borderSize").onChange(function () {
+    f0.add(config, "marginSize").min(0).max(10).step(1).title("marginSize").onChange(function () {
         rebuildBiotope(false);
+        visualizeCreatures();
       });
     // prettier-ignore
     f0.add(config, "cellWidth").min(2).max(100).title("cellWidth").onChange(function () {
         rebuildBiotope(false);
+        visualizeCreatures();
       });
     // prettier-ignore
     f0.add(config, "cellHeight").min(2).max(100).title("cellHeight")
       .onChange(function () {
         rebuildBiotope(false);
+        visualizeCreatures();
       });
 
     // prettier-ignore
@@ -579,27 +571,6 @@
         currentPreset = null;
       }
     }
-
-    // // Test Color:
-    // var colorStrings = [
-    //   "rgba(0,0,0,0.5)",
-    //   "rgba(255,255,255,1.0)",
-    //   "rgba(0,28,64,0)",
-    //   "rgba(1,2,3,1)",
-    //   "rgba( 1 , 2 , 3 , 0.5 )",
-    //   "rgba( 2, 3,4, .5)",
-
-    //   "rgb(0,0,0)",
-    //   "rgb(255,255,255)",
-    //   "rgb(0,28,64)",
-    //   "rgb(1,2,3)",
-    //   "rgb( 1 , 2 , 3  )",
-    //   "rgb( 2, 3,4)"
-    // ];
-    // for (var i = 0; i < colorStrings.length; i++) {
-    //   console.log("string: " + colorStrings[i]);
-    //   console.log("color:" + Color.parse(colorStrings[i]));
-    // }
 
     visualizeCreatures();
     startAnimation();

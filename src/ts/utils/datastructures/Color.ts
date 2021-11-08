@@ -464,8 +464,11 @@ export class Color {
     c.r = sanitized[0];
     c.g = sanitized[1];
     c.b = sanitized[2];
-    if (arguments.length == 4) c.a = arguments[3];
-    else c.a = 1.0;
+    if (arguments.length == 4) {
+      c.a = arguments[3];
+    } else {
+      c.a = 1.0;
+    }
     Color.Converter.RGBToHSL(c);
     return c;
   }
@@ -479,6 +482,7 @@ export class Color {
     c.s = sanitized[1];
     c.l = sanitized[2];
     if (arguments.length == 4) c.a = arguments[3];
+    else c.a = 1.0;
     Color.Converter.HSLToRGB(c);
     return c;
   }
@@ -506,6 +510,7 @@ export class Color {
     c.r = sanitized[0];
     c.g = sanitized[1];
     c.b = sanitized[2];
+    c.a = 1.0; // TODO: Accept #xxxxxxxx (8 chars, too, for alpha)
     Color.Converter.RGBToHSL(c);
     return c;
   }
@@ -529,8 +534,12 @@ export class Color {
         throw "Unrecognized color format (2): " + str;
       }
       // [ str, r, g, b, a|undefined ]
-      if (typeof parts[4] == "undefined") return Color.makeRGB(parts[1], parts[2], parts[3]);
-      else return Color.makeRGB(parts[1], parts[2], parts[3], Number(parts[4]));
+      //   console.log("parts", parts);
+      if (parts.length <= 4 || typeof parts[4] == "undefined" || parts[4] == "") {
+        return Color.makeRGB(parts[1], parts[2], parts[3]);
+      } else {
+        return Color.makeRGB(parts[1], parts[2], parts[3], Number(parts[4]));
+      }
     } else {
       throw "Unrecognized color format (1): " + str;
     }
