@@ -4,6 +4,7 @@
  * @requires getAvailableContainerSpace
  * @requires drawutilssvg
  * @requires gup
+ * @requires Biotope
  * @requires dat.gui
  *
  * @projectname Plotboilerplate.js
@@ -17,7 +18,7 @@
 
   // Fetch the GET params
   var GUP = gup();
-  globalThis.isDarkMode = detectDarkMode(GUP); // After GUP was initalized
+  globalThis.isDarkMode = detectDarkMode(GUP);
 
   window.addEventListener("load", function () {
     // THIS DEMO WORKS A BIT DIFFERENT THAN THE OTHERS.
@@ -134,13 +135,7 @@
       biotopeSize.height = Math.floor(canvasSize.height / config.cellHeight);
     };
 
-    // interface CellState {
-    //    isAlive: boolean;
-    //    lastAliveStep: number;
-    // }
-
-    // Array<CellState[]>
-    var biome = [];
+    var biome = new Biotope();
     var stepNumber = 0;
 
     // +---------------------------------------------------------------------------------
@@ -164,66 +159,27 @@
       tosvgFill.beginDrawCycle();
       tosvgFill.curClassName = "background";
       tosvgFill.curId = "background";
-      // tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, "#888888", 0);
-      // The 'borders' will just be the background shining through.
-      // tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, config.borderColor, 0);
       tosvgFill.rect({ x: 0, y: 0 }, canvasSize.width, canvasSize.height, config.backgroundColor, 0);
-      biome = [];
-      for (var j = 0; j < biotopeSize.height; j++) {
-        var row = [];
-        biome.push(row);
-        for (var i = 0; i < biotopeSize.width; i++) {
-          // Make square and add respective classes to visualize the borders.
-          tosvgFill.curClassName = "cell";
-          tosvgFill.curId = "cell-" + j + "-" + i;
-          tosvgFill.rect(
-            { x: i * config.cellWidth, y: j * config.cellHeight },
-            config.cellWidth - config.marginSize,
-            config.cellHeight - config.marginSize,
-            "#ffffff",
-            1
-          );
+      biome = new Biotope(biotopeSize.height, biotopeSize.width, function (_j, _i) {
+        // Make square and add respective classes to visualize the borders.
+        tosvgFill.curClassName = "cell";
+        tosvgFill.curId = "cell-" + _j + "-" + _i;
+        tosvgFill.rect(
+          { x: _i * config.cellWidth, y: _j * config.cellHeight },
+          config.cellWidth - config.marginSize,
+          config.cellHeight - config.marginSize,
+          "#ffffff",
+          1
+        );
 
-          // Init with random pattern?
-          if (randomizeBiome) {
-            row.push({ isAlive: Math.random() < config.randomizationThreshold, lastAliveStep: Number.NEGATIVE_INFINITY });
-          } else {
-            row.push({ isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY });
-          }
+        if (randomizeBiome) {
+          return { isAlive: Math.random() < config.randomizationThreshold, lastAliveStep: Number.NEGATIVE_INFINITY };
+        } else {
+          return { isAlive: false, lastAliveStep: Number.NEGATIVE_INFINITY };
         }
-      }
+      });
       tosvgDraw.endDrawCycle();
       tosvgFill.endDrawCycle();
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | This function rebuilds the maze and renders it onto the SVG canvas.
-    // | The old SVG data is cleared.
-    // +-------------------------------
-    var setCellAlive = function (position, alive) {
-      // Check bounds before setting anything
-      if (position.i >= 0 && position.j >= 0 && position.j < biome.length && position.i < biome[position.j].length) {
-        biome[position.j][position.i].isAlive = alive;
-      }
-    };
-
-    var relCol = function (i) {
-      return i + Math.floor(biotopeSize.width / 2);
-    };
-    var relRow = function (j) {
-      return j + Math.floor(biotopeSize.height / 2);
-    };
-    var relPos = function (j, i) {
-      return { j: relRow(j), i: relCol(i) };
-    };
-    var absCol = function (i) {
-      return i - Math.floor(biotopeSize.width / 2);
-    };
-    var absRow = function (j) {
-      return j - Math.floor(biotopeSize.height / 2);
-    };
-    var absPos = function (relPos) {
-      return { j: absRow(relPos.j), i: absCol(relPos.i) };
     };
 
     var addCurrentPreset = function () {
@@ -232,7 +188,10 @@
       }
       for (var j = 0; j < currentPreset.length; j++) {
         for (var i = 0; i < currentPreset[j].length; i++) {
-          setCellAlive(relPos(currentPresetPosition.j + j, currentPresetPosition.i + i), Boolean(currentPreset[j][i]));
+          biome.setCellAlive(
+            biome.relPos(currentPresetPosition.j + j, currentPresetPosition.i + i),
+            Boolean(currentPreset[j][i])
+          );
         }
       }
     };
@@ -243,15 +202,13 @@
     // | to indicate the current frontiers.
     // +-------------------------------
     var visualizeCreatures = function () {
-      var relCurrentPresetPosition = relPos(currentPresetPosition.j, currentPresetPosition.i);
-      // console.log("config.backgroundColor", config.backgroundColor);
+      var relCurrentPresetPosition = biome.relPos(currentPresetPosition.j, currentPresetPosition.i);
       var backgroundColor = Color.parse(config.backgroundColor);
       var lifeColor = Color.parse(config.lifeColor);
       var traceColor = Color.parse(config.traceColor);
-      var borderColor = Color.parse(config.borderColor);
+      // var borderColor = Color.parse(config.borderColor);
       var presetColor = Color.parse(config.presetColor);
       var presetColorAlive = Color.makeRGB(presetColor.r * 128, presetColor.g * 128, presetColor.b * 128);
-      // console.log("visualizeCreatures traceColor", traceColor);
       for (var j = 0; j < biome.length; j++) {
         for (var i = 0; i < biome[j].length; i++) {
           // Fetch the SVG rectangle
@@ -277,13 +234,8 @@
               var alpha = diff <= config.traceFalloff ? diff / config.traceFalloff : 1.0;
               if (config.drawTraces && alpha < 0.9) {
                 var cellColor = traceColor.clone().fadeout(config.traceAlpha + (1 - config.traceAlpha) * alpha);
-                // if (stepNumber < 5) {
-                //   console.log("alpha", alpha, "traceColor", traceColor.cssRGBA(), "cellColor", cellColor.cssRGBA(), cellColor);
-                // }
                 rectangle.setAttribute("fill", cellColor.cssRGBA());
               } else {
-                // backgroundColor.a = alpha;
-                // console.log("backgroundColor");
                 rectangle.setAttribute("fill", backgroundColor.cssRGB());
               }
             }
@@ -302,82 +254,7 @@
     var nextStep = function () {
       // Calculate next iteration of the game
       stepNumber++;
-
-      var newBiotope = [];
-      for (var j = 0; j < biome.length; j++) {
-        var row = []; // TODO: check if new Array(n) is better here (we know the size)
-        newBiotope.push(row);
-        for (var i = 0; i < biome[j].length; i++) {
-          var isAlive = biome[j][i].isAlive;
-          var latestAliveStep = biome[j][i].lastAliveStep;
-          var neighbourCount = getNumberOfLivingNeighbours(j, i);
-          if (isAlive) {
-            if (neighbourCount < 2) {
-              // Die of under-population
-              // row.push(false);
-              row.push({ isAlive: false, lastAliveStep: latestAliveStep });
-            } else if (neighbourCount == 2 || neighbourCount == 3) {
-              // Keep on living
-              // row.push(true);
-              row.push({ isAlive: true, lastAliveStep: stepNumber });
-            } else if (neighbourCount > 3) {
-              // Die of under-population
-              // row.push(false);
-              row.push({ isAlive: false, lastAliveStep: latestAliveStep });
-            } else {
-              // row.push(false);
-              row.push({ isAlive: false, lastAliveStep: latestAliveStep });
-            }
-          } else {
-            if (neighbourCount === 3) {
-              // Dead cell becomes alive dues to 3 living neighboures
-              // row.push(true);
-              row.push({ isAlive: true, lastAliveStep: stepNumber });
-            } else {
-              // Dead cell stays dead due to under- or over-poulation
-              // row.push(false);
-              row.push({ isAlive: false, lastAliveStep: latestAliveStep });
-            }
-          }
-        }
-      } // END for
-      biome = newBiotope;
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Get the number of neightbours for the given cell position.
-    // |
-    // | j is the row
-    // | i is the column
-    // +-------------------------------
-    var getNumberOfLivingNeighbours = function (j, i) {
-      var count = 0;
-      if (j - 1 >= 0 && biome[j - 1][i].isAlive) {
-        count++;
-      }
-      if (j + 1 < biome.length && biome[j + 1][i].isAlive) {
-        count++;
-      }
-      if (i - 1 >= 0 && biome[j][i - 1].isAlive) {
-        count++;
-      }
-      if (i + 1 < biome[j].length && biome[j][i + 1].isAlive) {
-        count++;
-      }
-      // Also look at diagoal neighbours
-      if (j - 1 >= 0 && i - 1 >= 0 && biome[j - 1][i - 1].isAlive) {
-        count++;
-      }
-      if (j + 1 < biome.length && i - 1 >= 0 && biome[j + 1][i - 1].isAlive) {
-        count++;
-      }
-      if (j + 1 < biome.length && i + 1 < biome[j].length && biome[j + 1][i + 1].isAlive) {
-        count++;
-      }
-      if (j - 1 >= 0 && i + 1 < biome[j].length && biome[j - 1][i + 1].isAlive) {
-        count++;
-      }
-      return count;
+      biome = biome.createNextCycle();
     };
 
     // +---------------------------------------------------------------------------------
@@ -438,10 +315,10 @@
       var i = Math.floor(pixelPosition.x / config.cellWidth);
       if (j >= 0 && i >= 0 && j < biome.length && i < biome[j].length) {
         if (config.directPaintMode) {
-          setCellAlive({ j: j, i: i }, !biome[j][i].isAlive);
+          biome.setCellAlive({ j: j, i: i }, !biome[j][i].isAlive);
         } else {
-          currentPresetPosition.j = absRow(j);
-          currentPresetPosition.i = absCol(i);
+          currentPresetPosition.j = biome.absRow(j);
+          currentPresetPosition.i = biome.absCol(i);
           addCurrentPreset();
           currentPreset = null;
           currentPresetPosition.j = 0;
@@ -460,8 +337,8 @@
       var j = Math.floor(pixelPosition.y / config.cellHeight);
       var i = Math.floor(pixelPosition.x / config.cellWidth);
       if (j >= 0 && i >= 0 && j < biome.length && i < biome[j].length) {
-        var jAbs = absRow(j);
-        var iAbs = absCol(i);
+        var jAbs = biome.absRow(j);
+        var iAbs = biome.absCol(i);
         if (currentPreset && currentPresetPosition && (currentPresetPosition.j !== j || currentPresetPosition.i !== i)) {
           currentPresetPosition.j = jAbs;
           currentPresetPosition.i = iAbs;
@@ -563,8 +440,8 @@
       var presetName = GUP["preset"];
       if (CONWAY_PRESETS.hasOwnProperty(presetName)) {
         currentPreset = CONWAY_PRESETS[presetName];
-        currentPresetPosition.j = GUP["j"] ? absRow(parseInt(GUP["j"])) : currentPresetPosition.j;
-        currentPresetPosition.i = GUP["i"] ? absCol(parseInt(GUP["i"])) : currentPresetPosition.i;
+        currentPresetPosition.j = GUP["j"] ? biome.absRow(parseInt(GUP["j"])) : currentPresetPosition.j;
+        currentPresetPosition.i = GUP["i"] ? biome.absCol(parseInt(GUP["i"])) : currentPresetPosition.i;
         addCurrentPreset();
         currentPresetPosition.j = 0;
         currentPresetPosition.i = 0;
