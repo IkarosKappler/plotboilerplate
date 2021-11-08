@@ -13,9 +13,10 @@
   "use strict";
 
   window.addEventListener("load", function () {
+    var GUP = gup();
     var config = {
       guiDoubleSize: false,
-      color: "rgba(0,167,185,1)"
+      color: GUP["color"] || "rgba(0,167,185,1)"
     };
 
     var showColor = function () {

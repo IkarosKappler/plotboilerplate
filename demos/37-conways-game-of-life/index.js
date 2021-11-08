@@ -17,7 +17,7 @@
   "use strict";
 
   // Fetch the GET params
-  let GUP = gup();
+  var GUP = gup();
   globalThis.isDarkMode = detectDarkMode(GUP); // After GUP was initalized
   console.log("isDarkMode", isDarkMode);
 
@@ -253,14 +253,12 @@
       var borderColor = Color.parse(config.borderColor);
       var presetColor = Color.parse(config.presetColor);
       var presetColorAlive = Color.makeRGB(presetColor.r * 128, presetColor.g * 128, presetColor.b * 128);
-      // var presetColorAlive = presetColor.clone().darken(0.5);
-      // console.log("presetColor", presetColor, presetColor.cssRGBA(), "config.presetColor", config.presetColor);
-      // console.log("presetColorAlive", presetColorAlive.cssRGBA());
       for (var j = 0; j < biome.length; j++) {
         for (var i = 0; i < biome[j].length; i++) {
           // Fetch the SVG rectangle
           var rectangle = document.getElementById("cell-" + j + "-" + i);
-          // Visualize presets, too!
+          // Visualize preset, if there currently is one
+          // Checl if the current position is inside the selected preset
           if (
             currentPreset &&
             j >= relCurrentPresetPosition.j &&
@@ -269,25 +267,30 @@
             i < relCurrentPresetPosition.i + currentPreset[0].length &&
             currentPreset[j - relCurrentPresetPosition.j][i - relCurrentPresetPosition.i] !== 0
           ) {
-            // rectangle.setAttribute("fill", biome[j][i].isAlive ? "rgba(128,0,128,1.0)" : "rgba(255,0,255,1.0)");
             rectangle.setAttribute("fill", biome[j][i].isAlive ? presetColorAlive.cssRGBA() : presetColor.cssRGBA());
           } else {
             if (biome[j][i].isAlive) {
-              rectangle.setAttribute("fill", lifeColor.cssRGB()); // "rgba(0,0,0,1.0)");
+              rectangle.setAttribute("fill", lifeColor.cssRGB());
             } else {
               var diff = stepNumber - biome[j][i].lastAliveStep;
               var alpha = diff <= config.traceFalloff ? diff / config.traceFalloff : 1.0;
+              // alpha = Math.max(1.0, alpha * 2);
+              if (stepNumber < 5) {
+                console.log("color", traceColor);
+                console.log("alpha", alpha, "color", traceColor.cssRGBA());
+              }
               // rectangle.setAttribute("fill", "rgba(255,255,255," + alpha + ")");
               if (config.drawTraces && alpha < 0.9) {
-                if (stepNumber < 5) {
-                  console.log("alpha", alpha);
+                if (stepNumber < 10) {
+                  console.log("alpha", alpha, traceColor);
                 }
                 rectangle.setAttribute(
                   "fill",
                   traceColor
                     .clone()
                     // .fadeout(1 - alpha)
-                    .setAlpha(1 - alpha)
+                    // .setAlpha(1 - alpha)
+                    .fadeout(alpha)
                     .cssRGBA()
                 );
               } else {

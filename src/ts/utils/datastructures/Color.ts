@@ -419,6 +419,7 @@ export class Color {
     } else {
       throw new Error("error: bad modifier format (percent or number)");
     }
+    console.log("New alpha", this.a);
     if (this.a > 1) this.a = 1;
     else if (this.a < 0) this.a = 0;
     Color.Converter.HSLToRGB(this);
@@ -529,7 +530,7 @@ export class Color {
       }
       // [ str, r, g, b, a|undefined ]
       if (typeof parts[4] == "undefined") return Color.makeRGB(parts[1], parts[2], parts[3]);
-      else return Color.makeRGB(parts[1], parts[2], parts[3], parts[4]);
+      else return Color.makeRGB(parts[1], parts[2], parts[3], Number(parts[4]));
     } else {
       throw "Unrecognized color format (1): " + str;
     }
