@@ -117,6 +117,8 @@
     var currentPreset = null;
     var currentPresetPosition = { j: 0, i: 0 };
 
+    var biome = new Biotope();
+
     // +---------------------------------------------------------------------------------
     // | Initialize the draw library for SVG rendering: width and height and style defs.
     // +-------------------------------
@@ -134,9 +136,6 @@
       biotopeSize.width = Math.floor(canvasSize.width / config.cellWidth);
       biotopeSize.height = Math.floor(canvasSize.height / config.cellHeight);
     };
-
-    var biome = new Biotope();
-    var stepNumber = 0;
 
     // +---------------------------------------------------------------------------------
     // | This function rebuilds the maze and renders it onto the SVG canvas.
@@ -230,7 +229,7 @@
             if (biome[j][i].isAlive) {
               rectangle.setAttribute("fill", lifeColor.cssRGB());
             } else {
-              var diff = stepNumber - biome[j][i].lastAliveStep;
+              var diff = biome.stepNumber - biome[j][i].lastAliveStep;
               var alpha = diff <= config.traceFalloff ? diff / config.traceFalloff : 1.0;
               if (config.drawTraces && alpha < 0.9) {
                 var cellColor = traceColor.clone().fadeout(config.traceAlpha + (1 - config.traceAlpha) * alpha);
@@ -253,7 +252,6 @@
     // +-------------------------------
     var nextStep = function () {
       // Calculate next iteration of the game
-      stepNumber++;
       biome = biome.createNextCycle();
     };
 

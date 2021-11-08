@@ -1,3 +1,12 @@
+/**
+ * @author  Ikaros Kappler
+ * @date    2021-11-07
+ * @version 1.0.0
+ *
+ * @param {Object} GUP
+ * @returns {boolean}
+ */
+
 function detectDarkMode(GUP) {
   // Respect overrides
   if (typeof GUP !== "undefined" && GUP.hasOwnProperty("darkmode") && GUP["darkmode"]) {
