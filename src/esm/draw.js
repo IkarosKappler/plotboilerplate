@@ -695,12 +695,37 @@ export class drawutils {
         this.ctx.setLineDash([]);
         this.ctx.restore();
     }
+    /**
+     * Draw a text label at the given relative position.
+     *
+     * @method text
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {string=} options.color - The Color to use.
+     * @param {string=} options.fontFamily - The font family to use.
+     * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {number=} options.lineHeight - The line height (in pixels) to use.
+     * @param {number=} options.rotation - The (optional) rotation in radians.
+     * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     text(text, x, y, options) {
+        // TODO: respect rotation
+        // See https://stackoverflow.com/a/23523697
+        var _a;
         options = options || {};
         this.ctx.save();
         x = this.offset.x + x * this.scale.x;
         y = this.offset.y + y * this.scale.y;
         const color = options.color || "black";
+        if (options.fontSize || options.fontFamily) {
+            // Scaling of text only works in uniform mode
+            this.ctx.font = (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") + ((_a = options.fontFamily) !== null && _a !== void 0 ? _a : "Arial");
+            console.log("font, ", this.ctx.font);
+        }
         if (this.fillShapes) {
             this.ctx.fillStyle = color;
             this.ctx.fillText(text, x, y);
@@ -710,6 +735,19 @@ export class drawutils {
             this.ctx.strokeText(text, x, y);
         }
         this.ctx.restore();
+        // options = options || {};
+        // this.ctx.save();
+        // x = this.offset.x + x * this.scale.x;
+        // y = this.offset.y + y * this.scale.y;
+        // const color: string = options.color || "black";
+        // if (this.fillShapes) {
+        //   this.ctx.fillStyle = color;
+        //   this.ctx.fillText(text, x, y);
+        // } else {
+        //   this.ctx.strokeStyle = color;
+        //   this.ctx.strokeText(text, x, y);
+        // }
+        // this.ctx.restore();
     }
     /**
      * Draw a non-scaling text label at the given position.

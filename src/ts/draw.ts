@@ -845,20 +845,89 @@ export class drawutils implements DrawLib<void> {
     this.ctx.restore();
   }
 
-  text(text: string, x: number, y: number, options?: { color?: string }) {
+  /**
+   * Draw a text label at the given relative position.
+   *
+   * @method text
+   * @param {string} text - The text to draw.
+   * @param {number} x - The x-position to draw the text at.
+   * @param {number} y - The y-position to draw the text at.
+   * @param {string=} options.color - The Color to use.
+   * @param {string=} options.fontFamily - The font family to use.
+   * @param {number=} options.fontSize - The font size (in pixels) to use.
+   * @param {number=} options.lineHeight - The line height (in pixels) to use.
+   * @param {number=} options.rotation - The (optional) rotation in radians.
+   * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+   * @return {void}
+   * @instance
+   * @memberof drawutils
+   */
+  text(
+    text: string,
+    x: number,
+    y: number,
+    options?: {
+      color?: string;
+      fontFamily?: string;
+      fontSize?: number;
+      lineHeight?: number;
+      textAlign?: CanvasRenderingContext2D["textAlign"];
+      rotation?: number;
+    }
+  ) {
+    // TODO: respect rotation
+    // See https://stackoverflow.com/a/23523697
+
     options = options || {};
     this.ctx.save();
-    x = this.offset.x + x * this.scale.x;
-    y = this.offset.y + y * this.scale.y;
+    let relX = this.offset.x + x * this.scale.x;
+    let relY = this.offset.y + y * this.scale.y;
     const color: string = options.color || "black";
+    if (options.fontSize || options.fontFamily) {
+      // Scaling of text only works in uniform mode
+      this.ctx.font = (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") + (options.fontFamily ?? "Arial");
+      // console.log("font", this.ctx.font);
+    }
+    if (options.textAlign) {
+      this.ctx.textAlign = options.textAlign;
+    }
+
+    var rotation = options.rotation ?? 0.0;
+    var lineHeight = options.lineHeight ?? options.fontSize ?? 0; // TODO: min should be font size or zero?
+    this.ctx.translate(relX, relY);
+    this.ctx.rotate(rotation);
+    // this.ctx.translate(x, y);
+
+    // console.log("relX", relX, "relY", relY, "lineHeight", lineHeight, "rotation", rotation);
+
     if (this.fillShapes) {
+      // console.log("fill");
       this.ctx.fillStyle = color;
-      this.ctx.fillText(text, x, y);
+      // this.ctx.fillText(text, relX, relY);
+      // this.ctx.fillText(text, 0, lineHeight / 2);
+      this.ctx.fillText(text, 0, lineHeight / 2);
     } else {
       this.ctx.strokeStyle = color;
-      this.ctx.strokeText(text, x, y);
+      // this.ctx.strokeText(text, relX, relY);
+      this.ctx.strokeText(text, 0, lineHeight / 2);
     }
+    this.ctx.translate(-relX, -relY);
+    this.ctx.rotate(-rotation); // TODO: check if this is necessary before 'restore()'
     this.ctx.restore();
+
+    // options = options || {};
+    // this.ctx.save();
+    // x = this.offset.x + x * this.scale.x;
+    // y = this.offset.y + y * this.scale.y;
+    // const color: string = options.color || "black";
+    // if (this.fillShapes) {
+    //   this.ctx.fillStyle = color;
+    //   this.ctx.fillText(text, x, y);
+    // } else {
+    //   this.ctx.strokeStyle = color;
+    //   this.ctx.strokeText(text, x, y);
+    // }
+    // this.ctx.restore();
   }
 
   /**

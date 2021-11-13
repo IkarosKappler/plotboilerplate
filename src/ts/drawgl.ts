@@ -471,9 +471,9 @@ export class drawutilsgl implements DrawLib<void> {
    * @param {string} color - The color to use.
    * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
    **/
-   rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): void {
+  rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): void {
     // NOT YET IMPLEMENTED
-   }
+  }
 
   /**
    * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -655,7 +655,36 @@ export class drawutilsgl implements DrawLib<void> {
     // NOT YET IMPLEMENTED
   }
 
-  text(text: string, x: number, y: number, options?: { color?: string }) {
+  /**
+   * Draw a text label at the given relative position.
+   *
+   * @method text
+   * @param {string} text - The text to draw.
+   * @param {number} x - The x-position to draw the text at.
+   * @param {number} y - The y-position to draw the text at.
+   * @param {string=} options.color - The Color to use.
+   * @param {string=} options.fontFamily - The font family to use.
+   * @param {number=} options.fontSize - The font size (in pixels) to use.
+   * @param {number=} options.lineHeight - The line height (in pixels) to use.
+   * @param {number=} options.rotation - The (optional) rotation in radians.
+   * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+   * @return {void}
+   * @instance
+   * @memberof drawutils
+   */
+  text(
+    text: string,
+    x: number,
+    y: number,
+    options?: {
+      color?: string;
+      fontFamily?: string;
+      fontSize?: number;
+      lineHeight?: number;
+      textAlign?: CanvasRenderingContext2D["textAlign"];
+      rotation?: number;
+    }
+  ) {
     // NOT YET IMPLEMENTED
   }
 

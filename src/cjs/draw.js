@@ -698,21 +698,74 @@ var drawutils = /** @class */ (function () {
         this.ctx.setLineDash([]);
         this.ctx.restore();
     };
+    /**
+     * Draw a text label at the given relative position.
+     *
+     * @method text
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {string=} options.color - The Color to use.
+     * @param {string=} options.fontFamily - The font family to use.
+     * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {number=} options.lineHeight - The line height (in pixels) to use.
+     * @param {number=} options.rotation - The (optional) rotation in radians.
+     * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     drawutils.prototype.text = function (text, x, y, options) {
+        // TODO: respect rotation
+        // See https://stackoverflow.com/a/23523697
+        var _a, _b, _c, _d;
         options = options || {};
         this.ctx.save();
-        x = this.offset.x + x * this.scale.x;
-        y = this.offset.y + y * this.scale.y;
+        var relX = this.offset.x + x * this.scale.x;
+        var relY = this.offset.y + y * this.scale.y;
         var color = options.color || "black";
+        if (options.fontSize || options.fontFamily) {
+            // Scaling of text only works in uniform mode
+            this.ctx.font = (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") + ((_a = options.fontFamily) !== null && _a !== void 0 ? _a : "Arial");
+            console.log("font", this.ctx.font);
+        }
+        if (options.textAlign) {
+            this.ctx.textAlign = options.textAlign;
+        }
+        var rotation = (_b = options.rotation) !== null && _b !== void 0 ? _b : 0.0;
+        var lineHeight = (_d = (_c = options.lineHeight) !== null && _c !== void 0 ? _c : options.fontSize) !== null && _d !== void 0 ? _d : 0; // TODO: min should be font size or zero?
+        this.ctx.translate(relX, relY);
+        this.ctx.rotate(rotation);
+        // this.ctx.translate(x, y);
+        console.log("relX", relX, "relY", relY, "lineHeight", lineHeight, "rotation", rotation);
         if (this.fillShapes) {
+            console.log("fill");
             this.ctx.fillStyle = color;
-            this.ctx.fillText(text, x, y);
+            // this.ctx.fillText(text, relX, relY);
+            // this.ctx.fillText(text, 0, lineHeight / 2);
+            this.ctx.fillText(text, 0, lineHeight / 2);
         }
         else {
             this.ctx.strokeStyle = color;
-            this.ctx.strokeText(text, x, y);
+            // this.ctx.strokeText(text, relX, relY);
+            this.ctx.strokeText(text, 0, lineHeight / 2);
         }
+        this.ctx.translate(-relX, -relY);
+        this.ctx.rotate(-rotation); // TODO: check if this is necessary before 'restore()'
         this.ctx.restore();
+        // options = options || {};
+        // this.ctx.save();
+        // x = this.offset.x + x * this.scale.x;
+        // y = this.offset.y + y * this.scale.y;
+        // const color: string = options.color || "black";
+        // if (this.fillShapes) {
+        //   this.ctx.fillStyle = color;
+        //   this.ctx.fillText(text, x, y);
+        // } else {
+        //   this.ctx.strokeStyle = color;
+        //   this.ctx.strokeText(text, x, y);
+        // }
+        // this.ctx.restore();
     };
     /**
      * Draw a non-scaling text label at the given position.

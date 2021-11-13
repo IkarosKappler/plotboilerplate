@@ -558,6 +558,23 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
+    /**
+     * Draw a text label at the given relative position.
+     *
+     * @method text
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {string=} options.color - The Color to use.
+     * @param {string=} options.fontFamily - The font family to use.
+     * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {number=} options.lineHeight - The line height (in pixels) to use.
+     * @param {number=} options.rotation - The (optional) rotation in radians.
+     * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     drawutilsgl.prototype.text = function (text, x, y, options) {
         // NOT YET IMPLEMENTED
     };

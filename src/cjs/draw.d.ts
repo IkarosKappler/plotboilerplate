@@ -454,8 +454,30 @@ export declare class drawutils implements DrawLib<void> {
      * @memberof drawutils
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): void;
+    /**
+     * Draw a text label at the given relative position.
+     *
+     * @method text
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {string=} options.color - The Color to use.
+     * @param {string=} options.fontFamily - The font family to use.
+     * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {number=} options.lineHeight - The line height (in pixels) to use.
+     * @param {number=} options.rotation - The (optional) rotation in radians.
+     * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     text(text: string, x: number, y: number, options?: {
         color?: string;
+        fontFamily?: string;
+        fontSize?: number;
+        lineHeight?: number;
+        textAlign?: CanvasRenderingContext2D["textAlign"];
+        rotation?: number;
     }): void;
     /**
      * Draw a non-scaling text label at the given position.
