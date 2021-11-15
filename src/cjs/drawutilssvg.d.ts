@@ -26,7 +26,8 @@
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.3.0
+ * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @version  1.4.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

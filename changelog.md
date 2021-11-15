@@ -1,5 +1,9 @@
 # Changelog
 
+- 2021-11-15
+  - Adding more parameters tot the `drawutilssvg.text()` function: fontSize, textAlign, fontFamily, lineHeight.
+- 2021-11-12
+  - Adding more parameters tot the `draw.text()` function: fontSize, textAlign, fontFamily, lineHeight.
 - 2021-11.07
   - Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
   - Added tests for the Color class. There were some strange things happening the the `ligthen` and `darken` function.

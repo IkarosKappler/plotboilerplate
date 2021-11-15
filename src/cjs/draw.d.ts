@@ -37,7 +37,8 @@
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.9.0
+ * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @version  1.10.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

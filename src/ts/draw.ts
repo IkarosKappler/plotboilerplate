@@ -37,7 +37,8 @@
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.9.0
+ * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @version  1.10.0
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -885,49 +886,33 @@ export class drawutils implements DrawLib<void> {
     const color: string = options.color || "black";
     if (options.fontSize || options.fontFamily) {
       // Scaling of text only works in uniform mode
-      this.ctx.font = (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") + (options.fontFamily ?? "Arial");
-      // console.log("font", this.ctx.font);
+      this.ctx.font =
+        (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") +
+        (options.fontFamily
+          ? options.fontFamily.indexOf(" ") === -1
+            ? options.fontFamily
+            : `"${options.fontFamily}"`
+          : "Arial");
     }
     if (options.textAlign) {
       this.ctx.textAlign = options.textAlign;
     }
 
-    var rotation = options.rotation ?? 0.0;
-    var lineHeight = options.lineHeight ?? options.fontSize ?? 0; // TODO: min should be font size or zero?
+    const rotation = options.rotation ?? 0.0;
+    const lineHeight = (options.lineHeight ?? options.fontSize ?? 0) * this.scale.x; // TODO: min should be font size or zero?
     this.ctx.translate(relX, relY);
     this.ctx.rotate(rotation);
-    // this.ctx.translate(x, y);
-
-    // console.log("relX", relX, "relY", relY, "lineHeight", lineHeight, "rotation", rotation);
 
     if (this.fillShapes) {
-      // console.log("fill");
       this.ctx.fillStyle = color;
-      // this.ctx.fillText(text, relX, relY);
-      // this.ctx.fillText(text, 0, lineHeight / 2);
       this.ctx.fillText(text, 0, lineHeight / 2);
     } else {
       this.ctx.strokeStyle = color;
-      // this.ctx.strokeText(text, relX, relY);
       this.ctx.strokeText(text, 0, lineHeight / 2);
     }
     this.ctx.translate(-relX, -relY);
     this.ctx.rotate(-rotation); // TODO: check if this is necessary before 'restore()'
     this.ctx.restore();
-
-    // options = options || {};
-    // this.ctx.save();
-    // x = this.offset.x + x * this.scale.x;
-    // y = this.offset.y + y * this.scale.y;
-    // const color: string = options.color || "black";
-    // if (this.fillShapes) {
-    //   this.ctx.fillStyle = color;
-    //   this.ctx.fillText(text, x, y);
-    // } else {
-    //   this.ctx.strokeStyle = color;
-    //   this.ctx.strokeText(text, x, y);
-    // }
-    // this.ctx.restore();
   }
 
   /**

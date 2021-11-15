@@ -26,7 +26,8 @@
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.3.0
+ * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @version  1.4.0
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -34,6 +35,8 @@ import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration } from "./interfaces";
+
+const RAD_TO_DEG = 180 / Math.PI;
 
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -1098,12 +1101,34 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       rotation?: number;
     }
   ): SVGElement {
+    // TODO: rotation and stuff
+
     options = options || {};
     const color: string = options.color || "black";
+    const lineHeight = (options.lineHeight ?? options.fontSize ?? 0) * this.scale.x; // TODO: min should be font size or zero?
+    // https://www.w3.org/TR/SVG/text.html#TextAnchorProperty
+    //    start | middle | end
+    const textAlign: "start" | "middle" | "end" =
+      options.textAlign === "left" || options.textAlign === "start"
+        ? "start"
+        : options.textAlign === "center"
+        ? "middle"
+        : options.textAlign === "right" || options.textAlign === "end"
+        ? "end"
+        : "start";
+    const transformOrigin = `${this._x(x)}px ${this._y(y)}px`;
+    const translate = `translate(0 ${lineHeight / 2})`;
+    const rotate = options.rotation ? `rotate(${options.rotation * RAD_TO_DEG})` : ``;
 
     const node: SVGElement = this.makeNode("text");
     node.setAttribute("x", `${this._x(x)}`);
     node.setAttribute("y", `${this._y(y)}`);
+    node.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
+    node.setAttribute("font-family", options.fontFamily); // May be undefined
+    node.setAttribute("text-anchor", textAlign);
+    node.style["transform-origin"] = transformOrigin;
+    node.setAttribute("transform", rotate + " " + translate);
+
     node.innerHTML = text;
     return this._bindFillDraw(node, "text", color, 1);
   }

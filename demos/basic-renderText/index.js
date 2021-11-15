@@ -25,11 +25,32 @@
     );
 
     const TEXT_ALIGN_OPTIONS = ["left", "right", "center", "start", "end"];
+    const FONT_FAMILY_OPTIONS = [
+      "Arial", // (sans-serif)
+      "Arial Black", // (sans-serif)
+      "Verdana", // (sans-serif)
+      "Tahoma", // (sans-serif)
+      "Trebuchet MS", // (sans-serif)
+      "Impact", // (sans-serif)
+      "Times New Roman", // (serif)
+      "Didot", // (serif)
+      "Georgia", // (serif)
+      "American Typewriter", // (serif)
+      "Andalé Mono", // (monospace)
+      "Courier", // (monospace)
+      "Lucida Console", // (monospace)
+      "Monaco", // (monospace)
+      "Bradley Hand", // (cursive)
+      "Brush Script MT", // (cursive)
+      "Luminari", // (fantasy)
+      "Comic Sans MS" // (cursive)
+    ];
 
     const config = {
       guiDoubleSize: false,
       x: 0,
       y: 0,
+      fontFamily: "Arial",
       fontSize: 12,
       lineHeight: 12,
       rotation: 0.0,
@@ -42,6 +63,7 @@
     pb.config.postDraw = function () {
       pb.fill.point({ x: config.x, y: config.y }, "rgba(192,0,128,0.5)");
       pb.fill.text(config.text, config.x, config.y, {
+        fontFamily: config.fontFamily,
         fontSize: config.fontSize,
         lineHeight: config.lineHeight,
         rotation: config.rotation * DEG_TO_RAD, // Convert degrees to radians
@@ -74,6 +96,7 @@
     gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(toggleGuiSize);
     gui.add(config, "x").title("The x position of the text.").onChange(redraw);
     gui.add(config, "y").title("The y position of the text.").onChange(redraw);
+    gui.add(config, "fontFamily", FONT_FAMILY_OPTIONS).title("The font family to use.").onChange(redraw);
     gui.add(config, "fontSize").min(1).max(64).step(1).title("The font size to use.").onChange(redraw);
     gui.add(config, "lineHeight").min(1).max(64).step(1).title("The line height to use.").onChange(redraw);
     gui.add(config, "rotation").min(0).max(360).step(1).title("The rotation to use in degrees.").onChange(redraw);
