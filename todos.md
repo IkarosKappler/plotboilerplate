@@ -34,6 +34,8 @@
 - Remove SVGBuilder from Girih-demo.
 - Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
 - Port `addContrastColor` function to typescript and add to the helpers (in demos now are pure JS).
+- Add the text draw demo (with new text params) to the basic demo page.
+- Add the new text params to the `label` function, too.
 
 ### Todos for future Version 2
 
