@@ -20,7 +20,7 @@ import { FontOptions, FontStyle, FontWeight, SVGSerializable, UID } from "./inte
  * @requires UID
  * @requires UIDGenerator
  **/
-export class PBText implements SVGSerializable {
+export class PBText implements SVGSerializable, FontOptions {
   /**
    * Required to generate proper CSS classes and other class related IDs.
    **/
@@ -116,6 +116,7 @@ export class PBText implements SVGSerializable {
    */
   constructor(text: string, anchor?: Vertex, options?: FontOptions) {
     this.uid = UIDGenerator.next();
+    this.text = text;
     this.anchor = anchor ?? new Vertex();
     this.color = options.color;
     this.fontFamily = options.fontFamily;

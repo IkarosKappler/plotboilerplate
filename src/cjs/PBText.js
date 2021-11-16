@@ -35,6 +35,7 @@ var PBText = /** @class */ (function () {
          **/
         this.className = "PBText";
         this.uid = UIDGenerator_1.UIDGenerator.next();
+        this.text = text;
         this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex_1.Vertex();
         this.color = options.color;
         this.fontFamily = options.fontFamily;

@@ -1,5 +1,8 @@
 # Changelog
 
+- 2021-11-16
+  - Added `text` options to the `DrawConfig` interface.
+  - Added the `PBText` class.
 - 2021-11-15
   - Adding more parameters tot the `drawutilssvg.text()` function: fontSize, textAlign, fontFamily, lineHeight.
 - 2021-11-12

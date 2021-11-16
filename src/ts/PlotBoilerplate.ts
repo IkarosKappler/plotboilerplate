@@ -73,7 +73,8 @@
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
  * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
- * @version  1.14.0
+ * @modified 2021-11-16 Adding the `PBText` drawable.
+ * @version  1.15.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -118,6 +119,7 @@ import {
   XYDimension,
   DatGuiProps
 } from "./interfaces";
+import { PBText } from "./PBText";
 
 /**
  * @classdesc The main class of the PlotBoilerplate.
@@ -521,6 +523,12 @@ export class PlotBoilerplate {
       image: {
         color: "#a8a8a8",
         lineWidth: 1
+      },
+      text: {
+        color: "rgba(192,0,128,0.5)",
+        lineWidth: 1,
+        fill: true,
+        anchor: true
       }
     }; // END drawConfig
 
@@ -834,6 +842,10 @@ export class PlotBoilerplate {
         drawable.lowerRight.add(e.params.dragAmount);
       });
       drawable.lowerRight.attr.selectable = false;
+    } else if (drawable instanceof PBText) {
+      this.vertices.push(drawable.anchor);
+      this.drawables.push(drawable);
+      drawable.anchor.attr.selectable = false;
     } else {
       throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
     }
@@ -923,6 +935,8 @@ export class PlotBoilerplate {
           } else if (drawable instanceof PBImage) {
             this.removeVertex(drawable.upperLeft, false);
             this.removeVertex(drawable.lowerRight, false);
+          } else if (drawable instanceof PBText) {
+            this.removeVertex(drawable.anchor, false);
           }
         } // END removeWithVertices
 
@@ -1320,6 +1334,15 @@ export class PlotBoilerplate {
         draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
         d.lowerRight.attr.renderTime = renderTime;
       }
+    } else if (d instanceof PBText) {
+      fill.setCurrentId(d.uid);
+      fill.text(d.text, d.anchor.x, d.anchor.y, d);
+      if (this.drawConfig.text.anchor) {
+        draw.setCurrentId(`${d.uid}_a0`);
+        draw.setCurrentClassName(`${d.className}-anchor`);
+        (this.drawConfig.text.fill ? fill : draw).point(d.anchor, this.drawConfig.text.color);
+      }
+      d.anchor.attr.renderTime = renderTime;
     } else {
       console.error("Cannot draw object. Unknown class.");
     }

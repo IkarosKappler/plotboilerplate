@@ -13,6 +13,7 @@
  * @modified 2021-05-31 Added the `drawLib.setConfiguration` function.
  * @modified 2021-05-31 Splitted the large interfaces.ts file into this one and others.
  * @modified 2021-06-21 Added `IBounds.getCenter()`.
+ * @modified 2021-11-16 Added `text` options to the `DrawConfig`.
  **/
 import { Vertex } from "../Vertex";
 import { Vector } from "../Vector";
@@ -27,6 +28,7 @@ import { BezierPath } from "../BezierPath";
 import { Line } from "../Line";
 import { PlotBoilerplate } from "../PlotBoilerplate";
 import { DrawLib } from "./DrawLib";
+import { PBText } from "../PBText";
 /**
  * @classdesc Coordinates (x,y) on the plane.
  *
@@ -61,7 +63,7 @@ export interface IBounds {
 /**
  * The types that can be drawn and thus added to the draw queue.
  */
-export declare type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | VEllipse | VEllipseSector | Polygon | BezierPath | Line;
+export declare type Drawable = Vertex | Vector | Triangle | Circle | CircleSector | PBImage | PBText | VEllipse | VEllipseSector | Polygon | BezierPath | Line;
 /**
  * A unique identifier (UID) to tell drawables apart in a performant manner.
  */
@@ -149,6 +151,12 @@ export interface DrawConfig {
     line: DrawSettings;
     vector: DrawSettings;
     image: DrawSettings;
+    text: {
+        color: string;
+        lineWidth: number;
+        fill?: boolean;
+        anchor?: boolean;
+    };
 }
 /** This is a fix for the problem, that the constructor's "name" attribute is not
  * visible in ES6:

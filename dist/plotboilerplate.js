@@ -3903,15 +3903,14 @@ exports.PBImage = PBImage;
 /***/ 196:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-var __webpack_unused_export__;
 
 /**
  * @author   Ikaros Kappler
  * @date     2021-11-16
  * @version  1.0.0
  **/
-__webpack_unused_export__ = ({ value: true });
-exports.B = void 0;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PBText = void 0;
 var UIDGenerator_1 = __webpack_require__(197);
 var Vertex_1 = __webpack_require__(421);
 /**
@@ -3941,6 +3940,7 @@ var PBText = /** @class */ (function () {
          **/
         this.className = "PBText";
         this.uid = UIDGenerator_1.UIDGenerator.next();
+        this.text = text;
         this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex_1.Vertex();
         this.color = options.color;
         this.fontFamily = options.fontFamily;
@@ -3967,7 +3967,7 @@ var PBText = /** @class */ (function () {
     };
     return PBText;
 }()); // END class
-exports.B = PBText;
+exports.PBText = PBText;
 //# sourceMappingURL=PBText.js.map
 
 /***/ }),
@@ -4052,7 +4052,8 @@ var __webpack_unused_export__;
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
  * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
- * @version  1.14.0
+ * @modified 2021-11-16 Adding the `PBText` drawable.
+ * @version  1.15.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -4080,6 +4081,7 @@ var VEllipseSector_1 = __webpack_require__(965);
 var Vector_1 = __webpack_require__(73);
 var Vertex_1 = __webpack_require__(421);
 var VertexAttr_1 = __webpack_require__(861);
+var PBText_1 = __webpack_require__(196);
 /**
  * @classdesc The main class of the PlotBoilerplate.
  *
@@ -4318,6 +4320,12 @@ var PlotBoilerplate = /** @class */ (function () {
             image: {
                 color: "#a8a8a8",
                 lineWidth: 1
+            },
+            text: {
+                color: "rgba(192,0,128,0.5)",
+                lineWidth: 1,
+                fill: true,
+                anchor: true
             }
         }; // END drawConfig
         // +---------------------------------------------------------------------------------
@@ -4625,6 +4633,11 @@ var PlotBoilerplate = /** @class */ (function () {
             });
             drawable.lowerRight.attr.selectable = false;
         }
+        else if (drawable instanceof PBText_1.PBText) {
+            this.vertices.push(drawable.anchor);
+            this.drawables.push(drawable);
+            drawable.anchor.attr.selectable = false;
+        }
         else {
             throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
         }
@@ -4722,6 +4735,9 @@ var PlotBoilerplate = /** @class */ (function () {
                     else if (drawable instanceof PBImage_1.PBImage) {
                         this.removeVertex(drawable.upperLeft, false);
                         this.removeVertex(drawable.lowerRight, false);
+                    }
+                    else if (drawable instanceof PBText_1.PBText) {
+                        this.removeVertex(drawable.anchor, false);
                     }
                 } // END removeWithVertices
                 if (redraw) {
@@ -5047,6 +5063,16 @@ var PlotBoilerplate = /** @class */ (function () {
                 draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                 d.lowerRight.attr.renderTime = renderTime;
             }
+        }
+        else if (d instanceof PBText_1.PBText) {
+            fill.setCurrentId(d.uid);
+            fill.text(d.text, d.anchor.x, d.anchor.y, d);
+            if (this.drawConfig.text.anchor) {
+                draw.setCurrentId(d.uid + "_a0");
+                draw.setCurrentClassName(d.className + "-anchor");
+                (this.drawConfig.text.fill ? fill : draw).point(d.anchor, this.drawConfig.text.color);
+            }
+            d.anchor.attr.renderTime = renderTime;
         }
         else {
             console.error("Cannot draw object. Unknown class.");
@@ -12040,7 +12066,7 @@ globalThis.VEllipse = __webpack_require__(112).VEllipse;
 globalThis.Circle = __webpack_require__(913).Circle;
 globalThis.CircleSector = __webpack_require__(946).CircleSector;
 globalThis.PBImage = __webpack_require__(699).PBImage;
-globalThis.PBText = __webpack_require__(196)/* .PBText */ .B;
+globalThis.PBText = __webpack_require__(196).PBText;
 globalThis.MouseHandler = __webpack_require__(293).MouseHandler;
 globalThis.KeyHandler = __webpack_require__(909).KeyHandler;
 globalThis.drawutils = __webpack_require__(149).drawutils;

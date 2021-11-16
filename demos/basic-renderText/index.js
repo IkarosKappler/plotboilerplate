@@ -24,9 +24,6 @@
       )
     );
 
-    var anchorPosition = new Vertex(0, 0);
-    pb.add(anchorPosition);
-
     var TEXT_ALIGN_OPTIONS = ["left", "right", "center", "start", "end"];
     var FONT_FAMILY_OPTIONS = [
       "Arial", // (sans-serif)
@@ -68,29 +65,27 @@
       textAlign: "left"
     };
 
-    pb.config.postDraw = function () {
-      pb.fill.point({ x: config.x, y: config.y }, "rgba(192,0,128,0.5)");
-      pb.fill.text(config.text, config.x, config.y, {
-        color: config.color,
-        fontFamily: config.fontFamily,
-        fontSize: config.fontSize,
-        fontStyle: config.fontStyle,
-        fontWeight: config.fontWeight,
-        lineHeight: config.lineHeight,
-        rotation: config.rotation * DEG_TO_RAD, // Convert degrees to radians
-        textAlign: config.textAlign
-      });
-    };
+    var text = new PBText(config.text, new Vertex(config.x, config.y), config);
+    pb.add(text);
 
-    var updateTextPosition = function () {
-      anchorPosition.x = config.x;
-      anchorPosition.y = config.y;
+    var updateTextProperties = function () {
+      text.anchor.x = config.x;
+      text.anchor.y = config.y;
+      text.color = config.color;
+      text.fontFamily = config.fontFamily;
+      text.fontSize = config.fontSize;
+      text.fontStyle = config.fontStyle;
+      text.fontWeight = config.fontWeight;
+      text.lineHeight = config.lineHeight;
+      text.rotation = config.rotation * DEG_TO_RAD;
+      text.text = config.text;
+      text.textAlign = config.textAlign;
       redraw();
     };
 
-    anchorPosition.listeners.addDragEndListener(function (event) {
-      config.x = anchorPosition.x;
-      config.y = anchorPosition.y;
+    text.anchor.listeners.addDragEndListener(function (event) {
+      config.x = text.anchor.x;
+      config.y = text.anchor.y;
       redraw();
     });
 
@@ -119,33 +114,27 @@
     // prettier-ignore
     gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(toggleGuiSize);
     // prettier-ignore
-    gui.add(config, "x").listen().title("The x position of the text.").onChange( function() { 
-      updateTextPosition(); 
-      redraw(); 
-    } );
+    gui.add(config, "x").listen().title("The x position of the text.").onChange( updateTextProperties);
     // prettier-ignore
-    gui.add(config, "y").listen().title("The y position of the text.").onChange( function() { 
-      updateTextPosition(); 
-      redraw(); 
-    } );
+    gui.add(config, "y").listen().title("The y position of the text.").onChange( updateTextProperties );
     // prettier-ignore
-    gui.addColor(config, "color").title("The color to use").onChange(redraw);
+    gui.addColor(config, "color").title("The color to use").onChange(updateTextProperties);
     // prettier-ignore
-    gui.add(config, "fontFamily", FONT_FAMILY_OPTIONS).title("The font family to use.").onChange(redraw);
+    gui.add(config, "fontFamily", FONT_FAMILY_OPTIONS).title("The font family to use.").onChange(updateTextProperties);
     // prettier-ignore
-    gui.add(config, "fontSize").min(1).max(64).step(1).title("The font size to use.").onChange(redraw);
+    gui.add(config, "fontSize").min(1).max(64).step(1).title("The font size to use.").onChange(updateTextProperties);
     // prettier-ignore
-    gui.add(config, "lineHeight").min(1).max(64).step(1).title("The line height to use.").onChange(redraw);
+    gui.add(config, "lineHeight").min(1).max(64).step(1).title("The line height to use.").onChange(updateTextProperties);
     // prettier-ignore
-    gui.add(config, "fontStyle", FONT_STYLES).title("The font size to use.").onChange(redraw);
+    gui.add(config, "fontStyle", FONT_STYLES).title("The font size to use.").onChange(updateTextProperties);
     // prettier-ignore
-    gui.add(config, "fontWeight", FONT_WEIGHTS).title("The font size to use.").onChange(redraw);
+    gui.add(config, "fontWeight", FONT_WEIGHTS).title("The font size to use.").onChange(updateTextProperties);
     // prettier-ignore
-    gui.add(config, "rotation").min(0).max(360).step(1).title("The rotation to use in degrees.").onChange(redraw);
+    gui.add(config, "rotation").min(0).max(360).step(1).title("The rotation to use in degrees.").onChange(updateTextProperties);
     // prettier-ignore
-    gui.add(config, "textAlign", TEXT_ALIGN_OPTIONS).title("The text align to use.").onChange(redraw);
+    gui.add(config, "textAlign", TEXT_ALIGN_OPTIONS).title("The text align to use.").onChange(updateTextProperties);
     // prettier-ignore
-    gui.add(config, "text").title("The text to draw.").onChange(redraw);
+    gui.add(config, "text").title("The text to draw.").onChange(updateTextProperties);
 
     redraw();
   });

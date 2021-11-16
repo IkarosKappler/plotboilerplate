@@ -25,16 +25,12 @@
 - Port all demos from vanilla JS to TypeScript.
 - Add a TouchHandler (such as the MouseHandler) to wrap AlloyFinger? Add this to the main demo to keep track of touch positions?
 - Add a removeVertices() function (and use it in the threejs demo).
-- Add class: EllipticSector
-- Extend the demo 25 (multiple circle intersection): add SVG export.
 - Replace drawables-to-svg.js by the new svg-draw library.
 - Remove all 'info' blocks and replace by uistats.
 - For convenience add an "Info" button to the UI of all demos with a short explanation about what's happening here.
 - Remove all <div id="dialog-wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
 - Remove SVGBuilder from Girih-demo.
 - Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
-- Port `addContrastColor` function to typescript and add to the helpers (in demos now are pure JS).
-- Add the text draw demo (with new text params) to the basic demo page.
 - Add the new text params to the `label` function, too.
 
 ### Todos for future Version 2
@@ -53,7 +49,7 @@
 - Change `Bounds.computeFromVertices` to `Bounds.fromVertices`.
 - Change draw.image(image, position:Vertex, size:Vertex) to Bounds or XYDimension.
 - Change draw.text(text, x:number, y:number, ...) to (..., position:XYCoords, ...). Same with draw.label(...).
-- draw.text() and draw.label() require color params.
+- draw.label() requires color param.
 - Render dashed lines around images that cannot be rendered (e.g. file not found).
 - Each render method should also get the ID of the rendered element; this is required to keep track of changes in SVG documents.
 - Remove the toSVGString methods from all Drawables and the SVGSerializable interface. The drawutilssvg does everything with SVGs now.

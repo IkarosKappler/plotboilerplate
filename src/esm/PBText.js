@@ -32,6 +32,7 @@ export class PBText {
          **/
         this.className = "PBText";
         this.uid = UIDGenerator.next();
+        this.text = text;
         this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex();
         this.color = options.color;
         this.fontFamily = options.fontFamily;

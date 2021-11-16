@@ -17,7 +17,7 @@ import { FontOptions, FontStyle, FontWeight, SVGSerializable, UID } from "./inte
  * @requires UID
  * @requires UIDGenerator
  **/
-export declare class PBText implements SVGSerializable {
+export declare class PBText implements SVGSerializable, FontOptions {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/

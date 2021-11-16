@@ -8389,6 +8389,7 @@ class PBText {
          **/
         this.className = "PBText";
         this.uid = UIDGenerator.next();
+        this.text = text;
         this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex();
         this.color = options.color;
         this.fontFamily = options.fontFamily;
@@ -9544,7 +9545,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2021-03-03 Added the `VEllipseSector` drawable.
  * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
- * @version  1.14.0
+ * @modified 2021-11-16 Adding the `PBText` drawable.
+ * @version  1.15.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -9789,6 +9791,12 @@ class PlotBoilerplate {
             image: {
                 color: "#a8a8a8",
                 lineWidth: 1
+            },
+            text: {
+                color: "rgba(192,0,128,0.5)",
+                lineWidth: 1,
+                fill: true,
+                anchor: true
             }
         }; // END drawConfig
         // +---------------------------------------------------------------------------------
@@ -10096,6 +10104,11 @@ class PlotBoilerplate {
             });
             drawable.lowerRight.attr.selectable = false;
         }
+        else if (drawable instanceof PBText) {
+            this.vertices.push(drawable.anchor);
+            this.drawables.push(drawable);
+            drawable.anchor.attr.selectable = false;
+        }
         else {
             throw "Cannot add drawable of unrecognized type: " + typeof drawable + ".";
         }
@@ -10193,6 +10206,9 @@ class PlotBoilerplate {
                     else if (drawable instanceof PBImage) {
                         this.removeVertex(drawable.upperLeft, false);
                         this.removeVertex(drawable.lowerRight, false);
+                    }
+                    else if (drawable instanceof PBText) {
+                        this.removeVertex(drawable.anchor, false);
                     }
                 } // END removeWithVertices
                 if (redraw) {
@@ -10518,6 +10534,16 @@ class PlotBoilerplate {
                 draw.circleHandle(d.lowerRight, 3, this.drawConfig.image.color);
                 d.lowerRight.attr.renderTime = renderTime;
             }
+        }
+        else if (d instanceof PBText) {
+            fill.setCurrentId(d.uid);
+            fill.text(d.text, d.anchor.x, d.anchor.y, d);
+            if (this.drawConfig.text.anchor) {
+                draw.setCurrentId(`${d.uid}_a0`);
+                draw.setCurrentClassName(`${d.className}-anchor`);
+                (this.drawConfig.text.fill ? fill : draw).point(d.anchor, this.drawConfig.text.color);
+            }
+            d.anchor.attr.renderTime = renderTime;
         }
         else {
             console.error("Cannot draw object. Unknown class.");
