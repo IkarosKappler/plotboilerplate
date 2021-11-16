@@ -876,7 +876,6 @@ export class drawutils implements DrawLib<void> {
       rotation?: number;
     }
   ) {
-    // TODO: respect rotation
     // See https://stackoverflow.com/a/23523697
 
     options = options || {};
@@ -899,7 +898,7 @@ export class drawutils implements DrawLib<void> {
     }
 
     const rotation = options.rotation ?? 0.0;
-    const lineHeight = (options.lineHeight ?? options.fontSize ?? 0) * this.scale.x; // TODO: min should be font size or zero?
+    const lineHeight = (options.lineHeight ?? options.fontSize ?? 0) * this.scale.x;
     this.ctx.translate(relX, relY);
     this.ctx.rotate(rotation);
 
@@ -910,8 +909,8 @@ export class drawutils implements DrawLib<void> {
       this.ctx.strokeStyle = color;
       this.ctx.strokeText(text, 0, lineHeight / 2);
     }
-    this.ctx.translate(-relX, -relY);
-    this.ctx.rotate(-rotation); // TODO: check if this is necessary before 'restore()'
+    // this.ctx.translate(-relX, -relY);
+    // this.ctx.rotate(-rotation); // is this necessary before 'restore()'?
     this.ctx.restore();
   }
 

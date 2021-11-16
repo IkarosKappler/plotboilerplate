@@ -717,7 +717,6 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.text = function (text, x, y, options) {
-        // TODO: respect rotation
         // See https://stackoverflow.com/a/23523697
         var _a, _b, _c;
         options = options || {};
@@ -739,7 +738,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.textAlign = options.textAlign;
         }
         var rotation = (_a = options.rotation) !== null && _a !== void 0 ? _a : 0.0;
-        var lineHeight = ((_c = (_b = options.lineHeight) !== null && _b !== void 0 ? _b : options.fontSize) !== null && _c !== void 0 ? _c : 0) * this.scale.x; // TODO: min should be font size or zero?
+        var lineHeight = ((_c = (_b = options.lineHeight) !== null && _b !== void 0 ? _b : options.fontSize) !== null && _c !== void 0 ? _c : 0) * this.scale.x;
         this.ctx.translate(relX, relY);
         this.ctx.rotate(rotation);
         if (this.fillShapes) {
@@ -750,8 +749,8 @@ var drawutils = /** @class */ (function () {
             this.ctx.strokeStyle = color;
             this.ctx.strokeText(text, 0, lineHeight / 2);
         }
-        this.ctx.translate(-relX, -relY);
-        this.ctx.rotate(-rotation); // TODO: check if this is necessary before 'restore()'
+        // this.ctx.translate(-relX, -relY);
+        // this.ctx.rotate(-rotation); // is this necessary before 'restore()'?
         this.ctx.restore();
     };
     /**

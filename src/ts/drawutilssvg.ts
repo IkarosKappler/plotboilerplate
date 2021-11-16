@@ -1101,11 +1101,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       rotation?: number;
     }
   ): SVGElement {
-    // TODO: rotation and stuff
-
     options = options || {};
     const color: string = options.color || "black";
-    const lineHeight = (options.lineHeight ?? options.fontSize ?? 0) * this.scale.x; // TODO: min should be font size or zero?
+    const lineHeight = (options.lineHeight ?? options.fontSize ?? 0) * this.scale.x;
     // https://www.w3.org/TR/SVG/text.html#TextAnchorProperty
     //    start | middle | end
     const textAlign: "start" | "middle" | "end" =

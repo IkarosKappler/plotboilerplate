@@ -24,6 +24,9 @@
       )
     );
 
+    var anchorPosition = new Vertex(0, 0);
+    pb.add(anchorPosition);
+
     const TEXT_ALIGN_OPTIONS = ["left", "right", "center", "start", "end"];
     const FONT_FAMILY_OPTIONS = [
       "Arial", // (sans-serif)
@@ -71,6 +74,18 @@
       });
     };
 
+    var updateTextPosition = function () {
+      anchorPosition.x = config.x;
+      anchorPosition.y = config.y;
+      redraw();
+    };
+
+    anchorPosition.listeners.addDragEndListener(function (event) {
+      config.x = anchorPosition.x;
+      config.y = anchorPosition.y;
+      redraw();
+    });
+
     var redraw = function () {
       pb.redraw();
     };
@@ -93,14 +108,29 @@
       config.guiDoubleSize = true;
       toggleGuiSize();
     }
+    // prettier-ignore
     gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(toggleGuiSize);
-    gui.add(config, "x").title("The x position of the text.").onChange(redraw);
-    gui.add(config, "y").title("The y position of the text.").onChange(redraw);
+    // prettier-ignore
+    gui.add(config, "x").listen().title("The x position of the text.").onChange( function() { 
+      updateTextPosition(); 
+      redraw(); 
+    } );
+    // prettier-ignore
+    gui.add(config, "y").listen().title("The y position of the text.").onChange( function() { 
+      updateTextPosition(); 
+      redraw(); 
+    } );
+    // prettier-ignore
     gui.add(config, "fontFamily", FONT_FAMILY_OPTIONS).title("The font family to use.").onChange(redraw);
+    // prettier-ignore
     gui.add(config, "fontSize").min(1).max(64).step(1).title("The font size to use.").onChange(redraw);
+    // prettier-ignore
     gui.add(config, "lineHeight").min(1).max(64).step(1).title("The line height to use.").onChange(redraw);
+    // prettier-ignore
     gui.add(config, "rotation").min(0).max(360).step(1).title("The rotation to use in degrees.").onChange(redraw);
+    // prettier-ignore
     gui.add(config, "textAlign", TEXT_ALIGN_OPTIONS).title("The text align to use.").onChange(redraw);
+    // prettier-ignore
     gui.add(config, "text").title("The text to draw.").onChange(redraw);
 
     redraw();

@@ -896,11 +896,10 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.text = function (text, x, y, options) {
-        // TODO: rotation and stuff
         var _a, _b;
         options = options || {};
         var color = options.color || "black";
-        var lineHeight = ((_b = (_a = options.lineHeight) !== null && _a !== void 0 ? _a : options.fontSize) !== null && _b !== void 0 ? _b : 0) * this.scale.x; // TODO: min should be font size or zero?
+        var lineHeight = ((_b = (_a = options.lineHeight) !== null && _a !== void 0 ? _a : options.fontSize) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
         // https://www.w3.org/TR/SVG/text.html#TextAnchorProperty
         //    start | middle | end
         var textAlign = options.textAlign === "left" || options.textAlign === "start"
