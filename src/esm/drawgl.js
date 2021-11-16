@@ -565,6 +565,8 @@ export class drawutilsgl {
      * @param {string=} options.color - The Color to use.
      * @param {string=} options.fontFamily - The font family to use.
      * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
      * @param {number=} options.lineHeight - The line height (in pixels) to use.
      * @param {number=} options.rotation - The (optional) rotation in radians.
      * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.

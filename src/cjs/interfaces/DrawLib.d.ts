@@ -23,6 +23,16 @@ export interface DrawLibConfiguration {
 }
 export declare type FontWeight = "normal" | "bold" | "bolder" | "lighter" | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 export declare type FontStyle = "normal" | "italic" | "oblique";
+export interface FontOptions {
+    color?: string;
+    fontFamily?: string;
+    fontSize?: number;
+    fontStyle?: FontStyle;
+    fontWeight?: FontWeight;
+    lineHeight?: number;
+    textAlign?: CanvasRenderingContext2D["textAlign"];
+    rotation?: number;
+}
 /**
  * An interface all drawing libraries must implement to be used with PlotBoilerplate.
  *
@@ -402,6 +412,8 @@ export interface DrawLib<R> {
      * @param {string=} options.color - The Color to use.
      * @param {string=} options.fontFamily - The font family to use.
      * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
      * @param {number=} options.lineHeight - The line height (in pixels) to use.
      * @param {number=} options.rotation - The (optional) rotation in radians.
      * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
@@ -409,16 +421,7 @@ export interface DrawLib<R> {
      * @instance
      * @memberof drawutils
      */
-    text: (text: string, x: number, y: number, options?: {
-        color?: string;
-        fontFamily?: string;
-        fontSize?: number;
-        fontStyle?: FontStyle;
-        fontWeight?: FontWeight;
-        lineHeight?: number;
-        textAlign?: CanvasRenderingContext2D["textAlign"];
-        rotation?: number;
-    }) => R;
+    text: (text: string, x: number, y: number, options?: FontOptions) => R;
     /**
      * Draw a non-scaling text label at the given absolute position.
      *

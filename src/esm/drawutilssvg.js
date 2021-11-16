@@ -26,11 +26,13 @@
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.3.0
+ * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @version  1.4.0
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
+const RAD_TO_DEG = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -882,6 +884,8 @@ export class drawutilssvg {
      * @param {string=} options.color - The Color to use.
      * @param {string=} options.fontFamily - The font family to use.
      * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
      * @param {number=} options.lineHeight - The line height (in pixels) to use.
      * @param {number=} options.rotation - The (optional) rotation in radians.
      * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
@@ -890,11 +894,32 @@ export class drawutilssvg {
      * @memberof drawutils
      */
     text(text, x, y, options) {
+        var _a, _b;
         options = options || {};
         const color = options.color || "black";
+        const lineHeight = ((_b = (_a = options.lineHeight) !== null && _a !== void 0 ? _a : options.fontSize) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
+        // https://www.w3.org/TR/SVG/text.html#TextAnchorProperty
+        //    start | middle | end
+        const textAlign = options.textAlign === "left" || options.textAlign === "start"
+            ? "start"
+            : options.textAlign === "center"
+                ? "middle"
+                : options.textAlign === "right" || options.textAlign === "end"
+                    ? "end"
+                    : "start";
+        const transformOrigin = `${this._x(x)}px ${this._y(y)}px`;
+        const translate = `translate(0 ${lineHeight / 2})`;
+        const rotate = options.rotation ? `rotate(${options.rotation * RAD_TO_DEG})` : ``;
         const node = this.makeNode("text");
         node.setAttribute("x", `${this._x(x)}`);
         node.setAttribute("y", `${this._y(y)}`);
+        node.setAttribute("font-family", options.fontFamily); // May be undefined
+        node.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
+        node.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : null);
+        node.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : null);
+        node.setAttribute("text-anchor", textAlign);
+        node.style["transform-origin"] = transformOrigin;
+        node.setAttribute("transform", rotate + " " + translate);
         node.innerHTML = text;
         return this._bindFillDraw(node, "text", color, 1);
     }

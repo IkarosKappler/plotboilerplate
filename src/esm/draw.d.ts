@@ -37,11 +37,12 @@
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.9.0
+ * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @version  1.10.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 /**
  * @classdesc A wrapper class for basic drawing operations.
  *
@@ -464,6 +465,8 @@ export declare class drawutils implements DrawLib<void> {
      * @param {string=} options.color - The Color to use.
      * @param {string=} options.fontFamily - The font family to use.
      * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
      * @param {number=} options.lineHeight - The line height (in pixels) to use.
      * @param {number=} options.rotation - The (optional) rotation in radians.
      * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
@@ -475,6 +478,8 @@ export declare class drawutils implements DrawLib<void> {
         color?: string;
         fontFamily?: string;
         fontSize?: number;
+        fontStyle?: FontStyle;
+        fontWeight?: FontWeight;
         lineHeight?: number;
         textAlign?: CanvasRenderingContext2D["textAlign"];
         rotation?: number;

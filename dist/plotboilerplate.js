@@ -3900,6 +3900,78 @@ exports.PBImage = PBImage;
 
 /***/ }),
 
+/***/ 196:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+var __webpack_unused_export__;
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2021-11-16
+ * @version  1.0.0
+ **/
+__webpack_unused_export__ = ({ value: true });
+exports.B = void 0;
+var UIDGenerator_1 = __webpack_require__(197);
+var Vertex_1 = __webpack_require__(421);
+/**
+ * @classdesc A simple text element: position, fontSize, fontFamily, color, textAlign, lineHeight and rotation.
+ *
+ * @requires FontOptions
+ * @requires FontSize
+ * @requires FontStyle
+ * @requires FontWeight
+ * @requires Vertex
+ * @requires SVGSerializale
+ * @requires UID
+ * @requires UIDGenerator
+ **/
+var PBText = /** @class */ (function () {
+    /**
+     * Create a new circle with given center point and radius.
+     *
+     * @constructor
+     * @name Circle
+     * @param {Vertex} center - The center point of the circle.
+     * @param {number} radius - The radius of the circle.
+     */
+    function PBText(text, anchor, options) {
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "PBText";
+        this.uid = UIDGenerator_1.UIDGenerator.next();
+        this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex_1.Vertex();
+        this.color = options.color;
+        this.fontFamily = options.fontFamily;
+        this.fontSize = options.fontSize;
+        this.fontStyle = options.fontStyle;
+        this.fontWeight = options.fontWeight;
+        this.lineHeight = options.lineHeight;
+        this.textAlign = options.textAlign;
+        this.rotation = options.rotation;
+    }
+    /**
+     * Create an SVG representation of this circle.
+     *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Circle
+     */
+    PBText.prototype.toSVGString = function (options) {
+        console.warn("[PBText.toSVGString()] This function is not implemented as it defines a deprecated method. Use the 'drawutilssvg.text()' method instead.");
+        return "";
+    };
+    return PBText;
+}()); // END class
+exports.B = PBText;
+//# sourceMappingURL=PBText.js.map
+
+/***/ }),
+
 /***/ 919:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -9070,7 +9142,8 @@ exports.VertexListeners = VertexListeners;
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.9.0
+ * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @version  1.10.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -9740,6 +9813,8 @@ var drawutils = /** @class */ (function () {
      * @param {string=} options.color - The Color to use.
      * @param {string=} options.fontFamily - The font family to use.
      * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
      * @param {number=} options.lineHeight - The line height (in pixels) to use.
      * @param {number=} options.rotation - The (optional) rotation in radians.
      * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
@@ -9748,41 +9823,43 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.text = function (text, x, y, options) {
-        // TODO: respect rotation
         // See https://stackoverflow.com/a/23523697
-        var _a;
+        var _a, _b, _c;
         options = options || {};
         this.ctx.save();
-        x = this.offset.x + x * this.scale.x;
-        y = this.offset.y + y * this.scale.y;
+        var relX = this.offset.x + x * this.scale.x;
+        var relY = this.offset.y + y * this.scale.y;
         var color = options.color || "black";
         if (options.fontSize || options.fontFamily) {
             // Scaling of text only works in uniform mode
-            this.ctx.font = (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") + ((_a = options.fontFamily) !== null && _a !== void 0 ? _a : "Arial");
-            console.log("font, ", this.ctx.font);
+            this.ctx.font =
+                (options.fontWeight ? options.fontWeight + " " : "") +
+                    (options.fontStyle ? options.fontStyle + " " : "") +
+                    (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") +
+                    (options.fontFamily
+                        ? options.fontFamily.indexOf(" ") === -1
+                            ? options.fontFamily
+                            : "\"" + options.fontFamily + "\""
+                        : "Arial");
         }
+        if (options.textAlign) {
+            this.ctx.textAlign = options.textAlign;
+        }
+        var rotation = (_a = options.rotation) !== null && _a !== void 0 ? _a : 0.0;
+        var lineHeight = ((_c = (_b = options.lineHeight) !== null && _b !== void 0 ? _b : options.fontSize) !== null && _c !== void 0 ? _c : 0) * this.scale.x;
+        this.ctx.translate(relX, relY);
+        this.ctx.rotate(rotation);
         if (this.fillShapes) {
             this.ctx.fillStyle = color;
-            this.ctx.fillText(text, x, y);
+            this.ctx.fillText(text, 0, lineHeight / 2);
         }
         else {
             this.ctx.strokeStyle = color;
-            this.ctx.strokeText(text, x, y);
+            this.ctx.strokeText(text, 0, lineHeight / 2);
         }
+        // this.ctx.translate(-relX, -relY);
+        // this.ctx.rotate(-rotation); // is this necessary before 'restore()'?
         this.ctx.restore();
-        // options = options || {};
-        // this.ctx.save();
-        // x = this.offset.x + x * this.scale.x;
-        // y = this.offset.y + y * this.scale.y;
-        // const color: string = options.color || "black";
-        // if (this.fillShapes) {
-        //   this.ctx.fillStyle = color;
-        //   this.ctx.fillText(text, x, y);
-        // } else {
-        //   this.ctx.strokeStyle = color;
-        //   this.ctx.strokeText(text, x, y);
-        // }
-        // this.ctx.restore();
     };
     /**
      * Draw a non-scaling text label at the given position.
@@ -10433,6 +10510,8 @@ var drawutilsgl = /** @class */ (function () {
      * @param {string=} options.color - The Color to use.
      * @param {string=} options.fontFamily - The font family to use.
      * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
      * @param {number=} options.lineHeight - The line height (in pixels) to use.
      * @param {number=} options.rotation - The (optional) rotation in radians.
      * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
@@ -10593,13 +10672,15 @@ var GLU = /** @class */ (function () {
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.3.0
+ * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @version  1.4.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
 var CircleSector_1 = __webpack_require__(946);
 var CubicBezierCurve_1 = __webpack_require__(510);
 var Vertex_1 = __webpack_require__(421);
+var RAD_TO_DEG = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -11452,6 +11533,8 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string=} options.color - The Color to use.
      * @param {string=} options.fontFamily - The font family to use.
      * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
      * @param {number=} options.lineHeight - The line height (in pixels) to use.
      * @param {number=} options.rotation - The (optional) rotation in radians.
      * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
@@ -11460,11 +11543,32 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.text = function (text, x, y, options) {
+        var _a, _b;
         options = options || {};
         var color = options.color || "black";
+        var lineHeight = ((_b = (_a = options.lineHeight) !== null && _a !== void 0 ? _a : options.fontSize) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
+        // https://www.w3.org/TR/SVG/text.html#TextAnchorProperty
+        //    start | middle | end
+        var textAlign = options.textAlign === "left" || options.textAlign === "start"
+            ? "start"
+            : options.textAlign === "center"
+                ? "middle"
+                : options.textAlign === "right" || options.textAlign === "end"
+                    ? "end"
+                    : "start";
+        var transformOrigin = this._x(x) + "px " + this._y(y) + "px";
+        var translate = "translate(0 " + lineHeight / 2 + ")";
+        var rotate = options.rotation ? "rotate(" + options.rotation * RAD_TO_DEG + ")" : "";
         var node = this.makeNode("text");
         node.setAttribute("x", "" + this._x(x));
         node.setAttribute("y", "" + this._y(y));
+        node.setAttribute("font-family", options.fontFamily); // May be undefined
+        node.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : null);
+        node.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : null);
+        node.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : null);
+        node.setAttribute("text-anchor", textAlign);
+        node.style["transform-origin"] = transformOrigin;
+        node.setAttribute("transform", rotate + " " + translate);
         node.innerHTML = text;
         return this._bindFillDraw(node, "text", color, 1);
     };
@@ -11936,6 +12040,7 @@ globalThis.VEllipse = __webpack_require__(112).VEllipse;
 globalThis.Circle = __webpack_require__(913).Circle;
 globalThis.CircleSector = __webpack_require__(946).CircleSector;
 globalThis.PBImage = __webpack_require__(699).PBImage;
+globalThis.PBText = __webpack_require__(196)/* .PBText */ .B;
 globalThis.MouseHandler = __webpack_require__(293).MouseHandler;
 globalThis.KeyHandler = __webpack_require__(909).KeyHandler;
 globalThis.drawutils = __webpack_require__(149).drawutils;

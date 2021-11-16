@@ -12,12 +12,26 @@
  * @modified 2021-03-30 Added the `endDrawCycle` function to `DrawLib`.
  * @modified 2021-05-31 Added the `drawLib.setConfiguration` function.
  * @modified 2021-05-31 Splitted the large interfaces.ts file into this one and others.
+ * @modified 2021-11-12 Added `text()` params fontSize, fontFamily, rotation, textAlign.
+ * @modified 2021-11-16 Added `text()` params fontWeight and fontStyle..
  **/
 import { Polygon } from "../Polygon";
 import { Vertex } from "../Vertex";
 import { SVGPathParams, UID, XYCoords } from "./core";
 export interface DrawLibConfiguration {
     blendMode?: 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity' | null;
+}
+export declare type FontWeight = "normal" | "bold" | "bolder" | "lighter" | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+export declare type FontStyle = "normal" | "italic" | "oblique";
+export interface FontOptions {
+    color?: string;
+    fontFamily?: string;
+    fontSize?: number;
+    fontStyle?: FontStyle;
+    fontWeight?: FontWeight;
+    lineHeight?: number;
+    textAlign?: CanvasRenderingContext2D["textAlign"];
+    rotation?: number;
 }
 /**
  * An interface all drawing libraries must implement to be used with PlotBoilerplate.
@@ -398,6 +412,8 @@ export interface DrawLib<R> {
      * @param {string=} options.color - The Color to use.
      * @param {string=} options.fontFamily - The font family to use.
      * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
      * @param {number=} options.lineHeight - The line height (in pixels) to use.
      * @param {number=} options.rotation - The (optional) rotation in radians.
      * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
@@ -405,14 +421,7 @@ export interface DrawLib<R> {
      * @instance
      * @memberof drawutils
      */
-    text: (text: string, x: number, y: number, options?: {
-        color?: string;
-        fontFamily?: string;
-        fontSize?: number;
-        lineHeight?: number;
-        textAlign?: CanvasRenderingContext2D["textAlign"];
-        rotation?: number;
-    }) => R;
+    text: (text: string, x: number, y: number, options?: FontOptions) => R;
     /**
      * Draw a non-scaling text label at the given absolute position.
      *

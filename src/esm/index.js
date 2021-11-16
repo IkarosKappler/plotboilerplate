@@ -13,6 +13,7 @@ export * from "./KeyHandler";
 export * from "./Line";
 export * from "./MouseHandler";
 export * from "./PBImage";
+export * from "./PBText";
 export * from "./PlotBoilerplate";
 export * from "./Polygon";
 export * from "./SVGBuilder";
