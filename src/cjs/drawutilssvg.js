@@ -915,8 +915,10 @@ var drawutilssvg = /** @class */ (function () {
         var node = this.makeNode("text");
         node.setAttribute("x", "" + this._x(x));
         node.setAttribute("y", "" + this._y(y));
-        node.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : null);
         node.setAttribute("font-family", options.fontFamily); // May be undefined
+        node.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : null);
+        node.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : null);
+        node.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : null);
         node.setAttribute("text-anchor", textAlign);
         node.style["transform-origin"] = transformOrigin;
         node.setAttribute("transform", rotate + " " + translate);

@@ -727,7 +727,9 @@ var drawutils = /** @class */ (function () {
         if (options.fontSize || options.fontFamily) {
             // Scaling of text only works in uniform mode
             this.ctx.font =
-                (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") +
+                (options.fontWeight ? options.fontWeight + " " : "") +
+                    (options.fontStyle ? options.fontStyle + " " : "") +
+                    (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") +
                     (options.fontFamily
                         ? options.fontFamily.indexOf(" ") === -1
                             ? options.fontFamily

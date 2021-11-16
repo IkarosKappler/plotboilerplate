@@ -12,6 +12,8 @@
  * @modified 2021-03-30 Added the `endDrawCycle` function to `DrawLib`.
  * @modified 2021-05-31 Added the `drawLib.setConfiguration` function.
  * @modified 2021-05-31 Splitted the large interfaces.ts file into this one and others.
+ * @modified 2021-11-12 Added `text()` params fontSize, fontFamily, rotation, textAlign.
+ * @modified 2021-11-16 Added `text()` params fontWeight and fontStyle..
  **/
 import { Polygon } from "../Polygon";
 import { Vertex } from "../Vertex";
@@ -19,6 +21,8 @@ import { SVGPathParams, UID, XYCoords } from "./core";
 export interface DrawLibConfiguration {
     blendMode?: 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity' | null;
 }
+export declare type FontWeight = "normal" | "bold" | "bolder" | "lighter" | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+export declare type FontStyle = "normal" | "italic" | "oblique";
 /**
  * An interface all drawing libraries must implement to be used with PlotBoilerplate.
  *
@@ -409,6 +413,8 @@ export interface DrawLib<R> {
         color?: string;
         fontFamily?: string;
         fontSize?: number;
+        fontStyle?: FontStyle;
+        fontWeight?: FontWeight;
         lineHeight?: number;
         textAlign?: CanvasRenderingContext2D["textAlign"];
         rotation?: number;

@@ -10,7 +10,7 @@
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration } from "./interfaces";
+import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -418,6 +418,8 @@ export declare class drawutilsgl implements DrawLib<void> {
         color?: string;
         fontFamily?: string;
         fontSize?: number;
+        fontStyle?: FontStyle;
+        fontWeight?: FontWeight;
         lineHeight?: number;
         textAlign?: CanvasRenderingContext2D["textAlign"];
         rotation?: number;

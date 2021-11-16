@@ -27,8 +27,8 @@
     var anchorPosition = new Vertex(0, 0);
     pb.add(anchorPosition);
 
-    const TEXT_ALIGN_OPTIONS = ["left", "right", "center", "start", "end"];
-    const FONT_FAMILY_OPTIONS = [
+    var TEXT_ALIGN_OPTIONS = ["left", "right", "center", "start", "end"];
+    var FONT_FAMILY_OPTIONS = [
       "Arial", // (sans-serif)
       "Arial Black", // (sans-serif)
       "Verdana", // (sans-serif)
@@ -48,13 +48,18 @@
       "Luminari", // (fantasy)
       "Comic Sans MS" // (cursive)
     ];
+    var FONT_STYLES = ["normal", "italic", "oblique"];
+    var FONT_WEIGHTS = ["normal", "bold", "bolder", "lighter", 100, 200, 300, 400, 500, 600, 700, 800, 900];
 
-    const config = {
+    var config = {
       guiDoubleSize: false,
       x: 0,
       y: 0,
+      color: "#000000",
       fontFamily: "Arial",
       fontSize: 12,
+      fontStyle: "normal", // "normal", "italics", "oblique"
+      fontWeight: "normal", // "normal", "bold", "bolder", "lighter", 100, 200, ... 900
       lineHeight: 12,
       rotation: 0.0,
       text: "Test text",
@@ -66,8 +71,11 @@
     pb.config.postDraw = function () {
       pb.fill.point({ x: config.x, y: config.y }, "rgba(192,0,128,0.5)");
       pb.fill.text(config.text, config.x, config.y, {
+        color: config.color,
         fontFamily: config.fontFamily,
         fontSize: config.fontSize,
+        fontStyle: config.fontStyle,
+        fontWeight: config.fontWeight,
         lineHeight: config.lineHeight,
         rotation: config.rotation * DEG_TO_RAD, // Convert degrees to radians
         textAlign: config.textAlign
@@ -121,11 +129,17 @@
       redraw(); 
     } );
     // prettier-ignore
+    gui.addColor(config, "color").title("The color to use").onChange(redraw);
+    // prettier-ignore
     gui.add(config, "fontFamily", FONT_FAMILY_OPTIONS).title("The font family to use.").onChange(redraw);
     // prettier-ignore
     gui.add(config, "fontSize").min(1).max(64).step(1).title("The font size to use.").onChange(redraw);
     // prettier-ignore
     gui.add(config, "lineHeight").min(1).max(64).step(1).title("The line height to use.").onChange(redraw);
+    // prettier-ignore
+    gui.add(config, "fontStyle", FONT_STYLES).title("The font size to use.").onChange(redraw);
+    // prettier-ignore
+    gui.add(config, "fontWeight", FONT_WEIGHTS).title("The font size to use.").onChange(redraw);
     // prettier-ignore
     gui.add(config, "rotation").min(0).max(360).step(1).title("The rotation to use in degrees.").onChange(redraw);
     // prettier-ignore

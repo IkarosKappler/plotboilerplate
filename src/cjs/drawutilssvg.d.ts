@@ -31,7 +31,7 @@
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration } from "./interfaces";
+import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -599,6 +599,8 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
         color?: string;
         fontFamily?: string;
         fontSize?: number;
+        fontStyle?: FontStyle;
+        fontWeight?: FontWeight;
         lineHeight?: number;
         textAlign?: CanvasRenderingContext2D["textAlign"];
         rotation?: number;

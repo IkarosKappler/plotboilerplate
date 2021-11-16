@@ -34,7 +34,18 @@ import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawConfig, DrawLib, DrawSettings, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration } from "./interfaces";
+import {
+  DrawConfig,
+  DrawLib,
+  DrawSettings,
+  XYCoords,
+  XYDimension,
+  SVGPathParams,
+  UID,
+  DrawLibConfiguration,
+  FontStyle,
+  FontWeight
+} from "./interfaces";
 
 const RAD_TO_DEG = 180 / Math.PI;
 
@@ -1096,6 +1107,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       color?: string;
       fontFamily?: string;
       fontSize?: number;
+      fontStyle?: FontStyle;
+      fontWeight?: FontWeight;
       lineHeight?: number;
       textAlign?: CanvasRenderingContext2D["textAlign"];
       rotation?: number;
@@ -1121,8 +1134,10 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     const node: SVGElement = this.makeNode("text");
     node.setAttribute("x", `${this._x(x)}`);
     node.setAttribute("y", `${this._y(y)}`);
-    node.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
     node.setAttribute("font-family", options.fontFamily); // May be undefined
+    node.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
+    node.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : null);
+    node.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : null);
     node.setAttribute("text-anchor", textAlign);
     node.style["transform-origin"] = transformOrigin;
     node.setAttribute("transform", rotate + " " + translate);

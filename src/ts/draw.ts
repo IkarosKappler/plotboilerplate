@@ -44,7 +44,7 @@
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 import { drawutilssvg } from "./drawutilssvg";
 
 // Todo: rename this class to Drawutils?
@@ -871,6 +871,8 @@ export class drawutils implements DrawLib<void> {
       color?: string;
       fontFamily?: string;
       fontSize?: number;
+      fontStyle?: FontStyle;
+      fontWeight?: FontWeight;
       lineHeight?: number;
       textAlign?: CanvasRenderingContext2D["textAlign"];
       rotation?: number;
@@ -886,6 +888,8 @@ export class drawutils implements DrawLib<void> {
     if (options.fontSize || options.fontFamily) {
       // Scaling of text only works in uniform mode
       this.ctx.font =
+        (options.fontWeight ? options.fontWeight + " " : "") +
+        (options.fontStyle ? options.fontStyle + " " : "") +
         (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") +
         (options.fontFamily
           ? options.fontFamily.indexOf(" ") === -1

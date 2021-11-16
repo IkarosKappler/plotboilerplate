@@ -12,7 +12,16 @@
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGPathParams, SVGSerializable, UID, DrawLibConfiguration } from "./interfaces";
+import {
+  DrawLib,
+  XYCoords,
+  SVGPathParams,
+  SVGSerializable,
+  UID,
+  DrawLibConfiguration,
+  FontStyle,
+  FontWeight
+} from "./interfaces";
 
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
@@ -680,6 +689,8 @@ export class drawutilsgl implements DrawLib<void> {
       color?: string;
       fontFamily?: string;
       fontSize?: number;
+      fontStyle?: FontStyle;
+      fontWeight?: FontWeight;
       lineHeight?: number;
       textAlign?: CanvasRenderingContext2D["textAlign"];
       rotation?: number;
