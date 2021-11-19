@@ -11584,7 +11584,9 @@ var drawutilssvg = /** @class */ (function () {
                     : "start";
         var transformOrigin = this._x(x) + "px " + this._y(y) + "px";
         var translate = "translate(0 " + lineHeight / 2 + ")";
-        var rotate = options.rotation ? "rotate(" + options.rotation * RAD_TO_DEG + ")" : "";
+        // Safari has a transform-origin/rotation bug.
+        // It's essential to use rotate(r,x,y) here. rotate(r) with transform-origin(x,y) won't do the job.
+        var rotate = options.rotation ? "rotate(" + options.rotation * RAD_TO_DEG + ", " + this._x(x) + "px,  " + this._y(y) + "px)" : "";
         var node = this.makeNode("text");
         node.setAttribute("x", "" + this._x(x));
         node.setAttribute("y", "" + this._y(y));

@@ -32,6 +32,7 @@
 - Remove SVGBuilder from Girih-demo.
 - Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
 - Add the new text params to the `label` function, too.
+- Make Images rotatetable.
 
 ### Todos for future Version 2
 

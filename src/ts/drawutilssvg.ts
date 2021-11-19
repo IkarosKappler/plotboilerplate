@@ -217,7 +217,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       "vertex": "Vertex",
       "line": "Line",
       "vector": "Vector",
-      "image": "Image"
+      "image": "Image",
+      "text": "Text"
     };
     // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
     const rules = [];
@@ -1079,7 +1080,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     }
     if (!isOpen) d.push("Z");
     node.setAttribute("d", d.join(" "));
-    return this._bindFillDraw(node, "polyline", color, lineWidth || 1);
+    return this._bindFillDraw(node, "polygon", color, lineWidth || 1);
   }
 
   /**
@@ -1130,21 +1131,31 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
         ? "end"
         : "start";
     const transformOrigin = `${this._x(x)}px ${this._y(y)}px`;
-    const translate = `translate(0 ${lineHeight / 2})`;
-    const rotate = options.rotation ? `rotate(${options.rotation * RAD_TO_DEG})` : ``;
+    const translate = `translate(${this._x(x)} ${this._y(y) + lineHeight / 2})`;
+    // Safari has a transform-origin/rotation bug.
+    // It's essential to use rotate(r,x,y) here. "rotate(r)"" with transform-origin(x,y) won't do the job.
+    // And rotate and translate cannot be used is combination on a text object.
+    // So wrap the text inside a <g>, translate the <g>, and rotate the text inside.
+    const rotate = options.rotation ? `rotate(${options.rotation * RAD_TO_DEG} 0 0)` : ``;
 
-    const node: SVGElement = this.makeNode("text");
-    node.setAttribute("x", `${this._x(x)}`);
-    node.setAttribute("y", `${this._y(y)}`);
-    node.setAttribute("font-family", options.fontFamily); // May be undefined
-    node.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
-    node.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : null);
-    node.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : null);
-    node.setAttribute("text-anchor", textAlign);
-    node.style["transform-origin"] = transformOrigin;
-    node.setAttribute("transform", rotate + " " + translate);
+    const node: SVGElement = this.makeNode("g");
+    const curId = this.curId;
+    this.curId = curId + "_text";
+    const textNode: SVGElement = this.makeNode("text");
+    node.appendChild(textNode);
+    textNode.setAttribute("font-family", options.fontFamily); // May be undefined
+    textNode.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
+    textNode.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : null);
+    textNode.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : null);
+    textNode.setAttribute("text-anchor", textAlign);
+    textNode.setAttribute("transform-origin", "0 0");
+    textNode.setAttribute("transform", rotate);
+    node.setAttribute("transform-origin", transformOrigin);
+    node.setAttribute("transform", translate);
 
-    node.innerHTML = text;
+    textNode.innerHTML = text;
+    // Restore old ID
+    this.curId = curId;
     return this._bindFillDraw(node, "text", color, 1);
   }
 
