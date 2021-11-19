@@ -31,7 +31,7 @@
 - Remove all <div id="dialog-wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
 - Remove SVGBuilder from Girih-demo.
 - Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
-- Add the new text params to the `label` function, too.
+- Add the new text params to the `label` function, too (except size? style? weight?).
 - Make Images rotatetable.
 
 ### Todos for future Version 2

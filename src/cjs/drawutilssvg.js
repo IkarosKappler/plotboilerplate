@@ -28,6 +28,8 @@
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @version  1.4.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -880,7 +882,7 @@ var drawutilssvg = /** @class */ (function () {
         return this._bindFillDraw(node, "polygon", color, lineWidth || 1);
     };
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -946,16 +948,21 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (optional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.label = function (text, x, y, rotation) {
+    drawutilssvg.prototype.label = function (text, x, y, rotation, color) {
         var node = this.makeNode("text");
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute("transform", "translate(" + this.offset.x + "," + this.offset.y + "), rotate(" + (rotation / Math.PI) * 180 + ")");
+        node.setAttribute("transform", "translate(" + x + "," + y + "), rotate(" + ((rotation || 0) / Math.PI) * 180 + ")");
+        node.setAttribute("font-family", "Arial");
+        node.setAttribute("font-size", "9pt");
+        node.setAttribute("font-style", "normal");
+        node.setAttribute("font-weight", "lighter");
         node.innerHTML = text;
-        return this._bindFillDraw(node, "label", "black", null);
+        return this._bindFillDraw(node, "label", color || "black", null);
     };
     /**
      * Draw an SVG-like path given by the specified path data.

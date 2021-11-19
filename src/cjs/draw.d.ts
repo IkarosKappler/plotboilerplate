@@ -38,6 +38,7 @@
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @version  1.10.0
  **/
 import { Polygon } from "./Polygon";
@@ -456,7 +457,7 @@ export declare class drawutils implements DrawLib<void> {
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): void;
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.

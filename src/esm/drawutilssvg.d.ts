@@ -27,6 +27,8 @@
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @version  1.4.0
  **/
 import { Polygon } from "./Polygon";
@@ -579,7 +581,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): SVGElement;
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -615,11 +617,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (optional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    label(text: string, x: number, y: number, rotation: number): SVGElement;
+    label(text: string, x: number, y: number, rotation?: number, color?: string): SVGElement;
     /**
      * Draw an SVG-like path given by the specified path data.
      *

@@ -1,5 +1,8 @@
 # Changelog
 
+- 2021-11-19
+  - Fixing the `drawutilssvg.label(text,x,y)` position.
+  - Added the `color` param to the `label(...)` function.
 - 2021-11-16
   - Added `text` options to the `DrawConfig` interface.
   - Added the `PBText` class.

@@ -27,6 +27,8 @@
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @version  1.4.0
  **/
 import { CircleSector } from "./CircleSector";
@@ -92,7 +94,8 @@ export class drawutilssvg {
             "vertex": "Vertex",
             "line": "Line",
             "vector": "Vector",
-            "image": "Image"
+            "image": "Image",
+            "text": "Text"
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
         const rules = [];
@@ -872,10 +875,10 @@ export class drawutilssvg {
         if (!isOpen)
             d.push("Z");
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "polyline", color, lineWidth || 1);
+        return this._bindFillDraw(node, "polygon", color, lineWidth || 1);
     }
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -908,21 +911,29 @@ export class drawutilssvg {
                     ? "end"
                     : "start";
         const transformOrigin = `${this._x(x)}px ${this._y(y)}px`;
-        const translate = `translate(0 ${lineHeight / 2})`;
+        const translate = `translate(${this._x(x)} ${this._y(y) + lineHeight / 2})`;
         // Safari has a transform-origin/rotation bug.
-        // It's essential to use rotate(r,x,y) here. rotate(r) with transform-origin(x,y) won't do the job.
-        const rotate = options.rotation ? `rotate(${options.rotation * RAD_TO_DEG}, ${this._x(x)}px,  ${this._y(y)}px)` : ``;
-        const node = this.makeNode("text");
-        node.setAttribute("x", `${this._x(x)}`);
-        node.setAttribute("y", `${this._y(y)}`);
-        node.setAttribute("font-family", options.fontFamily); // May be undefined
-        node.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
-        node.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : null);
-        node.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : null);
-        node.setAttribute("text-anchor", textAlign);
-        node.style["transform-origin"] = transformOrigin;
-        node.setAttribute("transform", rotate + " " + translate);
-        node.innerHTML = text;
+        // It's essential to use rotate(r,x,y) here. "rotate(r)"" with transform-origin(x,y) won't do the job.
+        // And rotate and translate cannot be used is combination on a text object.
+        // So wrap the text inside a <g>, translate the <g>, and rotate the text inside.
+        const rotate = options.rotation ? `rotate(${options.rotation * RAD_TO_DEG} 0 0)` : ``;
+        const node = this.makeNode("g");
+        const curId = this.curId;
+        this.curId = curId + "_text";
+        const textNode = this.makeNode("text");
+        node.appendChild(textNode);
+        textNode.setAttribute("font-family", options.fontFamily); // May be undefined
+        textNode.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
+        textNode.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : null);
+        textNode.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : null);
+        textNode.setAttribute("text-anchor", textAlign);
+        textNode.setAttribute("transform-origin", "0 0");
+        textNode.setAttribute("transform", rotate);
+        node.setAttribute("transform-origin", transformOrigin);
+        node.setAttribute("transform", translate);
+        textNode.innerHTML = text;
+        // Restore old ID
+        this.curId = curId;
         return this._bindFillDraw(node, "text", color, 1);
     }
     /**
@@ -933,16 +944,21 @@ export class drawutilssvg {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (optional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    label(text, x, y, rotation) {
+    label(text, x, y, rotation, color) {
         const node = this.makeNode("text");
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute("transform", `translate(${this.offset.x},${this.offset.y}), rotate(${(rotation / Math.PI) * 180})`);
+        node.setAttribute("transform", `translate(${x},${y}), rotate(${((rotation || 0) / Math.PI) * 180})`);
+        node.setAttribute("font-family", "Arial");
+        node.setAttribute("font-size", "9pt");
+        node.setAttribute("font-style", "normal");
+        node.setAttribute("font-weight", "lighter");
         node.innerHTML = text;
-        return this._bindFillDraw(node, "label", "black", null);
+        return this._bindFillDraw(node, "label", color || "black", null);
     }
     /**
      * Draw an SVG-like path given by the specified path data.

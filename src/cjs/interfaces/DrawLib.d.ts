@@ -13,7 +13,8 @@
  * @modified 2021-05-31 Added the `drawLib.setConfiguration` function.
  * @modified 2021-05-31 Splitted the large interfaces.ts file into this one and others.
  * @modified 2021-11-12 Added `text()` params fontSize, fontFamily, rotation, textAlign.
- * @modified 2021-11-16 Added `text()` params fontWeight and fontStyle..
+ * @modified 2021-11-16 Added `text()` params fontWeight and fontStyle.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  **/
 import { Polygon } from "../Polygon";
 import { Vertex } from "../Vertex";
@@ -403,7 +404,7 @@ export interface DrawLib<R> {
      */
     polyline: (vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number) => R;
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -430,11 +431,12 @@ export interface DrawLib<R> {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    label: (text: string, x: number, y: number, rotation: number) => R;
+    label: (text: string, x: number, y: number, rotation?: number, color?: string) => R;
     /**
      * Draw an SVG-like path given by the specified path data.
      *

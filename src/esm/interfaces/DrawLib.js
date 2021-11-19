@@ -13,7 +13,8 @@
  * @modified 2021-05-31 Added the `drawLib.setConfiguration` function.
  * @modified 2021-05-31 Splitted the large interfaces.ts file into this one and others.
  * @modified 2021-11-12 Added `text()` params fontSize, fontFamily, rotation, textAlign.
- * @modified 2021-11-16 Added `text()` params fontWeight and fontStyle..
+ * @modified 2021-11-16 Added `text()` params fontWeight and fontStyle.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  **/
 export {};
 //# sourceMappingURL=DrawLib.js.map

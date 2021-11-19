@@ -19,35 +19,12 @@
     // All config params except the canvas are optional.
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
-        { canvas: document.getElementById("my-canvas"), fullSize: true, drawOrigin: true },
+        { canvas: document.getElementById("my-canvas"), backgroundColor: "#ffffff", fullSize: true, drawOrigin: true },
         GUP
       )
     );
 
-    var TEXT_ALIGN_OPTIONS = ["left", "right", "center", "start", "end"];
-    var FONT_FAMILY_OPTIONS = [
-      "Arial", // (sans-serif)
-      "Arial Black", // (sans-serif)
-      "Verdana", // (sans-serif)
-      "Tahoma", // (sans-serif)
-      "Trebuchet MS", // (sans-serif)
-      "Impact", // (sans-serif)
-      "Times New Roman", // (serif)
-      "Didot", // (serif)
-      "Georgia", // (serif)
-      "American Typewriter", // (serif)
-      "Andalé Mono", // (monospace)
-      "Courier", // (monospace)
-      "Lucida Console", // (monospace)
-      "Monaco", // (monospace)
-      "Bradley Hand", // (cursive)
-      "Brush Script MT", // (cursive)
-      "Luminari", // (fantasy)
-      "Comic Sans MS" // (cursive)
-    ];
-    var FONT_STYLES = ["normal", "italic", "oblique"];
-    var FONT_WEIGHTS = ["normal", "bold", "bolder", "lighter", 100, 200, 300, 400, 500, 600, 700, 800, 900];
-
+    // We put all possible font options into a config (use this to create a tiny GUI).
     var config = {
       guiDoubleSize: false,
       x: 0,
@@ -65,9 +42,11 @@
       textAlign: "left"
     };
 
+    // Create the text element and add is to the canvas.
     var text = new PBText(config.text, new Vertex(config.x, config.y), config);
     pb.add(text);
 
+    // Apply the config settings to the font (called when some input has changed).
     var updateTextProperties = function () {
       text.anchor.x = config.x;
       text.anchor.y = config.y;
@@ -80,17 +59,22 @@
       text.rotation = config.rotation * DEG_TO_RAD;
       text.text = config.text;
       text.textAlign = config.textAlign;
-      redraw();
+      pb.redraw();
     };
 
+    // Install a Drag-and-drop listener to the text anchor
     text.anchor.listeners.addDragEndListener(function (event) {
       config.x = text.anchor.x;
       config.y = text.anchor.y;
-      redraw();
+      pb.redraw();
     });
 
-    var redraw = function () {
-      pb.redraw();
+    pb.config.postDraw = function (draw, fill) {
+      var backgroundColor = Color.parse(pb.config.backgroundColor);
+      var contrastColor = getContrastColor(backgroundColor).cssRGB();
+      fill.label("Label", 30, 20, 0.0, contrastColor);
+      fill.label("Label", 23, 34, Math.PI / 4.0, contrastColor);
+      fill.label("Label", 8, 34, Math.PI / 2.0, contrastColor);
     };
 
     // +---------------------------------------------------------------------------------
@@ -136,6 +120,6 @@
     // prettier-ignore
     gui.add(config, "text").title("The text to draw.").onChange(updateTextProperties);
 
-    redraw();
+    pb.redraw();
   });
 })(window);

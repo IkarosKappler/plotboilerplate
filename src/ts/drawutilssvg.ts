@@ -27,6 +27,8 @@
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @version  1.4.0
  **/
 
@@ -1084,7 +1086,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   }
 
   /**
-   * Draw a text label at the given relative position.
+   * Draw a text at the given relative position.
    *
    * @method text
    * @param {string} text - The text to draw.
@@ -1167,16 +1169,23 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {number} x - The x-position to draw the text at.
    * @param {number} y - The y-position to draw the text at.
    * @param {number=} rotation - The (optional) rotation in radians.
+   * @param {string="black"} color - The color to use (default is black).
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  label(text: string, x: number, y: number, rotation: number): SVGElement {
+  label(text: string, x: number, y: number, rotation?: number, color?: string): SVGElement {
     const node: SVGElement = this.makeNode("text");
     // For some strange reason SVG rotation transforms use degrees instead of radians
-    node.setAttribute("transform", `translate(${this.offset.x},${this.offset.y}), rotate(${(rotation / Math.PI) * 180})`);
+    node.setAttribute("transform", `translate(${x},${y}), rotate(${((rotation || 0) / Math.PI) * 180})`);
+
+    node.setAttribute("font-family", "Arial");
+    node.setAttribute("font-size", "9pt");
+    node.setAttribute("font-style", "normal");
+    node.setAttribute("font-weight", "lighter");
+
     node.innerHTML = text;
-    return this._bindFillDraw(node, "label", "black", null);
+    return this._bindFillDraw(node, "label", color || "black", null);
   }
 
   /**

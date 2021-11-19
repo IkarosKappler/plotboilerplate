@@ -665,7 +665,7 @@ export class drawutilsgl implements DrawLib<void> {
   }
 
   /**
-   * Draw a text label at the given relative position.
+   * Draw a text at the given relative position.
    *
    * @method text
    * @param {string} text - The text to draw.
@@ -709,14 +709,12 @@ export class drawutilsgl implements DrawLib<void> {
    * @param {number} x - The x-position to draw the text at.
    * @param {number} y - The y-position to draw the text at.
    * @param {number=} rotation - The (aoptional) rotation in radians.
+   * @param {string="black"} color - The color to use (default is black).
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  // +---------------------------------------------------------------------------------
-  // | Draw a non-scaling text label at the given position.
-  // +-------------------------------
-  label(text: string, x: number, y: number, rotation: number) {
+  label(text: string, x: number, y: number, rotation?: number, color?: string) {
     // NOT YET IMPLEMENTED
   }
 

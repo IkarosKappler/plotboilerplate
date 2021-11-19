@@ -398,7 +398,7 @@ export declare class drawutilsgl implements DrawLib<void> {
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): void;
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -434,11 +434,12 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    label(text: string, x: number, y: number, rotation: number): void;
+    label(text: string, x: number, y: number, rotation?: number, color?: string): void;
     /**
      * Draw an SVG-like path given by the specified path data.
      *

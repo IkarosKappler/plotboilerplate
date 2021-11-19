@@ -559,7 +559,7 @@ var drawutilsgl = /** @class */ (function () {
         // NOT YET IMPLEMENTED
     };
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -588,14 +588,12 @@ var drawutilsgl = /** @class */ (function () {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    // +---------------------------------------------------------------------------------
-    // | Draw a non-scaling text label at the given position.
-    // +-------------------------------
-    drawutilsgl.prototype.label = function (text, x, y, rotation) {
+    drawutilsgl.prototype.label = function (text, x, y, rotation, color) {
         // NOT YET IMPLEMENTED
     };
     /**

@@ -39,6 +39,7 @@
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @version  1.10.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -700,7 +701,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.restore();
     };
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -774,8 +775,9 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.label = function (text, x, y, rotation, color) {
         this.ctx.save();
+        this.ctx.font = "lighter 9pt Arial";
         this.ctx.translate(x, y);
-        if (typeof rotation != "undefined")
+        if (typeof rotation !== "undefined")
             this.ctx.rotate(rotation);
         this.ctx.fillStyle = color || "black";
         if (this.fillShapes) {

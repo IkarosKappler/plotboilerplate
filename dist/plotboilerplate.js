@@ -9169,6 +9169,7 @@ exports.VertexListeners = VertexListeners;
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @version  1.10.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -9830,7 +9831,7 @@ var drawutils = /** @class */ (function () {
         this.ctx.restore();
     };
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -9904,8 +9905,9 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.label = function (text, x, y, rotation, color) {
         this.ctx.save();
+        this.ctx.font = "lighter 9pt Arial";
         this.ctx.translate(x, y);
-        if (typeof rotation != "undefined")
+        if (typeof rotation !== "undefined")
             this.ctx.rotate(rotation);
         this.ctx.fillStyle = color || "black";
         if (this.fillShapes) {
@@ -10527,7 +10529,7 @@ var drawutilsgl = /** @class */ (function () {
         // NOT YET IMPLEMENTED
     };
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -10556,14 +10558,12 @@ var drawutilsgl = /** @class */ (function () {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    // +---------------------------------------------------------------------------------
-    // | Draw a non-scaling text label at the given position.
-    // +-------------------------------
-    drawutilsgl.prototype.label = function (text, x, y, rotation) {
+    drawutilsgl.prototype.label = function (text, x, y, rotation, color) {
         // NOT YET IMPLEMENTED
     };
     /**
@@ -10699,6 +10699,8 @@ var GLU = /** @class */ (function () {
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @version  1.4.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -10766,7 +10768,8 @@ var drawutilssvg = /** @class */ (function () {
             "vertex": "Vertex",
             "line": "Line",
             "vector": "Vector",
-            "image": "Image"
+            "image": "Image",
+            "text": "Text"
         };
         // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
         var rules = [];
@@ -11547,10 +11550,10 @@ var drawutilssvg = /** @class */ (function () {
         if (!isOpen)
             d.push("Z");
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "polyline", color, lineWidth || 1);
+        return this._bindFillDraw(node, "polygon", color, lineWidth || 1);
     };
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
      * @method text
      * @param {string} text - The text to draw.
@@ -11583,21 +11586,29 @@ var drawutilssvg = /** @class */ (function () {
                     ? "end"
                     : "start";
         var transformOrigin = this._x(x) + "px " + this._y(y) + "px";
-        var translate = "translate(0 " + lineHeight / 2 + ")";
+        var translate = "translate(" + this._x(x) + " " + (this._y(y) + lineHeight / 2) + ")";
         // Safari has a transform-origin/rotation bug.
-        // It's essential to use rotate(r,x,y) here. rotate(r) with transform-origin(x,y) won't do the job.
-        var rotate = options.rotation ? "rotate(" + options.rotation * RAD_TO_DEG + ", " + this._x(x) + "px,  " + this._y(y) + "px)" : "";
-        var node = this.makeNode("text");
-        node.setAttribute("x", "" + this._x(x));
-        node.setAttribute("y", "" + this._y(y));
-        node.setAttribute("font-family", options.fontFamily); // May be undefined
-        node.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : null);
-        node.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : null);
-        node.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : null);
-        node.setAttribute("text-anchor", textAlign);
-        node.style["transform-origin"] = transformOrigin;
-        node.setAttribute("transform", rotate + " " + translate);
-        node.innerHTML = text;
+        // It's essential to use rotate(r,x,y) here. "rotate(r)"" with transform-origin(x,y) won't do the job.
+        // And rotate and translate cannot be used is combination on a text object.
+        // So wrap the text inside a <g>, translate the <g>, and rotate the text inside.
+        var rotate = options.rotation ? "rotate(" + options.rotation * RAD_TO_DEG + " 0 0)" : "";
+        var node = this.makeNode("g");
+        var curId = this.curId;
+        this.curId = curId + "_text";
+        var textNode = this.makeNode("text");
+        node.appendChild(textNode);
+        textNode.setAttribute("font-family", options.fontFamily); // May be undefined
+        textNode.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : null);
+        textNode.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : null);
+        textNode.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : null);
+        textNode.setAttribute("text-anchor", textAlign);
+        textNode.setAttribute("transform-origin", "0 0");
+        textNode.setAttribute("transform", rotate);
+        node.setAttribute("transform-origin", transformOrigin);
+        node.setAttribute("transform", translate);
+        textNode.innerHTML = text;
+        // Restore old ID
+        this.curId = curId;
         return this._bindFillDraw(node, "text", color, 1);
     };
     /**
@@ -11608,16 +11619,21 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (optional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.label = function (text, x, y, rotation) {
+    drawutilssvg.prototype.label = function (text, x, y, rotation, color) {
         var node = this.makeNode("text");
         // For some strange reason SVG rotation transforms use degrees instead of radians
-        node.setAttribute("transform", "translate(" + this.offset.x + "," + this.offset.y + "), rotate(" + (rotation / Math.PI) * 180 + ")");
+        node.setAttribute("transform", "translate(" + x + "," + y + "), rotate(" + ((rotation || 0) / Math.PI) * 180 + ")");
+        node.setAttribute("font-family", "Arial");
+        node.setAttribute("font-size", "9pt");
+        node.setAttribute("font-style", "normal");
+        node.setAttribute("font-weight", "lighter");
         node.innerHTML = text;
-        return this._bindFillDraw(node, "label", "black", null);
+        return this._bindFillDraw(node, "label", color || "black", null);
     };
     /**
      * Draw an SVG-like path given by the specified path data.
