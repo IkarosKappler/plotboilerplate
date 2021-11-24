@@ -3,6 +3,9 @@ layout: page
 ---
 # Changelog
 
+- 2021-11-24
+  - Speeding up the demo page with async script execution.
+  - Finalizing the demo page for the new `PBText` element (note: it has this name because `Text` already exists).
 - 2021-11-19
   - Fixing the `drawutilssvg.label(text,x,y)` position.
   - Added the `color` param to the `label(...)` function.

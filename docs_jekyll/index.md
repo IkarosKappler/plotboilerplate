@@ -48,12 +48,15 @@ often use for the visualization of 2D geometries. Basic features are
   - images
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/pbimage.html "PBImage class"),
     [example](https://plotboilerplate.io/repo/demos/basic-PBImage "PBImage example"))
+  - text
+    ([docs](https://plotboilerplate.io/docs_typedoc/classes/pbtext.html "PBText class"),
+    [example](https://plotboilerplate.io/repo/demos/basic-PBText "PBText example"))
 - configuration of the canvas behavior (fullsize, interaction, raster)
 - mouse interaction (zoom, pan, drag elements)
 - keyboard interaction
 - touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
 
-The compressed library has 123kb.
+The compressed library has 128kb.
 
 ## Install the package via npm
 
