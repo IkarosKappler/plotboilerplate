@@ -3,6 +3,19 @@ layout: page
 ---
 # Changelog
 
+- 2021-11-24
+  - Speeding up the demo page with async script execution.
+  - Finalizing the demo page for the new `PBText` element (note: it has this name because `Text` already exists).
+- 2021-11-19
+  - Fixing the `drawutilssvg.label(text,x,y)` position.
+  - Added the `color` param to the `label(...)` function.
+- 2021-11-16
+  - Added `text` options to the `DrawConfig` interface.
+  - Added the `PBText` class.
+- 2021-11-15
+  - Adding more parameters tot the `drawutilssvg.text()` function: fontSize, textAlign, fontFamily, lineHeight.
+- 2021-11-12
+  - Adding more parameters tot the `draw.text()` function: fontSize, textAlign, fontFamily, lineHeight.
 - 2021-11.07
   - Changed the behavior of `darken` and `lighten`: the passed value is handled relative now which makes values much easier predictable and makes the change feel more 'natural'.
   - Added tests for the Color class. There were some strange things happening the the `ligthen` and `darken` function.

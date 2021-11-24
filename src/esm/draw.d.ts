@@ -37,11 +37,13 @@
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.9.0
+ * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
+ * @version  1.10.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 /**
  * @classdesc A wrapper class for basic drawing operations.
  *
@@ -454,8 +456,34 @@ export declare class drawutils implements DrawLib<void> {
      * @memberof drawutils
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): void;
+    /**
+     * Draw a text at the given relative position.
+     *
+     * @method text
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {string=} options.color - The Color to use.
+     * @param {string=} options.fontFamily - The font family to use.
+     * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
+     * @param {number=} options.lineHeight - The line height (in pixels) to use.
+     * @param {number=} options.rotation - The (optional) rotation in radians.
+     * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     text(text: string, x: number, y: number, options?: {
         color?: string;
+        fontFamily?: string;
+        fontSize?: number;
+        fontStyle?: FontStyle;
+        fontWeight?: FontWeight;
+        lineHeight?: number;
+        textAlign?: CanvasRenderingContext2D["textAlign"];
+        rotation?: number;
     }): void;
     /**
      * Draw a non-scaling text label at the given position.

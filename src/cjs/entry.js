@@ -18,6 +18,7 @@ globalThis.VEllipse = require("./VEllipse.js").VEllipse;
 globalThis.Circle = require("./Circle.js").Circle;
 globalThis.CircleSector = require("./CircleSector.js").CircleSector;
 globalThis.PBImage = require("./PBImage.js").PBImage;
+globalThis.PBText = require("./PBText.js").PBText;
 globalThis.MouseHandler = require("./MouseHandler.js").MouseHandler;
 globalThis.KeyHandler = require("./KeyHandler.js").KeyHandler;
 globalThis.drawutils = require("./draw.js").drawutils;

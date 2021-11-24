@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html class="fullscreen">
+  <head>
+    <title>2D Plotting Boilerplate – How to render Text (non-element)</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A demo about the usage of the Vertex class in PlotBoilerplate.js">
+    <meta name="keywords" content="plotboilerplate, Vertex, usage, howto, docs, documentation, text, render">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2021-11-13">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="A demo about rendering text in PlotBoilerplate.js.">
+    <meta property="og:description" content="A demo about rendering text in PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20211124-basic-text.png">
+
+    <!-- Polyfills for IE -->
+    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/path2d-polyfill.min.js"></script>
+    
+    <!-- Load thirdparty libraries -->
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/Color.js"></script>
+    <script src="../../lib/alloy_finger.js"></script>
+
+    <!-- Load helpers -->
+    <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
+    <script src="../../src/cjs/utils/creategui.js"></script>
+    <script src="../../src/cjs/utils/module.js"></script>
+    <script src="../../src/cjs/utils/gup.js"></script>
+
+    <!-- For development -->
+    <!-- <script src="../../src/cjs/UIDGenerator.js"></script>
+    <script src="../../src/cjs/VertexAttr.js"></script>
+    <script src="../../src/cjs/VertexListeners.js"></script>
+    <script src="../../src/cjs/VertTuple.js"></script>
+    <script src="../../src/cjs/Vertex.js"></script>
+    <script src="../../src/cjs/Bounds.js"></script>
+    <script src="../../src/cjs/Grid.js"></script>
+    <script src="../../src/cjs/Line.js"></script>
+    <script src="../../src/cjs/Vector.js"></script>
+    <script src="../../src/cjs/CubicBezierCurve.js"></script>
+    <script src="../../src/cjs/BezierPath.js"></script>
+    <script src="../../src/cjs/Polygon.js"></script>
+    <script src="../../src/cjs/Triangle.js"></script>
+    <script src="../../src/cjs/VEllipse.js"></script>
+    <script src="../../src/cjs/VEllipseSector.js"></script>
+    <script src="../../src/cjs/Circle.js"></script>
+    <script src="../../src/cjs/CircleSector.js"></script>
+    <script src="../../src/cjs/PBImage.js"></script>
+    <script src="../../src/cjs/PBText.js"></script>
+    <script src="../../src/cjs/MouseHandler.js"></script>
+    <script src="../../src/cjs/KeyHandler.js"></script>
+    <script src="../../src/cjs/drawutilssvg.js"></script>
+    <script src="../../src/cjs/geomutils.js"></script>
+    <script src="../../src/cjs/SVGBuilder.js"></script>
+    <script src="../../src/cjs/PlotBoilerplate.js"></script>  -->
+    <!-- END for development -->
+
+    <!-- For production -->
+    <script src="../../dist/plotboilerplate.min.js"></script>
+    <!-- END For production -->
+    
+    <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
+    <script src="../isMobileDevice.js"></script>
+    <script src="fontOptions.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
+  </head>
+  <body class="fullscreen">
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+
+    <!-- <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas> -->
+    <svg id="my-canvas"></svg>
+
+    <div class="info monospace">
+      [<span id="cx">-</span>,<span id="cy">-</span>]
+    </div>
+  </body>
+</html>

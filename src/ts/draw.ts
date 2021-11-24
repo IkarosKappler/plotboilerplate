@@ -37,13 +37,15 @@
  * @modified 2021-02-22 Added the `path` drawing function to draw SVG path data.
  * @modified 2021-03-31 Added the `endDrawCycle` function from `DrawLib`.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.9.0
+ * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
+ * @version  1.10.0
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 import { drawutilssvg } from "./drawutilssvg";
 
 // Todo: rename this class to Drawutils?
@@ -845,19 +847,77 @@ export class drawutils implements DrawLib<void> {
     this.ctx.restore();
   }
 
-  text(text: string, x: number, y: number, options?: { color?: string }) {
+  /**
+   * Draw a text at the given relative position.
+   *
+   * @method text
+   * @param {string} text - The text to draw.
+   * @param {number} x - The x-position to draw the text at.
+   * @param {number} y - The y-position to draw the text at.
+   * @param {string=} options.color - The Color to use.
+   * @param {string=} options.fontFamily - The font family to use.
+   * @param {number=} options.fontSize - The font size (in pixels) to use.
+   * @param {FontStyle=} options.fontStyle - The font style to use.
+   * @param {FontWeight=} options.fontWeight - The font weight to use.
+   * @param {number=} options.lineHeight - The line height (in pixels) to use.
+   * @param {number=} options.rotation - The (optional) rotation in radians.
+   * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+   * @return {void}
+   * @instance
+   * @memberof drawutils
+   */
+  text(
+    text: string,
+    x: number,
+    y: number,
+    options?: {
+      color?: string;
+      fontFamily?: string;
+      fontSize?: number;
+      fontStyle?: FontStyle;
+      fontWeight?: FontWeight;
+      lineHeight?: number;
+      textAlign?: CanvasRenderingContext2D["textAlign"];
+      rotation?: number;
+    }
+  ) {
+    // See https://stackoverflow.com/a/23523697
+
     options = options || {};
     this.ctx.save();
-    x = this.offset.x + x * this.scale.x;
-    y = this.offset.y + y * this.scale.y;
+    let relX = this.offset.x + x * this.scale.x;
+    let relY = this.offset.y + y * this.scale.y;
     const color: string = options.color || "black";
+    if (options.fontSize || options.fontFamily) {
+      // Scaling of text only works in uniform mode
+      this.ctx.font =
+        (options.fontWeight ? options.fontWeight + " " : "") +
+        (options.fontStyle ? options.fontStyle + " " : "") +
+        (options.fontSize ? options.fontSize * this.scale.x + "px " : " ") +
+        (options.fontFamily
+          ? options.fontFamily.indexOf(" ") === -1
+            ? options.fontFamily
+            : `"${options.fontFamily}"`
+          : "Arial");
+    }
+    if (options.textAlign) {
+      this.ctx.textAlign = options.textAlign;
+    }
+
+    const rotation = options.rotation ?? 0.0;
+    const lineHeight = (options.lineHeight ?? options.fontSize ?? 0) * this.scale.x;
+    this.ctx.translate(relX, relY);
+    this.ctx.rotate(rotation);
+
     if (this.fillShapes) {
       this.ctx.fillStyle = color;
-      this.ctx.fillText(text, x, y);
+      this.ctx.fillText(text, 0, lineHeight / 2);
     } else {
       this.ctx.strokeStyle = color;
-      this.ctx.strokeText(text, x, y);
+      this.ctx.strokeText(text, 0, lineHeight / 2);
     }
+    // this.ctx.translate(-relX, -relY);
+    // this.ctx.rotate(-rotation); // is this necessary before 'restore()'?
     this.ctx.restore();
   }
 
@@ -878,8 +938,11 @@ export class drawutils implements DrawLib<void> {
    */
   label(text: string, x: number, y: number, rotation?: number, color?: string) {
     this.ctx.save();
+
+    this.ctx.font = "lighter 9pt Arial";
+
     this.ctx.translate(x, y);
-    if (typeof rotation != "undefined") this.ctx.rotate(rotation);
+    if (typeof rotation !== "undefined") this.ctx.rotate(rotation);
     this.ctx.fillStyle = color || "black";
     if (this.fillShapes) {
       this.ctx.fillText(text, 0, 0);

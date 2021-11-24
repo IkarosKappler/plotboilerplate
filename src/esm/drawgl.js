@@ -555,6 +555,25 @@ export class drawutilsgl {
     polyline(vertices, isOpen, color, lineWidth) {
         // NOT YET IMPLEMENTED
     }
+    /**
+     * Draw a text at the given relative position.
+     *
+     * @method text
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {string=} options.color - The Color to use.
+     * @param {string=} options.fontFamily - The font family to use.
+     * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
+     * @param {number=} options.lineHeight - The line height (in pixels) to use.
+     * @param {number=} options.rotation - The (optional) rotation in radians.
+     * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     text(text, x, y, options) {
         // NOT YET IMPLEMENTED
     }
@@ -566,14 +585,12 @@ export class drawutilsgl {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    // +---------------------------------------------------------------------------------
-    // | Draw a non-scaling text label at the given position.
-    // +-------------------------------
-    label(text, x, y, rotation) {
+    label(text, x, y, rotation, color) {
         // NOT YET IMPLEMENTED
     }
     /**

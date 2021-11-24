@@ -10,7 +10,7 @@
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration } from "./interfaces";
+import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -397,8 +397,34 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @memberof drawutils
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): void;
+    /**
+     * Draw a text at the given relative position.
+     *
+     * @method text
+     * @param {string} text - The text to draw.
+     * @param {number} x - The x-position to draw the text at.
+     * @param {number} y - The y-position to draw the text at.
+     * @param {string=} options.color - The Color to use.
+     * @param {string=} options.fontFamily - The font family to use.
+     * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
+     * @param {number=} options.lineHeight - The line height (in pixels) to use.
+     * @param {number=} options.rotation - The (optional) rotation in radians.
+     * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     text(text: string, x: number, y: number, options?: {
         color?: string;
+        fontFamily?: string;
+        fontSize?: number;
+        fontStyle?: FontStyle;
+        fontWeight?: FontWeight;
+        lineHeight?: number;
+        textAlign?: CanvasRenderingContext2D["textAlign"];
+        rotation?: number;
     }): void;
     /**
      * Draw a non-scaling text label at the given position.
@@ -408,11 +434,12 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (aoptional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    label(text: string, x: number, y: number, rotation: number): void;
+    label(text: string, x: number, y: number, rotation?: number, color?: string): void;
     /**
      * Draw an SVG-like path given by the specified path data.
      *

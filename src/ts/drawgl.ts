@@ -12,7 +12,16 @@
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, XYCoords, SVGPathParams, SVGSerializable, UID, DrawLibConfiguration } from "./interfaces";
+import {
+  DrawLib,
+  XYCoords,
+  SVGPathParams,
+  SVGSerializable,
+  UID,
+  DrawLibConfiguration,
+  FontStyle,
+  FontWeight
+} from "./interfaces";
 
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
@@ -471,9 +480,9 @@ export class drawutilsgl implements DrawLib<void> {
    * @param {string} color - The color to use.
    * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
    **/
-   rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): void {
+  rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): void {
     // NOT YET IMPLEMENTED
-   }
+  }
 
   /**
    * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -655,7 +664,40 @@ export class drawutilsgl implements DrawLib<void> {
     // NOT YET IMPLEMENTED
   }
 
-  text(text: string, x: number, y: number, options?: { color?: string }) {
+  /**
+   * Draw a text at the given relative position.
+   *
+   * @method text
+   * @param {string} text - The text to draw.
+   * @param {number} x - The x-position to draw the text at.
+   * @param {number} y - The y-position to draw the text at.
+   * @param {string=} options.color - The Color to use.
+   * @param {string=} options.fontFamily - The font family to use.
+   * @param {number=} options.fontSize - The font size (in pixels) to use.
+   * @param {FontStyle=} options.fontStyle - The font style to use.
+   * @param {FontWeight=} options.fontWeight - The font weight to use.
+   * @param {number=} options.lineHeight - The line height (in pixels) to use.
+   * @param {number=} options.rotation - The (optional) rotation in radians.
+   * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
+   * @return {void}
+   * @instance
+   * @memberof drawutils
+   */
+  text(
+    text: string,
+    x: number,
+    y: number,
+    options?: {
+      color?: string;
+      fontFamily?: string;
+      fontSize?: number;
+      fontStyle?: FontStyle;
+      fontWeight?: FontWeight;
+      lineHeight?: number;
+      textAlign?: CanvasRenderingContext2D["textAlign"];
+      rotation?: number;
+    }
+  ) {
     // NOT YET IMPLEMENTED
   }
 
@@ -667,14 +709,12 @@ export class drawutilsgl implements DrawLib<void> {
    * @param {number} x - The x-position to draw the text at.
    * @param {number} y - The y-position to draw the text at.
    * @param {number=} rotation - The (aoptional) rotation in radians.
+   * @param {string="black"} color - The color to use (default is black).
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  // +---------------------------------------------------------------------------------
-  // | Draw a non-scaling text label at the given position.
-  // +-------------------------------
-  label(text: string, x: number, y: number, rotation: number) {
+  label(text: string, x: number, y: number, rotation?: number, color?: string) {
     // NOT YET IMPLEMENTED
   }
 

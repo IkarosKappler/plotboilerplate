@@ -25,6 +25,7 @@ __exportStar(require("./KeyHandler"), exports);
 __exportStar(require("./Line"), exports);
 __exportStar(require("./MouseHandler"), exports);
 __exportStar(require("./PBImage"), exports);
+__exportStar(require("./PBText"), exports);
 __exportStar(require("./PlotBoilerplate"), exports);
 __exportStar(require("./Polygon"), exports);
 __exportStar(require("./SVGBuilder"), exports);

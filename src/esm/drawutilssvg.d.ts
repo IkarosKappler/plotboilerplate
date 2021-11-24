@@ -26,11 +26,14 @@
  * @modified 2021-03-31 Added 'ellipseSector' the the class names.
  * @modified 2021-03-31 Implemented buffering using a buffer <g> node and the beginDrawCycle and endDrawCycle methods.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  1.3.0
+ * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
+ * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
+ * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
+ * @version  1.4.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration } from "./interfaces";
+import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -578,19 +581,33 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): SVGElement;
     /**
-     * Draw a text label at the given relative position.
+     * Draw a text at the given relative position.
      *
-     * @method label
+     * @method text
      * @param {string} text - The text to draw.
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
-     * @param {number=} rotation - The (optional) rotation in radians.
+     * @param {string=} options.color - The Color to use.
+     * @param {string=} options.fontFamily - The font family to use.
+     * @param {number=} options.fontSize - The font size (in pixels) to use.
+     * @param {FontStyle=} options.fontStyle - The font style to use.
+     * @param {FontWeight=} options.fontWeight - The font weight to use.
+     * @param {number=} options.lineHeight - The line height (in pixels) to use.
+     * @param {number=} options.rotation - The (optional) rotation in radians.
+     * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
      * @return {void}
      * @instance
-     * @memberof drawutilssvg
+     * @memberof drawutils
      */
     text(text: string, x: number, y: number, options?: {
         color?: string;
+        fontFamily?: string;
+        fontSize?: number;
+        fontStyle?: FontStyle;
+        fontWeight?: FontWeight;
+        lineHeight?: number;
+        textAlign?: CanvasRenderingContext2D["textAlign"];
+        rotation?: number;
     }): SVGElement;
     /**
      * Draw a non-scaling text label at the given position.
@@ -600,11 +617,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} x - The x-position to draw the text at.
      * @param {number} y - The y-position to draw the text at.
      * @param {number=} rotation - The (optional) rotation in radians.
+     * @param {string="black"} color - The color to use (default is black).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    label(text: string, x: number, y: number, rotation: number): SVGElement;
+    label(text: string, x: number, y: number, rotation?: number, color?: string): SVGElement;
     /**
      * Draw an SVG-like path given by the specified path data.
      *
