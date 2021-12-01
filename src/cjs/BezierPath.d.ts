@@ -262,6 +262,17 @@ export declare class BezierPath implements SVGSerializable {
      **/
     translate(amount: Vertex): BezierPath;
     /**
+     * Scale the whole bezier path by the given uniform factor.
+     *
+     * @method scale
+     * @param {Vertex} anchor - The scale origin to scale from.
+     * @param {number} scaleFactor - The scalar to be multiplied with.
+     * @instance
+     * @memberof BezierPath
+     * @return {BezierPath} this for chaining.
+     **/
+    scale(anchor: Vertex, scaleFactor: number): BezierPath;
+    /**
      * Scale the whole bezier path by the given (x,y)-factors.
      *
      * @method scale
@@ -271,7 +282,7 @@ export declare class BezierPath implements SVGSerializable {
      * @memberof BezierPath
      * @return {BezierPath} this for chaining.
      **/
-    scale(anchor: Vertex, scaling: number): BezierPath;
+    scaleXY(scaleFactors: XYCoords, anchor?: XYCoords): BezierPath;
     /**
      * Rotate the whole bezier path around a point..
      *

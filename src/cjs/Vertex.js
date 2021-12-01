@@ -23,7 +23,9 @@
  * @modified 2020-05-26 Added functions addX(number) and addY(number).
  * @modified 2020-10-30 Changed the warnings in `sub(...)` and `add(...)` into real errors.
  * @modified 2021-03-01 Changed the second param `center` in the `rotate` function from Vertex to XYCoords.
- * @version  2.4.2
+ * @modified 2021-12-01 Changed the type of param of `scale` to XYCoords.
+ * @modified 2021-12-01 Added function `scaleXY` for non uniform scaling.
+ * @version  2.5.0
  *
  * @file Vertex
  * @public
@@ -369,20 +371,35 @@ var Vertex = /** @class */ (function () {
     };
     /**
      * This is a vector-like behavior and 'scales' this vertex
-     * towards/from a given center.
+     * towards/from a given center by one uniform scale factor.
      *
      * @method scale
      * @param {number} factor - The factor to 'scale' this vertex; 1.0 means no change.
-     * @param {Vertex=} center - The origin of scaling; default is (0,0).
+     * @param {XYCoords=} center - The origin of scaling; default is (0,0).
      * @return {Vertex} this
      * @instance
      * @memberof Vertex
      **/
     Vertex.prototype.scale = function (factor, center) {
-        if (!center || typeof center === "undefined")
-            center = new Vertex(0, 0);
-        this.x = center.x + (this.x - center.x) * factor;
-        this.y = center.y + (this.y - center.y) * factor;
+        return this.scaleXY({ x: factor, y: factor }, center);
+    };
+    /**
+     * This is a vector-like behavior and 'scales' this vertex
+     * towards/from a given center by two independent x- and y- scale factors.
+     *
+     * @method scale
+     * @param {number} factor - The factor to 'scale' this vertex; 1.0 means no change.
+     * @param {XYCoords=} center - The origin of scaling; default is (0,0).
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.scaleXY = function (factors, center) {
+        if (!center || typeof center === "undefined") {
+            center = { x: 0, y: 0 };
+        }
+        this.x = center.x + (this.x - center.x) * factors.x;
+        this.y = center.y + (this.y - center.y) * factors.y;
         return this;
     };
     /**

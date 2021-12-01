@@ -456,6 +456,35 @@ export class BezierPath {
         return this;
     }
     /**
+     * Scale the whole bezier path by the given uniform factor.
+     *
+     * @method scale
+     * @param {Vertex} anchor - The scale origin to scale from.
+     * @param {number} scaleFactor - The scalar to be multiplied with.
+     * @instance
+     * @memberof BezierPath
+     * @return {BezierPath} this for chaining.
+     **/
+    scale(anchor, scaleFactor) {
+        // var scaleFactors : XYCoords = { x : scaleFactor, y : scaleFactor };
+        // for (var i = 0; i < this.bezierCurves.length; i++) {
+        //   var curve = this.bezierCurves[i];
+        //   curve.getStartPoint().scale(scaleFactor, anchor);
+        //   curve.getStartControlPoint().scale(scaleFactor, anchor);
+        //   curve.getEndControlPoint().scale(scaleFactor, anchor);
+        //   // Do NOT scale the end point here!
+        //   // Don't forget that the curves are connected and on curve's end point
+        //   // the the successor's start point (same instance)!
+        // }
+        // // Finally move the last end point (was not scaled yet)
+        // if (this.bezierCurves.length > 0 && !this.adjustCircular) {
+        //   this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scale(scaleFactor, anchor);
+        // }
+        // this.updateArcLengths();
+        // return this;
+        return this.scaleXY({ x: scaleFactor, y: scaleFactor }, anchor);
+    }
+    /**
      * Scale the whole bezier path by the given (x,y)-factors.
      *
      * @method scale
@@ -465,19 +494,19 @@ export class BezierPath {
      * @memberof BezierPath
      * @return {BezierPath} this for chaining.
      **/
-    scale(anchor, scaling) {
+    scaleXY(scaleFactors, anchor) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
-            curve.getStartPoint().scale(scaling, anchor);
-            curve.getStartControlPoint().scale(scaling, anchor);
-            curve.getEndControlPoint().scale(scaling, anchor);
+            curve.getStartPoint().scaleXY(scaleFactors, anchor);
+            curve.getStartControlPoint().scaleXY(scaleFactors, anchor);
+            curve.getEndControlPoint().scaleXY(scaleFactors, anchor);
             // Do NOT scale the end point here!
             // Don't forget that the curves are connected and on curve's end point
             // the the successor's start point (same instance)!
         }
         // Finally move the last end point (was not scaled yet)
         if (this.bezierCurves.length > 0 && !this.adjustCircular) {
-            this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scale(scaling, anchor);
+            this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scaleXY(scaleFactors, anchor);
         }
         this.updateArcLengths();
         return this;
