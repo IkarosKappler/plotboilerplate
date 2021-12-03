@@ -1,6 +1,8 @@
 # Changelog
 
 - 2021-12-01
+  - Changed the type of param of `BezierPath.scale` to XYCoords.
+  - Added function `BezierPath.scaleXY` for non uniform scaling.
   - Changed the type of param of `Vertex.scale` to XYCoords.
   - Added function `Vertex.scaleXY` for non uniform scaling.
 - 2021-11-24
