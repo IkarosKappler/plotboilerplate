@@ -883,6 +883,35 @@ var BezierPath = /** @class */ (function () {
         return this;
     };
     /**
+     * Scale the whole bezier path by the given uniform factor.
+     *
+     * @method scale
+     * @param {Vertex} anchor - The scale origin to scale from.
+     * @param {number} scaleFactor - The scalar to be multiplied with.
+     * @instance
+     * @memberof BezierPath
+     * @return {BezierPath} this for chaining.
+     **/
+    BezierPath.prototype.scale = function (anchor, scaleFactor) {
+        // var scaleFactors : XYCoords = { x : scaleFactor, y : scaleFactor };
+        // for (var i = 0; i < this.bezierCurves.length; i++) {
+        //   var curve = this.bezierCurves[i];
+        //   curve.getStartPoint().scale(scaleFactor, anchor);
+        //   curve.getStartControlPoint().scale(scaleFactor, anchor);
+        //   curve.getEndControlPoint().scale(scaleFactor, anchor);
+        //   // Do NOT scale the end point here!
+        //   // Don't forget that the curves are connected and on curve's end point
+        //   // the the successor's start point (same instance)!
+        // }
+        // // Finally move the last end point (was not scaled yet)
+        // if (this.bezierCurves.length > 0 && !this.adjustCircular) {
+        //   this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scale(scaleFactor, anchor);
+        // }
+        // this.updateArcLengths();
+        // return this;
+        return this.scaleXY({ x: scaleFactor, y: scaleFactor }, anchor);
+    };
+    /**
      * Scale the whole bezier path by the given (x,y)-factors.
      *
      * @method scale
@@ -892,19 +921,19 @@ var BezierPath = /** @class */ (function () {
      * @memberof BezierPath
      * @return {BezierPath} this for chaining.
      **/
-    BezierPath.prototype.scale = function (anchor, scaling) {
+    BezierPath.prototype.scaleXY = function (scaleFactors, anchor) {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             var curve = this.bezierCurves[i];
-            curve.getStartPoint().scale(scaling, anchor);
-            curve.getStartControlPoint().scale(scaling, anchor);
-            curve.getEndControlPoint().scale(scaling, anchor);
+            curve.getStartPoint().scaleXY(scaleFactors, anchor);
+            curve.getStartControlPoint().scaleXY(scaleFactors, anchor);
+            curve.getEndControlPoint().scaleXY(scaleFactors, anchor);
             // Do NOT scale the end point here!
             // Don't forget that the curves are connected and on curve's end point
             // the the successor's start point (same instance)!
         }
         // Finally move the last end point (was not scaled yet)
         if (this.bezierCurves.length > 0 && !this.adjustCircular) {
-            this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scale(scaling, anchor);
+            this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scaleXY(scaleFactors, anchor);
         }
         this.updateArcLengths();
         return this;
@@ -4447,7 +4476,7 @@ var PlotBoilerplate = /** @class */ (function () {
         var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
-        if (typeof globalThis["saveAs"] != "function")
+        if (typeof globalThis["saveAs"] !== "function")
             throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
@@ -4553,7 +4582,6 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.add = function (drawable, redraw) {
         if (Array.isArray(drawable)) {
             var arr = drawable;
-            // for( var i in arr )
             for (var i = 0; i < arr.length; i++) {
                 this.add(arr[i], false);
             }
@@ -4599,9 +4627,9 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (drawable instanceof Polygon_1.Polygon) {
             this.drawables.push(drawable);
-            // for( var i in drawable.vertices )
-            for (var i = 0; i < drawable.vertices.length; i++)
+            for (var i = 0; i < drawable.vertices.length; i++) {
                 this.vertices.push(drawable.vertices[i]);
+            }
         }
         else if (drawable instanceof Triangle_1.Triangle) {
             this.drawables.push(drawable);
@@ -4613,8 +4641,9 @@ var PlotBoilerplate = /** @class */ (function () {
             this.drawables.push(drawable);
             var bezierPath = drawable;
             for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
-                if (!drawable.adjustCircular && i == 0)
+                if (!drawable.adjustCircular && i == 0) {
                     this.vertices.push(bezierPath.bezierCurves[i].startPoint);
+                }
                 this.vertices.push(bezierPath.bezierCurves[i].endPoint);
                 this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
                 this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
@@ -4760,8 +4789,9 @@ var PlotBoilerplate = /** @class */ (function () {
         for (var i = 0; i < this.vertices.length; i++) {
             if (this.vertices[i] === vert) {
                 this.vertices.splice(i, 1);
-                if (redraw)
+                if (redraw) {
                     this.redraw();
+                }
                 return;
             }
         }
@@ -5353,7 +5383,6 @@ var PlotBoilerplate = /** @class */ (function () {
         // Apply the zoom (the tolerant area should not shrink or grow when zooming)
         tolerance /= _self.draw.scale.x;
         // Search in vertices
-        // for( var vindex in _self.vertices ) {
         for (var vindex = 0; vindex < _self.vertices.length; vindex++) {
             var vert = _self.vertices[vindex];
             if ((vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance) {
@@ -5373,10 +5402,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.handleClick = function (e) {
-        // x:number,y:number) {
         var _self = this;
-        // const x:number = e.params.pos.x;
-        //const y:number = e.params.pos.y;
         var p = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
         if (p) {
             _self.vertices[p.vindex].listeners.fireClickEvent(e);
@@ -5393,7 +5419,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 }
                 _self.redraw();
             }
-            else if (this.keyHandler.isDown("y") /* && p.type=='bpath' && (p.pid==BezierPath.START_POINT || p.pid==BezierPath.END_POINT) */) {
+            else if (this.keyHandler.isDown("y")) {
                 _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
                 _self.redraw();
             }
@@ -5691,6 +5717,7 @@ var PlotBoilerplate = /** @class */ (function () {
                         _self.draggedElements = [];
                     };
                     var afProps = {
+                        // touchStart: (evt: TouchEvent) => {
                         touchStart: function (evt) {
                             if (evt.touches.length == 1) {
                                 touchMovePos = new Vertex_1.Vertex(relPos_1({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
@@ -5793,10 +5820,13 @@ var PlotBoilerplate = /** @class */ (function () {
                             _self.redraw();
                         }
                     }; // END afProps
-                    if (window["createAlloyFinger"])
+                    if (window["createAlloyFinger"]) {
                         window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
-                    else
+                    }
+                    else {
+                        /* tslint:disable-next-line */
                         new alloyfinger_typescript_1.default(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                    }
                 }
                 catch (e) {
                     console.error("Failed to initialize AlloyFinger!");
@@ -8257,7 +8287,9 @@ exports.VertTuple = VertTuple;
  * @modified 2020-05-26 Added functions addX(number) and addY(number).
  * @modified 2020-10-30 Changed the warnings in `sub(...)` and `add(...)` into real errors.
  * @modified 2021-03-01 Changed the second param `center` in the `rotate` function from Vertex to XYCoords.
- * @version  2.4.2
+ * @modified 2021-12-01 Changed the type of param of `scale` to XYCoords.
+ * @modified 2021-12-01 Added function `scaleXY` for non uniform scaling.
+ * @version  2.5.0
  *
  * @file Vertex
  * @public
@@ -8603,20 +8635,35 @@ var Vertex = /** @class */ (function () {
     };
     /**
      * This is a vector-like behavior and 'scales' this vertex
-     * towards/from a given center.
+     * towards/from a given center by one uniform scale factor.
      *
      * @method scale
      * @param {number} factor - The factor to 'scale' this vertex; 1.0 means no change.
-     * @param {Vertex=} center - The origin of scaling; default is (0,0).
+     * @param {XYCoords=} center - The origin of scaling; default is (0,0).
      * @return {Vertex} this
      * @instance
      * @memberof Vertex
      **/
     Vertex.prototype.scale = function (factor, center) {
-        if (!center || typeof center === "undefined")
-            center = new Vertex(0, 0);
-        this.x = center.x + (this.x - center.x) * factor;
-        this.y = center.y + (this.y - center.y) * factor;
+        return this.scaleXY({ x: factor, y: factor }, center);
+    };
+    /**
+     * This is a vector-like behavior and 'scales' this vertex
+     * towards/from a given center by two independent x- and y- scale factors.
+     *
+     * @method scale
+     * @param {number} factor - The factor to 'scale' this vertex; 1.0 means no change.
+     * @param {XYCoords=} center - The origin of scaling; default is (0,0).
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.scaleXY = function (factors, center) {
+        if (!center || typeof center === "undefined") {
+            center = { x: 0, y: 0 };
+        }
+        this.x = center.x + (this.x - center.x) * factors.x;
+        this.y = center.y + (this.y - center.y) * factors.y;
         return this;
     };
     /**

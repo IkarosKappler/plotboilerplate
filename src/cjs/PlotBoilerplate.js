@@ -469,7 +469,7 @@ var PlotBoilerplate = /** @class */ (function () {
         var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
-        if (typeof globalThis["saveAs"] != "function")
+        if (typeof globalThis["saveAs"] !== "function")
             throw "Cannot save file; did you load the ./utils/savefile helper function and the eligrey/SaveFile library?";
         var _saveAs = globalThis["saveAs"];
         _saveAs(blob, "plotboilerplate.svg");
@@ -575,7 +575,6 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.add = function (drawable, redraw) {
         if (Array.isArray(drawable)) {
             var arr = drawable;
-            // for( var i in arr )
             for (var i = 0; i < arr.length; i++) {
                 this.add(arr[i], false);
             }
@@ -621,9 +620,9 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (drawable instanceof Polygon_1.Polygon) {
             this.drawables.push(drawable);
-            // for( var i in drawable.vertices )
-            for (var i = 0; i < drawable.vertices.length; i++)
+            for (var i = 0; i < drawable.vertices.length; i++) {
                 this.vertices.push(drawable.vertices[i]);
+            }
         }
         else if (drawable instanceof Triangle_1.Triangle) {
             this.drawables.push(drawable);
@@ -635,8 +634,9 @@ var PlotBoilerplate = /** @class */ (function () {
             this.drawables.push(drawable);
             var bezierPath = drawable;
             for (var i = 0; i < bezierPath.bezierCurves.length; i++) {
-                if (!drawable.adjustCircular && i == 0)
+                if (!drawable.adjustCircular && i == 0) {
                     this.vertices.push(bezierPath.bezierCurves[i].startPoint);
+                }
                 this.vertices.push(bezierPath.bezierCurves[i].endPoint);
                 this.vertices.push(bezierPath.bezierCurves[i].startControlPoint);
                 this.vertices.push(bezierPath.bezierCurves[i].endControlPoint);
@@ -782,8 +782,9 @@ var PlotBoilerplate = /** @class */ (function () {
         for (var i = 0; i < this.vertices.length; i++) {
             if (this.vertices[i] === vert) {
                 this.vertices.splice(i, 1);
-                if (redraw)
+                if (redraw) {
                     this.redraw();
+                }
                 return;
             }
         }
@@ -1375,7 +1376,6 @@ var PlotBoilerplate = /** @class */ (function () {
         // Apply the zoom (the tolerant area should not shrink or grow when zooming)
         tolerance /= _self.draw.scale.x;
         // Search in vertices
-        // for( var vindex in _self.vertices ) {
         for (var vindex = 0; vindex < _self.vertices.length; vindex++) {
             var vert = _self.vertices[vindex];
             if ((vert.attr.draggable || vert.attr.selectable) && vert.distance(point) < tolerance) {
@@ -1395,10 +1395,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.handleClick = function (e) {
-        // x:number,y:number) {
         var _self = this;
-        // const x:number = e.params.pos.x;
-        //const y:number = e.params.pos.y;
         var p = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
         if (p) {
             _self.vertices[p.vindex].listeners.fireClickEvent(e);
@@ -1415,7 +1412,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 }
                 _self.redraw();
             }
-            else if (this.keyHandler.isDown("y") /* && p.type=='bpath' && (p.pid==BezierPath.START_POINT || p.pid==BezierPath.END_POINT) */) {
+            else if (this.keyHandler.isDown("y")) {
                 _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
                 _self.redraw();
             }
@@ -1713,6 +1710,7 @@ var PlotBoilerplate = /** @class */ (function () {
                         _self.draggedElements = [];
                     };
                     var afProps = {
+                        // touchStart: (evt: TouchEvent) => {
                         touchStart: function (evt) {
                             if (evt.touches.length == 1) {
                                 touchMovePos = new Vertex_1.Vertex(relPos_1({ x: evt.touches[0].clientX, y: evt.touches[0].clientY }));
@@ -1815,10 +1813,13 @@ var PlotBoilerplate = /** @class */ (function () {
                             _self.redraw();
                         }
                     }; // END afProps
-                    if (window["createAlloyFinger"])
+                    if (window["createAlloyFinger"]) {
                         window["createAlloyFinger"](this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
-                    else
+                    }
+                    else {
+                        /* tslint:disable-next-line */
                         new alloyfinger_typescript_1.default(this.eventCatcher ? this.eventCatcher : this.canvas, afProps);
+                    }
                 }
                 catch (e) {
                     console.error("Failed to initialize AlloyFinger!");
