@@ -10295,8 +10295,9 @@ class PlotBoilerplate {
         for (var i = 0; i < this.vertices.length; i++) {
             if (this.vertices[i] === vert) {
                 this.vertices.splice(i, 1);
-                if (redraw)
+                if (redraw) {
                     this.redraw();
+                }
                 return;
             }
         }
