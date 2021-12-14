@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-12-14
+  - Added the `Polygon.perimeter()` function.
 - 2021-12-01
   - Changed the type of param of `BezierPath.scale` to XYCoords.
   - Added function `BezierPath.scaleXY` for non uniform scaling.

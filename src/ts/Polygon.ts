@@ -19,7 +19,8 @@
  * @modified 2021-01-29 Added the `isClockwise` function.
  * @modified 2021-01-29 Added the `area` function.
  * @modified 2021-01-29 Changed the param type for `containsVert` from Vertex to XYCoords.
- * @version 1.7.0
+ * @modified 2021-12-14 Added the `perimeter()` function.
+ * @version 1.8.0
  *
  * @file Polygon
  * @public
@@ -205,7 +206,28 @@ export class Polygon implements SVGSerializable {
     return Polygon.utils.signedArea(this.vertices) < 0;
   }
 
-  perimeter(): number {}
+  /**
+   * Get the perimeter of this polygon.
+   * The perimeter is the absolute length of the outline.
+   *
+   * If this polygon is open then the last segment (connecting the first and the
+   * last vertex) will be skipped.
+   *
+   * @method perimeter
+   * @instance
+   * @memberof Polygon
+   * @return {number}
+   */
+  perimeter(): number {
+    let length = 0;
+    for (var i = 1; i < this.vertices.length; i++) {
+      length += this.vertices[i - 1].distance(this.vertices[i]);
+    }
+    if (!this.isOpen && this.vertices.length > 1) {
+      length += this.vertices[0].distance(this.vertices[this.vertices.length - 1]);
+    }
+    return length;
+  }
 
   /**
    * Scale the polygon relative to the given center.

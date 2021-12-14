@@ -156,6 +156,19 @@ export declare class Polygon implements SVGSerializable {
      */
     isClockwise(): boolean;
     /**
+     * Get the perimeter of this polygon.
+     * The perimeter is the absolute length of the outline.
+     *
+     * If this polygon is open then the last segment (connecting the first and the
+     * last vertex) will be skipped.
+     *
+     * @method perimeter
+     * @instance
+     * @memberof Polygon
+     * @return {number}
+     */
+    perimeter(): number;
+    /**
      * Scale the polygon relative to the given center.
      *
      * @method scale

@@ -483,6 +483,7 @@ vert.listeners.addDragListener(function (e) {
 - [Torben Jansen](https://twitter.com/torbenjansen_ "Torben Jansen") for the [SVG-Arc to elliptic-sector conversion](https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion "SVG-Arc to elliptic-sector conversion")
 - [3daddict](https://github.com/3daddict) for the [js-stl-parser inspiration](https://github.com/3daddict/js-stl-parser/blob/master/index.js "js-stl-parser inspiration")
 - [jburkardt](https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html "jburkardt") for the obj test files.
+- [@veltman](https://noahveltman.com/) for the awesome [geometric skeletonization article](https://observablehq.com/@veltman/centerline-labeling)
 
 ## Todos
 
