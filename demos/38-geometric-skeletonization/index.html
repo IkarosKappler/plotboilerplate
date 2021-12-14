@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>2D Plotting Boilerplate - Conway's Game of Life</title>
+    <title>2D Plotting Boilerplate - Geometric Skeletonization</title>
     <meta charset="UTF-8">
     <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
     <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, function, graph, plot">
@@ -13,9 +13,9 @@
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Demo of visualising Conway's Game of Life with PlotBoilerplate.js.">
-    <meta property="og:description" content="Demo of visualising Conway's Game of Life with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20211108-1-conway.png">
+    <meta property="og:title" content="Demo of visualising Geometric Skeletonization with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demo of visualising Geometric Skeletonization with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/na.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
@@ -68,18 +68,20 @@
       <script src="../../dist/plotboilerplate.min.js"></script>
       <!-- END For production -->
       
-      <script src="../VertexAnimator.Linear.js"></script>
+      <!-- <script src="../VertexAnimator.Linear.js"></script>  -->
       <script src="../../src/cjs/utils/datastructures/Color.js"></script>
       <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
+      <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
+      <script src="../../src/cjs/utils/datastructures/VoronoiCell.js"></script>
+      <script src="../../src/cjs/utils/algorithms/delaunay.js"></script>
+      <script src="../../src/cjs/utils/algorithms/delaunay2voronoi.js"></script>
       <script src="../isMobileDevice.js"></script>
       <script src="../removeAllChildNodes.js"></script>
       <script src="../removeChildNodesByClass.js"></script>
       <script src="../modal.js"></script>
-      <script src="ConwayPresets.js"></script>
-      <script src="drawConfig.js"></script>
-      <script src="turnMatrixLeft.js"></script>
-      <script src="detectDarkMode.js"></script>
-      <script src="Biotope.js"></script>
+      <!--  <script src="detectDarkMode.js"></script> -->
+      <script src="../toggleGuiSize.js"></script>
+      <script src="VoronoiHelper.js"></script>
       <script src="index.js"></script>
     
     
