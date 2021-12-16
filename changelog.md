@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-12-16
+  - Added the `Polygon.getEvenDistributionPolygon()` function.
 - 2021-12-14
   - Added the `Polygon.perimeter()` function.
 - 2021-12-01

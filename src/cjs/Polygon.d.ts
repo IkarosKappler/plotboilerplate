@@ -19,7 +19,9 @@
  * @modified 2021-01-29 Added the `isClockwise` function.
  * @modified 2021-01-29 Added the `area` function.
  * @modified 2021-01-29 Changed the param type for `containsVert` from Vertex to XYCoords.
- * @version 1.7.0
+ * @modified 2021-12-14 Added the `perimeter()` function.
+ * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
+ * @version 1.8.0
  *
  * @file Polygon
  * @public
@@ -190,6 +192,12 @@ export declare class Polygon implements SVGSerializable {
      * @return {Polygon} this, for chaining.
      **/
     rotate(angle: number, center: Vertex): Polygon;
+    /**
+     * Convert this polygon into a new polygon with n evenly distributed vertices.
+     *
+     * @param {number} pointCount - Must not be negative.
+     */
+    getEvenDistributionPolygon(pointCount: number): Polygon;
     /**
      * Get the bounding box (bounds) of this polygon.
      *

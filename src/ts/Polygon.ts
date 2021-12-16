@@ -20,6 +20,7 @@
  * @modified 2021-01-29 Added the `area` function.
  * @modified 2021-01-29 Changed the param type for `containsVert` from Vertex to XYCoords.
  * @modified 2021-12-14 Added the `perimeter()` function.
+ * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
  * @version 1.8.0
  *
  * @file Polygon
@@ -262,6 +263,58 @@ export class Polygon implements SVGSerializable {
       this.vertices[i].rotate(angle, center);
     }
     return this;
+  }
+
+  /**
+   * Convert this polygon into a new polygon with n evenly distributed vertices.
+   *
+   * @param {number} pointCount - Must not be negative.
+   */
+  getEvenDistributionPolygon(pointCount: number): Polygon {
+    if (pointCount <= 0) {
+      throw new Error("[getEvenDistributionPolygon] pointCount must be larger than zero; is " + pointCount + ".");
+    }
+    var result = new Polygon([], this.isOpen);
+    if (this.vertices.length === 0) {
+      return result;
+    }
+    var perimeter = this.perimeter();
+    var stepSize = perimeter / pointCount;
+    var segmentLength = 0;
+
+    // Fetch and add the start point from the source polygon
+    var polygonPoint = new Vertex(this.vertices[0]);
+    result.vertices.push(polygonPoint);
+    var remainder = 0;
+    var polygonIndex = 1;
+    var loopMax = this.isOpen ? this.vertices.length : this.vertices.length + 1;
+    for (var i = 0; i < pointCount && polygonIndex < loopMax; i++) {
+      // Fetch next segment
+      var nextPolygonPoint = this.vertices[polygonIndex % this.vertices.length];
+      var segmentLength = polygonPoint.distance(nextPolygonPoint);
+      var segmentDiff = polygonPoint.difference(nextPolygonPoint);
+      var stepRatio = { x: segmentDiff.x / segmentLength, y: segmentDiff.y / segmentLength };
+      var j = 1;
+      while (segmentLength >= stepSize) {
+        // Get next point on local segment
+        var localStepSize = stepSize - (j === 1 ? remainder : 0);
+        var point = new Vertex(
+          polygonPoint.x + j * localStepSize * stepRatio.x - (j === 1 ? 0 : remainder) * stepRatio.x,
+          polygonPoint.y + j * localStepSize * stepRatio.y - (j === 1 ? 0 : remainder) * stepRatio.y
+        );
+
+        // Don't add if we did a full turn here.
+        segmentLength -= localStepSize;
+        j++;
+        if (this.isOpen || polygonIndex + 1 < loopMax || segmentLength >= stepSize) {
+          result.vertices.push(point);
+        }
+      }
+      polygonPoint = nextPolygonPoint;
+      remainder = segmentLength;
+      polygonIndex++;
+    }
+    return result;
   }
 
   /**

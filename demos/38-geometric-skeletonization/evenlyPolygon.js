@@ -1,6 +1,7 @@
 /**
  * Optimize a polygon: turn the shape into evenly spaced points.
  *
+ * @deprecation DEPRECATED: use Polygon.getEvenDistributionPolygon() instead.
  * @author  Ikaros Kappler
  * @date    2021-12-14
  * @version 1.0.0
@@ -23,33 +24,38 @@ globalThis.evenlyPolygon = (function () {
     }
     var perimeter = polygon.perimeter();
     var stepSize = perimeter / pointCount;
-    var curLength = 0;
-    var curIndex = 0;
     var segmentLength = 0;
-    var polygonPoint = polygon.vertices[curIndex];
-    var resultPoint = new Vertex(polygonPoint);
-    result.vertices.push(resultPoint);
-    while (curLength < perimeter && result.vertices.length < pointCount && curIndex < polygon.vertices.length) {
-      polygonPoint = polygon.vertices[curIndex];
-      var nextPolygonPoint = polygon.vertices[(curIndex + 1) % polygon.vertices.length];
-      var remainder = segmentLength;
-      segmentLength += polygonPoint.distance(nextPolygonPoint);
-      var segmentDifference = polygonPoint.difference(nextPolygonPoint);
-      var maxSubstepCount = Math.ceil(segmentLength / stepSize);
-      var i = 1;
-      var ratio = { x: segmentDifference.x / segmentLength, y: segmentDifference.y / segmentLength };
-      while (segmentLength >= stepSize && i <= maxSubstepCount) {
-        // Interpolate to next point
-        resultPoint = new Vertex(
-          polygonPoint.x + ratio.x * (stepSize - remainder) * i,
-          polygonPoint.y + ratio.y * (stepSize - remainder) * i
+
+    // Fetch and add the start point from the source polygon
+    var polygonPoint = new Vertex(polygon.vertices[0]);
+    result.vertices.push(polygonPoint);
+    var remainder = 0;
+    var polygonIndex = 1;
+    var loopMax = polygon.isOpen ? polygon.vertices.length : polygon.vertices.length + 1;
+    for (var i = 0; i < pointCount && polygonIndex < loopMax; i++) {
+      // Fetch next segment
+      var nextPolygonPoint = polygon.vertices[polygonIndex % polygon.vertices.length];
+      var segmentLength = polygonPoint.distance(nextPolygonPoint);
+      var segmentDiff = polygonPoint.difference(nextPolygonPoint);
+      var stepRatio = { x: segmentDiff.x / segmentLength, y: segmentDiff.y / segmentLength };
+      var j = 1;
+      while (segmentLength >= stepSize) {
+        // Get next point on local segment
+        var localStepSize = stepSize - (j === 1 ? remainder : 0);
+        var point = new Vertex(
+          polygonPoint.x + j * localStepSize * stepRatio.x - (j === 1 ? 0 : remainder) * stepRatio.x,
+          polygonPoint.y + j * localStepSize * stepRatio.y - (j === 1 ? 0 : remainder) * stepRatio.y
         );
-        result.vertices.push(resultPoint);
-        segmentLength -= stepSize;
-        remainder = 0;
-        i++;
+        // Don't add if we did a full turn here.
+        segmentLength -= localStepSize;
+        j++;
+        if (this.isOpen || polygonIndex + 1 < loopMax || segmentLength >= stepSize) {
+          result.vertices.push(point);
+        }
       }
-      curIndex++;
+      polygonPoint = nextPolygonPoint;
+      remainder = segmentLength;
+      polygonIndex++;
     }
 
     return result;

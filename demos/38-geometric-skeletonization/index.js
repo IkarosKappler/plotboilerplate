@@ -58,8 +58,13 @@
       )
     );
 
+    // Some prepared 'random' polygon.
     // prettier-ignore
     var rawData = [{ x: -231, y: -30 }, { x: -225, y: -72 }, { x: -180, y: -93 }, { x: -136, y: -131 }, { x: -86, y: -106 }, { x: -41, y: -130 }, { x: 42, y: -158 }, { x: 108, y: -145 }, { x: 193, y: -105 }, { x: 232, y: -61 }, { x: 214, y: -4 }, { x: 252, y: 37 }, { x: 291, y: 68 }, { x: 311, y: 120 }, { x: 273, y: 163 }, { x: 127, y: 209 }, { x: 103, y: 143 }, { x: 81, y: 67 }, { x: 9, y: 54 }, { x: -69, y: 80 }, { x: -80, y: 124 }, { x: -97, y: 162 }, { x: -201, y: 179 }, { x: -308, y: 128 }];
+    // A prepared square polygon.
+    var devY = 20;
+    // prettier-ignore
+    // var rawData = [ { x: -200, y: -200 - devY }, { x: 200, y: -200 - devY }, { x: 200, y: 200 + devY }, { x: -200, y: 200 + devY } ];
 
     var rawPolygon = new Polygon(
       rawData.map(function (coords) {
@@ -67,9 +72,16 @@
       }),
       false
     );
-    var polygon = evenlyPolygon(rawPolygon, rawData.length * 4);
+    // pb.add(rawPolygon);
+    var polygon = rawPolygon.getEvenDistributionPolygon(rawData.length * 4);
     pb.add(polygon, false);
-    var voronoiHelper = new VoronoiHelper(polygon);
+
+    // Include the bounding box into the voronoi.
+    var boundingBox = polygon.getBounds();
+    var boundingBoxPolygon = boundingBox.toPolygon().scale(1.2, boundingBox.getCenter());
+    var pointList = polygon.vertices.concat(boundingBoxPolygon.vertices);
+
+    var voronoiHelper = new VoronoiHelper(pointList);
 
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
@@ -87,7 +99,6 @@
       // TODO: call this only when the polygon changed!
       voronoiHelper.triangulate();
       voronoiHelper.makeVoronoiDiagram();
-      console.log("polygon", polygon);
       drawVoronoiDiagram(draw, fill);
     };
 
@@ -105,7 +116,7 @@
 
         // Draw large (unclipped) Voronoi cell
         // if (config.drawVoronoiOutlines && (!config.clipVoronoiCells || config.drawUnclippedVoronoiCells)) {
-        draw.polyline(poly.vertices, false, "rgba(128,128,128,0.333)", 1);
+        draw.polyline(poly.vertices, poly.isOpen, "rgba(128,128,128,0.333)", 1);
         // }
 
         // Apply clipping?

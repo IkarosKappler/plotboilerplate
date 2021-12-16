@@ -8,8 +8,8 @@
  */
 
 globalThis.VoronoiHelper = (function () {
-  var VH = function (polygon) {
-    this.polygon = polygon;
+  var VH = function (vertices) {
+    this.vertices = vertices;
     this.triangles = null;
     this.voronoiDiagram = null;
   };
@@ -18,7 +18,7 @@ globalThis.VoronoiHelper = (function () {
    * Make the triangulation (Delaunay).
    */
   VH.prototype.triangulate = function () {
-    var delau = new Delaunay(this.polygon.vertices, {});
+    var delau = new Delaunay(this.vertices, {});
     this.triangles = delau.triangulate();
   };
 
@@ -29,7 +29,7 @@ globalThis.VoronoiHelper = (function () {
     if (this.triangles === null) {
       throw Error("Triangulate the vertex first before make the voronoi diagram.");
     }
-    var voronoiBuilder = new delaunay2voronoi(this.polygon.vertices, this.triangles);
+    var voronoiBuilder = new delaunay2voronoi(this.vertices, this.triangles);
     this.voronoiDiagram = voronoiBuilder.build();
     // redraw(pb.draw, pb.fill);
     // Handle errors if vertices are too close and/or co-linear:
