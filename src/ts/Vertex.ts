@@ -24,7 +24,8 @@
  * @modified 2021-03-01 Changed the second param `center` in the `rotate` function from Vertex to XYCoords.
  * @modified 2021-12-01 Changed the type of param of `scale` to XYCoords.
  * @modified 2021-12-01 Added function `scaleXY` for non uniform scaling.
- * @version  2.5.0
+ * @modified 2021-12-17 Added the functions `lerp` and `lerpAbs` for linear interpolations.
+ * @version  2.6.0
  *
  * @file Vertex
  * @public
@@ -419,6 +420,45 @@ export class Vertex implements XYCoords, SVGSerializable {
    **/
   scale(factor: number, center?: XYCoords): Vertex {
     return this.scaleXY({ x: factor, y: factor }, center);
+  }
+
+  /**
+   * Perform a linear interpolation towards the given target vertex.
+   * The amount value `t` is relative, `t=0.0` means no change, `t=1.0`
+   * means this point will be moved to the exact target position.
+   *
+   * `t=0.5` will move this point to the middle of the connecting
+   * linear segment.
+   *
+   * @param {XYCoords} target - The target position to lerp this vertex to.
+   * @param {number} t - The relative amount, usually in [0..1], but other values will work, too.
+   * @returns
+   */
+  lerp(target: XYCoords, t: number): Vertex {
+    var diff = this.difference(target);
+    // return new Vertex(this.x + diff.x * t, this.y + diff.y * t);
+    this.x += diff.x * t;
+    this.y += diff.y * t;
+    return this;
+  }
+
+  /**
+   * Perform a linear interpolation towards the given target vertex (absolute variant).
+   * The amount value `t` is absolute, which means the lerp amount is a direct distance
+   * value. This point will have move the amount of the passed distance `u`.
+   *
+   * @param {XYCoords} target - The target position to lerp this vertex to.
+   * @param {number} t - The absolute move amount to use to lerping.
+   * @returns
+   */
+  lerpAbs(target: XYCoords, u: number): Vertex {
+    var dist = this.distance(target);
+    var diff = this.difference(target);
+    var step = { x: diff.x / dist, y: diff.y / dist };
+    // return new Vertex(this.x + step.x * u, this.y + step.y * u);
+    this.x += step.x * u;
+    this.y += step.y * u;
+    return this;
   }
 
   /**

@@ -22,44 +22,49 @@ globalThis.evenlyPolygon = (function () {
     if (polygon.vertices.length === 0) {
       return result;
     }
-    var perimeter = polygon.perimeter();
-    var stepSize = perimeter / pointCount;
-    var segmentLength = 0;
 
     // Fetch and add the start point from the source polygon
     var polygonPoint = new Vertex(polygon.vertices[0]);
     result.vertices.push(polygonPoint);
-    var remainder = 0;
-    var polygonIndex = 1;
-    var loopMax = polygon.isOpen ? polygon.vertices.length : polygon.vertices.length + 1;
-    for (var i = 0; i < pointCount && polygonIndex < loopMax; i++) {
-      // Fetch next segment
-      var nextPolygonPoint = polygon.vertices[polygonIndex % polygon.vertices.length];
-      var segmentLength = polygonPoint.distance(nextPolygonPoint);
-      var segmentDiff = polygonPoint.difference(nextPolygonPoint);
-      var stepRatio = { x: segmentDiff.x / segmentLength, y: segmentDiff.y / segmentLength };
-      var j = 1;
-      while (segmentLength >= stepSize) {
-        // Get next point on local segment
-        var localStepSize = stepSize - (j === 1 ? remainder : 0);
-        var point = new Vertex(
-          polygonPoint.x + j * localStepSize * stepRatio.x - (j === 1 ? 0 : remainder) * stepRatio.x,
-          polygonPoint.y + j * localStepSize * stepRatio.y - (j === 1 ? 0 : remainder) * stepRatio.y
-        );
-        // Don't add if we did a full turn here.
-        segmentLength -= localStepSize;
-        j++;
-        if (this.isOpen || polygonIndex + 1 < loopMax || segmentLength >= stepSize) {
-          result.vertices.push(point);
-        }
-      }
-      polygonPoint = nextPolygonPoint;
-      remainder = segmentLength;
-      polygonIndex++;
+    if (polygon.vertices.length === 1) {
+      return result;
     }
 
+    var perimeter = polygon.perimeter();
+    var stepSize = perimeter / (pointCount + 0);
+    var segmentLength = 0;
+    var n = polygon.vertices.length;
+
+    var polygonIndex = 1;
+    var nextPolygonPoint = new Vertex(polygon.vertices[1]);
+    var loopMax = polygon.isOpen ? n : n + 1;
+    var curSegmentU = stepSize;
+    var i = 1;
+    while (i < pointCount && polygonIndex < loopMax) {
+      var segmentLength = polygonPoint.distance(nextPolygonPoint);
+      // Check if next eq point is inside this segment
+      if (curSegmentU < segmentLength) {
+        var newPoint = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
+        result.vertices.push(newPoint);
+        curSegmentU += stepSize;
+        i++;
+      } else {
+        polygonIndex++;
+        polygonPoint = nextPolygonPoint;
+        nextPolygonPoint = new Vertex(polygon.vertices[polygonIndex % n]);
+        curSegmentU = curSegmentU - segmentLength;
+      }
+    }
     return result;
   };
+
+  // var lerpAbs = function (vert, u, target) {
+  //   var dist = vert.distance(target);
+  //   var diff = vert.difference(target);
+  //   var step = { x: diff.x / dist, y: diff.y / dist };
+  //   // var t = u / dist;
+  //   return new Vertex(vert.x + step.x * u, vert.y + step.y * u);
+  // };
 
   return ep;
 })();

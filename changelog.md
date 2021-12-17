@@ -1,5 +1,7 @@
 # Changelog
 
+- 2021-12-17
+  - Added the functions `Vertex.lerp` and `Vertex.lerpAbs` for linear interpolations.
 - 2021-12-16
   - Added the `Polygon.getEvenDistributionPolygon()` function.
 - 2021-12-14

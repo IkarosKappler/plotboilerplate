@@ -6344,42 +6344,42 @@ var Polygon = /** @class */ (function () {
      */
     Polygon.prototype.getEvenDistributionPolygon = function (pointCount) {
         if (pointCount <= 0) {
-            throw new Error("[getEvenDistributionPolygon] pointCount must be larger than zero; is " + pointCount + ".");
+            throw new Error("pointCount must be larger than zero; is " + pointCount + ".");
         }
         var result = new Polygon([], this.isOpen);
         if (this.vertices.length === 0) {
             return result;
         }
-        var perimeter = this.perimeter();
-        var stepSize = perimeter / pointCount;
-        var segmentLength = 0;
         // Fetch and add the start point from the source polygon
         var polygonPoint = new Vertex_1.Vertex(this.vertices[0]);
         result.vertices.push(polygonPoint);
-        var remainder = 0;
+        if (this.vertices.length === 1) {
+            return result;
+        }
+        var perimeter = this.perimeter();
+        var stepSize = perimeter / (pointCount + 0);
+        var segmentLength = 0;
+        var n = this.vertices.length;
         var polygonIndex = 1;
-        var loopMax = this.isOpen ? this.vertices.length : this.vertices.length + 1;
-        for (var i = 0; i < pointCount && polygonIndex < loopMax; i++) {
-            // Fetch next segment
-            var nextPolygonPoint = this.vertices[polygonIndex % this.vertices.length];
+        var nextPolygonPoint = new Vertex_1.Vertex(this.vertices[1]);
+        var loopMax = this.isOpen ? n : n + 1;
+        var curSegmentU = stepSize;
+        var i = 1;
+        while (i < pointCount && polygonIndex < loopMax) {
             var segmentLength = polygonPoint.distance(nextPolygonPoint);
-            var segmentDiff = polygonPoint.difference(nextPolygonPoint);
-            var stepRatio = { x: segmentDiff.x / segmentLength, y: segmentDiff.y / segmentLength };
-            var j = 1;
-            while (segmentLength >= stepSize) {
-                // Get next point on local segment
-                var localStepSize = stepSize - (j === 1 ? remainder : 0);
-                var point = new Vertex_1.Vertex(polygonPoint.x + j * localStepSize * stepRatio.x - (j === 1 ? 0 : remainder) * stepRatio.x, polygonPoint.y + j * localStepSize * stepRatio.y - (j === 1 ? 0 : remainder) * stepRatio.y);
-                // Don't add if we did a full turn here.
-                segmentLength -= localStepSize;
-                j++;
-                if (this.isOpen || polygonIndex + 1 < loopMax || segmentLength >= stepSize) {
-                    result.vertices.push(point);
-                }
+            // Check if next eq point is inside this segment
+            if (curSegmentU < segmentLength) {
+                var newPoint = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
+                result.vertices.push(newPoint);
+                curSegmentU += stepSize;
+                i++;
             }
-            polygonPoint = nextPolygonPoint;
-            remainder = segmentLength;
-            polygonIndex++;
+            else {
+                polygonIndex++;
+                polygonPoint = nextPolygonPoint;
+                nextPolygonPoint = new Vertex_1.Vertex(this.vertices[polygonIndex % n]);
+                curSegmentU = curSegmentU - segmentLength;
+            }
         }
         return result;
     };
@@ -8352,7 +8352,8 @@ exports.VertTuple = VertTuple;
  * @modified 2021-03-01 Changed the second param `center` in the `rotate` function from Vertex to XYCoords.
  * @modified 2021-12-01 Changed the type of param of `scale` to XYCoords.
  * @modified 2021-12-01 Added function `scaleXY` for non uniform scaling.
- * @version  2.5.0
+ * @modified 2021-12-17 Added the functions `lerp` and `lerpAbs` for linear interpolations.
+ * @version  2.6.0
  *
  * @file Vertex
  * @public
@@ -8709,6 +8710,43 @@ var Vertex = /** @class */ (function () {
      **/
     Vertex.prototype.scale = function (factor, center) {
         return this.scaleXY({ x: factor, y: factor }, center);
+    };
+    /**
+     * Perform a linear interpolation towards the given target vertex.
+     * The amount value `t` is relative, `t=0.0` means no change, `t=1.0`
+     * means this point will be moved to the exact target position.
+     *
+     * `t=0.5` will move this point to the middle of the connecting
+     * linear segment.
+     *
+     * @param {XYCoords} target - The target position to lerp this vertex to.
+     * @param {number} t - The relative amount, usually in [0..1], but other values will work, too.
+     * @returns
+     */
+    Vertex.prototype.lerp = function (target, t) {
+        var diff = this.difference(target);
+        // return new Vertex(this.x + diff.x * t, this.y + diff.y * t);
+        this.x += diff.x * t;
+        this.y += diff.y * t;
+        return this;
+    };
+    /**
+     * Perform a linear interpolation towards the given target vertex (absolute variant).
+     * The amount value `t` is absolute, which means the lerp amount is a direct distance
+     * value. This point will have move the amount of the passed distance `u`.
+     *
+     * @param {XYCoords} target - The target position to lerp this vertex to.
+     * @param {number} t - The absolute move amount to use to lerping.
+     * @returns
+     */
+    Vertex.prototype.lerpAbs = function (target, u) {
+        var dist = this.distance(target);
+        var diff = this.difference(target);
+        var step = { x: diff.x / dist, y: diff.y / dist };
+        // return new Vertex(this.x + step.x * u, this.y + step.y * u);
+        this.x += step.x * u;
+        this.y += step.y * u;
+        return this;
     };
     /**
      * This is a vector-like behavior and 'scales' this vertex
