@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A helper to do the Deulaunay and Voroni stuff for us.
  * Keep the main code tiny and clean.

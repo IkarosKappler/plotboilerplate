@@ -186,56 +186,51 @@
       }
 
       if (config.drawVoronoiGraph) {
-        // Clip the voronoi cells before proceeding?
-        // var voronoiCells = config.drawVoronoiGraph
-        //   ? clipVoronoiDiagram(voronoiHelper.voronoiDiagram)
-        //   : voronoiCellsToPolygons(voronoiHelper.voronoiDiagram);
-        var clippedCells = voronoiCellsToPolygons(voronoiHelper.voronoiDiagram);
-
+        var cellPolygons = voronoiCellsToPolygons(voronoiHelper.voronoiDiagram);
         // Convert voronoi cells to graph { vertices, edges }
-        var voronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
-        // console.log("voronoiGraph", voronoiGraph);
+        var voronoiGraph = new voronoi2graph(cellPolygons, 0.0000001);
         drawVoronoiGraph(draw, voronoiGraph);
       }
-      var clippedCells = clipVoronoiDiagram(voronoiHelper.voronoiDiagram);
-      // console.log("voronoiCells", voronoiCells);
 
-      // Draw clipped voronoi cells
-      console.log("clippedCells", clippedCells);
-      drawPolygonSet(clippedCells, draw, fill);
+      if (config.drawSkeleton) {
+        // Clip the voronoi cells before proceeding?
+        var clippedCells = clipVoronoiDiagram(voronoiHelper.voronoiDiagram);
+
+        // Draw clipped voronoi cells
+        drawPolygonSet(clippedCells, draw, fill);
+
+        // Convert the (clipped) Voronoi cells to a graph
+        // and find the shortest path.
+        var voronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
+        // TODO: shortest path algorithm?
+      }
     };
 
     var clipVoronoiDiagram = function (voronoiDiagram) {
-      // TODO: only use right (left???) winding polygons here
       var reversedClipVertices = [];
       for (var i = polygon.vertices.length - 1; i >= 0; i--) {
         reversedClipVertices.push(polygon.vertices[i]);
       }
-      // console.log("reversedClipVertices", reversedClipVertices);
       return voronoiDiagram.map(function (cell) {
-        // var cell = voronoiHelper.voronoiDiagram[c];
         var cellPolygon = cell.toPolygon();
-        // console.log("cellPolygon", cellPolygon);
         var reversedVertices = [];
         for (var i = cellPolygon.vertices.length - 1; i >= 0; i--) {
+          // Only use left winding polygons here.
+          // Otherwise Sutherland-Hodgman algorithm might not work.
           if (cellPolygon.isClockwise()) {
             reversedVertices.push(cellPolygon.vertices[cellPolygon.vertices.length - i - 1]);
           } else {
             reversedVertices.push(cellPolygon.vertices[i]);
           }
         }
-        // console.log("into sutherlandhodgman", reversedVertices, reversedClipVertices);
         var clippedPolygonVertices = sutherlandHodgman(polygon.vertices, reversedVertices);
-        // console.log("clippedPolygonVertices", clippedPolygonVertices);
         var clippedPolygon = new Polygon(cloneVertexArray(clippedPolygonVertices), false);
-        // console.log("clippedPolygon", clippedPolygon);
         return clippedPolygon;
       });
     };
 
     var voronoiCellsToPolygons = function (voronoiDiagram) {
       return voronoiDiagram.map(function (cell) {
-        // console.log("as cell:", cell, "as polygon", cell.toPolygon());
         return cell.toPolygon();
       });
     };
@@ -255,7 +250,7 @@
         if (!vertA || !vertB) {
           console.log("err ", e, edge, vertA, vertB);
         }
-        draw.line(vertA.clone(), vertB.clone(), "rgba(192,0,192,0.15)", 5);
+        draw.line(vertA.clone(), vertB.clone(), "rgba(192,0,192,0.1)", 5);
       }
     };
 
@@ -276,7 +271,7 @@
     var drawPolygonSet = function (polygons, draw, fill) {
       for (var p in polygons) {
         var poly = polygons[p];
-        draw.polyline(poly.vertices, poly.isOpen, "rgba(128,128,128,0.333)", 1);
+        draw.polyline(poly.vertices, poly.isOpen, "rgba(0,128,128,0.4)", 1);
       }
     };
 

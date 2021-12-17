@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Optimize a polygon: turn the shape into evenly spaced points.
  *
