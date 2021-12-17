@@ -98,20 +98,15 @@
       }),
       false
     );
-    // pb.add(rawPolygon);
-    console.log("rawData.length", rawData.length);
-    var polygon = null; // rawPolygon.getEvenDistributionPolygon(config.interpolationPointCount);
-    // var polygon = evenlyPolygon(rawPolygon, config.interpolationPointCount);
-    // console.log("polygon.vertices.length", polygon.vertices.length);
-    // pb.add(polygon, false);
+    var polygon = null;
 
     // +---------------------------------------------------------------------------------
     // | Point list and Voronoi helper.
     // +-------------------------------
     // Array<Vertex>
-    var pointList = []; // polygon.vertices.concat(boundingBoxPolygon.vertices);
+    var pointList = [];
     // VoronoiHelper
-    var voronoiHelper = null; // new VoronoiHelper(pointList);
+    var voronoiHelper = null;
 
     // +---------------------------------------------------------------------------------
     // | Called when the desired interpolation point count changes.
@@ -148,7 +143,6 @@
       voronoiHelper.makeVoronoiDiagram();
       pb.redraw();
     };
-    // handlePolygonChange();
 
     // +---------------------------------------------------------------------------------
     // | Install drag listeners to the polygon vertices (e.g. when polygon was added to the canvas).
@@ -191,17 +185,65 @@
         drawVertexNumbers(draw, fill);
       }
 
-      // Convert voronoi cells to graph { vertices, edges }
-      var voronoiGraph = new voronoi2graph(voronoiHelper.voronoiDiagram, 0.0000001);
       if (config.drawVoronoiGraph) {
+        // Clip the voronoi cells before proceeding?
+        // var voronoiCells = config.drawVoronoiGraph
+        //   ? clipVoronoiDiagram(voronoiHelper.voronoiDiagram)
+        //   : voronoiCellsToPolygons(voronoiHelper.voronoiDiagram);
+        var clippedCells = voronoiCellsToPolygons(voronoiHelper.voronoiDiagram);
+
+        // Convert voronoi cells to graph { vertices, edges }
+        var voronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
+        // console.log("voronoiGraph", voronoiGraph);
         drawVoronoiGraph(draw, voronoiGraph);
       }
+      var clippedCells = clipVoronoiDiagram(voronoiHelper.voronoiDiagram);
+      // console.log("voronoiCells", voronoiCells);
+
+      // Draw clipped voronoi cells
+      console.log("clippedCells", clippedCells);
+      drawPolygonSet(clippedCells, draw, fill);
+    };
+
+    var clipVoronoiDiagram = function (voronoiDiagram) {
+      // TODO: only use right (left???) winding polygons here
+      var reversedClipVertices = [];
+      for (var i = polygon.vertices.length - 1; i >= 0; i--) {
+        reversedClipVertices.push(polygon.vertices[i]);
+      }
+      // console.log("reversedClipVertices", reversedClipVertices);
+      return voronoiDiagram.map(function (cell) {
+        // var cell = voronoiHelper.voronoiDiagram[c];
+        var cellPolygon = cell.toPolygon();
+        // console.log("cellPolygon", cellPolygon);
+        var reversedVertices = [];
+        for (var i = cellPolygon.vertices.length - 1; i >= 0; i--) {
+          if (cellPolygon.isClockwise()) {
+            reversedVertices.push(cellPolygon.vertices[cellPolygon.vertices.length - i - 1]);
+          } else {
+            reversedVertices.push(cellPolygon.vertices[i]);
+          }
+        }
+        // console.log("into sutherlandhodgman", reversedVertices, reversedClipVertices);
+        var clippedPolygonVertices = sutherlandHodgman(polygon.vertices, reversedVertices);
+        // console.log("clippedPolygonVertices", clippedPolygonVertices);
+        var clippedPolygon = new Polygon(cloneVertexArray(clippedPolygonVertices), false);
+        // console.log("clippedPolygon", clippedPolygon);
+        return clippedPolygon;
+      });
+    };
+
+    var voronoiCellsToPolygons = function (voronoiDiagram) {
+      return voronoiDiagram.map(function (cell) {
+        // console.log("as cell:", cell, "as polygon", cell.toPolygon());
+        return cell.toPolygon();
+      });
     };
 
     var drawVertexNumbers = function (draw, fill) {
       for (var i = 0; i < polygon.vertices.length; i++) {
         var p = polygon.vertices[i];
-        fill.text("" + i, p.x + 5, p.y, { color: "black", fontSize: 12 / draw.scale.x });
+        fill.text("" + i, p.x + 5, p.y, { color: "rgba(0,0,0,0.5)", fontSize: 11 / draw.scale.x });
       }
     };
 
@@ -213,7 +255,7 @@
         if (!vertA || !vertB) {
           console.log("err ", e, edge, vertA, vertB);
         }
-        draw.line(vertA.clone().addXY(2, 2), vertB.clone().addXY(2, 2), "rgba(192,0,192,0.5)", 1);
+        draw.line(vertA.clone(), vertB.clone(), "rgba(192,0,192,0.15)", 5);
       }
     };
 
@@ -224,6 +266,16 @@
       for (var v in voronoiHelper.voronoiDiagram) {
         var cell = voronoiHelper.voronoiDiagram[v];
         var poly = cell.toPolygon();
+        draw.polyline(poly.vertices, poly.isOpen, "rgba(128,128,128,0.333)", 1);
+      }
+    };
+
+    /**
+     * Draw the stored voronoi diagram.
+     */
+    var drawPolygonSet = function (polygons, draw, fill) {
+      for (var p in polygons) {
+        var poly = polygons[p];
         draw.polyline(poly.vertices, poly.isOpen, "rgba(128,128,128,0.333)", 1);
       }
     };
@@ -240,6 +292,7 @@
       var pixelPosition = { x: event.offsetX - bounds.left, y: event.offsetY - bounds.top };
       var relPos = pb.transformMousePosition(pixelPosition.x, pixelPosition.y);
       console.log("clicked", pixelPosition, relPos);
+      // This was just a helper to construct the initial polygon just by clicking.
       if (config.pointCount > polygon.vertices.length) {
         // polygon.vertices.push(new Vertex(relPos));
         // pb.redraw();

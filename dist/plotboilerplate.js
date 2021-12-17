@@ -6357,16 +6357,15 @@ var Polygon = /** @class */ (function () {
             return result;
         }
         var perimeter = this.perimeter();
-        var stepSize = perimeter / (pointCount + 0);
-        var segmentLength = 0;
+        var stepSize = perimeter / pointCount;
         var n = this.vertices.length;
         var polygonIndex = 1;
         var nextPolygonPoint = new Vertex_1.Vertex(this.vertices[1]);
+        var segmentLength = polygonPoint.distance(nextPolygonPoint);
         var loopMax = this.isOpen ? n : n + 1;
         var curSegmentU = stepSize;
         var i = 1;
         while (i < pointCount && polygonIndex < loopMax) {
-            var segmentLength = polygonPoint.distance(nextPolygonPoint);
             // Check if next eq point is inside this segment
             if (curSegmentU < segmentLength) {
                 var newPoint = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
@@ -6379,6 +6378,7 @@ var Polygon = /** @class */ (function () {
                 polygonPoint = nextPolygonPoint;
                 nextPolygonPoint = new Vertex_1.Vertex(this.vertices[polygonIndex % n]);
                 curSegmentU = curSegmentU - segmentLength;
+                segmentLength = polygonPoint.distance(nextPolygonPoint);
             }
         }
         return result;

@@ -272,35 +272,34 @@ export class Polygon implements SVGSerializable {
    */
   getEvenDistributionPolygon(pointCount: number): Polygon {
     if (pointCount <= 0) {
-      throw new Error(`pointCount must be larger than zero; is ${pointCount}.`);
+      throw new Error("pointCount must be larger than zero; is " + pointCount + ".");
     }
-    var result = new Polygon([], this.isOpen);
+    const result: Polygon = new Polygon([], this.isOpen);
     if (this.vertices.length === 0) {
       return result;
     }
 
     // Fetch and add the start point from the source polygon
-    var polygonPoint = new Vertex(this.vertices[0]);
+    let polygonPoint: Vertex = new Vertex(this.vertices[0]);
     result.vertices.push(polygonPoint);
     if (this.vertices.length === 1) {
       return result;
     }
 
-    var perimeter = this.perimeter();
-    var stepSize = perimeter / (pointCount + 0);
-    var segmentLength = 0;
-    var n = this.vertices.length;
+    const perimeter: number = this.perimeter();
+    const stepSize: number = perimeter / pointCount;
+    const n: number = this.vertices.length;
 
-    var polygonIndex = 1;
-    var nextPolygonPoint = new Vertex(this.vertices[1]);
-    var loopMax = this.isOpen ? n : n + 1;
-    var curSegmentU = stepSize;
+    let polygonIndex: number = 1;
+    let nextPolygonPoint: Vertex = new Vertex(this.vertices[1]);
+    let segmentLength: number = polygonPoint.distance(nextPolygonPoint);
+    let loopMax: number = this.isOpen ? n : n + 1;
+    let curSegmentU: number = stepSize;
     var i = 1;
     while (i < pointCount && polygonIndex < loopMax) {
-      var segmentLength = polygonPoint.distance(nextPolygonPoint);
       // Check if next eq point is inside this segment
       if (curSegmentU < segmentLength) {
-        var newPoint = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
+        let newPoint: Vertex = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
         result.vertices.push(newPoint);
         curSegmentU += stepSize;
         i++;
@@ -309,6 +308,7 @@ export class Polygon implements SVGSerializable {
         polygonPoint = nextPolygonPoint;
         nextPolygonPoint = new Vertex(this.vertices[polygonIndex % n]);
         curSegmentU = curSegmentU - segmentLength;
+        segmentLength = polygonPoint.distance(nextPolygonPoint);
       }
     }
     return result;

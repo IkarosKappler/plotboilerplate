@@ -234,32 +234,31 @@ export class Polygon {
      */
     getEvenDistributionPolygon(pointCount) {
         if (pointCount <= 0) {
-            throw new Error(`pointCount must be larger than zero; is ${pointCount}.`);
+            throw new Error("pointCount must be larger than zero; is " + pointCount + ".");
         }
-        var result = new Polygon([], this.isOpen);
+        const result = new Polygon([], this.isOpen);
         if (this.vertices.length === 0) {
             return result;
         }
         // Fetch and add the start point from the source polygon
-        var polygonPoint = new Vertex(this.vertices[0]);
+        let polygonPoint = new Vertex(this.vertices[0]);
         result.vertices.push(polygonPoint);
         if (this.vertices.length === 1) {
             return result;
         }
-        var perimeter = this.perimeter();
-        var stepSize = perimeter / (pointCount + 0);
-        var segmentLength = 0;
-        var n = this.vertices.length;
-        var polygonIndex = 1;
-        var nextPolygonPoint = new Vertex(this.vertices[1]);
-        var loopMax = this.isOpen ? n : n + 1;
-        var curSegmentU = stepSize;
+        const perimeter = this.perimeter();
+        const stepSize = perimeter / pointCount;
+        const n = this.vertices.length;
+        let polygonIndex = 1;
+        let nextPolygonPoint = new Vertex(this.vertices[1]);
+        let segmentLength = polygonPoint.distance(nextPolygonPoint);
+        let loopMax = this.isOpen ? n : n + 1;
+        let curSegmentU = stepSize;
         var i = 1;
         while (i < pointCount && polygonIndex < loopMax) {
-            var segmentLength = polygonPoint.distance(nextPolygonPoint);
             // Check if next eq point is inside this segment
             if (curSegmentU < segmentLength) {
-                var newPoint = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
+                let newPoint = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
                 result.vertices.push(newPoint);
                 curSegmentU += stepSize;
                 i++;
@@ -269,6 +268,7 @@ export class Polygon {
                 polygonPoint = nextPolygonPoint;
                 nextPolygonPoint = new Vertex(this.vertices[polygonIndex % n]);
                 curSegmentU = curSegmentU - segmentLength;
+                segmentLength = polygonPoint.distance(nextPolygonPoint);
             }
         }
         return result;

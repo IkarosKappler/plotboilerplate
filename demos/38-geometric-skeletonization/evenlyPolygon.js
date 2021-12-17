@@ -31,17 +31,16 @@ globalThis.evenlyPolygon = (function () {
     }
 
     var perimeter = polygon.perimeter();
-    var stepSize = perimeter / (pointCount + 0);
-    var segmentLength = 0;
+    var stepSize = perimeter / pointCount;
     var n = polygon.vertices.length;
 
     var polygonIndex = 1;
     var nextPolygonPoint = new Vertex(polygon.vertices[1]);
+    var segmentLength = polygonPoint.distance(nextPolygonPoint);
     var loopMax = polygon.isOpen ? n : n + 1;
     var curSegmentU = stepSize;
     var i = 1;
     while (i < pointCount && polygonIndex < loopMax) {
-      var segmentLength = polygonPoint.distance(nextPolygonPoint);
       // Check if next eq point is inside this segment
       if (curSegmentU < segmentLength) {
         var newPoint = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
@@ -53,6 +52,7 @@ globalThis.evenlyPolygon = (function () {
         polygonPoint = nextPolygonPoint;
         nextPolygonPoint = new Vertex(polygon.vertices[polygonIndex % n]);
         curSegmentU = curSegmentU - segmentLength;
+        segmentLength = polygonPoint.distance(nextPolygonPoint);
       }
     }
     return result;
