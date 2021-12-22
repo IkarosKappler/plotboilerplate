@@ -186,63 +186,100 @@
       }
 
       if (config.drawVoronoiGraph) {
-        var cellPolygons = voronoiCellsToPolygons(voronoiHelper.voronoiDiagram);
+        var cellPolygons = voronoiHelper.voronoiCellsToPolygons();
         // Convert voronoi cells to graph { vertices, edges }
         var voronoiGraph = new voronoi2graph(cellPolygons, 0.0000001);
-        drawVoronoiGraph(draw, voronoiGraph);
+        drawVoronoiGraph(draw, voronoiGraph, "rgba(192,0,192,0.2)", 1);
+        console.log("voronoiGraph.edges", voronoiGraph.edges.length, "voronoiGraph.vertices", voronoiGraph.vertices.length);
       }
 
       if (config.drawSkeleton) {
-        // Clip the voronoi cells before proceeding?
-        var clippedCells = clipVoronoiDiagram(voronoiHelper.voronoiDiagram);
-
+        // Clip the voronoi cells before proceeding
+        var clippedCells = voronoiHelper.clipVoronoiDiagram(polygon);
         // Draw clipped voronoi cells
-        drawPolygonSet(clippedCells, draw, fill);
+        // drawPolygonSet(clippedCells, draw, fill);
 
         // Convert the (clipped) Voronoi cells to a graph
         // and find the shortest path.
-        var voronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
+        var clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
+        console.log(
+          "[before] clippedVoronoiGraph.edges",
+          clippedVoronoiGraph.edges.length,
+          "clippedVoronoiGraph.vertices",
+          clippedVoronoiGraph.vertices.length
+        );
+        stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
         // TODO: shortest path algorithm?
+        drawVoronoiGraph(draw, clippedVoronoiGraph, "rgba(0,128,192,0.4)", 3);
+        console.log(
+          "[after] clippedVoronoiGraph.edges",
+          clippedVoronoiGraph.edges.length,
+          "clippedVoronoiGraph.vertices",
+          clippedVoronoiGraph.vertices.length
+        );
       }
     };
 
-    var clipVoronoiDiagram = function (voronoiDiagram) {
-      var reversedClipVertices = [];
-      for (var i = polygon.vertices.length - 1; i >= 0; i--) {
-        reversedClipVertices.push(polygon.vertices[i]);
-      }
-      return voronoiDiagram.map(function (cell) {
-        var cellPolygon = cell.toPolygon();
-        var reversedVertices = [];
-        for (var i = cellPolygon.vertices.length - 1; i >= 0; i--) {
-          // Only use left winding polygons here.
-          // Otherwise Sutherland-Hodgman algorithm might not work.
-          if (cellPolygon.isClockwise()) {
-            reversedVertices.push(cellPolygon.vertices[cellPolygon.vertices.length - i - 1]);
-          } else {
-            reversedVertices.push(cellPolygon.vertices[i]);
+    // +---------------------------------------------------------------------------------
+    // | Strip all those edges from the graph that belong to the clipping
+    // | polygon (that is the outer border here).
+    // |
+    // | Note: this only works as the complete clip polygon lies _inside_ the
+    // |       Voronoi diagram. This guarantees that all outer graph edges must
+    // |       be some former edge segment of the clipping polygon.
+    // +-------------------------------
+    var stripOuterClipGraphEdges = function (graph, clipPolygon) {
+      var edgeComparator = function (edgeA, edgeB) {
+        return (edgeA.i === edgeB.i && edgeA.j === edgeB.j) || (edgeA.i === edgeB.j && edgeA.j === edgeB.i);
+      };
+      var edgeAsLine = new Line(new Vertex(), new Vertex());
+      var newEdges = new ArraySet(edgeComparator);
+      for (var e = 0; e < graph.edges.length; e++) {
+        var edge = graph.edges[e];
+        var vertA = graph.vertices[edge.i];
+        var vertB = graph.vertices[edge.j];
+        // console.log("vertA", vertA, "vertB", vertB);
+        edgeAsLine.a.set(vertA);
+        edgeAsLine.b.set(vertB);
+        // if (e < 5) {
+        //   console.log("edgeAsLine", edgeAsLine);
+        // }
+        // Check if some clipping polygon point is in the near middle of this
+        // edge.
+        var keepEdge = true;
+        for (var i = 0; i < clipPolygon.vertices.length; i++) {
+          var polygonPoint = clipPolygon.vertices[i];
+          var distA = vertA.distance(polygonPoint);
+          var distB = vertB.distance(polygonPoint);
+          // if (edgeAsLine.hasPoint(polygonPoint, true)) {
+          //   console.log("distA", distA, "distB", distB);
+          // }
+          // Check if polygon vertex in roughly in the middle of this edge.
+          // if (edgeAsLine.hasPoint(polygonPoint, true) && (distA < Vertex.EPSILON || distB < Vertex.EPSILON)) {
+          // if (distA < Vertex.EPSILON || distB < Vertex.EPSILON || edgeAsLine.hasPoint(polygonPoint, true)) {
+          if (edgeAsLine.hasPoint(polygonPoint, true)) {
+            // console.log("Point on outer edge!");
+            // Strip this edge from the result (will not be re-added).
+            keepEdge = false;
           }
         }
-        var clippedPolygonVertices = sutherlandHodgman(polygon.vertices, reversedVertices);
-        var clippedPolygon = new Polygon(cloneVertexArray(clippedPolygonVertices), false);
-        return clippedPolygon;
-      });
-    };
-
-    var voronoiCellsToPolygons = function (voronoiDiagram) {
-      return voronoiDiagram.map(function (cell) {
-        return cell.toPolygon();
-      });
+        if (keepEdge) {
+          newEdges.add(edge);
+        }
+      }
+      console.log("oldEdges", graph.edges.length, "newEdges", newEdges.length);
+      graph.edges = newEdges;
     };
 
     var drawVertexNumbers = function (draw, fill) {
+      var color = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGBA();
       for (var i = 0; i < polygon.vertices.length; i++) {
         var p = polygon.vertices[i];
-        fill.text("" + i, p.x + 5, p.y, { color: "rgba(0,0,0,0.5)", fontSize: 11 / draw.scale.x });
+        fill.text("" + i, p.x + 5, p.y, { color: color, fontSize: 11 / draw.scale.x });
       }
     };
 
-    var drawVoronoiGraph = function (draw, graph) {
+    var drawVoronoiGraph = function (draw, graph, color, lineWidth) {
       for (var e = 0; e < graph.edges.length; e++) {
         var edge = graph.edges[e];
         var vertA = graph.vertices[edge.i];
@@ -250,7 +287,7 @@
         if (!vertA || !vertB) {
           console.log("err ", e, edge, vertA, vertB);
         }
-        draw.line(vertA.clone(), vertB.clone(), "rgba(192,0,192,0.1)", 5);
+        draw.line(vertA.clone(), vertB.clone(), color, lineWidth);
       }
     };
 

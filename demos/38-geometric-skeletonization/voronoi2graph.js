@@ -36,17 +36,17 @@ globalThis.voronoi2graph = (function () {
       var cellIsOpen = cell.isOpen;
       var vertIndexA = -1;
       for (var v = 0; v < cellVertices.length; v++) {
-        if (cellIsOpen || v < cellVertices.length) {
-          var vertA = cellVertices[v];
-          var vertB = cellVertices[(v + 1) % cellVertices.length];
-          if (v === 0) {
-            vertIndexA = vertices.add(vertA);
-          }
-          var vertIndexB = vertices.add(vertB);
-          var edge = { i: vertIndexA, j: vertIndexB };
-          edges.add(edge);
-          vertIndexA = vertIndexB;
+        // if (cellIsOpen || v < cellVertices.length) {
+        var vertA = cellVertices[v];
+        var vertB = cellVertices[(v + 1) % cellVertices.length];
+        if (v === 0) {
+          vertIndexA = vertices.add(vertA);
         }
+        var vertIndexB = vertices.add(vertB);
+        var edge = { i: vertIndexA, j: vertIndexB };
+        edges.add(edge);
+        vertIndexA = vertIndexB;
+        // }
       }
     }
     return { edges: edges, vertices: vertices };

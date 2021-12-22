@@ -7,7 +7,7 @@
 /**
  * Creata new set, based on array.
  *
- * @param {function(item,itm)} comparator - Must return true if both items are considered equal.
+ * @param {function(itemA,itemB)} comparator - Must return true if both items are considered equal.
  */
 var ArraySet = function (comparator) {
   Array.call(this);

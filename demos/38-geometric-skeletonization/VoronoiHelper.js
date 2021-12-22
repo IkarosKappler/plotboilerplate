@@ -42,5 +42,34 @@ globalThis.VoronoiHelper = (function () {
     }
   };
 
+  /**
+   * Clip the whole voronoi diagram.
+   * Note that some cell need to be reversed as only clockwise winding cells can be
+   * clipped (with sutherland-hodgman, which is used here).
+   * @param {Polygon} clipPolygon - Should be in clockwise winding order.
+   */
+  VH.prototype.clipVoronoiDiagram = function (clipPolygon) {
+    // TODO: a similar clipping is also used in the 07-Voronoi-demo.
+    //       -> use this new class there?
+    return this.voronoiDiagram.map(function (cell) {
+      var cellPolygon = cell.toPolygon();
+      if (!cellPolygon.isClockwise()) {
+        cellPolygon.vertices.reverse();
+      }
+      var clippedPolygonVertices = sutherlandHodgman(clipPolygon.vertices, cellPolygon.vertices);
+      var clippedPolygon = new Polygon(cloneVertexArray(clippedPolygonVertices), false);
+      return clippedPolygon;
+    });
+  };
+
+  /**
+   * Convert the calculated Voronoi cell into polygons.
+   */
+  VH.prototype.voronoiCellsToPolygons = function () {
+    return this.voronoiDiagram.map(function (cell) {
+      return cell.toPolygon();
+    });
+  };
+
   return VH;
 })();
