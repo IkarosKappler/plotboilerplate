@@ -71,7 +71,7 @@
 
         pointCount: 24,
         interpolationPointCount: 24 * 4,
-        drawOriginalPolygon: false,
+        drawOriginalPolygon: true,
         drawVertexNumbers: false,
         drawVoronoiCells: true,
         drawVoronoiGraph: false,
@@ -111,6 +111,7 @@
     // +---------------------------------------------------------------------------------
     // | Called when the desired interpolation point count changes.
     // | Updates the polygon by interpolation the original one with the new point count.
+    // | Also called when a vertex of the raw input polygon was dragged around.
     // +-------------------------------
     var handleInterpolationPointCount = function () {
       if (polygon) {
@@ -123,6 +124,10 @@
       installDragListeners();
     };
 
+    for (var i in rawPolygon.vertices) {
+      rawPolygon.vertices[i].listeners.addDragListener(handleInterpolationPointCount);
+    }
+
     // +---------------------------------------------------------------------------------
     // | Called when a vertex in the polygon changed.
     // | Re-calculates the Voronoi graph.
@@ -134,6 +139,11 @@
 
       pb.removeAll(false, false);
       pb.add(polygon, false);
+      for (var i in polygon.vertices) {
+        polygon.vertices[i].attr.visible = true;
+        polygon.vertices[i].attr.draggable = false;
+        polygon.vertices[i].attr.selectable = false;
+      }
       if (config.drawOriginalPolygon) {
         pb.add(rawPolygon);
       }
@@ -190,7 +200,7 @@
         // Convert voronoi cells to graph { vertices, edges }
         var voronoiGraph = new voronoi2graph(cellPolygons, 0.0000001);
         drawVoronoiGraph(draw, voronoiGraph, "rgba(192,0,192,0.2)", 1);
-        console.log("voronoiGraph.edges", voronoiGraph.edges.length, "voronoiGraph.vertices", voronoiGraph.vertices.length);
+        // console.log("voronoiGraph.edges", voronoiGraph.edges.length, "voronoiGraph.vertices", voronoiGraph.vertices.length);
       }
 
       if (config.drawSkeleton) {
@@ -202,21 +212,25 @@
         // Convert the (clipped) Voronoi cells to a graph
         // and find the shortest path.
         var clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
-        console.log(
-          "[before] clippedVoronoiGraph.edges",
-          clippedVoronoiGraph.edges.length,
-          "clippedVoronoiGraph.vertices",
-          clippedVoronoiGraph.vertices.length
-        );
+        // console.log(
+        //   "[before] clippedVoronoiGraph.edges",
+        //   clippedVoronoiGraph.edges.length,
+        //   "clippedVoronoiGraph.vertices",
+        //   clippedVoronoiGraph.vertices.length
+        // );
         stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
         // TODO: shortest path algorithm?
         drawVoronoiGraph(draw, clippedVoronoiGraph, "rgba(0,128,192,0.4)", 3);
-        console.log(
-          "[after] clippedVoronoiGraph.edges",
-          clippedVoronoiGraph.edges.length,
-          "clippedVoronoiGraph.vertices",
-          clippedVoronoiGraph.vertices.length
-        );
+        // console.log(
+        //   "[after] clippedVoronoiGraph.edges",
+        //   clippedVoronoiGraph.edges.length,
+        //   "clippedVoronoiGraph.vertices",
+        //   clippedVoronoiGraph.vertices.length
+        // );
+
+        // Find longest path
+        // var longestPathGraphMatrix = longestPathUAG(clippedVoronoiGraph);
+        // console.log("longestPathGraphMatrix", longestPathGraphMatrix);
       }
     };
 
@@ -228,6 +242,7 @@
     // |       Voronoi diagram. This guarantees that all outer graph edges must
     // |       be some former edge segment of the clipping polygon.
     // +-------------------------------
+    // TODO: move to separate file
     var stripOuterClipGraphEdges = function (graph, clipPolygon) {
       var edgeComparator = function (edgeA, edgeB) {
         return (edgeA.i === edgeB.i && edgeA.j === edgeB.j) || (edgeA.i === edgeB.j && edgeA.j === edgeB.i);
@@ -267,7 +282,7 @@
           newEdges.add(edge);
         }
       }
-      console.log("oldEdges", graph.edges.length, "newEdges", newEdges.length);
+      // console.log("oldEdges", graph.edges.length, "newEdges", newEdges.length);
       graph.edges = newEdges;
     };
 
