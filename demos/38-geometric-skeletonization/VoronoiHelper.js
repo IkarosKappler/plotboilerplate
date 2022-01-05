@@ -47,17 +47,41 @@ globalThis.VoronoiHelper = (function () {
   };
 
   /**
+   * Clip the whole voronoi diagram.
+   *
+   * Note that some cell need to be reversed as only clockwise winding cells can be
+   * clipped (with sutherland-hodgman, which is used here).
+   * @param {Polygon} clipPolygon - Should be in clockwise winding order.
+   * @param {boolean} isConvex - Indicates if the polygon is convex; convex polygon will be clipped using Sutherland-Hodgman, others will be clipped using Greiner-Horman.
+   */
+  VH.prototype.clipVoronoiDiagram = function (clipPolygon, isConvex) {
+    if (isConvex) {
+      return clipVoronoiDiagram_convex(this.voronoiDiagram, clipPolygon);
+    } else {
+      return clipVoronoiDiagram_nonconvex(this.voronoiDiagram, clipPolygon);
+    }
+  };
+
+  /**
+   * Convert the calculated Voronoi cell into polygons.
+   */
+  VH.prototype.voronoiCellsToPolygons = function () {
+    return this.voronoiDiagram.map(function (cell) {
+      return cell.toPolygon();
+    });
+  };
+
+  /**
    * Clip the whole voronoi diagram using the Sutherland-Hodgman method.
    *
    * Note that some cell need to be reversed as only clockwise winding cells can be
    * clipped (with sutherland-hodgman, which is used here).
    * @param {Polygon} clipPolygon - Should be in clockwise winding order.
    */
-  VH.prototype.clipVoronoiDiagram = function (clipPolygon, isConvex) {
+  var clipVoronoiDiagram_convex = function (voronoiDiagram, clipPolygon) {
     // TODO: a similar clipping is also used in the 07-Voronoi-demo.
     //       -> use this new class there?
-
-    return this.voronoiDiagram.map(function (cell) {
+    return voronoiDiagram.map(function (cell) {
       var cellPolygon = cell.toPolygon();
       if (!cellPolygon.isClockwise()) {
         cellPolygon.vertices.reverse();
@@ -75,13 +99,13 @@ globalThis.VoronoiHelper = (function () {
    * clipped (with sutherland-hodgman, which is used here).
    * @param {Polygon} clipPolygon - Should be in clockwise winding order.
    */
-  VH.prototype.clipVoronoiDiagram = function (clipPolygon) {
+  var clipVoronoiDiagram_nonconvex = function (voronoiDiagram, clipPolygon) {
     // TODO: a similar clipping is also used in the 07-Voronoi-demo.
     //       -> use this new class there?
 
     // Array<Polygon>
     var resultPolygons = [];
-    this.voronoiDiagram.forEach(function (cell) {
+    voronoiDiagram.forEach(function (cell) {
       var cellPolygon = cell.toPolygon();
       if (!cellPolygon.isClockwise()) {
         cellPolygon.vertices.reverse();
@@ -107,15 +131,6 @@ globalThis.VoronoiHelper = (function () {
       }
     });
     return resultPolygons;
-  };
-
-  /**
-   * Convert the calculated Voronoi cell into polygons.
-   */
-  VH.prototype.voronoiCellsToPolygons = function () {
-    return this.voronoiDiagram.map(function (cell) {
-      return cell.toPolygon();
-    });
   };
 
   return VH;

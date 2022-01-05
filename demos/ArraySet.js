@@ -11,7 +11,11 @@
  */
 var ArraySet = function (comparator) {
   Array.call(this);
-  this.comparator = comparator;
+  this.comparator =
+    comparator ||
+    function (a, b) {
+      return a === b;
+    };
 };
 
 ArraySet.prototype.add = function (item) {

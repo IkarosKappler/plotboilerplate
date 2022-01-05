@@ -75,6 +75,9 @@
         drawVertexNumbers: false,
         drawVoronoiCells: true,
         drawVoronoiGraph: false,
+        drawClippedPolygons: false,
+        drawOuterGraphVertices: true,
+        drawLongestPath: false,
         drawSkeleton: true
       },
       GUP
@@ -208,7 +211,9 @@
           // Clip the voronoi cells before proceeding
           var clippedCells = voronoiHelper.clipVoronoiDiagram(polygon);
           // Draw clipped voronoi cells
-          drawPolygonSet(clippedCells, draw, fill);
+          if (config.drawClippedPolygons) {
+            drawPolygonSet(clippedCells, draw, fill, "rgba(0,128,192,0.4)", 3);
+          }
 
           // Convert the (clipped) Voronoi cells to a graph
           // and find the shortest path.
@@ -219,9 +224,14 @@
           //   "clippedVoronoiGraph.vertices",
           //   clippedVoronoiGraph.vertices.length
           // );
-          // stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
+          var outerVertexIndices = stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
           // TODO: shortest path algorithm?
-          //drawVoronoiGraph(draw, clippedVoronoiGraph, "rgba(0,128,192,0.4)", 3);
+          drawVoronoiGraph(draw, clippedVoronoiGraph, "rgba(0,128,128,0.8)", 3); //  "rgba(0,128,192,0.4)", 3);
+
+          // console.log(outerVertexIndices);
+          if (config.drawOuterGraphVertices) {
+            drawOuterGraphVertices(draw, fill, outerVertexIndices, clippedVoronoiGraph);
+          }
           // console.log(
           //   "[after] clippedVoronoiGraph.edges",
           //   clippedVoronoiGraph.edges.length,
@@ -230,8 +240,18 @@
           // );
 
           // Find longest path
-          // var longestPathGraphMatrix = longestPathUAG(clippedVoronoiGraph);
-          // console.log("longestPathGraphMatrix", longestPathGraphMatrix);
+          var longestPath = longestPathUAG(clippedVoronoiGraph, outerVertexIndices);
+          // console.log("longestPath", longestPath);
+
+          if (config.drawLongestPath) {
+            for (var p = 0; p + 1 < longestPath.length; p++) {
+              var i = longestPath[p];
+              var j = longestPath[p + 1];
+              var vertA = clippedVoronoiGraph.vertices[i];
+              var vertB = clippedVoronoiGraph.vertices[j];
+              draw.line(vertA, vertB, "red", 1);
+            }
+          }
         }
       }
     };
@@ -239,6 +259,9 @@
     // +---------------------------------------------------------------------------------
     // | Strip all those edges from the graph that belong to the clipping
     // | polygon (that is the outer border here).
+    // |
+    // | @return A list of vertex indices that are located exactly on the
+    // |         outer graph bounds.
     // |
     // | Note: this only works as the complete clip polygon lies _inside_ the
     // |       Voronoi diagram. This guarantees that all outer graph edges must
@@ -251,41 +274,42 @@
       };
       var edgeAsLine = new Line(new Vertex(), new Vertex());
       var newEdges = new ArraySet(edgeComparator);
+      var outerVertices = new ArraySet();
       for (var e = 0; e < graph.edges.length; e++) {
         var edge = graph.edges[e];
         var vertA = graph.vertices[edge.i];
         var vertB = graph.vertices[edge.j];
-        // console.log("vertA", vertA, "vertB", vertB);
         edgeAsLine.a.set(vertA);
         edgeAsLine.b.set(vertB);
-        // if (e < 5) {
-        //   console.log("edgeAsLine", edgeAsLine);
-        // }
-        // Check if some clipping polygon point is in the near middle of this
-        // edge.
         var keepEdge = true;
         for (var i = 0; i < clipPolygon.vertices.length; i++) {
           var polygonPoint = clipPolygon.vertices[i];
-          var distA = vertA.distance(polygonPoint);
-          var distB = vertB.distance(polygonPoint);
-          // if (edgeAsLine.hasPoint(polygonPoint, true)) {
-          //   console.log("distA", distA, "distB", distB);
-          // }
-          // Check if polygon vertex in roughly in the middle of this edge.
-          // if (edgeAsLine.hasPoint(polygonPoint, true) && (distA < Vertex.EPSILON || distB < Vertex.EPSILON)) {
-          // if (distA < Vertex.EPSILON || distB < Vertex.EPSILON || edgeAsLine.hasPoint(polygonPoint, true)) {
           if (edgeAsLine.hasPoint(polygonPoint, true)) {
-            // console.log("Point on outer edge!");
             // Strip this edge from the result (will not be re-added).
             keepEdge = false;
+            if (!vertexListContains(clipPolygon.vertices, edgeAsLine.a)) {
+              outerVertices.add(edge.i);
+            }
+            if (!vertexListContains(clipPolygon.vertices, edgeAsLine.b)) {
+              outerVertices.add(edge.j);
+            }
           }
         }
         if (keepEdge) {
           newEdges.add(edge);
         }
       }
-      // console.log("oldEdges", graph.edges.length, "newEdges", newEdges.length);
       graph.edges = newEdges;
+      return outerVertices;
+    };
+
+    var vertexListContains = function (vertexList, vertex) {
+      for (var i = 0; i < vertexList.length; i++) {
+        if (vertex.distance(vertexList[i]) < 0.0000001) {
+          return true;
+        }
+      }
+      return false;
     };
 
     var drawVertexNumbers = function (draw, fill) {
@@ -322,10 +346,18 @@
     /**
      * Draw the stored voronoi diagram.
      */
-    var drawPolygonSet = function (polygons, draw, fill) {
+    var drawPolygonSet = function (polygons, draw, fill, color, lineWidth) {
       for (var p in polygons) {
         var poly = polygons[p];
-        draw.polyline(poly.vertices, poly.isOpen, "rgba(0,128,128,0.4)", 3);
+        draw.polyline(poly.vertices, poly.isOpen, color, lineWidth); // "rgba(0,128,128,0.4)", 3);
+      }
+    };
+
+    var drawOuterGraphVertices = function (draw, fill, vertexIndices, graph) {
+      for (var i = 0; i < vertexIndices.length; i++) {
+        var index = vertexIndices[i];
+        var vertex = graph.vertices[index];
+        fill.diamondHandle(vertex, 3, "red");
       }
     };
 
@@ -375,6 +407,9 @@
     f0.add(config, "drawOriginalPolygon").title("Draw original polygon?").onChange(toggleOriginalPolygon);
     f0.add(config, "drawVoronoiCells").title("Draw voronoi cells?").onChange(redraw);
     f0.add(config, "drawVoronoiGraph").title("Draw voronoi graph?").onChange(redraw);
+    f0.add(config, "drawClippedPolygons").title("Draw clipped polygons?").onChange(redraw);
+    f0.add(config, "drawOuterGraphVertices").title("Draw vertices located on the outer graph bounds?").onChange(redraw);
+    f0.add(config, "drawLongestPath").title("Draw longest detected path?").onChange(redraw);
     f0.add(config, "drawSkeleton").title("Draw skeleton?").onChange(redraw);
     f0.open();
 
