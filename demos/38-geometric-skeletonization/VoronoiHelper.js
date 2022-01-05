@@ -3,6 +3,10 @@
  * A helper to do the Deulaunay and Voroni stuff for us.
  * Keep the main code tiny and clean.
  *
+ * This implementation can use two clipping methods:
+ *  - Sutherland-Hodgman (if the clip polygon is strictly convex!)
+ *  - Greiner-Horman (clip polygon may be non-convex; but is not self-intersecting!)
+ *
  * @author  Ikaros Kappler
  * @date    2021-12-14
  * @version 1.0.0
@@ -43,6 +47,29 @@ globalThis.VoronoiHelper = (function () {
   };
 
   /**
+   * Clip the whole voronoi diagram using the Sutherland-Hodgman method.
+   *
+   * Note that some cell need to be reversed as only clockwise winding cells can be
+   * clipped (with sutherland-hodgman, which is used here).
+   * @param {Polygon} clipPolygon - Should be in clockwise winding order.
+   */
+  VH.prototype.clipVoronoiDiagram = function (clipPolygon, isConvex) {
+    // TODO: a similar clipping is also used in the 07-Voronoi-demo.
+    //       -> use this new class there?
+
+    return this.voronoiDiagram.map(function (cell) {
+      var cellPolygon = cell.toPolygon();
+      if (!cellPolygon.isClockwise()) {
+        cellPolygon.vertices.reverse();
+      }
+      // Note: Sutherland-Hodgman only works with _convex_ clipping polygons.
+      var clippedPolygonVertices = sutherlandHodgman(clipPolygon.vertices, cellPolygon.vertices);
+      var clippedPolygon = new Polygon(cloneVertexArray(clippedPolygonVertices), false);
+      return clippedPolygon;
+    });
+  };
+
+  /**
    * Clip the whole voronoi diagram.
    * Note that some cell need to be reversed as only clockwise winding cells can be
    * clipped (with sutherland-hodgman, which is used here).
@@ -51,15 +78,35 @@ globalThis.VoronoiHelper = (function () {
   VH.prototype.clipVoronoiDiagram = function (clipPolygon) {
     // TODO: a similar clipping is also used in the 07-Voronoi-demo.
     //       -> use this new class there?
-    return this.voronoiDiagram.map(function (cell) {
+
+    // Array<Polygon>
+    var resultPolygons = [];
+    this.voronoiDiagram.forEach(function (cell) {
       var cellPolygon = cell.toPolygon();
       if (!cellPolygon.isClockwise()) {
         cellPolygon.vertices.reverse();
       }
-      var clippedPolygonVertices = sutherlandHodgman(clipPolygon.vertices, cellPolygon.vertices);
-      var clippedPolygon = new Polygon(cloneVertexArray(clippedPolygonVertices), false);
-      return clippedPolygon;
+      // Note: Greiner-Horman can be used for non-convex polygons, too.
+      var intersection = greinerHormann.intersection(cellPolygon.vertices, clipPolygon.vertices);
+      if (intersection) {
+        if (typeof intersection[0][0] === "number") {
+          // single linear ring
+          // intersection = [intersection];
+          resultPolygons.push(new Polygon(cloneVertexArray(intersection)));
+        } else {
+          for (var i = 0, len = intersection.length; i < len; i++) {
+            // Warning intersection polygons may have duplicate vertices (beginning and end).
+            // Remove duplicate vertices from the intersection polygons.
+            // These may also occur if two vertices of the clipping and the source polygon are congruent.
+            var intrsctn = intersection[i];
+            resultPolygons.push(new Polygon(cloneVertexArray(intrsctn)));
+          }
+        }
+      } else {
+        // Empty clip result.
+      }
     });
+    return resultPolygons;
   };
 
   /**

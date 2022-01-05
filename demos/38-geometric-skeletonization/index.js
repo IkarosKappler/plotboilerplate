@@ -195,42 +195,44 @@
         drawVertexNumbers(draw, fill);
       }
 
-      if (config.drawVoronoiGraph) {
+      if (config.drawSkeleton || config.drawVoronoiGraph) {
         var cellPolygons = voronoiHelper.voronoiCellsToPolygons();
         // Convert voronoi cells to graph { vertices, edges }
         var voronoiGraph = new voronoi2graph(cellPolygons, 0.0000001);
-        drawVoronoiGraph(draw, voronoiGraph, "rgba(192,0,192,0.2)", 1);
-        // console.log("voronoiGraph.edges", voronoiGraph.edges.length, "voronoiGraph.vertices", voronoiGraph.vertices.length);
-      }
+        if (config.drawVoronoiGraph) {
+          drawVoronoiGraph(draw, voronoiGraph, "rgba(192,0,192,0.2)", 5);
+          // console.log("voronoiGraph.edges", voronoiGraph.edges.length, "voronoiGraph.vertices", voronoiGraph.vertices.length);
+        }
 
-      if (config.drawSkeleton) {
-        // Clip the voronoi cells before proceeding
-        var clippedCells = voronoiHelper.clipVoronoiDiagram(polygon);
-        // Draw clipped voronoi cells
-        // drawPolygonSet(clippedCells, draw, fill);
+        if (config.drawSkeleton) {
+          // Clip the voronoi cells before proceeding
+          var clippedCells = voronoiHelper.clipVoronoiDiagram(polygon);
+          // Draw clipped voronoi cells
+          drawPolygonSet(clippedCells, draw, fill);
 
-        // Convert the (clipped) Voronoi cells to a graph
-        // and find the shortest path.
-        var clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
-        // console.log(
-        //   "[before] clippedVoronoiGraph.edges",
-        //   clippedVoronoiGraph.edges.length,
-        //   "clippedVoronoiGraph.vertices",
-        //   clippedVoronoiGraph.vertices.length
-        // );
-        stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
-        // TODO: shortest path algorithm?
-        drawVoronoiGraph(draw, clippedVoronoiGraph, "rgba(0,128,192,0.4)", 3);
-        // console.log(
-        //   "[after] clippedVoronoiGraph.edges",
-        //   clippedVoronoiGraph.edges.length,
-        //   "clippedVoronoiGraph.vertices",
-        //   clippedVoronoiGraph.vertices.length
-        // );
+          // Convert the (clipped) Voronoi cells to a graph
+          // and find the shortest path.
+          var clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
+          // console.log(
+          //   "[before] clippedVoronoiGraph.edges",
+          //   clippedVoronoiGraph.edges.length,
+          //   "clippedVoronoiGraph.vertices",
+          //   clippedVoronoiGraph.vertices.length
+          // );
+          // stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
+          // TODO: shortest path algorithm?
+          //drawVoronoiGraph(draw, clippedVoronoiGraph, "rgba(0,128,192,0.4)", 3);
+          // console.log(
+          //   "[after] clippedVoronoiGraph.edges",
+          //   clippedVoronoiGraph.edges.length,
+          //   "clippedVoronoiGraph.vertices",
+          //   clippedVoronoiGraph.vertices.length
+          // );
 
-        // Find longest path
-        // var longestPathGraphMatrix = longestPathUAG(clippedVoronoiGraph);
-        // console.log("longestPathGraphMatrix", longestPathGraphMatrix);
+          // Find longest path
+          // var longestPathGraphMatrix = longestPathUAG(clippedVoronoiGraph);
+          // console.log("longestPathGraphMatrix", longestPathGraphMatrix);
+        }
       }
     };
 
@@ -323,7 +325,7 @@
     var drawPolygonSet = function (polygons, draw, fill) {
       for (var p in polygons) {
         var poly = polygons[p];
-        draw.polyline(poly.vertices, poly.isOpen, "rgba(0,128,128,0.4)", 1);
+        draw.polyline(poly.vertices, poly.isOpen, "rgba(0,128,128,0.4)", 3);
       }
     };
 
