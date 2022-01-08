@@ -1,7 +1,8 @@
 /**
- * @author  Ikaros Kappler
- * @date    2021-12-16
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2021-12-16
+ * @modified 2021-01-08 Added `Array` prototype.
+ * @version  1.0.1
  */
 
 /**
@@ -17,6 +18,8 @@ var ArraySet = function (comparator) {
       return a === b;
     };
 };
+
+ArraySet.prototype = new Array();
 
 ArraySet.prototype.add = function (item) {
   for (var i = 0; i < this.length; i++) {

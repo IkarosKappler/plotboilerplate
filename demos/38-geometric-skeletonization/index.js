@@ -117,19 +117,19 @@
     // | Also called when a vertex of the raw input polygon was dragged around.
     // +-------------------------------
     var handleInterpolationPointCount = function () {
-      if (polygon) {
-        removeDragListeners();
-      }
+      // if (polygon) {
+      //   removeDragEndListeners();
+      // }
       polygon = rawPolygon.getEvenDistributionPolygon(config.interpolationPointCount);
       // polygon = evenlyPolygon(rawPolygon, config.interpolationPointCount);
       // console.log("EvenlyPolygon #vertices", polygon.vertices.length);
       handlePolygonChange();
-      installDragListeners();
+      // installDragListeners();
     };
 
-    for (var i in rawPolygon.vertices) {
-      rawPolygon.vertices[i].listeners.addDragEndListener(handleInterpolationPointCount);
-    }
+    // for (var i in rawPolygon.vertices) {
+    //   rawPolygon.vertices[i].listeners.addDragEndListener(handleInterpolationPointCount);
+    // }
 
     // +---------------------------------------------------------------------------------
     // | Called when a vertex in the polygon changed.
@@ -160,22 +160,21 @@
     // +---------------------------------------------------------------------------------
     // | Install drag listeners to the polygon vertices (e.g. when polygon was added to the canvas).
     // +-------------------------------
-    var installDragListeners = function () {
-      // TODO: not in use any more
-      // for (var i = 0; i < polygon.vertices.length; i++) {
-      //   polygon.vertices[i].listeners.addDragListener(handlePolygonChange);
-      // }
+    var installDragEndListeners = function (polygon, listener) {
+      for (var i = 0; i < polygon.vertices.length; i++) {
+        polygon.vertices[i].listeners.addDragEndListener(listener); // handlePolygonChange);
+      }
     };
+    installDragEndListeners(rawPolygon, handleInterpolationPointCount);
 
     // +---------------------------------------------------------------------------------
     // | Uninstall drag listeners (e.g. when polygon is removed from the canvas).
     // +-------------------------------
-    var removeDragListeners = function () {
-      // TODO: not in use any more
-      // for (var i = 0; i < polygon.vertices.length; i++) {
-      //   polygon.vertices[i].listeners.removeDragListener(handlePolygonChange);
-      // }
-    };
+    // var removeDragEndListeners = function () {
+    //   for (var i = 0; i < polygon.vertices.length; i++) {
+    //     polygon.vertices[i].listeners.removeDragEndListener(handlePolygonChange);
+    //   }
+    // };
 
     // +---------------------------------------------------------------------------------
     // | Removes or add the original polygon depending on the config setting.
@@ -242,7 +241,7 @@
           // );
 
           // Find longest path
-          var longestPath = longestPathUAG(clippedVoronoiGraph, outerVertexIndices);
+          var longestPath = findLongestPathUAG(clippedVoronoiGraph, outerVertexIndices);
           // console.log("longestPath", longestPath);
 
           if (config.drawLongestPath) {
@@ -276,6 +275,7 @@
       };
       var edgeAsLine = new Line(new Vertex(), new Vertex());
       var newEdges = new ArraySet(edgeComparator);
+      // console.log("newEdges", newEdges);
       var outerVertices = new ArraySet();
       for (var e = 0; e < graph.edges.length; e++) {
         var edge = graph.edges[e];
@@ -416,7 +416,6 @@
     f0.open();
 
     handleInterpolationPointCount();
-    // installDragListeners();
     pb.config.postDraw = postDraw;
     pb.redraw();
   });

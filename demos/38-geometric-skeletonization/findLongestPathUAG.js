@@ -1,12 +1,22 @@
+"use strict";
 /**
  * Find a longest path in any Undirected-Acyclic-Graph.
+ *
+ * Note that the passed graph in this implementation can be a directed one, but
+ * it will be handled as undirected. If edge(a,b) exists, then edge(b,a) is handled
+ * as existing, too.
+ *
+ * The algorithm uses a
+ *
+ * @requires arrayFill - See ./src/cjs/utils/algorithms/arrayFill.js
+ * @requires matrixFill - See ./src/cjs/utils/algorithms/matrixFill.js
  *
  * @author  Ikaros Kappler
  * @date    2022-01-04
  * @version 1.0.0
  */
 
-globalThis.longestPathUAG = (function () {
+globalThis.findLongestPathUAG = (function () {
   /**
    * type Edge = { i: number, j: number }
    * type Graph = { vertices : Array<Vertex>, edges: Array<Edge> }
@@ -14,7 +24,7 @@ globalThis.longestPathUAG = (function () {
    * @param {Graph} graph - The graph with `vertices` and `edges`.
    * @param {number[]} outerVertexIndices - The indices of vertices that are on the outer graph bounds.
    */
-  function longestPathUAG(graph, outerVertexIndices) {
+  function findLongestPathUAG(graph, outerVertexIndices) {
     // Build a matrix Array[a][b], with a = b = graph.vertices.length
     // Into each field store the distance between these two vertices.
 
@@ -23,17 +33,18 @@ globalThis.longestPathUAG = (function () {
     }
 
     var n = graph.vertices.length;
-
+    // console.log("graph.edges", graph.edges);
+    // var containedEdgeSubset = filterEdges(graph.edges, outerVertexIndices);
+    // console.log("containedEdgeSubset", containedEdgeSubset);
     var matrix = matrixFill(n, n, null);
-
     var longestPath = [];
     for (var i = 0; i < outerVertexIndices.length; i++) {
+      var visitedVertices = arrayFill(n, false);
       for (var j = i + 1; j < outerVertexIndices.length; j++) {
         if (j === i) {
           continue;
         }
         // var visitedVertices = fillArray(n, false);
-        var visitedVertices = arrayFill(n, false);
         var path = findPath(matrix, graph.edges, visitedVertices, outerVertexIndices[i], outerVertexIndices[j]);
         // pathList.push( )
         // console.log("path", path);
@@ -44,8 +55,16 @@ globalThis.longestPathUAG = (function () {
       }
     }
 
+    // console.log("longestPath", longestPath);
     return longestPath;
   }
+
+  // Filter out all edges that have vertices outside a previously computed vertex sub set.
+  // var filterEdges = function (edges, vertexSubSet) {
+  //   return edges.filter(function (edge) {
+  //     return vertexSubSet.includes(edge.i) && vertexSubSet.includes(edge.j);
+  //   });
+  // };
 
   var findPath = function (matrix, edges, visitedVertices, vertIndexI, vertIndexJ) {
     visitedVertices[vertIndexI] = true;
@@ -55,22 +74,20 @@ globalThis.longestPathUAG = (function () {
     if (matrix[vertIndexI][vertIndexJ] !== null) {
       return matrix[vertIndexI][vertIndexJ];
     }
-    // var adjacentEdges = findAdjacentEdges(edges, visitedVertices, vertIndexI);
     var adjacentVertices = findAdjacentVertices(edges, visitedVertices, vertIndexI);
-    // var path = [vertIndexI];
     var longestSubPath = [];
     for (var e = 0; e < adjacentVertices.length; e++) {
-      // var edge = adjacentVertices[e];
       var vertexIndex = adjacentVertices[e];
       var tmpPath = findPath(matrix, edges, visitedVertices, vertexIndex, vertIndexJ);
       if (tmpPath.length > longestSubPath.length) {
         longestSubPath = tmpPath;
       }
     }
-    var resultPath = [vertIndexI].concat(longestSubPath);
     // visitedVertices[vertIndexI] = false;
+    var resultPath = [vertIndexI].concat(longestSubPath);
     // TODO: here's an error. Why?
     // matrix[vertIndexI][vertIndexJ] = resultPath;
+    // matrix[vertIndexJ][vertIndexI] = resultPath.slice().reverse();
     return resultPath;
   };
 
@@ -79,16 +96,14 @@ globalThis.longestPathUAG = (function () {
     for (var e = 0; e < edges.length; e++) {
       var edge = edges[e];
       if (edge.i === vertIndex && !visitedVertices[edge.j]) {
-        // adjacentEdges.push(edge);
         adjacentVertices.push(edge.j);
       }
       if (edge.j === vertIndex && !visitedVertices[edge.i]) {
-        // adjacentEdges.push({ i: edge.j, j: edge.i });
         adjacentVertices.push(edge.i);
       }
     }
     return adjacentVertices;
   };
 
-  return longestPathUAG;
+  return findLongestPathUAG;
 })();

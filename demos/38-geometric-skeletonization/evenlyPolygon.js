@@ -9,6 +9,7 @@
  */
 
 globalThis.evenlyPolygon = (function () {
+  console.log("[evenlyPolygon] DEPRECATED: use Polygon.getEvenDistributionPolygon() instead.");
   /**
    * The main function.
    *
