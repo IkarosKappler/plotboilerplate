@@ -55,35 +55,39 @@ globalThis.longestPathUAG = (function () {
     if (matrix[vertIndexI][vertIndexJ] !== null) {
       return matrix[vertIndexI][vertIndexJ];
     }
-    var adjacentEdges = findAdjacentEdges(edges, visitedVertices, vertIndexI);
+    // var adjacentEdges = findAdjacentEdges(edges, visitedVertices, vertIndexI);
+    var adjacentVertices = findAdjacentVertices(edges, visitedVertices, vertIndexI);
     // var path = [vertIndexI];
     var longestSubPath = [];
-    for (var e = 0; e < adjacentEdges.length; e++) {
-      var edge = adjacentEdges[e];
-      var tmpPath = findPath(matrix, edges, visitedVertices, edge.j, vertIndexJ);
+    for (var e = 0; e < adjacentVertices.length; e++) {
+      // var edge = adjacentVertices[e];
+      var vertexIndex = adjacentVertices[e];
+      var tmpPath = findPath(matrix, edges, visitedVertices, vertexIndex, vertIndexJ);
       if (tmpPath.length > longestSubPath.length) {
         longestSubPath = tmpPath;
       }
     }
     var resultPath = [vertIndexI].concat(longestSubPath);
-    visitedVertices[vertIndexI] = false;
+    // visitedVertices[vertIndexI] = false;
     // TODO: here's an error. Why?
     // matrix[vertIndexI][vertIndexJ] = resultPath;
     return resultPath;
   };
 
-  var findAdjacentEdges = function (edges, visitedVertices, vertIndex) {
-    const adjacentEdges = [];
+  var findAdjacentVertices = function (edges, visitedVertices, vertIndex) {
+    const adjacentVertices = [];
     for (var e = 0; e < edges.length; e++) {
       var edge = edges[e];
       if (edge.i === vertIndex && !visitedVertices[edge.j]) {
-        adjacentEdges.push(edge);
+        // adjacentEdges.push(edge);
+        adjacentVertices.push(edge.j);
       }
       if (edge.j === vertIndex && !visitedVertices[edge.i]) {
-        adjacentEdges.push({ i: edge.j, j: edge.i });
+        // adjacentEdges.push({ i: edge.j, j: edge.i });
+        adjacentVertices.push(edge.i);
       }
     }
-    return adjacentEdges;
+    return adjacentVertices;
   };
 
   return longestPathUAG;
