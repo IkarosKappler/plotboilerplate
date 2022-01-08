@@ -128,7 +128,7 @@
     };
 
     for (var i in rawPolygon.vertices) {
-      rawPolygon.vertices[i].listeners.addDragListener(handleInterpolationPointCount);
+      rawPolygon.vertices[i].listeners.addDragEndListener(handleInterpolationPointCount);
     }
 
     // +---------------------------------------------------------------------------------
@@ -161,18 +161,20 @@
     // | Install drag listeners to the polygon vertices (e.g. when polygon was added to the canvas).
     // +-------------------------------
     var installDragListeners = function () {
-      for (var i = 0; i < polygon.vertices.length; i++) {
-        polygon.vertices[i].listeners.addDragListener(handlePolygonChange);
-      }
+      // TODO: not in use any more
+      // for (var i = 0; i < polygon.vertices.length; i++) {
+      //   polygon.vertices[i].listeners.addDragListener(handlePolygonChange);
+      // }
     };
 
     // +---------------------------------------------------------------------------------
     // | Uninstall drag listeners (e.g. when polygon is removed from the canvas).
     // +-------------------------------
     var removeDragListeners = function () {
-      for (var i = 0; i < polygon.vertices.length; i++) {
-        polygon.vertices[i].listeners.removeDragListener(handlePolygonChange);
-      }
+      // TODO: not in use any more
+      // for (var i = 0; i < polygon.vertices.length; i++) {
+      //   polygon.vertices[i].listeners.removeDragListener(handlePolygonChange);
+      // }
     };
 
     // +---------------------------------------------------------------------------------
