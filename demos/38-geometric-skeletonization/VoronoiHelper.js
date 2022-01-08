@@ -53,6 +53,7 @@ globalThis.VoronoiHelper = (function () {
    * clipped (with sutherland-hodgman, which is used here).
    * @param {Polygon} clipPolygon - Should be in clockwise winding order.
    * @param {boolean} isConvex - Indicates if the polygon is convex; convex polygon will be clipped using Sutherland-Hodgman, others will be clipped using Greiner-Horman.
+   * @return {Array<Polygon>}
    */
   VH.prototype.clipVoronoiDiagram = function (clipPolygon, isConvex) {
     if (isConvex) {
@@ -77,6 +78,7 @@ globalThis.VoronoiHelper = (function () {
    * Note that some cell need to be reversed as only clockwise winding cells can be
    * clipped (with sutherland-hodgman, which is used here).
    * @param {Polygon} clipPolygon - Should be in clockwise winding order.
+   * @return {Array<Polygon>}
    */
   var clipVoronoiDiagram_convex = function (voronoiDiagram, clipPolygon) {
     // TODO: a similar clipping is also used in the 07-Voronoi-demo.
@@ -98,6 +100,7 @@ globalThis.VoronoiHelper = (function () {
    * Note that some cell need to be reversed as only clockwise winding cells can be
    * clipped (with sutherland-hodgman, which is used here).
    * @param {Polygon} clipPolygon - Should be in clockwise winding order.
+   * @return {Array<Polygon>}
    */
   var clipVoronoiDiagram_nonconvex = function (voronoiDiagram, clipPolygon) {
     // TODO: a similar clipping is also used in the 07-Voronoi-demo.

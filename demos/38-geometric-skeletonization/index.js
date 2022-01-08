@@ -91,7 +91,7 @@
     // +---------------------------------------------------------------------------------
     // | A prepared square polygon.
     // +-------------------------------
-    var devY = 20;
+    // var devY = 20;
     // prettier-ignore
     // var rawData = [ { x: -200, y: -200 - devY }, { x: 200, y: -200 - devY }, { x: 200, y: 200 + devY }, { x: -200, y: 200 + devY } ];
 
@@ -110,6 +110,18 @@
     var pointList = [];
     // VoronoiHelper
     var voronoiHelper = null;
+    // Array<Polygon>
+    var cellPolygons = null;
+    // Array<Polygon>
+    var clippedCells = null;
+    // Graph
+    var voronoiGraph = null;
+    // Graph
+    var clippedVoronoiGraph = null;
+    // Array<number>
+    var outerVertexIndices = null;
+    // Array<number>
+    var longestPath = null;
 
     // +---------------------------------------------------------------------------------
     // | Called when the desired interpolation point count changes.
@@ -120,11 +132,13 @@
       // if (polygon) {
       //   removeDragEndListeners();
       // }
+      longestPath = [];
       polygon = rawPolygon.getEvenDistributionPolygon(config.interpolationPointCount);
       // polygon = evenlyPolygon(rawPolygon, config.interpolationPointCount);
       // console.log("EvenlyPolygon #vertices", polygon.vertices.length);
       handlePolygonChange();
       // installDragListeners();
+      computeLongestPath();
     };
 
     // for (var i in rawPolygon.vertices) {
@@ -166,6 +180,7 @@
       }
     };
     installDragEndListeners(rawPolygon, handleInterpolationPointCount);
+    var longestPath = [];
 
     // +---------------------------------------------------------------------------------
     // | Uninstall drag listeners (e.g. when polygon is removed from the canvas).
@@ -175,6 +190,39 @@
     //     polygon.vertices[i].listeners.removeDragEndListener(handlePolygonChange);
     //   }
     // };
+
+    var computeLongestPath = function () {
+      cellPolygons = voronoiHelper.voronoiCellsToPolygons();
+      // Convert voronoi cells to graph { vertices, edges }
+      voronoiGraph = new voronoi2graph(cellPolygons, 0.0000001);
+      // Clip the voronoi cells before proceeding
+      // Array<Polygon>
+      clippedCells = voronoiHelper.clipVoronoiDiagram(polygon);
+      // Convert the (clipped) Voronoi cells to a graph
+      // and find the shortest path.
+      clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
+      // console.log(
+      //   "[before] clippedVoronoiGraph.edges",
+      //   clippedVoronoiGraph.edges.length,
+      //   "clippedVoronoiGraph.vertices",
+      //   clippedVoronoiGraph.vertices.length
+      // );
+      outerVertexIndices = stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
+      // console.log(outerVertexIndices);
+      // if (config.drawOuterGraphVertices) {
+      //   drawOuterGraphVertices(draw, fill, outerVertexIndices, clippedVoronoiGraph);
+      // }
+      // console.log(
+      //   "[after] clippedVoronoiGraph.edges",
+      //   clippedVoronoiGraph.edges.length,
+      //   "clippedVoronoiGraph.vertices",
+      //   clippedVoronoiGraph.vertices.length
+      // );
+
+      // Find longest path
+      longestPath = findLongestPathUAG(clippedVoronoiGraph, outerVertexIndices);
+      // console.log("longestPath", longestPath);
+    };
 
     // +---------------------------------------------------------------------------------
     // | Removes or add the original polygon depending on the config setting.
@@ -196,54 +244,26 @@
       }
 
       if (config.drawVertexNumbers) {
-        drawVertexNumbers(draw, fill);
+        var color = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGBA();
+        // var polygonVertices = polygon.vertices.map(function (vertex, index) {
+        //   return { position: vertex, label: index };
+        // });
+        drawVertexNumbers(draw, fill, polygon.vertices, color);
       }
 
       if (config.drawSkeleton || config.drawVoronoiGraph) {
-        var cellPolygons = voronoiHelper.voronoiCellsToPolygons();
-        // Convert voronoi cells to graph { vertices, edges }
-        var voronoiGraph = new voronoi2graph(cellPolygons, 0.0000001);
         if (config.drawVoronoiGraph) {
           drawVoronoiGraph(draw, voronoiGraph, "rgba(192,0,192,0.2)", 5);
-          // console.log("voronoiGraph.edges", voronoiGraph.edges.length, "voronoiGraph.vertices", voronoiGraph.vertices.length);
         }
 
         if (config.drawSkeleton) {
-          // Clip the voronoi cells before proceeding
-          var clippedCells = voronoiHelper.clipVoronoiDiagram(polygon);
-          // Draw clipped voronoi cells
           if (config.drawClippedPolygons) {
             drawPolygonSet(clippedCells, draw, fill, "rgba(0,128,192,0.4)", 3);
           }
-
-          // Convert the (clipped) Voronoi cells to a graph
-          // and find the shortest path.
-          var clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
-          // console.log(
-          //   "[before] clippedVoronoiGraph.edges",
-          //   clippedVoronoiGraph.edges.length,
-          //   "clippedVoronoiGraph.vertices",
-          //   clippedVoronoiGraph.vertices.length
-          // );
-          var outerVertexIndices = stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
-          // TODO: shortest path algorithm?
-          drawVoronoiGraph(draw, clippedVoronoiGraph, "rgba(0,128,128,0.8)", 3); //  "rgba(0,128,192,0.4)", 3);
-
-          // console.log(outerVertexIndices);
+          drawVoronoiGraph(draw, clippedVoronoiGraph, "rgba(0,128,128,0.8)", 3);
           if (config.drawOuterGraphVertices) {
-            drawOuterGraphVertices(draw, fill, outerVertexIndices, clippedVoronoiGraph);
+            drawOuterGraphVertices(draw, fill, outerVertexIndices, clippedVoronoiGraph, config.drawVertexNumbers);
           }
-          // console.log(
-          //   "[after] clippedVoronoiGraph.edges",
-          //   clippedVoronoiGraph.edges.length,
-          //   "clippedVoronoiGraph.vertices",
-          //   clippedVoronoiGraph.vertices.length
-          // );
-
-          // Find longest path
-          var longestPath = findLongestPathUAG(clippedVoronoiGraph, outerVertexIndices);
-          // console.log("longestPath", longestPath);
-
           if (config.drawLongestPath) {
             for (var p = 0; p + 1 < longestPath.length; p++) {
               var i = longestPath[p];
@@ -314,10 +334,9 @@
       return false;
     };
 
-    var drawVertexNumbers = function (draw, fill) {
-      var color = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGBA();
-      for (var i = 0; i < polygon.vertices.length; i++) {
-        var p = polygon.vertices[i];
+    var drawVertexNumbers = function (draw, fill, vertices, color) {
+      for (var i = 0; i < vertices.length; i++) {
+        var p = vertices[i];
         fill.text("" + i, p.x + 5, p.y, { color: color, fontSize: 11 / draw.scale.x });
       }
     };
@@ -351,15 +370,18 @@
     var drawPolygonSet = function (polygons, draw, fill, color, lineWidth) {
       for (var p in polygons) {
         var poly = polygons[p];
-        draw.polyline(poly.vertices, poly.isOpen, color, lineWidth); // "rgba(0,128,128,0.4)", 3);
+        draw.polyline(poly.vertices, poly.isOpen, color, lineWidth);
       }
     };
 
-    var drawOuterGraphVertices = function (draw, fill, vertexIndices, graph) {
+    var drawOuterGraphVertices = function (draw, fill, vertexIndices, graph, drawLabels) {
       for (var i = 0; i < vertexIndices.length; i++) {
         var index = vertexIndices[i];
         var vertex = graph.vertices[index];
         fill.diamondHandle(vertex, 3, "red");
+        if (drawLabels) {
+          fill.text("" + index, vertex.x + 5, vertex.y, { color: "red", fontSize: 11 / draw.scale.x });
+        }
       }
     };
 
