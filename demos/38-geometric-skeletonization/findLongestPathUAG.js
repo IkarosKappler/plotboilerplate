@@ -29,22 +29,27 @@ globalThis.findLongestPathUAG = (function () {
     // Into each field store the distance between these two vertices.
 
     if (graph.edges.length === 0) {
-      return [];
+      // return [];
+      return new GraphPath(); // empty
     }
 
     var n = graph.vertices.length;
     var matrix = matrixFill(n, n, null);
-    var longestPath = [];
+    // var longestPath = [];
+    var longestPath = new GraphPath();
     for (var i = 0; i < outerVertexIndices.length; i++) {
       var visitedVertices = arrayFill(n, false);
       for (var j = i + 1; j < outerVertexIndices.length; j++) {
         if (j === i) {
           continue;
         }
-        var path = findPath(matrix, graph.edges, visitedVertices, outerVertexIndices[i], outerVertexIndices[j]);
+        var path = findPath(matrix, graph, visitedVertices, outerVertexIndices[i], outerVertexIndices[j]);
         // console.log("path", path);
         // TODO: here are a LOT of duplicates!
-        if (path.length > longestPath.length) {
+        // if (path.length > longestPath.length) {
+        //   longestPath = path;
+        // }
+        if (path.totalWeight > longestPath.totalWeight) {
           longestPath = path;
         }
       }
@@ -61,25 +66,42 @@ globalThis.findLongestPathUAG = (function () {
   //   });
   // };
 
-  var findPath = function (matrix, edges, visitedVertices, vertIndexI, vertIndexJ) {
+  var findPath = function (matrix, graph, visitedVertices, vertIndexI, vertIndexJ) {
     visitedVertices[vertIndexI] = true;
     if (vertIndexI === vertIndexJ) {
-      return [vertIndexJ];
+      // return [vertIndexJ];
+      var result = new GraphPath([vertIndexJ], 0);
+      // result.vertexIndices = [vertIndexJ];
+      // result.totalWeight = 0;
+      return result;
     }
     if (matrix[vertIndexI][vertIndexJ] !== null) {
       return matrix[vertIndexI][vertIndexJ];
     }
-    var adjacentVertices = findAdjacentVertices(edges, visitedVertices, vertIndexI);
-    var longestSubPath = [];
+    var adjacentVertices = findAdjacentVertices(graph.edges, visitedVertices, vertIndexI);
+    // var longestSubPath = [];
+    var longestSubPath = new GraphPath();
     for (var e = 0; e < adjacentVertices.length; e++) {
       var vertexIndex = adjacentVertices[e];
-      var tmpPath = findPath(matrix, edges, visitedVertices, vertexIndex, vertIndexJ);
-      if (tmpPath.length > longestSubPath.length) {
+      var tmpPath = findPath(matrix, graph, visitedVertices, vertexIndex, vertIndexJ);
+      // if (tmpPath.length > longestSubPath.length) {
+      // console.log("tmpPath", tmpPath);
+      if (
+        tmpPath.totalWeight > longestSubPath.totalWeight ||
+        (longestSubPath.totalWeight === 0 && tmpPath.vertexIndices.length > 0)
+      ) {
         longestSubPath = tmpPath;
       }
     }
     // visitedVertices[vertIndexI] = false;
-    var resultPath = [vertIndexI].concat(longestSubPath);
+    // var resultPath = [vertIndexI].concat(longestSubPath);
+    var resultPath = new GraphPath();
+    resultPath.vertexIndices = [vertIndexI].concat(longestSubPath.vertexIndices);
+    // console.log("longestSubPath", longestSubPath);
+    if (longestSubPath.vertexIndices.length > 0) {
+      // console.log("len");
+      resultPath.totalWeight = longestSubPath.totalWeight + graph.getEdgeWeight(vertIndexI, longestSubPath.vertexIndices[0]);
+    }
     // TODO: here's an error. Why?
     matrix[vertIndexI][vertIndexJ] = resultPath;
     // matrix[vertIndexJ][vertIndexI] = resultPath.slice().reverse();

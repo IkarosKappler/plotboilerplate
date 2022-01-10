@@ -66,6 +66,7 @@
 
         pointCount: 24,
         interpolationPointCount: 24 * 4,
+        calculateEdgeWeightByDistance: true,
         drawOriginalPolygon: true,
         drawVertexNumbers: false,
         drawVoronoiCells: true,
@@ -117,7 +118,7 @@
     // Array<number>
     var outerVertexIndices = null;
     // Array<number>
-    var longestPath = [];
+    var longestPath = null;
 
     // +---------------------------------------------------------------------------------
     // | Called when the desired interpolation point count changes.
@@ -125,16 +126,16 @@
     // | Also called when a vertex of the raw input polygon was dragged around.
     // +-------------------------------
     var handleInterpolationPointCount = function () {
-      longestPath = [];
+      longestPath = null;
       polygon = rawPolygon.getEvenDistributionPolygon(config.interpolationPointCount);
-      handlePolygonChange();
+      rebuildAll();
     };
 
     // +---------------------------------------------------------------------------------
     // | Called when a vertex in the polygon changed.
     // | Re-calculates the Voronoi graph.
     // +-------------------------------
-    var handlePolygonChange = function () {
+    var rebuildAll = function () {
       var boundingBox = polygon.getBounds();
       var boundingBoxPolygon = boundingBox.toPolygon().scale(1.2, boundingBox.getCenter());
       pointList = polygon.vertices.concat(boundingBoxPolygon.vertices);
@@ -166,12 +167,12 @@
       }
     };
     installDragEndListeners(rawPolygon, handleInterpolationPointCount);
-    // var longestPath = [];
 
     // +---------------------------------------------------------------------------------
     // | Install drag listeners to the polygon vertices (e.g. when polygon was added to the canvas).
     // +-------------------------------
     var computeLongestPath = function () {
+      var computeEdgeWeight = getSelectedEdgeWeightFunction();
       cellPolygons = voronoiHelper.voronoiCellsToPolygons();
       // Convert voronoi cells to graph { vertices, edges }
       voronoiGraph = new voronoi2graph(cellPolygons, 0.0000001);
@@ -180,11 +181,22 @@
       clippedCells = voronoiHelper.clipVoronoiDiagram(polygon);
       // Convert the (clipped) Voronoi cells to a graph
       // and find the shortest path.
-      clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
+      clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001, computeEdgeWeight);
       outerVertexIndices = stripOuterClipGraphEdges(clippedVoronoiGraph, polygon, config.stripSubEdges, 0.0000001);
       // Find longest path
+      // GraphPath
       longestPath = findLongestPathUAG(clippedVoronoiGraph, outerVertexIndices);
       // console.log("longestPath", longestPath);
+    };
+
+    var getSelectedEdgeWeightFunction = function () {
+      return config.calculateEdgeWeightByDistance
+        ? function (graph, i, j) {
+            return graph.vertices[i].distance(graph.vertices[j]);
+          }
+        : function (_graph, i, j) {
+            return i == j ? 0 : 1;
+          };
     };
 
     // +---------------------------------------------------------------------------------
@@ -224,14 +236,8 @@
           if (config.drawOuterGraphVertices) {
             drawOuterGraphVertices(draw, fill, outerVertexIndices, clippedVoronoiGraph, config.drawVertexNumbers);
           }
-          if (config.drawLongestPath) {
-            for (var p = 0; p + 1 < longestPath.length; p++) {
-              var i = longestPath[p];
-              var j = longestPath[p + 1];
-              var vertA = clippedVoronoiGraph.vertices[i];
-              var vertB = clippedVoronoiGraph.vertices[j];
-              draw.line(vertA, vertB, "red", 1);
-            }
+          if (config.drawLongestPath && longestPath) {
+            drawGraphPath(draw, fill, clippedVoronoiGraph, longestPath);
           }
         }
       }
@@ -277,6 +283,9 @@
       }
     };
 
+    /**
+     * Draw the detected outer graph vertices.
+     */
     var drawOuterGraphVertices = function (draw, fill, vertexIndices, graph, drawLabels) {
       for (var i = 0; i < vertexIndices.length; i++) {
         var index = vertexIndices[i];
@@ -288,6 +297,19 @@
       }
     };
 
+    /**
+     * Draw the detected graph path.
+     */
+    var drawGraphPath = function (draw, fill, graph, graphPath) {
+      var pathVertices = graphPath.vertexIndices.map(function (vertIndex) {
+        return graph.vertices[vertIndex];
+      });
+      draw.polyline(pathVertices, true, "red", 2.0);
+    };
+
+    /**
+     * Just redraw everything.
+     */
     var redraw = function () {
       pb.redraw();
     };
@@ -308,12 +330,14 @@
     var f0 = gui.addFolder("Settings");
     // prettier-ignore
     f0.add(config, "interpolationPointCount").min(1).max(100).title("The interpolation point count.").onChange( handleInterpolationPointCount );
+    // prettier-ignore
+    f0.add(config, "calculateEdgeWeightByDistance").title("Check if edge length is edge weight.").onChange(rebuildAll);
     f0.add(config, "drawVertexNumbers").title("Check if polygon vertex numbers should be drawn.").onChange(redraw);
     f0.add(config, "drawOriginalPolygon").title("Draw original polygon?").onChange(toggleOriginalPolygon);
     f0.add(config, "drawVoronoiCells").title("Draw voronoi cells?").onChange(redraw);
     f0.add(config, "drawVoronoiGraph").title("Draw voronoi graph?").onChange(redraw);
     f0.add(config, "drawClippedPolygons").title("Draw clipped polygons?").onChange(redraw);
-    f0.add(config, "stripSubEdges").title("Strip sub edges from clipped graph?").onChange(handlePolygonChange);
+    f0.add(config, "stripSubEdges").title("Strip sub edges from clipped graph?").onChange(rebuildAll);
     f0.add(config, "drawOuterGraphVertices").title("Draw vertices located on the outer graph bounds?").onChange(redraw);
     f0.add(config, "drawLongestPath").title("Draw longest detected path?").onChange(redraw);
     f0.add(config, "drawSkeleton").title("Draw skeleton?").onChange(redraw);

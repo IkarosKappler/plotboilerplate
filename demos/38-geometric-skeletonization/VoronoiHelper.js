@@ -36,7 +36,6 @@ globalThis.VoronoiHelper = (function () {
     }
     var voronoiBuilder = new delaunay2voronoi(this.vertices, this.triangles);
     this.voronoiDiagram = voronoiBuilder.build();
-    // redraw(pb.draw, pb.fill);
     // Handle errors if vertices are too close and/or co-linear:
     if (voronoiBuilder.failedTriangleSets.length != 0) {
       console.log("The error report contains " + voronoiBuilder.failedTriangleSets.length + " unconnected set(s) of triangles:");
@@ -118,7 +117,6 @@ globalThis.VoronoiHelper = (function () {
       if (intersection) {
         if (typeof intersection[0][0] === "number") {
           // single linear ring
-          // intersection = [intersection];
           resultPolygons.push(new Polygon(cloneVertexArray(intersection)));
         } else {
           for (var i = 0, len = intersection.length; i < len; i++) {

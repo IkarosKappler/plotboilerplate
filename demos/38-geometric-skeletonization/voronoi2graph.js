@@ -16,9 +16,10 @@ globalThis.voronoi2graph = (function () {
    *
    * @param {Polygon[]} vornoiCells - The Voronoi diagram's cells, as Polygons.
    * @param {number} epsilon - An epsilon to use to tell if two vertices are considered 'equal'.
+   * @param {function} computeEdgeWeight - function(graph,i,j) => number
    * @returns {{ edges: Array<Edge>, vertices: Array<Vertex> }}
    */
-  var v2g = function (voronoiCells, epsilon) {
+  var v2g = function (voronoiCells, epsilon, computeEdgeWeight) {
     // Array<Vertex>
     var vertices = new ArraySet(function (vertA, vertB) {
       return vertA.distance(vertB) < epsilon;
@@ -49,7 +50,7 @@ globalThis.voronoi2graph = (function () {
       }
     }
     // { edges: edges, vertices: vertices };
-    return new Graph(vertices, edges);
+    return new Graph(vertices, edges, computeEdgeWeight);
   };
 
   return v2g;
