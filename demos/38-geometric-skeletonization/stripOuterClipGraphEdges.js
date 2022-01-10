@@ -17,10 +17,12 @@
  * @param {Graph} graph - The clipped graph (created from a clipped Voronoi cell set).
  * @param {Polygon} clipPolygon - The actual clip polygon that was used beforehand. The polygon's edges
  *                                will be used to find outer graph edges as those are locally congruent.
+ * @param {boolean} stripSubEdges - Tells if complete sub edges should be stripped too (might be kept for some use-cases).
+ * @param {number} epsilon - The epsilon to use to detect "equal" vertices.
  * @returns {Array<number>} The indices of detected outer graph vertices.
  */
 
-var stripOuterClipGraphEdges = function (graph, clipPolygon, epsilon) {
+var stripOuterClipGraphEdges = function (graph, clipPolygon, stripSubEdges, epsilon) {
   var edgeComparator = function (edgeA, edgeB) {
     return (edgeA.i === edgeB.i && edgeA.j === edgeB.j) || (edgeA.i === edgeB.j && edgeA.j === edgeB.i);
   };
@@ -36,6 +38,7 @@ var stripOuterClipGraphEdges = function (graph, clipPolygon, epsilon) {
     var keepEdge = true;
     for (var i = 0; i < clipPolygon.vertices.length; i++) {
       var polygonPoint = clipPolygon.vertices[i];
+      // Case A: clip polygon point is on edge.
       if (edgeAsLine.hasPoint(polygonPoint, true)) {
         // Strip this edge from the result (will not be re-added).
         keepEdge = false;
@@ -44,6 +47,12 @@ var stripOuterClipGraphEdges = function (graph, clipPolygon, epsilon) {
         }
         if (findInVertexArray(clipPolygon.vertices, edgeAsLine.b, epsilon) === -1) {
           outerVertices.add(edge.j);
+        }
+      } else if (stripSubEdges) {
+        // Case B: both edge points are located on the clip polygon edge
+        var clipPolygonLine = new Line(polygonPoint, clipPolygon.vertices[(i + 1) % clipPolygon.vertices.length]);
+        if (clipPolygonLine.hasPoint(vertA, true) && clipPolygonLine.hasPoint(vertB, true)) {
+          keepEdge = false;
         }
       }
     }

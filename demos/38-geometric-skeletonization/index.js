@@ -72,6 +72,7 @@
         drawVoronoiGraph: false,
         drawClippedPolygons: false,
         drawOuterGraphVertices: true,
+        stripSubEdges: true,
         drawLongestPath: false,
         drawSkeleton: true
       },
@@ -180,7 +181,7 @@
       // Convert the (clipped) Voronoi cells to a graph
       // and find the shortest path.
       clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
-      outerVertexIndices = stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
+      outerVertexIndices = stripOuterClipGraphEdges(clippedVoronoiGraph, polygon, config.stripSubEdges, 0.0000001);
       // Find longest path
       longestPath = findLongestPathUAG(clippedVoronoiGraph, outerVertexIndices);
       // console.log("longestPath", longestPath);
@@ -312,6 +313,7 @@
     f0.add(config, "drawVoronoiCells").title("Draw voronoi cells?").onChange(redraw);
     f0.add(config, "drawVoronoiGraph").title("Draw voronoi graph?").onChange(redraw);
     f0.add(config, "drawClippedPolygons").title("Draw clipped polygons?").onChange(redraw);
+    f0.add(config, "stripSubEdges").title("Strip sub edges from clipped graph?").onChange(handlePolygonChange);
     f0.add(config, "drawOuterGraphVertices").title("Draw vertices located on the outer graph bounds?").onChange(redraw);
     f0.add(config, "drawLongestPath").title("Draw longest detected path?").onChange(redraw);
     f0.add(config, "drawSkeleton").title("Draw skeleton?").onChange(redraw);

@@ -6,7 +6,7 @@
  * it will be handled as undirected. If edge(a,b) exists, then edge(b,a) is handled
  * as existing, too.
  *
- * The algorithm uses a
+ * @requires GraphPath
  *
  * @requires arrayFill - See ./src/cjs/utils/algorithms/arrayFill.js
  * @requires matrixFill - See ./src/cjs/utils/algorithms/matrixFill.js
@@ -81,7 +81,7 @@ globalThis.findLongestPathUAG = (function () {
     // visitedVertices[vertIndexI] = false;
     var resultPath = [vertIndexI].concat(longestSubPath);
     // TODO: here's an error. Why?
-    // matrix[vertIndexI][vertIndexJ] = resultPath;
+    matrix[vertIndexI][vertIndexJ] = resultPath;
     // matrix[vertIndexJ][vertIndexI] = resultPath.slice().reverse();
     return resultPath;
   };

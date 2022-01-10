@@ -4,6 +4,8 @@
  *
  * Converts cells into edges.
  *
+ * @requires Graph
+ *
  * @author Ikaros Kappler
  * @date   2021-12-16
  * @version 1.0.0
@@ -33,7 +35,6 @@ globalThis.voronoi2graph = (function () {
       //  - put into vertex array (if not yet exists)
       //  - remember location (index)
       var cellVertices = cell.vertices;
-      var cellIsOpen = cell.isOpen;
       var vertIndexA = -1;
       for (var v = 0; v < cellVertices.length; v++) {
         var vertA = cellVertices[v];
@@ -47,7 +48,8 @@ globalThis.voronoi2graph = (function () {
         vertIndexA = vertIndexB;
       }
     }
-    return { edges: edges, vertices: vertices };
+    // { edges: edges, vertices: vertices };
+    return new Graph(vertices, edges);
   };
 
   return v2g;
