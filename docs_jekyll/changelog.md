@@ -3,6 +3,19 @@ layout: page
 ---
 # Changelog
 
+- 2022-01-10
+  - Added utility function `findInVertexArray`.
+- 2021-12-17
+  - Added the functions `Vertex.lerp` and `Vertex.lerpAbs` for linear interpolations.
+- 2021-12-16
+  - Added the `Polygon.getEvenDistributionPolygon()` function.
+- 2021-12-14
+  - Added the `Polygon.perimeter()` function.
+- 2021-12-01
+  - Changed the type of param of `BezierPath.scale` to XYCoords.
+  - Added function `BezierPath.scaleXY` for non uniform scaling.
+  - Changed the type of param of `Vertex.scale` to XYCoords.
+  - Added function `Vertex.scaleXY` for non uniform scaling.
 - 2021-11-24
   - Speeding up the demo page with async script execution.
   - Finalizing the demo page for the new `PBText` element (note: it has this name because `Text` already exists).

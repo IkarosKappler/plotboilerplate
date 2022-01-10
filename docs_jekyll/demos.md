@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2021-11-24
+date: 2022-01-10
 ---
 
 <h3>Basics</h3>
@@ -198,6 +198,11 @@ date: 2021-11-24
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/37-conways-game-of-life/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20211108-1-conway.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/38-geometric-skeletonization/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220110-0-polygon-skeletonization.png');"></div>
    </a>
 </div>
 </div>
