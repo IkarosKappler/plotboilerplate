@@ -15,16 +15,11 @@
  * @version     1.0.0
  **/
 
-// TODOs:
-//  reducing the polygon fails (only upscaling works)
-//  some voronoi GRAPH edges are missing from voronoi2graph
-
 (function (_context) {
   "use strict";
 
   // Fetch the GET params
   var GUP = gup();
-  // globalThis.isDarkMode = detectDarkMode(GUP);
 
   window.addEventListener("load", function () {
     // All config params are optional.
@@ -121,7 +116,7 @@
     // Array<number>
     var outerVertexIndices = null;
     // Array<number>
-    var longestPath = null;
+    var longestPath = [];
 
     // +---------------------------------------------------------------------------------
     // | Called when the desired interpolation point count changes.
@@ -129,21 +124,10 @@
     // | Also called when a vertex of the raw input polygon was dragged around.
     // +-------------------------------
     var handleInterpolationPointCount = function () {
-      // if (polygon) {
-      //   removeDragEndListeners();
-      // }
       longestPath = [];
       polygon = rawPolygon.getEvenDistributionPolygon(config.interpolationPointCount);
-      // polygon = evenlyPolygon(rawPolygon, config.interpolationPointCount);
-      // console.log("EvenlyPolygon #vertices", polygon.vertices.length);
       handlePolygonChange();
-      // installDragListeners();
-      computeLongestPath();
     };
-
-    // for (var i in rawPolygon.vertices) {
-    //   rawPolygon.vertices[i].listeners.addDragEndListener(handleInterpolationPointCount);
-    // }
 
     // +---------------------------------------------------------------------------------
     // | Called when a vertex in the polygon changed.
@@ -168,6 +152,7 @@
       voronoiHelper = new VoronoiHelper(cloneVertexArray(pointList));
       voronoiHelper.triangulate();
       voronoiHelper.makeVoronoiDiagram();
+      computeLongestPath();
       pb.redraw();
     };
 
@@ -180,17 +165,11 @@
       }
     };
     installDragEndListeners(rawPolygon, handleInterpolationPointCount);
-    var longestPath = [];
+    // var longestPath = [];
 
     // +---------------------------------------------------------------------------------
-    // | Uninstall drag listeners (e.g. when polygon is removed from the canvas).
+    // | Install drag listeners to the polygon vertices (e.g. when polygon was added to the canvas).
     // +-------------------------------
-    // var removeDragEndListeners = function () {
-    //   for (var i = 0; i < polygon.vertices.length; i++) {
-    //     polygon.vertices[i].listeners.removeDragEndListener(handlePolygonChange);
-    //   }
-    // };
-
     var computeLongestPath = function () {
       cellPolygons = voronoiHelper.voronoiCellsToPolygons();
       // Convert voronoi cells to graph { vertices, edges }
@@ -201,24 +180,7 @@
       // Convert the (clipped) Voronoi cells to a graph
       // and find the shortest path.
       clippedVoronoiGraph = new voronoi2graph(clippedCells, 0.0000001);
-      // console.log(
-      //   "[before] clippedVoronoiGraph.edges",
-      //   clippedVoronoiGraph.edges.length,
-      //   "clippedVoronoiGraph.vertices",
-      //   clippedVoronoiGraph.vertices.length
-      // );
       outerVertexIndices = stripOuterClipGraphEdges(clippedVoronoiGraph, polygon);
-      // console.log(outerVertexIndices);
-      // if (config.drawOuterGraphVertices) {
-      //   drawOuterGraphVertices(draw, fill, outerVertexIndices, clippedVoronoiGraph);
-      // }
-      // console.log(
-      //   "[after] clippedVoronoiGraph.edges",
-      //   clippedVoronoiGraph.edges.length,
-      //   "clippedVoronoiGraph.vertices",
-      //   clippedVoronoiGraph.vertices.length
-      // );
-
       // Find longest path
       longestPath = findLongestPathUAG(clippedVoronoiGraph, outerVertexIndices);
       // console.log("longestPath", longestPath);
@@ -245,9 +207,6 @@
 
       if (config.drawVertexNumbers) {
         var color = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGBA();
-        // var polygonVertices = polygon.vertices.map(function (vertex, index) {
-        //   return { position: vertex, label: index };
-        // });
         drawVertexNumbers(draw, fill, polygon.vertices, color);
       }
 
@@ -275,63 +234,6 @@
           }
         }
       }
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Strip all those edges from the graph that belong to the clipping
-    // | polygon (that is the outer border here).
-    // |
-    // | @return A list of vertex indices that are located exactly on the
-    // |         outer graph bounds.
-    // |
-    // | Note: this only works as the complete clip polygon lies _inside_ the
-    // |       Voronoi diagram. This guarantees that all outer graph edges must
-    // |       be some former edge segment of the clipping polygon.
-    // +-------------------------------
-    // TODO: move to separate file
-    var stripOuterClipGraphEdges = function (graph, clipPolygon) {
-      var edgeComparator = function (edgeA, edgeB) {
-        return (edgeA.i === edgeB.i && edgeA.j === edgeB.j) || (edgeA.i === edgeB.j && edgeA.j === edgeB.i);
-      };
-      var edgeAsLine = new Line(new Vertex(), new Vertex());
-      var newEdges = new ArraySet(edgeComparator);
-      // console.log("newEdges", newEdges);
-      var outerVertices = new ArraySet();
-      for (var e = 0; e < graph.edges.length; e++) {
-        var edge = graph.edges[e];
-        var vertA = graph.vertices[edge.i];
-        var vertB = graph.vertices[edge.j];
-        edgeAsLine.a.set(vertA);
-        edgeAsLine.b.set(vertB);
-        var keepEdge = true;
-        for (var i = 0; i < clipPolygon.vertices.length; i++) {
-          var polygonPoint = clipPolygon.vertices[i];
-          if (edgeAsLine.hasPoint(polygonPoint, true)) {
-            // Strip this edge from the result (will not be re-added).
-            keepEdge = false;
-            if (!vertexListContains(clipPolygon.vertices, edgeAsLine.a)) {
-              outerVertices.add(edge.i);
-            }
-            if (!vertexListContains(clipPolygon.vertices, edgeAsLine.b)) {
-              outerVertices.add(edge.j);
-            }
-          }
-        }
-        if (keepEdge) {
-          newEdges.add(edge);
-        }
-      }
-      graph.edges = newEdges;
-      return outerVertices;
-    };
-
-    var vertexListContains = function (vertexList, vertex) {
-      for (var i = 0; i < vertexList.length; i++) {
-        if (vertex.distance(vertexList[i]) < 0.0000001) {
-          return true;
-        }
-      }
-      return false;
     };
 
     var drawVertexNumbers = function (draw, fill, vertices, color) {
@@ -390,39 +292,17 @@
     };
 
     // +---------------------------------------------------------------------------------
-    // | Add mouse/touch interaction on click.
-    // +-------------------------------
-    pb.eventCatcher.addEventListener("click", function (event) {
-      var bounds = pb.eventCatcher.getBoundingClientRect();
-      var pixelPosition = { x: event.offsetX - bounds.left, y: event.offsetY - bounds.top };
-      var relPos = pb.transformMousePosition(pixelPosition.x, pixelPosition.y);
-      console.log("clicked", pixelPosition, relPos);
-      // This was just a helper to construct the initial polygon just by clicking.
-      if (config.pointCount > polygon.vertices.length) {
-        // polygon.vertices.push(new Vertex(relPos));
-        // pb.redraw();
-      } else {
-        // console.log("polygon", polygon.toSVGString());
-        // console.log(
-        //   polygon.vertices
-        //     .map(function (vert) {
-        //       return "{ x: " + vert.x + ", y: " + vert.y + " }";
-        //     })
-        //     .join(", ")
-        // );
-      }
-    });
-
-    // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
-    var gui = new dat.gui.GUI();
+    // var gui = new dat.gui.GUI();
+    var gui = pb.createGUI();
     gui.remember(config);
+    var guiSize = guiSizeToggler(gui, config);
     if (isMobileDevice()) {
       config.guiDoubleSize = true;
-      toggleGuiSize(gui, config.guiDoubleSize);
+      guiSize.update();
     }
-    gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(toggleGuiSize);
+    gui.add(config, "guiDoubleSize").title("Double size GUI?").onChange(guiSize.update);
 
     var f0 = gui.addFolder("Settings");
     // prettier-ignore

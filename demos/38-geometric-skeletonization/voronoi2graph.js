@@ -21,7 +21,7 @@ globalThis.voronoi2graph = (function () {
     var vertices = new ArraySet(function (vertA, vertB) {
       return vertA.distance(vertB) < epsilon;
     });
-    // Array<{ i:number, i:number}>
+    // Array<{ i:number, j:number}>
     var edges = new ArraySet(function (edgeA, edgeB) {
       return (edgeA.i === edgeB.i && edgeA.j === edgeB.j) || (edgeA.i === edgeB.j && edgeA.j === edgeB.i);
     });
@@ -36,7 +36,6 @@ globalThis.voronoi2graph = (function () {
       var cellIsOpen = cell.isOpen;
       var vertIndexA = -1;
       for (var v = 0; v < cellVertices.length; v++) {
-        // if (cellIsOpen || v < cellVertices.length) {
         var vertA = cellVertices[v];
         var vertB = cellVertices[(v + 1) % cellVertices.length];
         if (v === 0) {
@@ -46,7 +45,6 @@ globalThis.voronoi2graph = (function () {
         var edge = { i: vertIndexA, j: vertIndexB };
         edges.add(edge);
         vertIndexA = vertIndexB;
-        // }
       }
     }
     return { edges: edges, vertices: vertices };

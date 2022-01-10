@@ -66,5 +66,11 @@ var drawConfig = {
   image: {
     color: "#a8a8a8",
     lineWidth: 1
+  },
+  text: {
+    color: "#000000",
+    lineWidth: 1,
+    fill: true,
+    anchor: true
   }
 }; // END drawConfig

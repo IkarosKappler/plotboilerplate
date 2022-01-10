@@ -33,9 +33,6 @@ globalThis.findLongestPathUAG = (function () {
     }
 
     var n = graph.vertices.length;
-    // console.log("graph.edges", graph.edges);
-    // var containedEdgeSubset = filterEdges(graph.edges, outerVertexIndices);
-    // console.log("containedEdgeSubset", containedEdgeSubset);
     var matrix = matrixFill(n, n, null);
     var longestPath = [];
     for (var i = 0; i < outerVertexIndices.length; i++) {
@@ -44,9 +41,7 @@ globalThis.findLongestPathUAG = (function () {
         if (j === i) {
           continue;
         }
-        // var visitedVertices = fillArray(n, false);
         var path = findPath(matrix, graph.edges, visitedVertices, outerVertexIndices[i], outerVertexIndices[j]);
-        // pathList.push( )
         // console.log("path", path);
         // TODO: here are a LOT of duplicates!
         if (path.length > longestPath.length) {

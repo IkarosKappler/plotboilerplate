@@ -1,5 +1,7 @@
 # Changelog
 
+- 2022-01-10
+  - Added utility function `findInVertexArray`.
 - 2021-12-17
   - Added the functions `Vertex.lerp` and `Vertex.lerpAbs` for linear interpolations.
 - 2021-12-16

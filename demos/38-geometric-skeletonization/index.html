@@ -15,7 +15,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Demo of visualising Geometric Skeletonization with PlotBoilerplate.js.">
     <meta property="og:description" content="Demo of visualising Geometric Skeletonization with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/na.png">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20220110-0-polygon-skeletonization.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
@@ -70,6 +70,7 @@
       <!-- END For production -->
       
       <!-- <script src="../VertexAnimator.Linear.js"></script>  -->
+      <script src="../../src/cjs/utils/findInVertexArray.js"></script>
       <script src="../../src/cjs/utils/datastructures/Color.js"></script>
       <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
       <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
@@ -80,15 +81,13 @@
       <script src="../../src/cjs/utils/algorithms/delaunay2voronoi.js"></script>
       <script src="../../src/cjs/utils/algorithms/sutherlandHodgman.js"></script>
       <script src="../isMobileDevice.js"></script>
-      <!--  <script src="../removeAllChildNodes.js"></script>  -->
-      <!--  <script src="../removeChildNodesByClass.js"></script>  -->
       <script src="../modal.js"></script>
       <!--  <script src="detectDarkMode.js"></script> -->
       <script src="../toggleGuiSize.js"></script>
       <script src="../ArraySet.js"></script>
       <script src="VoronoiHelper.js"></script>
-      <script src="evenlyPolygon.js"></script>
       <script src="voronoi2graph.js"></script>
+      <script src="stripOuterClipGraphEdges.js"></script>
       <script src="findLongestPathUAG.js"></script>
       <script src="index.js"></script>
     

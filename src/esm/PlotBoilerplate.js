@@ -817,8 +817,9 @@ export class PlotBoilerplate {
      **/
     getVertexNear(pixelPosition, pixelTolerance) {
         var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min(this.config.cssScaleX, this.config.cssScaleY));
-        if (p && p.typeName == "vertex")
+        if (p && p.typeName == "vertex") {
             return this.vertices[p.vindex];
+        }
         return undefined;
     }
     /**
