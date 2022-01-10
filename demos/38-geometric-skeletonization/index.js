@@ -141,7 +141,7 @@
       pointList = polygon.vertices.concat(boundingBoxPolygon.vertices);
 
       pb.removeAll(false, false);
-      pb.add(polygon, false);
+      // pb.add(polygon, false);
       for (var i in polygon.vertices) {
         polygon.vertices[i].attr.visible = true;
         polygon.vertices[i].attr.draggable = false;
@@ -214,6 +214,8 @@
     // | Render additional stuff after tghe default elements were draw.
     // +-------------------------------
     var postDraw = function (draw, fill) {
+      drawClipPolygon(draw, fill, polygon);
+
       if (config.drawVoronoiCells) {
         drawVoronoiDiagram(draw, fill);
       }
@@ -243,6 +245,14 @@
       }
     };
 
+    var drawClipPolygon = function (draw, fill, polygon) {
+      draw.polygon(polygon, "rgba(0,64,255,0.75)", 2.0);
+      for (var i = 0; i < polygon.vertices.length; i++) {
+        var vertex = polygon.vertices[i];
+        draw.diamondHandle(vertex, 5, "rgba(255,255,0,0.75)");
+      }
+    };
+
     var drawVertexNumbers = function (draw, fill, vertices, color) {
       for (var i = 0; i < vertices.length; i++) {
         var p = vertices[i];
@@ -255,9 +265,6 @@
         var edge = graph.edges[e];
         var vertA = graph.vertices[edge.i];
         var vertB = graph.vertices[edge.j];
-        if (!vertA || !vertB) {
-          console.log("err ", e, edge, vertA, vertB);
-        }
         draw.line(vertA.clone(), vertB.clone(), color, lineWidth);
       }
     };
