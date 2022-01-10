@@ -1,5 +1,13 @@
 # Changelog
 
+- 2022-01-10
+  - Added utility function `findInVertexArray`.
+- 2021-12-17
+  - Added the functions `Vertex.lerp` and `Vertex.lerpAbs` for linear interpolations.
+- 2021-12-16
+  - Added the `Polygon.getEvenDistributionPolygon()` function.
+- 2021-12-14
+  - Added the `Polygon.perimeter()` function.
 - 2021-12-01
   - Changed the type of param of `BezierPath.scale` to XYCoords.
   - Added function `BezierPath.scaleXY` for non uniform scaling.

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>2D Plotting Boilerplate - Geometric Skeletonization</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, triangle, function, graph, plot">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2021-10-04">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Demo of visualising Geometric Skeletonization with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demo of visualising Geometric Skeletonization with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20220110-0-polygon-skeletonization.png">
+
+    <!-- Polyfills for IE -->
+    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/path2d-polyfill.min.js"></script>
+    <script src="../../lib/greiner-hormann-typescript/dist/greiner-hormann.min.js"></script>
+    
+    <script src="../../lib/humane.min.js"></script>
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/alloy_finger.js"></script>
+    <script src="../../lib/uistats.min.js"></script>
+    
+    <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script> 
+    <script src="../../src/cjs/utils/creategui.js"></script>
+    <script src="../../src/cjs/utils/module.js"></script>
+    <script src="../../src/cjs/utils/gup.js"></script>
+    <script src="../../src/cjs/utils/dom/getFProp.js"></script>
+    <script src="../../src/cjs/utils/dom/getAvailableContainerSpace.js"></script>
+    
+    <!-- For development -->
+    <!--
+      <script src="../../src/cjs/UIDGenerator.js"></script>
+      <script src="../../src/cjs/VertexAttr.js"></script>
+      <script src="../../src/cjs/VertexListeners.js"></script>
+      <script src="../../src/cjs/VertTuple.js"></script>
+      <script src="../../src/cjs/Vertex.js"></script>
+      <script src="../../src/cjs/Bounds.js"></script>
+      <script src="../../src/cjs/Grid.js"></script>
+      <script src="../../src/cjs/Line.js"></script>
+      <script src="../../src/cjs/Vector.js"></script>
+      <script src="../../src/cjs/CubicBezierCurve.js"></script>
+      <script src="../../src/cjs/BezierPath.js"></script>
+      <script src="../../src/cjs/Polygon.js"></script>
+      <script src="../../src/cjs/Triangle.js"></script>
+      <script src="../../src/cjs/VEllipse.js"></script>
+      <script src="../../src/cjs/VEllipseSector.js"></script>
+      <script src="../../src/cjs/Circle.js"></script>
+      <script src="../../src/cjs/CircleSector.js"></script>
+      <script src="../../src/cjs/PBImage.js"></script>
+      <script src="../../src/cjs/PBText.js"></script>
+      <script src="../../src/cjs/MouseHandler.js"></script>
+      <script src="../../src/cjs/KeyHandler.js"></script>
+      <script src="../../src/cjs/draw.js"></script>
+      <script src="../../src/cjs/geomutils.js"></script>
+      <script src="../../src/cjs/SVGBuilder.js"></script>
+      <script src="../../src/cjs/PlotBoilerplate.js"></script> -->
+      <!-- END for development -->
+      
+      <!-- For production -->
+      <script src="../../dist/plotboilerplate.min.js"></script>
+      <!-- END For production -->
+      
+      <!-- <script src="../VertexAnimator.Linear.js"></script>  -->
+      <script src="../../src/cjs/utils/findInVertexArray.js"></script>
+      <script src="../../src/cjs/utils/datastructures/Color.js"></script>
+      <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
+      <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
+      <script src="../../src/cjs/utils/datastructures/VoronoiCell.js"></script>
+      <script src="../../src/cjs/utils/algorithms/arrayFill.js"></script>
+      <script src="../../src/cjs/utils/algorithms/matrixFill.js"></script>
+      <script src="../../src/cjs/utils/algorithms/delaunay.js"></script>
+      <script src="../../src/cjs/utils/algorithms/delaunay2voronoi.js"></script>
+      <script src="../../src/cjs/utils/algorithms/sutherlandHodgman.js"></script>
+      <script src="../isMobileDevice.js"></script>
+      <script src="../modal.js"></script>
+      <!--  <script src="detectDarkMode.js"></script> -->
+      <script src="../toggleGuiSize.js"></script>
+      <script src="../ArraySet.js"></script>
+      <script src="Graph.js"></script>
+      <script src="GraphPath.js"></script>
+      <script src="VoronoiHelper.js"></script>
+      <script src="voronoi2graph.js"></script>
+      <script src="stripOuterClipGraphEdges.js"></script>
+      <script src="findLongestPathUAG.js"></script>
+      <script src="index.js"></script>
+    
+    
+    <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
+    <link rel="stylesheet" href="../../style.css">
+  </head>
+  <body>
+    <!-- Please not that this particular demo only works with SVG canvas -->
+    <svg id="my-canvas" width="1024" height="768"></svg>
+  </body>
+</html>

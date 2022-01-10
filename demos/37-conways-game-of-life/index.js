@@ -10,7 +10,8 @@
  * @projectname Plotboilerplate.js
  * @author      Ikaros Kappler
  * @date        2021-10-31
- * @version     1.0.0
+ * @modified    2022-01-10 Adding the f-pentomino by default if nothing else is specified.
+ * @version     1.0.1
  **/
 
 (function (_context) {
@@ -445,6 +446,15 @@
         currentPresetPosition.i = 0;
         currentPreset = null;
       }
+    } else {
+      console.log(biotopeSize);
+      currentPreset = CONWAY_PRESETS["f_pentomino"];
+      currentPresetPosition.j = GUP["j"] ? biome.absRow(parseInt(GUP["j"])) : 0;
+      currentPresetPosition.i = GUP["i"] ? biome.absCol(parseInt(GUP["i"])) : 0;
+      addCurrentPreset();
+      currentPresetPosition.j = 0;
+      currentPresetPosition.i = 0;
+      currentPreset = null;
     }
 
     visualizeCreatures();

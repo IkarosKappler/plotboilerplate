@@ -79,5 +79,10 @@ var CONWAY_PRESETS = {
     [X, X, X],
     [_, X, _],
     [_, X, _]
+  ],
+  "f_pentomino": [
+    [_, X, X],
+    [X, X, _],
+    [_, X, _]
   ]
 };

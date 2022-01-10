@@ -20,7 +20,9 @@
  * @modified 2021-01-29 Added the `isClockwise` function.
  * @modified 2021-01-29 Added the `area` function.
  * @modified 2021-01-29 Changed the param type for `containsVert` from Vertex to XYCoords.
- * @version 1.7.0
+ * @modified 2021-12-14 Added the `perimeter()` function.
+ * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
+ * @version 1.8.0
  *
  * @file Polygon
  * @public
@@ -57,12 +59,11 @@ var Polygon = /** @class */ (function () {
          **/
         this.className = "Polygon";
         this.uid = UIDGenerator_1.UIDGenerator.next();
-        if (typeof vertices == 'undefined')
+        if (typeof vertices == "undefined")
             vertices = [];
         this.vertices = vertices;
         this.isOpen = isOpen;
     }
-    ;
     /**
      * Add a vertex to the end of the `vertices` array.
      *
@@ -74,7 +75,6 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.addVertex = function (vert) {
         this.vertices.push(vert);
     };
-    ;
     /**
      * Get the polygon vertex at the given position (index).
      *
@@ -97,7 +97,6 @@ var Polygon = /** @class */ (function () {
         else
             return this.vertices[index % this.vertices.length];
     };
-    ;
     /**
      * Move the polygon's vertices by the given amount.
      *
@@ -113,7 +112,6 @@ var Polygon = /** @class */ (function () {
         }
         return this;
     };
-    ;
     /**
      * Check if the given vertex is inside this polygon.<br>
      * <br>
@@ -133,14 +131,12 @@ var Polygon = /** @class */ (function () {
         for (var i = 0, j = this.vertices.length - 1; i < this.vertices.length; j = i++) {
             var xi = this.vertices[i].x, yi = this.vertices[i].y;
             var xj = this.vertices[j].x, yj = this.vertices[j].y;
-            var intersect = ((yi > vert.y) != (yj > vert.y))
-                && (vert.x < (xj - xi) * (vert.y - yi) / (yj - yi) + xi);
+            var intersect = yi > vert.y != yj > vert.y && vert.x < ((xj - xi) * (vert.y - yi)) / (yj - yi) + xi;
             if (intersect)
                 inside = !inside;
         }
         return inside;
     };
-    ;
     /**
      * Calculate the area of the given polygon (unsigned).
      *
@@ -154,7 +150,6 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.area = function () {
         return Polygon.utils.area(this.vertices);
     };
-    ;
     /**
      * Calulate the signed polyon area by interpreting the polygon as a matrix
      * and calculating its determinant.
@@ -167,7 +162,6 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.signedArea = function () {
         return Polygon.utils.signedArea(this.vertices);
     };
-    ;
     /**
      * Get the winding order of this polgon: clockwise or counterclockwise.
      *
@@ -179,7 +173,28 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.isClockwise = function () {
         return Polygon.utils.signedArea(this.vertices) < 0;
     };
-    ;
+    /**
+     * Get the perimeter of this polygon.
+     * The perimeter is the absolute length of the outline.
+     *
+     * If this polygon is open then the last segment (connecting the first and the
+     * last vertex) will be skipped.
+     *
+     * @method perimeter
+     * @instance
+     * @memberof Polygon
+     * @return {number}
+     */
+    Polygon.prototype.perimeter = function () {
+        var length = 0;
+        for (var i = 1; i < this.vertices.length; i++) {
+            length += this.vertices[i - 1].distance(this.vertices[i]);
+        }
+        if (!this.isOpen && this.vertices.length > 1) {
+            length += this.vertices[0].distance(this.vertices[this.vertices.length - 1]);
+        }
+        return length;
+    };
     /**
      * Scale the polygon relative to the given center.
      *
@@ -192,14 +207,13 @@ var Polygon = /** @class */ (function () {
      **/
     Polygon.prototype.scale = function (factor, center) {
         for (var i in this.vertices) {
-            if (typeof this.vertices[i].scale == 'function')
+            if (typeof this.vertices[i].scale == "function")
                 this.vertices[i].scale(factor, center);
             else
-                console.log('There seems to be a null vertex!', this.vertices[i]);
+                console.log("There seems to be a null vertex!", this.vertices[i]);
         }
         return this;
     };
-    ;
     /**
      * Rotate the polygon around the given center.
      *
@@ -216,7 +230,52 @@ var Polygon = /** @class */ (function () {
         }
         return this;
     };
-    ;
+    /**
+     * Convert this polygon into a new polygon with n evenly distributed vertices.
+     *
+     * @param {number} pointCount - Must not be negative.
+     */
+    Polygon.prototype.getEvenDistributionPolygon = function (pointCount) {
+        if (pointCount <= 0) {
+            throw new Error("pointCount must be larger than zero; is " + pointCount + ".");
+        }
+        var result = new Polygon([], this.isOpen);
+        if (this.vertices.length === 0) {
+            return result;
+        }
+        // Fetch and add the start point from the source polygon
+        var polygonPoint = new Vertex_1.Vertex(this.vertices[0]);
+        result.vertices.push(polygonPoint);
+        if (this.vertices.length === 1) {
+            return result;
+        }
+        var perimeter = this.perimeter();
+        var stepSize = perimeter / pointCount;
+        var n = this.vertices.length;
+        var polygonIndex = 1;
+        var nextPolygonPoint = new Vertex_1.Vertex(this.vertices[1]);
+        var segmentLength = polygonPoint.distance(nextPolygonPoint);
+        var loopMax = this.isOpen ? n : n + 1;
+        var curSegmentU = stepSize;
+        var i = 1;
+        while (i < pointCount && polygonIndex < loopMax) {
+            // Check if next eq point is inside this segment
+            if (curSegmentU < segmentLength) {
+                var newPoint = polygonPoint.clone().lerpAbs(nextPolygonPoint, curSegmentU);
+                result.vertices.push(newPoint);
+                curSegmentU += stepSize;
+                i++;
+            }
+            else {
+                polygonIndex++;
+                polygonPoint = nextPolygonPoint;
+                nextPolygonPoint = new Vertex_1.Vertex(this.vertices[polygonIndex % n]);
+                curSegmentU = curSegmentU - segmentLength;
+                segmentLength = polygonPoint.distance(nextPolygonPoint);
+            }
+        }
+        return result;
+    };
     /**
      * Get the bounding box (bounds) of this polygon.
      *
@@ -228,7 +287,6 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.getBounds = function () {
         return Bounds_1.Bounds.computeFromVertices(this.vertices);
     };
-    ;
     /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
@@ -260,7 +318,6 @@ var Polygon = /** @class */ (function () {
         }
         return qbezier;
     };
-    ;
     /**
      * Convert this polygon to a quadratic bezier curve, represented as an SVG data string.
      *
@@ -273,13 +330,12 @@ var Polygon = /** @class */ (function () {
         var qdata = this.toQuadraticBezierData();
         if (qdata.length == 0)
             return "";
-        var buffer = ['M ' + qdata[0].x + ' ' + qdata[0].y];
+        var buffer = ["M " + qdata[0].x + " " + qdata[0].y];
         for (var i = 1; i < qdata.length; i += 2) {
-            buffer.push('Q ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y);
+            buffer.push("Q " + qdata[i].x + " " + qdata[i].y + ", " + qdata[i + 1].x + " " + qdata[i + 1].y);
         }
-        return buffer.join(' ');
+        return buffer.join(" ");
     };
-    ;
     /**
      * Convert this polygon to a sequence of cubic Bézier curves.<br>
      * <br>
@@ -296,7 +352,7 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      **/
     Polygon.prototype.toCubicBezierData = function (threshold) {
-        if (typeof threshold == 'undefined')
+        if (typeof threshold == "undefined")
             threshold = 1.0;
         if (this.vertices.length < 3)
             return [];
@@ -320,7 +376,6 @@ var Polygon = /** @class */ (function () {
         }
         return cbezier;
     };
-    ;
     /**
      * Convert this polygon to a cubic bezier curve, represented as an SVG data string.
      *
@@ -333,13 +388,23 @@ var Polygon = /** @class */ (function () {
         var qdata = this.toCubicBezierData(threshold);
         if (qdata.length == 0)
             return "";
-        var buffer = ['M ' + qdata[0].x + ' ' + qdata[0].y];
+        var buffer = ["M " + qdata[0].x + " " + qdata[0].y];
         for (var i = 1; i < qdata.length; i += 3) {
-            buffer.push('C ' + qdata[i].x + ' ' + qdata[i].y + ', ' + qdata[i + 1].x + ' ' + qdata[i + 1].y + ', ' + qdata[i + 2].x + ' ' + qdata[i + 2].y);
+            buffer.push("C " +
+                qdata[i].x +
+                " " +
+                qdata[i].y +
+                ", " +
+                qdata[i + 1].x +
+                " " +
+                qdata[i + 1].y +
+                ", " +
+                qdata[i + 2].x +
+                " " +
+                qdata[i + 2].y);
         }
-        return buffer.join(' ');
+        return buffer.join(" ");
     };
-    ;
     /**
      * Convert this polygon to a cubic bezier path instance.
      *
@@ -358,7 +423,6 @@ var Polygon = /** @class */ (function () {
         }
         return BezierPath_1.BezierPath.fromArray(pathdata);
     };
-    ;
     /**
      * Create an SVG representation of this polygon.
      *
@@ -372,29 +436,28 @@ var Polygon = /** @class */ (function () {
     Polygon.prototype.toSVGString = function (options) {
         options = options || {};
         var buffer = [];
-        buffer.push('<path');
+        buffer.push("<path");
         if (options.className)
             buffer.push(' class="' + options.className + '"');
         buffer.push(' d="');
         if (this.vertices.length > 0) {
-            buffer.push('M ');
+            buffer.push("M ");
             buffer.push(this.vertices[0].x.toString());
-            buffer.push(' ');
+            buffer.push(" ");
             buffer.push(this.vertices[0].y.toString());
             for (var i = 1; i < this.vertices.length; i++) {
-                buffer.push(' L ');
+                buffer.push(" L ");
                 buffer.push(this.vertices[i].x.toString());
-                buffer.push(' ');
+                buffer.push(" ");
                 buffer.push(this.vertices[i].y.toString());
             }
             if (!this.isOpen) {
-                buffer.push(' Z');
+                buffer.push(" Z");
             }
         }
         buffer.push('" />');
-        return buffer.join('');
+        return buffer.join("");
     };
-    ;
     Polygon.utils = {
         /**
          * Calculate the area of the given polygon (unsigned).
@@ -413,8 +476,8 @@ var Polygon = /** @class */ (function () {
                 var addY = vertices[(i + 1) % l].y;
                 var subX = vertices[(i + 1) % l].x;
                 var subY = vertices[i].y;
-                total += (addX * addY * 0.5);
-                total -= (subX * subY * 0.5);
+                total += addX * addY * 0.5;
+                total -= subX * subY * 0.5;
             }
             return Math.abs(total);
         },
