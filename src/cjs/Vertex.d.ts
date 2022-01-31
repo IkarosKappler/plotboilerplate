@@ -25,7 +25,8 @@
  * @modified 2021-12-01 Changed the type of param of `scale` to XYCoords.
  * @modified 2021-12-01 Added function `scaleXY` for non uniform scaling.
  * @modified 2021-12-17 Added the functions `lerp` and `lerpAbs` for linear interpolations.
- * @version  2.6.0
+ * @modified 2022-01-31 Added `Vertex.utils.arrayToJSON`.
+ * @version  2.6.1
  *
  * @file Vertex
  * @public
@@ -412,5 +413,12 @@ export declare class Vertex implements XYCoords, SVGSerializable {
          * @param {number} scaleY  - the vertical scaling during draw.
          **/
         buildArrowHead: (zA: Vertex, zB: Vertex, headlen: number, scaleX: number, scaleY: number) => Array<Vertex>;
+        /**
+         * Convert the given vertices (array) to a JSON string.
+         *
+         * @param {number?} precision - (optional) The numeric precision to be used (number of precision digits).
+         * @returns {string}
+         */
+        arrayToJSON(vertices: Array<XYCoords>, precision?: number): string;
     };
 }

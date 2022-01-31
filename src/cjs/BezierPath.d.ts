@@ -20,7 +20,8 @@
  * @modified 2020-07-24 Added the getClosestT(Vertex) function.
  * @modified 2020-12-29 Constructor is now private (no explicit use intended).
  * @modified 2021-05-25 Added BezierPath.fromReducedList( Array<number> ).
- * @version 2.3.1
+ * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
+ * @version 2.4.0
  *
  * @file BezierPath
  * @public
@@ -470,6 +471,22 @@ export declare class BezierPath implements SVGSerializable {
      * @return {Bounds} The bounds of this Bézier path.
      **/
     getBounds(): Bounds;
+    /**
+     * Get n 'equally' distributed vertices along this Bézier path.
+     *
+     * As the changing curvature of the B slines makes prediction of distances difficult, the
+     * returned vertices' distances are only relatively equal:
+     *  - the distance grows where curvature is large.
+     *  - the distance shrinks where curvature is small.
+     *
+     * Only the distance mean of all consecutive is 1/n-th of the total arc length.
+     *
+     * Usually this approximation is good enough for most use cases.
+     *
+     * @param {number} pointCount - (must be at least 2) The number of desired points (start and end point included).
+     * @return {Array<Vertex>}
+     */
+    getEvenDistributionVertices(pointCount: number): Array<Vertex>;
     /**
      * Clone this BezierPath (deep clone).
      *

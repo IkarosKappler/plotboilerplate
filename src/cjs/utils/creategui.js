@@ -256,7 +256,7 @@ globalThis.utils.createGUI = function (pb, props) {
 
   if (pb.config.enableSVGExport) {
     var fold1 = gui.addFolder("Export");
-    fold1.add(pb.config, "saveFile").name("Save a file").title("Save as SVG.");
+    fold1.add(pb.config, "saveFile").name("SVG Image").title("Save as SVG.");
   }
 
   return gui;

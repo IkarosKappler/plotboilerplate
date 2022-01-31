@@ -1,5 +1,10 @@
 # Changelog
 
+- 2022-01-31
+  - Added `Vertex.utils.arrayToJSON`.
+  - Added `BezierPath.getEvenDistributionVertices(number)`.
+  - Added the extende-vertices demo.
+  - Added `src/ts/io/FileDrop.ts`.
 - 2022-01-10
   - Added utility function `findInVertexArray`.
 - 2021-12-17

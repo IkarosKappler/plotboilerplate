@@ -445,7 +445,8 @@ class AlloyFinger {
  * @modified 2020-07-24 Added the getClosestT(Vertex) function.
  * @modified 2020-12-29 Constructor is now private (no explicit use intended).
  * @modified 2021-05-25 Added BezierPath.fromReducedList( Array<number> ).
- * @version 2.3.1
+ * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
+ * @version 2.4.0
  *
  * @file BezierPath
  * @public
@@ -1341,6 +1342,59 @@ var BezierPath = /** @class */ (function () {
             max.y = Math.max(max.y, b.max.y);
         }
         return new Bounds_1.Bounds(min, max);
+    };
+    /**
+     * Get n 'equally' distributed vertices along this Bézier path.
+     *
+     * As the changing curvature of the B slines makes prediction of distances difficult, the
+     * returned vertices' distances are only relatively equal:
+     *  - the distance grows where curvature is large.
+     *  - the distance shrinks where curvature is small.
+     *
+     * Only the distance mean of all consecutive is 1/n-th of the total arc length.
+     *
+     * Usually this approximation is good enough for most use cases.
+     *
+     * @param {number} pointCount - (must be at least 2) The number of desired points (start and end point included).
+     * @return {Array<Vertex>}
+     */
+    BezierPath.prototype.getEvenDistributionVertices = function (pointCount) {
+        if (pointCount < 2) {
+            throw new Error("pointCount must be larger than one; is " + pointCount + ".");
+        }
+        var result = [];
+        if (this.bezierCurves.length === 0) {
+            return result;
+        }
+        // Fetch and add the start point from the source polygon
+        var polygonPoint = new Vertex_1.Vertex(this.bezierCurves[0].startPoint);
+        result.push(polygonPoint);
+        // if (this.bezierCurves.length === 1) {
+        //   return result;
+        // }
+        var perimeter = this.totalArcLength;
+        var stepSize = perimeter / (pointCount - 1);
+        var n = this.bezierCurves.length;
+        var curveIndex = 0;
+        var segmentLength = this.bezierCurves[0].arcLength;
+        var curSegmentU = stepSize;
+        var i = 1;
+        while (i < pointCount && curveIndex < n) {
+            // Check if next eq point is inside this segment
+            if (curSegmentU < segmentLength) {
+                var newPoint = this.bezierCurves[curveIndex].getPoint(curSegmentU);
+                result.push(newPoint);
+                curSegmentU += stepSize;
+                i++;
+            }
+            else {
+                curveIndex++;
+                curSegmentU = curSegmentU - segmentLength;
+                segmentLength = curveIndex < n ? this.bezierCurves[curveIndex].arcLength : 0;
+            }
+        }
+        result.push(new Vertex_1.Vertex(this.bezierCurves[n - 1].endPoint));
+        return result;
     };
     /**
      * Clone this BezierPath (deep clone).
@@ -8354,7 +8408,8 @@ exports.VertTuple = VertTuple;
  * @modified 2021-12-01 Changed the type of param of `scale` to XYCoords.
  * @modified 2021-12-01 Added function `scaleXY` for non uniform scaling.
  * @modified 2021-12-17 Added the functions `lerp` and `lerpAbs` for linear interpolations.
- * @version  2.6.0
+ * @modified 2022-01-31 Added `Vertex.utils.arrayToJSON`.
+ * @version  2.6.1
  *
  * @file Vertex
  * @public
@@ -8921,6 +8976,19 @@ var Vertex = /** @class */ (function () {
             vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
             vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
             return vertices;
+        },
+        /**
+         * Convert the given vertices (array) to a JSON string.
+         *
+         * @param {number?} precision - (optional) The numeric precision to be used (number of precision digits).
+         * @returns {string}
+         */
+        arrayToJSON: function (vertices, precision) {
+            return JSON.stringify(vertices.map(function (vert) {
+                return typeof precision === undefined
+                    ? { x: vert.x, y: vert.y }
+                    : { x: vert.x.toFixed(precision), y: vert.y.toFixed(precision) };
+            }));
         }
     };
     return Vertex;
