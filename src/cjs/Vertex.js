@@ -605,7 +605,7 @@ var Vertex = /** @class */ (function () {
             return JSON.stringify(vertices.map(function (vert) {
                 return typeof precision === undefined
                     ? { x: vert.x, y: vert.y }
-                    : { x: vert.x.toFixed(precision), y: vert.y.toFixed(precision) };
+                    : { x: Number(vert.x.toFixed(precision)), y: Number(vert.y.toFixed(precision)) };
             }));
         }
     };

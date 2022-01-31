@@ -59,7 +59,8 @@
       {
         guiDoubleSize: false,
 
-        pointCount: 24
+        pointCount: 24,
+        drawPointLabels: false
       },
       GUP
     );
@@ -78,7 +79,9 @@
       var vertices = bezierPath.getEvenDistributionVertices(config.pointCount);
       for (var i = 0; i < vertices.length; i++) {
         draw.circleHandle(vertices[i], 3, "rgba(192,0,128,1.0)");
-        fill.text("" + i, vertices[i].x, vertices[i].y);
+        if (config.drawPointLabels) {
+          fill.text("" + i, vertices[i].x, vertices[i].y);
+        }
       }
       // Calculate area
       var bounds = bezierPath.getBounds();
@@ -111,6 +114,8 @@
     var f0 = gui.addFolder("Settings");
     // prettier-ignore
     f0.add(config, "pointCount").min(2).max(100).title("The point count.").onChange( redraw );
+    // prettier-ignore
+    f0.add(config, "drawPointLabels").title("Draw point labels?").onChange( redraw );
     f0.open();
 
     pb.config.postDraw = postDraw;

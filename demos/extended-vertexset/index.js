@@ -55,7 +55,7 @@
     setVertexData(vertexData);
 
     var exportVertexData = function () {
-      var jsonString = Vertex.arrayToJSON(polygon.vertices);
+      var jsonString = Vertex.utils.arrayToJSON(polygon.vertices);
       saveAs(new Blob([jsonString], { type: "application/json" }), "vertices.json");
     };
 
