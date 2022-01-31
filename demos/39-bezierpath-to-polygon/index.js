@@ -69,19 +69,29 @@
     var bezierPath = BezierPath.fromJSON(bezierJson);
     pb.add(bezierPath);
 
+    // +---------------------------------------------------------------------------------
+    // | After all static elements on the canvas (the Bèzier path) were drawn
+    // | just draw our custom stuff.
+    // +-------------------------------
     var postDraw = function (draw, fill) {
-      // var vertices = bezier2polygon(outline, 50);
+      bezierPath.updateArcLengths();
       var vertices = bezierPath.getEvenDistributionVertices(config.pointCount);
-
-      // console.log("drawOutlineToPolygon vertices", vertices);
       for (var i = 0; i < vertices.length; i++) {
         draw.circleHandle(vertices[i], 3, "rgba(192,0,128,1.0)");
+        fill.text("" + i, vertices[i].x, vertices[i].y);
       }
+      // Calculate area
+      var bounds = bezierPath.getBounds();
+      vertices.push(new Vertex(bounds.max));
+      var polygon = new Polygon(vertices, false);
+      draw.polygon(polygon, "rgba(192,192,192,0.5)", 2);
+      fill.polygon(polygon, "rgba(192,192,192,0.3)", 2);
+      fill.text("Area: " + polygon.area().toFixed(3) + "px²", bounds.max.x, bounds.max.y);
     };
 
-    /**
-     * Just redraw everything.
-     */
+    // +---------------------------------------------------------------------------------
+    // | Just redraw everything.
+    // +-------------------------------
     var redraw = function () {
       pb.redraw();
     };
@@ -89,7 +99,6 @@
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
-    // var gui = new dat.gui.GUI();
     var gui = pb.createGUI();
     gui.remember(config);
     var guiSize = guiSizeToggler(gui, config);
