@@ -108,7 +108,7 @@
     // +-------------------------------
     var gui = pb.createGUI();
     gui.remember(config);
-    var guiSize = guiSizeToggler(gui, config);
+    var guiSize = guiSizeToggler(gui, config, { transformOrigin: "top right" });
     if (isMobileDevice()) {
       config.guiDoubleSize = true;
       guiSize.update();
