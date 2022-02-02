@@ -7,7 +7,9 @@
  * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  * @modified 2020-10-16 Added the containsCircle(...) function.
  * @modified 2021-01-20 Added UID.
- * @version  1.2.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version  1.3.0
  **/
 import { Line } from "./Line";
 import { Vector } from "./Vector";
@@ -51,6 +53,13 @@ export declare class Circle implements SVGSerializable {
      * @instance
      */
     radius: number;
+    /**
+     * @member isDestroyed
+     * @memberof CubicBezierCurve
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /**
      * Create a new circle with given center point and radius.
      *
@@ -118,18 +127,24 @@ export declare class Circle implements SVGSerializable {
      **/
     circleIntersection(circle: Circle): Line | null;
     /**
-      * Create an SVG representation of this circle.
-      *
-      * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-      * @method toSVGString
-      * @param {object=} options - An optional set of options, like 'className'.
-      * @return {string} A string representing the SVG code for this vertex.
-      * @instance
-      * @memberof Circle
-      */
+     * Create an SVG representation of this circle.
+     *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Circle
+     */
     toSVGString(options: {
         className?: string;
     }): string;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     static circleUtils: {
         vertAt: (angle: number, radius: number) => Vertex;
     };

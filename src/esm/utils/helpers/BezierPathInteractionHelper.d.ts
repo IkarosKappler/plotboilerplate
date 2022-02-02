@@ -90,7 +90,11 @@ export declare class BezierPathInteractionHelper {
     private currentT;
     private currentA;
     private currentB;
+    private _mouseHandler;
+    private _touchHandler;
     private _keyHandler;
+    private _mouseEnterListener;
+    private _mouseLeaveListener;
     /**
      * Pre: all paths must have been added to the PlotBoilerplate's drawable buffer (use the add(Drawable) function).
      *
@@ -158,6 +162,17 @@ export declare class BezierPathInteractionHelper {
      * @return {void}
      **/
     update(): void;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used any more.
+     *
+     * @method destroy
+     * @instance
+     * @memberof BezierPathInteractionHelper
+     * @return {void}
+     **/
+    destroy(): void;
     private _locatePath;
     private _handleDelete;
     private _handleSingleVertexDelete;

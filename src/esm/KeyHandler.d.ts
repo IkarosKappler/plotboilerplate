@@ -5,7 +5,8 @@
  * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
  * @modified 2020-10-04 Changed `window` to `globalThis`.
  * @modified 2020-10-04 Added extended JSDoc.
- * @version  1.0.4
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version  1.1.0
  *
  * @file KeyHandler
  * @public
@@ -45,9 +46,9 @@ export declare class KeyHandler {
      * @memberof KeyHandler
      * @param {HTMLElement} options.element (optional) The HTML element to listen on; if null then 'window' will be used.
      * @param {boolean} options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
-    **/
+     **/
     constructor(options: {
-        element?: HTMLElement | Window | (typeof globalThis);
+        element?: HTMLElement | Window | typeof globalThis;
         trackAll?: boolean;
     });
     /**
@@ -161,6 +162,12 @@ export declare class KeyHandler {
      * @param {string|number} key - Any key identifier, key code or one from the KEY_CODES list.
      */
     isDown(key: string | number): boolean;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used any more.
+     */
+    destroy(): void;
 }
 export interface XKeyListener {
     key: string;

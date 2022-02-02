@@ -18,7 +18,9 @@
  * @modified 2020-07-14 Changed the moveCurvePoint(...,Vertex) to moveCurvePoint(...,XYCoords), which is more generic.
  * @modified 2020-07-24 Added the getClosestT function and the helper function locateIntervalByDistance(...).
  * @modified 2021-01-20 Added UID.
- * @version 2.5.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
+ * @version 2.6.0
  *
  * @file CubicBezierCurve
  * @public
@@ -110,6 +112,13 @@ export declare class CubicBezierCurve {
      * @instance
      */
     arcLength: number;
+    /**
+     * @member isDestroyed
+     * @memberof CubicBezierCurve
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /**
      * The constructor.
      *
@@ -394,6 +403,12 @@ export declare class CubicBezierCurve {
      **/
     equals(curve: CubicBezierCurve | undefined): boolean;
     /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
+    /**
      * Quick check for class instance.
      * Is there a better way?
      *
@@ -412,6 +427,7 @@ export declare class CubicBezierCurve {
      * or in other words<br>
      *   <pre>'M startoint.x startPoint.y C startControlPoint.x startControlPoint.y endControlPoint.x endControlPoint.y endPoint.x endPoint.y'</pre>
      *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
      * @method toSVGPathData
      * @instance
      * @memberof CubicBezierCurve

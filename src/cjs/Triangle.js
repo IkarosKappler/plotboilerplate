@@ -20,7 +20,9 @@
  * @modified  2020-12-28 Added the `getArea` function.
  * @modified  2021-01-20 Added UID.
  * @modified  2021-01-22 Always updating circumcircle when retieving it.
- * @version   2.5.1
+ * @modified  2022-02-02 Added the `destroy` method.
+ * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version   2.6.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -90,7 +92,6 @@ var Triangle = /** @class */ (function () {
             throw "Cannot create triangle from array with less than three vertices (" + arr.length + ")";
         return new Triangle(arr[0], arr[1], arr[2]);
     };
-    ;
     /**
      * Get the area of this triangle. The returned area is never negative.
      *
@@ -106,7 +107,6 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.getArea = function () {
         return Math.abs(Triangle.utils.signedArea(this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y));
     };
-    ;
     /**
      * Get the centroid of this triangle.
      *
@@ -120,7 +120,6 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.getCentroid = function () {
         return new Vertex_1.Vertex((this.a.x + this.b.x + this.c.x) / 3, (this.a.y + this.b.y + this.c.y) / 3);
     };
-    ;
     /**
      * Scale the triangle towards its centroid.
      *
@@ -137,7 +136,6 @@ var Triangle = /** @class */ (function () {
         this.c.scale(factor, centroid);
         return this;
     };
-    ;
     /**
      * Get the circumcircle of this triangle.
      *
@@ -154,11 +152,10 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      */
     Triangle.prototype.getCircumcircle = function () {
-        // if( !this.center || !this.radius ) 
+        // if( !this.center || !this.radius )
         this.calcCircumcircle();
         return new Circle_1.Circle(this.center.clone(), this.radius);
     };
-    ;
     /**
      * Check if this triangle and the passed triangle share an
      * adjacent edge.
@@ -178,7 +175,6 @@ var Triangle = /** @class */ (function () {
         var c = this.c.equals(tri.a) || this.c.equals(tri.b) || this.c.equals(tri.c);
         return (a && b) || (a && c) || (b && c);
     };
-    ;
     /**
      * Get that vertex of this triangle (a,b,c) that is not vert1 nor vert2 of
      * the passed two.
@@ -191,14 +187,13 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      */
     Triangle.prototype.getThirdVertex = function (vert1, vert2) {
-        if (this.a.equals(vert1) && this.b.equals(vert2) || this.a.equals(vert2) && this.b.equals(vert1))
+        if ((this.a.equals(vert1) && this.b.equals(vert2)) || (this.a.equals(vert2) && this.b.equals(vert1)))
             return this.c;
-        if (this.b.equals(vert1) && this.c.equals(vert2) || this.b.equals(vert2) && this.c.equals(vert1))
+        if ((this.b.equals(vert1) && this.c.equals(vert2)) || (this.b.equals(vert2) && this.c.equals(vert1)))
             return this.a;
         //if( this.c.equals(vert1) && this.a.equals(vert2) || this.c.equals(vert2) && this.a.equals(vert1) )
         return this.b;
     };
-    ;
     /**
      * Re-compute the circumcircle of this triangle (if the vertices
      * have changed).
@@ -238,8 +233,7 @@ var Triangle = /** @class */ (function () {
         }
         this.radius_squared = dx * dx + dy * dy;
         this.radius = Math.sqrt(this.radius_squared);
-    };
-    ; // END calcCircumcircle
+    }; // END calcCircumcircle
     /**
      * Check if the passed vertex is inside this triangle's
      * circumcircle.
@@ -254,9 +248,8 @@ var Triangle = /** @class */ (function () {
         var dx = this.center.x - v.x;
         var dy = this.center.y - v.y;
         var dist_squared = dx * dx + dy * dy;
-        return (dist_squared <= this.radius_squared);
+        return dist_squared <= this.radius_squared;
     };
-    ;
     /**
      * Get the rectangular bounds for this triangle.
      *
@@ -268,7 +261,6 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.bounds = function () {
         return new Bounds_1.Bounds(new Vertex_1.Vertex(Triangle.utils.min3(this.a.x, this.b.x, this.c.x), Triangle.utils.min3(this.a.y, this.b.y, this.c.y)), new Vertex_1.Vertex(Triangle.utils.max3(this.a.x, this.b.x, this.c.x), Triangle.utils.max3(this.a.y, this.b.y, this.c.y)));
     };
-    ;
     /**
      * Convert this triangle to a polygon instance.
      *
@@ -282,7 +274,6 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.toPolygon = function () {
         return new Polygon_1.Polygon([this.a, this.b, this.c]);
     };
-    ;
     /**
      * Get the determinant of this triangle.
      *
@@ -295,7 +286,6 @@ var Triangle = /** @class */ (function () {
         // (b.y - a.y)*(c.x - b.x) - (c.y - b.y)*(b.x - a.x);
         return (this.b.y - this.a.y) * (this.c.x - this.b.x) - (this.c.y - this.b.y) * (this.b.x - this.a.x);
     };
-    ;
     /**
      * Checks if the passed vertex (p) is inside this triangle.
      *
@@ -310,7 +300,6 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.containsPoint = function (p) {
         return Triangle.utils.pointIsInTriangle(p.x, p.y, this.a.x, this.a.y, this.b.x, this.b.y, this.c.x, this.c.y);
     };
-    ;
     /**
      * Get that inner triangle which defines the maximal incircle.
      *
@@ -329,7 +318,6 @@ var Triangle = /** @class */ (function () {
         var circleIntersC = lineC.getClosestPoint(intersection);
         return new Triangle(circleIntersA, circleIntersB, circleIntersC);
     };
-    ;
     /**
      * Get the incircle of this triangle. That is the circle that touches each side
      * of this triangle in exactly one point.
@@ -341,7 +329,6 @@ var Triangle = /** @class */ (function () {
     Triangle.prototype.getIncircle = function () {
         return this.getIncircularTriangle().getCircumcircle();
     };
-    ;
     /**
      * Get the incenter of this triangle (which is the center of the circumcircle).
      *
@@ -355,7 +342,6 @@ var Triangle = /** @class */ (function () {
             this.calcCircumcircle();
         return this.center.clone();
     };
-    ;
     /**
      * Converts this triangle into a human-readable string.
      *
@@ -365,9 +351,8 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      */
     Triangle.prototype.toString = function () {
-        return '{ a : ' + this.a.toString() + ', b : ' + this.b.toString() + ', c : ' + this.c.toString() + '}';
+        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + ", c : " + this.c.toString() + "}";
     };
-    ;
     /**
      * Create an SVG representation of this triangle.
      *
@@ -379,32 +364,43 @@ var Triangle = /** @class */ (function () {
      * @memberof Triangle
      **/
     Triangle.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<path');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' d="');
-        var vertices = [this.a, this.b, this.c];
-        if (vertices.length > 0) {
-            buffer.push('M ');
-            buffer.push(vertices[0].x);
-            buffer.push(' ');
-            buffer.push(vertices[0].y);
-            for (var i = 1; i < vertices.length; i++) {
-                buffer.push(' L ');
-                buffer.push(vertices[i].x);
-                buffer.push(' ');
-                buffer.push(vertices[i].y);
-            }
-            //if( !this.isOpen ) {
-            buffer.push(' Z');
-            //}
-        }
-        buffer.push('" />');
-        return buffer.join('');
+        // options = options || {};
+        // var buffer = [];
+        // buffer.push("<path");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // buffer.push(' d="');
+        // var vertices = [this.a, this.b, this.c];
+        // if (vertices.length > 0) {
+        //   buffer.push("M ");
+        //   buffer.push(vertices[0].x);
+        //   buffer.push(" ");
+        //   buffer.push(vertices[0].y);
+        //   for (var i = 1; i < vertices.length; i++) {
+        //     buffer.push(" L ");
+        //     buffer.push(vertices[i].x);
+        //     buffer.push(" ");
+        //     buffer.push(vertices[i].y);
+        //   }
+        //   //if( !this.isOpen ) {
+        //   buffer.push(" Z");
+        //   //}
+        // }
+        // buffer.push('" />');
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the Triangle.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
     };
-    ;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    Triangle.prototype.destroy = function () {
+        this.a.destroy();
+        this.b.destroy();
+        this.c.destroy();
+        this.isDestroyed = true;
+    };
     /**
      * An epsilon for comparison.
      * This should be the same epsilon as in Vertex.
@@ -415,10 +411,10 @@ var Triangle = /** @class */ (function () {
     Triangle.utils = {
         // Used in the bounds() function.
         max3: function (a, b, c) {
-            return (a >= b && a >= c) ? a : (b >= a && b >= c) ? b : c;
+            return a >= b && a >= c ? a : b >= a && b >= c ? b : c;
         },
         min3: function (a, b, c) {
-            return (a <= b && a <= c) ? a : (b <= a && b <= c) ? b : c;
+            return a <= b && a <= c ? a : b <= a && b <= c ? b : c;
         },
         signedArea: function (p0x, p0y, p1x, p1y, p2x, p2y) {
             return 0.5 * (-p1y * p2x + p0y * (-p1x + p2x) + p0x * (p1y - p2y) + p1x * p2y);
@@ -434,9 +430,9 @@ var Triangle = /** @class */ (function () {
             //   http://stackoverflow.com/questions/2049582/how-to-determine-a-point-in-a-2d-triangle
             // var area : number = 1/2*(-p1y*p2x + p0y*(-p1x + p2x) + p0x*(p1y - p2y) + p1x*p2y);
             var area = Triangle.utils.signedArea(p0x, p0y, p1x, p1y, p2x, p2y);
-            var s = 1 / (2 * area) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
-            var t = 1 / (2 * area) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
-            return s > 0 && t > 0 && (1 - s - t) > 0;
+            var s = (1 / (2 * area)) * (p0y * p2x - p0x * p2y + (p2y - p0y) * px + (p0x - p2x) * py);
+            var t = (1 / (2 * area)) * (p0x * p1y - p0y * p1x + (p0y - p1y) * px + (p1x - p0x) * py);
+            return s > 0 && t > 0 && 1 - s - t > 0;
         }
     };
     return Triangle;

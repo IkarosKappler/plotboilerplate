@@ -8,7 +8,9 @@
  * @modified 2020-09-07 Changed the vertAt function by switching sin and cos! The old version did not return the correct vertex (by angle) accoring to the assumed circle math.
  * @modified 2020-10-16 Added the containsCircle(...) function.
  * @modified 2021-01-20 Added UID.
- * @version  1.2.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version  1.3.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Circle = void 0;
@@ -45,7 +47,6 @@ var Circle = /** @class */ (function () {
         this.center = center;
         this.radius = radius;
     }
-    ;
     /**
      * Check if the given circle is fully contained inside this circle.
      *
@@ -58,7 +59,6 @@ var Circle = /** @class */ (function () {
     Circle.prototype.containsCircle = function (circle) {
         return this.center.distance(circle.center) + circle.radius < this.radius;
     };
-    ;
     /**
      * Calculate the distance from this circle to the given line.
      *
@@ -77,7 +77,6 @@ var Circle = /** @class */ (function () {
         var closestPointOnLine = line.getClosestPoint(this.center);
         return closestPointOnLine.distance(this.center) - this.radius;
     };
-    ;
     /**
      * Get the vertex on the this circle for the given angle.
      *
@@ -91,7 +90,6 @@ var Circle = /** @class */ (function () {
         // Find the point on the circle respective the angle. Then move relative to center.
         return Circle.circleUtils.vertAt(angle, this.radius).add(this.center);
     };
-    ;
     /**
      * Get a tangent line of this circle for a given angle.
      *
@@ -108,7 +106,6 @@ var Circle = /** @class */ (function () {
         // Construct the perpendicular of the line in point a. Then move relative to center.
         return new Vector_1.Vector(pointA, new Vertex_1.Vertex(0, 0)).add(this.center).perp();
     };
-    ;
     /**
      * Calculate the intersection points (if exists) with the given circle.
      *
@@ -148,47 +145,55 @@ var Circle = /** @class */ (function () {
         //    x4 = P2.x - h*(P1.y - P0.y)/d;
         //    y4 = P2.y + h*(P1.x - P0.x)/d;
         //    return pair<Point, Point>(Point(x3, y3), Point(x4, y4));
-        // } 
+        // }
         var p0 = this.center;
         var p1 = circle.center;
         var d = p0.distance(p1);
         var a = (this.radius * this.radius - circle.radius * circle.radius + d * d) / (2 * d);
         var h = Math.sqrt(this.radius * this.radius - a * a);
         var p2 = p1.clone().scale(a / d, p0);
-        var x3 = p2.x + h * (p1.y - p0.y) / d;
-        var y3 = p2.y - h * (p1.x - p0.x) / d;
-        var x4 = p2.x - h * (p1.y - p0.y) / d;
-        var y4 = p2.y + h * (p1.x - p0.x) / d;
+        var x3 = p2.x + (h * (p1.y - p0.y)) / d;
+        var y3 = p2.y - (h * (p1.x - p0.x)) / d;
+        var x4 = p2.x - (h * (p1.y - p0.y)) / d;
+        var y4 = p2.y + (h * (p1.x - p0.x)) / d;
         return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
     };
-    ;
     /**
-      * Create an SVG representation of this circle.
-      *
-      * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-      * @method toSVGString
-      * @param {object=} options - An optional set of options, like 'className'.
-      * @return {string} A string representing the SVG code for this vertex.
-      * @instance
-      * @memberof Circle
-      */
+     * Create an SVG representation of this circle.
+     *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Circle
+     */
     Circle.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<circle');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' cx="' + this.center.x + '"');
-        buffer.push(' cy="' + this.center.y + '"');
-        buffer.push(' r="' + this.radius + '"');
-        buffer.push(' />');
-        return buffer.join('');
+        // options = options || {};
+        // var buffer: Array<string> = [];
+        // buffer.push("<circle");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // buffer.push(' cx="' + this.center.x + '"');
+        // buffer.push(' cy="' + this.center.y + '"');
+        // buffer.push(' r="' + this.radius + '"');
+        // buffer.push(" />");
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the Circle.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
     };
-    ;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    Circle.prototype.destroy = function () {
+        this.center.destroy();
+        this.isDestroyed = true;
+    };
     Circle.circleUtils = {
         vertAt: function (angle, radius) {
             /* return new Vertex( Math.sin(angle) * radius,
-                       Math.cos(angle) * radius ); */
+                         Math.cos(angle) * radius ); */
             return new Vertex_1.Vertex(Math.cos(angle) * radius, Math.sin(angle) * radius);
         }
     };

@@ -20,7 +20,10 @@
  * @modified 2020-07-24 Added the getClosestT(Vertex) function.
  * @modified 2020-12-29 Constructor is now private (no explicit use intended).
  * @modified 2021-05-25 Added BezierPath.fromReducedList( Array<number> ).
- * @version 2.3.1
+ * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version 2.5.0
  *
  * @file BezierPath
  * @public
@@ -87,6 +90,13 @@ export declare class BezierPath implements SVGSerializable {
      * @instance
      */
     bezierCurves: Array<CubicBezierCurve>;
+    /**
+     * @member {boolean}
+     * @memberof BezierPath
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /** @constant {number} */
     static START_POINT: number;
     /** @constant {number} */
@@ -471,6 +481,22 @@ export declare class BezierPath implements SVGSerializable {
      **/
     getBounds(): Bounds;
     /**
+     * Get n 'equally' distributed vertices along this Bézier path.
+     *
+     * As the changing curvature of the B slines makes prediction of distances difficult, the
+     * returned vertices' distances are only relatively equal:
+     *  - the distance grows where curvature is large.
+     *  - the distance shrinks where curvature is small.
+     *
+     * Only the distance mean of all consecutive is 1/n-th of the total arc length.
+     *
+     * Usually this approximation is good enough for most use cases.
+     *
+     * @param {number} pointCount - (must be at least 2) The number of desired points (start and end point included).
+     * @return {Array<Vertex>}
+     */
+    getEvenDistributionVertices(pointCount: number): Array<Vertex>;
+    /**
      * Clone this BezierPath (deep clone).
      *
      * @method clone
@@ -503,6 +529,12 @@ export declare class BezierPath implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     }): string;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     /**
      * Create a JSON string representation of this bézier curve.
      *

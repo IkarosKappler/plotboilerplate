@@ -38,27 +38,42 @@ var CircleSector = /** @class */ (function () {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
-    ;
     /**
-      * Create an SVG representation of this circle.
-      *
-      * @method toSVGString
-      * @param {object=} options - An optional set of options, like 'className'.
-      * @return {string} A string representing the SVG code for this vertex.
-      * @instance
-      * @memberof Circle
-      */
+     * Create an SVG representation of this circle.
+     *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Circle
+     */
     CircleSector.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<path ');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        var data = CircleSector.circleSectorUtils.describeSVGArc(this.circle.center.x, this.circle.center.y, this.circle.radius, this.startAngle, this.endAngle);
-        buffer.push(' d="' + data.join(" ") + '" />');
-        return buffer.join('');
+        // options = options || {};
+        // var buffer: Array<string> = [];
+        // buffer.push("<path ");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // const data: SVGPathParams = CircleSector.circleSectorUtils.describeSVGArc(
+        //   this.circle.center.x,
+        //   this.circle.center.y,
+        //   this.circle.radius,
+        //   this.startAngle,
+        //   this.endAngle
+        // );
+        // buffer.push(' d="' + data.join(" ") + '" />');
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the CircleSector.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
     };
-    ;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    CircleSector.prototype.destroy = function () {
+        this.circle.destroy();
+        this.isDestroyed = true;
+    };
     CircleSector.circleSectorUtils = {
         /**
          * Helper function to convert polar circle coordinates to cartesian coordinates.
@@ -66,11 +81,11 @@ var CircleSector = /** @class */ (function () {
          * TODO: generalize for ellipses (two radii).
          *
          * @param {number} angle - The angle in radians.
-        */
+         */
         polarToCartesian: function (centerX, centerY, radius, angle) {
             return {
-                x: centerX + (radius * Math.cos(angle)),
-                y: centerY + (radius * Math.sin(angle))
+                x: centerX + radius * Math.cos(angle),
+                y: centerY + radius * Math.sin(angle)
             };
         },
         /**
@@ -83,7 +98,7 @@ var CircleSector = /** @class */ (function () {
          * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
          */
         describeSVGArc: function (x, y, radius, startAngle, endAngle, options) {
-            if (typeof options === 'undefined')
+            if (typeof options === "undefined")
                 options = { moveToStart: true };
             var end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
             var start = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
@@ -108,7 +123,7 @@ var CircleSector = /** @class */ (function () {
             }
             var pathData = [];
             if (options.moveToStart) {
-                pathData.push('M', start.x, start.y);
+                pathData.push("M", start.x, start.y);
             }
             pathData.push("A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y);
             return pathData;

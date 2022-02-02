@@ -121,41 +121,41 @@ export class MouseHandler {
         // | drag offset, ...) to the callbacks.
         // +-------------------------------------------------
         const _self = this;
-        this.handlers['mousemove'] = (e) => {
+        this.handlers["mousemove"] = (e) => {
             if (_self.listeners.mousemove)
-                _self.listeners.mousemove(_self.mkParams(e, 'mousemove'));
+                _self.listeners.mousemove(_self.mkParams(e, "mousemove"));
             if (_self.mouseDragPos && _self.listeners.drag)
-                _self.listeners.drag(_self.mkParams(e, 'drag'));
+                _self.listeners.drag(_self.mkParams(e, "drag"));
             if (_self.mouseDownPos)
                 _self.mouseDragPos = _self.relPos(e);
         };
-        this.handlers['mouseup'] = (e) => {
+        this.handlers["mouseup"] = (e) => {
             if (_self.listeners.mouseup)
-                _self.listeners.mouseup(_self.mkParams(e, 'mouseup'));
+                _self.listeners.mouseup(_self.mkParams(e, "mouseup"));
             _self.mouseDragPos = undefined;
             _self.mouseDownPos = undefined;
             _self.mouseButton = -1;
         };
-        this.handlers['mousedown'] = (e) => {
+        this.handlers["mousedown"] = (e) => {
             _self.mouseDragPos = _self.relPos(e);
             _self.mouseDownPos = _self.relPos(e);
             _self.mouseButton = e.button;
             if (_self.listeners.mousedown)
-                _self.listeners.mousedown(_self.mkParams(e, 'mousedown'));
+                _self.listeners.mousedown(_self.mkParams(e, "mousedown"));
         };
-        this.handlers['click'] = (e) => {
+        this.handlers["click"] = (e) => {
             if (_self.listeners.click)
-                _self.listeners.click(_self.mkParams(e, 'click'));
+                _self.listeners.click(_self.mkParams(e, "click"));
         };
-        this.handlers['wheel'] = (e) => {
+        this.handlers["wheel"] = (e) => {
             if (_self.listeners.wheel)
-                _self.listeners.wheel(_self.mkParams(e, 'wheel'));
+                _self.listeners.wheel(_self.mkParams(e, "wheel"));
         };
-        this.element.addEventListener('mousemove', this.handlers['mousemove']);
-        this.element.addEventListener('mouseup', this.handlers['mouseup']);
-        this.element.addEventListener('mousedown', this.handlers['mousedown']);
-        this.element.addEventListener('click', this.handlers['click']);
-        this.element.addEventListener('wheel', this.handlers['wheel']);
+        this.element.addEventListener("mousemove", this.handlers["mousemove"]);
+        this.element.addEventListener("mouseup", this.handlers["mouseup"]);
+        this.element.addEventListener("mousedown", this.handlers["mousedown"]);
+        this.element.addEventListener("click", this.handlers["click"]);
+        this.element.addEventListener("wheel", this.handlers["wheel"]);
     }
     /**
      * Get relative position from the given MouseEvent.
@@ -168,11 +168,8 @@ export class MouseHandler {
      * @return {XYCoords} The relative mouse coordinates.
      */
     relPos(e) {
-        return { x: e.offsetX,
-            y: e.offsetY
-        };
+        return { x: e.offsetX, y: e.offsetY };
     }
-    ;
     /**
      * Build the extended event params.
      *
@@ -198,8 +195,8 @@ export class MouseHandler {
             rightButton: this.mouseButton == 2,
             mouseDownPos: this.mouseDownPos,
             draggedFrom: this.mouseDragPos,
-            wasDragged: (this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y)),
-            dragAmount: (this.mouseDownPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 })
+            wasDragged: this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y),
+            dragAmount: this.mouseDownPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 }
         };
         return xEvent;
     }
@@ -250,14 +247,13 @@ export class MouseHandler {
      */
     drag(callback) {
         if (this.listeners.drag)
-            this.throwAlreadyInstalled('drag');
+            this.throwAlreadyInstalled("drag");
         this.listeners.drag = callback;
-        this.listenFor('mousedown');
-        this.listenFor('mousemove');
-        this.listenFor('mouseup');
+        this.listenFor("mousedown");
+        this.listenFor("mousemove");
+        this.listenFor("mouseup");
         return this;
     }
-    ;
     /**
      * Installer function to listen for a specific event: mouse-move.
      * Pass your callbacks here.
@@ -272,12 +268,11 @@ export class MouseHandler {
      */
     move(callback) {
         if (this.listeners.mousemove)
-            this.throwAlreadyInstalled('mousemove');
-        this.listenFor('mousemove');
+            this.throwAlreadyInstalled("mousemove");
+        this.listenFor("mousemove");
         this.listeners.mousemove = callback;
         return this;
     }
-    ;
     /**
      * Installer function to listen for a specific event: mouse-up.
      * Pass your callbacks here.
@@ -292,12 +287,11 @@ export class MouseHandler {
      */
     up(callback) {
         if (this.listeners.mouseup)
-            this.throwAlreadyInstalled('mouseup');
-        this.listenFor('mouseup');
+            this.throwAlreadyInstalled("mouseup");
+        this.listenFor("mouseup");
         this.listeners.mouseup = callback;
         return this;
     }
-    ;
     /**
      * Installer function to listen for a specific event: mouse-down.
      * Pass your callbacks here.
@@ -312,12 +306,11 @@ export class MouseHandler {
      */
     down(callback) {
         if (this.listeners.mousedown)
-            this.throwAlreadyInstalled('mousedown');
-        this.listenFor('mousedown');
+            this.throwAlreadyInstalled("mousedown");
+        this.listenFor("mousedown");
         this.listeners.mousedown = callback;
         return this;
     }
-    ;
     /**
      * Installer function to listen for a specific event: mouse-click.
      * Pass your callbacks here.
@@ -332,12 +325,11 @@ export class MouseHandler {
      */
     click(callback) {
         if (this.listeners.click)
-            this.throwAlreadyInstalled('click');
-        this.listenFor('click');
+            this.throwAlreadyInstalled("click");
+        this.listenFor("click");
         this.listeners.click = callback;
         return this;
     }
-    ;
     /**
      * Installer function to listen for a specific event: mouse-wheel.
      * Pass your callbacks here.
@@ -352,12 +344,11 @@ export class MouseHandler {
      */
     wheel(callback) {
         if (this.listeners.wheel)
-            this.throwAlreadyInstalled('wheel');
-        this.listenFor('wheel');
+            this.throwAlreadyInstalled("wheel");
+        this.listenFor("wheel");
         this.listeners.wheel = callback;
         return this;
     }
-    ;
     /**
      * An internal function to throw events.
      *
@@ -371,7 +362,6 @@ export class MouseHandler {
     throwAlreadyInstalled(name) {
         throw `This MouseHandler already has a '${name}' callback. To keep the code simple there is only room for one.`;
     }
-    ;
     /**
      * Call this when your work is done.
      *
@@ -384,16 +374,16 @@ export class MouseHandler {
      * @return {void}
      */
     destroy() {
-        this.unlistenFor('mousedown');
-        this.unlistenFor('mousemove');
-        this.unlistenFor('moseup');
-        this.unlistenFor('click');
-        this.unlistenFor('wheel');
-        this.element.removeEventListener('mousemove', this.handlers['mousemove']);
-        this.element.removeEventListener('mouseup', this.handlers['mousedown']);
-        this.element.removeEventListener('mousedown', this.handlers['mousedown']);
-        this.element.removeEventListener('click', this.handlers['click']);
-        this.element.removeEventListener('wheel', this.handlers['wheel']);
+        this.unlistenFor("mousedown");
+        this.unlistenFor("mousemove");
+        this.unlistenFor("moseup");
+        this.unlistenFor("click");
+        this.unlistenFor("wheel");
+        this.element.removeEventListener("mousemove", this.handlers["mousemove"]);
+        this.element.removeEventListener("mouseup", this.handlers["mousedown"]);
+        this.element.removeEventListener("mousedown", this.handlers["mousedown"]);
+        this.element.removeEventListener("click", this.handlers["click"]);
+        this.element.removeEventListener("wheel", this.handlers["wheel"]);
     }
 }
 //# sourceMappingURL=MouseHandler.js.map

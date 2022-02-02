@@ -19,7 +19,9 @@
  * @modified  2020-12-28 Added the `getArea` function.
  * @modified  2021-01-20 Added UID.
  * @modified  2021-01-22 Always updating circumcircle when retieving it.
- * @version   2.5.1
+ * @modified  2022-02-02 Added the `destroy` method.
+ * @modified  2022-02-02 Cleared the `Triangle.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version   2.6.0
  *
  * @file Triangle
  * @fileoverview A simple triangle class: three vertices.
@@ -107,6 +109,13 @@ export declare class Triangle implements SVGSerializable {
      * @private
      */
     private radius;
+    /**
+     * @member isDestroyed
+     * @memberof Triangle
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /**
      * The constructor.
      *
@@ -317,5 +326,11 @@ export declare class Triangle implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     }): string;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     private static utils;
 }

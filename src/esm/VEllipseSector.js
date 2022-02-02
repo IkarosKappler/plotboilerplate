@@ -4,7 +4,8 @@
  *
  * @author  Ikaros Kappler
  * @date    2021-02-26
- * @version 1.0.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version 1.1.0
  */
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { geomutils } from "./geomutils";
@@ -95,6 +96,15 @@ export class VEllipseSector {
             curAngle = nextAngle;
         }
         return curves;
+    }
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.ellipse.destroy();
+        this.isDestroyed = true;
     }
 }
 VEllipseSector.ellipseSectorUtils = {

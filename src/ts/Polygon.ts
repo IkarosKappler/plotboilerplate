@@ -21,7 +21,9 @@
  * @modified 2021-01-29 Changed the param type for `containsVert` from Vertex to XYCoords.
  * @modified 2021-12-14 Added the `perimeter()` function.
  * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
- * @version 1.8.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version 1.9.0
  *
  * @file Polygon
  * @public
@@ -75,6 +77,14 @@ export class Polygon implements SVGSerializable {
    * @instance
    */
   isOpen: boolean;
+
+  /**
+   * @member isDestroyed
+   * @memberof Polygon
+   * @type {boolean}
+   * @instance
+   */
+  isDestroyed: boolean;
 
   /**
    * The constructor.
@@ -480,28 +490,44 @@ export class Polygon implements SVGSerializable {
    * @memberof Polygon
    **/
   toSVGString(options: { className?: string } | undefined): string {
-    options = options || {};
-    var buffer: Array<string> = [];
-    buffer.push("<path");
-    if (options.className) buffer.push(' class="' + options.className + '"');
-    buffer.push(' d="');
-    if (this.vertices.length > 0) {
-      buffer.push("M ");
-      buffer.push(this.vertices[0].x.toString());
-      buffer.push(" ");
-      buffer.push(this.vertices[0].y.toString());
-      for (var i = 1; i < this.vertices.length; i++) {
-        buffer.push(" L ");
-        buffer.push(this.vertices[i].x.toString());
-        buffer.push(" ");
-        buffer.push(this.vertices[i].y.toString());
-      }
-      if (!this.isOpen) {
-        buffer.push(" Z");
-      }
+    // options = options || {};
+    // var buffer: Array<string> = [];
+    // buffer.push("<path");
+    // if (options.className) buffer.push(' class="' + options.className + '"');
+    // buffer.push(' d="');
+    // if (this.vertices.length > 0) {
+    //   buffer.push("M ");
+    //   buffer.push(this.vertices[0].x.toString());
+    //   buffer.push(" ");
+    //   buffer.push(this.vertices[0].y.toString());
+    //   for (var i = 1; i < this.vertices.length; i++) {
+    //     buffer.push(" L ");
+    //     buffer.push(this.vertices[i].x.toString());
+    //     buffer.push(" ");
+    //     buffer.push(this.vertices[i].y.toString());
+    //   }
+    //   if (!this.isOpen) {
+    //     buffer.push(" Z");
+    //   }
+    // }
+    // buffer.push('" />');
+    // return buffer.join("");
+    console.warn(
+      "[Deprecation] Warning: the Polygon.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
+    );
+    return "";
+  }
+
+  /**
+   * This function should invalidate any installed listeners and invalidate this object.
+   * After calling this function the object might not hold valid data any more and
+   * should not be used.
+   */
+  destroy() {
+    for (var i = 0; i < this.vertices.length; i++) {
+      this.vertices[i].destroy();
     }
-    buffer.push('" />');
-    return buffer.join("");
+    this.isDestroyed = true;
   }
 
   static utils = {

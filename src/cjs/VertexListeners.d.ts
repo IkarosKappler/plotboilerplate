@@ -136,14 +136,14 @@ export declare class VertexListeners {
      * @param {Event} e - The (extended) drag event.
      */
     /**
-    * Remove a drag listener.
-    *
-    * @method removeDragEndListener
-    * @param {VertexListeners~clickListener} listener - The drag listener to remove (a callback).
-    * @return {VertexListeners} this (for chaining)
-    * @instance
-    * @memberof VertexListeners
-    **/
+     * Remove a drag listener.
+     *
+     * @method removeDragEndListener
+     * @param {VertexListeners~clickListener} listener - The drag listener to remove (a callback).
+     * @return {VertexListeners} this (for chaining)
+     * @instance
+     * @memberof VertexListeners
+     **/
     removeDragEndListener(listener: (e: VertEvent) => void): VertexListeners;
     /**
      * Fire a click event with the given event instance to all
@@ -189,6 +189,10 @@ export declare class VertexListeners {
      * @memberof VertexListeners
      **/
     fireDragEndEvent(e: VertEvent | XMouseEvent): void;
+    /**
+     * Removes all listeners from this listeners object.
+     */
+    removeAllListeners(): void;
     /**
      * @private
      **/

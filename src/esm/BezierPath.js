@@ -20,7 +20,10 @@
  * @modified 2020-07-24 Added the getClosestT(Vertex) function.
  * @modified 2020-12-29 Constructor is now private (no explicit use intended).
  * @modified 2021-05-25 Added BezierPath.fromReducedList( Array<number> ).
- * @version 2.3.1
+ * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version 2.5.0
  *
  * @file BezierPath
  * @public
@@ -916,6 +919,59 @@ export class BezierPath {
         return new Bounds(min, max);
     }
     /**
+     * Get n 'equally' distributed vertices along this Bézier path.
+     *
+     * As the changing curvature of the B slines makes prediction of distances difficult, the
+     * returned vertices' distances are only relatively equal:
+     *  - the distance grows where curvature is large.
+     *  - the distance shrinks where curvature is small.
+     *
+     * Only the distance mean of all consecutive is 1/n-th of the total arc length.
+     *
+     * Usually this approximation is good enough for most use cases.
+     *
+     * @param {number} pointCount - (must be at least 2) The number of desired points (start and end point included).
+     * @return {Array<Vertex>}
+     */
+    getEvenDistributionVertices(pointCount) {
+        if (pointCount < 2) {
+            throw new Error("pointCount must be larger than one; is " + pointCount + ".");
+        }
+        const result = [];
+        if (this.bezierCurves.length === 0) {
+            return result;
+        }
+        // Fetch and add the start point from the source polygon
+        var polygonPoint = new Vertex(this.bezierCurves[0].startPoint);
+        result.push(polygonPoint);
+        // if (this.bezierCurves.length === 1) {
+        //   return result;
+        // }
+        const perimeter = this.totalArcLength;
+        const stepSize = perimeter / (pointCount - 1);
+        const n = this.bezierCurves.length;
+        let curveIndex = 0;
+        let segmentLength = this.bezierCurves[0].arcLength;
+        let curSegmentU = stepSize;
+        let i = 1;
+        while (i < pointCount && curveIndex < n) {
+            // Check if next eq point is inside this segment
+            if (curSegmentU < segmentLength) {
+                var newPoint = this.bezierCurves[curveIndex].getPoint(curSegmentU);
+                result.push(newPoint);
+                curSegmentU += stepSize;
+                i++;
+            }
+            else {
+                curveIndex++;
+                curSegmentU = curSegmentU - segmentLength;
+                segmentLength = curveIndex < n ? this.bezierCurves[curveIndex].arcLength : 0;
+            }
+        }
+        result.push(new Vertex(this.bezierCurves[n - 1].endPoint));
+        return result;
+    }
+    /**
      * Clone this BezierPath (deep clone).
      *
      * @method clone
@@ -972,19 +1028,30 @@ export class BezierPath {
      * @return {string} The SVG string.
      **/
     toSVGString(options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push("<path");
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' d="');
-        for (var c = 0; c < this.bezierCurves.length; c++) {
-            if (c > 0)
-                buffer.push(" ");
-            buffer.push(this.bezierCurves[c].toSVGPathData());
+        // options = options || {};
+        // var buffer: Array<string> = [];
+        // buffer.push("<path");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // buffer.push(' d="');
+        // for (var c = 0; c < this.bezierCurves.length; c++) {
+        //   if (c > 0) buffer.push(" ");
+        //   buffer.push(this.bezierCurves[c].toSVGPathData());
+        // }
+        // buffer.push('" />');
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the BezierPath.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
+    }
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        for (var i = 0; i < this.bezierCurves.length; i++) {
+            this.bezierCurves[i].destroy();
         }
-        buffer.push('" />');
-        return buffer.join("");
+        this.isDestroyed = true;
     }
     /**
      * Create a JSON string representation of this bézier curve.

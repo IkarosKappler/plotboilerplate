@@ -707,7 +707,7 @@ var PlotBoilerplate = /** @class */ (function () {
             }
         }
         for (var i = 0; i < this.drawables.length; i++) {
-            if (this.drawables[i] === drawable) {
+            if (this.drawables[i] === drawable || this.drawables[i].uid === drawable.uid) {
                 this.drawables.splice(i, 1);
                 if (removeWithVertices) {
                     // Check if some listeners need to be removed

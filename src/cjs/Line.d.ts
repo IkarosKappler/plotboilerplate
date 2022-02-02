@@ -12,7 +12,8 @@
  * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
- * @version  2.1.3
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version  2.2.0
  *
  * @file Line
  * @public

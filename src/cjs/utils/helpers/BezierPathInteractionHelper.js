@@ -72,6 +72,7 @@ var BezierPathInteractionHelper = /** @class */ (function () {
      * @param {function(number,BezierPath)} options.onPathRemoved (pathIndex,oldPath)
      **/
     function BezierPathInteractionHelper(pb, paths, options) {
+        var _this = this;
         options = options || {};
         this.pb = pb;
         this.paths = [];
@@ -99,8 +100,15 @@ var BezierPathInteractionHelper = /** @class */ (function () {
         for (var i = 0; i < paths.length; i++) {
             this.addPath(paths[i]);
         }
-        this._installMouseListener();
-        this._installTouchListener();
+        this._mouseEnterListener = function () {
+            _this.mouseIsOver = true;
+        };
+        this._mouseLeaveListener = function () {
+            _this.mouseIsOver = false;
+            _this._clearMoveEvent();
+        };
+        this._mouseHandler = this._installMouseListener();
+        this._touchHandler = this._installTouchListener();
         this._keyHandler = this._installKeyListener();
         // Paths might have changed by auto-adjustment.
         if (this.autoAdjustPaths)
@@ -172,6 +180,27 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     BezierPathInteractionHelper.prototype.update = function () {
         // Just re-run the calculation with the recent mouse/touch position
         this._handleMoveEvent(this.currentB.x, this.currentB.y);
+    };
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used any more.
+     *
+     * @method destroy
+     * @instance
+     * @memberof BezierPathInteractionHelper
+     * @return {void}
+     **/
+    BezierPathInteractionHelper.prototype.destroy = function () {
+        for (var i = 0; i < this.paths.length; i++) {
+            this._removeDefaultPathListeners(this.paths[i]);
+            // removePathVertexDragStartListeners(this.paths[i], listener);
+        }
+        this.paths = [];
+        this.pb.canvas.removeEventListener("mouseenter", this._mouseEnterListener);
+        this.pb.canvas.removeEventListener("mouseleave", this._mouseLeaveListener);
+        this._mouseHandler.destroy();
+        this._keyHandler.destroy();
     };
     // +---------------------------------------------------------------------------------
     // | A helper function to locate a given path instance inside the array.
@@ -256,6 +285,7 @@ var BezierPathInteractionHelper = /** @class */ (function () {
                 }
             }
             else {
+                // TODO: remove drag listener from removed vertex!
                 deletedVertIndices.push(i);
             }
         }
@@ -281,6 +311,7 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     BezierPathInteractionHelper.prototype._replacePathAt = function (pathIndex, newPath) {
         var oldPath = this.paths[pathIndex];
         this.pb.remove(oldPath, false, true); // Remove with vertices
+        oldPath.destroy();
         this._removeDefaultPathListeners(oldPath);
         BezierPathInteractionHelper.setPathAutoAdjust(newPath);
         this.paths[pathIndex] = newPath;
@@ -318,32 +349,34 @@ var BezierPathInteractionHelper = /** @class */ (function () {
         var _self = this;
         var afProps = {
             // Todo: which event types does AlloyFinger use?
-            touchStart: function (e) {
+            touchStart: function (_event) {
                 _self.mouseIsOver = true;
             },
-            touchMove: function (e) {
-                if (_self.pb.getDraggedElementCount() == 0 && e.touches.length > 0) {
+            touchMove: function (event) {
+                if (_self.pb.getDraggedElementCount() == 0 && event.touches.length > 0) {
                     // console.log('touchmove');
-                    _self._handleMoveEvent(e.touches[0].clientX, e.touches[0].clientY);
+                    _self._handleMoveEvent(event.touches[0].clientX, event.touches[0].clientY);
                 }
             },
-            touchEnd: function (e) {
+            touchEnd: function (_event) {
                 _self.mouseIsOver = false;
                 _self._clearMoveEvent();
             }
         };
         // new AlloyFinger(this.pb.canvas, afProps);
-        if (window["createAlloyFinger"])
-            window["createAlloyFinger"](this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.canvas, afProps);
-        else
-            new alloy_finger_1.AlloyFinger(this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.canvas, afProps);
+        if (window["createAlloyFinger"]) {
+            return window["createAlloyFinger"](this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.canvas, afProps);
+        }
+        else {
+            return new alloy_finger_1.AlloyFinger(this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.canvas, afProps);
+        }
     };
     // +---------------------------------------------------------------------------------
     // | Called once upon initialization.
     // +-------------------------------
     BezierPathInteractionHelper.prototype._installMouseListener = function () {
         var _self = this;
-        new MouseHandler_1.MouseHandler(this.pb.canvas)
+        var mouseHandler = new MouseHandler_1.MouseHandler(this.pb.canvas)
             .up(function (e) {
             if (e.params.wasDragged)
                 return;
@@ -388,13 +421,16 @@ var BezierPathInteractionHelper = /** @class */ (function () {
             _self.mouseIsOver = true;
             _self._handleMoveEvent(e.params.pos.x, e.params.pos.y);
         });
-        _self.pb.canvas.addEventListener("mouseenter", function () {
-            _self.mouseIsOver = true;
-        });
-        _self.pb.canvas.addEventListener("mouseleave", function () {
-            _self.mouseIsOver = false;
-            _self._clearMoveEvent();
-        });
+        // _self.pb.canvas.addEventListener("mouseenter", function () {
+        //   _self.mouseIsOver = true;
+        // });
+        // _self.pb.canvas.addEventListener("mouseleave", function () {
+        //   _self.mouseIsOver = false;
+        //   _self._clearMoveEvent();
+        // });
+        this.pb.canvas.addEventListener("mouseenter", this._mouseEnterListener);
+        this.pb.canvas.addEventListener("mouseleave", this._mouseLeaveListener);
+        return mouseHandler;
     };
     // +---------------------------------------------------------------------------------
     // | Called once upon initialization.
@@ -407,15 +443,6 @@ var BezierPathInteractionHelper = /** @class */ (function () {
             _self._handleDelete();
         });
     };
-    // +---------------------------------------------------------------------------------
-    // | Adds vertex listeners to all path points.
-    // |
-    // | @param {BezierPath} path - The path to add vertex listeners to.
-    // +-------------------------------
-    // TODO: THIS CAN BE REMOVED?
-    // private _addDefaultPathListeners( path:BezierPath ) : void {
-    //	BezierPathInteractionHelper.addPathVertexDragListeners( path, this._updateMinDistance );
-    // };
     // +---------------------------------------------------------------------------------
     // | Removes vertex listeners from all path points.
     // |

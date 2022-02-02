@@ -26,7 +26,10 @@
  * @modified 2021-12-01 Changed the type of param of `scale` to XYCoords.
  * @modified 2021-12-01 Added function `scaleXY` for non uniform scaling.
  * @modified 2021-12-17 Added the functions `lerp` and `lerpAbs` for linear interpolations.
- * @version  2.6.0
+ * @modified 2022-01-31 Added `Vertex.utils.arrayToJSON`.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version  2.7.0
  *
  * @file Vertex
  * @public
@@ -526,20 +529,31 @@ var Vertex = /** @class */ (function () {
      * @return {string} A string representing the SVG code for this vertex.
      * @instance
      * @memberof Vertex
+     * @deprecated
      **/
     Vertex.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push("<circle");
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' cx="' + this.x + '"');
-        buffer.push(' cy="' + this.y + '"');
-        buffer.push(' r="2"');
-        buffer.push(" />");
-        return buffer.join("");
+        // options = options || {};
+        // var buffer = [];
+        // buffer.push("<circle");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // buffer.push(' cx="' + this.x + '"');
+        // buffer.push(' cy="' + this.y + '"');
+        // buffer.push(' r="2"');
+        // buffer.push(" />");
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the Vertex.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
     };
     // END Vertex
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    Vertex.prototype.destroy = function () {
+        this.listeners.removeAllListeners();
+        this.isDestroyed = true;
+    };
     /**
      * Create a new random vertex inside the given viewport.
      *
@@ -593,6 +607,19 @@ var Vertex = /** @class */ (function () {
             vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
             vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
             return vertices;
+        },
+        /**
+         * Convert the given vertices (array) to a JSON string.
+         *
+         * @param {number?} precision - (optional) The numeric precision to be used (number of precision digits).
+         * @returns {string}
+         */
+        arrayToJSON: function (vertices, precision) {
+            return JSON.stringify(vertices.map(function (vert) {
+                return typeof precision === undefined
+                    ? { x: vert.x, y: vert.y }
+                    : { x: Number(vert.x.toFixed(precision)), y: Number(vert.y.toFixed(precision)) };
+            }));
         }
     };
     return Vertex;

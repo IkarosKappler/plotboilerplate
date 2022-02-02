@@ -37,10 +37,10 @@ export declare class CircleSector implements SVGSerializable {
      */
     circle: Circle;
     /**
-      * @member {number}
-      * @memberof CircleSector
-      * @instance
-      */
+     * @member {number}
+     * @memberof CircleSector
+     * @instance
+     */
     startAngle: number;
     /**
      * @member {number}
@@ -48,6 +48,13 @@ export declare class CircleSector implements SVGSerializable {
      * @instance
      */
     endAngle: number;
+    /**
+     * @member isDestroyed
+     * @memberof CircleSector
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /**
      * Create a new circle sector with given circle, start- and end-angle.
      *
@@ -59,17 +66,24 @@ export declare class CircleSector implements SVGSerializable {
      */
     constructor(circle: Circle, startAngle: number, endAngle: number);
     /**
-      * Create an SVG representation of this circle.
-      *
-      * @method toSVGString
-      * @param {object=} options - An optional set of options, like 'className'.
-      * @return {string} A string representing the SVG code for this vertex.
-      * @instance
-      * @memberof Circle
-      */
+     * Create an SVG representation of this circle.
+     *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Circle
+     */
     toSVGString(options: {
         className?: string;
     }): string;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     static circleSectorUtils: {
         /**
          * Helper function to convert polar circle coordinates to cartesian coordinates.
@@ -77,7 +91,7 @@ export declare class CircleSector implements SVGSerializable {
          * TODO: generalize for ellipses (two radii).
          *
          * @param {number} angle - The angle in radians.
-        */
+         */
         polarToCartesian: (centerX: number, centerY: number, radius: number, angle: number) => XYCoords;
         /**
          * Helper function to convert a circle section as SVG arc params (for the `d` attribute).
