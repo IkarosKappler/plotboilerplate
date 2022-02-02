@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2022-01-15
+date: 2022-02-02
 ---
 
 <h3>Basics</h3>
@@ -203,6 +203,16 @@ date: 2022-01-15
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/38-geometric-skeletonization/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220110-0-polygon-skeletonization.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/39-bezierpath-to-polygon/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/na.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/extended-vertexset/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200518-basic-vertex.png');"></div>
    </a>
 </div>
 </div>

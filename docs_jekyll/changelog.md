@@ -3,6 +3,30 @@ layout: page
 ---
 # Changelog
 
+- 2022-02-02
+  - Added the `BezierPath.destroy` method for releasing all installed event listeners.
+  - Added the `Circle.destroy` method for releasing all installed event listeners.
+  - Added the `CirclSector.destroy` method for releasing all installed event listeners.
+  - Added the `CubicBezierCurve.destroy` method for releasing all installed event listeners.
+  - Added the `KeyHandler.destroy` method for releasing all installed event listeners.
+  - Added the `Line.destroy` method for releasing all installed event listeners.
+  - Added the `MouseHandler.destroy` method for releasing all installed event listeners.
+  - Added the `PBImage.destroy` method for releasing all installed event listeners.
+  - Added the `PBText.destroy` method for releasing all installed event listeners.
+  - Added the `Polygon.destroy` method for releasing all installed event listeners.
+  - Added the `Triangle.destroy` method for releasing all installed event listeners.
+  - Added the `Vector.destroy` method for releasing all installed event listeners.
+  - Added the `VEllipse.destroy` method for releasing all installed event listeners.
+  - Added the `VEllipseSector.destroy` method for releasing all installed event listeners.
+  - Added the `Vertex.destroy` method for releasing all installed event listeners.
+  - Added the `VertTuple.destroy` method for releasing all installed event listeners.
+  - Added the `Vertex.destroy` method for releasing all installed event listeners.
+  - Removed the function body of `toSVGString` from all relevant drawable classes (deprecation). Use `drawutilssvg` instead.
+- 2022-01-31
+  - Added `Vertex.utils.arrayToJSON`.
+  - Added `BezierPath.getEvenDistributionVertices(number)`.
+  - Added the extende-vertices demo.
+  - Added `src/ts/io/FileDrop.ts`.
 - 2022-01-10
   - Added utility function `findInVertexArray`.
 - 2021-12-17
