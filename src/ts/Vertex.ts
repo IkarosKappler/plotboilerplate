@@ -26,7 +26,9 @@
  * @modified 2021-12-01 Added function `scaleXY` for non uniform scaling.
  * @modified 2021-12-17 Added the functions `lerp` and `lerpAbs` for linear interpolations.
  * @modified 2022-01-31 Added `Vertex.utils.arrayToJSON`.
- * @version  2.6.1
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version  2.7.0
  *
  * @file Vertex
  * @public
@@ -104,6 +106,14 @@ export class Vertex implements XYCoords, SVGSerializable {
    * @instance
    **/
   listeners: VertexListeners;
+
+  /**
+   * @member isDestroyed
+   * @memberof Vertex
+   * @type {boolean}
+   * @instance
+   */
+  isDestroyed: boolean;
 
   /**
    * The constructor for the vertex class.
@@ -573,19 +583,34 @@ export class Vertex implements XYCoords, SVGSerializable {
    * @return {string} A string representing the SVG code for this vertex.
    * @instance
    * @memberof Vertex
+   * @deprecated
    **/
   toSVGString(options: { className?: string }): string {
-    options = options || {};
-    var buffer = [];
-    buffer.push("<circle");
-    if (options.className) buffer.push(' class="' + options.className + '"');
-    buffer.push(' cx="' + this.x + '"');
-    buffer.push(' cy="' + this.y + '"');
-    buffer.push(' r="2"');
-    buffer.push(" />");
-    return buffer.join("");
+    // options = options || {};
+    // var buffer = [];
+    // buffer.push("<circle");
+    // if (options.className) buffer.push(' class="' + options.className + '"');
+    // buffer.push(' cx="' + this.x + '"');
+    // buffer.push(' cy="' + this.y + '"');
+    // buffer.push(' r="2"');
+    // buffer.push(" />");
+    // return buffer.join("");
+    console.warn(
+      "[Deprecation] Warning: the Vertex.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
+    );
+    return "";
   }
   // END Vertex
+
+  /**
+   * This function should invalidate any installed listeners and invalidate this object.
+   * After calling this function the object might not hold valid data any more and
+   * should not be used.
+   */
+  destroy() {
+    this.listeners.removeAllListeners();
+    this.isDestroyed = true;
+  }
 
   /**
    * Create a new random vertex inside the given viewport.

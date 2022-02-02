@@ -8,7 +8,8 @@
  * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
  * @modified 2021-01-20 Added UID.
- * @version 1.1.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version 1.2.0
  */
 import { Vertex } from "./Vertex";
 import { XYCoords, UID } from "./interfaces";
@@ -41,6 +42,13 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @instance
      */
     b: Vertex;
+    /**
+     * @member isDestroyed
+     * @memberof VertTuple
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /**
      * The factory is used by the `clone` method.
      */
@@ -231,6 +239,12 @@ export declare class VertTuple<T extends VertTuple<T>> {
      * @memberof VertTuple
      **/
     toString(): string;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     /**
      * @private
      **/

@@ -2,7 +2,8 @@
 /**
  * @author   Ikaros Kappler
  * @date     2021-11-16
- * @version  1.0.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version  1.1.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PBText = void 0;
@@ -59,6 +60,15 @@ var PBText = /** @class */ (function () {
     PBText.prototype.toSVGString = function (options) {
         console.warn("[PBText.toSVGString()] This function is not implemented as it defines a deprecated method. Use the 'drawutilssvg.text()' method instead.");
         return "";
+    };
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    PBText.prototype.destroy = function () {
+        this.anchor.destroy();
+        this.isDestroyed = true;
     };
     return PBText;
 }()); // END class

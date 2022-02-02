@@ -35,27 +35,42 @@ export class CircleSector {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
-    ;
     /**
-      * Create an SVG representation of this circle.
-      *
-      * @method toSVGString
-      * @param {object=} options - An optional set of options, like 'className'.
-      * @return {string} A string representing the SVG code for this vertex.
-      * @instance
-      * @memberof Circle
-      */
+     * Create an SVG representation of this circle.
+     *
+     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
+     * @method toSVGString
+     * @param {object=} options - An optional set of options, like 'className'.
+     * @return {string} A string representing the SVG code for this vertex.
+     * @instance
+     * @memberof Circle
+     */
     toSVGString(options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<path ');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        const data = CircleSector.circleSectorUtils.describeSVGArc(this.circle.center.x, this.circle.center.y, this.circle.radius, this.startAngle, this.endAngle);
-        buffer.push(' d="' + data.join(" ") + '" />');
-        return buffer.join('');
+        // options = options || {};
+        // var buffer: Array<string> = [];
+        // buffer.push("<path ");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // const data: SVGPathParams = CircleSector.circleSectorUtils.describeSVGArc(
+        //   this.circle.center.x,
+        //   this.circle.center.y,
+        //   this.circle.radius,
+        //   this.startAngle,
+        //   this.endAngle
+        // );
+        // buffer.push(' d="' + data.join(" ") + '" />');
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the CircleSector.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
     }
-    ;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.circle.destroy();
+        this.isDestroyed = true;
+    }
 } // END class
 CircleSector.circleSectorUtils = {
     /**
@@ -64,11 +79,11 @@ CircleSector.circleSectorUtils = {
      * TODO: generalize for ellipses (two radii).
      *
      * @param {number} angle - The angle in radians.
-    */
+     */
     polarToCartesian: (centerX, centerY, radius, angle) => {
         return {
-            x: centerX + (radius * Math.cos(angle)),
-            y: centerY + (radius * Math.sin(angle))
+            x: centerX + radius * Math.cos(angle),
+            y: centerY + radius * Math.sin(angle)
         };
     },
     /**
@@ -81,7 +96,7 @@ CircleSector.circleSectorUtils = {
      * @return [ 'A', radiusx, radiusy, rotation=0, largeArcFlag=1|0, sweepFlag=0, endx, endy ]
      */
     describeSVGArc: (x, y, radius, startAngle, endAngle, options) => {
-        if (typeof options === 'undefined')
+        if (typeof options === "undefined")
             options = { moveToStart: true };
         const end = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, endAngle);
         const start = CircleSector.circleSectorUtils.polarToCartesian(x, y, radius, startAngle);
@@ -106,7 +121,7 @@ CircleSector.circleSectorUtils = {
         }
         const pathData = [];
         if (options.moveToStart) {
-            pathData.push('M', start.x, start.y);
+            pathData.push("M", start.x, start.y);
         }
         pathData.push("A", radius, radius, 0, largeArcFlag, sweepFlag, end.x, end.y);
         return pathData;

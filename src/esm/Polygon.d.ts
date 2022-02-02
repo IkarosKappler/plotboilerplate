@@ -21,7 +21,9 @@
  * @modified 2021-01-29 Changed the param type for `containsVert` from Vertex to XYCoords.
  * @modified 2021-12-14 Added the `perimeter()` function.
  * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
- * @version 1.8.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version 1.9.0
  *
  * @file Polygon
  * @public
@@ -69,6 +71,13 @@ export declare class Polygon implements SVGSerializable {
      * @instance
      */
     isOpen: boolean;
+    /**
+     * @member isDestroyed
+     * @memberof Polygon
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /**
      * The constructor.
      *
@@ -277,6 +286,12 @@ export declare class Polygon implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     } | undefined): string;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     static utils: {
         /**
          * Calculate the area of the given polygon (unsigned).

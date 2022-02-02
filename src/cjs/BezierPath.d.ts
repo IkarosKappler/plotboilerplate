@@ -21,7 +21,9 @@
  * @modified 2020-12-29 Constructor is now private (no explicit use intended).
  * @modified 2021-05-25 Added BezierPath.fromReducedList( Array<number> ).
  * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
- * @version 2.4.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version 2.5.0
  *
  * @file BezierPath
  * @public
@@ -88,6 +90,13 @@ export declare class BezierPath implements SVGSerializable {
      * @instance
      */
     bezierCurves: Array<CubicBezierCurve>;
+    /**
+     * @member {boolean}
+     * @memberof BezierPath
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /** @constant {number} */
     static START_POINT: number;
     /** @constant {number} */
@@ -520,6 +529,12 @@ export declare class BezierPath implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     }): string;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     /**
      * Create a JSON string representation of this bézier curve.
      *

@@ -4,7 +4,8 @@
  *
  * @author  Ikaros Kappler
  * @date    2021-02-26
- * @version 1.0.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version 1.1.0
  */
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { SVGPathParams, UID } from "./interfaces";
@@ -53,6 +54,13 @@ export declare class VEllipseSector {
      */
     endAngle: number;
     /**
+     * @member isDestroyed
+     * @memberof VEllipseSector
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
+    /**
      * Create a new elliptic sector from the given ellipse and two angles.
      *
      * Note that the direction from start to end goes clockwise, and that start and end angle
@@ -74,6 +82,12 @@ export declare class VEllipseSector {
      * @return {Array<CubicBezierCurve>} An array of cubic Bézier curves representing the elliptic sector.
      */
     toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     static ellipseSectorUtils: {
         /**
          * Helper function to convert an elliptic section to SVG arc params (for the `d` attribute).

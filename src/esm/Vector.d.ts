@@ -9,7 +9,9 @@
  * @modified 2019-12-04 Added the Vector.inv() function.
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2021-01-20 Added UID.
- * @version  1.3.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version  1.4.0
  *
  * @file Vector
  * @public

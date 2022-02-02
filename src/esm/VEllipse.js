@@ -13,7 +13,9 @@
  * @modified 2021-03-10 Added the `toCubicBezier` method.
  * @modified 2021-03-15 Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
  * @modified 2021-03-19 Added the `VEllipse.rotate` function.
- * @version  1.2.2
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version  1.3.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -344,17 +346,28 @@ export class VEllipse {
      * @return string The SVG string
      */
     toSVGString(options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push("<ellipse");
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' cx="' + this.center.x + '"');
-        buffer.push(' cy="' + this.center.y + '"');
-        buffer.push(' rx="' + this.axis.x + '"');
-        buffer.push(' ry="' + this.axis.y + '"');
-        buffer.push(" />");
-        return buffer.join("");
+        // options = options || {};
+        // var buffer: Array<string> = [];
+        // buffer.push("<ellipse");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // buffer.push(' cx="' + this.center.x + '"');
+        // buffer.push(' cy="' + this.center.y + '"');
+        // buffer.push(' rx="' + this.axis.x + '"');
+        // buffer.push(' ry="' + this.axis.y + '"');
+        // buffer.push(" />");
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the VEllipse.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
+    }
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.center.destroy();
+        this.axis.destroy();
+        this.isDestroyed = true;
     }
 }
 /**

@@ -8,7 +8,8 @@
  * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
  * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
  * @modified 2021-01-20 Added UID.
- * @version 1.1.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version 1.2.0
  */
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
@@ -44,7 +45,6 @@ export class VertTuple {
     length() {
         return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
     }
-    ;
     /**
      * Set the length of this vector to the given amount. This only works if this
      * vector is not a null vector.
@@ -57,7 +57,6 @@ export class VertTuple {
     setLength(length) {
         return this.scale(length / this.length());
     }
-    ;
     /**
      * Substract the given vertex from this line's end points.
      *
@@ -72,7 +71,6 @@ export class VertTuple {
         this.b.sub(amount);
         return this;
     }
-    ;
     /**
      * Add the given vertex to this line's end points.
      *
@@ -87,7 +85,6 @@ export class VertTuple {
         this.b.add(amount);
         return this;
     }
-    ;
     /**
      * Normalize this line (set to length 1).
      *
@@ -100,7 +97,6 @@ export class VertTuple {
         this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
         return this;
     }
-    ;
     /**
      * Scale this line by the given factor.
      *
@@ -114,7 +110,6 @@ export class VertTuple {
         this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
         return this;
     }
-    ;
     /**
      * Move this line to a new location.
      *
@@ -130,7 +125,6 @@ export class VertTuple {
         this.b.add(diff);
         return this;
     }
-    ;
     /**
      * Get the angle between this and the passed line (in radians).
      *
@@ -141,7 +135,7 @@ export class VertTuple {
      * @memberof VertTuple
      **/
     angle(line) {
-        if (line == null || typeof line == 'undefined') {
+        if (line == null || typeof line == "undefined") {
             line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
         }
         // Compute the angle from x axis and the return the difference :)
@@ -151,7 +145,6 @@ export class VertTuple {
         // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
         return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
     }
-    ;
     /**
      * Get line point at position t in [0 ... 1]:<br>
      * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
@@ -167,7 +160,6 @@ export class VertTuple {
     vertAt(t) {
         return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
     }
-    ;
     /**
      * Get the denominator of this and the given line.
      *
@@ -181,9 +173,8 @@ export class VertTuple {
      **/
     denominator(line) {
         // http://jsfiddle.net/justin_c_rounds/Gd2S2/
-        return ((line.b.y - line.a.y) * (this.b.x - this.a.x)) - ((line.b.x - line.a.x) * (this.b.y - this.a.y));
+        return (line.b.y - line.a.y) * (this.b.x - this.a.x) - (line.b.x - line.a.x) * (this.b.y - this.a.y);
     }
-    ;
     /**
      * Checks if this and the given line are co-linear.
      *
@@ -198,7 +189,6 @@ export class VertTuple {
     colinear(line) {
         return Math.abs(this.denominator(line)) < Vertex.EPSILON;
     }
-    ;
     /**
      * Get the closest position T from this line to the specified point.
      *
@@ -221,7 +211,6 @@ export class VertTuple {
         // t = Math.max(0, Math.min(1, t));
         return t;
     }
-    ;
     /**
      * Check if the given point is located on this line. Optionally also check if
      * that point is located between point `a` and `b`.
@@ -257,7 +246,6 @@ export class VertTuple {
         var t = this.getClosestT(p);
         return this.vertAt(t);
     }
-    ;
     /**
      * The the minimal distance between this line and the specified point.
      *
@@ -272,7 +260,6 @@ export class VertTuple {
         // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
         return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
     }
-    ;
     /**
      * Create a deep clone of this instance.
      *
@@ -284,7 +271,6 @@ export class VertTuple {
     clone() {
         return this.factory(this.a.clone(), this.b.clone());
     }
-    ;
     /**
      * Create a string representation of this line.
      *
@@ -296,7 +282,16 @@ export class VertTuple {
     toString() {
         return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
     }
-    ;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.a.destroy();
+        this.b.destroy();
+        this.isDestroyed = true;
+    }
 }
 /**
  * @private

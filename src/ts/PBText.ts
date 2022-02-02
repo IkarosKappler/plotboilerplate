@@ -1,7 +1,8 @@
 /**
  * @author   Ikaros Kappler
  * @date     2021-11-16
- * @version  1.0.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version  1.1.0
  **/
 
 import { UIDGenerator } from "./UIDGenerator";
@@ -107,6 +108,14 @@ export class PBText implements SVGSerializable, FontOptions {
   color: string | undefined;
 
   /**
+   * @member isDestroyed
+   * @memberof PBText
+   * @type {boolean}
+   * @instance
+   */
+  isDestroyed: boolean;
+
+  /**
    * Create a new circle with given center point and radius.
    *
    * @constructor
@@ -143,5 +152,15 @@ export class PBText implements SVGSerializable, FontOptions {
       "[PBText.toSVGString()] This function is not implemented as it defines a deprecated method. Use the 'drawutilssvg.text()' method instead."
     );
     return "";
+  }
+
+  /**
+   * This function should invalidate any installed listeners and invalidate this object.
+   * After calling this function the object might not hold valid data any more and
+   * should not be used.
+   */
+  destroy() {
+    this.anchor.destroy();
+    this.isDestroyed = true;
   }
 } // END class

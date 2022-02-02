@@ -13,7 +13,9 @@
  * @modified 2021-03-10 Added the `toCubicBezier` method.
  * @modified 2021-03-15 Added `VEllipse.quarterSegmentCount` and `VEllipse.scale` functions.
  * @modified 2021-03-19 Added the `VEllipse.rotate` function.
- * @version  1.2.2
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `VEllipse.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version  1.3.0
  *
  * @file VEllipse
  * @fileoverview Ellipses with a center and an x- and a y-axis (stored as a vertex).
@@ -62,6 +64,13 @@ export declare class VEllipse implements SVGSerializable {
      * @instance
      */
     rotation: number;
+    /**
+     * @member isDestroyed
+     * @memberof VEllipse
+     * @type {boolean}
+     * @instance
+     */
+    isDestroyed: boolean;
     /**
      * The constructor.
      *
@@ -218,6 +227,12 @@ export declare class VEllipse implements SVGSerializable {
     toSVGString(options: {
         className?: string;
     }): string;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy(): void;
     /**
      * A static collection of ellipse-related helper functions.
      * @static

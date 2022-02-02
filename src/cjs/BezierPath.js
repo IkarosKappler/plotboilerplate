@@ -22,7 +22,9 @@
  * @modified 2020-12-29 Constructor is now private (no explicit use intended).
  * @modified 2021-05-25 Added BezierPath.fromReducedList( Array<number> ).
  * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
- * @version 2.4.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version 2.5.0
  *
  * @file BezierPath
  * @public
@@ -1029,19 +1031,30 @@ var BezierPath = /** @class */ (function () {
      * @return {string} The SVG string.
      **/
     BezierPath.prototype.toSVGString = function (options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push("<path");
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' d="');
-        for (var c = 0; c < this.bezierCurves.length; c++) {
-            if (c > 0)
-                buffer.push(" ");
-            buffer.push(this.bezierCurves[c].toSVGPathData());
+        // options = options || {};
+        // var buffer: Array<string> = [];
+        // buffer.push("<path");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // buffer.push(' d="');
+        // for (var c = 0; c < this.bezierCurves.length; c++) {
+        //   if (c > 0) buffer.push(" ");
+        //   buffer.push(this.bezierCurves[c].toSVGPathData());
+        // }
+        // buffer.push('" />');
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the BezierPath.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
+    };
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    BezierPath.prototype.destroy = function () {
+        for (var i = 0; i < this.bezierCurves.length; i++) {
+            this.bezierCurves[i].destroy();
         }
-        buffer.push('" />');
-        return buffer.join("");
+        this.isDestroyed = true;
     };
     /**
      * Create a JSON string representation of this bézier curve.

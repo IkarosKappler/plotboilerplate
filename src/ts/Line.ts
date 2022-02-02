@@ -12,7 +12,8 @@
  * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
- * @version  2.1.3
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version  2.2.0
  *
  * @file Line
  * @public
@@ -20,8 +21,7 @@
 
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable} from "./interfaces";
-
+import { SVGSerializable } from "./interfaces";
 
 /**
  * @classdesc A line consists of two vertices a and b.<br>
@@ -31,86 +31,83 @@ import { SVGSerializable} from "./interfaces";
  *
  * @requires Vertex
  */
-export class Line
-    extends VertTuple<Line>
-    implements SVGSerializable {
+export class Line extends VertTuple<Line> implements SVGSerializable {
+  /**
+   * Required to generate proper CSS classes and other class related IDs.
+   **/
+  readonly className: string = "Line";
 
-	/**
-	 * Required to generate proper CSS classes and other class related IDs.
-	 **/
-	readonly className : string = "Line";
-	
-	
-	/**
-	 * Creates an instance of Line.
-	 *
-	 * @constructor
-	 * @name Line
-	 * @param {Vertex} a The line's first point.
-	 * @param {Vertex} b The line's second point.
-	 **/
-	constructor(a:Vertex,b:Vertex) {
-	    super(a,b,(a:Vertex,b:Vertex)=>new Line(a,b));
-	}
-	
+  /**
+   * Creates an instance of Line.
+   *
+   * @constructor
+   * @name Line
+   * @param {Vertex} a The line's first point.
+   * @param {Vertex} b The line's second point.
+   **/
+  constructor(a: Vertex, b: Vertex) {
+    super(a, b, (a: Vertex, b: Vertex) => new Line(a, b));
+  }
 
-	/**
-	 * Get the intersection if this line and the specified line.
-	 *
-	 * @method intersection
-	 * @param {Line} line The second line.
-	 * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
-	 * @instance
-	 * @memberof Line
-	 **/
-	// !!! DO NOT MOVE TO VertTuple
-	intersection( line:Line ):Vertex|undefined {
-	    const denominator : number = this.denominator(line);
-	    if( denominator == 0 ) 
-		return null;
-	    
-	    let a : number = this.a.y - line.a.y; 
-	    let b : number = this.a.x - line.a.x; 
-	    const numerator1 : number = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-	    const numerator2 : number = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
-	    a = numerator1 / denominator; // NaN if parallel lines
-	    b = numerator2 / denominator;
+  /**
+   * Get the intersection if this line and the specified line.
+   *
+   * @method intersection
+   * @param {Line} line The second line.
+   * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
+   * @instance
+   * @memberof Line
+   **/
+  // !!! DO NOT MOVE TO VertTuple
+  intersection(line: Line): Vertex | undefined {
+    const denominator: number = this.denominator(line);
+    if (denominator == 0) return null;
 
-	    // Catch NaN?
-	    const x : number = this.a.x + (a * (this.b.x - this.a.x));
-	    const y : number = this.a.y + (a * (this.b.y - this.a.y));
+    let a: number = this.a.y - line.a.y;
+    let b: number = this.a.x - line.a.x;
+    const numerator1: number = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
+    const numerator2: number = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
+    a = numerator1 / denominator; // NaN if parallel lines
+    b = numerator2 / denominator;
 
-	    if( isNaN(a) || isNaN(x) || isNaN(y) ) {
-		return undefined;
-	    }
-	    
-	    // if we cast these lines infinitely in both directions, they intersect here:
-	    return new Vertex( x, y );
-	};
-	
+    // Catch NaN?
+    const x: number = this.a.x + a * (this.b.x - this.a.x);
+    const y: number = this.a.y + a * (this.b.y - this.a.y);
 
-	/**
-	 * Create an SVG representation of this line.
-	 *
-	 * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-	 * @method toSVGString
-	 * @param {options} p - A set of options, like the 'classname' to use 
-	 *                      for the line object.
-	 * @return {string} The SVG string representing this line.
-	 * @instance
-	 * @memberof Line
-	 **/
-	toSVGString( options:{ className?: string } ):string {
-	    options = options || {};
-	    var buffer = [];
-	    buffer.push( '<line' );
-	    if( options.className )
-		buffer.push( ' class="' + options.className + '"' );
-	    buffer.push( ' x1="' + this.a.x + '"' );
-	    buffer.push( ' y1="' + this.a.y + '"' );
-	    buffer.push( ' x2="' + this.b.x + '"' );
-	    buffer.push( ' y2="' + this.b.y + '"' );
-	    buffer.push( ' />' );
-	    return buffer.join('');
-	};
+    if (isNaN(a) || isNaN(x) || isNaN(y)) {
+      return undefined;
     }
+
+    // if we cast these lines infinitely in both directions, they intersect here:
+    return new Vertex(x, y);
+  }
+
+  /**
+   * Create an SVG representation of this line.
+   *
+   * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
+   * @method toSVGString
+   * @param {options} p - A set of options, like the 'classname' to use
+   *                      for the line object.
+   * @return {string} The SVG string representing this line.
+   * @instance
+   * @memberof Line
+   **/
+  toSVGString(options: { className?: string }): string {
+    // options = options || {};
+    // var buffer = [];
+    // buffer.push( '<line' );
+    // if( options.className )
+    // buffer.push( ' class="' + options.className + '"' );
+    // buffer.push( ' x1="' + this.a.x + '"' );
+    // buffer.push( ' y1="' + this.a.y + '"' );
+    // buffer.push( ' x2="' + this.b.x + '"' );
+    // buffer.push( ' y2="' + this.b.y + '"' );
+    // buffer.push( ' />' );
+    // return buffer.join('');
+    console.warn(
+      "[Deprecation] Warning: the Line.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
+    );
+    return "";
+  }
+}

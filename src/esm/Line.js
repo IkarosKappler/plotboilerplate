@@ -12,7 +12,8 @@
  * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
- * @version  2.1.3
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version  2.2.0
  *
  * @file Line
  * @public
@@ -59,20 +60,19 @@ export class Line extends VertTuple {
             return null;
         let a = this.a.y - line.a.y;
         let b = this.a.x - line.a.x;
-        const numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-        const numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+        const numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
+        const numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
         a = numerator1 / denominator; // NaN if parallel lines
         b = numerator2 / denominator;
         // Catch NaN?
-        const x = this.a.x + (a * (this.b.x - this.a.x));
-        const y = this.a.y + (a * (this.b.y - this.a.y));
+        const x = this.a.x + a * (this.b.x - this.a.x);
+        const y = this.a.y + a * (this.b.y - this.a.y);
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
             return undefined;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex(x, y);
     }
-    ;
     /**
      * Create an SVG representation of this line.
      *
@@ -85,18 +85,19 @@ export class Line extends VertTuple {
      * @memberof Line
      **/
     toSVGString(options) {
-        options = options || {};
-        var buffer = [];
-        buffer.push('<line');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push(' x1="' + this.a.x + '"');
-        buffer.push(' y1="' + this.a.y + '"');
-        buffer.push(' x2="' + this.b.x + '"');
-        buffer.push(' y2="' + this.b.y + '"');
-        buffer.push(' />');
-        return buffer.join('');
+        // options = options || {};
+        // var buffer = [];
+        // buffer.push( '<line' );
+        // if( options.className )
+        // buffer.push( ' class="' + options.className + '"' );
+        // buffer.push( ' x1="' + this.a.x + '"' );
+        // buffer.push( ' y1="' + this.a.y + '"' );
+        // buffer.push( ' x2="' + this.b.x + '"' );
+        // buffer.push( ' y2="' + this.b.y + '"' );
+        // buffer.push( ' />' );
+        // return buffer.join('');
+        console.warn("[Deprecation] Warning: the Line.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
     }
-    ;
 }
 //# sourceMappingURL=Line.js.map

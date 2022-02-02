@@ -4,7 +4,9 @@
  * @modified 2019-03-23 Added JSDoc tags.
  * @modified 2020-03-25 Ported this class from vanilla-JS to Typescript.
  * @modified 2021-01-20 Added UID.
- * @version 1.1.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `PBImage.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version 1.2.0
  *
  * @file PBImage
  * @fileoverview As native Image objects have only a position and with
@@ -40,7 +42,6 @@ export class PBImage {
         this.upperLeft = upperLeft;
         this.lowerRight = lowerRight;
     }
-    ;
     /**
      * Convert this vertex to SVG code.
      *
@@ -55,6 +56,15 @@ export class PBImage {
         console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
         return "";
     }
-    ;
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.upperLeft.destroy();
+        this.lowerRight.destroy();
+        this.isDestroyed = true;
+    }
 }
 //# sourceMappingURL=PBImage.js.map

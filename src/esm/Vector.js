@@ -9,7 +9,9 @@
  * @modified 2019-12-04 Added the Vector.inv() function.
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2021-01-20 Added UID.
- * @version  1.3.0
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
+ * @version  1.4.0
  *
  * @file Vector
  * @public
@@ -42,7 +44,6 @@ export class Vector extends VertTuple {
          **/
         this.className = "Vector";
     }
-    ;
     /**
      * Get the perpendicular of this vector which is located at a.
      *
@@ -57,7 +58,6 @@ export class Vector extends VertTuple {
         v.b.add(this.a);
         return v;
     }
-    ;
     /**
      * The inverse of a vector is a vector witht the same magnitude but oppose direction.
      *
@@ -71,7 +71,6 @@ export class Vector extends VertTuple {
         this.b = tmp;
         return this;
     }
-    ;
     /**
      * This function computes the inverse of the vector, which means 'a' stays untouched.
      *
@@ -82,7 +81,6 @@ export class Vector extends VertTuple {
         this.b.y = this.a.y - (this.b.y - this.a.y);
         return this;
     }
-    ;
     /**
      * Get the intersection if this vector and the specified vector.
      *
@@ -98,16 +96,15 @@ export class Vector extends VertTuple {
             return null;
         var a = this.a.y - line.a.y;
         var b = this.a.x - line.a.x;
-        var numerator1 = ((line.b.x - line.a.x) * a) - ((line.b.y - line.a.y) * b);
-        var numerator2 = ((this.b.x - this.a.x) * a) - ((this.b.y - this.a.y) * b);
+        var numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
+        var numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
         a = numerator1 / denominator; // NaN if parallel lines
         b = numerator2 / denominator;
         // TODO:
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(this.a.x + (a * (this.b.x - this.a.x)), this.a.y + (a * (this.b.y - this.a.y)));
+        return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
     }
-    ;
     /**
      * Create an SVG representation of this line.
      *
@@ -120,31 +117,30 @@ export class Vector extends VertTuple {
      * @memberof Vector
      **/
     toSVGString(options) {
-        options = options || {};
-        var buffer = [];
-        var vertices = Vector.utils.buildArrowHead(this.a, this.b, 8, 1.0, 1.0);
-        buffer.push('<g');
-        if (options.className)
-            buffer.push(' class="' + options.className + '"');
-        buffer.push('>');
-        buffer.push('   <line');
-        buffer.push(' x1="' + this.a.x + '"');
-        buffer.push(' y1="' + this.a.y + '"');
-        buffer.push(' x2="' + vertices[0].x + '"');
-        buffer.push(' y2="' + vertices[0].y + '"');
-        buffer.push(' />');
-        // Add arrow head
-        buffer.push('   <polygon points="');
-        for (var i = 0; i < vertices.length; i++) {
-            if (i > 0)
-                buffer.push(' ');
-            buffer.push('' + vertices[i].x + ',' + vertices[i].y);
-        }
-        buffer.push('"/>');
-        buffer.push('</g>');
-        return buffer.join('');
+        // options = options || {};
+        // var buffer = [];
+        // var vertices = Vector.utils.buildArrowHead(this.a, this.b, 8, 1.0, 1.0);
+        // buffer.push("<g");
+        // if (options.className) buffer.push(' class="' + options.className + '"');
+        // buffer.push(">");
+        // buffer.push("   <line");
+        // buffer.push(' x1="' + this.a.x + '"');
+        // buffer.push(' y1="' + this.a.y + '"');
+        // buffer.push(' x2="' + vertices[0].x + '"');
+        // buffer.push(' y2="' + vertices[0].y + '"');
+        // buffer.push(" />");
+        // // Add arrow head
+        // buffer.push('   <polygon points="');
+        // for (var i = 0; i < vertices.length; i++) {
+        //   if (i > 0) buffer.push(" ");
+        //   buffer.push("" + vertices[i].x + "," + vertices[i].y);
+        // }
+        // buffer.push('"/>');
+        // buffer.push("</g>");
+        // return buffer.join("");
+        console.warn("[Deprecation] Warning: the Vector.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
+        return "";
     }
-    ;
 }
 Vector.utils = {
     /**
@@ -175,10 +171,10 @@ Vector.utils = {
     buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
         var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         var vertices = [];
-        vertices.push(new Vertex(zB.x * scaleX - (headlen) * Math.cos(angle), zB.y * scaleY - (headlen) * Math.sin(angle)));
-        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle - Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle - Math.PI / 8)));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
         vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));
-        vertices.push(new Vertex(zB.x * scaleX - (headlen * 1.35) * Math.cos(angle + Math.PI / 8), zB.y * scaleY - (headlen * 1.35) * Math.sin(angle + Math.PI / 8)));
+        vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle + Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle + Math.PI / 8)));
         return vertices;
     }
 };

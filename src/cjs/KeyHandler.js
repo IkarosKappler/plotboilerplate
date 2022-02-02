@@ -6,7 +6,8 @@
  * @modified 2020-07-28 Changed the `delete` key code from 8 to 46.
  * @modified 2020-10-04 Changed `window` to `globalThis`.
  * @modified 2020-10-04 Added extended JSDoc.
- * @version  1.0.4
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version  1.1.0
  *
  * @file KeyHandler
  * @public
@@ -39,7 +40,7 @@ var KeyHandler = /** @class */ (function () {
      * @memberof KeyHandler
      * @param {HTMLElement} options.element (optional) The HTML element to listen on; if null then 'window' will be used.
      * @param {boolean} options.trackAll (optional) Set to true if you want to keep track of _all_ keys (keyStatus).
-    **/
+     **/
     function KeyHandler(options) {
         this.downListeners = [];
         this.pressListeners = [];
@@ -58,7 +59,6 @@ var KeyHandler = /** @class */ (function () {
         // Install the listeners
         this.installListeners();
     }
-    ;
     /**
      * A helper function to fire key events from this KeyHandler.
      *
@@ -76,7 +76,6 @@ var KeyHandler = /** @class */ (function () {
         }
         return hasListener;
     };
-    ;
     /**
      * Internal function to fire a new keydown event to all listeners.
      * You should not call this function on your own unless you know what you do.
@@ -92,10 +91,9 @@ var KeyHandler = /** @class */ (function () {
     KeyHandler.prototype.fireDownEvent = function (e, handler) {
         if (handler.fireEvent(e, handler.downListeners) || handler.trackAllKeys) {
             // Down event has listeners. Update key state.
-            handler.keyStates[e.keyCode] = 'down';
+            handler.keyStates[e.keyCode] = "down";
         }
     };
-    ;
     /**
      * Internal function to fire a new keypress event to all listeners.
      * You should not call this function on your own unless you know what you do.
@@ -111,7 +109,6 @@ var KeyHandler = /** @class */ (function () {
     KeyHandler.prototype.firePressEvent = function (e, handler) {
         handler.fireEvent(e, handler.pressListeners);
     };
-    ;
     /**
      * Internal function to fire a new keyup event to all listeners.
      * You should not call this function on your own unless you know what you do.
@@ -130,20 +127,18 @@ var KeyHandler = /** @class */ (function () {
             delete handler.keyStates[e.keyCode];
         }
     };
-    ;
     /**
      * Resolve the key/name code.
      */
     KeyHandler.key2code = function (key) {
-        if (typeof key == 'number')
+        if (typeof key == "number")
             return key;
-        if (typeof key != 'string')
+        if (typeof key != "string")
             throw "Unknown key name or key type (should be a string or integer): " + key;
         if (KeyHandler.KEY_CODES[key])
             return KeyHandler.KEY_CODES[key];
         throw "Unknown key (cannot resolve key code): " + key;
     };
-    ;
     /**
      * Install the required listeners into the initially passed element.
      *
@@ -152,20 +147,24 @@ var KeyHandler = /** @class */ (function () {
      */
     KeyHandler.prototype.installListeners = function () {
         var _self = this;
-        this.element.addEventListener('keydown', this._keyDownListener = function (e) { _self.fireDownEvent(e, _self); });
-        this.element.addEventListener('keypress', this._keyPressListener = function (e) { _self.firePressEvent(e, _self); });
-        this.element.addEventListener('keyup', this._keyUpListener = function (e) { _self.fireUpEvent(e, _self); });
+        this.element.addEventListener("keydown", (this._keyDownListener = function (e) {
+            _self.fireDownEvent(e, _self);
+        }));
+        this.element.addEventListener("keypress", (this._keyPressListener = function (e) {
+            _self.firePressEvent(e, _self);
+        }));
+        this.element.addEventListener("keyup", (this._keyUpListener = function (e) {
+            _self.fireUpEvent(e, _self);
+        }));
     };
-    ;
     /**
      *  Remove all installed event listeners from the underlying element.
      */
     KeyHandler.prototype.releaseListeners = function () {
-        this.element.removeEventListener('keydown', this._keyDownListener);
-        this.element.removeEventListener('keypress', this._keyPressListener);
-        this.element.removeEventListener('keyup', this._keyUpListener);
+        this.element.removeEventListener("keydown", this._keyDownListener);
+        this.element.removeEventListener("keypress", this._keyPressListener);
+        this.element.removeEventListener("keyup", this._keyUpListener);
     };
-    ;
     /**
      * Listen for key down. This function allows chaining.
      *
@@ -182,7 +181,6 @@ var KeyHandler = /** @class */ (function () {
         this.downListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
         return this;
     };
-    ;
     /**
      * Listen for key press.
      *
@@ -199,7 +197,6 @@ var KeyHandler = /** @class */ (function () {
         this.pressListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
         return this;
     };
-    ;
     /**
      * Listen for key up.
      *
@@ -216,22 +213,30 @@ var KeyHandler = /** @class */ (function () {
         this.upListeners.push({ key: key, keyCode: KeyHandler.key2code(key), listener: listener });
         return this;
     };
-    ;
     /**
      * Check if a specific key is currently held pressed.
      *
      * @param {string|number} key - Any key identifier, key code or one from the KEY_CODES list.
      */
     KeyHandler.prototype.isDown = function (key) {
-        if (typeof key == 'number')
+        if (typeof key == "number")
             return this.keyStates[key] ? true : false;
         else
             return this.keyStates[KeyHandler.key2code(key)] ? true : false;
     };
     /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used any more.
+     */
+    KeyHandler.prototype.destroy = function () {
+        this.releaseListeners();
+    };
+    /**
      * Source:
      * https://keycode.info/
      */
+    // prettier-ignore
     KeyHandler.KEY_CODES = {
         'break': 3,
         'backspace': 8,
