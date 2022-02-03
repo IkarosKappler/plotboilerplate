@@ -39,7 +39,9 @@
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.10.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @version  1.11.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -426,11 +428,27 @@ export declare class drawutils implements DrawLib<void> {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    crosshair(center: XYCoords, radius: number, color: string): void;
+    crosshair(center: XYCoords, radius: number, color: string, lineWidth?: number): void;
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    cross(center: XYCoords, radius: number, color: string, lineWidth?: number): void;
     /**
      * Draw a polygon.
      *

@@ -53,12 +53,14 @@
     var line = null; // new Line( new Vertex(0,0), new Vertex(0,0) );
     var t = 0.0;
 
-    pb.config.postDraw = function () {
+    pb.config.postDraw = function (draw, fill) {
       // The connecting line might be null if mouse/touch pointer is out of bounds.
       if (line) {
         // Draw the line connecting the mouse/touch position with the closest curve point.
-        pb.draw.line(line.a, line.b, "rgb(255,192,0)", 2);
-        pb.fill.circleHandle(line.a, 3.0, "rgb(255,192,0)");
+        draw.line(line.a, line.b, "rgba(192,128,0,0.5)", 1);
+        // pb.fill.circleHandle(line.a, 3.0, "rgb(255,192,0)");
+        draw.cross(line.a, 3.0, "rgb(192,128,0)", 1.0);
+        fill.text(t.toFixed(3), line.b.x + 3, line.b.y + 3, { color: "rgb(128,128,0)" });
       }
     };
 
@@ -99,7 +101,6 @@
         bpath[i] = [randomVertex(), randomVertex(), randomVertex(), randomVertex()];
       }
       var path = BezierPath.fromArray(bpath);
-      // addPath( path );
       paths.push(path);
     }
     pb.add(paths);

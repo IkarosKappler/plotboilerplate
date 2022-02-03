@@ -9465,7 +9465,9 @@ exports.VertexListeners = VertexListeners;
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.10.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @version  1.11.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -10064,11 +10066,12 @@ var drawutils = /** @class */ (function () {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.crosshair = function (center, radius, color) {
+    drawutils.prototype.crosshair = function (center, radius, color, lineWidth) {
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
@@ -10076,7 +10079,34 @@ var drawutils = /** @class */ (function () {
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - radius);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y + radius);
         this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = 0.5;
+        this.ctx.lineWidth = lineWidth || 0.5;
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore();
+    };
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.cross = function (center, radius, color, lineWidth) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y - radius);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y + radius);
+        this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y + radius);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y - radius);
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = lineWidth || 1.0;
         this.ctx.stroke();
         this.ctx.closePath();
         this.ctx.restore();
@@ -10272,7 +10302,9 @@ exports.drawutils = drawutils;
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2021-01-24 Added the `setCurrentId` function.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  0.0.5
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @version  0.0.6
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
@@ -10753,11 +10785,29 @@ var drawutilsgl = /** @class */ (function () {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.crosshair = function (center, radius, color) {
+    drawutilsgl.prototype.crosshair = function (center, radius, color, lineWidth) {
+        // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.cross = function (center, radius, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     /**
@@ -10996,7 +11046,9 @@ var GLU = /** @class */ (function () {
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.4.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @version  1.5.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -11783,11 +11835,12 @@ var drawutilssvg = /** @class */ (function () {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.crosshair = function (center, radius, color) {
+    drawutilssvg.prototype.crosshair = function (center, radius, color, lineWidth) {
         var node = this.makeNode("path");
         var d = [
             "M",
@@ -11804,7 +11857,40 @@ var drawutilssvg = /** @class */ (function () {
             this._y(center.y) + radius
         ];
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "crosshair", color, 0.5);
+        return this._bindFillDraw(node, "crosshair", color, lineWidth || 0.5);
+    };
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilssvg.prototype.cross = function (center, radius, color, lineWidth) {
+        var node = this.makeNode("path");
+        var d = [
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y) - radius,
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y) + radius,
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y) + radius,
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y) - radius
+        ];
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cross", color, lineWidth || 1.0);
     };
     /**
      * Draw a polygon.

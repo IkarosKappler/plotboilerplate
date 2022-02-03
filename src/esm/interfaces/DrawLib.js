@@ -15,6 +15,8 @@
  * @modified 2021-11-12 Added `text()` params fontSize, fontFamily, rotation, textAlign.
  * @modified 2021-11-16 Added `text()` params fontWeight and fontStyle.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
  **/
 export {};
 //# sourceMappingURL=DrawLib.js.map
