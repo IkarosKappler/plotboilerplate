@@ -5,7 +5,7 @@
   - Added the `draw.cross(...)` function.
   - Added the `drawgl.cross(...)` function.
   - Added the `drawutilssvg.cross(...)` function.
-  - Added the optional `lineWidth` param to the `DrawLib.crosshair` function (and thus to the classes `draw`, `drawgl` and `drawutilssvg`).
+  - Added the optional `lineWidth` param to the `DrawLib.crosshair` function (and thus to the classes `draw`, `drawgl` and `drawutilssvg`)- Changing the element to catch events (eventCatcher instead of canvas) in the `BezierPathInteractionHelper`.
 - 2022-02-02 [v1.16.0]
   - Added the `BezierPath.destroy` method for releasing all installed event listeners.
   - Added the `Circle.destroy` method for releasing all installed event listeners.
