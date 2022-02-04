@@ -1,5 +1,7 @@
 # Changelog
 
+- 2022-02-04 (breaking change)
+  - Removed the `toSVGString` function from all drawables. They were no use any more, as `drawutilssvg` is doing their task, and they turned out to be just code overhead. THIS IS A BREAKING CHANGE.
 - 2022-02-03
   - Added the `DrawLib.cross(...)` function.
   - Added the `draw.cross(...)` function.
