@@ -10,7 +10,6 @@
 - Measure the canvas' border when applying fitToParent! Currently a 1px border is expected.
 - Implement snap-to-grid.
 - Add image flipping.
-- Add Images to the SVGBuiler.
 - Add image/svg support (adding SVG images).
 - Add a demo that draws a proper mathematical xy-grid.
 - Extend the leaf venation generator demo.
@@ -29,7 +28,6 @@
 - Remove all 'info' blocks and replace by uistats.
 - For convenience add an "Info" button to the UI of all demos with a short explanation about what's happening here.
 - Remove all <div id="dialog-wrapper" ...> from the demos. They are deprecated. Where needed use the 'modal.js' instead.
-- Remove SVGBuilder from Girih-demo.
 - Add config params to the `saveFile` hook (png or svg plus options, like compression or line 'lineJoin').
 - Add the new text params to the `label` function, too (except size? style? weight?).
 - Make Images rotatetable.

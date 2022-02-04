@@ -518,31 +518,6 @@ export class Vertex {
         return "(" + this.x + "," + this.y + ")";
     }
     /**
-     * Convert this vertex to SVG code.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof Vertex
-     * @deprecated
-     **/
-    toSVGString(options) {
-        // options = options || {};
-        // var buffer = [];
-        // buffer.push("<circle");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' cx="' + this.x + '"');
-        // buffer.push(' cy="' + this.y + '"');
-        // buffer.push(' r="2"');
-        // buffer.push(" />");
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the Vertex.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    }
-    // END Vertex
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
