@@ -11,7 +11,7 @@ import { Circle } from "./Circle";
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { drawutils } from "./draw";
-import { drawutilsgl } from "./drawgl";
+// import { drawutilsgl } from "./drawgl";
 import { geomutils } from "./geomutils";
 import { Grid } from "./Grid";
 import { KeyHandler } from "./KeyHandler";
@@ -20,7 +20,6 @@ import { MouseHandler } from "./MouseHandler";
 import { PBImage } from "./PBImage";
 import { PlotBoilerplate } from "./PlotBoilerplate";
 import { Polygon } from "./Polygon";
-import { SVGBuilder } from "./SVGBuilder";
 import { Triangle } from "./Triangle";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
@@ -39,7 +38,7 @@ export {
   CircleSector,
   CubicBezierCurve,
   drawutils,
-  drawutilsgl,
+  // drawutilsgl,
   geomutils,
   Grid,
   // ...interf,
@@ -49,7 +48,6 @@ export {
   PBImage,
   PlotBoilerplate,
   Polygon,
-  SVGBuilder,
   Triangle,
   UIDGenerator,
   Vector,

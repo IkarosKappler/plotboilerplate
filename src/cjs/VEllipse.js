@@ -342,27 +342,6 @@ var VEllipse = /** @class */ (function () {
         return curves;
     };
     /**
-     * Create an SVG representation of this ellipse.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @param {object} options { className?:string }
-     * @return string The SVG string
-     */
-    VEllipse.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer: Array<string> = [];
-        // buffer.push("<ellipse");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' cx="' + this.center.x + '"');
-        // buffer.push(' cy="' + this.center.y + '"');
-        // buffer.push(' rx="' + this.axis.x + '"');
-        // buffer.push(' ry="' + this.axis.y + '"');
-        // buffer.push(" />");
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the VEllipse.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    };
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.

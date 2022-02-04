@@ -74,20 +74,6 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
      * @memberof Line
      **/
     intersection(line: Vector): Vertex | null;
-    /**
-     * Create an SVG representation of this line.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @override
-     * @param {object=} options - A set of options, like 'className'.
-     * @return {string} The SVG string representation.
-     * @instance
-     * @memberof Vector
-     **/
-    toSVGString(options: {
-        className?: string;
-    }): string;
     static utils: {
         /**
          * Generate a four-point arrow head, starting at the vector end minus the

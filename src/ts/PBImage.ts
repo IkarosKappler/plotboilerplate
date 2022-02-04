@@ -88,21 +88,6 @@ export class PBImage implements SVGSerializable {
   }
 
   /**
-   * Convert this vertex to SVG code.
-   *
-   * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-   * @method toSVGString
-   * @param {object=} options - An optional set of options, like 'className'.
-   * @return {string} A string representing the SVG code for this vertex.
-   * @instance
-   * @memberof PBImage
-   **/
-  toSVGString(options: { className?: string }): string {
-    console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
-    return "";
-  }
-
-  /**
    * This function should invalidate any installed listeners and invalidate this object.
    * After calling this function the object might not hold valid data any more and
    * should not be used.

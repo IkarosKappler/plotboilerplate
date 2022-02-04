@@ -81,36 +81,6 @@ export class CircleSector implements SVGSerializable {
   }
 
   /**
-   * Create an SVG representation of this circle.
-   *
-   * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-   * @method toSVGString
-   * @param {object=} options - An optional set of options, like 'className'.
-   * @return {string} A string representing the SVG code for this vertex.
-   * @instance
-   * @memberof Circle
-   */
-  toSVGString(options: { className?: string }) {
-    // options = options || {};
-    // var buffer: Array<string> = [];
-    // buffer.push("<path ");
-    // if (options.className) buffer.push(' class="' + options.className + '"');
-    // const data: SVGPathParams = CircleSector.circleSectorUtils.describeSVGArc(
-    //   this.circle.center.x,
-    //   this.circle.center.y,
-    //   this.circle.radius,
-    //   this.startAngle,
-    //   this.endAngle
-    // );
-    // buffer.push(' d="' + data.join(" ") + '" />');
-    // return buffer.join("");
-    console.warn(
-      "[Deprecation] Warning: the CircleSector.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
-    );
-    return "";
-  }
-
-  /**
    * This function should invalidate any installed listeners and invalidate this object.
    * After calling this function the object might not hold valid data any more and
    * should not be used.

@@ -480,45 +480,6 @@ export class Polygon implements SVGSerializable {
   }
 
   /**
-   * Create an SVG representation of this polygon.
-   *
-   * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-   * @method toSVGString
-   * @param {object=} options - An optional set of options, like 'className'.
-   * @return {string} The SVG string.
-   * @instance
-   * @memberof Polygon
-   **/
-  toSVGString(options: { className?: string } | undefined): string {
-    // options = options || {};
-    // var buffer: Array<string> = [];
-    // buffer.push("<path");
-    // if (options.className) buffer.push(' class="' + options.className + '"');
-    // buffer.push(' d="');
-    // if (this.vertices.length > 0) {
-    //   buffer.push("M ");
-    //   buffer.push(this.vertices[0].x.toString());
-    //   buffer.push(" ");
-    //   buffer.push(this.vertices[0].y.toString());
-    //   for (var i = 1; i < this.vertices.length; i++) {
-    //     buffer.push(" L ");
-    //     buffer.push(this.vertices[i].x.toString());
-    //     buffer.push(" ");
-    //     buffer.push(this.vertices[i].y.toString());
-    //   }
-    //   if (!this.isOpen) {
-    //     buffer.push(" Z");
-    //   }
-    // }
-    // buffer.push('" />');
-    // return buffer.join("");
-    console.warn(
-      "[Deprecation] Warning: the Polygon.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
-    );
-    return "";
-  }
-
-  /**
    * This function should invalidate any installed listeners and invalidate this object.
    * After calling this function the object might not hold valid data any more and
    * should not be used.

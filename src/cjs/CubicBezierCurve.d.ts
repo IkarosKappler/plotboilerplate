@@ -420,21 +420,6 @@ export declare class CubicBezierCurve {
      **/
     static isInstance(obj: any): boolean;
     /**
-     * Create an SVG path data representation of this bézier curve.
-     *
-     * Path data string format is:<br>
-     *  <pre>'M x0 y1 C dx0 dy1 dx1 dy1 x1 x2'</pre><br>
-     * or in other words<br>
-     *   <pre>'M startoint.x startPoint.y C startControlPoint.x startControlPoint.y endControlPoint.x endControlPoint.y endPoint.x endPoint.y'</pre>
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGPathData
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {string}  The SVG path data string.
-     **/
-    toSVGPathData(): string;
-    /**
      * Convert this curve to a JSON string.
      *
      * @method toJSON
