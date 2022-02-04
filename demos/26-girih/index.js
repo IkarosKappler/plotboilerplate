@@ -61,7 +61,7 @@
           enableKeys: true,
           enableTouch: true,
 
-          enableSVGExport: false
+          enableSVGExport: true
         },
         GUP
       )
@@ -124,11 +124,14 @@
     // +---------------------------------------------------------------------------------
     // | This is the actual render function.
     // +-------------------------------
-    var drawAll = function () {
-      pb.draw.ctx.lineJoin = config.lineJoin;
+    var drawAll = function (draw, fill) {
+      if (draw.ctx) {
+        // This is quirky. Only works if target is a canvas (will not work on SVG nodes)
+        draw.ctx.lineJoin = config.lineJoin;
+      }
       // Draw the preview polygon first
       if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && 0 <= previewTilePointer && previewTilePointer < previewTiles.length) {
-        pb.draw.polygon(previewTiles[previewTilePointer], "rgba(128,128,128,0.5)", 1.0); // Polygon is not open
+        draw.polygon(previewTiles[previewTilePointer], "rgba(128,128,128,0.5)", 1.0); // Polygon is not open
 
         // Draw intersection polygons (if there are any)
         if (config.showPreviewOverlaps) {
@@ -142,7 +145,7 @@
       for (var i in girih.tiles) {
         var tile = girih.tiles[i];
         // Fill polygon when highlighted (mouse hover)
-        drawTile(tile, i);
+        drawTile(draw, fill, tile, i);
       }
 
       // Draw intersection polygons? (if there are any)
@@ -154,14 +157,14 @@
         previewTilePointer < previewTiles.length
       ) {
         for (var i = 0; i < previewIntersectionPolygons.length; i++) {
-          pb.fill.polygon(previewIntersectionPolygons[i], "rgba(255,0,0,0.25)");
+          fill.polygon(previewIntersectionPolygons[i], "rgba(255,0,0,0.25)");
         }
       }
 
       if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
         var tile = girih.tiles[hoverTileIndex];
         var edge = new Line(tile.vertices[hoverEdgeIndex], tile.vertices[(hoverEdgeIndex + 1) % tile.vertices.length]);
-        pb.draw.line(edge.a, edge.b, Red.cssRGB(), 2.0);
+        draw.line(edge.a, edge.b, Red.cssRGB(), 2.0);
       }
     };
 
@@ -171,30 +174,31 @@
     // | @param {GirihTile} tile - The tile itself.
     // | @param {number} index - The index in the tiles-array (to highlight hover).
     // +-------------------------------
-    var drawTile = function (tile, index) {
+    var drawTile = function (draw, fill, tile, index) {
       if (config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0) {
         drawTileTexture(pb, tile, textureImage);
       }
       if (config.drawOutlines) {
-        pb.draw.polygon(tile, Green.cssRGB(), 2.0); // Polygon is not open
+        draw.polygon(tile, Green.cssRGB(), 2.0); // Polygon is not open
       }
       // Draw all inner polygons?
       if (config.drawInnerPolygons) {
         for (var j = 0; j < tile.innerTilePolygons.length; j++) {
-          pb.draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
+          draw.polygon(tile.innerTilePolygons[j], DeepPurple.cssRGB(), 1.0);
         }
       }
       // Draw all outer polygons?
       if (config.drawOuterPolygons) {
         for (var j = 0; j < tile.outerTilePolygons.length; j++) {
-          pb.draw.polygon(tile.outerTilePolygons[j], Teal.cssRGB(), 1.0);
+          draw.polygon(tile.outerTilePolygons[j], Teal.cssRGB(), 1.0);
         }
       }
       // Draw a crosshair at the center
       var isHighlighted = index == hoverTileIndex;
       if (config.drawCenters) {
         drawFancyCrosshair(
-          pb,
+          draw,
+          fill,
           tile.position,
           tile.position.attr.isSelected ? "red" : isHighlighted ? "rgba(192,0,0,0.5)" : "rgba(0,192,192,0.5)",
           tile.position.attr.isSelected ? 2.0 : 1.0,
@@ -207,12 +211,12 @@
       if (config.drawCornerNumbers) {
         for (var i = 0; i < tile.vertices.length; i++) {
           var pos = tile.vertices[i].clone().scale(0.85, tile.position);
-          pb.fill.text("" + i, pos.x, pos.y, { color: contrastColor });
+          fill.text("" + i, pos.x, pos.y, { color: contrastColor });
         }
       }
 
       if (config.drawTileNumbers) {
-        pb.fill.text("" + index, tile.position.x, tile.position.y, { color: contrastColor });
+        fill.text("" + index, tile.position.x, tile.position.y, { color: contrastColor });
       }
     };
 
