@@ -13,7 +13,6 @@
  **/
 
 // TODOs
-//  * detect polygon intersection (avoid displaced tiles)
 //  * build auto-generation (random)
 //  * build grid of all possible positions (centers only)
 //  * detect connecting lines (inner polygons to max paths)
@@ -67,22 +66,6 @@
         GUP
       )
     );
-
-    // // +---------------------------------------------------------------------------------
-    // // | Pick a color from the WebColors array.
-    // // +-------------------------------
-    // var randomWebColor = function(index) {
-    //     return WebColors[ index % WebColors.length ].cssRGB();
-    // };
-
-    // // +---------------------------------------------------------------------------------
-    // // | Create a random vertex inside the canvas viewport.
-    // // +-------------------------------
-    // var randomVertex = function() {
-    //     return new Vertex( Math.random()*pb.canvasSize.width*0.5 - pb.canvasSize.width/2*0.5,
-    // 		       Math.random()*pb.canvasSize.height*0.5 - pb.canvasSize.height/2*0.5
-    // 		     );
-    // };
 
     // +---------------------------------------------------------------------------------
     // | Initialize
