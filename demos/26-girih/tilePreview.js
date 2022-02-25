@@ -16,6 +16,8 @@
   // +-------------------------------
   var createAdjacentTilePreview = function (tiles, pointer, setPreviewTilePointer, pb) {
     var container = document.querySelector(".wrapper-bottom");
+    // Apply canvas background color (this respects the darkmode in this component)
+    container.style["background-color"] = pb.config.backgroundColor;
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
@@ -78,7 +80,7 @@
     var nodes = document.querySelectorAll(".wrapper-bottom .preview-wrapper");
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
-      if (node.dataset && node.dataset.tileIndex == pointer) {
+      if (node.dataset && node.dataset.tileIndex === pointer) {
         node.classList.add("highlighted-preview-tile");
       } else {
         node.classList.remove("highlighted-preview-tile");
