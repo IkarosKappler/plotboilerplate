@@ -80,8 +80,8 @@
     <script src="../../src/cjs/utils/datastructures/GirihRhombus.js"></script>
     <script src="../../src/cjs/utils/datastructures/Girih.js"></script>
     <script src="../addPolygonJitter.js"></script>
-    <!-- <script src="../calculatePolygonArea.js"></script> -->
     <script src="../drawFancyCrosshair.js"></script>
+    <script src="girihToJSON.js"></script>
     <script src="drawTileTexture.js"></script>
     <script src="tilePreview.js"></script>
 
@@ -90,36 +90,7 @@
     <script src="index.js"></script>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
-    <style>
-      body {
-      display: flex;
-      flex-direction: column;
-      }
-      .wrapper-top {
-      height : calc(100% - 64px);
-      width: 100%;
-      }
-      .wrapper-bottom {
-      display: flex;
-      flex-direction: row;
-      height : 64px;
-      width : 100%;
-      }
-      div.preview-wrapper {
-      cursor: pointer;
-      display: flex;
-      height : 100%;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      }
-      div.preview-wrapper:hover {
-      background: rgba(0,192,192,0.25);
-      }
-      .highlighted-preview-tile {
-      background: rgba(0,192,192,0.5);
-      }
-    </style>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body class="fullscreen">
     <div class="wrapper-top">

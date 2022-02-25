@@ -506,7 +506,14 @@
         lineJoin: "round", // [ "bevel", "round", "miter" ]
         drawTextures: false,
         showPreviewOverlaps: true,
-        allowOverlaps: false
+        allowOverlaps: false,
+        exportFile: function () {
+          // TODO: export current setup
+          exportFile();
+        },
+        importFile: function () {
+          // TODO: import a file
+        }
       },
       GUP
     );
@@ -527,6 +534,11 @@
       console.log("Texture loaded");
       pb.redraw();
     });
+
+    var exportFile = function () {
+      var data = girihToJSON(girih.tiles);
+      saveAs(new Blob([data], { type: "application/json" }), "girih.json");
+    };
 
     var stats = {
       intersectionArea: 0.0
@@ -557,6 +569,12 @@
       gui.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
       // prettier-ignore
       gui.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
+
+      // Add to internal dat.gui folder
+      var exportFolder = globalThis.utils.guiFolders["editor_settings.export"];
+      console.log("exportFolder", exportFolder);
+      exportFolder.add(config, "exportFile");
+      // also "importFile"
 
       // Add stats
       var uiStats = new UIStats(stats);

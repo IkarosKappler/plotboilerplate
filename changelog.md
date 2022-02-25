@@ -3,6 +3,7 @@
 - 2022-02-04 (breaking change)
   - Removed the `toSVGString` function from all drawables. They were no use any more, as `drawutilssvg` is doing their task, and they turned out to be just code overhead. THIS IS A BREAKING CHANGE.
   - Upgraded demo 26-girih: removed SVGBuilder and added proper SVG drawing for preview tiles.
+  - Fixed the SVG export in the Girih demo (nothing was rendered/exported at all, just an empty canvas).
 - 2022-02-03
   - Added the `DrawLib.cross(...)` function.
   - Added the `draw.cross(...)` function.
