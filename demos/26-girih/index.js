@@ -508,11 +508,10 @@
         showPreviewOverlaps: true,
         allowOverlaps: false,
         exportFile: function () {
-          // TODO: export current setup
           exportFile();
         },
         importFile: function () {
-          // TODO: import a file
+          importFile();
         }
       },
       GUP
@@ -539,6 +538,34 @@
       var data = girihToJSON(girih.tiles);
       saveAs(new Blob([data], { type: "application/json" }), "girih.json");
     };
+
+    // Handle file-import click
+    var importFile = function () {
+      var input = document.createElement("input");
+      // input.type = "file";
+      input.setAttribute("type", "file");
+      input.onchange = e => {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = readerEvent => {
+          var content = readerEvent.target.result;
+          var jsonData = JSON.parse(content);
+          var jsonObject = girihFromJSON(jsonData);
+          girih.replaceTiles(jsonObject);
+          pb.redraw();
+        };
+      };
+      input.click();
+    };
+
+    // Install DnD
+    var fileDrop = new FileDrop(pb.eventCatcher);
+    fileDrop.onFileJSONDropped(function (jsonObject) {
+      var loadedGirihTiles = girihFromJSON(jsonObject);
+      girih.replaceTiles(loadedGirihTiles);
+      pb.redraw();
+    });
 
     var stats = {
       intersectionArea: 0.0
@@ -569,12 +596,13 @@
       gui.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
       // prettier-ignore
       gui.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
+      var foldImport = gui.addFolder("Import");
+      foldImport.add(config, "importFile");
 
       // Add to internal dat.gui folder
       var exportFolder = globalThis.utils.guiFolders["editor_settings.export"];
       console.log("exportFolder", exportFolder);
       exportFolder.add(config, "exportFile");
-      // also "importFile"
 
       // Add stats
       var uiStats = new UIStats(stats);

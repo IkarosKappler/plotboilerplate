@@ -1,7 +1,8 @@
 /**
- * @author  Ikaros Kappler
- * @date    2022-02-04
- * @version 1.0.0
+ * @author   Ikaros Kappler
+ * @date     2022-02-04
+ * @modified 2022-02-25 Fixed the whole fromJSON part.
+ * @version  1.0.1
  */
 
 globalThis.girihToJSON =
@@ -20,41 +21,31 @@ globalThis.girihToJSON =
         };
       });
 
-      console.log("toJson", data);
       return JSON.stringify(data);
     };
 
     return gtj;
   })();
 
-//   export enum TileType {
-//     UNKNOWN            = "UNKNOWN",
-//     DECAGON            = "DECAGON",
-//     PENTAGON           = "PENTAGON",
-//     IRREGULAR_HEXAGON  = "IRREGULAR_HEXAGON",
-//     RHOMBUS            = "RHOMBUS",
-//     BOW_TIE            = "BOW_TIE",
-//     // This is not part of the actual girih tile set!
-//     PENROSE_RHOMBUS    = "PENROSE_RHOMBUS"
-// };
-
 globalThis.girihFromJSON =
   globalThis.girihFromJSON ||
   (function () {
     function createFromDataElement(elem) {
+      // Convert the JSON position to a plotboilerplate.Vertex
+      var pos = new Vertex(elem.position);
       switch (elem.tileType) {
         case TileType.DECAGON:
-          return new GirihDecagon(elem.position, elem.edgeLength);
+          return new GirihDecagon(pos, elem.edgeLength);
         case TileType.PENTAGON:
-          return new Girihtagon(elem.position, elem.edgeLength);
+          return new GirihPentagon(pos, elem.edgeLength);
         case TileType.IRREGULAR_HEXAGON:
-          return new GirihHexagon(elem.position, elem.edgeLength);
+          return new GirihHexagon(pos, elem.edgeLength);
         case TileType.RHOMBUS:
-          return new GirihRhombus(elem.position, elem.edgeLength);
+          return new GirihRhombus(pos, elem.edgeLength);
         case TileType.BOW_TIE:
-          return new GirihBowtie(elem.position, elem.edgeLength);
+          return new GirihBowtie(pos, elem.edgeLength);
         case TileType.PENROSE_RHOMBUS:
-          return new GirihRhombus(elem.position, elem.edgeLength);
+          return new GirihPenroseRhombus(pos, elem.edgeLength);
         default:
           return null;
       }
@@ -67,7 +58,7 @@ globalThis.girihFromJSON =
       var girihTiles = data.map(function (elem) {
         var tile = createFromDataElement(elem);
         if (tile) {
-          tile.rotation = elem.rotation;
+          tile.rotate(elem.rotation);
         }
         return tile;
       });

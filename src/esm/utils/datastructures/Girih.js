@@ -41,7 +41,6 @@ export class Girih {
         this.tiles = [];
         this.initTemplates(edgeLength);
     }
-    ;
     /**
      * Initialize the TILE_TEMPLATES array.
      *
@@ -69,7 +68,6 @@ export class Girih {
         this.TILE_TEMPLATES.push(decagon.transformTilePositionToAdjacency(5, bowtie));
         this.TILE_TEMPLATES.push(pentagon.transformTilePositionToAdjacency(4, rhombus));
     }
-    ;
     /**
      * Add a new tile to this Girih pattern.
      *
@@ -82,7 +80,6 @@ export class Girih {
     addTile(tile) {
         this.tiles.push(tile);
     }
-    ;
     /**
      * Remove the tile at given array position. The index must be inside valid bounds.
      *
@@ -95,7 +92,16 @@ export class Girih {
     removeTileAt(index) {
         this.tiles.splice(index, 1);
     }
-    ;
+    /**
+     *
+     * @param tiles
+     */
+    replaceTiles(tiles) {
+        this.tiles.splice(0, this.tiles.length);
+        for (var i in tiles) {
+            this.addTile(tiles[i]);
+        }
+    }
     /**
      * Find that tile (index) which contains the given position. First match will be returned.
      *
@@ -112,7 +118,6 @@ export class Girih {
         }
         return -1;
     }
-    ;
     /**
      * Turn the tile the mouse is hovering over.
      * The turnCount is ab abstract number: -1 for one turn left, +1 for one turn right.
@@ -127,12 +132,12 @@ export class Girih {
      * @return {void}
      */
     turnTile(tileIndex, turnCount) {
-        if (tileIndex == -1) // TODO: still required?
+        if (tileIndex == -1)
+            // TODO: still required?
             return;
         const tile = this.tiles[tileIndex];
-        tile.rotate(turnCount * Math.PI * 2 / tile.symmetry);
+        tile.rotate((turnCount * Math.PI * 2) / tile.symmetry);
     }
-    ;
     /**
      * Move that tile the mouse is hovering over.
      * The move amounts are abstract numbers, 1 indicating one unit along each axis.
@@ -146,12 +151,12 @@ export class Girih {
      * @return {void}
      */
     moveTile(tileIndex, moveXAmount, moveYAmount) {
-        if (tileIndex == -1) // TODO: still required?
+        if (tileIndex == -1)
+            // TODO: still required?
             return;
         const tile = this.tiles[tileIndex];
         tile.move({ x: moveXAmount * 10, y: moveYAmount * 10 });
     }
-    ;
     /**
      * Find all possible adjadent tiles and their locations (type, rotation and offset). The
      * function will return an array of all possible tiles matching at the given tile and edge.
@@ -165,7 +170,8 @@ export class Girih {
      */
     findPossibleAdjacentTiles(tileIndex, edgeIndex) {
         var adjTiles = [];
-        if (tileIndex == -1 || edgeIndex == -1) // TODO: still required?
+        if (tileIndex == -1 || edgeIndex == -1)
+            // TODO: still required?
             return [];
         let template = null;
         for (var i in this.TILE_TEMPLATES) {
@@ -180,7 +186,5 @@ export class Girih {
         // previewTilePointer = Math.min( adjTiles.length-1, previewTiilePointer );
         return adjTiles;
     }
-    ;
-}
-; // END class Girih
+} // END class Girih
 //# sourceMappingURL=Girih.js.map
