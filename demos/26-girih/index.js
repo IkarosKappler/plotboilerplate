@@ -600,9 +600,8 @@
       var foldImport = gui.addFolder("Import");
       foldImport.add(config, "importFile");
 
-      // Add to internal dat.gui folder
+      // Add to internal dat.gui folder (exists as enableSVGExport=true)
       var exportFolder = globalThis.utils.guiFolders["editor_settings.export"];
-      console.log("exportFolder", exportFolder);
       exportFolder.add(config, "exportFile");
 
       // Add stats

@@ -32,6 +32,7 @@
 - Add the new text params to the `label` function, too (except size? style? weight?).
 - Make Images rotatetable.
 - Add `BezierResizeHelper` (from ndgd project).
+- Validate if the `./demos/detectDarkMode.js` or the `./demos/darkModeHandler.js` is better.
 
 ### Todos for future Version 2
 
