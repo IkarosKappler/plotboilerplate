@@ -16,8 +16,6 @@
   // +-------------------------------
   var createAdjacentTilePreview = function (tiles, pointer, setPreviewTilePointer, pb) {
     var container = document.querySelector(".wrapper-bottom");
-    // Apply canvas background color (this respects the darkmode in this component)
-    container.style["background-color"] = pb.config.backgroundColor;
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }

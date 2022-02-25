@@ -26,6 +26,7 @@
 
     // Fetch the GET params
     let GUP = gup();
+    var isDarkmode = detectDarkMode(GUP);
 
     var textureImage = null;
 
@@ -56,7 +57,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: "#ffffff",
+          backgroundColor: isDarkmode ? "#000000" : "#ffffff",
           enableMouse: true,
           enableKeys: true,
           enableTouch: true,
@@ -612,6 +613,9 @@
 
     initTiles();
     pb.config.preDraw = drawAll;
+    var container = document.querySelector(".wrapper-bottom");
+    // Apply canvas background color (this respects the darkmode in this component)
+    container.style["background-color"] = pb.config.backgroundColor;
     pb.redraw();
     pb.canvas.focus();
   };
