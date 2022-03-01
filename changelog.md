@@ -2,7 +2,7 @@
 
 - 2022-02-25
   - Extended the Girih demo: can upload files now per file select.
-  - Extended the Gihih demo: can upload files now per fiel drop.
+  - Extended the Gihih demo: can upload files now per file drop.
   - Added `globalThis.util.guiFolders` to gain quick access to the dat.gui folders created by the app (src/cjs/utils/createGui.js).
   - Added a new darkmode detection (already used in the ngdg project) to to demos.
 - 2022-02-04 (breaking change)

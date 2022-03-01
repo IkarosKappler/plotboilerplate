@@ -42,9 +42,10 @@
       tosvgDraw.beginDrawCycle(drawCycle);
       tosvgFill.beginDrawCycle(drawCycle);
       tosvgDraw.clear(pb.config.backgroundColor);
-      // tosvg.label('My Label', 0, 0, 45/180*Math.PI );
-
-      //   pb.drawAll(drawCycle, tosvgDraw, tosvgFill);
+      // Add a background for highlight the selected
+      tosvgFill.curClassName = "tile-background";
+      tosvgFill.rect(bounds.min, bounds.width, bounds.height, "rgba(0,255,0," + (pointer == i ? 0.25 : 0.0) + ")", 2);
+      tosvgFill.curClassName = null;
       tosvgDraw.polygon(tile, "green", 2);
       tosvgDraw.endDrawCycle(drawCycle);
       tosvgFill.endDrawCycle(drawCycle);
@@ -55,9 +56,9 @@
       node.addEventListener(
         "click",
         (function (tileIndex) {
-          return function (event) {
+          return function (_event) {
             setPreviewTilePointer(tileIndex);
-            highlightPreviewTile(tileIndex);
+            highlightPreviewTile(tileIndex, pb);
           };
         })(i)
       );
@@ -66,7 +67,7 @@
       container.appendChild(node);
     }
 
-    highlightPreviewTile(pointer);
+    highlightPreviewTile(pointer, pb);
   };
 
   // +---------------------------------------------------------------------------------
@@ -74,14 +75,16 @@
   // |
   // | @param {number} pointer - The tile pointer (index of highlighted preview tile).
   // +-------------------------------
-  var highlightPreviewTile = function (pointer) {
+  var highlightPreviewTile = function (pointer, pb) {
     var nodes = document.querySelectorAll(".wrapper-bottom .preview-wrapper");
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
-      if (node.dataset && node.dataset.tileIndex === pointer) {
+      if (node.dataset && Number(node.dataset["tileIndex"]) === pointer) {
         node.classList.add("highlighted-preview-tile");
+        node.querySelectorAll(".tile-background")[0].setAttribute("fill", "rgba(0,255,0,0.25)");
       } else {
         node.classList.remove("highlighted-preview-tile");
+        node.querySelectorAll(".tile-background")[0].setAttribute("fill", pb.config.backgroundColor);
       }
     }
   };

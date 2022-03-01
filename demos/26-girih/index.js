@@ -368,7 +368,7 @@
       })
       .down("d", function () {
         previewTilePointer = (previewTilePointer + 1) % previewTiles.length;
-        highlightPreviewTile(previewTilePointer);
+        highlightPreviewTile(previewTilePointer, pb);
         if ((hoverTileIndex != -1) & (hoverEdgeIndex != -1)) {
           findPreviewIntersections();
           pb.redraw();
@@ -377,7 +377,7 @@
       .down("a", function () {
         previewTilePointer--;
         if (previewTilePointer < 0) previewTilePointer = previewTiles.length - 1;
-        highlightPreviewTile(previewTilePointer);
+        highlightPreviewTile(previewTilePointer, pb);
         if (hoverTileIndex != -1 && hoverEdgeIndex != -1) {
           findPreviewIntersections();
           pb.redraw();
