@@ -33,6 +33,7 @@
 - Make Images rotatetable.
 - Add `BezierResizeHelper` (from ndgd project).
 - Validate if the `./demos/detectDarkMode.js` or the `./demos/darkModeHandler.js` is better.
+- Draw a helper function to draw scaled and shifted textures with a clip polygon (think of the Girih demo).
 
 ### Todos for future Version 2
 

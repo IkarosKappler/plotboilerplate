@@ -55,19 +55,21 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
         // Overwrite the default symmetries:
         //    the penrose-rhombus tile has a 180° symmetry (5/10 * 360°)
         _this.uniqueSymmetries = 5;
-        if (typeof addCenterPolygon == "undefined")
+        if (typeof addCenterPolygon === "undefined") {
             addCenterPolygon = true; // Add by default
+        }
         // Init the actual decahedron shape with the passed size
         var pointA = new Vertex_1.Vertex(0, 0);
         var pointB = pointA;
         _this.addVertex(pointB);
-        var angles = [0.0,
+        var angles = [
+            0.0,
             36.0,
             144.0 // 108.0
         ];
         var theta = 0.0;
         for (var i = 0; i < angles.length; i++) {
-            theta += (180.0 - angles[i]);
+            theta += 180.0 - angles[i];
             pointA = pointB; // center of rotation
             pointB = pointB.clone();
             pointB.x += _this.edgeLength;
@@ -80,56 +82,68 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
         for (var i = 0; i < _this.vertices.length; i++) {
             _this.vertices[i].add(move).add(position);
         }
-        _this.textureSource.min.x = 2 / 500.0,
-            _this.textureSource.min.y = 8 / 460.0;
+        _this.textureSource.min.x = 2 / 500.0;
+        _this.textureSource.min.y = 8 / 460.0;
         _this.textureSource.max.x = _this.textureSource.min.x + 173 / 500.0;
         _this.textureSource.max.y = _this.textureSource.min.y + 56 / 460.0;
-        ;
         _this.baseBounds = _this.getBounds();
         _this._buildInnerPolygons(_this.edgeLength, addCenterPolygon);
         _this._buildOuterPolygons(_this.edgeLength, addCenterPolygon);
         return _this;
     }
-    ;
     /**
      * @override
      */
     GirihPenroseRhombus.prototype.clone = function () {
         return new GirihPenroseRhombus(this.position.clone(), this.edgeLength, true).rotate(this.rotation);
     };
-    ;
-    GirihPenroseRhombus.prototype._buildInnerPolygons = function (edgeLength, addCenterPolygon) {
+    GirihPenroseRhombus.prototype._buildInnerPolygons = function (_edgeLength, addCenterPolygon) {
         var indices = [0, 2];
         var centerTile = new Polygon_1.Polygon();
         for (var i = 0; i < indices.length; i++) {
             var innerTile = new Polygon_1.Polygon();
             var index = indices[i];
-            var left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
-            var right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
-            var innerA = this.getVertexAt(index + 1).clone().scale(0.28, this.position);
-            var innerB = this.getVertexAt(index + 1).clone().scale(0.55, this.position);
+            var left = this.getVertexAt(index)
+                .clone()
+                .scale(0.5, this.getVertexAt(index + 1));
+            var right = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.5, this.getVertexAt(index + 2));
+            var innerA = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.28, this.position);
+            var innerB = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.55, this.position);
             innerTile.addVertex(left);
             innerTile.addVertex(innerA);
             innerTile.addVertex(right);
             innerTile.addVertex(innerB);
-            centerTile.addVertex(this.getVertexAt(index).clone().scale(0.1775, this.getVertexAt(index + 2)));
+            centerTile.addVertex(this.getVertexAt(index)
+                .clone()
+                .scale(0.1775, this.getVertexAt(index + 2)));
             centerTile.addVertex(innerA.clone());
             this.innerTilePolygons.push(innerTile);
         }
         if (addCenterPolygon)
             this.innerTilePolygons.push(centerTile);
     };
-    ;
-    GirihPenroseRhombus.prototype._buildOuterPolygons = function (edgeLength, centerPolygonExists) {
+    GirihPenroseRhombus.prototype._buildOuterPolygons = function (_edgeLength, centerPolygonExists) {
         // Add left and right 'spikes'.
         var indices = [0, 2];
         for (var i = 0; i < indices.length; i++) {
             var outerTile = new Polygon_1.Polygon();
             var index = indices[i];
-            var left = this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1));
-            var right = this.getVertexAt(index + 1).clone().scale(0.5, this.getVertexAt(index + 2));
+            var left = this.getVertexAt(index)
+                .clone()
+                .scale(0.5, this.getVertexAt(index + 1));
+            var right = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.5, this.getVertexAt(index + 2));
             // const innerA:Vertex = this.getVertexAt( index+1 ).clone().scale( 0.28, this.position );
-            var innerB = this.getVertexAt(index + 1).clone().scale(0.55, this.position);
+            var innerB = this.getVertexAt(index + 1)
+                .clone()
+                .scale(0.55, this.position);
             outerTile.addVertex(left.clone());
             outerTile.addVertex(this.getVertexAt(index + 1).clone());
             outerTile.addVertex(right.clone());
@@ -144,16 +158,21 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
                 var outerTile = new Polygon_1.Polygon();
                 var index = indices_1[i];
                 outerTile.addVertex(this.getVertexAt(index).clone());
-                outerTile.addVertex(this.getVertexAt(index).clone().scale(0.5, this.getVertexAt(index + 1)));
+                outerTile.addVertex(this.getVertexAt(index)
+                    .clone()
+                    .scale(0.5, this.getVertexAt(index + 1)));
                 outerTile.addVertex(this.innerTilePolygons[i].getVertexAt(1).clone());
-                outerTile.addVertex(this.getVertexAt(index).clone().scale(0.1775, this.getVertexAt(index + 2)));
+                outerTile.addVertex(this.getVertexAt(index)
+                    .clone()
+                    .scale(0.1775, this.getVertexAt(index + 2)));
                 outerTile.addVertex(this.innerTilePolygons[(i + 1) % 2].getVertexAt(1).clone());
-                outerTile.addVertex(this.getVertexAt(index - 1).clone().scale(0.5, this.getVertexAt(index)));
+                outerTile.addVertex(this.getVertexAt(index - 1)
+                    .clone()
+                    .scale(0.5, this.getVertexAt(index)));
                 this.outerTilePolygons.push(outerTile);
             }
         }
     };
-    ;
     /**
      * If you want the center polygon not to be drawn the canvas handler needs to
      * know the respective polygon index (inside the this.innerTilePolygons array).
@@ -162,9 +181,7 @@ var GirihPenroseRhombus = /** @class */ (function (_super) {
     GirihPenroseRhombus.prototype.getCenterPolygonIndex = function () {
         return 2;
     };
-    ;
     return GirihPenroseRhombus;
 }(GirihTile_1.GirihTile));
 exports.GirihPenroseRhombus = GirihPenroseRhombus;
-;
 //# sourceMappingURL=GirihPenroseRhombus.js.map

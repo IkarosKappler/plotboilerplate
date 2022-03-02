@@ -1,0 +1,10 @@
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.top,
+.bottom {
+  height: 50%;
+  width: 100%;
+}

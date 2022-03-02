@@ -23,8 +23,6 @@ export var TileType;
     // This is not part of the actual girih tile set!
     TileType["PENROSE_RHOMBUS"] = "PENROSE_RHOMBUS";
 })(TileType || (TileType = {}));
-;
-;
 /**
  * @classdesc This is a general tile superclass. All other tile classes extends this one.
  *
@@ -73,7 +71,6 @@ export class GirihTile extends Polygon {
         this.textureSource = new Bounds(new Vertex(), new Vertex());
         this.tileType = tileType;
     }
-    ;
     /**
      * Move this tile around (together will all inner polygons).
      * As this function overrides Polygon.move(...), the returned
@@ -95,7 +92,6 @@ export class GirihTile extends Polygon {
         this.position.add(amount);
         return this;
     }
-    ;
     /**
      * Find the adjacent tile (given by the template tile)
      * Note that the tile itself will be modified (rotated and moved to the correct position).
@@ -122,7 +118,6 @@ export class GirihTile extends Polygon {
         }
         return null;
     }
-    ;
     /**
      * Find all possible adjacent tile positions (and rotations) for `neighbourTile`.
      *
@@ -149,7 +144,6 @@ export class GirihTile extends Polygon {
         }
         return foundAlignments;
     }
-    ;
     /**
      * Apply adjacent tile position to `neighbourTile`.
      *
@@ -170,7 +164,6 @@ export class GirihTile extends Polygon {
         }
         return null;
     }
-    ;
     /**
      * Get the inner tile polygon at the given index.
      * This function applies MOD to the index.
@@ -187,7 +180,6 @@ export class GirihTile extends Polygon {
         else
             return this.innerTilePolygons[index % this.innerTilePolygons.length];
     }
-    ;
     /**
      * Get the outer tile polygon at the given index.
      * This function applies MOD to the index.
@@ -204,7 +196,6 @@ export class GirihTile extends Polygon {
         else
             return this.outerTilePolygons[index % this.outerTilePolygons.length];
     }
-    ;
     /**
      * Rotate this tile
      * Note: this function behaves a bitdifferent than the genuine Polygon.rotate function!
@@ -231,7 +222,6 @@ export class GirihTile extends Polygon {
         this.rotation += angle;
         return this;
     }
-    ;
     /**
      * This function locates the closest tile edge (polygon edge)
      * to the passed point.
@@ -259,7 +249,7 @@ export class GirihTile extends Polygon {
         for (var i = 0; i < this.vertices.length; i++) {
             const vertI = this.getVertexAt(i);
             const vertJ = this.getVertexAt(i + 1);
-            // Create a point in the middle of the edge	
+            // Create a point in the middle of the edge
             middle.x = vertI.x + (vertJ.x - vertI.x) / 2.0;
             middle.y = vertI.y + (vertJ.y - vertI.y) / 2.0;
             tmpDistance = middle.distance(point);
@@ -270,7 +260,7 @@ export class GirihTile extends Polygon {
         }
         return resultIndex;
     }
-}
+} // END class
 /**
  * An epsilon to use for detecting adjacent edges. 0.001 seems to be a good value.
  * Adjust if needed.
@@ -293,5 +283,4 @@ GirihTile.epsilon = 0.001;
  * @static
  */
 GirihTile.DEFAULT_EDGE_LENGTH = 58;
-; // END class
 //# sourceMappingURL=GirihTile.js.map
