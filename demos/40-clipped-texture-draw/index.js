@@ -153,28 +153,31 @@
       pbBottom.redraw();
     };
 
+    // TOOD: replace all .scale() to non uniform .scaleXY()
     var drawTarget = function (draw, fill) {
       // Get the position offset of the polygon
       var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
       if (fill.ctx) {
+        var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+        var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        draw.rect(targetTextureOffset, targetTextureSize.x, targetTextureSize.y, "blue", 1);
         fill.ctx.save();
-        clipPoly(fill.ctx, fill.offset.clone().sub(targetCenterDifference), fill.scale, polygon.vertices);
-        var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2)
-          .scaleXY({
-            x: fill.scale.x,
-            y: fill.scale.y
-          })
-          .sub(targetCenterDifference.scaleXY({ x: 1 / fill.scale.x, y: 1 / fill.scale.y }));
-        var targetTextureSize = new Vertex(textureSize.width, textureSize.height); // .scale(1 / fill.scale.x);
+        clipPoly(
+          fill.ctx,
+          fill.offset.clone().sub(targetCenterDifference.clone().scale(fill.scale.x)),
+          fill.scale,
+          polygon.vertices
+        );
         fill.image(textureImage, targetTextureOffset, targetTextureSize);
         fill.ctx.restore();
       }
 
-      // console.log("targetCenterDifference", targetCenterDifference);
+      // Draw move offset as line
+      draw.line(basePolygonBounds.getCenter(), targetCenterDifference, "grey", 1);
+
       draw.polyline(
         polygon.vertices.map(function (vert) {
-          return { x: vert.x - targetCenterDifference.x, y: vert.y - targetCenterDifference.y };
-          // return { x: vert.x, y: vert.y };
+          return vert.clone().sub(targetCenterDifference);
         }),
         false,
         "green",
