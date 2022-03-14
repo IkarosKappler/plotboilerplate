@@ -1,5 +1,7 @@
 # Changelog
 
+- 2022-03-08
+  - Added the `Polygon.clone()` function.
 - 2022-02-25
   - Extended the Girih demo: can upload files now per file select.
   - Extended the Gihih demo: can upload files now per file drop.

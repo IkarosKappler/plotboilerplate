@@ -1207,6 +1207,14 @@ class Polygon {
         return Bounds.computeFromVertices(this.vertices);
     }
     /**
+     * Create a deep copy of this polygon.
+     *
+     * @return {Polygon} The cloned polygon.
+     */
+    clone() {
+        return new Polygon(this.vertices.map(vert => vert.clone()), this.isOpen);
+    }
+    /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
      * The first vertex in the returned array is the start point.<br>

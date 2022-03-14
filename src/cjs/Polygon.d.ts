@@ -217,6 +217,12 @@ export declare class Polygon implements SVGSerializable {
      **/
     getBounds(): Bounds;
     /**
+     * Create a deep copy of this polygon.
+     *
+     * @return {Polygon} The cloned polygon.
+     */
+    clone(): Polygon;
+    /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
      * The first vertex in the returned array is the start point.<br>

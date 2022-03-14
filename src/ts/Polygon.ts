@@ -23,7 +23,8 @@
  * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version 1.9.0
+ * @modified 2022-03-08 Added the `Polygon.clone()` function.
+ * @version 1.10.0
  *
  * @file Polygon
  * @public
@@ -334,6 +335,18 @@ export class Polygon implements SVGSerializable {
    **/
   getBounds(): Bounds {
     return Bounds.computeFromVertices(this.vertices);
+  }
+
+  /**
+   * Create a deep copy of this polygon.
+   *
+   * @return {Polygon} The cloned polygon.
+   */
+  clone(): Polygon {
+    return new Polygon(
+      this.vertices.map(vert => vert.clone()),
+      this.isOpen
+    );
   }
 
   /**

@@ -105,7 +105,10 @@
     // this.textureSource.min.y = 8 / 460.0;
     // this.textureSource.max.x = this.textureSource.min.x + 173 / 500.0;
     // this.textureSource.max.y = this.textureSource.min.y + 56 / 460.0;
-    var textureSize = new Bounds({ x: 0, y: 0 }, { x: 500, y: 460 });
+    var imageWidth = 500.0;
+    var imageHeight = 460.0;
+    // var textureSize = new Bounds({ x: 0, y: 0 }, { x: 500, y: 460 });
+    var textureSize = new Bounds({ x: -imageWidth / 2, y: -imageHeight / 2 }, { x: imageWidth / 2, y: imageHeight / 2 });
     var polygon = new Polygon(
       [
         { x: 2, y: 64 },
@@ -155,20 +158,53 @@
 
     // TOOD: replace all .scale() to non uniform .scaleXY()
     var drawTarget = function (draw, fill) {
-      // Get the position offset of the polygon
+      var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
       var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+
+      var tile = polygon
+        .clone()
+        .rotate(rotation, basePolygonBounds.getCenter())
+        .move({ x: -targetCenterDifference.x, y: -targetCenterDifference.y });
+      var tileBounds = tile.getBounds();
+      var tileCenter = tileBounds.getCenter();
+
+      // Get the position offset of the polygon
       if (fill.ctx) {
         var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+        // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
         var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        // .add(targetCenterDifference);
         draw.rect(targetTextureOffset, targetTextureSize.x, targetTextureSize.y, "blue", 1);
         fill.ctx.save();
-        clipPoly(
-          fill.ctx,
-          fill.offset.clone().sub(targetCenterDifference.clone().scale(fill.scale.x)),
-          fill.scale,
-          polygon.vertices
+        // fill.ctx.translate(offset.x + tile.position.x, offset.y + tile.position.y);
+        var position = {
+          x: targetTextureOffset.x - targetCenterDifference.x,
+          y: targetTextureOffset.y - targetCenterDifference.y
+        };
+        console.log("targetCenterDifference", targetCenterDifference.toString());
+        var hardTranslation = {
+          x: fill.offset.x + (tileCenter.x - position.x * 0) * fill.scale.x,
+          y: fill.offset.y + (tileCenter.y - position.y * 0) * fill.scale.y
+        };
+        fill.ctx.translate(hardTranslation.x, hardTranslation.y);
+        fill.ctx.rotate(rotation);
+
+        // var position = {
+        //   x: (textureSize.min.x - targetCenterDifference.x) / fill.scale.x - (fill.offset.x + tileCenter.x / fill.scale.x),
+        //   y: (textureSize.min.y - targetCenterDifference.y) / fill.scale.y - (fill.offset.y + tileCenter.y / fill.scale.y)
+        // };
+
+        fill.ctx.drawImage(
+          textureImage,
+          0,
+          0,
+          textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+          textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+          (-polygonPosition.x + targetTextureOffset.x) * fill.scale.x, // 0, // fill.offset.x + position.x * fill.scale.x,
+          (-polygonPosition.y + targetTextureOffset.y) * fill.scale.y, // 0, // fill.offset.y + position.y * fill.scale.y,
+          targetTextureSize.x * fill.scale.x,
+          targetTextureSize.y * fill.scale.y
         );
-        fill.image(textureImage, targetTextureOffset, targetTextureSize);
         fill.ctx.restore();
       }
 
@@ -176,9 +212,9 @@
       draw.line(basePolygonBounds.getCenter(), targetCenterDifference, "grey", 1);
 
       draw.polyline(
-        polygon.vertices.map(function (vert) {
+        tile.vertices /* .map(function (vert) {
           return vert.clone().sub(targetCenterDifference);
-        }),
+        })*/,
         false,
         "green",
         2
@@ -204,22 +240,23 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        drawOutlines: true,
-        drawCenters: true,
-        drawCornerNumbers: false,
-        drawTileNumbers: false,
-        drawOuterPolygons: true,
-        drawInnerPolygons: true,
-        lineJoin: "round", // [ "bevel", "round", "miter" ]
-        drawTextures: false,
-        showPreviewOverlaps: true,
-        allowOverlaps: false,
-        exportFile: function () {
-          exportFile();
-        },
-        importFile: function () {
-          importFile();
-        }
+        // drawOutlines: true,
+        // drawCenters: true,
+        // drawCornerNumbers: false,
+        // drawTileNumbers: false,
+        // drawOuterPolygons: true,
+        // drawInnerPolygons: true,
+        // lineJoin: "round", // [ "bevel", "round", "miter" ]
+        // drawTextures: false,
+        // showPreviewOverlaps: true,
+        // allowOverlaps: false,
+        // exportFile: function () {
+        //   exportFile();
+        // },
+        // importFile: function () {
+        //   importFile();
+        // }
+        rotation: 0.0
       },
       GUP
     );
@@ -278,6 +315,9 @@
     // +-------------------------------
     {
       var gui = pbTop.createGUI();
+      // prettier-ignore
+      gui.add(config, 'rotation').min(-180).max(180).step(1).listen().onChange( function() { pbTop.redraw(); } ).name("rotation").title("Rotation of the tile");
+
       // prettier-ignore
       // gui.add(config, 'drawCornerNumbers').listen().onChange( function() { pbTop.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
       // // prettier-ignore

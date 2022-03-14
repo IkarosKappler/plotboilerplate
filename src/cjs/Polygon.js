@@ -290,6 +290,14 @@ var Polygon = /** @class */ (function () {
         return Bounds_1.Bounds.computeFromVertices(this.vertices);
     };
     /**
+     * Create a deep copy of this polygon.
+     *
+     * @return {Polygon} The cloned polygon.
+     */
+    Polygon.prototype.clone = function () {
+        return new Polygon(this.vertices.map(function (vert) { return vert.clone(); }), this.isOpen);
+    };
+    /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
      * The first vertex in the returned array is the start point.<br>
