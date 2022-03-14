@@ -194,6 +194,15 @@
         //   y: (textureSize.min.y - targetCenterDifference.y) / fill.scale.y - (fill.offset.y + tileCenter.y / fill.scale.y)
         // };
 
+        clipPoly(
+          fill.ctx,
+          {
+            x: (-targetCenterDifference.x - tileCenter.x) * fill.scale.x,
+            y: (-targetCenterDifference.y - tileCenter.y) * fill.scale.y
+          },
+          fill.scale,
+          polygon.vertices
+        );
         fill.ctx.drawImage(
           textureImage,
           0,
