@@ -114,7 +114,8 @@
         { x: 2, y: 64 },
         { x: 78, y: 9 },
         { x: 174, y: 9 },
-        { x: 97, y: 64 }
+        { x: 97, y: 64 },
+        { x: 50, y: 64 }
       ].map(function (coords) {
         return new Vertex(coords).sub(textureSize.width / 2, textureSize.height / 2);
       })
@@ -158,6 +159,7 @@
 
     // TOOD: replace all .scale() to non uniform .scaleXY()
     var drawTarget = function (draw, fill) {
+      basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
       var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
       var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
 
