@@ -161,7 +161,10 @@
     var drawTarget = function (draw, fill) {
       basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
       var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
+      // var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
       var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+      console.log("polygonPosition", polygonPosition.toString());
+      // polygonPosition.set(basePolygonBounds.getCenter());
 
       var tile = polygon
         .clone()
@@ -180,13 +183,17 @@
         fill.ctx.save();
         // fill.ctx.translate(offset.x + tile.position.x, offset.y + tile.position.y);
         var position = {
-          x: targetTextureOffset.x - targetCenterDifference.x,
-          y: targetTextureOffset.y - targetCenterDifference.y
+          x: targetTextureOffset.x * 1 - targetCenterDifference.x * 1,
+          y: targetTextureOffset.y * 1 - targetCenterDifference.y * 1
         };
         console.log("targetCenterDifference", targetCenterDifference.toString());
+        // var hardTranslation = {
+        //   x: fill.offset.x + (tileCenter.x - position.x * 0) * fill.scale.x,
+        //   y: fill.offset.y + (tileCenter.y - position.y * 0) * fill.scale.y
+        // };
         var hardTranslation = {
-          x: fill.offset.x + (tileCenter.x - position.x * 0) * fill.scale.x,
-          y: fill.offset.y + (tileCenter.y - position.y * 0) * fill.scale.y
+          x: fill.offset.x + (tileCenter.x - position.x * 0) * fill.scale.x, // - position.x,
+          y: fill.offset.y + (tileCenter.y - position.y * 0) * fill.scale.y //  - position.y
         };
         fill.ctx.translate(hardTranslation.x, hardTranslation.y);
         fill.ctx.rotate(rotation);
@@ -196,15 +203,28 @@
         //   y: (textureSize.min.y - targetCenterDifference.y) / fill.scale.y - (fill.offset.y + tileCenter.y / fill.scale.y)
         // };
 
-        clipPoly(
-          fill.ctx,
-          {
-            x: (-targetCenterDifference.x - tileCenter.x) * fill.scale.x,
-            y: (-targetCenterDifference.y - tileCenter.y) * fill.scale.y
-          },
-          fill.scale,
-          polygon.vertices
-        );
+        if (config.performClip) {
+          clipPoly(
+            fill.ctx,
+            {
+              x: (-targetCenterDifference.x - tileCenter.x) * fill.scale.x,
+              y: (-targetCenterDifference.y - tileCenter.y) * fill.scale.y
+            },
+            fill.scale,
+            polygon.vertices
+          );
+        }
+        // fill.ctx.drawImage(
+        //   textureImage,
+        //   0,
+        //   0,
+        //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+        //   (-polygonPosition.x + targetTextureOffset.x) * fill.scale.x, // 0, // fill.offset.x + position.x * fill.scale.x,
+        //   (-polygonPosition.y + targetTextureOffset.y) * fill.scale.y, // 0, // fill.offset.y + position.y * fill.scale.y,
+        //   targetTextureSize.x * fill.scale.x,
+        //   targetTextureSize.y * fill.scale.y
+        // );
         fill.ctx.drawImage(
           textureImage,
           0,
@@ -267,7 +287,8 @@
         // importFile: function () {
         //   importFile();
         // }
-        rotation: 0.0
+        rotation: 0.0,
+        performClip: true
       },
       GUP
     );
@@ -317,9 +338,31 @@
     //   pb.redraw();
     // });
 
+    // Add a mouse listener to track the mouse position.-
+    new MouseHandler(pbTop.canvas).move(function (e) {
+      var relPos = pbTop.transformMousePosition(e.params.pos.x, e.params.pos.y);
+      stats.mouseX = -textureSize.min.x + relPos.x;
+      stats.mouseY = -textureSize.min.y + relPos.y;
+    });
+
     // var stats = {
     //   intersectionArea: 0.0
     // };
+    // +---------------------------------------------------------------------------------
+    // | Add stats.
+    // +-------------------------------
+    var stats = {
+      mouseX: 0,
+      mouseY: 0,
+      width: 0,
+      height: 0,
+      diameter: 0,
+      area: 0
+    };
+    var uiStats = new UIStats(stats);
+    stats = uiStats.proxy;
+    uiStats.add("mouseX").precision(1);
+    uiStats.add("mouseY").precision(1);
 
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
@@ -328,6 +371,7 @@
       var gui = pbTop.createGUI();
       // prettier-ignore
       gui.add(config, 'rotation').min(-180).max(180).step(1).listen().onChange( function() { pbTop.redraw(); } ).name("rotation").title("Rotation of the tile");
+      gui.add(config, 'performClip').listen().onChange( function() { pbTop.redraw(); } ).name("performClip").title("Perform the clipping?");
 
       // prettier-ignore
       // gui.add(config, 'drawCornerNumbers').listen().onChange( function() { pbTop.redraw(); } ).name("drawCornerNumbers").title("Draw the number of each tile corner?");
