@@ -192,8 +192,8 @@
         //   y: fill.offset.y + (tileCenter.y - position.y * 0) * fill.scale.y
         // };
         var hardTranslation = {
-          x: fill.offset.x + (tileCenter.x - position.x * 0) * fill.scale.x, // - position.x,
-          y: fill.offset.y + (tileCenter.y - position.y * 0) * fill.scale.y //  - position.y
+          x: fill.offset.x + (tileCenter.x - position.x * 0 + targetCenterDifference.x * 0) * fill.scale.x, // - position.x,
+          y: fill.offset.y + (tileCenter.y - position.y * 0 + targetCenterDifference.y * 0) * fill.scale.y //  - position.y
         };
         fill.ctx.translate(hardTranslation.x, hardTranslation.y);
         fill.ctx.rotate(rotation);
@@ -236,6 +236,15 @@
           targetTextureSize.x * fill.scale.x,
           targetTextureSize.y * fill.scale.y
         );
+        fill.ctx.beginPath();
+        fill.ctx.moveTo(-10, 0);
+        fill.ctx.lineTo(10, 0);
+        fill.ctx.moveTo(0, -10);
+        fill.ctx.lineTo(0, 10);
+        fill.ctx.strokeStyle = "red";
+        fill.ctx.lineWidth = 2.0;
+        fill.ctx.stroke();
+        fill.ctx.closePath();
         fill.ctx.restore();
       }
 
