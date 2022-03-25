@@ -5,7 +5,8 @@
  * @modified 2020-11-19 Set min, max, width and height to private.
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
- * @version  1.3.0
+ * @modified 2022-02-01 Added the `toString` function.
+ * @version  1.4.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -65,6 +66,7 @@ export declare class Bounds implements IBounds, XYDimension {
      */
     toPolygon(): Polygon;
     getCenter(): Vertex;
+    toString(): string;
     /**
      * Compute the minimal bounding box for a given set of vertices.
      *

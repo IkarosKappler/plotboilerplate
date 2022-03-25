@@ -157,8 +157,21 @@
       pbBottom.redraw();
     };
 
-    // TOOD: replace all .scale() to non uniform .scaleXY()
     var drawTarget = function (draw, fill) {
+      // basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
+      var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
+      // console.log("rotation", rotation);
+      if (fill.ctx) {
+        // At the moment avoid calling this on SVG renderers
+        fillPolyTex(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
+      } else {
+        // At the moment avoid calling this on SVG renderers
+        fillPolyTexSVG(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
+      }
+    };
+
+    // TOOD: replace all .scale() to non uniform .scaleXY()
+    var _drawTarget = function (draw, fill) {
       basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
       var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
       // var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());

@@ -1,5 +1,7 @@
 # Changelog
 
+- 2022-03-25
+  - Added the `Bounds.toString()` function.
 - 2022-03-08
   - Added the `Polygon.clone()` function.
 - 2022-02-25
