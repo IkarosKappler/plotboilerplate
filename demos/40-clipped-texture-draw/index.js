@@ -114,7 +114,7 @@
         { x: 2, y: 64 },
         { x: 78, y: 9 },
         { x: 174, y: 9 },
-        { x: 97, y: 64 },
+        { x: 97, y: 64 + 40 }, // Add one more test point
         { x: 50, y: 64 }
       ].map(function (coords) {
         return new Vertex(coords).sub(textureSize.width / 2, textureSize.height / 2);
@@ -163,14 +163,18 @@
       var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
       // var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
       var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-      console.log("polygonPosition", polygonPosition.toString());
+      // console.log("polygonPosition", polygonPosition.toString());
       // polygonPosition.set(basePolygonBounds.getCenter());
 
       var tile = polygon
         .clone()
         .rotate(rotation, basePolygonBounds.getCenter())
         .move({ x: -targetCenterDifference.x, y: -targetCenterDifference.y });
-      var tileBounds = tile.getBounds();
+      // var tileBounds = tile.getBounds();
+      // var tileCenter = tileBounds.getCenter();
+      var tileBounds = polygon.getBounds();
+      tileBounds.min.sub(targetCenterDifference);
+      tileBounds.max.sub(targetCenterDifference);
       var tileCenter = tileBounds.getCenter();
 
       // Get the position offset of the polygon
@@ -186,15 +190,26 @@
           x: targetTextureOffset.x * 1 - targetCenterDifference.x * 1,
           y: targetTextureOffset.y * 1 - targetCenterDifference.y * 1
         };
-        console.log("targetCenterDifference", targetCenterDifference.toString());
+        console.log(
+          "polygonPosition",
+          polygonPosition.toString(),
+          "targetTextureOffset",
+          targetTextureOffset.toString(),
+          "targetCenterDifference",
+          targetCenterDifference.toString()
+        );
         // var hardTranslation = {
         //   x: fill.offset.x + (tileCenter.x - position.x * 0) * fill.scale.x,
         //   y: fill.offset.y + (tileCenter.y - position.y * 0) * fill.scale.y
         // };
-        var hardTranslation = {
-          x: fill.offset.x + (tileCenter.x - position.x * 0 + targetCenterDifference.x * 0) * fill.scale.x, // - position.x,
-          y: fill.offset.y + (tileCenter.y - position.y * 0 + targetCenterDifference.y * 0) * fill.scale.y //  - position.y
-        };
+        // var hardTranslation = {
+        //   x: fill.offset.x + tileCenter.x * fill.scale.x, // - position.x,
+        //   y: fill.offset.y + tileCenter.y * fill.scale.y //  - position.y
+        // };
+        var hardTranslation = new Vertex(
+          fill.offset.x + tileCenter.x * fill.scale.x,
+          fill.offset.y + tileCenter.y * fill.scale.y
+        ); // rotate(rotation, );
         fill.ctx.translate(hardTranslation.x, hardTranslation.y);
         fill.ctx.rotate(rotation);
 
@@ -225,27 +240,32 @@
         //   targetTextureSize.x * fill.scale.x,
         //   targetTextureSize.y * fill.scale.y
         // );
+        var textureTargetPos = {
+          x: (-polygonPosition.x + targetTextureOffset.x) * fill.scale.x,
+          y: (-polygonPosition.y + targetTextureOffset.y) * fill.scale.y
+        };
         fill.ctx.drawImage(
           textureImage,
           0,
           0,
           textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
           textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-          (-polygonPosition.x + targetTextureOffset.x) * fill.scale.x, // 0, // fill.offset.x + position.x * fill.scale.x,
-          (-polygonPosition.y + targetTextureOffset.y) * fill.scale.y, // 0, // fill.offset.y + position.y * fill.scale.y,
+          textureTargetPos.x, // (-polygonPosition.x + targetTextureOffset.x) * fill.scale.x, // 0, // fill.offset.x + position.x * fill.scale.x,
+          textureTargetPos.y, // (-polygonPosition.y + targetTextureOffset.y) * fill.scale.y, // 0, // fill.offset.y + position.y * fill.scale.y,
           targetTextureSize.x * fill.scale.x,
           targetTextureSize.y * fill.scale.y
         );
-        fill.ctx.beginPath();
-        fill.ctx.moveTo(-10, 0);
-        fill.ctx.lineTo(10, 0);
-        fill.ctx.moveTo(0, -10);
-        fill.ctx.lineTo(0, 10);
-        fill.ctx.strokeStyle = "red";
-        fill.ctx.lineWidth = 2.0;
-        fill.ctx.stroke();
-        fill.ctx.closePath();
-        fill.ctx.restore();
+        _crosshairAtZero(fill.ctx);
+        // fill.ctx.beginPath();
+        // fill.ctx.moveTo(-10, 0);
+        // fill.ctx.lineTo(10, 0);
+        // fill.ctx.moveTo(0, -10);
+        // fill.ctx.lineTo(0, 10);
+        // fill.ctx.strokeStyle = "red";
+        // fill.ctx.lineWidth = 2.0;
+        // fill.ctx.stroke();
+        // fill.ctx.closePath();
+        // fill.ctx.restore();
       }
 
       // Draw move offset as line
@@ -260,6 +280,19 @@
         2
       );
     };
+
+    function _crosshairAtZero(ctx) {
+      ctx.beginPath();
+      ctx.moveTo(-10, 0);
+      ctx.lineTo(10, 0);
+      ctx.moveTo(0, -10);
+      ctx.lineTo(0, 10);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 2.0;
+      ctx.stroke();
+      ctx.closePath();
+      ctx.restore();
+    }
 
     // A helper function to define the clipping path.
     // This could be a candidate for the draw library.
