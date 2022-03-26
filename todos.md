@@ -34,6 +34,7 @@
 - Add `BezierResizeHelper` (from ndgd project).
 - Validate if the `./demos/detectDarkMode.js` or the `./demos/darkModeHandler.js` is better.
 - Draw a helper function to draw scaled and shifted textures with a clip polygon (think of the Girih demo).
+- Change drawutilssvg.copyPathData(...); this is a simple array-copy, nothing more, use a global generic helper function for this (re-usability).
 
 ### Todos for future Version 2
 

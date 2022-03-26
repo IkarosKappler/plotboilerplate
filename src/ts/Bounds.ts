@@ -83,10 +83,29 @@ export class Bounds implements IBounds, XYDimension {
     );
   }
 
+  /**
+   * Get the center of this boinding box.
+   *
+   * @method getCenter
+   * @instance
+   * @memberof Bounds
+   * @returns {Vertex} The center of these bounds.
+   */
   getCenter(): Vertex {
     return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
   }
 
+  /**
+   * Convert these bounds to a human readable form.
+   *
+   * Note: the returned format might change in the future, so please do not
+   * rely on the returned string format.
+   *
+   * @method toString
+   * @instance
+   * @memberof Bounds
+   * @returns {string} Get these bounds in a human readable form.
+   */
   toString(): string {
     return `{ min: ${this.min.toString()}, max : ${this.max.toString()}, width: ${this.width}, height : ${this.height} }`;
   }

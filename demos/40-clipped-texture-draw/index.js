@@ -166,7 +166,8 @@
         fillPolyTex(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
       } else {
         // At the moment avoid calling this on SVG renderers
-        fillPolyTexSVG(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
+        // fillPolyTexSVG(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
+        fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation);
       }
     };
 

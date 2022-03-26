@@ -31,11 +31,14 @@
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  1.5.0
+ * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
+ * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
+ * @version  1.6.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -73,6 +76,22 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @private
      */
     private nodeStyle;
+    /**
+     * A style node of type `<defs>`.
+     * @member {SVGGelement}
+     * @memberof drawutilssvg
+     * @instance
+     * @private
+     */
+    private nodeDefs;
+    /**
+     * The buffered nodeDefs.
+     * @member {SVGGelement}
+     * @memberof drawutilssvg
+     * @instance
+     * @private
+     */
+    private bufferedNodeDefs;
     /**
      * @member {Vertex}
      * @memberof drawutilssvg
@@ -138,8 +157,18 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement, nodeDefs?: SVGDefsElement, bufferNodeDefs?: SVGDefsElement);
+    /**
+     * Adds a default style defintion based on the passed DrawConfig.
+     * Twaek the draw config to change default colors or line thicknesses.
+     *
+     * @param {DrawConfig} drawConfig
+     */
     private addStyleDefs;
+    /**
+     * Adds the internal <defs> node.
+     */
+    private addDefsNode;
     /**
      * This is a simple way to include custom CSS class mappings to the style defs of the generated SVG.
      *
@@ -317,6 +346,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @memberof drawutilssvg
      **/
     image(image: HTMLImageElement, position: Vertex, size: Vertex): SVGElement;
+    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number, isNoClip?: boolean): SVGElement;
     /**
      * Draw the given (cubic) bézier curve.
      *
