@@ -669,7 +669,18 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     // SVG rotations in degrees
     node.setAttribute(
       "transform",
-      `rotate(${rotation * RAD_TO_DEG}, ${this._x(polygonPosition.x)}, ${this._y(polygonPosition.y)})`
+      // Test
+      `translate(${-targetCenterDifference.x}, ${-targetCenterDifference.y}) ` +
+        // `rotate(${rotation * RAD_TO_DEG})`
+        `rotate(${rotation * RAD_TO_DEG}, ${this._x(targetCenterDifference.x + polygonPosition.x)}, ${this._y(
+          targetCenterDifference.y + polygonPosition.y
+        )})`
+      // `rotate(${rotation * RAD_TO_DEG}, ${this._x(polygonPosition.x - targetCenterDifference.x)}, ${this._y(
+      //   polygonPosition.y - targetCenterDifference.y
+      // )})`
+      // `rotate(${rotation * RAD_TO_DEG}, ${polygonPosition.x - targetCenterDifference.x}, ${
+      //   polygonPosition.y - targetCenterDifference.y
+      // })`
     );
     const pathNode: SVGPathElement = this.makeNode("path") as SVGPathElement;
     // TODO: convert to helper function

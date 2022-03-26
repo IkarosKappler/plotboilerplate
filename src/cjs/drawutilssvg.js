@@ -484,7 +484,19 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute("clip-path", "url(#" + clipPathId + ")");
         // node.setAttribute("transform-origin", "50% 50%");
         // SVG rotations in degrees
-        node.setAttribute("transform", "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(polygonPosition.x) + ", " + this._y(polygonPosition.y) + ")");
+        node.setAttribute("transform", 
+        // Test
+        "translate(" + -targetCenterDifference.x + ", " + -targetCenterDifference.y + ") " +
+            (
+            // `rotate(${rotation * RAD_TO_DEG})`
+            "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(targetCenterDifference.x + polygonPosition.x) + ", " + this._y(targetCenterDifference.y + polygonPosition.y) + ")")
+        // `rotate(${rotation * RAD_TO_DEG}, ${this._x(polygonPosition.x - targetCenterDifference.x)}, ${this._y(
+        //   polygonPosition.y - targetCenterDifference.y
+        // )})`
+        // `rotate(${rotation * RAD_TO_DEG}, ${polygonPosition.x - targetCenterDifference.x}, ${
+        //   polygonPosition.y - targetCenterDifference.y
+        // })`
+        );
         var pathNode = this.makeNode("path");
         // TODO: convert to helper function
         var pathData = [];
