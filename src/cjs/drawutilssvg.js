@@ -41,6 +41,7 @@ exports.drawutilssvg = void 0;
 var CircleSector_1 = require("./CircleSector");
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Vertex_1 = require("./Vertex");
+var UIDGenerator_1 = require("./UIDGenerator");
 var RAD_TO_DEG = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -471,24 +472,33 @@ var drawutilssvg = /** @class */ (function () {
         //    <image width="643" height="643" clip-path="url(#shape)"  xlink:href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/222579/beagle400.jpg" >
         //    </image>
         // ...
-        var node = this.makeNode("image");
-        node.setAttribute("x", "" + textureSize.min.x);
-        node.setAttribute("y", "" + textureSize.min.y);
-        node.setAttribute("width", "" + textureSize.width);
-        node.setAttribute("height", "" + textureSize.width);
         var clipPathNode = this.makeNode("clipPath");
+        var clipPathId = "clippath_" + UIDGenerator_1.UIDGenerator.next(); // TODO: use a better UUID generator here?
+        clipPathNode.setAttribute("id", clipPathId);
+        var node = this.makeNode("image");
+        node.setAttribute("x", "" + this._x(textureSize.min.x));
+        node.setAttribute("y", "" + this._y(textureSize.min.y));
+        node.setAttribute("width", "" + textureSize.width * this.scale.x);
+        node.setAttribute("height", "" + textureSize.height * this.scale.y);
+        node.setAttribute("href", textureImage.src);
+        node.setAttribute("clip-path", "url(#" + clipPathId + ")");
+        // node.setAttribute("transform-origin", "50% 50%");
+        // SVG rotations in degrees
+        node.setAttribute("transform", "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(polygonPosition.x) + ", " + this._y(polygonPosition.y) + ")");
         var pathNode = this.makeNode("path");
         // TODO: convert to helper function
         var pathData = [];
         if (polygon.vertices.length > 0) {
-            pathData.push("M", "" + polygon.vertices[0].x, "" + polygon.vertices[0].y);
+            pathData.push("M", "" + this._x(polygon.vertices[0].x), "" + this._y(polygon.vertices[0].y));
             for (var i = 1; i < polygon.vertices.length; i++) {
-                pathData.push("L", "" + polygon.vertices[i].x, "" + polygon.vertices[i].y);
+                pathData.push("L", "" + this._x(polygon.vertices[i].x), "" + this._y(polygon.vertices[i].y));
             }
         }
         pathNode.setAttribute("d", pathData.join(" "));
         clipPathNode.appendChild(pathNode);
-        this.nodeDefs.appendChild(clipPathNode);
+        this.bufferedNodeDefs.appendChild(clipPathNode);
+        // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
+        this._bindFillDraw(node, "image", null, null); // No color, no lineWidth
         //---END
         //   fill.ctx.save();
         //   fill.ctx.translate(fill.offset.x + tileCenter.x * fill.scale.x, fill.offset.y + tileCenter.y * fill.scale.y);
@@ -1152,6 +1162,9 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.removeAllChildNodes = function () {
         while (this.bufferGNode.lastChild) {
             this.bufferGNode.removeChild(this.bufferGNode.lastChild);
+        }
+        while (this.bufferedNodeDefs.lastChild) {
+            this.bufferedNodeDefs.removeChild(this.bufferedNodeDefs.lastChild);
         }
     };
     /**
