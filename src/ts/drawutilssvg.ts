@@ -670,7 +670,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     node.setAttribute(
       "transform",
       // Test
-      `translate(${-targetCenterDifference.x}, ${-targetCenterDifference.y}) ` +
+      `translate(${-targetCenterDifference.x * this.scale.x}, ${-targetCenterDifference.y * this.scale.y}) ` +
         // `rotate(${rotation * RAD_TO_DEG})`
         `rotate(${rotation * RAD_TO_DEG}, ${this._x(targetCenterDifference.x + polygonPosition.x)}, ${this._y(
           targetCenterDifference.y + polygonPosition.y
