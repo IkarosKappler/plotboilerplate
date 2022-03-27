@@ -1,5 +1,8 @@
 # Changelog
 
+- 2022-03-27
+  - Added the `texturedPoly` function to the `DrawLib` interface.
+  - Added the `texturedPoly` function to the `drawutils` and `drawutilssvg` class.
 - 2022-03-25
   - Added the `Bounds.toString()` function.
   - Added the private `nodeDefs` and `bufferedNodeDefs` attributes.

@@ -161,14 +161,15 @@
       // basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
       var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
       // console.log("rotation", rotation);
-      if (fill.ctx) {
-        // At the moment avoid calling this on SVG renderers
-        fillPolyTex(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
-      } else {
-        // At the moment avoid calling this on SVG renderers
-        // fillPolyTexSVG(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
-        fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation);
-      }
+      // if (fill.ctx) {
+      //   // At the moment avoid calling this on SVG renderers
+      //   fillPolyTex(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
+      // } else {
+      //   // At the moment avoid calling this on SVG renderers
+      //   // fillPolyTexSVG(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
+      //   fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation);
+      // }
+      fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation);
     };
 
     // TOOD: replace all .scale() to non uniform .scaleXY()

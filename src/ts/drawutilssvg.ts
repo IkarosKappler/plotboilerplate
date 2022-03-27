@@ -626,23 +626,37 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     return this._bindFillDraw(node, "image", null, null);
   }
 
+  /**
+   * Draw an image at the given position with the given size.<br>
+   * <br>
+   * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+   *
+   * @method texturedPoly
+   * @param {Image} textureImage - The image object to draw.
+   * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+   * @param {Polygon} polygon - The polygon to use as clip path.
+   * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+   * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+   * @return {void}
+   * @instance
+   * @memberof drawutilssvg
+   **/
   texturedPoly(
     textureImage: HTMLImageElement,
     textureSize: Bounds,
     polygon: Polygon,
     polygonPosition: Vertex,
-    rotation: number,
-    isNoClip: boolean = false
+    rotation: number
   ): SVGElement {
     var basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
     var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-    var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+    // TODO: cc
+    // var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
 
-    // Get the position offset of the polygon
-    var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
-    var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+    // // Get the position offset of the polygon
+    // var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+    // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
 
-    //---NEW
     // Create something like this
     // ...
     //    <defs>

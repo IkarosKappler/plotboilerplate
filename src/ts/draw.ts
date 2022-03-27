@@ -41,7 +41,8 @@
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  1.11.0
+ * @modified 2022-03-27 Added the `texturedPoly` function.
+ * @version  1.12.0
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -49,6 +50,7 @@ import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 import { drawutilssvg } from "./drawutilssvg";
+import { Bounds } from "./Bounds";
 
 // Todo: rename this class to Drawutils?
 /**
@@ -250,6 +252,66 @@ export class drawutils implements DrawLib<void> {
       size.x * this.scale.x,
       size.y * this.scale.y
     );
+    this.ctx.restore();
+  }
+
+  /**
+   * Draw an image at the given position with the given size.<br>
+   * <br>
+   * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+   *
+   * @method texturedPoly
+   * @param {Image} textureImage - The image object to draw.
+   * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+   * @param {Polygon} polygon - The polygon to use as clip path.
+   * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+   * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+   * @return {void}
+   * @instance
+   * @memberof drawutils
+   **/
+  // function fillPolyTex(fill, textureImage, textureSize, polygon, polygonPosition, rotation, isNoClip) {
+  texturedPoly(
+    textureImage: HTMLImageElement,
+    textureSize: Bounds,
+    polygon: Polygon,
+    polygonPosition: Vertex,
+    rotation: number
+  ): void {
+    var basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
+    var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+    var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+
+    // Get the position offset of the polygon
+    var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+    var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+
+    this.ctx.save();
+
+    this.ctx.translate(this.offset.x + tileCenter.x * this.scale.x, this.offset.y + tileCenter.y * this.scale.y);
+    this.ctx.rotate(rotation);
+
+    drawutils.helpers.clipPoly(
+      this.ctx,
+      {
+        x: (-targetCenterDifference.x - tileCenter.x) * this.scale.x,
+        y: (-targetCenterDifference.y - tileCenter.y) * this.scale.y
+      },
+      this.scale,
+      polygon.vertices
+    );
+    this.ctx.drawImage(
+      textureImage,
+      0,
+      0,
+      textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+      textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+      (-polygonPosition.x + targetTextureOffset.x) * this.scale.x,
+      (-polygonPosition.y + targetTextureOffset.y) * this.scale.y,
+      targetTextureSize.x * this.scale.x,
+      targetTextureSize.y * this.scale.y
+    );
+
     this.ctx.restore();
   }
 
@@ -1023,4 +1085,20 @@ export class drawutils implements DrawLib<void> {
     this.ctx.fillStyle = color;
     this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
   }
+
+  private static helpers = {
+    // A helper function to define the clipping path.
+    // This could be a candidate for the draw library.
+    clipPoly: (ctx: CanvasRenderingContext2D, offset: XYCoords, scale: XYCoords, vertices: Array<XYCoords>): void => {
+      ctx.beginPath();
+      // Set clip mask
+      ctx.moveTo(offset.x + vertices[0].x * scale.x, offset.y + vertices[0].y * scale.y);
+      for (var i = 1; i < vertices.length; i++) {
+        const vert: XYCoords = vertices[i];
+        ctx.lineTo(offset.x + vert.x * scale.x, offset.y + vert.y * scale.y);
+      }
+      ctx.closePath();
+      ctx.clip();
+    }
+  };
 }

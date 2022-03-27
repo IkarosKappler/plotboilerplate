@@ -9,7 +9,8 @@
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  0.0.6
+ * @modified 2022-03-27 Added the `texturedPoly` function.
+ * @version  0.0.7
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilsgl = void 0;
@@ -207,6 +208,24 @@ var drawutilsgl = /** @class */ (function () {
      * @memberof drawutils
      **/
     drawutilsgl.prototype.image = function (image, position, size) {
+        // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @return {void}
+     * @instance
+     * @memberof drawutilsgl
+     **/
+    drawutilsgl.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
         // NOT YET IMPLEMENTED
     };
     // +---------------------------------------------------------------------------------
