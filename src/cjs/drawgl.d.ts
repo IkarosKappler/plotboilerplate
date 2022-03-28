@@ -147,11 +147,12 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @param {Polygon} polygon - The polygon to use as clip path.
      * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
      * @return {void}
      * @instance
      * @memberof drawutilsgl
      **/
-    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number): void;
+    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number, rotationCenter?: XYCoords): void;
     _fillOrDraw(color: string): void;
     /**
      * Draw the given (cubic) bézier curve.

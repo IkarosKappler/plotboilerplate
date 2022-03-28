@@ -221,11 +221,12 @@ var drawutilsgl = /** @class */ (function () {
      * @param {Polygon} polygon - The polygon to use as clip path.
      * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
      * @return {void}
      * @instance
      * @memberof drawutilsgl
      **/
-    drawutilsgl.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
+    drawutilsgl.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter) {
         // NOT YET IMPLEMENTED
     };
     // +---------------------------------------------------------------------------------

@@ -35,6 +35,7 @@
 - Validate if the `./demos/detectDarkMode.js` or the `./demos/darkModeHandler.js` is better.
 - Draw a helper function to draw scaled and shifted textures with a clip polygon (think of the Girih demo).
 - Change drawutilssvg.copyPathData(...); this is a simple array-copy, nothing more, use a global generic helper function for this (re-usability).
+- Fix a bug in the textured-polygon demo (mouse coordinates in canvas demo do not match coordinates in svg demo).
 
 ### Todos for future Version 2
 

@@ -463,13 +463,15 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Polygon} polygon - The polygon to use as clip path.
      * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
-        var basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
+    drawutilssvg.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter) {
+        var basePolygonBounds = polygon.getBounds();
         var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
         // TODO: cc
         // var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
         // // Get the position offset of the polygon
@@ -498,19 +500,8 @@ var drawutilssvg = /** @class */ (function () {
         node.setAttribute("clip-path", "url(#" + clipPathId + ")");
         // node.setAttribute("transform-origin", "50% 50%");
         // SVG rotations in degrees
-        node.setAttribute("transform", 
-        // Test
-        "translate(" + -targetCenterDifference.x * this.scale.x + ", " + -targetCenterDifference.y * this.scale.y + ") " +
-            (
-            // `rotate(${rotation * RAD_TO_DEG})`
-            "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(targetCenterDifference.x + polygonPosition.x) + ", " + this._y(targetCenterDifference.y + polygonPosition.y) + ")")
-        // `rotate(${rotation * RAD_TO_DEG}, ${this._x(polygonPosition.x - targetCenterDifference.x)}, ${this._y(
-        //   polygonPosition.y - targetCenterDifference.y
-        // )})`
-        // `rotate(${rotation * RAD_TO_DEG}, ${polygonPosition.x - targetCenterDifference.x}, ${
-        //   polygonPosition.y - targetCenterDifference.y
-        // })`
-        );
+        node.setAttribute("transform", "translate(" + (-rotationalOffset.x - targetCenterDifference.x) * this.scale.x + ", " + (-rotationalOffset.y - targetCenterDifference.y) * this.scale.y + ") " +
+            ("rotate(" + rotation * RAD_TO_DEG + ", " + this._x(targetCenterDifference.x + polygonPosition.x + rotationalOffset.x) + ", " + this._y(targetCenterDifference.y + polygonPosition.y + rotationalOffset.y) + ")"));
         var pathNode = this.makeNode("path");
         // TODO: convert to helper function
         var pathData = [];
@@ -525,33 +516,6 @@ var drawutilssvg = /** @class */ (function () {
         this.bufferedNodeDefs.appendChild(clipPathNode);
         // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
         this._bindFillDraw(node, "image", null, null); // No color, no lineWidth
-        //---END
-        //   fill.ctx.save();
-        //   fill.ctx.translate(fill.offset.x + tileCenter.x * fill.scale.x, fill.offset.y + tileCenter.y * fill.scale.y);
-        //   fill.ctx.rotate(rotation);
-        //   if (!isNoClip) {
-        //     clipPoly(
-        //       fill.ctx,
-        //       {
-        //         x: (-targetCenterDifference.x - tileCenter.x) * fill.scale.x,
-        //         y: (-targetCenterDifference.y - tileCenter.y) * fill.scale.y
-        //       },
-        //       fill.scale,
-        //       polygon.vertices
-        //     );
-        //   }
-        //   fill.ctx.drawImage(
-        //     textureImage,
-        //     0,
-        //     0,
-        //     textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
-        //     textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-        //     (-polygonPosition.x + targetTextureOffset.x) * fill.scale.x,
-        //     (-polygonPosition.y + targetTextureOffset.y) * fill.scale.y,
-        //     targetTextureSize.x * fill.scale.x,
-        //     targetTextureSize.y * fill.scale.y
-        //   );
-        //   fill.ctx.restore();
         return node;
     };
     /**

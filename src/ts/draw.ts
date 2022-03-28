@@ -266,20 +266,22 @@ export class drawutils implements DrawLib<void> {
    * @param {Polygon} polygon - The polygon to use as clip path.
    * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
    * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+   * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
    * @return {void}
    * @instance
    * @memberof drawutils
    **/
-  // function fillPolyTex(fill, textureImage, textureSize, polygon, polygonPosition, rotation, isNoClip) {
   texturedPoly(
     textureImage: HTMLImageElement,
     textureSize: Bounds,
     polygon: Polygon,
     polygonPosition: Vertex,
-    rotation: number
+    rotation: number,
+    rotationCenter?: XYCoords
   ): void {
-    var basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
+    var basePolygonBounds = polygon.getBounds();
     var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+    var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
     var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
 
     // Get the position offset of the polygon
@@ -288,14 +290,17 @@ export class drawutils implements DrawLib<void> {
 
     this.ctx.save();
 
-    this.ctx.translate(this.offset.x + tileCenter.x * this.scale.x, this.offset.y + tileCenter.y * this.scale.y);
+    this.ctx.translate(
+      this.offset.x + (tileCenter.x - rotationalOffset.x) * this.scale.x,
+      this.offset.y + (tileCenter.y - rotationalOffset.y) * this.scale.y
+    );
     this.ctx.rotate(rotation);
 
     drawutils.helpers.clipPoly(
       this.ctx,
       {
-        x: (-targetCenterDifference.x - tileCenter.x) * this.scale.x,
-        y: (-targetCenterDifference.y - tileCenter.y) * this.scale.y
+        x: (-targetCenterDifference.x - tileCenter.x - rotationalOffset.x) * this.scale.x,
+        y: (-targetCenterDifference.y - tileCenter.y - rotationalOffset.y) * this.scale.y
       },
       this.scale,
       polygon.vertices
@@ -306,8 +311,8 @@ export class drawutils implements DrawLib<void> {
       0,
       textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
       textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-      (-polygonPosition.x + targetTextureOffset.x) * this.scale.x,
-      (-polygonPosition.y + targetTextureOffset.y) * this.scale.y,
+      (-polygonPosition.x + targetTextureOffset.x - rotationalOffset.x) * this.scale.x,
+      (-polygonPosition.y + targetTextureOffset.y - rotationalOffset.y) * this.scale.y,
       targetTextureSize.x * this.scale.x,
       targetTextureSize.y * this.scale.y
     );
