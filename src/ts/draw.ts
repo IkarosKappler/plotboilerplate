@@ -282,6 +282,7 @@ export class drawutils implements DrawLib<void> {
     var basePolygonBounds = polygon.getBounds();
     var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
     var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+    // var rotationalOffset = { x: 0, y: 0 };
     var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
 
     // Get the position offset of the polygon
@@ -291,16 +292,16 @@ export class drawutils implements DrawLib<void> {
     this.ctx.save();
 
     this.ctx.translate(
-      this.offset.x + (tileCenter.x - rotationalOffset.x) * this.scale.x,
-      this.offset.y + (tileCenter.y - rotationalOffset.y) * this.scale.y
+      this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+      this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
     );
     this.ctx.rotate(rotation);
 
     drawutils.helpers.clipPoly(
       this.ctx,
       {
-        x: (-targetCenterDifference.x - tileCenter.x - rotationalOffset.x) * this.scale.x,
-        y: (-targetCenterDifference.y - tileCenter.y - rotationalOffset.y) * this.scale.y
+        x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
+        y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
       },
       this.scale,
       polygon.vertices
@@ -311,11 +312,33 @@ export class drawutils implements DrawLib<void> {
       0,
       textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
       textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-      (-polygonPosition.x + targetTextureOffset.x - rotationalOffset.x) * this.scale.x,
-      (-polygonPosition.y + targetTextureOffset.y - rotationalOffset.y) * this.scale.y,
+      (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x,
+      (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y,
       targetTextureSize.x * this.scale.x,
       targetTextureSize.y * this.scale.y
     );
+
+    // const scaledTextureSize = new Bounds(
+    //   new Vertex(
+    //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
+    //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
+    //   ).scaleXY(this.scale, rotationCenter),
+    //   new Vertex(
+    //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
+    //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
+    //   ).scaleXY(this.scale, rotationCenter)
+    // );
+    // this.ctx.drawImage(
+    //   textureImage,
+    //   0,
+    //   0,
+    //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+    //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+    //   scaledTextureSize.min.x,
+    //   scaledTextureSize.min.y,
+    //   scaledTextureSize.width,
+    //   scaledTextureSize.height
+    // );
 
     this.ctx.restore();
   }

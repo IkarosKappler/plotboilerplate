@@ -103,7 +103,7 @@
     // +-------------------------------
     var imageWidth = 500.0;
     var imageHeight = 460.0;
-    var textureSize = new Bounds({ x: -imageWidth / 2, y: -imageHeight / 2 }, { x: imageWidth / 2, y: imageHeight / 2 });
+    var textureSize = new Bounds(new Vertex(-imageWidth / 2, -imageHeight / 2), new Vertex(imageWidth / 2, imageHeight / 2));
     // var textureSize = new Bounds({ x: -0, y: 0 }, { x: imageWidth, y: imageHeight });
     // Penrose Rhombus
     // var polygon = new Polygon(
@@ -134,8 +134,16 @@
     var basePolygonBounds = polygon.getBounds();
     var polygonPosition = basePolygonBounds.getCenter();
     // TODO: define according to type
-    var polygonRotationCenter = polygonPosition.clone().addY(-5); // ONLY PENTAGON
+    // var polygonRotationCenter = polygonPosition.clone().addY(-5); // ONLY PENTAGON
     pbBottom.add(polygonPosition);
+
+    var polygonRotationCenter = polygonPosition.clone().addXY(0, -5);
+    // polygonPosition.listeners.addDragListener(function (event) {
+    //   console.log("move", event.params);
+    //   polygonRotationCenter.add(event.params.dragAmount);
+    //   pbTop.redraw();
+    // });
+    pbTop.add(polygonRotationCenter);
 
     // // +---------------------------------------------------------------------------------
     // // | Get the contrast color (string) for the given color (object).
@@ -164,20 +172,25 @@
     var drawTarget = function (draw, fill) {
       // basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
       var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
-      var polygonRotationCenter = polygonPosition.clone().addY(-5); // ONLY PENTAGON
-      // var newBasePolygonBounds = polygon.getBounds();
-      // var newPolygonPosition = newBasePolygonBounds.getCenter();
-      // console.log("rotation", rotation);
-      // if (fill.ctx) {
-      //   // At the moment avoid calling this on SVG renderers
-      //   fillPolyTex(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
-      // } else {
-      //   // At the moment avoid calling this on SVG renderers
-      //   // fillPolyTexSVG(fill, textureImage, textureSize, polygon, polygonPosition, rotation, !config.performClip);
-      //   fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation);
-      // }
+      // var rotationalOffset = new Vertex(0, -5); //* config.tileScale);
+      var rotationalOffset = basePolygonBounds.getCenter().difference(polygonRotationCenter);
+      var positionOffset = basePolygonBounds.getCenter().difference(polygonPosition);
+      var localRotationCenter = polygonPosition.clone().add(rotationalOffset);
 
-      fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, polygonRotationCenter);
+      // Scale around center
+      var scaledTextureSize = new Bounds(
+        textureSize.min.clone().add(positionOffset).scale(config.tileScale, localRotationCenter),
+        textureSize.max.clone().add(positionOffset).scale(config.tileScale, localRotationCenter)
+      );
+      var boundsPolygon = scaledTextureSize.toPolygon().rotate(rotation, localRotationCenter); // .move(positionOffset); //.move(rotationalOffset.inv());
+      draw.polygon(boundsPolygon, "orange", 1.0);
+      draw.crosshair(localRotationCenter, 4, "green");
+      var scaledPolygon = polygon.clone().scale(config.tileScale, localRotationCenter);
+
+      // fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, polygonRotationCenter);
+      fill.texturedPoly(textureImage, scaledTextureSize, scaledPolygon, polygonPosition, rotation, localRotationCenter);
+
+      // draw.polygon( polygon)
     };
 
     function _crosshairAtZero(ctx) {
