@@ -484,6 +484,7 @@ vert.listeners.addDragListener(function (e) {
 - [3daddict](https://github.com/3daddict) for the [js-stl-parser inspiration](https://github.com/3daddict/js-stl-parser/blob/master/index.js "js-stl-parser inspiration")
 - [jburkardt](https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html "jburkardt") for the obj test files.
 - [@veltman](https://noahveltman.com/) for the awesome [geometric skeletonization article](https://observablehq.com/@veltman/centerline-labeling)
+- [girih-tiles-spatial.jpg from Lund University, Architecture, Spatial Experiments, 2016.](https://spatialexperiments.wordpress.com/2016/09/19/islamic-geometry/girih-tiles-4/)
 
 ## Todos
 

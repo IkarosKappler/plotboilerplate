@@ -28,8 +28,6 @@
     let GUP = gup();
     var isDarkmode = detectDarkMode(GUP);
 
-    var textureImage = null;
-
     // All config params are optional.
     var pbTop = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
@@ -99,45 +97,82 @@
     );
 
     // +---------------------------------------------------------------------------------
-    // | A texture source,
+    // | A global config that's attached to the dat.gui control interface.
     // +-------------------------------
-    var imageWidth = 500.0;
-    var imageHeight = 460.0;
-    var textureSize = new Bounds(new Vertex(-imageWidth / 2, -imageHeight / 2), new Vertex(imageWidth / 2, imageHeight / 2));
-    // var textureSize = new Bounds({ x: -0, y: 0 }, { x: imageWidth, y: imageHeight });
-    // Penrose Rhombus
-    // var polygon = new Polygon(
-    //   [
-    //     { x: 2, y: 64 },
-    //     { x: 78, y: 9 },
-    //     { x: 174, y: 9 },
-    //     { x: 97, y: 64 } // Add one more test point
-    //     // { x: 50, y: 64 }
-    //   ].map(function (coords) {
-    //     return new Vertex(coords).sub(textureSize.width / 2, textureSize.height / 2);
-    //   })
-    // );
-    var polygon = new Polygon(
-      [
-        { x: 37, y: 305 },
-        { x: 134, y: 305 },
-        { x: 164, y: 397 },
-        { x: 86, y: 453 },
-        { x: 8, y: 397 }
-      ].map(function (coords) {
-        return new Vertex(coords).sub(textureSize.width / 2, textureSize.height / 2);
-        // return new Vertex(coords); // .sub(textureSize.width / 2, textureSize.height / 2);
-      })
+    // Cronholm144 or Lund-University template
+    // See testPresets.js
+    var config = PlotBoilerplate.utils.safeMergeByKeys(
+      {
+        rotation: 0.0,
+        tileScale: 1.0,
+        presetName: GUP["presetName"] || "LU_pentagon" // "LS_penrose"
+      },
+      GUP
     );
-    pbTop.add(polygon);
 
-    var basePolygonBounds = polygon.getBounds();
-    var polygonPosition = basePolygonBounds.getCenter();
+    // Keep track of loaded textures
+    var textureStore = new Map();
+    var loadTextureImage = function (path, onLoad) {
+      var texture = textureStore.get(path);
+      if (!texture) {
+        texture = new Image();
+        texture.onload = onLoad;
+        texture.src = path;
+        textureStore.set(path, texture);
+      }
+      return texture;
+    };
+    // textureImage = loadTextureImage(imagePath, function () {
+    //   console.log("Texture loaded");
+    //   pbTop.redraw();
+    // });
+
+    // Fetch initial polygon
+    var textureImage = null;
+    var imagePath = null;
+    var textureSize = null;
+    var polygon = null; //
+    var polygonPosition = new Vertex();
+    var polygonCenterOffset = new Vertex();
+    var basePolygonBounds = null; // polygon.getBounds();
+    // var polygonPosition = new Vertex(); // basePolygonBounds.getCenter();
+
+    function changeTilePreset() {
+      // { polygon : Polygon, polygonPosition : Vertex, centerOffset : Vertex, ... }
+      var preset = getTestPreset(config.presetName);
+      console.log("Found preset", preset);
+      imagePath = preset.imagePath;
+      textureSize = preset.textureSize;
+      loadTextureImage();
+      pbTop.remove(polygon, false, true); // redraw=false, removeWithVertices=true
+      polygon = preset.polygon;
+      pbTop.add(polygon);
+      // polygonPosition.set(preset.polygonPosition);
+      polygonCenterOffset.set(preset.centerOffset);
+      // Update position and bounds
+      basePolygonBounds = polygon.getBounds();
+      polygonPosition.set(basePolygonBounds.getCenter());
+      // Load texture image
+      textureImage = loadTextureImage(imagePath, function () {
+        console.log("Texture loaded");
+        pbTop.redraw();
+      });
+      pbTop.redraw();
+    }
+    changeTilePreset();
+
+    // +---------------------------------------------------------------------------------
+    // | Add texture source and source polygon.
+    // +-------------------------------
+    // pbTop.add(polygon);
+
+    // var basePolygonBounds = polygon.getBounds();
+    // var polygonPosition = basePolygonBounds.getCenter();
     // TODO: define according to type
     // var polygonRotationCenter = polygonPosition.clone().addY(-5); // ONLY PENTAGON
     pbBottom.add(polygonPosition);
 
-    var polygonRotationCenter = polygonPosition.clone().addXY(0, -5);
+    var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset); // addXY(0, -5);
     // polygonPosition.listeners.addDragListener(function (event) {
     //   console.log("move", event.params);
     //   polygonRotationCenter.add(event.params.dragAmount);
@@ -157,7 +192,7 @@
     // +-------------------------------
     var drawSource = function (draw, fill) {
       //
-      var textureImage = textureStore.get("girihtexture-500px-2.png");
+      var textureImage = textureStore.get(imagePath);
       if (textureImage && textureImage.complete && textureImage.naturalWidth) {
         draw.image(
           textureImage,
@@ -220,36 +255,24 @@
       ctx.clip();
     };
 
-    var changeTilePreset = function () {};
+    // var changeTilePreset = function () {};
 
-    // +---------------------------------------------------------------------------------
-    // | A global config that's attached to the dat.gui control interface.
-    // +-------------------------------
-    var config = PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        rotation: 0.0,
-        tileScale: 1.0,
-        presetName: "penrose"
-      },
-      GUP
-    );
-
-    // Keep track of loaded textures
-    var textureStore = new Map();
-    var loadTextureImage = function (path, onLoad) {
-      var texture = textureStore.get(path);
-      if (!texture) {
-        texture = new Image();
-        texture.onload = onLoad;
-        texture.src = path;
-        textureStore.set(path, texture);
-      }
-      return texture;
-    };
-    textureImage = loadTextureImage("girihtexture-500px-2.png", function () {
-      console.log("Texture loaded");
-      pbTop.redraw();
-    });
+    // // Keep track of loaded textures
+    // var textureStore = new Map();
+    // var loadTextureImage = function (path, onLoad) {
+    //   var texture = textureStore.get(path);
+    //   if (!texture) {
+    //     texture = new Image();
+    //     texture.onload = onLoad;
+    //     texture.src = path;
+    //     textureStore.set(path, texture);
+    //   }
+    //   return texture;
+    // };
+    // textureImage = loadTextureImage(imagePath, function () {
+    //   console.log("Texture loaded");
+    //   pbTop.redraw();
+    // });
 
     // Add a mouse listener to track the mouse position.-
     new MouseHandler(pbTop.canvas).move(function (e) {
@@ -287,7 +310,7 @@
       gui.add(config, 'tileScale').min(0.5).max(2.0).listen().onChange( function() { pbTop.redraw(); } ).name("tileScale").title("Scale the tile up or down.");
 
       // prettier-ignore
-      gui.add(config, 'presetName', ["penrose", "pentagon"]).listen().onChange( function() { changeTilePreset(); } ).name("presetName").title("Name a tile (penrose, pentagon, ...)");
+      gui.add(config, 'presetName', presetNames).listen().onChange( function() { changeTilePreset(); } ).name("presetName").title("Name a tile (penrose, pentagon, ...)");
     }
 
     pbTop.config.preDraw = drawSource;
