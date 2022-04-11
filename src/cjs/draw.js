@@ -219,6 +219,34 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      **/
     drawutils.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter) {
+        if (rotationCenter === void 0) { rotationCenter = { x: 0, y: 0 }; }
+        var basePolygonBounds = polygon.getBounds();
+        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        // var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+        // var rotationalOffset = { x: 0, y: 0 };
+        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+        // Get the position offset of the polygon
+        var targetTextureSize = new Vertex_1.Vertex(textureSize.width, textureSize.height);
+        var targetTextureOffset = new Vertex_1.Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        this.ctx.save();
+        this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
+        this.ctx.rotate(rotation);
+        // drawutils.helpers.clipPoly(
+        //   this.ctx,
+        //   {
+        //     x: targetTextureOffset.x - rotationCenter.x * this.scale.x,
+        //     y: targetTextureOffset.y - rotationCenter.y * this.scale.y
+        //   },
+        //   this.scale,
+        //   polygon.vertices
+        // );
+        this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+        targetTextureOffset.x * this.scale.x, targetTextureOffset.y * this.scale.y, targetTextureSize.x * this.scale.x, targetTextureSize.y * this.scale.y);
+        this.ctx.restore();
+    };
+    drawutils.prototype._texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter) {
+        if (rotationCenter === void 0) { rotationCenter = { x: 0, y: 0 }; }
         var basePolygonBounds = polygon.getBounds();
         var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
         var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
@@ -228,6 +256,10 @@ var drawutils = /** @class */ (function () {
         var targetTextureSize = new Vertex_1.Vertex(textureSize.width, textureSize.height);
         var targetTextureOffset = new Vertex_1.Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
         this.ctx.save();
+        // this.ctx.translate(
+        //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+        //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+        // );
         this.ctx.translate(this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x, this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y);
         this.ctx.rotate(rotation);
         drawutils.helpers.clipPoly(this.ctx, {

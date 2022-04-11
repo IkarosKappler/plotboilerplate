@@ -220,12 +220,12 @@
       var boundsPolygon = scaledTextureSize.toPolygon().rotate(rotation, localRotationCenter); // .move(positionOffset); //.move(rotationalOffset.inv());
       draw.polygon(boundsPolygon, "orange", 1.0);
       draw.crosshair(localRotationCenter, 4, "green");
-      var scaledPolygon = polygon.clone().scale(config.tileScale, localRotationCenter);
+      var scaledPolygon = polygon.clone().scale(config.tileScale, localRotationCenter).move(rotationalOffset.inv());
 
       // fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, polygonRotationCenter);
       fill.texturedPoly(textureImage, scaledTextureSize, scaledPolygon, polygonPosition, rotation, localRotationCenter);
 
-      // draw.polygon( polygon)
+      draw.polygon(scaledPolygon);
     };
 
     function _crosshairAtZero(ctx) {

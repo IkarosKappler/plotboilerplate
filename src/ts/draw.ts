@@ -277,7 +277,53 @@ export class drawutils implements DrawLib<void> {
     polygon: Polygon,
     polygonPosition: Vertex,
     rotation: number,
-    rotationCenter?: XYCoords
+    rotationCenter: XYCoords = { x: 0, y: 0 }
+  ): void {
+    var basePolygonBounds = polygon.getBounds();
+    var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+    // var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+    // var rotationalOffset = { x: 0, y: 0 };
+    var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+
+    // Get the position offset of the polygon
+    var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+    var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+
+    this.ctx.save();
+    this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
+    this.ctx.rotate(rotation);
+
+    // drawutils.helpers.clipPoly(
+    //   this.ctx,
+    //   {
+    //     x: targetTextureOffset.x - rotationCenter.x * this.scale.x,
+    //     y: targetTextureOffset.y - rotationCenter.y * this.scale.y
+    //   },
+    //   this.scale,
+    //   polygon.vertices
+    // );
+    this.ctx.drawImage(
+      textureImage,
+      0,
+      0,
+      textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+      textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+      targetTextureOffset.x * this.scale.x,
+      targetTextureOffset.y * this.scale.y,
+      targetTextureSize.x * this.scale.x,
+      targetTextureSize.y * this.scale.y
+    );
+
+    this.ctx.restore();
+  }
+
+  _texturedPoly(
+    textureImage: HTMLImageElement,
+    textureSize: Bounds,
+    polygon: Polygon,
+    polygonPosition: Vertex,
+    rotation: number,
+    rotationCenter: XYCoords = { x: 0, y: 0 }
   ): void {
     var basePolygonBounds = polygon.getBounds();
     var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
@@ -291,6 +337,10 @@ export class drawutils implements DrawLib<void> {
 
     this.ctx.save();
 
+    // this.ctx.translate(
+    //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+    //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+    // );
     this.ctx.translate(
       this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
       this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y

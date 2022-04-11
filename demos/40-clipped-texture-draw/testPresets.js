@@ -5,7 +5,7 @@
 (function () {
   var PRESETS = [];
 
-  // Large image settings
+  // Large image settings with the cronholm144 texture
   var imagePath_ch = "girihtexture-500px-2.png";
   var imageWidth = 500.0;
   var imageHeight = 460.0;

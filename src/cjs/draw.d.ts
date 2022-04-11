@@ -193,6 +193,7 @@ export declare class drawutils implements DrawLib<void> {
      * @memberof drawutils
      **/
     texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number, rotationCenter?: XYCoords): void;
+    _texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number, rotationCenter?: XYCoords): void;
     /**
      * Draw a rectangle.
      *
