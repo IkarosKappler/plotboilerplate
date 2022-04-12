@@ -104,8 +104,13 @@
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         rotation: 0.0,
+        resetRotation: function () {
+          config.rotation = 0.0;
+          pbBottom.redraw();
+        },
         tileScale: 1.0,
-        presetName: GUP["presetName"] || "LU_pentagon" // "LS_penrose"
+        presetName: GUP["presetName"] || "LU_pentagon", // "LS_penrose"
+        drawTargetTexture: true
       },
       GUP
     );
@@ -213,19 +218,39 @@
       var localRotationCenter = polygonPosition.clone().add(rotationalOffset);
 
       // Scale around center
+      // var scaledTextureSize = new Bounds(
+      //   textureSize.min.clone().add(positionOffset).scale(config.tileScale, localRotationCenter),
+      //   textureSize.max.clone().add(positionOffset).scale(config.tileScale, localRotationCenter)
+      // );
       var scaledTextureSize = new Bounds(
-        textureSize.min.clone().add(positionOffset).scale(config.tileScale, localRotationCenter),
-        textureSize.max.clone().add(positionOffset).scale(config.tileScale, localRotationCenter)
+        textureSize.min.clone(), // .scale(config.tileScale, polygonRotationCenter).add(positionOffset.inv()),
+        // .rotate(rotation, polygonPosition),
+        textureSize.max.clone() // .scale(config.tileScale, polygonRotationCenter).add(positionOffset.inv())
+        // .rotate(rotation, polygonPosition)
       );
-      var boundsPolygon = scaledTextureSize.toPolygon().rotate(rotation, localRotationCenter); // .move(positionOffset); //.move(rotationalOffset.inv());
+      var boundsPolygon = scaledTextureSize
+        .toPolygon()
+        .scale(config.tileScale, polygonRotationCenter)
+        .move(rotationalOffset.inv())
+        .move(positionOffset)
+        .rotate(rotation, polygonPosition);
       draw.polygon(boundsPolygon, "orange", 1.0);
       draw.crosshair(localRotationCenter, 4, "green");
-      var scaledPolygon = polygon.clone().scale(config.tileScale, localRotationCenter).move(rotationalOffset.inv());
+      var scaledPolygon = polygon
+        .clone()
+        .scale(config.tileScale, polygonRotationCenter)
+        .move(rotationalOffset)
+        .move(positionOffset);
+      var rotatedPolygon = scaledPolygon.clone().rotate(rotation, polygonPosition); //.move(positionOffset);
 
-      // fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, polygonRotationCenter);
-      fill.texturedPoly(textureImage, scaledTextureSize, scaledPolygon, polygonPosition, rotation, localRotationCenter);
+      if (config.drawTargetTexture) {
+        // fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, polygonRotationCenter);
+        fill.texturedPoly(textureImage, scaledTextureSize, rotatedPolygon, polygonPosition, rotation, localRotationCenter);
+      }
 
-      draw.polygon(scaledPolygon);
+      draw.polygon(polygon, "rgba(192,192,192,0.5)", 2.0);
+      draw.polygon(scaledPolygon, "white", 1.0);
+      draw.polygon(rotatedPolygon, "rgb(0,128,192)", 1.0);
     };
 
     function _crosshairAtZero(ctx) {
@@ -305,9 +330,13 @@
       // prettier-ignore
       gui.add(config, 'rotation').min(-180).max(180).step(1).listen().onChange( function() { pbTop.redraw(); } ).name("rotation").title("Rotation of the tile");
       // prettier-ignore
+      gui.add(config, 'resetRotation').name("resetRotation").title("resetRotation");
+      // prettier-ignore
       // gui.add(config, 'performClip').listen().onChange( function() { pbTop.redraw(); } ).name("performClip").title("Perform the clipping?");
       // prettier-ignore
       gui.add(config, 'tileScale').min(0.5).max(2.0).listen().onChange( function() { pbTop.redraw(); } ).name("tileScale").title("Scale the tile up or down.");
+      // prettier-ignore
+      gui.add(config, 'drawTargetTexture').listen().onChange( function() { pbTop.redraw(); } ).name("drawTargetTexture").title("drawTargetTexture");
 
       // prettier-ignore
       gui.add(config, 'presetName', presetNames).listen().onChange( function() { changeTilePreset(); } ).name("presetName").title("Name a tile (penrose, pentagon, ...)");
