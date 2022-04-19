@@ -109,6 +109,8 @@
           pbBottom.redraw();
         },
         tileScale: 1.0,
+        canvasScaleX: 1.0,
+        canvasScaleY: 1.0,
         presetName: GUP["presetName"] || "LU_pentagon", // "LS_penrose"
         drawTargetTexture: true
       },
@@ -351,6 +353,11 @@
       // gui.add(config, 'performClip').listen().onChange( function() { pbTop.redraw(); } ).name("performClip").title("Perform the clipping?");
       // prettier-ignore
       gui.add(config, 'tileScale').min(0.5).max(2.0).listen().onChange( function() { pbTop.redraw(); } ).name("tileScale").title("Scale the tile up or down.");
+      // prettier-ignore
+      gui.add(config, 'canvasScaleX').min(-2.0).max(2.0).listen().onChange( function() { pbBottom.draw.scale.x = pbBottom.fill.scale.x = config.canvasScaleX; pbBottom.redraw(); } ).name("canvasScaleX").title("Scale the canvas horizontally.");
+      // prettier-ignore
+      gui.add(config, 'canvasScaleY').min(-2.0).max(2.0).listen().onChange( function() { pbBottom.draw.scale.y = pbBottom.fill.scale.y = config.canvasScaleY; pbBottom.redraw();  } ).name("canvasScaleY").title("Scale the canvas vertically.");
+
       // prettier-ignore
       gui.add(config, 'drawTargetTexture').listen().onChange( function() { pbTop.redraw(); } ).name("drawTargetTexture").title("drawTargetTexture");
 

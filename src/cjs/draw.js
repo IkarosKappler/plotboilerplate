@@ -236,10 +236,15 @@ var drawutils = /** @class */ (function () {
             x: -polygonPosition.x * this.scale.x,
             y: -polygonPosition.y * this.scale.y
         }, this.scale, polygon.vertices);
+        this.ctx.scale(this.scale.x, this.scale.y);
         this.ctx.rotate(rotation);
         this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
         textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-        targetTextureOffset.x * this.scale.x, targetTextureOffset.y * this.scale.y, targetTextureSize.x * this.scale.x, targetTextureSize.y * this.scale.y);
+        targetTextureOffset.x, // * this.scale.x,
+        targetTextureOffset.y, // * this.scale.y,
+        targetTextureSize.x, //  * this.scale.x,
+        targetTextureSize.y // * this.scale.y
+        );
         this.ctx.restore();
     };
     drawutils.prototype._texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter) {

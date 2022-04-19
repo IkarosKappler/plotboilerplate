@@ -303,6 +303,7 @@ export class drawutils implements DrawLib<void> {
       this.scale,
       polygon.vertices
     );
+    this.ctx.scale(this.scale.x, this.scale.y);
     this.ctx.rotate(rotation);
     this.ctx.drawImage(
       textureImage,
@@ -310,10 +311,10 @@ export class drawutils implements DrawLib<void> {
       0,
       textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
       textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-      targetTextureOffset.x * this.scale.x,
-      targetTextureOffset.y * this.scale.y,
-      targetTextureSize.x * this.scale.x,
-      targetTextureSize.y * this.scale.y
+      targetTextureOffset.x, // * this.scale.x,
+      targetTextureOffset.y, // * this.scale.y,
+      targetTextureSize.x, //  * this.scale.x,
+      targetTextureSize.y // * this.scale.y
     );
 
     this.ctx.restore();
