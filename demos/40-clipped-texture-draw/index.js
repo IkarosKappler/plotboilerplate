@@ -214,28 +214,44 @@
       var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
       // var rotationalOffset = new Vertex(0, -5); //* config.tileScale);
       var rotationalOffset = basePolygonBounds.getCenter().difference(polygonRotationCenter);
+      var rotationalOffsetInv = rotationalOffset.inv();
       var positionOffset = basePolygonBounds.getCenter().difference(polygonPosition);
-      var localRotationCenter = polygonPosition.clone().add(rotationalOffset);
+      var _localRotationCenter = polygonPosition.clone().add(rotationalOffset);
+
+      // console.log("config.tileScale", config.tileScale);
 
       // Scale around center
-      // var scaledTextureSize = new Bounds(
-      //   textureSize.min.clone().add(positionOffset).scale(config.tileScale, localRotationCenter),
-      //   textureSize.max.clone().add(positionOffset).scale(config.tileScale, localRotationCenter)
-      // );
-      var scaledTextureSize = new Bounds(
+      var clonedTextureSize = new Bounds(
         textureSize.min.clone(), // .scale(config.tileScale, polygonRotationCenter).add(positionOffset.inv()),
         // .rotate(rotation, polygonPosition),
         textureSize.max.clone() // .scale(config.tileScale, polygonRotationCenter).add(positionOffset.inv())
         // .rotate(rotation, polygonPosition)
       );
-      var boundsPolygon = scaledTextureSize
+      var scaledTextureSize = new Bounds(
+        textureSize.min.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset),
+        textureSize.max.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset)
+      );
+      // console.log("scaledTextureSize", scaledTextureSize);
+      var boundsPolygon = clonedTextureSize
         .toPolygon()
         .scale(config.tileScale, polygonRotationCenter)
-        .move(rotationalOffset.inv())
+        .move(rotationalOffsetInv)
         .move(positionOffset)
         .rotate(rotation, polygonPosition);
+      // var scaledTextureSize = new Bounds(
+      //   textureSize.min.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset),
+      //   textureSize.max.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset)
+      // );
+      // var boundsPolygon = scaledTextureSize
+      //   .toPolygon()
+      //   // .scale(config.tileScale, polygonRotationCenter)
+      //   // .move(rotationalOffsetInv)
+      //   // .move(positionOffset)
+      //   .rotate(rotation, polygonPosition);
       draw.polygon(boundsPolygon, "orange", 1.0);
-      draw.crosshair(localRotationCenter, 4, "green");
+      draw.polygon(scaledTextureSize.toPolygon(), "yellow", 1.0);
+      draw.polygon(clonedTextureSize.toPolygon(), "green", 1.0);
+      draw.crosshair(_localRotationCenter, 4, "green");
       var scaledPolygon = polygon
         .clone()
         .scale(config.tileScale, polygonRotationCenter)
@@ -245,11 +261,11 @@
 
       if (config.drawTargetTexture) {
         // fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, polygonRotationCenter);
-        fill.texturedPoly(textureImage, scaledTextureSize, rotatedPolygon, polygonPosition, rotation, localRotationCenter);
+        fill.texturedPoly(textureImage, scaledTextureSize, rotatedPolygon, polygonPosition, rotation); //, _localRotationCenter);
       }
 
       draw.polygon(polygon, "rgba(192,192,192,0.5)", 2.0);
-      draw.polygon(scaledPolygon, "white", 1.0);
+      draw.polygon(scaledPolygon, "rgba(255,192,0,0.75)", 1.0);
       draw.polygon(rotatedPolygon, "rgb(0,128,192)", 1.0);
     };
 

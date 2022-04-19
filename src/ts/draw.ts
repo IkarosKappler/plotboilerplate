@@ -287,21 +287,23 @@ export class drawutils implements DrawLib<void> {
 
     // Get the position offset of the polygon
     var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
-    var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+    // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+    var targetTextureOffset = new Vertex(textureSize.min.x, textureSize.min.y).sub(polygonPosition);
 
     this.ctx.save();
-    this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
-    this.ctx.rotate(rotation);
+    // this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
+    this.ctx.translate(this.offset.x + polygonPosition.x * this.scale.x, this.offset.y + polygonPosition.y * this.scale.y);
 
-    // drawutils.helpers.clipPoly(
-    //   this.ctx,
-    //   {
-    //     x: targetTextureOffset.x - rotationCenter.x * this.scale.x,
-    //     y: targetTextureOffset.y - rotationCenter.y * this.scale.y
-    //   },
-    //   this.scale,
-    //   polygon.vertices
-    // );
+    drawutils.helpers.clipPoly(
+      this.ctx,
+      {
+        x: -polygonPosition.x * this.scale.x,
+        y: -polygonPosition.y * this.scale.y
+      },
+      this.scale,
+      polygon.vertices
+    );
+    this.ctx.rotate(rotation);
     this.ctx.drawImage(
       textureImage,
       0,

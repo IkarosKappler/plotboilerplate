@@ -144,9 +144,9 @@ export class Polygon implements SVGSerializable {
    * @memberof Polygon
    * @return {Polygon} this for chaining
    **/
-  move(vert: XYCoords): Polygon {
+  move(amount: XYCoords): Polygon {
     for (var i in this.vertices) {
-      this.vertices[i].add(vert);
+      this.vertices[i].add(amount);
     }
     return this;
   }

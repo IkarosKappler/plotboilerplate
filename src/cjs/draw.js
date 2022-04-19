@@ -227,19 +227,16 @@ var drawutils = /** @class */ (function () {
         var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
         // Get the position offset of the polygon
         var targetTextureSize = new Vertex_1.Vertex(textureSize.width, textureSize.height);
-        var targetTextureOffset = new Vertex_1.Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        var targetTextureOffset = new Vertex_1.Vertex(textureSize.min.x, textureSize.min.y).sub(polygonPosition);
         this.ctx.save();
-        this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
+        // this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
+        this.ctx.translate(this.offset.x + polygonPosition.x * this.scale.x, this.offset.y + polygonPosition.y * this.scale.y);
+        drawutils.helpers.clipPoly(this.ctx, {
+            x: -polygonPosition.x * this.scale.x,
+            y: -polygonPosition.y * this.scale.y
+        }, this.scale, polygon.vertices);
         this.ctx.rotate(rotation);
-        // drawutils.helpers.clipPoly(
-        //   this.ctx,
-        //   {
-        //     x: targetTextureOffset.x - rotationCenter.x * this.scale.x,
-        //     y: targetTextureOffset.y - rotationCenter.y * this.scale.y
-        //   },
-        //   this.scale,
-        //   polygon.vertices
-        // );
         this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
         textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
         targetTextureOffset.x * this.scale.x, targetTextureOffset.y * this.scale.y, targetTextureSize.x * this.scale.x, targetTextureSize.y * this.scale.y);

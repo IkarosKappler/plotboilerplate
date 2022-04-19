@@ -109,9 +109,9 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Polygon} this for chaining
      **/
-    Polygon.prototype.move = function (vert) {
+    Polygon.prototype.move = function (amount) {
         for (var i in this.vertices) {
-            this.vertices[i].add(vert);
+            this.vertices[i].add(amount);
         }
         return this;
     };
