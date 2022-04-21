@@ -276,8 +276,7 @@ export class drawutils implements DrawLib<void> {
     textureSize: Bounds,
     polygon: Polygon,
     polygonPosition: Vertex,
-    rotation: number,
-    rotationCenter: XYCoords = { x: 0, y: 0 }
+    rotation: number
   ): void {
     var basePolygonBounds = polygon.getBounds();
     var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());

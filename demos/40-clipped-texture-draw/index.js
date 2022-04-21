@@ -320,23 +320,30 @@
     // Add a mouse listener to track the mouse position.-
     new MouseHandler(pbTop.canvas).move(function (e) {
       var relPos = pbTop.transformMousePosition(e.params.pos.x, e.params.pos.y);
-      stats.mouseX = -textureSize.min.x + relPos.x;
-      stats.mouseY = -textureSize.min.y + relPos.y;
+      stats.mouseXTop = -textureSize.min.x + relPos.x;
+      stats.mouseYTop = -textureSize.min.y + relPos.y;
+    });
+
+    // Add a mouse listener to track the mouse position.-
+    new MouseHandler(pbBottom.eventCatcher).move(function (e) {
+      var relPos = pbBottom.transformMousePosition(e.params.pos.x, e.params.pos.y);
+      stats.mouseXTop = e.params.pos.x; // relPos.x;
+      stats.mouseYTop = e.params.pos.y; // relPos.y;
     });
 
     // +---------------------------------------------------------------------------------
     // | Add stats.
     // +-------------------------------
     var stats = {
-      mouseX: 0,
-      mouseY: 0,
+      mouseXTop: 0,
+      mouseYTop: 0,
       textureX: 0,
       textureY: 0
     };
     var uiStats = new UIStats(stats);
     stats = uiStats.proxy;
-    uiStats.add("mouseX").precision(1);
-    uiStats.add("mouseY").precision(1);
+    uiStats.add("mouseXTop").precision(1);
+    uiStats.add("mouseYTop").precision(1);
     uiStats.add("textureX").precision(1);
     uiStats.add("textureY").precision(1);
 

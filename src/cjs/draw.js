@@ -218,8 +218,7 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      **/
-    drawutils.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter) {
-        if (rotationCenter === void 0) { rotationCenter = { x: 0, y: 0 }; }
+    drawutils.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
         var basePolygonBounds = polygon.getBounds();
         var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
         // var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };

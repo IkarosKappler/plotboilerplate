@@ -637,7 +637,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {Polygon} polygon - The polygon to use as clip path.
    * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
    * @param {number} rotation - The rotation to use for the polygon (and for the texture).
-   * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
@@ -647,12 +646,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     textureSize: Bounds,
     polygon: Polygon,
     polygonPosition: Vertex,
-    rotation: number,
-    rotationCenter?: XYCoords
+    rotation: number
   ): SVGElement {
     const basePolygonBounds: Bounds = polygon.getBounds();
-    const targetCenterDifference: XYCoords = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-    const rotationalOffset: XYCoords = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+    // const targetCenterDifference: XYCoords = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+    // const rotationalOffset: XYCoords = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+    // const rotationalOffset: XYCoords = { x: 0, y: 0 };
+    // const rotationalOffset: XYCoords = basePolygonBounds.getCenter().difference(polygonPosition);
+
     // TODO: cc
     // var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
 
@@ -668,30 +669,41 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     //       </clipPath>
     //    </defs>
     //    ...
-    //    <image width="643" height="643" clip-path="url(#shape)"  xlink:href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/222579/beagle400.jpg" >
+    //    <g clip-path="url(#shape)" transform="scale(...)">
+    //       <image width="643" height="643" transform="rotate(...)" xlink:href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/222579/beagle400.jpg" >
+    //    </g>
     //    </image>
     // ...
     const clipPathNode: SVGClipPathElement = this.makeNode("clipPath") as SVGClipPathElement;
     const clipPathId: string = `clippath_${UIDGenerator.next()}`; // TODO: use a better UUID generator here?
     clipPathNode.setAttribute("id", clipPathId);
 
-    const node: SVGImageElement = this.makeNode("image") as SVGImageElement;
-    node.setAttribute("x", `${this._x(textureSize.min.x)}`);
-    node.setAttribute("y", `${this._y(textureSize.min.y)}`);
-    node.setAttribute("width", `${textureSize.width * this.scale.x}`);
-    node.setAttribute("height", `${textureSize.height * this.scale.y}`);
-    node.setAttribute("href", textureImage.src);
-    node.setAttribute("clip-path", `url(#${clipPathId})`);
+    const gNode = this.makeNode("g") as SVGGElement;
+    const imageNode: SVGImageElement = this.makeNode("image") as SVGImageElement;
+    imageNode.setAttribute("x", `${this._x(textureSize.min.x)}`);
+    imageNode.setAttribute("y", `${this._y(textureSize.min.y)}`);
+    // imageNode.setAttribute("width", `${textureSize.width * this.scale.x}`);
+    // imageNode.setAttribute("height", `${textureSize.height * this.scale.y}`);
+    imageNode.setAttribute("width", `${textureSize.width}`);
+    imageNode.setAttribute("height", `${textureSize.height}`);
+    imageNode.setAttribute("href", textureImage.src);
+    // imageNode.setAttribute("transform-origin", `${this._x(polygonPosition.x)} ${this._y(polygonPosition.y)}`);
+    imageNode.setAttribute("opacity", "0.5");
+    // imageNode.setAttribute("clip-path", `url(#${clipPathId})`);
     // node.setAttribute("transform-origin", "50% 50%");
     // SVG rotations in degrees
-    node.setAttribute(
+    imageNode.setAttribute(
       "transform",
-      `translate(${(-rotationalOffset.x - targetCenterDifference.x) * this.scale.x}, ${
-        (-rotationalOffset.y - targetCenterDifference.y) * this.scale.y
-      }) ` +
-        `rotate(${rotation * RAD_TO_DEG}, ${this._x(
-          targetCenterDifference.x + polygonPosition.x + rotationalOffset.x
-        )}, ${this._y(targetCenterDifference.y + polygonPosition.y + rotationalOffset.y)})`
+      // `translate(${(-rotationalOffset.x - targetCenterDifference.x) * this.scale.x}, ${
+      //   (-rotationalOffset.y - targetCenterDifference.y) * this.scale.y
+      // }) ` +
+      // `rotate(${rotation * RAD_TO_DEG}, ${this._x(targetCenterDifference.x + polygonPosition.x + rotationalOffset.x)}, ${this._y(
+      //   targetCenterDifference.y + polygonPosition.y + rotationalOffset.y
+      // )})` // +
+      // `rotate(${rotation * RAD_TO_DEG}, ${polygonPosition.x}, ${polygonPosition.y})` // +
+      // `rotate(${rotation * RAD_TO_DEG}, ${textureSize.min.x - polygonPosition.x}, ${textureSize.min.y - polygonPosition.y})` // +
+      `rotate(${rotation * RAD_TO_DEG}, ${this._x(polygonPosition.x)}, ${this._y(polygonPosition.y)})` // +
+      // `scale(${this.scale.x}, ${this.scale.y})`
     );
     const pathNode: SVGPathElement = this.makeNode("path") as SVGPathElement;
     // TODO: convert to helper function
@@ -705,10 +717,30 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     pathNode.setAttribute("d", pathData.join(" "));
     clipPathNode.appendChild(pathNode);
     this.bufferedNodeDefs.appendChild(clipPathNode);
-    // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
-    this._bindFillDraw(node, "image", null, null); // No color, no lineWidth
 
-    return node;
+    gNode.appendChild(imageNode);
+    // node.setAttribute("clip-path", `url(#${clipPathId})`);
+
+    // gNode.setAttribute("transform-origin", `${this._x(polygonPosition.x)} ${this._y(polygonPosition.y)}`);
+    // gNode.setAttribute("transform-origin", `${this._x(textureSize.min.x)} ${this._y(textureSize.min.y)}`);
+    const rotatedScalingOrigin = new Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
+    gNode.setAttribute("transform-origin", `${this._x(rotatedScalingOrigin.x)} ${this._y(rotatedScalingOrigin.y)}`);
+    gNode.setAttribute(
+      "transform",
+      // `translate(${(-rotationalOffset.x - targetCenterDifference.x) * this.scale.x}, ${
+      //   (-rotationalOffset.y - targetCenterDifference.y) * this.scale.y
+      // }) ` +
+      // `rotate(${rotation * RAD_TO_DEG}, ${this._x(targetCenterDifference.x + polygonPosition.x + rotationalOffset.x)}, ${this._y(
+      //   targetCenterDifference.y + polygonPosition.y + rotationalOffset.y
+      // )})` +
+      `scale(${this.scale.x}, ${this.scale.y})` + // ...
+        ""
+    );
+
+    // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
+    this._bindFillDraw(gNode, "image", null, null); // No color, no lineWidth
+
+    return gNode;
   }
 
   /**
