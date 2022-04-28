@@ -507,6 +507,7 @@ var drawutilssvg = /** @class */ (function () {
         imageNode.setAttribute("opacity", "0.5");
         // imageNode.setAttribute("clip-path", `url(#${clipPathId})`);
         // node.setAttribute("transform-origin", "50% 50%");
+        // const scaledPolygonPosition = new Vertex(textureSize.min).clone().scaleXY(this.scale, this.offset);
         // SVG rotations in degrees
         imageNode.setAttribute("transform", 
         // `translate(${(-rotationalOffset.x - targetCenterDifference.x) * this.scale.x}, ${
@@ -517,6 +518,7 @@ var drawutilssvg = /** @class */ (function () {
         // )})` // +
         // `rotate(${rotation * RAD_TO_DEG}, ${polygonPosition.x}, ${polygonPosition.y})` // +
         // `rotate(${rotation * RAD_TO_DEG}, ${textureSize.min.x - polygonPosition.x}, ${textureSize.min.y - polygonPosition.y})` // +
+        // `rotate(${rotation * RAD_TO_DEG}, ${this._x(scaledPolygonPosition.x)}, ${this._y(scaledPolygonPosition.y)})` // +
         "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(polygonPosition.x) + ", " + this._y(polygonPosition.y) + ")" // +
         // `scale(${this.scale.x}, ${this.scale.y})`
         );
@@ -537,7 +539,9 @@ var drawutilssvg = /** @class */ (function () {
         // gNode.setAttribute("transform-origin", `${this._x(polygonPosition.x)} ${this._y(polygonPosition.y)}`);
         // gNode.setAttribute("transform-origin", `${this._x(textureSize.min.x)} ${this._y(textureSize.min.y)}`);
         var rotatedScalingOrigin = new Vertex_1.Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
+        // .scaleXY(this.scale, polygonPosition);
         gNode.setAttribute("transform-origin", this._x(rotatedScalingOrigin.x) + " " + this._y(rotatedScalingOrigin.y));
+        // gNode.setAttribute("transform-origin", `${297} ${this._y(231)}`);
         gNode.setAttribute("transform", 
         // `translate(${(-rotationalOffset.x - targetCenterDifference.x) * this.scale.x}, ${
         //   (-rotationalOffset.y - targetCenterDifference.y) * this.scale.y
@@ -545,8 +549,8 @@ var drawutilssvg = /** @class */ (function () {
         // `rotate(${rotation * RAD_TO_DEG}, ${this._x(targetCenterDifference.x + polygonPosition.x + rotationalOffset.x)}, ${this._y(
         //   targetCenterDifference.y + polygonPosition.y + rotationalOffset.y
         // )})` +
-        "scale(" + this.scale.x + ", " + this.scale.y + ")" + // ...
-            "");
+        // `scale(${this.scale.x}, ${this.scale.y})` + // ...
+        "");
         // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
         this._bindFillDraw(gNode, "image", null, null); // No color, no lineWidth
         return gNode;
