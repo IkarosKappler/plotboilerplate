@@ -10,7 +10,6 @@
   var imageWidth = 500.0;
   var imageHeight = 460.0;
   var textureSize_ch = new Bounds(new Vertex(-imageWidth / 2, -imageHeight / 2), new Vertex(imageWidth / 2, imageHeight / 2));
-  // var textureSize = new Bounds({ x: -0, y: 0 }, { x: imageWidth, y: imageHeight });
   // Penrose Rhombus (cronholm144)
   var polygon_penrose_ch = new Polygon(
     [
@@ -18,18 +17,107 @@
       { x: 78, y: 9 },
       { x: 174, y: 9 },
       { x: 97, y: 64 } // Add one more test point
-      // { x: 50, y: 64 }
+    ].map(function (coords) {
+      return new Vertex(coords).sub(textureSize_ch.width / 2, textureSize_ch.height / 2);
+    })
+  );
+  var polgonCenterOffset = { x: 0, y: 0 };
+  PRESETS.push({
+    name: "CH_Penrose",
+    imagePath: imagePath_ch,
+    textureSize: textureSize_ch,
+    polygon: polygon_penrose_ch,
+    centerOffset: { x: 0, y: 0 }
+  });
+
+  // Cronholm144 Hexagon
+  var polygon_hexagon_ch = new Polygon(
+    [
+      { x: 185.5, y: 13 },
+      { x: 281, y: 13 },
+      { x: 252, y: 103 },
+      { x: 173, y: 160 },
+      { x: 78, y: 160 },
+      { x: 107.5, y: 69 }
     ].map(function (coords) {
       return new Vertex(coords).sub(textureSize_ch.width / 2, textureSize_ch.height / 2);
     })
   );
   var polgonCenterOffset = { x: 0, y: -5 };
   PRESETS.push({
-    name: "CH_Penrose",
+    name: "CH_Hexagon",
     imagePath: imagePath_ch,
     textureSize: textureSize_ch,
-    polygon: polygon_penrose_ch,
-    centerOffset: polgonCenterOffset
+    polygon: polygon_hexagon_ch,
+    centerOffset: { x: 0, y: 0 }
+  });
+
+  // Cronholm144 Bowtie
+  var polygon_bowtie_ch = new Polygon(
+    [
+      { x: 319, y: 8.5 },
+      { x: 397, y: 65 },
+      { x: 493, y: 65 },
+      { x: 463, y: 156.5 },
+      { x: 386, y: 99.5 },
+      { x: 289.5, y: 99.5 }
+    ].map(function (coords) {
+      return new Vertex(coords).sub(textureSize_ch.width / 2, textureSize_ch.height / 2);
+    })
+  );
+  var polgonCenterOffset = { x: 0, y: -5 };
+  PRESETS.push({
+    name: "CH_Bowtie",
+    imagePath: imagePath_ch,
+    textureSize: textureSize_ch,
+    polygon: polygon_bowtie_ch,
+    centerOffset: { x: 0, y: 0 }
+  });
+
+  // Cronholm144 Rhombus
+  var polygon_rhombus_ch = new Polygon(
+    [
+      { x: 63.5, y: 190 },
+      { x: 158, y: 190 },
+      { x: 128.5, y: 280 },
+      { x: 33, y: 280 }
+    ].map(function (coords) {
+      return new Vertex(coords).sub(textureSize_ch.width / 2, textureSize_ch.height / 2);
+    })
+  );
+  var polgonCenterOffset = { x: 0, y: -5 };
+  PRESETS.push({
+    name: "CH_Rhombus",
+    imagePath: imagePath_ch,
+    textureSize: textureSize_ch,
+    polygon: polygon_rhombus_ch,
+    centerOffset: { x: 0, y: 0 }
+  });
+
+  // Cronholm144 Decadon
+  var polygon_decagon_ch = new Polygon(
+    [
+      { x: 278, y: 142 },
+      { x: 375, y: 142 },
+      { x: 452.5, y: 198 },
+      { x: 482, y: 289.5 },
+      { x: 452.5, y: 380 },
+      { x: 375, y: 436.5 },
+      { x: 278, y: 436.5 },
+      { x: 201, y: 380 },
+      { x: 171.5, y: 289.5 },
+      { x: 201, y: 198 }
+    ].map(function (coords) {
+      return new Vertex(coords).sub(textureSize_ch.width / 2, textureSize_ch.height / 2);
+    })
+  );
+  var polgonCenterOffset = { x: 0, y: -5 };
+  PRESETS.push({
+    name: "CH_Pentagon",
+    imagePath: imagePath_ch,
+    textureSize: textureSize_ch,
+    polygon: polygon_decagon_ch,
+    centerOffset: { x: 0, y: 0 }
   });
 
   // Cronholm144 Pentagon
@@ -51,7 +139,7 @@
     imagePath: imagePath_ch,
     textureSize: textureSize_ch,
     polygon: polygon_pentagon_ch,
-    centerOffset: polgonCenterOffset
+    centerOffset: { x: 0, y: -5 } // polgonCenterOffset
   });
 
   var imagePath_lu = "girih-tiles-spatial.jpg";
@@ -92,13 +180,14 @@
       // return new Vertex(coords); // .sub(textureSize.width / 2, textureSize.height / 2);
     })
   );
+
   var polgonCenterOffset = { x: 0, y: 0 };
   PRESETS.push({
     name: "LU_Rhombus",
     imagePath: imagePath_lu,
     textureSize: textureSize_lu,
     polygon: polygon_pentagon_lu,
-    centerOffset: polgonCenterOffset
+    centerOffset: { x: 0, y: 0 }
   });
 
   // Lund University Bowtie
@@ -115,7 +204,6 @@
       // return new Vertex(coords); // .sub(textureSize.width / 2, textureSize.height / 2);
     })
   );
-  var polgonCenterOffset = { x: 0, y: 0 };
 
   // Lund University Hexagon
   var polygon_pentagon_lu = new Polygon(
@@ -136,8 +224,8 @@
   // Lund University Hexagon
   var polygon_pentagon_lu = new Polygon(
     [
-      { x: 514, y: 152 },
-      { x: 572, y: 152 },
+      { x: 514, y: 153 },
+      { x: 572, y: 153 },
       { x: 618, y: 186 },
       { x: 636, y: 240.5 },
       { x: 618, y: 295 },
@@ -151,14 +239,59 @@
       // return new Vertex(coords); // .sub(textureSize.width / 2, textureSize.height / 2);
     })
   );
-  var polgonCenterOffset = { x: 0, y: 0 };
-
+  // var polgonCenterOffset = { x: 0, y: 0 };
   PRESETS.push({
     name: "LU_Decagon",
     imagePath: imagePath_lu,
     textureSize: textureSize_lu,
     polygon: polygon_pentagon_lu,
-    centerOffset: polgonCenterOffset
+    centerOffset: { x: 0, y: 0 }
+  });
+
+  // Lund University Hexagon
+  var polygon_bowtie_lu = new Polygon(
+    [
+      { x: 233.5, y: 186.5 },
+      { x: 289, y: 186 },
+      { x: 272.5, y: 240 },
+      { x: 289, y: 294 },
+      { x: 233.5, y: 294 },
+      { x: 251.5, y: 240 }
+    ].map(function (coords) {
+      return new Vertex(coords).sub(textureSize_lu.width / 2, textureSize_lu.height / 2);
+      // return new Vertex(coords); // .sub(textureSize.width / 2, textureSize.height / 2);
+    })
+  );
+  // var polgonCenterOffset = { x: 0, y: 0 };
+  PRESETS.push({
+    name: "LU_Bowtie",
+    imagePath: imagePath_lu,
+    textureSize: textureSize_lu,
+    polygon: polygon_bowtie_lu,
+    centerOffset: { x: 0, y: 0 }
+  });
+
+  // Lund University Hexagon
+  var polygon_hexagon_lu = new Polygon(
+    [
+      { x: 372.5, y: 166 },
+      { x: 406, y: 212 },
+      { x: 406.5, y: 268.5 },
+      { x: 372.5, y: 315 },
+      { x: 339, y: 268.5 },
+      { x: 339, y: 212 }
+    ].map(function (coords) {
+      return new Vertex(coords).sub(textureSize_lu.width / 2, textureSize_lu.height / 2);
+      // return new Vertex(coords); // .sub(textureSize.width / 2, textureSize.height / 2);
+    })
+  );
+  // var polgonCenterOffset = { x: 0, y: 0 };
+  PRESETS.push({
+    name: "LU_Hexagon",
+    imagePath: imagePath_lu,
+    textureSize: textureSize_lu,
+    polygon: polygon_hexagon_lu,
+    centerOffset: { x: 0, y: 0 }
   });
 
   // var presetNames = ["CH_Pentagon", "CH_penrose", "LU_Pentagon"];

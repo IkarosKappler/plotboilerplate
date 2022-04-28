@@ -143,6 +143,7 @@
     var polygonCenterOffset = new Vertex();
     var basePolygonBounds = null; // polygon.getBounds();
     // var polygonPosition = new Vertex(); // basePolygonBounds.getCenter();
+    var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset); // addXY(0, -5);
 
     function changeTilePreset() {
       // { polygon : Polygon, polygonPosition : Vertex, centerOffset : Vertex, ... }
@@ -159,6 +160,7 @@
       // Update position and bounds
       basePolygonBounds = polygon.getBounds();
       polygonPosition.set(basePolygonBounds.getCenter());
+      polygonRotationCenter.set(polygonPosition).add(preset.centerOffset);
       // Load texture image
       textureImage = loadTextureImage(imagePath, function () {
         console.log("Texture loaded");
@@ -179,7 +181,7 @@
     // var polygonRotationCenter = polygonPosition.clone().addY(-5); // ONLY PENTAGON
     pbBottom.add(polygonPosition);
 
-    var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset); // addXY(0, -5);
+    // var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset); // addXY(0, -5);
     // polygonPosition.listeners.addDragListener(function (event) {
     //   console.log("move", event.params);
     //   polygonRotationCenter.add(event.params.dragAmount);
@@ -233,23 +235,14 @@
         textureSize.min.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset),
         textureSize.max.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset)
       );
-      // console.log("scaledTextureSize", scaledTextureSize);
+
       var boundsPolygon = clonedTextureSize
         .toPolygon()
         .scale(config.tileScale, polygonRotationCenter)
         .move(rotationalOffsetInv)
         .move(positionOffset)
         .rotate(rotation, polygonPosition);
-      // var scaledTextureSize = new Bounds(
-      //   textureSize.min.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset),
-      //   textureSize.max.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset)
-      // );
-      // var boundsPolygon = scaledTextureSize
-      //   .toPolygon()
-      //   // .scale(config.tileScale, polygonRotationCenter)
-      //   // .move(rotationalOffsetInv)
-      //   // .move(positionOffset)
-      //   .rotate(rotation, polygonPosition);
+
       draw.polygon(boundsPolygon, "orange", 1.0);
       draw.polygon(scaledTextureSize.toPolygon(), "yellow", 1.0);
       draw.polygon(clonedTextureSize.toPolygon(), "green", 1.0);
