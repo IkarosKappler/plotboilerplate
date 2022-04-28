@@ -649,6 +649,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     rotation: number
   ): SVGElement {
     const basePolygonBounds: Bounds = polygon.getBounds();
+    const rotatedScalingOrigin = new Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
+    const rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
     // const targetCenterDifference: XYCoords = polygonPosition.clone().difference(basePolygonBounds.getCenter());
     // const rotationalOffset: XYCoords = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
     // const rotationalOffset: XYCoords = { x: 0, y: 0 };
@@ -680,18 +682,15 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
 
     const gNode = this.makeNode("g") as SVGGElement;
     const imageNode: SVGImageElement = this.makeNode("image") as SVGImageElement;
-    imageNode.setAttribute("x", `${this._x(textureSize.min.x)}`);
-    imageNode.setAttribute("y", `${this._y(textureSize.min.y)}`);
-    // imageNode.setAttribute("width", `${textureSize.width * this.scale.x}`);
-    // imageNode.setAttribute("height", `${textureSize.height * this.scale.y}`);
+    // imageNode.setAttribute("x", `${this._x(textureSize.min.x)}`);
+    // imageNode.setAttribute("y", `${this._y(textureSize.min.y)}`);
+    imageNode.setAttribute("x", `${this._x(rotatedScalingOrigin.x)}`);
+    imageNode.setAttribute("y", `${this._y(rotatedScalingOrigin.y)}`);
     imageNode.setAttribute("width", `${textureSize.width}`);
     imageNode.setAttribute("height", `${textureSize.height}`);
     imageNode.setAttribute("href", textureImage.src);
-    // imageNode.setAttribute("transform-origin", `${this._x(polygonPosition.x)} ${this._y(polygonPosition.y)}`);
     imageNode.setAttribute("opacity", "0.5");
-    // imageNode.setAttribute("clip-path", `url(#${clipPathId})`);
-    // node.setAttribute("transform-origin", "50% 50%");
-    // const scaledPolygonPosition = new Vertex(textureSize.min).clone().scaleXY(this.scale, this.offset);
+    // imageNode.setAttribute("transform-origin", `0% 0%`); // Obsolete?
     // SVG rotations in degrees
     imageNode.setAttribute(
       "transform",
@@ -701,11 +700,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       // `rotate(${rotation * RAD_TO_DEG}, ${this._x(targetCenterDifference.x + polygonPosition.x + rotationalOffset.x)}, ${this._y(
       //   targetCenterDifference.y + polygonPosition.y + rotationalOffset.y
       // )})` // +
-      // `rotate(${rotation * RAD_TO_DEG}, ${polygonPosition.x}, ${polygonPosition.y})` // +
-      // `rotate(${rotation * RAD_TO_DEG}, ${textureSize.min.x - polygonPosition.x}, ${textureSize.min.y - polygonPosition.y})` // +
-      // `rotate(${rotation * RAD_TO_DEG}, ${this._x(scaledPolygonPosition.x)}, ${this._y(scaledPolygonPosition.y)})` // +
-      `rotate(${rotation * RAD_TO_DEG}, ${this._x(polygonPosition.x)}, ${this._y(polygonPosition.y)})` // +
-      // `scale(${this.scale.x}, ${this.scale.y})`
+      // `rotate(${rotation * RAD_TO_DEG}, ${this._x(polygonPosition.x)}, ${this._y(polygonPosition.y)})` // + //
+      `rotate(${rotation * RAD_TO_DEG}, ${this._x(rotatedScalingOrigin.x)}, ${this._y(rotatedScalingOrigin.y)})` // + //
     );
     const pathNode: SVGPathElement = this.makeNode("path") as SVGPathElement;
     // TODO: convert to helper function
@@ -721,14 +717,17 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     this.bufferedNodeDefs.appendChild(clipPathNode);
 
     gNode.appendChild(imageNode);
-    // node.setAttribute("clip-path", `url(#${clipPathId})`);
+    // const rotatedScalingOrigin = new Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
+    // .scaleXY(this.scale, this.offset);
+    this.squareHandle(rotatedScalingOrigin, 5, "red");
+    const cross: SVGElement = this.makeNode("rect");
+    cross.setAttribute("x", `${this._x(rotatedScalingOrigin.x) - 8 / 2.0}`);
+    cross.setAttribute("y", `${this._y(rotatedScalingOrigin.y) - 8 / 2.0}`);
+    cross.setAttribute("width", `${5}`);
+    cross.setAttribute("height", `${5}`);
+    this._bindFillDraw(cross, "cross", "red", null); // No color, no lineWidth
 
-    // gNode.setAttribute("transform-origin", `${this._x(polygonPosition.x)} ${this._y(polygonPosition.y)}`);
-    // gNode.setAttribute("transform-origin", `${this._x(textureSize.min.x)} ${this._y(textureSize.min.y)}`);
-    const rotatedScalingOrigin = new Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
-    // .scaleXY(this.scale, polygonPosition);
     gNode.setAttribute("transform-origin", `${this._x(rotatedScalingOrigin.x)} ${this._y(rotatedScalingOrigin.y)}`);
-    // gNode.setAttribute("transform-origin", `${297} ${this._y(231)}`);
     gNode.setAttribute(
       "transform",
       // `translate(${(-rotationalOffset.x - targetCenterDifference.x) * this.scale.x}, ${
@@ -737,8 +736,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       // `rotate(${rotation * RAD_TO_DEG}, ${this._x(targetCenterDifference.x + polygonPosition.x + rotationalOffset.x)}, ${this._y(
       //   targetCenterDifference.y + polygonPosition.y + rotationalOffset.y
       // )})` +
-      // `scale(${this.scale.x}, ${this.scale.y})` + // ...
-      ""
+      `scale(${this.scale.x}, ${this.scale.y})` + // ...
+        ""
     );
 
     // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here

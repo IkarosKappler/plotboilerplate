@@ -267,7 +267,7 @@
       }
 
       draw.polygon(polygon, "rgba(192,192,192,0.5)", 2.0);
-      draw.polygon(scaledPolygon, "rgba(255,192,0,0.75)", 1.0);
+      draw.polygon(scaledPolygon, "rgba(255,192,0,0.75)", 1.0); // orange
       draw.polygon(rotatedPolygon, "rgb(0,128,192)", 1.0);
     };
 
