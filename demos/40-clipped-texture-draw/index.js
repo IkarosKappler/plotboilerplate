@@ -1,5 +1,5 @@
 /**
- * A script for drawing Girihs.
+ * A script to demonstrate how to draw clipped polygons.
  *
  * @requires PlotBoilerplate
  * @requires MouseHandler
@@ -11,11 +11,6 @@
  * @date     2020-10-30
  * @version  1.0.0
  **/
-
-// TODOs
-//  * build auto-generation (random)
-//  * build grid of all possible positions (centers only)
-//  * detect connecting lines (inner polygons to max paths)
 
 (function (_context) {
   "use strict";
@@ -85,7 +80,7 @@
           autoAdjustOffset: true,
           offsetAdjustXPercent: 50,
           offsetAdjustYPercent: 50,
-          backgroundColor: isDarkmode ? "#002424" : "#a8e8e8",
+          backgroundColor: isDarkmode ? "#002424" : "#ffffff",
           enableMouse: true,
           enableKeys: true,
           enableTouch: true,
@@ -141,21 +136,18 @@
     var polygon = null; //
     var polygonPosition = new Vertex();
     var polygonCenterOffset = new Vertex();
-    var basePolygonBounds = null; // polygon.getBounds();
-    // var polygonPosition = new Vertex(); // basePolygonBounds.getCenter();
-    var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset); // addXY(0, -5);
+    var basePolygonBounds = null;
+    var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset);
 
     function changeTilePreset() {
       // { polygon : Polygon, polygonPosition : Vertex, centerOffset : Vertex, ... }
       var preset = getTestPreset(config.presetName);
-      console.log("Found preset", preset);
       imagePath = preset.imagePath;
       textureSize = preset.textureSize;
       loadTextureImage();
       pbTop.remove(polygon, false, true); // redraw=false, removeWithVertices=true
       polygon = preset.polygon;
       pbTop.add(polygon);
-      // polygonPosition.set(preset.polygonPosition);
       polygonCenterOffset.set(preset.centerOffset);
       // Update position and bounds
       basePolygonBounds = polygon.getBounds();
@@ -173,28 +165,8 @@
     // +---------------------------------------------------------------------------------
     // | Add texture source and source polygon.
     // +-------------------------------
-    // pbTop.add(polygon);
-
-    // var basePolygonBounds = polygon.getBounds();
-    // var polygonPosition = basePolygonBounds.getCenter();
-    // TODO: define according to type
-    // var polygonRotationCenter = polygonPosition.clone().addY(-5); // ONLY PENTAGON
     pbBottom.add(polygonPosition);
-
-    // var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset); // addXY(0, -5);
-    // polygonPosition.listeners.addDragListener(function (event) {
-    //   console.log("move", event.params);
-    //   polygonRotationCenter.add(event.params.dragAmount);
-    //   pbTop.redraw();
-    // });
     pbTop.add(polygonRotationCenter);
-
-    // // +---------------------------------------------------------------------------------
-    // // | Get the contrast color (string) for the given color (object).
-    // // +-------------------------------
-    // var toContrastColor = function (color) {
-    //   return getContrastColor(color).cssRGB();
-    // };
 
     // +---------------------------------------------------------------------------------
     // | This is the actual render function.
@@ -214,23 +186,14 @@
     };
 
     var drawTarget = function (draw, fill) {
-      // basePolygonBounds = polygon.getBounds(); // Only required on editable polygons
-      var rotation = (config.rotation / 180) * Math.PI; // Math.PI / 4;
-      // var rotationalOffset = new Vertex(0, -5); //* config.tileScale);
+      var rotation = (config.rotation / 180) * Math.PI;
       var rotationalOffset = basePolygonBounds.getCenter().difference(polygonRotationCenter);
       var rotationalOffsetInv = rotationalOffset.inv();
       var positionOffset = basePolygonBounds.getCenter().difference(polygonPosition);
       var _localRotationCenter = polygonPosition.clone().add(rotationalOffset);
 
-      // console.log("config.tileScale", config.tileScale);
-
       // Scale around center
-      var clonedTextureSize = new Bounds(
-        textureSize.min.clone(), // .scale(config.tileScale, polygonRotationCenter).add(positionOffset.inv()),
-        // .rotate(rotation, polygonPosition),
-        textureSize.max.clone() // .scale(config.tileScale, polygonRotationCenter).add(positionOffset.inv())
-        // .rotate(rotation, polygonPosition)
-      );
+      var clonedTextureSize = new Bounds(textureSize.min.clone(), textureSize.max.clone());
       var scaledTextureSize = new Bounds(
         textureSize.min.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset),
         textureSize.max.clone().scale(config.tileScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset)
@@ -252,11 +215,10 @@
         .scale(config.tileScale, polygonRotationCenter)
         .move(rotationalOffset)
         .move(positionOffset);
-      var rotatedPolygon = scaledPolygon.clone().rotate(rotation, polygonPosition); //.move(positionOffset);
+      var rotatedPolygon = scaledPolygon.clone().rotate(rotation, polygonPosition);
 
       if (config.drawTargetTexture) {
-        // fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, polygonRotationCenter);
-        fill.texturedPoly(textureImage, scaledTextureSize, rotatedPolygon, polygonPosition, rotation); //, _localRotationCenter);
+        fill.texturedPoly(textureImage, scaledTextureSize, rotatedPolygon, polygonPosition, rotation);
       }
 
       draw.polygon(polygon, "rgba(192,192,192,0.5)", 2.0);
@@ -290,25 +252,6 @@
       ctx.closePath();
       ctx.clip();
     };
-
-    // var changeTilePreset = function () {};
-
-    // // Keep track of loaded textures
-    // var textureStore = new Map();
-    // var loadTextureImage = function (path, onLoad) {
-    //   var texture = textureStore.get(path);
-    //   if (!texture) {
-    //     texture = new Image();
-    //     texture.onload = onLoad;
-    //     texture.src = path;
-    //     textureStore.set(path, texture);
-    //   }
-    //   return texture;
-    // };
-    // textureImage = loadTextureImage(imagePath, function () {
-    //   console.log("Texture loaded");
-    //   pbTop.redraw();
-    // });
 
     // Add a mouse listener to track the mouse position.-
     new MouseHandler(pbTop.canvas).move(function (e) {
@@ -367,9 +310,6 @@
 
     pbTop.config.preDraw = drawSource;
     pbBottom.config.preDraw = drawTarget;
-    // var container = document.querySelector(".wrapper-bottom");
-    // // Apply canvas background color (this respects the darkmode in this component)
-    // container.style["background-color"] = pb.config.backgroundColor;
     pbTop.redraw();
     pbTop.canvas.focus();
   };

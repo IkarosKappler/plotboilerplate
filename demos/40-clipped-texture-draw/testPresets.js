@@ -308,6 +308,5 @@
   globalThis.getTestPreset = getTestPreset;
   globalThis.presetNames = PRESETS.map(function (preset) {
     return preset.name;
-  }); // presetNames;
-  console.log(presetNames);
+  });
 })();
