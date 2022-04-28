@@ -106,9 +106,9 @@ export class Polygon {
      * @memberof Polygon
      * @return {Polygon} this for chaining
      **/
-    move(vert) {
+    move(amount) {
         for (var i in this.vertices) {
-            this.vertices[i].add(vert);
+            this.vertices[i].add(amount);
         }
         return this;
     }

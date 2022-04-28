@@ -41,7 +41,8 @@
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  1.11.0
+ * @modified 2022-03-27 Added the `texturedPoly` function.
+ * @version  1.12.0
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
@@ -196,6 +197,96 @@ export class drawutils {
         this.ctx.drawImage(image, 0, 0, image.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
         image.naturalHeight - 1, // To avoid errors substract 1 here.
         this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
+        this.ctx.restore();
+    }
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation) {
+        var basePolygonBounds = polygon.getBounds();
+        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        // var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+        // var rotationalOffset = { x: 0, y: 0 };
+        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+        // Get the position offset of the polygon
+        var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+        // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        var targetTextureOffset = new Vertex(textureSize.min.x, textureSize.min.y).sub(polygonPosition);
+        this.ctx.save();
+        // this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
+        this.ctx.translate(this.offset.x + polygonPosition.x * this.scale.x, this.offset.y + polygonPosition.y * this.scale.y);
+        drawutils.helpers.clipPoly(this.ctx, {
+            x: -polygonPosition.x * this.scale.x,
+            y: -polygonPosition.y * this.scale.y
+        }, this.scale, polygon.vertices);
+        this.ctx.scale(this.scale.x, this.scale.y);
+        this.ctx.rotate(rotation);
+        this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+        targetTextureOffset.x, // * this.scale.x,
+        targetTextureOffset.y, // * this.scale.y,
+        targetTextureSize.x, //  * this.scale.x,
+        targetTextureSize.y // * this.scale.y
+        );
+        this.ctx.restore();
+    }
+    _texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter = { x: 0, y: 0 }) {
+        var basePolygonBounds = polygon.getBounds();
+        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+        // var rotationalOffset = { x: 0, y: 0 };
+        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+        // Get the position offset of the polygon
+        var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+        var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        this.ctx.save();
+        // this.ctx.translate(
+        //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+        //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+        // );
+        this.ctx.translate(this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x, this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y);
+        this.ctx.rotate(rotation);
+        drawutils.helpers.clipPoly(this.ctx, {
+            x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
+            y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
+        }, this.scale, polygon.vertices);
+        this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+        (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x, (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y, targetTextureSize.x * this.scale.x, targetTextureSize.y * this.scale.y);
+        // const scaledTextureSize = new Bounds(
+        //   new Vertex(
+        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
+        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
+        //   ).scaleXY(this.scale, rotationCenter),
+        //   new Vertex(
+        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
+        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
+        //   ).scaleXY(this.scale, rotationCenter)
+        // );
+        // this.ctx.drawImage(
+        //   textureImage,
+        //   0,
+        //   0,
+        //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+        //   scaledTextureSize.min.x,
+        //   scaledTextureSize.min.y,
+        //   scaledTextureSize.width,
+        //   scaledTextureSize.height
+        // );
         this.ctx.restore();
     }
     /**
@@ -856,4 +947,19 @@ export class drawutils {
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 }
+drawutils.helpers = {
+    // A helper function to define the clipping path.
+    // This could be a candidate for the draw library.
+    clipPoly: (ctx, offset, scale, vertices) => {
+        ctx.beginPath();
+        // Set clip mask
+        ctx.moveTo(offset.x + vertices[0].x * scale.x, offset.y + vertices[0].y * scale.y);
+        for (var i = 1; i < vertices.length; i++) {
+            const vert = vertices[i];
+            ctx.lineTo(offset.x + vert.x * scale.x, offset.y + vert.y * scale.y);
+        }
+        ctx.closePath();
+        ctx.clip();
+    }
+};
 //# sourceMappingURL=draw.js.map

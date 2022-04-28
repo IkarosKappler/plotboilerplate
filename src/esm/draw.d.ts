@@ -41,11 +41,13 @@
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  1.11.0
+ * @modified 2022-03-27 Added the `texturedPoly` function.
+ * @version  1.12.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc A wrapper class for basic drawing operations.
  *
@@ -174,6 +176,24 @@ export declare class drawutils implements DrawLib<void> {
      * @memberof drawutils
      **/
     image(image: HTMLImageElement, position: Vertex, size: Vertex): void;
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number): void;
+    _texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number, rotationCenter?: XYCoords): void;
     /**
      * Draw a rectangle.
      *
@@ -544,4 +564,5 @@ export declare class drawutils implements DrawLib<void> {
      * @param {string} color - The color to clear with.
      **/
     clear(color: string): void;
+    private static helpers;
 }

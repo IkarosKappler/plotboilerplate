@@ -1721,9 +1721,28 @@ var Bounds = /** @class */ (function () {
     Bounds.prototype.toPolygon = function () {
         return new Polygon_1.Polygon([new Vertex_1.Vertex(this.min), new Vertex_1.Vertex(this.max.x, this.min.y), new Vertex_1.Vertex(this.max), new Vertex_1.Vertex(this.min.x, this.max.y)], false);
     };
+    /**
+     * Get the center of this boinding box.
+     *
+     * @method getCenter
+     * @instance
+     * @memberof Bounds
+     * @returns {Vertex} The center of these bounds.
+     */
     Bounds.prototype.getCenter = function () {
         return new Vertex_1.Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
     };
+    /**
+     * Convert these bounds to a human readable form.
+     *
+     * Note: the returned format might change in the future, so please do not
+     * rely on the returned string format.
+     *
+     * @method toString
+     * @instance
+     * @memberof Bounds
+     * @returns {string} Get these bounds in a human readable form.
+     */
     Bounds.prototype.toString = function () {
         return "{ min: " + this.min.toString() + ", max : " + this.max.toString() + ", width: " + this.width + ", height : " + this.height + " }";
     };
@@ -6157,9 +6176,9 @@ var Polygon = /** @class */ (function () {
      * @memberof Polygon
      * @return {Polygon} this for chaining
      **/
-    Polygon.prototype.move = function (vert) {
+    Polygon.prototype.move = function (amount) {
         for (var i in this.vertices) {
-            this.vertices[i].add(vert);
+            this.vertices[i].add(amount);
         }
         return this;
     };
@@ -9159,7 +9178,8 @@ exports.VertexListeners = VertexListeners;
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  1.11.0
+ * @modified 2022-03-27 Added the `texturedPoly` function.
+ * @version  1.12.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -9316,6 +9336,97 @@ var drawutils = /** @class */ (function () {
         this.ctx.drawImage(image, 0, 0, image.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
         image.naturalHeight - 1, // To avoid errors substract 1 here.
         this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y, size.x * this.scale.x, size.y * this.scale.y);
+        this.ctx.restore();
+    };
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     **/
+    drawutils.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
+        var basePolygonBounds = polygon.getBounds();
+        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        // var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+        // var rotationalOffset = { x: 0, y: 0 };
+        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+        // Get the position offset of the polygon
+        var targetTextureSize = new Vertex_1.Vertex(textureSize.width, textureSize.height);
+        // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        var targetTextureOffset = new Vertex_1.Vertex(textureSize.min.x, textureSize.min.y).sub(polygonPosition);
+        this.ctx.save();
+        // this.ctx.translate(this.offset.x + rotationCenter.x * this.scale.x, this.offset.y + rotationCenter.y * this.scale.y);
+        this.ctx.translate(this.offset.x + polygonPosition.x * this.scale.x, this.offset.y + polygonPosition.y * this.scale.y);
+        drawutils.helpers.clipPoly(this.ctx, {
+            x: -polygonPosition.x * this.scale.x,
+            y: -polygonPosition.y * this.scale.y
+        }, this.scale, polygon.vertices);
+        this.ctx.scale(this.scale.x, this.scale.y);
+        this.ctx.rotate(rotation);
+        this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+        targetTextureOffset.x, // * this.scale.x,
+        targetTextureOffset.y, // * this.scale.y,
+        targetTextureSize.x, //  * this.scale.x,
+        targetTextureSize.y // * this.scale.y
+        );
+        this.ctx.restore();
+    };
+    drawutils.prototype._texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter) {
+        if (rotationCenter === void 0) { rotationCenter = { x: 0, y: 0 }; }
+        var basePolygonBounds = polygon.getBounds();
+        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+        // var rotationalOffset = { x: 0, y: 0 };
+        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+        // Get the position offset of the polygon
+        var targetTextureSize = new Vertex_1.Vertex(textureSize.width, textureSize.height);
+        var targetTextureOffset = new Vertex_1.Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+        this.ctx.save();
+        // this.ctx.translate(
+        //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+        //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+        // );
+        this.ctx.translate(this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x, this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y);
+        this.ctx.rotate(rotation);
+        drawutils.helpers.clipPoly(this.ctx, {
+            x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
+            y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
+        }, this.scale, polygon.vertices);
+        this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+        (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x, (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y, targetTextureSize.x * this.scale.x, targetTextureSize.y * this.scale.y);
+        // const scaledTextureSize = new Bounds(
+        //   new Vertex(
+        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
+        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
+        //   ).scaleXY(this.scale, rotationCenter),
+        //   new Vertex(
+        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
+        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
+        //   ).scaleXY(this.scale, rotationCenter)
+        // );
+        // this.ctx.drawImage(
+        //   textureImage,
+        //   0,
+        //   0,
+        //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+        //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+        //   scaledTextureSize.min.x,
+        //   scaledTextureSize.min.y,
+        //   scaledTextureSize.width,
+        //   scaledTextureSize.height
+        // );
         this.ctx.restore();
     };
     /**
@@ -9975,6 +10086,21 @@ var drawutils = /** @class */ (function () {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     };
+    drawutils.helpers = {
+        // A helper function to define the clipping path.
+        // This could be a candidate for the draw library.
+        clipPoly: function (ctx, offset, scale, vertices) {
+            ctx.beginPath();
+            // Set clip mask
+            ctx.moveTo(offset.x + vertices[0].x * scale.x, offset.y + vertices[0].y * scale.y);
+            for (var i = 1; i < vertices.length; i++) {
+                var vert = vertices[i];
+                ctx.lineTo(offset.x + vert.x * scale.x, offset.y + vert.y * scale.y);
+            }
+            ctx.closePath();
+            ctx.clip();
+        }
+    };
     return drawutils;
 }());
 exports.drawutils = drawutils;
@@ -9996,7 +10122,8 @@ exports.drawutils = drawutils;
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  0.0.6
+ * @modified 2022-03-27 Added the `texturedPoly` function.
+ * @version  0.0.7
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
@@ -10194,6 +10321,24 @@ var drawutilsgl = /** @class */ (function () {
      * @memberof drawutils
      **/
     drawutilsgl.prototype.image = function (image, position, size) {
+        // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @return {void}
+     * @instance
+     * @memberof drawutilsgl
+     **/
+    drawutilsgl.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
         // NOT YET IMPLEMENTED
     };
     // +---------------------------------------------------------------------------------
@@ -10740,13 +10885,16 @@ var GLU = /** @class */ (function () {
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  1.5.0
+ * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
+ * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
+ * @version  1.6.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
 var CircleSector_1 = __webpack_require__(946);
 var CubicBezierCurve_1 = __webpack_require__(510);
 var Vertex_1 = __webpack_require__(421);
+var UIDGenerator_1 = __webpack_require__(197);
 var RAD_TO_DEG = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -10772,7 +10920,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
@@ -10784,14 +10932,23 @@ var drawutilssvg = /** @class */ (function () {
         if (isSecondary) {
             this.gNode = gNode;
             this.bufferGNode = bufferGNode;
+            this.nodeDefs = nodeDefs;
+            this.bufferedNodeDefs = bufferNodeDefs;
         }
         else {
             this.addStyleDefs(drawConfig);
+            this.addDefsNode();
             this.gNode = this.createSVGNode("g");
             this.bufferGNode = this.createSVGNode("g");
             this.svgNode.appendChild(this.gNode);
         }
     }
+    /**
+     * Adds a default style defintion based on the passed DrawConfig.
+     * Twaek the draw config to change default colors or line thicknesses.
+     *
+     * @param {DrawConfig} drawConfig
+     */
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
         this.nodeStyle = this.createSVGNode("style");
         this.svgNode.appendChild(this.nodeStyle);
@@ -10823,6 +10980,15 @@ var drawutilssvg = /** @class */ (function () {
             }
         }
         this.nodeStyle.innerHTML = rules.join("\n");
+    };
+    /**
+     * Adds the internal <defs> node.
+     */
+    drawutilssvg.prototype.addDefsNode = function () {
+        this.nodeDefs = this.createSVGNode("defs");
+        // this.svgNode.appendChild(this.nodeDefs);
+        this.bufferedNodeDefs = this.createSVGNode("defs");
+        this.svgNode.appendChild(this.nodeDefs);
     };
     /**
      * This is a simple way to include custom CSS class mappings to the style defs of the generated SVG.
@@ -10961,7 +11127,7 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
         var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
         true, // isSecondary
-        this.gNode, this.bufferGNode);
+        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs);
         return copy;
     };
     /**
@@ -11038,11 +11204,15 @@ var drawutilssvg = /** @class */ (function () {
             // layout updates.
             // Replace the old <g>-node with the buffer node.
             //   https://stackoverflow.com/questions/27442464/how-to-update-a-svg-image-without-seeing-a-blinking
+            this.svgNode.replaceChild(this.bufferedNodeDefs, this.nodeDefs);
             this.svgNode.replaceChild(this.bufferGNode, this.gNode);
         }
-        var tmp = this.gNode;
+        var tmpGNode = this.gNode;
         this.gNode = this.bufferGNode;
-        this.bufferGNode = tmp;
+        this.bufferGNode = tmpGNode;
+        var tmpDefsNode = this.nodeDefs;
+        this.nodeDefs = this.bufferedNodeDefs;
+        this.bufferedNodeDefs = tmpDefsNode;
     };
     drawutilssvg.prototype._x = function (x) {
         return this.offset.x + this.scale.x * x;
@@ -11134,6 +11304,75 @@ var drawutilssvg = /** @class */ (function () {
         setImageSize(image);
         node.setAttribute("href", image.src);
         return this._bindFillDraw(node, "image", null, null);
+    };
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @return {void}
+     * @instance
+     * @memberof drawutilssvg
+     **/
+    drawutilssvg.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
+        var basePolygonBounds = polygon.getBounds();
+        var rotatedScalingOrigin = new Vertex_1.Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
+        var rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
+        // Create something like this
+        // ...
+        //    <defs>
+        //       <clipPath id="shape">
+        //         <path fill="none" d="..."/>
+        //       </clipPath>
+        //    </defs>
+        //    ...
+        //    <g clip-path="url(#shape)">
+        //       <g transform="scale(...)">
+        //          <image width="643" height="643" transform="rotate(...)" xlink:href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/222579/beagle400.jpg" >
+        //       </g>
+        //    </g>
+        //    </image>
+        // ...
+        var clipPathNode = this.makeNode("clipPath");
+        var clipPathId = "clippath_" + UIDGenerator_1.UIDGenerator.next(); // TODO: use a better UUID generator here?
+        clipPathNode.setAttribute("id", clipPathId);
+        var gNode = this.makeNode("g");
+        var imageNode = this.makeNode("image");
+        imageNode.setAttribute("x", "" + this._x(rotatedScalingOrigin.x));
+        imageNode.setAttribute("y", "" + this._y(rotatedScalingOrigin.y));
+        imageNode.setAttribute("width", "" + textureSize.width);
+        imageNode.setAttribute("height", "" + textureSize.height);
+        imageNode.setAttribute("href", textureImage.src);
+        // imageNode.setAttribute("opacity", "0.5");
+        // SVG rotations in degrees
+        imageNode.setAttribute("transform", "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(rotatedScalingOrigin.x) + ", " + this._y(rotatedScalingOrigin.y) + ")");
+        var pathNode = this.makeNode("path");
+        var pathData = [];
+        if (polygon.vertices.length > 0) {
+            var self_1 = this;
+            pathData.push("M", "" + this._x(polygon.vertices[0].x), "" + this._y(polygon.vertices[0].y));
+            for (var i = 1; i < polygon.vertices.length; i++) {
+                pathData.push("L", "" + this._x(polygon.vertices[i].x), "" + this._y(polygon.vertices[i].y));
+            }
+        }
+        pathNode.setAttribute("d", pathData.join(" "));
+        clipPathNode.appendChild(pathNode);
+        this.bufferedNodeDefs.appendChild(clipPathNode);
+        gNode.appendChild(imageNode);
+        gNode.setAttribute("transform-origin", this._x(rotatedScalingOrigin.x) + " " + this._y(rotatedScalingOrigin.y));
+        gNode.setAttribute("transform", "scale(" + this.scale.x + ", " + this.scale.y + ")");
+        var clipNode = this.makeNode("g");
+        clipNode.appendChild(gNode);
+        clipNode.setAttribute("clip-path", "url(#" + clipPathId + ")");
+        // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
+        this._bindFillDraw(clipNode, "image", null, null); // No color, no lineWidth
+        return clipNode;
     };
     /**
      * Draw the given (cubic) bézier curve.
@@ -11745,14 +11984,6 @@ var drawutilssvg = /** @class */ (function () {
         if (this.isSecondary) {
             return;
         }
-        // // Clearing an SVG is equivalent to removing all its child elements.
-        // for (var i = 0; i < this.gNode.childNodes.length; i++) {
-        //   // Hide all nodes here. Don't throw them away.
-        //   // We can probably re-use them in the next draw cycle.
-        //   var child: SVGElement = this.gNode.childNodes[i] as SVGElement;
-        //   this.cache.set(child.getAttribute("id"), child);
-        // }
-        // this.removeAllChildNodes();
         // Add a covering rect with the given background color
         this.curId = "background";
         this.curClassName = undefined;
@@ -11777,6 +12008,9 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.removeAllChildNodes = function () {
         while (this.bufferGNode.lastChild) {
             this.bufferGNode.removeChild(this.bufferGNode.lastChild);
+        }
+        while (this.bufferedNodeDefs.lastChild) {
+            this.bufferedNodeDefs.removeChild(this.bufferedNodeDefs.lastChild);
         }
     };
     /**

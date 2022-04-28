@@ -8,11 +8,13 @@
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
- * @version  0.0.6
+ * @modified 2022-03-27 Added the `texturedPoly` function.
+ * @version  0.0.7
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -134,6 +136,22 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @memberof drawutils
      **/
     image(image: HTMLImageElement, position: Vertex, size: Vertex): void;
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @return {void}
+     * @instance
+     * @memberof drawutilsgl
+     **/
+    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number): void;
     _fillOrDraw(color: string): void;
     /**
      * Draw the given (cubic) bézier curve.

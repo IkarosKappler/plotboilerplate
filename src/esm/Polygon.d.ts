@@ -123,7 +123,7 @@ export declare class Polygon implements SVGSerializable {
      * @memberof Polygon
      * @return {Polygon} this for chaining
      **/
-    move(vert: XYCoords): Polygon;
+    move(amount: XYCoords): Polygon;
     /**
      * Check if the given vertex is inside this polygon.<br>
      * <br>

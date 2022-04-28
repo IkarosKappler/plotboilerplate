@@ -65,7 +65,26 @@ export declare class Bounds implements IBounds, XYDimension {
      * @return {Polygon} This bound rectangle as a polygon.
      */
     toPolygon(): Polygon;
+    /**
+     * Get the center of this boinding box.
+     *
+     * @method getCenter
+     * @instance
+     * @memberof Bounds
+     * @returns {Vertex} The center of these bounds.
+     */
     getCenter(): Vertex;
+    /**
+     * Convert these bounds to a human readable form.
+     *
+     * Note: the returned format might change in the future, so please do not
+     * rely on the returned string format.
+     *
+     * @method toString
+     * @instance
+     * @memberof Bounds
+     * @returns {string} Get these bounds in a human readable form.
+     */
     toString(): string;
     /**
      * Compute the minimal bounding box for a given set of vertices.
