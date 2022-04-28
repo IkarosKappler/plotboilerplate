@@ -159,29 +159,6 @@ var Circle = /** @class */ (function () {
         return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
     };
     /**
-     * Create an SVG representation of this circle.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof Circle
-     */
-    Circle.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer: Array<string> = [];
-        // buffer.push("<circle");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' cx="' + this.center.x + '"');
-        // buffer.push(' cy="' + this.center.y + '"');
-        // buffer.push(' r="' + this.radius + '"');
-        // buffer.push(" />");
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the Circle.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    };
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.

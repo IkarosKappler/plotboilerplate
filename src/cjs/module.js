@@ -6,7 +6,7 @@
 //
 // @date 2021-02
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.drawutilssvg = exports.VertTuple = exports.VertexListeners = exports.VertexAttr = exports.Vertex = exports.VEllipseSector = exports.VEllipse = exports.Vector = exports.UIDGenerator = exports.Triangle = exports.SVGBuilder = exports.Polygon = exports.PlotBoilerplate = exports.PBImage = exports.MouseHandler = exports.Line = exports.KeyHandler = exports.Grid = exports.geomutils = exports.drawutilsgl = exports.drawutils = exports.CubicBezierCurve = exports.CircleSector = exports.Circle = exports.Bounds = exports.BezierPath = void 0;
+exports.drawutilssvg = exports.VertTuple = exports.VertexListeners = exports.VertexAttr = exports.Vertex = exports.VEllipseSector = exports.VEllipse = exports.Vector = exports.UIDGenerator = exports.Triangle = exports.Polygon = exports.PlotBoilerplate = exports.PBImage = exports.MouseHandler = exports.Line = exports.KeyHandler = exports.Grid = exports.geomutils = exports.drawutils = exports.CubicBezierCurve = exports.CircleSector = exports.Circle = exports.Bounds = exports.BezierPath = void 0;
 var BezierPath_1 = require("./BezierPath");
 Object.defineProperty(exports, "BezierPath", { enumerable: true, get: function () { return BezierPath_1.BezierPath; } });
 var Bounds_1 = require("./Bounds");
@@ -19,8 +19,7 @@ var CubicBezierCurve_1 = require("./CubicBezierCurve");
 Object.defineProperty(exports, "CubicBezierCurve", { enumerable: true, get: function () { return CubicBezierCurve_1.CubicBezierCurve; } });
 var draw_1 = require("./draw");
 Object.defineProperty(exports, "drawutils", { enumerable: true, get: function () { return draw_1.drawutils; } });
-var drawgl_1 = require("./drawgl");
-Object.defineProperty(exports, "drawutilsgl", { enumerable: true, get: function () { return drawgl_1.drawutilsgl; } });
+// import { drawutilsgl } from "./drawgl";
 var geomutils_1 = require("./geomutils");
 Object.defineProperty(exports, "geomutils", { enumerable: true, get: function () { return geomutils_1.geomutils; } });
 var Grid_1 = require("./Grid");
@@ -37,8 +36,6 @@ var PlotBoilerplate_1 = require("./PlotBoilerplate");
 Object.defineProperty(exports, "PlotBoilerplate", { enumerable: true, get: function () { return PlotBoilerplate_1.PlotBoilerplate; } });
 var Polygon_1 = require("./Polygon");
 Object.defineProperty(exports, "Polygon", { enumerable: true, get: function () { return Polygon_1.Polygon; } });
-var SVGBuilder_1 = require("./SVGBuilder");
-Object.defineProperty(exports, "SVGBuilder", { enumerable: true, get: function () { return SVGBuilder_1.SVGBuilder; } });
 var Triangle_1 = require("./Triangle");
 Object.defineProperty(exports, "Triangle", { enumerable: true, get: function () { return Triangle_1.Triangle; } });
 var UIDGenerator_1 = require("./UIDGenerator");

@@ -91,32 +91,6 @@ var Line = /** @class */ (function (_super) {
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
     };
-    /**
-     * Create an SVG representation of this line.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {options} p - A set of options, like the 'classname' to use
-     *                      for the line object.
-     * @return {string} The SVG string representing this line.
-     * @instance
-     * @memberof Line
-     **/
-    Line.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer = [];
-        // buffer.push( '<line' );
-        // if( options.className )
-        // buffer.push( ' class="' + options.className + '"' );
-        // buffer.push( ' x1="' + this.a.x + '"' );
-        // buffer.push( ' y1="' + this.a.y + '"' );
-        // buffer.push( ' x2="' + this.b.x + '"' );
-        // buffer.push( ' y2="' + this.b.y + '"' );
-        // buffer.push( ' />' );
-        // return buffer.join('');
-        console.warn("[Deprecation] Warning: the Line.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    };
     return Line;
 }(VertTuple_1.VertTuple));
 exports.Line = Line;

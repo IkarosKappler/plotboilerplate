@@ -29,7 +29,11 @@
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.4.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
+ * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
+ * @version  1.6.0
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -48,6 +52,8 @@ import {
   FontStyle,
   FontWeight
 } from "./interfaces";
+import { Bounds } from "./Bounds";
+import { UIDGenerator } from "./UIDGenerator";
 
 const RAD_TO_DEG = 180 / Math.PI;
 
@@ -97,6 +103,24 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @private
    */
   private nodeStyle: SVGStyleElement;
+
+  /**
+   * A style node of type `<defs>`.
+   * @member {SVGGelement}
+   * @memberof drawutilssvg
+   * @instance
+   * @private
+   */
+  private nodeDefs: SVGDefsElement;
+
+  /**
+   * The buffered nodeDefs.
+   * @member {SVGGelement}
+   * @memberof drawutilssvg
+   * @instance
+   * @private
+   */
+  private bufferedNodeDefs: SVGDefsElement;
 
   /**
    * @member {Vertex}
@@ -181,7 +205,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     drawConfig: DrawConfig,
     isSecondary?: boolean,
     gNode?: SVGGElement,
-    bufferGNode?: SVGGElement
+    bufferGNode?: SVGGElement,
+    nodeDefs?: SVGDefsElement,
+    bufferNodeDefs?: SVGDefsElement
   ) {
     this.svgNode = svgNode;
     this.offset = new Vertex(0, 0).set(offset);
@@ -195,14 +221,23 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     if (isSecondary) {
       this.gNode = gNode;
       this.bufferGNode = bufferGNode;
+      this.nodeDefs = nodeDefs;
+      this.bufferedNodeDefs = bufferNodeDefs;
     } else {
       this.addStyleDefs(drawConfig);
+      this.addDefsNode();
       this.gNode = this.createSVGNode("g") as SVGGElement;
       this.bufferGNode = this.createSVGNode("g") as SVGGElement;
       this.svgNode.appendChild(this.gNode);
     }
   }
 
+  /**
+   * Adds a default style defintion based on the passed DrawConfig.
+   * Twaek the draw config to change default colors or line thicknesses.
+   *
+   * @param {DrawConfig} drawConfig
+   */
   private addStyleDefs(drawConfig: DrawConfig) {
     this.nodeStyle = this.createSVGNode("style") as SVGStyleElement;
     this.svgNode.appendChild(this.nodeStyle);
@@ -234,6 +269,16 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       }
     }
     this.nodeStyle.innerHTML = rules.join("\n");
+  }
+
+  /**
+   * Adds the internal <defs> node.
+   */
+  private addDefsNode() {
+    this.nodeDefs = this.createSVGNode("defs") as SVGDefsElement;
+    // this.svgNode.appendChild(this.nodeDefs);
+    this.bufferedNodeDefs = this.createSVGNode("defs") as SVGDefsElement;
+    this.svgNode.appendChild(this.nodeDefs);
   }
 
   /**
@@ -386,7 +431,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       null, // no DrawConfig
       true, // isSecondary
       this.gNode,
-      this.bufferGNode
+      this.bufferGNode,
+      this.nodeDefs,
+      this.bufferedNodeDefs
     );
     return copy;
   }
@@ -470,11 +517,16 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       // layout updates.
       // Replace the old <g>-node with the buffer node.
       //   https://stackoverflow.com/questions/27442464/how-to-update-a-svg-image-without-seeing-a-blinking
+      this.svgNode.replaceChild(this.bufferedNodeDefs, this.nodeDefs);
       this.svgNode.replaceChild(this.bufferGNode, this.gNode);
     }
-    let tmp: SVGGElement = this.gNode;
+    const tmpGNode: SVGGElement = this.gNode;
     this.gNode = this.bufferGNode;
-    this.bufferGNode = tmp;
+    this.bufferGNode = tmpGNode;
+
+    const tmpDefsNode: SVGDefsElement = this.nodeDefs;
+    this.nodeDefs = this.bufferedNodeDefs;
+    this.bufferedNodeDefs = tmpDefsNode;
   }
 
   private _x(x: number): number {
@@ -572,6 +624,90 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     setImageSize(image);
     node.setAttribute("href", image.src);
     return this._bindFillDraw(node, "image", null, null);
+  }
+
+  /**
+   * Draw an image at the given position with the given size.<br>
+   * <br>
+   * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+   *
+   * @method texturedPoly
+   * @param {Image} textureImage - The image object to draw.
+   * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+   * @param {Polygon} polygon - The polygon to use as clip path.
+   * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+   * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+   * @return {void}
+   * @instance
+   * @memberof drawutilssvg
+   **/
+  texturedPoly(
+    textureImage: HTMLImageElement,
+    textureSize: Bounds,
+    polygon: Polygon,
+    polygonPosition: Vertex,
+    rotation: number
+  ): SVGElement {
+    const basePolygonBounds: Bounds = polygon.getBounds();
+    const rotatedScalingOrigin = new Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
+    const rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
+    // Create something like this
+    // ...
+    //    <defs>
+    //       <clipPath id="shape">
+    //         <path fill="none" d="..."/>
+    //       </clipPath>
+    //    </defs>
+    //    ...
+    //    <g clip-path="url(#shape)">
+    //       <g transform="scale(...)">
+    //          <image width="643" height="643" transform="rotate(...)" xlink:href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/222579/beagle400.jpg" >
+    //       </g>
+    //    </g>
+    //    </image>
+    // ...
+    const clipPathNode: SVGClipPathElement = this.makeNode("clipPath") as SVGClipPathElement;
+    const clipPathId: string = `clippath_${UIDGenerator.next()}`; // TODO: use a better UUID generator here?
+    clipPathNode.setAttribute("id", clipPathId);
+
+    const gNode = this.makeNode("g") as SVGGElement;
+    const imageNode: SVGImageElement = this.makeNode("image") as SVGImageElement;
+    imageNode.setAttribute("x", `${this._x(rotatedScalingOrigin.x)}`);
+    imageNode.setAttribute("y", `${this._y(rotatedScalingOrigin.y)}`);
+    imageNode.setAttribute("width", `${textureSize.width}`);
+    imageNode.setAttribute("height", `${textureSize.height}`);
+    imageNode.setAttribute("href", textureImage.src);
+    // imageNode.setAttribute("opacity", "0.5");
+    // SVG rotations in degrees
+    imageNode.setAttribute(
+      "transform",
+      `rotate(${rotation * RAD_TO_DEG}, ${this._x(rotatedScalingOrigin.x)}, ${this._y(rotatedScalingOrigin.y)})`
+    );
+    const pathNode: SVGPathElement = this.makeNode("path") as SVGPathElement;
+    const pathData: string[] = [];
+    if (polygon.vertices.length > 0) {
+      const self = this;
+      pathData.push("M", `${this._x(polygon.vertices[0].x)}`, `${this._y(polygon.vertices[0].y)}`);
+      for (var i = 1; i < polygon.vertices.length; i++) {
+        pathData.push("L", `${this._x(polygon.vertices[i].x)}`, `${this._y(polygon.vertices[i].y)}`);
+      }
+    }
+
+    pathNode.setAttribute("d", pathData.join(" "));
+    clipPathNode.appendChild(pathNode);
+    this.bufferedNodeDefs.appendChild(clipPathNode);
+
+    gNode.appendChild(imageNode);
+    gNode.setAttribute("transform-origin", `${this._x(rotatedScalingOrigin.x)} ${this._y(rotatedScalingOrigin.y)}`);
+    gNode.setAttribute("transform", `scale(${this.scale.x}, ${this.scale.y})`);
+
+    const clipNode: SVGGElement = this.makeNode("g") as SVGGElement;
+    clipNode.appendChild(gNode);
+    clipNode.setAttribute("clip-path", `url(#${clipPathId})`);
+
+    // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
+    this._bindFillDraw(clipNode, "image", null, null); // No color, no lineWidth
+    return clipNode;
   }
 
   /**
@@ -1020,11 +1156,12 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {XYCoords} center - The center of the crosshair.
    * @param {number} radius - The radius of the crosshair.
    * @param {string} color - The CSS color to draw the crosshair with.
+   * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  crosshair(center: XYCoords, radius: number, color: string) {
+  crosshair(center: XYCoords, radius: number, color: string, lineWidth?: number) {
     const node: SVGElement = this.makeNode("path");
     const d: SVGPathParams = [
       "M",
@@ -1041,7 +1178,41 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       this._y(center.y) + radius
     ];
     node.setAttribute("d", d.join(" "));
-    return this._bindFillDraw(node, "crosshair", color, 0.5);
+    return this._bindFillDraw(node, "crosshair", color, lineWidth || 0.5);
+  }
+
+  /**
+   * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+   * <br>
+   * Note that the x's radius will not be affected by scaling.
+   *
+   * @method crosshair
+   * @param {XYCoords} center - The center of the crosshair.
+   * @param {number} radius - The radius of the crosshair.
+   * @param {string} color - The CSS color to draw the crosshair with.
+   * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+   * @return {void}
+   * @instance
+   * @memberof drawutils
+   */
+  cross(center: XYCoords, radius: number, color: string, lineWidth?: number) {
+    const node: SVGElement = this.makeNode("path");
+    const d: SVGPathParams = [
+      "M",
+      this._x(center.x) - radius,
+      this._y(center.y) - radius,
+      "L",
+      this._x(center.x) + radius,
+      this._y(center.y) + radius,
+      "M",
+      this._x(center.x) - radius,
+      this._y(center.y) + radius,
+      "L",
+      this._x(center.x) + radius,
+      this._y(center.y) - radius
+    ];
+    node.setAttribute("d", d.join(" "));
+    return this._bindFillDraw(node, "cross", color, lineWidth || 1.0);
   }
 
   /**
@@ -1226,14 +1397,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     if (this.isSecondary) {
       return;
     }
-    // // Clearing an SVG is equivalent to removing all its child elements.
-    // for (var i = 0; i < this.gNode.childNodes.length; i++) {
-    //   // Hide all nodes here. Don't throw them away.
-    //   // We can probably re-use them in the next draw cycle.
-    //   var child: SVGElement = this.gNode.childNodes[i] as SVGElement;
-    //   this.cache.set(child.getAttribute("id"), child);
-    // }
-    // this.removeAllChildNodes();
 
     // Add a covering rect with the given background color
     this.curId = "background";
@@ -1261,6 +1424,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   private removeAllChildNodes() {
     while (this.bufferGNode.lastChild) {
       this.bufferGNode.removeChild(this.bufferGNode.lastChild);
+    }
+    while (this.bufferedNodeDefs.lastChild) {
+      this.bufferedNodeDefs.removeChild(this.bufferedNodeDefs.lastChild);
     }
   }
 

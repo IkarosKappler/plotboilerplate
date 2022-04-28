@@ -15,8 +15,11 @@
  * @modified 2021-11-12 Added `text()` params fontSize, fontFamily, rotation, textAlign.
  * @modified 2021-11-16 Added `text()` params fontWeight and fontStyle.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
  **/
 
+import { Bounds } from "../Bounds";
 import { Polygon } from "../Polygon";
 import { Vertex } from "../Vertex";
 import { SVGPathParams, UID, XYCoords } from "./core";
@@ -121,7 +124,7 @@ export interface DrawLib<R> {
    * @param {number=1} lineWidth? - [optional] The line's width.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    **/
   line: (zA: Vertex, zB: Vertex, color: string, lineWidth?: number) => R;
 
@@ -135,7 +138,7 @@ export interface DrawLib<R> {
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    **/
   arrow: (zA: Vertex, zB: Vertex, color: string, lineWidth?: number) => R;
 
@@ -150,9 +153,32 @@ export interface DrawLib<R> {
    * @param {Vertex} size - The x/y-size to draw the image with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    **/
   image: (image: HTMLImageElement, position: Vertex, size: Vertex) => R;
+
+  /**
+   * Draw an image at the given position with the given size.<br>
+   * <br>
+   * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+   *
+   * @method texturedPoly
+   * @param {Image} textureImage - The image object to draw.
+   * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+   * @param {Polygon} polygon - The polygon to use as clip path.
+   * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+   * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+   * @return {void}
+   * @instance
+   * @memberof DrawLib
+   **/
+  texturedPoly: (
+    textureImage: HTMLImageElement,
+    textureSize: Bounds,
+    polygon: Polygon,
+    polygonPosition: Vertex,
+    rotation: number
+  ) => R;
 
   /**
    * Draw the given (cubic) bézier curve.
@@ -166,7 +192,7 @@ export interface DrawLib<R> {
    * @param {number} lineWidth - (optional) The line width to use.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   cubicBezier: (
     startPoint: Vertex,
@@ -190,7 +216,7 @@ export interface DrawLib<R> {
    * @param {number=1} lineWidth - (optional) The line width to use.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   cubicBezierPath: (path: Array<Vertex>, color: string, lineWidth?: number) => R;
 
@@ -204,7 +230,7 @@ export interface DrawLib<R> {
    * @param {Vertex} endPoint - The end point of the handle.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   handle: (startPoint: Vertex, endPoint: Vertex) => R;
 
@@ -216,7 +242,7 @@ export interface DrawLib<R> {
    * @param {Vertex} endPoint - The end point to draw the handle at.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   handleLine: (startPoint: Vertex, endPoint: Vertex) => R;
 
@@ -228,7 +254,7 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the dot with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   dot: (p: Vertex, color: string) => R;
 
@@ -240,7 +266,7 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the point with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   point: (p: Vertex, color: string) => R;
 
@@ -256,7 +282,7 @@ export interface DrawLib<R> {
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   circle: (center: Vertex, radius: number, color: string, lineWidth?: number) => R;
 
@@ -272,7 +298,7 @@ export interface DrawLib<R> {
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   circleArc: (center: Vertex, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) => R;
 
@@ -288,7 +314,7 @@ export interface DrawLib<R> {
    * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   ellipse: (center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) => R;
 
@@ -304,7 +330,7 @@ export interface DrawLib<R> {
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   square: (center: XYCoords, size: number, color: string, lineWidth?: number) => R;
 
@@ -319,7 +345,7 @@ export interface DrawLib<R> {
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   rect: (upperLeft: XYCoords, width: number, height: number, color: string, lineWidth?: number) => R;
 
@@ -335,7 +361,7 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the grid with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   grid: (center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string) => R;
 
@@ -353,7 +379,7 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the raster with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   raster: (center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string) => R;
 
@@ -370,7 +396,7 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the diamond with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   diamondHandle: (center: Vertex, size: number, color: string) => R;
 
@@ -387,7 +413,7 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the square with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   squareHandle: (center: Vertex, size: number, color: string) => R;
 
@@ -404,7 +430,7 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the circle with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   circleHandle: (center: Vertex, size: number, color: string) => R;
 
@@ -417,11 +443,28 @@ export interface DrawLib<R> {
    * @param {XYCoords} center - The center of the crosshair.
    * @param {number} radius - The radius of the crosshair.
    * @param {string} color - The CSS color to draw the crosshair with.
+   * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
-  crosshair: (center: XYCoords, radius: number, color: string) => R;
+  crosshair: (center: XYCoords, radius: number, color: string, lineWidth?: number) => R;
+
+  /**
+   * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+   * <br>
+   * Note that the x's radius will not be affected by scaling.
+   *
+   * @method crosshair
+   * @param {XYCoords} center - The center of the crosshair.
+   * @param {number} radius - The radius of the crosshair.
+   * @param {string} color - The CSS color to draw the crosshair with.
+   * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+   * @return {void}
+   * @instance
+   * @memberof DrawLib
+   */
+  cross: (center: XYCoords, radius: number, color: string, lineWidth?: number) => R;
 
   /**
    * Draw a polygon.
@@ -431,7 +474,7 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the polygon with.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   polygon: (polygon: Polygon, color: string, lineWidth?: number) => R;
 
@@ -445,7 +488,7 @@ export interface DrawLib<R> {
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   polyline: (vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number) => R;
 
@@ -466,7 +509,7 @@ export interface DrawLib<R> {
    * @param {string=} options.textAlign - The text align to use. According to the specifiactions (https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign) valid values are `"left" || "right" || "center" || "start" || "end"`.
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   text: (text: string, x: number, y: number, options?: FontOptions) => R;
 
@@ -481,7 +524,7 @@ export interface DrawLib<R> {
    * @param {string="black"} color - The color to use (default is black).
    * @return {void}
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    */
   label: (text: string, x: number, y: number, rotation?: number, color?: string) => R;
 
@@ -494,7 +537,7 @@ export interface DrawLib<R> {
    * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
    * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
    * @instance
-   * @memberof drawutils
+   * @memberof DrawLib
    * @return {R} An instance representing the drawn path.
    */
   path: (pathData: SVGPathParams, color?: string, lineWidth?: number, options?: { inplace?: boolean }) => R;

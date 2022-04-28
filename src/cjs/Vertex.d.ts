@@ -373,20 +373,6 @@ export declare class Vertex implements XYCoords, SVGSerializable {
      **/
     toString(): string;
     /**
-     * Convert this vertex to SVG code.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof Vertex
-     * @deprecated
-     **/
-    toSVGString(options: {
-        className?: string;
-    }): string;
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.

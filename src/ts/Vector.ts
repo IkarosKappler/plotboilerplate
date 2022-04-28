@@ -116,46 +116,6 @@ export class Vector extends VertTuple<Vector> implements SVGSerializable {
     return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
   }
 
-  /**
-   * Create an SVG representation of this line.
-   *
-   * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-   * @method toSVGString
-   * @override
-   * @param {object=} options - A set of options, like 'className'.
-   * @return {string} The SVG string representation.
-   * @instance
-   * @memberof Vector
-   **/
-  toSVGString(options: { className?: string }) {
-    // options = options || {};
-    // var buffer = [];
-    // var vertices = Vector.utils.buildArrowHead(this.a, this.b, 8, 1.0, 1.0);
-    // buffer.push("<g");
-    // if (options.className) buffer.push(' class="' + options.className + '"');
-    // buffer.push(">");
-    // buffer.push("   <line");
-    // buffer.push(' x1="' + this.a.x + '"');
-    // buffer.push(' y1="' + this.a.y + '"');
-    // buffer.push(' x2="' + vertices[0].x + '"');
-    // buffer.push(' y2="' + vertices[0].y + '"');
-    // buffer.push(" />");
-    // // Add arrow head
-
-    // buffer.push('   <polygon points="');
-    // for (var i = 0; i < vertices.length; i++) {
-    //   if (i > 0) buffer.push(" ");
-    //   buffer.push("" + vertices[i].x + "," + vertices[i].y);
-    // }
-    // buffer.push('"/>');
-    // buffer.push("</g>");
-    // return buffer.join("");
-    console.warn(
-      "[Deprecation] Warning: the Vector.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
-    );
-    return "";
-  }
-
   static utils = {
     /**
      * Generate a four-point arrow head, starting at the vector end minus the

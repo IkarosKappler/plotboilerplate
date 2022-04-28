@@ -218,16 +218,6 @@ export declare class VEllipse implements SVGSerializable {
      */
     toCubicBezier(quarterSegmentCount?: number, threshold?: number): Array<CubicBezierCurve>;
     /**
-     * Create an SVG representation of this ellipse.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @param {object} options { className?:string }
-     * @return string The SVG string
-     */
-    toSVGString(options: {
-        className?: string;
-    }): string;
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.

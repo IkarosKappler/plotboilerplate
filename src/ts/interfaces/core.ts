@@ -211,17 +211,6 @@ export interface SVGSerializable {
    * Required to generate proper CSS classes and other class related IDs.
    **/
   readonly className: string;
-
-  /**
-   * Convert this vertex to SVG code.
-   *
-   * @method toSVGString
-   * @param {object=} options - An optional set of options, like 'className'.
-   * @return {string} A string representing the SVG code for this vertex.
-   * @instance
-   * @memberof Vertex
-   **/
-  toSVGString: (options: { className?: string }) => string;
 }
 
 /**

@@ -87,6 +87,11 @@ export declare class Girih {
      */
     removeTileAt(index: number): void;
     /**
+     *
+     * @param tiles
+     */
+    replaceTiles(tiles: GirihTile): void;
+    /**
      * Find that tile (index) which contains the given position. First match will be returned.
      *
      * @name locateContainingTile

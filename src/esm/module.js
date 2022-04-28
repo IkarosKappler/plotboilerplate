@@ -10,7 +10,7 @@ import { Circle } from "./Circle";
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { drawutils } from "./draw";
-import { drawutilsgl } from "./drawgl";
+// import { drawutilsgl } from "./drawgl";
 import { geomutils } from "./geomutils";
 import { Grid } from "./Grid";
 import { KeyHandler } from "./KeyHandler";
@@ -19,7 +19,6 @@ import { MouseHandler } from "./MouseHandler";
 import { PBImage } from "./PBImage";
 import { PlotBoilerplate } from "./PlotBoilerplate";
 import { Polygon } from "./Polygon";
-import { SVGBuilder } from "./SVGBuilder";
 import { Triangle } from "./Triangle";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vector } from "./Vector";
@@ -30,8 +29,10 @@ import { VertexAttr } from "./VertexAttr";
 import { VertexListeners } from "./VertexListeners";
 import { VertTuple } from "./VertTuple";
 import { drawutilssvg } from "./drawutilssvg";
-export { BezierPath, Bounds, Circle, CircleSector, CubicBezierCurve, drawutils, drawutilsgl, geomutils, Grid, 
+export { BezierPath, Bounds, Circle, CircleSector, CubicBezierCurve, drawutils, 
+// drawutilsgl,
+geomutils, Grid, 
 // ...interf,
-KeyHandler, Line, MouseHandler, PBImage, PlotBoilerplate, Polygon, SVGBuilder, Triangle, UIDGenerator, Vector, VEllipse, VEllipseSector, Vertex, VertexAttr, VertexListeners, VertTuple, drawutilssvg };
+KeyHandler, Line, MouseHandler, PBImage, PlotBoilerplate, Polygon, Triangle, UIDGenerator, Vector, VEllipse, VEllipseSector, Vertex, VertexAttr, VertexListeners, VertTuple, drawutilssvg };
 export default PlotBoilerplate;
 //# sourceMappingURL=module.js.map

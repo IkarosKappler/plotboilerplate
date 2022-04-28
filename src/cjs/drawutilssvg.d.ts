@@ -29,11 +29,16 @@
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.4.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
+ * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
+ * @version  1.6.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
  * be compatible to the default 'draw' class.
@@ -71,6 +76,22 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @private
      */
     private nodeStyle;
+    /**
+     * A style node of type `<defs>`.
+     * @member {SVGGelement}
+     * @memberof drawutilssvg
+     * @instance
+     * @private
+     */
+    private nodeDefs;
+    /**
+     * The buffered nodeDefs.
+     * @member {SVGGelement}
+     * @memberof drawutilssvg
+     * @instance
+     * @private
+     */
+    private bufferedNodeDefs;
     /**
      * @member {Vertex}
      * @memberof drawutilssvg
@@ -136,8 +157,18 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement);
+    constructor(svgNode: SVGElement, offset: XYCoords, scale: XYCoords, canvasSize: XYDimension, fillShapes: boolean, drawConfig: DrawConfig, isSecondary?: boolean, gNode?: SVGGElement, bufferGNode?: SVGGElement, nodeDefs?: SVGDefsElement, bufferNodeDefs?: SVGDefsElement);
+    /**
+     * Adds a default style defintion based on the passed DrawConfig.
+     * Twaek the draw config to change default colors or line thicknesses.
+     *
+     * @param {DrawConfig} drawConfig
+     */
     private addStyleDefs;
+    /**
+     * Adds the internal <defs> node.
+     */
+    private addDefsNode;
     /**
      * This is a simple way to include custom CSS class mappings to the style defs of the generated SVG.
      *
@@ -315,6 +346,22 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @memberof drawutilssvg
      **/
     image(image: HTMLImageElement, position: Vertex, size: Vertex): SVGElement;
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @return {void}
+     * @instance
+     * @memberof drawutilssvg
+     **/
+    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number): SVGElement;
     /**
      * Draw the given (cubic) bézier curve.
      *
@@ -550,11 +597,27 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    crosshair(center: XYCoords, radius: number, color: string): SVGElement;
+    crosshair(center: XYCoords, radius: number, color: string, lineWidth?: number): SVGElement;
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    cross(center: XYCoords, radius: number, color: string, lineWidth?: number): SVGElement;
     /**
      * Draw a polygon.
      *

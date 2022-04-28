@@ -20,7 +20,8 @@
  * @modified 2021-01-03 Changed property to `autoAdjustPaths` in the HandlerOptions interface (typo).
  * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
  * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
- * @version  1.1.1
+ * @modified 2022-02-03 Changing the element to catch events (eventCatcher instead of canvas).
+ * @version  1.1.2
  *
  * @file BezierPathInteractionHelper
  * @public

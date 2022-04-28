@@ -21,7 +21,8 @@
  * @modified 2021-01-03 Changed property to `autoAdjustPaths` in the HandlerOptions interface (typo).
  * @modified 2021-01-03 Added following new functions: `addPathVertexDragStartListeners`, `removePathVertexDragStartListeners`, `addPathVertexDragEndListeners` and `removePathVertexDragEndListeners`.
  * @modified 2021-03-31 Fixed the issue with the new AlloyFinger (Typescript).
- * @version  1.1.1
+ * @modified 2022-02-03 Changing the element to catch events (eventCatcher instead of canvas).
+ * @version  1.1.2
  *
  * @file BezierPathInteractionHelper
  * @public
@@ -197,8 +198,8 @@ var BezierPathInteractionHelper = /** @class */ (function () {
             // removePathVertexDragStartListeners(this.paths[i], listener);
         }
         this.paths = [];
-        this.pb.canvas.removeEventListener("mouseenter", this._mouseEnterListener);
-        this.pb.canvas.removeEventListener("mouseleave", this._mouseLeaveListener);
+        this.pb.eventCatcher.removeEventListener("mouseenter", this._mouseEnterListener);
+        this.pb.eventCatcher.removeEventListener("mouseleave", this._mouseLeaveListener);
         this._mouseHandler.destroy();
         this._keyHandler.destroy();
     };
@@ -363,12 +364,11 @@ var BezierPathInteractionHelper = /** @class */ (function () {
                 _self._clearMoveEvent();
             }
         };
-        // new AlloyFinger(this.pb.canvas, afProps);
         if (window["createAlloyFinger"]) {
-            return window["createAlloyFinger"](this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.canvas, afProps);
+            return window["createAlloyFinger"](this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.eventCatcher, afProps);
         }
         else {
-            return new alloy_finger_1.AlloyFinger(this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.canvas, afProps);
+            return new alloy_finger_1.AlloyFinger(this.pb.eventCatcher ? this.pb.eventCatcher : this.pb.eventCatcher, afProps);
         }
     };
     // +---------------------------------------------------------------------------------
@@ -376,7 +376,7 @@ var BezierPathInteractionHelper = /** @class */ (function () {
     // +-------------------------------
     BezierPathInteractionHelper.prototype._installMouseListener = function () {
         var _self = this;
-        var mouseHandler = new MouseHandler_1.MouseHandler(this.pb.canvas)
+        var mouseHandler = new MouseHandler_1.MouseHandler(this.pb.eventCatcher)
             .up(function (e) {
             if (e.params.wasDragged)
                 return;
@@ -416,20 +416,11 @@ var BezierPathInteractionHelper = /** @class */ (function () {
             _self.onVertexInserted(_self.currentPathIndex, leftPath.bezierCurves.length, newPath, oldPath);
         })
             .move(function (e) {
-            // console.log('moved');
-            // if( _self.pb.getDraggedElementCount() == 0 )
             _self.mouseIsOver = true;
             _self._handleMoveEvent(e.params.pos.x, e.params.pos.y);
         });
-        // _self.pb.canvas.addEventListener("mouseenter", function () {
-        //   _self.mouseIsOver = true;
-        // });
-        // _self.pb.canvas.addEventListener("mouseleave", function () {
-        //   _self.mouseIsOver = false;
-        //   _self._clearMoveEvent();
-        // });
-        this.pb.canvas.addEventListener("mouseenter", this._mouseEnterListener);
-        this.pb.canvas.addEventListener("mouseleave", this._mouseLeaveListener);
+        this.pb.eventCatcher.addEventListener("mouseenter", this._mouseEnterListener);
+        this.pb.eventCatcher.addEventListener("mouseleave", this._mouseLeaveListener);
         return mouseHandler;
     };
     // +---------------------------------------------------------------------------------

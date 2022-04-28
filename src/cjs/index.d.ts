@@ -16,7 +16,6 @@ export * from "./PBImage";
 export * from "./PBText";
 export * from "./PlotBoilerplate";
 export * from "./Polygon";
-export * from "./SVGBuilder";
 export * from "./Triangle";
 export * from "./UIDGenerator";
 export * from "./Vector";

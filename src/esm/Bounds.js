@@ -5,7 +5,8 @@
  * @modified 2020-11-19 Set min, max, width and height to private.
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
- * @version  1.3.0
+ * @modified 2022-02-01 Added the `toString` function.
+ * @version  1.4.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -44,6 +45,9 @@ export class Bounds {
     }
     getCenter() {
         return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+    }
+    toString() {
+        return `{ min: ${this.min.toString()}, max : ${this.max.toString()}, width: ${this.width}, height : ${this.height} }`;
     }
     /**
      * Compute the minimal bounding box for a given set of vertices.

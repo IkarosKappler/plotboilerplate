@@ -23,7 +23,8 @@
  * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version 1.9.0
+ * @modified 2022-03-08 Added the `Polygon.clone()` function.
+ * @version 1.10.0
  *
  * @file Polygon
  * @public
@@ -217,6 +218,12 @@ export declare class Polygon implements SVGSerializable {
      **/
     getBounds(): Bounds;
     /**
+     * Create a deep copy of this polygon.
+     *
+     * @return {Polygon} The cloned polygon.
+     */
+    clone(): Polygon;
+    /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
      * The first vertex in the returned array is the start point.<br>
@@ -273,19 +280,6 @@ export declare class Polygon implements SVGSerializable {
      * @memberof Polygon
      **/
     toCubicBezierPath(threshold: number): BezierPath;
-    /**
-     * Create an SVG representation of this polygon.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} The SVG string.
-     * @instance
-     * @memberof Polygon
-     **/
-    toSVGString(options: {
-        className?: string;
-    } | undefined): string;
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

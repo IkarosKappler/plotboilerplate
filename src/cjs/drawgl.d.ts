@@ -6,11 +6,15 @@
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2021-01-24 Added the `setCurrentId` function.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  0.0.5
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @modified 2022-03-27 Added the `texturedPoly` function.
+ * @version  0.0.7
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
 import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { Bounds } from "./Bounds";
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
  * implementation whih sould work with shaders.
@@ -132,6 +136,22 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @memberof drawutils
      **/
     image(image: HTMLImageElement, position: Vertex, size: Vertex): void;
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @return {void}
+     * @instance
+     * @memberof drawutilsgl
+     **/
+    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number): void;
     _fillOrDraw(color: string): void;
     /**
      * Draw the given (cubic) bézier curve.
@@ -368,11 +388,27 @@ export declare class drawutilsgl implements DrawLib<void> {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    crosshair(center: XYCoords, radius: number, color: string): void;
+    crosshair(center: XYCoords, radius: number, color: string, lineWidth?: number): void;
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    cross(center: XYCoords, radius: number, color: string, lineWidth?: number): void;
     /**
      * Draw a polygon.
      *

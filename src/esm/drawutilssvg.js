@@ -29,7 +29,9 @@
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.4.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @version  1.5.0
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -813,11 +815,12 @@ export class drawutilssvg {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    crosshair(center, radius, color) {
+    crosshair(center, radius, color, lineWidth) {
         const node = this.makeNode("path");
         const d = [
             "M",
@@ -834,7 +837,40 @@ export class drawutilssvg {
             this._y(center.y) + radius
         ];
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "crosshair", color, 0.5);
+        return this._bindFillDraw(node, "crosshair", color, lineWidth || 0.5);
+    }
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    cross(center, radius, color, lineWidth) {
+        const node = this.makeNode("path");
+        const d = [
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y) - radius,
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y) + radius,
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y) + radius,
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y) - radius
+        ];
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cross", color, lineWidth || 1.0);
     }
     /**
      * Draw a polygon.

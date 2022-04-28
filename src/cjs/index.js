@@ -28,7 +28,6 @@ __exportStar(require("./PBImage"), exports);
 __exportStar(require("./PBText"), exports);
 __exportStar(require("./PlotBoilerplate"), exports);
 __exportStar(require("./Polygon"), exports);
-__exportStar(require("./SVGBuilder"), exports);
 __exportStar(require("./Triangle"), exports);
 __exportStar(require("./UIDGenerator"), exports);
 __exportStar(require("./Vector"), exports);

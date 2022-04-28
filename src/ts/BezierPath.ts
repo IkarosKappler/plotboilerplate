@@ -1165,35 +1165,6 @@ export class BezierPath implements SVGSerializable {
   }
 
   /**
-   * Create a <pre>&lt;path&gt;</pre> SVG representation of this bézier curve.
-   *
-   * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-   * @method toSVGString
-   * @param {object=} [options={}] - Like options.className
-   * @param {string=} [options.className] - The classname to use for the SVG item.
-   * @instance
-   * @memberof BezierPath
-   * @return {string} The SVG string.
-   **/
-  toSVGString(options: { className?: string }): string {
-    // options = options || {};
-    // var buffer: Array<string> = [];
-    // buffer.push("<path");
-    // if (options.className) buffer.push(' class="' + options.className + '"');
-    // buffer.push(' d="');
-    // for (var c = 0; c < this.bezierCurves.length; c++) {
-    //   if (c > 0) buffer.push(" ");
-    //   buffer.push(this.bezierCurves[c].toSVGPathData());
-    // }
-    // buffer.push('" />');
-    // return buffer.join("");
-    console.warn(
-      "[Deprecation] Warning: the BezierPath.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
-    );
-    return "";
-  }
-
-  /**
    * This function should invalidate any installed listeners and invalidate this object.
    * After calling this function the object might not hold valid data any more and
    * should not be used.

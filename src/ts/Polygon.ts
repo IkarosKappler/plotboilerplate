@@ -23,7 +23,8 @@
  * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version 1.9.0
+ * @modified 2022-03-08 Added the `Polygon.clone()` function.
+ * @version 1.10.0
  *
  * @file Polygon
  * @public
@@ -143,9 +144,9 @@ export class Polygon implements SVGSerializable {
    * @memberof Polygon
    * @return {Polygon} this for chaining
    **/
-  move(vert: XYCoords): Polygon {
+  move(amount: XYCoords): Polygon {
     for (var i in this.vertices) {
-      this.vertices[i].add(vert);
+      this.vertices[i].add(amount);
     }
     return this;
   }
@@ -337,6 +338,18 @@ export class Polygon implements SVGSerializable {
   }
 
   /**
+   * Create a deep copy of this polygon.
+   *
+   * @return {Polygon} The cloned polygon.
+   */
+  clone(): Polygon {
+    return new Polygon(
+      this.vertices.map(vert => vert.clone()),
+      this.isOpen
+    );
+  }
+
+  /**
    * Convert this polygon to a sequence of quadratic Bézier curves.<br>
    * <br>
    * The first vertex in the returned array is the start point.<br>
@@ -477,45 +490,6 @@ export class Polygon implements SVGSerializable {
       pathdata.push([qdata[i], qdata[i + 3], qdata[i + 1], qdata[i + 2]]);
     }
     return BezierPath.fromArray(pathdata);
-  }
-
-  /**
-   * Create an SVG representation of this polygon.
-   *
-   * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-   * @method toSVGString
-   * @param {object=} options - An optional set of options, like 'className'.
-   * @return {string} The SVG string.
-   * @instance
-   * @memberof Polygon
-   **/
-  toSVGString(options: { className?: string } | undefined): string {
-    // options = options || {};
-    // var buffer: Array<string> = [];
-    // buffer.push("<path");
-    // if (options.className) buffer.push(' class="' + options.className + '"');
-    // buffer.push(' d="');
-    // if (this.vertices.length > 0) {
-    //   buffer.push("M ");
-    //   buffer.push(this.vertices[0].x.toString());
-    //   buffer.push(" ");
-    //   buffer.push(this.vertices[0].y.toString());
-    //   for (var i = 1; i < this.vertices.length; i++) {
-    //     buffer.push(" L ");
-    //     buffer.push(this.vertices[i].x.toString());
-    //     buffer.push(" ");
-    //     buffer.push(this.vertices[i].y.toString());
-    //   }
-    //   if (!this.isOpen) {
-    //     buffer.push(" Z");
-    //   }
-    // }
-    // buffer.push('" />');
-    // return buffer.join("");
-    console.warn(
-      "[Deprecation] Warning: the Polygon.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
-    );
-    return "";
   }
 
   /**

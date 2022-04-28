@@ -30,13 +30,18 @@
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.4.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
+ * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
+ * @version  1.6.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
 var CircleSector_1 = require("./CircleSector");
 var CubicBezierCurve_1 = require("./CubicBezierCurve");
 var Vertex_1 = require("./Vertex");
+var UIDGenerator_1 = require("./UIDGenerator");
 var RAD_TO_DEG = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -62,7 +67,7 @@ var drawutilssvg = /** @class */ (function () {
      * @param {boolean=} isSecondary - (optional) Indicates if this is the primary or secondary instance. Only primary instances manage child nodes.
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
-    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode) {
+    function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs) {
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
@@ -74,14 +79,23 @@ var drawutilssvg = /** @class */ (function () {
         if (isSecondary) {
             this.gNode = gNode;
             this.bufferGNode = bufferGNode;
+            this.nodeDefs = nodeDefs;
+            this.bufferedNodeDefs = bufferNodeDefs;
         }
         else {
             this.addStyleDefs(drawConfig);
+            this.addDefsNode();
             this.gNode = this.createSVGNode("g");
             this.bufferGNode = this.createSVGNode("g");
             this.svgNode.appendChild(this.gNode);
         }
     }
+    /**
+     * Adds a default style defintion based on the passed DrawConfig.
+     * Twaek the draw config to change default colors or line thicknesses.
+     *
+     * @param {DrawConfig} drawConfig
+     */
     drawutilssvg.prototype.addStyleDefs = function (drawConfig) {
         this.nodeStyle = this.createSVGNode("style");
         this.svgNode.appendChild(this.nodeStyle);
@@ -113,6 +127,15 @@ var drawutilssvg = /** @class */ (function () {
             }
         }
         this.nodeStyle.innerHTML = rules.join("\n");
+    };
+    /**
+     * Adds the internal <defs> node.
+     */
+    drawutilssvg.prototype.addDefsNode = function () {
+        this.nodeDefs = this.createSVGNode("defs");
+        // this.svgNode.appendChild(this.nodeDefs);
+        this.bufferedNodeDefs = this.createSVGNode("defs");
+        this.svgNode.appendChild(this.nodeDefs);
     };
     /**
      * This is a simple way to include custom CSS class mappings to the style defs of the generated SVG.
@@ -251,7 +274,7 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
         var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
         true, // isSecondary
-        this.gNode, this.bufferGNode);
+        this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs);
         return copy;
     };
     /**
@@ -328,11 +351,15 @@ var drawutilssvg = /** @class */ (function () {
             // layout updates.
             // Replace the old <g>-node with the buffer node.
             //   https://stackoverflow.com/questions/27442464/how-to-update-a-svg-image-without-seeing-a-blinking
+            this.svgNode.replaceChild(this.bufferedNodeDefs, this.nodeDefs);
             this.svgNode.replaceChild(this.bufferGNode, this.gNode);
         }
-        var tmp = this.gNode;
+        var tmpGNode = this.gNode;
         this.gNode = this.bufferGNode;
-        this.bufferGNode = tmp;
+        this.bufferGNode = tmpGNode;
+        var tmpDefsNode = this.nodeDefs;
+        this.nodeDefs = this.bufferedNodeDefs;
+        this.bufferedNodeDefs = tmpDefsNode;
     };
     drawutilssvg.prototype._x = function (x) {
         return this.offset.x + this.scale.x * x;
@@ -424,6 +451,75 @@ var drawutilssvg = /** @class */ (function () {
         setImageSize(image);
         node.setAttribute("href", image.src);
         return this._bindFillDraw(node, "image", null, null);
+    };
+    /**
+     * Draw an image at the given position with the given size.<br>
+     * <br>
+     * Note: SVG images may have resizing issues at the moment.Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     *
+     * @method texturedPoly
+     * @param {Image} textureImage - The image object to draw.
+     * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
+     * @param {Polygon} polygon - The polygon to use as clip path.
+     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {number} rotation - The rotation to use for the polygon (and for the texture).
+     * @return {void}
+     * @instance
+     * @memberof drawutilssvg
+     **/
+    drawutilssvg.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
+        var basePolygonBounds = polygon.getBounds();
+        var rotatedScalingOrigin = new Vertex_1.Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
+        var rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
+        // Create something like this
+        // ...
+        //    <defs>
+        //       <clipPath id="shape">
+        //         <path fill="none" d="..."/>
+        //       </clipPath>
+        //    </defs>
+        //    ...
+        //    <g clip-path="url(#shape)">
+        //       <g transform="scale(...)">
+        //          <image width="643" height="643" transform="rotate(...)" xlink:href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/222579/beagle400.jpg" >
+        //       </g>
+        //    </g>
+        //    </image>
+        // ...
+        var clipPathNode = this.makeNode("clipPath");
+        var clipPathId = "clippath_" + UIDGenerator_1.UIDGenerator.next(); // TODO: use a better UUID generator here?
+        clipPathNode.setAttribute("id", clipPathId);
+        var gNode = this.makeNode("g");
+        var imageNode = this.makeNode("image");
+        imageNode.setAttribute("x", "" + this._x(rotatedScalingOrigin.x));
+        imageNode.setAttribute("y", "" + this._y(rotatedScalingOrigin.y));
+        imageNode.setAttribute("width", "" + textureSize.width);
+        imageNode.setAttribute("height", "" + textureSize.height);
+        imageNode.setAttribute("href", textureImage.src);
+        // imageNode.setAttribute("opacity", "0.5");
+        // SVG rotations in degrees
+        imageNode.setAttribute("transform", "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(rotatedScalingOrigin.x) + ", " + this._y(rotatedScalingOrigin.y) + ")");
+        var pathNode = this.makeNode("path");
+        var pathData = [];
+        if (polygon.vertices.length > 0) {
+            var self_1 = this;
+            pathData.push("M", "" + this._x(polygon.vertices[0].x), "" + this._y(polygon.vertices[0].y));
+            for (var i = 1; i < polygon.vertices.length; i++) {
+                pathData.push("L", "" + this._x(polygon.vertices[i].x), "" + this._y(polygon.vertices[i].y));
+            }
+        }
+        pathNode.setAttribute("d", pathData.join(" "));
+        clipPathNode.appendChild(pathNode);
+        this.bufferedNodeDefs.appendChild(clipPathNode);
+        gNode.appendChild(imageNode);
+        gNode.setAttribute("transform-origin", this._x(rotatedScalingOrigin.x) + " " + this._y(rotatedScalingOrigin.y));
+        gNode.setAttribute("transform", "scale(" + this.scale.x + ", " + this.scale.y + ")");
+        var clipNode = this.makeNode("g");
+        clipNode.appendChild(gNode);
+        clipNode.setAttribute("clip-path", "url(#" + clipPathId + ")");
+        // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
+        this._bindFillDraw(clipNode, "image", null, null); // No color, no lineWidth
+        return clipNode;
     };
     /**
      * Draw the given (cubic) bézier curve.
@@ -817,11 +913,12 @@ var drawutilssvg = /** @class */ (function () {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.crosshair = function (center, radius, color) {
+    drawutilssvg.prototype.crosshair = function (center, radius, color, lineWidth) {
         var node = this.makeNode("path");
         var d = [
             "M",
@@ -838,7 +935,40 @@ var drawutilssvg = /** @class */ (function () {
             this._y(center.y) + radius
         ];
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "crosshair", color, 0.5);
+        return this._bindFillDraw(node, "crosshair", color, lineWidth || 0.5);
+    };
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilssvg.prototype.cross = function (center, radius, color, lineWidth) {
+        var node = this.makeNode("path");
+        var d = [
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y) - radius,
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y) + radius,
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y) + radius,
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y) - radius
+        ];
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cross", color, lineWidth || 1.0);
     };
     /**
      * Draw a polygon.
@@ -1001,14 +1131,6 @@ var drawutilssvg = /** @class */ (function () {
         if (this.isSecondary) {
             return;
         }
-        // // Clearing an SVG is equivalent to removing all its child elements.
-        // for (var i = 0; i < this.gNode.childNodes.length; i++) {
-        //   // Hide all nodes here. Don't throw them away.
-        //   // We can probably re-use them in the next draw cycle.
-        //   var child: SVGElement = this.gNode.childNodes[i] as SVGElement;
-        //   this.cache.set(child.getAttribute("id"), child);
-        // }
-        // this.removeAllChildNodes();
         // Add a covering rect with the given background color
         this.curId = "background";
         this.curClassName = undefined;
@@ -1033,6 +1155,9 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.removeAllChildNodes = function () {
         while (this.bufferGNode.lastChild) {
             this.bufferGNode.removeChild(this.bufferGNode.lastChild);
+        }
+        while (this.bufferedNodeDefs.lastChild) {
+            this.bufferedNodeDefs.removeChild(this.bufferedNodeDefs.lastChild);
         }
     };
     /**

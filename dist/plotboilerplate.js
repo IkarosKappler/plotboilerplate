@@ -1444,32 +1444,6 @@ var BezierPath = /** @class */ (function () {
         return true;
     };
     /**
-     * Create a <pre>&lt;path&gt;</pre> SVG representation of this bézier curve.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} [options={}] - Like options.className
-     * @param {string=} [options.className] - The classname to use for the SVG item.
-     * @instance
-     * @memberof BezierPath
-     * @return {string} The SVG string.
-     **/
-    BezierPath.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer: Array<string> = [];
-        // buffer.push("<path");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' d="');
-        // for (var c = 0; c < this.bezierCurves.length; c++) {
-        //   if (c > 0) buffer.push(" ");
-        //   buffer.push(this.bezierCurves[c].toSVGPathData());
-        // }
-        // buffer.push('" />');
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the BezierPath.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    };
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -1707,7 +1681,8 @@ exports.BezierPath = BezierPath;
  * @modified 2020-11-19 Set min, max, width and height to private.
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
- * @version  1.3.0
+ * @modified 2022-02-01 Added the `toString` function.
+ * @version  1.4.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
@@ -1748,6 +1723,9 @@ var Bounds = /** @class */ (function () {
     };
     Bounds.prototype.getCenter = function () {
         return new Vertex_1.Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+    };
+    Bounds.prototype.toString = function () {
+        return "{ min: " + this.min.toString() + ", max : " + this.max.toString() + ", width: " + this.width + ", height : " + this.height + " }";
     };
     /**
      * Compute the minimal bounding box for a given set of vertices.
@@ -1948,29 +1926,6 @@ var Circle = /** @class */ (function () {
         return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
     };
     /**
-     * Create an SVG representation of this circle.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof Circle
-     */
-    Circle.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer: Array<string> = [];
-        // buffer.push("<circle");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' cx="' + this.center.x + '"');
-        // buffer.push(' cy="' + this.center.y + '"');
-        // buffer.push(' r="' + this.radius + '"');
-        // buffer.push(" />");
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the Circle.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    };
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -2036,33 +1991,6 @@ var CircleSector = /** @class */ (function () {
         this.startAngle = startAngle;
         this.endAngle = endAngle;
     }
-    /**
-     * Create an SVG representation of this circle.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof Circle
-     */
-    CircleSector.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer: Array<string> = [];
-        // buffer.push("<path ");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // const data: SVGPathParams = CircleSector.circleSectorUtils.describeSVGArc(
-        //   this.circle.center.x,
-        //   this.circle.center.y,
-        //   this.circle.radius,
-        //   this.startAngle,
-        //   this.endAngle
-        // );
-        // buffer.push(' d="' + data.join(" ") + '" />');
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the CircleSector.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
@@ -2705,42 +2633,6 @@ var CubicBezierCurve = /** @class */ (function () {
             && typeof obj.endControlPoint == "object" && hasXY(obj.endControlPoint);
         */
         return obj instanceof CubicBezierCurve;
-    };
-    /**
-     * Create an SVG path data representation of this bézier curve.
-     *
-     * Path data string format is:<br>
-     *  <pre>'M x0 y1 C dx0 dy1 dx1 dy1 x1 x2'</pre><br>
-     * or in other words<br>
-     *   <pre>'M startoint.x startPoint.y C startControlPoint.x startControlPoint.y endControlPoint.x endControlPoint.y endPoint.x endPoint.y'</pre>
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGPathData
-     * @instance
-     * @memberof CubicBezierCurve
-     * @return {string}  The SVG path data string.
-     **/
-    CubicBezierCurve.prototype.toSVGPathData = function () {
-        // var buffer: Array<string> = [];
-        // buffer.push("M ");
-        // buffer.push(this.startPoint.x.toString());
-        // buffer.push(" ");
-        // buffer.push(this.startPoint.y.toString());
-        // buffer.push(" C ");
-        // buffer.push(this.startControlPoint.x.toString());
-        // buffer.push(" ");
-        // buffer.push(this.startControlPoint.y.toString());
-        // buffer.push(" ");
-        // buffer.push(this.endControlPoint.x.toString());
-        // buffer.push(" ");
-        // buffer.push(this.endControlPoint.y.toString());
-        // buffer.push(" ");
-        // buffer.push(this.endPoint.x.toString());
-        // buffer.push(" ");
-        // buffer.push(this.endPoint.y.toString());
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the CubicBezierCurve.toSVGPathData method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
     };
     /**
      * Convert this curve to a JSON string.
@@ -3482,32 +3374,6 @@ var Line = /** @class */ (function (_super) {
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
     };
-    /**
-     * Create an SVG representation of this line.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {options} p - A set of options, like the 'classname' to use
-     *                      for the line object.
-     * @return {string} The SVG string representing this line.
-     * @instance
-     * @memberof Line
-     **/
-    Line.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer = [];
-        // buffer.push( '<line' );
-        // if( options.className )
-        // buffer.push( ' class="' + options.className + '"' );
-        // buffer.push( ' x1="' + this.a.x + '"' );
-        // buffer.push( ' y1="' + this.a.y + '"' );
-        // buffer.push( ' x2="' + this.b.x + '"' );
-        // buffer.push( ' y2="' + this.b.y + '"' );
-        // buffer.push( ' />' );
-        // return buffer.join('');
-        console.warn("[Deprecation] Warning: the Line.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    };
     return Line;
 }(VertTuple_1.VertTuple));
 exports.Line = Line;
@@ -3991,20 +3857,6 @@ var PBImage = /** @class */ (function () {
         this.lowerRight = lowerRight;
     }
     /**
-     * Convert this vertex to SVG code.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof PBImage
-     **/
-    PBImage.prototype.toSVGString = function (options) {
-        console.warn("PBImage is not yet SVG serializable. Returning empty SVG string.");
-        return "";
-    };
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -4073,20 +3925,6 @@ var PBText = /** @class */ (function () {
         this.textAlign = options.textAlign;
         this.rotation = options.rotation;
     }
-    /**
-     * Create an SVG representation of this circle.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof Circle
-     */
-    PBText.prototype.toSVGString = function (options) {
-        console.warn("[PBText.toSVGString()] This function is not implemented as it defines a deprecated method. Use the 'drawutilssvg.text()' method instead.");
-        return "";
-    };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
@@ -6234,7 +6072,8 @@ __webpack_unused_export__ = PlotBoilerplate;
  * @modified 2021-12-16 Added the `getEvenDistributionPolygon()` function.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version 1.9.0
+ * @modified 2022-03-08 Added the `Polygon.clone()` function.
+ * @version 1.10.0
  *
  * @file Polygon
  * @public
@@ -6500,6 +6339,14 @@ var Polygon = /** @class */ (function () {
         return Bounds_1.Bounds.computeFromVertices(this.vertices);
     };
     /**
+     * Create a deep copy of this polygon.
+     *
+     * @return {Polygon} The cloned polygon.
+     */
+    Polygon.prototype.clone = function () {
+        return new Polygon(this.vertices.map(function (vert) { return vert.clone(); }), this.isOpen);
+    };
+    /**
      * Convert this polygon to a sequence of quadratic Bézier curves.<br>
      * <br>
      * The first vertex in the returned array is the start point.<br>
@@ -6634,42 +6481,6 @@ var Polygon = /** @class */ (function () {
             pathdata.push([qdata[i], qdata[i + 3], qdata[i + 1], qdata[i + 2]]);
         }
         return BezierPath_1.BezierPath.fromArray(pathdata);
-    };
-    /**
-     * Create an SVG representation of this polygon.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} The SVG string.
-     * @instance
-     * @memberof Polygon
-     **/
-    Polygon.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer: Array<string> = [];
-        // buffer.push("<path");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' d="');
-        // if (this.vertices.length > 0) {
-        //   buffer.push("M ");
-        //   buffer.push(this.vertices[0].x.toString());
-        //   buffer.push(" ");
-        //   buffer.push(this.vertices[0].y.toString());
-        //   for (var i = 1; i < this.vertices.length; i++) {
-        //     buffer.push(" L ");
-        //     buffer.push(this.vertices[i].x.toString());
-        //     buffer.push(" ");
-        //     buffer.push(this.vertices[i].y.toString());
-        //   }
-        //   if (!this.isOpen) {
-        //     buffer.push(" Z");
-        //   }
-        // }
-        // buffer.push('" />');
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the Polygon.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
     };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
@@ -7086,43 +6897,6 @@ var Triangle = /** @class */ (function () {
      */
     Triangle.prototype.toString = function () {
         return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + ", c : " + this.c.toString() + "}";
-    };
-    /**
-     * Create an SVG representation of this triangle.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} The SVG string.
-     * @instance
-     * @memberof Triangle
-     **/
-    Triangle.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer = [];
-        // buffer.push("<path");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' d="');
-        // var vertices = [this.a, this.b, this.c];
-        // if (vertices.length > 0) {
-        //   buffer.push("M ");
-        //   buffer.push(vertices[0].x);
-        //   buffer.push(" ");
-        //   buffer.push(vertices[0].y);
-        //   for (var i = 1; i < vertices.length; i++) {
-        //     buffer.push(" L ");
-        //     buffer.push(vertices[i].x);
-        //     buffer.push(" ");
-        //     buffer.push(vertices[i].y);
-        //   }
-        //   //if( !this.isOpen ) {
-        //   buffer.push(" Z");
-        //   //}
-        // }
-        // buffer.push('" />');
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the Triangle.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
     };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
@@ -7548,27 +7322,6 @@ var VEllipse = /** @class */ (function () {
             curAngle = nextAngle;
         }
         return curves;
-    };
-    /**
-     * Create an SVG representation of this ellipse.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @param {object} options { className?:string }
-     * @return string The SVG string
-     */
-    VEllipse.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer: Array<string> = [];
-        // buffer.push("<ellipse");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' cx="' + this.center.x + '"');
-        // buffer.push(' cy="' + this.center.y + '"');
-        // buffer.push(' rx="' + this.axis.x + '"');
-        // buffer.push(' ry="' + this.axis.y + '"');
-        // buffer.push(" />");
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the VEllipse.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
     };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
@@ -8054,42 +7807,6 @@ var Vector = /** @class */ (function (_super) {
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
-    };
-    /**
-     * Create an SVG representation of this line.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @override
-     * @param {object=} options - A set of options, like 'className'.
-     * @return {string} The SVG string representation.
-     * @instance
-     * @memberof Vector
-     **/
-    Vector.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer = [];
-        // var vertices = Vector.utils.buildArrowHead(this.a, this.b, 8, 1.0, 1.0);
-        // buffer.push("<g");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(">");
-        // buffer.push("   <line");
-        // buffer.push(' x1="' + this.a.x + '"');
-        // buffer.push(' y1="' + this.a.y + '"');
-        // buffer.push(' x2="' + vertices[0].x + '"');
-        // buffer.push(' y2="' + vertices[0].y + '"');
-        // buffer.push(" />");
-        // // Add arrow head
-        // buffer.push('   <polygon points="');
-        // for (var i = 0; i < vertices.length; i++) {
-        //   if (i > 0) buffer.push(" ");
-        //   buffer.push("" + vertices[i].x + "," + vertices[i].y);
-        // }
-        // buffer.push('"/>');
-        // buffer.push("</g>");
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the Vector.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
     };
     Vector.utils = {
         /**
@@ -8975,31 +8692,6 @@ var Vertex = /** @class */ (function () {
         return "(" + this.x + "," + this.y + ")";
     };
     /**
-     * Convert this vertex to SVG code.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} A string representing the SVG code for this vertex.
-     * @instance
-     * @memberof Vertex
-     * @deprecated
-     **/
-    Vertex.prototype.toSVGString = function (options) {
-        // options = options || {};
-        // var buffer = [];
-        // buffer.push("<circle");
-        // if (options.className) buffer.push(' class="' + options.className + '"');
-        // buffer.push(' cx="' + this.x + '"');
-        // buffer.push(' cy="' + this.y + '"');
-        // buffer.push(' r="2"');
-        // buffer.push(" />");
-        // return buffer.join("");
-        console.warn("[Deprecation] Warning: the Vertex.toSVGString method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead.");
-        return "";
-    };
-    // END Vertex
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
@@ -9465,7 +9157,9 @@ exports.VertexListeners = VertexListeners;
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
  * @modified 2021-11-12 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.10.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @version  1.11.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -10064,11 +9758,12 @@ var drawutils = /** @class */ (function () {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.crosshair = function (center, radius, color) {
+    drawutils.prototype.crosshair = function (center, radius, color, lineWidth) {
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
@@ -10076,7 +9771,34 @@ var drawutils = /** @class */ (function () {
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - radius);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y + radius);
         this.ctx.strokeStyle = color;
-        this.ctx.lineWidth = 0.5;
+        this.ctx.lineWidth = lineWidth || 0.5;
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.restore();
+    };
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutils.prototype.cross = function (center, radius, color, lineWidth) {
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y - radius);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y + radius);
+        this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y + radius);
+        this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y - radius);
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = lineWidth || 1.0;
         this.ctx.stroke();
         this.ctx.closePath();
         this.ctx.restore();
@@ -10272,7 +9994,9 @@ exports.drawutils = drawutils;
  * @modified 2020-10-15 Re-added the text() function.
  * @modified 2021-01-24 Added the `setCurrentId` function.
  * @modified 2021-05-31 Added the `setConfiguration` function from `DrawLib`.
- * @version  0.0.5
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @version  0.0.6
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
@@ -10753,11 +10477,29 @@ var drawutilsgl = /** @class */ (function () {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutilsgl.prototype.crosshair = function (center, radius, color) {
+    drawutilsgl.prototype.crosshair = function (center, radius, color, lineWidth) {
+        // NOT YET IMPLEMENTED
+    };
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilsgl.prototype.cross = function (center, radius, color, lineWidth) {
         // NOT YET IMPLEMENTED
     };
     /**
@@ -10996,7 +10738,9 @@ var GLU = /** @class */ (function () {
  * @modified 2021-11-15 Adding more parameters tot the `text()` function: fontSize, textAlign, fontFamily, lineHeight.
  * @modified 2021-11-19 Fixing the `label(text,x,y)` position.
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
- * @version  1.4.0
+ * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
+ * @modified 2022-02-03 Added the `cross(...)` function.
+ * @version  1.5.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -11783,11 +11527,12 @@ var drawutilssvg = /** @class */ (function () {
      * @param {XYCoords} center - The center of the crosshair.
      * @param {number} radius - The radius of the crosshair.
      * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    drawutilssvg.prototype.crosshair = function (center, radius, color) {
+    drawutilssvg.prototype.crosshair = function (center, radius, color, lineWidth) {
         var node = this.makeNode("path");
         var d = [
             "M",
@@ -11804,7 +11549,40 @@ var drawutilssvg = /** @class */ (function () {
             this._y(center.y) + radius
         ];
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "crosshair", color, 0.5);
+        return this._bindFillDraw(node, "crosshair", color, lineWidth || 0.5);
+    };
+    /**
+     * Draw a cross with diagonal axes with given radius, color and lineWidth at the given position.<br>
+     * <br>
+     * Note that the x's radius will not be affected by scaling.
+     *
+     * @method crosshair
+     * @param {XYCoords} center - The center of the crosshair.
+     * @param {number} radius - The radius of the crosshair.
+     * @param {string} color - The CSS color to draw the crosshair with.
+     * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    drawutilssvg.prototype.cross = function (center, radius, color, lineWidth) {
+        var node = this.makeNode("path");
+        var d = [
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y) - radius,
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y) + radius,
+            "M",
+            this._x(center.x) - radius,
+            this._y(center.y) + radius,
+            "L",
+            this._x(center.x) + radius,
+            this._y(center.y) - radius
+        ];
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cross", color, lineWidth || 1.0);
     };
     /**
      * Draw a polygon.

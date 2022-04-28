@@ -12,6 +12,16 @@
 var utils = (globalThis.utils = globalThis.utils || {});
 
 /**
+ * Need to access the dat.gui folders of plotboilerplate? You will find them here.
+ *
+ * Following keys are currently available:
+ *  - editor_settings
+ *  - editor_settings.export  (if enableSVGExport=true)
+ *  - draw_settings
+ */
+globalThis.utils.guiFolders = globalThis.utils.guiFolders || {};
+
+/**
  * Creates a control GUI (a dat.gui instance) for this
  * plot boilerplate instance.
  *
@@ -255,9 +265,13 @@ globalThis.utils.createGUI = function (pb, props) {
   fold0.add(dummy, "resetScale").title("Reset the draw scale to (1.,1.).");
 
   if (pb.config.enableSVGExport) {
-    var fold1 = gui.addFolder("Export");
-    fold1.add(pb.config, "saveFile").name("SVG Image").title("Save as SVG.");
+    var foldExport = gui.addFolder("Export");
+    foldExport.add(pb.config, "saveFile").name("SVG Image").title("Save as SVG.");
+    globalThis.utils.guiFolders["editor_settings.export"] = foldExport;
   }
+
+  globalThis.utils.guiFolders["editor_settings"] = fold0;
+  globalThis.utils.guiFolders["draw_settings"] = fold01;
 
   return gui;
 }; // END creategui

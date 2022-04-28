@@ -693,45 +693,6 @@ export class CubicBezierCurve {
   }
 
   /**
-   * Create an SVG path data representation of this bézier curve.
-   *
-   * Path data string format is:<br>
-   *  <pre>'M x0 y1 C dx0 dy1 dx1 dy1 x1 x2'</pre><br>
-   * or in other words<br>
-   *   <pre>'M startoint.x startPoint.y C startControlPoint.x startControlPoint.y endControlPoint.x endControlPoint.y endPoint.x endPoint.y'</pre>
-   *
-   * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-   * @method toSVGPathData
-   * @instance
-   * @memberof CubicBezierCurve
-   * @return {string}  The SVG path data string.
-   **/
-  toSVGPathData(): string {
-    // var buffer: Array<string> = [];
-    // buffer.push("M ");
-    // buffer.push(this.startPoint.x.toString());
-    // buffer.push(" ");
-    // buffer.push(this.startPoint.y.toString());
-    // buffer.push(" C ");
-    // buffer.push(this.startControlPoint.x.toString());
-    // buffer.push(" ");
-    // buffer.push(this.startControlPoint.y.toString());
-    // buffer.push(" ");
-    // buffer.push(this.endControlPoint.x.toString());
-    // buffer.push(" ");
-    // buffer.push(this.endControlPoint.y.toString());
-    // buffer.push(" ");
-    // buffer.push(this.endPoint.x.toString());
-    // buffer.push(" ");
-    // buffer.push(this.endPoint.y.toString());
-    // return buffer.join("");
-    console.warn(
-      "[Deprecation] Warning: the CubicBezierCurve.toSVGPathData method is deprecated and does not return and valid SVG data any more. Please use `drawutilssvg` instead."
-    );
-    return "";
-  }
-
-  /**
    * Convert this curve to a JSON string.
    *
    * @method toJSON

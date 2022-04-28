@@ -1,6 +1,31 @@
 # Changelog
 
-- 2022-02-02
+- 2022-03-27
+  - Added the `texturedPoly` function to the `DrawLib` interface.
+  - Added the `texturedPoly` function to the `drawutils` and `drawutilssvg` class.
+- 2022-03-25
+  - Added the `Bounds.toString()` function.
+  - Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
+  - Added the `texturedPoly` function to draw textures polygons.
+  - Added a demo (demo 40) for showing the way the new `texturePoly` function is working and to be used.
+- 2022-03-08
+  - Added the `Polygon.clone()` function.
+- 2022-02-25
+  - Extended the Girih demo: can upload files now per file select.
+  - Extended the Gihih demo: can upload files now per file drop.
+  - Added `globalThis.util.guiFolders` to gain quick access to the dat.gui folders created by the app (src/cjs/utils/createGui.js).
+  - Added a new darkmode detection (already used in the ngdg project) to to demos.
+- 2022-02-04 (breaking change)
+  - Removed the `toSVGString` function from all drawables. They were no use any more, as `drawutilssvg` is doing their task, and they turned out to be just code overhead. THIS IS A BREAKING CHANGE.
+  - Upgraded demo 26-girih: removed SVGBuilder and added proper SVG drawing for preview tiles.
+  - Fixed the SVG export in the Girih demo (nothing was rendered/exported at all, just an empty canvas).
+- 2022-02-03
+  - Added the `DrawLib.cross(...)` function.
+  - Added the `draw.cross(...)` function.
+  - Added the `drawgl.cross(...)` function.
+  - Added the `drawutilssvg.cross(...)` function.
+  - Added the optional `lineWidth` param to the `DrawLib.crosshair` function (and thus to the classes `draw`, `drawgl` and `drawutilssvg`)- Changing the element to catch events (eventCatcher instead of canvas) in the `BezierPathInteractionHelper` (did not interact on SVGs so far).
+- 2022-02-02 [v1.16.0]
   - Added the `BezierPath.destroy` method for releasing all installed event listeners.
   - Added the `Circle.destroy` method for releasing all installed event listeners.
   - Added the `CirclSector.destroy` method for releasing all installed event listeners.

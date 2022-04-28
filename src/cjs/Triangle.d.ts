@@ -314,19 +314,6 @@ export declare class Triangle implements SVGSerializable {
      */
     toString(): string;
     /**
-     * Create an SVG representation of this triangle.
-     *
-     * @deprecated DEPRECATION Please use the drawutilssvg library and an XMLSerializer instead.
-     * @method toSVGString
-     * @param {object=} options - An optional set of options, like 'className'.
-     * @return {string} The SVG string.
-     * @instance
-     * @memberof Triangle
-     **/
-    toSVGString(options: {
-        className?: string;
-    }): string;
-    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.

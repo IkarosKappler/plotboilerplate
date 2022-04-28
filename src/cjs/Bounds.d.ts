@@ -5,7 +5,8 @@
  * @modified 2020-11-19 Set min, max, width and height to private.
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
- * @version  1.3.0
+ * @modified 2022-02-01 Added the `toString` function.
+ * @version  1.4.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -64,7 +65,27 @@ export declare class Bounds implements IBounds, XYDimension {
      * @return {Polygon} This bound rectangle as a polygon.
      */
     toPolygon(): Polygon;
+    /**
+     * Get the center of this boinding box.
+     *
+     * @method getCenter
+     * @instance
+     * @memberof Bounds
+     * @returns {Vertex} The center of these bounds.
+     */
     getCenter(): Vertex;
+    /**
+     * Convert these bounds to a human readable form.
+     *
+     * Note: the returned format might change in the future, so please do not
+     * rely on the returned string format.
+     *
+     * @method toString
+     * @instance
+     * @memberof Bounds
+     * @returns {string} Get these bounds in a human readable form.
+     */
+    toString(): string;
     /**
      * Compute the minimal bounding box for a given set of vertices.
      *
