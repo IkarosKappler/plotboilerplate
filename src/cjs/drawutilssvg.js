@@ -479,8 +479,10 @@ var drawutilssvg = /** @class */ (function () {
         //       </clipPath>
         //    </defs>
         //    ...
-        //    <g clip-path="url(#shape)" transform="scale(...)">
-        //       <image width="643" height="643" transform="rotate(...)" xlink:href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/222579/beagle400.jpg" >
+        //    <g clip-path="url(#shape)">
+        //       <g transform="scale(...)">
+        //          <image width="643" height="643" transform="rotate(...)" xlink:href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/222579/beagle400.jpg" >
+        //       </g>
         //    </g>
         //    </image>
         // ...
@@ -494,50 +496,28 @@ var drawutilssvg = /** @class */ (function () {
         imageNode.setAttribute("width", "" + textureSize.width);
         imageNode.setAttribute("height", "" + textureSize.height);
         imageNode.setAttribute("href", textureImage.src);
-        imageNode.setAttribute("opacity", "0.5");
+        // imageNode.setAttribute("opacity", "0.5");
         // SVG rotations in degrees
         imageNode.setAttribute("transform", "rotate(" + rotation * RAD_TO_DEG + ", " + this._x(rotatedScalingOrigin.x) + ", " + this._y(rotatedScalingOrigin.y) + ")");
         var pathNode = this.makeNode("path");
-        // TODO: convert to helper function
         var pathData = [];
-        // if (polygon.vertices.length > 0) {
-        //   pathData.push("M", `${this._x(polygon.vertices[0].x)}`, `${this._y(polygon.vertices[0].y)}`);
-        //   for (var i = 1; i < polygon.vertices.length; i++) {
-        //     pathData.push("L", `${this._x(polygon.vertices[i].x)}`, `${this._y(polygon.vertices[i].y)}`);
-        //   }
-        // }
         if (polygon.vertices.length > 0) {
             var self_1 = this;
-            var clipVertices = polygon.vertices.map(function (vert) {
-                // return new Vertex(self._x(vert.x), self._y(vert.y));
-                // return new Vertex(self.offset.x + vert.x, self.offset.y + vert.y).scaleXY(self.scale, rotatedScalingOrigin);
-                return new Vertex_1.Vertex(self_1._x(vert.x), self_1._y(vert.y)); //.add(rotatedScalingOrigin);
-            });
-            pathData.push("M", "" + clipVertices[0].x, "" + clipVertices[0].y);
-            for (var i = 1; i < clipVertices.length; i++) {
-                pathData.push("L", "" + clipVertices[i].x, "" + clipVertices[i].y);
+            pathData.push("M", "" + this._x(polygon.vertices[0].x), "" + this._y(polygon.vertices[0].y));
+            for (var i = 1; i < polygon.vertices.length; i++) {
+                pathData.push("L", "" + this._x(polygon.vertices[i].x), "" + this._y(polygon.vertices[i].y));
             }
         }
         pathNode.setAttribute("d", pathData.join(" "));
         clipPathNode.appendChild(pathNode);
         this.bufferedNodeDefs.appendChild(clipPathNode);
-        // gNode.setAttribute("clip-path", `url(#${clipPathId})`);
         gNode.appendChild(imageNode);
-        // this.squareHandle(rotatedScalingOrigin, 5, "red");
-        // const cross: SVGElement = this.makeNode("rect");
-        // cross.setAttribute("x", `${this._x(rotatedScalingOrigin.x) - 8 / 2.0}`);
-        // cross.setAttribute("y", `${this._y(rotatedScalingOrigin.y) - 8 / 2.0}`);
-        // cross.setAttribute("width", `${5}`);
-        // cross.setAttribute("height", `${5}`);
-        // this._bindFillDraw(cross, "cross", "red", null); // No color, no lineWidth
         gNode.setAttribute("transform-origin", this._x(rotatedScalingOrigin.x) + " " + this._y(rotatedScalingOrigin.y));
         gNode.setAttribute("transform", "scale(" + this.scale.x + ", " + this.scale.y + ")");
         var clipNode = this.makeNode("g");
         clipNode.appendChild(gNode);
         clipNode.setAttribute("clip-path", "url(#" + clipPathId + ")");
         // TODO: check if the image class is correct here or if we should use a 'clippedImage' class here
-        // this._bindFillDraw(gNode, "image", null, null); // No color, no lineWidth
-        // return gNode;
         this._bindFillDraw(clipNode, "image", null, null); // No color, no lineWidth
         return clipNode;
     };
