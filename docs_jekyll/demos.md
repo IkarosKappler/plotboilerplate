@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2022-02-02
+date: 2022-04-29
 ---
 
 <h3>Basics</h3>
@@ -207,12 +207,17 @@ date: 2022-02-02
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/39-bezierpath-to-polygon/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/na.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220429-bezierpath-to-polygon.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/40-clipped-texture-draw/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220428-texture-polygon-clipping.png');"></div>
    </a>
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/extended-vertexset/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20200518-basic-vertex.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220429-extended-vertexset.png');"></div>
    </a>
 </div>
 </div>
