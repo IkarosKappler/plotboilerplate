@@ -14,7 +14,9 @@
  * @modified 2021-11-07 Did the same with `saturate` and `desaturate`.
  * @modified 2021-11-07 Did the same with the `fadein` and `fadeout` functions.
  * @modified 2021-11-07 Added setRed, setGreen, setBlue, setHue, setSaturation, setLiminance functions.
- * @version 0.0.10
+ * @modified 2022-05-11 Modified the `clone` function by just copying the numeric calues, not re-calculating the whole color.
+ * @modified 2022-05-11 Fixed the `interpolate` function.
+ * @version 0.0.11
  **/
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.

@@ -1,5 +1,8 @@
 # Changelog
 
+- 2022-05-11
+  - Modified the `Color.clone` function by just copying the numeric calues, not re-calculating the whole color.
+  - Fixed the `Color.interpolate` function.
 - 2022-03-27
   - Added the `texturedPoly` function to the `DrawLib` interface.
   - Added the `texturedPoly` function to the `drawutils` and `drawutilssvg` class.

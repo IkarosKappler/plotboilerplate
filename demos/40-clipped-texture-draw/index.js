@@ -124,10 +124,6 @@
       }
       return texture;
     };
-    // textureImage = loadTextureImage(imagePath, function () {
-    //   console.log("Texture loaded");
-    //   pbTop.redraw();
-    // });
 
     // Fetch initial polygon
     var textureImage = null;
@@ -225,19 +221,6 @@
       draw.polygon(scaledPolygon, "rgba(255,192,0,0.75)", 1.0); // orange
       draw.polygon(rotatedPolygon, "rgb(0,128,192)", 1.0);
     };
-
-    function _crosshairAtZero(ctx) {
-      ctx.beginPath();
-      ctx.moveTo(-10, 0);
-      ctx.lineTo(10, 0);
-      ctx.moveTo(0, -10);
-      ctx.lineTo(0, 10);
-      ctx.strokeStyle = "red";
-      ctx.lineWidth = 2.0;
-      ctx.stroke();
-      ctx.closePath();
-      ctx.restore();
-    }
 
     // A helper function to define the clipping path.
     // This could be a candidate for the draw library.
