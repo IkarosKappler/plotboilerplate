@@ -63,16 +63,7 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        rotation: 0.0,
-        resetRotation: function () {
-          config.rotation = 0.0;
-          pbBottom.redraw();
-        },
-        tileScale: 1.0,
-        canvasScaleX: 1.0,
-        canvasScaleY: 1.0,
-        presetName: GUP["presetName"] || "LU_pentagon", // "LS_penrose"
-        drawTargetTexture: true,
+        dropCount: 10,
         animate: true,
         animationDelay: 50,
         dropMaxRadius: 100
@@ -118,10 +109,20 @@
 
     // Array<{ position, radius }>
     var dropList = [];
-    var radiusBackdrop = 50;
-    for (var i = 0; i < 10; i++) {
-      dropList.push({ position: randomVertex(), radius: -Math.floor(Math.random() * radiusBackdrop) });
-    }
+    var radiusBackdrop = 50; // Add to config?
+
+    var handleDropCountChange = function () {
+      if (dropList.length > config.dropCount) {
+        // Shrink
+        dropList.splice(config.dropCount);
+      } else {
+        // Enlarge
+        while (dropList.length < config.dropCount) {
+          dropList.push({ position: randomVertex(), radius: -Math.floor(Math.random() * radiusBackdrop) });
+        }
+      }
+    };
+    handleDropCountChange();
 
     var startColor = Color.parse("#ff0000");
     var endColor = Color.parse("#00ff00");
@@ -155,7 +156,6 @@
         return;
       }
       nextStep();
-      // console.log("animate");
       // Animate here
       window.setTimeout(function () {
         window.requestAnimationFrame(renderLoop);
@@ -178,24 +178,9 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
-      // prettier-ignore
-      gui.add(config, 'rotation').min(-180).max(180).step(1).listen().onChange( function() { pb.redraw(); } ).name("rotation").title("Rotation of the tile");
-      // prettier-ignore
-      gui.add(config, 'resetRotation').name("resetRotation").title("resetRotation");
-      // prettier-ignore
-      // gui.add(config, 'performClip').listen().onChange( function() { pbTop.redraw(); } ).name("performClip").title("Perform the clipping?");
-      // prettier-ignore
-      gui.add(config, 'tileScale').min(0.5).max(2.0).listen().onChange( function() { pb.redraw(); } ).name("tileScale").title("Scale the tile up or down.");
-      // prettier-ignore
-      gui.add(config, 'canvasScaleX').min(-2.0).max(2.0).listen().onChange( function() { pbBottom.draw.scale.x = pbBottom.fill.scale.x = config.canvasScaleX; pbBottom.redraw(); } ).name("canvasScaleX").title("Scale the canvas horizontally.");
-      // prettier-ignore
-      gui.add(config, 'canvasScaleY').min(-2.0).max(2.0).listen().onChange( function() { pbBottom.draw.scale.y = pbBottom.fill.scale.y = config.canvasScaleY; pbBottom.redraw();  } ).name("canvasScaleY").title("Scale the canvas vertically.");
 
       // prettier-ignore
-      gui.add(config, 'drawTargetTexture').listen().onChange( function() { pb.redraw(); } ).name("drawTargetTexture").title("drawTargetTexture");
-
-      // prettier-ignore
-      // gui.add(config, 'presetName', presetNames).listen().onChange( function() { changeTilePreset(); } ).name("presetName").title("Name a tile (penrose, pentagon, ...)");
+      gui.add(config, 'dropCount').listen().onChange( handleDropCountChange ).name("dropCount").title("dropCount");
       // prettier-ignore
       gui.add(config, 'animate').listen().onChange( startAnimation ).name("animate").title("animate");
       // prettier-ignore
