@@ -66,7 +66,10 @@
         dropCount: 10,
         animate: true,
         animationDelay: 50,
-        dropMaxRadius: 100
+        dropMaxRadius: 100,
+        lineThickness: 2,
+        innerCircleDistance: 25,
+        drawCircleIntersections: true
       },
       GUP
     );
@@ -79,13 +82,6 @@
         Math.random() * pb.canvasSize.width * 0.5 - (pb.canvasSize.width / 2) * 0.5,
         Math.random() * pb.canvasSize.height * 0.5 - (pb.canvasSize.height / 2) * 0.5
       );
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | This is the actual render function.
-    // +-------------------------------
-    var drawSource = function (draw, fill) {
-      // TODO
     };
 
     // Add a mouse listener to track the mouse position.-
@@ -136,7 +132,13 @@
           var color = startColor.clone().interpolate(endColor, intensity);
           color.a = intensity;
           if (drop.radius >= 0) {
-            pb.draw.circle(drop.position, drop.radius, color.cssRGBA(), 1);
+            // pb.draw.circle(drop.position, drop.radius, color.cssRGBA(), config.lineThickness);
+            var radius = drop.radius;
+            do {
+              color.a = intensity * (radius / drop.radius);
+              pb.draw.circle(drop.position, radius, color.cssRGBA(), config.lineThickness);
+              radius -= config.innerCircleDistance;
+            } while (radius >= 0);
           }
           drop.radius += 1;
         } else {
@@ -145,6 +147,24 @@
           drop.radius = 0;
         }
       }
+
+      // Draw circle intersections?
+      if (config.drawCircleIntersections) {
+        for (var i = 0; i < dropList.length; i++) {
+          // ...
+          for (var j = i + 1; j < dropList.length; j++) {
+            // ...
+            const intersection = new Circle(dropList[i].position, dropList[i].radius).circleIntersection(
+              new Circle(dropList[j].position, dropList[j].radius)
+            );
+            if (intersection) {
+              pb.draw.diamondHandle(intersection.a, 5, "rgba(255,0,255,0.5)");
+              pb.draw.diamondHandle(intersection.b, 5, "rgba(255,0,255,0.5)");
+            }
+          }
+        }
+      }
+
       pb.draw.endDrawCycle();
     };
 
@@ -155,7 +175,7 @@
       if (!config.animate) {
         return;
       }
-      nextStep();
+      pb.redraw();
       // Animate here
       window.setTimeout(function () {
         window.requestAnimationFrame(renderLoop);
@@ -185,9 +205,16 @@
       gui.add(config, 'animate').listen().onChange( startAnimation ).name("animate").title("animate");
       // prettier-ignore
       gui.add(config, 'animationDelay').listen().name("animationDelay").title("animationDelay");
+      // prettier-ignore
+      gui.add(config, 'lineThickness').listen().min(1).max(32).step(1).name("lineThickness").title("lineThickness");
+      // prettier-ignore
+      gui.add(config, 'innerCircleDistance').listen().min(1).max(32).step(1).name("innerCircleDistance").title("innerCircleDistance");
+      // prettier-ignore
+      gui.add(config, 'drawCircleIntersections').listen().name("drawCircleIntersections").title("drawCircleIntersections");
     }
 
-    pb.config.preDraw = drawSource;
+    // pb.config.preDraw = drawSource;
+    pb.config.postDraw = nextStep;
     pb.redraw();
     pb.canvas.focus();
   };
