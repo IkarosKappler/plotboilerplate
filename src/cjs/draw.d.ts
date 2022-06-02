@@ -42,7 +42,8 @@
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
- * @version  1.12.0
+ * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
+ * @version  1.12.1
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

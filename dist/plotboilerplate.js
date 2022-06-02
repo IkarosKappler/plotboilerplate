@@ -9179,7 +9179,8 @@ exports.VertexListeners = VertexListeners;
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
- * @version  1.12.0
+ * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
+ * @version  1.12.1
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -9945,7 +9946,7 @@ var drawutils = /** @class */ (function () {
             return;
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.lineWidth = lineWidth || 1.0;
+        this.ctx.lineWidth = lineWidth * this.scale.x || 1.0;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);

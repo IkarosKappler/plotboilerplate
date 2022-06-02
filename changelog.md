@@ -1,5 +1,9 @@
 # Changelog
 
+- 2022-06-01
+  - Tweaked the `draw.polyline` function; lineWidth now scales with scale.x.
+- 2022-05-11
+- Adding new demo: raindrops.
 - 2022-05-11
   - Modified the `Color.clone` function by just copying the numeric calues, not re-calculating the whole color.
   - Fixed the `Color.interpolate` function.

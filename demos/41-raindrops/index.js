@@ -1,5 +1,5 @@
 /**
- * A script to demonstrate how to draw clipped polygons.
+ * A script to demonstrate how to draw animated circles.
  *
  * @requires PlotBoilerplate
  * @requires MouseHandler
@@ -69,7 +69,9 @@
         dropMaxRadius: 100,
         lineThickness: 2,
         innerCircleDistance: 25,
-        drawCircleIntersections: true
+        drawCircleIntersections: true,
+        startColor: "rgba(255,0,0,1)",
+        endColor: "rgba(0,255,0,1)"
       },
       GUP
     );
@@ -120,8 +122,8 @@
     };
     handleDropCountChange();
 
-    var startColor = Color.parse("#ff0000");
-    var endColor = Color.parse("#00ff00");
+    var startColor = Color.parse(config.startColor);
+    var endColor = Color.parse(config.endColor);
     var nextStep = function () {
       pb.draw.clear();
       pb.draw.beginDrawCycle();
@@ -211,6 +213,10 @@
       gui.add(config, 'innerCircleDistance').listen().min(1).max(32).step(1).name("innerCircleDistance").title("innerCircleDistance");
       // prettier-ignore
       gui.add(config, 'drawCircleIntersections').listen().name("drawCircleIntersections").title("drawCircleIntersections");
+      // prettier-ignore
+      gui.addColor(config, 'startColor').onChange( function() { startColor = Color.parse(config.startColor); } );
+      // prettier-ignore
+      gui.addColor(config, 'endColor').onChange( function() { endColor = Color.parse(config.endColor); } );
     }
 
     // pb.config.preDraw = drawSource;
