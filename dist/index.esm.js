@@ -6344,8 +6344,9 @@ class drawutils {
      * @memberof drawutils
      */
     polyline(vertices, isOpen, color, lineWidth) {
-        if (vertices.length <= 1)
+        if (vertices.length <= 1) {
             return;
+        }
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.lineWidth = lineWidth * this.scale.x || 1.0;

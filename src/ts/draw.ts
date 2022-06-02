@@ -1004,7 +1004,9 @@ export class drawutils implements DrawLib<void> {
    * @memberof drawutils
    */
   polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number) {
-    if (vertices.length <= 1) return;
+    if (vertices.length <= 1) {
+      return;
+    }
     this.ctx.save();
     this.ctx.beginPath();
     this.ctx.lineWidth = lineWidth * this.scale.x || 1.0;

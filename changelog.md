@@ -1,5 +1,7 @@
 # Changelog
 
+- 2022-06-02
+  - Adding the demo 42 (Hick's Hexagons).
 - 2022-06-01
   - Tweaked the `draw.polyline` function; lineWidth now scales with scale.x.
 - 2022-05-11

@@ -65,17 +65,18 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        dropCount: 10,
-        animate: true,
-        animationDelay: 50,
-        dropMaxRadius: 100,
+        // dropCount: 10,
+        // animate: true,
+        // animationDelay: 50,
+        // dropMaxRadius: 100,
+        // innerCircleDistance: 25,
+        // drawCircleIntersections: true,
         lineThickness: 2,
-        innerCircleDistance: 25,
-        drawCircleIntersections: true,
         startColor: "rgba(255,0,0,1)",
         endColor: "rgba(0,255,0,1)",
         hexWidth: 100,
-        hexHeight: 100 * HEX_RATIO
+        hexHeight: 100 * HEX_RATIO,
+        heightOffset: -0.1
       },
       GUP
     );
@@ -99,6 +100,7 @@
       var rowNumber = 0;
       while (y < viewport.max.y + config.hexWidth / 2) {
         var x = leftOffset + (rowNumber % 2 ? 0 : config.hexWidth / 2);
+        var lineCoords = [];
         while (x < viewport.max.x + config.hexHeight / 2) {
           var primaryVerts = mkHexAt({ x: x, y: y }, 0.45);
           var secondaryVerts = mkHexAt({ x: x, y: y }, 0.68);
@@ -106,11 +108,17 @@
           // fillHexagon({ x: x, y: y });
           pb.fill.polyline(secondaryVerts, false, "black");
           pb.fill.polyline(primaryVerts, false, "rgb(192,0,0)");
-          pb.draw.polyline(tertiaryVerts, false, "black", config.hexWidth * 0.12);
+          // pb.draw.polyline(tertiaryVerts, false, "black", config.hexWidth * 0.12);
+          if (rowNumber % 2) {
+            addHexLine(lineCoords, x, y);
+          }
           pb.draw.diamondHandle({ x: x, y: y }, 5, "rgba(255,0,255,0.5)");
           x += config.hexWidth;
         }
-        y += config.hexHeight * 0.75;
+        if (rowNumber % 8) {
+          pb.draw.polyline(lineCoords, true, "black", config.lineThickness); // config.hexWidth * 0.012);
+        }
+        y += config.hexHeight * 0.75 + config.hexHeight * (rowNumber % 2 === 0 ? 0 : config.heightOffset);
         rowNumber++;
       }
     };
@@ -130,6 +138,25 @@
         // left lower
         { x: position.x - config.hexWidth * 0.5 * scale, y: position.y + config.hexHeight * 0.25 * scale }
       ];
+    };
+
+    var addHexLine = function (lineCoords, x, y) {
+      //
+      var lerpValue = 0.25;
+      var topHex = mkHexAt({ x: x, y: y }, 0.9);
+      var bottomHex = mkHexAt(
+        { x: x + config.hexWidth / 2, y: y + config.hexHeight * 0.75 + config.hexHeight * config.heightOffset },
+        0.9
+      );
+      // lineCoords.push(new Vertex(topHex[4]).lerp(topHex[5], lerpValue));
+      lineCoords.push(topHex[5], topHex[0], topHex[1], topHex[2], topHex[3]);
+      // lineCoords.push(topHex[4]); // new Vertex(topHex[4]).lerp(topHex[3], lerpValue));
+      lineCoords.push(bottomHex[0]);
+
+      // Add bottom hex elements
+      // lineCoords.push(new Vertex(bottomHex[1]).lerp(bottomHex[0], lerpValue));
+      lineCoords.push(bottomHex[5], bottomHex[4], bottomHex[3], bottomHex[2]);
+      // lineCoords.push(new Vertex(bottomHex[1]).lerp(bottomHex[2], lerpValue));
     };
 
     var fillHexagon = function (position) {
@@ -171,6 +198,10 @@
       var gui = pb.createGUI();
       // prettier-ignore
       gui.add(config, 'hexWidth').listen().onChange(function() { pb.redraw() }).name("hexWidth").title("hexWidth");
+      // prettier-ignore
+      gui.add(config, 'heightOffset').listen().onChange(function() { pb.redraw() }).name("heightOffset").title("heightOffset");
+      // prettier-ignore
+      gui.add(config, 'lineThickness').listen().onChange(function() { pb.redraw() }).name("lineThickness").title("lineThickness");
       // // prettier-ignore
       // gui.add(config, 'lineThickness').listen().min(1).max(32).step(1).name("lineThickness").title("lineThickness");
       // // prettier-ignore
