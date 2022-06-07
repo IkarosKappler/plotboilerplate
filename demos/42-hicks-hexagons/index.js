@@ -65,35 +65,20 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        // dropCount: 10,
-        // animate: true,
-        // animationDelay: 50,
-        // dropMaxRadius: 100,
-        // innerCircleDistance: 25,
-        // drawCircleIntersections: true,
-        lineThickness: 2,
-        startColor: "rgba(255,0,0,1)",
-        endColor: "rgba(0,255,0,1)",
+        lineThickness: 12,
+        innerColor: "rgb(192,0,0)",
+        lineColor: "rgb(218,164,0)",
         hexWidth: 100,
         hexHeight: 100 * HEX_RATIO,
-        heightOffset: -0.1
+        hexDistort: 0.0,
+        innerScale: 0.39,
+        heightOffset: -0.25
       },
       GUP
     );
 
-    // +---------------------------------------------------------------------------------
-    // | Create a random vertex inside the canvas viewport.
-    // +-------------------------------
-    var randomVertex = function () {
-      return new Vertex(
-        Math.random() * pb.canvasSize.width * 0.5 - (pb.canvasSize.width / 2) * 0.5,
-        Math.random() * pb.canvasSize.height * 0.5 - (pb.canvasSize.height / 2) * 0.5
-      );
-    };
-
     var redraw = function () {
       var viewport = pb.viewport();
-      pb.fill.rect(viewport.min, viewport.width, viewport.height, "orange");
       var leftOffset = viewport.min.x;
       var topOffset = viewport.min.y;
       var y = topOffset;
@@ -102,23 +87,17 @@
         var x = leftOffset + (rowNumber % 2 ? 0 : config.hexWidth / 2);
         var lineCoords = [];
         while (x < viewport.max.x + config.hexHeight / 2) {
-          var primaryVerts = mkHexAt({ x: x, y: y }, 0.45);
-          var secondaryVerts = mkHexAt({ x: x, y: y }, 0.68);
-          var tertiaryVerts = mkHexAt({ x: x, y: y }, 1.0);
-          // fillHexagon({ x: x, y: y });
-          pb.fill.polyline(secondaryVerts, false, "black");
-          pb.fill.polyline(primaryVerts, false, "rgb(192,0,0)");
-          // pb.draw.polyline(tertiaryVerts, false, "black", config.hexWidth * 0.12);
-          if (rowNumber % 2) {
+          var primaryVerts = mkHexAt({ x: x - config.hexWidth / 2, y: y }, config.innerScale);
+          pb.fill.polyline(primaryVerts, false, config.innerColor);
+          if (rowNumber % 2 === 0) {
             addHexLine(lineCoords, x, y);
           }
-          pb.draw.diamondHandle({ x: x, y: y }, 5, "rgba(255,0,255,0.5)");
           x += config.hexWidth;
         }
-        if (rowNumber % 8) {
-          pb.draw.polyline(lineCoords, true, "black", config.lineThickness); // config.hexWidth * 0.012);
+        if ((rowNumber + 1) % 8) {
+          pb.draw.polyline(lineCoords, true, config.lineColor, config.lineThickness);
         }
-        y += config.hexHeight * 0.75 + config.hexHeight * (rowNumber % 2 === 0 ? 0 : config.heightOffset);
+        y += config.hexHeight * 0.75 + config.hexHeight * (rowNumber % 2 === 1 ? 0 : config.heightOffset);
         rowNumber++;
       }
     };
@@ -141,32 +120,17 @@
     };
 
     var addHexLine = function (lineCoords, x, y) {
-      //
-      var lerpValue = 0.25;
-      var topHex = mkHexAt({ x: x, y: y }, 0.9);
+      var hexScale = (config.hexWidth - 2 * config.lineThickness) / config.hexWidth;
+      var topHex = mkHexAt({ x: x - config.hexWidth / 2, y: y }, hexScale);
       var bottomHex = mkHexAt(
-        { x: x + config.hexWidth / 2, y: y + config.hexHeight * 0.75 + config.hexHeight * config.heightOffset },
-        0.9
+        { x: x, y: y + config.hexHeight * 0.75 + config.hexHeight * config.heightOffset },
+        hexScale // 0.9
       );
-      // lineCoords.push(new Vertex(topHex[4]).lerp(topHex[5], lerpValue));
       lineCoords.push(topHex[5], topHex[0], topHex[1], topHex[2], topHex[3]);
-      // lineCoords.push(topHex[4]); // new Vertex(topHex[4]).lerp(topHex[3], lerpValue));
       lineCoords.push(bottomHex[0]);
 
       // Add bottom hex elements
-      // lineCoords.push(new Vertex(bottomHex[1]).lerp(bottomHex[0], lerpValue));
       lineCoords.push(bottomHex[5], bottomHex[4], bottomHex[3], bottomHex[2]);
-      // lineCoords.push(new Vertex(bottomHex[1]).lerp(bottomHex[2], lerpValue));
-    };
-
-    var fillHexagon = function (position) {
-      var vertices = mkHexAt(position);
-      pb.draw.polyline(vertices, false, "orange");
-    };
-
-    var drawHexagon = function (position) {
-      var vertices = mkHexAt(position);
-      pb.draw.polyline(vertices, false, "orange");
     };
 
     // Add a mouse listener to track the mouse position.-
@@ -188,8 +152,8 @@
     uiStats.add("mouseXTop").precision(1);
     uiStats.add("mouseYTop").precision(1);
 
-    var startColor = Color.parse(config.startColor);
-    var endColor = Color.parse(config.endColor);
+    var innerColor = Color.parse(config.startColor);
+    var lineColor = Color.parse(config.endColor);
 
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
@@ -197,21 +161,22 @@
     {
       var gui = pb.createGUI();
       // prettier-ignore
-      gui.add(config, 'hexWidth').listen().onChange(function() { pb.redraw() }).name("hexWidth").title("hexWidth");
+      gui.add(config, 'hexWidth').min(10).max(160).step(1).listen().onChange(function() { config.hexHeight = config.hexWidth * (HEX_RATIO+config.hexDistort); pb.redraw() }).name("hexWidth").title("hexWidth");
       // prettier-ignore
-      gui.add(config, 'heightOffset').listen().onChange(function() { pb.redraw() }).name("heightOffset").title("heightOffset");
+      gui.add(config, 'heightOffset').min(-1.0).max(1.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("heightOffset").title("heightOffset");
       // prettier-ignore
       gui.add(config, 'lineThickness').listen().onChange(function() { pb.redraw() }).name("lineThickness").title("lineThickness");
-      // // prettier-ignore
-      // gui.add(config, 'lineThickness').listen().min(1).max(32).step(1).name("lineThickness").title("lineThickness");
-      // // prettier-ignore
-      // gui.add(config, 'innerCircleDistance').listen().min(1).max(32).step(1).name("innerCircleDistance").title("innerCircleDistance");
-      // // prettier-ignore
-      // gui.add(config, 'drawCircleIntersections').listen().name("drawCircleIntersections").title("drawCircleIntersections");
       // prettier-ignore
-      gui.addColor(config, 'startColor').onChange( function() { startColor = Color.parse(config.startColor); } );
+      gui.add(config, 'hexDistort').min(-1).max(1).step(0.01).listen().onChange(function() { config.hexHeight = config.hexWidth * (HEX_RATIO+config.hexDistort); pb.redraw() }).name("hexDistort").title("hexDistort");
       // prettier-ignore
-      gui.addColor(config, 'endColor').onChange( function() { endColor = Color.parse(config.endColor); } );
+      gui.add(config, 'innerScale').min(0.0).max(1.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("innerScale").title("innerScale");
+
+      // prettier-ignore
+      gui.addColor(pb.config, 'backgroundColor').onChange( function() { pb.redraw(); } );
+      // prettier-ignore
+      gui.addColor(config, 'innerColor').onChange( function() { innerColor = Color.parse(config.innerColor); pb.redraw(); } );
+      // prettier-ignore
+      gui.addColor(config, 'lineColor').onChange( function() { lineColor = Color.parse(config.lineColor); pb.redraw(); } );
     }
 
     // pb.config.preDraw = drawSource;
