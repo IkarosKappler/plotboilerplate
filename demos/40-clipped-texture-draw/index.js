@@ -222,20 +222,6 @@
       draw.polygon(rotatedPolygon, "rgb(0,128,192)", 1.0);
     };
 
-    // A helper function to define the clipping path.
-    // This could be a candidate for the draw library.
-    var clipPoly = function (ctx, offset, scale, vertices) {
-      ctx.beginPath();
-      // Set clip mask
-      ctx.moveTo(offset.x + vertices[0].x * scale.x, offset.y + vertices[0].y * scale.y);
-      for (var i = 1; i < vertices.length; i++) {
-        var vert = vertices[i];
-        ctx.lineTo(offset.x + vert.x * scale.x, offset.y + vert.y * scale.y);
-      }
-      ctx.closePath();
-      ctx.clip();
-    };
-
     // Add a mouse listener to track the mouse position.-
     new MouseHandler(pbTop.canvas).move(function (e) {
       var relPos = pbTop.transformMousePosition(e.params.pos.x, e.params.pos.y);

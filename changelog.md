@@ -1,5 +1,8 @@
 # Changelog
 
+<!-- - 2022-06-21 (Midsommer)
+  - Added `Bounds.clone()`. -->
+
 - 2022-06-02
   - Adding the demo 42 (Hick's Hexagons).
 - 2022-06-01

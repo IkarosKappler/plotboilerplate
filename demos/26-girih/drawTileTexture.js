@@ -155,25 +155,27 @@
     //   new Vertex(tileBounds.max.x * scale.x, tileBounds.max.y * scale.y)
     // );
 
-    clipPoly(pb.draw.ctx, pb.draw.offset, pb.draw.scale, tile.vertices);
+    // clipPoly(pb.draw.ctx, pb.draw.offset, pb.draw.scale, tile.vertices);
 
-    // Set offset and translation here.
-    // Other ways we will not be able to rotate textures properly around the tile center.
-    pb.draw.ctx.translate(offset.x + tile.position.x, offset.y + tile.position.y);
-    pb.draw.ctx.rotate(tile.rotation);
-    pb.draw.ctx.drawImage(
-      imageObject,
+    // // Set offset and translation here.
+    // // Other ways we will not be able to rotate textures properly around the tile center.
+    // pb.draw.ctx.translate(offset.x + tile.position.x, offset.y + tile.position.y);
+    // pb.draw.ctx.rotate(tile.rotation);
+    // pb.draw.ctx.drawImage(
+    //   imageObject,
 
-      srcBounds.min.x, // source x
-      srcBounds.min.y, // source y
-      srcBounds.width, // source w
-      srcBounds.height, // source h
+    //   srcBounds.min.x, // source x
+    //   srcBounds.min.y, // source y
+    //   srcBounds.width, // source w
+    //   srcBounds.height, // source h
 
-      destBounds.min.x - tile.position.x, // dest x,
-      destBounds.min.y - tile.position.y, // dest y,
-      destBounds.width, // dest w
-      destBounds.height // dest h
-    );
+    //   destBounds.min.x - tile.position.x, // dest x,
+    //   destBounds.min.y - tile.position.y, // dest y,
+    //   destBounds.width, // dest w
+    //   destBounds.height // dest h
+    // );
+
+    drawTarget(pb.draw, pb.fill, tile, imageObject);
 
     pb.draw.ctx.restore();
   };
@@ -190,6 +192,86 @@
     }
     ctx.closePath();
     ctx.clip();
+  };
+
+  var drawTarget = function (draw, fill, tile, textureImage) {
+    if (tile.tileType !== "DECAGON") {
+      return;
+    }
+    var basePolygonBounds = tile.getBounds(); // polygon.getBounds();
+    // NEW
+    var imageWidth = 500.0; // TODO: read from image (naturalWidth?)
+    var imageHeight = 460.0;
+    // ...?
+    var textureScale = 0.66;
+    var baseTextureSize = new Bounds(new Vertex(0, 0), new Vertex(imageWidth, imageHeight));
+    // var textureSize = tile.baseBounds;
+    // var textureSize = new Bounds(
+    //   new Vertex(-imageWidth / 2, -imageHeight / 2).add(tile.position),
+    //   new Vertex(imageWidth / 2, imageHeight / 2).add(tile.position)
+    // );
+    // var textureSize = new Bounds(new Vertex(0, 0), new Vertex(imageWidth, imageHeight));
+    var relativeTileTextureBounds = new Bounds(
+      new Vertex(baseTextureSize.min.x * tile.textureSource.min.x, baseTextureSize.min.y * tile.textureSource.max.y),
+      new Vertex(baseTextureSize.max.x * tile.textureSource.max.x, baseTextureSize.max.y * tile.textureSource.max.y)
+    );
+    // var textureSize = baseTextureSize.clone();
+    // baseTextureSize;
+    var relativeTileOffset = new Vertex(
+      baseTextureSize.width * tile.textureSource.min.x,
+      baseTextureSize.height * tile.textureSource.max.x
+    );
+    var textureSize = new Bounds(
+      baseTextureSize.min.clone(), // .add(relativeTileOffset.difference(relativeTileTextureBounds.min)),
+      baseTextureSize.max.clone() // .add(relativeTileOffset.difference(relativeTileTextureBounds.min))
+    );
+    // var textureSize = new Bounds(
+    //   new Vertex(tile.textureSource.min.x * textureImage.width, tile.textureSource.min.y * textureImage.height),
+    //   new Vertex(tile.textureSource.max.x * textureImage.width, tile.textureSource.max.y * textureImage.height)
+    // );
+    // var textureSize = tile.baseBounds;
+
+    var polygonPosition = basePolygonBounds.getCenter();
+    var polygonCenterOffset = { x: 0, y: 0 }; // TODO: add this to the GirihTile class
+    var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset);
+    var tileScale = 1.0;
+
+    // REFACTOR
+    // var rotation = (config.rotation / 180) * Math.PI;
+    var rotation = tile.rotation;
+    var rotationalOffset = basePolygonBounds.getCenter().difference(polygonRotationCenter);
+    var rotationalOffsetInv = rotationalOffset.inv();
+    var positionOffset = basePolygonBounds.getCenter().difference(polygonPosition);
+    var _localRotationCenter = polygonPosition.clone().add(rotationalOffset);
+
+    // Scale around center
+    var clonedTextureSize = new Bounds(textureSize.min.clone(), textureSize.max.clone());
+    var scaledTextureSize = new Bounds(
+      textureSize.min.clone().scale(textureScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset),
+      textureSize.max.clone().scale(textureScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset)
+    );
+
+    var boundsPolygon = clonedTextureSize
+      .toPolygon()
+      .scale(tileScale, polygonRotationCenter) // TODO: this is probably obsolete with tileScale=1.0
+      .move(rotationalOffsetInv)
+      .move(positionOffset)
+      .rotate(rotation, polygonPosition);
+
+    draw.polygon(boundsPolygon, "orange", 1.0);
+    draw.polygon(scaledTextureSize.toPolygon(), "yellow", 1.0);
+    draw.polygon(clonedTextureSize.toPolygon(), "green", 1.0);
+    draw.crosshair(_localRotationCenter, 4, "green");
+    var scaledPolygon = tile.clone().scale(tileScale, polygonRotationCenter).move(rotationalOffset).move(positionOffset);
+    var rotatedPolygon = scaledPolygon.clone().rotate(rotation, polygonPosition);
+
+    // if (config.drawTargetTexture) {
+    fill.texturedPoly(textureImage, scaledTextureSize, rotatedPolygon, polygonPosition, rotation);
+    // }
+
+    draw.polygon(tile, "rgba(192,192,192,0.5)", 2.0);
+    draw.polygon(scaledPolygon, "rgba(255,192,0,0.75)", 1.0); // orange
+    draw.polygon(rotatedPolygon, "rgb(0,128,192)", 1.0);
   };
 
   _context.drawTileTexture = drawTileTexture;

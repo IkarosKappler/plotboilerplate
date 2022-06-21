@@ -87,6 +87,17 @@ export declare class Bounds implements IBounds, XYDimension {
      */
     toString(): string;
     /**
+     * Clone this bounds object (create a deep clone).
+     *
+     * Note: the returned format might change in the future, so please do not
+     * rely on the returned string format.
+     *
+     * @method clone
+     * @instance
+     * @memberof Bounds
+     * @returns {string} Creates a deep clone of this bounds object. The returned object's `min` and `max` instances are `Vertex` instances.
+     */
+    /**
      * Compute the minimal bounding box for a given set of vertices.
      *
      * An empty vertex array will return an empty bounding box located at (0,0).
