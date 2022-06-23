@@ -196,42 +196,29 @@
 
   var drawTarget = function (draw, fill, tile, textureImage) {
     if (tile.tileType !== "DECAGON") {
-      return;
+      // return;
     }
     var basePolygonBounds = tile.getBounds(); // polygon.getBounds();
     // NEW
     var imageWidth = 500.0; // TODO: read from image (naturalWidth?)
     var imageHeight = 460.0;
     // ...?
-    var textureScale = 0.66;
-    var baseTextureSize = new Bounds(new Vertex(0, 0), new Vertex(imageWidth, imageHeight));
-    // var textureSize = tile.baseBounds;
-    // var textureSize = new Bounds(
-    //   new Vertex(-imageWidth / 2, -imageHeight / 2).add(tile.position),
-    //   new Vertex(imageWidth / 2, imageHeight / 2).add(tile.position)
-    // );
-    // var textureSize = new Bounds(new Vertex(0, 0), new Vertex(imageWidth, imageHeight));
-    var relativeTileTextureBounds = new Bounds(
-      new Vertex(baseTextureSize.min.x * tile.textureSource.min.x, baseTextureSize.min.y * tile.textureSource.max.y),
-      new Vertex(baseTextureSize.max.x * tile.textureSource.max.x, baseTextureSize.max.y * tile.textureSource.max.y)
-    );
-    // var textureSize = baseTextureSize.clone();
-    // baseTextureSize;
-    var relativeTileOffset = new Vertex(
-      baseTextureSize.width * tile.textureSource.min.x,
-      baseTextureSize.height * tile.textureSource.max.x
+    var textureScale = 1.0; //0.705; //0.475;
+    var tileBounds = tile.getBounds();
+    // console.log("tileBounds", tileBounds, "tile.baseBounds", tile.baseBounds);
+
+    var upperLeftTextureBound = new Vertex(tileBounds.min).addXY(
+      -tile.textureSource.min.x * imageWidth,
+      -tile.textureSource.min.y * imageHeight
     );
     var textureSize = new Bounds(
-      baseTextureSize.min.clone(), // .add(relativeTileOffset.difference(relativeTileTextureBounds.min)),
-      baseTextureSize.max.clone() // .add(relativeTileOffset.difference(relativeTileTextureBounds.min))
+      upperLeftTextureBound,
+      // new Vertex(tileBounds.max).addXY((1 - tile.textureSource.max.x) * imageWidth, (1 - tile.textureSource.max.y) * imageHeight)
+      upperLeftTextureBound.clone().addXY(imageWidth, imageHeight)
     );
-    // var textureSize = new Bounds(
-    //   new Vertex(tile.textureSource.min.x * textureImage.width, tile.textureSource.min.y * textureImage.height),
-    //   new Vertex(tile.textureSource.max.x * textureImage.width, tile.textureSource.max.y * textureImage.height)
-    // );
-    // var textureSize = tile.baseBounds;
 
-    var polygonPosition = basePolygonBounds.getCenter();
+    // var polygonPosition = basePolygonBounds.getCenter();
+    var polygonPosition = tile.position.clone();
     var polygonCenterOffset = { x: 0, y: 0 }; // TODO: add this to the GirihTile class
     var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset);
     var tileScale = 1.0;
