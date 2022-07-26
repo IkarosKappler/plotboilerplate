@@ -43,7 +43,8 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
- * @version  1.12.1
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.12.2
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -234,12 +235,13 @@ export class drawutils implements DrawLib<void> {
    * @instance
    * @memberof drawutils
    **/
-  image(image: HTMLImageElement, position: Vertex, size: Vertex): void {
+  image(image: HTMLImageElement, position: Vertex, size: Vertex, alpha: number = 0.0): void {
     if (!image.complete || !image.naturalWidth) {
       // Avoid drawing un-unloaded or broken images
       return;
     }
     this.ctx.save();
+    this.ctx.globalAlpha = alpha;
     // Note that there is a Safari bug with the 3 or 5 params variant.
     // Only the 9-param varaint works.
     this.ctx.drawImage(

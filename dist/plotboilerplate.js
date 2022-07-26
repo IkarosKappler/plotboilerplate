@@ -9194,7 +9194,8 @@ exports.VertexListeners = VertexListeners;
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
- * @version  1.12.1
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.12.2
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -9340,12 +9341,14 @@ var drawutils = /** @class */ (function () {
      * @instance
      * @memberof drawutils
      **/
-    drawutils.prototype.image = function (image, position, size) {
+    drawutils.prototype.image = function (image, position, size, alpha) {
+        if (alpha === void 0) { alpha = 0.0; }
         if (!image.complete || !image.naturalWidth) {
             // Avoid drawing un-unloaded or broken images
             return;
         }
         this.ctx.save();
+        this.ctx.globalAlpha = alpha;
         // Note that there is a Safari bug with the 3 or 5 params variant.
         // Only the 9-param varaint works.
         this.ctx.drawImage(image, 0, 0, image.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
@@ -10139,7 +10142,8 @@ exports.drawutils = drawutils;
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
- * @version  0.0.7
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  0.0.8
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
@@ -10332,11 +10336,13 @@ var drawutilsgl = /** @class */ (function () {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    drawutilsgl.prototype.image = function (image, position, size) {
+    drawutilsgl.prototype.image = function (image, position, size, alpha) {
+        if (alpha === void 0) { alpha = 0.0; }
         // NOT YET IMPLEMENTED
     };
     /**
@@ -10903,7 +10909,8 @@ var GLU = /** @class */ (function () {
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
- * @version  1.6.0
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.6.1
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -11291,12 +11298,14 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.image = function (image, position, size) {
+    drawutilssvg.prototype.image = function (image, position, size, alpha) {
         var _this = this;
+        if (alpha === void 0) { alpha = 0.0; }
         var node = this.makeNode("image");
         // We need to re-adjust the image if it was not yet fully loaded before.
         var setImageSize = function (image) {
@@ -11306,6 +11315,9 @@ var drawutilssvg = /** @class */ (function () {
                 node.setAttribute("width", "" + image.naturalWidth * _this.scale.x);
                 node.setAttribute("height", "" + image.naturalHeight * _this.scale.y);
                 node.setAttribute("display", null); // Dislay when loaded
+                if (alpha) {
+                    node.setAttribute("opacity", "" + (1.0 - alpha));
+                }
                 node.setAttribute("transform", "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + ratioX + " " + ratioY + ")");
             }
         };

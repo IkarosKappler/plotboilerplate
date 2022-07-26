@@ -17,6 +17,7 @@
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  **/
 export {};
 //# sourceMappingURL=DrawLib.js.map

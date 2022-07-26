@@ -17,6 +17,7 @@
  * @modified 2021-11-19 Added the `color` param to the `label(...)` function.
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  **/
 import { Bounds } from "../Bounds";
 import { Polygon } from "../Polygon";
@@ -132,11 +133,12 @@ export interface DrawLib<R> {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
      * @return {void}
      * @instance
      * @memberof DrawLib
      **/
-    image: (image: HTMLImageElement, position: Vertex, size: Vertex) => R;
+    image: (image: HTMLImageElement, position: Vertex, size: Vertex, alpha?: number) => R;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>

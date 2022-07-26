@@ -43,7 +43,8 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
- * @version  1.12.1
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.12.2
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -176,7 +177,7 @@ export declare class drawutils implements DrawLib<void> {
      * @instance
      * @memberof drawutils
      **/
-    image(image: HTMLImageElement, position: Vertex, size: Vertex): void;
+    image(image: HTMLImageElement, position: Vertex, size: Vertex, alpha?: number): void;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>

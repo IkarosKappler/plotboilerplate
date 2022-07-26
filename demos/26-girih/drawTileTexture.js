@@ -196,8 +196,9 @@
 
   var drawTarget = function (draw, fill, tile, textureImage) {
     if (tile.tileType !== "DECAGON") {
-      // return;
+      return;
     }
+    // console.log("textureImage.")
     var basePolygonBounds = tile.getBounds(); // polygon.getBounds();
     // NEW
     var imageWidth = 500.0; // TODO: read from image (naturalWidth?)
@@ -216,6 +217,11 @@
       // new Vertex(tileBounds.max).addXY((1 - tile.textureSource.max.x) * imageWidth, (1 - tile.textureSource.max.y) * imageHeight)
       upperLeftTextureBound.clone().addXY(imageWidth, imageHeight)
     );
+    // WHY IS THIS NOT WORKING???!!!
+
+    console.log("x", upperLeftTextureBound, textureSize);
+    fill.image(textureImage, upperLeftTextureBound, { x: textureSize.width, y: textureSize.height }, 0.3);
+    // draw.crosshair(upperLeftTextureBound, )
 
     // var polygonPosition = basePolygonBounds.getCenter();
     var polygonPosition = tile.position.clone();
