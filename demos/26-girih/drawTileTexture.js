@@ -196,7 +196,7 @@
 
   var drawTarget = function (draw, fill, tile, textureImage) {
     if (tile.tileType !== "DECAGON") {
-      return;
+      // return;
     }
     // console.log("textureImage.")
     var basePolygonBounds = tile.getBounds(); // polygon.getBounds();
@@ -204,24 +204,26 @@
     var imageWidth = 500.0; // TODO: read from image (naturalWidth?)
     var imageHeight = 460.0;
     // ...?
-    var textureScale = 1.0; //0.705; //0.475;
     var tileBounds = tile.getBounds();
-    // console.log("tileBounds", tileBounds, "tile.baseBounds", tile.baseBounds);
+    var ratio = tileBounds.width / (imageWidth * tile.textureSource.max.x - imageWidth * tile.textureSource.min.x);
+    console.log("tileBounds", tileBounds, "tile.baseBounds", tile.baseBounds, "ratio", ratio);
 
     var upperLeftTextureBound = new Vertex(tileBounds.min).addXY(
-      -tile.textureSource.min.x * imageWidth,
-      -tile.textureSource.min.y * imageHeight
+      -tile.textureSource.min.x * imageWidth * ratio,
+      -tile.textureSource.min.y * imageHeight * ratio
     );
     var textureSize = new Bounds(
       upperLeftTextureBound,
       // new Vertex(tileBounds.max).addXY((1 - tile.textureSource.max.x) * imageWidth, (1 - tile.textureSource.max.y) * imageHeight)
-      upperLeftTextureBound.clone().addXY(imageWidth, imageHeight)
+      upperLeftTextureBound.clone().addXY(imageWidth * ratio, imageHeight * ratio)
     );
     // WHY IS THIS NOT WORKING???!!!
 
-    console.log("x", upperLeftTextureBound, textureSize);
-    fill.image(textureImage, upperLeftTextureBound, { x: textureSize.width, y: textureSize.height }, 0.3);
+    // console.log("x", upperLeftTextureBound, textureSize);
+    // fill.image(textureImage, upperLeftTextureBound, { x: textureSize.width, y: textureSize.height }, 0.3);
     // draw.crosshair(upperLeftTextureBound, )
+
+    var textureScale = 1.0; // tile.textureSource.min * imageWidth;
 
     // var polygonPosition = basePolygonBounds.getCenter();
     var polygonPosition = tile.position.clone();
