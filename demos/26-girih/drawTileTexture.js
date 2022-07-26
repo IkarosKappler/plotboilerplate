@@ -198,6 +198,7 @@
     if (tile.tileType !== "DECAGON") {
       // return;
     }
+    var RAD_TO_DEG = 180 / Math.PI;
     // console.log("textureImage.")
     var basePolygonBounds = tile.getBounds(); // polygon.getBounds();
     // NEW
@@ -206,7 +207,7 @@
     // ...?
     var tileBounds = tile.getBounds();
     var ratio = tileBounds.width / (imageWidth * tile.textureSource.max.x - imageWidth * tile.textureSource.min.x);
-    console.log("tileBounds", tileBounds, "tile.baseBounds", tile.baseBounds, "ratio", ratio);
+    // console.log("tileBounds", tileBounds, "tile.baseBounds", tile.baseBounds, "ratio", ratio);
 
     var upperLeftTextureBound = new Vertex(tileBounds.min).addXY(
       -tile.textureSource.min.x * imageWidth * ratio,
