@@ -177,7 +177,7 @@
     // +-------------------------------
     var drawTile = function (draw, fill, tile, index) {
       if (config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0) {
-        drawTileTexture(pb, tile, textureImage);
+        drawTileTexture(pb, tile, textureImage, config.drawFullImages, config.drawBoundingBoxes);
 
         // Rotate back for drawing
         // var imageWidth = textureImage.naturalWidth; // 500.0;
@@ -519,6 +519,8 @@
         drawTextures: false,
         showPreviewOverlaps: true,
         allowOverlaps: false,
+        drawFullImages: false,
+        drawBoundingBoxes: false,
         exportFile: function () {
           exportFile();
         },
@@ -608,6 +610,10 @@
       gui.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
       // prettier-ignore
       gui.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
+      // prettier-ignore
+      gui.add(config, 'drawFullImages').listen().onChange( function() { pb.redraw(); } ).name('drawFullImages').title('Show a hint of the full imagse?');
+      // prettier-ignore
+      gui.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes?');
       var foldImport = gui.addFolder("Import");
       foldImport.add(config, "importFile");
 
