@@ -9337,12 +9337,13 @@ var drawutils = /** @class */ (function () {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
     drawutils.prototype.image = function (image, position, size, alpha) {
-        if (alpha === void 0) { alpha = 0.0; }
+        if (alpha === void 0) { alpha = 1.0; }
         if (!image.complete || !image.naturalWidth) {
             // Avoid drawing un-unloaded or broken images
             return;
@@ -11298,14 +11299,14 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
-     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.image = function (image, position, size, alpha) {
         var _this = this;
-        if (alpha === void 0) { alpha = 0.0; }
+        if (alpha === void 0) { alpha = 1.0; }
         var node = this.makeNode("image");
         // We need to re-adjust the image if it was not yet fully loaded before.
         var setImageSize = function (image) {
@@ -11315,9 +11316,9 @@ var drawutilssvg = /** @class */ (function () {
                 node.setAttribute("width", "" + image.naturalWidth * _this.scale.x);
                 node.setAttribute("height", "" + image.naturalHeight * _this.scale.y);
                 node.setAttribute("display", null); // Dislay when loaded
-                if (alpha) {
-                    node.setAttribute("opacity", "" + (1.0 - alpha));
-                }
+                // if (alpha) {
+                node.setAttribute("opacity", "" + alpha);
+                // }
                 node.setAttribute("transform", "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + ratioX + " " + ratioY + ")");
             }
         };

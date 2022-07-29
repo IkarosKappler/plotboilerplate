@@ -184,11 +184,12 @@ export class drawutils {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    image(image, position, size, alpha = 0.0) {
+    image(image, position, size, alpha = 1.0) {
         if (!image.complete || !image.naturalWidth) {
             // Avoid drawing un-unloaded or broken images
             return;

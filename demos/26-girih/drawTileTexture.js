@@ -206,7 +206,9 @@
     var imageHeight = 460.0;
     // ...?
     var tileBounds = tile.getBounds();
-    var ratio = tileBounds.width / (imageWidth * tile.textureSource.max.x - imageWidth * tile.textureSource.min.x);
+    // var ratio = tileBounds.width / (imageWidth * tile.textureSource.max.x - imageWidth * tile.textureSource.min.x);
+    var ratio = tile.baseBounds.width / (imageWidth * tile.textureSource.max.x - imageWidth * tile.textureSource.min.x);
+
     // console.log("tileBounds", tileBounds, "tile.baseBounds", tile.baseBounds, "ratio", ratio);
 
     var upperLeftTextureBound = new Vertex(tileBounds.min).addXY(
@@ -215,14 +217,14 @@
     );
     var textureSize = new Bounds(
       upperLeftTextureBound,
-      // new Vertex(tileBounds.max).addXY((1 - tile.textureSource.max.x) * imageWidth, (1 - tile.textureSource.max.y) * imageHeight)
       upperLeftTextureBound.clone().addXY(imageWidth * ratio, imageHeight * ratio)
     );
-    // WHY IS THIS NOT WORKING???!!!
 
-    // console.log("x", upperLeftTextureBound, textureSize);
-    // fill.image(textureImage, upperLeftTextureBound, { x: textureSize.width, y: textureSize.height }, 0.3);
-    // draw.crosshair(upperLeftTextureBound, )
+    // var rotation = (config.rotation / 180) * Math.PI;
+    var rotation = tile.rotation;
+    if (rotation) {
+      fill.image(textureImage, upperLeftTextureBound, { x: textureSize.width, y: textureSize.height }, 0.1);
+    }
 
     var textureScale = 1.0; // tile.textureSource.min * imageWidth;
 
@@ -230,11 +232,9 @@
     var polygonPosition = tile.position.clone();
     var polygonCenterOffset = { x: 0, y: 0 }; // TODO: add this to the GirihTile class
     var polygonRotationCenter = polygonPosition.clone().add(polygonCenterOffset);
-    var tileScale = 1.0;
+    // var tileScale = 1.0;
 
     // REFACTOR
-    // var rotation = (config.rotation / 180) * Math.PI;
-    var rotation = tile.rotation;
     var rotationalOffset = basePolygonBounds.getCenter().difference(polygonRotationCenter);
     var rotationalOffsetInv = rotationalOffset.inv();
     var positionOffset = basePolygonBounds.getCenter().difference(polygonPosition);
@@ -246,24 +246,30 @@
       textureSize.min.clone().scale(textureScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset),
       textureSize.max.clone().scale(textureScale, polygonRotationCenter).add(rotationalOffsetInv).add(positionOffset)
     );
+    if (rotation) {
+      console.log("textureSize", textureSize, "scaledTextureSize", scaledTextureSize);
+    }
 
     var boundsPolygon = clonedTextureSize
       .toPolygon()
-      .scale(tileScale, polygonRotationCenter) // TODO: this is probably obsolete with tileScale=1.0
+      // .scale(tileScale, polygonPosition) // polygonRotationCenter) // TODO: this is probably obsolete with tileScale=1.0
       .move(rotationalOffsetInv)
       .move(positionOffset)
       .rotate(rotation, polygonPosition);
 
     draw.polygon(boundsPolygon, "orange", 1.0);
     draw.polygon(scaledTextureSize.toPolygon(), "yellow", 1.0);
-    draw.polygon(clonedTextureSize.toPolygon(), "green", 1.0);
+    // draw.polygon(clonedTextureSize.toPolygon(), "green", 1.0);
     draw.crosshair(_localRotationCenter, 4, "green");
-    var scaledPolygon = tile.clone().scale(tileScale, polygonRotationCenter).move(rotationalOffset).move(positionOffset);
-    var rotatedPolygon = scaledPolygon.clone().rotate(rotation, polygonPosition);
+    // var scaledPolygon = tile.clone().scale(tileScale, polygonRotationCenter).move(rotationalOffset).move(positionOffset);
+    var scaledPolygon = tile.clone().move(rotationalOffset).move(positionOffset);
+
+    var rotatedPolygon = scaledPolygon.clone(); // Is already rotated by the tile //.rotate(rotation, polygonPosition);
 
     // if (config.drawTargetTexture) {
     fill.texturedPoly(textureImage, scaledTextureSize, rotatedPolygon, polygonPosition, rotation);
     // }
+    fill.circle(polygonPosition, 5, "green");
 
     draw.polygon(tile, "rgba(192,192,192,0.5)", 2.0);
     draw.polygon(scaledPolygon, "rgba(255,192,0,0.75)", 1.0); // orange

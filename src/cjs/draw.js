@@ -187,12 +187,13 @@ var drawutils = /** @class */ (function () {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
     drawutils.prototype.image = function (image, position, size, alpha) {
-        if (alpha === void 0) { alpha = 0.0; }
+        if (alpha === void 0) { alpha = 1.0; }
         if (!image.complete || !image.naturalWidth) {
             // Avoid drawing un-unloaded or broken images
             return;

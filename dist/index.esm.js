@@ -4625,12 +4625,12 @@ class drawutilssvg {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
-     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    image(image, position, size, alpha = 0.0) {
+    image(image, position, size, alpha = 1.0) {
         const node = this.makeNode("image");
         // We need to re-adjust the image if it was not yet fully loaded before.
         const setImageSize = (image) => {
@@ -4640,9 +4640,9 @@ class drawutilssvg {
                 node.setAttribute("width", `${image.naturalWidth * this.scale.x}`);
                 node.setAttribute("height", `${image.naturalHeight * this.scale.y}`);
                 node.setAttribute("display", null); // Dislay when loaded
-                if (alpha) {
-                    node.setAttribute("opacity", `${1.0 - alpha}`);
-                }
+                // if (alpha) {
+                node.setAttribute("opacity", `${alpha}`);
+                // }
                 node.setAttribute("transform", `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${ratioX} ${ratioY})`);
             }
         };
@@ -5745,11 +5745,12 @@ class drawutils {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    image(image, position, size, alpha = 0.0) {
+    image(image, position, size, alpha = 1.0) {
         if (!image.complete || !image.naturalWidth) {
             // Avoid drawing un-unloaded or broken images
             return;

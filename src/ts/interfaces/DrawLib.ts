@@ -152,7 +152,7 @@ export interface DrawLib<R> {
    * @param {Image} image - The image object to draw.
    * @param {Vertex} position - The position to draw the the upper left corner at.
    * @param {Vertex} size - The x/y-size to draw the image with.
-   * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
+   * @param {number=1.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
    * @return {void}
    * @instance
    * @memberof DrawLib
