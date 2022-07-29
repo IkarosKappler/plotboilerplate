@@ -543,7 +543,9 @@
       }
       return texture;
     };
-    textureImage = loadTextureImage("girihtexture-500px-2.png", function () {
+    var path = "girih-tiles-spatial-1.png";
+    // var path = "girihtexture-500px-2.png";
+    textureImage = loadTextureImage(path, function () {
       console.log("Texture loaded");
       pb.redraw();
     });

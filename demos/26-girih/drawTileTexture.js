@@ -51,9 +51,6 @@
       textureSize.min.clone().add(rotationalOffsetInv).add(positionOffset),
       textureSize.max.clone().add(rotationalOffsetInv).add(positionOffset)
     );
-    if (rotation) {
-      console.log("textureSize", textureSize, "scaledTextureSize", scaledTextureSize);
-    }
 
     if (drawBoundingBoxes) {
       var boundsPolygon = clonedTextureSize
@@ -74,9 +71,9 @@
 
     fill.texturedPoly(textureImage, scaledTextureSize, rotatedPolygon, polygonPosition, rotation);
 
-    draw.polygon(tile, "rgba(192,192,192,0.5)", 2.0);
-    draw.polygon(scaledPolygon, "rgba(255,192,0,0.75)", 1.0); // orange
-    draw.polygon(rotatedPolygon, "rgb(0,128,192)", 1.0);
+    // draw.polygon(tile, "rgba(192,192,192,0.5)", 2.0);
+    // draw.polygon(scaledPolygon, "rgba(255,192,0,0.75)", 1.0); // orange
+    // draw.polygon(rotatedPolygon, "rgb(0,128,192)", 1.0);
   };
 
   _context.drawTileTexture = drawTileTexture;
