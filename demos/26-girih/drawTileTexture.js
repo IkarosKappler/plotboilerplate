@@ -199,17 +199,13 @@
       // return;
     }
     var RAD_TO_DEG = 180 / Math.PI;
-    // console.log("textureImage.")
-    var basePolygonBounds = tile.getBounds(); // polygon.getBounds();
+    var basePolygonBounds = tile.getBounds();
     // NEW
     var imageWidth = 500.0; // TODO: read from image (naturalWidth?)
     var imageHeight = 460.0;
     // ...?
-    var tileBounds = tile.getBounds();
-    // var ratio = tileBounds.width / (imageWidth * tile.textureSource.max.x - imageWidth * tile.textureSource.min.x);
+    var tileBounds = tile.baseBounds;
     var ratio = tile.baseBounds.width / (imageWidth * tile.textureSource.max.x - imageWidth * tile.textureSource.min.x);
-
-    // console.log("tileBounds", tileBounds, "tile.baseBounds", tile.baseBounds, "ratio", ratio);
 
     var upperLeftTextureBound = new Vertex(tileBounds.min).addXY(
       -tile.textureSource.min.x * imageWidth * ratio,
@@ -220,7 +216,6 @@
       upperLeftTextureBound.clone().addXY(imageWidth * ratio, imageHeight * ratio)
     );
 
-    // var rotation = (config.rotation / 180) * Math.PI;
     var rotation = tile.rotation;
     if (rotation) {
       fill.image(textureImage, upperLeftTextureBound, { x: textureSize.width, y: textureSize.height }, 0.1);
