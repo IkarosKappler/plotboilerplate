@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2022-04-29
+date: 2022-08-01
 ---
 
 <h3>Basics</h3>
@@ -213,6 +213,16 @@ date: 2022-04-29
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/40-clipped-texture-draw/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220428-texture-polygon-clipping.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/41-raindrops/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220601-raindrops-1.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/42-hicks-hexagons/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/na.png');"></div>
    </a>
 </div>
 <div class="demo-box">
