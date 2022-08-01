@@ -11,6 +11,7 @@
   "use strict";
 
   var drawTileTexture = function (pb, tile, textureImage, drawFullImages, drawBoundingBoxes) {
+    console.log("textureImage", textureImage);
     var draw = pb.draw;
     var fill = pb.fill;
     var basePolygonBounds = tile.getBounds();

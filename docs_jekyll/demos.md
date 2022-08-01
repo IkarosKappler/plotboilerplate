@@ -222,7 +222,7 @@ date: 2022-08-01
 </div>
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/42-hicks-hexagons/index.html' | prepend: site.url }}">
-      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/na.png');"></div>
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220607-0-Hicks-Hexagons.png');"></div>
    </a>
 </div>
 <div class="demo-box">

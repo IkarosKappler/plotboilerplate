@@ -142,10 +142,10 @@
     // | This is the actual render function.
     // +-------------------------------
     var drawAll = function (draw, fill) {
-      if (draw.ctx) {
-        // This is quirky. Only works if target is a canvas (will not work on SVG nodes)
-        draw.ctx.lineJoin = config.lineJoin;
-      }
+      // if (draw.ctx) {
+      //   // This is quirky. Only works if target is a canvas (will not work on SVG nodes)
+      //   draw.ctx.lineJoin = config.lineJoin;
+      // }
       // Draw the preview polygon first
       if (hoverTileIndex != -1 && hoverEdgeIndex != -1 && 0 <= previewTilePointer && previewTilePointer < previewTiles.length) {
         draw.polygon(previewTiles[previewTilePointer], "rgba(128,128,128,0.5)", 1.0); // Polygon is not open
@@ -516,6 +516,7 @@
         allowOverlaps: false,
         drawFullImages: false,
         drawBoundingBoxes: false,
+        texturePath: "girihtexture-500px-2.png",
         exportFile: function () {
           exportFile();
         },
@@ -527,23 +528,23 @@
     );
 
     // Keep track of loaded textures
-    var textureStore = new Map();
-    var loadTextureImage = function (path, onLoad) {
-      var texture = textureStore.get(path);
-      if (!texture) {
-        texture = new Image();
-        texture.onload = onLoad;
-        texture.src = path;
-        textureStore.set(path, texture);
-      }
-      return texture;
-    };
-    var path = "girih-tiles-spatial-1.png";
-    // var path = "girihtexture-500px-2.png";
-    textureImage = loadTextureImage(path, function () {
-      console.log("Texture loaded");
-      pb.redraw();
-    });
+    // var textureStore = new Map();
+    // var loadTextureImage = function (path, onLoad) {
+    //   var texture = textureStore.get(path);
+    //   if (!texture) {
+    //     texture = new Image();
+    //     texture.onload = onLoad;
+    //     texture.src = path;
+    //     textureStore.set(path, texture);
+    //   }
+    //   return texture;
+    // };
+    // var path = "girih-tiles-spatial-1.png";
+    // // var path = "girihtexture-500px-2.png";
+    // textureImage = loadTextureImage(path, function () {
+    //   console.log("Texture loaded");
+    //   pb.redraw();
+    // });
 
     var exportFile = function () {
       var data = girihToJSON(girih.tiles);
@@ -569,6 +570,35 @@
       };
       input.click();
     };
+
+    // Keep track of loaded textures
+    var textureStore = new Map();
+    var loadTextureImage = function (path, onLoad) {
+      var texture = textureStore.get(path);
+      if (!texture) {
+        texture = new Image();
+        texture.onload = onLoad;
+        texture.src = path;
+        textureStore.set(path, texture);
+      }
+      return texture;
+    };
+    textureImage = loadTextureImage(config.texturePath, function () {
+      console.log("Texture loaded");
+      pb.redraw();
+    });
+
+    var imagePath = null;
+    function handleTextureChange() {
+      imagePath = config.texturePath;
+      console.log("handleChange", imagePath);
+      // Load texture image
+      textureImage = loadTextureImage(imagePath, function () {
+        console.log("Texture loaded");
+        pb.redraw();
+      });
+      pb.redraw();
+    }
 
     // Install DnD
     var fileDrop = new FileDrop(pb.eventCatcher);
@@ -611,6 +641,8 @@
       gui.add(config, 'drawFullImages').listen().onChange( function() { pb.redraw(); } ).name('drawFullImages').title('Show a hint of the full imagse?');
       // prettier-ignore
       gui.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes?');
+      // prettier-ignore
+      gui.add(config, 'texturePath', ["girihtexture-500px-2.png", "girih-tiles-spatial-1.png"]).listen().onChange( handleTextureChange ).name('texturePath').title('Choose a texture.');
       var foldImport = gui.addFolder("Import");
       foldImport.add(config, "importFile");
 
