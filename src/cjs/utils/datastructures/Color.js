@@ -15,7 +15,9 @@
  * @modified 2021-11-07 Did the same with `saturate` and `desaturate`.
  * @modified 2021-11-07 Did the same with the `fadein` and `fadeout` functions.
  * @modified 2021-11-07 Added setRed, setGreen, setBlue, setHue, setSaturation, setLiminance functions.
- * @version 0.0.10
+ * @modified 2022-05-11 Modified the `clone` function by just copying the numeric calues, not re-calculating the whole color.
+ * @modified 2022-05-11 Fixed the `interpolate` function.
+ * @version 0.0.11
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Color = void 0;
@@ -529,7 +531,16 @@ var Color = /** @class */ (function () {
      * @return {Color} A clone of this color (in RGB mode).
      */
     Color.prototype.clone = function () {
-        return Color.makeRGB(this.r, this.g, this.b, this.a);
+        // return Color.makeRGB(this.r, this.g, this.b, this.a);
+        var col = new Color();
+        col.r = this.r;
+        col.g = this.g;
+        col.b = this.b;
+        col.a = this.a;
+        col.h = this.h;
+        col.s = this.s;
+        col.l = this.l;
+        return col;
     };
     /**
      * Interpolate this color on the RGB scale.
@@ -542,10 +553,10 @@ var Color = /** @class */ (function () {
      * @return {Color} A clone of this color (in RGB mode).
      */
     Color.prototype.interpolate = function (c, t) {
-        this.r += (c.r - c.r) * t;
-        this.g += (c.g - c.g) * t;
-        this.b += (c.b - c.b) * t;
-        this.a += (c.a - c.a) * t;
+        this.r += (c.r - this.r) * t;
+        this.g += (c.g - this.g) * t;
+        this.b += (c.b - this.b) * t;
+        this.a += (c.a - this.a) * t;
         return this;
     };
     Color.Sanitizer = {

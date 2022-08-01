@@ -42,7 +42,9 @@
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
- * @version  1.12.0
+ * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.12.2
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
@@ -182,16 +184,18 @@ export class drawutils {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    image(image, position, size) {
+    image(image, position, size, alpha = 1.0) {
         if (!image.complete || !image.naturalWidth) {
             // Avoid drawing un-unloaded or broken images
             return;
         }
         this.ctx.save();
+        this.ctx.globalAlpha = alpha;
         // Note that there is a Safari bug with the 3 or 5 params variant.
         // Only the 9-param varaint works.
         this.ctx.drawImage(image, 0, 0, image.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
@@ -801,11 +805,12 @@ export class drawutils {
      * @memberof drawutils
      */
     polyline(vertices, isOpen, color, lineWidth) {
-        if (vertices.length <= 1)
+        if (vertices.length <= 1) {
             return;
+        }
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.lineWidth = lineWidth || 1.0;
+        this.ctx.lineWidth = lineWidth * this.scale.x || 1.0;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);

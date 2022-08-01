@@ -1473,6 +1473,20 @@ class Bounds {
         return `{ min: ${this.min.toString()}, max : ${this.max.toString()}, width: ${this.width}, height : ${this.height} }`;
     }
     /**
+     * Clone this bounds object (create a deep clone).
+     *
+     * Note: the returned format might change in the future, so please do not
+     * rely on the returned string format.
+     *
+     * @method clone
+     * @instance
+     * @memberof Bounds
+     * @returns {string} Creates a deep clone of this bounds object. The returned object's `min` and `max` instances are `Vertex` instances.
+     */
+    // clone() {
+    //   return new Bounds(new Vertex(this.min.x, this.min.y), new Vertex(this.max.x, this.max.y));
+    // }
+    /**
      * Compute the minimal bounding box for a given set of vertices.
      *
      * An empty vertex array will return an empty bounding box located at (0,0).
@@ -4228,7 +4242,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
- * @version  1.6.0
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.6.1
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -4610,11 +4625,12 @@ class drawutilssvg {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    image(image, position, size) {
+    image(image, position, size, alpha = 1.0) {
         const node = this.makeNode("image");
         // We need to re-adjust the image if it was not yet fully loaded before.
         const setImageSize = (image) => {
@@ -4624,6 +4640,9 @@ class drawutilssvg {
                 node.setAttribute("width", `${image.naturalWidth * this.scale.x}`);
                 node.setAttribute("height", `${image.naturalHeight * this.scale.y}`);
                 node.setAttribute("display", null); // Dislay when loaded
+                // if (alpha) {
+                node.setAttribute("opacity", `${alpha}`);
+                // }
                 node.setAttribute("transform", `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${ratioX} ${ratioY})`);
             }
         };
@@ -5587,7 +5606,9 @@ drawutilssvg.HEAD_XML = [
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
- * @version  1.12.0
+ * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.12.2
  **/
 // Todo: rename this class to Drawutils?
 /**
@@ -5724,16 +5745,18 @@ class drawutils {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    image(image, position, size) {
+    image(image, position, size, alpha = 1.0) {
         if (!image.complete || !image.naturalWidth) {
             // Avoid drawing un-unloaded or broken images
             return;
         }
         this.ctx.save();
+        this.ctx.globalAlpha = alpha;
         // Note that there is a Safari bug with the 3 or 5 params variant.
         // Only the 9-param varaint works.
         this.ctx.drawImage(image, 0, 0, image.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
@@ -6343,11 +6366,12 @@ class drawutils {
      * @memberof drawutils
      */
     polyline(vertices, isOpen, color, lineWidth) {
-        if (vertices.length <= 1)
+        if (vertices.length <= 1) {
             return;
+        }
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.lineWidth = lineWidth || 1.0;
+        this.ctx.lineWidth = lineWidth * this.scale.x || 1.0;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
@@ -6516,7 +6540,8 @@ drawutils.helpers = {
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
- * @version  0.0.7
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  0.0.8
  **/
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
@@ -6706,11 +6731,12 @@ class drawutilsgl {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    image(image, position, size) {
+    image(image, position, size, alpha = 0.0) {
         // NOT YET IMPLEMENTED
     }
     /**
@@ -9866,7 +9892,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @modified 2021-11-16 Adding the `PBText` drawable.
- * @version  1.15.0
+ * @modified 2022-08-01 Added `title` to the params.
+ * @version  1.15.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -9959,6 +9986,7 @@ class PlotBoilerplate {
      * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features (not recommended).
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true).
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
+     * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
      */
     constructor(config) {
         /**
@@ -10173,6 +10201,11 @@ class PlotBoilerplate {
         }
         else {
             throw "Element is neither a canvas nor an svg element.";
+        }
+        // At this point the event cacher element is deinfed and located at highest elevation.
+        // Set `title` attribut?
+        if (config.title) {
+            this.eventCatcher.setAttribute("title", config.title);
         }
         this.draw.scale.set(this.config.scaleX, this.config.scaleY);
         this.fill.scale.set(this.config.scaleX, this.config.scaleY);

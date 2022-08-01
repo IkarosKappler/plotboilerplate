@@ -34,7 +34,8 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
- * @version  1.6.0
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.6.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilssvg = void 0;
@@ -422,12 +423,14 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    drawutilssvg.prototype.image = function (image, position, size) {
+    drawutilssvg.prototype.image = function (image, position, size, alpha) {
         var _this = this;
+        if (alpha === void 0) { alpha = 1.0; }
         var node = this.makeNode("image");
         // We need to re-adjust the image if it was not yet fully loaded before.
         var setImageSize = function (image) {
@@ -437,6 +440,9 @@ var drawutilssvg = /** @class */ (function () {
                 node.setAttribute("width", "" + image.naturalWidth * _this.scale.x);
                 node.setAttribute("height", "" + image.naturalHeight * _this.scale.y);
                 node.setAttribute("display", null); // Dislay when loaded
+                // if (alpha) {
+                node.setAttribute("opacity", "" + alpha);
+                // }
                 node.setAttribute("transform", "translate(" + _this._x(position.x) + " " + _this._y(position.y) + ") scale(" + ratioX + " " + ratioY + ")");
             }
         };

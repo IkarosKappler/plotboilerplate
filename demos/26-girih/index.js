@@ -33,6 +33,19 @@
     // Initialize templates, one for each Girih tile type.
     var girih = new Girih(GirihTile.DEFAULT_EDGE_LENGTH);
 
+    var title = `Hover over existing tiles to see possible adjacent tiles.
+
+    Press [a] or [d] to navigate through the tile set.
+    
+    Press [Enter] or click to place new tiles onto the canvas.
+    
+    Press [o] to toggle the outlines on/off.
+    
+    Press [p] to toggle the outer polygons on/off.
+    
+    Press [i] to toggle the inner polygons on/off.
+    
+    Press [t] to toggle the textures on/off.`;
     // All config params are optional.
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
@@ -62,11 +75,14 @@
           enableKeys: true,
           enableTouch: true,
 
-          enableSVGExport: true
+          enableSVGExport: true,
+          title: title
         },
         GUP
       )
     );
+    pb.drawConfig.polygon.color = Green.cssRGB();
+    pb.drawConfig.polygon.lineWidth = 2.0;
 
     // +---------------------------------------------------------------------------------
     // | Initialize
@@ -177,21 +193,10 @@
     // +-------------------------------
     var drawTile = function (draw, fill, tile, index) {
       if (config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0) {
-        drawTileTexture(pb, tile, textureImage);
-
-        // Rotate back for drawing
-        // var imageWidth = textureImage.naturalWidth; // 500.0;
-        // var imageHeight = textureImage.naturalHeight; // 460.0;
-        // // var textureSize = new Bounds({ x: 0, y: 0 }, { x: 500, y: 460 });
-        // var textureSize = new Bounds({ x: 0, y: 0 }, { x: imageWidth, y: imageHeight });
-        // var tileBounds = tile.getBounds();
-        // var polygon = tile.clone().rotate(-tile.rotation, tileBounds.getCenter());
-        // var polygonPosition = polygon.position;
-        // var rotation = tile.rotation;
-        // fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation);
+        drawTileTexture(pb, tile, textureImage, config.drawFullImages, config.drawBoundingBoxes);
       }
       if (config.drawOutlines) {
-        draw.polygon(tile, Green.cssRGB(), 2.0); // Polygon is not open
+        draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
       }
       // Draw all inner polygons?
       if (config.drawInnerPolygons) {
@@ -301,7 +306,7 @@
     // +---------------------------------------------------------------------------------
     // | Add a mouse listener to track the mouse position.
     // +-------------------------------
-    new MouseHandler(pb.canvas, "girih-demo")
+    new MouseHandler(pb.eventCatcher, "girih-demo")
       .move(function (e) {
         var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
         var cx = document.getElementById("cx");
@@ -316,16 +321,6 @@
         if (!clickedVert && previewTilePointer < previewTiles.length) {
           // Touch and mouse devices handle this differently
           if (e.params.isTouchEvent || (!e.params.isTouchEvent && hoverTileIndex != -1 && hoverEdgeIndex != -1)) {
-            /* 
-			// Avoid overlaps?
-			if( !config.allowOverlaps && stats.intersectionArea > 1 ) {
-			    console.log('Adding overlapping tiles not allowed.');
-			    return;
-			}
-			
-			addTile( previewTiles[previewTilePointer].clone() );
-			pb.redraw();
-			*/
             addPreviewTile();
           }
         }
@@ -519,6 +514,8 @@
         drawTextures: false,
         showPreviewOverlaps: true,
         allowOverlaps: false,
+        drawFullImages: false,
+        drawBoundingBoxes: false,
         exportFile: function () {
           exportFile();
         },
@@ -541,7 +538,9 @@
       }
       return texture;
     };
-    textureImage = loadTextureImage("girihtexture-500px-2.png", function () {
+    var path = "girih-tiles-spatial-1.png";
+    // var path = "girihtexture-500px-2.png";
+    textureImage = loadTextureImage(path, function () {
       console.log("Texture loaded");
       pb.redraw();
     });
@@ -608,6 +607,10 @@
       gui.add(config, 'showPreviewOverlaps').listen().onChange( function() { pb.redraw(); } ).name('showPreviewOverlaps').title('Detect and show preview overlaps?');
       // prettier-ignore
       gui.add(config, 'allowOverlaps').listen().onChange( function() { pb.redraw(); } ).name('allowOverlaps').title('Allow placement of intersecting tiles?');
+      // prettier-ignore
+      gui.add(config, 'drawFullImages').listen().onChange( function() { pb.redraw(); } ).name('drawFullImages').title('Show a hint of the full imagse?');
+      // prettier-ignore
+      gui.add(config, 'drawBoundingBoxes').listen().onChange( function() { pb.redraw(); } ).name('drawBoundingBoxes').title('Show different kind of bounding boxes?');
       var foldImport = gui.addFolder("Import");
       foldImport.add(config, "importFile");
 

@@ -33,7 +33,8 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
- * @version  1.6.0
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.6.1
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -341,11 +342,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    image(image: HTMLImageElement, position: Vertex, size: Vertex): SVGElement;
+    image(image: HTMLImageElement, position: Vertex, size: Vertex, alpha?: number): SVGElement;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>

@@ -14,6 +14,7 @@
  * @modified 2021-05-31 Splitted the large interfaces.ts file into this one and others.
  * @modified 2021-06-21 Added `IBounds.getCenter()`.
  * @modified 2021-11-16 Added `text` options to the `DrawConfig`.
+ * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
  **/
 import { Vertex } from "../Vertex";
 import { Vector } from "../Vector";
@@ -120,6 +121,7 @@ export interface Config {
  * For initialization the constructor needs a mix of config and draw-settings.
  */
 export interface PBParams extends Config {
+    title?: string;
 }
 export interface DrawSettings {
     color: string;

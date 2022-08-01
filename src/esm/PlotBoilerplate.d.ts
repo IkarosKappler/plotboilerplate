@@ -74,7 +74,8 @@
  * @modified 2021-03-29 Clearing `currentClassName` and `currentId` after drawing each drawable.
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @modified 2021-11-16 Adding the `PBText` drawable.
- * @version  1.15.0
+ * @modified 2022-08-01 Added `title` to the params.
+ * @version  1.15.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -313,6 +314,7 @@ export declare class PlotBoilerplate {
      * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features (not recommended).
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true).
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
+     * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
      */
     constructor(config: PBParams);
     /**

@@ -42,7 +42,9 @@
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
- * @version  1.12.0
+ * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.12.2
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -171,11 +173,12 @@ export declare class drawutils implements DrawLib<void> {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    image(image: HTMLImageElement, position: Vertex, size: Vertex): void;
+    image(image: HTMLImageElement, position: Vertex, size: Vertex, alpha?: number): void;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate – Girih</title>
+    <title>2D Plotting Boilerplate – Hick's Hexagons</title>
     <meta charset="UTF-8">
     <meta name="description" content="A javascript and HTML canvas plotting boilerplate to draw my 2D stuff.">
-    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, girih, gereh, islamic art, knot, architecture">
+    <meta name="keywords" content="2D painting and plotting, javascript, canvas, context2d, draw, fill, select, bezier, polygon, shape, path, line, curve, clip, clip path, clipped">
     <meta name="author" content="Ikaros Kappler">
     <meta name="date" content="2020-10-30">
 
@@ -17,23 +17,22 @@
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Demonstrating Girihs with PlotBoilerplate.js.">
-    <meta property="og:description" content="Demonstrating Girihs with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20201101-0-girih-basic-tiles.png">
+    <meta property="og:title" content="Demonstrating raindrop animations with PlotBoilerplate.js.">
+    <meta property="og:description" content="Demonstrating raindrop animations with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/na.png">
 
     <script src="../../lib/humane.min.js"></script>
     <script src="../../lib/dat.gui.min.js"></script>
     <script src="../../lib/FileSaver.min.js"></script>
-    <script src="../../lib/Color.js"></script>
     <script src="../../lib/alloy_finger.js"></script>
     <script src="../../lib/uistats.min.js"></script>
-    <!-- <script src="../../../uistats-typescript/dist/uistats.min.js"></script> -->
 
     <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
     <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
     <script src="../../src/cjs/utils/creategui.js"></script>
     <script src="../../src/cjs/utils/module.js"></script>
     <script src="../../src/cjs/utils/gup.js"></script>
+    <script src="../../src/cjs/utils/datastructures/Color.js"></script>
 
     <!-- For development -->
     <script src="../../src/cjs/UIDGenerator.js"></script>
@@ -54,7 +53,7 @@
     <script src="../../src/cjs/Circle.js"></script>
     <script src="../../src/cjs/CircleSector.js"></script>
     <script src="../../src/cjs/PBImage.js"></script>
-      <script src="../../src/cjs/PBText.js"></script>
+    <script src="../../src/cjs/PBText.js"></script>
     <script src="../../src/cjs/MouseHandler.js"></script>
     <script src="../../src/cjs/KeyHandler.js"></script>
     <script src="../../src/cjs/draw.js"></script>
@@ -80,14 +79,8 @@
     <script src="../../src/cjs/utils/datastructures/GirihRhombus.js"></script>
     <script src="../../src/cjs/utils/datastructures/Girih.js"></script>
     <script src="../../src/cjs/utils/io/FileDrop.js"></script>
-    <script src="../addPolygonJitter.js"></script>
     <script src="../detectDarkMode.js"></script>
-    <script src="../drawFancyCrosshair.js"></script>
-    <script src="girihToJSON.js"></script>
-    <script src="drawTileTexture.js"></script>
-    <script src="tilePreview.js"></script>
-
-    <script src="../../lib/greiner-hormann-typescript/dist/greiner-hormann.min.js"></script>
+    <script src="Tile.js"></script>
 
     <script src="index.js"></script>
     <link rel="stylesheet" href="../style.css">
@@ -95,18 +88,9 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body class="fullscreen">
-    <div class="wrapper-top">
-      <canvas
-	id="my-canvas"
-	width="1024"
-	height="768">Your browser does not support the canvas tag.</canvas>
-    </div>
-    <div class="wrapper-bottom">
-      Preview
-    </div>
-    <div class="info monospace">
-      [<span id="cx">-</span>,<span id="cy">-</span>]
-    </div>
-
+    <canvas
+      id="canvas"
+      width="1024"
+      height="768">Your browser does not support the canvas tag.</canvas>
   </body>
 </html>

@@ -1,5 +1,21 @@
 # Changelog
 
+<!-- - 2022-06-21 (Midsommer)
+  - Added `Bounds.clone()`. -->
+
+- 2022-08-01
+  - Added `title` param to the `PBParams` interface.
+- 2022-07-26
+  - Adding `alpha` to the `draw.image(...)` function.
+- 2022-06-02
+  - Adding the demo 42 (Hick's Hexagons).
+- 2022-06-01
+  - Tweaked the `draw.polyline` function; lineWidth now scales with scale.x.
+- 2022-05-11
+- Adding new demo: raindrops.
+- 2022-05-11
+  - Modified the `Color.clone` function by just copying the numeric calues, not re-calculating the whole color.
+  - Fixed the `Color.interpolate` function.
 - 2022-03-27
   - Added the `texturedPoly` function to the `DrawLib` interface.
   - Added the `texturedPoly` function to the `drawutils` and `drawutilssvg` class.

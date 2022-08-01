@@ -33,7 +33,8 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
- * @version  1.6.0
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  1.6.1
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -594,11 +595,12 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {Image} image - The image object to draw.
    * @param {Vertex} position - The position to draw the the upper left corner at.
    * @param {Vertex} size - The x/y-size to draw the image with.
+   * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    **/
-  image(image: HTMLImageElement, position: Vertex, size: Vertex) {
+  image(image: HTMLImageElement, position: Vertex, size: Vertex, alpha: number = 1.0) {
     const node: SVGElement = this.makeNode("image");
 
     // We need to re-adjust the image if it was not yet fully loaded before.
@@ -609,6 +611,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
         node.setAttribute("width", `${image.naturalWidth * this.scale.x}`);
         node.setAttribute("height", `${image.naturalHeight * this.scale.y}`);
         node.setAttribute("display", null); // Dislay when loaded
+        // if (alpha) {
+        node.setAttribute("opacity", `${alpha}`);
+        // }
         node.setAttribute("transform", `translate(${this._x(position.x)} ${this._y(position.y)}) scale(${ratioX} ${ratioY})`);
       }
     };

@@ -10,7 +10,8 @@
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
- * @version  0.0.7
+ * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @version  0.0.8
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutilsgl = void 0;
@@ -203,11 +204,13 @@ var drawutilsgl = /** @class */ (function () {
      * @param {Image} image - The image object to draw.
      * @param {Vertex} position - The position to draw the the upper left corner at.
      * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    drawutilsgl.prototype.image = function (image, position, size) {
+    drawutilsgl.prototype.image = function (image, position, size, alpha) {
+        if (alpha === void 0) { alpha = 0.0; }
         // NOT YET IMPLEMENTED
     };
     /**
