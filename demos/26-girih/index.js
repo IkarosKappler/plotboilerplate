@@ -81,6 +81,8 @@
         GUP
       )
     );
+    pb.drawConfig.polygon.color = Green.cssRGB();
+    pb.drawConfig.polygon.lineWidth = 2.0;
 
     // +---------------------------------------------------------------------------------
     // | Initialize
@@ -192,20 +194,9 @@
     var drawTile = function (draw, fill, tile, index) {
       if (config.drawTextures && textureImage.complete && textureImage.naturalHeight !== 0) {
         drawTileTexture(pb, tile, textureImage, config.drawFullImages, config.drawBoundingBoxes);
-
-        // Rotate back for drawing
-        // var imageWidth = textureImage.naturalWidth; // 500.0;
-        // var imageHeight = textureImage.naturalHeight; // 460.0;
-        // // var textureSize = new Bounds({ x: 0, y: 0 }, { x: 500, y: 460 });
-        // var textureSize = new Bounds({ x: 0, y: 0 }, { x: imageWidth, y: imageHeight });
-        // var tileBounds = tile.getBounds();
-        // var polygon = tile.clone().rotate(-tile.rotation, tileBounds.getCenter());
-        // var polygonPosition = polygon.position;
-        // var rotation = tile.rotation;
-        // fill.texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation);
       }
       if (config.drawOutlines) {
-        draw.polygon(tile, Green.cssRGB(), 2.0); // Polygon is not open
+        draw.polygon(tile, pb.drawConfig.polygon.color, pb.drawConfig.polygon.lineWidth); // Polygon is not open
       }
       // Draw all inner polygons?
       if (config.drawInnerPolygons) {
@@ -330,16 +321,6 @@
         if (!clickedVert && previewTilePointer < previewTiles.length) {
           // Touch and mouse devices handle this differently
           if (e.params.isTouchEvent || (!e.params.isTouchEvent && hoverTileIndex != -1 && hoverEdgeIndex != -1)) {
-            /* 
-			// Avoid overlaps?
-			if( !config.allowOverlaps && stats.intersectionArea > 1 ) {
-			    console.log('Adding overlapping tiles not allowed.');
-			    return;
-			}
-			
-			addTile( previewTiles[previewTilePointer].clone() );
-			pb.redraw();
-			*/
             addPreviewTile();
           }
         }
