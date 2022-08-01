@@ -33,6 +33,19 @@
     // Initialize templates, one for each Girih tile type.
     var girih = new Girih(GirihTile.DEFAULT_EDGE_LENGTH);
 
+    var title = `Hover over existing tiles to see possible adjacent tiles.
+
+    Press [a] or [d] to navigate through the tile set.
+    
+    Press [Enter] or click to place new tiles onto the canvas.
+    
+    Press [o] to toggle the outlines on/off.
+    
+    Press [p] to toggle the outer polygons on/off.
+    
+    Press [i] to toggle the inner polygons on/off.
+    
+    Press [t] to toggle the textures on/off.`;
     // All config params are optional.
     var pb = new PlotBoilerplate(
       PlotBoilerplate.utils.safeMergeByKeys(
@@ -62,7 +75,8 @@
           enableKeys: true,
           enableTouch: true,
 
-          enableSVGExport: true
+          enableSVGExport: true,
+          title: title
         },
         GUP
       )

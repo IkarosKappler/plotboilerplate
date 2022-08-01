@@ -3,6 +3,8 @@
 <!-- - 2022-06-21 (Midsommer)
   - Added `Bounds.clone()`. -->
 
+- 2022-08-01
+  - Added `title` param to the `PBParams` interface.
 - 2022-07-26
   - Adding `alpha` to the `draw.image(...)` function.
 - 2022-06-02

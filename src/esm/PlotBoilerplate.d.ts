@@ -313,6 +313,7 @@ export declare class PlotBoilerplate {
      * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features (not recommended).
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true).
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
+     * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
      */
     constructor(config: PBParams);
     /**
