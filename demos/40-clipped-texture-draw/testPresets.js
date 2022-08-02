@@ -142,7 +142,7 @@
     centerOffset: { x: 0, y: -5 } // polgonCenterOffset
   });
 
-  var imagePath_lu = "girih-tiles-spatial.jpg";
+  var imagePath_lu = "girih-tiles-spatial-2.png";
   var imageWidth = 640;
   var imageHeight = 500;
   var textureSize_lu = new Bounds(new Vertex(-imageWidth / 2, -imageHeight / 2), new Vertex(imageWidth / 2, imageHeight / 2));
@@ -291,6 +291,27 @@
     imagePath: imagePath_lu,
     textureSize: textureSize_lu,
     polygon: polygon_hexagon_lu,
+    centerOffset: { x: 0, y: 0 }
+  });
+
+  // EXTENDED Lund University Penrose Tile
+  var polygon_penrose_lu = new Polygon(
+    [
+      { x: 320, y: 402 },
+      { x: 337, y: 348 },
+      { x: 354, y: 402 },
+      { x: 337, y: 455 }
+    ].map(function (coords) {
+      return new Vertex(coords).sub(textureSize_lu.width / 2, textureSize_lu.height / 2);
+      // return new Vertex(coords); // .sub(textureSize.width / 2, textureSize.height / 2);
+    })
+  );
+  // var polgonCenterOffset = { x: 0, y: 0 };
+  PRESETS.push({
+    name: "LU_Penrose",
+    imagePath: imagePath_lu,
+    textureSize: textureSize_lu,
+    polygon: polygon_penrose_lu,
     centerOffset: { x: 0, y: 0 }
   });
 
