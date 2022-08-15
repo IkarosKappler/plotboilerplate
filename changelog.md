@@ -3,6 +3,8 @@
 <!-- - 2022-06-21 (Midsommer)
   - Added `Bounds.clone()`. -->
 
+- 2022-08-15
+  - Added the `Circle.containsPoint(XYCoords)` function.
 - 2022-08-01
   - Added `title` param to the `PBParams` interface.
 - 2022-07-26

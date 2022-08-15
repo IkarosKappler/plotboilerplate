@@ -10,7 +10,8 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.3.0
+ * @modified 2022-08-15 Added the `containsPoint` function.
+ * @version  1.4.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Circle = void 0;
@@ -47,6 +48,18 @@ var Circle = /** @class */ (function () {
         this.center = center;
         this.radius = radius;
     }
+    /**
+     * Check if the given circle is fully contained inside this circle.
+     *
+     * @method containsPoint
+     * @param {XYCoords} point - The point to check if it is contained in this circle.
+     * @instance
+     * @memberof Circle
+     * @return {boolean} `true` if the given point is inside this circle.
+     */
+    Circle.prototype.containsPoint = function (point) {
+        return this.center.distance(point) < this.radius;
+    };
     /**
      * Check if the given circle is fully contained inside this circle.
      *

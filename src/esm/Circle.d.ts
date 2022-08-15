@@ -9,13 +9,14 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.3.0
+ * @modified 2022-08-15 Added the `containsPoint` function.
+ * @version  1.4.0
  **/
 import { Line } from "./Line";
 import { Vector } from "./Vector";
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable, UID } from "./interfaces";
+import { SVGSerializable, UID, XYCoords } from "./interfaces";
 /**
  * @classdesc A simple circle: center point and radius.
  *
@@ -69,6 +70,16 @@ export declare class Circle implements SVGSerializable {
      * @param {number} radius - The radius of the circle.
      */
     constructor(center: Vertex, radius: number);
+    /**
+     * Check if the given circle is fully contained inside this circle.
+     *
+     * @method containsPoint
+     * @param {XYCoords} point - The point to check if it is contained in this circle.
+     * @instance
+     * @memberof Circle
+     * @return {boolean} `true` if the given point is inside this circle.
+     */
+    containsPoint(point: XYCoords): boolean;
     /**
      * Check if the given circle is fully contained inside this circle.
      *
