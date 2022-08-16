@@ -1,5 +1,26 @@
 # Keycodes
 
+These key codes are used by the KeyHandler class.
+
+```javascript
+new KeyHandler({ trackAll: true })
+  .down("enter", function () {
+    console.log("ENTER was hit.");
+  })
+  .press("enter", function () {
+    console.log("ENTER was pressed.");
+  })
+  .up("enter", function () {
+    console.log("ENTER was released.");
+  })
+  .down("e", function () {
+    console.log("e was hit. shift is pressed?", keyHandler.isDown("shift"));
+  })
+  .up("spacebar", function () {
+    console.log("spacebar was released.");
+  });
+```
+
 | Identifier to use     | Internal value                |
 | --------------------- | ----------------------------- |
 | 'break'               | 3 // alternate: 19            |
