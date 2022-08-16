@@ -463,7 +463,7 @@ new KeyHandler({ trackAll: true })
   });
 ```
 
-For a list of all supported key codes see [keycodes.md].
+For a list of all supported key codes see [Full list of supported key codes](https://github.com/IkarosKappler/plotboilerplate/blob/master/keycodes.md "Full list of supported key codes").
 
 ## Custom mouse event
 
