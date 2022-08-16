@@ -8293,7 +8293,8 @@ KeyHandler.KEY_CODES = {
  * @modified 2020-10-04 Added extended JSDoc comments.
  * @modified 2020-11-25 Added the `isTouchEvent` param.
  * @modified 2021-01-10 The mouse handler is now also working with SVGElements.
- * @version  1.2.0
+ * @modified 2022-08-16 Fixed a bug in the mouse button detection.
+ * @version  1.2.1
  *
  * @file MouseHandler
  * @public
@@ -8383,8 +8384,8 @@ class MouseHandler {
         // +-------------------------------------------------
         this.name = name;
         this.element = element;
-        this.mouseDownPos = null;
-        this.mouseDragPos = null;
+        this.mouseDownPos = undefined;
+        this.mouseDragPos = undefined;
         // this.mousePos     = null;
         this.mouseButton = -1;
         this.listeners = {};
@@ -8458,9 +8459,9 @@ class MouseHandler {
      * @return {XMouseEvent}
      */
     mkParams(event, eventName) {
+        var _a, _b;
         const rel = this.relPos(event);
         const xEvent = event;
-        console.log("btn", this.mouseButton);
         xEvent.params = {
             element: this.element,
             name: eventName,
@@ -8470,10 +8471,10 @@ class MouseHandler {
             leftButton: event.button === 0,
             middleButton: event.button === 1,
             rightButton: event.button === 2,
-            mouseDownPos: this.mouseDownPos,
-            draggedFrom: this.mouseDragPos,
+            mouseDownPos: (_a = this.mouseDownPos) !== null && _a !== void 0 ? _a : { x: NaN, y: NaN },
+            draggedFrom: (_b = this.mouseDragPos) !== null && _b !== void 0 ? _b : { x: NaN, y: NaN },
             wasDragged: this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y),
-            dragAmount: this.mouseDownPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 }
+            dragAmount: this.mouseDragPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 }
         };
         return xEvent;
     }

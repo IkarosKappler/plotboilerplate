@@ -61,10 +61,10 @@
     );
 
     var addCircle = function (circle) {
-      initialCircle.center.attr.draggable = false;
+      circle.center.attr.draggable = false;
       // initialCircle.center.attr.selectable = true;
-      initialCircle.center.attr.isInitialCircle = true;
-      pb.add(initialCircle);
+      // initialCircle.center.attr.isInitialCircle = true;
+      pb.add(circle);
       // circle.center.listeners.addClickListener(function (event) {
       //   if (event.params.leftButton) {
       //     return;
@@ -79,8 +79,10 @@
     var initialCircleRadius = Math.min(initialViewport.width, initialViewport.height) / 3;
     var initialCircle = new Circle(new Vertex(0, 0), initialCircleRadius);
     // initialCircle.center.attr.draggable = false;
-    // // initialCircle.center.attr.selectable = true;
+    initialCircle.center.attr.selectable = false;
     initialCircle.center.attr.isInitialCircle = true;
+    // We want to draw this in a different color
+    initialCircle.center.attr.visible = false;
     // pb.add(initialCircle);
     addCircle(initialCircle);
 
@@ -99,20 +101,20 @@
     );
 
     var getMaxRadius = function (position) {
-      var minRadius = Number.MAX_VALUE;
+      var maxRadius = Number.MAX_VALUE;
       for (var i in pb.drawables) {
         var circle = pb.drawables[i];
         if (!(circle instanceof Circle)) {
           continue;
         }
-        console.log("i", i, circle.center.distance(position) - circle.radius);
+        // console.log("i", i, circle.center.distance(position) - circle.radius);
         if (!circle.center.attr.isInitialCircle && circle.containsPoint(position)) {
           return -1;
         }
-        console.log("x", minRadius, circle.center.distance(position), circle.radius);
-        minRadius = Math.min(minRadius, Math.abs(circle.center.distance(position) - circle.radius));
+        // console.log("x", maxRadius, circle.center.distance(position), circle.radius);
+        maxRadius = Math.min(maxRadius, Math.abs(circle.center.distance(position) - circle.radius));
       }
-      return minRadius;
+      return maxRadius;
     };
 
     var findMinContainingCircle = function (position) {
@@ -132,16 +134,23 @@
     };
 
     var redraw = function () {
+      // Draw containing circle
+      pb.draw.circle(pb.drawables[0].center, pb.drawables[0].radius, "rgb(128,164,0)", 2);
       // ...
       pb.draw.circle(mousePosition, 5, "orange");
       var maxRadius = getMaxRadius(mousePosition);
-      pb.draw.circle(mousePosition, maxRadius, "grey");
+      if (maxRadius !== -1) {
+        // console.log("maxRadius", maxRadius);
+        pb.draw.circle(mousePosition, maxRadius, "grey");
+      }
 
       // Draw an extended line?
       if (selectedCircleIndices[0] !== -1) {
         var selectedCircle = pb.drawables[selectedCircleIndices[0]];
-        var line = new Line(mousePosition, selectedCircle.center);
+        var line = new Line(selectedCircle.center, mousePosition);
         pb.draw.line(line.a, line.b, 1, "grey");
+        // Extend line
+        pb.draw.line(line.b, line.b.clone().add(line.a.difference(line.b)), "rgba(192,192,192,0.2)");
       }
     };
 
@@ -155,7 +164,7 @@
         pb.redraw();
       })
       .click(function (event) {
-        console.log("event.params.buttonNumber", event.params.buttonNumber, event.params.leftButton);
+        console.log("event.params.buttonNumber", event.params.button, event.params.leftButton);
         if (!event.params.leftButton) {
           return;
         }
@@ -167,17 +176,28 @@
         var newCircle = new Circle(mousePosition.clone(), newRadius);
         // newCircle.center.attr.draggable = false;
         // pb.add(newCircle);
+        console.log("Add new circle");
+        // newCircle.center.attr.selectable = true;
+        selectedCircleIndices[0] = pb.drawables.length;
         addCircle(newCircle);
       });
 
-    var keyHandler = new KeyHandler({ trackAll: true }).down("spacebar", function () {
+    new KeyHandler({ trackAll: true }).down("spacebar", function () {
       // Find circle that contains the current mouse position
       var circleIndex = findMinContainingCircle(mousePosition);
       if (circleIndex === -1) {
         return;
       }
       var circle = pb.drawables[circleIndex];
+      if (!circle.center.attr.selectable) {
+        return;
+      }
       circle.center.attr.isSelected = !circle.center.attr.isSelected;
+      if (circle.center.attr.isSelected) {
+        selectedCircleIndices[0] = circleIndex;
+      } else {
+        selectedCircleIndices[0] = -1;
+      }
       pb.redraw();
     });
 
