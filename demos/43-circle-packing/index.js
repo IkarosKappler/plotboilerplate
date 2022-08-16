@@ -60,16 +60,33 @@
       )
     );
 
+    var addCircle = function (circle) {
+      initialCircle.center.attr.draggable = false;
+      // initialCircle.center.attr.selectable = true;
+      initialCircle.center.attr.isInitialCircle = true;
+      pb.add(initialCircle);
+      // circle.center.listeners.addClickListener(function (event) {
+      //   if (event.params.leftButton) {
+      //     return;
+      //   }
+      //   circle.center.attr.isSelected = !circle.center.attr.isSelected;
+      //   pb.redraw();
+      // });
+    };
+
     // Create an initial wrapper circle
     var initialViewport = pb.viewport();
     var initialCircleRadius = Math.min(initialViewport.width, initialViewport.height) / 3;
     var initialCircle = new Circle(new Vertex(0, 0), initialCircleRadius);
-    initialCircle.center.attr.draggable = false;
+    // initialCircle.center.attr.draggable = false;
+    // // initialCircle.center.attr.selectable = true;
     initialCircle.center.attr.isInitialCircle = true;
-    pb.add(initialCircle);
+    // pb.add(initialCircle);
+    addCircle(initialCircle);
 
     // A point to use for the next circle center
     var mousePosition = new Vertex();
+    var selectedCircleIndices = [-1, -1];
 
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
@@ -98,30 +115,71 @@
       return minRadius;
     };
 
+    var findMinContainingCircle = function (position) {
+      var index = -1;
+      var minRadius = Number.MAX_VALUE;
+      for (var i in pb.drawables) {
+        var circle = pb.drawables[i];
+        if (!(circle instanceof Circle)) {
+          continue;
+        }
+        if ((index === -1 || minRadius > circle.radius) && circle.containsPoint(position)) {
+          index = i;
+          minRadius = circle.radius;
+        }
+      }
+      return index;
+    };
+
     var redraw = function () {
       // ...
       pb.draw.circle(mousePosition, 5, "orange");
+      var maxRadius = getMaxRadius(mousePosition);
+      pb.draw.circle(mousePosition, maxRadius, "grey");
+
+      // Draw an extended line?
+      if (selectedCircleIndices[0] !== -1) {
+        var selectedCircle = pb.drawables[selectedCircleIndices[0]];
+        var line = new Line(mousePosition, selectedCircle.center);
+        pb.draw.line(line.a, line.b, 1, "grey");
+      }
     };
 
     // Add a mouse listener to track the mouse position.-
     new MouseHandler(pb.eventCatcher)
-      .move(function (e) {
-        var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
+      .move(function (event) {
+        var relPos = pb.transformMousePosition(event.params.pos.x, event.params.pos.y);
         stats.mouseXTop = relPos.x;
         stats.mouseYTop = relPos.y;
         mousePosition.set(relPos);
         pb.redraw();
       })
-      .click(function (e) {
+      .click(function (event) {
+        console.log("event.params.buttonNumber", event.params.buttonNumber, event.params.leftButton);
+        if (!event.params.leftButton) {
+          return;
+        }
         var newRadius = getMaxRadius(mousePosition);
         console.log("newRadius", newRadius);
         if (newRadius === -1) {
           return;
         }
         var newCircle = new Circle(mousePosition.clone(), newRadius);
-        newCircle.center.attr.draggable = false;
-        pb.add(newCircle);
+        // newCircle.center.attr.draggable = false;
+        // pb.add(newCircle);
+        addCircle(newCircle);
       });
+
+    var keyHandler = new KeyHandler({ trackAll: true }).down("spacebar", function () {
+      // Find circle that contains the current mouse position
+      var circleIndex = findMinContainingCircle(mousePosition);
+      if (circleIndex === -1) {
+        return;
+      }
+      var circle = pb.drawables[circleIndex];
+      circle.center.attr.isSelected = !circle.center.attr.isSelected;
+      pb.redraw();
+    });
 
     // +---------------------------------------------------------------------------------
     // | Add stats.

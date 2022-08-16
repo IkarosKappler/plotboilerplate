@@ -3637,22 +3637,23 @@ var MouseHandler = /** @class */ (function () {
      * @memberof MouseHandler
      * @instance
      * @private
-     * @param {MouseEvent} e - The mouse event to get the relative position for.
+     * @param {MouseEvent} event - The mouse event to get the relative position for.
      * @param {string} eventName - The name of the firing event.
      * @return {XMouseEvent}
      */
-    MouseHandler.prototype.mkParams = function (e, eventName) {
-        var rel = this.relPos(e);
-        var xEvent = e;
+    MouseHandler.prototype.mkParams = function (event, eventName) {
+        var rel = this.relPos(event);
+        var xEvent = event;
+        console.log("btn", this.mouseButton);
         xEvent.params = {
             element: this.element,
             name: eventName,
             isTouchEvent: false,
             pos: rel,
-            button: this.mouseButton,
-            leftButton: this.mouseButton == 0,
-            middleButton: this.mouseButton == 1,
-            rightButton: this.mouseButton == 2,
+            button: event.button,
+            leftButton: event.button === 0,
+            middleButton: event.button === 1,
+            rightButton: event.button === 2,
             mouseDownPos: this.mouseDownPos,
             draggedFrom: this.mouseDragPos,
             wasDragged: this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y),

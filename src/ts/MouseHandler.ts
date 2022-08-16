@@ -202,22 +202,23 @@ export class MouseHandler {
    * @memberof MouseHandler
    * @instance
    * @private
-   * @param {MouseEvent} e - The mouse event to get the relative position for.
+   * @param {MouseEvent} event - The mouse event to get the relative position for.
    * @param {string} eventName - The name of the firing event.
    * @return {XMouseEvent}
    */
-  private mkParams(e: MouseEvent, eventName: string): XMouseEvent {
-    const rel: { x: number; y: number } = this.relPos(e);
-    const xEvent: XMouseEvent = e as unknown as XMouseEvent;
+  private mkParams(event: MouseEvent, eventName: string): XMouseEvent {
+    const rel: { x: number; y: number } = this.relPos(event);
+    const xEvent: XMouseEvent = event as unknown as XMouseEvent;
+    console.log("btn", this.mouseButton);
     xEvent.params = {
       element: this.element,
       name: eventName,
       isTouchEvent: false,
       pos: rel,
-      button: this.mouseButton,
-      leftButton: this.mouseButton == 0,
-      middleButton: this.mouseButton == 1,
-      rightButton: this.mouseButton == 2,
+      button: event.button, // this.mouseButton,
+      leftButton: event.button === 0, // this.mouseButton === 0,
+      middleButton: event.button === 1, // this.mouseButton === 1,
+      rightButton: event.button === 2, // this.mouseButton === 2,
       mouseDownPos: this.mouseDownPos,
       draggedFrom: this.mouseDragPos,
       wasDragged: this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y),

@@ -442,6 +442,55 @@ vert.listeners.addDragListener(function (e) {
 - Touch & move (2 fingers): Pan the area
 - Touch & pinch: Zoom in/out
 
+## Custom keyboard events
+
+```javascript
+new KeyHandler({ trackAll: true })
+  .down("enter", function () {
+    console.log("ENTER was hit.");
+  })
+  .press("enter", function () {
+    console.log("ENTER was pressed.");
+  })
+  .up("enter", function () {
+    console.log("ENTER was released.");
+  })
+  .down("e", function () {
+    console.log("e was hit. shift is pressed?", keyHandler.isDown("shift"));
+  })
+  .up("spacebar", function () {
+    console.log("spacebar was released.");
+  });
+```
+
+For a list of all supported key codes see [keycodes.md].
+
+## Custom mouse event
+
+```javascript
+new MouseHandler(document.getElementById("mycanvas"))
+  .drag(function (e) {
+    console.log("Mouse dragged: " + JSON.stringify(e));
+    if (e.params.leftMouse);
+    else if (e.params.rightMouse);
+  })
+  .move(function (e) {
+    console.log("Mouse moved: " + JSON.stringify(e.params));
+  })
+  .up(function (e) {
+    console.log("Mouse up. Was dragged?", e.params.wasDragged);
+  })
+  .down(function (e) {
+    console.log("Mouse down.");
+  })
+  .click(function (e) {
+    console.log("Click.");
+  })
+  .wheel(function (e) {
+    console.log("Wheel. delta=" + e.deltaY);
+  });
+```
+
 ## Build the package
 
 [Compile and build howto](https://github.com/IkarosKappler/plotboilerplate/blob/master/build.md "Compile and build howto")

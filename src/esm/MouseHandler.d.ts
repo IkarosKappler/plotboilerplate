@@ -150,7 +150,7 @@ export declare class MouseHandler {
      * @memberof MouseHandler
      * @instance
      * @private
-     * @param {MouseEvent} e - The mouse event to get the relative position for.
+     * @param {MouseEvent} event - The mouse event to get the relative position for.
      * @param {string} eventName - The name of the firing event.
      * @return {XMouseEvent}
      */
