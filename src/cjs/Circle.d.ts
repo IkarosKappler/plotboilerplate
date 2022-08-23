@@ -138,6 +138,17 @@ export declare class Circle implements SVGSerializable {
      **/
     circleIntersection(circle: Circle): Line | null;
     /**
+     * Calculate the intersection points (if exists) with the given infinite line (defined by two points).
+     *
+     * @method lineIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} a - The first of the two points defining the line.
+     * @param {Vertex} b - The second of the two points defining the line.
+     * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
+     **/
+    lineIntersection(a: Vertex, b: Vertex): Line | null;
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.

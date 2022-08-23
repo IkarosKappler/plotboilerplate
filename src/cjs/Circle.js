@@ -172,6 +172,38 @@ var Circle = /** @class */ (function () {
         return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
     };
     /**
+     * Calculate the intersection points (if exists) with the given infinite line (defined by two points).
+     *
+     * @method lineIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} a - The first of the two points defining the line.
+     * @param {Vertex} b - The second of the two points defining the line.
+     * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
+     **/
+    Circle.prototype.lineIntersection = function (a, b) {
+        // Based on the math from
+        //    https://mathworld.wolfram.com/Circle-LineIntersection.html
+        var interA = new Vertex_1.Vertex();
+        var interB = new Vertex_1.Vertex();
+        var diff = a.difference(b);
+        var dist = a.distance(b);
+        var det = a.x * b.y - a.y * b.x;
+        var distSquared = dist * dist;
+        var radiusSquared = this.radius * this.radius;
+        // Check if circle and line have an intersection at all
+        if (radiusSquared * distSquared - det * det < 0) {
+            return null;
+        }
+        var belowSqrt = this.radius * this.radius * dist * dist - det * det;
+        var sqrt = Math.sqrt(belowSqrt);
+        interA.x = (det * diff.y + Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+        interB.x = (det * diff.y - Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+        interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
+        interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
+        return new Line_1.Line(interA, interB);
+    };
+    /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.

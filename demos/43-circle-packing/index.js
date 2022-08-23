@@ -135,7 +135,8 @@
 
     var redraw = function () {
       // Draw containing circle
-      pb.draw.circle(pb.drawables[0].center, pb.drawables[0].radius, "rgb(128,164,0)", 2);
+      var containingCircle = pb.drawables[0];
+      pb.draw.circle(containingCircle.center, containingCircle.radius, "rgb(128,164,0)", 2);
       // ...
       pb.draw.circle(mousePosition, 5, "orange");
       var maxRadius = getMaxRadius(mousePosition);
@@ -151,6 +152,11 @@
         pb.draw.line(line.a, line.b, 1, "grey");
         // Extend line
         pb.draw.line(line.b, line.b.clone().add(line.a.difference(line.b)), "rgba(192,192,192,0.2)");
+        // Find extreme points of intersection
+        var intersection = containingCircle.lineIntersection(line.a, line.b);
+        console.log("intersection", intersection.a, intersection.b);
+        pb.draw.circle(intersection.a, 5, "green");
+        pb.draw.circle(intersection.b, 5, "green");
       }
     };
 

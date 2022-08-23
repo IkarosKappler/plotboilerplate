@@ -137,6 +137,7 @@ export declare class Circle implements SVGSerializable {
      * @return {Line|null} The intersection points (as a line) or null if the two circles do not intersect.
      **/
     circleIntersection(circle: Circle): Line | null;
+    lineIntersection(a: XYCoords, b: XYCoords): Line;
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

@@ -4100,6 +4100,20 @@ class Circle {
         var y4 = p2.y + (h * (p1.x - p0.x)) / d;
         return new Line(new Vertex(x3, y3), new Vertex(x4, y4));
     }
+    lineIntersection(a, b) {
+        const interA = new Vertex();
+        const interB = new Vertex();
+        const diff = interB.difference(interA);
+        const dist = interB.distance(interA);
+        const D = a.x * b.y - a.y * b.x;
+        const belowSqrt = this.radius * this.radius * dist * dist - D * D;
+        console.log(D, dist, belowSqrt);
+        interA.x = D * diff.y + Math.sign(diff.y) * diff.x * Math.sqrt(belowSqrt);
+        interB.x = D * diff.y - Math.sign(diff.y) * diff.x * Math.sqrt(belowSqrt);
+        interA.y = -D * diff.x + Math.abs(diff.y) * Math.sqrt(belowSqrt);
+        interB.y = -D * diff.x - Math.abs(diff.y) * Math.sqrt(belowSqrt);
+        return new Line(interA, interB);
+    }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

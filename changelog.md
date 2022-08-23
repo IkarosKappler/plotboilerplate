@@ -3,6 +3,8 @@
 <!-- - 2022-06-21 (Midsommer)
   - Added `Bounds.clone()`. -->
 
+- 2022-08-23
+  - Added the `Circle.lineIntersection(Vertex,Vertex)` function.
 - 2022-08-16
   - MouseHandler: Fixed a bug in the mouse button detection.
 - 2022-08-15

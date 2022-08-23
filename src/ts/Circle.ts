@@ -10,6 +10,7 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-08-15 Added the `containsPoint` function.
+ * @modified 2022-08-23 Added the `lineIntersection` function.
  * @version  1.4.0
  **/
 
@@ -210,6 +211,45 @@ export class Circle implements SVGSerializable {
     var x4 = p2.x - (h * (p1.y - p0.y)) / d;
     var y4 = p2.y + (h * (p1.x - p0.x)) / d;
     return new Line(new Vertex(x3, y3), new Vertex(x4, y4));
+  }
+
+  /**
+   * Calculate the intersection points (if exists) with the given infinite line (defined by two points).
+   *
+   * @method lineIntersection
+   * @instance
+   * @memberof Circle
+   * @param {Vertex} a - The first of the two points defining the line.
+   * @param {Vertex} b - The second of the two points defining the line.
+   * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
+   **/
+  lineIntersection(a: Vertex, b: Vertex): Line | null {
+    // Based on the math from
+    //    https://mathworld.wolfram.com/Circle-LineIntersection.html
+    const interA = new Vertex();
+    const interB = new Vertex();
+
+    const diff = a.difference(b);
+    const dist = a.distance(b);
+    const det = a.x * b.y - a.y * b.x;
+    const distSquared = dist * dist;
+    const radiusSquared = this.radius * this.radius;
+
+    // Check if circle and line have an intersection at all
+    if (radiusSquared * distSquared - det * det < 0) {
+      return null;
+    }
+
+    const belowSqrt = this.radius * this.radius * dist * dist - det * det;
+    const sqrt = Math.sqrt(belowSqrt);
+
+    interA.x = (det * diff.y + Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+    interB.x = (det * diff.y - Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+
+    interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
+    interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
+
+    return new Line(interA, interB);
   }
 
   /**
