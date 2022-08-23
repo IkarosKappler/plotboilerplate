@@ -143,20 +143,23 @@
       if (maxRadius !== -1) {
         // console.log("maxRadius", maxRadius);
         pb.draw.circle(mousePosition, maxRadius, "grey");
+        // Draw closest point on containing circle
+        var closestPointOnContainingCircle = containingCircle.closestPoint(mousePosition);
+        pb.draw.circle(closestPointOnContainingCircle, 5, "red", 2);
       }
 
       // Draw an extended line?
       if (selectedCircleIndices[0] !== -1) {
         var selectedCircle = pb.drawables[selectedCircleIndices[0]];
         var line = new Line(selectedCircle.center, mousePosition);
-        pb.draw.line(line.a, line.b, 1, "grey");
+        pb.draw.line(line.a, line.b, "grey", 1);
         // Extend line
-        pb.draw.line(line.b, line.b.clone().add(line.a.difference(line.b)), "rgba(192,192,192,0.2)");
+        pb.draw.line(line.b, line.b.clone().add(line.a.difference(line.b)), "rgba(192,192,192,0.2)", 1);
         // Find extreme points of intersection
         var intersection = containingCircle.lineIntersection(line.a, line.b);
-        console.log("intersection", intersection.a, intersection.b);
-        pb.draw.circle(intersection.a, 5, "green");
-        pb.draw.circle(intersection.b, 5, "green");
+        // console.log("intersection", intersection.a, intersection.b);
+        pb.draw.circle(intersection.a, 5, "green", 2);
+        pb.draw.circle(intersection.b, 5, "green", 2);
       }
     };
 

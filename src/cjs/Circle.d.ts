@@ -10,6 +10,8 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-08-15 Added the `containsPoint` function.
+ * @modified 2022-08-23 Added the `lineIntersection` function.
+ * @modified 2022-08-23 Added the `closestPoint` function.
  * @version  1.4.0
  **/
 import { Line } from "./Line";
@@ -147,7 +149,17 @@ export declare class Circle implements SVGSerializable {
      * @param {Vertex} b - The second of the two points defining the line.
      * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
      **/
-    lineIntersection(a: Vertex, b: Vertex): Line | null;
+    lineIntersection(a: Vertex, b: XYCoords): Line | null;
+    /**
+     * Calculate the closest point on the outline of this circle to the given point.
+     *
+     * @method closestPoint
+     * @instance
+     * @memberof Circle
+     * @param {XYCoords} vert - The point to find the closest circle point for.
+     * @return {Vertex} The closest point on this circle.
+     **/
+    closestPoint(vert: XYCoords): Vertex;
     /**
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and

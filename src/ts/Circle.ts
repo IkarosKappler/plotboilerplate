@@ -11,6 +11,7 @@
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-08-15 Added the `containsPoint` function.
  * @modified 2022-08-23 Added the `lineIntersection` function.
+ * @modified 2022-08-23 Added the `closestPoint` function.
  * @version  1.4.0
  **/
 
@@ -223,7 +224,7 @@ export class Circle implements SVGSerializable {
    * @param {Vertex} b - The second of the two points defining the line.
    * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
    **/
-  lineIntersection(a: Vertex, b: Vertex): Line | null {
+  lineIntersection(a: Vertex, b: XYCoords): Line | null {
     // Based on the math from
     //    https://mathworld.wolfram.com/Circle-LineIntersection.html
     const interA = new Vertex();
@@ -250,6 +251,29 @@ export class Circle implements SVGSerializable {
     interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
 
     return new Line(interA, interB);
+  }
+
+  /**
+   * Calculate the closest point on the outline of this circle to the given point.
+   *
+   * @method closestPoint
+   * @instance
+   * @memberof Circle
+   * @param {XYCoords} vert - The point to find the closest circle point for.
+   * @return {Vertex} The closest point on this circle.
+   **/
+  closestPoint(vert: XYCoords): Vertex {
+    const lineIntersection = this.lineIntersection(this.center, vert);
+    if (!lineIntersection) {
+      // Note: this case should not happen as a radial from the center always intersect this circle.
+      return new Vertex();
+    }
+    // Return closed of both
+    if (lineIntersection.a.distance(vert) < lineIntersection.b.distance(vert)) {
+      return lineIntersection.a;
+    } else {
+      return lineIntersection.b;
+    }
   }
 
   /**

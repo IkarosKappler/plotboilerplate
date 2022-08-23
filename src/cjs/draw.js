@@ -45,7 +45,10 @@
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  1.12.2
+ * @modified 2022-08-23 Fixed a type issue in the `polyline` function.
+ * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
+ * @modified 2022-08-23 Fixed a type issue in the `path` function.
+ * @version  1.12.3
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutils = void 0;
@@ -104,7 +107,7 @@ var drawutils = /** @class */ (function () {
      * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
      */
     drawutils.prototype.setConfiguration = function (configuration) {
-        this.ctx.globalCompositeOperation = configuration.blendMode;
+        this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
     };
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -815,7 +818,7 @@ var drawutils = /** @class */ (function () {
         }
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.lineWidth = lineWidth * this.scale.x || 1.0;
+        this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
@@ -932,14 +935,20 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.path = function (pathData, color, lineWidth, options) {
         var d = options && options.inplace ? pathData : drawutilssvg_1.drawutilssvg.copyPathData(pathData);
         drawutilssvg_1.drawutilssvg.transformPathData(d, this.offset, this.scale);
-        this.ctx.strokeStyle = color;
+        if (color) {
+            this.ctx.strokeStyle = color;
+        }
         this.ctx.lineWidth = lineWidth || 1;
         if (this.fillShapes) {
-            this.ctx.fillStyle = color;
+            if (color) {
+                this.ctx.fillStyle = color;
+            }
             this.ctx.fill(new Path2D(d.join(" ")));
         }
         else {
-            this.ctx.strokeStyle = color;
+            if (color) {
+                this.ctx.strokeStyle = color;
+            }
             this.ctx.stroke(new Path2D(d.join(" ")));
         }
     };

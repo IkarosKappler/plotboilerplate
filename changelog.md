@@ -5,6 +5,10 @@
 
 - 2022-08-23
   - Added the `Circle.lineIntersection(Vertex,Vertex)` function.
+  - Added the `Circle.closestPoint(XYCoords)` function.
+  - Fixed a type issue in the `draw.polyline` function.
+  - Fixed a type issue in the `draw.setConfiguration` function.
+  - Fixed a type issue in the `draw.path` function.
 - 2022-08-16
   - MouseHandler: Fixed a bug in the mouse button detection.
 - 2022-08-15
