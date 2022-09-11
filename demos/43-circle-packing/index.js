@@ -137,6 +137,10 @@
       //
     }
 
+    function detectClosest3Points(closestThreePoints, closestLinePoint, mousePosition) {
+      return [];
+    }
+
     function getClosestLinePoint(lineOrNull, position) {
       if (lineOrNull) {
         if (lineOrNull.a.distance(position) < lineOrNull.b.distance(position)) {
@@ -148,7 +152,7 @@
       return null;
     }
 
-    var redraw = function () {
+    var redraw = function (draw, fill) {
       // Draw containing circle
       var containingCircle = pb.drawables[0];
       pb.draw.circle(containingCircle.center, containingCircle.radius, "rgb(128,164,0)", 2);
@@ -172,21 +176,41 @@
         // Extend line
         pb.draw.line(line.b, line.b.clone().add(line.a.difference(line.b)), "rgba(192,192,192,0.2)", 1);
         // Find extreme points of intersection
-        var intersection = containingCircle.lineIntersection(line.a, line.b);
-        // console.log("intersection", intersection.a, intersection.b);
-        pb.draw.circle(intersection.a, 5, "green", 2);
-        pb.draw.circle(intersection.b, 5, "green", 2);
+        // var intersection = containingCircle.lineIntersection(line.a, line.b);
+        // // console.log("intersection", intersection.a, intersection.b);
+        // if (intersection) {
+        //   pb.draw.circle(intersection.a, 5, "green", 2);
+        //   pb.draw.circle(intersection.b, 5, "green", 2);
+        // }
 
-        // Draw forced intersection point from selected circle
-        // var forcedIntersectionLine = selectedCircle.lineIntersection(new Vertex(line.a.x, line.a.y), mousePosition);
-        var forcedIntersectionLine = selectedCircle.lineIntersection(intersection.a, intersection.b);
+        // // Draw forced intersection point from selected circle
+        // // var forcedIntersectionLine = selectedCircle.lineIntersection(new Vertex(line.a.x, line.a.y), mousePosition);
+        // var forcedIntersectionLine = selectedCircle.lineIntersection(intersection.a, intersection.b);
 
-        // pb.draw.line(forcedIntersectionLine.a, forcedIntersectionLine.b, "grey", 1);
-        // var forcedIntersectionPoint = getClosestLinePoint(forcedIntersectionLine, mousePosition);
-        if (forcedIntersectionLine) {
-          pb.draw.circle(forcedIntersectionLine.a, 5, "grey", 2);
-          pb.draw.circle(forcedIntersectionLine.b, 5, "grey", 2);
-          // pb.draw.circle(forcedIntersectionPoint, 5, "yellow", 2);
+        // // pb.draw.line(forcedIntersectionLine.a, forcedIntersectionLine.b, "grey", 1);
+        // // var forcedIntersectionPoint = getClosestLinePoint(forcedIntersectionLine, mousePosition);
+        // if (forcedIntersectionLine) {
+        //   pb.draw.circle(forcedIntersectionLine.a, 5, "grey", 2);
+        //   pb.draw.circle(forcedIntersectionLine.b, 5, "grey", 2);
+        //   // pb.draw.circle(forcedIntersectionPoint, 5, "yellow", 2);
+        // }
+        var closestPoints = []; // Other sentinels useful?
+        for (var i = 0; i < pb.drawables.length; i++) {
+          var childCircle = pb.drawables[i];
+          var intersection = childCircle.lineIntersection(childCircle.center, mousePosition);
+          // console.log("intersection", intersection.a, intersection.b);
+          if (intersection) {
+            // pb.draw.circle(intersection.a, 5, "green", 2);
+            // pb.draw.circle(intersection.b, 5, "green", 2);
+            pb.draw.line(childCircle.center, mousePosition, "rgba(192,192,192,0.25)", 1);
+            var closestLinePoint = getClosestLinePoint(intersection, mousePosition);
+            pb.draw.circle(closestLinePoint, 5, "green", 2);
+            closestPoints.push(closestLinePoint);
+          }
+        }
+        var closestThreePoints = detectClosest3Points(closestPoints, closestLinePoint, mousePosition);
+        for (var i = 0; i < closestThreePoints; i++) {
+          fill.circle(closestLinePoint, 5, "rgba(0,128,64,0.5)", 0);
         }
       }
     };
