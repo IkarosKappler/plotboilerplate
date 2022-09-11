@@ -145,7 +145,7 @@ export declare class Circle implements SVGSerializable {
      * @method lineIntersection
      * @instance
      * @memberof Circle
-     * @param {Vertex} a - The first of the two points defining the line.
+     * @param {Vertex} a- The first of the two points defining the line.
      * @param {Vertex} b - The second of the two points defining the line.
      * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
      **/

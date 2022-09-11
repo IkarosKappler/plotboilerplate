@@ -220,7 +220,7 @@ export class Circle implements SVGSerializable {
    * @method lineIntersection
    * @instance
    * @memberof Circle
-   * @param {Vertex} a - The first of the two points defining the line.
+   * @param {Vertex} a- The first of the two points defining the line.
    * @param {Vertex} b - The second of the two points defining the line.
    * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
    **/
@@ -230,19 +230,30 @@ export class Circle implements SVGSerializable {
     const interA = new Vertex();
     const interB = new Vertex();
 
-    const diff = a.difference(b);
-    const dist = a.distance(b);
-    const det = a.x * b.y - a.y * b.x;
-    const distSquared = dist * dist;
-    const radiusSquared = this.radius * this.radius;
+    // First do a transformation, because the calculation is based on a cicle at (0,0)
+    const transA = new Vertex(a).sub(this.center);
+    const transB = new Vertex(b).sub(this.center);
+
+    const diff: XYCoords = transA.difference(transB);
+    // There is a special case if diff.y=0, where the intersection is not calcuatable.
+    // Use an non-zero epsilon here to approximate this case.
+    // TODO for the future: find a better solution
+    if (Math.abs(diff.y) === 0) {
+      diff.y = 0.000001;
+    }
+
+    const dist: number = transA.distance(transB);
+    const det: number = transA.x * transB.y - transA.y * transB.x;
+    const distSquared: number = dist * dist;
+    const radiusSquared: number = this.radius * this.radius;
 
     // Check if circle and line have an intersection at all
     if (radiusSquared * distSquared - det * det < 0) {
       return null;
     }
 
-    const belowSqrt = this.radius * this.radius * dist * dist - det * det;
-    const sqrt = Math.sqrt(belowSqrt);
+    const belowSqrt: number = this.radius * this.radius * dist * dist - det * det;
+    const sqrt: number = Math.sqrt(belowSqrt);
 
     interA.x = (det * diff.y + Math.sign(diff.y) * diff.x * sqrt) / distSquared;
     interB.x = (det * diff.y - Math.sign(diff.y) * diff.x * sqrt) / distSquared;
@@ -250,7 +261,8 @@ export class Circle implements SVGSerializable {
     interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
     interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
 
-    return new Line(interA, interB);
+    return new Line(interA.add(this.center), interB.add(this.center));
+    // return new Line(interA, interB);
   }
 
   /**

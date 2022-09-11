@@ -179,7 +179,7 @@ var Circle = /** @class */ (function () {
      * @method lineIntersection
      * @instance
      * @memberof Circle
-     * @param {Vertex} a - The first of the two points defining the line.
+     * @param {Vertex} a- The first of the two points defining the line.
      * @param {Vertex} b - The second of the two points defining the line.
      * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
      **/
@@ -188,9 +188,18 @@ var Circle = /** @class */ (function () {
         //    https://mathworld.wolfram.com/Circle-LineIntersection.html
         var interA = new Vertex_1.Vertex();
         var interB = new Vertex_1.Vertex();
-        var diff = a.difference(b);
-        var dist = a.distance(b);
-        var det = a.x * b.y - a.y * b.x;
+        // First do a transformation, because the calculation is based on a cicle at (0,0)
+        var transA = new Vertex_1.Vertex(a).sub(this.center);
+        var transB = new Vertex_1.Vertex(b).sub(this.center);
+        var diff = transA.difference(transB);
+        // There is a special case if diff.y=0, where the intersection is not calcuatable.
+        // Use an non-zero epsilon here to approximate this case.
+        // TODO for the future: find a better solution
+        if (Math.abs(diff.y) === 0) {
+            diff.y = 0.000001;
+        }
+        var dist = transA.distance(transB);
+        var det = transA.x * transB.y - transA.y * transB.x;
         var distSquared = dist * dist;
         var radiusSquared = this.radius * this.radius;
         // Check if circle and line have an intersection at all
@@ -203,7 +212,8 @@ var Circle = /** @class */ (function () {
         interB.x = (det * diff.y - Math.sign(diff.y) * diff.x * sqrt) / distSquared;
         interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
         interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
-        return new Line_1.Line(interA, interB);
+        return new Line_1.Line(interA.add(this.center), interB.add(this.center));
+        // return new Line(interA, interB);
     };
     /**
      * Calculate the closest point on the outline of this circle to the given point.

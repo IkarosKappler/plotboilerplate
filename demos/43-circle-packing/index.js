@@ -133,6 +133,21 @@
       return index;
     };
 
+    function approximateBetFitCircle(startCircle, endPosition) {
+      //
+    }
+
+    function getClosestLinePoint(lineOrNull, position) {
+      if (lineOrNull) {
+        if (lineOrNull.a.distance(position) < lineOrNull.b.distance(position)) {
+          return lineOrNull.a;
+        } else {
+          return lineOrNull.b;
+        }
+      }
+      return null;
+    }
+
     var redraw = function () {
       // Draw containing circle
       var containingCircle = pb.drawables[0];
@@ -145,6 +160,7 @@
         pb.draw.circle(mousePosition, maxRadius, "grey");
         // Draw closest point on containing circle
         var closestPointOnContainingCircle = containingCircle.closestPoint(mousePosition);
+        pb.draw.line(containingCircle.center, closestPointOnContainingCircle, "rgba(0,192,192,0.5)", 1);
         pb.draw.circle(closestPointOnContainingCircle, 5, "red", 2);
       }
 
@@ -160,6 +176,18 @@
         // console.log("intersection", intersection.a, intersection.b);
         pb.draw.circle(intersection.a, 5, "green", 2);
         pb.draw.circle(intersection.b, 5, "green", 2);
+
+        // Draw forced intersection point from selected circle
+        // var forcedIntersectionLine = selectedCircle.lineIntersection(new Vertex(line.a.x, line.a.y), mousePosition);
+        var forcedIntersectionLine = selectedCircle.lineIntersection(intersection.a, intersection.b);
+
+        // pb.draw.line(forcedIntersectionLine.a, forcedIntersectionLine.b, "grey", 1);
+        // var forcedIntersectionPoint = getClosestLinePoint(forcedIntersectionLine, mousePosition);
+        if (forcedIntersectionLine) {
+          pb.draw.circle(forcedIntersectionLine.a, 5, "grey", 2);
+          pb.draw.circle(forcedIntersectionLine.b, 5, "grey", 2);
+          // pb.draw.circle(forcedIntersectionPoint, 5, "yellow", 2);
+        }
       }
     };
 

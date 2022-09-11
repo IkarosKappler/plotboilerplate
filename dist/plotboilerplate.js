@@ -1811,6 +1811,8 @@ exports.Bounds = Bounds;
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-08-15 Added the `containsPoint` function.
+ * @modified 2022-08-23 Added the `lineIntersection` function.
+ * @modified 2022-08-23 Added the `closestPoint` function.
  * @version  1.4.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -1971,19 +1973,70 @@ var Circle = /** @class */ (function () {
         var y4 = p2.y + (h * (p1.x - p0.x)) / d;
         return new Line_1.Line(new Vertex_1.Vertex(x3, y3), new Vertex_1.Vertex(x4, y4));
     };
+    /**
+     * Calculate the intersection points (if exists) with the given infinite line (defined by two points).
+     *
+     * @method lineIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} a- The first of the two points defining the line.
+     * @param {Vertex} b - The second of the two points defining the line.
+     * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
+     **/
     Circle.prototype.lineIntersection = function (a, b) {
+        // Based on the math from
+        //    https://mathworld.wolfram.com/Circle-LineIntersection.html
         var interA = new Vertex_1.Vertex();
         var interB = new Vertex_1.Vertex();
-        var diff = interB.difference(interA);
-        var dist = interB.distance(interA);
-        var D = a.x * b.y - a.y * b.x;
-        var belowSqrt = this.radius * this.radius * dist * dist - D * D;
-        console.log(D, dist, belowSqrt);
-        interA.x = D * diff.y + Math.sign(diff.y) * diff.x * Math.sqrt(belowSqrt);
-        interB.x = D * diff.y - Math.sign(diff.y) * diff.x * Math.sqrt(belowSqrt);
-        interA.y = -D * diff.x + Math.abs(diff.y) * Math.sqrt(belowSqrt);
-        interB.y = -D * diff.x - Math.abs(diff.y) * Math.sqrt(belowSqrt);
-        return new Line_1.Line(interA, interB);
+        // First do a transformation, because the calculation is based on a cicle at (0,0)
+        var transA = new Vertex_1.Vertex(a).sub(this.center);
+        var transB = new Vertex_1.Vertex(b).sub(this.center);
+        var diff = transA.difference(transB);
+        // There is a special case if diff.y=0, where the intersection is not calcuatable.
+        // Use an non-zero epsilon here to approximate this case.
+        // TODO for the future: find a better solution
+        if (Math.abs(diff.y) === 0) {
+            diff.y = 0.000001;
+        }
+        var dist = transA.distance(transB);
+        var det = transA.x * transB.y - transA.y * transB.x;
+        var distSquared = dist * dist;
+        var radiusSquared = this.radius * this.radius;
+        // Check if circle and line have an intersection at all
+        if (radiusSquared * distSquared - det * det < 0) {
+            return null;
+        }
+        var belowSqrt = this.radius * this.radius * dist * dist - det * det;
+        var sqrt = Math.sqrt(belowSqrt);
+        interA.x = (det * diff.y + Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+        interB.x = (det * diff.y - Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+        interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
+        interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
+        return new Line_1.Line(interA.add(this.center), interB.add(this.center));
+        // return new Line(interA, interB);
+    };
+    /**
+     * Calculate the closest point on the outline of this circle to the given point.
+     *
+     * @method closestPoint
+     * @instance
+     * @memberof Circle
+     * @param {XYCoords} vert - The point to find the closest circle point for.
+     * @return {Vertex} The closest point on this circle.
+     **/
+    Circle.prototype.closestPoint = function (vert) {
+        var lineIntersection = this.lineIntersection(this.center, vert);
+        if (!lineIntersection) {
+            // Note: this case should not happen as a radial from the center always intersect this circle.
+            return new Vertex_1.Vertex();
+        }
+        // Return closed of both
+        if (lineIntersection.a.distance(vert) < lineIntersection.b.distance(vert)) {
+            return lineIntersection.a;
+        }
+        else {
+            return lineIntersection.b;
+        }
     };
     /**
      * This function should invalidate any installed listeners and invalidate this object.
@@ -9231,7 +9284,10 @@ exports.VertexListeners = VertexListeners;
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-06-01 Tweaked the `polyline` function; lineWidth now scales with scale.x.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  1.12.2
+ * @modified 2022-08-23 Fixed a type issue in the `polyline` function.
+ * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
+ * @modified 2022-08-23 Fixed a type issue in the `path` function.
+ * @version  1.12.3
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -9290,7 +9346,7 @@ var drawutils = /** @class */ (function () {
      * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
      */
     drawutils.prototype.setConfiguration = function (configuration) {
-        this.ctx.globalCompositeOperation = configuration.blendMode;
+        this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
     };
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -10001,7 +10057,7 @@ var drawutils = /** @class */ (function () {
         }
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.lineWidth = lineWidth * this.scale.x || 1.0;
+        this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x * this.scale.x, this.offset.y + vertices[i].y * this.scale.y);
@@ -10118,14 +10174,20 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.path = function (pathData, color, lineWidth, options) {
         var d = options && options.inplace ? pathData : drawutilssvg_1.drawutilssvg.copyPathData(pathData);
         drawutilssvg_1.drawutilssvg.transformPathData(d, this.offset, this.scale);
-        this.ctx.strokeStyle = color;
+        if (color) {
+            this.ctx.strokeStyle = color;
+        }
         this.ctx.lineWidth = lineWidth || 1;
         if (this.fillShapes) {
-            this.ctx.fillStyle = color;
+            if (color) {
+                this.ctx.fillStyle = color;
+            }
             this.ctx.fill(new Path2D(d.join(" ")));
         }
         else {
-            this.ctx.strokeStyle = color;
+            if (color) {
+                this.ctx.strokeStyle = color;
+            }
             this.ctx.stroke(new Path2D(d.join(" ")));
         }
     };
