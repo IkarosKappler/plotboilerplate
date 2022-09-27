@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html class="fullscreen">
+  <head>
+    <title>2D Plotting Boilerplate – An extended demo how circle-line intersections work</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A demo about importing and exporting vertex sets with PlotBoilerplate.js.">
+    <meta name="keywords" content="plotboilerplate, Vertex, usage, howto, docs, documentation, circle, line, intersection">
+    <meta name="author" content="Ikaros Kappler">
+    <meta name="date" content="2022-01-14">
+    <meta name="docinfo" content="Drag the line points or the circle center around and see how the circle-line-intersection changes.">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@humanearthpig">
+    <meta name="twitter:creator" content="@humanearthpig">
+    <meta property="og:url" content="https://www.plotboilerplate.de">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="An extended demo how circle-line intersections work with PlotBoilerplate.js.">
+    <meta property="og:description" content="An extended demo how circle-line intersections work with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20220910-extended-circle-line-intersection.png">
+
+    <!-- Polyfills for IE -->
+    <script src="../../lib/globalthis-polyfill.min.js"></script> 
+    <script src="../../lib/path2d-polyfill.min.js"></script>
+
+    <!-- A modal -->
+    <script src="../modal.js"></script>
+    <link rel="stylesheet" href="../modal.css">
+    
+    <!-- Load thirdparty libraries -->
+    <script src="../../lib/dat.gui.min.js"></script>
+    <script src="../../lib/FileSaver.min.js"></script>
+    <script src="../../lib/Color.js"></script>
+    <script src="../../lib/alloy_finger.js"></script>
+
+    <!-- Load helpers -->
+    <script src="../../src/cjs/utils/dat.gui.title.polyfill.js"></script>
+    <script src="../../src/cjs/utils/dat.gui.arrowbounce.polyfill.js"></script>
+    <script src="../../src/cjs/utils/creategui.js"></script>
+    <script src="../../src/cjs/utils/module.js"></script>
+    <script src="../../src/cjs/utils/gup.js"></script>
+    <script src="../../src/cjs/utils/io/FileDrop.js"></script>
+
+    <!-- For production -->
+    <script src="../../dist/plotboilerplate.min.js"></script>
+    <!-- END For production -->
+    
+    <script src="../detectDarkMode.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
+  </head>
+  <body class="fullscreen">
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+
+    <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
+
+    <div class="info monospace">
+      [<span id="cx">-</span>,<span id="cy">-</span>]
+    </div>
+  </body>
+</html>

@@ -47,12 +47,18 @@ often use for the visualization of 2D geometries. Basic features are
   - text
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/pbtext.html "PBText class"),
     [example](https://plotboilerplate.io/repo/demos/basic-PBText "PBText example"))
-- configuration of the canvas behavior (fullsize, interaction, raster)
-- mouse interaction (zoom, pan, drag elements)
-- keyboard interaction
-- touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
+- configuration of the canvas behavior
+  - fullsize and auto-resizing
+  - enable/disable mouse, touch or keyboard interaction
+  - draw rasters
+  - default colors and darkmode
+- mouse and touch interaction
+  - zoom
+  - pan
+  - drag and select elements
+- keyboard interaction customizable
 
-The compressed library has 128kb.
+The compressed library has 133kb.
 
 ## Install the package via npm
 
@@ -142,6 +148,8 @@ globalThis.addEventListener("load", () => {
   pb.add(line);
 });
 ```
+
+For a guide of how to [Getting Started click here](https://github.com/IkarosKappler/plotboilerplate/blob/master/Getting-Started.md "Getting Started click here.").
 
 A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
 
@@ -441,6 +449,55 @@ vert.listeners.addDragListener(function (e) {
 - Touch & move (1 finger): Move item
 - Touch & move (2 fingers): Pan the area
 - Touch & pinch: Zoom in/out
+
+## Custom keyboard events
+
+```javascript
+new KeyHandler({ trackAll: true })
+  .down("enter", function () {
+    console.log("ENTER was hit.");
+  })
+  .press("enter", function () {
+    console.log("ENTER was pressed.");
+  })
+  .up("enter", function () {
+    console.log("ENTER was released.");
+  })
+  .down("e", function () {
+    console.log("e was hit. shift is pressed?", keyHandler.isDown("shift"));
+  })
+  .up("spacebar", function () {
+    console.log("spacebar was released.");
+  });
+```
+
+For a list of all supported key codes see [Full list of supported key codes](https://github.com/IkarosKappler/plotboilerplate/blob/master/keycodes.md "Full list of supported key codes").
+
+## Custom mouse event
+
+```javascript
+new MouseHandler(document.getElementById("mycanvas"))
+  .drag(function (e) {
+    console.log("Mouse dragged: " + JSON.stringify(e));
+    if (e.params.leftMouse);
+    else if (e.params.rightMouse);
+  })
+  .move(function (e) {
+    console.log("Mouse moved: " + JSON.stringify(e.params));
+  })
+  .up(function (e) {
+    console.log("Mouse up. Was dragged?", e.params.wasDragged);
+  })
+  .down(function (e) {
+    console.log("Mouse down.");
+  })
+  .click(function (e) {
+    console.log("Click.");
+  })
+  .wheel(function (e) {
+    console.log("Wheel. delta=" + e.deltaY);
+  });
+```
 
 ## Build the package
 

@@ -17,7 +17,8 @@
  * @modified 2020-10-04 Added extended JSDoc comments.
  * @modified 2020-11-25 Added the `isTouchEvent` param.
  * @modified 2021-01-10 The mouse handler is now also working with SVGElements.
- * @version  1.2.0
+ * @modified 2022-08-16 Fixed a bug in the mouse button detection.
+ * @version  1.2.1
  *
  * @file MouseHandler
  * @public
@@ -150,7 +151,7 @@ export declare class MouseHandler {
      * @memberof MouseHandler
      * @instance
      * @private
-     * @param {MouseEvent} e - The mouse event to get the relative position for.
+     * @param {MouseEvent} event - The mouse event to get the relative position for.
      * @param {string} eventName - The name of the firing event.
      * @return {XMouseEvent}
      */

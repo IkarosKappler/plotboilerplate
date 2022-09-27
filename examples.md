@@ -229,8 +229,26 @@
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/39-bezierpath-to-polygon/index.html" title="See the demo">See the demo</a>
 
-### Texture polygon clipping
+### Textured polygon clipping
 
 ![Texture polygon clipping](https://plotboilerplate.io/repo/screenshots/screenshot-20220428-texture-polygon-clipping.png "Texture polygon clipping")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/40-clipped-texture-draw/index.html" title="See the demo">See the demo</a>
+
+### Raindrops demo
+
+![Raindrops demo](https://plotboilerplate.io/repo/screenshots/screenshot-20220601-raindrops-1.png "Raindrops demo")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/41-raindrops/index.html" title="See the demo">See the demo</a>
+
+### Hick's Hexagons
+
+![Hick's Hexagons](https://plotboilerplate.io/repo/screenshots/screenshot-20220607-0-Hicks-Hexagons.png "Hick's Hexagons")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/42-hicks-hexagons/index.html" title="See the demo">See the demo</a>
+
+### Planar circle packing
+
+![Planar circle packing](https://plotboilerplate.io/repo/screenshots/screenshot-20220927-0-circle-packing-all-intersections.png "Planar circle packing")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/43-circle-packing/index.html" title="See the demo">See the demo</a>

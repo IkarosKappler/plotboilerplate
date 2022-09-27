@@ -17,7 +17,8 @@
  * @modified 2020-10-04 Added extended JSDoc comments.
  * @modified 2020-11-25 Added the `isTouchEvent` param.
  * @modified 2021-01-10 The mouse handler is now also working with SVGElements.
- * @version  1.2.0
+ * @modified 2022-08-16 Fixed a bug in the mouse button detection.
+ * @version  1.2.1
  *
  * @file MouseHandler
  * @public
@@ -58,7 +59,7 @@ export type XWheelCallback = (e: XWheelEvent) => void;
  * @requires XYCoords
  */
 export class MouseHandler {
-  private name: string;
+  private name: string | undefined;
   private element: HTMLElement | SVGElement;
   private mouseDownPos: { x: number; y: number } | undefined = undefined;
   private mouseDragPos: { x: number; y: number } | undefined = undefined;
@@ -135,8 +136,8 @@ export class MouseHandler {
     // +-------------------------------------------------
     this.name = name;
     this.element = element;
-    this.mouseDownPos = null;
-    this.mouseDragPos = null;
+    this.mouseDownPos = undefined;
+    this.mouseDragPos = undefined;
     // this.mousePos     = null;
     this.mouseButton = -1;
     this.listeners = {};
@@ -202,26 +203,26 @@ export class MouseHandler {
    * @memberof MouseHandler
    * @instance
    * @private
-   * @param {MouseEvent} e - The mouse event to get the relative position for.
+   * @param {MouseEvent} event - The mouse event to get the relative position for.
    * @param {string} eventName - The name of the firing event.
    * @return {XMouseEvent}
    */
-  private mkParams(e: MouseEvent, eventName: string): XMouseEvent {
-    const rel: { x: number; y: number } = this.relPos(e);
-    const xEvent: XMouseEvent = e as unknown as XMouseEvent;
+  private mkParams(event: MouseEvent, eventName: string): XMouseEvent {
+    const rel: { x: number; y: number } = this.relPos(event);
+    const xEvent: XMouseEvent = event as unknown as XMouseEvent;
     xEvent.params = {
       element: this.element,
       name: eventName,
       isTouchEvent: false,
       pos: rel,
-      button: this.mouseButton,
-      leftButton: this.mouseButton == 0,
-      middleButton: this.mouseButton == 1,
-      rightButton: this.mouseButton == 2,
-      mouseDownPos: this.mouseDownPos,
-      draggedFrom: this.mouseDragPos,
+      button: event.button, // this.mouseButton,
+      leftButton: event.button === 0, // this.mouseButton === 0,
+      middleButton: event.button === 1, // this.mouseButton === 1,
+      rightButton: event.button === 2, // this.mouseButton === 2,
+      mouseDownPos: this.mouseDownPos ?? { x: NaN, y: NaN },
+      draggedFrom: this.mouseDragPos ?? { x: NaN, y: NaN },
       wasDragged: this.mouseDownPos != null && (this.mouseDownPos.x != rel.x || this.mouseDownPos.y != rel.y),
-      dragAmount: this.mouseDownPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 }
+      dragAmount: this.mouseDragPos != null ? { x: rel.x - this.mouseDragPos.x, y: rel.y - this.mouseDragPos.y } : { x: 0, y: 0 }
     };
     return xEvent;
   }

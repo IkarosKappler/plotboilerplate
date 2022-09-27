@@ -9,7 +9,10 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.3.0
+ * @modified 2022-08-15 Added the `containsPoint` function.
+ * @modified 2022-08-23 Added the `lineIntersection` function.
+ * @modified 2022-08-23 Added the `closestPoint` function.
+ * @version  1.4.0
  **/
 import { Line } from "./Line";
 import { UIDGenerator } from "./UIDGenerator";
@@ -43,6 +46,18 @@ export class Circle {
         this.uid = UIDGenerator.next();
         this.center = center;
         this.radius = radius;
+    }
+    /**
+     * Check if the given circle is fully contained inside this circle.
+     *
+     * @method containsPoint
+     * @param {XYCoords} point - The point to check if it is contained in this circle.
+     * @instance
+     * @memberof Circle
+     * @return {boolean} `true` if the given point is inside this circle.
+     */
+    containsPoint(point) {
+        return this.center.distance(point) < this.radius;
     }
     /**
      * Check if the given circle is fully contained inside this circle.
@@ -154,6 +169,71 @@ export class Circle {
         var x4 = p2.x - (h * (p1.y - p0.y)) / d;
         var y4 = p2.y + (h * (p1.x - p0.x)) / d;
         return new Line(new Vertex(x3, y3), new Vertex(x4, y4));
+    }
+    /**
+     * Calculate the intersection points (if exists) with the given infinite line (defined by two points).
+     *
+     * @method lineIntersection
+     * @instance
+     * @memberof Circle
+     * @param {Vertex} a- The first of the two points defining the line.
+     * @param {Vertex} b - The second of the two points defining the line.
+     * @return {Line|null} The intersection points (as a line) or null if this circle does not intersect the line given.
+     **/
+    lineIntersection(a, b) {
+        // Based on the math from
+        //    https://mathworld.wolfram.com/Circle-LineIntersection.html
+        const interA = new Vertex();
+        const interB = new Vertex();
+        // First do a transformation, because the calculation is based on a cicle at (0,0)
+        const transA = new Vertex(a).sub(this.center);
+        const transB = new Vertex(b).sub(this.center);
+        const diff = transA.difference(transB);
+        // There is a special case if diff.y=0, where the intersection is not calcuatable.
+        // Use an non-zero epsilon here to approximate this case.
+        // TODO for the future: find a better solution
+        if (Math.abs(diff.y) === 0) {
+            diff.y = 0.000001;
+        }
+        const dist = transA.distance(transB);
+        const det = transA.x * transB.y - transA.y * transB.x;
+        const distSquared = dist * dist;
+        const radiusSquared = this.radius * this.radius;
+        // Check if circle and line have an intersection at all
+        if (radiusSquared * distSquared - det * det < 0) {
+            return null;
+        }
+        const belowSqrt = this.radius * this.radius * dist * dist - det * det;
+        const sqrt = Math.sqrt(belowSqrt);
+        interA.x = (det * diff.y + Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+        interB.x = (det * diff.y - Math.sign(diff.y) * diff.x * sqrt) / distSquared;
+        interA.y = (-det * diff.x + Math.abs(diff.y) * sqrt) / distSquared;
+        interB.y = (-det * diff.x - Math.abs(diff.y) * sqrt) / distSquared;
+        return new Line(interA.add(this.center), interB.add(this.center));
+        // return new Line(interA, interB);
+    }
+    /**
+     * Calculate the closest point on the outline of this circle to the given point.
+     *
+     * @method closestPoint
+     * @instance
+     * @memberof Circle
+     * @param {XYCoords} vert - The point to find the closest circle point for.
+     * @return {Vertex} The closest point on this circle.
+     **/
+    closestPoint(vert) {
+        const lineIntersection = this.lineIntersection(this.center, vert);
+        if (!lineIntersection) {
+            // Note: this case should not happen as a radial from the center always intersect this circle.
+            return new Vertex();
+        }
+        // Return closed of both
+        if (lineIntersection.a.distance(vert) < lineIntersection.b.distance(vert)) {
+            return lineIntersection.a;
+        }
+        else {
+            return lineIntersection.b;
+        }
     }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
