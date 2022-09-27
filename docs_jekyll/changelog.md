@@ -3,9 +3,18 @@ layout: page
 ---
 # Changelog
 
-<!-- - 2022-06-21 (Midsommer)
-  - Added `Bounds.clone()`. -->
-
+- 2022-09-11
+  - Added the extended circle-line-intersection demo (because I am stupid and need visual confirmation).
+- 2022-08-23
+  - Added the `Circle.lineIntersection(Vertex,Vertex)` function.
+  - Added the `Circle.closestPoint(XYCoords)` function.
+  - Fixed a type issue in the `draw.polyline` function.
+  - Fixed a type issue in the `draw.setConfiguration` function.
+  - Fixed a type issue in the `draw.path` function.
+- 2022-08-16
+  - MouseHandler: Fixed a bug in the mouse button detection.
+- 2022-08-15
+  - Added the `Circle.containsPoint(XYCoords)` function.
 - 2022-08-01
   - Added `title` param to the `PBParams` interface.
 - 2022-07-26
