@@ -9,6 +9,7 @@
  *
  * @author   Ikaros Kappler
  * @date     2022-08-15
+ * @modified 2022-09-27 Code cleanup.
  * @version  1.0.0
  **/
 
@@ -62,28 +63,17 @@
 
     var addCircle = function (circle) {
       circle.center.attr.draggable = false;
-      // initialCircle.center.attr.selectable = true;
-      // initialCircle.center.attr.isInitialCircle = true;
       pb.add(circle);
-      // circle.center.listeners.addClickListener(function (event) {
-      //   if (event.params.leftButton) {
-      //     return;
-      //   }
-      //   circle.center.attr.isSelected = !circle.center.attr.isSelected;
-      //   pb.redraw();
-      // });
     };
 
     // Create an initial wrapper circle
     var initialViewport = pb.viewport();
     var initialCircleRadius = Math.min(initialViewport.width, initialViewport.height) / 3;
     var initialCircle = new Circle(new Vertex(0, 0), initialCircleRadius);
-    // initialCircle.center.attr.draggable = false;
     initialCircle.center.attr.selectable = false;
     initialCircle.center.attr.isInitialCircle = true;
     // We want to draw this in a different color
     initialCircle.center.attr.visible = false;
-    // pb.add(initialCircle);
     addCircle(initialCircle);
 
     // A point to use for the next circle center
@@ -93,13 +83,12 @@
     // +---------------------------------------------------------------------------------
     // | A global config that's attached to the dat.gui control interface.
     // +-------------------------------
-    var config = PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        lineThickness: 12
-      },
-      GUP
-    );
+    var config = PlotBoilerplate.utils.safeMergeByKeys({}, GUP);
 
+    // +---------------------------------------------------------------------------------
+    // | Get the maximal available radius for a circle at the given position
+    // | wihout intersecting with any other circl around.
+    // +-------------------------------
     var getMaxRadius = function (position) {
       var maxRadius = Number.MAX_VALUE;
       for (var i in pb.drawables) {
@@ -107,16 +96,17 @@
         if (!(circle instanceof Circle)) {
           continue;
         }
-        // console.log("i", i, circle.center.distance(position) - circle.radius);
         if (!circle.center.attr.isInitialCircle && circle.containsPoint(position)) {
           return -1;
         }
-        // console.log("x", maxRadius, circle.center.distance(position), circle.radius);
         maxRadius = Math.min(maxRadius, Math.abs(circle.center.distance(position) - circle.radius));
       }
       return maxRadius;
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Find the minimal circle (index) that conatins the given point.
+    // +-------------------------------
     var findMinContainingCircle = function (position) {
       var index = -1;
       var minRadius = Number.MAX_VALUE;
@@ -133,14 +123,10 @@
       return index;
     };
 
-    function approximateBetFitCircle(startCircle, endPosition) {
-      //
-    }
-
-    function detectClosest3Points(closestThreePoints, closestLinePoint, mousePosition) {
-      return [];
-    }
-
+    // +---------------------------------------------------------------------------------
+    // | Find the closest intersection point of the given line (possibly null, will return
+    // | null then) and all available circles relative to the given position.
+    // +-------------------------------
     function getClosestLinePoint(lineOrNull, position) {
       if (lineOrNull) {
         if (lineOrNull.a.distance(position) < lineOrNull.b.distance(position)) {
@@ -152,15 +138,16 @@
       return null;
     }
 
+    // +---------------------------------------------------------------------------------
+    // | Draw our custom stuff after everything else in the scene was drawn.
+    // +-------------------------------
     var redraw = function (draw, fill) {
       // Draw containing circle
       var containingCircle = pb.drawables[0];
       pb.draw.circle(containingCircle.center, containingCircle.radius, "rgb(128,164,0)", 2);
-      // ...
       pb.draw.circle(mousePosition, 5, "orange");
       var maxRadius = getMaxRadius(mousePosition);
       if (maxRadius !== -1) {
-        // console.log("maxRadius", maxRadius);
         pb.draw.circle(mousePosition, maxRadius, "grey");
         // Draw closest point on containing circle
         var closestPointOnContainingCircle = containingCircle.closestPoint(mousePosition);
@@ -176,44 +163,41 @@
         // Extend line
         pb.draw.line(line.b, line.b.clone().add(line.a.difference(line.b)), "rgba(192,192,192,0.2)", 1);
         // Find extreme points of intersection
-        // var intersection = containingCircle.lineIntersection(line.a, line.b);
-        // // console.log("intersection", intersection.a, intersection.b);
-        // if (intersection) {
-        //   pb.draw.circle(intersection.a, 5, "green", 2);
-        //   pb.draw.circle(intersection.b, 5, "green", 2);
-        // }
-
-        // // Draw forced intersection point from selected circle
-        // // var forcedIntersectionLine = selectedCircle.lineIntersection(new Vertex(line.a.x, line.a.y), mousePosition);
-        // var forcedIntersectionLine = selectedCircle.lineIntersection(intersection.a, intersection.b);
-
-        // // pb.draw.line(forcedIntersectionLine.a, forcedIntersectionLine.b, "grey", 1);
-        // // var forcedIntersectionPoint = getClosestLinePoint(forcedIntersectionLine, mousePosition);
-        // if (forcedIntersectionLine) {
-        //   pb.draw.circle(forcedIntersectionLine.a, 5, "grey", 2);
-        //   pb.draw.circle(forcedIntersectionLine.b, 5, "grey", 2);
-        //   // pb.draw.circle(forcedIntersectionPoint, 5, "yellow", 2);
-        // }
-        var closestPoints = []; // Other sentinels useful?
         for (var i = 0; i < pb.drawables.length; i++) {
           var childCircle = pb.drawables[i];
           var intersection = childCircle.lineIntersection(childCircle.center, mousePosition);
-          // console.log("intersection", intersection.a, intersection.b);
           if (intersection) {
-            // pb.draw.circle(intersection.a, 5, "green", 2);
-            // pb.draw.circle(intersection.b, 5, "green", 2);
             pb.draw.line(childCircle.center, mousePosition, "rgba(192,192,192,0.25)", 1);
             var closestLinePoint = getClosestLinePoint(intersection, mousePosition);
             pb.draw.circle(closestLinePoint, 5, "green", 2);
-            closestPoints.push(closestLinePoint);
           }
-        }
-        var closestThreePoints = detectClosest3Points(closestPoints, closestLinePoint, mousePosition);
-        for (var i = 0; i < closestThreePoints; i++) {
-          fill.circle(closestLinePoint, 5, "rgba(0,128,64,0.5)", 0);
+          var rootIntersection = childCircle.lineIntersection(selectedCircle.center, mousePosition);
+          if (rootIntersection) {
+            pb.draw.line(childCircle.center, mousePosition, "rgba(192,192,192,0.25)", 1);
+            var closestLinePoint = getClosestLinePoint(rootIntersection, mousePosition);
+            pb.draw.circle(closestLinePoint, 3, "yellow", 2);
+          }
         }
       }
     };
+
+    function setSelectedCircleByPosition(position) {
+      var circleIndex = findMinContainingCircle(position);
+      if (circleIndex === -1) {
+        return false;
+      }
+      var circle = pb.drawables[circleIndex];
+      if (!circle.center.attr.selectable) {
+        return false;
+      }
+      circle.center.attr.isSelected = !circle.center.attr.isSelected;
+      if (circle.center.attr.isSelected) {
+        selectedCircleIndices[0] = circleIndex;
+      } else {
+        selectedCircleIndices[0] = -1;
+      }
+      return true;
+    }
 
     // Add a mouse listener to track the mouse position.-
     new MouseHandler(pb.eventCatcher)
@@ -225,41 +209,28 @@
         pb.redraw();
       })
       .click(function (event) {
-        console.log("event.params.buttonNumber", event.params.button, event.params.leftButton);
         if (!event.params.leftButton) {
           return;
         }
         var newRadius = getMaxRadius(mousePosition);
-        console.log("newRadius", newRadius);
         if (newRadius === -1) {
+          // This means: the position is INSIDE a circle -> select it
+          if (setSelectedCircleByPosition(mousePosition)) {
+            pb.redraw();
+          }
           return;
         }
         var newCircle = new Circle(mousePosition.clone(), newRadius);
-        // newCircle.center.attr.draggable = false;
-        // pb.add(newCircle);
-        console.log("Add new circle");
-        // newCircle.center.attr.selectable = true;
         selectedCircleIndices[0] = pb.drawables.length;
         addCircle(newCircle);
       });
 
+    // Maybe this is not the best solution from a UX point of view, as the [spacebar]
+    // event does not exist in most mobile devices.
     new KeyHandler({ trackAll: true }).down("spacebar", function () {
-      // Find circle that contains the current mouse position
-      var circleIndex = findMinContainingCircle(mousePosition);
-      if (circleIndex === -1) {
-        return;
+      if (setSelectedCircleByPosition(mousePosition)) {
+        pb.redraw();
       }
-      var circle = pb.drawables[circleIndex];
-      if (!circle.center.attr.selectable) {
-        return;
-      }
-      circle.center.attr.isSelected = !circle.center.attr.isSelected;
-      if (circle.center.attr.isSelected) {
-        selectedCircleIndices[0] = circleIndex;
-      } else {
-        selectedCircleIndices[0] = -1;
-      }
-      pb.redraw();
     });
 
     // +---------------------------------------------------------------------------------
@@ -274,34 +245,14 @@
     uiStats.add("mouseXTop").precision(1);
     uiStats.add("mouseYTop").precision(1);
 
-    var innerColor = Color.parse(config.startColor);
-    var lineColor = Color.parse(config.endColor);
-
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
     {
       var gui = pb.createGUI();
-      // prettier-ignore
-      // gui.add(config, 'hexWidth').min(10).max(160).step(1).listen().onChange(function() { config.hexHeight = config.hexWidth * (HEX_RATIO+config.hexDistort); pb.redraw() }).name("hexWidth").title("hexWidth");
-      // prettier-ignore
-      // gui.add(config, 'heightOffset').min(-1.0).max(1.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("heightOffset").title("heightOffset");
-      // prettier-ignore
-      gui.add(config, 'lineThickness').listen().onChange(function() { pb.redraw() }).name("lineThickness").title("lineThickness");
-      // // prettier-ignore
-      // gui.add(config, 'hexDistort').min(-1).max(1).step(0.01).listen().onChange(function() { config.hexHeight = config.hexWidth * (HEX_RATIO+config.hexDistort); pb.redraw() }).name("hexDistort").title("hexDistort");
-      // // prettier-ignore
-      // gui.add(config, 'innerScale').min(0.0).max(1.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("innerScale").title("innerScale");
-
-      // // prettier-ignore
-      // gui.addColor(pb.config, 'backgroundColor').onChange( function() { pb.redraw(); } );
-      // // prettier-ignore
-      // gui.addColor(config, 'innerColor').onChange( function() { innerColor = Color.parse(config.innerColor); pb.redraw(); } );
-      // // prettier-ignore
-      // gui.addColor(config, 'lineColor').onChange( function() { lineColor = Color.parse(config.lineColor); pb.redraw(); } );
+      // Well, not really much happens here
     }
 
-    // pb.config.preDraw = drawSource;
     pb.config.postDraw = redraw;
     pb.redraw();
     pb.canvas.focus();
