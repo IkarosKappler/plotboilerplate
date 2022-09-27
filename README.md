@@ -47,12 +47,18 @@ often use for the visualization of 2D geometries. Basic features are
   - text
     ([docs](https://plotboilerplate.io/docs_typedoc/classes/pbtext.html "PBText class"),
     [example](https://plotboilerplate.io/repo/demos/basic-PBText "PBText example"))
-- configuration of the canvas behavior (fullsize, interaction, raster)
-- mouse interaction (zoom, pan, drag elements)
-- keyboard interaction
-- touch interaction for dragging vertices (mobile devices: zoom, pan, drag elements)
+- configuration of the canvas behavior
+  - fullsize and auto-resizing
+  - enable/disable mouse, touch or keyboard interaction
+  - draw rasters
+  - default colors and darkmode
+- mouse and touch interaction
+  - zoom
+  - pan
+  - drag and select elements
+- keyboard interaction customizable
 
-The compressed library has 128kb.
+The compressed library has 133kb.
 
 ## Install the package via npm
 
@@ -142,6 +148,8 @@ globalThis.addEventListener("load", () => {
   pb.add(line);
 });
 ```
+
+For a guide of how to [Getting Started click here](https://github.com/IkarosKappler/plotboilerplate/blob/master/Getting-Started.md "Getting Started click here.").
 
 A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
 

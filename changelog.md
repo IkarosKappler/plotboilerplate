@@ -1,8 +1,5 @@
 # Changelog
 
-<!-- - 2022-06-21 (Midsommer)
-  - Added `Bounds.clone()`. -->
-
 - 2022-09-11
   - Added the extended circle-line-intersection demo (because I am stupid and need visual confirmation).
 - 2022-08-23
