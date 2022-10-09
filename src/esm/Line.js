@@ -13,7 +13,8 @@
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  2.2.0
+ * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
+ * @version  2.2.1
  *
  * @file Line
  * @public
@@ -56,8 +57,9 @@ export class Line extends VertTuple {
     // !!! DO NOT MOVE TO VertTuple
     intersection(line) {
         const denominator = this.denominator(line);
-        if (denominator == 0)
+        if (denominator == 0) {
             return null;
+        }
         let a = this.a.y - line.a.y;
         let b = this.a.x - line.a.x;
         const numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
@@ -68,7 +70,7 @@ export class Line extends VertTuple {
         const x = this.a.x + a * (this.b.x - this.a.x);
         const y = this.a.y + a * (this.b.y - this.a.y);
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
-            return undefined;
+            return null;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex(x, y);

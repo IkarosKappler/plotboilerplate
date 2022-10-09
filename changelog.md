@@ -1,5 +1,9 @@
 # Changelog
 
+- 2022-10-09 (v1.18.0)
+  - Added the `Bounds.fromDimension` function.
+  - Changed the actual return value of the `Line.intersection` function to null (was undefined before).
+  - Added the `utils/shuffleArray.ts` helper utils function.
 - 2022-09-11
   - Added the extended circle-line-intersection demo (because I am stupid and need visual confirmation).
 - 2022-08-23

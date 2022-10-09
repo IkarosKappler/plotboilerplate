@@ -1682,7 +1682,8 @@ exports.BezierPath = BezierPath;
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
  * @modified 2022-02-01 Added the `toString` function.
- * @version  1.4.0
+ * @modified 2022-10-09 Added the `fromDimension` function.
+ * @version  1.5.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
@@ -1787,6 +1788,17 @@ var Bounds = /** @class */ (function () {
             yMax = Math.max(yMax, vert.y);
         }
         return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
+    };
+    /**
+     * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.
+     *
+     * @param {number} width - The width of the bounds
+     * @param {number} height  - The height of the bounds
+     * @param {XYCoords={x:0,y:0}} origin - [optional] A origin to locate the new Bounds object at.
+     * @returns {Bounds} A new `Bounds` instance width given width and height, located at (0,0) or the given origin..
+     */
+    Bounds.fromDimension = function (width, height, origin) {
+        return new Bounds(origin !== null && origin !== void 0 ? origin : { x: 0, y: 0 }, { x: (origin ? origin.x : 0) + width, y: (origin ? origin.y : 0) + height });
     };
     return Bounds;
 }()); // END class bounds
@@ -3410,7 +3422,8 @@ exports.KeyHandler = KeyHandler;
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  2.2.0
+ * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
+ * @version  2.2.1
  *
  * @file Line
  * @public
@@ -3470,8 +3483,9 @@ var Line = /** @class */ (function (_super) {
     // !!! DO NOT MOVE TO VertTuple
     Line.prototype.intersection = function (line) {
         var denominator = this.denominator(line);
-        if (denominator == 0)
+        if (denominator == 0) {
             return null;
+        }
         var a = this.a.y - line.a.y;
         var b = this.a.x - line.a.x;
         var numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
@@ -3482,7 +3496,7 @@ var Line = /** @class */ (function (_super) {
         var x = this.a.x + a * (this.b.x - this.a.x);
         var y = this.a.y + a * (this.b.y - this.a.y);
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
-            return undefined;
+            return null;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);

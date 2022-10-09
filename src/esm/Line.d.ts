@@ -13,7 +13,8 @@
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  2.2.0
+ * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
+ * @version  2.2.1
  *
  * @file Line
  * @public
@@ -52,5 +53,5 @@ export declare class Line extends VertTuple<Line> implements SVGSerializable {
      * @instance
      * @memberof Line
      **/
-    intersection(line: Line): Vertex | undefined;
+    intersection(line: Line): Vertex | null;
 }
