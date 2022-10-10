@@ -69,7 +69,8 @@
       {
         safeZonePct: 0.1,
         countH: 10,
-        countV: 10
+        countV: 10,
+        clearTilesOnRedraw: true
       },
       GUP
     );
@@ -77,8 +78,9 @@
     var tiles = [];
 
     var computeTiles = function () {
-      // var viewport = pb.viewport();
-      // console.log("viewport", viewport);
+      if (config.clearTilesOnRedraw) {
+        tiles = [];
+      }
       var bounds = new Bounds(
         { x: viewport.min.x + viewport.width * config.safeZonePct, y: viewport.min.y + viewport.height * config.safeZonePct },
         {
@@ -155,29 +157,29 @@
           };
         case 4:
           return {
-            point: { x: tileBounds.min.x + tileBounds.width / 3, y: tileBounds.max.y },
-            controlPoint: { x: tileBounds.min.x + tileBounds.width / 3, y: ((tileBounds.min.y * tileBounds.height) / 3) * 2 }
+            point: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.max.y },
+            controlPoint: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.min.y + (tileBounds.height / 3) * 2 }
           };
         case 5:
           return {
-            point: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.max.y },
+            point: { x: tileBounds.min.x + tileBounds.width / 3, y: tileBounds.max.y },
             controlPoint: {
-              x: tileBounds.min.x + (tileBounds.width / 3) * 2,
-              y: ((tileBounds.min.y * tileBounds.height) / 3) * 2
+              x: tileBounds.min.x + tileBounds.width / 3,
+              y: tileBounds.min.y + (tileBounds.height / 3) * 2
             }
           };
         case 6:
           return {
             point: { x: tileBounds.min.x, y: tileBounds.min.y + (tileBounds.height / 3) * 2 },
             controlPoint: {
-              x: ((tileBounds.min.x * tileBounds.width) / 3) * 2,
+              x: tileBounds.min.x + tileBounds.width / 3,
               y: tileBounds.min.y + (tileBounds.height / 3) * 2
             }
           };
         case 7:
           return {
             point: { x: tileBounds.min.x, y: tileBounds.min.y + tileBounds.height / 3 },
-            controlPoint: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.min.y + tileBounds.height / 3 }
+            controlPoint: { x: tileBounds.min.x + tileBounds.width / 3, y: tileBounds.min.y + tileBounds.height / 3 }
           };
       }
     };
@@ -203,27 +205,30 @@
       7: [0, 2, 4, 6]
     };
     var makeTruchetSquare = function (tileBounds) {
-      var connections = []; // Array<{ line: Line, indices : [number,number] } >
+      var connections = []; // Array<{ line: Line, startVector, endVector, indices : [number,number] } >
       var isConnected = [false, false, false, false, false, false, false, false];
       var indices = [0, 1, 2, 3, 4, 5, 6, 7];
       arrayShuffle(indices);
       for (var i = 0; i < 8; i++) {
-        if (isConnected[i]) {
+        var start = indices[i];
+        if (isConnected[start]) {
           continue;
         }
-        var start = indices[i];
         var startVector = getSquareConnectorLocation(tileBounds, start);
         arrayShuffle(allowedConnections[start]);
-        if (start === 0) {
-          console.log("Shuffled", allowedConnections[start]);
-        }
+        // if (start === 0) {
+        //   console.log("Shuffled", allowedConnections[start]);
+        // }
         for (var j = 0; j < allowedConnections[start].length; j++) {
-          if (isConnected[allowedConnections[start][j]]) {
+          var end = allowedConnections[start][j];
+          if (isConnected[end]) {
+            // console.log("isconnected", end);
             continue;
           }
-          var endVector = getSquareConnectorLocation(tileBounds, allowedConnections[start][j]);
+          var endVector = getSquareConnectorLocation(tileBounds, end);
           var line = new Line(startVector.point, endVector.point);
           if (!canConnectLine(line, connections)) {
+            // console.log("Cannot connect ", start, end);
             continue;
           }
           connections.push({
@@ -234,15 +239,6 @@
           });
           isConnected[start] = true;
           isConnected[allowedConnections[start][j]] = true;
-          // draw.line(startVector.point, endVector.point, "rgba(192,0,192,0.333)", 2);
-          // draw.cubicBezier(
-          //   startVector.point,
-          //   endVector.point,
-          //   startVector.controlPoint,
-          //   endVector.controlPoint,
-          //   "rgba(192,0,192,0.333)",
-          //   2
-          // );
         }
       }
       return { bounds: tileBounds, connections: connections };
@@ -278,17 +274,17 @@
       for (var tileIndex in tiles) {
         // console.log("tile", tile);
         var tile = tiles[tileIndex];
-        draw.rect(tile.bounds.min, tile.bounds.width, tile.bounds.height, "green", 1);
+        draw.rect(tile.bounds.min, tile.bounds.width, tile.bounds.height, "rgba(0,255,0,0.5)", 1);
         for (var c in tile.connections) {
           var connection = tile.connections[c];
-          draw.line(connection.line.a, connection.line.b, "rgba(192,0,192,0.333)", 2);
-          console.log("connection", connection);
+          draw.line(connection.line.a, connection.line.b, "rgba(192,192,192,0.1)", 3);
+          // console.log("connection", connection);
           draw.cubicBezier(
             connection.startVector.point,
             connection.endVector.point,
             connection.startVector.controlPoint,
             connection.endVector.controlPoint,
-            "rgba(192,0,192,0.333)",
+            "rgba(192,0,192,0.75)",
             2
           );
         }
@@ -301,7 +297,7 @@
       stats.mouseXTop = relPos.x;
       stats.mouseYTop = relPos.y;
       // mousePosition.set(relPos);
-      pb.redraw();
+      // pb.redraw();
     });
 
     // +---------------------------------------------------------------------------------
@@ -324,9 +320,13 @@
       // prettier-ignore
       gui.add(config, 'safeZonePct').min(0.5).max(1.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("safeZonePct").title("safeZonePct");
       // prettier-ignore
-      gui.add(config, 'countH').min(1).max(100).step(1).listen().onChange(function() { pb.redraw() }).name("countH").title("countH");
+      gui.add(config, 'countH').min(1).max(100).step(1).listen().onChange(function() { computeTiles(); pb.redraw() }).name("countH").title("countH");
       // prettier-ignore
-      gui.add(config, 'countV').min(1).max(100).step(1).listen().onChange(function() { pb.redraw() }).name("countV").title("countV");
+      gui.add(config, 'countV').min(1).max(100).step(1).listen().onChange(function() { computeTiles(); pb.redraw() }).name("countV").title("countV");
+      // prettier-ignore
+      gui.add(config, 'countV').min(1).max(100).step(1).listen().onChange(function() { computeTiles(); pb.redraw() }).name("countV").title("countV");
+      // prettier-ignore
+      gui.add(config, 'clearTilesOnRedraw').listen().onChange(function() { pb.redraw() }).name("clearTilesOnRedraw").title("clearTilesOnRedraw");
     }
 
     computeTiles();
