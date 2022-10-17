@@ -15,7 +15,8 @@
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
- * @version  2.2.1
+ * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @version  2.3.0
  *
  * @file Line
  * @public
@@ -92,6 +93,27 @@ var Line = /** @class */ (function (_super) {
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
+    };
+    //--- Implement PathSegment ---
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    Line.prototype.getStartPoint = function () {
+        return this.a;
+    };
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    Line.prototype.getEndPoint = function () {
+        return this.b;
     };
     return Line;
 }(VertTuple_1.VertTuple));

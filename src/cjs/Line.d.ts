@@ -14,14 +14,15 @@
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
- * @version  2.2.1
+ * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @version  2.3.0
  *
  * @file Line
  * @public
  **/
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable } from "./interfaces";
+import { PathSegment, SVGSerializable } from "./interfaces";
 /**
  * @classdesc A line consists of two vertices a and b.<br>
  * <br>
@@ -30,7 +31,7 @@ import { SVGSerializable } from "./interfaces";
  *
  * @requires Vertex
  */
-export declare class Line extends VertTuple<Line> implements SVGSerializable {
+export declare class Line extends VertTuple<Line> implements SVGSerializable, PathSegment {
     /**
      * Required to generate proper CSS classes and other class related IDs.
      **/
@@ -54,4 +55,35 @@ export declare class Line extends VertTuple<Line> implements SVGSerializable {
      * @memberof Line
      **/
     intersection(line: Line): Vertex | null;
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    getStartPoint(): Vertex;
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    getEndPoint(): Vertex;
+    /**
+     * Create a deep clone of this path segment.
+     *
+     * @method clone
+     * @memberof PathSegment
+     * @return {PathSegment} A deep clone/copy of this path segment.
+     */
+    /**
+     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
+     *
+     * @method revert
+     * @memberof PathSegment
+     * @return {PathSegment} This path segment instance (for chaining).
+     */
+    revert: () => PathSegment;
 }

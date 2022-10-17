@@ -20,14 +20,15 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.6.0
+ * @modified 2022-10-17 Addint these method from the `PathSegment` interface: revert.
+ * @version 2.7.0
  *
  * @file CubicBezierCurve
  * @public
  **/
 import { Bounds } from "./Bounds";
 import { Vertex } from "./Vertex";
-import { XYCoords, UID } from "./interfaces";
+import { XYCoords, UID, PathSegment } from "./interfaces";
 /**
  * @classdesc A refactored cubic bezier curve class.
  *
@@ -38,7 +39,7 @@ import { XYCoords, UID } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  */
-export declare class CubicBezierCurve {
+export declare class CubicBezierCurve implements PathSegment {
     /** @constant {number} */
     static readonly START_POINT: number;
     /** @constant {number} */
@@ -388,6 +389,7 @@ export declare class CubicBezierCurve {
      * @return {CubicBezierCurve}
      **/
     clone(): CubicBezierCurve;
+    revert(): CubicBezierCurve;
     /**
      * Check if this and the specified curve are equal.<br>
      * <br>

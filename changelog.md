@@ -1,5 +1,13 @@
 # Changelog
 
+- 2022-10-17
+  - Adding the `algorithms/detectPaths` function.
+  - Changing the return type of `GirihTile.transformTilePositionToAdjacency` from `Polygon`to `Polygon | null`.
+  - Adding these methods from the `PathSegment` interface to the `Line` class: getStartPoint, getEndPoint, revert.
+  - Adding these methods from the `PathSegment` interface to the `CubicBezierCurve` class: revert.
+- 2022-10-07
+  - Adding the 44-truchet-tiles demo.
+  - Adding the `algorithms/arrayShuffle` function.
 - 2022-10-09 (v1.18.0)
   - Added the `Bounds.fromDimension` function.
   - Changed the actual return value of the `Line.intersection` function to null (was undefined before).

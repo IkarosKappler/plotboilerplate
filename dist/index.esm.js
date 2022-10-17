@@ -1995,7 +1995,8 @@ Vector.utils = {
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.6.0
+ * @modified 2022-10-17 Addint these method from the `PathSegment` interface: revert.
+ * @version 2.7.0
  *
  * @file CubicBezierCurve
  * @public
@@ -2041,7 +2042,7 @@ class CubicBezierCurve {
         // An array of floats
         this.segmentLengths = [];
         // float
-        this.arcLength = null;
+        // this.arcLength = null;
         this.updateArcLengths();
     }
     /**
@@ -2472,6 +2473,17 @@ class CubicBezierCurve {
      **/
     clone() {
         return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
+    }
+    revert() {
+        const sp = this.startPoint;
+        const scp = this.startControlPoint;
+        const ep = this.endPoint;
+        const ecp = this.endControlPoint;
+        this.startPoint = ep;
+        this.startControlPoint = ecp;
+        this.endPoint = sp;
+        this.endControlPoint = scp;
+        return this;
     }
     /**
      * Check if this and the specified curve are equal.<br>
@@ -3887,7 +3899,8 @@ BezierPath.END_POINT = 3;
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
- * @version  2.2.1
+ * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @version  2.3.0
  *
  * @file Line
  * @public
@@ -3945,6 +3958,27 @@ class Line extends VertTuple {
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex(x, y);
+    }
+    //--- Implement PathSegment ---
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    getStartPoint() {
+        return this.a;
+    }
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    getEndPoint() {
+        return this.b;
     }
 }
 

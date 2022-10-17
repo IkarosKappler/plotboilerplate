@@ -2213,7 +2213,8 @@ exports.CircleSector = CircleSector;
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.6.0
+ * @modified 2022-10-17 Addint these method from the `PathSegment` interface: revert.
+ * @version 2.7.0
  *
  * @file CubicBezierCurve
  * @public
@@ -2265,7 +2266,7 @@ var CubicBezierCurve = /** @class */ (function () {
         // An array of floats
         this.segmentLengths = [];
         // float
-        this.arcLength = null;
+        // this.arcLength = null;
         this.updateArcLengths();
     }
     /**
@@ -2696,6 +2697,17 @@ var CubicBezierCurve = /** @class */ (function () {
      **/
     CubicBezierCurve.prototype.clone = function () {
         return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
+    };
+    CubicBezierCurve.prototype.revert = function () {
+        var sp = this.startPoint;
+        var scp = this.startControlPoint;
+        var ep = this.endPoint;
+        var ecp = this.endControlPoint;
+        this.startPoint = ep;
+        this.startControlPoint = ecp;
+        this.endPoint = sp;
+        this.endControlPoint = scp;
+        return this;
     };
     /**
      * Check if this and the specified curve are equal.<br>
@@ -3423,7 +3435,8 @@ exports.KeyHandler = KeyHandler;
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
- * @version  2.2.1
+ * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @version  2.3.0
  *
  * @file Line
  * @public
@@ -3500,6 +3513,27 @@ var Line = /** @class */ (function (_super) {
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
+    };
+    //--- Implement PathSegment ---
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    Line.prototype.getStartPoint = function () {
+        return this.a;
+    };
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    Line.prototype.getEndPoint = function () {
+        return this.b;
     };
     return Line;
 }(VertTuple_1.VertTuple));
