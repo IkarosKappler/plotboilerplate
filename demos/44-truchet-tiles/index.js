@@ -60,6 +60,12 @@
       )
     );
 
+    var randColor = function (i, alpha) {
+      var color = WebColorsContrast[i % WebColorsContrast.length].clone();
+      if (typeof alpha !== undefined) color.a = alpha;
+      return color.cssRGBA();
+    };
+
     var viewport = pb.viewport();
 
     // +---------------------------------------------------------------------------------
@@ -126,60 +132,49 @@
     };
 
     // Get the sqare connector vector
-    // { point, controlPoint }
+    // --- { point, controlPoint }
+    // +++ { a, b }
     var getSquareConnectorLocation = function (tileBounds, connectorIndex) {
       switch (connectorIndex) {
         case 0:
           return {
-            point: { x: tileBounds.min.x + tileBounds.width / 3, y: tileBounds.min.y },
-            controlPoint: {
-              x: tileBounds.min.x + tileBounds.width / 3,
-              y: tileBounds.min.y + tileBounds.height / 3
-            }
+            a: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y),
+            b: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
           };
         case 1:
           return {
-            point: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.min.y },
-            controlPoint: {
-              x: tileBounds.min.x + (tileBounds.width / 3) * 2,
-              y: tileBounds.min.y + tileBounds.height / 3
-            }
+            a: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y),
+            b: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
           };
         case 2:
           return {
-            point: { x: tileBounds.max.x, y: tileBounds.min.y + tileBounds.height / 3 },
-            controlPoint: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.min.y + tileBounds.height / 3 }
+            a: new Vertex(tileBounds.max.x, tileBounds.min.y + tileBounds.height / 3),
+            b: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
           };
         case 3:
           return {
-            point: { x: tileBounds.min.x + tileBounds.width, y: tileBounds.min.y + (tileBounds.height / 3) * 2 },
-            controlPoint: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.min.y + (tileBounds.height / 3) * 2 }
+            a: new Vertex(tileBounds.min.x + tileBounds.width, tileBounds.min.y + (tileBounds.height / 3) * 2),
+            b: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
           };
         case 4:
           return {
-            point: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.max.y },
-            controlPoint: { x: tileBounds.min.x + (tileBounds.width / 3) * 2, y: tileBounds.min.y + (tileBounds.height / 3) * 2 }
+            a: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.max.y),
+            b: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
           };
         case 5:
           return {
-            point: { x: tileBounds.min.x + tileBounds.width / 3, y: tileBounds.max.y },
-            controlPoint: {
-              x: tileBounds.min.x + tileBounds.width / 3,
-              y: tileBounds.min.y + (tileBounds.height / 3) * 2
-            }
+            a: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.max.y),
+            b: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
           };
         case 6:
           return {
-            point: { x: tileBounds.min.x, y: tileBounds.min.y + (tileBounds.height / 3) * 2 },
-            controlPoint: {
-              x: tileBounds.min.x + tileBounds.width / 3,
-              y: tileBounds.min.y + (tileBounds.height / 3) * 2
-            }
+            a: new Vertex(tileBounds.min.x, tileBounds.min.y + (tileBounds.height / 3) * 2),
+            b: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
           };
         case 7:
           return {
-            point: { x: tileBounds.min.x, y: tileBounds.min.y + tileBounds.height / 3 },
-            controlPoint: { x: tileBounds.min.x + tileBounds.width / 3, y: tileBounds.min.y + tileBounds.height / 3 }
+            a: new Vertex(tileBounds.min.x, tileBounds.min.y + tileBounds.height / 3),
+            b: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
           };
       }
     };
@@ -226,15 +221,16 @@
             continue;
           }
           var endVector = getSquareConnectorLocation(tileBounds, end);
-          var line = new Line(startVector.point, endVector.point);
+          var line = new Line(startVector.a, endVector.a);
           if (!canConnectLine(line, connections)) {
             // console.log("Cannot connect ", start, end);
             continue;
           }
           connections.push({
             line: line,
-            startVector: startVector,
-            endVector: endVector,
+            // startVector: startVector,
+            // endVector: endVector,
+            curveSegment: new CubicBezierCurve(startVector.a, endVector.a, startVector.b, endVector.b),
             indices: [start, allowedConnections[start][j]]
           });
           isConnected[start] = true;
@@ -258,19 +254,7 @@
         }
       );
       draw.rect(bounds.min, bounds.width, bounds.height, "orange", 1);
-      // var tileSize = Bounds.fromDimension(bounds.width / config.countH, bounds.height / config.countV, bounds.min);
-      // // console.log("tileSize", tileSize);
-      // for (var i = 0; i < config.countH; i++) {
-      //   for (var j = 0; j < config.countV; j++) {
-      //     var tileBounds = new Bounds(
-      //       { x: bounds.min.x + tileSize.width * i, y: bounds.min.y + tileSize.height * j },
-      //       { x: bounds.min.x + tileSize.width * (i + 1), y: bounds.min.y + tileSize.height * (j + 1) }
-      //     );
-      //     // console.log("tileBounds", tileBounds);
-      //     draw.rect(tileBounds.min, tileBounds.width, tileBounds.height, "green", 1);
-      //     drawTruchetSquare(draw, fill, tileBounds);
-      //   }
-      // }
+      var pathSegments = []; // Array<PathSegment>
       for (var tileIndex in tiles) {
         // console.log("tile", tile);
         var tile = tiles[tileIndex];
@@ -280,15 +264,44 @@
           draw.line(connection.line.a, connection.line.b, "rgba(192,192,192,0.1)", 3);
           // console.log("connection", connection);
           draw.cubicBezier(
-            connection.startVector.point,
-            connection.endVector.point,
-            connection.startVector.controlPoint,
-            connection.endVector.controlPoint,
+            connection.curveSegment.startPoint,
+            connection.curveSegment.endPoint,
+            connection.curveSegment.startControlPoint,
+            connection.curveSegment.endControlPoint,
             "rgba(192,0,192,0.75)",
             2
           );
+          pathSegments.push(connection.curveSegment);
         }
       }
+
+      // Find connected paths
+      console.log("Path segments generated", pathSegments.length);
+      var paths = detectPaths(pathSegments);
+      console.log("paths found", paths.length);
+      console.log("paths", paths);
+
+      // Connect adjacent paths?
+      // paths = detectPaths(paths);
+
+      for (var i = 0; i < paths.length; i++) {
+        var path = paths[i];
+        // draw.cubicBezierPath(path: Array<Vertex>, color: string, lineWidth?: number) {
+        draw.cubicBezierPath(cubicBezierPath2VertexArray(path), randColor(i, 0.5), 2);
+      }
+    };
+
+    var cubicBezierPath2VertexArray = function (path) {
+      if (path.getSegmentCount() === 0) {
+        return [];
+      }
+      var result = [];
+      result.push(path.getSegmentAt(0).startPoint);
+      for (var i = 0; i < path.getSegmentCount(); i++) {
+        var curve = path.getSegmentAt(i);
+        result.push(curve.startControlPoint, curve.endControlPoint, curve.endPoint);
+      }
+      return result;
     };
 
     // Add a mouse listener to track the mouse position.

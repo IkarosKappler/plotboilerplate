@@ -3,15 +3,6 @@
  * @version 1.0.0
  * @date    2022-10-17
  */
-// export interface PathSegment {
-//   getStartPoint(): Vertex;
-//   getEndPoint(): Vertex;
-//   revert: () => PathSegment;
-// }
-// export interface Path {
-//   segments: Array<PathSegment>;
-//   revert: () => Path;
-// }
 export class GenericPath {
     constructor(startSegment) {
         this.segments = [startSegment];
@@ -64,6 +55,26 @@ export class GenericPath {
         }
         this.segments = newSegments;
         return this;
+    }
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    getStartPoint() {
+        return this.segments[0].getStartPoint();
+    }
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    getEndPoint() {
+        return this.segments[this.segments.length - 1].getEndPoint();
     }
 }
 //# sourceMappingURL=GenericPath.js.map

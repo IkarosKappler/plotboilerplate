@@ -18,7 +18,7 @@ var locateUnvisitedSegment = function (segments, isSegmentVisited) {
     }
     return -1;
 };
-var getAdjacentSegment = function (segments, isSegmentVisited, currentSegment, epsilon) {
+var getAdjacentSegment = function (segments, isSegmentVisited, currentSegment, epsilon, resultPath) {
     for (var j = 0; j < segments.length; j++) {
         if (isSegmentVisited[j]) {
             continue;
@@ -26,10 +26,13 @@ var getAdjacentSegment = function (segments, isSegmentVisited, currentSegment, e
         var nextSegment = segments[j];
         // [start]---[end] [start]---[end]
         if (currentSegment.getEndPoint().distance(nextSegment.getStartPoint()) < epsilon) {
+            // resultPath. .segments.push(nextSegment);
+            isSegmentVisited[j] = true;
             return nextSegment;
         }
         // [start]---[end] [end]---[start]
         else if (currentSegment.getEndPoint().distance(nextSegment.getEndPoint()) < epsilon) {
+            isSegmentVisited[j] = true;
             return nextSegment.revert();
         }
     }
@@ -42,7 +45,10 @@ var detectAdjacentPath = function (segments, isSegmentVisited, currentSegmentInd
     var i = 0;
     // Find a good condition for this loop
     while (i < segments.length && currentSegment) {
-        currentSegment = getAdjacentSegment(segments, isSegmentVisited, currentSegment, epsilon);
+        currentSegment = getAdjacentSegment(segments, isSegmentVisited, currentSegment, epsilon, path);
+        if (currentSegment) {
+            path.segments.push(currentSegment);
+        }
         i++;
     }
     return path;
@@ -60,6 +66,7 @@ var detectPaths = function (segments) {
         i++;
         var path = detectAdjacentPath(segments, isSegmentVisited, nextSegmentIndex, 0.1);
         i += path.getSegmentCount() - 1;
+        resultPaths.push(path);
     }
     return resultPaths;
 };

@@ -23,7 +23,8 @@ const getAdjacentSegment = (
   segments: Array<PathSegment>,
   isSegmentVisited: Array<boolean>,
   currentSegment: PathSegment,
-  epsilon: number
+  epsilon: number,
+  resultPath: Path
 ): PathSegment | null => {
   for (var j = 0; j < segments.length; j++) {
     if (isSegmentVisited[j]) {
@@ -32,10 +33,13 @@ const getAdjacentSegment = (
     var nextSegment = segments[j];
     // [start]---[end] [start]---[end]
     if (currentSegment.getEndPoint().distance(nextSegment.getStartPoint()) < epsilon) {
+      // resultPath. .segments.push(nextSegment);
+      isSegmentVisited[j] = true;
       return nextSegment;
     }
     // [start]---[end] [end]---[start]
     else if (currentSegment.getEndPoint().distance(nextSegment.getEndPoint()) < epsilon) {
+      isSegmentVisited[j] = true;
       return nextSegment.revert();
     }
   }
@@ -55,7 +59,10 @@ const detectAdjacentPath = (
   var i = 0;
   // Find a good condition for this loop
   while (i < segments.length && currentSegment) {
-    currentSegment = getAdjacentSegment(segments, isSegmentVisited, currentSegment, epsilon);
+    currentSegment = getAdjacentSegment(segments, isSegmentVisited, currentSegment, epsilon, path);
+    if (currentSegment) {
+      path.segments.push(currentSegment);
+    }
 
     i++;
   }
@@ -77,6 +84,8 @@ export const detectPaths = (segments: Array<PathSegment>): Array<Path> => {
 
     const path = detectAdjacentPath(segments, isSegmentVisited, nextSegmentIndex, 0.1);
     i += path.getSegmentCount() - 1;
+
+    resultPaths.push(path);
   }
   return resultPaths;
 };

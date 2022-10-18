@@ -42,7 +42,7 @@ export interface PathSegment {
 /**
  * A common interface for general path representations.
  */
-export interface Path {
+export interface Path extends PathSegment {
     /**
      * Get the number of segments in this path.
      *

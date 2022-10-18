@@ -39,4 +39,20 @@ export declare class GenericPath implements Path {
      * @return {PathSegment} This path instance.
      */
     revert(): this;
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    getStartPoint(): import("../..").Vertex;
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    getEndPoint(): import("../..").Vertex;
 }

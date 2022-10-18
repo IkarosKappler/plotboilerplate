@@ -6,15 +6,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GenericPath = void 0;
-// export interface PathSegment {
-//   getStartPoint(): Vertex;
-//   getEndPoint(): Vertex;
-//   revert: () => PathSegment;
-// }
-// export interface Path {
-//   segments: Array<PathSegment>;
-//   revert: () => Path;
-// }
 var GenericPath = /** @class */ (function () {
     function GenericPath(startSegment) {
         this.segments = [startSegment];
@@ -67,6 +58,26 @@ var GenericPath = /** @class */ (function () {
         }
         this.segments = newSegments;
         return this;
+    };
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    GenericPath.prototype.getStartPoint = function () {
+        return this.segments[0].getStartPoint();
+    };
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    GenericPath.prototype.getEndPoint = function () {
+        return this.segments[this.segments.length - 1].getEndPoint();
     };
     return GenericPath;
 }());
