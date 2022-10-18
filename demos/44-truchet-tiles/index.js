@@ -83,7 +83,9 @@
         clearTilesOnRedraw: true,
         drawLinearConnections: false,
         drawTruchetRaster: false,
-        closePattern: false
+        closePattern: false,
+        drawPathLabels: false,
+        fillAreas: false
       },
       GUP
     );
@@ -144,45 +146,45 @@
     var getSquareConnectorLocation = function (tileBounds, connectorIndex) {
       switch (connectorIndex) {
         case 0:
-          return {
-            a: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y),
-            b: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
-          };
+          return new Line(
+            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y),
+            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
+          );
         case 1:
-          return {
-            a: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y),
-            b: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-          };
+          return new Line(
+            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y),
+            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
+          );
         case 2:
-          return {
-            a: new Vertex(tileBounds.max.x, tileBounds.min.y + tileBounds.height / 3),
-            b: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-          };
+          return new Line(
+            new Vertex(tileBounds.max.x, tileBounds.min.y + tileBounds.height / 3),
+            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
+          );
         case 3:
-          return {
-            a: new Vertex(tileBounds.min.x + tileBounds.width, tileBounds.min.y + (tileBounds.height / 3) * 2),
-            b: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-          };
+          return new Line(
+            new Vertex(tileBounds.min.x + tileBounds.width, tileBounds.min.y + (tileBounds.height / 3) * 2),
+            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
+          );
         case 4:
-          return {
-            a: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.max.y),
-            b: new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-          };
+          return new Line(
+            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.max.y),
+            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
+          );
         case 5:
-          return {
-            a: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.max.y),
-            b: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
-          };
+          return new Line(
+            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.max.y),
+            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
+          );
         case 6:
-          return {
-            a: new Vertex(tileBounds.min.x, tileBounds.min.y + (tileBounds.height / 3) * 2),
-            b: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
-          };
+          return new Line(
+            new Vertex(tileBounds.min.x, tileBounds.min.y + (tileBounds.height / 3) * 2),
+            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
+          );
         case 7:
-          return {
-            a: new Vertex(tileBounds.min.x, tileBounds.min.y + tileBounds.height / 3),
-            b: new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
-          };
+          return new Line(
+            new Vertex(tileBounds.min.x, tileBounds.min.y + tileBounds.height / 3),
+            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
+          );
       }
     };
 
@@ -249,63 +251,15 @@
       if (config.closePattern) {
         var startVector, endVector;
         if (indexH === 0) {
-          // startVector = getSquareConnectorLocation(tileBounds, 7);
-          // endVector = getSquareConnectorLocation(tileBounds, 6);
-          // connections.push({
-          //   line: new Line(startVector, endVector),
-          //   curveSegment: new CubicBezierCurve(
-          //     startVector.a,
-          //     endVector.a,
-          //     startVector.a.clone().lerp(endVector.a, 0.3),
-          //     endVector.a.clone().lerp(startVector.a, 0.3),
-          //     indices[[7, 6]]
-          //   )
-          // });
           closeTileAt(tileBounds, connections, 6, 7);
         }
         if (indexH + 1 === config.countH) {
-          // startVector = getSquareConnectorLocation(tileBounds, 2);
-          // endVector = getSquareConnectorLocation(tileBounds, 3);
-          // connections.push({
-          //   line: new Line(startVector, endVector),
-          //   curveSegment: new CubicBezierCurve(
-          //     startVector.a,
-          //     endVector.a,
-          //     startVector.a.clone().lerp(endVector.a, 0.3),
-          //     endVector.a.clone().lerp(startVector.a, 0.3),
-          //     indices[[2, 3]]
-          //   )
-          // });
           closeTileAt(tileBounds, connections, 2, 3);
         }
-        if (indexH === 0) {
-          // startVector = getSquareConnectorLocation(tileBounds, 0);
-          // endVector = getSquareConnectorLocation(tileBounds, 1);
-          // connections.push({
-          //   line: new Line(startVector, endVector),
-          //   curveSegment: new CubicBezierCurve(
-          //     startVector.a,
-          //     endVector.a,
-          //     startVector.a.clone().lerp(endVector.a, 0.3),
-          //     endVector.a.clone().lerp(startVector.a, 0.3),
-          //     indices[[0, 1]]
-          //   )
-          // });
+        if (indexV === 0) {
           closeTileAt(tileBounds, connections, 0, 1);
         }
-        if (indexH + 1 === config.countH) {
-          // startVector = getSquareConnectorLocation(tileBounds, 5);
-          // endVector = getSquareConnectorLocation(tileBounds, 4);
-          // connections.push({
-          //   line: new Line(startVector, endVector),
-          //   curveSegment: new CubicBezierCurve(
-          //     startVector.a,
-          //     endVector.a,
-          //     startVector.a.clone().lerp(endVector.a, 0.3),
-          //     endVector.a.clone().lerp(startVector.a, 0.3),
-          //     indices[(5, 4)]
-          //   )
-          // });
+        if (indexV + 1 === config.countV) {
           closeTileAt(tileBounds, connections, 4, 5);
         }
       }
@@ -314,17 +268,17 @@
     };
 
     var closeTileAt = function (tileBounds, connections, squareConnectorIndexA, squareConnectorIndexB) {
-      startVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexA); //.addXY(5, 5);
-      endVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexB); // .addXY(5, 5);
+      var startVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexA); // .add({ x: 5, y: 5 });
+      var endVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexB); // .add({ x: 5, y: 5 });
       connections.push({
         line: new Line(startVector, endVector),
         curveSegment: new CubicBezierCurve(
           startVector.a,
           endVector.a,
           startVector.a.clone().lerp(endVector.a, 0.3),
-          endVector.a.clone().lerp(startVector.a, 0.3),
-          indices[(squareConnectorIndexA, squareConnectorIndexB)]
-        )
+          endVector.a.clone().lerp(startVector.a, 0.3)
+        ),
+        indices: [squareConnectorIndexA, squareConnectorIndexB]
       });
     };
 
@@ -363,16 +317,15 @@
             "rgba(192,0,192,0.75)",
             2
           );
-          fill.text("SP", connection.curveSegment.startPoint.x - 5, connection.curveSegment.startPoint.y - 1, {
-            color: "rgba(128,128,128,0.5)"
-          });
-          fill.text("EP", connection.curveSegment.endPoint.x + 5, connection.curveSegment.endPoint.y + 1, {
-            color: "rgba(128,0,128,0.5)"
-          });
+          if (config.drawPathLabels) {
+            fill.text("SP", connection.curveSegment.startPoint.x - 5, connection.curveSegment.startPoint.y - 1, {
+              color: "rgba(128,128,128,0.5)"
+            });
+            fill.text("EP", connection.curveSegment.endPoint.x + 5, connection.curveSegment.endPoint.y + 1, {
+              color: "rgba(128,0,128,0.5)"
+            });
+          }
           pathSegments.push(connection.curveSegment);
-          // if( i === 0 || i+1 ===) {
-
-          // }
         }
       }
 
@@ -389,6 +342,9 @@
         var path = paths[i];
         // draw.cubicBezierPath(path: Array<Vertex>, color: string, lineWidth?: number) {
         draw.cubicBezierPath(cubicBezierPath2VertexArray(path), randColor(i, 0.5), 2);
+        if (config.fillAreas) {
+          fill.cubicBezierPath(cubicBezierPath2VertexArray(path), randColor(i, 0.2), 2);
+        }
       }
     };
 
@@ -442,7 +398,11 @@
       // prettier-ignore
       gui.add(config, 'drawTruchetRaster').listen().onChange(function() { pb.redraw() }).name("drawTruchetRaster").title("drawTruchetRaster");
       // prettier-ignore
+      gui.add(config, 'drawPathLabels').listen().onChange(function() { pb.redraw() }).name("drawPathLabels").title("drawPathLabels");
+      // prettier-ignore
       gui.add(config, 'closePattern').listen().onChange(function() { computeTiles(); pb.redraw(); }).name("closePattern").title("closePattern");
+      // prettier-ignore
+      gui.add(config, 'fillAreas').listen().onChange(function() {  pb.redraw(); }).name("fillAreas").title("fillAreas");
     }
 
     computeTiles();
