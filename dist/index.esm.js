@@ -2474,6 +2474,7 @@ class CubicBezierCurve {
     clone() {
         return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
     }
+    // TODO: docs?
     revert() {
         const sp = this.startPoint;
         const scp = this.startControlPoint;

@@ -6,4 +6,4 @@
  * @date    2022-10-17
  */
 import { Path, PathSegment } from "../..";
-export declare const detectPaths: (segments: Array<PathSegment>) => Array<Path>;
+export declare const detectPaths: (segments: Array<PathSegment>, epsilon?: number) => Array<Path>;

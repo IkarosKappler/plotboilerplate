@@ -2698,6 +2698,7 @@ var CubicBezierCurve = /** @class */ (function () {
     CubicBezierCurve.prototype.clone = function () {
         return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
     };
+    // TODO: docs?
     CubicBezierCurve.prototype.revert = function () {
         var sp = this.startPoint;
         var scp = this.startControlPoint;

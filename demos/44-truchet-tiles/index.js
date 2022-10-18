@@ -15,6 +15,10 @@
 (function (_context) {
   "use strict";
 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+  // TODO: CubicBezierCurve already has a `reverse` method!!!!!!!!
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 -> rename `revert` in Path!
+
   window.initializePB = function () {
     if (window.pbInitialized) {
       return;
@@ -76,7 +80,10 @@
         safeZonePct: 0.1,
         countH: 10,
         countV: 10,
-        clearTilesOnRedraw: true
+        clearTilesOnRedraw: true,
+        drawLinearConnections: false,
+        drawTruchetRaster: false,
+        closePattern: false
       },
       GUP
     );
@@ -105,7 +112,7 @@
           );
           // console.log("tileBounds", tileBounds);
           // draw.rect(tileBounds.min, tileBounds.width, tileBounds.height, "green", 1);
-          const tile = makeTruchetSquare(tileBounds);
+          const tile = makeTruchetSquare(tileBounds, i, j);
           tiles.push(tile);
         }
       }
@@ -199,7 +206,7 @@
       6: [1, 3, 5, 7],
       7: [0, 2, 4, 6]
     };
-    var makeTruchetSquare = function (tileBounds) {
+    var makeTruchetSquare = function (tileBounds, indexH, indexV) {
       var connections = []; // Array<{ line: Line, startVector, endVector, indices : [number,number] } >
       var isConnected = [false, false, false, false, false, false, false, false];
       var indices = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -237,7 +244,88 @@
           isConnected[allowedConnections[start][j]] = true;
         }
       }
+
+      // If on the border of the grid close connections in a linear manner
+      if (config.closePattern) {
+        var startVector, endVector;
+        if (indexH === 0) {
+          // startVector = getSquareConnectorLocation(tileBounds, 7);
+          // endVector = getSquareConnectorLocation(tileBounds, 6);
+          // connections.push({
+          //   line: new Line(startVector, endVector),
+          //   curveSegment: new CubicBezierCurve(
+          //     startVector.a,
+          //     endVector.a,
+          //     startVector.a.clone().lerp(endVector.a, 0.3),
+          //     endVector.a.clone().lerp(startVector.a, 0.3),
+          //     indices[[7, 6]]
+          //   )
+          // });
+          closeTileAt(tileBounds, connections, 6, 7);
+        }
+        if (indexH + 1 === config.countH) {
+          // startVector = getSquareConnectorLocation(tileBounds, 2);
+          // endVector = getSquareConnectorLocation(tileBounds, 3);
+          // connections.push({
+          //   line: new Line(startVector, endVector),
+          //   curveSegment: new CubicBezierCurve(
+          //     startVector.a,
+          //     endVector.a,
+          //     startVector.a.clone().lerp(endVector.a, 0.3),
+          //     endVector.a.clone().lerp(startVector.a, 0.3),
+          //     indices[[2, 3]]
+          //   )
+          // });
+          closeTileAt(tileBounds, connections, 2, 3);
+        }
+        if (indexH === 0) {
+          // startVector = getSquareConnectorLocation(tileBounds, 0);
+          // endVector = getSquareConnectorLocation(tileBounds, 1);
+          // connections.push({
+          //   line: new Line(startVector, endVector),
+          //   curveSegment: new CubicBezierCurve(
+          //     startVector.a,
+          //     endVector.a,
+          //     startVector.a.clone().lerp(endVector.a, 0.3),
+          //     endVector.a.clone().lerp(startVector.a, 0.3),
+          //     indices[[0, 1]]
+          //   )
+          // });
+          closeTileAt(tileBounds, connections, 0, 1);
+        }
+        if (indexH + 1 === config.countH) {
+          // startVector = getSquareConnectorLocation(tileBounds, 5);
+          // endVector = getSquareConnectorLocation(tileBounds, 4);
+          // connections.push({
+          //   line: new Line(startVector, endVector),
+          //   curveSegment: new CubicBezierCurve(
+          //     startVector.a,
+          //     endVector.a,
+          //     startVector.a.clone().lerp(endVector.a, 0.3),
+          //     endVector.a.clone().lerp(startVector.a, 0.3),
+          //     indices[(5, 4)]
+          //   )
+          // });
+          closeTileAt(tileBounds, connections, 4, 5);
+        }
+      }
+
       return { bounds: tileBounds, connections: connections };
+    };
+
+    var closeTileAt = function (tileBounds, connections, squareConnectorIndexA, squareConnectorIndexB) {
+      startVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexA); //.addXY(5, 5);
+      endVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexB); // .addXY(5, 5);
+      connections.push({
+        line: new Line(startVector, endVector),
+        curveSegment: new CubicBezierCurve(
+          startVector.a,
+          endVector.a,
+          startVector.a.clone().lerp(endVector.a, 0.3),
+          endVector.a.clone().lerp(startVector.a, 0.3),
+          indices[(squareConnectorIndexA, squareConnectorIndexB)]
+        )
+      });
     };
 
     // +---------------------------------------------------------------------------------
@@ -258,10 +346,14 @@
       for (var tileIndex in tiles) {
         // console.log("tile", tile);
         var tile = tiles[tileIndex];
-        draw.rect(tile.bounds.min, tile.bounds.width, tile.bounds.height, "rgba(0,255,0,0.5)", 1);
+        if (config.drawTruchetRaster) {
+          draw.rect(tile.bounds.min, tile.bounds.width, tile.bounds.height, "rgba(0,255,0,0.5)", 1);
+        }
         for (var c in tile.connections) {
           var connection = tile.connections[c];
-          draw.line(connection.line.a, connection.line.b, "rgba(192,192,192,0.1)", 3);
+          if (config.drawLinearConnections) {
+            draw.line(connection.line.a, connection.line.b, "rgba(192,192,192,0.1)", 3);
+          }
           // console.log("connection", connection);
           draw.cubicBezier(
             connection.curveSegment.startPoint,
@@ -271,7 +363,16 @@
             "rgba(192,0,192,0.75)",
             2
           );
+          fill.text("SP", connection.curveSegment.startPoint.x - 5, connection.curveSegment.startPoint.y - 1, {
+            color: "rgba(128,128,128,0.5)"
+          });
+          fill.text("EP", connection.curveSegment.endPoint.x + 5, connection.curveSegment.endPoint.y + 1, {
+            color: "rgba(128,0,128,0.5)"
+          });
           pathSegments.push(connection.curveSegment);
+          // if( i === 0 || i+1 ===) {
+
+          // }
         }
       }
 
@@ -309,8 +410,6 @@
       var relPos = pb.transformMousePosition(event.params.pos.x, event.params.pos.y);
       stats.mouseXTop = relPos.x;
       stats.mouseYTop = relPos.y;
-      // mousePosition.set(relPos);
-      // pb.redraw();
     });
 
     // +---------------------------------------------------------------------------------
@@ -338,6 +437,12 @@
       gui.add(config, 'countV').min(1).max(100).step(1).listen().onChange(function() { computeTiles(); pb.redraw() }).name("countV").title("countV");
       // prettier-ignore
       gui.add(config, 'clearTilesOnRedraw').listen().onChange(function() { pb.redraw() }).name("clearTilesOnRedraw").title("clearTilesOnRedraw");
+      // prettier-ignore
+      gui.add(config, 'drawLinearConnections').listen().onChange(function() { pb.redraw() }).name("drawLinearConnections").title("drawLinearConnections");
+      // prettier-ignore
+      gui.add(config, 'drawTruchetRaster').listen().onChange(function() { pb.redraw() }).name("drawTruchetRaster").title("drawTruchetRaster");
+      // prettier-ignore
+      gui.add(config, 'closePattern').listen().onChange(function() { computeTiles(); pb.redraw(); }).name("closePattern").title("closePattern");
     }
 
     computeTiles();

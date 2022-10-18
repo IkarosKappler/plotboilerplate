@@ -628,6 +628,7 @@ export class CubicBezierCurve implements PathSegment {
     );
   }
 
+  // TODO: docs?
   revert(): CubicBezierCurve {
     const sp = this.startPoint;
     const scp = this.startControlPoint;
