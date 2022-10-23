@@ -15,10 +15,6 @@
 (function (_context) {
   "use strict";
 
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-  // TODO: CubicBezierCurve already has a `reverse` method!!!!!!!!
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 -> rename `revert` in Path!
-
   window.initializePB = function () {
     if (window.pbInitialized) {
       return;
@@ -64,6 +60,8 @@
       )
     );
 
+    var tileBuilder = SquareTileBuilder;
+
     var randColor = function (i, alpha) {
       var color = WebColorsContrast[i % WebColorsContrast.length].clone();
       if (typeof alpha !== undefined) color.a = alpha;
@@ -77,6 +75,7 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
+        drawSafeZone: true,
         safeZonePct: 0.1,
         countH: 10,
         countV: 10,
@@ -103,191 +102,13 @@
           y: viewport.min.y + viewport.height * config.safeZonePct + viewport.height * (1 - 2 * config.safeZonePct)
         }
       );
-      // draw.rect(bounds.min, bounds.width, bounds.height, "orange", 1);
-      var tileSize = Bounds.fromDimension(bounds.width / config.countH, bounds.height / config.countV, bounds.min);
-      // console.log("tileSize", tileSize);
-      for (var i = 0; i < config.countH; i++) {
-        for (var j = 0; j < config.countV; j++) {
-          var tileBounds = new Bounds(
-            { x: bounds.min.x + tileSize.width * i, y: bounds.min.y + tileSize.height * j },
-            { x: bounds.min.x + tileSize.width * (i + 1), y: bounds.min.y + tileSize.height * (j + 1) }
-          );
-          // console.log("tileBounds", tileBounds);
-          // draw.rect(tileBounds.min, tileBounds.width, tileBounds.height, "green", 1);
-          const tile = makeTruchetSquare(tileBounds, i, j);
-          tiles.push(tile);
-        }
-      }
-    };
-
-    var doLinesIntersect = function (lineA, lineB) {
-      var intersection = lineA.intersection(lineB);
-      if (!intersection) {
-        return false;
-      }
-      // TODO: check if only one condition is enough here
-      return lineA.hasPoint(intersection, true) && lineB.hasPoint(intersection, true);
-    };
-
-    // Line
-    // Array<{ line : Line, ... }>
-    var canConnectLine = function (line, connections) {
-      for (var i = 0; i < connections.length; i++) {
-        if (doLinesIntersect(line, connections[i].line)) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    // Get the sqare connector vector
-    // --- { point, controlPoint }
-    // +++ { a, b }
-    var getSquareConnectorLocation = function (tileBounds, connectorIndex) {
-      switch (connectorIndex) {
-        case 0:
-          return new Line(
-            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y),
-            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
-          );
-        case 1:
-          return new Line(
-            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y),
-            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-          );
-        case 2:
-          return new Line(
-            new Vertex(tileBounds.max.x, tileBounds.min.y + tileBounds.height / 3),
-            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-          );
-        case 3:
-          return new Line(
-            new Vertex(tileBounds.min.x + tileBounds.width, tileBounds.min.y + (tileBounds.height / 3) * 2),
-            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-          );
-        case 4:
-          return new Line(
-            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.max.y),
-            new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-          );
-        case 5:
-          return new Line(
-            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.max.y),
-            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
-          );
-        case 6:
-          return new Line(
-            new Vertex(tileBounds.min.x, tileBounds.min.y + (tileBounds.height / 3) * 2),
-            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
-          );
-        case 7:
-          return new Line(
-            new Vertex(tileBounds.min.x, tileBounds.min.y + tileBounds.height / 3),
-            new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
-          );
-      }
-    };
-
-    // Connector indices:
-    //         0    1
-    //    +----*----*----+
-    //    |              |
-    //  7 *              * 2
-    //    |              |
-    //  6 *              * 3
-    //    |              |
-    //    +----*----*----+
-    //         5    4
-    var allowedConnections = {
-      0: [1, 3, 5, 7],
-      1: [0, 2, 4, 6],
-      2: [1, 3, 5, 7],
-      3: [0, 2, 4, 6],
-      4: [1, 3, 5, 7],
-      5: [0, 2, 4, 6],
-      6: [1, 3, 5, 7],
-      7: [0, 2, 4, 6]
-    };
-    var makeTruchetSquare = function (tileBounds, indexH, indexV) {
-      var connections = []; // Array<{ line: Line, startVector, endVector, indices : [number,number] } >
-      var isConnected = [false, false, false, false, false, false, false, false];
-      var indices = [0, 1, 2, 3, 4, 5, 6, 7];
-      arrayShuffle(indices);
-      for (var i = 0; i < 8; i++) {
-        var start = indices[i];
-        if (isConnected[start]) {
-          continue;
-        }
-        var startVector = getSquareConnectorLocation(tileBounds, start);
-        arrayShuffle(allowedConnections[start]);
-        // if (start === 0) {
-        //   console.log("Shuffled", allowedConnections[start]);
-        // }
-        for (var j = 0; j < allowedConnections[start].length; j++) {
-          var end = allowedConnections[start][j];
-          if (isConnected[end]) {
-            // console.log("isconnected", end);
-            continue;
-          }
-          var endVector = getSquareConnectorLocation(tileBounds, end);
-          var line = new Line(startVector.a, endVector.a);
-          if (!canConnectLine(line, connections)) {
-            // console.log("Cannot connect ", start, end);
-            continue;
-          }
-          connections.push({
-            line: line,
-            // startVector: startVector,
-            // endVector: endVector,
-            curveSegment: new CubicBezierCurve(startVector.a, endVector.a, startVector.b, endVector.b),
-            indices: [start, allowedConnections[start][j]]
-          });
-          isConnected[start] = true;
-          isConnected[allowedConnections[start][j]] = true;
-        }
-      }
-
-      // If on the border of the grid close connections in a linear manner
-      if (config.closePattern) {
-        var startVector, endVector;
-        if (indexH === 0) {
-          closeTileAt(tileBounds, connections, 6, 7);
-        }
-        if (indexH + 1 === config.countH) {
-          closeTileAt(tileBounds, connections, 2, 3);
-        }
-        if (indexV === 0) {
-          closeTileAt(tileBounds, connections, 0, 1);
-        }
-        if (indexV + 1 === config.countV) {
-          closeTileAt(tileBounds, connections, 4, 5);
-        }
-      }
-
-      return { bounds: tileBounds, connections: connections };
-    };
-
-    var closeTileAt = function (tileBounds, connections, squareConnectorIndexA, squareConnectorIndexB) {
-      var startVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexA); // .add({ x: 5, y: 5 });
-      var endVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexB); // .add({ x: 5, y: 5 });
-      connections.push({
-        line: new Line(startVector, endVector),
-        curveSegment: new CubicBezierCurve(
-          startVector.a,
-          endVector.a,
-          startVector.a.clone().lerp(endVector.a, 0.3),
-          endVector.a.clone().lerp(startVector.a, 0.3)
-        ),
-        indices: [squareConnectorIndexA, squareConnectorIndexB]
-      });
+      tiles = tiles.concat(tileBuilder.computeTiles(bounds, config));
     };
 
     // +---------------------------------------------------------------------------------
     // | Draw our custom stuff after everything else in the scene was drawn.
     // +-------------------------------
     var redraw = function (draw, fill) {
-      // // var viewport = pb.viewport();
-      // // console.log("viewport", viewport);
       var bounds = new Bounds(
         { x: viewport.min.x + viewport.width * config.safeZonePct, y: viewport.min.y + viewport.height * config.safeZonePct },
         {
@@ -295,7 +116,9 @@
           y: viewport.min.y + viewport.height * config.safeZonePct + viewport.height * (1 - 2 * config.safeZonePct)
         }
       );
-      draw.rect(bounds.min, bounds.width, bounds.height, "orange", 1);
+      if (config.drawSafeZone) {
+        draw.rect(bounds.min, bounds.width, bounds.height, "orange", 1);
+      }
       var pathSegments = []; // Array<PathSegment>
       for (var tileIndex in tiles) {
         // console.log("tile", tile);
@@ -330,17 +153,10 @@
       }
 
       // Find connected paths
-      // console.log("Path segments generated", pathSegments.length);
       var paths = detectPaths(pathSegments);
-      // console.log("paths found", paths.length);
-      // console.log("paths", paths);
-
-      // Connect adjacent paths?
-      // paths = detectPaths(paths);
 
       for (var i = 0; i < paths.length; i++) {
         var path = paths[i];
-        // draw.cubicBezierPath(path: Array<Vertex>, color: string, lineWidth?: number) {
         var vertexData = cubicBezierPath2VertexArray(path);
         draw.cubicBezierPath(vertexData, randColor(i, 0.5), 2);
         if (config.fillAreas) {
@@ -386,6 +202,8 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
+      // prettier-ignore
+      gui.add(config, 'drawSafeZone').listen().onChange(function() { pb.redraw() }).name("drawSafeZone").title("drawSafeZone");
       // prettier-ignore
       gui.add(config, 'safeZonePct').min(0.5).max(1.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("safeZonePct").title("safeZonePct");
       // prettier-ignore
