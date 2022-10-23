@@ -60,7 +60,8 @@
       )
     );
 
-    var tileBuilder = SquareTileBuilder;
+    // var tileBuilder = SquareTileBuilder;
+    var tileBuilder = TriangleTileBuilder;
 
     var randColor = function (i, alpha) {
       var color = WebColorsContrast[i % WebColorsContrast.length].clone();
@@ -124,7 +125,10 @@
         // console.log("tile", tile);
         var tile = tiles[tileIndex];
         if (config.drawTruchetRaster) {
-          draw.rect(tile.bounds.min, tile.bounds.width, tile.bounds.height, "rgba(0,255,0,0.5)", 1);
+          // console.log("outlinePolygon", tile.outlinePolygon);
+          // draw.rect(tile.bounds.min, tile.bounds.width, tile.bounds.height, "rgba(0,255,0,0.5)", 1);
+          draw.polygon(tile.outlinePolygon, "rgba(0,255,0,0.5)", 1);
+          // fill.polygon(tile.outlinePolygon, randColor(tileIndex, 0.2), 1);
         }
         for (var c in tile.connections) {
           var connection = tile.connections[c];

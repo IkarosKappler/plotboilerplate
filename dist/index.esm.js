@@ -982,7 +982,7 @@ class Polygon {
         if (typeof vertices == "undefined")
             vertices = [];
         this.vertices = vertices;
-        this.isOpen = isOpen;
+        this.isOpen = isOpen || false;
     }
     /**
      * Add a vertex to the end of the `vertices` array.
