@@ -42,7 +42,7 @@ const initVisitationArray = (segments: Array<PathSegment>, epsilon: number) => {
   }
   for (var i = 0; i < segments.length; i++) {
     if (!result[i].hasSuccessor && result[i].hasPredecessor) {
-      segments[i] = segments[i].revert();
+      segments[i] = segments[i].reverse();
       result[i].hasPredecessor = false;
       result[i].hasSuccessor = true;
     }
@@ -88,7 +88,7 @@ const getAdjacentSegment = (
     // [start]---[end] [end]---[start]
     else if (currentSegment.getEndPoint().distance(nextSegment.getEndPoint()) < epsilon) {
       isSegmentVisited[j].visited = true;
-      return nextSegment.revert();
+      return nextSegment.reverse();
     }
   }
   return null;

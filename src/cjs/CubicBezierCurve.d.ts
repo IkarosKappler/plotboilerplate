@@ -20,8 +20,8 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
- * @modified 2022-10-17 Addint these method from the `PathSegment` interface: revert.
- * @version 2.7.0
+ * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
+ * @version 2.7.1
  *
  * @file CubicBezierCurve
  * @public
@@ -389,7 +389,22 @@ export declare class CubicBezierCurve implements PathSegment {
      * @return {CubicBezierCurve}
      **/
     clone(): CubicBezierCurve;
-    revert(): CubicBezierCurve;
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    getStartTangent(): Vertex;
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    getEndTangent(): Vertex;
     /**
      * Check if this and the specified curve are equal.<br>
      * <br>

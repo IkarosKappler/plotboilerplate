@@ -2213,8 +2213,8 @@ exports.CircleSector = CircleSector;
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
- * @modified 2022-10-17 Addint these method from the `PathSegment` interface: revert.
- * @version 2.7.0
+ * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
+ * @version 2.7.1
  *
  * @file CubicBezierCurve
  * @public
@@ -2698,18 +2698,28 @@ var CubicBezierCurve = /** @class */ (function () {
     CubicBezierCurve.prototype.clone = function () {
         return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
     };
-    // TODO: docs?
-    CubicBezierCurve.prototype.revert = function () {
-        var sp = this.startPoint;
-        var scp = this.startControlPoint;
-        var ep = this.endPoint;
-        var ecp = this.endControlPoint;
-        this.startPoint = ep;
-        this.startControlPoint = ecp;
-        this.endPoint = sp;
-        this.endControlPoint = scp;
-        return this;
+    //---BEGIN PathSegment-------------------------
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    CubicBezierCurve.prototype.getStartTangent = function () {
+        return this.startControlPoint;
     };
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    CubicBezierCurve.prototype.getEndTangent = function () {
+        return this.endControlPoint;
+    };
+    //---END PathSegment-------------------------
     /**
      * Check if this and the specified curve are equal.<br>
      * <br>
@@ -3535,6 +3545,39 @@ var Line = /** @class */ (function (_super) {
      */
     Line.prototype.getEndPoint = function () {
         return this.b;
+    };
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    Line.prototype.getStartTangent = function () {
+        return this.b;
+    };
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    Line.prototype.getEndTangent = function () {
+        return this.a;
+    };
+    /**
+     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
+     *
+     * @method reverse
+     * @memberof PathSegment
+     * @return {PathSegment} This path segment instance (for chaining).
+     */
+    Line.prototype.reverse = function () {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
     };
     return Line;
 }(VertTuple_1.VertTuple));

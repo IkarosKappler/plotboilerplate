@@ -330,10 +330,10 @@
       }
 
       // Find connected paths
-      console.log("Path segments generated", pathSegments.length);
+      // console.log("Path segments generated", pathSegments.length);
       var paths = detectPaths(pathSegments);
-      console.log("paths found", paths.length);
-      console.log("paths", paths);
+      // console.log("paths found", paths.length);
+      // console.log("paths", paths);
 
       // Connect adjacent paths?
       // paths = detectPaths(paths);
@@ -341,9 +341,10 @@
       for (var i = 0; i < paths.length; i++) {
         var path = paths[i];
         // draw.cubicBezierPath(path: Array<Vertex>, color: string, lineWidth?: number) {
-        draw.cubicBezierPath(cubicBezierPath2VertexArray(path), randColor(i, 0.5), 2);
+        var vertexData = cubicBezierPath2VertexArray(path);
+        draw.cubicBezierPath(vertexData, randColor(i, 0.5), 2);
         if (config.fillAreas) {
-          fill.cubicBezierPath(cubicBezierPath2VertexArray(path), randColor(i, 0.2), 2);
+          fill.cubicBezierPath(vertexData, randColor(i, 0.2), 2);
         }
       }
     };

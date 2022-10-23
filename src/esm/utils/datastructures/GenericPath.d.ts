@@ -4,6 +4,7 @@
  * @date    2022-10-17
  */
 import { Path, PathSegment } from "../../interfaces/additionals";
+import { Vertex } from "../../Vertex";
 export declare class GenericPath implements Path {
     segments: Array<PathSegment>;
     constructor(startSegment: PathSegment);
@@ -34,11 +35,11 @@ export declare class GenericPath implements Path {
     /**
      * Reverse this path (swap start and end and thus – the direction) in-place.
      *
-     * @method revert
+     * @method reverse
      * @memberof Path
      * @return {PathSegment} This path instance.
      */
-    revert(): this;
+    reverse(): this;
     /**
      * Get the start point of this path segment.
      *
@@ -46,7 +47,7 @@ export declare class GenericPath implements Path {
      * @memberof PathSegment
      * @return {Vertex} The start point of this path segment.
      */
-    getStartPoint(): import("../..").Vertex;
+    getStartPoint(): Vertex;
     /**
      * Get the end point of this path segment.
      *
@@ -54,5 +55,21 @@ export declare class GenericPath implements Path {
      * @memberof PathSegment
      * @return {Vertex} The end point of this path segment.
      */
-    getEndPoint(): import("../..").Vertex;
+    getEndPoint(): Vertex;
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    getStartTangent(): Vertex;
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    getEndTangent(): Vertex;
 }

@@ -5,6 +5,7 @@
  */
 
 import { Path, PathSegment } from "../../interfaces/additionals";
+import { Vertex } from "../../Vertex";
 
 export class GenericPath implements Path {
   segments: Array<PathSegment>;
@@ -43,9 +44,9 @@ export class GenericPath implements Path {
    * @return {Path} A deep clone/copy of this path.
    */
   clone(): GenericPath {
-    const newPath = new GenericPath(this.segments[this.segments.length - 1].clone().revert());
+    const newPath = new GenericPath(this.segments[this.segments.length - 1].clone().reverse());
     for (var i = this.segments.length - 2; i >= 0; i--) {
-      newPath.segments.push(this.segments[i].clone().revert());
+      newPath.segments.push(this.segments[i].clone().reverse());
     }
     return newPath;
   }
@@ -53,14 +54,14 @@ export class GenericPath implements Path {
   /**
    * Reverse this path (swap start and end and thus – the direction) in-place.
    *
-   * @method revert
+   * @method reverse
    * @memberof Path
    * @return {PathSegment} This path instance.
    */
-  revert() {
+  reverse() {
     const newSegments: Array<PathSegment> = [];
     for (var i = this.segments.length - 1; i >= 0; i--) {
-      newSegments.push(this.segments[i].revert());
+      newSegments.push(this.segments[i].reverse());
     }
     this.segments = newSegments;
     return this;
@@ -73,7 +74,7 @@ export class GenericPath implements Path {
    * @memberof PathSegment
    * @return {Vertex} The start point of this path segment.
    */
-  getStartPoint() {
+  getStartPoint(): Vertex {
     return this.segments[0].getStartPoint();
   }
 
@@ -84,7 +85,29 @@ export class GenericPath implements Path {
    * @memberof PathSegment
    * @return {Vertex} The end point of this path segment.
    */
-  getEndPoint() {
+  getEndPoint(): Vertex {
     return this.segments[this.segments.length - 1].getEndPoint();
+  }
+
+  /**
+   * Get the tangent's end point at the start point of this segment.
+   *
+   * @method getStartTangent
+   * @memberof PathSegment
+   * @return {Vertex} The end point of the starting point's tangent.
+   */
+  getStartTangent(): Vertex {
+    return this.segments[0].getStartTangent();
+  }
+
+  /**
+   * Get the tangent's end point at the end point of this segment.
+   *
+   * @method getEndTangent
+   * @memberof PathSegment
+   * @return {Vertex} The end point of the ending point's tangent.
+   */
+  getEndTangent(): Vertex {
+    return this.segments[this.segments.length - 1].getEndTangent();
   }
 }

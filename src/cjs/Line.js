@@ -115,6 +115,39 @@ var Line = /** @class */ (function (_super) {
     Line.prototype.getEndPoint = function () {
         return this.b;
     };
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    Line.prototype.getStartTangent = function () {
+        return this.b;
+    };
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    Line.prototype.getEndTangent = function () {
+        return this.a;
+    };
+    /**
+     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
+     *
+     * @method reverse
+     * @memberof PathSegment
+     * @return {PathSegment} This path segment instance (for chaining).
+     */
+    Line.prototype.reverse = function () {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
+    };
     return Line;
 }(VertTuple_1.VertTuple));
 exports.Line = Line;

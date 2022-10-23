@@ -72,18 +72,27 @@ export declare class Line extends VertTuple<Line> implements SVGSerializable, Pa
      */
     getEndPoint(): Vertex;
     /**
-     * Create a deep clone of this path segment.
+     * Get the tangent's end point at the start point of this segment.
      *
-     * @method clone
+     * @method getStartTangent
      * @memberof PathSegment
-     * @return {PathSegment} A deep clone/copy of this path segment.
+     * @return {Vertex} The end point of the starting point's tangent.
      */
+    getStartTangent(): Vertex;
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    getEndTangent(): Vertex;
     /**
      * Inverse this path segment (in-place) and return this same instance (useful for chaining).
      *
-     * @method revert
+     * @method reverse
      * @memberof PathSegment
      * @return {PathSegment} This path segment instance (for chaining).
      */
-    revert: () => PathSegment;
+    reverse(): Line;
 }

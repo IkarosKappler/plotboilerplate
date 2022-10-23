@@ -2,6 +2,8 @@
 /**
  * A function to detect connected paths on the plane given by a random set of segments.
  *
+ * Note that is algorithm operates IN PLACE and will ALTER your INPUT array.
+ *
  * @author  Ikaros Kappler
  * @version 1.0.0
  * @date    2022-10-17
@@ -29,7 +31,7 @@ var initVisitationArray = function (segments, epsilon) {
     }
     for (var i = 0; i < segments.length; i++) {
         if (!result[i].hasSuccessor && result[i].hasPredecessor) {
-            segments[i] = segments[i].revert();
+            segments[i] = segments[i].reverse();
             result[i].hasPredecessor = false;
             result[i].hasSuccessor = true;
         }
@@ -67,7 +69,7 @@ var getAdjacentSegment = function (segments, isSegmentVisited, currentSegment, e
         // [start]---[end] [end]---[start]
         else if (currentSegment.getEndPoint().distance(nextSegment.getEndPoint()) < epsilon) {
             isSegmentVisited[j].visited = true;
-            return nextSegment.revert();
+            return nextSegment.reverse();
         }
     }
     return null;
@@ -87,14 +89,6 @@ var detectAdjacentPath = function (segments, isSegmentVisited, currentSegmentInd
     }
     return path;
 };
-// const unifyPaths = (paths: Array<GenericPath>) => {
-//   const resultPaths = [];
-//   const pathVisited = arrayFill(paths.length, false);
-//   for (var i = 0; i < paths.length; i++) {
-//     var
-//   }
-//   return resultPaths;
-// };
 var detectPaths = function (segments, epsilon) {
     var eps = typeof epsilon === "undefined" || epsilon < 0 ? 1.0 : epsilon;
     // const isSegmentVisited : Array<Visitation> = arrayFill(segments.length, { visited: false, hasPredecessor: false });

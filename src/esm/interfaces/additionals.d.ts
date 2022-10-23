@@ -23,6 +23,22 @@ export interface PathSegment {
      */
     getEndPoint(): Vertex;
     /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    getStartTangent(): Vertex;
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    getEndTangent(): Vertex;
+    /**
      * Create a deep clone of this path segment.
      *
      * @method clone
@@ -31,13 +47,14 @@ export interface PathSegment {
      */
     clone: () => PathSegment;
     /**
-     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
+     * Revserse this path segment (in-place) and return this same instance (useful for chaining).
+     * The new path segment has start and end point swapped.
      *
-     * @method revert
+     * @method reverse
      * @memberof PathSegment
      * @return {PathSegment} This path segment instance (for chaining).
      */
-    revert: () => PathSegment;
+    reverse: () => PathSegment;
 }
 /**
  * A common interface for general path representations.
@@ -74,5 +91,5 @@ export interface Path extends PathSegment {
      * @memberof Path
      * @return {PathSegment} This path instance.
      */
-    revert: () => Path;
+    reverse: () => Path;
 }
