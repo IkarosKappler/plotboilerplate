@@ -15,6 +15,7 @@
  * @modified 2021-06-21 Added `IBounds.getCenter()`.
  * @modified 2021-11-16 Added `text` options to the `DrawConfig`.
  * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
+ * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
  **/
 export {};
 //# sourceMappingURL=core.js.map

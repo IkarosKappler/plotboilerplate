@@ -8,7 +8,9 @@
 
 (function (_context) {
   // Connector indices:
-
+  //
+  // Case A:
+  //        +
   //       / \
   //      /   \
   //   1 *     * 2
@@ -17,6 +19,18 @@
   //  /           \
   // +----*---*----+
   //      5   4
+  //
+  // Case B:
+  //      2   3
+  // +----*---*----+
+  //  \           /
+  // 1 *         * 4
+  //    \       /
+  //   0 *     * 5
+  //      \   /
+  //       \ /
+  //        +
+
   var allowedConnections = {
     0: [1, 3, 5],
     1: [0, 2, 4],
@@ -55,18 +69,18 @@
   };
 
   var makeTruchetTriangle = function (tileBounds, config, indexH, indexV, closePattern) {
-    var outlineVertices =
-      indexH % 2
-        ? [
-            new Vertex(tileBounds.min.x, tileBounds.min.y),
-            new Vertex(tileBounds.max.x, tileBounds.min.y),
-            new Vertex(tileBounds.min.x + tileBounds.width / 2, tileBounds.max.y)
-          ]
-        : [
-            new Vertex(tileBounds.min.x + tileBounds.width / 2, tileBounds.min.y),
-            new Vertex(tileBounds.max.x, tileBounds.max.y),
-            new Vertex(tileBounds.min.x, tileBounds.max.y)
-          ];
+    var isSpikeDown = (indexH % 2 && !(indexV % 2)) || (!(indexH % 2) && indexV % 2);
+    var outlineVertices = isSpikeDown
+      ? [
+          new Vertex(tileBounds.min.x + tileBounds.width / 2, tileBounds.max.y),
+          new Vertex(tileBounds.min.x, tileBounds.min.y),
+          new Vertex(tileBounds.max.x, tileBounds.min.y)
+        ]
+      : [
+          new Vertex(tileBounds.min.x, tileBounds.max.y),
+          new Vertex(tileBounds.min.x + tileBounds.width / 2, tileBounds.min.y),
+          new Vertex(tileBounds.max.x, tileBounds.max.y)
+        ];
     var outlinePolygon = new Polygon(outlineVertices);
     var connections = []; // Array<{ line: Line, startVector, endVector, indices : [number,number] } >
     var isConnected = arrayFill(connectorCount, false); // [false, false, false, false, false];
@@ -109,34 +123,22 @@
 
     // If on the border of the grid close connections in a linear manner
     if (closePattern) {
-      var startVector, endVector;
-      // TODO!
-      //   if (indexH === 0) {
-      //     closeTileAt(tileBounds,outlinePolygon, connections, 6, 7);
-      //   }
-      //   if (indexH + 1 === config.countH) {
-      //     closeTileAt(tileBounds,outlinePolygon, connections, 2, 3);
-      //   }
-      //   if (indexV === 0) {
-      //     closeTileAt(tileBounds,outlinePolygon, connections, 0, 1);
-      //   }
-      //   if (indexV + 1 === config.countV) {
-      //     closeTileAt(tileBounds,outlinePolygon, connections, 4, 5);
-      //   }
+      if (indexV === 0) {
+        if (isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 2, 3);
+      }
+      if (indexV + 1 === config.countV) {
+        if (!isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 4, 5);
+      }
+      if (indexH === 0) {
+        // In both cases: spikeDown and not spikeDown
+        closeTileAt(tileBounds, outlinePolygon, connections, 0, 1);
+      }
+      if (indexH + 1 === config.countH * 2) {
+        if (isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 4, 5);
+        else closeTileAt(tileBounds, outlinePolygon, connections, 2, 3);
+      }
     }
 
-    // var outlineVertices =
-    //   indexV % 2
-    //     ? [
-    //         new Vertex(tileBounds.min.x, tileBounds.min.y),
-    //         new Vertex(tileBounds.max.x, tileBounds.min.y),
-    //         new Vertex(tileBounds.min.x + tileBounds.width / 2, tileBounds.max.y)
-    //       ]
-    //     : [
-    //         new Vertex(tileBounds.min.x + tileBounds.width / 2, tileBounds.min.y),
-    //         new Vertex(tileBounds.max.x, tileBounds.max.y),
-    //         new Vertex(tileBounds.min.x, tileBounds.max.y)
-    //       ];
     console.log("outlineVertices", Vertex.utils.arrayToJSON(outlineVertices));
     return { bounds: tileBounds, connections: connections, outlinePolygon: outlinePolygon };
   };
@@ -183,46 +185,61 @@
 
   var getTriangleConnectorLocation = function (tileBounds, outlinePolygon, connectorIndex, indexV) {
     var vector = getBaseTriangleConnectorLocation(tileBounds, outlinePolygon, connectorIndex);
-    if (indexV % 2) {
-      vector.a.y = tileBounds.max.y - (vector.a.y - tileBounds.min.y);
-      vector.b.y = tileBounds.max.y - (vector.b.y - tileBounds.min.y);
-      vector.a.x += tileBounds.width / 2;
-      vector.b.x += tileBounds.width / 2;
-    }
+    // if (indexV % 2) {
+    //   vector.a.y = tileBounds.max.y - (vector.a.y - tileBounds.min.y);
+    //   vector.b.y = tileBounds.max.y - (vector.b.y - tileBounds.min.y);
+    //   vector.a.x += tileBounds.width / 2;
+    //   vector.b.x += tileBounds.width / 2;
+    // }
     return vector;
   };
   var getBaseTriangleConnectorLocation = function (tileBounds, outlinePolygon, connectorIndex) {
-    switch (connectorIndex) {
-      case 0:
-        return new Vector(
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y),
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
-        );
-      case 1:
-        return new Vector(
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y),
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-        );
-      case 2:
-        return new Vector(
-          new Vertex(tileBounds.max.x, tileBounds.min.y + tileBounds.height / 3),
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-        );
-      case 3:
-        return new Vector(
-          new Vertex(tileBounds.min.x + tileBounds.width, tileBounds.min.y + (tileBounds.height / 3) * 2),
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-        );
-      case 4:
-        return new Vector(
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.max.y),
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-        );
-      case 5:
-        return new Vector(
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.max.y),
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
-        );
-    }
+    // switch (connectorIndex) {
+    //   case 0:
+    //     return new Vector(
+    //       new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y),
+    //       new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
+    //     );
+    //   case 1:
+    //     return new Vector(
+    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y),
+    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
+    //     );
+    //   case 2:
+    //     return new Vector(
+    //       new Vertex(tileBounds.max.x, tileBounds.min.y + tileBounds.height / 3),
+    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
+    //     );
+    //   case 3:
+    //     return new Vector(
+    //       new Vertex(tileBounds.min.x + tileBounds.width, tileBounds.min.y + (tileBounds.height / 3) * 2),
+    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
+    //     );
+    //   case 4:
+    //     return new Vector(
+    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.max.y),
+    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
+    //     );
+    //   case 5:
+    //     return new Vector(
+    //       new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.max.y),
+    //       new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
+    //     );
+    // }
+
+    // Each side has 2 connectors
+    var SIDE_CONNECTOR_COUNT = 2;
+    var sideIndex = Math.floor(connectorIndex / SIDE_CONNECTOR_COUNT);
+    var sideConnectorIndex = connectorIndex - SIDE_CONNECTOR_COUNT * sideIndex;
+    var sideConnectorRatio = (sideConnectorIndex + 1) / (SIDE_CONNECTOR_COUNT + 1);
+    var sideLine = new Line(
+      outlinePolygon.vertices[sideIndex],
+      outlinePolygon.vertices[(sideIndex + 1) % outlinePolygon.vertices.length]
+    );
+    var connectorStartPoint = sideLine.vertAt(sideConnectorRatio);
+    // var connectorEndPoint = connectorStartPoint.clone(); // TODO!
+    var connectorEndPoint = sideLine.vertAt(sideConnectorRatio + 1 / (SIDE_CONNECTOR_COUNT + 1));
+    var parallelVector = new Vector(connectorStartPoint, connectorEndPoint);
+    return parallelVector.getOrthogonal().scale(0.5);
   };
 })(globalThis);

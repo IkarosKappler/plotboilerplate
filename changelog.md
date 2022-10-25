@@ -1,5 +1,10 @@
 # Changelog
 
+- 2022-10-25
+  - Added `origin` param to the `DrawConfig` interface.
+  - Added the `extended-vector-orthogonal` demo.
+  - Added `Vector.getOrthogonal` method.
+  - Added `origin` to PlotBoilerplate's default draw config.
 - 2022-10-17
   - The `CubicBezierCurve` class now implements the new `PathSegment` interface.
   - Adding the `algorithms/detectPaths` function.

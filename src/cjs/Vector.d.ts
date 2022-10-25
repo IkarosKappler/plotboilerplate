@@ -11,7 +11,8 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.4.0
+ * @modified 2022-10-25 Added the `getOrthogonal` method.
+ * @version  1.5.0
  *
  * @file Vector
  * @public
@@ -51,7 +52,7 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
      **/
     perp(): Vector;
     /**
-     * The inverse of a vector is a vector witht the same magnitude but oppose direction.
+     * The inverse of a vector is a vector with the same magnitude but oppose direction.
      *
      * Please not that the origin of this vector changes here: a->b becomes b->a.
      *
@@ -74,6 +75,16 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
      * @memberof Line
      **/
     intersection(line: Vector): Vertex | null;
+    /**
+     * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
+     *
+     * @name getOrthogonal
+     * @method getOrthogonal
+     * @return {Vector} A new vector with the same length that stands on this vector's point a.
+     * @instance
+     * @memberof Vector
+     **/
+    getOrthogonal(): Vector;
     static utils: {
         /**
          * Generate a four-point arrow head, starting at the vector end minus the

@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate – An extended demo how circle-line intersections work</title>
+    <title>2D Plotting Boilerplate – An extended demo how line orthogonals work</title>
     <meta charset="UTF-8">
-    <meta name="description" content="A demo about circle-line intersections with PlotBoilerplate.js.">
+    <meta name="description" content="A demo about finding line orthogonals with PlotBoilerplate.js.">
     <meta name="keywords" content="plotboilerplate, Vertex, usage, howto, docs, documentation, circle, line, intersection">
     <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2022-01-14">
-    <meta name="docinfo" content="Drag the line points or the circle center around and see how the circle-line-intersection changes.">
+    <meta name="date" content="2022-10-25">
+    <meta name="docinfo" content="Change the value of 't' using the interface and see how the orthogonal line changes.">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="An extended demo how circle-line intersections work with PlotBoilerplate.js.">
-    <meta property="og:description" content="An extended demo how circle-line intersections work with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20220910-extended-circle-line-intersection.png">
+    <meta property="og:title" content="A demo about finding line orthogonals with PlotBoilerplate.js.">
+    <meta property="og:description" content="An extended demo how finding line orthogonals works with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20221025-0-orthogonal-vector.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
@@ -44,6 +44,7 @@
     <script src="../../dist/plotboilerplate.min.js"></script>
     <!-- END For production -->
     
+    <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
     <script src="../detectDarkMode.js"></script>
     <script src="index.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 

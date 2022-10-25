@@ -1843,7 +1843,8 @@ VertTuple.vtutils = {
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.4.0
+ * @modified 2022-10-25 Added the `getOrthogonal` method.
+ * @version  1.5.0
  *
  * @file Vector
  * @public
@@ -1889,7 +1890,7 @@ class Vector extends VertTuple {
         return v;
     }
     /**
-     * The inverse of a vector is a vector witht the same magnitude but oppose direction.
+     * The inverse of a vector is a vector with the same magnitude but oppose direction.
      *
      * Please not that the origin of this vector changes here: a->b becomes b->a.
      *
@@ -1934,6 +1935,24 @@ class Vector extends VertTuple {
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
+    }
+    /**
+     * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
+     *
+     * @name getOrthogonal
+     * @method getOrthogonal
+     * @return {Vector} A new vector with the same length that stands on this vector's point a.
+     * @instance
+     * @memberof Vector
+     **/
+    getOrthogonal() {
+        // Orthogonal of vector (0,0)->(x,y) is (0,0)->(-y,x)
+        const linePoint = this.a.clone();
+        const startPoint = this.b.clone().sub(this.a);
+        const tmp = startPoint.x;
+        startPoint.x = -startPoint.y;
+        startPoint.y = tmp;
+        return new Vector(linePoint, startPoint.add(this.a));
     }
 }
 Vector.utils = {
@@ -10076,7 +10095,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @modified 2021-11-16 Adding the `PBText` drawable.
  * @modified 2022-08-01 Added `title` to the params.
- * @version  1.15.1
+ * @modified 2022-10-25 Added the `origin` to the default draw config.
+ * @version  1.16.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -10328,6 +10348,9 @@ class PlotBoilerplate {
                 lineWidth: 1,
                 fill: true,
                 anchor: true
+            },
+            origin: {
+                color: "#000000"
             }
         }; // END drawConfig
         // +---------------------------------------------------------------------------------
@@ -10869,7 +10892,7 @@ class PlotBoilerplate {
     drawOrigin(draw) {
         // Add a crosshair to mark the origin
         draw.setCurrentId("origin");
-        draw.crosshair({ x: 0, y: 0 }, 10, "#000000");
+        draw.crosshair({ x: 0, y: 0 }, 10, this.drawConfig.origin.color);
     }
     /**
      * This is just a tiny helper function to determine the render color of vertices.

@@ -75,7 +75,8 @@
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @modified 2021-11-16 Adding the `PBText` drawable.
  * @modified 2022-08-01 Added `title` to the params.
- * @version  1.15.1
+ * @modified 2022-10-25 Added the `origin` to the default draw config.
+ * @version  1.16.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

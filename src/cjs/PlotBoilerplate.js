@@ -76,7 +76,8 @@
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @modified 2021-11-16 Adding the `PBText` drawable.
  * @modified 2022-08-01 Added `title` to the params.
- * @version  1.15.1
+ * @modified 2022-10-25 Added the `origin` to the default draw config.
+ * @version  1.16.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -350,6 +351,9 @@ var PlotBoilerplate = /** @class */ (function () {
                 lineWidth: 1,
                 fill: true,
                 anchor: true
+            },
+            origin: {
+                color: "#000000"
             }
         }; // END drawConfig
         // +---------------------------------------------------------------------------------
@@ -891,7 +895,7 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.drawOrigin = function (draw) {
         // Add a crosshair to mark the origin
         draw.setCurrentId("origin");
-        draw.crosshair({ x: 0, y: 0 }, 10, "#000000");
+        draw.crosshair({ x: 0, y: 0 }, 10, this.drawConfig.origin.color);
     };
     /**
      * This is just a tiny helper function to determine the render color of vertices.
