@@ -84,7 +84,7 @@
     var outlinePolygon = new Polygon(outlineVertices);
     var connections = []; // Array<{ line: Line, startVector, endVector, indices : [number,number] } >
     var isConnected = arrayFill(connectorCount, false); // [false, false, false, false, false];
-    console.log("isConnected", isConnected);
+    // console.log("isConnected", isConnected);
     var indices = [0, 1, 2, 3, 4, 5]; // TODO: use array_fill here
     arrayShuffle(indices);
     for (var i = 0; i < connectorCount; i++) {
@@ -139,7 +139,7 @@
       }
     }
 
-    console.log("outlineVertices", Vertex.utils.arrayToJSON(outlineVertices));
+    // console.log("outlineVertices", Vertex.utils.arrayToJSON(outlineVertices));
     return { bounds: tileBounds, connections: connections, outlinePolygon: outlinePolygon };
   };
 

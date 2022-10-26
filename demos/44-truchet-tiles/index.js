@@ -54,7 +54,7 @@
           enableKeys: true,
           enableTouch: true,
 
-          enableSVGExport: false
+          enableSVGExport: true
         },
         GUP
       )
