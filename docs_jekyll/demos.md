@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2022-09-27
+date: 2022-11-06
 ---
 
 <h3>Basics</h3>
@@ -231,8 +231,18 @@ date: 2022-09-27
    </a>
 </div>
 <div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/44-truchet-tiles/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20221010-1-truchet-tiles-bright.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/extended-circle-line-intersection/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220910-extended-circle-line-intersection.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/extended-vector-orthogonal/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20221025-0-orthogonal-vector.png');"></div>
    </a>
 </div>
 <div class="demo-box">
