@@ -1,10 +1,10 @@
 /**
- * A script for demonstrating the basic usage of orthogonal vectors.
+ * A script for demonstrating how to import SVG path data.
  *
  * @requires PlotBoilerplate, gup, dat.gui,
  *
  * @author   Ikaros Kappler
- * @date     2022-10-25
+ * @date     2022-11-06
  * @version  1.0.0
  **/
 
@@ -35,34 +35,43 @@
 
     var initialViewport = pb.viewport();
 
-    // Create a random reference line inside the current viewport
-    var line = new Line(
-      new Vertex(
-        Math.random() * initialViewport.width * 0.75 - initialViewport.width * 0.5,
-        Math.random() * initialViewport.height * 0.75 - initialViewport.height * 0.5
-      ),
-      new Vertex(
-        Math.random() * initialViewport.width * 0.75 - initialViewport.width * 0.5,
-        Math.random() * initialViewport.height * 0.75 - initialViewport.height * 0.5
-      )
-    );
-    pb.add(line);
+    var modal = new Modal();
+
+    var data1 =
+      "m 51.076662,93.800013 c 1e-6,-16.933333 8.466667,-25.399999 25.399994,-25.399999 h 25.400004 c 16.93334,0 25.4,8.466666 25.4,25.399999 v 16.933337 c 0,16.93333 16.93334,33.86666 33.86667,33.86666 h 16.93333 c 16.93333,0 25.4,8.46667 25.4,25.4 v 25.4 c 0,16.93333 -8.46667,25.4 -25.4,25.4 h -16.93333 c -16.93333,0 -33.86667,16.93332 -33.86667,33.86666 V 271.6 c 0,16.93334 -8.46666,25.4 -25.4,25.4 H 76.476656 c -16.933327,0 -25.399993,-8.46666 -25.399994,-25.4 z";
+
+    var loadPathData = function (data) {
+      console.log("data", data);
+      var elements = parseSVGPathData(data);
+      console.log("elements", elements);
+    };
+
+    var insertPathJSON = function () {
+      var textarea = document.createElement("textarea");
+      textarea.style.width = "100%";
+      textarea.style.height = "50vh";
+      textarea.innerHTML = data1; // outline.toJSON(true);
+      modal.setTitle("Insert Path data (the 'd' string)");
+      modal.setFooter("");
+      modal.setActions([
+        Modal.ACTION_CANCEL,
+        {
+          label: "Load data",
+          action: function () {
+            loadPathData(textarea.value);
+            modal.close();
+          }
+        }
+      ]);
+      modal.setBody(textarea);
+      modal.open();
+    };
+    insertPathJSON();
 
     // On redrawing determine the orthogonal vector at the given position
     pb.config.postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
-      fill.text("Start (a)", line.a.x + 3, line.a.y, { color: contrastColor });
-      fill.text("End (b)", line.b.x + 3, line.b.y, { color: contrastColor });
-      var linePoint = line.vertAt(config.t);
-      draw.circle(linePoint, 5, "grey", 1);
-      fill.text("vertAt(t)", linePoint.x + 3, linePoint.y, { color: contrastColor });
-
-      // Always keep the vector the same length as (a,b)
-      var vector = new Vector(linePoint, line.b.clone().add(line.a.difference(linePoint)));
-      var ortho = vector.getOrthogonal();
-      draw.line(ortho.a, ortho.b, "orange", 2);
-      draw.circle(ortho.b, 5, "green", 1);
-      fill.text("ortho", ortho.b.x + 3, ortho.b.y, { color: contrastColor });
+      console.log("contrastColor", contrastColor);
     };
 
     // +---------------------------------------------------------------------------------
