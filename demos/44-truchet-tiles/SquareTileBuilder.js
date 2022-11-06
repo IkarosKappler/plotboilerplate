@@ -51,8 +51,8 @@
   var SquareTileBuilder = function () {
     // NOOP
   };
-  CairoTileBuilder.LONG_PATH_FACTOR = 1.0;
-  CairoTileBuilder.SHORT_PATH_FACTOR = 0.555;
+  SquareTileBuilder.LONG_PATH_FACTOR = 1.0;
+  SquareTileBuilder.SHORT_PATH_FACTOR = 0.555;
 
   _context.SquareTileBuilder = SquareTileBuilder;
 

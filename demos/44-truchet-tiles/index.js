@@ -74,14 +74,14 @@
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
         tileType: "Triangle2", // [ "Triangle2", "Square2", "Cairo2" ]
-        drawSafeZone: true,
+        drawSafeZone: false,
         safeZonePct: 0.1,
         countH: 10,
         countV: 10,
         clearTilesOnRedraw: true,
         drawLinearConnections: false,
         drawTruchetRaster: false,
-        closePattern: false,
+        closePattern: true,
         drawPathLabels: false,
         fillAreas: false,
         longConnectionFactor: 1.0,

@@ -61,8 +61,8 @@
   var TriangleTileBuilder = function () {
     // NOOP
   };
-  CairoTileBuilder.LONG_PATH_FACTOR = 0.75;
-  CairoTileBuilder.SHORT_PATH_FACTOR = 0.4;
+  TriangleTileBuilder.LONG_PATH_FACTOR = 0.75;
+  TriangleTileBuilder.SHORT_PATH_FACTOR = 0.4;
 
   _context.TriangleTileBuilder = TriangleTileBuilder;
 
