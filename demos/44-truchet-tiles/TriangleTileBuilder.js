@@ -39,7 +39,24 @@
     4: [1, 3, 5],
     5: [0, 2, 4]
   };
-  var connectorCount = 6;
+  var CONNECTOR_COUNT = 6;
+  var SIDE_CONNECTOR_COUNT = 2;
+
+  // This function determines if the connecting path is a long one. The relation
+  // should be symmetrical (if a connection from 0 to 3 is long, then the connection
+  // fropm 3 to 0 should be long, too).
+  //
+  // Long connections a draw as a longer arc, short connections are drawn as a shorter arc.
+  var isLongConnection = function (indexA, indexB) {
+    return (
+      (indexA === 0 && indexB === 3) ||
+      (indexA === 1 && indexB === 4) ||
+      (indexA === 2 && indexB === 5) ||
+      (indexA === 3 && indexB === 0) ||
+      (indexA === 4 && indexB === 1) ||
+      (indexA === 5 && indexB === 2)
+    );
+  };
 
   var TriangleTileBuilder = function () {
     // NOOP
@@ -47,27 +64,36 @@
 
   _context.TriangleTileBuilder = TriangleTileBuilder;
 
+  /**
+   * Construct a plane-filling (inside the given plane bounds) pattern of trinagular tiles.
+   *
+   * @param {Bounds} bounds - The plane bounds to build the pattern within.
+   * @param {number} config.countV - The vertical pattern size (measured in tile count).
+   * @param {number} config.countH - The horizontal pattern size (measured in tile count).
+   **/
   _context.TriangleTileBuilder.computeTiles = function (bounds, config) {
     var tiles = [];
-
     var tileSize = Bounds.fromDimension(bounds.width / config.countH, bounds.height / config.countV, bounds.min);
-    // console.log("tileSize", tileSize);
     for (var i = 0; i < config.countH * 2; i++) {
       for (var j = 0; j < config.countV; j++) {
         var tileBounds = new Bounds(
           { x: bounds.min.x + (tileSize.width / 2) * i, y: bounds.min.y + tileSize.height * j },
           { x: bounds.min.x + (tileSize.width / 2) * i + tileSize.width, y: bounds.min.y + tileSize.height * (j + 1) }
         );
-        // console.log("tileBounds", tileBounds);
-        // draw.rect(tileBounds.min, tileBounds.width, tileBounds.height, "green", 1);
         const tile = makeTruchetTriangle(tileBounds, config, i, j, config.closePattern);
         tiles.push(tile);
       }
     }
-
     return tiles;
   };
 
+  /**
+   * Construct the next Truchet triangle withing the given tile bounds.
+   *
+   * @param {Bounds} tileBounds - The bounding box for the new tile.
+   * @param {number} config.countV - The vertical pattern size (measured in tile count).
+   * @param {number} config.countH - The horizontal pattern size (measured in tile count).
+   **/
   var makeTruchetTriangle = function (tileBounds, config, indexH, indexV, closePattern) {
     var isSpikeDown = (indexH % 2 && !(indexV % 2)) || (!(indexH % 2) && indexV % 2);
     var outlineVertices = isSpikeDown
@@ -83,30 +109,25 @@
         ];
     var outlinePolygon = new Polygon(outlineVertices);
     var connections = []; // Array<{ line: Line, startVector, endVector, indices : [number,number] } >
-    var isConnected = arrayFill(connectorCount, false); // [false, false, false, false, false];
-    // console.log("isConnected", isConnected);
-    var indices = [0, 1, 2, 3, 4, 5]; // TODO: use array_fill here
+    var isConnected = arrayFill(CONNECTOR_COUNT, false); // [false, false, false, false, false];
+    var indices = [0, 1, 2, 3, 4, 5]; // Use something like array_fill here?
     arrayShuffle(indices);
-    for (var i = 0; i < connectorCount; i++) {
+    for (var i = 0; i < CONNECTOR_COUNT; i++) {
       var start = indices[i];
       if (isConnected[start]) {
         continue;
       }
-      var startVector = getTriangleConnectorLocation(tileBounds, outlinePolygon, start, indexV);
+      // var startVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, start, indexV);
       arrayShuffle(allowedConnections[start]);
-      // if (start === 0) {
-      //   console.log("Shuffled", allowedConnections[start]);
-      // }
       for (var j = 0; j < allowedConnections[start].length; j++) {
         var end = allowedConnections[start][j];
+        var startVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, start, end); // indexV);
         if (isConnected[end]) {
-          // console.log("isconnected", end);
           continue;
         }
-        var endVector = getTriangleConnectorLocation(tileBounds, outlinePolygon, end, indexV);
+        var endVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, end, start); // indexV);
         var line = new Line(startVector.a, endVector.a);
-        if (!canConnectLine(line, connections)) {
-          // console.log("Cannot connect ", start, end);
+        if (!TruchetUtils.canConnectLine(line, connections)) {
           continue;
         }
         connections.push({
@@ -139,28 +160,7 @@
       }
     }
 
-    // console.log("outlineVertices", Vertex.utils.arrayToJSON(outlineVertices));
     return { bounds: tileBounds, connections: connections, outlinePolygon: outlinePolygon };
-  };
-
-  var doLinesIntersect = function (lineA, lineB) {
-    var intersection = lineA.intersection(lineB);
-    if (!intersection) {
-      return false;
-    }
-    // TODO: check if only one condition is enough here
-    return lineA.hasPoint(intersection, true) && lineB.hasPoint(intersection, true);
-  };
-
-  // Line
-  // Array<{ line : Line, ... }>
-  var canConnectLine = function (line, connections) {
-    for (var i = 0; i < connections.length; i++) {
-      if (doLinesIntersect(line, connections[i].line)) {
-        return false;
-      }
-    }
-    return true;
   };
 
   // +---------------------------------------------------------------------------------
@@ -168,8 +168,8 @@
   // | Solution: just use the inverse of the connecting inner vectors (flip them to the outside).
   // +-------------------------------
   var closeTileAt = function (tileBounds, outlinePolygon, connections, squareConnectorIndexA, squareConnectorIndexB) {
-    var startVector = getTriangleConnectorLocation(tileBounds, outlinePolygon, squareConnectorIndexA);
-    var endVector = getTriangleConnectorLocation(tileBounds, outlinePolygon, squareConnectorIndexB);
+    var startVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, squareConnectorIndexA);
+    var endVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, squareConnectorIndexB);
     startVector.inv();
     endVector.inv();
 
@@ -180,66 +180,17 @@
     });
   };
 
-  // Get the sqare connector vector
+  // Get the triangulare connector vector
   // @return Vector
-
-  var getTriangleConnectorLocation = function (tileBounds, outlinePolygon, connectorIndex, indexV) {
-    var vector = getBaseTriangleConnectorLocation(tileBounds, outlinePolygon, connectorIndex);
-    // if (indexV % 2) {
-    //   vector.a.y = tileBounds.max.y - (vector.a.y - tileBounds.min.y);
-    //   vector.b.y = tileBounds.max.y - (vector.b.y - tileBounds.min.y);
-    //   vector.a.x += tileBounds.width / 2;
-    //   vector.b.x += tileBounds.width / 2;
-    // }
-    return vector;
-  };
-  var getBaseTriangleConnectorLocation = function (tileBounds, outlinePolygon, connectorIndex) {
-    // switch (connectorIndex) {
-    //   case 0:
-    //     return new Vector(
-    //       new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y),
-    //       new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
-    //     );
-    //   case 1:
-    //     return new Vector(
-    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y),
-    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-    //     );
-    //   case 2:
-    //     return new Vector(
-    //       new Vertex(tileBounds.max.x, tileBounds.min.y + tileBounds.height / 3),
-    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-    //     );
-    //   case 3:
-    //     return new Vector(
-    //       new Vertex(tileBounds.min.x + tileBounds.width, tileBounds.min.y + (tileBounds.height / 3) * 2),
-    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-    //     );
-    //   case 4:
-    //     return new Vector(
-    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.max.y),
-    //       new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-    //     );
-    //   case 5:
-    //     return new Vector(
-    //       new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.max.y),
-    //       new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
-    //     );
-    // }
-
-    // Each side has 2 connectors
-    var SIDE_CONNECTOR_COUNT = 2;
-    var sideIndex = Math.floor(connectorIndex / SIDE_CONNECTOR_COUNT);
-    var sideConnectorIndex = connectorIndex - SIDE_CONNECTOR_COUNT * sideIndex;
-    var sideConnectorRatio = (sideConnectorIndex + 1) / (SIDE_CONNECTOR_COUNT + 1);
-    var sideLine = new Line(
-      outlinePolygon.vertices[sideIndex],
-      outlinePolygon.vertices[(sideIndex + 1) % outlinePolygon.vertices.length]
+  var getTriangleConnectorLocation = function (outlinePolygon, sideConnectorCount, connectorIndexA, connectorIndexB) {
+    // Just get the normal connector and apply a pattern-specific scale factor.
+    var parallelVector = TruchetUtils.getOrthoConnectorLocation(
+      outlinePolygon,
+      sideConnectorCount,
+      connectorIndexA,
+      connectorIndexB
     );
-    var connectorStartPoint = sideLine.vertAt(sideConnectorRatio);
-    // var connectorEndPoint = connectorStartPoint.clone(); // TODO!
-    var connectorEndPoint = sideLine.vertAt(sideConnectorRatio + 1 / (SIDE_CONNECTOR_COUNT + 1));
-    var parallelVector = new Vector(connectorStartPoint, connectorEndPoint);
-    return parallelVector.getOrthogonal().scale(0.5);
+    var isLong = isLongConnection(connectorIndexA, connectorIndexB);
+    return parallelVector.scale(isLong ? 0.75 : 0.4);
   };
 })(globalThis);

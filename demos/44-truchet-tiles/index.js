@@ -61,7 +61,15 @@
     );
 
     // var tileBuilder = SquareTileBuilder;
-    var tileBuilder = TriangleTileBuilder;
+    // var tileBuilder = TriangleTileBuilder;
+    var getTileBuilder = function (typeName) {
+      switch (typeName) {
+        case "Square2":
+          return SquareTileBuilder;
+        default: // "Triangle2"
+          return TriangleTileBuilder;
+      }
+    };
 
     var randColor = function (i, alpha) {
       var color = WebColorsContrast[i % WebColorsContrast.length].clone();
@@ -76,6 +84,7 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
+        tileType: "Triangle2", // [ "Triangle2", "Square2" ]
         drawSafeZone: true,
         safeZonePct: 0.1,
         countH: 10,
@@ -103,6 +112,7 @@
           y: viewport.min.y + viewport.height * config.safeZonePct + viewport.height * (1 - 2 * config.safeZonePct)
         }
       );
+      var tileBuilder = getTileBuilder(config.tileType);
       tiles = tiles.concat(tileBuilder.computeTiles(bounds, config));
     };
 
@@ -206,6 +216,8 @@
     // +-------------------------------
     {
       var gui = pb.createGUI();
+      // prettier-ignore
+      gui.add(config, 'tileType', [ "Triangle2", "Square2" ]).listen().onChange(function() { computeTiles(); pb.redraw() }).name("tileType").title("tileType");
       // prettier-ignore
       gui.add(config, 'drawSafeZone').listen().onChange(function() { pb.redraw() }).name("drawSafeZone").title("drawSafeZone");
       // prettier-ignore

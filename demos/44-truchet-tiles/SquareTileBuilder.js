@@ -27,6 +27,26 @@
     6: [1, 3, 5, 7],
     7: [0, 2, 4, 6]
   };
+  var CONNECTOR_COUNT = 8;
+  var SIDE_CONNECTOR_COUNT = 2;
+
+  // This function determines if the connecting path is a long one. The relation
+  // should be symmetrical (if a connection from 0 to 3 is long, then the connection
+  // fropm 3 to 0 should be long, too).
+  //
+  // Long connections a draw as a longer arc, short connections are drawn as a shorter arc.
+  var isLongConnection = function (indexA, indexB) {
+    return (
+      (indexA === 0 && (indexB === 3 || indexB === 5)) ||
+      (indexA === 1 && (indexB === 4 || indexB === 6)) ||
+      (indexA === 2 && (indexB === 5 || indexB === 7)) ||
+      (indexA === 3 && (indexB === 0 || indexB === 6)) ||
+      (indexA === 4 && (indexB === 1 || indexB === 7)) ||
+      (indexA === 5 && (indexB === 0 || indexB === 2)) ||
+      (indexA === 6 && (indexB === 1 || indexB === 3)) ||
+      (indexA === 7 && (indexB === 2 || indexB === 4))
+    );
+  };
 
   var SquareTileBuilder = function () {
     // NOOP
@@ -34,19 +54,23 @@
 
   _context.SquareTileBuilder = SquareTileBuilder;
 
+  /**
+   * Construct a plane-filling (inside the given plane bounds) pattern of trinagular tiles.
+   *
+   * @param {Bounds} bounds - The plane bounds to build the pattern within.
+   * @param {number} config.countV - The vertical pattern size (measured in tile count).
+   * @param {number} config.countH - The horizontal pattern size (measured in tile count).
+   **/
   _context.SquareTileBuilder.computeTiles = function (bounds, config) {
     var tiles = [];
 
     var tileSize = Bounds.fromDimension(bounds.width / config.countH, bounds.height / config.countV, bounds.min);
-    // console.log("tileSize", tileSize);
     for (var i = 0; i < config.countH; i++) {
       for (var j = 0; j < config.countV; j++) {
         var tileBounds = new Bounds(
           { x: bounds.min.x + tileSize.width * i, y: bounds.min.y + tileSize.height * j },
           { x: bounds.min.x + tileSize.width * (i + 1), y: bounds.min.y + tileSize.height * (j + 1) }
         );
-        // console.log("tileBounds", tileBounds);
-        // draw.rect(tileBounds.min, tileBounds.width, tileBounds.height, "green", 1);
         const tile = makeTruchetSquare(tileBounds, config, i, j, config.closePattern);
         tiles.push(tile);
       }
@@ -55,42 +79,49 @@
     return tiles;
   };
 
+  /**
+   * Construct the next Truchet square withing the given tile bounds.
+   *
+   * @param {Bounds} tileBounds - The bounding box for the new tile.
+   * @param {number} config.countV - The vertical pattern size (measured in tile count).
+   * @param {number} config.countH - The horizontal pattern size (measured in tile count).
+   **/
   var makeTruchetSquare = function (tileBounds, config, indexH, indexV, closePattern) {
-    var connections = []; // Array<{ line: Line, startVector, endVector, indices : [number,number] } >
-    var isConnected = [false, false, false, false, false, false, false, false];
-    var indices = [0, 1, 2, 3, 4, 5, 6, 7]; // TODO: use array_fill here
+    var outlinePolygon = tileBounds.toPolygon();
+    var connections = []; // Array<{ line: Line, curveSegment: CubicBezierCurve, indices : [number,number] } >
+    // var isConnected = [false, false, false, false, false, false, false, false];
+    var isConnected = arrayFill(CONNECTOR_COUNT, false);
+    var indices = [0, 1, 2, 3, 4, 5, 6, 7]; // TODO: use array_fill here?
     arrayShuffle(indices);
     for (var i = 0; i < 8; i++) {
       var start = indices[i];
       if (isConnected[start]) {
         continue;
       }
-      var startVector = getSquareConnectorLocation(tileBounds, start);
       arrayShuffle(allowedConnections[start]);
       // if (start === 0) {
       //   console.log("Shuffled", allowedConnections[start]);
       // }
       for (var j = 0; j < allowedConnections[start].length; j++) {
         var end = allowedConnections[start][j];
+        var startVector = getSquareConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, start, end);
         if (isConnected[end]) {
           // console.log("isconnected", end);
           continue;
         }
-        var endVector = getSquareConnectorLocation(tileBounds, end);
+        var endVector = getSquareConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, end, start);
         var line = new Line(startVector.a, endVector.a);
-        if (!canConnectLine(line, connections)) {
+        if (!TruchetUtils.canConnectLine(line, connections)) {
           // console.log("Cannot connect ", start, end);
           continue;
         }
         connections.push({
           line: line,
-          // startVector: startVector,
-          // endVector: endVector,
           curveSegment: new CubicBezierCurve(startVector.a, endVector.a, startVector.b, endVector.b),
-          indices: [start, allowedConnections[start][j]]
+          indices: [start, end]
         });
         isConnected[start] = true;
-        isConnected[allowedConnections[start][j]] = true;
+        isConnected[end] = true;
       }
     }
 
@@ -98,49 +129,39 @@
     if (closePattern) {
       var startVector, endVector;
       if (indexH === 0) {
-        closeTileAt(tileBounds, connections, 6, 7);
+        closeTileAt(outlinePolygon, connections, 6, 7);
       }
       if (indexH + 1 === config.countH) {
-        closeTileAt(tileBounds, connections, 2, 3);
+        closeTileAt(outlinePolygon, connections, 2, 3);
       }
       if (indexV === 0) {
-        closeTileAt(tileBounds, connections, 0, 1);
+        closeTileAt(outlinePolygon, connections, 0, 1);
       }
       if (indexV + 1 === config.countV) {
-        closeTileAt(tileBounds, connections, 4, 5);
+        closeTileAt(outlinePolygon, connections, 4, 5);
       }
     }
 
     return { bounds: tileBounds, connections: connections, outlinePolygon: tileBounds.toPolygon() };
   };
 
-  var doLinesIntersect = function (lineA, lineB) {
-    var intersection = lineA.intersection(lineB);
-    if (!intersection) {
-      return false;
-    }
-    // TODO: check if only one condition is enough here
-    return lineA.hasPoint(intersection, true) && lineB.hasPoint(intersection, true);
-  };
-
-  // Line
-  // Array<{ line : Line, ... }>
-  var canConnectLine = function (line, connections) {
-    for (var i = 0; i < connections.length; i++) {
-      if (doLinesIntersect(line, connections[i].line)) {
-        return false;
-      }
-    }
-    return true;
-  };
-
   // +---------------------------------------------------------------------------------
   // | Close a tile at the bounds of the whole pattern (no adjacent tile available).
   // | Solution: just use the inverse of the connecting inner vectors (flip them to the outside).
   // +-------------------------------
-  var closeTileAt = function (tileBounds, connections, squareConnectorIndexA, squareConnectorIndexB) {
-    var startVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexA);
-    var endVector = getSquareConnectorLocation(tileBounds, squareConnectorIndexB);
+  var closeTileAt = function (outlinePolygon, connections, squareConnectorIndexA, squareConnectorIndexB) {
+    var startVector = getSquareConnectorLocation(
+      outlinePolygon,
+      SIDE_CONNECTOR_COUNT,
+      squareConnectorIndexA,
+      squareConnectorIndexB
+    );
+    var endVector = getSquareConnectorLocation(
+      outlinePolygon,
+      SIDE_CONNECTOR_COUNT,
+      squareConnectorIndexB,
+      squareConnectorIndexA
+    );
     startVector.inv();
     endVector.inv();
 
@@ -151,50 +172,17 @@
     });
   };
 
-  // Get the sqare connector vector
+  // Get the square connector vector
   // @return Vector
-  var getSquareConnectorLocation = function (tileBounds, connectorIndex) {
-    switch (connectorIndex) {
-      case 0:
-        return new Vector(
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y),
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
-        );
-      case 1:
-        return new Vector(
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y),
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-        );
-      case 2:
-        return new Vector(
-          new Vertex(tileBounds.max.x, tileBounds.min.y + tileBounds.height / 3),
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + tileBounds.height / 3)
-        );
-      case 3:
-        return new Vector(
-          new Vertex(tileBounds.min.x + tileBounds.width, tileBounds.min.y + (tileBounds.height / 3) * 2),
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-        );
-      case 4:
-        return new Vector(
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.max.y),
-          new Vertex(tileBounds.min.x + (tileBounds.width / 3) * 2, tileBounds.min.y + (tileBounds.height / 3) * 2)
-        );
-      case 5:
-        return new Vector(
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.max.y),
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
-        );
-      case 6:
-        return new Vector(
-          new Vertex(tileBounds.min.x, tileBounds.min.y + (tileBounds.height / 3) * 2),
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + (tileBounds.height / 3) * 2)
-        );
-      case 7:
-        return new Vector(
-          new Vertex(tileBounds.min.x, tileBounds.min.y + tileBounds.height / 3),
-          new Vertex(tileBounds.min.x + tileBounds.width / 3, tileBounds.min.y + tileBounds.height / 3)
-        );
-    }
+  var getSquareConnectorLocation = function (outlinePolygon, sideConnectorCount, connectorIndexA, connectorIndexB) {
+    // Just get the normal connector and apply a pattern-specific scale factor.
+    var parallelVector = TruchetUtils.getOrthoConnectorLocation(
+      outlinePolygon,
+      sideConnectorCount,
+      connectorIndexA,
+      connectorIndexB
+    );
+    var isLong = isLongConnection(connectorIndexA, connectorIndexB);
+    return parallelVector.scale(isLong ? 1.0 : 0.555);
   };
 })(globalThis);
