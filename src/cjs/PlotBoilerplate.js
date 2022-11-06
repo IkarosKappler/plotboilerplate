@@ -77,6 +77,7 @@
  * @modified 2021-11-16 Adding the `PBText` drawable.
  * @modified 2022-08-01 Added `title` to the params.
  * @modified 2022-10-25 Added the `origin` to the default draw config.
+ * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @version  1.16.0
  *
  * @file PlotBoilerplate
@@ -462,11 +463,13 @@ var PlotBoilerplate = /** @class */ (function () {
         var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
         tosvgDraw.beginDrawCycle(0);
         tosvgFill.beginDrawCycle(0);
-        if (pb.config.preClear)
+        if (pb.config.preClear) {
             pb.config.preClear();
-        tosvgDraw.clear(pb.config.backgroundColor);
-        if (pb.config.preDraw)
+        }
+        tosvgDraw.clear(pb.config.backgroundColor || "white");
+        if (pb.config.preDraw) {
             pb.config.preDraw(tosvgDraw, tosvgFill);
+        }
         pb.drawAll(0, tosvgDraw, tosvgFill);
         pb.drawVertices(0, tosvgDraw);
         if (pb.config.postDraw)
@@ -477,7 +480,8 @@ var PlotBoilerplate = /** @class */ (function () {
         //    https://caniuse.com/xml-serializer
         var serializer = new XMLSerializer();
         var svgCode = serializer.serializeToString(svgNode);
-        var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
+        // Add: '<?xml version="1.0" encoding="utf-8"?>\n' ?
+        var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>\n' + svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
         if (typeof globalThis["saveAs"] !== "function")

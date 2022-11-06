@@ -76,6 +76,7 @@
  * @modified 2021-11-16 Adding the `PBText` drawable.
  * @modified 2022-08-01 Added `title` to the params.
  * @modified 2022-10-25 Added the `origin` to the default draw config.
+ * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @version  1.16.0
  *
  * @file PlotBoilerplate

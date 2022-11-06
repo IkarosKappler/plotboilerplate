@@ -1,5 +1,8 @@
 # Changelog
 
+- 2022-11-06
+  - Adding an XML declaration to the SVG export routine.
+  - Added the CairoTileBuilder to the Truchet demo 44.
 - 2022-10-25
   - Added `origin` param to the `DrawConfig` interface.
   - Added the `extended-vector-orthogonal` demo.
