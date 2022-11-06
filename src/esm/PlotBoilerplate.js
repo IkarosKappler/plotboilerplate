@@ -194,6 +194,7 @@ export class PlotBoilerplate {
      * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
      */
     constructor(config) {
+        var _a, _b;
         /**
          * A discrete timestamp to identify single render cycles.
          * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
@@ -371,6 +372,7 @@ export class PlotBoilerplate {
                 this.config.enableGL = false;
             }
             if (this.config.enableGL) {
+                // Override the case 'null' here. If GL is not supported, well then nothing works.
                 const ctx = this.canvas.getContext("webgl"); // webgl-experimental?
                 this.draw = new drawutilsgl(ctx, false);
                 // PROBLEM: same instance of fill and draw when using WebGL.
@@ -379,6 +381,7 @@ export class PlotBoilerplate {
                 console.warn("Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.");
             }
             else {
+                // Override the case 'null' here. If context creation is not supported, well then nothing works.
                 const ctx = this.canvas.getContext("2d");
                 this.draw = new drawutils(ctx, false);
                 this.fill = new drawutils(ctx, true);
@@ -415,8 +418,8 @@ export class PlotBoilerplate {
         if (config.title) {
             this.eventCatcher.setAttribute("title", config.title);
         }
-        this.draw.scale.set(this.config.scaleX, this.config.scaleY);
-        this.fill.scale.set(this.config.scaleX, this.config.scaleY);
+        this.draw.scale.set((_a = this.config.scaleX) !== null && _a !== void 0 ? _a : 1.0, this.config.scaleY);
+        this.fill.scale.set((_b = this.config.scaleX) !== null && _b !== void 0 ? _b : 1.0, this.config.scaleY);
         this.vertices = [];
         this.selectPolygon = null;
         this.draggedElements = [];
@@ -554,11 +557,12 @@ export class PlotBoilerplate {
      * @private
      **/
     updateCSSscale() {
+        var _a, _b, _c, _d;
         if (this.config.cssUniformScale) {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleX);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0);
         }
         else {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleY);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_c = this.config.cssScaleX) !== null && _c !== void 0 ? _c : 1.0, (_d = this.config.cssScaleY) !== null && _d !== void 0 ? _d : 1.0);
         }
     }
     /**
@@ -831,7 +835,8 @@ export class PlotBoilerplate {
      * @return The vertex near the given position or undefined if none was found there.
      **/
     getVertexNear(pixelPosition, pixelTolerance) {
-        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min(this.config.cssScaleX, this.config.cssScaleY));
+        var _a, _b;
+        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
         if (p && p.typeName == "vertex") {
             return this.vertices[p.vindex];
         }
@@ -1114,10 +1119,10 @@ export class PlotBoilerplate {
         else {
             console.error("Cannot draw object. Unknown class.");
         }
-        draw.setCurrentClassName(null);
-        draw.setCurrentId(null);
-        fill.setCurrentClassName(null);
-        fill.setCurrentId(null);
+        draw.setCurrentClassName(undefined);
+        draw.setCurrentId(undefined);
+        fill.setCurrentClassName(undefined);
+        fill.setCurrentId(undefined);
     }
     /**
      * Draw the select-polygon (if there is one).
@@ -1220,7 +1225,7 @@ export class PlotBoilerplate {
      **/
     clear() {
         // Note that elements might have an alpha channel. Clear the scene first.
-        this.draw.clear(this.config.backgroundColor);
+        this.draw.clear(this.config.backgroundColor || "white");
     }
     /**
      * Clear the selection.<br>
@@ -1250,7 +1255,8 @@ export class PlotBoilerplate {
      * @return {Bounds} The current viewport.
      **/
     viewport() {
-        return new Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY));
+        var _a, _b;
+        return new Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * ((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0), this.canvasSize.height * ((_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0)));
     }
     /**
      * Trigger the saveFile.hook.
@@ -1298,10 +1304,12 @@ export class PlotBoilerplate {
      * @return {void}
      **/
     resizeCanvas() {
+        var _a, _b, _c, _d, _e, _f;
         const _self = this;
         const _setSize = (w, h) => {
-            w *= _self.config.canvasWidthFactor;
-            h *= _self.config.canvasHeightFactor;
+            var _a, _b;
+            w *= (_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0;
+            h *= (_b = _self.config.canvasHeightFactor) !== null && _b !== void 0 ? _b : 1.0;
             _self.canvasSize.width = w;
             _self.canvasSize.height = h;
             if (_self.canvas instanceof HTMLCanvasElement) {
@@ -1330,8 +1338,8 @@ export class PlotBoilerplate {
             var width = globalThis.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             var height = globalThis.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             _self.canvas.style.position = "absolute";
-            _self.canvas.style.width = _self.config.canvasWidthFactor * width + "px";
-            _self.canvas.style.height = _self.config.canvasWidthFactor * height + "px";
+            _self.canvas.style.width = ((_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0) * width + "px";
+            _self.canvas.style.height = ((_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0) * height + "px";
             _self.canvas.style.top = "0px";
             _self.canvas.style.left = "0px";
             _setSize(width, height);
@@ -1340,16 +1348,16 @@ export class PlotBoilerplate {
             // Set editor size
             _self.canvas.style.position = "absolute";
             const space = this.getAvailableContainerSpace();
-            _self.canvas.style.width = _self.config.canvasWidthFactor * space.width + "px";
-            _self.canvas.style.height = _self.config.canvasHeightFactor * space.height + "px";
-            _self.canvas.style.top = null;
-            _self.canvas.style.left = null;
+            _self.canvas.style.width = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * space.width + "px";
+            _self.canvas.style.height = ((_d = _self.config.canvasHeightFactor) !== null && _d !== void 0 ? _d : 1.0) * space.height + "px";
+            _self.canvas.style.top = "";
+            _self.canvas.style.left = "";
             _setSize(space.width, space.height);
         }
         else {
-            _self.canvas.style.width = null;
-            _self.canvas.style.height = null;
-            _setSize(_self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight);
+            _self.canvas.style.width = "";
+            _self.canvas.style.height = "";
+            _setSize((_e = _self.config.defaultCanvasWidth) !== null && _e !== void 0 ? _e : 1024, (_f = _self.config.defaultCanvasHeight) !== null && _f !== void 0 ? _f : 768);
         }
         if (_self.config.redrawOnResize)
             _self.redraw();

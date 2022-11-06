@@ -216,7 +216,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @instance
      */
-    selectPolygon: Polygon;
+    selectPolygon: Polygon | null;
     /**
      * @member {Array<IDraggable>}
      * @memberof PlotBoilerplate
