@@ -60,17 +60,6 @@
       )
     );
 
-    // var tileBuilder = SquareTileBuilder;
-    // var tileBuilder = TriangleTileBuilder;
-    var getTileBuilder = function (typeName) {
-      switch (typeName) {
-        case "Square2":
-          return SquareTileBuilder;
-        default: // "Triangle2"
-          return TriangleTileBuilder;
-      }
-    };
-
     var randColor = function (i, alpha) {
       var color = WebColorsContrast[i % WebColorsContrast.length].clone();
       if (typeof alpha !== undefined) color.a = alpha;
@@ -84,7 +73,7 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        tileType: "Triangle2", // [ "Triangle2", "Square2" ]
+        tileType: "Triangle2", // [ "Triangle2", "Square2", "Cairo2" ]
         drawSafeZone: true,
         safeZonePct: 0.1,
         countH: 10,
@@ -94,12 +83,39 @@
         drawTruchetRaster: false,
         closePattern: false,
         drawPathLabels: false,
-        fillAreas: false
+        fillAreas: false,
+        longConnectionFactor: 1.0,
+        shortConnectionFactor: 0.5 // default values depend on the selected tile type!
       },
       GUP
     );
 
+    var prepareTileBuilder = function () {
+      switch (config.tileType) {
+        case "Square2":
+          tileBuilder = SquareTileBuilder;
+          config.longConnectionFactor = SquareTileBuilder.LONG_PATH_FACTOR; // 1.0;
+          config.shortConnectionFactor = SquareTileBuilder.SHORT_PATH_FACTOR; // 0.555;
+          break;
+        case "Cairo2":
+          tileBuilder = CairoTileBuilder;
+          config.longConnectionFactor = CairoTileBuilder.LONG_PATH_FACTOR; // 1.3;
+          config.shortConnectionFactor = CairoTileBuilder.SHORT_PATH_FACTOR; // 0.666;
+          break;
+        default: // "Triangle2"
+          tileBuilder = TriangleTileBuilder;
+          config.longConnectionFactor = TriangleTileBuilder.LONG_PATH_FACTOR;
+          config.shortConnectionFactor = TriangleTileBuilder.SHORT_PATH_FACTOR;
+          break;
+      }
+    };
+
+    // Initialize this with the help of the config setting
+    var tileBuilder = null;
+    prepareTileBuilder();
+
     var tiles = [];
+    var paths = [];
 
     var computeTiles = function () {
       if (config.clearTilesOnRedraw) {
@@ -112,8 +128,21 @@
           y: viewport.min.y + viewport.height * config.safeZonePct + viewport.height * (1 - 2 * config.safeZonePct)
         }
       );
-      var tileBuilder = getTileBuilder(config.tileType);
+      // var tileBuilder = getTileBuilder(config.tileType);
       tiles = tiles.concat(tileBuilder.computeTiles(bounds, config));
+
+      // Collect all paths segments
+      var pathSegments = [];
+      for (var tileIndex in tiles) {
+        var tile = tiles[tileIndex];
+        for (var c in tile.connections) {
+          var connection = tile.connections[c];
+          pathSegments.push(connection.curveSegment);
+        }
+      }
+
+      // Find connected paths
+      paths = detectPaths(pathSegments, 5.0); // Which epsilon to use?
     };
 
     // +---------------------------------------------------------------------------------
@@ -130,15 +159,13 @@
       if (config.drawSafeZone) {
         draw.rect(bounds.min, bounds.width, bounds.height, "orange", 1);
       }
-      var pathSegments = []; // Array<PathSegment>
+      // var pathSegments = []; // Array<PathSegment>
       for (var tileIndex in tiles) {
         // console.log("tile", tile);
         var tile = tiles[tileIndex];
         if (config.drawTruchetRaster) {
           // console.log("outlinePolygon", tile.outlinePolygon);
-          // draw.rect(tile.bounds.min, tile.bounds.width, tile.bounds.height, "rgba(0,255,0,0.5)", 1);
           draw.polygon(tile.outlinePolygon, "rgba(0,255,0,0.5)", 1);
-          // fill.polygon(tile.outlinePolygon, randColor(tileIndex, 0.2), 1);
         }
         for (var c in tile.connections) {
           var connection = tile.connections[c];
@@ -162,12 +189,12 @@
               color: "rgba(128,0,128,0.5)"
             });
           }
-          pathSegments.push(connection.curveSegment);
+          // pathSegments.push(connection.curveSegment);
         }
       }
 
-      // Find connected paths
-      var paths = detectPaths(pathSegments);
+      // // Find connected paths
+      // var paths = detectPaths(pathSegments, 5.0); // Which epsilon to use?
 
       for (var i = 0; i < paths.length; i++) {
         var path = paths[i];
@@ -217,7 +244,7 @@
     {
       var gui = pb.createGUI();
       // prettier-ignore
-      gui.add(config, 'tileType', [ "Triangle2", "Square2" ]).listen().onChange(function() { computeTiles(); pb.redraw() }).name("tileType").title("tileType");
+      gui.add(config, 'tileType', [ "Triangle2", "Square2", "Cairo2" ]).listen().onChange(function() { prepareTileBuilder(); computeTiles(); pb.redraw() }).name("tileType").title("tileType");
       // prettier-ignore
       gui.add(config, 'drawSafeZone').listen().onChange(function() { pb.redraw() }).name("drawSafeZone").title("drawSafeZone");
       // prettier-ignore
@@ -238,6 +265,10 @@
       gui.add(config, 'closePattern').listen().onChange(function() { computeTiles(); pb.redraw(); }).name("closePattern").title("closePattern");
       // prettier-ignore
       gui.add(config, 'fillAreas').listen().onChange(function() {  pb.redraw(); }).name("fillAreas").title("fillAreas");
+      // prettier-ignore
+      gui.add(config, 'longConnectionFactor').min(0.0).max(2.0).step(0.01).listen().onChange(function() { computeTiles(); pb.redraw(); }).name("longConnectionFactor").title("longConnectionFactor");
+      // prettier-ignore
+      gui.add(config, 'shortConnectionFactor').min(0.0).max(2.0).step(0.01).listen().onChange(function() { computeTiles(); pb.redraw(); }).name("shortConnectionFactor").title("shortConnectionFactor");
     }
 
     computeTiles();

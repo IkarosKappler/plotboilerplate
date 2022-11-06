@@ -61,6 +61,8 @@
   var TriangleTileBuilder = function () {
     // NOOP
   };
+  CairoTileBuilder.LONG_PATH_FACTOR = 0.75;
+  CairoTileBuilder.SHORT_PATH_FACTOR = 0.4;
 
   _context.TriangleTileBuilder = TriangleTileBuilder;
 
@@ -70,6 +72,9 @@
    * @param {Bounds} bounds - The plane bounds to build the pattern within.
    * @param {number} config.countV - The vertical pattern size (measured in tile count).
    * @param {number} config.countH - The horizontal pattern size (measured in tile count).
+   * @param {boolean} config.closePattern - Pass `true` if the pattern should be closed at its borders.
+   * @param {number} config.longConnectionFactor - The Beziér bending factor to use for long connections.
+   * @param {number} config.shortConnectionFactor - The Beziér bending factor to use for short connections.
    **/
   _context.TriangleTileBuilder.computeTiles = function (bounds, config) {
     var tiles = [];
@@ -80,7 +85,7 @@
           { x: bounds.min.x + (tileSize.width / 2) * i, y: bounds.min.y + tileSize.height * j },
           { x: bounds.min.x + (tileSize.width / 2) * i + tileSize.width, y: bounds.min.y + tileSize.height * (j + 1) }
         );
-        const tile = makeTruchetTriangle(tileBounds, config, i, j, config.closePattern);
+        const tile = makeTruchetTriangle(tileBounds, config, i, j);
         tiles.push(tile);
       }
     }
@@ -94,7 +99,7 @@
    * @param {number} config.countV - The vertical pattern size (measured in tile count).
    * @param {number} config.countH - The horizontal pattern size (measured in tile count).
    **/
-  var makeTruchetTriangle = function (tileBounds, config, indexH, indexV, closePattern) {
+  var makeTruchetTriangle = function (tileBounds, config, indexH, indexV) {
     var isSpikeDown = (indexH % 2 && !(indexV % 2)) || (!(indexH % 2) && indexV % 2);
     var outlineVertices = isSpikeDown
       ? [
@@ -117,23 +122,20 @@
       if (isConnected[start]) {
         continue;
       }
-      // var startVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, start, indexV);
       arrayShuffle(allowedConnections[start]);
       for (var j = 0; j < allowedConnections[start].length; j++) {
         var end = allowedConnections[start][j];
-        var startVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, start, end); // indexV);
+        var startVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, start, end, config);
         if (isConnected[end]) {
           continue;
         }
-        var endVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, end, start); // indexV);
+        var endVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, end, start, config);
         var line = new Line(startVector.a, endVector.a);
         if (!TruchetUtils.canConnectLine(line, connections)) {
           continue;
         }
         connections.push({
           line: line,
-          // startVector: startVector,
-          // endVector: endVector,
           curveSegment: new CubicBezierCurve(startVector.a, endVector.a, startVector.b, endVector.b),
           indices: [start, allowedConnections[start][j]]
         });
@@ -143,20 +145,20 @@
     }
 
     // If on the border of the grid close connections in a linear manner
-    if (closePattern) {
+    if (config.closePattern) {
       if (indexV === 0) {
-        if (isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 2, 3);
+        if (isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 2, 3, config);
       }
       if (indexV + 1 === config.countV) {
-        if (!isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 4, 5);
+        if (!isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 4, 5, config);
       }
       if (indexH === 0) {
         // In both cases: spikeDown and not spikeDown
-        closeTileAt(tileBounds, outlinePolygon, connections, 0, 1);
+        closeTileAt(tileBounds, outlinePolygon, connections, 0, 1, config);
       }
       if (indexH + 1 === config.countH * 2) {
-        if (isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 4, 5);
-        else closeTileAt(tileBounds, outlinePolygon, connections, 2, 3);
+        if (isSpikeDown) closeTileAt(tileBounds, outlinePolygon, connections, 4, 5, config);
+        else closeTileAt(tileBounds, outlinePolygon, connections, 2, 3, config);
       }
     }
 
@@ -167,9 +169,21 @@
   // | Close a tile at the bounds of the whole pattern (no adjacent tile available).
   // | Solution: just use the inverse of the connecting inner vectors (flip them to the outside).
   // +-------------------------------
-  var closeTileAt = function (tileBounds, outlinePolygon, connections, squareConnectorIndexA, squareConnectorIndexB) {
-    var startVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, squareConnectorIndexA);
-    var endVector = getTriangleConnectorLocation(outlinePolygon, SIDE_CONNECTOR_COUNT, squareConnectorIndexB);
+  var closeTileAt = function (tileBounds, outlinePolygon, connections, squareConnectorIndexA, squareConnectorIndexB, config) {
+    var startVector = getTriangleConnectorLocation(
+      outlinePolygon,
+      SIDE_CONNECTOR_COUNT,
+      squareConnectorIndexA,
+      squareConnectorIndexB,
+      config
+    );
+    var endVector = getTriangleConnectorLocation(
+      outlinePolygon,
+      SIDE_CONNECTOR_COUNT,
+      squareConnectorIndexB,
+      squareConnectorIndexA,
+      config
+    );
     startVector.inv();
     endVector.inv();
 
@@ -182,7 +196,7 @@
 
   // Get the triangulare connector vector
   // @return Vector
-  var getTriangleConnectorLocation = function (outlinePolygon, sideConnectorCount, connectorIndexA, connectorIndexB) {
+  var getTriangleConnectorLocation = function (outlinePolygon, sideConnectorCount, connectorIndexA, connectorIndexB, config) {
     // Just get the normal connector and apply a pattern-specific scale factor.
     var parallelVector = TruchetUtils.getOrthoConnectorLocation(
       outlinePolygon,
@@ -191,6 +205,7 @@
       connectorIndexB
     );
     var isLong = isLongConnection(connectorIndexA, connectorIndexB);
-    return parallelVector.scale(isLong ? 0.75 : 0.4);
+    // return parallelVector.scale(isLong ? 0.75 : 0.4);
+    return parallelVector.scale(isLong ? config.longConnectionFactor : config.shortConnectionFactor);
   };
 })(globalThis);
