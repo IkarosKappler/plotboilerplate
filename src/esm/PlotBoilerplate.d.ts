@@ -75,7 +75,9 @@
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @modified 2021-11-16 Adding the `PBText` drawable.
  * @modified 2022-08-01 Added `title` to the params.
- * @version  1.15.1
+ * @modified 2022-10-25 Added the `origin` to the default draw config.
+ * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
+ * @version  1.16.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -214,7 +216,7 @@ export declare class PlotBoilerplate {
      * @memberof PlotBoilerplate
      * @instance
      */
-    selectPolygon: Polygon;
+    selectPolygon: Polygon | null;
     /**
      * @member {Array<IDraggable>}
      * @memberof PlotBoilerplate

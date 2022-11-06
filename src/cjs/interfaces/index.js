@@ -13,4 +13,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./core"), exports);
 __exportStar(require("./DrawLib"), exports);
 __exportStar(require("./externals"), exports);
+__exportStar(require("./additionals"), exports);
 //# sourceMappingURL=index.js.map

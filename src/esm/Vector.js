@@ -11,7 +11,8 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.4.0
+ * @modified 2022-10-25 Added the `getOrthogonal` method.
+ * @version  1.5.0
  *
  * @file Vector
  * @public
@@ -59,7 +60,7 @@ export class Vector extends VertTuple {
         return v;
     }
     /**
-     * The inverse of a vector is a vector witht the same magnitude but oppose direction.
+     * The inverse of a vector is a vector with the same magnitude but oppose direction.
      *
      * Please not that the origin of this vector changes here: a->b becomes b->a.
      *
@@ -105,6 +106,24 @@ export class Vector extends VertTuple {
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
     }
+    /**
+     * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
+     *
+     * @name getOrthogonal
+     * @method getOrthogonal
+     * @return {Vector} A new vector with the same length that stands on this vector's point a.
+     * @instance
+     * @memberof Vector
+     **/
+    getOrthogonal() {
+        // Orthogonal of vector (0,0)->(x,y) is (0,0)->(-y,x)
+        const linePoint = this.a.clone();
+        const startPoint = this.b.clone().sub(this.a);
+        const tmp = startPoint.x;
+        startPoint.x = -startPoint.y;
+        startPoint.y = tmp;
+        return new Vector(linePoint, startPoint.add(this.a));
+    }
 }
 Vector.utils = {
     /**
@@ -133,8 +152,8 @@ Vector.utils = {
      * @param {number} scaleY  - the vertical scaling during draw.
      **/
     buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
-        var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
-        var vertices = [];
+        const angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
+        const vertices = [];
         vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
         vertices.push(new Vertex(zB.x * scaleX - headlen * 1.35 * Math.cos(angle - Math.PI / 8), zB.y * scaleY - headlen * 1.35 * Math.sin(angle - Math.PI / 8)));
         vertices.push(new Vertex(zB.x * scaleX, zB.y * scaleY));

@@ -225,7 +225,7 @@ export declare abstract class GirihTile extends Polygon {
      * @param {Polygon} neighbourTile - The polygon (or tile) you want to find adjacency for at the specified edge.
      * @return {Polygon|null} the passed tile itself if adjacency was found, null otherwise.
      */
-    transformTilePositionToAdjacency<P extends Polygon>(baseEdgeIndex: number, neighbourTile: P): P;
+    transformTilePositionToAdjacency<P extends Polygon>(baseEdgeIndex: number, neighbourTile: P): P | null;
     /**
      * Get the inner tile polygon at the given index.
      * This function applies MOD to the index.

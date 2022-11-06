@@ -14,7 +14,9 @@
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  2.2.0
+ * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
+ * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @version  2.3.0
  *
  * @file Line
  * @public
@@ -74,8 +76,9 @@ var Line = /** @class */ (function (_super) {
     // !!! DO NOT MOVE TO VertTuple
     Line.prototype.intersection = function (line) {
         var denominator = this.denominator(line);
-        if (denominator == 0)
+        if (denominator == 0) {
             return null;
+        }
         var a = this.a.y - line.a.y;
         var b = this.a.x - line.a.x;
         var numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
@@ -86,10 +89,64 @@ var Line = /** @class */ (function (_super) {
         var x = this.a.x + a * (this.b.x - this.a.x);
         var y = this.a.y + a * (this.b.y - this.a.y);
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
-            return undefined;
+            return null;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
+    };
+    //--- Implement PathSegment ---
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    Line.prototype.getStartPoint = function () {
+        return this.a;
+    };
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    Line.prototype.getEndPoint = function () {
+        return this.b;
+    };
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    Line.prototype.getStartTangent = function () {
+        return this.b;
+    };
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    Line.prototype.getEndTangent = function () {
+        return this.a;
+    };
+    /**
+     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
+     *
+     * @method reverse
+     * @memberof PathSegment
+     * @return {PathSegment} This path segment instance (for chaining).
+     */
+    Line.prototype.reverse = function () {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
     };
     return Line;
 }(VertTuple_1.VertTuple));

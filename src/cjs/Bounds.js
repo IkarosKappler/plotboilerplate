@@ -7,7 +7,8 @@
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
  * @modified 2022-02-01 Added the `toString` function.
- * @version  1.4.0
+ * @modified 2022-10-09 Added the `fromDimension` function.
+ * @version  1.5.0
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bounds = void 0;
@@ -112,6 +113,17 @@ var Bounds = /** @class */ (function () {
             yMax = Math.max(yMax, vert.y);
         }
         return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
+    };
+    /**
+     * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.
+     *
+     * @param {number} width - The width of the bounds
+     * @param {number} height  - The height of the bounds
+     * @param {XYCoords={x:0,y:0}} origin - [optional] A origin to locate the new Bounds object at.
+     * @returns {Bounds} A new `Bounds` instance width given width and height, located at (0,0) or the given origin..
+     */
+    Bounds.fromDimension = function (width, height, origin) {
+        return new Bounds(origin !== null && origin !== void 0 ? origin : { x: 0, y: 0 }, { x: (origin ? origin.x : 0) + width, y: (origin ? origin.y : 0) + height });
     };
     return Bounds;
 }()); // END class bounds

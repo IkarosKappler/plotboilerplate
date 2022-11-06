@@ -1682,7 +1682,8 @@ exports.BezierPath = BezierPath;
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
  * @modified 2022-02-01 Added the `toString` function.
- * @version  1.4.0
+ * @modified 2022-10-09 Added the `fromDimension` function.
+ * @version  1.5.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
@@ -1787,6 +1788,17 @@ var Bounds = /** @class */ (function () {
             yMax = Math.max(yMax, vert.y);
         }
         return new Bounds(new Vertex_1.Vertex(xMin, yMin), new Vertex_1.Vertex(xMax, yMax));
+    };
+    /**
+     * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.
+     *
+     * @param {number} width - The width of the bounds
+     * @param {number} height  - The height of the bounds
+     * @param {XYCoords={x:0,y:0}} origin - [optional] A origin to locate the new Bounds object at.
+     * @returns {Bounds} A new `Bounds` instance width given width and height, located at (0,0) or the given origin..
+     */
+    Bounds.fromDimension = function (width, height, origin) {
+        return new Bounds(origin !== null && origin !== void 0 ? origin : { x: 0, y: 0 }, { x: (origin ? origin.x : 0) + width, y: (origin ? origin.y : 0) + height });
     };
     return Bounds;
 }()); // END class bounds
@@ -2201,7 +2213,8 @@ exports.CircleSector = CircleSector;
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.6.0
+ * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
+ * @version 2.7.1
  *
  * @file CubicBezierCurve
  * @public
@@ -2253,7 +2266,7 @@ var CubicBezierCurve = /** @class */ (function () {
         // An array of floats
         this.segmentLengths = [];
         // float
-        this.arcLength = null;
+        // this.arcLength = null;
         this.updateArcLengths();
     }
     /**
@@ -2685,6 +2698,28 @@ var CubicBezierCurve = /** @class */ (function () {
     CubicBezierCurve.prototype.clone = function () {
         return new CubicBezierCurve(this.getStartPoint().clone(), this.getEndPoint().clone(), this.getStartControlPoint().clone(), this.getEndControlPoint().clone());
     };
+    //---BEGIN PathSegment-------------------------
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    CubicBezierCurve.prototype.getStartTangent = function () {
+        return this.startControlPoint;
+    };
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    CubicBezierCurve.prototype.getEndTangent = function () {
+        return this.endControlPoint;
+    };
+    //---END PathSegment-------------------------
     /**
      * Check if this and the specified curve are equal.<br>
      * <br>
@@ -3410,7 +3445,9 @@ exports.KeyHandler = KeyHandler;
  * @modified 2020-03-23 Ported to Typescript from JS.
  * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  2.2.0
+ * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
+ * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @version  2.3.0
  *
  * @file Line
  * @public
@@ -3470,8 +3507,9 @@ var Line = /** @class */ (function (_super) {
     // !!! DO NOT MOVE TO VertTuple
     Line.prototype.intersection = function (line) {
         var denominator = this.denominator(line);
-        if (denominator == 0)
+        if (denominator == 0) {
             return null;
+        }
         var a = this.a.y - line.a.y;
         var b = this.a.x - line.a.x;
         var numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
@@ -3482,10 +3520,64 @@ var Line = /** @class */ (function (_super) {
         var x = this.a.x + a * (this.b.x - this.a.x);
         var y = this.a.y + a * (this.b.y - this.a.y);
         if (isNaN(a) || isNaN(x) || isNaN(y)) {
-            return undefined;
+            return null;
         }
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(x, y);
+    };
+    //--- Implement PathSegment ---
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    Line.prototype.getStartPoint = function () {
+        return this.a;
+    };
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    Line.prototype.getEndPoint = function () {
+        return this.b;
+    };
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    Line.prototype.getStartTangent = function () {
+        return this.b;
+    };
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    Line.prototype.getEndTangent = function () {
+        return this.a;
+    };
+    /**
+     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
+     *
+     * @method reverse
+     * @memberof PathSegment
+     * @return {PathSegment} This path segment instance (for chaining).
+     */
+    Line.prototype.reverse = function () {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
     };
     return Line;
 }(VertTuple_1.VertTuple));
@@ -4138,7 +4230,9 @@ var __webpack_unused_export__;
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @modified 2021-11-16 Adding the `PBText` drawable.
  * @modified 2022-08-01 Added `title` to the params.
- * @version  1.15.1
+ * @modified 2022-10-25 Added the `origin` to the default draw config.
+ * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
+ * @version  1.16.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -4256,6 +4350,7 @@ var PlotBoilerplate = /** @class */ (function () {
      * @param {string=} [config.title=null] - Specify any hover tile here. It will be attached as a `title` attribute to the most elevated element.
      */
     function PlotBoilerplate(config) {
+        var _a, _b;
         /**
          * A discrete timestamp to identify single render cycles.
          * Note that using system time milliseconds is not a safe way to identify render frames, as on modern powerful machines
@@ -4412,6 +4507,9 @@ var PlotBoilerplate = /** @class */ (function () {
                 lineWidth: 1,
                 fill: true,
                 anchor: true
+            },
+            origin: {
+                color: "#000000"
             }
         }; // END drawConfig
         // +---------------------------------------------------------------------------------
@@ -4430,6 +4528,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 this.config.enableGL = false;
             }
             if (this.config.enableGL) {
+                // Override the case 'null' here. If GL is not supported, well then nothing works.
                 var ctx = this.canvas.getContext("webgl"); // webgl-experimental?
                 this.draw = new drawgl_1.drawutilsgl(ctx, false);
                 // PROBLEM: same instance of fill and draw when using WebGL.
@@ -4438,6 +4537,7 @@ var PlotBoilerplate = /** @class */ (function () {
                 console.warn("Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.");
             }
             else {
+                // Override the case 'null' here. If context creation is not supported, well then nothing works.
                 var ctx = this.canvas.getContext("2d");
                 this.draw = new draw_1.drawutils(ctx, false);
                 this.fill = new draw_1.drawutils(ctx, true);
@@ -4474,8 +4574,8 @@ var PlotBoilerplate = /** @class */ (function () {
         if (config.title) {
             this.eventCatcher.setAttribute("title", config.title);
         }
-        this.draw.scale.set(this.config.scaleX, this.config.scaleY);
-        this.fill.scale.set(this.config.scaleX, this.config.scaleY);
+        this.draw.scale.set((_a = this.config.scaleX) !== null && _a !== void 0 ? _a : 1.0, this.config.scaleY);
+        this.fill.scale.set((_b = this.config.scaleX) !== null && _b !== void 0 ? _b : 1.0, this.config.scaleY);
         this.vertices = [];
         this.selectPolygon = null;
         this.draggedElements = [];
@@ -4520,11 +4620,13 @@ var PlotBoilerplate = /** @class */ (function () {
         var tosvgFill = tosvgDraw.copyInstance(true); // fillShapes=true
         tosvgDraw.beginDrawCycle(0);
         tosvgFill.beginDrawCycle(0);
-        if (pb.config.preClear)
+        if (pb.config.preClear) {
             pb.config.preClear();
-        tosvgDraw.clear(pb.config.backgroundColor);
-        if (pb.config.preDraw)
+        }
+        tosvgDraw.clear(pb.config.backgroundColor || "white");
+        if (pb.config.preDraw) {
             pb.config.preDraw(tosvgDraw, tosvgFill);
+        }
         pb.drawAll(0, tosvgDraw, tosvgFill);
         pb.drawVertices(0, tosvgDraw);
         if (pb.config.postDraw)
@@ -4535,7 +4637,8 @@ var PlotBoilerplate = /** @class */ (function () {
         //    https://caniuse.com/xml-serializer
         var serializer = new XMLSerializer();
         var svgCode = serializer.serializeToString(svgNode);
-        var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
+        // Add: '<?xml version="1.0" encoding="utf-8"?>\n' ?
+        var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>\n' + svgCode], { type: "image/svg;charset=utf-8" });
         // See documentation for FileSaver.js for usage.
         //    https://github.com/eligrey/FileSaver.js
         if (typeof globalThis["saveAs"] !== "function")
@@ -4610,11 +4713,12 @@ var PlotBoilerplate = /** @class */ (function () {
      * @private
      **/
     PlotBoilerplate.prototype.updateCSSscale = function () {
+        var _a, _b, _c, _d;
         if (this.config.cssUniformScale) {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleX);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleX) !== null && _b !== void 0 ? _b : 1.0);
         }
         else {
-            PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleY);
+            PlotBoilerplate.utils.setCSSscale(this.canvas, (_c = this.config.cssScaleX) !== null && _c !== void 0 ? _c : 1.0, (_d = this.config.cssScaleY) !== null && _d !== void 0 ? _d : 1.0);
         }
     };
     /**
@@ -4887,7 +4991,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return The vertex near the given position or undefined if none was found there.
      **/
     PlotBoilerplate.prototype.getVertexNear = function (pixelPosition, pixelTolerance) {
-        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min(this.config.cssScaleX, this.config.cssScaleY));
+        var _a, _b;
+        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
         if (p && p.typeName == "vertex") {
             return this.vertices[p.vindex];
         }
@@ -4953,7 +5058,7 @@ var PlotBoilerplate = /** @class */ (function () {
     PlotBoilerplate.prototype.drawOrigin = function (draw) {
         // Add a crosshair to mark the origin
         draw.setCurrentId("origin");
-        draw.crosshair({ x: 0, y: 0 }, 10, "#000000");
+        draw.crosshair({ x: 0, y: 0 }, 10, this.drawConfig.origin.color);
     };
     /**
      * This is just a tiny helper function to determine the render color of vertices.
@@ -5170,10 +5275,10 @@ var PlotBoilerplate = /** @class */ (function () {
         else {
             console.error("Cannot draw object. Unknown class.");
         }
-        draw.setCurrentClassName(null);
-        draw.setCurrentId(null);
-        fill.setCurrentClassName(null);
-        fill.setCurrentId(null);
+        draw.setCurrentClassName(undefined);
+        draw.setCurrentId(undefined);
+        fill.setCurrentClassName(undefined);
+        fill.setCurrentId(undefined);
     };
     /**
      * Draw the select-polygon (if there is one).
@@ -5276,7 +5381,7 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.clear = function () {
         // Note that elements might have an alpha channel. Clear the scene first.
-        this.draw.clear(this.config.backgroundColor);
+        this.draw.clear(this.config.backgroundColor || "white");
     };
     /**
      * Clear the selection.<br>
@@ -5306,7 +5411,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {Bounds} The current viewport.
      **/
     PlotBoilerplate.prototype.viewport = function () {
-        return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY));
+        var _a, _b;
+        return new Bounds_1.Bounds(this.transformMousePosition(0, 0), this.transformMousePosition(this.canvasSize.width * ((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0), this.canvasSize.height * ((_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0)));
     };
     /**
      * Trigger the saveFile.hook.
@@ -5355,10 +5461,12 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.resizeCanvas = function () {
         var _this = this;
+        var _a, _b, _c, _d, _e, _f;
         var _self = this;
         var _setSize = function (w, h) {
-            w *= _self.config.canvasWidthFactor;
-            h *= _self.config.canvasHeightFactor;
+            var _a, _b;
+            w *= (_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0;
+            h *= (_b = _self.config.canvasHeightFactor) !== null && _b !== void 0 ? _b : 1.0;
             _self.canvasSize.width = w;
             _self.canvasSize.height = h;
             if (_self.canvas instanceof HTMLCanvasElement) {
@@ -5387,8 +5495,8 @@ var PlotBoilerplate = /** @class */ (function () {
             var width = globalThis.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             var height = globalThis.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             _self.canvas.style.position = "absolute";
-            _self.canvas.style.width = _self.config.canvasWidthFactor * width + "px";
-            _self.canvas.style.height = _self.config.canvasWidthFactor * height + "px";
+            _self.canvas.style.width = ((_a = _self.config.canvasWidthFactor) !== null && _a !== void 0 ? _a : 1.0) * width + "px";
+            _self.canvas.style.height = ((_b = _self.config.canvasWidthFactor) !== null && _b !== void 0 ? _b : 1.0) * height + "px";
             _self.canvas.style.top = "0px";
             _self.canvas.style.left = "0px";
             _setSize(width, height);
@@ -5397,16 +5505,16 @@ var PlotBoilerplate = /** @class */ (function () {
             // Set editor size
             _self.canvas.style.position = "absolute";
             var space = this.getAvailableContainerSpace();
-            _self.canvas.style.width = _self.config.canvasWidthFactor * space.width + "px";
-            _self.canvas.style.height = _self.config.canvasHeightFactor * space.height + "px";
-            _self.canvas.style.top = null;
-            _self.canvas.style.left = null;
+            _self.canvas.style.width = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * space.width + "px";
+            _self.canvas.style.height = ((_d = _self.config.canvasHeightFactor) !== null && _d !== void 0 ? _d : 1.0) * space.height + "px";
+            _self.canvas.style.top = "";
+            _self.canvas.style.left = "";
             _setSize(space.width, space.height);
         }
         else {
-            _self.canvas.style.width = null;
-            _self.canvas.style.height = null;
-            _setSize(_self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight);
+            _self.canvas.style.width = "";
+            _self.canvas.style.height = "";
+            _setSize((_e = _self.config.defaultCanvasWidth) !== null && _e !== void 0 ? _e : 1024, (_f = _self.config.defaultCanvasHeight) !== null && _f !== void 0 ? _f : 768);
         }
         if (_self.config.redrawOnResize)
             _self.redraw();
@@ -6235,7 +6343,7 @@ var Polygon = /** @class */ (function () {
         if (typeof vertices == "undefined")
             vertices = [];
         this.vertices = vertices;
-        this.isOpen = isOpen;
+        this.isOpen = isOpen || false;
     }
     /**
      * Add a vertex to the end of the `vertices` array.
@@ -7819,7 +7927,8 @@ exports.VEllipseSector = VEllipseSector;
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vector.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  1.4.0
+ * @modified 2022-10-25 Added the `getOrthogonal` method.
+ * @version  1.5.0
  *
  * @file Vector
  * @public
@@ -7884,7 +7993,7 @@ var Vector = /** @class */ (function (_super) {
         return v;
     };
     /**
-     * The inverse of a vector is a vector witht the same magnitude but oppose direction.
+     * The inverse of a vector is a vector with the same magnitude but oppose direction.
      *
      * Please not that the origin of this vector changes here: a->b becomes b->a.
      *
@@ -7929,6 +8038,24 @@ var Vector = /** @class */ (function (_super) {
         // FOR A VECTOR THE LINE-INTERSECTION MUST BE ON BOTH VECTORS
         // if we cast these lines infinitely in both directions, they intersect here:
         return new Vertex_1.Vertex(this.a.x + a * (this.b.x - this.a.x), this.a.y + a * (this.b.y - this.a.y));
+    };
+    /**
+     * Get the orthogonal "vector" of this vector (rotated by 90° clockwise).
+     *
+     * @name getOrthogonal
+     * @method getOrthogonal
+     * @return {Vector} A new vector with the same length that stands on this vector's point a.
+     * @instance
+     * @memberof Vector
+     **/
+    Vector.prototype.getOrthogonal = function () {
+        // Orthogonal of vector (0,0)->(x,y) is (0,0)->(-y,x)
+        var linePoint = this.a.clone();
+        var startPoint = this.b.clone().sub(this.a);
+        var tmp = startPoint.x;
+        startPoint.x = -startPoint.y;
+        startPoint.y = tmp;
+        return new Vector(linePoint, startPoint.add(this.a));
     };
     Vector.utils = {
         /**

@@ -20,7 +20,8 @@
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.6.0
+ * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
+ * @version 2.7.1
  *
  * @file CubicBezierCurve
  * @public
@@ -30,7 +31,7 @@ import { Bounds } from "./Bounds";
 import { UIDGenerator } from "./UIDGenerator";
 import { Vertex } from "./Vertex";
 import { Vector } from "./Vector";
-import { XYCoords, UID } from "./interfaces";
+import { XYCoords, UID, PathSegment } from "./interfaces";
 
 /**
  * @classdesc A refactored cubic bezier curve class.
@@ -42,7 +43,7 @@ import { XYCoords, UID } from "./interfaces";
  * @requires UID
  * @requires UIDGenerator
  */
-export class CubicBezierCurve {
+export class CubicBezierCurve implements PathSegment {
   /** @constant {number} */
   static readonly START_POINT: number = 0;
   /** @constant {number} */
@@ -157,7 +158,7 @@ export class CubicBezierCurve {
     // An array of floats
     this.segmentLengths = [];
     // float
-    this.arcLength = null;
+    // this.arcLength = null;
 
     this.updateArcLengths();
   }
@@ -626,6 +627,30 @@ export class CubicBezierCurve {
       this.getEndControlPoint().clone()
     );
   }
+
+  //---BEGIN PathSegment-------------------------
+  /**
+   * Get the tangent's end point at the start point of this segment.
+   *
+   * @method getStartTangent
+   * @memberof PathSegment
+   * @return {Vertex} The end point of the starting point's tangent.
+   */
+  getStartTangent(): Vertex {
+    return this.startControlPoint;
+  }
+
+  /**
+   * Get the tangent's end point at the end point of this segment.
+   *
+   * @method getEndTangent
+   * @memberof PathSegment
+   * @return {Vertex} The end point of the ending point's tangent.
+   */
+  getEndTangent(): Vertex {
+    return this.endControlPoint;
+  }
+  //---END PathSegment-------------------------
 
   /**
    * Check if this and the specified curve are equal.<br>

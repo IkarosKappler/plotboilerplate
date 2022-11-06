@@ -15,6 +15,7 @@
  * @modified 2021-06-21 Added `IBounds.getCenter()`.
  * @modified 2021-11-16 Added `text` options to the `DrawConfig`.
  * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
+ * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
  **/
 import { Vertex } from "../Vertex";
 import { Vector } from "../Vector";
@@ -158,6 +159,9 @@ export interface DrawConfig {
         lineWidth: number;
         fill?: boolean;
         anchor?: boolean;
+    };
+    origin: {
+        color: string;
     };
 }
 /** This is a fix for the problem, that the constructor's "name" attribute is not

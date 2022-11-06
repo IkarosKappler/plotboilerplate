@@ -1,5 +1,25 @@
 # Changelog
 
+- 2022-11-06
+  - Adding an XML declaration to the SVG export routine.
+  - Added the CairoTileBuilder to the Truchet demo 44.
+- 2022-10-25
+  - Added `origin` param to the `DrawConfig` interface.
+  - Added the `extended-vector-orthogonal` demo.
+  - Added `Vector.getOrthogonal` method.
+  - Added `origin` to PlotBoilerplate's default draw config.
+- 2022-10-17
+  - The `CubicBezierCurve` class now implements the new `PathSegment` interface.
+  - Adding the `algorithms/detectPaths` function.
+  - Changing the return type of `GirihTile.transformTilePositionToAdjacency` from `Polygon`to `Polygon | null`.
+  - Adding these methods from the `PathSegment` interface to the `Line` class: getStartPoint, getEndPoint, reverse.
+- 2022-10-07
+  - Adding the 44-truchet-tiles demo.
+  - Adding the `algorithms/arrayShuffle` function.
+- 2022-10-09 (v1.18.0)
+  - Added the `Bounds.fromDimension` function.
+  - Changed the actual return value of the `Line.intersection` function to null (was undefined before).
+  - Added the `utils/shuffleArray.ts` helper utils function.
 - 2022-09-11
   - Added the extended circle-line-intersection demo (because I am stupid and need visual confirmation).
 - 2022-08-23

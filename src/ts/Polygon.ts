@@ -99,7 +99,7 @@ export class Polygon implements SVGSerializable {
     this.uid = UIDGenerator.next();
     if (typeof vertices == "undefined") vertices = [];
     this.vertices = vertices;
-    this.isOpen = isOpen;
+    this.isOpen = isOpen || false;
   }
 
   /**

@@ -6,7 +6,8 @@
  * @modified 2021-02-02 Added the `toPolygon` method.
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
  * @modified 2022-02-01 Added the `toString` function.
- * @version  1.4.0
+ * @modified 2022-10-09 Added the `fromDimension` function.
+ * @version  1.5.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -109,4 +110,13 @@ export declare class Bounds implements IBounds, XYDimension {
      * @return The minimal Bounds for the given vertices.
      **/
     static computeFromVertices(vertices: Array<Vertex>): Bounds;
+    /**
+     * Create a new `Bounds` instance just from `width` and `height`, located at (0,0) or the optionally given origin.
+     *
+     * @param {number} width - The width of the bounds
+     * @param {number} height  - The height of the bounds
+     * @param {XYCoords={x:0,y:0}} origin - [optional] A origin to locate the new Bounds object at.
+     * @returns {Bounds} A new `Bounds` instance width given width and height, located at (0,0) or the given origin..
+     */
+    static fromDimension(width: number, height: number, origin?: XYCoords): Bounds;
 }

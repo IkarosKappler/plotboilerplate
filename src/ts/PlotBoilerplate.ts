@@ -75,7 +75,9 @@
  * @modified 2021-04-25 Extending `remove` to accept arrays of drawables.
  * @modified 2021-11-16 Adding the `PBText` drawable.
  * @modified 2022-08-01 Added `title` to the params.
- * @version  1.15.1
+ * @modified 2022-10-25 Added the `origin` to the default draw config.
+ * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
+ * @version  1.16.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -270,7 +272,7 @@ export class PlotBoilerplate {
    * @memberof PlotBoilerplate
    * @instance
    */
-  selectPolygon: Polygon;
+  selectPolygon: Polygon | null;
 
   /**
    * @member {Array<IDraggable>}
@@ -532,6 +534,9 @@ export class PlotBoilerplate {
         lineWidth: 1,
         fill: true,
         anchor: true
+      },
+      origin: {
+        color: "#000000"
       }
     }; // END drawConfig
 
@@ -554,14 +559,16 @@ export class PlotBoilerplate {
         this.config.enableGL = false;
       }
       if (this.config.enableGL) {
-        const ctx: WebGLRenderingContext = this.canvas.getContext("webgl"); // webgl-experimental?
+        // Override the case 'null' here. If GL is not supported, well then nothing works.
+        const ctx: WebGLRenderingContext = this.canvas.getContext("webgl") as WebGLRenderingContext; // webgl-experimental?
         this.draw = new drawutilsgl(ctx, false);
         // PROBLEM: same instance of fill and draw when using WebGL.
         //          Shader program cannot be duplicated on the same context.
         this.fill = (this.draw as drawutilsgl).copyInstance(true);
         console.warn("Initialized with experimental mode enableGL=true. Note that this is not yet fully implemented.");
       } else {
-        const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d");
+        // Override the case 'null' here. If context creation is not supported, well then nothing works.
+        const ctx: CanvasRenderingContext2D = this.canvas.getContext("2d") as CanvasRenderingContext2D;
         this.draw = new drawutils(ctx, false);
         this.fill = new drawutils(ctx, true);
       }
@@ -599,8 +606,8 @@ export class PlotBoilerplate {
     if (config.title) {
       this.eventCatcher.setAttribute("title", config.title);
     }
-    this.draw.scale.set(this.config.scaleX, this.config.scaleY);
-    this.fill.scale.set(this.config.scaleX, this.config.scaleY);
+    this.draw.scale.set(this.config.scaleX ?? 1.0, this.config.scaleY);
+    this.fill.scale.set(this.config.scaleX ?? 1.0, this.config.scaleY);
     this.vertices = [];
     this.selectPolygon = null;
     this.draggedElements = [];
@@ -655,9 +662,13 @@ export class PlotBoilerplate {
 
     tosvgDraw.beginDrawCycle(0);
     tosvgFill.beginDrawCycle(0);
-    if (pb.config.preClear) pb.config.preClear();
-    tosvgDraw.clear(pb.config.backgroundColor);
-    if (pb.config.preDraw) pb.config.preDraw(tosvgDraw, tosvgFill);
+    if (pb.config.preClear) {
+      pb.config.preClear();
+    }
+    tosvgDraw.clear(pb.config.backgroundColor || "white");
+    if (pb.config.preDraw) {
+      pb.config.preDraw(tosvgDraw, tosvgFill);
+    }
     pb.drawAll(0, tosvgDraw, tosvgFill);
     pb.drawVertices(0, tosvgDraw);
     if (pb.config.postDraw) pb.config.postDraw(tosvgDraw, tosvgFill);
@@ -669,7 +680,8 @@ export class PlotBoilerplate {
     var serializer = new XMLSerializer();
     var svgCode = serializer.serializeToString(svgNode);
 
-    var blob = new Blob([svgCode], { type: "image/svg;charset=utf-8" });
+    // Add: '<?xml version="1.0" encoding="utf-8"?>\n' ?
+    var blob = new Blob(['<?xml version="1.0" encoding="utf-8"?>\n' + svgCode], { type: "image/svg;charset=utf-8" });
     // See documentation for FileSaver.js for usage.
     //    https://github.com/eligrey/FileSaver.js
     if (typeof globalThis["saveAs"] !== "function")
@@ -751,9 +763,9 @@ export class PlotBoilerplate {
    **/
   private updateCSSscale() {
     if (this.config.cssUniformScale) {
-      PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleX);
+      PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX ?? 1.0, this.config.cssScaleX ?? 1.0);
     } else {
-      PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX, this.config.cssScaleY);
+      PlotBoilerplate.utils.setCSSscale(this.canvas, this.config.cssScaleX ?? 1.0, this.config.cssScaleY ?? 1.0);
     }
   }
 
@@ -1011,7 +1023,7 @@ export class PlotBoilerplate {
   getVertexNear(pixelPosition: XYCoords, pixelTolerance: number): Vertex | undefined {
     var p: IDraggable | undefined = this.locatePointNear(
       this.transformMousePosition(pixelPosition.x, pixelPosition.y),
-      pixelTolerance / Math.min(this.config.cssScaleX, this.config.cssScaleY)
+      pixelTolerance / Math.min(this.config.cssScaleX ?? 1.0, this.config.cssScaleY ?? 1.0)
     );
     if (p && p.typeName == "vertex") {
       return this.vertices[p.vindex];
@@ -1095,7 +1107,7 @@ export class PlotBoilerplate {
   drawOrigin(draw: DrawLib<any>) {
     // Add a crosshair to mark the origin
     draw.setCurrentId("origin");
-    draw.crosshair({ x: 0, y: 0 }, 10, "#000000");
+    draw.crosshair({ x: 0, y: 0 }, 10, this.drawConfig.origin.color);
   }
 
   /**
@@ -1360,10 +1372,10 @@ export class PlotBoilerplate {
     } else {
       console.error("Cannot draw object. Unknown class.");
     }
-    draw.setCurrentClassName(null);
-    draw.setCurrentId(null);
-    fill.setCurrentClassName(null);
-    fill.setCurrentId(null);
+    draw.setCurrentClassName(undefined);
+    draw.setCurrentId(undefined);
+    fill.setCurrentClassName(undefined);
+    fill.setCurrentId(undefined);
   }
 
   /**
@@ -1473,7 +1485,7 @@ export class PlotBoilerplate {
    **/
   clear() {
     // Note that elements might have an alpha channel. Clear the scene first.
-    this.draw.clear(this.config.backgroundColor);
+    this.draw.clear(this.config.backgroundColor || "white");
   }
 
   /**
@@ -1505,7 +1517,10 @@ export class PlotBoilerplate {
   viewport(): Bounds {
     return new Bounds(
       this.transformMousePosition(0, 0),
-      this.transformMousePosition(this.canvasSize.width * this.config.cssScaleX, this.canvasSize.height * this.config.cssScaleY)
+      this.transformMousePosition(
+        this.canvasSize.width * (this.config.cssScaleX ?? 1.0),
+        this.canvasSize.height * (this.config.cssScaleY ?? 1.0)
+      )
     );
   }
 
@@ -1569,8 +1584,8 @@ export class PlotBoilerplate {
   resizeCanvas() {
     const _self: PlotBoilerplate = this;
     const _setSize = (w: number, h: number) => {
-      w *= _self.config.canvasWidthFactor;
-      h *= _self.config.canvasHeightFactor;
+      w *= _self.config.canvasWidthFactor ?? 1.0;
+      h *= _self.config.canvasHeightFactor ?? 1.0;
       _self.canvasSize.width = w;
       _self.canvasSize.height = h;
       if (_self.canvas instanceof HTMLCanvasElement) {
@@ -1597,8 +1612,8 @@ export class PlotBoilerplate {
       var width: number = globalThis.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
       var height: number = globalThis.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
       _self.canvas.style.position = "absolute";
-      _self.canvas.style.width = _self.config.canvasWidthFactor * width + "px";
-      _self.canvas.style.height = _self.config.canvasWidthFactor * height + "px";
+      _self.canvas.style.width = (_self.config.canvasWidthFactor ?? 1.0) * width + "px";
+      _self.canvas.style.height = (_self.config.canvasWidthFactor ?? 1.0) * height + "px";
       _self.canvas.style.top = "0px";
       _self.canvas.style.left = "0px";
       _setSize(width, height);
@@ -1606,15 +1621,15 @@ export class PlotBoilerplate {
       // Set editor size
       _self.canvas.style.position = "absolute";
       const space: XYDimension = this.getAvailableContainerSpace();
-      _self.canvas.style.width = _self.config.canvasWidthFactor * space.width + "px";
-      _self.canvas.style.height = _self.config.canvasHeightFactor * space.height + "px";
-      _self.canvas.style.top = null;
-      _self.canvas.style.left = null;
+      _self.canvas.style.width = (_self.config.canvasWidthFactor ?? 1.0) * space.width + "px";
+      _self.canvas.style.height = (_self.config.canvasHeightFactor ?? 1.0) * space.height + "px";
+      _self.canvas.style.top = "";
+      _self.canvas.style.left = "";
       _setSize(space.width, space.height);
     } else {
-      _self.canvas.style.width = null;
-      _self.canvas.style.height = null;
-      _setSize(_self.config.defaultCanvasWidth, _self.config.defaultCanvasHeight);
+      _self.canvas.style.width = "";
+      _self.canvas.style.height = "";
+      _setSize(_self.config.defaultCanvasWidth ?? 1024, _self.config.defaultCanvasHeight ?? 768);
     }
 
     if (_self.config.redrawOnResize) _self.redraw();
@@ -2269,7 +2284,7 @@ export class PlotBoilerplate {
        * @param {function} fallback - A default value if the key does not exist.
        * @return {function}
        **/
-      func: (obj: any, key: string, fallback: (...args: any[]) => any) => {
+      func: (obj: any, key: string, fallback: ((...args: any[]) => any) | null) => {
         if (!obj.hasOwnProperty(key)) return fallback;
         if (typeof obj[key] !== "function") return fallback;
         return obj[key];
