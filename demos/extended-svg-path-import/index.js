@@ -40,17 +40,55 @@
     var data1 =
       "m 51.076662,93.800013 c 1e-6,-16.933333 8.466667,-25.399999 25.399994,-25.399999 h 25.400004 c 16.93334,0 25.4,8.466666 25.4,25.399999 v 16.933337 c 0,16.93333 16.93334,33.86666 33.86667,33.86666 h 16.93333 c 16.93333,0 25.4,8.46667 25.4,25.4 v 25.4 c 0,16.93333 -8.46667,25.4 -25.4,25.4 h -16.93333 c -16.93333,0 -33.86667,16.93332 -33.86667,33.86666 V 271.6 c 0,16.93334 -8.46666,25.4 -25.4,25.4 H 76.476656 c -16.933327,0 -25.399993,-8.46666 -25.399994,-25.4 z";
 
+    // Define a shape with SVG path data attributes only with _absolute_
+    // path commands.
+    // prettier-ignore
+    var svgDataAbsolute = [
+      'M', -10, -7.5,
+      'V', -10, 
+      'L', 0, -10,
+      'C', -5, -15, 10, -15, 5, -10,
+      'H', 10,
+      'C', 5, -7.5, 5, -7.5, 10, -5,
+      'S', 15, 0, 10, 0,
+      'Q', 5, 5, 0, 0,
+      'T', -10, 0,
+      'A', 5, 4, 0, 1, 1, -10, -5,    
+      'Z'
+    ].join(" ");
+
+    // Now define the same shape. But only y with _relative_
+    // path commands.
+    // prettier-ignore
+    var svgDataRelative = [
+      'M', -10, -7.5,
+      'v', -2.5, 
+      'l', 10, 0,
+      'c', -5, -5, 10, -5, 5, 0,
+      'h', 5,
+      'c', -5, 2.5, -5, 2.5, 0, 5,
+      's', 5, 5, 0, 5,
+      'q', -5, 5, -10, 0,
+      't', -10, 0,
+      'a', 5, 4, 0, 1, 1, 0, -5,    
+      'z'
+    ].join(" ");
+
+    var pathSegments = [];
+
     var loadPathData = function (data) {
       console.log("data", data);
-      var elements = parseSVGPathData(data);
-      console.log("elements", elements);
+      pathSegments = parseSVGPathData(data);
+      console.log("pathSegments", pathSegments);
+
+      pb.redraw();
     };
 
     var insertPathJSON = function () {
       var textarea = document.createElement("textarea");
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
-      textarea.innerHTML = data1; // outline.toJSON(true);
+      textarea.innerHTML = svgDataAbsolute; // data1; // outline.toJSON(true);
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
@@ -72,6 +110,22 @@
     pb.config.postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
       console.log("contrastColor", contrastColor);
+
+      for (var i = 0; i < pathSegments.length; i++) {
+        var segment = pathSegments[i];
+        if (segment instanceof Line) {
+          pb.draw.line(segment.a, segment.b, "green", 2);
+        } else if (segment instanceof CubicBezierCurve) {
+          pb.draw.cubicBezier(
+            segment.startPoint,
+            segment.endPoint,
+            segment.startControlPoint,
+            segment.endControlPoint,
+            "green",
+            2
+          );
+        }
+      }
     };
 
     // +---------------------------------------------------------------------------------
