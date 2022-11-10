@@ -139,7 +139,7 @@ export class VEllipseSector {
         curves.push(curve);
       } else {
         // Find intersection
-        let intersection: Vertex | undefined = startTangent.intersection(endTangent);
+        let intersection: Vertex | null = startTangent.intersection(endTangent);
         // What if intersection is undefined?
         // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
 

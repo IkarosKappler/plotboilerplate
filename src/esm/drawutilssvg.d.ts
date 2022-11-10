@@ -34,7 +34,8 @@
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  1.6.1
+ * @modified 2022-11-10 Tweaking some type issues.
+ * @version  1.6.2
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

@@ -11136,7 +11136,8 @@ var GLU = /** @class */ (function () {
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  1.6.1
+ * @modified 2022-11-10 Tweaking some type issues.
+ * @version  1.6.2
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -12138,7 +12139,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.text = function (text, x, y, options) {
-        var _a, _b;
+        var _a, _b, _c;
         options = options || {};
         var color = options.color || "black";
         var lineHeight = ((_b = (_a = options.lineHeight) !== null && _a !== void 0 ? _a : options.fontSize) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
@@ -12163,10 +12164,10 @@ var drawutilssvg = /** @class */ (function () {
         this.curId = curId + "_text";
         var textNode = this.makeNode("text");
         node.appendChild(textNode);
-        textNode.setAttribute("font-family", options.fontFamily); // May be undefined
-        textNode.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : null);
-        textNode.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : null);
-        textNode.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : null);
+        textNode.setAttribute("font-family", (_c = options.fontFamily) !== null && _c !== void 0 ? _c : ""); // May be undefined
+        textNode.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : "");
+        textNode.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : "");
+        textNode.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : "");
         textNode.setAttribute("text-anchor", textAlign);
         textNode.setAttribute("transform-origin", "0 0");
         textNode.setAttribute("transform", rotate);
@@ -12317,19 +12318,6 @@ var drawutilssvg = /** @class */ (function () {
         };
         var _sy = function (index) {
             data[index] = scale.y * Number(data[index]);
-        };
-        var stx = function (value) {
-            return offset.x + scale.x * value;
-        };
-        var sty = function (value) {
-            return offset.y + scale.y * value;
-        };
-        // scale only {x,y}
-        var sx = function (value) {
-            return scale.x * value;
-        };
-        var sy = function (value) {
-            return scale.y * value;
         };
         var i = 0;
         var lastPoint = { x: NaN, y: NaN };
@@ -12642,6 +12630,7 @@ globalThis.BezierPath = __webpack_require__(126).BezierPath;
 globalThis.Polygon = __webpack_require__(661).Polygon;
 globalThis.Triangle = __webpack_require__(212).Triangle;
 globalThis.VEllipse = __webpack_require__(112).VEllipse;
+globalThis.VEllipseSector = __webpack_require__(965).VEllipseSector;
 globalThis.Circle = __webpack_require__(913).Circle;
 globalThis.CircleSector = __webpack_require__(946).CircleSector;
 globalThis.PBImage = __webpack_require__(699).PBImage;

@@ -74,6 +74,12 @@
       'z'
     ].join(" ");
 
+    var shortHandStart = new Vertex(0, 0);
+    var shortHandControl = new Vertex(0, 300);
+    var shortHandEnd = new Vertex(300, 0);
+    // var svgDataShorthand = ["M", 0, 0, "S", 0, 300, 300, 0];
+    pb.add([shortHandStart, shortHandControl, shortHandEnd]);
+
     var pathSegments = [];
 
     var loadPathData = function (data) {
@@ -111,6 +117,30 @@
       var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
       console.log("contrastColor", contrastColor);
 
+      var svgDataShorthand = [
+        "M",
+        shortHandStart.x,
+        shortHandStart.y,
+        "S",
+        shortHandControl.x,
+        shortHandControl.y,
+        shortHandEnd.x,
+        shortHandEnd.y
+      ];
+      draw.path(svgDataShorthand, "orange", 2);
+      var parsedShorthand = parseSVGPathData(svgDataShorthand.join(" "))[0];
+      console.log(parsedShorthand);
+      pb.draw.cubicBezier(
+        parsedShorthand.startPoint,
+        parsedShorthand.endPoint,
+        parsedShorthand.startControlPoint,
+        parsedShorthand.endControlPoint,
+        "rgba(255,255,0,0.5)",
+        8
+      );
+      pb.draw.line(parsedShorthand.startPoint, parsedShorthand.startControlPoint, "red", 1);
+      pb.draw.line(parsedShorthand.endPoint, parsedShorthand.endControlPoint, "red", 1);
+
       for (var i = 0; i < pathSegments.length; i++) {
         var segment = pathSegments[i];
         if (segment instanceof Line) {
@@ -129,12 +159,33 @@
     };
 
     // +---------------------------------------------------------------------------------
+    // | Install a mouse handler to display current pointer position.
+    // +-------------------------------
+    new MouseHandler(pb.canvas, "drawsvg-demo").move(function (e) {
+      // Display the mouse position
+      var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
+      stats.mouseX = relPos.x;
+      stats.mouseY = relPos.y;
+    });
+
+    var stats = {
+      mouseX: 0,
+      mouseY: 0
+    };
+
+    // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
     // +-------------------------------
     {
       var gui = pb.createGUI();
       // prettier-ignore
-      gui.add(config, 't').min(-2.0).max(2.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("t").title("The relative value on the line (relative to the distance between start and end point).");
+      // gui.add(config, 't').min(-2.0).max(2.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("t").title("The relative value on the line (relative to the distance between start and end point).");
+
+      // Add stats
+      var uiStats = new UIStats(stats);
+      stats = uiStats.proxy;
+      uiStats.add("mouseX");
+      uiStats.add("mouseY");
     }
 
     pb.redraw();

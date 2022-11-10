@@ -34,7 +34,8 @@
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  1.6.1
+ * @modified 2022-11-10 Tweaking some type issues.
+ * @version  1.6.2
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -1032,7 +1033,7 @@ export class drawutilssvg {
      * @memberof drawutils
      */
     text(text, x, y, options) {
-        var _a, _b;
+        var _a, _b, _c;
         options = options || {};
         const color = options.color || "black";
         const lineHeight = ((_b = (_a = options.lineHeight) !== null && _a !== void 0 ? _a : options.fontSize) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
@@ -1057,10 +1058,10 @@ export class drawutilssvg {
         this.curId = curId + "_text";
         const textNode = this.makeNode("text");
         node.appendChild(textNode);
-        textNode.setAttribute("font-family", options.fontFamily); // May be undefined
-        textNode.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
-        textNode.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : null);
-        textNode.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : null);
+        textNode.setAttribute("font-family", (_c = options.fontFamily) !== null && _c !== void 0 ? _c : ""); // May be undefined
+        textNode.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : "");
+        textNode.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : "");
+        textNode.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : "");
         textNode.setAttribute("text-anchor", textAlign);
         textNode.setAttribute("transform-origin", "0 0");
         textNode.setAttribute("transform", rotate);
@@ -1211,19 +1212,6 @@ export class drawutilssvg {
         };
         const _sy = (index) => {
             data[index] = scale.y * Number(data[index]);
-        };
-        const stx = (value) => {
-            return offset.x + scale.x * value;
-        };
-        const sty = (value) => {
-            return offset.y + scale.y * value;
-        };
-        // scale only {x,y}
-        const sx = (value) => {
-            return scale.x * value;
-        };
-        const sy = (value) => {
-            return scale.y * value;
         };
         var i = 0;
         var lastPoint = { x: NaN, y: NaN };
