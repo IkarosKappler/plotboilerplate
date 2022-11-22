@@ -177,7 +177,7 @@ const detectAdjacentPath = (
  * @param {number=1.0} epsilon - (optional) An epsilon to use to tell if two plane points should be considered 'equal'.
  * @returns {Array<GenericPath>} An array containing all detected path (consisting of adjacent path segments of the original set).
  */
-export const detectPaths = (segments: Array<PathSegment>, epsilon?: number): Array<Path> => {
+export const detectPaths = (segments: Array<PathSegment>, epsilon?: number): Array<GenericPath> => {
   const eps = typeof epsilon === "undefined" || epsilon < 0 ? 1.0 : epsilon;
   const isSegmentVisited: Array<Visitation> = initVisitationArray(segments, eps);
   const resultPaths: Array<GenericPath> = [];

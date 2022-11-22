@@ -143,15 +143,19 @@ export class VEllipseSector {
         // What if intersection is undefined?
         // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
 
-        let startDiff: Vertex = startPoint.difference(intersection);
-        let endDiff: Vertex = endPoint.difference(intersection);
-        let curve: CubicBezierCurve = new CubicBezierCurve(
-          startPoint.clone(),
-          endPoint.clone(),
-          startPoint.clone().add(startDiff.scale(threshold)),
-          endPoint.clone().add(endDiff.scale(threshold))
-        );
-        curves.push(curve);
+        if (intersection) {
+          // It's VERY LIKELY hat this ALWAYS happens; it's just a typesave variant.
+          // Intersection cannot be null.
+          let startDiff: Vertex = startPoint.difference(intersection);
+          let endDiff: Vertex = endPoint.difference(intersection);
+          let curve: CubicBezierCurve = new CubicBezierCurve(
+            startPoint.clone(),
+            endPoint.clone(),
+            startPoint.clone().add(startDiff.scale(threshold)),
+            endPoint.clone().add(endDiff.scale(threshold))
+          );
+          curves.push(curve);
+        }
       }
       startPoint = endPoint;
       curAngle = nextAngle;
@@ -268,7 +272,7 @@ export class VEllipseSector {
 
       // Bring all angles into the correct order
       //    Idea: use splice or slice here?
-      var angles = [];
+      var angles: Array<number> = [];
       for (var i = 0; i < ellipseAngles.length; i++) {
         angles.push(ellipseAngles[(startIndex + i) % ellipseAngles.length]);
       }
@@ -355,7 +359,10 @@ export class VEllipseSector {
 
       // Step 2 + 3: compute center
       const sign: number = fa === fs ? -1 : 1;
-      const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+      // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+      const M: number = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
+      // TODO: is this correct
+      console.log("sign", sign, "M", M, prx, pry, py, px, "sqrt--", (prx * pry - prx * py - pry * px) / (prx * py + pry * px));
 
       const _cx: number = (M * (rx * y)) / ry;
       const _cy: number = (M * (-ry * x)) / rx;
@@ -367,6 +374,7 @@ export class VEllipseSector {
       const center: Vertex = new Vertex(cx, cy);
       const axis: Vertex = center.clone().addXY(rx, ry);
       const ellipse: VEllipse = new VEllipse(center, axis, 0);
+      // console.log("VELLIPSE::::::", ellipse);
       ellipse.rotate(phi);
 
       const startAngle: number = new Line(ellipse.center, new Vertex(x1, y1)).angle();

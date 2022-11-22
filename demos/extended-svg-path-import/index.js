@@ -80,11 +80,14 @@
     // var svgDataShorthand = ["M", 0, 0, "S", 0, 300, 300, 0];
     pb.add([shortHandStart, shortHandControl, shortHandEnd]);
 
+    var sourceData = null;
     var pathSegments = [];
 
     var loadPathData = function (data) {
       console.log("data", data);
       pathSegments = parseSVGPathData(data);
+      sourceData = data;
+      console.log("Setting sourceData", sourceData);
       console.log("pathSegments", pathSegments);
 
       pb.redraw();
@@ -141,6 +144,16 @@
       pb.draw.line(parsedShorthand.startPoint, parsedShorthand.startControlPoint, "red", 1);
       pb.draw.line(parsedShorthand.endPoint, parsedShorthand.endControlPoint, "red", 1);
 
+      console.log("sourceData", sourceData);
+      if (sourceData) {
+        var sourceDataElements = splitSVGPathData(sourceData);
+        var sourceDataElements = sourceDataElements.reduce(function (buf, elem) {
+          buf = buf.concat(elem);
+          return buf;
+        });
+        draw.path(sourceDataElements);
+      }
+
       for (var i = 0; i < pathSegments.length; i++) {
         var segment = pathSegments[i];
         if (segment instanceof Line) {
@@ -154,6 +167,9 @@
             "green",
             2
           );
+        } else if (segment instanceof VEllipse) {
+          console.log("Ellipse", segment);
+          pb.draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
         }
       }
     };

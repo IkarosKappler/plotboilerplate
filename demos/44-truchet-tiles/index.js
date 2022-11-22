@@ -61,6 +61,7 @@
     );
 
     var randColor = function (i, alpha) {
+      // i += Math.floor(Math.random() * WebColorsContrast.length);
       var color = WebColorsContrast[i % WebColorsContrast.length].clone();
       if (typeof alpha !== undefined) color.a = alpha;
       return color.cssRGBA();
@@ -85,7 +86,9 @@
         drawPathLabels: false,
         fillAreas: false,
         longConnectionFactor: 1.0,
-        shortConnectionFactor: 0.5 // default values depend on the selected tile type!
+        shortConnectionFactor: 0.5, // default values depend on the selected tile type!
+        drawPaths: true,
+        drawSegments: false
       },
       GUP
     );
@@ -173,14 +176,17 @@
             draw.line(connection.line.a, connection.line.b, "rgba(192,192,192,0.1)", 3);
           }
           // console.log("connection", connection);
-          draw.cubicBezier(
-            connection.curveSegment.startPoint,
-            connection.curveSegment.endPoint,
-            connection.curveSegment.startControlPoint,
-            connection.curveSegment.endControlPoint,
-            "rgba(192,0,192,0.75)",
-            2
-          );
+          if (config.drawSegments) {
+            // console.log("WebColorsContrast", WebColorsContrast);
+            draw.cubicBezier(
+              connection.curveSegment.startPoint,
+              connection.curveSegment.endPoint,
+              connection.curveSegment.startControlPoint,
+              connection.curveSegment.endControlPoint,
+              randColor(c, 1.0),
+              2
+            );
+          }
           if (config.drawPathLabels) {
             fill.text("SP", connection.curveSegment.startPoint.x - 5, connection.curveSegment.startPoint.y - 1, {
               color: "rgba(128,128,128,0.5)"
@@ -199,7 +205,9 @@
       for (var i = 0; i < paths.length; i++) {
         var path = paths[i];
         var vertexData = cubicBezierPath2VertexArray(path);
-        draw.cubicBezierPath(vertexData, randColor(i, 0.5), 2);
+        if (config.drawPaths) {
+          draw.cubicBezierPath(vertexData, randColor(i, 1.0), 2);
+        }
         if (config.fillAreas) {
           fill.cubicBezierPath(vertexData, randColor(i, 0.2), 2);
         }
@@ -269,6 +277,10 @@
       gui.add(config, 'longConnectionFactor').min(0.0).max(2.0).step(0.01).listen().onChange(function() { computeTiles(); pb.redraw(); }).name("longConnectionFactor").title("longConnectionFactor");
       // prettier-ignore
       gui.add(config, 'shortConnectionFactor').min(0.0).max(2.0).step(0.01).listen().onChange(function() { computeTiles(); pb.redraw(); }).name("shortConnectionFactor").title("shortConnectionFactor");
+      // prettier-ignore
+      gui.add(config, 'drawPaths').listen().onChange(function() { pb.redraw(); }).name("drawPaths").title("drawPaths");
+      // prettier-ignore
+      gui.add(config, 'drawSegments').listen().onChange(function() { pb.redraw(); }).name("drawSegments").title("drawSegments");
     }
 
     computeTiles();

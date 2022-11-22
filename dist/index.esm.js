@@ -9836,10 +9836,14 @@ class VEllipseSector {
                 let intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
                 // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
-                let startDiff = startPoint.difference(intersection);
-                let endDiff = endPoint.difference(intersection);
-                let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
-                curves.push(curve);
+                if (intersection) {
+                    // It's VERY LIKELY hat this ALWAYS happens; it's just a typesave variant.
+                    // Intersection cannot be null.
+                    let startDiff = startPoint.difference(intersection);
+                    let endDiff = endPoint.difference(intersection);
+                    let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+                    curves.push(curve);
+                }
             }
             startPoint = endPoint;
             curAngle = nextAngle;
@@ -10003,7 +10007,9 @@ VEllipseSector.ellipseSectorUtils = {
         }
         // Step 2 + 3: compute center
         const sign = fa === fs ? -1 : 1;
-        const M = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+        // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+        const M = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
+        console.log("sign", sign, "M", M, prx, pry, py, px, "sqrt--", (prx * pry - prx * py - pry * px) / (prx * py + pry * px));
         const _cx = (M * (rx * y)) / ry;
         const _cy = (M * (-ry * x)) / rx;
         const cx = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2;
@@ -10012,6 +10018,7 @@ VEllipseSector.ellipseSectorUtils = {
         const center = new Vertex(cx, cy);
         const axis = center.clone().addXY(rx, ry);
         const ellipse = new VEllipse(center, axis, 0);
+        // console.log("VELLIPSE::::::", ellipse);
         ellipse.rotate(phi);
         const startAngle = new Line(ellipse.center, new Vertex(x1, y1)).angle();
         const endAngle = new Line(ellipse.center, new Vertex(x2, y2)).angle();

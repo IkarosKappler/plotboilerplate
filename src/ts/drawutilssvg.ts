@@ -260,7 +260,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       "text": "Text"
     };
     // Question: why isn't this working if the svgNode is created dynamically? (nodeStyle.sheet is null)
-    const rules = [];
+    const rules: Array<string> = [];
     for (var k in keys) {
       const className: string = keys[k];
       const drawSettings: DrawSettings | undefined = drawConfig[k];

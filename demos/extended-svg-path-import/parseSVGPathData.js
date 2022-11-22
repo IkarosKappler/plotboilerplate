@@ -1,6 +1,8 @@
 /**
  * Transform the given path data (translate and scale. rotating is not intended here).
  *
+ * @date 2022-11-06
+ *
  * @name parseSVGPathData
  * @static
  * @memberof drawutilssvg
@@ -8,12 +10,15 @@
  */
 
 (function (_context) {
+  var DEG_TO_RAD = Math.PI / 180;
+
   function parseSVGPathData(dataString) {
-    // Source
-    //    https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115
-    const validCommand =
-      /([ml](\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))|([hv](\s?-?((\d+(\.\d+)?)|(\.\d+))))|(c(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){5})|(q(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3}(\s?t?(\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))*)|(a(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2}[,\s]?[01][,\s]+[01][,\s]+([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2})|(s(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3})|z/gi;
-    var dataElements = dataString.match(validCommand);
+    // // Source
+    // //    https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115
+    // const validCommand =
+    //   /([ml](\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))|([hv](\s?-?((\d+(\.\d+)?)|(\.\d+))))|(c(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){5})|(q(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3}(\s?t?(\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))*)|(a(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2}[,\s]?[01][,\s]+[01][,\s]+([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2})|(s(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3})|z/gi;
+    // var dataElements = dataString.match(validCommand);
+    var dataElements = splitSVGPathData(dataString);
     console.log("data array", dataElements);
     // Scale and translate {x,y}
 
@@ -30,9 +35,11 @@
     //   lastPoint.y = Number(dataElements[index + 1]);
     // };
     while (i < dataElements.length) {
-      var token = dataElements[i];
-      var data = token.split(/[\s,]/);
-      const cmd = data[0];
+      // var token = dataElements[i];
+      // var data = token.split(/[\s,]/);
+      var data = dataElements[i];
+      var cmd = data[0];
+      var token = data.join(" ");
       console.log("token", token, "cmd", cmd, "data", data);
       switch (cmd) {
         case "M":
@@ -454,24 +461,33 @@
     // var ellipse = new VEllipse(center, axis, rotation);
     // result.push()
 
-    // console.log(
-    //   lastPoint.x, // x1
-    //   lastPoint.y, // y1
-    //   Number(data[1]), // rx
-    //   Number(data[2]), // ry
-    //   Number(data[3]), // phi: number,
-    //   Boolean(data[4]), // fa: boolean,
-    //   Boolean(data[5]), // fs: boolean,
-    //   Number(data[6]), // x2: number,
-    //   Number(data[7]) // y2: number
-    // );
+    console.log(
+      "lastPoint.x",
+      lastPoint.x, // x1
+      "lastPoint.y",
+      lastPoint.y, // y1
+      "data[1]",
+      Number(data[1]), // rx
+      "data[2]",
+      Number(data[2]), // ry
+      "data[3]",
+      Number(data[3]), // phi: number,
+      "data[4]",
+      Boolean(data[4]), // fa: boolean,
+      "data[5]",
+      Boolean(data[5]), // fs: boolean,
+      "data[6]",
+      Number(data[6]), // x2: number,
+      "data[7]",
+      Number(data[7]) // y2: number
+    );
     // TODO: respect relative/absolute here
     var ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
       lastPoint.x, // x1
       lastPoint.y, // y1
       Number(data[1]), // rx
       Number(data[2]), // ry
-      Number(data[3]), // phi: number,
+      Number(data[3]) * DEG_TO_RAD, // phi: number,
       Boolean(data[4]), // fa: boolean,
       Boolean(data[5]), // fs: boolean,
       Number(data[6]), // x2: number,
@@ -483,6 +499,7 @@
     for (var i = 0; i < curves.length; i++) {
       result.push(curves[i]); // Destruct!
     }
+    result.push(ellipseSector.ellipse);
 
     if (curves.length > 0) {
       console.log("curves", curves);

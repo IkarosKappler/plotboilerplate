@@ -7722,10 +7722,14 @@ var VEllipseSector = /** @class */ (function () {
                 var intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
                 // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
-                var startDiff = startPoint.difference(intersection);
-                var endDiff = endPoint.difference(intersection);
-                var curve = new CubicBezierCurve_1.CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
-                curves.push(curve);
+                if (intersection) {
+                    // It's VERY LIKELY hat this ALWAYS happens; it's just a typesave variant.
+                    // Intersection cannot be null.
+                    var startDiff = startPoint.difference(intersection);
+                    var endDiff = endPoint.difference(intersection);
+                    var curve = new CubicBezierCurve_1.CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+                    curves.push(curve);
+                }
             }
             startPoint = endPoint;
             curAngle = nextAngle;
@@ -7888,7 +7892,9 @@ var VEllipseSector = /** @class */ (function () {
             }
             // Step 2 + 3: compute center
             var sign = fa === fs ? -1 : 1;
-            var M = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+            // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+            var M = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
+            console.log("sign", sign, "M", M, prx, pry, py, px, "sqrt--", (prx * pry - prx * py - pry * px) / (prx * py + pry * px));
             var _cx = (M * (rx * y)) / ry;
             var _cy = (M * (-ry * x)) / rx;
             var cx = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2;
@@ -7897,6 +7903,7 @@ var VEllipseSector = /** @class */ (function () {
             var center = new Vertex_1.Vertex(cx, cy);
             var axis = center.clone().addXY(rx, ry);
             var ellipse = new VEllipse_1.VEllipse(center, axis, 0);
+            // console.log("VELLIPSE::::::", ellipse);
             ellipse.rotate(phi);
             var startAngle = new Line_1.Line(ellipse.center, new Vertex_1.Vertex(x1, y1)).angle();
             var endAngle = new Line_1.Line(ellipse.center, new Vertex_1.Vertex(x2, y2)).angle();
