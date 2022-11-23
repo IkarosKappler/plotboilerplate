@@ -77,7 +77,8 @@
  * @modified 2022-08-01 Added `title` to the params.
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
- * @version  1.16.0
+ * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
+ * @version  1.17.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -413,6 +414,7 @@ export class PlotBoilerplate {
       offsetX: f.num(config, "offsetX", 0.0),
       offsetY: f.num(config, "offsetY", 0.0),
       rasterGrid: f.bool(config, "rasterGrid", true),
+      drawRaster: f.bool(config, "drawRaster", true),
       rasterScaleX: f.num(config, "rasterScaleX", 1.0),
       rasterScaleY: f.num(config, "rasterScaleY", 1.0),
       rasterAdjustFactor: f.num(config, "rasterAdjustdFactror", 2.0),
@@ -467,6 +469,7 @@ export class PlotBoilerplate {
       drawHandleLines: f.bool(config, "drawHandleLines", true),
       drawHandlePoints: f.bool(config, "drawHandlePoints", true),
       drawGrid: f.bool(config, "drawGrid", true),
+      drawRaster: f.bool(config, "drawRaster", true),
       bezier: {
         color: "#00a822",
         lineWidth: 2,
@@ -1021,7 +1024,7 @@ export class PlotBoilerplate {
    * @return The vertex near the given position or undefined if none was found there.
    **/
   getVertexNear(pixelPosition: XYCoords, pixelTolerance: number): Vertex | undefined {
-    var p: IDraggable | undefined = this.locatePointNear(
+    const p: IDraggable | null = this.locatePointNear(
       this.transformMousePosition(pixelPosition.x, pixelPosition.y),
       pixelTolerance / Math.min(this.config.cssScaleX ?? 1.0, this.config.cssScaleY ?? 1.0)
     );
@@ -1460,8 +1463,12 @@ export class PlotBoilerplate {
    * @return {void}
    **/
   drawAll(renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>) {
-    this.drawGrid(draw);
-    if (this.config.drawOrigin) this.drawOrigin(draw);
+    if (this.config.drawRaster) {
+      this.drawGrid(draw);
+    }
+    if (this.config.drawOrigin) {
+      this.drawOrigin(draw);
+    }
     this.drawDrawables(renderTime, draw, fill);
     this.drawVertices(renderTime, draw);
     this.drawSelectPolygon(draw);

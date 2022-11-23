@@ -1,5 +1,7 @@
 # Changelog
 
+- 2022-11-23
+  - Added `drawRaster` to the `Config` interface.
 - 2022-11-10
   - Fixing an export bug: VEllipseSector was missing in the CJS and ESM exports.
 - 2022-11-06 (v1.19.0)

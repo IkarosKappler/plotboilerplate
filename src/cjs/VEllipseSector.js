@@ -262,6 +262,7 @@ var VEllipseSector = /** @class */ (function () {
             var sign = fa === fs ? -1 : 1;
             // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
             var M = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
+            // TODO: is this correct
             console.log("sign", sign, "M", M, prx, pry, py, px, "sqrt--", (prx * pry - prx * py - pry * px) / (prx * py + pry * px));
             var _cx = (M * (rx * y)) / ry;
             var _cy = (M * (-ry * x)) / rx;

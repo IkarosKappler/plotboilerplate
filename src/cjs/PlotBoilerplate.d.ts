@@ -77,7 +77,8 @@
  * @modified 2022-08-01 Added `title` to the params.
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
- * @version  1.16.0
+ * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
+ * @version  1.17.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

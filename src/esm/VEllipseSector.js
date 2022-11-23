@@ -260,6 +260,7 @@ VEllipseSector.ellipseSectorUtils = {
         const sign = fa === fs ? -1 : 1;
         // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
         const M = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
+        // TODO: is this correct
         console.log("sign", sign, "M", M, prx, pry, py, px, "sqrt--", (prx * pry - prx * py - pry * px) / (prx * py + pry * px));
         const _cx = (M * (rx * y)) / ry;
         const _cy = (M * (-ry * x)) / rx;

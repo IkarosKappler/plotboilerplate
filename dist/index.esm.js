@@ -10009,6 +10009,7 @@ VEllipseSector.ellipseSectorUtils = {
         const sign = fa === fs ? -1 : 1;
         // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
         const M = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
+        // TODO: is this correct
         console.log("sign", sign, "M", M, prx, pry, py, px, "sqrt--", (prx * pry - prx * py - pry * px) / (prx * py + pry * px));
         const _cx = (M * (rx * y)) / ry;
         const _cy = (M * (-ry * x)) / rx;
@@ -10105,7 +10106,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2022-08-01 Added `title` to the params.
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
- * @version  1.16.0
+ * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
+ * @version  1.17.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -10241,6 +10243,7 @@ class PlotBoilerplate {
             offsetX: f.num(config, "offsetX", 0.0),
             offsetY: f.num(config, "offsetY", 0.0),
             rasterGrid: f.bool(config, "rasterGrid", true),
+            drawRaster: f.bool(config, "drawRaster", true),
             rasterScaleX: f.num(config, "rasterScaleX", 1.0),
             rasterScaleY: f.num(config, "rasterScaleY", 1.0),
             rasterAdjustFactor: f.num(config, "rasterAdjustdFactror", 2.0),
@@ -10291,6 +10294,7 @@ class PlotBoilerplate {
             drawHandleLines: f.bool(config, "drawHandleLines", true),
             drawHandlePoints: f.bool(config, "drawHandlePoints", true),
             drawGrid: f.bool(config, "drawGrid", true),
+            drawRaster: f.bool(config, "drawRaster", true),
             bezier: {
                 color: "#00a822",
                 lineWidth: 2,
@@ -10843,7 +10847,7 @@ class PlotBoilerplate {
      **/
     getVertexNear(pixelPosition, pixelTolerance) {
         var _a, _b;
-        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
+        const p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
         if (p && p.typeName == "vertex") {
             return this.vertices[p.vindex];
         }
@@ -11208,9 +11212,12 @@ class PlotBoilerplate {
      * @return {void}
      **/
     drawAll(renderTime, draw, fill) {
-        this.drawGrid(draw);
-        if (this.config.drawOrigin)
+        if (this.config.drawRaster) {
+            this.drawGrid(draw);
+        }
+        if (this.config.drawOrigin) {
             this.drawOrigin(draw);
+        }
         this.drawDrawables(renderTime, draw, fill);
         this.drawVertices(renderTime, draw);
         this.drawSelectPolygon(draw);

@@ -36,6 +36,7 @@
           scaleY: 1.0,
           rasterGrid: true,
           drawGrid: true,
+          drawRaster: false,
           drawOrigin: false,
           rasterAdjustFactor: 2.0,
           redrawOnResize: true,
