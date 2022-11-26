@@ -106,6 +106,11 @@
           config.longConnectionFactor = CairoTileBuilder.LONG_PATH_FACTOR; // 1.3;
           config.shortConnectionFactor = CairoTileBuilder.SHORT_PATH_FACTOR; // 0.666;
           break;
+        case "PentagonalP4":
+          tileBuilder = PentagonalP4TileBuilder;
+          config.longConnectionFactor = PentagonalP4TileBuilder.LONG_PATH_FACTOR; // ?
+          config.shortConnectionFactor = PentagonalP4TileBuilder.SHORT_PATH_FACTOR; // ?
+          break;
         default: // "Triangle2"
           tileBuilder = TriangleTileBuilder;
           config.longConnectionFactor = TriangleTileBuilder.LONG_PATH_FACTOR;
@@ -253,7 +258,7 @@
     {
       var gui = pb.createGUI();
       // prettier-ignore
-      gui.add(config, 'tileType', [ "Triangle2", "Square2", "Cairo2" ]).listen().onChange(function() { prepareTileBuilder(); computeTiles(); pb.redraw() }).name("tileType").title("tileType");
+      gui.add(config, 'tileType', [ "Triangle2", "Square2", "Cairo2", "PentagonalP4" ]).listen().onChange(function() { prepareTileBuilder(); computeTiles(); pb.redraw() }).name("tileType").title("tileType");
       // prettier-ignore
       gui.add(config, 'drawSafeZone').listen().onChange(function() { pb.redraw() }).name("drawSafeZone").title("drawSafeZone");
       // prettier-ignore
