@@ -357,7 +357,8 @@ class VertexListeners {
  * @modified 2022-01-31 Added `Vertex.utils.arrayToJSON`.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  2.7.0
+ * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+ * @version  2.8.0
  *
  * @file Vertex
  * @public
@@ -624,6 +625,47 @@ class Vertex {
                     throw `Cannot add ${typeof y} to numeric y component!`;
             }
         }
+        return this;
+    }
+    /**
+     * Substract the passed amounts from the x- and y- components of this vertex.
+     *
+     * @method subXY
+     * @param {number} x - The amount to substract from x.
+     * @param {number} y - The amount to substract from y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    subXY(amountX, amountY) {
+        this.x -= amountX;
+        this.y -= amountY;
+        return this;
+    }
+    /**
+     * Substract the passed amounts from the x-component of this vertex.
+     *
+     * @method addX
+     * @param {number} x - The amount to substract from x.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    subX(amountX) {
+        this.x -= amountX;
+        return this;
+    }
+    /**
+     * Substract the passed amounts from the y-component of this vertex.
+     *
+     * @method subY
+     * @param {number} y - The amount to substract from y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    subY(amountY) {
+        this.y -= amountY;
         return this;
     }
     /**
@@ -1413,7 +1455,8 @@ Polygon.utils = {
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
  * @modified 2022-02-01 Added the `toString` function.
  * @modified 2022-10-09 Added the `fromDimension` function.
- * @version  1.5.0
+ * @modified 2022-11-28 Added the `clone` method.
+ * @version  1.6.0
  **/
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -1476,17 +1519,14 @@ class Bounds {
     /**
      * Clone this bounds object (create a deep clone).
      *
-     * Note: the returned format might change in the future, so please do not
-     * rely on the returned string format.
-     *
      * @method clone
      * @instance
      * @memberof Bounds
-     * @returns {string} Creates a deep clone of this bounds object. The returned object's `min` and `max` instances are `Vertex` instances.
+     * @returns {Bounds} Creates a deep clone of this bounds object.
      */
-    // clone() {
-    //   return new Bounds(new Vertex(this.min.x, this.min.y), new Vertex(this.max.x, this.max.y));
-    // }
+    clone() {
+        return new Bounds({ x: this.min.x, y: this.min.y }, { x: this.max.x, y: this.max.y });
+    }
     /**
      * Compute the minimal bounding box for a given set of vertices.
      *

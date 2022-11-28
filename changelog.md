@@ -1,5 +1,8 @@
 # Changelog
 
+- 2022-11-28
+  - Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+  - Added the `clone` method to the `Bounds` class.
 - 2022-11-23
   - Added `drawRaster` to the `Config` interface.
 - 2022-11-10

@@ -37,6 +37,11 @@
   };
   var CONNECTOR_COUNT = 8;
   var SIDE_CONNECTOR_COUNT = [2, 1, 1, 2, 2];
+  var ORIENTATION_UP = 0;
+  var ORIENTATION_RIGHT = 1;
+  var ORIENTATION_DOWN = 2;
+  var ORIENTATION_LEFT = 3;
+  var ORIENTATION_UNDEFINED = -1;
 
   var getSideConnectorCount = function (connectorIndex) {
     if (connectorIndex === 2 || connectorIndex === 3) {
@@ -61,54 +66,65 @@
     }
   };
 
-  var getP4Outline = function (tileBounds, isVerticalSplit, isPrimary) {
-    // A simple construction of Cairo tiles.
-    // Consult the Wikipedia page for mathematical details
-    //    https://en.wikipedia.org/wiki/Cairo_pentagonal_tiling
-    var sqrt3m1 = Math.sqrt(3) - 1;
-    var h_sqrt3m1_d2 = (tileBounds.height * sqrt3m1) / 3.0;
-    var w_sqrt3m1_d2 = (tileBounds.width * sqrt3m1) / 3.0;
+  var getRelativeSideConnectorIndex = function (connectorIndex) {
+    if (connectorIndex === 0 || connectorIndex === 1) {
+      return connectorIndex;
+    } else if (connectorIndex === 2) {
+      return 0;
+    } else if (connectorIndex === 3) {
+      return 0;
+    } else if (connectorIndex === 4 || connectorIndex === 5) {
+      return connectorIndex - 4;
+    } else {
+      // if( connectorIndex ===  6 || connectorIndex === 7 ) {
+      return connectorIndex - 6;
+    }
+  };
 
-    if (isVerticalSplit) {
-      if (isPrimary) {
-        // Case C (pointy edge up)
+  var getOrientation = function (indexH, indexV) {
+    var orientations = [ORIENTATION_LEFT, ORIENTATION_UP, ORIENTATION_DOWN, ORIENTATION_RIGHT, ORIENTATION_UNDEFINED];
+    var offsetsY = [0, 2, 4, 1, 3];
+    var offset = offsetsY[indexV % offsetsY.length];
+    return orientations[(indexH + offset) % orientations.length];
+  };
+
+  var getP4Outline = function (tileBounds, orientation) {
+    switch (orientation) {
+      case ORIENTATION_RIGHT:
         return new Polygon([
-          new Vertex(tileBounds.min).addXY(tileBounds.width - w_sqrt3m1_d2, tileBounds.height / 2),
-          new Vertex(tileBounds.min).addXY(w_sqrt3m1_d2, tileBounds.height / 2),
           new Vertex(tileBounds.min),
-          new Vertex(tileBounds.min).addXY(tileBounds.width / 2, -h_sqrt3m1_d2),
-          new Vertex(tileBounds.min).addX(tileBounds.width)
-        ]);
-      } else {
-        // Case D (pointy edge down)
-        return new Polygon([
-          new Vertex(tileBounds.min).addXY(w_sqrt3m1_d2, tileBounds.height / 2),
-          new Vertex(tileBounds.min).addXY(tileBounds.width - w_sqrt3m1_d2, tileBounds.height / 2),
+          new Vertex(tileBounds.min).addX(tileBounds.width),
+          new Vertex(tileBounds.min).addXY(tileBounds.width + tileBounds.width / 2, tileBounds.height / 2),
           new Vertex(tileBounds.max),
-          new Vertex(tileBounds.min).addXY(tileBounds.width / 2, tileBounds.height + h_sqrt3m1_d2),
           new Vertex(tileBounds.min).addY(tileBounds.height)
         ]);
-      }
-    } else {
-      if (isPrimary) {
-        // Case A (pointy edge left)
+      case ORIENTATION_DOWN:
         return new Polygon([
-          new Vertex(tileBounds.min).addXY(tileBounds.width / 2, h_sqrt3m1_d2),
-          new Vertex(tileBounds.max).addXY(-tileBounds.width / 2, -h_sqrt3m1_d2),
+          new Vertex(tileBounds.min).addX(tileBounds.width),
+          new Vertex(tileBounds.max),
+          new Vertex(tileBounds.min).addXY(tileBounds.width / 2, tileBounds.height + tileBounds.height / 2),
           new Vertex(tileBounds.min).addY(tileBounds.height),
-          new Vertex(tileBounds.min).addXY(-w_sqrt3m1_d2, tileBounds.height / 2),
           new Vertex(tileBounds.min)
         ]);
-      } else {
-        // Case B (pointy edge right)
+      case ORIENTATION_LEFT:
         return new Polygon([
-          new Vertex(tileBounds.min).addXY(tileBounds.width / 2, tileBounds.height - h_sqrt3m1_d2),
-          new Vertex(tileBounds.min).addXY(tileBounds.width / 2, h_sqrt3m1_d2),
+          new Vertex(tileBounds.max),
+          new Vertex(tileBounds.min).addY(tileBounds.height),
+          new Vertex(tileBounds.min).addXY(-tileBounds.width / 2, tileBounds.height / 2),
+          new Vertex(tileBounds.min),
+          new Vertex(tileBounds.min).addX(tileBounds.width)
+        ]);
+      case ORIENTATION_UP:
+        return new Polygon([
+          new Vertex(tileBounds.min).addY(tileBounds.height),
+          new Vertex(tileBounds.min),
+          new Vertex(tileBounds.min).addXY(tileBounds.width / 2, -tileBounds.height / 2),
           new Vertex(tileBounds.min).addX(tileBounds.width),
-          new Vertex(tileBounds.min).addXY(tileBounds.width + w_sqrt3m1_d2, tileBounds.height / 2),
           new Vertex(tileBounds.max)
         ]);
-      }
+      default:
+        // UNDEFINED orientation
+        return new Polygon([]);
     }
   };
 
@@ -119,6 +135,11 @@
   // Long connections a draw as a longer arc, short connections are drawn as a shorter arc.
   var isLongConnection = function (indexA, indexB) {
     var discreteDistance = Math.abs(indexA - indexB) % (CONNECTOR_COUNT - 1);
+    if ((indexA === 0 && indexB === 7) || (indexA === 7 && indexB === 0)) {
+      console.log("indexA", indexA, "indexB", indexB, "discreteDistance", discreteDistance);
+    }
+    // return (indexA === 2 && indexB === 3) || (indexA === 3 && indexB === 2) || discreteDistance > 1;
+    // indexA === 2 || indexB === 2 || indexA === 3 || indexB === 3 ||
     return discreteDistance > 1;
   };
 
@@ -150,10 +171,62 @@
           { x: bounds.min.x + tileSize.width * i, y: bounds.min.y + tileSize.height * j },
           { x: bounds.min.x + tileSize.width * (i + 1), y: bounds.min.y + tileSize.height * (j + 1) }
         );
-        const primaryTile = makeTruchetP4(tileBounds, config, i, j, true);
-        tiles.push(primaryTile);
-        const secondaryTile = makeTruchetP4(tileBounds, config, i, j, false);
-        tiles.push(secondaryTile);
+        var orientation = getOrientation(i, j);
+        if (orientation !== ORIENTATION_UNDEFINED) {
+          var primaryTile = makeTruchetP4(tileBounds, config, i, j, orientation);
+          tiles.push(primaryTile);
+        } else {
+          // Edge cases: add more tiles at the outer bounds, because empty boxes (UNDEFINED)
+          //             should only appear inside the pattern
+          if (i === 0) {
+            var appendingTileBounds = tileBounds.clone();
+            appendingTileBounds.min.x -= tileBounds.width;
+            appendingTileBounds.max.x -= tileBounds.width;
+            // console.log()
+            var primaryTile = makeTruchetP4(appendingTileBounds, config, i, j, ORIENTATION_RIGHT, {
+              closeTop: true,
+              closeLeft: true,
+              closeBottom: true
+            });
+            tiles.push(primaryTile);
+          }
+          if (i + 1 === config.countH) {
+            var appendingTileBounds = tileBounds.clone();
+            appendingTileBounds.min.x += tileBounds.width;
+            appendingTileBounds.max.x += tileBounds.width;
+            // console.log()
+            var primaryTile = makeTruchetP4(appendingTileBounds, config, i, j, ORIENTATION_LEFT, {
+              closeTop: true,
+              closeRight: true,
+              closeBottom: true
+            });
+            tiles.push(primaryTile);
+          }
+          if (j === 0) {
+            var appendingTileBounds = tileBounds.clone();
+            appendingTileBounds.min.y -= tileBounds.height;
+            appendingTileBounds.max.y -= tileBounds.height;
+            // console.log()
+            var primaryTile = makeTruchetP4(appendingTileBounds, config, i, j, ORIENTATION_DOWN, {
+              closeTop: true,
+              closeLeft: true,
+              closeRight: true
+            });
+            tiles.push(primaryTile);
+          }
+          if (j + 1 === config.countV) {
+            var appendingTileBounds = tileBounds.clone();
+            appendingTileBounds.min.y += tileBounds.height;
+            appendingTileBounds.max.y += tileBounds.height;
+            // console.log()
+            var primaryTile = makeTruchetP4(appendingTileBounds, config, i, j, ORIENTATION_UP, {
+              closeBottom: true,
+              closeLeft: true,
+              closeRight: true
+            });
+            tiles.push(primaryTile);
+          }
+        }
       }
     }
     return tiles;
@@ -166,14 +239,17 @@
    * @param {number} config.countV - The vertical pattern size (measured in tile count).
    * @param {number} config.countH - The horizontal pattern size (measured in tile count).
    **/
-  var makeTruchetP4 = function (tileBounds, config, indexH, indexV, isPrimary) {
-    var isVerticalSplit = (indexH % 2 === 0 && indexV % 2 !== 0) || (indexH % 2 !== 0 && indexV % 2 === 0);
-    var outlinePolygon = getP4Outline(tileBounds, isVerticalSplit, isPrimary);
+  var makeTruchetP4 = function (tileBounds, config, indexH, indexV, orientation, options) {
+    options = options || {};
+    // var isVerticalSplit = (indexH % 2 === 0 && indexV % 2 !== 0) || (indexH % 2 !== 0 && indexV % 2 === 0);
+    // var orientation = getOrientation(indexH, indexV);
+    var outlinePolygon = getP4Outline(tileBounds, orientation);
     // console.log("outlinePolygon.vertices.length", outlinePolygon.vertices.length);
     var connections = []; // Array<{ line: Line, curveSegment: CubicBezierCurve, indices : [number,number] } >
+
     // var isConnected = [false, false, false, false, false, false, false, false, false, false];
     var isConnected = arrayFill(CONNECTOR_COUNT, false);
-    var indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; // TODO: use array_fill here?
+    var indices = [0, 1, 2, 3, 4, 5, 6, 7]; // TODO: use array_fill here?
     arrayShuffle(indices);
     for (var i = 0; i < CONNECTOR_COUNT; i++) {
       var start = indices[i];
@@ -205,87 +281,50 @@
     }
 
     // If on the border of the grid close connections in a linear manner
+    // closeTileAt(outlinePolygon, connections, 4, 5, config);
     if (config.closePattern) {
-      if (indexH === 0) {
-        // Leftmost borders
-        if (isVerticalSplit) {
-          if (isPrimary) {
-            // Variant C
-            closeTileAt(outlinePolygon, connections, 2, 3, config);
-          } else {
-            // Variant D
-            closeTileAt(outlinePolygon, connections, 8, 9, config);
-          }
-        } else {
-          if (isPrimary) {
-            // Variant A
-            closeTileAt(outlinePolygon, connections, 4, 5, config);
-            closeTileAt(outlinePolygon, connections, 6, 7, config);
-          } else {
-            // Variant B (no need to close anything here)
-          }
+      if (indexH === 0 || options.closeLeft) {
+        if (orientation === ORIENTATION_RIGHT) {
+          closeTileAt(outlinePolygon, connections, 6, 7, config);
+        } else if (orientation === ORIENTATION_DOWN) {
+          closeTileAt(outlinePolygon, connections, 4, 5, config);
+        } else if (orientation === ORIENTATION_LEFT) {
+          closeTileAt(outlinePolygon, connections, 2, 3, config);
+        } else if (orientation === ORIENTATION_UP) {
+          closeTileAt(outlinePolygon, connections, 0, 1, config);
         }
       }
-      if (indexH + 1 === config.countH) {
-        // Rightmose borders
-        if (isVerticalSplit) {
-          if (isPrimary) {
-            // Variant C
-            closeTileAt(outlinePolygon, connections, 8, 9, config);
-          } else {
-            // Variant D
-            closeTileAt(outlinePolygon, connections, 2, 3, config);
-          }
-        } else {
-          if (isPrimary) {
-            // Variant A (no need to close anything here)
-          } else {
-            // Variant B (no need to close anything here)
-            closeTileAt(outlinePolygon, connections, 4, 5, config);
-            closeTileAt(outlinePolygon, connections, 6, 7, config);
-          }
+      if (indexH + 1 === config.countH || options.closeRight) {
+        if (orientation === ORIENTATION_RIGHT) {
+          closeTileAt(outlinePolygon, connections, 2, 3, config);
+        } else if (orientation === ORIENTATION_DOWN) {
+          closeTileAt(outlinePolygon, connections, 0, 1, config);
+        } else if (orientation === ORIENTATION_LEFT) {
+          closeTileAt(outlinePolygon, connections, 6, 7, config);
+        } else if (orientation === ORIENTATION_UP) {
+          closeTileAt(outlinePolygon, connections, 4, 5, config);
         }
       }
-      if (indexV === 0) {
-        // Uppermost borders
-        if (isVerticalSplit) {
-          if (isPrimary) {
-            // Variant C
-            closeTileAt(outlinePolygon, connections, 4, 5, config);
-            closeTileAt(outlinePolygon, connections, 6, 7, config);
-          } else {
-            // Variant D (no need to close anything here)
-          }
-        } else {
-          if (isPrimary) {
-            // Variant A
-            // closeTileAt(outlinePolygon, connections, 4, 5, config);
-            closeTileAt(outlinePolygon, connections, 8, 9, config);
-          } else {
-            // Variant B (no need to close anything here)
-            closeTileAt(outlinePolygon, connections, 2, 3, config);
-          }
+      if (indexV === 0 || options.closeTop) {
+        if (orientation === ORIENTATION_RIGHT) {
+          closeTileAt(outlinePolygon, connections, 0, 1, config);
+        } else if (orientation === ORIENTATION_DOWN) {
+          closeTileAt(outlinePolygon, connections, 6, 7, config);
+        } else if (orientation === ORIENTATION_LEFT) {
+          closeTileAt(outlinePolygon, connections, 4, 5, config);
+        } else if (orientation === ORIENTATION_UP) {
+          closeTileAt(outlinePolygon, connections, 2, 3, config);
         }
       }
-      if (indexV + 1 === config.countV) {
-        // Lowermost borders
-        if (isVerticalSplit) {
-          if (isPrimary) {
-            // Variant C (no need to close anything here)
-          } else {
-            // Variant D (no need to close anything here)
-            closeTileAt(outlinePolygon, connections, 4, 5, config);
-            closeTileAt(outlinePolygon, connections, 6, 7, config);
-          }
-        } else {
-          if (isPrimary) {
-            // Variant A
-            // closeTileAt(outlinePolygon, connections, 4, 5, config);
-            closeTileAt(outlinePolygon, connections, 2, 3, config);
-          } else {
-            // Variant B
-            closeTileAt(outlinePolygon, connections, 8, 9, config);
-          }
+      if (indexV + 1 === config.countV || options.closeBottom) {
+        if (orientation === ORIENTATION_RIGHT) {
+          closeTileAt(outlinePolygon, connections, 4, 5, config);
+        } else if (orientation === ORIENTATION_DOWN) {
+          closeTileAt(outlinePolygon, connections, 2, 3, config);
+        } else if (orientation === ORIENTATION_LEFT) {
+          closeTileAt(outlinePolygon, connections, 0, 1, config);
+        } else if (orientation === ORIENTATION_UP) {
+          closeTileAt(outlinePolygon, connections, 6, 7, config);
         }
       }
     }
@@ -329,8 +368,8 @@
     var parallelVector = TruchetUtils.getOrthoConnectorLocationNonUniform(
       outlinePolygon,
       getSideConnectorCount(connectorIndexA), // sideConnectorCount,
-      connectorIndexA,
-      getSideIndexByConnectorIndex(connectorIndexA) // sideIndex
+      getSideIndexByConnectorIndex(connectorIndexA), // sideIndex
+      getRelativeSideConnectorIndex(connectorIndexA)
     );
     var isLong = isLongConnection(connectorIndexA, connectorIndexB);
     // return parallelVector.scale(isLong ? 1.0 : 0.555);

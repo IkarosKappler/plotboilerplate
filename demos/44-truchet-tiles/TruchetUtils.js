@@ -44,6 +44,16 @@
     },
 
     getOrthoConnectorLocationNonUniform: function (outlinePolygon, sideConnectorCount, sideIndex, sideConnectorIndex) {
+      // console.log(
+      //   "outlinePolygon",
+      //   outlinePolygon,
+      //   "sideConnectorCount",
+      //   sideConnectorCount,
+      //   "sideIndex",
+      //   sideIndex,
+      //   "sideConnectorIndex",
+      //   sideConnectorIndex
+      // );
       // var sideIndex = Math.floor(connectorIndexA / sideConnectorCount);
       // var sideConnectorIndex = connectorIndexA - sideConnectorCount * sideIndex;
       var sideConnectorRatio = (sideConnectorIndex + 1) / (sideConnectorCount + 1);
@@ -51,6 +61,16 @@
         outlinePolygon.vertices[sideIndex],
         outlinePolygon.vertices[(sideIndex + 1) % outlinePolygon.vertices.length]
       );
+      // console.log(
+      //   "sideConnectorIndex",
+      //   sideConnectorIndex,
+      //   "sideConnectorCount",
+      //   sideConnectorCount,
+      //   "sideConnectorRatio",
+      //   sideConnectorRatio,
+      //   "sideConnectorRatio + 1 / (sideConnectorCount + 1)",
+      //   sideConnectorRatio + 1 / (sideConnectorCount + 1)
+      // );
       var connectorStartPoint = sideLine.vertAt(sideConnectorRatio);
       var connectorEndPoint = sideLine.vertAt(sideConnectorRatio + 1 / (sideConnectorCount + 1));
       var parallelVector = new Vector(connectorStartPoint, connectorEndPoint);

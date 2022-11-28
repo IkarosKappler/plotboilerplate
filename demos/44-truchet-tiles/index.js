@@ -83,6 +83,8 @@
         clearTilesOnRedraw: true,
         drawLinearConnections: false,
         drawTruchetRaster: false,
+        truchetRasterLineWidth: 1,
+        truchetRasterLineColor: "rgba(0,192,128,0.5)",
         closePattern: true,
         drawPathLabels: false,
         fillAreas: false,
@@ -174,7 +176,7 @@
         var tile = tiles[tileIndex];
         if (config.drawTruchetRaster) {
           // console.log("outlinePolygon", tile.outlinePolygon);
-          draw.polygon(tile.outlinePolygon, "rgba(0,255,0,0.5)", 1);
+          draw.polygon(tile.outlinePolygon, config.truchetRasterLineColor, config.truchetRasterLineWidth);
         }
         for (var c in tile.connections) {
           var connection = tile.connections[c];
@@ -273,6 +275,10 @@
       gui.add(config, 'drawLinearConnections').listen().onChange(function() { pb.redraw() }).name("drawLinearConnections").title("drawLinearConnections");
       // prettier-ignore
       gui.add(config, 'drawTruchetRaster').listen().onChange(function() { pb.redraw() }).name("drawTruchetRaster").title("drawTruchetRaster");
+      // prettier-ignore
+      gui.add(config, 'truchetRasterLineWidth').min(1).max(10).listen().onChange(function() { pb.redraw() }).name("truchetRasterLineWidth").title("truchetRasterLineWidth");
+      // prettier-ignore
+      gui.addColor(config, 'truchetRasterLineColor').listen().onChange(function() { pb.redraw() }).name("truchetRasterLineColor").title("truchetRasterLineColor");
       // prettier-ignore
       gui.add(config, 'drawPathLabels').listen().onChange(function() { pb.redraw() }).name("drawPathLabels").title("drawPathLabels");
       // prettier-ignore

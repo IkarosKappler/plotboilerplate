@@ -7,7 +7,8 @@
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
  * @modified 2022-02-01 Added the `toString` function.
  * @modified 2022-10-09 Added the `fromDimension` function.
- * @version  1.5.0
+ * @modified 2022-11-28 Added the `clone` method.
+ * @version  1.6.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -72,17 +73,14 @@ export class Bounds {
     /**
      * Clone this bounds object (create a deep clone).
      *
-     * Note: the returned format might change in the future, so please do not
-     * rely on the returned string format.
-     *
      * @method clone
      * @instance
      * @memberof Bounds
-     * @returns {string} Creates a deep clone of this bounds object. The returned object's `min` and `max` instances are `Vertex` instances.
+     * @returns {Bounds} Creates a deep clone of this bounds object.
      */
-    // clone() {
-    //   return new Bounds(new Vertex(this.min.x, this.min.y), new Vertex(this.max.x, this.max.y));
-    // }
+    clone() {
+        return new Bounds({ x: this.min.x, y: this.min.y }, { x: this.max.x, y: this.max.y });
+    }
     /**
      * Compute the minimal bounding box for a given set of vertices.
      *
