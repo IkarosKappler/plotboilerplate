@@ -24,6 +24,7 @@
     // Fetch the GET params
     let GUP = gup();
     var isDarkmode = detectDarkMode(GUP);
+    var mousePosition = { x: NaN, y: NaN };
 
     // All config params are optional.
     var pb = new PlotBoilerplate(
@@ -62,7 +63,6 @@
     );
 
     var randColor = function (i, alpha) {
-      // i += Math.floor(Math.random() * WebColorsContrast.length);
       var color = WebColorsContrast[i % WebColorsContrast.length].clone();
       if (typeof alpha !== undefined) color.a = alpha;
       return color.cssRGBA();
@@ -91,7 +91,8 @@
         longConnectionFactor: 1.0,
         shortConnectionFactor: 0.5, // default values depend on the selected tile type!
         drawPaths: true,
-        drawSegments: false
+        drawSegments: false,
+        highlightOnMouseHover: false
       },
       GUP
     );
@@ -125,6 +126,7 @@
     var tileBuilder = null;
     prepareTileBuilder();
 
+    // Array<{ bounds: Bounds, connections: {...}, outlinePolygon: Polygon }>
     var tiles = [];
     var paths = [];
 
@@ -141,7 +143,10 @@
       );
       // var tileBuilder = getTileBuilder(config.tileType);
       tiles = tiles.concat(tileBuilder.computeTiles(bounds, config));
+      pathSegmentsToPaths();
+    };
 
+    var pathSegmentsToPaths = function () {
       // Collect all paths segments
       var pathSegments = [];
       for (var tileIndex in tiles) {
@@ -204,8 +209,11 @@
             });
           }
           // pathSegments.push(connection.curveSegment);
+        } // END for (connections in tile)
+        if (config.highlightOnMouseHover && tile.outlinePolygon.containsVert(mousePosition)) {
+          fill.polygon(tile.outlinePolygon, "rgba(192,192,192,0.5)");
         }
-      }
+      } // END for (tiles)
 
       // // Find connected paths
       // var paths = detectPaths(pathSegments, 5.0); // Which epsilon to use?
@@ -222,6 +230,30 @@
       }
     };
 
+    var handleMouseClick = function () {
+      // Find containing
+      var tile = findTileAtPosition(mousePosition);
+      if (!tile) {
+        console.log("No tile at position found.");
+        return;
+      }
+      console.log("Rebuild", tile);
+      tile.rebuildConnections();
+      pathSegmentsToPaths();
+      pb.redraw();
+    };
+
+    var findTileAtPosition = function (position) {
+      for (var tileIndex in tiles) {
+        // console.log("tile", tile);
+        var tile = tiles[tileIndex];
+        if (tile.outlinePolygon.containsVert(mousePosition)) {
+          return tile;
+        }
+      } // END for (tiles)
+      return null;
+    };
+
     var cubicBezierPath2VertexArray = function (path) {
       if (path.getSegmentCount() === 0) {
         return [];
@@ -236,11 +268,21 @@
     };
 
     // Add a mouse listener to track the mouse position.
-    new MouseHandler(pb.eventCatcher).move(function (event) {
-      var relPos = pb.transformMousePosition(event.params.pos.x, event.params.pos.y);
-      stats.mouseXTop = relPos.x;
-      stats.mouseYTop = relPos.y;
-    });
+    new MouseHandler(pb.eventCatcher)
+      .move(function (event) {
+        var relPos = pb.transformMousePosition(event.params.pos.x, event.params.pos.y);
+        stats.mouseXTop = relPos.x;
+        stats.mouseYTop = relPos.y;
+        if (config.highlightOnMouseHover) {
+          // handleMousePositionChange();
+          mousePosition.x = relPos.x;
+          mousePosition.y = relPos.y;
+          pb.redraw();
+        }
+      })
+      .click(function () {
+        handleMouseClick();
+      });
 
     // +---------------------------------------------------------------------------------
     // | Add stats.
@@ -293,6 +335,8 @@
       gui.add(config, 'drawPaths').listen().onChange(function() { pb.redraw(); }).name("drawPaths").title("drawPaths");
       // prettier-ignore
       gui.add(config, 'drawSegments').listen().onChange(function() { pb.redraw(); }).name("drawSegments").title("drawSegments");
+      // prettier-ignore
+      gui.add(config, 'highlightOnMouseHover').listen().onChange(function() { pb.redraw(); }).name("highlightOnMouseHover").title("highlightOnMouseHover");
     }
 
     computeTiles();

@@ -162,7 +162,19 @@
       }
     }
 
-    return { bounds: tileBounds, connections: connections, outlinePolygon: outlinePolygon };
+    // return { bounds: tileBounds, connections: connections, outlinePolygon: outlinePolygon };
+    // Prepate re-builder for connections
+    var tile = {
+      bounds: tileBounds,
+      connections: connections,
+      outlinePolygon: outlinePolygon
+    };
+    var rebuildConnections = function () {
+      var newTile = makeTruchetTriangle(tileBounds, config, indexH, indexV);
+      tile.connections = newTile.connections;
+    };
+    tile.rebuildConnections = rebuildConnections;
+    return tile;
   };
 
   // +---------------------------------------------------------------------------------

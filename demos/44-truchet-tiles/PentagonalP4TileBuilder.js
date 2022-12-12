@@ -135,11 +135,6 @@
   // Long connections a draw as a longer arc, short connections are drawn as a shorter arc.
   var isLongConnection = function (indexA, indexB) {
     var discreteDistance = Math.abs(indexA - indexB) % (CONNECTOR_COUNT - 1);
-    if ((indexA === 0 && indexB === 7) || (indexA === 7 && indexB === 0)) {
-      console.log("indexA", indexA, "indexB", indexB, "discreteDistance", discreteDistance);
-    }
-    // return (indexA === 2 && indexB === 3) || (indexA === 3 && indexB === 2) || discreteDistance > 1;
-    // indexA === 2 || indexB === 2 || indexA === 3 || indexB === 3 ||
     return discreteDistance > 1;
   };
 
@@ -329,7 +324,19 @@
       }
     }
 
-    return { bounds: tileBounds, connections: connections, outlinePolygon: outlinePolygon };
+    // Prepate re-builder for connections
+    var tile = {
+      bounds: tileBounds,
+      connections: connections,
+      outlinePolygon: outlinePolygon
+    };
+    var rebuildConnections = function () {
+      var newTile = makeTruchetP4(tileBounds, config, indexH, indexV, orientation, options);
+      tile.connections = newTile.connections;
+    };
+    tile.rebuildConnections = rebuildConnections;
+    return tile;
+    // return { bounds: tileBounds, connections: connections, outlinePolygon: outlinePolygon, rebuildConnections : rebuildConnections};
   };
 
   // +---------------------------------------------------------------------------------
