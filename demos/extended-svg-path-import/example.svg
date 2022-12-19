@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 40 40" width="400" height="400">
+<g>
+<path d="
+M -10 -7.5 
+V -10 
+L 0 -10 
+C -5 -15 10 -15 5 -10 
+H 10 
+C 5 -7.5 5 -7.5 10 -5 
+S 15 0 10 0 
+Q 5 5 0 0 
+T -10 0 
+A 5 4 0 1 1 -10 -5 
+Z" />
+</g>
+</svg>

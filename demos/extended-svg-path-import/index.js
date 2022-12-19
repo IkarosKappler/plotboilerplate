@@ -43,7 +43,7 @@
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
     // prettier-ignore
-    var svgDataAbsolute = [
+    var _svgDataAbsolute_ = [
       'M', -10, -7.5,
       'V', -10, 
       'L', 0, -10,
@@ -55,24 +55,39 @@
       'T', -10, 0,
       'A', 5, 4, 0, 1, 1, -10, -5,    
       'Z'
-    ].join(" ");
+    ];
+    // prettier-ignore
+    var svgDataAbsolute = [
+      'M', -10, -7.5,
+      'V', -10, 
+      'L', 0, -10,
+      'C', -5, -15, 10, -15, 5, -10,
+      'H', 10,
+      'C', 5, -7.5, 5, -7.5, 10, -5,
+      'S', 15, 0, 10, 0,
+      'Q', 5, 5, 0, 0,
+      'T', -10, 0,
+      'A', 5, 4, 0, 1, 1, -10, -5,
+      'Z'
+    ]; // .join(" ");
+    console.log("svgDataAbsolute", svgDataAbsolute);
 
     // Now define the same shape. But only y with _relative_
     // path commands.
     // prettier-ignore
     var svgDataRelative = [
-      'M', -10, -7.5,
-      'v', -2.5, 
-      'l', 10, 0,
-      'c', -5, -5, 10, -5, 5, 0,
-      'h', 5,
-      'c', -5, 2.5, -5, 2.5, 0, 5,
-      's', 5, 5, 0, 5,
-      'q', -5, 5, -10, 0,
-      't', -10, 0,
-      'a', 5, 4, 0, 1, 1, 0, -5,    
-      'z'
-    ].join(" ");
+      '\n M', -10, -7.5,
+      '\n v', -2.5, 
+      '\n l', 10, 0,
+      '\n c', -5, -5, 10, -5, 5, 0,
+      '\n h', 5,
+      '\n c', -5, 2.5, -5, 2.5, 0, 5,
+      '\n s', 5, 5, 0, 5,
+      '\n q', -5, 5, -10, 0,
+      '\n t', -10, 0,
+      '\n a', 5, 4, 0, 1, 1, 0, -5,    
+      '\n z'
+    ]; //.join(" ");
 
     var shortHandStart = new Vertex(0, 0);
     var shortHandControl = new Vertex(0, 300);
@@ -97,7 +112,7 @@
       var textarea = document.createElement("textarea");
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
-      textarea.innerHTML = svgDataAbsolute; // data1; // outline.toJSON(true);
+      textarea.innerHTML = svgDataAbsolute.join(" "); // data1; // outline.toJSON(true);
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
@@ -118,7 +133,7 @@
     // On redrawing determine the orthogonal vector at the given position
     pb.config.postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
-      console.log("contrastColor", contrastColor);
+      // console.log("contrastColor", contrastColor);
 
       var svgDataShorthand = [
         "M",
@@ -132,8 +147,8 @@
       ];
       draw.path(svgDataShorthand, "orange", 2);
       var parsedShorthand = parseSVGPathData(svgDataShorthand.join(" "))[0];
-      console.log(parsedShorthand);
-      pb.draw.cubicBezier(
+      // console.log(parsedShorthand);
+      draw.cubicBezier(
         parsedShorthand.startPoint,
         parsedShorthand.endPoint,
         parsedShorthand.startControlPoint,
@@ -141,17 +156,19 @@
         "rgba(255,255,0,0.5)",
         8
       );
-      pb.draw.line(parsedShorthand.startPoint, parsedShorthand.startControlPoint, "red", 1);
-      pb.draw.line(parsedShorthand.endPoint, parsedShorthand.endControlPoint, "red", 1);
+      draw.line(parsedShorthand.startPoint, parsedShorthand.startControlPoint, "red", 1);
+      draw.line(parsedShorthand.endPoint, parsedShorthand.endControlPoint, "red", 1);
 
-      console.log("sourceData", sourceData);
+      draw.path(svgDataAbsolute, "rgba(192,0,0,0.5)", 6);
+      // console.log("sourceData", sourceData);
       if (sourceData) {
         var sourceDataElements = splitSVGPathData(sourceData);
         var sourceDataElements = sourceDataElements.reduce(function (buf, elem) {
           buf = buf.concat(elem);
           return buf;
         });
-        draw.path(sourceDataElements);
+        // console.log("Split Sourc Data Elements", sourceDataElements);
+        draw.path(sourceDataElements, "rgba(128,128,128,0.5)", 3);
       }
 
       for (var i = 0; i < pathSegments.length; i++) {
@@ -168,7 +185,7 @@
             2
           );
         } else if (segment instanceof VEllipse) {
-          console.log("Ellipse", segment);
+          // console.log("Ellipse", segment);
           pb.draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
         }
       }

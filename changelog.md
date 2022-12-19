@@ -1,5 +1,7 @@
 # Changelog
 
+- 2022-12-13
+  - Modified the Truchet demo so single cells can be edited.
 - 2022-11-28
   - Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
   - Added the `clone` method to the `Bounds` class.
