@@ -43,20 +43,6 @@
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
     // prettier-ignore
-    var _svgDataAbsolute_ = [
-      'M', -10, -7.5,
-      'V', -10, 
-      'L', 0, -10,
-      'C', -5, -15, 10, -15, 5, -10,
-      'H', 10,
-      'C', 5, -7.5, 5, -7.5, 10, -5,
-      'S', 15, 0, 10, 0,
-      'Q', 5, 5, 0, 0,
-      'T', -10, 0,
-      'A', 5, 4, 0, 1, 1, -10, -5,    
-      'Z'
-    ];
-    // prettier-ignore
     var svgDataAbsolute = [
       'M', -10, -7.5,
       'V', -10, 
@@ -114,6 +100,7 @@
       textarea.style.height = "50vh";
       // textarea.innerHTML = svgDataAbsolute.join(" ");
       textarea.innerHTML = svgDataRelative.join(" ");
+      // textarea.innerHTML = data1;
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
@@ -134,8 +121,40 @@
     // On redrawing determine the orthogonal vector at the given position
     pb.config.postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
-      // console.log("contrastColor", contrastColor);
 
+      // drawTestShorthand(draw, fill);
+
+      draw.path(svgDataRelative, "rgba(192,0,0,0.5)", 6);
+      if (sourceData) {
+        var sourceDataElements = splitSVGPathData(sourceData);
+        var sourceDataElements = sourceDataElements.reduce(function (buf, elem) {
+          buf = buf.concat(elem);
+          return buf;
+        });
+        draw.path(sourceDataElements, "rgba(128,128,128,0.5)", 3);
+      }
+
+      for (var i = 0; i < pathSegments.length; i++) {
+        var segment = pathSegments[i];
+        if (segment instanceof Line) {
+          pb.draw.line(segment.a, segment.b, "green", 2);
+        } else if (segment instanceof CubicBezierCurve) {
+          pb.draw.cubicBezier(
+            segment.startPoint,
+            segment.endPoint,
+            segment.startControlPoint,
+            segment.endControlPoint,
+            "green",
+            2
+          );
+        } else if (segment instanceof VEllipse) {
+          // console.log("Ellipse", segment);
+          pb.draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
+        }
+      }
+    };
+
+    var drawTestShorthand = function (draw, fill) {
       var svgDataShorthand = [
         "M",
         shortHandStart.x,
@@ -159,38 +178,6 @@
       );
       draw.line(parsedShorthand.startPoint, parsedShorthand.startControlPoint, "red", 1);
       draw.line(parsedShorthand.endPoint, parsedShorthand.endControlPoint, "red", 1);
-
-      // draw.path(svgDataAbsolute, "rgba(192,0,0,0.5)", 6);
-      draw.path(svgDataRelative, "rgba(192,0,0,0.5)", 6);
-      // console.log("sourceData", sourceData);
-      if (sourceData) {
-        var sourceDataElements = splitSVGPathData(sourceData);
-        var sourceDataElements = sourceDataElements.reduce(function (buf, elem) {
-          buf = buf.concat(elem);
-          return buf;
-        });
-        // console.log("Split Sourc Data Elements", sourceDataElements);
-        draw.path(sourceDataElements, "rgba(128,128,128,0.5)", 3);
-      }
-
-      for (var i = 0; i < pathSegments.length; i++) {
-        var segment = pathSegments[i];
-        if (segment instanceof Line) {
-          pb.draw.line(segment.a, segment.b, "green", 2);
-        } else if (segment instanceof CubicBezierCurve) {
-          pb.draw.cubicBezier(
-            segment.startPoint,
-            segment.endPoint,
-            segment.startControlPoint,
-            segment.endControlPoint,
-            "green",
-            2
-          );
-        } else if (segment instanceof VEllipse) {
-          // console.log("Ellipse", segment);
-          pb.draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
-        }
-      }
     };
 
     // +---------------------------------------------------------------------------------

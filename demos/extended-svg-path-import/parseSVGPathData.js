@@ -481,13 +481,6 @@
     if (data.length < 8) {
       throw "Unsufficient params for ARCTO";
     }
-    // center: Vertex, axis: Vertex, rotation?: number
-    var center = new Vertex(Number(data[1]), Number(data[2]));
-    var rotation = Number(data[3]);
-    var axis = new Vertex(Number(data[6], Number(data[7])));
-
-    // var ellipse = new VEllipse(center, axis, rotation);
-    // result.push()
 
     var arcEndPoint = { x: Number(data[6]), y: Number(data[7]) };
     if (isRelative) {
@@ -495,26 +488,26 @@
       arcEndPoint.y += lastPoint.y;
     }
 
-    console.log(
-      "lastPoint.x",
-      lastPoint.x, // x1
-      "lastPoint.y",
-      lastPoint.y, // y1
-      "data[1]",
-      Number(data[1]), // rx
-      "data[2]",
-      Number(data[2]), // ry
-      "data[3]",
-      Number(data[3]), // phi: number,
-      "data[4]",
-      Boolean(data[4]), // fa: boolean,
-      "data[5]",
-      Boolean(data[5]), // fs: boolean,
-      "data[6]",
-      arcEndPoint.x, // Number(data[6]), // x2: number,
-      "data[7]",
-      arcEndPoint.y // Number(data[7]) // y2: number
-    );
+    // console.log(
+    //   "lastPoint.x",
+    //   lastPoint.x, // x1
+    //   "lastPoint.y",
+    //   lastPoint.y, // y1
+    //   "data[1]",
+    //   Number(data[1]), // rx
+    //   "data[2]",
+    //   Number(data[2]), // ry
+    //   "data[3]",
+    //   Number(data[3]), // phi: number,
+    //   "data[4]",
+    //   Boolean(data[4]), // fa: boolean,
+    //   "data[5]",
+    //   Boolean(data[5]), // fs: boolean,
+    //   "data[6]",
+    //   arcEndPoint.x, // Number(data[6]), // x2: number,
+    //   "data[7]",
+    //   arcEndPoint.y // Number(data[7]) // y2: number
+    // );
     // A 5 4 0 1 1 -10 -5
     // TODO: respect relative/absolute here
     var ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
