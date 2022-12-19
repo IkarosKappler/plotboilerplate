@@ -334,8 +334,8 @@
     result.push(curve);
     lastPoint.x = curve.endPoint.x;
     lastPoint.y = curve.endPoint.y;
-    lastControlPoint.x = curve.endPoint.x;
-    lastControlPoint.y = curve.endPoint.y;
+    lastControlPoint.x = curve.endControlPoint.x;
+    lastControlPoint.y = curve.endControlPoint.y;
     if (isNaN(firstPoint.x)) {
       firstPoint.x = curve.startPoint.x;
       firstPoint.y = curve.startPoint.y;
@@ -352,18 +352,12 @@
     // result.push( new)
     var curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
-      // curve.startControlPoint.x += Number(data[1]);
-      // curve.startControlPoint.y += Number(data[2]);
-      // curve.endControlPoint.x += Number(data[1]);
-      // curve.endControlPoint.y += Number(data[2]);
-      // curve.endPoint.x += Number(data[3]);
-      // curve.endPoint.y += Number(data[4]);
       curve.startControlPoint.x += curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
       curve.startControlPoint.y += curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
       curve.endPoint.x += Number(data[3]);
       curve.endPoint.y += Number(data[4]);
-      curve.endControlPoint.x += curve.startControlPoint.x;
-      curve.endControlPoint.y += curve.startControlPoint.y;
+      curve.endControlPoint.x = curve.startControlPoint.x;
+      curve.endControlPoint.y = curve.startControlPoint.y;
     } else {
       curve.startControlPoint.x = curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
       curve.startControlPoint.y = curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
@@ -372,6 +366,8 @@
       curve.endControlPoint.x = curve.startControlPoint.x;
       curve.endControlPoint.y = curve.startControlPoint.y;
     }
+    // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
+    var lastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
     // Convert quadratic curve to cubic curve
     curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
     curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
@@ -391,7 +387,7 @@
     // 'T' or 't' command may follow
     if (data.length >= 8) {
       var subData = data.slice(5);
-      var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
+      // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
       if (subData[0] === "T") {
         // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, result);
         _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastQuadraticControlPoint, result);
@@ -403,6 +399,7 @@
   };
 
   // This is a helper function and works only in combination with Quadratic Bézier Curves
+  // T|t x y
   var _handleShorthandQuadraticCurveTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
     console.log("Handle SHORTHANDQUADRATICCURVETO", data);
     if (data.length < 3) {
@@ -410,15 +407,11 @@
     }
     var curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
-      // curve.endControlPoint.x += Number(data[1]);
-      // curve.endControlPoint.y += Number(data[2]);
       curve.endPoint.x += Number(data[1]);
       curve.endPoint.y += Number(data[2]);
       curve.startControlPoint.x += curve.startPoint.x - (lastControlPoint.x - lastPoint.x);
       curve.startControlPoint.y += curve.startPoint.y - (lastControlPoint.y - lastPoint.y);
     } else {
-      // curve.endControlPoint.x = Number(data[1]);
-      // curve.endControlPoint.y = Number(data[2]);
       curve.endPoint.x = Number(data[1]);
       curve.endPoint.y = Number(data[2]);
       curve.startControlPoint.x = curve.startPoint.x - (lastControlPoint.x - lastPoint.x);
@@ -446,32 +439,32 @@
     }
   };
 
+  // The S|s x2 y2 x y
   var _handleShorthandCubicCurveTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
-    console.log("Handle SHORTHANDBEZIERTO", data);
+    console.log("Handle SHORTHANDCUBICBEZIERTO", data);
     if (data.length < 5) {
-      throw "Unsufficient params for SHORTHANDBEZIERTO";
+      throw "Unsufficient params for SHORTHANDCUBICBEZIERTO";
     }
     var curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+
     if (isRelative) {
+      curve.startControlPoint.x = lastPoint.x - (lastControlPoint.x - lastPoint.x);
+      curve.startControlPoint.y = lastPoint.y - (lastControlPoint.y - lastPoint.y);
       curve.endControlPoint.x += Number(data[1]);
       curve.endControlPoint.y += Number(data[2]);
       curve.endPoint.x += Number(data[3]);
       curve.endPoint.y += Number(data[4]);
     } else {
+      curve.startControlPoint.x = lastPoint.x - (lastControlPoint.x - lastPoint.x);
+      curve.startControlPoint.y = lastPoint.y - (lastControlPoint.y - lastPoint.y);
       curve.endControlPoint.x = Number(data[1]);
       curve.endControlPoint.y = Number(data[2]);
       curve.endPoint.x = Number(data[3]);
       curve.endPoint.y = Number(data[4]);
     }
-    // Mirror the first control point
-    var line = new Line(curve.startPoint, curve.endPoint);
-    var mirrorVector = new Vector(line.vertAt(0.5), line.b).getOrthogonal();
-    var closestT = mirrorVector.getClosestT(curve.endControlPoint);
-    var pointOnMirror = mirrorVector.vertAt(closestT);
-    curve.startControlPoint.x = pointOnMirror.x - (curve.endControlPoint.x - pointOnMirror.x);
-    curve.startControlPoint.y = pointOnMirror.y - (curve.endControlPoint.y - pointOnMirror.y);
 
     result.push(curve);
+
     lastPoint.x = curve.endPoint.x;
     lastPoint.y = curve.endPoint.y;
     lastControlPoint.x = curve.endControlPoint.x;
@@ -496,6 +489,12 @@
     // var ellipse = new VEllipse(center, axis, rotation);
     // result.push()
 
+    var arcEndPoint = { x: Number(data[6]), y: Number(data[7]) };
+    if (isRelative) {
+      arcEndPoint.x += lastPoint.x;
+      arcEndPoint.y += lastPoint.y;
+    }
+
     console.log(
       "lastPoint.x",
       lastPoint.x, // x1
@@ -512,9 +511,9 @@
       "data[5]",
       Boolean(data[5]), // fs: boolean,
       "data[6]",
-      Number(data[6]), // x2: number,
+      arcEndPoint.x, // Number(data[6]), // x2: number,
       "data[7]",
-      Number(data[7]) // y2: number
+      arcEndPoint.y // Number(data[7]) // y2: number
     );
     // A 5 4 0 1 1 -10 -5
     // TODO: respect relative/absolute here
@@ -526,8 +525,8 @@
       Number(data[3]) * DEG_TO_RAD, // phi: number,
       Boolean(data[4]), // fa: boolean,
       Boolean(data[5]), // fs: boolean,
-      Number(data[6]), // x2: number,
-      Number(data[7]) // y2: number
+      arcEndPoint.x, // Number(data[6]), // x2: number,
+      arcEndPoint.y // Number(data[7]) // y2: number
     );
 
     console.log("ellipseSector", ellipseSector);

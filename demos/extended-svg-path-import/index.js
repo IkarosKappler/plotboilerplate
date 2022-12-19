@@ -76,17 +76,17 @@
     // path commands.
     // prettier-ignore
     var svgDataRelative = [
-      '\n M', -10, -7.5,
-      '\n v', -2.5, 
-      '\n l', 10, 0,
-      '\n c', -5, -5, 10, -5, 5, 0,
-      '\n h', 5,
-      '\n c', -5, 2.5, -5, 2.5, 0, 5,
-      '\n s', 5, 5, 0, 5,
-      '\n q', -5, 5, -10, 0,
-      '\n t', -10, 0,
-      '\n a', 5, 4, 0, 1, 1, 0, -5,    
-      '\n z'
+      'M', -10, -7.5,
+      'v', -2.5, 
+      'l', 10, 0,
+      'c', -5, -5, 10, -5, 5, 0,
+      'h', 5,
+      'c', -5, 2.5, -5, 2.5, 0, 5,
+      's', 5, 5, 0, 5,
+      'q', -5, 5, -10, 0,
+      't', -10, 0,
+      'a', 5, 4, 0, 1, 1, 0, -5,    
+      'z'
     ]; //.join(" ");
 
     var shortHandStart = new Vertex(0, 0);
@@ -112,7 +112,8 @@
       var textarea = document.createElement("textarea");
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
-      textarea.innerHTML = svgDataAbsolute.join(" "); // data1; // outline.toJSON(true);
+      // textarea.innerHTML = svgDataAbsolute.join(" ");
+      textarea.innerHTML = svgDataRelative.join(" ");
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
@@ -159,7 +160,8 @@
       draw.line(parsedShorthand.startPoint, parsedShorthand.startControlPoint, "red", 1);
       draw.line(parsedShorthand.endPoint, parsedShorthand.endControlPoint, "red", 1);
 
-      draw.path(svgDataAbsolute, "rgba(192,0,0,0.5)", 6);
+      // draw.path(svgDataAbsolute, "rgba(192,0,0,0.5)", 6);
+      draw.path(svgDataRelative, "rgba(192,0,0,0.5)", 6);
       // console.log("sourceData", sourceData);
       if (sourceData) {
         var sourceDataElements = splitSVGPathData(sourceData);
