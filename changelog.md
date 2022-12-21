@@ -1,5 +1,8 @@
 # Changelog
 
+- 2022-12-21 (winter solstice)
+  - Porting the yet experimental SVG path data parser to Typescript (early 0.0.1-alpha).
+  - Defining very basic SVG path command types for parsing (early 0.0.1-alpha).
 - 2022-12-13
   - Modified the Truchet demo so single cells can be edited.
 - 2022-11-28

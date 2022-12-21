@@ -30,15 +30,17 @@
     pb.drawConfig.origin.color = isDarkmode ? "#ffffff" : "#000000";
 
     var config = {
-      t: 0.5
+      useRelativePath: false,
+      drawAbsoluteExamplePath: false,
+      drawRelativeExamplePath: false,
+      drawSourcePathParsed: true,
+      drawSourcePathNative: true
     };
-
-    var initialViewport = pb.viewport();
 
     var modal = new Modal();
 
-    var data1 =
-      "m 51.076662,93.800013 c 1e-6,-16.933333 8.466667,-25.399999 25.399994,-25.399999 h 25.400004 c 16.93334,0 25.4,8.466666 25.4,25.399999 v 16.933337 c 0,16.93333 16.93334,33.86666 33.86667,33.86666 h 16.93333 c 16.93333,0 25.4,8.46667 25.4,25.4 v 25.4 c 0,16.93333 -8.46667,25.4 -25.4,25.4 h -16.93333 c -16.93333,0 -33.86667,16.93332 -33.86667,33.86666 V 271.6 c 0,16.93334 -8.46666,25.4 -25.4,25.4 H 76.476656 c -16.933327,0 -25.399993,-8.46666 -25.399994,-25.4 z";
+    // var data1 =
+    //   "m 51.076662,93.800013 c 1e-6,-16.933333 8.466667,-25.399999 25.399994,-25.399999 h 25.400004 c 16.93334,0 25.4,8.466666 25.4,25.399999 v 16.933337 c 0,16.93333 16.93334,33.86666 33.86667,33.86666 h 16.93333 c 16.93333,0 25.4,8.46667 25.4,25.4 v 25.4 c 0,16.93333 -8.46667,25.4 -25.4,25.4 h -16.93333 c -16.93333,0 -33.86667,16.93332 -33.86667,33.86666 V 271.6 c 0,16.93334 -8.46666,25.4 -25.4,25.4 H 76.476656 c -16.933327,0 -25.399993,-8.46666 -25.399994,-25.4 z";
 
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
@@ -55,7 +57,7 @@
       'T', -10, 0,
       'A', 5, 4, 0, 1, 1, -10, -5,
       'Z'
-    ]; // .join(" ");
+    ];
     console.log("svgDataAbsolute", svgDataAbsolute);
 
     // Now define the same shape. But only y with _relative_
@@ -73,13 +75,7 @@
       't', -10, 0,
       'a', 5, 4, 0, 1, 1, 0, -5,    
       'z'
-    ]; //.join(" ");
-
-    var shortHandStart = new Vertex(0, 0);
-    var shortHandControl = new Vertex(0, 300);
-    var shortHandEnd = new Vertex(300, 0);
-    // var svgDataShorthand = ["M", 0, 0, "S", 0, 300, 300, 0];
-    pb.add([shortHandStart, shortHandControl, shortHandEnd]);
+    ];
 
     var sourceData = null;
     var pathSegments = [];
@@ -98,9 +94,7 @@
       var textarea = document.createElement("textarea");
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
-      // textarea.innerHTML = svgDataAbsolute.join(" ");
-      textarea.innerHTML = svgDataRelative.join(" ");
-      // textarea.innerHTML = data1;
+      textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
@@ -120,20 +114,43 @@
 
     // On redrawing determine the orthogonal vector at the given position
     pb.config.postDraw = function (draw, fill) {
-      var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
+      if (config.drawRelativeExamplePath) {
+        drawRelativeExamplePath(draw, fill);
+      }
+      if (config.drawAbsoluteExamplePath) {
+        drawAbsoluteExamplePath(draw, fill);
+      }
 
-      // drawTestShorthand(draw, fill);
+      if (config.drawSourcePathNative) {
+        drawSourcePathNative(draw, fill);
+      }
 
+      if (config.drawSourcePathParsed) {
+        drawSourcePathParsed(draw, fill);
+      }
+    };
+
+    var drawRelativeExamplePath = function (draw, fill) {
       draw.path(svgDataRelative, "rgba(192,0,0,0.5)", 6);
+    };
+
+    var drawAbsoluteExamplePath = function (draw, fill) {
+      draw.path(svgDataAbsolute, "rgba(192,0,0,0.5)", 6);
+    };
+
+    var drawSourcePathNative = function (draw, fill) {
       if (sourceData) {
+        var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGB();
         var sourceDataElements = splitSVGPathData(sourceData);
         var sourceDataElements = sourceDataElements.reduce(function (buf, elem) {
           buf = buf.concat(elem);
           return buf;
         });
-        draw.path(sourceDataElements, "rgba(128,128,128,0.5)", 3);
+        draw.path(sourceDataElements, contrastColor, 3);
       }
+    };
 
+    var drawSourcePathParsed = function (draw, fill) {
       for (var i = 0; i < pathSegments.length; i++) {
         var segment = pathSegments[i];
         if (segment instanceof Line) {
@@ -148,36 +165,9 @@
             2
           );
         } else if (segment instanceof VEllipse) {
-          // console.log("Ellipse", segment);
           pb.draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
         }
       }
-    };
-
-    var drawTestShorthand = function (draw, fill) {
-      var svgDataShorthand = [
-        "M",
-        shortHandStart.x,
-        shortHandStart.y,
-        "S",
-        shortHandControl.x,
-        shortHandControl.y,
-        shortHandEnd.x,
-        shortHandEnd.y
-      ];
-      draw.path(svgDataShorthand, "orange", 2);
-      var parsedShorthand = parseSVGPathData(svgDataShorthand.join(" "))[0];
-      // console.log(parsedShorthand);
-      draw.cubicBezier(
-        parsedShorthand.startPoint,
-        parsedShorthand.endPoint,
-        parsedShorthand.startControlPoint,
-        parsedShorthand.endControlPoint,
-        "rgba(255,255,0,0.5)",
-        8
-      );
-      draw.line(parsedShorthand.startPoint, parsedShorthand.startControlPoint, "red", 1);
-      draw.line(parsedShorthand.endPoint, parsedShorthand.endControlPoint, "red", 1);
     };
 
     // +---------------------------------------------------------------------------------
@@ -201,7 +191,15 @@
     {
       var gui = pb.createGUI();
       // prettier-ignore
-      // gui.add(config, 't').min(-2.0).max(2.0).step(0.01).listen().onChange(function() { pb.redraw() }).name("t").title("The relative value on the line (relative to the distance between start and end point).");
+      gui.add(config, 'useRelativePath').listen().onChange(function() { pb.redraw() }).name("useRelativePath").title("Which example path variant to use: relative or absolute?");
+      // prettier-ignore
+      gui.add(config, 'drawAbsoluteExamplePath').listen().onChange(function() { pb.redraw() }).name("drawAbsoluteExamplePath").title("Test draw the absolute example path for comparison?");
+      // prettier-ignore
+      gui.add(config, 'drawRelativeExamplePath').listen().onChange(function() { pb.redraw() }).name("drawRelativeExamplePath").title("Test draw the relative example path for comparison?");
+      // prettier-ignore
+      gui.add(config, 'drawSourcePathNative').listen().onChange(function() { pb.redraw() }).name("drawSourcePathNative").title("Draw the native path?");
+      // prettier-ignore
+      gui.add(config, 'drawSourcePathParsed').listen().onChange(function() { pb.redraw() }).name("drawSourcePathParsed").title("Draw the parsed path segments?");
 
       // Add stats
       var uiStats = new UIStats(stats);

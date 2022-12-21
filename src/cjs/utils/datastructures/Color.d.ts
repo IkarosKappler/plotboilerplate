@@ -215,7 +215,7 @@ export declare class Color {
      * @param {string} str - The string representation to parse.
      * @return {Color} The color instance that's represented by the given string.
      */
-    static parse(str: string): Color;
+    static parse(str: string): Color | null;
     private static Sanitizer;
     private static Validator;
     private static Converter;

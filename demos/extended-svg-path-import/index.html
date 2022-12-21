@@ -29,7 +29,6 @@
     <!-- Load thirdparty libraries -->
     <script src="../../lib/dat.gui.min.js"></script>
     <script src="../../lib/FileSaver.min.js"></script>
-    <script src="../../lib/Color.js"></script>
     <script src="../../lib/alloy_finger.js"></script>
     <script src="../../lib/uistats.min.js"></script>
 
@@ -45,11 +44,14 @@
     <script src="../../dist/plotboilerplate.min.js"></script>
     <!-- END For production -->
     
+    <script src="../../src/cjs/utils/datastructures/Color.js"></script>
     <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
     <script src="../detectDarkMode.js"></script>
     <script src="../modal.js"></script>
-    <script src="splitSVGPathData.js"></script>
-    <script src="parseSVGPathData.js"></script>
+    <!-- <script src="splitSVGPathData.js"></script> -->
+    <script src="../../src/cjs/utils/parsers/svg/splitSVGPathData.js"></script>
+    <!-- <script src="parseSVGPathData.js"></script> --> 
+    <script src="../../src/cjs/utils/parsers/svg/parseSVGPathData.js"></script>
     <script src="index.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
     <link rel="stylesheet" href="../modal.css">
