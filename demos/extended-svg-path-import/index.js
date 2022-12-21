@@ -22,7 +22,9 @@
         {
           canvas: document.getElementById("my-canvas"),
           backgroundColor: isDarkmode ? "#000000" : "#ffffff",
-          fullSize: true
+          fullSize: true,
+          scaleX: 5.0,
+          scaleY: 5.0
         },
         GUP
       )
@@ -41,6 +43,10 @@
 
     // var data1 =
     //   "m 51.076662,93.800013 c 1e-6,-16.933333 8.466667,-25.399999 25.399994,-25.399999 h 25.400004 c 16.93334,0 25.4,8.466666 25.4,25.399999 v 16.933337 c 0,16.93333 16.93334,33.86666 33.86667,33.86666 h 16.93333 c 16.93333,0 25.4,8.46667 25.4,25.4 v 25.4 c 0,16.93333 -8.46667,25.4 -25.4,25.4 h -16.93333 c -16.93333,0 -33.86667,16.93332 -33.86667,33.86666 V 271.6 c 0,16.93334 -8.46666,25.4 -25.4,25.4 H 76.476656 c -16.933327,0 -25.399993,-8.46666 -25.399994,-25.4 z";
+
+    // From the official logo
+    var data2 =
+      "M51.077 102.267c0-16.934 16.933-33.867 33.866-33.867h8.467c16.933 0 33.867 16.933 33.867 33.867v8.466c-16.934 25.4 8.466 50.8 33.866 33.867h8.467c16.933 0 33.867 16.933 33.867 33.867v8.466c0 16.934-16.934 33.867-33.867 33.867h-8.467c-25.4-16.933-50.8 8.467-33.866 33.867v8.466c0 16.934-16.934 33.867-33.867 33.867h-8.467c-16.933 0-33.866-16.933-33.866-33.867l-.277-8.466c16.933-33.867 16.933-110.067 0-143.934z";
 
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
@@ -95,6 +101,7 @@
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
       textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
+      // textarea.innerHTML = data2;
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([

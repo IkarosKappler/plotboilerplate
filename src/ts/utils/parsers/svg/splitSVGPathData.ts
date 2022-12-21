@@ -25,19 +25,31 @@ export const splitSVGPathData = (dataString: string): Array<SVGPathCommand> | nu
   const validCommand =
     /([ml](\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))|([hv](\s?-?((\d+(\.\d+)?)|(\.\d+))))|(c(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){5})|(q(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3}(\s?t?(\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))*)|(a(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2}[,\s]?[01][,\s]+[01][,\s]+([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2})|(s(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3})|z/gi;
 
-  var dataElements = dataString.match(validCommand);
+  const dataElements = dataString.match(validCommand);
+  // console.log("Splitted: ", dataElements);
   if (!dataElements) {
     return null;
   }
 
-  var result: Array<SVGPathCommand> = [];
+  const result: Array<SVGPathCommand> = [];
 
   var i = 0;
   while (i < dataElements.length) {
-    var token = dataElements[i];
-    var data = token.split(/[\s,]/);
-    const cmd = data[0];
-    result.push(data as SVGPathCommand);
+    const token = dataElements[i];
+    // var data = token.split(/[\s,]/);
+    // console.log("Token", token);
+    const dataRaw = token.match(/-?(?:\d*\.)?\d+|[a-z]/gi);
+    // console.log("dataRaw", dataRaw);
+    if (dataRaw) {
+      // var dataFiltered = dataRaw.filter(function (n) {
+      //   return n != "";
+      // });
+      // console.log("dataFiltered", dataRaw);
+      // const cmd = dataRaw[0];
+      result.push(dataRaw as SVGPathCommand);
+    } else {
+      // throw Error?
+    }
     i++;
   }
   return result;

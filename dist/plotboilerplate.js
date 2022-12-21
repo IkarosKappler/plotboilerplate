@@ -7639,10 +7639,11 @@ exports.VEllipse = VEllipse;
  * Implementation of elliptic sectors.
  * Note that sectors are constructed in clockwise direction.
  *
- * @author  Ikaros Kappler
- * @date    2021-02-26
+ * @author   Ikaros Kappler
+ * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
- * @version 1.1.0
+ * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
+ * @version  1.1.1
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VEllipseSector = void 0;
@@ -7898,8 +7899,6 @@ var VEllipseSector = /** @class */ (function () {
             var sign = fa === fs ? -1 : 1;
             // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
             var M = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
-            // TODO: is this correct
-            console.log("sign", sign, "M", M, prx, pry, py, px, "sqrt--", (prx * pry - prx * py - pry * px) / (prx * py + pry * px));
             var _cx = (M * (rx * y)) / ry;
             var _cy = (M * (-ry * x)) / rx;
             var cx = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2;

@@ -129,7 +129,7 @@ export const parseSVGPathData = (dataString) => {
     return result;
 }; // END parseSVGPathData
 // Just update the current position
-var _handleMove = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, _result) {
+const _handleMove = (data, isRelative, firstPoint, lastPoint, lastControlPoint, _result) => {
     if (data.length < 3) {
         throw "Unsufficient params for MOVE";
     }
@@ -153,14 +153,14 @@ var _handleMove = function (data, isRelative, firstPoint, lastPoint, lastControl
     }
 };
 // Draw a line segment from the current position
-var _handleLineTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleLineTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle LINETO", data);
     if (data.length < 3) {
         throw "Unsufficient params for LINETO";
     }
     // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
     // result.push( new)
-    var line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
         line.b.x += Number(data[1]);
         line.b.y += Number(data[2]);
@@ -179,14 +179,14 @@ var _handleLineTo = function (data, isRelative, firstPoint, lastPoint, lastContr
         firstPoint.y = line.a.y;
     }
 };
-var _handleHorizontalLineTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleHorizontalLineTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle HORIZONTALLINETO", data);
     if (data.length < 2) {
         throw "Unsufficient params for HORIZONTALLINETO";
     }
     // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
     // result.push( new)
-    var line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
         line.b.x += Number(data[1]);
         // line.b.y += Number(data[2]);
@@ -204,14 +204,14 @@ var _handleHorizontalLineTo = function (data, isRelative, firstPoint, lastPoint,
         firstPoint.y = line.a.y;
     }
 };
-var _handleVerticalLineTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleVerticalLineTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle VERTICALLINETO", data);
     if (data.length < 2) {
         throw "Unsufficient params for VERTICALLINETO";
     }
     // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
     // result.push( new)
-    var line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
         // line.b.x += Number(data[1]);
         line.b.y += Number(data[1]);
@@ -230,14 +230,14 @@ var _handleVerticalLineTo = function (data, isRelative, firstPoint, lastPoint, l
     }
 };
 // CurveTo: C|c x1 y1 x2 y2 x y
-var _handleCubicBezierTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleCubicBezierTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle CUBICBEZIERTO", data);
     if (data.length < 7) {
         throw "Unsufficient params for CUBICBEZIERTO";
     }
     // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
     // result.push( new)
-    var curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+    const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
         curve.startControlPoint.x += Number(data[1]);
         curve.startControlPoint.y += Number(data[2]);
@@ -265,14 +265,14 @@ var _handleCubicBezierTo = function (data, isRelative, firstPoint, lastPoint, la
     }
 };
 // QuadraticCurveTo: Q|q x1 y1 x y
-var _handleQuadraticCurveTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleQuadraticCurveTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle QUADRATICBEZIERTO", data);
     if (data.length < 5) {
         throw "Unsufficient params for QUADRATICBEZIERTO";
     }
     // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
     // result.push( new)
-    var curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+    const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
         curve.startControlPoint.x += curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
         curve.startControlPoint.y += curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
@@ -290,7 +290,7 @@ var _handleQuadraticCurveTo = function (data, isRelative, firstPoint, lastPoint,
         curve.endControlPoint.y = curve.startControlPoint.y;
     }
     // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
-    var lastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
+    const lastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
     // Convert quadratic curve to cubic curve
     curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
     curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
@@ -308,7 +308,7 @@ var _handleQuadraticCurveTo = function (data, isRelative, firstPoint, lastPoint,
     // 'T' or 't' command may follow
     if (data.length >= 8) {
         // TODO: think about this type cast!
-        var subData = data.slice(5);
+        const subData = data.slice(5);
         // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
         if (subData[0] === "T") {
             // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, result);
@@ -322,12 +322,12 @@ var _handleQuadraticCurveTo = function (data, isRelative, firstPoint, lastPoint,
 };
 // This is a helper function and works only in combination with Quadratic Bézier Curves
 // T|t x y
-var _handleShorthandQuadraticCurveTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleShorthandQuadraticCurveTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle SHORTHANDQUADRATICCURVETO", data);
     if (data.length < 3) {
         throw "Unsufficient params for SHORTHANDQUADRATICCURVETO";
     }
-    var curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+    const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
         curve.endPoint.x += Number(data[1]);
         curve.endPoint.y += Number(data[2]);
@@ -360,12 +360,12 @@ var _handleShorthandQuadraticCurveTo = function (data, isRelative, firstPoint, l
     }
 };
 // The S|s x2 y2 x y
-var _handleShorthandCubicCurveTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleShorthandCubicCurveTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle SHORTHANDCUBICBEZIERTO", data);
     if (data.length < 5) {
         throw "Unsufficient params for SHORTHANDCUBICBEZIERTO";
     }
-    var curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+    const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
     if (isRelative) {
         curve.startControlPoint.x = lastPoint.x - (lastControlPoint.x - lastPoint.x);
         curve.startControlPoint.y = lastPoint.y - (lastControlPoint.y - lastPoint.y);
@@ -393,12 +393,12 @@ var _handleShorthandCubicCurveTo = function (data, isRelative, firstPoint, lastP
     }
 };
 // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
-var _handleArcTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleArcTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle ARCTO", data);
     if (data.length < 8) {
         throw "Unsufficient params for ARCTO";
     }
-    var arcEndPoint = { x: Number(data[6]), y: Number(data[7]) };
+    const arcEndPoint = { x: Number(data[6]), y: Number(data[7]) };
     if (isRelative) {
         arcEndPoint.x += lastPoint.x;
         arcEndPoint.y += lastPoint.y;
@@ -425,25 +425,17 @@ var _handleArcTo = function (data, isRelative, firstPoint, lastPoint, lastContro
     // );
     // A 5 4 0 1 1 -10 -5
     // TODO: respect relative/absolute here
-    var ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(lastPoint.x, // x1
-    lastPoint.y, // y1
-    Number(data[1]), // rx
-    Number(data[2]), // ry
-    Number(data[3]) * DEG_TO_RAD, // phi: number,
-    Boolean(data[4]), // fa: boolean,
-    Boolean(data[5]), // fs: boolean,
-    arcEndPoint.x, // Number(data[6]), // x2: number,
-    arcEndPoint.y // Number(data[7]) // y2: number
+    const ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(lastPoint.x, lastPoint.y, Number(data[1]), Number(data[2]), Number(data[3]) * DEG_TO_RAD, Boolean(data[4]), Boolean(data[5]), arcEndPoint.x, arcEndPoint.y // Number(data[7]) // y2: number
     );
     //   console.log("ellipseSector", ellipseSector);
-    var curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
+    const curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
     for (var i = 0; i < curves.length; i++) {
         result.push(curves[i]); // Destruct!
     }
     // result.push(ellipseSector.ellipse);
     if (curves.length > 0) {
         // console.log("curves", curves);
-        var lastCurve = curves[curves.length - 1];
+        const lastCurve = curves[curves.length - 1];
         lastPoint.x = lastCurve.endPoint.x;
         lastPoint.y = lastCurve.endPoint.y;
         lastControlPoint.x = lastCurve.endControlPoint.x;
@@ -455,9 +447,9 @@ var _handleArcTo = function (data, isRelative, firstPoint, lastPoint, lastContro
     }
     // TODO: track first/last/control point
 };
-var _handleClosePath = function (_data, _isRelative, firstPoint, lastPoint, lastControlPoint, result) {
+const _handleClosePath = (_data, _isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
     //   console.log("Handle CLOSEPATH", "lastPoint", lastPoint, "firstPoint", firstPoint);
-    var line = new Line(new Vertex(lastPoint), new Vertex(firstPoint));
+    const line = new Line(new Vertex(lastPoint), new Vertex(firstPoint));
     result.push(line);
     lastPoint.x = line.b.x;
     lastPoint.y = line.b.y;

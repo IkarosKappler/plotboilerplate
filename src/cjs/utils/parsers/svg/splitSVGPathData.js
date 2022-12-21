@@ -24,6 +24,7 @@ var splitSVGPathData = function (dataString) {
     //    https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115
     var validCommand = /([ml](\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))|([hv](\s?-?((\d+(\.\d+)?)|(\.\d+))))|(c(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){5})|(q(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3}(\s?t?(\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))*)|(a(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2}[,\s]?[01][,\s]+[01][,\s]+([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2})|(s(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3})|z/gi;
     var dataElements = dataString.match(validCommand);
+    // console.log("Splitted: ", dataElements);
     if (!dataElements) {
         return null;
     }
@@ -31,9 +32,21 @@ var splitSVGPathData = function (dataString) {
     var i = 0;
     while (i < dataElements.length) {
         var token = dataElements[i];
-        var data = token.split(/[\s,]/);
-        var cmd = data[0];
-        result.push(data);
+        // var data = token.split(/[\s,]/);
+        // console.log("Token", token);
+        var dataRaw = token.match(/-?(?:\d*\.)?\d+|[a-z]/gi);
+        // console.log("dataRaw", dataRaw);
+        if (dataRaw) {
+            // var dataFiltered = dataRaw.filter(function (n) {
+            //   return n != "";
+            // });
+            // console.log("dataFiltered", dataRaw);
+            // const cmd = dataRaw[0];
+            result.push(dataRaw);
+        }
+        else {
+            // throw Error?
+        }
         i++;
     }
     return result;

@@ -429,15 +429,7 @@ var _handleArcTo = function (data, isRelative, firstPoint, lastPoint, lastContro
     // );
     // A 5 4 0 1 1 -10 -5
     // TODO: respect relative/absolute here
-    var ellipseSector = VEllipseSector_1.VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(lastPoint.x, // x1
-    lastPoint.y, // y1
-    Number(data[1]), // rx
-    Number(data[2]), // ry
-    Number(data[3]) * DEG_TO_RAD, // phi: number,
-    Boolean(data[4]), // fa: boolean,
-    Boolean(data[5]), // fs: boolean,
-    arcEndPoint.x, // Number(data[6]), // x2: number,
-    arcEndPoint.y // Number(data[7]) // y2: number
+    var ellipseSector = VEllipseSector_1.VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(lastPoint.x, lastPoint.y, Number(data[1]), Number(data[2]), Number(data[3]) * DEG_TO_RAD, Boolean(data[4]), Boolean(data[5]), arcEndPoint.x, arcEndPoint.y // Number(data[7]) // y2: number
     );
     //   console.log("ellipseSector", ellipseSector);
     var curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
