@@ -83,19 +83,29 @@
       'z'
     ];
 
+    // The input data 'd' (from SVG path element): a string
     var sourceData = null;
+    // The result array. All path commands will be converted to:
+    //    Array<Line | CubicBezierCurve>
     var pathSegments = [];
 
+    // +---------------------------------------------------------------------------------
+    // | This is the callback function that's invoked when the user wants
+    // | to load inserted data (from the dialog/modal).
+    // +-------------------------------
     var loadPathData = function (data) {
       console.log("data", data);
       pathSegments = parseSVGPathData(data);
       sourceData = data;
       console.log("Setting sourceData", sourceData);
       console.log("pathSegments", pathSegments);
-
       pb.redraw();
     };
 
+    // +---------------------------------------------------------------------------------
+    // | This is the callback to use when the user wants to insert
+    // | path data into the dialog (modal).
+    // +-------------------------------
     var insertPathJSON = function () {
       var textarea = document.createElement("textarea");
       textarea.style.width = "100%";
@@ -119,7 +129,50 @@
     };
     insertPathJSON();
 
-    // On redrawing determine the orthogonal vector at the given position
+    // +---------------------------------------------------------------------------------
+    // | Show a dialog to select a path from an SVG document.
+    // +-------------------------------
+    var selectPathFromSvgDocument = function (svgDocument) {
+      var pathNodes = svgDocument.getElementsByTagName("path");
+      // console.log("pathNodes", pathNodes);
+      var container = document.createElement("div");
+      var title = document.createElement("div");
+      title.innerText = "" + pathNodes.length + " path elements found";
+      container.appendChild(title);
+      var selectList = document.createElement("select");
+      container.appendChild(selectList);
+      selectList.style.width = "100%";
+      for (var i = 0; i < pathNodes.length; i++) {
+        //
+        var option = document.createElement("option");
+        option.innerText = pathNodes[i].getAttribute("d");
+        selectList.appendChild(option);
+      }
+
+      // textarea.innerHTML = data2;
+      modal.setTitle("Insert Path data (the 'd' string)");
+      modal.setFooter("");
+      modal.setActions([
+        Modal.ACTION_CANCEL,
+        {
+          label: "Load data",
+          action: function () {
+            // var selectedOptionValue = selectList.options[selectList.selectedIndex].value;
+            var selectedOptionValue = selectList.value;
+            if (selectedOptionValue) {
+              loadPathData(selectedOptionValue);
+              modal.close();
+            }
+          }
+        }
+      ]);
+      modal.setBody(container);
+      modal.open();
+    };
+
+    // +---------------------------------------------------------------------------------
+    // | This is our default redraw function here.
+    // +-------------------------------
     pb.config.postDraw = function (draw, fill) {
       if (config.drawRelativeExamplePath) {
         drawRelativeExamplePath(draw, fill);
@@ -127,53 +180,61 @@
       if (config.drawAbsoluteExamplePath) {
         drawAbsoluteExamplePath(draw, fill);
       }
-
       if (config.drawSourcePathNative) {
         drawSourcePathNative(draw, fill);
       }
-
       if (config.drawSourcePathParsed) {
         drawSourcePathParsed(draw, fill);
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draw the relative example path that was predefined for this demo.
+    // +-------------------------------
     var drawRelativeExamplePath = function (draw, fill) {
       draw.path(svgDataRelative, "rgba(192,0,0,0.5)", 6);
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draw the absolute example path that was predefined for this demo.
+    // +-------------------------------
     var drawAbsoluteExamplePath = function (draw, fill) {
       draw.path(svgDataAbsolute, "rgba(192,0,0,0.5)", 6);
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draw the original input path.
+    // | As the original path is only an SVG data string we need to split this and
+    // | convert to a sequence of native SVG path commands and params (array).
+    // +-------------------------------
     var drawSourcePathNative = function (draw, fill) {
       if (sourceData) {
-        var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGB();
+        // Array<SVGPathCommand> which is acually Array<string[]> of a particular format
         var sourceDataElements = splitSVGPathData(sourceData);
-        var sourceDataElements = sourceDataElements.reduce(function (buf, elem) {
+        // Convert to pure Array<string> by concatenating all commands.
+        var dataElementsPlain = sourceDataElements.reduce(function (buf, elem) {
           buf = buf.concat(elem);
           return buf;
         });
-        draw.path(sourceDataElements, contrastColor, 3);
+        // Choose a high contrast color
+        var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGB();
+        draw.path(dataElementsPlain, contrastColor, 4);
       }
     };
 
+    // +---------------------------------------------------------------------------------
+    // | Draw the final parsed path – which consists of Lines, Curves and Ellipses.
+    // +-------------------------------
     var drawSourcePathParsed = function (draw, fill) {
       for (var i = 0; i < pathSegments.length; i++) {
         var segment = pathSegments[i];
         if (segment instanceof Line) {
-          pb.draw.line(segment.a, segment.b, "green", 2);
+          draw.line(segment.a, segment.b, "green", 2);
         } else if (segment instanceof CubicBezierCurve) {
-          pb.draw.cubicBezier(
-            segment.startPoint,
-            segment.endPoint,
-            segment.startControlPoint,
-            segment.endControlPoint,
-            "green",
-            2
-          );
-        } else if (segment instanceof VEllipse) {
-          pb.draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
-        }
+          draw.cubicBezier(segment.startPoint, segment.endPoint, segment.startControlPoint, segment.endControlPoint, "green", 2);
+        } /* else if (segment instanceof VEllipse) {
+          draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
+        } */
       }
     };
 
@@ -185,6 +246,16 @@
       var relPos = pb.transformMousePosition(e.params.pos.x, e.params.pos.y);
       stats.mouseX = relPos.x;
       stats.mouseY = relPos.y;
+    });
+
+    // Install DnD
+    var fileDrop = new FileDrop(pb.eventCatcher);
+    fileDrop.onFileSVGDropped(function (svgDocument) {
+      // TODO
+      // console.log("Document:", svgDocument);
+      // var pathNodes = svgDocument.getElementsByTagName("path");
+      // console.log("pathNodes", pathNodes);
+      selectPathFromSvgDocument(svgDocument);
     });
 
     var stats = {

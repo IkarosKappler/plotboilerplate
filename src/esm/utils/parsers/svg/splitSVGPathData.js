@@ -29,16 +29,10 @@ export const splitSVGPathData = (dataString) => {
     var i = 0;
     while (i < dataElements.length) {
         const token = dataElements[i];
-        // var data = token.split(/[\s,]/);
-        // console.log("Token", token);
+        // Ctwheels comment was really useful here
+        //    https://stackoverflow.com/questions/47801455/what-is-the-regex-that-properly-splits-svg-d-attributes-into-tokens
         const dataRaw = token.match(/-?(?:\d*\.)?\d+|[a-z]/gi);
-        // console.log("dataRaw", dataRaw);
         if (dataRaw) {
-            // var dataFiltered = dataRaw.filter(function (n) {
-            //   return n != "";
-            // });
-            // console.log("dataFiltered", dataRaw);
-            // const cmd = dataRaw[0];
             result.push(dataRaw);
         }
         else {
