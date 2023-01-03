@@ -6,6 +6,7 @@
  * @name splitSVGPathData
  * @static
  * @param {string} data - The data to split.
+ * @DEPRECATED Ported to Typescript. See ./src/cjs/utils/parsers/svg/splitSVGPathData.js
  */
 
 (function (_context) {
@@ -25,21 +26,6 @@
     var result = [];
 
     var i = 0;
-    var firstPoint = { x: NaN, y: NaN };
-    var lastPoint = { x: NaN, y: NaN };
-    var lastControlPoint = { x: NaN, y: NaN };
-    // "save last point"
-    // var _slp = index => {
-    //   lastPoint.x = Number(dataElements[index]);
-    //   lastPoint.y = Number(dataElements[index + 1]);
-    // };
-    // while (i < dataElements.length) {
-    //   var token = dataElements[i];
-    //   var data = token.split(/[\s,]/);
-    //   const cmd = data[0];
-    //   result.push(data);
-    //   i++;
-    // }
 
     var i = 0;
     while (i < dataElements.length) {

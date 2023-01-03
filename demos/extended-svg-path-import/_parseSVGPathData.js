@@ -7,6 +7,7 @@
  * @static
  * @memberof drawutilssvg
  * @param {SVGPathParams} data - The data to transform.
+ * @DEPRECATED Was ported to typescript. See ./src/cjs/utils/parsers/svg/parseSVGPathData.js
  */
 
 (function (_context) {
@@ -19,8 +20,6 @@
     //   /([ml](\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))|([hv](\s?-?((\d+(\.\d+)?)|(\.\d+))))|(c(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){5})|(q(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3}(\s?t?(\s?-?((\d+(\.\d+)?)|(\.\d+)))[,\s]?(-?((\d+(\.\d+)?)|(\.\d+))))*)|(a(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2}[,\s]?[01][,\s]+[01][,\s]+([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){2})|(s(\s?-?((\d+(\.\d+)?)|(\.\d+)))([,\s]?(-?((\d+(\.\d+)?)|(\.\d+)))){3})|z/gi;
     // var dataElements = dataString.match(validCommand);
     var dataElements = splitSVGPathData(dataString);
-    // console.log("data array", dataElements);
-    // Scale and translate {x,y}
 
     // Array<PathSegments>
     var result = [];
@@ -29,14 +28,7 @@
     var firstPoint = { x: NaN, y: NaN };
     var lastPoint = { x: NaN, y: NaN };
     var lastControlPoint = { x: NaN, y: NaN };
-    // "save last point"
-    // var _slp = index => {
-    //   lastPoint.x = Number(dataElements[index]);
-    //   lastPoint.y = Number(dataElements[index + 1]);
-    // };
     while (i < dataElements.length) {
-      // var token = dataElements[i];
-      // var data = token.split(/[\s,]/);
       var data = dataElements[i];
       var cmd = data[0];
       // var token = data.join(" ");
