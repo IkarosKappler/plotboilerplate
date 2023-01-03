@@ -1,5 +1,8 @@
 # Changelog
 
+- 2023-01-03
+  - Adding SVG processing to the `FileDrop` class.
+  - Adding SVG import to the svg-path-import demo.
 - 2022-12-21 (winter solstice)
   - Porting the yet experimental SVG path data parser to Typescript (early 0.0.1-alpha).
   - Defining very basic SVG path command types for parsing (early 0.0.1-alpha).
