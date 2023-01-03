@@ -1,6 +1,6 @@
 # Changelog
 
-- 2023-01-03
+- 2023-01-03 (v1.20.0)
   - Adding SVG processing to the `FileDrop` class.
   - Adding SVG import to the svg-path-import demo.
 - 2022-12-21 (winter solstice)

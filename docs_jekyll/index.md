@@ -62,7 +62,7 @@ often use for the visualization of 2D geometries. Basic features are
   - drag and select elements
 - keyboard interaction customizable
 
-The compressed library has 133kb.
+The compressed library has 135kb.
 
 ## Install the package via npm
 

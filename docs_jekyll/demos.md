@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2022-11-06
+date: 2023-01-03
 ---
 
 <h3>Basics</h3>
@@ -238,6 +238,16 @@ date: 2022-11-06
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/extended-circle-line-intersection/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220910-extended-circle-line-intersection.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/extended-elliptic-conversion/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20230103-0-extended-elliptic-conversion.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/extended-svg-path-import/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20230103-svg-path-import-logo.png');"></div>
    </a>
 </div>
 <div class="demo-box">
