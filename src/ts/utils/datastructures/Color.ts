@@ -532,9 +532,13 @@ export class Color {
    * @param {string} str - The string representation to parse.
    * @return {Color} The color instance that's represented by the given string.
    */
-  static parse(str: string): Color {
-    if (typeof str == "undefined") return null;
-    if ((str = str.trim().toLowerCase()).length == 0) return null;
+  static parse(str: string): Color | null {
+    if (typeof str == "undefined") {
+      return null;
+    }
+    if ((str = str.trim().toLowerCase()).length == 0) {
+      return null;
+    }
     if (str.startsWith("#")) return Color.makeHEX(str.substring(1, str.length));
     if (str.startsWith("rgb")) {
       var parts = str.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,?\s*(\d*(?:\.\d+\s*)?)\)$/);
@@ -555,7 +559,7 @@ export class Color {
 
   private static Sanitizer = {
     RGB: function (...args: any[]) {
-      var o = [];
+      var o: number[] = [];
       if (arguments.length == 0) {
         return [];
       }

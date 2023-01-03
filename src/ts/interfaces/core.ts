@@ -16,6 +16,7 @@
  * @modified 2021-11-16 Added `text` options to the `DrawConfig`.
  * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
  * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
+ * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
  **/
 
 import { Vertex } from "../Vertex";
@@ -108,6 +109,7 @@ export interface Config {
   offsetX?: number; // The initial x-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
   offsetY?: number; // The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
   rasterGrid?: boolean; // If set to true the background grid will be drawn rastered.
+  drawRaster?: boolean; // If set to false, no raster or grid will be drawn at all.
   rasterScaleX?: number; // Define the default horizontal raster scale (default=1.0).
   rasterScaleY?: number; // Define the default vertical raster scale (default=1.0).
   rasterAdjustFactor?: number; // The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
@@ -176,6 +178,7 @@ export interface DrawConfig {
   drawHandleLines: boolean;
   drawHandlePoints: boolean;
   drawGrid: boolean;
+  drawRaster: boolean; // If set to false, no raster or grid will be drawn at all.
   bezier: {
     color: string;
     lineWidth: number;

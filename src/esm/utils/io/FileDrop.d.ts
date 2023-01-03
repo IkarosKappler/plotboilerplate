@@ -13,10 +13,12 @@
  * @author   Ikaros Kappler
  * @date     2021-10-13
  * @modified 2022-01-31 (ported from the ngdg project, then generalized)
- * @version  2.0.0
+ * @modified 2023-01-03 Fixing some minor type issues and adding SVG reading capabilities.
+ * @version  2.1.0
  */
 declare type IDroppedCallbackJSON = (jsonData: object) => void;
 declare type IDroppedCallbackText = (textData: string) => void;
+declare type IDroppedCallbackSVG = (svgDocument: Document) => void;
 export declare class FileDrop {
     /**
      * The 'dropzone' element.
@@ -47,6 +49,13 @@ export declare class FileDrop {
      */
     private fileDroppedCallbackBinary;
     /**
+     * The SVG file drop callback.
+     * @private
+     * @memberof FileDrop
+     * @member {HTMLElement}
+     */
+    private fileDroppedCallbackSVG;
+    /**
      *
      * @param {HTMLElement} element - The element you wish to operate as the drop zone (like <body/>).
      */
@@ -71,6 +80,7 @@ export declare class FileDrop {
      * @param {(data:object)=>void} callback
      */
     onFileTextDropped(callback: IDroppedCallbackText): void;
+    onFileSVGDropped(callback: IDroppedCallbackSVG): void;
     /**
      * Internally handle a drop event.
      *

@@ -16,6 +16,7 @@
  * @modified 2021-11-16 Added `text` options to the `DrawConfig`.
  * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
  * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
+ * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
  **/
 import { Vertex } from "../Vertex";
 import { Vector } from "../Vector";
@@ -89,6 +90,7 @@ export interface Config {
     offsetX?: number;
     offsetY?: number;
     rasterGrid?: boolean;
+    drawRaster?: boolean;
     rasterScaleX?: number;
     rasterScaleY?: number;
     rasterAdjustFactor?: number;
@@ -136,6 +138,7 @@ export interface DrawConfig {
     drawHandleLines: boolean;
     drawHandlePoints: boolean;
     drawGrid: boolean;
+    drawRaster: boolean;
     bezier: {
         color: string;
         lineWidth: number;

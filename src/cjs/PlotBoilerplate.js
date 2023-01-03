@@ -78,7 +78,8 @@
  * @modified 2022-08-01 Added `title` to the params.
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
- * @version  1.16.0
+ * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
+ * @version  1.17.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -236,6 +237,7 @@ var PlotBoilerplate = /** @class */ (function () {
             offsetX: f.num(config, "offsetX", 0.0),
             offsetY: f.num(config, "offsetY", 0.0),
             rasterGrid: f.bool(config, "rasterGrid", true),
+            drawRaster: f.bool(config, "drawRaster", true),
             rasterScaleX: f.num(config, "rasterScaleX", 1.0),
             rasterScaleY: f.num(config, "rasterScaleY", 1.0),
             rasterAdjustFactor: f.num(config, "rasterAdjustdFactror", 2.0),
@@ -286,6 +288,7 @@ var PlotBoilerplate = /** @class */ (function () {
             drawHandleLines: f.bool(config, "drawHandleLines", true),
             drawHandlePoints: f.bool(config, "drawHandlePoints", true),
             drawGrid: f.bool(config, "drawGrid", true),
+            drawRaster: f.bool(config, "drawRaster", true),
             bezier: {
                 color: "#00a822",
                 lineWidth: 2,
@@ -1203,9 +1206,12 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.drawAll = function (renderTime, draw, fill) {
-        this.drawGrid(draw);
-        if (this.config.drawOrigin)
+        if (this.config.drawRaster) {
+            this.drawGrid(draw);
+        }
+        if (this.config.drawOrigin) {
             this.drawOrigin(draw);
+        }
         this.drawDrawables(renderTime, draw, fill);
         this.drawVertices(renderTime, draw);
         this.drawSelectPolygon(draw);

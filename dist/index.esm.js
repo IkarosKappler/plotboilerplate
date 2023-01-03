@@ -357,7 +357,8 @@ class VertexListeners {
  * @modified 2022-01-31 Added `Vertex.utils.arrayToJSON`.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  2.7.0
+ * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+ * @version  2.8.0
  *
  * @file Vertex
  * @public
@@ -624,6 +625,47 @@ class Vertex {
                     throw `Cannot add ${typeof y} to numeric y component!`;
             }
         }
+        return this;
+    }
+    /**
+     * Substract the passed amounts from the x- and y- components of this vertex.
+     *
+     * @method subXY
+     * @param {number} x - The amount to substract from x.
+     * @param {number} y - The amount to substract from y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    subXY(amountX, amountY) {
+        this.x -= amountX;
+        this.y -= amountY;
+        return this;
+    }
+    /**
+     * Substract the passed amounts from the x-component of this vertex.
+     *
+     * @method addX
+     * @param {number} x - The amount to substract from x.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    subX(amountX) {
+        this.x -= amountX;
+        return this;
+    }
+    /**
+     * Substract the passed amounts from the y-component of this vertex.
+     *
+     * @method subY
+     * @param {number} y - The amount to substract from y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    subY(amountY) {
+        this.y -= amountY;
         return this;
     }
     /**
@@ -1413,7 +1455,8 @@ Polygon.utils = {
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
  * @modified 2022-02-01 Added the `toString` function.
  * @modified 2022-10-09 Added the `fromDimension` function.
- * @version  1.5.0
+ * @modified 2022-11-28 Added the `clone` method.
+ * @version  1.6.0
  **/
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -1476,17 +1519,14 @@ class Bounds {
     /**
      * Clone this bounds object (create a deep clone).
      *
-     * Note: the returned format might change in the future, so please do not
-     * rely on the returned string format.
-     *
      * @method clone
      * @instance
      * @memberof Bounds
-     * @returns {string} Creates a deep clone of this bounds object. The returned object's `min` and `max` instances are `Vertex` instances.
+     * @returns {Bounds} Creates a deep clone of this bounds object.
      */
-    // clone() {
-    //   return new Bounds(new Vertex(this.min.x, this.min.y), new Vertex(this.max.x, this.max.y));
-    // }
+    clone() {
+        return new Bounds({ x: this.min.x, y: this.min.y }, { x: this.max.x, y: this.max.y });
+    }
     /**
      * Compute the minimal bounding box for a given set of vertices.
      *
@@ -4434,7 +4474,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  1.6.1
+ * @modified 2022-11-10 Tweaking some type issues.
+ * @version  1.6.2
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -5427,7 +5468,7 @@ class drawutilssvg {
      * @memberof drawutils
      */
     text(text, x, y, options) {
-        var _a, _b;
+        var _a, _b, _c;
         options = options || {};
         const color = options.color || "black";
         const lineHeight = ((_b = (_a = options.lineHeight) !== null && _a !== void 0 ? _a : options.fontSize) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
@@ -5452,10 +5493,10 @@ class drawutilssvg {
         this.curId = curId + "_text";
         const textNode = this.makeNode("text");
         node.appendChild(textNode);
-        textNode.setAttribute("font-family", options.fontFamily); // May be undefined
-        textNode.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : null);
-        textNode.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : null);
-        textNode.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : null);
+        textNode.setAttribute("font-family", (_c = options.fontFamily) !== null && _c !== void 0 ? _c : ""); // May be undefined
+        textNode.setAttribute("font-size", options.fontSize ? `${options.fontSize * this.scale.x}` : "");
+        textNode.setAttribute("font-style", options.fontStyle ? `${options.fontStyle}` : "");
+        textNode.setAttribute("font-weight", options.fontWeight ? `${options.fontWeight}` : "");
         textNode.setAttribute("text-anchor", textAlign);
         textNode.setAttribute("transform-origin", "0 0");
         textNode.setAttribute("transform", rotate);
@@ -9756,10 +9797,11 @@ VEllipse.utils = {
  * Implementation of elliptic sectors.
  * Note that sectors are constructed in clockwise direction.
  *
- * @author  Ikaros Kappler
- * @date    2021-02-26
+ * @author   Ikaros Kappler
+ * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
- * @version 1.1.0
+ * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
+ * @version  1.1.1
  */
 /**
  * @classdesc A class for elliptic sectors.
@@ -9835,10 +9877,14 @@ class VEllipseSector {
                 let intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
                 // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
-                let startDiff = startPoint.difference(intersection);
-                let endDiff = endPoint.difference(intersection);
-                let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
-                curves.push(curve);
+                if (intersection) {
+                    // It's VERY LIKELY hat this ALWAYS happens; it's just a typesave variant.
+                    // Intersection cannot be null.
+                    let startDiff = startPoint.difference(intersection);
+                    let endDiff = endPoint.difference(intersection);
+                    let curve = new CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+                    curves.push(curve);
+                }
             }
             startPoint = endPoint;
             curAngle = nextAngle;
@@ -10002,7 +10048,8 @@ VEllipseSector.ellipseSectorUtils = {
         }
         // Step 2 + 3: compute center
         const sign = fa === fs ? -1 : 1;
-        const M = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+        // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+        const M = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
         const _cx = (M * (rx * y)) / ry;
         const _cy = (M * (-ry * x)) / rx;
         const cx = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2;
@@ -10011,6 +10058,7 @@ VEllipseSector.ellipseSectorUtils = {
         const center = new Vertex(cx, cy);
         const axis = center.clone().addXY(rx, ry);
         const ellipse = new VEllipse(center, axis, 0);
+        // console.log("VELLIPSE::::::", ellipse);
         ellipse.rotate(phi);
         const startAngle = new Line(ellipse.center, new Vertex(x1, y1)).angle();
         const endAngle = new Line(ellipse.center, new Vertex(x2, y2)).angle();
@@ -10097,7 +10145,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2022-08-01 Added `title` to the params.
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
- * @version  1.16.0
+ * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
+ * @version  1.17.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -10233,6 +10282,7 @@ class PlotBoilerplate {
             offsetX: f.num(config, "offsetX", 0.0),
             offsetY: f.num(config, "offsetY", 0.0),
             rasterGrid: f.bool(config, "rasterGrid", true),
+            drawRaster: f.bool(config, "drawRaster", true),
             rasterScaleX: f.num(config, "rasterScaleX", 1.0),
             rasterScaleY: f.num(config, "rasterScaleY", 1.0),
             rasterAdjustFactor: f.num(config, "rasterAdjustdFactror", 2.0),
@@ -10283,6 +10333,7 @@ class PlotBoilerplate {
             drawHandleLines: f.bool(config, "drawHandleLines", true),
             drawHandlePoints: f.bool(config, "drawHandlePoints", true),
             drawGrid: f.bool(config, "drawGrid", true),
+            drawRaster: f.bool(config, "drawRaster", true),
             bezier: {
                 color: "#00a822",
                 lineWidth: 2,
@@ -10835,7 +10886,7 @@ class PlotBoilerplate {
      **/
     getVertexNear(pixelPosition, pixelTolerance) {
         var _a, _b;
-        var p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
+        const p = this.locatePointNear(this.transformMousePosition(pixelPosition.x, pixelPosition.y), pixelTolerance / Math.min((_a = this.config.cssScaleX) !== null && _a !== void 0 ? _a : 1.0, (_b = this.config.cssScaleY) !== null && _b !== void 0 ? _b : 1.0));
         if (p && p.typeName == "vertex") {
             return this.vertices[p.vindex];
         }
@@ -11200,9 +11251,12 @@ class PlotBoilerplate {
      * @return {void}
      **/
     drawAll(renderTime, draw, fill) {
-        this.drawGrid(draw);
-        if (this.config.drawOrigin)
+        if (this.config.drawRaster) {
+            this.drawGrid(draw);
+        }
+        if (this.config.drawOrigin) {
             this.drawOrigin(draw);
+        }
         this.drawDrawables(renderTime, draw, fill);
         this.drawVertices(renderTime, draw);
         this.drawSelectPolygon(draw);

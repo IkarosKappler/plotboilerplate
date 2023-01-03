@@ -51,7 +51,6 @@
     // On redrawing determine the orthogonal vector at the given position
     pb.config.postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
-      console.log("contrastColor", contrastColor);
       fill.text("Start (a)", line.a.x + 3, line.a.y, { color: contrastColor });
       fill.text("End (b)", line.b.x + 3, line.b.y, { color: contrastColor });
       var linePoint = line.vertAt(config.t);

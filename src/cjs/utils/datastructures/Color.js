@@ -498,10 +498,12 @@ var Color = /** @class */ (function () {
      * @return {Color} The color instance that's represented by the given string.
      */
     Color.parse = function (str) {
-        if (typeof str == "undefined")
+        if (typeof str == "undefined") {
             return null;
-        if ((str = str.trim().toLowerCase()).length == 0)
+        }
+        if ((str = str.trim().toLowerCase()).length == 0) {
             return null;
+        }
         if (str.startsWith("#"))
             return Color.makeHEX(str.substring(1, str.length));
         if (str.startsWith("rgb")) {

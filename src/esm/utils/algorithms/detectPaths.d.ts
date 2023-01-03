@@ -7,7 +7,8 @@
  * @version 1.0.0
  * @date    2022-10-17
  */
-import { Path, PathSegment } from "../../interfaces";
+import { PathSegment } from "../../interfaces";
+import { GenericPath } from "../datastructures/GenericPath";
 /**
  * Run a path detection on the given set of path segments.
  *
@@ -17,4 +18,4 @@ import { Path, PathSegment } from "../../interfaces";
  * @param {number=1.0} epsilon - (optional) An epsilon to use to tell if two plane points should be considered 'equal'.
  * @returns {Array<GenericPath>} An array containing all detected path (consisting of adjacent path segments of the original set).
  */
-export declare const detectPaths: (segments: Array<PathSegment>, epsilon?: number) => Array<Path>;
+export declare const detectPaths: (segments: Array<PathSegment>, epsilon?: number) => Array<GenericPath>;

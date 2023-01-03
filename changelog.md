@@ -1,6 +1,21 @@
 # Changelog
 
-- 2022-11-06
+- 2023-01-03
+  - Adding SVG processing to the `FileDrop` class.
+  - Adding SVG import to the svg-path-import demo.
+- 2022-12-21 (winter solstice)
+  - Porting the yet experimental SVG path data parser to Typescript (early 0.0.1-alpha).
+  - Defining very basic SVG path command types for parsing (early 0.0.1-alpha).
+- 2022-12-13
+  - Modified the Truchet demo so single cells can be edited.
+- 2022-11-28
+  - Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+  - Added the `clone` method to the `Bounds` class.
+- 2022-11-23
+  - Added `drawRaster` to the `Config` interface.
+- 2022-11-10
+  - Fixing an export bug: VEllipseSector was missing in the CJS and ESM exports.
+- 2022-11-06 (v1.19.0)
   - Adding an XML declaration to the SVG export routine.
   - Added the CairoTileBuilder to the Truchet demo 44.
 - 2022-10-25

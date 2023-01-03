@@ -14,7 +14,8 @@
  * @author   Ikaros Kappler
  * @date     2021-10-13
  * @modified 2022-01-31 (ported from the ngdg project, then generalized)
- * @version  2.0.0
+ * @modified 2023-01-03 Fixing some minor type issues and adding SVG reading capabilities.
+ * @version  2.1.0
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FileDrop = void 0;
@@ -35,7 +36,7 @@ var FileDrop = /** @class */ (function () {
             event.preventDefault();
             event.stopPropagation();
             _this.element.style.opacity = "1.0";
-            if (!event.dataTransfer.files || event.dataTransfer.files.length === 0) {
+            if (!event.dataTransfer || !event.dataTransfer.files || event.dataTransfer.files.length === 0) {
                 // No files were dropped
                 return;
             }
@@ -43,38 +44,65 @@ var FileDrop = /** @class */ (function () {
                 // Multiple file drop is not nupported
                 return;
             }
-            if (!_this.fileDroppedCallbackJSON) {
-                // No handling callback defined.
-                return;
-            }
+            // if (!this.fileDroppedCallbackJSON) {
+            //   // No handling callback defined.
+            //   return;
+            // }
             if (event.dataTransfer.files[0]) {
                 var file_1 = event.dataTransfer.files[0];
                 // console.log("file", file);
-                if (file_1.type.match(/json.*/) && _this.fileDroppedCallbackJSON) {
+                if (file_1.type.match(/json.*/) && _this.fileDroppedCallbackJSON !== null) {
                     var reader = new FileReader();
                     reader.onload = function (readEvent) {
+                        if (!readEvent.target) {
+                            console.warn("Cannot process JSON ProgressEvent data: target is null.");
+                            return;
+                        }
                         // Finished reading file data.
                         var jsonObject = JSON.parse(readEvent.target.result);
                         // TODO: what happens on fail?
-                        _this.fileDroppedCallbackJSON(jsonObject);
+                        _this.fileDroppedCallbackJSON && _this.fileDroppedCallbackJSON(jsonObject);
                     };
                     reader.readAsText(file_1); // start reading the file data.
                 }
                 else if (file_1.type.match(/text\/plain.*/) && _this.fileDroppedCallbackText) {
                     var reader = new FileReader();
                     reader.onload = function (readEvent) {
+                        if (!readEvent.target) {
+                            console.warn("Cannot process Text ProgressEvent data: target is null.");
+                            return;
+                        }
                         // Finished reading file data.
-                        _this.fileDroppedCallbackText(readEvent.target.result);
+                        _this.fileDroppedCallbackText && _this.fileDroppedCallbackText(readEvent.target.result);
                     };
                     reader.readAsText(file_1); // start reading the file data.
                 }
                 else if (_this.fileDroppedCallbackBinary) {
                     var reader = new FileReader();
                     reader.onload = function (readEvent) {
+                        if (!readEvent.target) {
+                            console.warn("Cannot process Binary ProgressEvent data: target is null.");
+                            return;
+                        }
                         // Finished reading file data.
-                        _this.fileDroppedCallbackBinary(new Blob([readEvent.target.result]), file_1);
+                        _this.fileDroppedCallbackBinary &&
+                            _this.fileDroppedCallbackBinary(new Blob([readEvent.target.result]), file_1);
                     };
                     reader.readAsBinaryString(file_1); // start reading the file data.
+                }
+                else if (_this.fileDroppedCallbackSVG) {
+                    var reader = new FileReader();
+                    reader.onload = function (readEvent) {
+                        if (!readEvent.target) {
+                            console.warn("Cannot process SVG ProgressEvent data: target is null.");
+                            return;
+                        }
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(readEvent.target.result, "image/svg+xml");
+                        // Finished reading file data.
+                        _this.fileDroppedCallbackSVG && _this.fileDroppedCallbackSVG(doc);
+                    };
+                    reader.readAsText(file_1); // start reading the file data.
                 }
             }
         };
@@ -127,6 +155,9 @@ var FileDrop = /** @class */ (function () {
      */
     FileDrop.prototype.onFileTextDropped = function (callback) {
         this.fileDroppedCallbackText = callback;
+    };
+    FileDrop.prototype.onFileSVGDropped = function (callback) {
+        this.fileDroppedCallbackSVG = callback;
     };
     /**
      * Removes all listeners (drop, dragover and dragleave).

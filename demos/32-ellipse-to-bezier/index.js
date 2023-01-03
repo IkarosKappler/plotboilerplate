@@ -13,12 +13,17 @@
 
   // Fetch the GET params
   let GUP = gup();
+  var isDarkmode = detectDarkMode(GUP);
 
   window.addEventListener("load", function () {
     // All config params except the canvas are optional.
     var pb = new PlotBoilerplate(
-      PlotBoilerplate.utils.safeMergeByKeys({ canvas: document.getElementById("my-canvas"), fullSize: true }, GUP)
+      PlotBoilerplate.utils.safeMergeByKeys(
+        { canvas: document.getElementById("my-canvas"), backgroundColor: isDarkmode ? "#000000" : "#ffffff", fullSize: true },
+        GUP
+      )
     );
+    pb.drawConfig.origin.color = isDarkmode ? "#ffffff" : "#000000";
     pb.drawConfig.circle.lineWidth = 1;
     // pb.drawConfig.ellipse.color = "rgba(192,192,192,0.75)";
 

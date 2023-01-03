@@ -252,3 +252,15 @@
 ![Planar circle packing](https://plotboilerplate.io/repo/screenshots/screenshot-20220927-0-circle-packing-all-intersections.png "Planar circle packing")
 
 <a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/43-circle-packing/index.html" title="See the demo">See the demo</a>
+
+### Truchet tiles
+
+![Truchet tiles](https://plotboilerplate.io/repo/screenshots/screenshot-20221010-1-truchet-tiles-bright.png "Truchet tiles")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/44-truchet-tiles/index.html" title="See the demo">See the demo</a>
+
+### Extended demo: Import, split, parse and convert SVG paths
+
+![SVG path parse and conversion](https://plotboilerplate.io/repo/screenshots/screenshot-20230103-svg-path-import-logo.png "SVG path parse and conversion")
+
+<a class="btn btn-link" href="https://plotboilerplate.io/repo/demos/extended-svg-path-import/index.html" title="See the demo">See the demo</a>

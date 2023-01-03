@@ -254,6 +254,13 @@ globalThis.utils.createGUI = function (pb, props) {
       _self.redraw();
     })
     .listen();
+  fold0
+    .add(pb.config, "drawRaster")
+    .title("If set to false no raster or grid will be drawn at all.")
+    .onChange(function () {
+      _self.redraw();
+    })
+    .listen();
   fold0.add(pb.config, "redrawOnResize").title("Automatically redraw the data if window or canvas is resized.").listen();
   fold0
     .addColor(pb.config, "backgroundColor")

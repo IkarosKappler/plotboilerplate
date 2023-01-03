@@ -2,10 +2,11 @@
  * Implementation of elliptic sectors.
  * Note that sectors are constructed in clockwise direction.
  *
- * @author  Ikaros Kappler
- * @date    2021-02-26
+ * @author   Ikaros Kappler
+ * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
- * @version 1.1.0
+ * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
+ * @version  1.1.1
  */
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { SVGPathParams, UID } from "./interfaces";

@@ -1683,7 +1683,8 @@ exports.BezierPath = BezierPath;
  * @modified 2021-06-21 (mid-summer) Added `getCenter` method.
  * @modified 2022-02-01 Added the `toString` function.
  * @modified 2022-10-09 Added the `fromDimension` function.
- * @version  1.5.0
+ * @modified 2022-11-28 Added the `clone` method.
+ * @version  1.6.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Bounds = void 0;
@@ -1750,17 +1751,14 @@ var Bounds = /** @class */ (function () {
     /**
      * Clone this bounds object (create a deep clone).
      *
-     * Note: the returned format might change in the future, so please do not
-     * rely on the returned string format.
-     *
      * @method clone
      * @instance
      * @memberof Bounds
-     * @returns {string} Creates a deep clone of this bounds object. The returned object's `min` and `max` instances are `Vertex` instances.
+     * @returns {Bounds} Creates a deep clone of this bounds object.
      */
-    // clone() {
-    //   return new Bounds(new Vertex(this.min.x, this.min.y), new Vertex(this.max.x, this.max.y));
-    // }
+    Bounds.prototype.clone = function () {
+        return new Bounds({ x: this.min.x, y: this.min.y }, { x: this.max.x, y: this.max.y });
+    };
     /**
      * Compute the minimal bounding box for a given set of vertices.
      *
@@ -4232,7 +4230,8 @@ var __webpack_unused_export__;
  * @modified 2022-08-01 Added `title` to the params.
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
- * @version  1.16.0
+ * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
+ * @version  1.17.0
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -4390,6 +4389,7 @@ var PlotBoilerplate = /** @class */ (function () {
             offsetX: f.num(config, "offsetX", 0.0),
             offsetY: f.num(config, "offsetY", 0.0),
             rasterGrid: f.bool(config, "rasterGrid", true),
+            drawRaster: f.bool(config, "drawRaster", true),
             rasterScaleX: f.num(config, "rasterScaleX", 1.0),
             rasterScaleY: f.num(config, "rasterScaleY", 1.0),
             rasterAdjustFactor: f.num(config, "rasterAdjustdFactror", 2.0),
@@ -4440,6 +4440,7 @@ var PlotBoilerplate = /** @class */ (function () {
             drawHandleLines: f.bool(config, "drawHandleLines", true),
             drawHandlePoints: f.bool(config, "drawHandlePoints", true),
             drawGrid: f.bool(config, "drawGrid", true),
+            drawRaster: f.bool(config, "drawRaster", true),
             bezier: {
                 color: "#00a822",
                 lineWidth: 2,
@@ -5357,9 +5358,12 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.drawAll = function (renderTime, draw, fill) {
-        this.drawGrid(draw);
-        if (this.config.drawOrigin)
+        if (this.config.drawRaster) {
+            this.drawGrid(draw);
+        }
+        if (this.config.drawOrigin) {
             this.drawOrigin(draw);
+        }
         this.drawDrawables(renderTime, draw, fill);
         this.drawVertices(renderTime, draw);
         this.drawSelectPolygon(draw);
@@ -7635,10 +7639,11 @@ exports.VEllipse = VEllipse;
  * Implementation of elliptic sectors.
  * Note that sectors are constructed in clockwise direction.
  *
- * @author  Ikaros Kappler
- * @date    2021-02-26
+ * @author   Ikaros Kappler
+ * @date     2021-02-26
  * @modified 2022-02-02 Added the `destroy` method.
- * @version 1.1.0
+ * @modified 2022-11-01 Tweaked the `endpointToCenterParameters` function to handle negative values, too, without errors.
+ * @version  1.1.1
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.VEllipseSector = void 0;
@@ -7722,10 +7727,14 @@ var VEllipseSector = /** @class */ (function () {
                 var intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
                 // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
-                var startDiff = startPoint.difference(intersection);
-                var endDiff = endPoint.difference(intersection);
-                var curve = new CubicBezierCurve_1.CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
-                curves.push(curve);
+                if (intersection) {
+                    // It's VERY LIKELY hat this ALWAYS happens; it's just a typesave variant.
+                    // Intersection cannot be null.
+                    var startDiff = startPoint.difference(intersection);
+                    var endDiff = endPoint.difference(intersection);
+                    var curve = new CubicBezierCurve_1.CubicBezierCurve(startPoint.clone(), endPoint.clone(), startPoint.clone().add(startDiff.scale(threshold)), endPoint.clone().add(endDiff.scale(threshold)));
+                    curves.push(curve);
+                }
             }
             startPoint = endPoint;
             curAngle = nextAngle;
@@ -7888,7 +7897,8 @@ var VEllipseSector = /** @class */ (function () {
             }
             // Step 2 + 3: compute center
             var sign = fa === fs ? -1 : 1;
-            var M = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+            // const M: number = sqrt((prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * sign;
+            var M = sqrt(Math.abs((prx * pry - prx * py - pry * px) / (prx * py + pry * px))) * sign;
             var _cx = (M * (rx * y)) / ry;
             var _cy = (M * (-ry * x)) / rx;
             var cx = cosphi * _cx - sinphi * _cy + (x1 + x2) / 2;
@@ -7897,6 +7907,7 @@ var VEllipseSector = /** @class */ (function () {
             var center = new Vertex_1.Vertex(cx, cy);
             var axis = center.clone().addXY(rx, ry);
             var ellipse = new VEllipse_1.VEllipse(center, axis, 0);
+            // console.log("VELLIPSE::::::", ellipse);
             ellipse.rotate(phi);
             var startAngle = new Line_1.Line(ellipse.center, new Vertex_1.Vertex(x1, y1)).angle();
             var endAngle = new Line_1.Line(ellipse.center, new Vertex_1.Vertex(x2, y2)).angle();
@@ -8449,7 +8460,8 @@ exports.VertTuple = VertTuple;
  * @modified 2022-01-31 Added `Vertex.utils.arrayToJSON`.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  2.7.0
+ * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+ * @version  2.8.0
  *
  * @file Vertex
  * @public
@@ -8721,6 +8733,47 @@ var Vertex = /** @class */ (function () {
                     throw "Cannot add " + typeof y + " to numeric y component!";
             }
         }
+        return this;
+    };
+    /**
+     * Substract the passed amounts from the x- and y- components of this vertex.
+     *
+     * @method subXY
+     * @param {number} x - The amount to substract from x.
+     * @param {number} y - The amount to substract from y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.subXY = function (amountX, amountY) {
+        this.x -= amountX;
+        this.y -= amountY;
+        return this;
+    };
+    /**
+     * Substract the passed amounts from the x-component of this vertex.
+     *
+     * @method addX
+     * @param {number} x - The amount to substract from x.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.subX = function (amountX) {
+        this.x -= amountX;
+        return this;
+    };
+    /**
+     * Substract the passed amounts from the y-component of this vertex.
+     *
+     * @method subY
+     * @param {number} y - The amount to substract from y.
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     **/
+    Vertex.prototype.subY = function (amountY) {
+        this.y -= amountY;
         return this;
     };
     /**
@@ -11136,7 +11189,8 @@ var GLU = /** @class */ (function () {
  * @modified 2022-03-26 Added the private `nodeDefs` and `bufferedNodeDefs` attributes.
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  1.6.1
+ * @modified 2022-11-10 Tweaking some type issues.
+ * @version  1.6.2
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -12138,7 +12192,7 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutilssvg.prototype.text = function (text, x, y, options) {
-        var _a, _b;
+        var _a, _b, _c;
         options = options || {};
         var color = options.color || "black";
         var lineHeight = ((_b = (_a = options.lineHeight) !== null && _a !== void 0 ? _a : options.fontSize) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
@@ -12163,10 +12217,10 @@ var drawutilssvg = /** @class */ (function () {
         this.curId = curId + "_text";
         var textNode = this.makeNode("text");
         node.appendChild(textNode);
-        textNode.setAttribute("font-family", options.fontFamily); // May be undefined
-        textNode.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : null);
-        textNode.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : null);
-        textNode.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : null);
+        textNode.setAttribute("font-family", (_c = options.fontFamily) !== null && _c !== void 0 ? _c : ""); // May be undefined
+        textNode.setAttribute("font-size", options.fontSize ? "" + options.fontSize * this.scale.x : "");
+        textNode.setAttribute("font-style", options.fontStyle ? "" + options.fontStyle : "");
+        textNode.setAttribute("font-weight", options.fontWeight ? "" + options.fontWeight : "");
         textNode.setAttribute("text-anchor", textAlign);
         textNode.setAttribute("transform-origin", "0 0");
         textNode.setAttribute("transform", rotate);
@@ -12317,19 +12371,6 @@ var drawutilssvg = /** @class */ (function () {
         };
         var _sy = function (index) {
             data[index] = scale.y * Number(data[index]);
-        };
-        var stx = function (value) {
-            return offset.x + scale.x * value;
-        };
-        var sty = function (value) {
-            return offset.y + scale.y * value;
-        };
-        // scale only {x,y}
-        var sx = function (value) {
-            return scale.x * value;
-        };
-        var sy = function (value) {
-            return scale.y * value;
         };
         var i = 0;
         var lastPoint = { x: NaN, y: NaN };
@@ -12642,6 +12683,7 @@ globalThis.BezierPath = __webpack_require__(126).BezierPath;
 globalThis.Polygon = __webpack_require__(661).Polygon;
 globalThis.Triangle = __webpack_require__(212).Triangle;
 globalThis.VEllipse = __webpack_require__(112).VEllipse;
+globalThis.VEllipseSector = __webpack_require__(965).VEllipseSector;
 globalThis.Circle = __webpack_require__(913).Circle;
 globalThis.CircleSector = __webpack_require__(946).CircleSector;
 globalThis.PBImage = __webpack_require__(699).PBImage;

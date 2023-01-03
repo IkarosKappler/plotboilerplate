@@ -15,6 +15,7 @@ globalThis.BezierPath = require("./BezierPath.js").BezierPath;
 globalThis.Polygon = require("./Polygon.js").Polygon;
 globalThis.Triangle = require("./Triangle.js").Triangle;
 globalThis.VEllipse = require("./VEllipse.js").VEllipse;
+globalThis.VEllipseSector = require("./VEllipseSector.js").VEllipseSector;
 globalThis.Circle = require("./Circle.js").Circle;
 globalThis.CircleSector = require("./CircleSector.js").CircleSector;
 globalThis.PBImage = require("./PBImage.js").PBImage;

@@ -28,7 +28,8 @@
  * @modified 2022-01-31 Added `Vertex.utils.arrayToJSON`.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version  2.7.0
+ * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+ * @version  2.8.0
  *
  * @file Vertex
  * @public
@@ -339,6 +340,50 @@ export class Vertex implements XYCoords, SVGSerializable {
         else throw `Cannot add ${typeof y} to numeric y component!`;
       }
     }
+    return this;
+  }
+
+  /**
+   * Substract the passed amounts from the x- and y- components of this vertex.
+   *
+   * @method subXY
+   * @param {number} x - The amount to substract from x.
+   * @param {number} y - The amount to substract from y.
+   * @return {Vertex} this
+   * @instance
+   * @memberof Vertex
+   **/
+  subXY(amountX: number, amountY: number): Vertex {
+    this.x -= amountX;
+    this.y -= amountY;
+    return this;
+  }
+
+  /**
+   * Substract the passed amounts from the x-component of this vertex.
+   *
+   * @method addX
+   * @param {number} x - The amount to substract from x.
+   * @return {Vertex} this
+   * @instance
+   * @memberof Vertex
+   **/
+  subX(amountX: number): Vertex {
+    this.x -= amountX;
+    return this;
+  }
+
+  /**
+   * Substract the passed amounts from the y-component of this vertex.
+   *
+   * @method subY
+   * @param {number} y - The amount to substract from y.
+   * @return {Vertex} this
+   * @instance
+   * @memberof Vertex
+   **/
+  subY(amountY: number): Vertex {
+    this.y -= amountY;
     return this;
   }
 

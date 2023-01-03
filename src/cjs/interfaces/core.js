@@ -17,6 +17,7 @@
  * @modified 2021-11-16 Added `text` options to the `DrawConfig`.
  * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
  * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
+ * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=core.js.map
