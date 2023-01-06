@@ -314,32 +314,64 @@ const _handleCubicBezierTo = (
   if (data.length < 7) {
     throw "Unsufficient params for CUBICBEZIERTO";
   }
-  // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-  // result.push( new)
-  const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
-  if (isRelative) {
-    curve.startControlPoint.x += Number(data[1]);
-    curve.startControlPoint.y += Number(data[2]);
-    curve.endControlPoint.x += Number(data[3]);
-    curve.endControlPoint.y += Number(data[4]);
-    curve.endPoint.x += Number(data[5]);
-    curve.endPoint.y += Number(data[6]);
-  } else {
-    curve.startControlPoint.x = Number(data[1]);
-    curve.startControlPoint.y = Number(data[2]);
-    curve.endControlPoint.x = Number(data[3]);
-    curve.endControlPoint.y = Number(data[4]);
-    curve.endPoint.x = Number(data[5]);
-    curve.endPoint.y = Number(data[6]);
-  }
-  result.push(curve);
-  lastPoint.x = curve.endPoint.x;
-  lastPoint.y = curve.endPoint.y;
-  lastControlPoint.x = curve.endControlPoint.x;
-  lastControlPoint.y = curve.endControlPoint.y;
-  if (isNaN(firstPoint.x)) {
-    firstPoint.x = curve.startPoint.x;
-    firstPoint.y = curve.startPoint.y;
+
+  // const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+  // if (isRelative) {
+  //   curve.startControlPoint.x += Number(data[1]);
+  //   curve.startControlPoint.y += Number(data[2]);
+  //   curve.endControlPoint.x += Number(data[3]);
+  //   curve.endControlPoint.y += Number(data[4]);
+  //   curve.endPoint.x += Number(data[5]);
+  //   curve.endPoint.y += Number(data[6]);
+  // } else {
+  //   curve.startControlPoint.x = Number(data[1]);
+  //   curve.startControlPoint.y = Number(data[2]);
+  //   curve.endControlPoint.x = Number(data[3]);
+  //   curve.endControlPoint.y = Number(data[4]);
+  //   curve.endPoint.x = Number(data[5]);
+  //   curve.endPoint.y = Number(data[6]);
+  // }
+  // result.push(curve);
+  // lastPoint.x = curve.endPoint.x;
+  // lastPoint.y = curve.endPoint.y;
+  // lastControlPoint.x = curve.endControlPoint.x;
+  // lastControlPoint.y = curve.endControlPoint.y;
+  // if (isNaN(firstPoint.x)) {
+  //   firstPoint.x = curve.startPoint.x;
+  //   firstPoint.y = curve.startPoint.y;
+  // }
+
+  for (var i = 1; i + 5 < data.length; i += 6) {
+    const curve = new CubicBezierCurve(
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint)
+    );
+    if (isRelative) {
+      curve.startControlPoint.x += Number(data[i]);
+      curve.startControlPoint.y += Number(data[i + 1]);
+      curve.endControlPoint.x += Number(data[i + 2]);
+      curve.endControlPoint.y += Number(data[i + 3]);
+      curve.endPoint.x += Number(data[i + 4]);
+      curve.endPoint.y += Number(data[i + 5]);
+    } else {
+      curve.startControlPoint.x = Number(data[i]);
+      curve.startControlPoint.y = Number(data[i + 1]);
+      curve.endControlPoint.x = Number(data[i + 2]);
+      curve.endControlPoint.y = Number(data[i + 3]);
+      curve.endPoint.x = Number(data[i + 4]);
+      curve.endPoint.y = Number(data[i + 5]);
+    }
+    result.push(curve);
+    lastPoint.x = curve.endPoint.x;
+    lastPoint.y = curve.endPoint.y;
+    lastControlPoint.x = curve.endControlPoint.x;
+    lastControlPoint.y = curve.endControlPoint.y;
+    if (isNaN(firstPoint.x)) {
+      firstPoint.x = curve.startPoint.x;
+      firstPoint.y = curve.startPoint.y;
+    }
   }
 };
 
