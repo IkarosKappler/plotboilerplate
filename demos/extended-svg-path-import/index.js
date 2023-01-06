@@ -51,7 +51,11 @@
     // A square using only a single LINETO command with more than two params
     var data3 = "M 25 25 L 75 25 75 75 25 75 z";
 
+    // A closed path consisting of a singl CUBICCURVETO command with multiple params.
     var data4 = `M 25 25 C 50 0 50 0 75 25 100 50 100 50 75 75 50 100 50 100 25 75 0 50 0 50 25 25 z`;
+
+    // A closed path consisting of a singl QUADRATICCURVETO command with multiple params.
+    var data5 = "M 50 25 Q 75 25 75 50 75 75 50 75 25 75 25 50 25 25 50 25";
 
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
@@ -120,7 +124,7 @@
       textarea.style.height = "50vh";
       // textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
       // textarea.innerHTML = data2;
-      textarea.innerHTML = data4;
+      textarea.innerHTML = data5;
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([

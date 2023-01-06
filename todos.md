@@ -37,6 +37,7 @@
 - Change drawutilssvg.copyPathData(...); this is a simple array-copy, nothing more, use a global generic helper function for this (re-usability).
 - Fix a bug in the textured-polygon demo (mouse coordinates in canvas demo do not match coordinates in svg demo).
 - Since refactoring the Girih demo does not respect the `Bevel` setting any more. Re-implement.
+- Add a function to create a Cubic Bézier Curve from quadratic parameters. Use this in the `parseSVGPath` function.
 
 ### Todos for future Version 2
 

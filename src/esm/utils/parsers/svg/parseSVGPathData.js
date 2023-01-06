@@ -315,43 +315,93 @@ const _handleQuadraticCurveTo = (data, isRelative, firstPoint, lastPoint, lastCo
     if (data.length < 5) {
         throw "Unsufficient params for QUADRATICBEZIERTO";
     }
-    // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-    // result.push( new)
-    const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
-    if (isRelative) {
-        curve.startControlPoint.x += curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
-        curve.startControlPoint.y += curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
-        curve.endPoint.x += Number(data[3]);
-        curve.endPoint.y += Number(data[4]);
-        curve.endControlPoint.x = curve.startControlPoint.x;
-        curve.endControlPoint.y = curve.startControlPoint.y;
-    }
-    else {
-        curve.startControlPoint.x = curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
-        curve.startControlPoint.y = curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
-        curve.endPoint.x = Number(data[3]);
-        curve.endPoint.y = Number(data[4]);
-        curve.endControlPoint.x = curve.startControlPoint.x;
-        curve.endControlPoint.y = curve.startControlPoint.y;
-    }
-    // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
-    const lastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
-    // Convert quadratic curve to cubic curve
-    curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
-    curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
-    curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
-    curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
-    result.push(curve);
-    lastPoint.x = curve.endPoint.x;
-    lastPoint.y = curve.endPoint.y;
-    lastControlPoint.x = curve.endControlPoint.x;
-    lastControlPoint.y = curve.endControlPoint.y;
-    if (isNaN(firstPoint.x)) {
-        firstPoint.x = curve.startPoint.x;
-        firstPoint.y = curve.startPoint.y;
-    }
+    // const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+    // if (isRelative) {
+    //   curve.startControlPoint.x += curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
+    //   curve.startControlPoint.y += curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
+    //   curve.endPoint.x += Number(data[3]);
+    //   curve.endPoint.y += Number(data[4]);
+    //   curve.endControlPoint.x = curve.startControlPoint.x;
+    //   curve.endControlPoint.y = curve.startControlPoint.y;
+    // } else {
+    //   curve.startControlPoint.x = curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
+    //   curve.startControlPoint.y = curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
+    //   curve.endPoint.x = Number(data[3]);
+    //   curve.endPoint.y = Number(data[4]);
+    //   curve.endControlPoint.x = curve.startControlPoint.x;
+    //   curve.endControlPoint.y = curve.startControlPoint.y;
+    // }
+    // // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
+    // const lastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
+    // // Convert quadratic curve to cubic curve
+    // curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
+    // curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
+    // curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
+    // curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
+    // result.push(curve);
+    // lastPoint.x = curve.endPoint.x;
+    // lastPoint.y = curve.endPoint.y;
+    // lastControlPoint.x = curve.endControlPoint.x;
+    // lastControlPoint.y = curve.endControlPoint.y;
+    // if (isNaN(firstPoint.x)) {
+    //   firstPoint.x = curve.startPoint.x;
+    //   firstPoint.y = curve.startPoint.y;
+    // }
+    // // 'T' or 't' command may follow
+    // if (data.length >= 8) {
+    //   // TODO: think about this type cast!
+    //   const subData: SVGPathShorthandQuadraticCurveToCommand = data.slice(5) as SVGPathShorthandQuadraticCurveToCommand;
+    //   // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
+    //   if (subData[0] === "T") {
+    //     // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, result);
+    //     _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastQuadraticControlPoint, result);
+    //   } else if (subData[0] === "t") {
+    //     // _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, result);
+    //     _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastQuadraticControlPoint, result);
+    //   }
+    // }
+    var i = 1;
+    var lastQuadraticControlPoint = { x: 0, y: 0 };
+    // This loops runs at least once
+    while (i + 3 < data.length && data[i] !== "t" && data[i] !== "T") {
+        const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+        if (isRelative) {
+            curve.startControlPoint.x += curve.startPoint.x + (Number(data[i]) - curve.startControlPoint.x); // * 0.666;
+            curve.startControlPoint.y += curve.startPoint.y + (Number(data[i + 1]) - curve.startControlPoint.y); // * 0.666;
+            curve.endPoint.x += Number(data[i + 2]);
+            curve.endPoint.y += Number(data[i + 3]);
+            curve.endControlPoint.x = curve.startControlPoint.x;
+            curve.endControlPoint.y = curve.startControlPoint.y;
+        }
+        else {
+            curve.startControlPoint.x = curve.startPoint.x + (Number(data[i]) - curve.startControlPoint.x); // * 0.666;
+            curve.startControlPoint.y = curve.startPoint.y + (Number(data[i + 1]) - curve.startControlPoint.y); // * 0.666;
+            curve.endPoint.x = Number(data[i + 2]);
+            curve.endPoint.y = Number(data[i + 3]);
+            curve.endControlPoint.x = curve.startControlPoint.x;
+            curve.endControlPoint.y = curve.startControlPoint.y;
+        }
+        // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
+        lastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
+        // Convert quadratic curve to cubic curve
+        curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
+        curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
+        curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
+        curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
+        result.push(curve);
+        lastPoint.x = curve.endPoint.x;
+        lastPoint.y = curve.endPoint.y;
+        lastControlPoint.x = curve.endControlPoint.x;
+        lastControlPoint.y = curve.endControlPoint.y;
+        if (isNaN(firstPoint.x)) {
+            firstPoint.x = curve.startPoint.x;
+            firstPoint.y = curve.startPoint.y;
+        }
+        i += 4;
+    } // END while
     // 'T' or 't' command may follow
-    if (data.length >= 8) {
+    // if (data.length >= 8) {
+    if (i < data.length && (data[i] == "t" || data[i] === "T")) {
         // TODO: think about this type cast!
         const subData = data.slice(5);
         // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
