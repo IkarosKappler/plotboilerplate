@@ -48,6 +48,9 @@
     var data2 =
       "M51.077 102.267c0-16.934 16.933-33.867 33.866-33.867h8.467c16.933 0 33.867 16.933 33.867 33.867v8.466c-16.934 25.4 8.466 50.8 33.866 33.867h8.467c16.933 0 33.867 16.933 33.867 33.867v8.466c0 16.934-16.934 33.867-33.867 33.867h-8.467c-25.4-16.933-50.8 8.467-33.866 33.867v8.466c0 16.934-16.934 33.867-33.867 33.867h-8.467c-16.933 0-33.866-16.933-33.866-33.867l-.277-8.466c16.933-33.867 16.933-110.067 0-143.934z";
 
+    // A square using only a single LINETO command with more than two params
+    var data3 = "M 25 25 L 75 25 75 75 25 75 z";
+
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
     // prettier-ignore
@@ -95,6 +98,9 @@
     // +-------------------------------
     var loadPathData = function (data) {
       console.log("data", data);
+      // TODO: the SVGCommand can have multiple additional parameters :)
+      var tmpSplitElements = splitSVGPathData(data);
+      console.log("tmpSplitElements", tmpSplitElements);
       pathSegments = parseSVGPathData(data);
       sourceData = data;
       console.log("Setting sourceData", sourceData);
@@ -110,8 +116,9 @@
       var textarea = document.createElement("textarea");
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
-      textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
+      // textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
       // textarea.innerHTML = data2;
+      textarea.innerHTML = data3;
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
@@ -218,6 +225,7 @@
         });
         // Choose a high contrast color
         var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGB();
+        console.log("dataElementsPlain", dataElementsPlain);
         draw.path(dataElementsPlain, contrastColor, 4);
       }
     };

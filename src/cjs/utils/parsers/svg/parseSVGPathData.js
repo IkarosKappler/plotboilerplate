@@ -164,23 +164,43 @@ var _handleLineTo = function (data, isRelative, firstPoint, lastPoint, lastContr
     }
     // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
     // result.push( new)
-    var line = new Line_1.Line(new Vertex_1.Vertex(lastPoint), new Vertex_1.Vertex(lastPoint));
-    if (isRelative) {
-        line.b.x += Number(data[1]);
-        line.b.y += Number(data[2]);
-    }
-    else {
-        line.b.x = Number(data[1]);
-        line.b.y = Number(data[2]);
-    }
-    result.push(line);
-    lastPoint.x = line.b.x;
-    lastPoint.y = line.b.y;
-    lastControlPoint.x = line.b.x;
-    lastControlPoint.y = line.b.y;
-    if (isNaN(firstPoint.y)) {
-        firstPoint.x = line.a.x;
-        firstPoint.y = line.a.y;
+    // const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    // if (isRelative) {
+    //   line.b.x += Number(data[1]);
+    //   line.b.y += Number(data[2]);
+    // } else {
+    //   line.b.x = Number(data[1]);
+    //   line.b.y = Number(data[2]);
+    // }
+    // result.push(line);
+    // lastPoint.x = line.b.x;
+    // lastPoint.y = line.b.y;
+    // lastControlPoint.x = line.b.x;
+    // lastControlPoint.y = line.b.y;
+    // if (isNaN(firstPoint.y)) {
+    //   firstPoint.x = line.a.x;
+    //   firstPoint.y = line.a.y;
+    // }
+    for (var i = 1; i + 1 < data.length; i += 2) {
+        var line = new Line_1.Line(new Vertex_1.Vertex(lastPoint), new Vertex_1.Vertex(lastPoint));
+        if (isRelative) {
+            line.b.x += Number(data[i]);
+            line.b.y += Number(data[i + 1]);
+        }
+        else {
+            line.b.x = Number(data[i]);
+            line.b.y = Number(data[i + 1]);
+        }
+        result.push(line);
+        lastPoint.x = line.b.x;
+        lastPoint.y = line.b.y;
+        lastControlPoint.x = line.b.x;
+        lastControlPoint.y = line.b.y;
+        if (isNaN(firstPoint.y)) {
+            firstPoint.x = line.a.x;
+            firstPoint.y = line.a.y;
+        }
+        console.log("LINETO LINE", i, line.toString());
     }
 };
 var _handleHorizontalLineTo = function (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) {

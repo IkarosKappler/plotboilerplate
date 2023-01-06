@@ -18,7 +18,7 @@ export type BooleanString = "0" | "1" | `${boolean}`;
 // Example: 'M', -10, -7.5,
 export type SVGPathMoveToCommand = ["M" | "m", NumericString, NumericString];
 // Example: 'L', 0, -10,
-export type SVGPathLineToCommand = ["L" | "l", NumericString, NumericString];
+export type SVGPathLineToCommand = ["L" | "l", NumericString, NumericString, ...Array<NumericString>];
 // Example: 'V', -10,
 export type SVGPathVerticalLineToCommand = ["V" | "v", NumericString];
 // Example: 'H', 10,
