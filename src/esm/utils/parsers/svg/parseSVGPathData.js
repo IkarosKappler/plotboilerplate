@@ -204,24 +204,40 @@ const _handleHorizontalLineTo = (data, isRelative, firstPoint, lastPoint, lastCo
     if (data.length < 2) {
         throw "Unsufficient params for HORIZONTALLINETO";
     }
-    // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-    // result.push( new)
-    const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
-    if (isRelative) {
-        line.b.x += Number(data[1]);
-        // line.b.y += Number(data[2]);
-    }
-    else {
-        line.b.x = Number(data[1]);
-        // line.b.y = Number(data[2]);
-    }
-    result.push(line);
-    lastPoint.x = line.b.x;
-    // lastPoint.y = line.b.y;
-    lastControlPoint.x = line.b.x;
-    if (isNaN(firstPoint.y)) {
-        firstPoint.x = line.a.x;
-        firstPoint.y = line.a.y;
+    // const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    // if (isRelative) {
+    //   line.b.x += Number(data[1]);
+    //   // line.b.y += Number(data[2]);
+    // } else {
+    //   line.b.x = Number(data[1]);
+    //   // line.b.y = Number(data[2]);
+    // }
+    // result.push(line);
+    // lastPoint.x = line.b.x;
+    // // lastPoint.y = line.b.y;
+    // lastControlPoint.x = line.b.x;
+    // if (isNaN(firstPoint.y)) {
+    //   firstPoint.x = line.a.x;
+    //   firstPoint.y = line.a.y;
+    // }
+    for (var i = 1; i < data.length; i++) {
+        const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+        if (isRelative) {
+            line.b.x += Number(data[i]);
+            // line.b.y += Number(data[2]);
+        }
+        else {
+            line.b.x = Number(data[i]);
+            // line.b.y = Number(data[2]);
+        }
+        result.push(line);
+        lastPoint.x = line.b.x;
+        // lastPoint.y = line.b.y;
+        lastControlPoint.x = line.b.x;
+        if (isNaN(firstPoint.y)) {
+            firstPoint.x = line.a.x;
+            firstPoint.y = line.a.y;
+        }
     }
 };
 const _handleVerticalLineTo = (data, isRelative, firstPoint, lastPoint, lastControlPoint, result) => {
@@ -229,24 +245,36 @@ const _handleVerticalLineTo = (data, isRelative, firstPoint, lastPoint, lastCont
     if (data.length < 2) {
         throw "Unsufficient params for VERTICALLINETO";
     }
-    // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-    // result.push( new)
-    const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
-    if (isRelative) {
-        // line.b.x += Number(data[1]);
-        line.b.y += Number(data[1]);
-    }
-    else {
-        // line.b.x = Number(data[1]);
-        line.b.y = Number(data[1]);
-    }
-    result.push(line);
-    // lastPoint.x = line.b.x;
-    lastPoint.y = line.b.y;
-    lastControlPoint.y = line.b.y;
-    if (isNaN(firstPoint.y)) {
-        firstPoint.x = line.a.x;
-        firstPoint.y = line.a.y;
+    // const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    // if (isRelative) {
+    //   line.b.y += Number(data[1]);
+    // } else {
+    //   line.b.y = Number(data[1]);
+    // }
+    // result.push(line);
+    // // lastPoint.x = line.b.x;
+    // lastPoint.y = line.b.y;
+    // lastControlPoint.y = line.b.y;
+    // if (isNaN(firstPoint.y)) {
+    //   firstPoint.x = line.a.x;
+    //   firstPoint.y = line.a.y;
+    // }
+    for (var i = 1; i < data.length; i++) {
+        const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+        if (isRelative) {
+            line.b.y += Number(data[i]);
+        }
+        else {
+            line.b.y = Number(data[i]);
+        }
+        result.push(line);
+        // lastPoint.x = line.b.x;
+        lastPoint.y = line.b.y;
+        lastControlPoint.y = line.b.y;
+        if (isNaN(firstPoint.y)) {
+            firstPoint.x = line.a.x;
+            firstPoint.y = line.a.y;
+        }
     }
 };
 // CurveTo: C|c x1 y1 x2 y2 x y

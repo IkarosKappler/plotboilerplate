@@ -57,6 +57,8 @@
     // A closed path consisting of a singl QUADRATICCURVETO command with multiple params.
     var data5 = "M 50 25 Q 75 25 75 50 75 75 50 75 25 75 25 50 25 25 50 25";
 
+    var data6 = "M 25 25 H 35 45 55 65 75 V 35 45 55 65 75 H 65 55 45 35 25 V 65 55 45 35 25 z";
+
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
     // prettier-ignore
@@ -124,7 +126,7 @@
       textarea.style.height = "50vh";
       // textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
       // textarea.innerHTML = data2;
-      textarea.innerHTML = data5;
+      textarea.innerHTML = data6;
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
