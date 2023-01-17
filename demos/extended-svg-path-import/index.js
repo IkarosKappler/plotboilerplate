@@ -35,7 +35,7 @@
       useRelativePath: false,
       drawAbsoluteExamplePath: false,
       drawRelativeExamplePath: false,
-      drawSourcePathParsed: true,
+      drawParsedPath: true,
       drawSourcePathNative: true
     };
 
@@ -57,7 +57,26 @@
     // A closed path consisting of a singl QUADRATICCURVETO command with multiple params.
     var data5 = "M 50 25 Q 75 25 75 50 75 75 50 75 25 75 25 50 25 25 50 25";
 
+    // A sqare made of vertical and horizontal path commands only.
     var data6 = "M 25 25 H 35 45 55 65 75 V 35 45 55 65 75 H 65 55 45 35 25 V 65 55 45 35 25 z";
+
+    // A closed circle-like path consisting of one quadratic curve and three quadratic curves in shorthand notation.
+    var data7 = "M 50 25 Q 75 25 75 50 T 50 75 T 25 50 T 50 25 z";
+
+    // The same circle-like path consisting of one quadratic curve and one shorthand curve with multiple params (resulting in three curves).
+    var data8 = "M 50 25 Q 75 25 75 50 T 50 75 25 50 50 25 z";
+
+    // Arcs: 'A|a' (rx ry x-axis-rotation large-arc-flag sweep-flag x y)+
+    var radiusX = 25;
+    var radiusY = 25;
+    // prettier-ignore
+    var data9 = "M 25 25 " +
+      "A " + radiusX + " " + radiusY + " 180.0 0 1 75 25 " + 
+      radiusX + " " + radiusY + " 90.0 0 1 75 75 " +
+      radiusX + " " + radiusY + " 180.0 0 1 25 75 " +
+      radiusX + " " + radiusY + " 90.0 0 1 25 25 " +
+      "Z";
+    // var data9 = "M 75 25 A 100 50 0.0 0 1 75 75";
 
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
@@ -126,7 +145,7 @@
       textarea.style.height = "50vh";
       // textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
       // textarea.innerHTML = data2;
-      textarea.innerHTML = data6;
+      textarea.innerHTML = data9;
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
@@ -198,7 +217,7 @@
       if (config.drawSourcePathNative) {
         drawSourcePathNative(draw, fill);
       }
-      if (config.drawSourcePathParsed) {
+      if (config.drawParsedPath) {
         drawSourcePathParsed(draw, fill);
       }
     };
@@ -248,6 +267,8 @@
           draw.line(segment.a, segment.b, "green", 2);
         } else if (segment instanceof CubicBezierCurve) {
           draw.cubicBezier(segment.startPoint, segment.endPoint, segment.startControlPoint, segment.endControlPoint, "green", 2);
+          draw.line(segment.startPoint, segment.startControlPoint, "rgba(192,192,192,0.5)", 2);
+          draw.line(segment.endPoint, segment.endControlPoint, "rgba(192,192,192,0.5)", 2);
         } /* else if (segment instanceof VEllipse) {
           draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
         } */
@@ -293,7 +314,7 @@
       // prettier-ignore
       gui.add(config, 'drawSourcePathNative').listen().onChange(function() { pb.redraw() }).name("drawSourcePathNative").title("Draw the native path?");
       // prettier-ignore
-      gui.add(config, 'drawSourcePathParsed').listen().onChange(function() { pb.redraw() }).name("drawSourcePathParsed").title("Draw the parsed path segments?");
+      gui.add(config, 'drawParsedPath').listen().onChange(function() { pb.redraw() }).name("drawParsedPath").title("Draw the parsed path segments?");
 
       // Add stats
       var uiStats = new UIStats(stats);

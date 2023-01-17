@@ -55,9 +55,10 @@ export const parseSVGPathData = (dataString: string): Array<Line | CubicBezierCu
   const result: Array<Line | CubicBezierCurve> = [];
 
   var i = 0;
-  const firstPoint = { x: NaN, y: NaN };
-  const lastPoint = { x: NaN, y: NaN };
-  const lastControlPoint = { x: NaN, y: NaN };
+  const firstPoint: XYCoords = { x: NaN, y: NaN };
+  const lastPoint: XYCoords = { x: NaN, y: NaN };
+  const lastControlPoint: XYCoords = { x: NaN, y: NaN };
+  const lastQuadraticControlPoint: XYCoords = { x: NaN, y: NaN };
 
   while (i < dataElements.length) {
     // Could this also be SVGPathShorthandQuadraticCurveToCommand?
@@ -67,72 +68,72 @@ export const parseSVGPathData = (dataString: string): Array<Line | CubicBezierCu
     switch (data[0]) {
       case "M":
         // MoveTo: M|m x y
-        _handleMove(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleMove(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "m":
         // MoveTo: M|m x y
-        _handleMove(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleMove(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "L":
         // LineTo L|l x y
-        _handleLineTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleLineTo(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "l":
         // LineTo L|l x y
-        _handleLineTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleLineTo(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "H":
         // HorizontalLineTo: H|h x
-        _handleHorizontalLineTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleHorizontalLineTo(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "h":
         // HorizontalLineTo: H|h x
-        _handleHorizontalLineTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleHorizontalLineTo(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "V":
         // VerticalLineTo: V|v y
-        _handleVerticalLineTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleVerticalLineTo(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "v":
         // VerticalLineTo: V|v y
-        _handleVerticalLineTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleVerticalLineTo(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "C":
         // CurveTo: C|c x1 y1 x2 y2 x y
-        _handleCubicBezierTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleCubicBezierTo(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "c":
         // CurveTo: C|c x1 y1 x2 y2 x y
-        _handleCubicBezierTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleCubicBezierTo(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "S":
-        _handleShorthandCubicCurveTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleShorthandCubicCurveTo(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "s":
-        _handleShorthandCubicCurveTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleShorthandCubicCurveTo(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "Q":
         // QuadraticCurveTo: Q|q x1 y1 x y
-        _handleQuadraticCurveTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleQuadraticCurveTo(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "q":
         // QuadraticCurveTo: Q|q x1 y1 x y
-        _handleQuadraticCurveTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleQuadraticCurveTo(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "A":
         // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
-        _handleArcTo(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleArcTo(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "a":
         // EllipticalArcTo: A|a rx ry x-axis-rotation large-arc-flag sweep-flag x y
-        _handleArcTo(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleArcTo(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "z":
-        _handleClosePath(data, false, firstPoint, lastPoint, lastControlPoint, result);
+        _handleClosePath(data, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         break;
       case "Z":
         // ClosePath: Z|z (no arguments)
-        _handleClosePath(data, true, firstPoint, lastPoint, lastControlPoint, result);
+        _handleClosePath(data, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
         // i++;
         break;
       default:
@@ -158,6 +159,7 @@ const _handleMove = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   _result: Array<Line | CubicBezierCurve>
 ) => {
   if (data.length < 3) {
@@ -189,6 +191,7 @@ const _handleLineTo = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle LINETO", data);
@@ -243,6 +246,7 @@ const _handleHorizontalLineTo = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle HORIZONTALLINETO", data);
@@ -292,6 +296,7 @@ const _handleVerticalLineTo = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle VERTICALLINETO", data);
@@ -339,6 +344,7 @@ const _handleCubicBezierTo = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle CUBICBEZIERTO", data);
@@ -413,6 +419,7 @@ const _handleQuadraticCurveTo = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle QUADRATICBEZIERTO", data);
@@ -460,16 +467,16 @@ const _handleQuadraticCurveTo = (
   //   const subData: SVGPathShorthandQuadraticCurveToCommand = data.slice(5) as SVGPathShorthandQuadraticCurveToCommand;
   //   // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
   //   if (subData[0] === "T") {
-  //     // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, result);
+  //     // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
   //     _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastQuadraticControlPoint, result);
   //   } else if (subData[0] === "t") {
-  //     // _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, result);
+  //     // _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
   //     _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastQuadraticControlPoint, result);
   //   }
   // }
 
   var i = 1;
-  var lastQuadraticControlPoint = { x: 0, y: 0 };
+  var localLastQuadraticControlPoint = { x: 0, y: 0 };
   // This loops runs at least once
   while (i + 3 < data.length && data[i] !== "t" && data[i] !== "T") {
     const curve = new CubicBezierCurve(
@@ -494,7 +501,7 @@ const _handleQuadraticCurveTo = (
       curve.endControlPoint.y = curve.startControlPoint.y;
     }
     // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
-    lastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
+    localLastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
     // Convert quadratic curve to cubic curve
     curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
     curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
@@ -520,60 +527,129 @@ const _handleQuadraticCurveTo = (
     const subData: SVGPathShorthandQuadraticCurveToCommand = data.slice(5) as SVGPathShorthandQuadraticCurveToCommand;
     // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
     if (subData[0] === "T") {
-      // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, result);
-      _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastQuadraticControlPoint, result);
+      // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
+      _handleShorthandQuadraticCurveTo(
+        subData,
+        false,
+        firstPoint,
+        lastPoint,
+        lastControlPoint,
+        localLastQuadraticControlPoint,
+        result
+      );
     } else if (subData[0] === "t") {
-      // _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, result);
-      _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastQuadraticControlPoint, result);
+      // _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
+      _handleShorthandQuadraticCurveTo(
+        subData,
+        true,
+        firstPoint,
+        lastPoint,
+        lastControlPoint,
+        localLastQuadraticControlPoint,
+        result
+      );
     }
   }
 };
 
 // This is a helper function and works only in combination with Quadratic Bézier Curves
-// T|t x y
+// T|t (x y)+
 const _handleShorthandQuadraticCurveTo = (
   data: SVGPathShorthandQuadraticCurveToCommand,
   isRelative: boolean,
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle SHORTHANDQUADRATICCURVETO", data);
   if (data.length < 3) {
     throw "Unsufficient params for SHORTHANDQUADRATICCURVETO";
   }
-  const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
-  if (isRelative) {
-    curve.endPoint.x += Number(data[1]);
-    curve.endPoint.y += Number(data[2]);
-    curve.startControlPoint.x += curve.startPoint.x - (lastControlPoint.x - lastPoint.x);
-    curve.startControlPoint.y += curve.startPoint.y - (lastControlPoint.y - lastPoint.y);
-  } else {
-    curve.endPoint.x = Number(data[1]);
-    curve.endPoint.y = Number(data[2]);
-    curve.startControlPoint.x = curve.startPoint.x - (lastControlPoint.x - lastPoint.x);
-    curve.startControlPoint.y = curve.startPoint.y - (lastControlPoint.y - lastPoint.y);
-  }
-  // First handle as symmetrical cubic curve
-  curve.endControlPoint.x = curve.startControlPoint.x;
-  curve.endControlPoint.y = curve.startControlPoint.y;
+  // const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
+  // if (isRelative) {
+  //   curve.endPoint.x += Number(data[1]);
+  //   curve.endPoint.y += Number(data[2]);
+  //   curve.startControlPoint.x += curve.startPoint.x - (lastControlPoint.x - lastPoint.x);
+  //   curve.startControlPoint.y += curve.startPoint.y - (lastControlPoint.y - lastPoint.y);
+  // } else {
+  //   curve.endPoint.x = Number(data[1]);
+  //   curve.endPoint.y = Number(data[2]);
+  //   curve.startControlPoint.x = curve.startPoint.x - (lastControlPoint.x - lastPoint.x);
+  //   curve.startControlPoint.y = curve.startPoint.y - (lastControlPoint.y - lastPoint.y);
+  // }
+  // // First handle as symmetrical cubic curve
+  // curve.endControlPoint.x = curve.startControlPoint.x;
+  // curve.endControlPoint.y = curve.startControlPoint.y;
 
-  // Convert quadratic curve to cubic curve
-  curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
-  curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
-  curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
-  curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
+  // // Convert quadratic curve to cubic curve
+  // curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
+  // curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
+  // curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
+  // curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
 
-  //   console.log("ADDING T CURVE", curve);
-  result.push(curve);
-  lastPoint.x = curve.endPoint.x;
-  lastPoint.y = curve.endPoint.y;
-  lastControlPoint.x = curve.endControlPoint.x;
-  lastControlPoint.y = curve.endControlPoint.y;
-  if (isNaN(firstPoint.x)) {
-    firstPoint.x = curve.startPoint.x;
-    firstPoint.y = curve.startPoint.y;
+  // //   console.log("ADDING T CURVE", curve);
+  // result.push(curve);
+  // lastPoint.x = curve.endPoint.x;
+  // lastPoint.y = curve.endPoint.y;
+  // lastControlPoint.x = curve.endControlPoint.x;
+  // lastControlPoint.y = curve.endControlPoint.y;
+  // if (isNaN(firstPoint.x)) {
+  //   firstPoint.x = curve.startPoint.x;
+  //   firstPoint.y = curve.startPoint.y;
+  // }
+  // HOW SHOULD THE 'T x0 y0 x1 y1 x2 y2 ...' command be interpreted???
+  // for (var i = 1; i + 1 < data.length; i += 2) {
+  var i = 1;
+  while (i + 1 < data.length) {
+    // Respect multiple 'T|t' commands here
+    if (data[i] === "T" || data[i] === "t") {
+      i++;
+      continue;
+    }
+    const curve = new CubicBezierCurve(
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint)
+    );
+    if (isRelative) {
+      curve.endPoint.x += Number(data[i]);
+      curve.endPoint.y += Number(data[i + 1]);
+      curve.startControlPoint.x += curve.startPoint.x - (lastQuadraticControlPoint.x - lastPoint.x);
+      curve.startControlPoint.y += curve.startPoint.y - (lastQuadraticControlPoint.y - lastPoint.y);
+    } else {
+      curve.endPoint.x = Number(data[i]);
+      curve.endPoint.y = Number(data[i + 1]);
+      curve.startControlPoint.x = curve.startPoint.x - (lastQuadraticControlPoint.x - lastPoint.x);
+      curve.startControlPoint.y = curve.startPoint.y - (lastQuadraticControlPoint.y - lastPoint.y);
+    }
+    // First handle as symmetrical cubic curve
+    curve.endControlPoint.x = curve.startControlPoint.x;
+    curve.endControlPoint.y = curve.startControlPoint.y;
+    lastQuadraticControlPoint.y = curve.endControlPoint.y;
+    lastQuadraticControlPoint.x = curve.endControlPoint.x;
+
+    // Convert quadratic curve to cubic curve
+    var scaleFactor = 0.666; // i === 1 ? 0.666 : 1.0;
+    curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * scaleFactor;
+    curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * scaleFactor;
+    curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * scaleFactor;
+    curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * scaleFactor;
+
+    //   console.log("ADDING T CURVE", curve);
+    result.push(curve);
+    lastPoint.x = curve.endPoint.x;
+    lastPoint.y = curve.endPoint.y;
+    lastControlPoint.x = curve.endControlPoint.x;
+    lastControlPoint.y = curve.endControlPoint.y;
+    if (isNaN(firstPoint.x)) {
+      firstPoint.x = curve.startPoint.x;
+      firstPoint.y = curve.startPoint.y;
+    }
+
+    i += 2;
   }
 };
 
@@ -584,6 +660,7 @@ const _handleShorthandCubicCurveTo = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle SHORTHANDCUBICBEZIERTO", data);
@@ -627,6 +704,7 @@ const _handleArcTo = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle ARCTO", data);
@@ -634,65 +712,132 @@ const _handleArcTo = (
     throw "Unsufficient params for ARCTO";
   }
 
-  const arcEndPoint = { x: Number(data[6]), y: Number(data[7]) };
-  if (isRelative) {
-    arcEndPoint.x += lastPoint.x;
-    arcEndPoint.y += lastPoint.y;
-  }
+  // const arcEndPoint = { x: Number(data[6]), y: Number(data[7]) };
+  // if (isRelative) {
+  //   arcEndPoint.x += lastPoint.x;
+  //   arcEndPoint.y += lastPoint.y;
+  // }
 
-  // console.log(
-  //   "lastPoint.x",
-  //   lastPoint.x, // x1
-  //   "lastPoint.y",
-  //   lastPoint.y, // y1
-  //   "data[1]",
-  //   Number(data[1]), // rx
-  //   "data[2]",
-  //   Number(data[2]), // ry
-  //   "data[3]",
-  //   Number(data[3]), // phi: number,
-  //   "data[4]",
-  //   Boolean(data[4]), // fa: boolean,
-  //   "data[5]",
-  //   Boolean(data[5]), // fs: boolean,
-  //   "data[6]",
-  //   arcEndPoint.x, // Number(data[6]), // x2: number,
-  //   "data[7]",
+  // // console.log(
+  // //   "lastPoint.x",
+  // //   lastPoint.x, // x1
+  // //   "lastPoint.y",
+  // //   lastPoint.y, // y1
+  // //   "data[1]",
+  // //   Number(data[1]), // rx
+  // //   "data[2]",
+  // //   Number(data[2]), // ry
+  // //   "data[3]",
+  // //   Number(data[3]), // phi: number,
+  // //   "data[4]",
+  // //   Boolean(data[4]), // fa: boolean,
+  // //   "data[5]",
+  // //   Boolean(data[5]), // fs: boolean,
+  // //   "data[6]",
+  // //   arcEndPoint.x, // Number(data[6]), // x2: number,
+  // //   "data[7]",
+  // //   arcEndPoint.y // Number(data[7]) // y2: number
+  // // );
+  // // A 5 4 0 1 1 -10 -5
+  // // TODO: respect relative/absolute here
+  // const ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
+  //   lastPoint.x,
+  //   lastPoint.y,
+  //   Number(data[1]),
+  //   Number(data[2]),
+  //   Number(data[3]) * DEG_TO_RAD,
+  //   Boolean(data[4]),
+  //   Boolean(data[5]),
+  //   arcEndPoint.x,
   //   arcEndPoint.y // Number(data[7]) // y2: number
   // );
-  // A 5 4 0 1 1 -10 -5
-  // TODO: respect relative/absolute here
-  const ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
-    lastPoint.x,
-    lastPoint.y,
-    Number(data[1]),
-    Number(data[2]),
-    Number(data[3]) * DEG_TO_RAD,
-    Boolean(data[4]),
-    Boolean(data[5]),
-    arcEndPoint.x,
-    arcEndPoint.y // Number(data[7]) // y2: number
-  );
 
-  //   console.log("ellipseSector", ellipseSector);
-  const curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
-  for (var i = 0; i < curves.length; i++) {
-    result.push(curves[i]); // Destruct!
-  }
-  // result.push(ellipseSector.ellipse);
-  if (curves.length > 0) {
-    // console.log("curves", curves);
-    const lastCurve = curves[curves.length - 1];
-    lastPoint.x = lastCurve.endPoint.x;
-    lastPoint.y = lastCurve.endPoint.y;
-    lastControlPoint.x = lastCurve.endControlPoint.x;
-    lastControlPoint.y = lastCurve.endControlPoint.y;
-    if (isNaN(firstPoint.x)) {
-      firstPoint.x = curves[0].startPoint.x;
-      firstPoint.y = curves[0].startPoint.y;
+  // //   console.log("ellipseSector", ellipseSector);
+  // const curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
+  // for (var i = 0; i < curves.length; i++) {
+  //   result.push(curves[i]); // Destruct!
+  // }
+  // // result.push(ellipseSector.ellipse);
+  // if (curves.length > 0) {
+  //   // console.log("curves", curves);
+  //   const lastCurve = curves[curves.length - 1];
+  //   lastPoint.x = lastCurve.endPoint.x;
+  //   lastPoint.y = lastCurve.endPoint.y;
+  //   lastControlPoint.x = lastCurve.endControlPoint.x;
+  //   lastControlPoint.y = lastCurve.endControlPoint.y;
+  //   if (isNaN(firstPoint.x)) {
+  //     firstPoint.x = curves[0].startPoint.x;
+  //     firstPoint.y = curves[0].startPoint.y;
+  //   }
+  // }
+
+  console.log("ARC params", data);
+  for (var i = 1; i + 6 < data.length; i += 7) {
+    const arcEndPoint = { x: Number(data[i + 5]), y: Number(data[i + 6]) };
+    if (isRelative) {
+      arcEndPoint.x += lastPoint.x;
+      arcEndPoint.y += lastPoint.y;
     }
-  }
+    console.log(
+      "ARC",
+      "data.length",
+      data.length,
+      "i",
+      i,
+      "lastPoint.x",
+      lastPoint.x, // x1
+      "lastPoint.y",
+      lastPoint.y, // y1
+      "data[i]",
+      Number(data[i]), // rx
+      "data[i+1]",
+      Number(data[i + 1]), // ry
+      "data[i+2]",
+      Number(data[i + 2]), // phi: number,
+      "data[i+3]",
+      Boolean(data[i + 3]), // fa: boolean,
+      "data[i+4]",
+      Boolean(data[i + 4]), // fs: boolean,
+      "data[i+5]",
+      arcEndPoint.x, // Number(data[6]), // x2: number,
+      "data[i+6]",
+      arcEndPoint.y // Number(data[7]) // y2: number
+    );
+    // A 5 4 0 1 1 -10 -5
+    // TODO: respect relative/absolute here
+    const ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
+      lastPoint.x,
+      lastPoint.y,
+      Number(data[i]),
+      Number(data[i + 1]),
+      Number(data[i + 2]) * DEG_TO_RAD,
+      Boolean(data[i + 3]),
+      Boolean(data[i + 4]),
+      arcEndPoint.x,
+      arcEndPoint.y // Number(data[7]) // y2: number
+    );
 
+    //   console.log("ellipseSector", ellipseSector);
+    const curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
+    for (var j = 0; j < curves.length; j++) {
+      result.push(curves[j]); // Destruct!
+    }
+    // result.push(ellipseSector.ellipse);
+    if (curves.length > 0) {
+      // console.log("curves", curves);
+      const lastCurve = curves[curves.length - 1];
+      // lastPoint.x = lastCurve.endPoint.x;
+      // lastPoint.y = lastCurve.endPoint.y;
+      lastControlPoint.x = lastCurve.endControlPoint.x;
+      lastControlPoint.y = lastCurve.endControlPoint.y;
+      if (isNaN(firstPoint.x)) {
+        firstPoint.x = curves[0].startPoint.x;
+        firstPoint.y = curves[0].startPoint.y;
+      }
+    }
+    lastPoint.x = arcEndPoint.x;
+    lastPoint.y = arcEndPoint.y;
+  } // END for
   // TODO: track first/last/control point
 };
 
@@ -702,6 +847,7 @@ const _handleClosePath = (
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
   //   console.log("Handle CLOSEPATH", "lastPoint", lastPoint, "firstPoint", firstPoint);

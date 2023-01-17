@@ -27,7 +27,17 @@ export type SVGPathHorizontalLineToCommand = ["H" | "h", NumericString];
 // Example2: 'Q', 5, 5, 0, 0, 'T', -10, 0,
 export type SVGPathQuadraticCurveToCommand =
   | ["Q" | "q", NumericString, NumericString, NumericString, NumericString]
-  | ["Q" | "q", NumericString, NumericString, NumericString, NumericString, "T" | "t", NumericString, NumericString];
+  | [
+      "Q" | "q",
+      NumericString,
+      NumericString,
+      NumericString,
+      NumericString,
+      "T" | "t",
+      NumericString,
+      NumericString,
+      ...Array<NumericString>
+    ];
 // Example: 'C', -5, -15, 10, -15, 5, -10,
 export type SVGPathCubicCurveToCommand = [
   "C" | "c",
@@ -36,10 +46,18 @@ export type SVGPathCubicCurveToCommand = [
   NumericString,
   NumericString,
   NumericString,
-  NumericString
+  NumericString,
+  ...Array<NumericString>
 ];
 // Example: 'S', 15, 0, 10, 0,
-export type SVGPathShorthandCubicCurveToCommand = ["S" | "s", NumericString, NumericString, NumericString, NumericString];
+export type SVGPathShorthandCubicCurveToCommand = [
+  "S" | "s",
+  NumericString,
+  NumericString,
+  NumericString,
+  NumericString,
+  ...Array<NumericString>
+];
 // Example: 'A', 5, 4, 0, 1, 1, -10, -5,
 export type SVGPathArcToCommand = [
   "A" | "a",
@@ -49,14 +67,15 @@ export type SVGPathArcToCommand = [
   BooleanString,
   BooleanString,
   NumericString,
-  NumericString
+  NumericString,
+  ...Array<NumericString>
 ];
 // Example: 'Z'
 export type SVGPathCloseCommand = ["Z" | "z"];
 
 // NOTE: this is not a standalone command. It is only valid in combination with the Q|q command!
 // Example2: 'T', -10, 0,
-export type SVGPathShorthandQuadraticCurveToCommand = ["T" | "t", NumericString, NumericString];
+export type SVGPathShorthandQuadraticCurveToCommand = ["T" | "t", NumericString, NumericString, ...Array<NumericString>];
 
 export type SVGPathCommand =
   | SVGPathMoveToCommand
