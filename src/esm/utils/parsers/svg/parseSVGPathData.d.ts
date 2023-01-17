@@ -9,7 +9,8 @@
  * @author  Ikaros Kappler
  * @date    2022-11-06
  * @modified 2022-12-21 (winter solstice) Porting this to Typescript.
- * @version 0.0.1-alpha
+ * @modified 2023-01-17 Handling multiple parameter sets now.
+ * @version 0.0.2-alpha
  **/
 import { CubicBezierCurve } from "../../../CubicBezierCurve";
 import { Line } from "../../../Line";

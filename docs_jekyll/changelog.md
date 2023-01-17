@@ -3,7 +3,10 @@ layout: page
 ---
 # Changelog
 
-- 2023-01-03
+- 2023-01-17
+  - 2023-01-17 Tweaking the demo `extended-elliptic-conversion`: adding large-arc-flag and sweep-flag.
+  - Extending the `parseSVGPathData` and `splitSVGPathData` functions: basic path commands accepting additional sets of params now (ARC-command still missing).
+- 2023-01-03 (v1.20.0)
   - Adding SVG processing to the `FileDrop` class.
   - Adding SVG import to the svg-path-import demo.
 - 2022-12-21 (winter solstice)
