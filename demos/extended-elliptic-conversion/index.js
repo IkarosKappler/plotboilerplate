@@ -5,7 +5,8 @@
  *
  * @author   Ikaros Kappler
  * @date     2022-09-10
- * @version  1.0.0
+ * @modified 2023-01-17 Tweaking the demo: adding large-arc-flag and sweep-flag.
+ * @version  1.0.1
  **/
 
 (function (_context) {
@@ -25,13 +26,6 @@
       )
     );
     var initialViewport = pb.viewport();
-
-    var config = {
-      radiusX: 60,
-      radiusY: 50,
-      rotation: 0 // Here: degrees
-    };
-
     var startPoint = new Vertex(
       Math.random() * initialViewport.width + initialViewport.min.x,
       Math.random() * initialViewport.width + initialViewport.min.x
@@ -40,6 +34,14 @@
       Math.random() * initialViewport.width + initialViewport.min.x,
       Math.random() * initialViewport.width + initialViewport.min.x
     );
+
+    var config = {
+      radiusX: Math.abs(endPoint.x - startPoint.x),
+      radiusY: Math.abs(endPoint.y - startPoint.y),
+      rotation: 0, // Here: degrees
+      largeArcFlag: true,
+      sweepFlag: true
+    };
 
     pb.add(startPoint);
     pb.add(endPoint);
@@ -53,13 +55,26 @@
         config.radiusX, // rx
         config.radiusY, // ry
         config.rotation * DEG_TO_RAD, // phi: number,
-        true, // Boolean(data[4]), // fa: boolean,
-        true, // Boolean(data[5]), // fs: boolean,
+        config.largeArcFlag, // fa: boolean,
+        config.sweepFlag, // fs: boolean,
         endPoint.x, // x2: number,
         endPoint.y // y2: number
       );
       var ellipse = ellipseSector.ellipse;
-      pb.draw.ellipse(ellipse.center, ellipse.radiusH(), ellipse.radiusV(), "green", 2, config.rotation * DEG_TO_RAD);
+      draw.ellipse(ellipse.center, ellipse.radiusH(), ellipse.radiusV(), "green", 2, config.rotation * DEG_TO_RAD);
+
+      // Draw partial arc
+      var arcCurves = ellipseSector.toCubicBezier(4);
+      for (var i = 0; i < arcCurves.length; i++) {
+        draw.cubicBezier(
+          arcCurves[i].startPoint,
+          arcCurves[i].endPoint,
+          arcCurves[i].startControlPoint,
+          arcCurves[i].endControlPoint,
+          "rgba(192,192,0,0.5)",
+          6
+        );
+      }
     };
 
     pb.redraw();
@@ -75,6 +90,10 @@
       gui.add(config, 'radiusY').min(0).max(initialViewport.height/2).listen().onChange(function() { pb.redraw() }).name("radiusY").title("radiusY");
       // prettier-ignore
       gui.add(config, 'rotation').min(0).max(180).listen().onChange(function() { pb.redraw() }).name("rotation").title("rotation");
+      // prettier-ignore
+      gui.add(config, 'largeArcFlag').listen().onChange(function() { pb.redraw() }).name("largeArcFlag").title("largeArcFlag");
+      // prettier-ignore
+      gui.add(config, 'sweepFlag').listen().onChange(function() { pb.redraw() }).name("sweepFlag").title("sweepFlag");
     }
   });
 })(globalThis);

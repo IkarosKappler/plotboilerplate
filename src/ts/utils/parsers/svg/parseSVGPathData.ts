@@ -9,7 +9,8 @@
  * @author  Ikaros Kappler
  * @date    2022-11-06
  * @modified 2022-12-21 (winter solstice) Porting this to Typescript.
- * @version 0.0.1-alpha
+ * @modified 2023-01-17 Handling multiple parameter sets now.
+ * @version 0.0.2-alpha
  **/
 
 import { CubicBezierCurve } from "../../../CubicBezierCurve";
@@ -55,9 +56,10 @@ export const parseSVGPathData = (dataString: string): Array<Line | CubicBezierCu
   const result: Array<Line | CubicBezierCurve> = [];
 
   var i = 0;
-  const firstPoint = { x: NaN, y: NaN };
-  const lastPoint = { x: NaN, y: NaN };
-  const lastControlPoint = { x: NaN, y: NaN };
+  const firstPoint: XYCoords = { x: NaN, y: NaN };
+  const lastPoint: XYCoords = { x: NaN, y: NaN };
+  const lastControlPoint: XYCoords = { x: NaN, y: NaN };
+  const lastQuadraticControlPoint: XYCoords = { x: NaN, y: NaN };
 
   while (i < dataElements.length) {
     // Could this also be SVGPathShorthandQuadraticCurveToCommand?
@@ -191,28 +193,29 @@ const _handleLineTo = (
   lastControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
-  //   console.log("Handle LINETO", data);
   if (data.length < 3) {
     throw "Unsufficient params for LINETO";
   }
-  // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-  // result.push( new)
-  const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
-  if (isRelative) {
-    line.b.x += Number(data[1]);
-    line.b.y += Number(data[2]);
-  } else {
-    line.b.x = Number(data[1]);
-    line.b.y = Number(data[2]);
-  }
-  result.push(line);
-  lastPoint.x = line.b.x;
-  lastPoint.y = line.b.y;
-  lastControlPoint.x = line.b.x;
-  lastControlPoint.y = line.b.y;
-  if (isNaN(firstPoint.y)) {
-    firstPoint.x = line.a.x;
-    firstPoint.y = line.a.y;
+
+  for (var i = 1; i + 1 < data.length; i += 2) {
+    const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    if (isRelative) {
+      line.b.x += Number(data[i]);
+      line.b.y += Number(data[i + 1]);
+    } else {
+      line.b.x = Number(data[i]);
+      line.b.y = Number(data[i + 1]);
+    }
+    result.push(line);
+    lastPoint.x = line.b.x;
+    lastPoint.y = line.b.y;
+    lastControlPoint.x = line.b.x;
+    lastControlPoint.y = line.b.y;
+    if (isNaN(firstPoint.y)) {
+      firstPoint.x = line.a.x;
+      firstPoint.y = line.a.y;
+    }
+    console.log("LINETO LINE", i, line.toString());
   }
 };
 
@@ -228,23 +231,24 @@ const _handleHorizontalLineTo = (
   if (data.length < 2) {
     throw "Unsufficient params for HORIZONTALLINETO";
   }
-  // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-  // result.push( new)
-  const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
-  if (isRelative) {
-    line.b.x += Number(data[1]);
-    // line.b.y += Number(data[2]);
-  } else {
-    line.b.x = Number(data[1]);
-    // line.b.y = Number(data[2]);
-  }
-  result.push(line);
-  lastPoint.x = line.b.x;
-  // lastPoint.y = line.b.y;
-  lastControlPoint.x = line.b.x;
-  if (isNaN(firstPoint.y)) {
-    firstPoint.x = line.a.x;
-    firstPoint.y = line.a.y;
+
+  for (var i = 1; i < data.length; i++) {
+    const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    if (isRelative) {
+      line.b.x += Number(data[i]);
+      // line.b.y += Number(data[2]);
+    } else {
+      line.b.x = Number(data[i]);
+      // line.b.y = Number(data[2]);
+    }
+    result.push(line);
+    lastPoint.x = line.b.x;
+    // lastPoint.y = line.b.y;
+    lastControlPoint.x = line.b.x;
+    if (isNaN(firstPoint.y)) {
+      firstPoint.x = line.a.x;
+      firstPoint.y = line.a.y;
+    }
   }
 };
 
@@ -256,27 +260,25 @@ const _handleVerticalLineTo = (
   lastControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
-  //   console.log("Handle VERTICALLINETO", data);
   if (data.length < 2) {
     throw "Unsufficient params for VERTICALLINETO";
   }
-  // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-  // result.push( new)
-  const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
-  if (isRelative) {
-    // line.b.x += Number(data[1]);
-    line.b.y += Number(data[1]);
-  } else {
-    // line.b.x = Number(data[1]);
-    line.b.y = Number(data[1]);
-  }
-  result.push(line);
-  // lastPoint.x = line.b.x;
-  lastPoint.y = line.b.y;
-  lastControlPoint.y = line.b.y;
-  if (isNaN(firstPoint.y)) {
-    firstPoint.x = line.a.x;
-    firstPoint.y = line.a.y;
+
+  for (var i = 1; i < data.length; i++) {
+    const line = new Line(new Vertex(lastPoint), new Vertex(lastPoint));
+    if (isRelative) {
+      line.b.y += Number(data[i]);
+    } else {
+      line.b.y = Number(data[i]);
+    }
+    result.push(line);
+    // lastPoint.x = line.b.x;
+    lastPoint.y = line.b.y;
+    lastControlPoint.y = line.b.y;
+    if (isNaN(firstPoint.y)) {
+      firstPoint.x = line.a.x;
+      firstPoint.y = line.a.y;
+    }
   }
 };
 
@@ -293,32 +295,38 @@ const _handleCubicBezierTo = (
   if (data.length < 7) {
     throw "Unsufficient params for CUBICBEZIERTO";
   }
-  // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-  // result.push( new)
-  const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
-  if (isRelative) {
-    curve.startControlPoint.x += Number(data[1]);
-    curve.startControlPoint.y += Number(data[2]);
-    curve.endControlPoint.x += Number(data[3]);
-    curve.endControlPoint.y += Number(data[4]);
-    curve.endPoint.x += Number(data[5]);
-    curve.endPoint.y += Number(data[6]);
-  } else {
-    curve.startControlPoint.x = Number(data[1]);
-    curve.startControlPoint.y = Number(data[2]);
-    curve.endControlPoint.x = Number(data[3]);
-    curve.endControlPoint.y = Number(data[4]);
-    curve.endPoint.x = Number(data[5]);
-    curve.endPoint.y = Number(data[6]);
-  }
-  result.push(curve);
-  lastPoint.x = curve.endPoint.x;
-  lastPoint.y = curve.endPoint.y;
-  lastControlPoint.x = curve.endControlPoint.x;
-  lastControlPoint.y = curve.endControlPoint.y;
-  if (isNaN(firstPoint.x)) {
-    firstPoint.x = curve.startPoint.x;
-    firstPoint.y = curve.startPoint.y;
+
+  for (var i = 1; i + 5 < data.length; i += 6) {
+    const curve = new CubicBezierCurve(
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint)
+    );
+    if (isRelative) {
+      curve.startControlPoint.x += Number(data[i]);
+      curve.startControlPoint.y += Number(data[i + 1]);
+      curve.endControlPoint.x += Number(data[i + 2]);
+      curve.endControlPoint.y += Number(data[i + 3]);
+      curve.endPoint.x += Number(data[i + 4]);
+      curve.endPoint.y += Number(data[i + 5]);
+    } else {
+      curve.startControlPoint.x = Number(data[i]);
+      curve.startControlPoint.y = Number(data[i + 1]);
+      curve.endControlPoint.x = Number(data[i + 2]);
+      curve.endControlPoint.y = Number(data[i + 3]);
+      curve.endPoint.x = Number(data[i + 4]);
+      curve.endPoint.y = Number(data[i + 5]);
+    }
+    result.push(curve);
+    lastPoint.x = curve.endPoint.x;
+    lastPoint.y = curve.endPoint.y;
+    lastControlPoint.x = curve.endControlPoint.x;
+    lastControlPoint.y = curve.endControlPoint.y;
+    if (isNaN(firstPoint.x)) {
+      firstPoint.x = curve.startPoint.x;
+      firstPoint.y = curve.startPoint.y;
+    }
   }
 };
 
@@ -335,102 +343,147 @@ const _handleQuadraticCurveTo = (
   if (data.length < 5) {
     throw "Unsufficient params for QUADRATICBEZIERTO";
   }
-  // console.log("Y: ", Number(data[2]), "lastPoint", lastPoint);
-  // result.push( new)
-  const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
-  if (isRelative) {
-    curve.startControlPoint.x += curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
-    curve.startControlPoint.y += curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
-    curve.endPoint.x += Number(data[3]);
-    curve.endPoint.y += Number(data[4]);
-    curve.endControlPoint.x = curve.startControlPoint.x;
-    curve.endControlPoint.y = curve.startControlPoint.y;
-  } else {
-    curve.startControlPoint.x = curve.startPoint.x + (Number(data[1]) - curve.startControlPoint.x); // * 0.666;
-    curve.startControlPoint.y = curve.startPoint.y + (Number(data[2]) - curve.startControlPoint.y); // * 0.666;
-    curve.endPoint.x = Number(data[3]);
-    curve.endPoint.y = Number(data[4]);
-    curve.endControlPoint.x = curve.startControlPoint.x;
-    curve.endControlPoint.y = curve.startControlPoint.y;
-  }
-  // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
-  const lastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
-  // Convert quadratic curve to cubic curve
-  curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
-  curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
-  curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
-  curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
 
-  result.push(curve);
-  lastPoint.x = curve.endPoint.x;
-  lastPoint.y = curve.endPoint.y;
-  lastControlPoint.x = curve.endControlPoint.x;
-  lastControlPoint.y = curve.endControlPoint.y;
-  if (isNaN(firstPoint.x)) {
-    firstPoint.x = curve.startPoint.x;
-    firstPoint.y = curve.startPoint.y;
-  }
+  var i = 1;
+  var localLastQuadraticControlPoint = { x: 0, y: 0 };
+  // This loops runs at least once
+  while (i + 3 < data.length && data[i] !== "t" && data[i] !== "T") {
+    const curve = new CubicBezierCurve(
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint)
+    );
+    if (isRelative) {
+      curve.startControlPoint.x += curve.startPoint.x + (Number(data[i]) - curve.startControlPoint.x); // * 0.666;
+      curve.startControlPoint.y += curve.startPoint.y + (Number(data[i + 1]) - curve.startControlPoint.y); // * 0.666;
+      curve.endPoint.x += Number(data[i + 2]);
+      curve.endPoint.y += Number(data[i + 3]);
+      curve.endControlPoint.x = curve.startControlPoint.x;
+      curve.endControlPoint.y = curve.startControlPoint.y;
+    } else {
+      curve.startControlPoint.x = curve.startPoint.x + (Number(data[i]) - curve.startControlPoint.x); // * 0.666;
+      curve.startControlPoint.y = curve.startPoint.y + (Number(data[i + 1]) - curve.startControlPoint.y); // * 0.666;
+      curve.endPoint.x = Number(data[i + 2]);
+      curve.endPoint.y = Number(data[i + 3]);
+      curve.endControlPoint.x = curve.startControlPoint.x;
+      curve.endControlPoint.y = curve.startControlPoint.y;
+    }
+    // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
+    localLastQuadraticControlPoint = { x: curve.endControlPoint.x, y: curve.endControlPoint.y };
+    // Convert quadratic curve to cubic curve
+    curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
+    curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
+    curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
+    curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
+
+    result.push(curve);
+    lastPoint.x = curve.endPoint.x;
+    lastPoint.y = curve.endPoint.y;
+    lastControlPoint.x = curve.endControlPoint.x;
+    lastControlPoint.y = curve.endControlPoint.y;
+    if (isNaN(firstPoint.x)) {
+      firstPoint.x = curve.startPoint.x;
+      firstPoint.y = curve.startPoint.y;
+    }
+    i += 4;
+  } // END while
 
   // 'T' or 't' command may follow
-  if (data.length >= 8) {
+  // if (data.length >= 8) {
+  if (i < data.length && (data[i] == "t" || data[i] === "T")) {
     // TODO: think about this type cast!
     const subData: SVGPathShorthandQuadraticCurveToCommand = data.slice(5) as SVGPathShorthandQuadraticCurveToCommand;
     // var lastQuadraticControlPoint = { x: Number(data[1]), y: Number(data[2]) };
     if (subData[0] === "T") {
-      // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, result);
-      _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastQuadraticControlPoint, result);
+      // _handleShorthandQuadraticCurveTo(subData, false, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
+      _handleShorthandQuadraticCurveTo(
+        subData,
+        false,
+        firstPoint,
+        lastPoint,
+        lastControlPoint,
+        localLastQuadraticControlPoint,
+        result
+      );
     } else if (subData[0] === "t") {
-      // _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, result);
-      _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastQuadraticControlPoint, result);
+      // _handleShorthandQuadraticCurveTo(subData, true, firstPoint, lastPoint, lastControlPoint, lastQuadraticControlPoint, result);
+      _handleShorthandQuadraticCurveTo(
+        subData,
+        true,
+        firstPoint,
+        lastPoint,
+        lastControlPoint,
+        localLastQuadraticControlPoint,
+        result
+      );
     }
   }
 };
 
 // This is a helper function and works only in combination with Quadratic Bézier Curves
-// T|t x y
+// T|t (x y)+
 const _handleShorthandQuadraticCurveTo = (
   data: SVGPathShorthandQuadraticCurveToCommand,
   isRelative: boolean,
   firstPoint: XYCoords,
   lastPoint: XYCoords,
   lastControlPoint: XYCoords,
+  lastQuadraticControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
-  //   console.log("Handle SHORTHANDQUADRATICCURVETO", data);
   if (data.length < 3) {
     throw "Unsufficient params for SHORTHANDQUADRATICCURVETO";
   }
-  const curve = new CubicBezierCurve(new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint), new Vertex(lastPoint));
-  if (isRelative) {
-    curve.endPoint.x += Number(data[1]);
-    curve.endPoint.y += Number(data[2]);
-    curve.startControlPoint.x += curve.startPoint.x - (lastControlPoint.x - lastPoint.x);
-    curve.startControlPoint.y += curve.startPoint.y - (lastControlPoint.y - lastPoint.y);
-  } else {
-    curve.endPoint.x = Number(data[1]);
-    curve.endPoint.y = Number(data[2]);
-    curve.startControlPoint.x = curve.startPoint.x - (lastControlPoint.x - lastPoint.x);
-    curve.startControlPoint.y = curve.startPoint.y - (lastControlPoint.y - lastPoint.y);
-  }
-  // First handle as symmetrical cubic curve
-  curve.endControlPoint.x = curve.startControlPoint.x;
-  curve.endControlPoint.y = curve.startControlPoint.y;
+  var i = 1;
+  while (i + 1 < data.length) {
+    // Respect multiple 'T|t' commands here
+    if (data[i] === "T" || data[i] === "t") {
+      i++;
+      continue;
+    }
+    const curve = new CubicBezierCurve(
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint),
+      new Vertex(lastPoint)
+    );
+    if (isRelative) {
+      curve.endPoint.x += Number(data[i]);
+      curve.endPoint.y += Number(data[i + 1]);
+      curve.startControlPoint.x += curve.startPoint.x - (lastQuadraticControlPoint.x - lastPoint.x);
+      curve.startControlPoint.y += curve.startPoint.y - (lastQuadraticControlPoint.y - lastPoint.y);
+    } else {
+      curve.endPoint.x = Number(data[i]);
+      curve.endPoint.y = Number(data[i + 1]);
+      curve.startControlPoint.x = curve.startPoint.x - (lastQuadraticControlPoint.x - lastPoint.x);
+      curve.startControlPoint.y = curve.startPoint.y - (lastQuadraticControlPoint.y - lastPoint.y);
+    }
+    // First handle as symmetrical cubic curve
+    curve.endControlPoint.x = curve.startControlPoint.x;
+    curve.endControlPoint.y = curve.startControlPoint.y;
+    lastQuadraticControlPoint.y = curve.endControlPoint.y;
+    lastQuadraticControlPoint.x = curve.endControlPoint.x;
 
-  // Convert quadratic curve to cubic curve
-  curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * 0.666;
-  curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * 0.666;
-  curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * 0.666;
-  curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * 0.666;
+    // Convert quadratic curve to cubic curve
+    var scaleFactor = 0.666; // i === 1 ? 0.666 : 1.0;
+    curve.startControlPoint.x = curve.startPoint.x + (curve.startControlPoint.x - curve.startPoint.x) * scaleFactor;
+    curve.startControlPoint.y = curve.startPoint.y + (curve.startControlPoint.y - curve.startPoint.y) * scaleFactor;
+    curve.endControlPoint.x = curve.endPoint.x + (curve.endControlPoint.x - curve.endPoint.x) * scaleFactor;
+    curve.endControlPoint.y = curve.endPoint.y + (curve.endControlPoint.y - curve.endPoint.y) * scaleFactor;
 
-  //   console.log("ADDING T CURVE", curve);
-  result.push(curve);
-  lastPoint.x = curve.endPoint.x;
-  lastPoint.y = curve.endPoint.y;
-  lastControlPoint.x = curve.endControlPoint.x;
-  lastControlPoint.y = curve.endControlPoint.y;
-  if (isNaN(firstPoint.x)) {
-    firstPoint.x = curve.startPoint.x;
-    firstPoint.y = curve.startPoint.y;
+    //   console.log("ADDING T CURVE", curve);
+    result.push(curve);
+    lastPoint.x = curve.endPoint.x;
+    lastPoint.y = curve.endPoint.y;
+    lastControlPoint.x = curve.endControlPoint.x;
+    lastControlPoint.y = curve.endControlPoint.y;
+    if (isNaN(firstPoint.x)) {
+      firstPoint.x = curve.startPoint.x;
+      firstPoint.y = curve.startPoint.y;
+    }
+
+    i += 2;
   }
 };
 
@@ -486,70 +539,76 @@ const _handleArcTo = (
   lastControlPoint: XYCoords,
   result: Array<Line | CubicBezierCurve>
 ) => {
-  //   console.log("Handle ARCTO", data);
   if (data.length < 8) {
     throw "Unsufficient params for ARCTO";
   }
 
-  const arcEndPoint = { x: Number(data[6]), y: Number(data[7]) };
-  if (isRelative) {
-    arcEndPoint.x += lastPoint.x;
-    arcEndPoint.y += lastPoint.y;
-  }
-
-  // console.log(
-  //   "lastPoint.x",
-  //   lastPoint.x, // x1
-  //   "lastPoint.y",
-  //   lastPoint.y, // y1
-  //   "data[1]",
-  //   Number(data[1]), // rx
-  //   "data[2]",
-  //   Number(data[2]), // ry
-  //   "data[3]",
-  //   Number(data[3]), // phi: number,
-  //   "data[4]",
-  //   Boolean(data[4]), // fa: boolean,
-  //   "data[5]",
-  //   Boolean(data[5]), // fs: boolean,
-  //   "data[6]",
-  //   arcEndPoint.x, // Number(data[6]), // x2: number,
-  //   "data[7]",
-  //   arcEndPoint.y // Number(data[7]) // y2: number
-  // );
-  // A 5 4 0 1 1 -10 -5
-  // TODO: respect relative/absolute here
-  const ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
-    lastPoint.x,
-    lastPoint.y,
-    Number(data[1]),
-    Number(data[2]),
-    Number(data[3]) * DEG_TO_RAD,
-    Boolean(data[4]),
-    Boolean(data[5]),
-    arcEndPoint.x,
-    arcEndPoint.y // Number(data[7]) // y2: number
-  );
-
-  //   console.log("ellipseSector", ellipseSector);
-  const curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
-  for (var i = 0; i < curves.length; i++) {
-    result.push(curves[i]); // Destruct!
-  }
-  // result.push(ellipseSector.ellipse);
-  if (curves.length > 0) {
-    // console.log("curves", curves);
-    const lastCurve = curves[curves.length - 1];
-    lastPoint.x = lastCurve.endPoint.x;
-    lastPoint.y = lastCurve.endPoint.y;
-    lastControlPoint.x = lastCurve.endControlPoint.x;
-    lastControlPoint.y = lastCurve.endControlPoint.y;
-    if (isNaN(firstPoint.x)) {
-      firstPoint.x = curves[0].startPoint.x;
-      firstPoint.y = curves[0].startPoint.y;
+  for (var i = 1; i + 6 < data.length; i += 7) {
+    const arcEndPoint = { x: Number(data[i + 5]), y: Number(data[i + 6]) };
+    if (isRelative) {
+      arcEndPoint.x += lastPoint.x;
+      arcEndPoint.y += lastPoint.y;
     }
-  }
+    // console.log(
+    //   "ARC",
+    //   "data.length",
+    //   data.length,
+    //   "i",
+    //   i,
+    //   "lastPoint.x",
+    //   lastPoint.x, // x1
+    //   "lastPoint.y",
+    //   lastPoint.y, // y1
+    //   "data[i]",
+    //   Number(data[i]), // rx
+    //   "data[i+1]",
+    //   Number(data[i + 1]), // ry
+    //   "data[i+2]",
+    //   Number(data[i + 2]), // phi: number,
+    //   "data[i+3]",
+    //   Boolean(data[i + 3]), // fa: boolean,
+    //   "data[i+4]",
+    //   Boolean(data[i + 4]), // fs: boolean,
+    //   "data[i+5]",
+    //   arcEndPoint.x, // Number(data[6]), // x2: number,
+    //   "data[i+6]",
+    //   arcEndPoint.y // Number(data[7]) // y2: number
+    // );
+    // A 5 4 0 1 1 -10 -5
+    // TODO: respect relative/absolute here
+    const ellipseSector = VEllipseSector.ellipseSectorUtils.endpointToCenterParameters(
+      lastPoint.x,
+      lastPoint.y,
+      Number(data[i]),
+      Number(data[i + 1]),
+      Number(data[i + 2]) * DEG_TO_RAD,
+      Boolean(data[i + 3]),
+      Boolean(data[i + 4]),
+      arcEndPoint.x,
+      arcEndPoint.y // Number(data[7]) // y2: number
+    );
 
+    //   console.log("ellipseSector", ellipseSector);
+    const curves = ellipseSector.toCubicBezier(4); // 4 segments already seems to be a good approximation
+    for (var j = 0; j < curves.length; j++) {
+      result.push(curves[j]); // Destruct!
+    }
+    // result.push(ellipseSector.ellipse);
+    if (curves.length > 0) {
+      // console.log("curves", curves);
+      const lastCurve = curves[curves.length - 1];
+      // lastPoint.x = lastCurve.endPoint.x;
+      // lastPoint.y = lastCurve.endPoint.y;
+      lastControlPoint.x = lastCurve.endControlPoint.x;
+      lastControlPoint.y = lastCurve.endControlPoint.y;
+      if (isNaN(firstPoint.x)) {
+        firstPoint.x = curves[0].startPoint.x;
+        firstPoint.y = curves[0].startPoint.y;
+      }
+    }
+    lastPoint.x = arcEndPoint.x;
+    lastPoint.y = arcEndPoint.y;
+  } // END for
   // TODO: track first/last/control point
 };
 

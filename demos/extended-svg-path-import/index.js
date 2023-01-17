@@ -35,7 +35,7 @@
       useRelativePath: false,
       drawAbsoluteExamplePath: false,
       drawRelativeExamplePath: false,
-      drawSourcePathParsed: true,
+      drawParsedPath: true,
       drawSourcePathNative: true
     };
 
@@ -47,6 +47,36 @@
     // From the official logo
     var data2 =
       "M51.077 102.267c0-16.934 16.933-33.867 33.866-33.867h8.467c16.933 0 33.867 16.933 33.867 33.867v8.466c-16.934 25.4 8.466 50.8 33.866 33.867h8.467c16.933 0 33.867 16.933 33.867 33.867v8.466c0 16.934-16.934 33.867-33.867 33.867h-8.467c-25.4-16.933-50.8 8.467-33.866 33.867v8.466c0 16.934-16.934 33.867-33.867 33.867h-8.467c-16.933 0-33.866-16.933-33.866-33.867l-.277-8.466c16.933-33.867 16.933-110.067 0-143.934z";
+
+    // A square using only a single LINETO command with more than two params
+    var data3 = "M 25 25 L 75 25 75 75 25 75 z";
+
+    // A closed path consisting of a singl CUBICCURVETO command with multiple params.
+    var data4 = `M 25 25 C 50 0 50 0 75 25 100 50 100 50 75 75 50 100 50 100 25 75 0 50 0 50 25 25 z`;
+
+    // A closed path consisting of a singl QUADRATICCURVETO command with multiple params.
+    var data5 = "M 50 25 Q 75 25 75 50 75 75 50 75 25 75 25 50 25 25 50 25";
+
+    // A sqare made of vertical and horizontal path commands only.
+    var data6 = "M 25 25 H 35 45 55 65 75 V 35 45 55 65 75 H 65 55 45 35 25 V 65 55 45 35 25 z";
+
+    // A closed circle-like path consisting of one quadratic curve and three quadratic curves in shorthand notation.
+    var data7 = "M 50 25 Q 75 25 75 50 T 50 75 T 25 50 T 50 25 z";
+
+    // The same circle-like path consisting of one quadratic curve and one shorthand curve with multiple params (resulting in three curves).
+    var data8 = "M 50 25 Q 75 25 75 50 T 50 75 25 50 50 25 z";
+
+    // Arcs: 'A|a' (rx ry x-axis-rotation large-arc-flag sweep-flag x y)+
+    var radiusX = 25;
+    var radiusY = 25;
+    // prettier-ignore
+    var data9 = "M 25 25 " +
+      "A " + radiusX + " " + radiusY + " 180.0 0 1 75 25 " + 
+      radiusX + " " + radiusY + " 90.0 0 1 75 75 " +
+      radiusX + " " + radiusY + " 180.0 0 1 25 75 " +
+      radiusX + " " + radiusY + " 90.0 0 1 25 25 " +
+      "Z";
+    // var data9 = "M 75 25 A 100 50 0.0 0 1 75 75";
 
     // Define a shape with SVG path data attributes only with _absolute_
     // path commands.
@@ -94,11 +124,8 @@
     // | to load inserted data (from the dialog/modal).
     // +-------------------------------
     var loadPathData = function (data) {
-      console.log("data", data);
       pathSegments = parseSVGPathData(data);
       sourceData = data;
-      console.log("Setting sourceData", sourceData);
-      console.log("pathSegments", pathSegments);
       pb.redraw();
     };
 
@@ -110,8 +137,9 @@
       var textarea = document.createElement("textarea");
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
-      textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
+      // textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
       // textarea.innerHTML = data2;
+      textarea.innerHTML = data9;
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([
@@ -183,7 +211,7 @@
       if (config.drawSourcePathNative) {
         drawSourcePathNative(draw, fill);
       }
-      if (config.drawSourcePathParsed) {
+      if (config.drawParsedPath) {
         drawSourcePathParsed(draw, fill);
       }
     };
@@ -232,9 +260,9 @@
           draw.line(segment.a, segment.b, "green", 2);
         } else if (segment instanceof CubicBezierCurve) {
           draw.cubicBezier(segment.startPoint, segment.endPoint, segment.startControlPoint, segment.endControlPoint, "green", 2);
-        } /* else if (segment instanceof VEllipse) {
-          draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
-        } */
+          draw.line(segment.startPoint, segment.startControlPoint, "rgba(192,192,192,0.5)", 2);
+          draw.line(segment.endPoint, segment.endControlPoint, "rgba(192,192,192,0.5)", 2);
+        }
       }
     };
 
@@ -277,7 +305,7 @@
       // prettier-ignore
       gui.add(config, 'drawSourcePathNative').listen().onChange(function() { pb.redraw() }).name("drawSourcePathNative").title("Draw the native path?");
       // prettier-ignore
-      gui.add(config, 'drawSourcePathParsed').listen().onChange(function() { pb.redraw() }).name("drawSourcePathParsed").title("Draw the parsed path segments?");
+      gui.add(config, 'drawParsedPath').listen().onChange(function() { pb.redraw() }).name("drawParsedPath").title("Draw the parsed path segments?");
 
       // Add stats
       var uiStats = new UIStats(stats);
