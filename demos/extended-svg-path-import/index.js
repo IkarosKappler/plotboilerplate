@@ -124,14 +124,8 @@
     // | to load inserted data (from the dialog/modal).
     // +-------------------------------
     var loadPathData = function (data) {
-      console.log("data", data);
-      // TODO: the SVGCommand can have multiple additional parameters :)
-      var tmpSplitElements = splitSVGPathData(data);
-      console.log("tmpSplitElements", tmpSplitElements);
       pathSegments = parseSVGPathData(data);
       sourceData = data;
-      console.log("Setting sourceData", sourceData);
-      console.log("pathSegments", pathSegments);
       pb.redraw();
     };
 
@@ -252,7 +246,6 @@
         });
         // Choose a high contrast color
         var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).setAlpha(0.5).cssRGB();
-        console.log("dataElementsPlain", dataElementsPlain);
         draw.path(dataElementsPlain, contrastColor, 4);
       }
     };
@@ -269,9 +262,7 @@
           draw.cubicBezier(segment.startPoint, segment.endPoint, segment.startControlPoint, segment.endControlPoint, "green", 2);
           draw.line(segment.startPoint, segment.startControlPoint, "rgba(192,192,192,0.5)", 2);
           draw.line(segment.endPoint, segment.endControlPoint, "rgba(192,192,192,0.5)", 2);
-        } /* else if (segment instanceof VEllipse) {
-          draw.ellipse(segment.center, segment.radiusH(), segment.radiusV(), "green", 2);
-        } */
+        }
       }
     };
 

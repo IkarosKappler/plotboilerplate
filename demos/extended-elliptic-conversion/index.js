@@ -36,8 +36,8 @@
     );
 
     var config = {
-      radiusX: Math.abs(endPoint.x - startPoint.x), // 60,
-      radiusY: Math.abs(endPoint.y - startPoint.y), // 50,
+      radiusX: Math.abs(endPoint.x - startPoint.x),
+      radiusY: Math.abs(endPoint.y - startPoint.y),
       rotation: 0, // Here: degrees
       largeArcFlag: true,
       sweepFlag: true
@@ -66,14 +66,6 @@
       // Draw partial arc
       var arcCurves = ellipseSector.toCubicBezier(4);
       for (var i = 0; i < arcCurves.length; i++) {
-        console.log(
-          "arcCurves[i]",
-          i,
-          arcCurves[i].startPoint.toString(),
-          arcCurves[i].endPoint.toString(),
-          arcCurves[i].startControlPoint.toString(),
-          arcCurves[i].endControlPoint.toString()
-        );
         draw.cubicBezier(
           arcCurves[i].startPoint,
           arcCurves[i].endPoint,
