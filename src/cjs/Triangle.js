@@ -311,6 +311,7 @@ var Triangle = /** @class */ (function () {
         var lineC = new Line_1.Line(this.c, this.a);
         var bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
         var bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        // Cast to non-null here because we know there _is_ an intersection
         var intersection = bisector1.intersection(bisector2);
         // Find the closest points on one of the polygon lines (all have same distance by construction)
         var circleIntersA = lineA.getClosestPoint(intersection);

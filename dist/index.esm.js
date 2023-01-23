@@ -3910,8 +3910,7 @@ class BezierPath {
     static fromReducedList(pointArray, adjustCircular) {
         // Convert to object
         var bezierPath = new BezierPath(null); // No points yet
-        // var firstStartPoint: Vertex;
-        var startPoint;
+        var startPoint = new Vertex();
         var startControlPoint;
         var endControlPoint;
         var endPoint;
@@ -3933,7 +3932,7 @@ class BezierPath {
             startPoint = endPoint;
             i += 6;
         } while (i + 2 < pointArray.length);
-        bezierPath.adjustCircular = adjustCircular;
+        bezierPath.adjustCircular = adjustCircular !== null && adjustCircular !== void 0 ? adjustCircular : false;
         if (adjustCircular) {
             bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint = bezierPath.bezierCurves[0].startPoint;
         }
@@ -7823,6 +7822,7 @@ class Triangle {
         const lineC = new Line(this.c, this.a);
         const bisector1 = geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
         const bisector2 = geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        // Cast to non-null here because we know there _is_ an intersection
         const intersection = bisector1.intersection(bisector2);
         // Find the closest points on one of the polygon lines (all have same distance by construction)
         const circleIntersA = lineA.getClosestPoint(intersection);
@@ -11470,24 +11470,24 @@ class PlotBoilerplate {
      **/
     handleClick(e) {
         const _self = this;
-        var p = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
-        if (p) {
-            _self.vertices[p.vindex].listeners.fireClickEvent(e);
+        var point = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX || 1.0, _self.config.cssScaleY || 1.0));
+        if (point) {
+            _self.vertices[point.vindex].listeners.fireClickEvent(e);
             if (this.keyHandler && this.keyHandler.isDown("shift")) {
-                if (p.typeName == "bpath") {
-                    let vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
+                if (point.typeName == "bpath") {
+                    let vert = _self.paths[point.pindex].bezierCurves[point.cindex].getPointByID(point.pid);
                     if (vert.attr.selectable)
                         vert.attr.isSelected = !vert.attr.isSelected;
                 }
-                else if (p.typeName == "vertex") {
-                    let vert = _self.vertices[p.vindex];
+                else if (point.typeName == "vertex") {
+                    let vert = _self.vertices[point.vindex];
                     if (vert.attr.selectable)
                         vert.attr.isSelected = !vert.attr.isSelected;
                 }
                 _self.redraw();
             }
-            else if (this.keyHandler.isDown("y")) {
-                _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
+            else if (this.keyHandler && this.keyHandler.isDown("y")) {
+                _self.vertices[point.vindex].attr.bezierAutoAdjust = !_self.vertices[point.vindex].attr.bezierAutoAdjust;
                 _self.redraw();
             }
         }

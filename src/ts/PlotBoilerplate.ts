@@ -1697,23 +1697,23 @@ export class PlotBoilerplate {
    **/
   private handleClick(e: XMouseEvent) {
     const _self: PlotBoilerplate = this;
-    var p: IDraggable = this.locatePointNear(
+    var point: IDraggable | null = this.locatePointNear(
       _self.transformMousePosition(e.params.pos.x, e.params.pos.y),
-      PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY)
+      PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX || 1.0, _self.config.cssScaleY || 1.0)
     );
-    if (p) {
-      _self.vertices[p.vindex].listeners.fireClickEvent(e);
+    if (point) {
+      _self.vertices[point.vindex].listeners.fireClickEvent(e);
       if (this.keyHandler && this.keyHandler.isDown("shift")) {
-        if (p.typeName == "bpath") {
-          let vert: Vertex = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
+        if (point.typeName == "bpath") {
+          let vert: Vertex = _self.paths[point.pindex].bezierCurves[point.cindex].getPointByID(point.pid);
           if (vert.attr.selectable) vert.attr.isSelected = !vert.attr.isSelected;
-        } else if (p.typeName == "vertex") {
-          let vert: Vertex = _self.vertices[p.vindex];
+        } else if (point.typeName == "vertex") {
+          let vert: Vertex = _self.vertices[point.vindex];
           if (vert.attr.selectable) vert.attr.isSelected = !vert.attr.isSelected;
         }
         _self.redraw();
-      } else if (this.keyHandler.isDown("y")) {
-        _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
+      } else if (this.keyHandler && this.keyHandler.isDown("y")) {
+        _self.vertices[point.vindex].attr.bezierAutoAdjust = !_self.vertices[point.vindex].attr.bezierAutoAdjust;
         _self.redraw();
       }
     } else if (_self.selectPolygon != null) {

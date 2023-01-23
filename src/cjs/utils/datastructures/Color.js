@@ -17,7 +17,8 @@
  * @modified 2021-11-07 Added setRed, setGreen, setBlue, setHue, setSaturation, setLiminance functions.
  * @modified 2022-05-11 Modified the `clone` function by just copying the numeric calues, not re-calculating the whole color.
  * @modified 2022-05-11 Fixed the `interpolate` function.
- * @version 0.0.11
+ * @modified 2023-01-23 Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly .
+ * @version 0.0.12
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Color = void 0;
@@ -101,6 +102,16 @@ var Color = /** @class */ (function () {
      */
     Color.prototype.blue = function () {
         return this.b;
+    };
+    Color.prototype.set = function (color) {
+        this.r = color.r;
+        this.g = color.g;
+        this.b = color.b;
+        this.a = color.a;
+        this.h = color.h;
+        this.s = color.s;
+        this.l = color.l;
+        return this;
     };
     Color.prototype.setRed = function (r) {
         this.r = r;

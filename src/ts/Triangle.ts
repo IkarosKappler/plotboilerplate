@@ -404,7 +404,8 @@ export class Triangle implements SVGSerializable {
 
     const bisector1 = geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
     const bisector2 = geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
-    const intersection = bisector1.intersection(bisector2);
+    // Cast to non-null here because we know there _is_ an intersection
+    const intersection = bisector1.intersection(bisector2) as Vertex;
 
     // Find the closest points on one of the polygon lines (all have same distance by construction)
     const circleIntersA = lineA.getClosestPoint(intersection);

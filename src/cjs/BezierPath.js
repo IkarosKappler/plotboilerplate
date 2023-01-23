@@ -1198,8 +1198,7 @@ var BezierPath = /** @class */ (function () {
     BezierPath.fromReducedList = function (pointArray, adjustCircular) {
         // Convert to object
         var bezierPath = new BezierPath(null); // No points yet
-        // var firstStartPoint: Vertex;
-        var startPoint;
+        var startPoint = new Vertex_1.Vertex();
         var startControlPoint;
         var endControlPoint;
         var endPoint;
@@ -1221,7 +1220,7 @@ var BezierPath = /** @class */ (function () {
             startPoint = endPoint;
             i += 6;
         } while (i + 2 < pointArray.length);
-        bezierPath.adjustCircular = adjustCircular;
+        bezierPath.adjustCircular = adjustCircular !== null && adjustCircular !== void 0 ? adjustCircular : false;
         if (adjustCircular) {
             bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint = bezierPath.bezierCurves[0].startPoint;
         }

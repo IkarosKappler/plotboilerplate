@@ -1195,8 +1195,7 @@ export class BezierPath {
     static fromReducedList(pointArray, adjustCircular) {
         // Convert to object
         var bezierPath = new BezierPath(null); // No points yet
-        // var firstStartPoint: Vertex;
-        var startPoint;
+        var startPoint = new Vertex();
         var startControlPoint;
         var endControlPoint;
         var endPoint;
@@ -1218,7 +1217,7 @@ export class BezierPath {
             startPoint = endPoint;
             i += 6;
         } while (i + 2 < pointArray.length);
-        bezierPath.adjustCircular = adjustCircular;
+        bezierPath.adjustCircular = adjustCircular !== null && adjustCircular !== void 0 ? adjustCircular : false;
         if (adjustCircular) {
             bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint = bezierPath.bezierCurves[0].startPoint;
         }
