@@ -153,6 +153,10 @@ For a guide of how to [Getting Started click here](https://github.com/IkarosKapp
 
 A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
 
+### Codepen Demos
+
+[Basic Setup in a Codepen.io demo](https://codepen.io/ikaroskappler/pen/ZEjamVb)
+
 ### Screenshot
 
 ![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
@@ -542,7 +546,7 @@ new MouseHandler(document.getElementById("mycanvas"))
 - [jburkardt](https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html "jburkardt") for the obj test files.
 - [@veltman](https://noahveltman.com/) for the awesome [geometric skeletonization article](https://observablehq.com/@veltman/centerline-labeling)
 - [girih-tiles-spatial.jpg from Lund University, Architecture, Spatial Experiments, 2016.](https://spatialexperiments.wordpress.com/2016/09/19/islamic-geometry/girih-tiles-4/)
-- [https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115] Josh Frank's regular expression for parsing SVG path data.
+- [Josh Frank's regular expression for parsing SVG path data.](https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115)
 
 ## Todos
 
