@@ -1,6 +1,8 @@
 # Changelog
 
-- 2023-01-17
+- 2023-01-23
+  - Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
+- 2023-01-17 (v1.20.1)
   - 2023-01-17 Tweaking the demo `extended-elliptic-conversion`: adding large-arc-flag and sweep-flag.
   - Extending the `parseSVGPathData` and `splitSVGPathData` functions: basic path commands accepting additional sets of params now (ARC-command still missing).
 - 2023-01-03 (v1.20.0)
