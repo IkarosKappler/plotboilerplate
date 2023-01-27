@@ -138,8 +138,8 @@
       textarea.style.width = "100%";
       textarea.style.height = "50vh";
       // textarea.innerHTML = config.useRelativePath ? svgDataRelative.join(" ") : svgDataAbsolute.join(" ");
-      // textarea.innerHTML = data2;
-      textarea.innerHTML = data9;
+      textarea.innerHTML = data2;
+      // textarea.innerHTML = data9;
       modal.setTitle("Insert Path data (the 'd' string)");
       modal.setFooter("");
       modal.setActions([

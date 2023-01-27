@@ -1,0 +1,51 @@
+html, body {
+    font-family: 'Courier New', Courier, monospace;
+    /* font-size */
+}
+
+#top-container, #bottom-container {
+    /* width: 100%; */
+    margin-left: 32px;
+    margin-right: 32px;
+}
+
+#top-container {
+    padding-top: 32px;
+    /* height: 80%; */
+}
+
+#bottom-container {
+    /* height: 20%; */
+}
+
+#envelope-options {
+    display: flex;
+    flex-direction: row;;
+}
+
+#envelope-options-right, #envelope-options-left {
+    display: block;
+}
+
+#envelope-options-left {
+    width: 35%;
+    display: flex;
+    flex-shrink: 1;
+    flex-direction: column;
+}
+
+#envelope-options-right {
+    width: 65%;
+    display: flex;
+    flex-grow: 1;
+} 
+
+body.darkmode {
+    background-color: #001240;
+    color: #b900ff;
+}
+
+select.note-select {
+    width: 42px;
+    max-width: 42px;
+}

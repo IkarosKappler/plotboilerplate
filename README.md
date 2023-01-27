@@ -547,6 +547,7 @@ new MouseHandler(document.getElementById("mycanvas"))
 - [@veltman](https://noahveltman.com/) for the awesome [geometric skeletonization article](https://observablehq.com/@veltman/centerline-labeling)
 - [girih-tiles-spatial.jpg from Lund University, Architecture, Spatial Experiments, 2016.](https://spatialexperiments.wordpress.com/2016/09/19/islamic-geometry/girih-tiles-4/)
 - [Josh Frank's regular expression for parsing SVG path data.](https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115)
+- [Rick Moore for the useful javascript-synthesizer howto](https://medium.com/geekculture/building-a-modular-synth-with-web-audio-api-and-javascript-d38ccdeca9ea)
 
 ## Todos
 
@@ -559,3 +560,6 @@ new MouseHandler(document.getElementById("mycanvas"))
 - The minifid BBTree and BBTreeCollection files do not export anything. The un-minified does. Why that?
 - Arcs and ellipses break when non-uniform scaling (scalex!=scaley) is applied. Convert them to Bézier curves before drawing.
 - Currently no more known. Please report bugs.
+
+Oh look, a cat
+ᓚᘏᗢ
