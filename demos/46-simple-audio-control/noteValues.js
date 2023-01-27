@@ -139,3 +139,9 @@ var locateNoteByIdentifier = function (name) {
   }
   return -1;
 };
+
+var getNoteByIndex = function (index) {
+  var keys = Object.keys(noteValues);
+  var key = keys[index];
+  return { identifier: key, frequency: noteValues[key], index: index };
+};

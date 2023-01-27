@@ -57,49 +57,14 @@
     ];
 
     // NOTE SELECTS
-    const noteSelectsTable = document.querySelector("#note-selects-table");
-    const noteTableRow = document.createElement("tr");
-    for (let i = 0; i < NOTE_INPUT_COUNT; i++) {
-      const select = document.createElement("select");
-      select.id = `note ${i + 1}`;
-      select.classList.add("note-select");
-      for (let j = 0; j < Object.keys(noteValues).length; j++) {
-        const option = document.createElement("option");
-        option.value = j;
-        option.innerText = `${Object.keys(noteValues)[j]}`;
-        select.appendChild(option);
-        select.addEventListener("change", setCurrentNotes);
-      }
-      // Create duration slider
-      // <input type="range" id="attack-control" value="0.3" min="0" max="0.5" step="0.02"><br></br>
-      var lengthSlider = document.createElement("input");
-      lengthSlider.setAttribute("type", "range");
-      lengthSlider.setAttribute("min", 0.0);
-      lengthSlider.setAttribute("max", 4.0);
-      lengthSlider.setAttribute("orient", "vertical");
-      lengthSlider.classList.add("note_duration_slider");
-      lengthSlider.value = 1.0;
-      lengthSlider.step = 0.1;
-      lengthSlider.addEventListener("input", setCurrentNoteLengths);
-      var sliderValueDisplay = document.createElement("span");
-      sliderValueDisplay.innerHTML = 1.0;
-      sliderValueDisplay.id = `note-length-display-${i + 1}`;
-      var noteCell = document.createElement("td");
-      var noteCellDiv = document.createElement("div");
-      noteCellDiv.appendChild(sliderValueDisplay);
-      noteCellDiv.appendChild(lengthSlider);
-      noteCellDiv.appendChild(select);
-      noteCell.appendChild(noteCellDiv);
-      noteTableRow.appendChild(noteCell);
-    }
-    noteSelectsTable.appendChild(noteTableRow);
+    renderNoteSelectTable(NOTE_INPUT_COUNT, setCurrentNotes, setCurrentNoteLengths, handleNoteSelectChange);
 
     // let currentNotes = [0, 3, 0, 7, 8, 7, 3, 2];
     var currentNotes = new Array(NOTE_INPUT_COUNT).fill(0, 0, NOTE_INPUT_COUNT).map(function (value, index) {
       // Pick a note in the 4th or 5th ocate
       // C4 is at index 48
       // return 48 + Math.floor(Math.random() * 12);
-      return locateNoteByIdentifier(initialConfig[index].value);
+      return { noteIndex: locateNoteByIdentifier(initialConfig[index].value), lengthFactor: initialConfig[index].lengthFactor };
     });
     // Close encounters: https://johnloomis.org/ece303L/notes/music/Close_Encounters.html
     // G-A-F-F-C = 7-9-5-5-0
@@ -117,28 +82,55 @@
     const noteSelects = document.querySelectorAll("select");
     function setNoteSelects() {
       for (let i = 0; i < currentNotes.length; i++) {
-        noteSelects[i].value = currentNotes[i];
+        var noteIndex = currentNotes[i].noteIndex;
+        noteSelects[i].value = noteIndex;
+        var noteIdentifier = Object.keys(noteValues)[noteIndex];
+        var noteFrequency = noteValues[noteIdentifier];
+        noteSelects[i].setAttribute("title", `${noteIdentifier} @${noteFrequency}Hz`);
       }
     }
-    const currentNoteLengthFactors = new Array(NOTE_INPUT_COUNT).fill(1, 0, NOTE_INPUT_COUNT);
+    // const currentNoteLengthFactors = new Array(NOTE_INPUT_COUNT).fill(1, 0, NOTE_INPUT_COUNT);
 
     function setCurrentNotes() {
       for (let i = 0; i < noteSelects.length; i++) {
-        currentNotes[i] = noteSelects[i].value;
+        currentNotes[i].noteIndex = noteSelects[i].value;
       }
+    }
+
+    function handleNoteSelectChange(event) {
+      console.log("event", event, event.target.value);
+      var noteIndex = event.target.value;
+      var selectIndex = event.target.getAttribute("data-index");
+      currentNotes[selectIndex].noteIndex = noteIndex;
+      var note = getNoteByIndex(noteIndex);
+      noteSelects[selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
+      // for (let i = 0; i < noteSelects.length; i++) {
+      //   currentNotes[i].noteIndex = noteSelects[i].value;
+      // }
     }
 
     const noteLengthSliders = document.querySelectorAll("input[type=range].note_duration_slider");
     console.log("noteLengthSliders", noteLengthSliders.length);
+    function setCurrentNoteLengthInputs() {
+      // console.log("setCurrentNoteLengths", setCurrentNoteLengths);
+      for (let i = 0; i < noteLengthSliders.length; i++) {
+        // currentNoteLengthFactors[i] = Number(noteLengthSliders[i].value);
+        noteLengthSliders[i].value = currentNotes[i].lengthFactor;
+        document.getElementById(`note-length-display-${i + 1}`).innerHTML = currentNotes[i].lengthFactor;
+      }
+      console.log("currentNotes", currentNotes);
+    }
     function setCurrentNoteLengths() {
       // console.log("setCurrentNoteLengths", setCurrentNoteLengths);
       for (let i = 0; i < noteLengthSliders.length; i++) {
         document.getElementById(`note-length-display-${i + 1}`).innerHTML = noteLengthSliders[i].value;
-        currentNoteLengthFactors[i] = Number(noteLengthSliders[i].value);
+        // currentNoteLengthFactors[i] = Number(noteLengthSliders[i].value);
+        currentNotes[i].lengthFactor = Number(noteLengthSliders[i].value);
       }
-      console.log("currentNoteLengths", currentNoteLengthFactors);
+      console.log("currentNotes", currentNotes);
     }
 
+    setCurrentNoteLengthInputs();
     setNoteSelects();
 
     // CONTEXT AND MASTER VOLUME
@@ -150,10 +142,12 @@
     masterVolume.gain.value = 0.2;
 
     const volumeControl = document.querySelector("#volume-control");
-
-    volumeControl.addEventListener("input", function () {
-      masterVolume.gain.value = this.value;
-    });
+    var handleMasterVolumeChange = function () {
+      masterVolume.gain.value = volumeControl.value;
+      document.querySelector("#display-master-volume-control").innerHTML = `${(Number(volumeControl.value) * 100).toFixed(0)}%`;
+    };
+    volumeControl.addEventListener("input", handleMasterVolumeChange);
+    handleMasterVolumeChange();
 
     //WAVEFORM SELECT
     const waveforms = document.getElementsByName("waveform");
@@ -174,13 +168,7 @@
     });
 
     // EFFECTS CONTROLS
-
     // Envelope
-    // let attackTime = 0.3;
-    // let sustainLevel = 0.8;
-    // let releaseTime = 0.3;
-    // let noteLength = 1;
-
     const attackControl = document.querySelector("#attack-control");
     const releaseControl = document.querySelector("#release-control");
     const noteLengthControl = document.querySelector("#note-length-control");
@@ -261,13 +249,12 @@
     let currentNoteIndex = 0;
     let isPlaying = false;
 
-    tempoControl.addEventListener(
-      "input",
-      function () {
-        tempo = Number(this.value);
-      },
-      false
-    );
+    var handleTempChange = function () {
+      tempo = Number(tempoControl.value);
+      document.querySelector("#display-tempo-control").innerHTML = `${tempo}bpm`;
+    };
+    tempoControl.addEventListener("input", handleTempChange, false);
+    handleTempChange();
 
     startButton.addEventListener("click", function () {
       if (!isPlaying) {
@@ -307,7 +294,8 @@
     }
 
     function playCurrentNote() {
-      const noteLengthFactor = currentNoteLengthFactors[currentNoteIndex];
+      var curNote = currentNotes[currentNoteIndex];
+      const noteLengthFactor = curNote.lengthFactor; // currentNoteLengthFactors[currentNoteIndex];
       if (noteLengthFactor <= 0.0) {
         return;
       }
@@ -338,7 +326,9 @@
       lfo.connect(lfoGain);
 
       osc.type = waveform;
-      osc.frequency.setValueAtTime(Object.values(noteValues)[`${currentNotes[currentNoteIndex]}`], 0);
+      // osc.frequency.setValueAtTime(Object.values(noteValues)[`${currentNotes[currentNoteIndex]}`], 0);
+      osc.frequency.setValueAtTime(Object.values(noteValues)[`${curNote.noteIndex}`], 0);
+
       osc.start(0);
       osc.stop(context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
       osc.connect(noteGain);
@@ -351,14 +341,14 @@
     // +---------------------------------------------------------------------------------
     // | Add stats.
     // +-------------------------------
-    var stats = {
-      mouseXTop: 0,
-      mouseYTop: 0
-    };
-    var uiStats = new UIStats(stats);
-    stats = uiStats.proxy;
-    uiStats.add("mouseXTop").precision(1);
-    uiStats.add("mouseYTop").precision(1);
+    // var stats = {
+    //   mouseXTop: 0,
+    //   mouseYTop: 0
+    // };
+    // var uiStats = new UIStats(stats);
+    // stats = uiStats.proxy;
+    // uiStats.add("mouseXTop").precision(1);
+    // uiStats.add("mouseYTop").precision(1);
 
     // +---------------------------------------------------------------------------------
     // | Initialize dat.gui
