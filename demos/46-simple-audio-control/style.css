@@ -1,6 +1,20 @@
+:root {
+    --text-color: #b900ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html, body {
     font-family: 'Courier New', Courier, monospace;
     /* font-size */
+}
+
+h1, h2, h3 {
+    text-shadow: 2px 2px 6px var(--text-color);
 }
 
 #top-container, #bottom-container {
@@ -18,14 +32,48 @@ html, body {
     /* height: 20%; */
 }
 
-#envelope-options {
+.flex-row {
     display: flex;
-    flex-direction: row;;
+    flex-direction: row;
 }
 
-#envelope-options-right, #envelope-options-left {
+.flex-row-wrap {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.d-block {
     display: block;
 }
+
+/* .w-50 {
+    width: 50%;
+} */
+
+@media only screen and (min-width: 769px) {
+    /* STYLES HERE */
+    .w-lg-33 {
+        width: 33%;
+    }
+}
+
+@media only screen and (min-width: 481px) and (max-width: 768px) { 
+    /* STYLES HERE */
+    .w-md-33 {
+        width: 33%;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    /* STYLES HERE */
+    .w-sm-50 {
+        width: 50%;
+    }
+}
+
+/* #envelope-options-right, #envelope-options-left {
+    display: block;
+} */
 
 #envelope-options-left {
     width: 35%;
@@ -45,7 +93,21 @@ body.darkmode {
     color: #b900ff;
 }
 
+#note-selects-table tr td div {
+    display: flex;
+    flex-direction: column; 
+}
+
 select.note-select {
     width: 42px;
     max-width: 42px;
+}
+
+input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* Chromium */
+    width: 8px;
+    height: 100px;
+    padding: 0 5px;
 }

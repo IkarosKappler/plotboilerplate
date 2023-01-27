@@ -30,103 +30,89 @@
     if (isDarkmode) {
       document.getElementsByTagName("body")[0].classList.add("darkmode");
     }
-    var mousePosition = { x: NaN, y: NaN };
 
-    // // All config params are optional.
-    // var pbEnvelope = new PlotBoilerplate(
-    //   PlotBoilerplate.utils.safeMergeByKeys(
-    //     {
-    //       canvas: document.getElementById("envelope-canvas"),
-    //       fullSize: false,
-    //       fitToParent: true,
-    //       backgroundColor: isDarkmode ? "#000000" : "#ffffff",
-    //       drawGrid: true,
-    //       drawRaster: true,
-    //       drawOrigin: true,
-    //       autoAdjustOffset: true,
-    //       offsetAdjustXPercent: 0,
-    //       offsetAdjustYPercent: 100
-    //     },
-    //     GUP
-    //   )
-    // );
     var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff");
 
-    var randColor = function (i, alpha) {
-      var color = WebColorsContrast[i % WebColorsContrast.length].clone();
-      if (typeof alpha !== undefined) color.a = alpha;
-      return color;
-    };
+    const NOTE_INPUT_COUNT = 16;
 
-    // // {Bounds}
-    // var viewport = pbEnvelope.viewport();
-    // pbEnvelope.config.scale.x = 1.0 / viewport.width;
-    // pbEnvelope.config.scale.y = 1.0 / viewport.height;
-    // pbEnvelope.fitToView(new Bounds(new Vertex(0, 0), new Vertex(1, 1)));
-
-    // +---------------------------------------------------------------------------------
-    // | A global config that's attached to the dat.gui control interface.
-    // +-------------------------------
-    var config = PlotBoilerplate.utils.safeMergeByKeys(
-      {
-        animate: true,
-        showPath: false
-      },
-      GUP
-    );
-
-    // // +---------------------------------------------------------------------------------
-    // // | Draw our custom stuff after everything else in the scene was drawn.
-    // // +-------------------------------
-    // var predraw = function (draw, fill) {
-    //   draw.polygon(viewport.toPolygon(), "rgba(192,192,192,0.5)", 1);
-    // };
-
-    const notes = {
-      "C4": 261.63,
-      "Db4": 277.18,
-      "D4": 293.66,
-      "Eb4": 311.13,
-      "E4": 329.63,
-      "F4": 349.23,
-      "Gb4": 369.99,
-      "G4": 392.0,
-      "Ab4": 415.3,
-      "A4": 440,
-      "Bb4": 466.16,
-      "B4": 493.88,
-      "C5": 523.25
-    };
+    // This config MUST have 16 entries
+    var initialConfig = [
+      { value: "G4", lengthFactor: 1.0 },
+      { value: "A4", lengthFactor: 1.0 },
+      { value: "F4", lengthFactor: 1.0 },
+      { value: "F3", lengthFactor: 3.0 },
+      { value: "C4", lengthFactor: 0.0 },
+      { value: "C4", lengthFactor: 2.0 },
+      { value: "C4", lengthFactor: 0.0 },
+      { value: "C4", lengthFactor: 0.0 },
+      // 8/16
+      { value: "G4", lengthFactor: 1.0 },
+      { value: "A4", lengthFactor: 1.0 },
+      { value: "F4", lengthFactor: 1.0 },
+      { value: "F3", lengthFactor: 3.0 },
+      { value: "C4", lengthFactor: 0.0 },
+      { value: "C4", lengthFactor: 2.0 },
+      { value: "C4", lengthFactor: 0.0 },
+      { value: "C4", lengthFactor: 0.0 }
+    ];
 
     // NOTE SELECTS
-    const noteSelectsDiv = document.querySelector("#note-selects-div");
-
-    const noteInputCount = 16;
-
-    for (let i = 0; i < noteInputCount; i++) {
+    const noteSelectsTable = document.querySelector("#note-selects-table");
+    const noteTableRow = document.createElement("tr");
+    for (let i = 0; i < NOTE_INPUT_COUNT; i++) {
       const select = document.createElement("select");
       select.id = `note ${i + 1}`;
       select.classList.add("note-select");
-      for (let j = 0; j < Object.keys(notes).length; j++) {
+      for (let j = 0; j < Object.keys(noteValues).length; j++) {
         const option = document.createElement("option");
         option.value = j;
-        option.innerText = `${Object.keys(notes)[j]}`;
+        option.innerText = `${Object.keys(noteValues)[j]}`;
         select.appendChild(option);
         select.addEventListener("change", setCurrentNotes);
       }
-      noteSelectsDiv.appendChild(select);
+      // Create duration slider
+      // <input type="range" id="attack-control" value="0.3" min="0" max="0.5" step="0.02"><br></br>
+      var lengthSlider = document.createElement("input");
+      lengthSlider.setAttribute("type", "range");
+      lengthSlider.setAttribute("min", 0.0);
+      lengthSlider.setAttribute("max", 4.0);
+      lengthSlider.setAttribute("orient", "vertical");
+      lengthSlider.classList.add("note_duration_slider");
+      lengthSlider.value = 1.0;
+      lengthSlider.step = 0.1;
+      lengthSlider.addEventListener("input", setCurrentNoteLengths);
+      var sliderValueDisplay = document.createElement("span");
+      sliderValueDisplay.innerHTML = 1.0;
+      sliderValueDisplay.id = `note-length-display-${i + 1}`;
+      var noteCell = document.createElement("td");
+      var noteCellDiv = document.createElement("div");
+      noteCellDiv.appendChild(sliderValueDisplay);
+      noteCellDiv.appendChild(lengthSlider);
+      noteCellDiv.appendChild(select);
+      noteCell.appendChild(noteCellDiv);
+      noteTableRow.appendChild(noteCell);
     }
+    noteSelectsTable.appendChild(noteTableRow);
 
     // let currentNotes = [0, 3, 0, 7, 8, 7, 3, 2];
-    var currentNotes = new Array(noteInputCount).fill(0, 0, noteInputCount).map(function () {
-      return Math.floor(Math.random() * Object.keys(notes).length);
+    var currentNotes = new Array(NOTE_INPUT_COUNT).fill(0, 0, NOTE_INPUT_COUNT).map(function (value, index) {
+      // Pick a note in the 4th or 5th ocate
+      // C4 is at index 48
+      // return 48 + Math.floor(Math.random() * 12);
+      return locateNoteByIdentifier(initialConfig[index].value);
     });
+    // Close encounters: https://johnloomis.org/ece303L/notes/music/Close_Encounters.html
     // G-A-F-F-C = 7-9-5-5-0
-    currentNotes[0] = 7;
-    currentNotes[1] = 9;
-    currentNotes[2] = 5;
-    currentNotes[3] = 5;
-    currentNotes[4] = 0;
+    // currentNotes[0] = 7;
+    // currentNotes[1] = 9;
+    // currentNotes[2] = 5;
+    // currentNotes[3] = 5;
+    // currentNotes[4] = 0;
+    // currentNotes[0] = 56 - 1;
+    // currentNotes[1] = 58 - 1;
+    // currentNotes[2] = 54 - 1;
+    // currentNotes[3] = 54 - 1 - 12; // 42
+    // currentNotes[4] = 49 - 1;
     console.log("currentNotes", currentNotes);
     const noteSelects = document.querySelectorAll("select");
     function setNoteSelects() {
@@ -134,11 +120,23 @@
         noteSelects[i].value = currentNotes[i];
       }
     }
+    const currentNoteLengthFactors = new Array(NOTE_INPUT_COUNT).fill(1, 0, NOTE_INPUT_COUNT);
 
     function setCurrentNotes() {
       for (let i = 0; i < noteSelects.length; i++) {
         currentNotes[i] = noteSelects[i].value;
       }
+    }
+
+    const noteLengthSliders = document.querySelectorAll("input[type=range].note_duration_slider");
+    console.log("noteLengthSliders", noteLengthSliders.length);
+    function setCurrentNoteLengths() {
+      // console.log("setCurrentNoteLengths", setCurrentNoteLengths);
+      for (let i = 0; i < noteLengthSliders.length; i++) {
+        document.getElementById(`note-length-display-${i + 1}`).innerHTML = noteLengthSliders[i].value;
+        currentNoteLengthFactors[i] = Number(noteLengthSliders[i].value);
+      }
+      console.log("currentNoteLengths", currentNoteLengthFactors);
     }
 
     setNoteSelects();
@@ -178,18 +176,10 @@
     // EFFECTS CONTROLS
 
     // Envelope
-    let attackTime = 0.3;
-    let sustainLevel = 0.8;
-    let releaseTime = 0.3;
-    let noteLength = 1;
-    // var attackTimeVert = new Vertex(attackTime * viewport.width, -1.0 * viewport.height);
-    // var sustainLevelVert = new Vertex(sustainLevel * viewport.width, -0.7 * viewport.height);
-    // var noteLengthVert = new Vertex(noteLength * viewport.width, -0.5 * viewport.height);
-    // pbEnvelope.add(attackTimeVert);
-    // pbEnvelope.add(sustainLevelVert);
-    // pbEnvelope.add(noteLengthVert);
-    // pbEnvelope.add(new Polygon([new Vertex(0, 0), attackTimeVert, sustainLevelVert, noteLengthVert], true));
-    // pbEnvelope.drawConfig.polygon.lineWidth = 2.0;
+    // let attackTime = 0.3;
+    // let sustainLevel = 0.8;
+    // let releaseTime = 0.3;
+    // let noteLength = 1;
 
     const attackControl = document.querySelector("#attack-control");
     const releaseControl = document.querySelector("#release-control");
@@ -307,22 +297,34 @@
         noteSelects[currentNoteIndex - 1].style.background = "white";
       } else {
         // noteSelects[7].style.background = "white";
-        noteSelects[noteInputCount - 1].style.background = "white";
+        noteSelects[NOTE_INPUT_COUNT - 1].style.background = "white";
       }
       // currentNoteIndex++;
       // if (currentNoteIndex === 8) {
       //   currentNoteIndex = 0;
       // }
-      currentNoteIndex = (currentNoteIndex + 1) % noteInputCount;
+      currentNoteIndex = (currentNoteIndex + 1) % NOTE_INPUT_COUNT;
     }
 
     function playCurrentNote() {
+      const noteLengthFactor = currentNoteLengthFactors[currentNoteIndex];
+      if (noteLengthFactor <= 0.0) {
+        return;
+      }
       const osc = context.createOscillator();
       const noteGain = context.createGain();
       noteGain.gain.setValueAtTime(0, 0);
-      noteGain.gain.linearRampToValueAtTime(sustainLevel, context.currentTime + noteLength * attackTime);
-      noteGain.gain.setValueAtTime(sustainLevel, context.currentTime + noteLength - noteLength * releaseTime);
-      noteGain.gain.linearRampToValueAtTime(0, context.currentTime + noteLength);
+      noteGain.gain.linearRampToValueAtTime(
+        envelopeHandler.envelope.sustainLevel,
+        context.currentTime + envelopeHandler.envelope.noteLength * envelopeHandler.envelope.attackTime * noteLengthFactor
+      );
+      noteGain.gain.setValueAtTime(
+        envelopeHandler.envelope.sustainLevel,
+        context.currentTime +
+          (envelopeHandler.envelope.noteLength - envelopeHandler.envelope.noteLength * envelopeHandler.envelope.releaseTime) *
+            noteLengthFactor
+      );
+      noteGain.gain.linearRampToValueAtTime(0, context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
 
       var lfoGain = context.createGain();
       lfoGain.gain.setValueAtTime(vibratoAmount, 0);
@@ -331,13 +333,14 @@
       var lfo = context.createOscillator();
       lfo.frequency.setValueAtTime(vibratoSpeed, 0);
       lfo.start(0);
-      lfo.stop(context.currentTime + noteLength);
+      // lfo.stop(context.currentTime + envelopeHandler.envelope.noteLength);
+      lfo.stop(context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
       lfo.connect(lfoGain);
 
       osc.type = waveform;
-      osc.frequency.setValueAtTime(Object.values(notes)[`${currentNotes[currentNoteIndex]}`], 0);
+      osc.frequency.setValueAtTime(Object.values(noteValues)[`${currentNotes[currentNoteIndex]}`], 0);
       osc.start(0);
-      osc.stop(context.currentTime + noteLength);
+      osc.stop(context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
       osc.connect(noteGain);
 
       noteGain.connect(masterVolume);
