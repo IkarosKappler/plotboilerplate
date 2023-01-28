@@ -10,7 +10,7 @@
 (function (context) {
   const NOTE_INPUT_COUNT = 16;
 
-  context.NoteSelectHandler = function (initialPreset, setCurrentNoteLengths) {
+  context.NoteSelectHandler = function (initialPreset) {
     this.currentNotes = convertPresetToNotes(NOTE_INPUT_COUNT, initialPreset.noteValues);
 
     var _self = this;
@@ -27,14 +27,6 @@
     const noteSelectsTable = document.querySelector("#note-selects-table");
     // Create the table row
     const noteTableRow = document.createElement("tr");
-    // Create the leftest info cell
-    var labelCell = document.createElement("td");
-    labelCell.classList.add("align-top");
-    var labelCellDiv = document.createElement("div");
-    labelCellDiv.innerHTML = "dur ×";
-    labelCell.classList.add("align-center", "vertical-text");
-    labelCell.appendChild(labelCellDiv);
-    noteTableRow.appendChild(labelCell);
     // Now create n cells for n notes
     for (let i = 0; i < NOTE_INPUT_COUNT; i++) {
       const select = document.createElement("select");
@@ -58,7 +50,9 @@
       lengthSlider.classList.add("note_duration_slider");
       lengthSlider.value = 1.0;
       lengthSlider.step = 0.1;
-      lengthSlider.addEventListener("input", setCurrentNoteLengths);
+      lengthSlider.addEventListener("input", function () {
+        _self.setCurrentNoteLengths();
+      });
       var sliderValueDisplay = document.createElement("span");
       sliderValueDisplay.innerHTML = 1.0;
       sliderValueDisplay.id = `note-length-display-${i + 1}`;
@@ -71,9 +65,17 @@
       noteCellDiv.appendChild(select);
       noteCell.appendChild(noteCellDiv);
       noteTableRow.appendChild(noteCell);
-    }
+    } // END for
     noteSelectsTable.appendChild(noteTableRow);
-    // }
+
+    // Create the rightest info cell
+    var labelCell = document.createElement("td");
+    labelCell.classList.add("align-top");
+    var labelCellDiv = document.createElement("div");
+    labelCellDiv.innerHTML = "dur ×";
+    labelCell.classList.add("align-center", "vertical-text");
+    labelCell.appendChild(labelCellDiv);
+    noteTableRow.appendChild(labelCell);
 
     this._noteSelects = document.querySelectorAll("select");
     this._noteLengthSliders = document.querySelectorAll("input[type=range].note_duration_slider");
@@ -117,8 +119,8 @@
   };
 
   context.NoteSelectHandler.prototype.setCurrentNoteLengths = function () {
-    for (let i = 0; i < noteLengthSliders.length; i++) {
-      document.getElementById(`note-length-display-${i + 1}`).innerHTML = noteLengthSliders[i].value;
+    for (let i = 0; i < this._noteLengthSliders.length; i++) {
+      document.getElementById(`note-length-display-${i + 1}`).innerHTML = this._noteLengthSliders[i].value;
       this.currentNotes[i].lengthFactor = Number(this._noteLengthSliders[i].value);
     }
     console.log("currentNotes", currentNotes);
