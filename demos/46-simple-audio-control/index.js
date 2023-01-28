@@ -32,27 +32,7 @@
       document.getElementsByTagName("body")[0].classList.add("darkmode");
     }
 
-    var mainControls = new MainControls();
     var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff");
-
-    let currentNoteIndex = 0;
-    let isPlaying = false;
-
-    // NOTE SELECTS
-    var initialPreset = getDefaultPreset();
-    var noteSelectHandler = new NoteSelectHandler(initialPreset);
-
-    var resetLoop = function () {
-      currentNoteIndex = 0;
-    };
-
-    new PresetSelector(function (selectedPreset) {
-      noteSelectHandler.setFromPreset(selectedPreset);
-      console.log("selectedPreset.envelope", selectedPreset.envelope);
-      envelopeHandler.setValues(selectedPreset.envelope);
-      mainControls.setValues(selectedPreset.mainValues);
-      resetLoop();
-    });
 
     // WAVEFORM SELECT
     const waveforms = document.getElementsByName("waveform");
@@ -64,12 +44,51 @@
           waveform = waveforms[i].value;
         }
       }
+      console.log("waveform", waveform);
     }
 
     waveforms.forEach(waveformInput => {
       waveformInput.addEventListener("change", function () {
         setWaveform();
       });
+    });
+
+    var updateWaveformDisplay = function () {
+      for (var i = 0; i < waveforms.length; i++) {
+        waveforms[i].checked = Boolean(waveforms[i].value === waveform);
+      }
+    };
+
+    var setOscillatorValues = function (options) {
+      if (options && typeof options.waveform !== "undefined") {
+        waveform = options.waveform;
+        updateWaveformDisplay();
+      }
+    };
+
+    let currentNoteIndex = 0;
+    let isPlaying = false;
+
+    // NOTE SELECTS
+    var initialPreset = getDefaultPreset();
+    var noteSelectHandler = new NoteSelectHandler(initialPreset);
+
+    var mainControls = new MainControls();
+    mainControls.setValues(initialPreset.mainValues);
+    envelopeHandler.setValues(initialPreset.envelope);
+    setOscillatorValues(initialPreset.oscillator);
+
+    var resetLoop = function () {
+      currentNoteIndex = 0;
+    };
+
+    new PresetSelector(function (selectedPreset) {
+      noteSelectHandler.setFromPreset(selectedPreset);
+      console.log("selectedPreset.envelope", selectedPreset.envelope);
+      envelopeHandler.setValues(selectedPreset.envelope);
+      mainControls.setValues(selectedPreset.mainValues);
+      setOscillatorValues(initialPreset.oscillator);
+      resetLoop();
     });
 
     // // EFFECTS CONTROLS
@@ -100,6 +119,11 @@
     const delay = mainControls.context.createDelay();
     const feedback = mainControls.context.createGain();
     const delayAmountGain = mainControls.context.createGain();
+
+    const singleLoopControl = document.querySelector("#single-loop-only");
+    singleLoopControl.addEventListener("input", function () {
+      // ???
+    });
 
     delayAmountGain.connect(delay);
     delay.connect(feedback);
@@ -140,10 +164,21 @@
       resetLoop();
     });
 
-    startButton.addEventListener("click", function () {
-      if (!isPlaying) {
+    var updatePlayingDisplay = function () {
+      if (isPlaying) {
+        startButton.classList.remove("d-none");
+        stopButton.classList.add("d-none");
+      } else {
         startButton.classList.add("d-none");
         stopButton.classList.remove("d-none");
+      }
+    };
+
+    startButton.addEventListener("click", function () {
+      if (!isPlaying) {
+        // startButton.classList.add("d-none");
+        // stopButton.classList.remove("d-none");
+        updatePlayingDisplay();
         isPlaying = true;
         noteLoop();
       }
@@ -151,8 +186,9 @@
 
     stopButton.addEventListener("click", function () {
       if (isPlaying) {
-        startButton.classList.remove("d-none");
-        stopButton.classList.add("d-none");
+        // startButton.classList.remove("d-none");
+        // stopButton.classList.add("d-none");
+        updatePlayingDisplay();
       }
       isPlaying = false;
     });
@@ -162,9 +198,15 @@
       if (isPlaying) {
         playCurrentNote();
         nextNote();
-        window.setTimeout(function () {
-          noteLoop();
-        }, secondsPerBeat * 1000);
+        if (currentNoteIndex === 0 && singleLoopControl.checked) {
+          singleLoopControl.checked = false;
+          isPlaying = false;
+          updatePlayingDisplay();
+        } else {
+          window.setTimeout(function () {
+            noteLoop();
+          }, secondsPerBeat * 1000);
+        }
       }
     }
 

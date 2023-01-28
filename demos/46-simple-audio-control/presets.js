@@ -3,6 +3,7 @@
 // This config MUST have 16 entries
 var presetsCloseEncounters = {
   envelope: { attackTime: 0.06, noteLength: 1.0 },
+  mainValues: { tempo: 120, masterVolume: 0.2 },
   noteValues: [
     { value: "G4", lengthFactor: 1.0 },
     { value: "A4", lengthFactor: 1.0 },
@@ -76,17 +77,75 @@ var presetsUlravoxHymn = {
   ]
 };
 
-// Start Wars?
-// Mass Effect?
-//
+// Start Wars The Force
+// ...
+var presetsUTheForce = {
+  envelope: { attackTime: 0.36, noteLength: 2.8, releaseTime: 0.5, sustainLevel: 0.38 },
+  mainValues: { tempo: 60, masterVolume: 0.2 },
+  noteValues: [
+    { value: "G3", lengthFactor: 1.0 },
+    { value: "C4", lengthFactor: 1.0 },
+    { value: "D4", lengthFactor: 1.0 },
+    { value: "D#4/Eb4", lengthFactor: 0.5 },
+    { value: "F4", lengthFactor: 0.5 },
+    { value: "D#4/Eb4", lengthFactor: 1.0 },
+    { value: "G3", lengthFactor: 1.0 },
+    // -- Pause
+    { value: "G3", lengthFactor: 0.5 },
+    // 8/16
+    { value: "C4", lengthFactor: 1.0 },
+    { value: "D4", lengthFactor: 0.5 },
+    { value: "D#4/Eb4", lengthFactor: 0.5 },
+    { value: "G3", lengthFactor: 0.5 },
+    { value: "D#4/Eb4", lengthFactor: 0.5 },
+    { value: "C4", lengthFactor: 0.5 },
+    { value: "G4", lengthFactor: 0.5 },
+    { value: "F4", lengthFactor: 1.0 }
+  ]
+};
+
+// Mass Effect
+// ...
+var presetsMassEffect = {
+  envelope: { attackTime: 0.2, noteLength: 1.3, releaseTime: 0.5, sustainLevel: 0.38 },
+  mainValues: { tempo: 60, masterVolume: 0.2 },
+  oscillator: { waveform: "triangle" },
+  noteValues: [
+    { value: "G4", lengthFactor: 0.5 },
+    { value: "G4", lengthFactor: 1.0 },
+    { value: "D5", lengthFactor: 1.0 },
+    { value: "G4", lengthFactor: 1.5 },
+    { value: "F4", lengthFactor: 1.5 },
+    { value: "--", lengthFactor: 0.0 },
+    { value: "G4", lengthFactor: 1.0 },
+    { value: "D5", lengthFactor: 0.5 },
+    // 8/16
+    { value: "G4", lengthFactor: 1.0 },
+    { value: "D#4/Eb4", lengthFactor: 0.5 },
+    // pause
+    { value: "G4", lengthFactor: 0.5 },
+    { value: "D5", lengthFactor: 0.5 },
+    { value: "G4", lengthFactor: 0.5 },
+    { value: "F4", lengthFactor: 0.5 },
+    // pause
+    { value: "E4", lengthFactor: 0.5 },
+    { value: "F4", lengthFactor: 1.0 }
+  ]
+};
 
 function getPresetList() {
-  return { "Close Encounters": presetsCloseEncounters, "Super Mario": presetsSuperMario, "Ulravox Hymn": presetsUlravoxHymn };
+  return {
+    "Mass Effect": presetsMassEffect,
+    "The Force": presetsUTheForce,
+    "Close Encounters": presetsCloseEncounters,
+    "Super Mario": presetsSuperMario,
+    "Ulravox Hymn": presetsUlravoxHymn
+  };
 }
 
 // This should match the with the index in NoteSelectHandler
 function getDefaultPreset() {
-  return presetsCloseEncounters;
+  return presetsMassEffect; // presetsUTheForce; // presetsCloseEncounters;
 }
 
 var convertPresetToNotes = function (NOTE_INPUT_COUNT, preset) {

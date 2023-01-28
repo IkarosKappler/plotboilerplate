@@ -111,7 +111,13 @@
           <button id="stop-button" class="playback-button d-none" title="Stop Loop"><img src="pause.svg" /></button><br>
         </div>
       </div>
-      <h2>Notes</h2>
+      <div class="flex-row">
+        <h2 class="d-block w-sm-50 w-md-50 w-lg-50">Notes</h2>
+        <div class="w-sm-50 w-md-50 w-lg-50 align-right">
+          <input type="checkbox" id="single-loop-only"/> 
+          <label for="single-loop-only">Single Loop Only</label> 
+        </div>
+      </div>
       <!-- <div id="note-selects-div"></div> -->
       <table id="note-selects-table"></table>
       <h2>Envelope</h2>
@@ -134,17 +140,25 @@
         </div>
       </div>
       <div class="flex-row flex-row-wrap">
-        <div id="oscillator-options" class="d-block w-sm-50 w-md-33 w-lg-33">
+        <div id="oscillator-options" class="w-sm-50 w-md-33 w-lg-33 flex-row flex-row-wrap ">
           <h2>Oscillator</h2>
-          <input type="radio" id="sin-wave" name="waveform" value="sine"
+          <div class="waveform-pick">
+            <input type="radio" id="sin-wave" name="waveform" value="sine"
           checked>
-          <label for="sin-wave">Sin Wave</label><br>
-          <input type="radio" id="square-wave" name="waveform" value="square">
-          <label for="square-wave">Square Wave</label><br>
-          <input type="radio" id="triangle-wave" name="waveform" value="triangle">
-          <label for="triangle-wave">Triangle Wave</label><br>
-          <input type="radio" id="sawtooth-wave" name="waveform" value="sawtooth">
-          <label for="sawtooth-wave">Sawtooth Wave</label>
+            <label for="sin-wave"><img src="waveform_sine.svg" title="Sin Wave" /></label><br>
+          </div>
+          <div class="waveform-pick">
+            <input type="radio" id="square-wave" name="waveform" value="square">
+            <label for="square-wave"><img src="waveform_square.svg" title="Square Wave" /></label><br>
+          </div>
+          <div class="waveform-pick">
+            <input type="radio" id="triangle-wave" name="waveform" value="triangle">
+            <label for="triangle-wave"><img src="waveform_triangle.svg" title="Triangle Wave" /></label><br>
+          </div>
+          <div class="waveform-pick">
+            <input type="radio" id="sawtooth-wave" name="waveform" value="sawtooth">
+            <label for="sawtooth-wave"><img src="waveform_sawtooth.svg" title="Sawtooth Wave" /></label>
+          </div>
         </div>
         <div id="vibrato-options" class="d-block w-sm-50 w-md-33 w-lg-33">
           <h2>Vibrato</h2>
@@ -163,6 +177,7 @@
           <input id='delay-amount-control' type="range" min = "0" max = ".9" step='0.05' value='0'>
         </div>
       </div>
+      Presets<br>
       <div id="presets-container"></div>
     </div>
     

@@ -25,7 +25,17 @@
 
     // function renderNoteSelectTable(NOTE_INPUT_COUNT, setCurrentNotes, setCurrentNoteLengths, handleNoteSelectChange) {
     const noteSelectsTable = document.querySelector("#note-selects-table");
+    // Create the table row
     const noteTableRow = document.createElement("tr");
+    // Create the leftest info cell
+    var labelCell = document.createElement("td");
+    labelCell.classList.add("align-top");
+    var labelCellDiv = document.createElement("div");
+    labelCellDiv.innerHTML = "dur ×";
+    labelCell.classList.add("align-center", "vertical-text");
+    labelCell.appendChild(labelCellDiv);
+    noteTableRow.appendChild(labelCell);
+    // Now create n cells for n notes
     for (let i = 0; i < NOTE_INPUT_COUNT; i++) {
       const select = document.createElement("select");
       select.id = `note ${i + 1}`;
@@ -99,9 +109,7 @@
   };
 
   context.NoteSelectHandler.prototype.setCurrentNoteLengthInputs = function () {
-    // console.log("setCurrentNoteLengths", setCurrentNoteLengths);
     for (let i = 0; i < this._noteLengthSliders.length; i++) {
-      // currentNoteLengthFactors[i] = Number(noteLengthSliders[i].value);
       this._noteLengthSliders[i].value = this.currentNotes[i].lengthFactor;
       document.getElementById(`note-length-display-${i + 1}`).innerHTML = this.currentNotes[i].lengthFactor;
     }
@@ -109,10 +117,8 @@
   };
 
   context.NoteSelectHandler.prototype.setCurrentNoteLengths = function () {
-    // console.log("setCurrentNoteLengths", setCurrentNoteLengths);
     for (let i = 0; i < noteLengthSliders.length; i++) {
       document.getElementById(`note-length-display-${i + 1}`).innerHTML = noteLengthSliders[i].value;
-      // currentNoteLengthFactors[i] = Number(noteLengthSliders[i].value);
       this.currentNotes[i].lengthFactor = Number(this._noteLengthSliders[i].value);
     }
     console.log("currentNotes", currentNotes);

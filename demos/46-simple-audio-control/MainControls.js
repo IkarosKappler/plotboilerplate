@@ -46,6 +46,7 @@
   };
 
   _context.MainControls.prototype.setValues = function (options) {
+    console.log("Setting main controls", options);
     if (options && typeof options.tempo !== "undefined") {
       this.values.tempo = options.tempo;
     }

@@ -43,6 +43,22 @@ h1, h2, h3 {
     flex-flow: row wrap;
 }
 
+.align-top {
+    vertical-align: top;
+}
+
+.align-right {
+    justify-content: end;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
 .d-block {
     display: block;
 }
@@ -61,9 +77,31 @@ h1, h2, h3 {
     text-shadow: 2px 2px 6px var(--value-color);
 }
 
-/* .w-50 {
+.waveform-pick {
+    display: flex;
     width: 50%;
-} */
+}
+
+/* Waveform radio with images only */
+.waveform-pick input {
+   /* Hide radio button */
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.waveform-pick input[type=radio] + label img {
+    cursor: pointer;
+    width: 66%;
+    height: 66%;
+}
+  
+.waveform-pick input[type=radio]:checked + label img {
+    outline: 2px solid #f00;
+    background-color: var(--select-border-color);
+}
+/* --- END --- Waveform radio with images only */
 
 @media only screen and (min-width: 769px) {
     /* STYLES HERE */
