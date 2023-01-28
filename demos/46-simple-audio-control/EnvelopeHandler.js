@@ -120,6 +120,7 @@
    * @param {number?} options.noteLength (optional)
    */
   context.EnvelopeHandler.prototype.setValues = function (options) {
+    // console.log("EnvelopeHandler.prototype.setValues", options);
     if (options && typeof options.attackTime !== "undefined") {
       this.envelope.attackTime = options.attackTime;
       this._attackControl.value = options.attackTime;
@@ -129,6 +130,7 @@
       this._releaseControl.value = options.releaseTime;
     }
     if (options && typeof options.noteLength !== "undefined") {
+      //   console.log("Set note length");
       this.envelope.noteLength = options.noteLength;
       this._noteLengthControl.value = options.noteLength;
     }

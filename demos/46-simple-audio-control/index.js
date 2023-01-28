@@ -27,106 +27,35 @@
     // Fetch the GET params
     let GUP = gup();
     // Always add darkmode
-    var isDarkmode = true; // detectDarkMode(GUP);
+    var isDarkmode = true || detectDarkMode(GUP);
     if (isDarkmode) {
       document.getElementsByTagName("body")[0].classList.add("darkmode");
     }
 
-    // CONTEXT AND MASTER VOLUME
-    // var AudioContext = window.AudioContext || window.webkitAudioContext;
-
-    // const context = new AudioContext();
-    // const masterVolume = context.createGain();
-    // masterVolume.connect(context.destination);
-    // masterVolume.gain.value = 0.2;
     var mainControls = new MainControls();
 
     var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff");
 
-    // let tempo = 120.0;
-    let currentNoteIndex = 0;
-    let isPlaying = false;
-
     const NOTE_INPUT_COUNT = 16;
 
-    // Close encounters: https://johnloomis.org/ece303L/notes/music/Close_Encounters.html
-    // G-A-F-F-C
-
-    // This config MUST have 16 entries
-    // var initialConfig = [
-    //   { value: "G4", lengthFactor: 1.0 },
-    //   { value: "A4", lengthFactor: 1.0 },
-    //   { value: "F4", lengthFactor: 1.0 },
-    //   { value: "F3", lengthFactor: 3.0 },
-    //   { value: "C4", lengthFactor: 0.0 },
-    //   { value: "C4", lengthFactor: 2.0 },
-    //   { value: "C4", lengthFactor: 0.0 },
-    //   { value: "C4", lengthFactor: 0.0 },
-    //   // 8/16
-    //   { value: "G4", lengthFactor: 1.0 },
-    //   { value: "A4", lengthFactor: 1.0 },
-    //   { value: "F4", lengthFactor: 1.0 },
-    //   { value: "F3", lengthFactor: 3.0 },
-    //   { value: "C4", lengthFactor: 0.0 },
-    //   { value: "C4", lengthFactor: 2.0 },
-    //   { value: "C4", lengthFactor: 0.0 },
-    //   { value: "C4", lengthFactor: 0.0 }
-    // ];
-    // Super Mario Intro
-    // var initialConfig = [
-    //   { value: "E4", lengthFactor: 1.0 },
-    //   { value: "E4", lengthFactor: 1.0 },
-    //   { value: "E4", lengthFactor: 1.0 },
-    //   { value: "C4", lengthFactor: 1.0 },
-    //   { value: "E4", lengthFactor: 1.0 },
-    //   { value: "G4", lengthFactor: 2.0 },
-    //   { value: "G4", lengthFactor: 0.0 },
-    //   { value: "--", lengthFactor: 0.0 },
-    //   // 8/16
-    //   { value: "--", lengthFactor: 1.0 },
-    //   { value: "--", lengthFactor: 1.0 },
-    //   { value: "--", lengthFactor: 1.0 },
-    //   { value: "--", lengthFactor: 1.0 },
-    //   { value: "--", lengthFactor: 1.0 },
-    //   { value: "--", lengthFactor: 1.0 },
-    //   { value: "--", lengthFactor: 1.0 },
-    //   { value: "--", lengthFactor: 1.0 }
-    // ];
-
-    // Super Mario Jingle
-    // EGA FC E CD B
-    envelopeHandler.setValues({ attackTime: 0.06 });
-    mainControls.setValues({ tempo: 180, masterVolume: 0.2 });
-    var initialConfig = [
-      { value: "C4", lengthFactor: 1.0 },
-      { value: "G3", lengthFactor: 1.0 },
-      { value: "E3", lengthFactor: 1.0 },
-      { value: "A3", lengthFactor: 1.0 },
-      { value: "B3", lengthFactor: 1.0 },
-      { value: "A#3/Bb3", lengthFactor: 1.0 },
-      { value: "A3", lengthFactor: 1.0 },
-      { value: "G3", lengthFactor: 1.0 },
-      // 8/16
-      { value: "C4", lengthFactor: 1.0 },
-      { value: "E3", lengthFactor: 1.0 },
-      { value: "A4", lengthFactor: 0.0 },
-      { value: "F4", lengthFactor: 0.0 },
-      { value: "G4", lengthFactor: 0.0 },
-      { value: "E4", lengthFactor: 0.0 },
-      { value: "C4", lengthFactor: 0.0 },
-      { value: "D4", lengthFactor: 0.0 }
-    ];
+    let currentNoteIndex = 0;
+    let isPlaying = false;
+    var currentNotes = null; // Will be initiallized with the PresetSelector
 
     // NOTE SELECTS
     renderNoteSelectTable(NOTE_INPUT_COUNT, setCurrentNotes, setCurrentNoteLengths, handleNoteSelectChange);
 
-    // let currentNotes = [0, 3, 0, 7, 8, 7, 3, 2];
-    var currentNotes = new Array(NOTE_INPUT_COUNT).fill(0, 0, NOTE_INPUT_COUNT).map(function (value, index) {
-      // Pick a note in the 4th or 5th ocate
-      // C4 is at index 48
-      // return 48 + Math.floor(Math.random() * 12);
-      return { noteIndex: locateNoteByIdentifier(initialConfig[index].value), lengthFactor: initialConfig[index].lengthFactor };
-    });
+    var convertPresetToNotes = function (preset) {
+      // let currentNotes = [0, 3, 0, 7, 8, 7, 3, 2];
+      var notes = new Array(NOTE_INPUT_COUNT).fill(0, 0, NOTE_INPUT_COUNT).map(function (value, index) {
+        // Pick a note in the 4th or 5th ocate
+        // C4 is at index 48
+        // return 48 + Math.floor(Math.random() * 12);
+        return { noteIndex: locateNoteByIdentifier(preset[index].value), lengthFactor: preset[index].lengthFactor };
+      });
+      return notes;
+    };
+
     console.log("currentNotes", currentNotes);
     const noteSelects = document.querySelectorAll("select");
     function setNoteSelects() {
@@ -176,6 +105,21 @@
       console.log("currentNotes", currentNotes);
     }
 
+    var resetLoop = function () {
+      currentNoteIndex = 0;
+    };
+
+    new PresetSelector(function (selectedPreset, isInitialSelect) {
+      // initialConfig = selectedPreset.noteValues;
+      currentNotes = convertPresetToNotes(selectedPreset.noteValues);
+      console.log("Applying notes from preset");
+      setCurrentNoteLengthInputs();
+      setNoteSelects();
+      console.log("selectedPreset.envelope", selectedPreset.envelope);
+      envelopeHandler.setValues(selectedPreset.envelope);
+      mainControls.setValues(selectedPreset.mainValues);
+      resetLoop();
+    });
     setCurrentNoteLengthInputs();
     setNoteSelects();
 
@@ -262,7 +206,7 @@
     const stopButton = document.querySelector("#stop-button");
 
     resetButton.addEventListener("click", function () {
-      currentNoteIndex = 0;
+      resetLoop();
     });
 
     startButton.addEventListener("click", function () {
