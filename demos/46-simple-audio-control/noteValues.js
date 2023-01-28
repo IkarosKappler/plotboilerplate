@@ -133,6 +133,7 @@ const noteValues = {
 var locateNoteByIdentifier = function (name) {
   var keys = Object.keys(noteValues);
   for (let j = 0; j < keys.length; j++) {
+    // var split = keys[j].split("/");
     if (keys[j].toLocaleLowerCase() === name.toLocaleLowerCase()) {
       return j;
     }

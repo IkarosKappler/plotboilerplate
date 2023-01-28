@@ -26,12 +26,26 @@
 
     // Fetch the GET params
     let GUP = gup();
-    var isDarkmode = detectDarkMode(GUP);
+    // Always add darkmode
+    var isDarkmode = true; // detectDarkMode(GUP);
     if (isDarkmode) {
       document.getElementsByTagName("body")[0].classList.add("darkmode");
     }
 
+    // CONTEXT AND MASTER VOLUME
+    // var AudioContext = window.AudioContext || window.webkitAudioContext;
+
+    // const context = new AudioContext();
+    // const masterVolume = context.createGain();
+    // masterVolume.connect(context.destination);
+    // masterVolume.gain.value = 0.2;
+    var mainControls = new MainControls();
+
     var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff");
+
+    // let tempo = 120.0;
+    let currentNoteIndex = 0;
+    let isPlaying = false;
 
     const NOTE_INPUT_COUNT = 16;
 
@@ -39,24 +53,68 @@
     // G-A-F-F-C
 
     // This config MUST have 16 entries
+    // var initialConfig = [
+    //   { value: "G4", lengthFactor: 1.0 },
+    //   { value: "A4", lengthFactor: 1.0 },
+    //   { value: "F4", lengthFactor: 1.0 },
+    //   { value: "F3", lengthFactor: 3.0 },
+    //   { value: "C4", lengthFactor: 0.0 },
+    //   { value: "C4", lengthFactor: 2.0 },
+    //   { value: "C4", lengthFactor: 0.0 },
+    //   { value: "C4", lengthFactor: 0.0 },
+    //   // 8/16
+    //   { value: "G4", lengthFactor: 1.0 },
+    //   { value: "A4", lengthFactor: 1.0 },
+    //   { value: "F4", lengthFactor: 1.0 },
+    //   { value: "F3", lengthFactor: 3.0 },
+    //   { value: "C4", lengthFactor: 0.0 },
+    //   { value: "C4", lengthFactor: 2.0 },
+    //   { value: "C4", lengthFactor: 0.0 },
+    //   { value: "C4", lengthFactor: 0.0 }
+    // ];
+    // Super Mario Intro
+    // var initialConfig = [
+    //   { value: "E4", lengthFactor: 1.0 },
+    //   { value: "E4", lengthFactor: 1.0 },
+    //   { value: "E4", lengthFactor: 1.0 },
+    //   { value: "C4", lengthFactor: 1.0 },
+    //   { value: "E4", lengthFactor: 1.0 },
+    //   { value: "G4", lengthFactor: 2.0 },
+    //   { value: "G4", lengthFactor: 0.0 },
+    //   { value: "--", lengthFactor: 0.0 },
+    //   // 8/16
+    //   { value: "--", lengthFactor: 1.0 },
+    //   { value: "--", lengthFactor: 1.0 },
+    //   { value: "--", lengthFactor: 1.0 },
+    //   { value: "--", lengthFactor: 1.0 },
+    //   { value: "--", lengthFactor: 1.0 },
+    //   { value: "--", lengthFactor: 1.0 },
+    //   { value: "--", lengthFactor: 1.0 },
+    //   { value: "--", lengthFactor: 1.0 }
+    // ];
+
+    // Super Mario Jingle
+    // EGA FC E CD B
+    envelopeHandler.setValues({ attackTime: 0.06 });
+    mainControls.setValues({ tempo: 180, masterVolume: 0.2 });
     var initialConfig = [
-      { value: "G4", lengthFactor: 1.0 },
-      { value: "A4", lengthFactor: 1.0 },
-      { value: "F4", lengthFactor: 1.0 },
-      { value: "F3", lengthFactor: 3.0 },
-      { value: "C4", lengthFactor: 0.0 },
-      { value: "C4", lengthFactor: 2.0 },
-      { value: "C4", lengthFactor: 0.0 },
-      { value: "C4", lengthFactor: 0.0 },
+      { value: "C4", lengthFactor: 1.0 },
+      { value: "G3", lengthFactor: 1.0 },
+      { value: "E3", lengthFactor: 1.0 },
+      { value: "A3", lengthFactor: 1.0 },
+      { value: "B3", lengthFactor: 1.0 },
+      { value: "A#3/Bb3", lengthFactor: 1.0 },
+      { value: "A3", lengthFactor: 1.0 },
+      { value: "G3", lengthFactor: 1.0 },
       // 8/16
-      { value: "G4", lengthFactor: 1.0 },
-      { value: "A4", lengthFactor: 1.0 },
-      { value: "F4", lengthFactor: 1.0 },
-      { value: "F3", lengthFactor: 3.0 },
+      { value: "C4", lengthFactor: 1.0 },
+      { value: "E3", lengthFactor: 1.0 },
+      { value: "A4", lengthFactor: 0.0 },
+      { value: "F4", lengthFactor: 0.0 },
+      { value: "G4", lengthFactor: 0.0 },
+      { value: "E4", lengthFactor: 0.0 },
       { value: "C4", lengthFactor: 0.0 },
-      { value: "C4", lengthFactor: 2.0 },
-      { value: "C4", lengthFactor: 0.0 },
-      { value: "C4", lengthFactor: 0.0 }
+      { value: "D4", lengthFactor: 0.0 }
     ];
 
     // NOTE SELECTS
@@ -121,22 +179,6 @@
     setCurrentNoteLengthInputs();
     setNoteSelects();
 
-    // CONTEXT AND MASTER VOLUME
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-
-    const context = new AudioContext();
-    const masterVolume = context.createGain();
-    masterVolume.connect(context.destination);
-    masterVolume.gain.value = 0.2;
-
-    const volumeControl = document.querySelector("#volume-control");
-    var handleMasterVolumeChange = function () {
-      masterVolume.gain.value = volumeControl.value;
-      document.querySelector("#display-master-volume-control").innerHTML = `${(Number(volumeControl.value) * 100).toFixed(0)}%`;
-    };
-    volumeControl.addEventListener("input", handleMasterVolumeChange);
-    handleMasterVolumeChange();
-
     //WAVEFORM SELECT
     const waveforms = document.getElementsByName("waveform");
     let waveform = "sine";
@@ -155,37 +197,7 @@
       });
     });
 
-    // EFFECTS CONTROLS
-    // Envelope
-    const attackControl = document.querySelector("#attack-control");
-    const releaseControl = document.querySelector("#release-control");
-    const noteLengthControl = document.querySelector("#note-length-control");
-    const sustainLevelControl = document.querySelector("#sustain-level-control");
-
-    attackControl.addEventListener("input", function () {
-      // attackTime = Number(this.value);
-      envelopeHandler.envelope.attackTime = Number(this.value);
-      envelopeHandler.update();
-    });
-
-    releaseControl.addEventListener("input", function () {
-      // releaseTime = Number(this.value);
-      envelopeHandler.envelope.releaseTime = Number(this.value);
-      envelopeHandler.update();
-    });
-
-    noteLengthControl.addEventListener("input", function () {
-      // noteLength = Number(this.value);
-      envelopeHandler.envelope.noteLength = Number(this.value);
-      envelopeHandler.update();
-    });
-
-    sustainLevelControl.addEventListener("input", function () {
-      // noteLength = Number(this.value);
-      envelopeHandler.envelope.sustainLevel = Number(this.value);
-      envelopeHandler.update();
-    });
-
+    // // EFFECTS CONTROLS
     // Vibrato
     let vibratoSpeed = 10;
     let vibratoAmount = 0;
@@ -210,14 +222,14 @@
     const delayAmountControl = document.querySelector("#delay-amount-control");
     const delayTimeControl = document.querySelector("#delay-time-control");
     const feedbackControl = document.querySelector("#feedback-control");
-    const delay = context.createDelay();
-    const feedback = context.createGain();
-    const delayAmountGain = context.createGain();
+    const delay = mainControls.context.createDelay();
+    const feedback = mainControls.context.createGain();
+    const delayAmountGain = mainControls.context.createGain();
 
     delayAmountGain.connect(delay);
     delay.connect(feedback);
     feedback.connect(delay);
-    delay.connect(masterVolume);
+    delay.connect(mainControls.masterVolume);
 
     delay.delayTime.value = 0;
     delayAmountGain.gain.value = 0;
@@ -245,19 +257,13 @@
     handleFeedbackChanged();
 
     // LOOP CONTROLS
+    const resetButton = document.querySelector("#reset-button");
     const startButton = document.querySelector("#start-button");
     const stopButton = document.querySelector("#stop-button");
-    const tempoControl = document.querySelector("#tempo-control");
-    let tempo = 120.0;
-    let currentNoteIndex = 0;
-    let isPlaying = false;
 
-    var handleTempChange = function () {
-      tempo = Number(tempoControl.value);
-      document.querySelector("#display-tempo-control").innerHTML = `${tempo}bpm`;
-    };
-    tempoControl.addEventListener("input", handleTempChange, false);
-    handleTempChange();
+    resetButton.addEventListener("click", function () {
+      currentNoteIndex = 0;
+    });
 
     startButton.addEventListener("click", function () {
       if (!isPlaying) {
@@ -271,7 +277,7 @@
     });
 
     function noteLoop() {
-      const secondsPerBeat = 60.0 / tempo;
+      const secondsPerBeat = 60.0 / mainControls.values.tempo;
       if (isPlaying) {
         playCurrentNote();
         nextNote();
@@ -292,35 +298,41 @@
     }
 
     function playCurrentNote() {
+      console.log("noteGain.gain.value", mainControls.masterVolume.gain.value);
       var curNote = currentNotes[currentNoteIndex];
       const noteLengthFactor = curNote.lengthFactor;
       if (noteLengthFactor <= 0.0) {
         return;
       }
-      const osc = context.createOscillator();
-      const noteGain = context.createGain();
+      const osc = mainControls.context.createOscillator();
+      const noteGain = mainControls.context.createGain();
       noteGain.gain.setValueAtTime(0, 0);
       noteGain.gain.linearRampToValueAtTime(
         envelopeHandler.envelope.sustainLevel,
-        context.currentTime + envelopeHandler.envelope.noteLength * envelopeHandler.envelope.attackTime * noteLengthFactor
+        mainControls.context.currentTime +
+          envelopeHandler.envelope.noteLength * envelopeHandler.envelope.attackTime * noteLengthFactor
       );
+      console.log("envelopeHandler.envelope", envelopeHandler.envelope, "noteLengthFactor", noteLengthFactor);
       noteGain.gain.setValueAtTime(
         envelopeHandler.envelope.sustainLevel,
-        context.currentTime +
+        mainControls.context.currentTime +
           (envelopeHandler.envelope.noteLength - envelopeHandler.envelope.noteLength * envelopeHandler.envelope.releaseTime) *
             noteLengthFactor
       );
-      noteGain.gain.linearRampToValueAtTime(0, context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
+      noteGain.gain.linearRampToValueAtTime(
+        0,
+        mainControls.context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor
+      );
 
-      var lfoGain = context.createGain();
+      var lfoGain = mainControls.context.createGain();
       lfoGain.gain.setValueAtTime(vibratoAmount, 0);
       lfoGain.connect(osc.frequency);
 
-      var lfo = context.createOscillator();
+      var lfo = mainControls.context.createOscillator();
       lfo.frequency.setValueAtTime(vibratoSpeed, 0);
       lfo.start(0);
       // lfo.stop(context.currentTime + envelopeHandler.envelope.noteLength);
-      lfo.stop(context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
+      lfo.stop(mainControls.context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
       lfo.connect(lfoGain);
 
       osc.type = waveform;
@@ -328,41 +340,13 @@
       osc.frequency.setValueAtTime(Object.values(noteValues)[`${curNote.noteIndex}`], 0);
 
       osc.start(0);
-      osc.stop(context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
+      osc.stop(mainControls.context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
       osc.connect(noteGain);
 
-      noteGain.connect(masterVolume);
+      noteGain.connect(mainControls.masterVolume);
       noteGain.connect(delay);
     }
     // ### END SYNTH
-
-    // +---------------------------------------------------------------------------------
-    // | Add stats.
-    // +-------------------------------
-    // var stats = {
-    //   mouseXTop: 0,
-    //   mouseYTop: 0
-    // };
-    // var uiStats = new UIStats(stats);
-    // stats = uiStats.proxy;
-    // uiStats.add("mouseXTop").precision(1);
-    // uiStats.add("mouseYTop").precision(1);
-
-    // +---------------------------------------------------------------------------------
-    // | Initialize dat.gui
-    // +-------------------------------
-    // {
-    //   var gui = pbEnvelope.createGUI();
-    //   // prettier-ignore
-    //   gui.add(config, 'animate').listen().onChange(function(prm) { if(prm) { startAnimation(); } }).name("animate").title("animate");
-    //   // prettier-ignore
-    //   gui.add(config, 'showPath').listen().onChange(function() { togglePath() }).name("showPath").title("showPath");
-    // }
-
-    // pbEnvelope.config.preDraw = predraw;
-    // pbEnvelope.redraw();
-    // pbEnvelope.canvas.focus();
-    // startAnimation();
   };
 
   if (!window.pbPreventAutoLoad) {

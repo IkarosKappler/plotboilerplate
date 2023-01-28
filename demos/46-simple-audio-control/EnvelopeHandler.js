@@ -35,19 +35,11 @@
     // {Bounds}
     var viewport = this.pb.viewport();
 
-    // let attackTime = 0.3;
-    // let sustainLevel = 0.8;
-    // let releaseTime = 0.3;
-    // let noteLength = 1;
-
     var baseVert = new Vertex(0, 0);
     baseVert.attr.draggable = false;
-    var attackTimeVert = new Vertex(); // new Vertex(this.envelope.attackTime * viewport.width, -1.0 * viewport.height);
-    var releaseTimeVert = new Vertex(); /* new Vertex(
-      (1 - this.envelope.releaseTime) * viewport.width,
-      -this.envelope.sustainLevel * viewport.height
-    ); */
-    var noteLengthVert = new Vertex(); // new Vertex(viewport.width, 0.0);
+    var attackTimeVert = new Vertex();
+    var releaseTimeVert = new Vertex();
+    var noteLengthVert = new Vertex();
     noteLengthVert.attr.draggable = false;
     this.pb.add(new Polygon([baseVert, attackTimeVert, releaseTimeVert, noteLengthVert], true));
     this.pb.drawConfig.polygon.lineWidth = 2.0;
@@ -81,11 +73,73 @@
       sustainLevelControlDisplay.innerHTML = this.envelope.sustainLevel;
     };
 
+    // EFFECTS CONTROLS
+    // Envelope
+    this._attackControl = document.querySelector("#attack-control");
+    this._releaseControl = document.querySelector("#release-control");
+    this._noteLengthControl = document.querySelector("#note-length-control");
+    this._sustainLevelControl = document.querySelector("#sustain-level-control");
+
+    var _self = this;
+    this._attackControl.addEventListener("input", function () {
+      // attackTime = Number(this.value);
+      _self.envelope.attackTime = Number(this.value);
+      _self.update();
+    });
+
+    this._releaseControl.addEventListener("input", function () {
+      // releaseTime = Number(this.value);
+      _self.envelope.releaseTime = Number(this.value);
+      _self.update();
+    });
+
+    this._noteLengthControl.addEventListener("input", function () {
+      // noteLength = Number(this.value);
+      _self.envelope.noteLength = Number(this.value);
+      _self.update();
+    });
+
+    this._sustainLevelControl.addEventListener("input", function () {
+      // noteLength = Number(this.value);
+      _self.envelope.sustainLevel = Number(this.value);
+      _self.update();
+    });
+
     this.pb.config.preDraw = predraw;
     this._updateVertices();
     this._updateDisplay();
     this.pb.redraw();
     this.pb.canvas.focus();
+  };
+
+  /**
+   * Set the values of the envelope
+   * @param {number?} options.attackTime (optional)
+   * @param {number?} options.releaseTime (optional)
+   * @param {number?} options.sustainLevel (optional)
+   * @param {number?} options.noteLength (optional)
+   */
+  context.EnvelopeHandler.prototype.setValues = function (options) {
+    if (options && typeof options.attackTime !== "undefined") {
+      this.envelope.attackTime = options.attackTime;
+      this._attackControl.value = options.attackTime;
+    }
+    if (options && typeof options.releaseTime !== "undefined") {
+      this.envelope.releaseTime = options.releaseTime;
+      this._releaseControl.value = options.releaseTime;
+    }
+    if (options && typeof options.noteLength !== "undefined") {
+      this.envelope.noteLength = options.noteLength;
+      this._noteLengthControl.value = options.noteLength;
+    }
+    if (options && typeof options.sustainLevel !== "undefined") {
+      this.envelope.sustainLevel = options.sustainLevel;
+      this._sustainLevelControl.value = options.sustainLevel;
+    }
+    // Adjust vertices to new points
+    this._updateVertices();
+    this._updateDisplay();
+    this.pb.redraw();
   };
 
   context.EnvelopeHandler.prototype.update = function () {
