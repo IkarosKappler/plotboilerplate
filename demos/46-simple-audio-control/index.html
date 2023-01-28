@@ -95,12 +95,19 @@
   </head>
   <body class="fullscreen">
     <div id="top-container">
-      <button id="start-button">Start Loop</button>
-      <button id="stop-button">Stop Loop</button><br>
-      <label for="volume-control">Master Volume</label><br>
-      <input type="range" id="volume-control" min="0" max="1" step="0.05" value=".2"> (<span id="display-master-volume-control" class="value-display">-</span>)<br>
-      <label for="tempo-control">Tempo</label><br>
-      <input type="range" id="tempo-control" min="60" max="300" step="5" value="120"> (<span id="display-tempo-control" class="value-display">-</span>)<br>
+      <div class="flex-row">
+        <div class="d-block w-sm-50 w-md-50 w-lg-50">
+          <label for="volume-control">Master Volume</label><br>
+          <input type="range" id="volume-control" min="0" max="1" step="0.05" value=".2"> (<span id="display-master-volume-control" class="value-display">-</span>)<br>
+          <label for="tempo-control">Tempo</label><br>
+          <input type="range" id="tempo-control" min="60" max="300" step="5" value="120"> (<span id="display-tempo-control" class="value-display">-</span>)<br>
+        </div>
+        <div class="d-block w-sm-50 w-md-50 w-lg-50">
+          <button id="restart-button" class="playback-button" title="Restart Loop" disabled><img src="begin.svg" /></button>
+          <button id="start-button" class="playback-button" title="Start Loop"><img src="play.svg" /></button>
+          <button id="stop-button" class="playback-button" title="Stop Loop"><img src="pause.svg" /></button><br>
+        </div>
+      </div>
       <h2>Notes</h2>
       <!-- <div id="note-selects-div"></div> -->
       <table id="note-selects-table"></table>
@@ -138,18 +145,18 @@
         </div>
         <div id="vibrato-options" class="d-block w-sm-50 w-md-33 w-lg-33">
           <h2>Vibrato</h2>
-          <label for="vibrato-amount-control">Vibrato Amount</label><br>
+          <label for="vibrato-amount-control">Vibrato Amount</label> (<span id="display-vibrato-amount-control" class="value-display">-</span>)<br>
           <input type="range" id="vibrato-amount-control" value="0" min="0" max="5" step="0.5"><br>
-          <label for="vibrato-amount-control">Vibrato Speed</label><br>
+          <label for="vibrato-speed-control">Vibrato Speed</label> (<span id="display-vibrato-speed-control" class="value-display">-</span>)<br>
           <input type="range" id="vibrato-speed-control" value="10" min="0" max="30" step="0.5"><br>
         </div>
         <div id="delay-options" class="d-block w-sm-50 w-md-33 w-lg-33">
           <h2>Delay</h2>
-          <label for="delay-time-control">Delay Time</label><br>
+          <label for="delay-time-control">Delay Time</label> (<span id="display-delay-time-control" class="value-display">-</span>)<br>
           <input id='delay-time-control' type="range" min = "0" max = "1" step='0.05' value='0'><br>
-          <label for="feedback-control">Delay Feedback</label><br>
+          <label for="feedback-control">Delay Feedback</label> (<span id="display-feedback-control" class="value-display">-</span>)<br>
           <input id='feedback-control' type="range" min = "0" max = ".9" step='0.05' value='0'><br>
-          <label for="delay-amount-control">Delay Amount</label><br>
+          <label for="delay-amount-control">Delay Amount</label> (<span id="display-delay-amount-control" class="value-display">-</span>)<br>
           <input id='delay-amount-control' type="range" min = "0" max = ".9" step='0.05' value='0'>
         </div>
       </div>

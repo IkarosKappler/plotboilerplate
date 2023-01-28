@@ -35,6 +35,9 @@
 
     const NOTE_INPUT_COUNT = 16;
 
+    // Close encounters: https://johnloomis.org/ece303L/notes/music/Close_Encounters.html
+    // G-A-F-F-C
+
     // This config MUST have 16 entries
     var initialConfig = [
       { value: "G4", lengthFactor: 1.0 },
@@ -66,18 +69,6 @@
       // return 48 + Math.floor(Math.random() * 12);
       return { noteIndex: locateNoteByIdentifier(initialConfig[index].value), lengthFactor: initialConfig[index].lengthFactor };
     });
-    // Close encounters: https://johnloomis.org/ece303L/notes/music/Close_Encounters.html
-    // G-A-F-F-C = 7-9-5-5-0
-    // currentNotes[0] = 7;
-    // currentNotes[1] = 9;
-    // currentNotes[2] = 5;
-    // currentNotes[3] = 5;
-    // currentNotes[4] = 0;
-    // currentNotes[0] = 56 - 1;
-    // currentNotes[1] = 58 - 1;
-    // currentNotes[2] = 54 - 1;
-    // currentNotes[3] = 54 - 1 - 12; // 42
-    // currentNotes[4] = 49 - 1;
     console.log("currentNotes", currentNotes);
     const noteSelects = document.querySelectorAll("select");
     function setNoteSelects() {
@@ -104,9 +95,6 @@
       currentNotes[selectIndex].noteIndex = noteIndex;
       var note = getNoteByIndex(noteIndex);
       noteSelects[selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
-      // for (let i = 0; i < noteSelects.length; i++) {
-      //   currentNotes[i].noteIndex = noteSelects[i].value;
-      // }
     }
 
     const noteLengthSliders = document.querySelectorAll("input[type=range].note_duration_slider");
@@ -204,13 +192,19 @@
     const vibratoAmountControl = document.querySelector("#vibrato-amount-control");
     const vibratoSpeedControl = document.querySelector("#vibrato-speed-control");
 
-    vibratoAmountControl.addEventListener("input", function () {
-      vibratoAmount = this.value;
-    });
+    var handleVibratoAmountChange = function () {
+      vibratoAmount = vibratoAmountControl.value;
+      document.querySelector("#display-vibrato-amount-control").innerHTML = vibratoAmount;
+    };
+    vibratoAmountControl.addEventListener("input", handleVibratoAmountChange);
+    handleVibratoAmountChange();
 
-    vibratoSpeedControl.addEventListener("input", function () {
-      vibratoSpeed = this.value;
-    });
+    var handleVibratoSpeedChange = function () {
+      vibratoSpeed = vibratoSpeedControl.value;
+      document.querySelector("#display-vibrato-speed-control").innerHTML = vibratoSpeed;
+    };
+    vibratoSpeedControl.addEventListener("input", handleVibratoSpeedChange);
+    handleVibratoSpeedChange();
 
     // Delay
     const delayAmountControl = document.querySelector("#delay-amount-control");
@@ -229,17 +223,26 @@
     delayAmountGain.gain.value = 0;
     feedback.gain.value = 0;
 
-    delayAmountControl.addEventListener("input", function () {
-      delayAmountGain.value = this.value;
-    });
+    var handleDelayAmountChange = function () {
+      delayAmountGain.value = delayAmountControl.value;
+      document.querySelector("#display-delay-amount-control").innerHTML = delayAmountControl.value;
+    };
+    delayAmountControl.addEventListener("input", handleDelayAmountChange);
+    handleDelayAmountChange();
 
-    delayTimeControl.addEventListener("input", function () {
-      delay.delayTime.value = this.value;
-    });
+    var handleDelayTimeChange = function () {
+      delay.delayTime.value = delayTimeControl.value;
+      document.querySelector("#display-delay-time-control").innerHTML = delayTimeControl.value;
+    };
+    delayTimeControl.addEventListener("input", handleDelayTimeChange);
+    handleDelayTimeChange();
 
-    feedbackControl.addEventListener("input", function () {
-      feedback.gain.value = this.value;
-    });
+    var handleFeedbackChanged = function () {
+      feedback.gain.value = feedbackControl.value;
+      document.querySelector("#display-feedback-control").innerHTML = feedbackControl.value;
+    };
+    feedbackControl.addEventListener("input", handleFeedbackChanged);
+    handleFeedbackChanged();
 
     // LOOP CONTROLS
     const startButton = document.querySelector("#start-button");
@@ -279,23 +282,18 @@
     }
 
     function nextNote() {
-      noteSelects[currentNoteIndex].style.background = "yellow";
+      noteSelects[currentNoteIndex].classList.add("note-is-playing");
       if (noteSelects[currentNoteIndex - 1]) {
-        noteSelects[currentNoteIndex - 1].style.background = "white";
+        noteSelects[currentNoteIndex - 1].classList.remove("note-is-playing");
       } else {
-        // noteSelects[7].style.background = "white";
-        noteSelects[NOTE_INPUT_COUNT - 1].style.background = "white";
+        noteSelects[NOTE_INPUT_COUNT - 1].classList.remove("note-is-playing");
       }
-      // currentNoteIndex++;
-      // if (currentNoteIndex === 8) {
-      //   currentNoteIndex = 0;
-      // }
       currentNoteIndex = (currentNoteIndex + 1) % NOTE_INPUT_COUNT;
     }
 
     function playCurrentNote() {
       var curNote = currentNotes[currentNoteIndex];
-      const noteLengthFactor = curNote.lengthFactor; // currentNoteLengthFactors[currentNoteIndex];
+      const noteLengthFactor = curNote.lengthFactor;
       if (noteLengthFactor <= 0.0) {
         return;
       }
