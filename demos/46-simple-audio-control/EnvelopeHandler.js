@@ -41,14 +41,16 @@
     var releaseTimeVert = new Vertex();
     var noteLengthVert = new Vertex();
     noteLengthVert.attr.draggable = false;
-    this.pb.add(new Polygon([baseVert, attackTimeVert, releaseTimeVert, noteLengthVert], true));
-    this.pb.drawConfig.polygon.lineWidth = 2.0;
+    var envelopePolygon = new Polygon([baseVert, attackTimeVert, releaseTimeVert, noteLengthVert], true);
+    this.pb.add(envelopePolygon);
+    this.pb.drawConfig.polygon.lineWidth = 4.0;
 
     // +---------------------------------------------------------------------------------
     // | Draw our custom stuff after everything else in the scene was drawn.
     // +-------------------------------
     var predraw = function (draw, fill) {
       draw.polygon(viewport.toPolygon(), "rgba(192,192,192,0.5)", 1);
+      fill.polygon(envelopePolygon, "rgba(192,192,192,0.1)");
     };
 
     this._updateVertices = function () {

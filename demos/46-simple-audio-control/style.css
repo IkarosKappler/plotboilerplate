@@ -10,7 +10,7 @@
   box-sizing: border-box;
 }
 
-html, body {
+html, body, option {
     font-family: 'Courier New', Courier, monospace;
 }
 
@@ -183,48 +183,35 @@ input[type=range][orient=vertical]
 
 
 /* custom-select  */
-select
-{
+select {
     display: inline-block;
     position: relative;
     top: 50%;
     -webkit-transform: translateY(-50%);
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
-    /* border-radius: 5px; */
-    /* box-shadow: 0 0 1em rgba(white,0.2), inset 0 0 1px rgba(white,0.8); */
-    /* box-shadow: 0 0 1em rgba(255,255,255,0.2), inset 0 0 1px rgba(255,255,255,0.8); */
-
-    /* Styling the select background */
-    background-color: #1FBDED; /* ligthen(#1FBDED,20%); */
+    background-color: #1FBDED; 
 }
 
-select 
-    {
-        width: auto;
-        margin: 0;
-        margin-top: 1.0em;
-        /* padding: .75em 1.5em; */
-        outline: none;
-        cursor: pointer;
-        border: none;
-        border-top: 1px solid var(--select-border-color);
-        border-bottom: 1px solid var(--select-border-color);
-        border-radius: 0;
-        background-color: transparent;
-        /* Styling the select text color */
-        /* color: darken(#1FBDED,35%); */
-        /* color: #1FBDED; */
-        color: var(--value-color);
-
-
-        /* removes the fucking native down arrow */
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        text-indent: 0.01px;
-        text-overflow: '';
-      
-    }
+select {
+    width: auto;
+    margin: 0;
+    margin-top: 1.0em;
+    outline: none;
+    cursor: pointer;
+    border: none;
+    border-top: 1px solid var(--select-border-color);
+    border-bottom: 1px solid var(--select-border-color);
+    border-radius: 0;
+    background-color: transparent;
+    color: var(--value-color);
+    /* removes the native down arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 0.01px;
+    text-overflow: '';
+    
+}
 select::-ms-expand {
     display: none;
 }
@@ -246,8 +233,6 @@ select:before {
     /* Styling the down arrow */
     border-left: .25em solid transparent;
     border-right: .25em solid transparent;
-    /* border-bottom: .375em solid darken(#1FBDED,25%); */
-    /* border-bottom: .375em solid #1FBDED;  */
 
 }
 
@@ -255,7 +240,4 @@ select:after {
     /* Styling the down arrow */
     border-left: .25em solid transparent;
     border-right: .25em solid transparent;
-    /* border-top: .375em solid darken(#1FBDED,25%); */
-    /* border-top: .375em solid #1FBDED; */
-
 }
