@@ -47,6 +47,10 @@ h1, h2, h3 {
     display: block;
 }
 
+.d-none {
+    display: none;
+}
+
 .align-center {
     align-items: center;
 }

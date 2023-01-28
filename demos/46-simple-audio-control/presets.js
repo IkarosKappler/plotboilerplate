@@ -76,6 +76,26 @@ var presetsUlravoxHymn = {
   ]
 };
 
+// Start Wars?
+// Mass Effect?
+//
+
 function getPresetList() {
   return { "Close Encounters": presetsCloseEncounters, "Super Mario": presetsSuperMario, "Ulravox Hymn": presetsUlravoxHymn };
 }
+
+// This should match the with the index in NoteSelectHandler
+function getDefaultPreset() {
+  return presetsCloseEncounters;
+}
+
+var convertPresetToNotes = function (NOTE_INPUT_COUNT, preset) {
+  // let currentNotes = [0, 3, 0, 7, 8, 7, 3, 2];
+  var notes = new Array(NOTE_INPUT_COUNT).fill(0, 0, NOTE_INPUT_COUNT).map(function (value, index) {
+    // Pick a note in the 4th or 5th ocate
+    // C4 is at index 48
+    // return 48 + Math.floor(Math.random() * 12);
+    return { noteIndex: locateNoteByIdentifier(preset[index].value), lengthFactor: preset[index].lengthFactor };
+  });
+  return notes;
+};

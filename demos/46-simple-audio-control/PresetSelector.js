@@ -14,7 +14,7 @@
     var handlePresetSelectChange = function (event) {
       selectedKey = event.target.value;
       console.log("selectedKey", selectedKey);
-      onPresetSelected(presets[selectedKey], false); // !isInitialSelect
+      onPresetSelected(presets[selectedKey]); // !isInitialSelect
     };
 
     const select = document.createElement("select");
@@ -32,6 +32,6 @@
 
     container.appendChild(select);
 
-    onPresetSelected(presets[selectedKey], true); // isInitialSelect
+    // onPresetSelected(presets[selectedKey], true); // isInitialSelect
   };
 })(globalThis);

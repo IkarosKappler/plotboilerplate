@@ -33,97 +33,28 @@
     }
 
     var mainControls = new MainControls();
-
     var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff");
-
-    const NOTE_INPUT_COUNT = 16;
 
     let currentNoteIndex = 0;
     let isPlaying = false;
-    var currentNotes = null; // Will be initiallized with the PresetSelector
 
     // NOTE SELECTS
-    renderNoteSelectTable(NOTE_INPUT_COUNT, setCurrentNotes, setCurrentNoteLengths, handleNoteSelectChange);
-
-    var convertPresetToNotes = function (preset) {
-      // let currentNotes = [0, 3, 0, 7, 8, 7, 3, 2];
-      var notes = new Array(NOTE_INPUT_COUNT).fill(0, 0, NOTE_INPUT_COUNT).map(function (value, index) {
-        // Pick a note in the 4th or 5th ocate
-        // C4 is at index 48
-        // return 48 + Math.floor(Math.random() * 12);
-        return { noteIndex: locateNoteByIdentifier(preset[index].value), lengthFactor: preset[index].lengthFactor };
-      });
-      return notes;
-    };
-
-    console.log("currentNotes", currentNotes);
-    const noteSelects = document.querySelectorAll("select");
-    function setNoteSelects() {
-      for (let i = 0; i < currentNotes.length; i++) {
-        var noteIndex = currentNotes[i].noteIndex;
-        noteSelects[i].value = noteIndex;
-        var noteIdentifier = Object.keys(noteValues)[noteIndex];
-        var noteFrequency = noteValues[noteIdentifier];
-        noteSelects[i].setAttribute("title", `${noteIdentifier} @${noteFrequency}Hz`);
-      }
-    }
-    // const currentNoteLengthFactors = new Array(NOTE_INPUT_COUNT).fill(1, 0, NOTE_INPUT_COUNT);
-
-    function setCurrentNotes() {
-      for (let i = 0; i < noteSelects.length; i++) {
-        currentNotes[i].noteIndex = noteSelects[i].value;
-      }
-    }
-
-    function handleNoteSelectChange(event) {
-      console.log("event", event, event.target.value);
-      var noteIndex = event.target.value;
-      var selectIndex = event.target.getAttribute("data-index");
-      currentNotes[selectIndex].noteIndex = noteIndex;
-      var note = getNoteByIndex(noteIndex);
-      noteSelects[selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
-    }
-
-    const noteLengthSliders = document.querySelectorAll("input[type=range].note_duration_slider");
-    console.log("noteLengthSliders", noteLengthSliders.length);
-    function setCurrentNoteLengthInputs() {
-      // console.log("setCurrentNoteLengths", setCurrentNoteLengths);
-      for (let i = 0; i < noteLengthSliders.length; i++) {
-        // currentNoteLengthFactors[i] = Number(noteLengthSliders[i].value);
-        noteLengthSliders[i].value = currentNotes[i].lengthFactor;
-        document.getElementById(`note-length-display-${i + 1}`).innerHTML = currentNotes[i].lengthFactor;
-      }
-      console.log("currentNotes", currentNotes);
-    }
-    function setCurrentNoteLengths() {
-      // console.log("setCurrentNoteLengths", setCurrentNoteLengths);
-      for (let i = 0; i < noteLengthSliders.length; i++) {
-        document.getElementById(`note-length-display-${i + 1}`).innerHTML = noteLengthSliders[i].value;
-        // currentNoteLengthFactors[i] = Number(noteLengthSliders[i].value);
-        currentNotes[i].lengthFactor = Number(noteLengthSliders[i].value);
-      }
-      console.log("currentNotes", currentNotes);
-    }
+    var initialPreset = getDefaultPreset();
+    var noteSelectHandler = new NoteSelectHandler(initialPreset);
 
     var resetLoop = function () {
       currentNoteIndex = 0;
     };
 
-    new PresetSelector(function (selectedPreset, isInitialSelect) {
-      // initialConfig = selectedPreset.noteValues;
-      currentNotes = convertPresetToNotes(selectedPreset.noteValues);
-      console.log("Applying notes from preset");
-      setCurrentNoteLengthInputs();
-      setNoteSelects();
+    new PresetSelector(function (selectedPreset) {
+      noteSelectHandler.setFromPreset(selectedPreset);
       console.log("selectedPreset.envelope", selectedPreset.envelope);
       envelopeHandler.setValues(selectedPreset.envelope);
       mainControls.setValues(selectedPreset.mainValues);
       resetLoop();
     });
-    setCurrentNoteLengthInputs();
-    setNoteSelects();
 
-    //WAVEFORM SELECT
+    // WAVEFORM SELECT
     const waveforms = document.getElementsByName("waveform");
     let waveform = "sine";
 
@@ -211,12 +142,18 @@
 
     startButton.addEventListener("click", function () {
       if (!isPlaying) {
+        startButton.classList.add("d-none");
+        stopButton.classList.remove("d-none");
         isPlaying = true;
         noteLoop();
       }
     });
 
     stopButton.addEventListener("click", function () {
+      if (isPlaying) {
+        startButton.classList.remove("d-none");
+        stopButton.classList.add("d-none");
+      }
       isPlaying = false;
     });
 
@@ -232,18 +169,13 @@
     }
 
     function nextNote() {
-      noteSelects[currentNoteIndex].classList.add("note-is-playing");
-      if (noteSelects[currentNoteIndex - 1]) {
-        noteSelects[currentNoteIndex - 1].classList.remove("note-is-playing");
-      } else {
-        noteSelects[NOTE_INPUT_COUNT - 1].classList.remove("note-is-playing");
-      }
-      currentNoteIndex = (currentNoteIndex + 1) % NOTE_INPUT_COUNT;
+      noteSelectHandler.setPlayingNoteIndex(currentNoteIndex);
+      currentNoteIndex = (currentNoteIndex + 1) % NoteSelectHandler.NOTE_INPUT_COUNT;
     }
 
     function playCurrentNote() {
       console.log("noteGain.gain.value", mainControls.masterVolume.gain.value);
-      var curNote = currentNotes[currentNoteIndex];
+      var curNote = noteSelectHandler.currentNotes[currentNoteIndex];
       const noteLengthFactor = curNote.lengthFactor;
       if (noteLengthFactor <= 0.0) {
         return;
