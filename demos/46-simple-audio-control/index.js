@@ -216,8 +216,13 @@
     }
 
     function playCurrentNote() {
-      console.log("noteGain.gain.value", mainControls.masterVolume.gain.value);
+      // console.log("mainControls.masterVolume.gain.value", mainControls.masterVolume.gain.value);
       var curNote = noteSelectHandler.currentNotes[currentNoteIndex];
+      console.log("curNote", curNote);
+      if (!curNote || curNote.noteIndex === -1) {
+        console.info("Note at index " + currentNoteIndex + " not set.");
+        return;
+      }
       const noteLengthFactor = curNote.lengthFactor;
       if (noteLengthFactor <= 0.0) {
         return;
@@ -256,6 +261,7 @@
       osc.type = waveform;
       // osc.frequency.setValueAtTime(Object.values(noteValues)[`${currentNotes[currentNoteIndex]}`], 0);
       osc.frequency.setValueAtTime(Object.values(noteValues)[`${curNote.noteIndex}`], 0);
+      // osc.frequency.setValueAtTime(curNote.frequency, 0);
 
       osc.start(0);
       osc.stop(mainControls.context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);

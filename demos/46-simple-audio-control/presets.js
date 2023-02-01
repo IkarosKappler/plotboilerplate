@@ -133,8 +133,38 @@ var presetsMassEffect = {
   ]
 };
 
+// The Riddle
+// ...
+var presetsTheRiddle = {
+  envelope: { attackTime: 0.2, noteLength: 1.0, releaseTime: 0.5, sustainLevel: 0.38 },
+  mainValues: { tempo: 100, masterVolume: 0.2 },
+  oscillator: { waveform: "triangle" },
+  noteValues: [
+    { value: "F4", lengthFactor: 0.5 },
+    { value: "G4", lengthFactor: 1.0 },
+    { value: "G#4/Ab4", lengthFactor: 1.0 },
+    { value: "G#4/Ab4", lengthFactor: 1.5 },
+    { value: "A#4/Bb4", lengthFactor: 1.0 },
+    { value: "G#4/Ab4", lengthFactor: 1.0 },
+    { value: "G4", lengthFactor: 1.0 },
+    { value: "F4", lengthFactor: 0.5 },
+    // 8/16
+    { value: "D#4/Eb4", lengthFactor: 1.0 },
+    { value: "D#4/Eb4", lengthFactor: 1.5 },
+    // pause
+    { value: "--", lengthFactor: 0.0 },
+    { value: "F4", lengthFactor: 0.5 },
+    { value: "G4", lengthFactor: 1.0 },
+    { value: "G4", lengthFactor: 1.0 },
+    // pause
+    { value: "--", lengthFactor: 0.5 },
+    { value: "--", lengthFactor: 1.0 }
+  ]
+};
+
 function getPresetList() {
   return {
+    "The Riddle": presetsTheRiddle,
     "Mass Effect": presetsMassEffect,
     "The Force": presetsUTheForce,
     "Close Encounters": presetsCloseEncounters,
@@ -145,7 +175,7 @@ function getPresetList() {
 
 // This should match the with the index in NoteSelectHandler
 function getDefaultPreset() {
-  return presetsMassEffect; // presetsUTheForce; // presetsCloseEncounters;
+  return presetsTheRiddle; // presetsMassEffect; // presetsUTheForce; // presetsCloseEncounters;
 }
 
 var convertPresetToNotes = function (NOTE_INPUT_COUNT, preset) {
