@@ -1,7 +1,7 @@
 // Close encounters: https://johnloomis.org/ece303L/notes/music/Close_Encounters.html
 // G-A-F-F-C
 
-import { TrackPreset } from "./interfaces";
+import { NoteConfig, TrackPreset } from "./interfaces";
 import { locateNoteByIdentifier } from "./noteValues";
 
 // This config MUST have 16 entries
@@ -170,7 +170,7 @@ const presetsTheRiddle: TrackPreset = {
   ]
 };
 
-export const getPresetList = () => {
+export const getPresetList = (): Record<string, TrackPreset> => {
   return {
     "The Riddle": presetsTheRiddle,
     "Mass Effect": presetsMassEffect,
@@ -193,12 +193,13 @@ export const getDefaultPreset = (): TrackPreset => {
  * @param {*} preset - { envelope: ..., mainValues: ..., oscillator: ..., noteValues: Array<{ value: "F4", lengthFactor: 0.5 }>}
  * @returns Array<{ noteIndex: number, lengthFactor : number }>
  */
-export const convertPresetToNotes = (NOTE_INPUT_COUNT, preset) => {
+export const convertPresetToNotes = (NOTE_INPUT_COUNT, preset): NoteConfig[] => {
   // let currentNotes = [0, 3, 0, 7, 8, 7, 3, 2];
   var notes = new Array(NOTE_INPUT_COUNT).fill(0, 0, NOTE_INPUT_COUNT).map(function (value, index) {
     // Pick a note in the 4th or 5th ocate
     // C4 is at index 48
     // return 48 + Math.floor(Math.random() * 12);
+    //   return { identifier: key, frequency: noteValues[key], index: index };
     return { noteIndex: locateNoteByIdentifier(preset[index].value), lengthFactor: preset[index].lengthFactor };
   });
   return notes;

@@ -10,8 +10,20 @@ export interface Note {
   identifier: string; // The note's name
 }
 
+export interface NoteConfig {
+  noteIndex: number;
+  lengthFactor: number;
+}
+
+export interface EnvelopeSettings {
+  attackTime: number;
+  releaseTime: number;
+  noteLength: number;
+  sustainLevel: number;
+}
+
 export interface TrackPreset {
-  envelope: { attackTime: number; releaseTime: number; noteLength: number; sustainLevel: number };
+  envelope: EnvelopeSettings;
   mainValues: { tempo: number; masterVolume: number };
   oscillator: { waveform: "triangle" | "square" | "sine" | "sawtooth" };
   noteValues: Array<{ value: string; lengthFactor: number }>;

@@ -7,13 +7,18 @@ export interface Note {
     frequency: number;
     identifier: string;
 }
+export interface NoteConfig {
+    noteIndex: number;
+    lengthFactor: number;
+}
+export interface EnvelopeSettings {
+    attackTime: number;
+    releaseTime: number;
+    noteLength: number;
+    sustainLevel: number;
+}
 export interface TrackPreset {
-    envelope: {
-        attackTime: number;
-        releaseTime: number;
-        noteLength: number;
-        sustainLevel: number;
-    };
+    envelope: EnvelopeSettings;
     mainValues: {
         tempo: number;
         masterVolume: number;
