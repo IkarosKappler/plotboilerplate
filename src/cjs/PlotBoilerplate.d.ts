@@ -78,7 +78,8 @@
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
- * @version  1.17.0
+ * @modified 2023-02-04 Fixed a bug in the `drawDrawable` function; fill's current classname was not set.
+ * @version  1.17.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.

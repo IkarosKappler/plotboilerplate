@@ -35,7 +35,8 @@
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2022-11-10 Tweaking some type issues.
- * @version  1.6.2
+ * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
+ * @version  1.6.3
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";

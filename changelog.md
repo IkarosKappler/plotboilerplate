@@ -1,5 +1,8 @@
 # Changelog
 
+- 2023-02-04
+  - Fixed a bug in the `PlotBoilerplate.drawDrawable` function; fill's current classname was not set.
+  - drawutilssvg: Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
 - 2023-01-23
   - Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
 - 2023-01-17 (v1.20.1)

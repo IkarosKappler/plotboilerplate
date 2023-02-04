@@ -4474,7 +4474,8 @@ CircleSector.circleSectorUtils = {
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2022-11-10 Tweaking some type issues.
- * @version  1.6.2
+ * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
+ * @version  1.6.3
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -4536,6 +4537,8 @@ class drawutilssvg {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         const keys = {
+            // "bezier": "CubicBezierCurve", // TODO: is this correct?
+            "bezierPath": "BezierPath",
             "polygon": "Polygon",
             "triangle": "Triangle",
             "ellipse": "Ellipse",
@@ -4990,7 +4993,7 @@ class drawutilssvg {
             this._y(endPoint.y)
         ];
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "cubierBezier", color, lineWidth);
+        return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
     }
     /**
      * Draw the given (cubic) Bézier path.
@@ -10146,7 +10149,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
- * @version  1.17.0
+ * @modified 2023-02-04 Fixed a bug in the `drawDrawable` function; fill's current classname was not set.
+ * @version  1.17.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -10980,7 +10984,7 @@ class PlotBoilerplate {
             this.draw.setCurrentId(d.uid);
             this.fill.setCurrentId(d.uid);
             this.draw.setCurrentClassName(d.className);
-            this.draw.setCurrentClassName(d.className);
+            this.fill.setCurrentClassName(d.className);
             this.drawDrawable(d, renderTime, draw, fill);
         }
     }
@@ -11001,7 +11005,13 @@ class PlotBoilerplate {
      **/
     drawDrawable(d, renderTime, draw, fill) {
         if (d instanceof BezierPath) {
+            var curveIndex = 0;
             for (var c in d.bezierCurves) {
+                // Restore these settings again in each loop (will be overwritten)
+                this.draw.setCurrentId(`${d.uid}-${curveIndex}`);
+                this.fill.setCurrentId(`${d.uid}-${curveIndex}`);
+                this.draw.setCurrentClassName(d.className);
+                this.fill.setCurrentClassName(d.className);
                 draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                 if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                     if (d.bezierCurves[c].startPoint.attr.visible) {
@@ -11058,7 +11068,8 @@ class PlotBoilerplate {
                     draw.setCurrentClassName(`${d.className}-end-line`);
                     draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
                 }
-            }
+                curveIndex++;
+            } // END for
         }
         else if (d instanceof Polygon) {
             draw.polygon(d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth);

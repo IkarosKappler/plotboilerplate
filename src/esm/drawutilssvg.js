@@ -35,7 +35,8 @@
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2022-11-10 Tweaking some type issues.
- * @version  1.6.2
+ * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
+ * @version  1.6.3
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -101,6 +102,8 @@ export class drawutilssvg {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         const keys = {
+            // "bezier": "CubicBezierCurve", // TODO: is this correct?
+            "bezierPath": "BezierPath",
             "polygon": "Polygon",
             "triangle": "Triangle",
             "ellipse": "Ellipse",
@@ -556,7 +559,7 @@ export class drawutilssvg {
             this._y(endPoint.y)
         ];
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "cubierBezier", color, lineWidth);
+        return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
     }
     /**
      * Draw the given (cubic) Bézier path.

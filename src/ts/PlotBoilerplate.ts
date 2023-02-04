@@ -78,7 +78,8 @@
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
- * @version  1.17.0
+ * @modified 2023-02-04 Fixed a bug in the `drawDrawable` function; fill's current classname was not set.
+ * @version  1.17.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -1140,7 +1141,7 @@ export class PlotBoilerplate {
       this.draw.setCurrentId(d.uid);
       this.fill.setCurrentId(d.uid);
       this.draw.setCurrentClassName(d.className);
-      this.draw.setCurrentClassName(d.className);
+      this.fill.setCurrentClassName(d.className);
       this.drawDrawable(d, renderTime, draw, fill);
     }
   }
@@ -1162,7 +1163,13 @@ export class PlotBoilerplate {
    **/
   drawDrawable(d: Drawable, renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>) {
     if (d instanceof BezierPath) {
+      var curveIndex = 0;
       for (var c in d.bezierCurves) {
+        // Restore these settings again in each loop (will be overwritten)
+        this.draw.setCurrentId(`${d.uid}-${curveIndex}`);
+        this.fill.setCurrentId(`${d.uid}-${curveIndex}`);
+        this.draw.setCurrentClassName(d.className);
+        this.fill.setCurrentClassName(d.className);
         draw.cubicBezier(
           d.bezierCurves[c].startPoint,
           d.bezierCurves[c].endPoint,
@@ -1260,7 +1267,8 @@ export class PlotBoilerplate {
             this.drawConfig.bezier.handleLine.lineWidth
           );
         }
-      }
+        curveIndex++;
+      } // END for
     } else if (d instanceof Polygon) {
       draw.polygon(d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth);
       if (!this.drawConfig.drawHandlePoints) {

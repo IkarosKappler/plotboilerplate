@@ -79,7 +79,8 @@
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
- * @version  1.17.0
+ * @modified 2023-02-04 Fixed a bug in the `drawDrawable` function; fill's current classname was not set.
+ * @version  1.17.1
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -935,7 +936,7 @@ var PlotBoilerplate = /** @class */ (function () {
             this.draw.setCurrentId(d.uid);
             this.fill.setCurrentId(d.uid);
             this.draw.setCurrentClassName(d.className);
-            this.draw.setCurrentClassName(d.className);
+            this.fill.setCurrentClassName(d.className);
             this.drawDrawable(d, renderTime, draw, fill);
         }
     };
@@ -956,7 +957,13 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.drawDrawable = function (d, renderTime, draw, fill) {
         if (d instanceof BezierPath_1.BezierPath) {
+            var curveIndex = 0;
             for (var c in d.bezierCurves) {
+                // Restore these settings again in each loop (will be overwritten)
+                this.draw.setCurrentId(d.uid + "-" + curveIndex);
+                this.fill.setCurrentId(d.uid + "-" + curveIndex);
+                this.draw.setCurrentClassName(d.className);
+                this.fill.setCurrentClassName(d.className);
                 draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                 if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                     if (d.bezierCurves[c].startPoint.attr.visible) {
@@ -1013,7 +1020,8 @@ var PlotBoilerplate = /** @class */ (function () {
                     draw.setCurrentClassName(d.className + "-end-line");
                     draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
                 }
-            }
+                curveIndex++;
+            } // END for
         }
         else if (d instanceof Polygon_1.Polygon) {
             draw.polygon(d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth);
