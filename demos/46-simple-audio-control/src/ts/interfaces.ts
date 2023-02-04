@@ -22,9 +22,14 @@ export interface EnvelopeSettings {
   sustainLevel: number;
 }
 
+export interface MainSettings {
+  tempo: number;
+  masterVolume: number;
+}
+
 export interface TrackPreset {
   envelope: EnvelopeSettings;
-  mainValues: { tempo: number; masterVolume: number };
+  mainValues: MainSettings;
   oscillator: { waveform: "triangle" | "square" | "sine" | "sawtooth" };
   noteValues: Array<{ value: string; lengthFactor: number }>;
 }

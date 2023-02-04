@@ -17,12 +17,13 @@ export interface EnvelopeSettings {
     noteLength: number;
     sustainLevel: number;
 }
+export interface MainSettings {
+    tempo: number;
+    masterVolume: number;
+}
 export interface TrackPreset {
     envelope: EnvelopeSettings;
-    mainValues: {
-        tempo: number;
-        masterVolume: number;
-    };
+    mainValues: MainSettings;
     oscillator: {
         waveform: "triangle" | "square" | "sine" | "sawtooth";
     };
