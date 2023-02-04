@@ -69,6 +69,8 @@
     let currentNoteIndex = 0;
     let isPlaying = false;
 
+    console.log("exports", globalThis.noteValues);
+
     // NOTE SELECTS
     var initialPreset = getDefaultPreset();
     var noteSelectHandler = new NoteSelectHandler(initialPreset);
