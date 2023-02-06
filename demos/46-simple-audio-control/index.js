@@ -73,6 +73,7 @@
 
     // NOTE SELECTS
     var initialPreset = getDefaultPreset();
+    var currentPreset = initialPreset;
     var noteSelectHandler = new NoteSelectHandler(initialPreset, 2);
 
     var mainControls = new MainControls();
@@ -84,12 +85,26 @@
       currentNoteIndex = 0;
     };
 
+    var setTrackCount = function (newTrackCount) {
+      if (noteSelectHandler.trackCount === newTrackCount) {
+        console.log("setTrackCount: no change.");
+        return;
+      }
+      noteSelectHandler.setTrackCount(currentPreset, newTrackCount);
+      setTrackCountDisplay();
+    };
+    var setTrackCountDisplay = function () {
+      document.querySelector("#display-track-count").innerHTML = noteSelectHandler.trackCount;
+    };
+    setTrackCountDisplay();
+
     new PresetSelector(function (selectedPreset) {
       noteSelectHandler.setFromPreset(selectedPreset);
       console.log("selectedPreset.envelope", selectedPreset.envelope);
       envelopeHandler.setValues(selectedPreset.envelope);
       mainControls.setValues(selectedPreset.mainValues);
-      setOscillatorValues(initialPreset.oscillator);
+      setOscillatorValues(selectedPreset.oscillator);
+      currentPreset = selectedPreset;
       resetLoop();
     });
 
@@ -158,9 +173,9 @@
     handleFeedbackChanged();
 
     // LOOP CONTROLS
-    const resetButton = document.querySelector("#reset-button");
-    const startButton = document.querySelector("#start-button");
-    const stopButton = document.querySelector("#stop-button");
+    var resetButton = document.querySelector("#reset-button");
+    var startButton = document.querySelector("#start-button");
+    var stopButton = document.querySelector("#stop-button");
 
     resetButton.addEventListener("click", function () {
       resetLoop();
@@ -242,7 +257,7 @@
         mainControls.context.currentTime +
           envelopeHandler.envelope.noteLength * envelopeHandler.envelope.attackTime * noteLengthFactor
       );
-      console.log("envelopeHandler.envelope", envelopeHandler.envelope, "noteLengthFactor", noteLengthFactor);
+      // console.log("envelopeHandler.envelope", envelopeHandler.envelope, "noteLengthFactor", noteLengthFactor);
       noteGain.gain.setValueAtTime(
         envelopeHandler.envelope.sustainLevel,
         mainControls.context.currentTime +
@@ -279,6 +294,45 @@
       noteGain.connect(delay);
     }
     // ### END SYNTH
+
+    // BEGIN DIALOGS AND OTHER INPUT
+    var modal = new Modal();
+    // +---------------------------------------------------------------------------------
+    // | This is the callback to use when the user wants to insert
+    // | path data into the dialog (modal).
+    // +-------------------------------
+    var showTrackCountDialog = function () {
+      var trackCountInput = document.createElement("input");
+      trackCountInput.setAttribute("id", "track-count-input");
+      // trackCountInput.style.fontSize = "42pt";
+      // trackCountInput.style.width = "50%";
+      // trackCountInput.style.textAlign = "center";
+      trackCountInput.setAttribute("type", "number");
+      trackCountInput.value = noteSelectHandler.trackCount;
+      modal.setTitle("Track count");
+      modal.setFooter("");
+      modal.setActions([
+        Modal.ACTION_CANCEL,
+        {
+          label: "Change",
+          action: function () {
+            setTrackCount(trackCountInput.value);
+            modal.close();
+          }
+        }
+      ]);
+      modal.setBody(trackCountInput);
+      if (modal.modalElements.modal.body.content) {
+        modal.modalElements.modal.body.content.style.display = "flex";
+        modal.modalElements.modal.body.content.style.justifyContent = "center";
+      }
+      modal.open();
+    };
+    // insertPathJSON();
+    var editTrackCountButton = document.querySelector("#edit-track-count-button");
+    console.log("editTrackCountButton", editTrackCountButton);
+    editTrackCountButton.addEventListener("click", showTrackCountDialog);
+    // BEGIN DIALOGS AND OTHER INPUT
   };
 
   if (!window.pbPreventAutoLoad) {

@@ -67,6 +67,11 @@
     <!-- <script src="../../dist/plotboilerplate.min.js"></script> -->
     <!-- END For production -->
 
+    <!-- A modal -->
+    <script src="../modal.js"></script>
+    <link rel="stylesheet" href="../modal.css">
+    <link rel="stylesheet" href="modal-overrides.css">
+
     <script src="../../src/cjs/utils/cloneVertexArray.js"></script>
     <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
@@ -94,8 +99,8 @@
     <script src="src/js/PresetSelector.js"></script>
 
     <script src="index.js"></script>
-    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../lib/humane.theme.flatty.css"> 
+    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="style.css">
   </head>
   <body class="fullscreen">
@@ -115,6 +120,7 @@
       </div>
       <div class="flex-row">
         <h2 class="d-block w-sm-50 w-md-50 w-lg-50">Notes</h2>
+        <h3 class="d-block w-sm-50 w-md-50 w-lg-50">#Tracks: <span id="display-track-count">2</span> <button id="edit-track-count-button">&#x270E;</button></h3>
         <div class="w-sm-50 w-md-50 w-lg-50 align-right">
           <input type="checkbox" id="single-loop-only"/> 
           <label for="single-loop-only">Single Loop Only</label> 

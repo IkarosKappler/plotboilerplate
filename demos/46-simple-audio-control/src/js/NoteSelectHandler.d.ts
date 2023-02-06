@@ -15,6 +15,8 @@ export declare class NoteSelectHandler {
     private _noteLengthSliders;
     static NOTE_INPUT_COUNT: number;
     constructor(initialPreset: TrackPreset, trackCount?: number);
+    private _createNoteSelectsDOM;
+    setTrackCount(preset: TrackPreset, newTrackCount: number): void;
     setCurrentNotesFromPreset(preset: TrackPreset): void;
     setFromPreset(preset: TrackPreset): void;
     setNoteSelects(): void;

@@ -241,3 +241,17 @@ select:after {
     border-left: .25em solid transparent;
     border-right: .25em solid transparent;
 }
+
+#edit-track-count-button {
+    border: 1px solid var(--select-border-color);
+    background: none;
+    color: var(--text-color);
+}
+
+#track-count-input {
+    font-size : 42pt;
+    width : 50%;
+    text-align: center;
+    color: var(--value-color);
+    background-color: #001240;
+}
