@@ -29,42 +29,7 @@ export class NoteSelectHandler {
     if (typeof trackCount === "undefined") {
       console.info("[NoteSelectHandler] `trackCount` not provided, using default setting 1.");
     }
-    // this.setCurrentNotesFromPreset(initialPreset);
-
-    var _self = this;
-    // function handleNoteSelectChange(event) {
-    //   console.log("event", event, event.target.value);
-    //   var noteIndex = event.target.value;
-    //   var selectTrackIndex = event.target.getAttribute("data-trackIndex");
-    //   console.log("selectTrackIndex", selectTrackIndex);
-    //   var selectIndex = event.target.getAttribute("data-index");
-    //   for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-    //     _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
-    //   }
-    //   var note = getNoteByIndex(noteIndex);
-    //   _self._noteSelects[selectTrackIndex][selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
-    // }
-
-    // function handleNoteDurationChange() {
-    //   _self.setCurrentNoteLengths();
-    // }
-
-    // const noteSelectsTable = document.querySelector("#note-selects-table");
-    // this._noteSelects = [];
-    // for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-    //   createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange);
-    //   this._noteSelects[trackIndex] = document.querySelectorAll(`select[data-trackindex='${trackIndex}'].note-select`);
-    // }
     this._createNoteSelectsDOM(initialPreset);
-
-    // this._noteLengthSliders = [];
-    // for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-    //   this._noteLengthSliders.push(document.querySelectorAll(`input[type=range].note_duration_slider_${trackIndex}`));
-    // }
-    // console.log("noteLengthSliders", this._noteLengthSliders.length);
-
-    // this.setCurrentNoteLengthInputs();
-    // this.setNoteSelects();
   }
 
   private _createNoteSelectsDOM(preset) {
