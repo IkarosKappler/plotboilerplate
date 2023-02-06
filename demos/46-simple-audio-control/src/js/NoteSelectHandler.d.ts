@@ -9,15 +9,18 @@
  */
 import { NoteConfig, TrackPreset } from "./interfaces";
 export declare class NoteSelectHandler {
-    currentNotes: Array<NoteConfig>;
-    _noteSelects: NodeListOf<HTMLSelectElement>;
-    _noteLengthSliders: NodeListOf<HTMLInputElement>;
+    currentNotes: Array<NoteConfig[]>;
+    trackCount: number;
+    private _noteSelects;
+    private _noteLengthSliders;
     static NOTE_INPUT_COUNT: number;
-    constructor(initialPreset: TrackPreset);
+    constructor(initialPreset: TrackPreset, trackCount?: number);
+    setCurrentNotesFromPreset(preset: TrackPreset): void;
     setFromPreset(preset: TrackPreset): void;
     setNoteSelects(): void;
     setCurrentNotes(): void;
     setCurrentNoteLengthInputs(): void;
     setCurrentNoteLengths(): void;
-    setPlayingNoteIndex(noteIndex: any): void;
+    setPlayingNoteIndex(noteIndex: number): void;
+    setNoteLengthDisplay(trackIndex: number, noteIndex: number): void;
 }

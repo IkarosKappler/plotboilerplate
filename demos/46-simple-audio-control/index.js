@@ -73,7 +73,7 @@
 
     // NOTE SELECTS
     var initialPreset = getDefaultPreset();
-    var noteSelectHandler = new NoteSelectHandler(initialPreset);
+    var noteSelectHandler = new NoteSelectHandler(initialPreset, 2);
 
     var mainControls = new MainControls();
     mainControls.setValues(initialPreset.mainValues);
@@ -198,7 +198,11 @@
     function noteLoop() {
       const secondsPerBeat = 60.0 / mainControls.values.tempo;
       if (isPlaying) {
-        playCurrentNote();
+        for (var curTrackIndex = 0; curTrackIndex < noteSelectHandler.trackCount; curTrackIndex++) {
+          // console.log("Play note in track", curTrackIndex);
+          playCurrentNote(curTrackIndex);
+        }
+        // playCurrentNote(0);
         nextNote();
         if (currentNoteIndex === 0 && singleLoopControl.checked) {
           singleLoopControl.checked = false;
@@ -217,11 +221,12 @@
       currentNoteIndex = (currentNoteIndex + 1) % NoteSelectHandler.NOTE_INPUT_COUNT;
     }
 
-    function playCurrentNote() {
+    function playCurrentNote(curTrackIndex) {
+      // var curTrackIndex = 0;
       // console.log("mainControls.masterVolume.gain.value", mainControls.masterVolume.gain.value);
-      var curNote = noteSelectHandler.currentNotes[currentNoteIndex];
+      var curNote = noteSelectHandler.currentNotes[curTrackIndex][currentNoteIndex];
       console.log("curNote", curNote);
-      if (!curNote || curNote.noteIndex === -1) {
+      if (!curNote || curNote.noteIndex < 1 || curNote.noteIndex >= noteValues.length) {
         console.info("Note at index " + currentNoteIndex + " not set.");
         return;
       }
@@ -262,6 +267,7 @@
 
       osc.type = waveform;
       // osc.frequency.setValueAtTime(Object.values(noteValues)[`${currentNotes[currentNoteIndex]}`], 0);
+      console.log("curNote", curNote);
       osc.frequency.setValueAtTime(Object.values(noteValues)[`${curNote.noteIndex}`], 0);
       // osc.frequency.setValueAtTime(curNote.frequency, 0);
 

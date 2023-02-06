@@ -164,6 +164,8 @@ var presetsTheRiddle = {
         { value: "--", lengthFactor: 1.0 }
     ]
 };
+// TODO: If I touch a burning candle
+//
 var getPresetList = function () {
     return {
         "The Riddle": presetsTheRiddle,
