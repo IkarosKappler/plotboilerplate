@@ -255,3 +255,34 @@ select:after {
     color: var(--value-color);
     background-color: #001240;
 }
+
+
+
+/* Checkboxes for is-muted */
+/* input[type="checkbox"] + label {
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+} */
+
+input[type="checkbox"].ismuted-checkbox {
+    visibility: hidden;
+}
+
+input[type="checkbox"].ismuted-checkbox:not(:checked) + label {
+    background: url('unmuted.svg') 0 0px no-repeat;
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+}
+
+input[type="checkbox"].ismuted-checkbox:checked + label {
+    background: url('muted.svg') 0 0px no-repeat;
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+}
+

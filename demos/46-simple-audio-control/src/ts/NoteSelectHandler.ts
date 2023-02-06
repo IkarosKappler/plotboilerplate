@@ -18,6 +18,7 @@ const NOTE_INPUT_COUNT = 16;
 export class NoteSelectHandler {
   currentNotes: Array<NoteConfig[]>;
   trackCount: number;
+  isTrackMuted: Array<boolean>;
 
   private _noteSelects: Array<NodeListOf<HTMLSelectElement>>;
   private _noteLengthSliders: Array<NodeListOf<HTMLInputElement>>;
@@ -52,12 +53,19 @@ export class NoteSelectHandler {
       _self.setCurrentNoteLengths();
     }
 
+    var handleTrackMutedChange = (trackIndex: number, isChecked: boolean) => {
+      console.log("is muted", isChecked);
+      this.isTrackMuted[trackIndex] = isChecked;
+    };
+
     const noteSelectsTable = document.querySelector("#note-selects-table") as HTMLTableElement;
     emptyElement(noteSelectsTable);
     this._noteSelects = [];
+    this.isTrackMuted = [];
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-      createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange);
+      createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange);
       this._noteSelects[trackIndex] = document.querySelectorAll(`select[data-trackindex='${trackIndex}'].note-select`);
+      this.isTrackMuted.push(false);
     }
 
     this._noteLengthSliders = [];
@@ -120,13 +128,7 @@ export class NoteSelectHandler {
   setCurrentNoteLengthInputs() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
-        // this._noteLengthSliders[i].value = this.currentNotes[i].lengthFactor;
-        // CHANGED both
-        // this._noteLengthSliders[trackIndex][i].setAttribute("value", `${this.currentNotes[trackIndex][i].lengthFactor}`);
         this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
-        // (document.getElementById(`note-length-display-${trackIndex}-${i + 1}`) as HTMLElement).innerHTML = String(
-        //   this.currentNotes[trackIndex][i].lengthFactor
-        // );
         this.setNoteLengthDisplay(trackIndex, i);
       }
     }
@@ -136,9 +138,7 @@ export class NoteSelectHandler {
   setCurrentNoteLengths() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
-        console.log("i", i, "this._noteLengthSliders[trackIndex][i].value", this._noteLengthSliders[trackIndex][i].value);
-        // (document.getElementById(`note-length-display-${trackIndex}-${i + 1}`) as HTMLElement).innerHTML =
-        //   this._noteLengthSliders[trackIndex][i].value;
+        // console.log("i", i, "this._noteLengthSliders[trackIndex][i].value", this._noteLengthSliders[trackIndex][i].value);
         this.setNoteLengthDisplay(trackIndex, i);
         this.currentNotes[trackIndex][i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
       }
@@ -147,10 +147,6 @@ export class NoteSelectHandler {
   }
 
   setPlayingNoteIndex(noteIndex: number) {
-    // select.setAttribute("data-index", `${i}`);
-    // select.setAttribute("data-trackIndex", `${trackIndex}`);
-    // select.classList.add("note-select");
-
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       this._noteSelects[trackIndex][noteIndex].classList.add("note-is-playing");
       if (this._noteSelects[trackIndex][noteIndex - 1]) {
@@ -183,10 +179,31 @@ const createNoteSelectRow = (
   noteSelectsTable: HTMLTableElement,
   trackIndex: number,
   handleNoteSelectChange,
-  handleNoteDurationChange
+  handleNoteDurationChange,
+  handleTrackMutedChange: (trackIndex: number, checked: boolean) => void
 ) => {
   // Create the table row
   const noteTableRow = document.createElement("tr");
+
+  // Create the leftest option cell (for muting tracks)
+  var labelCell = document.createElement("td");
+  labelCell.classList.add("align-top");
+  var labelCellDiv = document.createElement("div");
+  const mutedCheckbox = document.createElement("input");
+  mutedCheckbox.setAttribute("type", "checkbox");
+  mutedCheckbox.setAttribute("id", `ismuted-checkbox-${trackIndex}`);
+  mutedCheckbox.classList.add("ismuted-checkbox");
+  mutedCheckbox.addEventListener("change", (event: Event) => {
+    handleTrackMutedChange(trackIndex, (event.currentTarget as HTMLInputElement).checked);
+  });
+  var checkboxLabel = document.createElement("label");
+  checkboxLabel.setAttribute("for", `ismuted-checkbox-${trackIndex}`);
+  labelCellDiv.appendChild(mutedCheckbox);
+  labelCellDiv.appendChild(checkboxLabel);
+  labelCell.classList.add("align-center");
+  labelCell.appendChild(labelCellDiv);
+  noteTableRow.appendChild(labelCell);
+
   // Now create n cells for n notes
   for (let i = 0; i < NOTE_INPUT_COUNT; i++) {
     const select = document.createElement("select");
@@ -235,9 +252,9 @@ const createNoteSelectRow = (
   noteSelectsTable.appendChild(noteTableRow);
 
   // Create the rightest info cell
-  var labelCell = document.createElement("td");
+  labelCell = document.createElement("td");
   labelCell.classList.add("align-top");
-  var labelCellDiv = document.createElement("div");
+  labelCellDiv = document.createElement("div");
   labelCellDiv.innerHTML = "dur ×";
   labelCell.classList.add("align-center", "vertical-text");
   labelCell.appendChild(labelCellDiv);

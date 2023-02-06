@@ -11,6 +11,7 @@ import { NoteConfig, TrackPreset } from "./interfaces";
 export declare class NoteSelectHandler {
     currentNotes: Array<NoteConfig[]>;
     trackCount: number;
+    isTrackMuted: Array<boolean>;
     private _noteSelects;
     private _noteLengthSliders;
     static NOTE_INPUT_COUNT: number;

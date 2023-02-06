@@ -20,39 +20,10 @@ var NoteSelectHandler = /** @class */ (function () {
         if (typeof trackCount === "undefined") {
             console.info("[NoteSelectHandler] `trackCount` not provided, using default setting 1.");
         }
-        // this.setCurrentNotesFromPreset(initialPreset);
-        var _self = this;
-        // function handleNoteSelectChange(event) {
-        //   console.log("event", event, event.target.value);
-        //   var noteIndex = event.target.value;
-        //   var selectTrackIndex = event.target.getAttribute("data-trackIndex");
-        //   console.log("selectTrackIndex", selectTrackIndex);
-        //   var selectIndex = event.target.getAttribute("data-index");
-        //   for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-        //     _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
-        //   }
-        //   var note = getNoteByIndex(noteIndex);
-        //   _self._noteSelects[selectTrackIndex][selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
-        // }
-        // function handleNoteDurationChange() {
-        //   _self.setCurrentNoteLengths();
-        // }
-        // const noteSelectsTable = document.querySelector("#note-selects-table");
-        // this._noteSelects = [];
-        // for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-        //   createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange);
-        //   this._noteSelects[trackIndex] = document.querySelectorAll(`select[data-trackindex='${trackIndex}'].note-select`);
-        // }
         this._createNoteSelectsDOM(initialPreset);
-        // this._noteLengthSliders = [];
-        // for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-        //   this._noteLengthSliders.push(document.querySelectorAll(`input[type=range].note_duration_slider_${trackIndex}`));
-        // }
-        // console.log("noteLengthSliders", this._noteLengthSliders.length);
-        // this.setCurrentNoteLengthInputs();
-        // this.setNoteSelects();
     }
     NoteSelectHandler.prototype._createNoteSelectsDOM = function (preset) {
+        var _this = this;
         this.setCurrentNotesFromPreset(preset);
         var _self = this;
         function handleNoteSelectChange(event) {
@@ -70,12 +41,18 @@ var NoteSelectHandler = /** @class */ (function () {
         function handleNoteDurationChange() {
             _self.setCurrentNoteLengths();
         }
+        var handleTrackMutedChange = function (trackIndex, isChecked) {
+            console.log("is muted", isChecked);
+            _this.isTrackMuted[trackIndex] = isChecked;
+        };
         var noteSelectsTable = document.querySelector("#note-selects-table");
         emptyElement(noteSelectsTable);
         this._noteSelects = [];
+        this.isTrackMuted = [];
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange);
+            createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange);
             this._noteSelects[trackIndex] = document.querySelectorAll("select[data-trackindex='" + trackIndex + "'].note-select");
+            this.isTrackMuted.push(false);
         }
         this._noteLengthSliders = [];
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
@@ -130,13 +107,7 @@ var NoteSelectHandler = /** @class */ (function () {
     NoteSelectHandler.prototype.setCurrentNoteLengthInputs = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
             for (var i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
-                // this._noteLengthSliders[i].value = this.currentNotes[i].lengthFactor;
-                // CHANGED both
-                // this._noteLengthSliders[trackIndex][i].setAttribute("value", `${this.currentNotes[trackIndex][i].lengthFactor}`);
                 this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
-                // (document.getElementById(`note-length-display-${trackIndex}-${i + 1}`) as HTMLElement).innerHTML = String(
-                //   this.currentNotes[trackIndex][i].lengthFactor
-                // );
                 this.setNoteLengthDisplay(trackIndex, i);
             }
         }
@@ -145,9 +116,7 @@ var NoteSelectHandler = /** @class */ (function () {
     NoteSelectHandler.prototype.setCurrentNoteLengths = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
             for (var i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
-                console.log("i", i, "this._noteLengthSliders[trackIndex][i].value", this._noteLengthSliders[trackIndex][i].value);
-                // (document.getElementById(`note-length-display-${trackIndex}-${i + 1}`) as HTMLElement).innerHTML =
-                //   this._noteLengthSliders[trackIndex][i].value;
+                // console.log("i", i, "this._noteLengthSliders[trackIndex][i].value", this._noteLengthSliders[trackIndex][i].value);
                 this.setNoteLengthDisplay(trackIndex, i);
                 this.currentNotes[trackIndex][i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
             }
@@ -155,9 +124,6 @@ var NoteSelectHandler = /** @class */ (function () {
         console.log("currentNotes", this.currentNotes);
     };
     NoteSelectHandler.prototype.setPlayingNoteIndex = function (noteIndex) {
-        // select.setAttribute("data-index", `${i}`);
-        // select.setAttribute("data-trackIndex", `${trackIndex}`);
-        // select.classList.add("note-select");
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
             this._noteSelects[trackIndex][noteIndex].classList.add("note-is-playing");
             if (this._noteSelects[trackIndex][noteIndex - 1]) {
@@ -187,9 +153,27 @@ var emptyElement = function (element) {
  * @param {HTMLTableElement} noteSelectsTable - The table element from the DOM.
  * @param {function} handleNoteSelectChange - A callback to handle note value changes.
  */
-var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange) {
+var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange) {
     // Create the table row
     var noteTableRow = document.createElement("tr");
+    // Create the leftest option cell (for muting tracks)
+    var labelCell = document.createElement("td");
+    labelCell.classList.add("align-top");
+    var labelCellDiv = document.createElement("div");
+    var mutedCheckbox = document.createElement("input");
+    mutedCheckbox.setAttribute("type", "checkbox");
+    mutedCheckbox.setAttribute("id", "ismuted-checkbox-" + trackIndex);
+    mutedCheckbox.classList.add("ismuted-checkbox");
+    mutedCheckbox.addEventListener("change", function (event) {
+        handleTrackMutedChange(trackIndex, event.currentTarget.checked);
+    });
+    var checkboxLabel = document.createElement("label");
+    checkboxLabel.setAttribute("for", "ismuted-checkbox-" + trackIndex);
+    labelCellDiv.appendChild(mutedCheckbox);
+    labelCellDiv.appendChild(checkboxLabel);
+    labelCell.classList.add("align-center");
+    labelCell.appendChild(labelCellDiv);
+    noteTableRow.appendChild(labelCell);
     // Now create n cells for n notes
     for (var i = 0; i < NOTE_INPUT_COUNT; i++) {
         var select = document.createElement("select");
@@ -237,9 +221,9 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
     } // END for
     noteSelectsTable.appendChild(noteTableRow);
     // Create the rightest info cell
-    var labelCell = document.createElement("td");
+    labelCell = document.createElement("td");
     labelCell.classList.add("align-top");
-    var labelCellDiv = document.createElement("div");
+    labelCellDiv = document.createElement("div");
     labelCellDiv.innerHTML = "dur ×";
     labelCell.classList.add("align-center", "vertical-text");
     labelCell.appendChild(labelCellDiv);

@@ -215,6 +215,10 @@
       if (isPlaying) {
         for (var curTrackIndex = 0; curTrackIndex < noteSelectHandler.trackCount; curTrackIndex++) {
           // console.log("Play note in track", curTrackIndex);
+          if (noteSelectHandler.isTrackMuted[curTrackIndex]) {
+            // Don't play muted tracks.
+            continue;
+          }
           playCurrentNote(curTrackIndex);
         }
         // playCurrentNote(0);
@@ -281,10 +285,8 @@
       lfo.connect(lfoGain);
 
       osc.type = waveform;
-      // osc.frequency.setValueAtTime(Object.values(noteValues)[`${currentNotes[currentNoteIndex]}`], 0);
       console.log("curNote", curNote);
       osc.frequency.setValueAtTime(Object.values(noteValues)[`${curNote.noteIndex}`], 0);
-      // osc.frequency.setValueAtTime(curNote.frequency, 0);
 
       osc.start(0);
       osc.stop(mainControls.context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
@@ -295,7 +297,7 @@
     }
     // ### END SYNTH
 
-    // BEGIN DIALOGS AND OTHER INPUT
+    // ### BEGIN DIALOGS AND OTHER INPUT
     var modal = new Modal();
     // +---------------------------------------------------------------------------------
     // | This is the callback to use when the user wants to insert
@@ -304,9 +306,6 @@
     var showTrackCountDialog = function () {
       var trackCountInput = document.createElement("input");
       trackCountInput.setAttribute("id", "track-count-input");
-      // trackCountInput.style.fontSize = "42pt";
-      // trackCountInput.style.width = "50%";
-      // trackCountInput.style.textAlign = "center";
       trackCountInput.setAttribute("type", "number");
       trackCountInput.value = noteSelectHandler.trackCount;
       modal.setTitle("Track count");
@@ -328,11 +327,10 @@
       }
       modal.open();
     };
-    // insertPathJSON();
     var editTrackCountButton = document.querySelector("#edit-track-count-button");
     console.log("editTrackCountButton", editTrackCountButton);
     editTrackCountButton.addEventListener("click", showTrackCountDialog);
-    // BEGIN DIALOGS AND OTHER INPUT
+    // ### END DIALOGS AND OTHER INPUT
   };
 
   if (!window.pbPreventAutoLoad) {
