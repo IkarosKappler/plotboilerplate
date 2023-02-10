@@ -2,6 +2,7 @@
     --text-color: #b900ff;
     --value-color: #0088ff;
     --select-border-color: #5900ff;
+    --highlight-color: #002c53;
 }
 
 *,
@@ -299,4 +300,9 @@ input[type="radio"].isactive-radio:checked + label {
     height: 16px;
     padding: 0 0 0 0px;
     background-size: contain;
+}
+
+/* Highlight the complete track that's currently selected */
+tr.selected-track td {
+    background-color: var(--highlight-color);
 }

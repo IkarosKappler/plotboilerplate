@@ -7,9 +7,9 @@
  * @modified 2023-02-04 Ported to Typescript.
  * @version 1.0.1
  */
-import { NoteConfig, TrackPreset } from "./interfaces";
+import { Track, TrackPreset } from "./interfaces";
 export declare class NoteSelectHandler {
-    currentNotes: Array<NoteConfig[]>;
+    tracks: Array<Track>;
     trackCount: number;
     isTrackMuted: Array<boolean>;
     private _noteSelects;

@@ -243,7 +243,9 @@
     function playCurrentNote(curTrackIndex) {
       // var curTrackIndex = 0;
       // console.log("mainControls.masterVolume.gain.value", mainControls.masterVolume.gain.value);
-      var curNote = noteSelectHandler.currentNotes[curTrackIndex][currentNoteIndex];
+      // var curNote = noteSelectHandler.currentNotes[curTrackIndex][currentNoteIndex];
+      var curNote = noteSelectHandler.tracks[curTrackIndex].currentNotes[currentNoteIndex];
+
       console.log("curNote", curNote);
       if (!curNote || curNote.noteIndex < 1 || curNote.noteIndex >= noteValues.length) {
         console.info("Note at index " + currentNoteIndex + " not set.");

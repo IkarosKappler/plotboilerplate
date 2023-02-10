@@ -8,15 +8,15 @@
  * @version 1.0.1
  */
 
-import { Note, NoteConfig, TrackPreset } from "./interfaces";
+import { Note, NoteConfig, Track, TrackPreset } from "./interfaces";
 import { getNoteByIndex, noteValues } from "./noteValues";
 import { convertPresetToNotes } from "./presets";
 
 const NOTE_INPUT_COUNT = 16;
-// const TRACK_COUNT = 2;
 
 export class NoteSelectHandler {
-  currentNotes: Array<NoteConfig[]>;
+  // currentNotes: Array<NoteConfig[]>;
+  tracks: Array<Track>;
   trackCount: number;
   isTrackMuted: Array<boolean>;
 
@@ -43,7 +43,8 @@ export class NoteSelectHandler {
       console.log("selectTrackIndex", selectTrackIndex);
       var selectIndex = event.target.getAttribute("data-index");
       for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-        _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
+        // _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
+        _self.tracks[selectTrackIndex].currentNotes[selectIndex].noteIndex = noteIndex;
       }
       var note = getNoteByIndex(noteIndex);
       _self._noteSelects[selectTrackIndex][selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
@@ -58,12 +59,36 @@ export class NoteSelectHandler {
       this.isTrackMuted[trackIndex] = isChecked;
     };
 
+    const handleTrackSelectedChange = (trackIndex: number, checked: boolean) => {
+      console.log("checked", checked);
+      // if (checked) {
+      //   noteTableRow.classList.add("selected-track");
+      // } else {
+      //   console.log("Remove class");
+      //   noteTableRow.classList.remove("selected-track");
+      // }
+      for (var t = 0; t < this.trackCount; t++) {
+        if (t != trackIndex) {
+          document.querySelector(`.noteTableRow-${t}`)?.classList.remove("selected-track");
+        }
+        // noteTableRow", `noteTableRow-${trackIndex}`)
+      }
+      document.querySelector(`.noteTableRow-${trackIndex}`)?.classList.add("selected-track");
+    };
+
     const noteSelectsTable = document.querySelector("#note-selects-table") as HTMLTableElement;
     emptyElement(noteSelectsTable);
     this._noteSelects = [];
     this.isTrackMuted = [];
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-      createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange);
+      createNoteSelectRow(
+        noteSelectsTable,
+        trackIndex,
+        handleNoteSelectChange,
+        handleNoteDurationChange,
+        handleTrackMutedChange,
+        handleTrackSelectedChange
+      );
       this._noteSelects[trackIndex] = document.querySelectorAll(`select[data-trackindex='${trackIndex}'].note-select`);
       this.isTrackMuted.push(false);
     }
@@ -85,13 +110,16 @@ export class NoteSelectHandler {
   }
 
   setCurrentNotesFromPreset(preset: TrackPreset) {
-    this.currentNotes = [];
+    // this.currentNotes = [];
+    this.tracks = [];
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-      this.currentNotes.push(convertPresetToNotes(NOTE_INPUT_COUNT, preset.noteValues));
+      const track: Track = { currentNotes: [] };
+      this.tracks.push(track);
+      track.currentNotes = convertPresetToNotes(NOTE_INPUT_COUNT, preset.noteValues);
       if (trackIndex === 1) {
         // For testing: transpose the first track one octave down
-        for (var i = 0; i < this.currentNotes[trackIndex].length; i++) {
-          this.currentNotes[trackIndex][i].noteIndex -= 12;
+        for (var i = 0; i < track.currentNotes.length; i++) {
+          track.currentNotes[i].noteIndex -= 12;
         }
       }
     }
@@ -106,8 +134,11 @@ export class NoteSelectHandler {
 
   setNoteSelects() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-      for (let i = 0; i < this.currentNotes[trackIndex].length; i++) {
-        const noteIndex = this.currentNotes[trackIndex][i].noteIndex;
+      // for (let i = 0; i < this.currentNotes[trackIndex].length; i++) {
+      for (let i = 0; i < this.tracks[trackIndex].currentNotes.length; i++) {
+        // const noteIndex = this.currentNotes[trackIndex][i].noteIndex;
+        const noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
+
         // console.log("i noteIndex", i, noteIndex);
         this._noteSelects[trackIndex][i].value = `${noteIndex}`;
         const noteIdentifier = Object.keys(noteValues)[noteIndex];
@@ -120,7 +151,8 @@ export class NoteSelectHandler {
   setCurrentNotes() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this._noteSelects.length; i++) {
-        this.currentNotes[trackIndex][i].noteIndex = Number(this._noteSelects[trackIndex][i].value);
+        // this.currentNotes[trackIndex][i].noteIndex = Number(this._noteSelects[trackIndex][i].value);
+        this.tracks[trackIndex].currentNotes[i].noteIndex = Number(this._noteSelects[trackIndex][i].value);
       }
     }
   }
@@ -128,11 +160,13 @@ export class NoteSelectHandler {
   setCurrentNoteLengthInputs() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
-        this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
+        // this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
+        this._noteLengthSliders[trackIndex][i].value = String(this.tracks[trackIndex].currentNotes[i].lengthFactor);
+
         this.setNoteLengthDisplay(trackIndex, i);
       }
     }
-    console.log("currentNotes", this.currentNotes);
+    console.log("this.tracks", this.tracks);
   }
 
   setCurrentNoteLengths() {
@@ -140,10 +174,11 @@ export class NoteSelectHandler {
       for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
         // console.log("i", i, "this._noteLengthSliders[trackIndex][i].value", this._noteLengthSliders[trackIndex][i].value);
         this.setNoteLengthDisplay(trackIndex, i);
-        this.currentNotes[trackIndex][i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
+        // this.currentNotes[trackIndex][i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
+        this.tracks[trackIndex].currentNotes[i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
       }
     }
-    console.log("currentNotes", this.currentNotes);
+    console.log("this.tracks", this.tracks);
   }
 
   setPlayingNoteIndex(noteIndex: number) {
@@ -180,10 +215,12 @@ const createNoteSelectRow = (
   trackIndex: number,
   handleNoteSelectChange,
   handleNoteDurationChange,
-  handleTrackMutedChange: (trackIndex: number, checked: boolean) => void
+  handleTrackMutedChange: (trackIndex: number, checked: boolean) => void,
+  handleTrackSelectChange: (trackIndex: number, checked: boolean) => void
 ) => {
   // Create the table row
   const noteTableRow = document.createElement("tr");
+  noteTableRow.classList.add("noteTableRow", `noteTableRow-${trackIndex}`);
 
   // Create the leftest option cell (for muting tracks)
   var labelCell = document.createElement("td");
@@ -209,12 +246,23 @@ const createNoteSelectRow = (
   activeRadiobox.setAttribute("id", `isactive-radio-${trackIndex}`);
   activeRadiobox.setAttribute("name", `isactive-radio`);
   if (trackIndex === 0) {
+    console.log("tackIndex", 0);
     activeRadiobox.checked = true;
+    noteTableRow.classList.add("selected-track");
   }
+  // const handleTrackSelectedChange = (trackIndex: number, checked: boolean) => {
+  //   console.log("checked", checked);
+  //   if (checked) {
+  //     noteTableRow.classList.add("selected-track");
+  //   } else {
+  //     console.log("Remove class");
+  //     noteTableRow.classList.remove("selected-track");
+  //   }
+  // };
   activeRadiobox.classList.add("isactive-radio");
   activeRadiobox.addEventListener("change", (event: Event) => {
-    // handleTrackMutedChange(trackIndex, (event.currentTarget as HTMLInputElement).checked);
-    // TODO ...
+    console.log("event.currentTarget", event.target);
+    handleTrackSelectChange(trackIndex, (event.target as HTMLInputElement).checked);
   });
   var activeRadioboxLabel = document.createElement("label");
   activeRadioboxLabel.setAttribute("for", `isactive-radio-${trackIndex}`);

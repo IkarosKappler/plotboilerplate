@@ -33,3 +33,7 @@ export interface TrackPreset {
   oscillator: { waveform: "triangle" | "square" | "sine" | "sawtooth" };
   noteValues: Array<{ value: string; lengthFactor: number }>;
 }
+
+export interface Track {
+  currentNotes: Array<NoteConfig>;
+}

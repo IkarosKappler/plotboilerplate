@@ -13,7 +13,6 @@ exports.NoteSelectHandler = void 0;
 var noteValues_1 = require("./noteValues");
 var presets_1 = require("./presets");
 var NOTE_INPUT_COUNT = 16;
-// const TRACK_COUNT = 2;
 var NoteSelectHandler = /** @class */ (function () {
     function NoteSelectHandler(initialPreset, trackCount) {
         this.trackCount = trackCount || 1;
@@ -33,7 +32,8 @@ var NoteSelectHandler = /** @class */ (function () {
             console.log("selectTrackIndex", selectTrackIndex);
             var selectIndex = event.target.getAttribute("data-index");
             for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-                _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
+                // _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
+                _self.tracks[selectTrackIndex].currentNotes[selectIndex].noteIndex = noteIndex;
             }
             var note = noteValues_1.getNoteByIndex(noteIndex);
             _self._noteSelects[selectTrackIndex][selectIndex].setAttribute("title", note.identifier + " @" + note.frequency + "Hz");
@@ -45,12 +45,29 @@ var NoteSelectHandler = /** @class */ (function () {
             console.log("is muted", isChecked);
             _this.isTrackMuted[trackIndex] = isChecked;
         };
+        var handleTrackSelectedChange = function (trackIndex, checked) {
+            var _a, _b;
+            console.log("checked", checked);
+            // if (checked) {
+            //   noteTableRow.classList.add("selected-track");
+            // } else {
+            //   console.log("Remove class");
+            //   noteTableRow.classList.remove("selected-track");
+            // }
+            for (var t = 0; t < _this.trackCount; t++) {
+                if (t != trackIndex) {
+                    (_a = document.querySelector(".noteTableRow-" + t)) === null || _a === void 0 ? void 0 : _a.classList.remove("selected-track");
+                }
+                // noteTableRow", `noteTableRow-${trackIndex}`)
+            }
+            (_b = document.querySelector(".noteTableRow-" + trackIndex)) === null || _b === void 0 ? void 0 : _b.classList.add("selected-track");
+        };
         var noteSelectsTable = document.querySelector("#note-selects-table");
         emptyElement(noteSelectsTable);
         this._noteSelects = [];
         this.isTrackMuted = [];
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange);
+            createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange, handleTrackSelectedChange);
             this._noteSelects[trackIndex] = document.querySelectorAll("select[data-trackindex='" + trackIndex + "'].note-select");
             this.isTrackMuted.push(false);
         }
@@ -68,13 +85,16 @@ var NoteSelectHandler = /** @class */ (function () {
         this.setCurrentNotesFromPreset(preset);
     };
     NoteSelectHandler.prototype.setCurrentNotesFromPreset = function (preset) {
-        this.currentNotes = [];
+        // this.currentNotes = [];
+        this.tracks = [];
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            this.currentNotes.push(presets_1.convertPresetToNotes(NOTE_INPUT_COUNT, preset.noteValues));
+            var track = { currentNotes: [] };
+            this.tracks.push(track);
+            track.currentNotes = presets_1.convertPresetToNotes(NOTE_INPUT_COUNT, preset.noteValues);
             if (trackIndex === 1) {
                 // For testing: transpose the first track one octave down
-                for (var i = 0; i < this.currentNotes[trackIndex].length; i++) {
-                    this.currentNotes[trackIndex][i].noteIndex -= 12;
+                for (var i = 0; i < track.currentNotes.length; i++) {
+                    track.currentNotes[i].noteIndex -= 12;
                 }
             }
         }
@@ -87,8 +107,10 @@ var NoteSelectHandler = /** @class */ (function () {
     };
     NoteSelectHandler.prototype.setNoteSelects = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            for (var i = 0; i < this.currentNotes[trackIndex].length; i++) {
-                var noteIndex = this.currentNotes[trackIndex][i].noteIndex;
+            // for (let i = 0; i < this.currentNotes[trackIndex].length; i++) {
+            for (var i = 0; i < this.tracks[trackIndex].currentNotes.length; i++) {
+                // const noteIndex = this.currentNotes[trackIndex][i].noteIndex;
+                var noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
                 // console.log("i noteIndex", i, noteIndex);
                 this._noteSelects[trackIndex][i].value = "" + noteIndex;
                 var noteIdentifier = Object.keys(noteValues_1.noteValues)[noteIndex];
@@ -100,28 +122,31 @@ var NoteSelectHandler = /** @class */ (function () {
     NoteSelectHandler.prototype.setCurrentNotes = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
             for (var i = 0; i < this._noteSelects.length; i++) {
-                this.currentNotes[trackIndex][i].noteIndex = Number(this._noteSelects[trackIndex][i].value);
+                // this.currentNotes[trackIndex][i].noteIndex = Number(this._noteSelects[trackIndex][i].value);
+                this.tracks[trackIndex].currentNotes[i].noteIndex = Number(this._noteSelects[trackIndex][i].value);
             }
         }
     };
     NoteSelectHandler.prototype.setCurrentNoteLengthInputs = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
             for (var i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
-                this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
+                // this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
+                this._noteLengthSliders[trackIndex][i].value = String(this.tracks[trackIndex].currentNotes[i].lengthFactor);
                 this.setNoteLengthDisplay(trackIndex, i);
             }
         }
-        console.log("currentNotes", this.currentNotes);
+        console.log("this.tracks", this.tracks);
     };
     NoteSelectHandler.prototype.setCurrentNoteLengths = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
             for (var i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
                 // console.log("i", i, "this._noteLengthSliders[trackIndex][i].value", this._noteLengthSliders[trackIndex][i].value);
                 this.setNoteLengthDisplay(trackIndex, i);
-                this.currentNotes[trackIndex][i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
+                // this.currentNotes[trackIndex][i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
+                this.tracks[trackIndex].currentNotes[i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
             }
         }
-        console.log("currentNotes", this.currentNotes);
+        console.log("this.tracks", this.tracks);
     };
     NoteSelectHandler.prototype.setPlayingNoteIndex = function (noteIndex) {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
@@ -153,9 +178,10 @@ var emptyElement = function (element) {
  * @param {HTMLTableElement} noteSelectsTable - The table element from the DOM.
  * @param {function} handleNoteSelectChange - A callback to handle note value changes.
  */
-var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange) {
+var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange, handleTrackSelectChange) {
     // Create the table row
     var noteTableRow = document.createElement("tr");
+    noteTableRow.classList.add("noteTableRow", "noteTableRow-" + trackIndex);
     // Create the leftest option cell (for muting tracks)
     var labelCell = document.createElement("td");
     labelCell.classList.add("align-top");
@@ -179,12 +205,23 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
     activeRadiobox.setAttribute("id", "isactive-radio-" + trackIndex);
     activeRadiobox.setAttribute("name", "isactive-radio");
     if (trackIndex === 0) {
+        console.log("tackIndex", 0);
         activeRadiobox.checked = true;
+        noteTableRow.classList.add("selected-track");
     }
+    // const handleTrackSelectedChange = (trackIndex: number, checked: boolean) => {
+    //   console.log("checked", checked);
+    //   if (checked) {
+    //     noteTableRow.classList.add("selected-track");
+    //   } else {
+    //     console.log("Remove class");
+    //     noteTableRow.classList.remove("selected-track");
+    //   }
+    // };
     activeRadiobox.classList.add("isactive-radio");
     activeRadiobox.addEventListener("change", function (event) {
-        // handleTrackMutedChange(trackIndex, (event.currentTarget as HTMLInputElement).checked);
-        // TODO ...
+        console.log("event.currentTarget", event.target);
+        handleTrackSelectChange(trackIndex, event.target.checked);
     });
     var activeRadioboxLabel = document.createElement("label");
     activeRadioboxLabel.setAttribute("for", "isactive-radio-" + trackIndex);

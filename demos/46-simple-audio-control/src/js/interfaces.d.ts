@@ -32,3 +32,6 @@ export interface TrackPreset {
         lengthFactor: number;
     }>;
 }
+export interface Track {
+    currentNotes: Array<NoteConfig>;
+}
