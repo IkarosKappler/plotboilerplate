@@ -1,5 +1,11 @@
 # Changelog
 
+- 2023-02-10
+  - Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
+  - All non-function attributes of the `Config` interface are now mandatory.
+  - The methods `DrawLib.setCurrentClassName` and `DrawLib.setCurrentId` also accept `null` now.
+  - Cleaning up most type errors in the main class (mostly null checks).
+  - Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
 - 2023-02-04
   - Fixed a bug in the `PlotBoilerplate.drawDrawable` function; fill's current classname was not set.
   - drawutilssvg: Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).

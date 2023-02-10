@@ -358,6 +358,14 @@ var pb = new PlotBoilerplate({
   //   Indicates if the application should handle mouse wheelevents for you.
   enableMouseWheel: true,
 
+  // boolean (default true)
+  //    Use this to disable panning completely.
+  enablePan: true,
+
+  // boolean (default true)
+  //    Use this to disable zooming completely.
+  enableZoom: true,
+
   // Indicates if the SVG export should be enabled (default is true).
   enableSVGExport: true,
 

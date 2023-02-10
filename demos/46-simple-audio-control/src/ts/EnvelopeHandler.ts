@@ -68,7 +68,9 @@ export class EnvelopeHandler {
           drawOrigin: true,
           autoAdjustOffset: true,
           offsetAdjustXPercent: 0,
-          offsetAdjustYPercent: 100
+          offsetAdjustYPercent: 100,
+          enablePan: false,
+          enableZoom: false
         },
         GUP
       )
@@ -95,28 +97,6 @@ export class EnvelopeHandler {
       draw.polygon(_self.viewport.toPolygon(), "rgba(192,192,192,0.5)", 1);
       fill.polygon(envelopePolygon, "rgba(192,192,192,0.1)");
     };
-
-    // this._updateVertices = function () {
-    //   attackTimeVert.set((this.envelope.attackTime / this.envelope.noteLength) * viewport.width, -1.0 * viewport.height);
-    //   releaseTimeVert.set(
-    //     ((this.envelope.noteLength - this.envelope.releaseTime) / this.envelope.noteLength) * viewport.width,
-    //     -this.envelope.sustainLevel * viewport.height
-    //   );
-    //   //   noteLengthVert.set(this.envelope.noteLength * viewport.width, -0.5 * viewport.height);
-    //   noteLengthVert.set(viewport.width, 0.0);
-    // };
-
-    // this._updateDisplay = function () {
-    //   console.log("update");
-    //   const attackControlDisplay = document.querySelector("#display-attack-control");
-    //   attackControlDisplay.innerHTML = this.envelope.attackTime;
-    //   const releaseControlDisplay = document.querySelector("#display-release-control");
-    //   releaseControlDisplay.innerHTML = this.envelope.releaseTime;
-    //   const noteLengthControlDisplay = document.querySelector("#display-note-length-control");
-    //   noteLengthControlDisplay.innerHTML = this.envelope.noteLength;
-    //   const sustainLevelControlDisplay = document.querySelector("#display-sustain-level-control");
-    //   sustainLevelControlDisplay.innerHTML = this.envelope.sustainLevel;
-    // };
 
     // EFFECTS CONTROLS
     // Envelope

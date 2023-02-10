@@ -47,7 +47,8 @@
  * @modified 2022-08-23 Fixed a type issue in the `polyline` function.
  * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
- * @version  1.12.3
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  1.12.4
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
@@ -112,7 +113,7 @@ export class drawutils {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).
      **/
     setCurrentId(uid) {
         // NOOP
@@ -123,7 +124,7 @@ export class drawutils {
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      **/
     setCurrentClassName(className) {
         // NOOP

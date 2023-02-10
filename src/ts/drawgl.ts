@@ -10,7 +10,8 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  0.0.8
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  0.0.9
  **/
 
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -82,7 +83,7 @@ export class drawutilsgl implements DrawLib<void> {
   private _program: WebGLProgram;
   private vertex_buffer: WebGLBuffer; // TODO
 
-  private curId: UID | undefined;
+  private curId: UID | null;
   private renderTime: number;
 
   /**
@@ -90,7 +91,7 @@ export class drawutilsgl implements DrawLib<void> {
    *
    * @constructor
    * @name drawutils
-   * @param {WebGLRenderingContext} context - The drawing context.
+   * @param {WebGLRenderingContext|null} context - The drawing context.
    * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
    **/
   constructor(context: WebGLRenderingContext, fillShapes: boolean) {
@@ -114,7 +115,7 @@ export class drawutilsgl implements DrawLib<void> {
     this._program = this.glutils.makeProgram(this._vertShader, this._fragShader);
 
     // Create an empty buffer object
-    this.vertex_buffer = this.gl.createBuffer();
+    this.vertex_buffer = this.gl.createBuffer() as WebGLBuffer;
     // Bind appropriate array buffer to it
     // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertex_buffer);
 
@@ -182,9 +183,9 @@ export class drawutilsgl implements DrawLib<void> {
    *
    * @name setCurrentId
    * @method
-   * @param {UID} uid - A UID identifying the currently drawn element(s).es.
+   * @param {UID|null} uid - A UID identifying the currently drawn element(s).es.
    **/
-  setCurrentId(uid: UID | undefined): void {
+  setCurrentId(uid: UID | null): void {
     // NOOP
     this.curId = uid;
   }
@@ -195,9 +196,9 @@ export class drawutilsgl implements DrawLib<void> {
    *
    * @name setCurrentClassName
    * @method
-   * @param {string} className - A class name for further custom use cases.
+   * @param {string|null} className - A class name for further custom use cases.
    **/
-  setCurrentClassName(className: string | undefined): void {
+  setCurrentClassName(className: string | null): void {
     // NOOP
   }
 

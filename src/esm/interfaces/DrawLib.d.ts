@@ -18,6 +18,7 @@
  * @modified 2022-02-03 Added the `lineWidth` param to the `crosshair` function.
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
  **/
 import { Bounds } from "../Bounds";
 import { Polygon } from "../Polygon";
@@ -66,16 +67,16 @@ export interface DrawLib<R> {
      * @method
      * @param {UID|null} uid - A UID identifying the currently drawn element(s), or null to clear.
      **/
-    setCurrentId: (uid: UID | undefined) => void;
+    setCurrentId: (uid: UID | null) => void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      **/
-    setCurrentClassName: (className: string | undefined) => void;
+    setCurrentClassName: (className: string | null) => void;
     /**
      * Called before each draw cycle.
      *

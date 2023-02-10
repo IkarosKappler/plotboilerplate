@@ -47,7 +47,8 @@
  * @modified 2022-08-23 Fixed a type issue in the `polyline` function.
  * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
- * @version  1.12.3
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  1.12.4
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -129,18 +130,18 @@ export declare class drawutils implements DrawLib<void> {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).
      **/
-    setCurrentId(uid: UID | undefined): void;
+    setCurrentId(uid: UID | null): void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      **/
-    setCurrentClassName(className: string | undefined): void;
+    setCurrentClassName(className: string | null): void;
     /**
      * Draw the line between the given two points with the specified (CSS-) color.
      *

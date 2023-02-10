@@ -36,7 +36,8 @@
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2022-11-10 Tweaking some type issues.
  * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
- * @version  1.6.3
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  1.6.4
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -72,7 +73,7 @@ export class drawutilssvg {
         this.offset = new Vertex(0, 0).set(offset);
         this.scale = new Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
-        this.isSecondary = isSecondary;
+        this.isSecondary = Boolean(isSecondary);
         this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
@@ -169,6 +170,9 @@ export class drawutilssvg {
      * @param {string} nodeName - The expected node name.
      */
     findElement(key, nodeName) {
+        if (!key) {
+            return null;
+        }
         var node = this.cache.get(key);
         if (node && node.nodeName.toUpperCase() === nodeName.toUpperCase()) {
             this.cache.delete(key);
@@ -243,8 +247,8 @@ export class drawutilssvg {
         else {
             node.setAttribute("class", className);
         }
-        node.setAttribute("fill", this.fillShapes ? color : "none");
-        node.setAttribute("stroke", this.fillShapes ? "none" : color);
+        node.setAttribute("fill", this.fillShapes && color ? color : "none");
+        node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
         node.setAttribute("stroke-width", `${lineWidth || 1}`);
         if (this.curId) {
             node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
@@ -295,7 +299,7 @@ export class drawutilssvg {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).
      * @instance
      * @memberof drawutilssvg
      **/
@@ -308,7 +312,7 @@ export class drawutilssvg {
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      * @instance
      * @memberof drawutilssvg
      **/

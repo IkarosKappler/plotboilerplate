@@ -48,7 +48,8 @@
  * @modified 2022-08-23 Fixed a type issue in the `polyline` function.
  * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
- * @version  1.12.3
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  1.12.4
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.drawutils = void 0;
@@ -115,7 +116,7 @@ var drawutils = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).
      **/
     drawutils.prototype.setCurrentId = function (uid) {
         // NOOP
@@ -126,7 +127,7 @@ var drawutils = /** @class */ (function () {
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      **/
     drawutils.prototype.setCurrentClassName = function (className) {
         // NOOP

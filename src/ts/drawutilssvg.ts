@@ -36,7 +36,8 @@
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2022-11-10 Tweaking some type issues.
  * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
- * @version  1.6.3
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  1.6.4
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -164,16 +165,16 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   /**
    * The current drawable-ID. This can be any unique ID identifying the following drawn element.
    *
-   * @member {UID|undefined}
+   * @member {UID|null}
    * @memberof drawutilssvg
    * @instance
    */
-  private curId: UID | undefined;
+  private curId: UID | null;
 
   /**
    * The current drawable-classname.
    */
-  private curClassName: string | undefined;
+  private curClassName: string | null;
 
   /**
    * The SVG element cache. On clear() all elements are kept for possible re-use on next draw cycle.
@@ -216,7 +217,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     this.offset = new Vertex(0, 0).set(offset);
     this.scale = new Vertex(1, 1).set(scale);
     this.fillShapes = fillShapes;
-    this.isSecondary = isSecondary;
+    this.isSecondary = Boolean(isSecondary);
 
     this.drawlibConfiguration = {} as DrawLibConfiguration;
     this.cache = new Map<UID, SVGElement>();
@@ -316,8 +317,11 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {UID} key - The key of the desired element (used when re-drawing).
    * @param {string} nodeName - The expected node name.
    */
-  private findElement(key: UID, nodeName: string): SVGElement | undefined {
-    var node: SVGElement = this.cache.get(key);
+  private findElement(key: UID | null, nodeName: string): SVGElement | null {
+    if (!key) {
+      return null;
+    }
+    var node: SVGElement | undefined = this.cache.get(key);
     if (node && node.nodeName.toUpperCase() === nodeName.toUpperCase()) {
       this.cache.delete(key);
       return node;
@@ -356,7 +360,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     // Unique node keys are strictly necessary.
 
     // Try to recycle an old element from cache.
-    var node: SVGElement | undefined = this.findElement(this.curId, nodeName);
+    var node: SVGElement | null = this.findElement(this.curId, nodeName);
     if (!node) {
       // If no such old elements exists (key not found, tag name not matching),
       // then create a new one.
@@ -394,8 +398,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     } else {
       node.setAttribute("class", className);
     }
-    node.setAttribute("fill", this.fillShapes ? color : "none");
-    node.setAttribute("stroke", this.fillShapes ? "none" : color);
+    node.setAttribute("fill", this.fillShapes && color ? color : "none");
+    node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
     node.setAttribute("stroke-width", `${lineWidth || 1}`);
     if (this.curId) {
       node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
@@ -460,11 +464,11 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    *
    * @name setCurrentId
    * @method
-   * @param {UID} uid - A UID identifying the currently drawn element(s).
+   * @param {UID|null} uid - A UID identifying the currently drawn element(s).
    * @instance
    * @memberof drawutilssvg
    **/
-  setCurrentId(uid: UID | undefined): void {
+  setCurrentId(uid: UID | null): void {
     this.curId = uid;
   }
 
@@ -474,11 +478,11 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    *
    * @name setCurrentClassName
    * @method
-   * @param {string} className - A class name for further custom use cases.
+   * @param {string|null} className - A class name for further custom use cases.
    * @instance
    * @memberof drawutilssvg
    **/
-  setCurrentClassName(className: string | undefined): void {
+  setCurrentClassName(className: string | null): void {
     this.curClassName = className;
   }
 
@@ -501,7 +505,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       // Hide all nodes here. Don't throw them away.
       // We can probably re-use them in the next draw cycle.
       var child: SVGElement = this.bufferGNode.childNodes[i] as SVGElement;
-      this.cache.set(child.getAttribute("id"), child);
+      this.cache.set(child.getAttribute("id") as string, child);
     }
     this.removeAllChildNodes();
   }
