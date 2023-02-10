@@ -3,10 +3,10 @@
  * Inspired by
  *    https://medium.com/geekculture/building-a-modular-synth-with-web-audio-api-and-javascript-d38ccdeca9ea
  *
- * @author  Ikaros Kappler
- * @date    2023-01-27
+ * @author   Ikaros Kappler
+ * @date     2023-01-27
  * @modified 2023-02-04 Ported to Typescript.
- * @version 1.0.1
+ * @version  1.0.1
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoteSelectHandler = void 0;
@@ -47,18 +47,10 @@ var NoteSelectHandler = /** @class */ (function () {
         };
         var handleTrackSelectedChange = function (trackIndex, checked) {
             var _a, _b;
-            console.log("checked", checked);
-            // if (checked) {
-            //   noteTableRow.classList.add("selected-track");
-            // } else {
-            //   console.log("Remove class");
-            //   noteTableRow.classList.remove("selected-track");
-            // }
             for (var t = 0; t < _this.trackCount; t++) {
                 if (t != trackIndex) {
                     (_a = document.querySelector(".noteTableRow-" + t)) === null || _a === void 0 ? void 0 : _a.classList.remove("selected-track");
                 }
-                // noteTableRow", `noteTableRow-${trackIndex}`)
             }
             (_b = document.querySelector(".noteTableRow-" + trackIndex)) === null || _b === void 0 ? void 0 : _b.classList.add("selected-track");
         };
@@ -85,10 +77,19 @@ var NoteSelectHandler = /** @class */ (function () {
         this.setCurrentNotesFromPreset(preset);
     };
     NoteSelectHandler.prototype.setCurrentNotesFromPreset = function (preset) {
-        // this.currentNotes = [];
         this.tracks = [];
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            var track = { currentNotes: [] };
+            // envelope: EnvelopeSettings;
+            // mainValues: MainSettings;
+            // oscillator
+            // Important: create clones here
+            var track = {
+                currentNotes: [],
+                envelope: cloneObject(preset.envelope),
+                mainValues: cloneObject(preset.mainValues),
+                oscillator: cloneObject(preset.oscillator)
+            };
+            // track.envelope = { preset.envelope};
             this.tracks.push(track);
             track.currentNotes = presets_1.convertPresetToNotes(NOTE_INPUT_COUNT, preset.noteValues);
             if (trackIndex === 1) {
@@ -286,4 +287,7 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
     noteTableRow.appendChild(labelCell);
 };
 NoteSelectHandler.NOTE_INPUT_COUNT = NOTE_INPUT_COUNT;
+var cloneObject = function (obj) {
+    return Object.assign({}, obj);
+};
 //# sourceMappingURL=NoteSelectHandler.js.map

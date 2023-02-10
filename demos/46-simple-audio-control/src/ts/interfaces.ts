@@ -34,6 +34,6 @@ export interface TrackPreset {
   noteValues: Array<{ value: string; lengthFactor: number }>;
 }
 
-export interface Track {
+export interface Track extends Pick<TrackPreset, "envelope" | "mainValues" | "oscillator"> {
   currentNotes: Array<NoteConfig>;
 }

@@ -265,7 +265,7 @@ input[type="checkbox"].ismuted-checkbox {
 }
 
 input[type="checkbox"].ismuted-checkbox:not(:checked) + label {
-    background: url('unmuted.svg') 0 0px no-repeat;
+    background: url('icons/unmuted.svg') 0 0px no-repeat;
     width: 100%;
     height: 16px;
     padding: 0 0 0 0px;
@@ -273,7 +273,7 @@ input[type="checkbox"].ismuted-checkbox:not(:checked) + label {
 }
 
 input[type="checkbox"].ismuted-checkbox:checked + label {
-    background: url('muted.svg') 0 0px no-repeat;
+    background: url('icons/muted.svg') 0 0px no-repeat;
     width: 100%;
     height: 16px;
     padding: 0 0 0 0px;
@@ -287,7 +287,7 @@ input[type="radio"].isactive-radio {
 }
 
 input[type="radio"].isactive-radio:not(:checked) + label {
-    background: url('settings-icon-outline.svg') 0 0px no-repeat;
+    background: url('icons/settings-icon-outline.svg') 0 0px no-repeat;
     width: 100%;
     height: 16px;
     padding: 0 0 0 0px;
@@ -295,7 +295,7 @@ input[type="radio"].isactive-radio:not(:checked) + label {
 }
 
 input[type="radio"].isactive-radio:checked + label {
-    background: url('settings-icon-filled.svg') 0 0px no-repeat;
+    background: url('icons/settings-icon-filled.svg') 0 0px no-repeat;
     width: 100%;
     height: 16px;
     padding: 0 0 0 0px;

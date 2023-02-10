@@ -2,10 +2,10 @@
  * Inspired by
  *    https://medium.com/geekculture/building-a-modular-synth-with-web-audio-api-and-javascript-d38ccdeca9ea
  *
- * @author  Ikaros Kappler
- * @date    2023-01-27
+ * @author   Ikaros Kappler
+ * @date     2023-01-27
  * @modified 2023-02-04 Ported to Typescript.
- * @version 1.0.1
+ * @version  1.0.1
  */
 import { Track, TrackPreset } from "./interfaces";
 export declare class NoteSelectHandler {

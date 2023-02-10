@@ -2,20 +2,19 @@
  * Inspired by
  *    https://medium.com/geekculture/building-a-modular-synth-with-web-audio-api-and-javascript-d38ccdeca9ea
  *
- * @author  Ikaros Kappler
- * @date    2023-01-27
+ * @author   Ikaros Kappler
+ * @date     2023-01-27
  * @modified 2023-02-04 Ported to Typescript.
- * @version 1.0.1
+ * @version  1.0.1
  */
 
-import { Note, NoteConfig, Track, TrackPreset } from "./interfaces";
+import { Track, TrackPreset } from "./interfaces";
 import { getNoteByIndex, noteValues } from "./noteValues";
 import { convertPresetToNotes } from "./presets";
 
 const NOTE_INPUT_COUNT = 16;
 
 export class NoteSelectHandler {
-  // currentNotes: Array<NoteConfig[]>;
   tracks: Array<Track>;
   trackCount: number;
   isTrackMuted: Array<boolean>;
@@ -60,18 +59,10 @@ export class NoteSelectHandler {
     };
 
     const handleTrackSelectedChange = (trackIndex: number, checked: boolean) => {
-      console.log("checked", checked);
-      // if (checked) {
-      //   noteTableRow.classList.add("selected-track");
-      // } else {
-      //   console.log("Remove class");
-      //   noteTableRow.classList.remove("selected-track");
-      // }
       for (var t = 0; t < this.trackCount; t++) {
         if (t != trackIndex) {
           document.querySelector(`.noteTableRow-${t}`)?.classList.remove("selected-track");
         }
-        // noteTableRow", `noteTableRow-${trackIndex}`)
       }
       document.querySelector(`.noteTableRow-${trackIndex}`)?.classList.add("selected-track");
     };
@@ -110,10 +101,19 @@ export class NoteSelectHandler {
   }
 
   setCurrentNotesFromPreset(preset: TrackPreset) {
-    // this.currentNotes = [];
     this.tracks = [];
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-      const track: Track = { currentNotes: [] };
+      // envelope: EnvelopeSettings;
+      // mainValues: MainSettings;
+      // oscillator
+      // Important: create clones here
+      const track: Track = {
+        currentNotes: [],
+        envelope: cloneObject(preset.envelope),
+        mainValues: cloneObject(preset.mainValues),
+        oscillator: cloneObject(preset.oscillator)
+      };
+      // track.envelope = { preset.envelope};
       this.tracks.push(track);
       track.currentNotes = convertPresetToNotes(NOTE_INPUT_COUNT, preset.noteValues);
       if (trackIndex === 1) {
@@ -330,3 +330,7 @@ const createNoteSelectRow = (
 };
 
 NoteSelectHandler.NOTE_INPUT_COUNT = NOTE_INPUT_COUNT;
+
+const cloneObject = <T extends object>(obj: T) => {
+  return Object.assign({}, obj) as T;
+};
