@@ -259,13 +259,6 @@ select:after {
 
 
 /* Checkboxes for is-muted */
-/* input[type="checkbox"] + label {
-    width: 100%;
-    height: 16px;
-    padding: 0 0 0 0px;
-    background-size: contain;
-} */
-
 input[type="checkbox"].ismuted-checkbox {
     visibility: hidden;
 }
@@ -286,3 +279,24 @@ input[type="checkbox"].ismuted-checkbox:checked + label {
     background-size: contain;
 }
 
+
+/* Radio buttons for is-active */
+input[type="radio"].isactive-radio {
+    visibility: hidden;
+}
+
+input[type="radio"].isactive-radio:not(:checked) + label {
+    background: url('settings-icon-outline.svg') 0 0px no-repeat;
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+}
+
+input[type="radio"].isactive-radio:checked + label {
+    background: url('settings-icon-filled.svg') 0 0px no-repeat;
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+}

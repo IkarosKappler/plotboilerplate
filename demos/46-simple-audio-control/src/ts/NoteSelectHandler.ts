@@ -196,10 +196,30 @@ const createNoteSelectRow = (
   mutedCheckbox.addEventListener("change", (event: Event) => {
     handleTrackMutedChange(trackIndex, (event.currentTarget as HTMLInputElement).checked);
   });
-  var checkboxLabel = document.createElement("label");
-  checkboxLabel.setAttribute("for", `ismuted-checkbox-${trackIndex}`);
+  var mutedCheckboxLabel = document.createElement("label");
+  mutedCheckboxLabel.setAttribute("for", `ismuted-checkbox-${trackIndex}`);
   labelCellDiv.appendChild(mutedCheckbox);
-  labelCellDiv.appendChild(checkboxLabel);
+  labelCellDiv.appendChild(mutedCheckboxLabel);
+  labelCell.classList.add("align-center");
+  labelCell.appendChild(labelCellDiv);
+  noteTableRow.appendChild(labelCell);
+
+  const activeRadiobox = document.createElement("input");
+  activeRadiobox.setAttribute("type", "radio");
+  activeRadiobox.setAttribute("id", `isactive-radio-${trackIndex}`);
+  activeRadiobox.setAttribute("name", `isactive-radio`);
+  if (trackIndex === 0) {
+    activeRadiobox.checked = true;
+  }
+  activeRadiobox.classList.add("isactive-radio");
+  activeRadiobox.addEventListener("change", (event: Event) => {
+    // handleTrackMutedChange(trackIndex, (event.currentTarget as HTMLInputElement).checked);
+    // TODO ...
+  });
+  var activeRadioboxLabel = document.createElement("label");
+  activeRadioboxLabel.setAttribute("for", `isactive-radio-${trackIndex}`);
+  labelCellDiv.appendChild(activeRadiobox);
+  labelCellDiv.appendChild(activeRadioboxLabel);
   labelCell.classList.add("align-center");
   labelCell.appendChild(labelCellDiv);
   noteTableRow.appendChild(labelCell);
