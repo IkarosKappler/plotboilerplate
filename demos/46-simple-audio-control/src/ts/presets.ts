@@ -170,11 +170,39 @@ const presetsTheRiddle: TrackPreset = {
   ]
 };
 
+// Le Chuck's Theme
+// C C E G
+const presetsLeChuck: TrackPreset = {
+  envelope: { attackTime: 0.2, noteLength: 1.0, releaseTime: 0.5, sustainLevel: 0.38 },
+  mainValues: { tempo: 100, masterVolume: 0.2 },
+  oscillator: { waveform: "triangle" },
+  noteValues: [
+    { value: "C4", lengthFactor: 0.5 },
+    { value: "C4", lengthFactor: 1.0 },
+    { value: "E4", lengthFactor: 1.0 },
+    { value: "G4", lengthFactor: 1.5 },
+    { value: "F#4/Gb4", lengthFactor: 1.0 },
+    { value: "F#4/Gb4", lengthFactor: 1.0 },
+    { value: "D4", lengthFactor: 1.0 },
+    { value: "--", lengthFactor: 0.5 },
+    // 8/16
+    { value: "F4", lengthFactor: 1.0 },
+    { value: "F4", lengthFactor: 1.0 },
+    { value: "F4", lengthFactor: 1.0 },
+    { value: "D#4/Eb4", lengthFactor: 1.0 },
+    { value: "C4", lengthFactor: 1.0 },
+    { value: "C4", lengthFactor: 1.0 },
+    { value: "C4", lengthFactor: 1.5 },
+    { value: "--", lengthFactor: 0.0 }
+  ]
+};
+
 // TODO: If I touch a burning candle
 //
 
 export const getPresetList = (): Record<string, TrackPreset> => {
   return {
+    "Le Chuck": presetsLeChuck,
     "The Riddle": presetsTheRiddle,
     "Mass Effect": presetsMassEffect,
     "The Force": presetsUTheForce,
@@ -186,7 +214,7 @@ export const getPresetList = (): Record<string, TrackPreset> => {
 
 // This should match the with the index in NoteSelectHandler
 export const getDefaultPreset = (): TrackPreset => {
-  return presetsTheRiddle; // presetsMassEffect; // presetsUTheForce; // presetsCloseEncounters;
+  return presetsLeChuck;
 };
 
 /**
