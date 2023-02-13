@@ -55,8 +55,6 @@
       envelopeHandler.setValues(selectedTrack.envelope);
       setVibratoAmount(selectedTrack.vibratoValues.amount);
       setVibratoSpeed(selectedTrack.vibratoValues.speed);
-      // setWaveform(selectedTrack.oscillator.waveform);
-      // updateWaveformDisplay();
       setOscillatorValues(selectedTrack.oscillator);
     };
 
@@ -67,16 +65,9 @@
 
     // WAVEFORM SELECT
     const waveforms = document.getElementsByName("waveform");
-    // let waveform = "sine";
-
-    // var setWaveform = function (newWaveform) {
-    //   noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = newWaveform;
-    // };
-
     function handleWaveformChange() {
       for (var i = 0; i < waveforms.length; i++) {
         if (waveforms[i].checked) {
-          // setWaveform(waveforms[i].value);
           noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = waveforms[i].value;
         }
       }
@@ -92,7 +83,6 @@
     var updateWaveformDisplay = function () {
       var selectedTrack = noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex];
       for (var i = 0; i < waveforms.length; i++) {
-        // waveforms[i].checked = Boolean(waveforms[i].value === waveform);
         waveforms[i].checked = Boolean(waveforms[i].value === selectedTrack.oscillator.waveform);
       }
     };
@@ -108,11 +98,7 @@
     let currentNoteIndex = 0;
     let isPlaying = false;
 
-    // // NOTE SELECTS
-    // var initialPreset = getDefaultPreset();
-    // var currentPreset = initialPreset;
-    // var noteSelectHandler = new NoteSelectHandler(initialPreset, 2);
-
+    // NOTE SELECTS
     var mainControls = new MainControls();
     mainControls.setValues(initialPreset.mainValues);
     envelopeHandler.setValues(initialPreset.envelope);
