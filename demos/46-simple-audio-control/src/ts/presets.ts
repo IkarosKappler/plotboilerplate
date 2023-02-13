@@ -9,6 +9,8 @@ const presetsCloseEncounters: TrackPreset = {
   envelope: { attackTime: 0.06, releaseTime: 0.3, noteLength: 1.0, sustainLevel: 0.8 },
   mainValues: { tempo: 120, masterVolume: 0.2 },
   oscillator: { waveform: "sine" },
+  vibratoValues: { amount: 0, speed: 10 },
+  // delayValues: { time: 0, feedback: 0, amount: 0 },
   noteValues: [
     { value: "G4", lengthFactor: 1.0 },
     { value: "A4", lengthFactor: 1.0 },
@@ -36,6 +38,8 @@ const presetsSuperMario: TrackPreset = {
   envelope: { attackTime: 0.06, releaseTime: 0.3, noteLength: 0.45, sustainLevel: 0.8 },
   mainValues: { tempo: 180, masterVolume: 0.2 },
   oscillator: { waveform: "sine" },
+  vibratoValues: { amount: 0, speed: 10 },
+  // delayValues: { time: 0, feedback: 0, amount: 0 },
   noteValues: [
     { value: "C4", lengthFactor: 1.0 },
     { value: "G3", lengthFactor: 1.0 },
@@ -63,6 +67,8 @@ const presetsUlravoxHymn: TrackPreset = {
   envelope: { attackTime: 0.06, releaseTime: 0.3, noteLength: 1.0, sustainLevel: 0.8 },
   mainValues: { tempo: 80, masterVolume: 0.2 },
   oscillator: { waveform: "sine" },
+  vibratoValues: { amount: 0, speed: 10 },
+  // delayValues: { time: 0, feedback: 0, amount: 0 },
   noteValues: [
     { value: "E4", lengthFactor: 2.0 },
     { value: "E4", lengthFactor: 0.0 },
@@ -90,6 +96,8 @@ const presetsUTheForce: TrackPreset = {
   envelope: { attackTime: 0.36, noteLength: 2.8, releaseTime: 0.5, sustainLevel: 0.38 },
   mainValues: { tempo: 60, masterVolume: 0.2 },
   oscillator: { waveform: "sine" },
+  vibratoValues: { amount: 0, speed: 10 },
+  // delayValues: { time: 0, feedback: 0, amount: 0 },
   noteValues: [
     { value: "G3", lengthFactor: 1.0 },
     { value: "C4", lengthFactor: 1.0 },
@@ -118,6 +126,8 @@ const presetsMassEffect: TrackPreset = {
   envelope: { attackTime: 0.2, noteLength: 1.3, releaseTime: 0.5, sustainLevel: 0.38 },
   mainValues: { tempo: 60, masterVolume: 0.2 },
   oscillator: { waveform: "triangle" },
+  vibratoValues: { amount: 0, speed: 10 },
+  // delayValues: { time: 0, feedback: 0, amount: 0 },
   noteValues: [
     { value: "G4", lengthFactor: 0.5 },
     { value: "G4", lengthFactor: 1.0 },
@@ -147,6 +157,8 @@ const presetsTheRiddle: TrackPreset = {
   envelope: { attackTime: 0.2, noteLength: 1.0, releaseTime: 0.5, sustainLevel: 0.38 },
   mainValues: { tempo: 100, masterVolume: 0.2 },
   oscillator: { waveform: "triangle" },
+  vibratoValues: { amount: 0, speed: 10 },
+  // delayValues: { time: 0, feedback: 0, amount: 0 },
   noteValues: [
     { value: "F4", lengthFactor: 0.5 },
     { value: "G4", lengthFactor: 1.0 },
@@ -176,6 +188,8 @@ const presetsLeChuck: TrackPreset = {
   envelope: { attackTime: 0.2, noteLength: 1.0, releaseTime: 0.5, sustainLevel: 0.38 },
   mainValues: { tempo: 100, masterVolume: 0.2 },
   oscillator: { waveform: "triangle" },
+  vibratoValues: { amount: 0, speed: 10 },
+  // delayValues: { time: 0, feedback: 0, amount: 0 },
   noteValues: [
     { value: "C4", lengthFactor: 0.5 },
     { value: "C4", lengthFactor: 1.0 },

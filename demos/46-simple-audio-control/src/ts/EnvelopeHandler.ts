@@ -5,6 +5,7 @@
  * @version  1.0.1
  */
 
+import { cloneObject } from "./cloneObject";
 import { EnvelopeSettings } from "./interfaces";
 // import { PlotBoilerplate } from "../../../../src/ts/PlotBoilerplate";
 // import PlotBoilerplate from "../../../../dist/plotboilerplate";
@@ -15,6 +16,7 @@ import { EnvelopeSettings } from "./interfaces";
 
 export class EnvelopeHandler {
   envelope: EnvelopeSettings;
+  private onEnvelopeChanged: (newEnvelope: EnvelopeSettings) => void;
   pb: any; // PlotBoilerplate;
   attackTimeVert: any; // Vertex;
   releaseTimeVert: any; //Vertex;
@@ -25,7 +27,12 @@ export class EnvelopeHandler {
   _sustainLevelControl: HTMLInputElement; //  document.querySelector("#sustain-level-control");
   viewport: any; //Bounds;
 
-  constructor(canvasId: string, GUP, backgroundColor: string) {
+  constructor(
+    canvasId: string,
+    GUP: Record<string, string>,
+    backgroundColor: string,
+    onEnvelopeChanged: (newEnvelope: EnvelopeSettings) => void
+  ) {
     // }, mkPlotBoilerplate:(config)=>void) {
     this.envelope = {
       attackTime: 0.3,
@@ -33,25 +40,9 @@ export class EnvelopeHandler {
       releaseTime: 0.3,
       noteLength: 1.0
     };
+    this.onEnvelopeChanged = onEnvelopeChanged;
 
     // All config params are optional.
-    // this.pb = new PlotBoilerplate(
-    //   PlotBoilerplate.utils.safeMergeByKeys(
-    //     {
-    //       canvas: document.getElementById(canvasId),
-    //       fullSize: false,
-    //       fitToParent: true,
-    //       backgroundColor: backgroundColor, // isDarkmode ? "#000000" : "#ffffff",
-    //       drawGrid: true,
-    //       drawRaster: true,
-    //       drawOrigin: true,
-    //       autoAdjustOffset: true,
-    //       offsetAdjustXPercent: 0,
-    //       offsetAdjustYPercent: 100
-    //     },
-    //     GUP
-    //   ) as PBParams
-    // );
     var PlotBoilerplate = window["PlotBoilerplate"];
     var Vertex = window["Vertex"];
     var Polygon = window["Polygon"];
@@ -137,6 +128,10 @@ export class EnvelopeHandler {
     this.pb.canvas.focus();
   } // END constructor
 
+  private _fireEnvelopeChanged() {
+    this.onEnvelopeChanged(cloneObject(this.envelope));
+  }
+
   _updateVertices() {
     this.attackTimeVert.set(
       (this.envelope.attackTime / this.envelope.noteLength) * this.viewport.width,
@@ -199,5 +194,6 @@ export class EnvelopeHandler {
     this._updateVertices();
     this._updateDisplay();
     this.pb.redraw();
+    this._fireEnvelopeChanged();
   }
 }

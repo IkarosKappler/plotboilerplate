@@ -10,12 +10,15 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NoteSelectHandler = void 0;
+var cloneObject_1 = require("./cloneObject");
 var noteValues_1 = require("./noteValues");
 var presets_1 = require("./presets");
 var NOTE_INPUT_COUNT = 16;
 var NoteSelectHandler = /** @class */ (function () {
-    function NoteSelectHandler(initialPreset, trackCount) {
+    function NoteSelectHandler(initialPreset, trackCount, onTrackSelected) {
         this.trackCount = trackCount || 1;
+        this.selectedTrackIndex = 0;
+        this._onTrackSelected = onTrackSelected;
         if (typeof trackCount === "undefined") {
             console.info("[NoteSelectHandler] `trackCount` not provided, using default setting 1.");
         }
@@ -25,19 +28,20 @@ var NoteSelectHandler = /** @class */ (function () {
         var _this = this;
         this.setCurrentNotesFromPreset(preset);
         var _self = this;
-        function handleNoteSelectChange(event) {
+        var handleNoteSelectChange = function (event) {
             console.log("event", event, event.target.value);
             var noteIndex = event.target.value;
-            var selectTrackIndex = event.target.getAttribute("data-trackIndex");
-            console.log("selectTrackIndex", selectTrackIndex);
+            var affectedTrackIndex = event.target.getAttribute("data-trackIndex");
+            console.log("affectedTrackIndex", affectedTrackIndex);
             var selectIndex = event.target.getAttribute("data-index");
-            for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
+            for (var trackIndex = 0; trackIndex < _self.trackCount; trackIndex++) {
                 // _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
-                _self.tracks[selectTrackIndex].currentNotes[selectIndex].noteIndex = noteIndex;
+                _self.tracks[affectedTrackIndex].currentNotes[selectIndex].noteIndex = noteIndex;
             }
             var note = noteValues_1.getNoteByIndex(noteIndex);
-            _self._noteSelects[selectTrackIndex][selectIndex].setAttribute("title", note.identifier + " @" + note.frequency + "Hz");
-        }
+            _self._noteSelects[affectedTrackIndex][selectIndex].setAttribute("title", note.identifier + " @" + note.frequency + "Hz");
+            _self.setCurrentNoteFreuqencyDisplays();
+        };
         function handleNoteDurationChange() {
             _self.setCurrentNoteLengths();
         }
@@ -53,6 +57,8 @@ var NoteSelectHandler = /** @class */ (function () {
                 }
             }
             (_b = document.querySelector(".noteTableRow-" + trackIndex)) === null || _b === void 0 ? void 0 : _b.classList.add("selected-track");
+            _this.selectedTrackIndex = trackIndex;
+            _self._onTrackSelected(_self.tracks[_self.selectedTrackIndex], _self.selectedTrackIndex);
         };
         var noteSelectsTable = document.querySelector("#note-selects-table");
         emptyElement(noteSelectsTable);
@@ -70,6 +76,7 @@ var NoteSelectHandler = /** @class */ (function () {
         console.log("noteLengthSliders", this._noteLengthSliders.length);
         this.setCurrentNoteLengthInputs();
         this.setNoteSelects();
+        this.setCurrentNoteFreuqencyDisplays();
     };
     NoteSelectHandler.prototype.setTrackCount = function (preset, newTrackCount) {
         this.trackCount = newTrackCount;
@@ -79,15 +86,15 @@ var NoteSelectHandler = /** @class */ (function () {
     NoteSelectHandler.prototype.setCurrentNotesFromPreset = function (preset) {
         this.tracks = [];
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            // envelope: EnvelopeSettings;
-            // mainValues: MainSettings;
-            // oscillator
-            // Important: create clones here
+            // Important: create clones here (we don't want to change the preset if
+            //   the track settings get changed)
             var track = {
                 currentNotes: [],
-                envelope: cloneObject(preset.envelope),
-                mainValues: cloneObject(preset.mainValues),
-                oscillator: cloneObject(preset.oscillator)
+                envelope: cloneObject_1.cloneObject(preset.envelope),
+                mainValues: cloneObject_1.cloneObject(preset.mainValues),
+                oscillator: cloneObject_1.cloneObject(preset.oscillator),
+                vibratoValues: cloneObject_1.cloneObject(preset.vibratoValues)
+                // delayValues: cloneObject(preset.delayValues)
             };
             // track.envelope = { preset.envelope};
             this.tracks.push(track);
@@ -105,6 +112,7 @@ var NoteSelectHandler = /** @class */ (function () {
         console.log("Applying notes from preset");
         this.setCurrentNoteLengthInputs();
         this.setNoteSelects();
+        this.setCurrentNoteFreuqencyDisplays();
     };
     NoteSelectHandler.prototype.setNoteSelects = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
@@ -134,16 +142,34 @@ var NoteSelectHandler = /** @class */ (function () {
                 // this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
                 this._noteLengthSliders[trackIndex][i].value = String(this.tracks[trackIndex].currentNotes[i].lengthFactor);
                 this.setNoteLengthDisplay(trackIndex, i);
+                // const noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
+                // const note = getNoteByIndex(noteIndex);
+                // const noteFrequencyDisplay = document.querySelector(`#note-frequency-display-${trackIndex}-${i}`) as HTMLDivElement;
+                // noteFrequencyDisplay.innerHTML = `${note.frequency}`;
             }
         }
         console.log("this.tracks", this.tracks);
     };
+    NoteSelectHandler.prototype.setCurrentNoteFreuqencyDisplays = function () {
+        console.log("setCurrentNoteFreuqencyDisplays");
+        for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
+            for (var i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
+                var noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
+                var note = noteValues_1.getNoteByIndex(noteIndex);
+                var noteFrequencyDisplay = document.querySelector("#note-frequency-display-" + trackIndex + "-" + i);
+                if (typeof noteIndex === "undefined" || noteIndex < 0 || !note) {
+                    noteFrequencyDisplay.innerHTML = "&nbsp;";
+                }
+                else {
+                    noteFrequencyDisplay.innerHTML = "" + note.frequency;
+                }
+            }
+        }
+    };
     NoteSelectHandler.prototype.setCurrentNoteLengths = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
             for (var i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
-                // console.log("i", i, "this._noteLengthSliders[trackIndex][i].value", this._noteLengthSliders[trackIndex][i].value);
                 this.setNoteLengthDisplay(trackIndex, i);
-                // this.currentNotes[trackIndex][i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
                 this.tracks[trackIndex].currentNotes[i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
             }
         }
@@ -161,7 +187,7 @@ var NoteSelectHandler = /** @class */ (function () {
         }
     };
     NoteSelectHandler.prototype.setNoteLengthDisplay = function (trackIndex, noteIndex) {
-        console.log("Setting disaplay", trackIndex, noteIndex);
+        // console.log("Setting disaplay", trackIndex, noteIndex);
         var displayElem = document.getElementById("note-length-display-" + trackIndex + "-" + (noteIndex + 1));
         displayElem.innerHTML = this._noteLengthSliders[trackIndex][noteIndex].value;
     };
@@ -187,6 +213,7 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
     var labelCell = document.createElement("td");
     labelCell.classList.add("align-top");
     var labelCellDiv = document.createElement("div");
+    // IS-MUSTED CHECKBOX
     var mutedCheckbox = document.createElement("input");
     mutedCheckbox.setAttribute("type", "checkbox");
     mutedCheckbox.setAttribute("id", "ismuted-checkbox-" + trackIndex);
@@ -210,15 +237,7 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
         activeRadiobox.checked = true;
         noteTableRow.classList.add("selected-track");
     }
-    // const handleTrackSelectedChange = (trackIndex: number, checked: boolean) => {
-    //   console.log("checked", checked);
-    //   if (checked) {
-    //     noteTableRow.classList.add("selected-track");
-    //   } else {
-    //     console.log("Remove class");
-    //     noteTableRow.classList.remove("selected-track");
-    //   }
-    // };
+    // IS-ACTIVE RADIO
     activeRadiobox.classList.add("isactive-radio");
     activeRadiobox.addEventListener("change", function (event) {
         console.log("event.currentTarget", event.target);
@@ -257,9 +276,6 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
         lengthSlider.classList.add("note_duration_slider_" + trackIndex + "-" + (i + 1));
         lengthSlider.value = "1.0";
         lengthSlider.step = "0.1";
-        // lengthSlider.addEventListener("input", function () {
-        //   _self.setCurrentNoteLengths();
-        // });
         lengthSlider.addEventListener("input", function () {
             handleNoteDurationChange();
         });
@@ -267,11 +283,16 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
         sliderValueDisplay.innerHTML = "1.0";
         sliderValueDisplay.id = "note-length-display-" + trackIndex + "-" + (i + 1);
         sliderValueDisplay.classList.add("value-display");
+        var noteFrquencyDisplay = document.createElement("div");
+        noteFrquencyDisplay.classList.add("note-frequency-display");
+        noteFrquencyDisplay.setAttribute("id", "note-frequency-display-" + trackIndex + "-" + i);
+        noteFrquencyDisplay.innerHTML = "test";
         var noteCell = document.createElement("td");
         var noteCellDiv = document.createElement("div");
         noteCellDiv.classList.add("align-center");
         noteCellDiv.appendChild(sliderValueDisplay);
         noteCellDiv.appendChild(lengthSlider);
+        noteCellDiv.appendChild(noteFrquencyDisplay);
         noteCellDiv.appendChild(select);
         noteCell.appendChild(noteCellDiv);
         noteTableRow.appendChild(noteCell);
@@ -287,7 +308,4 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
     noteTableRow.appendChild(labelCell);
 };
 NoteSelectHandler.NOTE_INPUT_COUNT = NOTE_INPUT_COUNT;
-var cloneObject = function (obj) {
-    return Object.assign({}, obj);
-};
 //# sourceMappingURL=NoteSelectHandler.js.map

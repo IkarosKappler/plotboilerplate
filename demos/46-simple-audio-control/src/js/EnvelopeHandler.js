@@ -7,6 +7,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EnvelopeHandler = void 0;
+var cloneObject_1 = require("./cloneObject");
 // import { PlotBoilerplate } from "../../../../src/ts/PlotBoilerplate";
 // import PlotBoilerplate from "../../../../dist/plotboilerplate";
 // import { Vertex } from "../../../../src/ts/Vertex";
@@ -14,7 +15,7 @@ exports.EnvelopeHandler = void 0;
 // import { PBParams } from "../../../../src/ts/interfaces";
 // import { Bounds } from "../../../../src/ts/Bounds";
 var EnvelopeHandler = /** @class */ (function () {
-    function EnvelopeHandler(canvasId, GUP, backgroundColor) {
+    function EnvelopeHandler(canvasId, GUP, backgroundColor, onEnvelopeChanged) {
         this._updateDisplay = function () {
             console.log("update");
             var attackControlDisplay = document.querySelector("#display-attack-control");
@@ -33,24 +34,8 @@ var EnvelopeHandler = /** @class */ (function () {
             releaseTime: 0.3,
             noteLength: 1.0
         };
+        this.onEnvelopeChanged = onEnvelopeChanged;
         // All config params are optional.
-        // this.pb = new PlotBoilerplate(
-        //   PlotBoilerplate.utils.safeMergeByKeys(
-        //     {
-        //       canvas: document.getElementById(canvasId),
-        //       fullSize: false,
-        //       fitToParent: true,
-        //       backgroundColor: backgroundColor, // isDarkmode ? "#000000" : "#ffffff",
-        //       drawGrid: true,
-        //       drawRaster: true,
-        //       drawOrigin: true,
-        //       autoAdjustOffset: true,
-        //       offsetAdjustXPercent: 0,
-        //       offsetAdjustYPercent: 100
-        //     },
-        //     GUP
-        //   ) as PBParams
-        // );
         var PlotBoilerplate = window["PlotBoilerplate"];
         var Vertex = window["Vertex"];
         var Polygon = window["Polygon"];
@@ -120,6 +105,9 @@ var EnvelopeHandler = /** @class */ (function () {
         this.pb.redraw();
         this.pb.canvas.focus();
     } // END constructor
+    EnvelopeHandler.prototype._fireEnvelopeChanged = function () {
+        this.onEnvelopeChanged(cloneObject_1.cloneObject(this.envelope));
+    };
     EnvelopeHandler.prototype._updateVertices = function () {
         this.attackTimeVert.set((this.envelope.attackTime / this.envelope.noteLength) * this.viewport.width, -1.0 * this.viewport.height);
         this.releaseTimeVert.set(((this.envelope.noteLength - this.envelope.releaseTime) / this.envelope.noteLength) * this.viewport.width, -this.envelope.sustainLevel * this.viewport.height);
@@ -162,6 +150,7 @@ var EnvelopeHandler = /** @class */ (function () {
         this._updateVertices();
         this._updateDisplay();
         this.pb.redraw();
+        this._fireEnvelopeChanged();
     };
     return EnvelopeHandler;
 }());

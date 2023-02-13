@@ -31,7 +31,11 @@ export interface TrackPreset {
         value: string;
         lengthFactor: number;
     }>;
+    vibratoValues: {
+        amount: number;
+        speed: number;
+    };
 }
-export interface Track extends Pick<TrackPreset, "envelope" | "mainValues" | "oscillator"> {
+export interface Track extends Pick<TrackPreset, "envelope" | "mainValues" | "oscillator" | "vibratoValues"> {
     currentNotes: Array<NoteConfig>;
 }

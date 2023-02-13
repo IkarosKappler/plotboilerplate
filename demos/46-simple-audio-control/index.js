@@ -32,36 +32,75 @@
       document.getElementsByTagName("body")[0].classList.add("darkmode");
     }
 
-    var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff");
+    /**
+     * Called from the EnvelopeHandler when the envelope values are manually altered.
+     *
+     * @param {EnvelopeSettings} newEnvelope
+     */
+    var onEnvelopeChanged = function (newEnvelope) {
+      noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].envelope = newEnvelope;
+    };
+    var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff", onEnvelopeChanged);
+
+    /**
+     * Called from the NoteSelectHandler when a track is selected and the
+     * selectedTrackIndex changed.
+     *
+     * @param {Track} selectedTrack
+     * @param {number} selectedTrackIndex
+     */
+    var handleTrackSelected = function (selectedTrack, selectedTrackIndex) {
+      console.log("track selected", selectedTrackIndex);
+      // Track selected
+      envelopeHandler.setValues(selectedTrack.envelope);
+      setVibratoAmount(selectedTrack.vibratoValues.amount);
+      setVibratoSpeed(selectedTrack.vibratoValues.speed);
+      // setWaveform(selectedTrack.oscillator.waveform);
+      // updateWaveformDisplay();
+      setOscillatorValues(selectedTrack.oscillator);
+    };
+
+    // NOTE SELECTS
+    var initialPreset = getDefaultPreset();
+    var currentPreset = initialPreset;
+    var noteSelectHandler = new NoteSelectHandler(initialPreset, 2, handleTrackSelected);
 
     // WAVEFORM SELECT
     const waveforms = document.getElementsByName("waveform");
-    let waveform = "sine";
+    // let waveform = "sine";
 
-    function setWaveform() {
+    // var setWaveform = function (newWaveform) {
+    //   noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = newWaveform;
+    // };
+
+    function handleWaveformChange() {
       for (var i = 0; i < waveforms.length; i++) {
         if (waveforms[i].checked) {
-          waveform = waveforms[i].value;
+          // setWaveform(waveforms[i].value);
+          noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = waveforms[i].value;
         }
       }
-      console.log("waveform", waveform);
+      // console.log("waveform", waveform);
     }
 
     waveforms.forEach(waveformInput => {
       waveformInput.addEventListener("change", function () {
-        setWaveform();
+        handleWaveformChange();
       });
     });
 
     var updateWaveformDisplay = function () {
+      var selectedTrack = noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex];
       for (var i = 0; i < waveforms.length; i++) {
-        waveforms[i].checked = Boolean(waveforms[i].value === waveform);
+        // waveforms[i].checked = Boolean(waveforms[i].value === waveform);
+        waveforms[i].checked = Boolean(waveforms[i].value === selectedTrack.oscillator.waveform);
       }
     };
 
     var setOscillatorValues = function (options) {
       if (options && typeof options.waveform !== "undefined") {
-        waveform = options.waveform;
+        // waveform = options.waveform;
+        noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = options.waveform;
         updateWaveformDisplay();
       }
     };
@@ -69,12 +108,10 @@
     let currentNoteIndex = 0;
     let isPlaying = false;
 
-    console.log("exports", globalThis.noteValues);
-
-    // NOTE SELECTS
-    var initialPreset = getDefaultPreset();
-    var currentPreset = initialPreset;
-    var noteSelectHandler = new NoteSelectHandler(initialPreset, 2);
+    // // NOTE SELECTS
+    // var initialPreset = getDefaultPreset();
+    // var currentPreset = initialPreset;
+    // var noteSelectHandler = new NoteSelectHandler(initialPreset, 2);
 
     var mainControls = new MainControls();
     mainControls.setValues(initialPreset.mainValues);
@@ -110,24 +147,35 @@
 
     // // EFFECTS CONTROLS
     // Vibrato
-    let vibratoSpeed = 10;
-    let vibratoAmount = 0;
+    // let vibratoSpeed = 10;
+    // let vibratoAmount = 0;
     const vibratoAmountControl = document.querySelector("#vibrato-amount-control");
     const vibratoSpeedControl = document.querySelector("#vibrato-speed-control");
 
     var handleVibratoAmountChange = function () {
-      vibratoAmount = vibratoAmountControl.value;
+      var vibratoAmount = Number(vibratoAmountControl.value);
+      console.log("handleVibratoAmountChange", vibratoAmountControl.value);
+      noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].vibratoValues.amount = vibratoAmount;
       document.querySelector("#display-vibrato-amount-control").innerHTML = vibratoAmount;
     };
     vibratoAmountControl.addEventListener("input", handleVibratoAmountChange);
     handleVibratoAmountChange();
+    var setVibratoAmount = function (amnt) {
+      vibratoAmountControl.value = amnt;
+      handleVibratoAmountChange();
+    };
 
     var handleVibratoSpeedChange = function () {
-      vibratoSpeed = vibratoSpeedControl.value;
+      var vibratoSpeed = Number(vibratoSpeedControl.value);
+      noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].vibratoValues.speed = vibratoSpeed;
       document.querySelector("#display-vibrato-speed-control").innerHTML = vibratoSpeed;
     };
     vibratoSpeedControl.addEventListener("input", handleVibratoSpeedChange);
     handleVibratoSpeedChange();
+    var setVibratoSpeed = function (spd) {
+      vibratoSpeedControl.value = spd;
+      handleVibratoSpeedChange();
+    };
 
     // Delay
     const delayAmountControl = document.querySelector("#delay-amount-control");
@@ -153,7 +201,8 @@
 
     var handleDelayAmountChange = function () {
       delayAmountGain.value = delayAmountControl.value;
-      document.querySelector("#display-delay-amount-control").innerHTML = delayAmountControl.value;
+      // noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].delayValues.amount = delayAmountControl.value; // delayAmountGain.value;
+      document.querySelector("#display-delay-amount-control").innerHTML = delayAmountControl.value; // delayAmountControl.value;
     };
     delayAmountControl.addEventListener("input", handleDelayAmountChange);
     handleDelayAmountChange();
@@ -241,10 +290,10 @@
     }
 
     function playCurrentNote(curTrackIndex) {
-      // var curTrackIndex = 0;
-      // console.log("mainControls.masterVolume.gain.value", mainControls.masterVolume.gain.value);
-      // var curNote = noteSelectHandler.currentNotes[curTrackIndex][currentNoteIndex];
-      var curNote = noteSelectHandler.tracks[curTrackIndex].currentNotes[currentNoteIndex];
+      var curTrack = noteSelectHandler.tracks[curTrackIndex];
+      var curNote = curTrack.currentNotes[currentNoteIndex];
+      // delayAmountGain.value = curTrack.delayValues.amount;
+      console.log("curTrack.vibratoValues", curTrack.vibratoValues); // , vibratoAmount, vibratoSpeed);
 
       console.log("curNote", curNote);
       if (!curNote || curNote.noteIndex < 1 || curNote.noteIndex >= noteValues.length) {
@@ -259,39 +308,40 @@
       const noteGain = mainControls.context.createGain();
       noteGain.gain.setValueAtTime(0, 0);
       noteGain.gain.linearRampToValueAtTime(
-        envelopeHandler.envelope.sustainLevel,
-        mainControls.context.currentTime +
-          envelopeHandler.envelope.noteLength * envelopeHandler.envelope.attackTime * noteLengthFactor
+        curTrack.envelope.sustainLevel,
+        mainControls.context.currentTime + curTrack.envelope.noteLength * curTrack.envelope.attackTime * noteLengthFactor
       );
       // console.log("envelopeHandler.envelope", envelopeHandler.envelope, "noteLengthFactor", noteLengthFactor);
       noteGain.gain.setValueAtTime(
-        envelopeHandler.envelope.sustainLevel,
+        curTrack.envelope.sustainLevel,
         mainControls.context.currentTime +
-          (envelopeHandler.envelope.noteLength - envelopeHandler.envelope.noteLength * envelopeHandler.envelope.releaseTime) *
-            noteLengthFactor
+          (curTrack.envelope.noteLength - curTrack.envelope.noteLength * curTrack.envelope.releaseTime) * noteLengthFactor
       );
       noteGain.gain.linearRampToValueAtTime(
         0,
-        mainControls.context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor
+        mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor
       );
 
       var lfoGain = mainControls.context.createGain();
-      lfoGain.gain.setValueAtTime(vibratoAmount, 0);
+      // lfoGain.gain.setValueAtTime(vibratoAmount, 0);
+      lfoGain.gain.setValueAtTime(curTrack.vibratoValues.amount, 0);
       lfoGain.connect(osc.frequency);
 
       var lfo = mainControls.context.createOscillator();
-      lfo.frequency.setValueAtTime(vibratoSpeed, 0);
+      // lfo.frequency.setValueAtTime(vibratoSpeed, 0);
+      lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed, 0);
       lfo.start(0);
       // lfo.stop(context.currentTime + envelopeHandler.envelope.noteLength);
-      lfo.stop(mainControls.context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
+      lfo.stop(mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
       lfo.connect(lfoGain);
 
-      osc.type = waveform;
+      // osc.type = waveform;
+      osc.type = curTrack.oscillator.waveform;
       console.log("curNote", curNote);
       osc.frequency.setValueAtTime(Object.values(noteValues)[`${curNote.noteIndex}`], 0);
 
       osc.start(0);
-      osc.stop(mainControls.context.currentTime + envelopeHandler.envelope.noteLength * noteLengthFactor);
+      osc.stop(mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
       osc.connect(noteGain);
 
       noteGain.connect(mainControls.masterVolume);

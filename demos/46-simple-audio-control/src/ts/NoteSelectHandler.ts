@@ -8,6 +8,7 @@
  * @version  1.0.1
  */
 
+import { cloneObject } from "./cloneObject";
 import { Track, TrackPreset } from "./interfaces";
 import { getNoteByIndex, noteValues } from "./noteValues";
 import { convertPresetToNotes } from "./presets";
@@ -18,36 +19,45 @@ export class NoteSelectHandler {
   tracks: Array<Track>;
   trackCount: number;
   isTrackMuted: Array<boolean>;
+  selectedTrackIndex: number;
+  private _onTrackSelected: (selectedTrack: Track, selectedTrackIndex: number) => void;
 
   private _noteSelects: Array<NodeListOf<HTMLSelectElement>>;
   private _noteLengthSliders: Array<NodeListOf<HTMLInputElement>>;
 
   static NOTE_INPUT_COUNT: number;
 
-  constructor(initialPreset: TrackPreset, trackCount?: number) {
+  constructor(
+    initialPreset: TrackPreset,
+    trackCount: number,
+    onTrackSelected: (selectedTrack: Track, selectedTrackIndex: number) => void
+  ) {
     this.trackCount = trackCount || 1;
+    this.selectedTrackIndex = 0;
+    this._onTrackSelected = onTrackSelected;
     if (typeof trackCount === "undefined") {
       console.info("[NoteSelectHandler] `trackCount` not provided, using default setting 1.");
     }
     this._createNoteSelectsDOM(initialPreset);
   }
 
-  private _createNoteSelectsDOM(preset) {
+  private _createNoteSelectsDOM(preset: TrackPreset) {
     this.setCurrentNotesFromPreset(preset);
     var _self = this;
-    function handleNoteSelectChange(event) {
+    const handleNoteSelectChange = event => {
       console.log("event", event, event.target.value);
       var noteIndex = event.target.value;
-      var selectTrackIndex = event.target.getAttribute("data-trackIndex");
-      console.log("selectTrackIndex", selectTrackIndex);
+      var affectedTrackIndex = event.target.getAttribute("data-trackIndex");
+      console.log("affectedTrackIndex", affectedTrackIndex);
       var selectIndex = event.target.getAttribute("data-index");
-      for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
+      for (var trackIndex = 0; trackIndex < _self.trackCount; trackIndex++) {
         // _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
-        _self.tracks[selectTrackIndex].currentNotes[selectIndex].noteIndex = noteIndex;
+        _self.tracks[affectedTrackIndex].currentNotes[selectIndex].noteIndex = noteIndex;
       }
       var note = getNoteByIndex(noteIndex);
-      _self._noteSelects[selectTrackIndex][selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
-    }
+      _self._noteSelects[affectedTrackIndex][selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
+      _self.setCurrentNoteFreuqencyDisplays();
+    };
 
     function handleNoteDurationChange() {
       _self.setCurrentNoteLengths();
@@ -65,6 +75,8 @@ export class NoteSelectHandler {
         }
       }
       document.querySelector(`.noteTableRow-${trackIndex}`)?.classList.add("selected-track");
+      this.selectedTrackIndex = trackIndex;
+      _self._onTrackSelected(_self.tracks[_self.selectedTrackIndex], _self.selectedTrackIndex);
     };
 
     const noteSelectsTable = document.querySelector("#note-selects-table") as HTMLTableElement;
@@ -92,6 +104,7 @@ export class NoteSelectHandler {
 
     this.setCurrentNoteLengthInputs();
     this.setNoteSelects();
+    this.setCurrentNoteFreuqencyDisplays();
   }
 
   setTrackCount(preset: TrackPreset, newTrackCount: number) {
@@ -103,15 +116,15 @@ export class NoteSelectHandler {
   setCurrentNotesFromPreset(preset: TrackPreset) {
     this.tracks = [];
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-      // envelope: EnvelopeSettings;
-      // mainValues: MainSettings;
-      // oscillator
-      // Important: create clones here
+      // Important: create clones here (we don't want to change the preset if
+      //   the track settings get changed)
       const track: Track = {
         currentNotes: [],
         envelope: cloneObject(preset.envelope),
         mainValues: cloneObject(preset.mainValues),
-        oscillator: cloneObject(preset.oscillator)
+        oscillator: cloneObject(preset.oscillator),
+        vibratoValues: cloneObject(preset.vibratoValues)
+        // delayValues: cloneObject(preset.delayValues)
       };
       // track.envelope = { preset.envelope};
       this.tracks.push(track);
@@ -130,6 +143,7 @@ export class NoteSelectHandler {
     console.log("Applying notes from preset");
     this.setCurrentNoteLengthInputs();
     this.setNoteSelects();
+    this.setCurrentNoteFreuqencyDisplays();
   }
 
   setNoteSelects() {
@@ -164,17 +178,36 @@ export class NoteSelectHandler {
         this._noteLengthSliders[trackIndex][i].value = String(this.tracks[trackIndex].currentNotes[i].lengthFactor);
 
         this.setNoteLengthDisplay(trackIndex, i);
+
+        // const noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
+        // const note = getNoteByIndex(noteIndex);
+        // const noteFrequencyDisplay = document.querySelector(`#note-frequency-display-${trackIndex}-${i}`) as HTMLDivElement;
+        // noteFrequencyDisplay.innerHTML = `${note.frequency}`;
       }
     }
     console.log("this.tracks", this.tracks);
   }
 
+  setCurrentNoteFreuqencyDisplays() {
+    console.log("setCurrentNoteFreuqencyDisplays");
+    for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
+      for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
+        const noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
+        const note = getNoteByIndex(noteIndex);
+        const noteFrequencyDisplay = document.querySelector(`#note-frequency-display-${trackIndex}-${i}`) as HTMLDivElement;
+        if (typeof noteIndex === "undefined" || noteIndex < 0 || !note) {
+          noteFrequencyDisplay.innerHTML = "&nbsp;";
+        } else {
+          noteFrequencyDisplay.innerHTML = `${note.frequency}`;
+        }
+      }
+    }
+  }
+
   setCurrentNoteLengths() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
-        // console.log("i", i, "this._noteLengthSliders[trackIndex][i].value", this._noteLengthSliders[trackIndex][i].value);
         this.setNoteLengthDisplay(trackIndex, i);
-        // this.currentNotes[trackIndex][i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
         this.tracks[trackIndex].currentNotes[i].lengthFactor = Number(this._noteLengthSliders[trackIndex][i].value);
       }
     }
@@ -192,7 +225,7 @@ export class NoteSelectHandler {
     }
   }
   setNoteLengthDisplay(trackIndex: number, noteIndex: number) {
-    console.log("Setting disaplay", trackIndex, noteIndex);
+    // console.log("Setting disaplay", trackIndex, noteIndex);
     const displayElem = document.getElementById(`note-length-display-${trackIndex}-${noteIndex + 1}`) as HTMLElement;
     displayElem.innerHTML = this._noteLengthSliders[trackIndex][noteIndex].value;
   }
@@ -226,6 +259,8 @@ const createNoteSelectRow = (
   var labelCell = document.createElement("td");
   labelCell.classList.add("align-top");
   var labelCellDiv = document.createElement("div");
+
+  // IS-MUSTED CHECKBOX
   const mutedCheckbox = document.createElement("input");
   mutedCheckbox.setAttribute("type", "checkbox");
   mutedCheckbox.setAttribute("id", `ismuted-checkbox-${trackIndex}`);
@@ -250,15 +285,8 @@ const createNoteSelectRow = (
     activeRadiobox.checked = true;
     noteTableRow.classList.add("selected-track");
   }
-  // const handleTrackSelectedChange = (trackIndex: number, checked: boolean) => {
-  //   console.log("checked", checked);
-  //   if (checked) {
-  //     noteTableRow.classList.add("selected-track");
-  //   } else {
-  //     console.log("Remove class");
-  //     noteTableRow.classList.remove("selected-track");
-  //   }
-  // };
+
+  // IS-ACTIVE RADIO
   activeRadiobox.classList.add("isactive-radio");
   activeRadiobox.addEventListener("change", (event: Event) => {
     console.log("event.currentTarget", event.target);
@@ -298,9 +326,6 @@ const createNoteSelectRow = (
     lengthSlider.classList.add(`note_duration_slider_${trackIndex}-${i + 1}`);
     lengthSlider.value = "1.0";
     lengthSlider.step = "0.1";
-    // lengthSlider.addEventListener("input", function () {
-    //   _self.setCurrentNoteLengths();
-    // });
     lengthSlider.addEventListener("input", function () {
       handleNoteDurationChange();
     });
@@ -308,11 +333,17 @@ const createNoteSelectRow = (
     sliderValueDisplay.innerHTML = "1.0";
     sliderValueDisplay.id = `note-length-display-${trackIndex}-${i + 1}`;
     sliderValueDisplay.classList.add("value-display");
+
+    var noteFrquencyDisplay = document.createElement("div");
+    noteFrquencyDisplay.classList.add("note-frequency-display");
+    noteFrquencyDisplay.setAttribute("id", `note-frequency-display-${trackIndex}-${i}`);
+    noteFrquencyDisplay.innerHTML = "test";
     var noteCell = document.createElement("td");
     var noteCellDiv = document.createElement("div");
     noteCellDiv.classList.add("align-center");
     noteCellDiv.appendChild(sliderValueDisplay);
     noteCellDiv.appendChild(lengthSlider);
+    noteCellDiv.appendChild(noteFrquencyDisplay);
     noteCellDiv.appendChild(select);
     noteCell.appendChild(noteCellDiv);
     noteTableRow.appendChild(noteCell);
@@ -330,7 +361,3 @@ const createNoteSelectRow = (
 };
 
 NoteSelectHandler.NOTE_INPUT_COUNT = NOTE_INPUT_COUNT;
-
-const cloneObject = <T extends object>(obj: T) => {
-  return Object.assign({}, obj) as T;
-};

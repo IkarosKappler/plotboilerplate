@@ -243,6 +243,13 @@ select:after {
     border-right: .25em solid transparent;
 }
 
+.note-frequency-display {
+    font-size: 9pt;
+    /* height: 9pt; */
+    /* margin-top: -10px; */
+    color: var(--value-color);
+}
+
 #edit-track-count-button {
     border: 1px solid var(--select-border-color);
     background: none;

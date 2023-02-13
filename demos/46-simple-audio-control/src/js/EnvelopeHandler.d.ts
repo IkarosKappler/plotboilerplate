@@ -7,6 +7,7 @@
 import { EnvelopeSettings } from "./interfaces";
 export declare class EnvelopeHandler {
     envelope: EnvelopeSettings;
+    private onEnvelopeChanged;
     pb: any;
     attackTimeVert: any;
     releaseTimeVert: any;
@@ -16,7 +17,8 @@ export declare class EnvelopeHandler {
     _noteLengthControl: HTMLInputElement;
     _sustainLevelControl: HTMLInputElement;
     viewport: any;
-    constructor(canvasId: string, GUP: any, backgroundColor: string);
+    constructor(canvasId: string, GUP: Record<string, string>, backgroundColor: string, onEnvelopeChanged: (newEnvelope: EnvelopeSettings) => void);
+    private _fireEnvelopeChanged;
     _updateVertices(): void;
     _updateDisplay: () => void;
     /**
