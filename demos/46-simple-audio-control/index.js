@@ -32,308 +32,310 @@
       document.getElementsByTagName("body")[0].classList.add("darkmode");
     }
 
-    /**
-     * Called from the EnvelopeHandler when the envelope values are manually altered.
-     *
-     * @param {EnvelopeSettings} newEnvelope
-     */
-    var onEnvelopeChanged = function (newEnvelope) {
-      noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].envelope = newEnvelope;
-    };
-    var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff", onEnvelopeChanged);
+    var audioControl = new AudioControl(GUP, isDarkmode);
 
-    /**
-     * Called from the NoteSelectHandler when a track is selected and the
-     * selectedTrackIndex changed.
-     *
-     * @param {Track} selectedTrack
-     * @param {number} selectedTrackIndex
-     */
-    var handleTrackSelected = function (selectedTrack, selectedTrackIndex) {
-      console.log("track selected", selectedTrackIndex);
-      // Track selected
-      envelopeHandler.setValues(selectedTrack.envelope);
-      setVibratoAmount(selectedTrack.vibratoValues.amount);
-      setVibratoSpeed(selectedTrack.vibratoValues.speed);
-      setOscillatorValues(selectedTrack.oscillator);
-    };
+    // /**
+    //  * Called from the EnvelopeHandler when the envelope values are manually altered.
+    //  *
+    //  * @param {EnvelopeSettings} newEnvelope
+    //  */
+    // var onEnvelopeChanged = function (newEnvelope) {
+    //   noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].envelope = newEnvelope;
+    // };
+    // var envelopeHandler = new EnvelopeHandler("envelope-canvas", GUP, isDarkmode ? "#000000" : "#ffffff", onEnvelopeChanged);
 
-    // NOTE SELECTS
-    var initialPreset = getDefaultPreset();
-    var currentPreset = initialPreset;
-    var noteSelectHandler = new NoteSelectHandler(initialPreset, 2, handleTrackSelected);
+    // /**
+    //  * Called from the NoteSelectHandler when a track is selected and the
+    //  * selectedTrackIndex changed.
+    //  *
+    //  * @param {Track} selectedTrack
+    //  * @param {number} selectedTrackIndex
+    //  */
+    // var handleTrackSelected = function (selectedTrack, selectedTrackIndex) {
+    //   console.log("track selected", selectedTrackIndex);
+    //   // Track selected
+    //   envelopeHandler.setValues(selectedTrack.envelope);
+    //   setVibratoAmount(selectedTrack.vibratoValues.amount);
+    //   setVibratoSpeed(selectedTrack.vibratoValues.speed);
+    //   setOscillatorValues(selectedTrack.oscillator);
+    // };
 
-    // WAVEFORM SELECT
-    const waveforms = document.getElementsByName("waveform");
-    function handleWaveformChange() {
-      for (var i = 0; i < waveforms.length; i++) {
-        if (waveforms[i].checked) {
-          noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = waveforms[i].value;
-        }
-      }
-      // console.log("waveform", waveform);
-    }
+    // // NOTE SELECTS
+    // var initialPreset = getDefaultPreset();
+    // var currentPreset = initialPreset;
+    // var noteSelectHandler = new NoteSelectHandler(initialPreset, 2, handleTrackSelected);
 
-    waveforms.forEach(waveformInput => {
-      waveformInput.addEventListener("change", function () {
-        handleWaveformChange();
-      });
-    });
+    // // WAVEFORM SELECT
+    // const waveforms = document.getElementsByName("waveform");
+    // function handleWaveformChange() {
+    //   for (var i = 0; i < waveforms.length; i++) {
+    //     if (waveforms[i].checked) {
+    //       noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = waveforms[i].value;
+    //     }
+    //   }
+    //   // console.log("waveform", waveform);
+    // }
 
-    var updateWaveformDisplay = function () {
-      var selectedTrack = noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex];
-      for (var i = 0; i < waveforms.length; i++) {
-        waveforms[i].checked = Boolean(waveforms[i].value === selectedTrack.oscillator.waveform);
-      }
-    };
+    // waveforms.forEach(waveformInput => {
+    //   waveformInput.addEventListener("change", function () {
+    //     handleWaveformChange();
+    //   });
+    // });
 
-    var setOscillatorValues = function (options) {
-      if (options && typeof options.waveform !== "undefined") {
-        // waveform = options.waveform;
-        noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = options.waveform;
-        updateWaveformDisplay();
-      }
-    };
+    // var updateWaveformDisplay = function () {
+    //   var selectedTrack = noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex];
+    //   for (var i = 0; i < waveforms.length; i++) {
+    //     waveforms[i].checked = Boolean(waveforms[i].value === selectedTrack.oscillator.waveform);
+    //   }
+    // };
 
-    let currentNoteIndex = 0;
-    let isPlaying = false;
+    // var setOscillatorValues = function (options) {
+    //   if (options && typeof options.waveform !== "undefined") {
+    //     // waveform = options.waveform;
+    //     noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].oscillator.waveform = options.waveform;
+    //     updateWaveformDisplay();
+    //   }
+    // };
 
-    // NOTE SELECTS
-    var mainControls = new MainControls();
-    mainControls.setValues(initialPreset.mainValues);
-    envelopeHandler.setValues(initialPreset.envelope);
-    setOscillatorValues(initialPreset.oscillator);
+    // let currentNoteIndex = 0;
+    // let isPlaying = false;
 
-    var resetLoop = function () {
-      currentNoteIndex = 0;
-    };
+    // // NOTE SELECTS
+    // var mainControls = new MainControls();
+    // mainControls.setValues(initialPreset.mainValues);
+    // envelopeHandler.setValues(initialPreset.envelope);
+    // setOscillatorValues(initialPreset.oscillator);
 
-    var setTrackCount = function (newTrackCount) {
-      if (noteSelectHandler.trackCount === newTrackCount) {
-        console.log("setTrackCount: no change.");
-        return;
-      }
-      noteSelectHandler.setTrackCount(currentPreset, newTrackCount);
-      setTrackCountDisplay();
-    };
-    var setTrackCountDisplay = function () {
-      document.querySelector("#display-track-count").innerHTML = noteSelectHandler.trackCount;
-    };
-    setTrackCountDisplay();
+    // var resetLoop = function () {
+    //   currentNoteIndex = 0;
+    // };
 
-    new PresetSelector(function (selectedPreset) {
-      noteSelectHandler.setFromPreset(selectedPreset);
-      console.log("selectedPreset.envelope", selectedPreset.envelope);
-      envelopeHandler.setValues(selectedPreset.envelope);
-      mainControls.setValues(selectedPreset.mainValues);
-      setOscillatorValues(selectedPreset.oscillator);
-      currentPreset = selectedPreset;
-      resetLoop();
-    });
+    // var setTrackCount = function (newTrackCount) {
+    //   if (noteSelectHandler.trackCount === newTrackCount) {
+    //     console.log("setTrackCount: no change.");
+    //     return;
+    //   }
+    //   noteSelectHandler.setTrackCount(currentPreset, newTrackCount);
+    //   setTrackCountDisplay();
+    // };
+    // var setTrackCountDisplay = function () {
+    //   document.querySelector("#display-track-count").innerHTML = noteSelectHandler.trackCount;
+    // };
+    // setTrackCountDisplay();
 
-    // // EFFECTS CONTROLS
-    // Vibrato
-    // let vibratoSpeed = 10;
-    // let vibratoAmount = 0;
-    const vibratoAmountControl = document.querySelector("#vibrato-amount-control");
-    const vibratoSpeedControl = document.querySelector("#vibrato-speed-control");
+    // new PresetSelector(function (selectedPreset) {
+    //   noteSelectHandler.setFromPreset(selectedPreset);
+    //   console.log("selectedPreset.envelope", selectedPreset.envelope);
+    //   envelopeHandler.setValues(selectedPreset.envelope);
+    //   mainControls.setValues(selectedPreset.mainValues);
+    //   setOscillatorValues(selectedPreset.oscillator);
+    //   currentPreset = selectedPreset;
+    //   resetLoop();
+    // });
 
-    var handleVibratoAmountChange = function () {
-      var vibratoAmount = Number(vibratoAmountControl.value);
-      console.log("handleVibratoAmountChange", vibratoAmountControl.value);
-      noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].vibratoValues.amount = vibratoAmount;
-      document.querySelector("#display-vibrato-amount-control").innerHTML = vibratoAmount;
-    };
-    vibratoAmountControl.addEventListener("input", handleVibratoAmountChange);
-    handleVibratoAmountChange();
-    var setVibratoAmount = function (amnt) {
-      vibratoAmountControl.value = amnt;
-      handleVibratoAmountChange();
-    };
+    // // // EFFECTS CONTROLS
+    // // Vibrato
+    // // let vibratoSpeed = 10;
+    // // let vibratoAmount = 0;
+    // const vibratoAmountControl = document.querySelector("#vibrato-amount-control");
+    // const vibratoSpeedControl = document.querySelector("#vibrato-speed-control");
 
-    var handleVibratoSpeedChange = function () {
-      var vibratoSpeed = Number(vibratoSpeedControl.value);
-      noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].vibratoValues.speed = vibratoSpeed;
-      document.querySelector("#display-vibrato-speed-control").innerHTML = vibratoSpeed;
-    };
-    vibratoSpeedControl.addEventListener("input", handleVibratoSpeedChange);
-    handleVibratoSpeedChange();
-    var setVibratoSpeed = function (spd) {
-      vibratoSpeedControl.value = spd;
-      handleVibratoSpeedChange();
-    };
+    // var handleVibratoAmountChange = function () {
+    //   var vibratoAmount = Number(vibratoAmountControl.value);
+    //   console.log("handleVibratoAmountChange", vibratoAmountControl.value);
+    //   noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].vibratoValues.amount = vibratoAmount;
+    //   document.querySelector("#display-vibrato-amount-control").innerHTML = vibratoAmount;
+    // };
+    // vibratoAmountControl.addEventListener("input", handleVibratoAmountChange);
+    // handleVibratoAmountChange();
+    // var setVibratoAmount = function (amnt) {
+    //   vibratoAmountControl.value = amnt;
+    //   handleVibratoAmountChange();
+    // };
 
-    // Delay
-    const delayAmountControl = document.querySelector("#delay-amount-control");
-    const delayTimeControl = document.querySelector("#delay-time-control");
-    const feedbackControl = document.querySelector("#feedback-control");
-    const delay = mainControls.context.createDelay();
-    const feedback = mainControls.context.createGain();
-    const delayAmountGain = mainControls.context.createGain();
+    // var handleVibratoSpeedChange = function () {
+    //   var vibratoSpeed = Number(vibratoSpeedControl.value);
+    //   noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].vibratoValues.speed = vibratoSpeed;
+    //   document.querySelector("#display-vibrato-speed-control").innerHTML = vibratoSpeed;
+    // };
+    // vibratoSpeedControl.addEventListener("input", handleVibratoSpeedChange);
+    // handleVibratoSpeedChange();
+    // var setVibratoSpeed = function (spd) {
+    //   vibratoSpeedControl.value = spd;
+    //   handleVibratoSpeedChange();
+    // };
 
-    const singleLoopControl = document.querySelector("#single-loop-only");
-    singleLoopControl.addEventListener("input", function () {
-      // ???
-    });
+    // // Delay
+    // const delayAmountControl = document.querySelector("#delay-amount-control");
+    // const delayTimeControl = document.querySelector("#delay-time-control");
+    // const feedbackControl = document.querySelector("#feedback-control");
+    // const delay = mainControls.context.createDelay();
+    // const feedback = mainControls.context.createGain();
+    // const delayAmountGain = mainControls.context.createGain();
 
-    delayAmountGain.connect(delay);
-    delay.connect(feedback);
-    feedback.connect(delay);
-    delay.connect(mainControls.masterVolume);
+    // const singleLoopControl = document.querySelector("#single-loop-only");
+    // singleLoopControl.addEventListener("input", function () {
+    //   // ???
+    // });
 
-    delay.delayTime.value = 0;
-    delayAmountGain.gain.value = 0;
-    feedback.gain.value = 0;
+    // delayAmountGain.connect(delay);
+    // delay.connect(feedback);
+    // feedback.connect(delay);
+    // delay.connect(mainControls.masterVolume);
 
-    var handleDelayAmountChange = function () {
-      delayAmountGain.value = delayAmountControl.value;
-      // noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].delayValues.amount = delayAmountControl.value; // delayAmountGain.value;
-      document.querySelector("#display-delay-amount-control").innerHTML = delayAmountControl.value; // delayAmountControl.value;
-    };
-    delayAmountControl.addEventListener("input", handleDelayAmountChange);
-    handleDelayAmountChange();
+    // delay.delayTime.value = 0;
+    // delayAmountGain.gain.value = 0;
+    // feedback.gain.value = 0;
 
-    var handleDelayTimeChange = function () {
-      delay.delayTime.value = delayTimeControl.value;
-      document.querySelector("#display-delay-time-control").innerHTML = delayTimeControl.value;
-    };
-    delayTimeControl.addEventListener("input", handleDelayTimeChange);
-    handleDelayTimeChange();
+    // var handleDelayAmountChange = function () {
+    //   delayAmountGain.value = delayAmountControl.value;
+    //   // noteSelectHandler.tracks[noteSelectHandler.selectedTrackIndex].delayValues.amount = delayAmountControl.value; // delayAmountGain.value;
+    //   document.querySelector("#display-delay-amount-control").innerHTML = delayAmountControl.value; // delayAmountControl.value;
+    // };
+    // delayAmountControl.addEventListener("input", handleDelayAmountChange);
+    // handleDelayAmountChange();
 
-    var handleFeedbackChanged = function () {
-      feedback.gain.value = feedbackControl.value;
-      document.querySelector("#display-feedback-control").innerHTML = feedbackControl.value;
-    };
-    feedbackControl.addEventListener("input", handleFeedbackChanged);
-    handleFeedbackChanged();
+    // var handleDelayTimeChange = function () {
+    //   delay.delayTime.value = delayTimeControl.value;
+    //   document.querySelector("#display-delay-time-control").innerHTML = delayTimeControl.value;
+    // };
+    // delayTimeControl.addEventListener("input", handleDelayTimeChange);
+    // handleDelayTimeChange();
 
-    // LOOP CONTROLS
-    var resetButton = document.querySelector("#reset-button");
-    var startButton = document.querySelector("#start-button");
-    var stopButton = document.querySelector("#stop-button");
+    // var handleFeedbackChanged = function () {
+    //   feedback.gain.value = feedbackControl.value;
+    //   document.querySelector("#display-feedback-control").innerHTML = feedbackControl.value;
+    // };
+    // feedbackControl.addEventListener("input", handleFeedbackChanged);
+    // handleFeedbackChanged();
 
-    resetButton.addEventListener("click", function () {
-      resetLoop();
-    });
+    // // LOOP CONTROLS
+    // var resetButton = document.querySelector("#reset-button");
+    // var startButton = document.querySelector("#start-button");
+    // var stopButton = document.querySelector("#stop-button");
 
-    var updatePlayingDisplay = function () {
-      if (isPlaying) {
-        startButton.classList.remove("d-none");
-        stopButton.classList.add("d-none");
-      } else {
-        startButton.classList.add("d-none");
-        stopButton.classList.remove("d-none");
-      }
-    };
+    // resetButton.addEventListener("click", function () {
+    //   resetLoop();
+    // });
 
-    startButton.addEventListener("click", function () {
-      if (!isPlaying) {
-        // startButton.classList.add("d-none");
-        // stopButton.classList.remove("d-none");
-        updatePlayingDisplay();
-        isPlaying = true;
-        noteLoop();
-      }
-    });
+    // var updatePlayingDisplay = function () {
+    //   if (isPlaying) {
+    //     startButton.classList.remove("d-none");
+    //     stopButton.classList.add("d-none");
+    //   } else {
+    //     startButton.classList.add("d-none");
+    //     stopButton.classList.remove("d-none");
+    //   }
+    // };
 
-    stopButton.addEventListener("click", function () {
-      if (isPlaying) {
-        // startButton.classList.remove("d-none");
-        // stopButton.classList.add("d-none");
-        updatePlayingDisplay();
-      }
-      isPlaying = false;
-    });
+    // startButton.addEventListener("click", function () {
+    //   if (!isPlaying) {
+    //     // startButton.classList.add("d-none");
+    //     // stopButton.classList.remove("d-none");
+    //     updatePlayingDisplay();
+    //     isPlaying = true;
+    //     noteLoop();
+    //   }
+    // });
 
-    function noteLoop() {
-      const secondsPerBeat = 60.0 / mainControls.values.tempo;
-      if (isPlaying) {
-        for (var curTrackIndex = 0; curTrackIndex < noteSelectHandler.trackCount; curTrackIndex++) {
-          // console.log("Play note in track", curTrackIndex);
-          if (noteSelectHandler.isTrackMuted[curTrackIndex]) {
-            // Don't play muted tracks.
-            continue;
-          }
-          playCurrentNote(curTrackIndex);
-        }
-        // playCurrentNote(0);
-        nextNote();
-        if (currentNoteIndex === 0 && singleLoopControl.checked) {
-          singleLoopControl.checked = false;
-          isPlaying = false;
-          updatePlayingDisplay();
-        } else {
-          window.setTimeout(function () {
-            noteLoop();
-          }, secondsPerBeat * 1000);
-        }
-      }
-    }
+    // stopButton.addEventListener("click", function () {
+    //   if (isPlaying) {
+    //     // startButton.classList.remove("d-none");
+    //     // stopButton.classList.add("d-none");
+    //     updatePlayingDisplay();
+    //   }
+    //   isPlaying = false;
+    // });
 
-    function nextNote() {
-      noteSelectHandler.setPlayingNoteIndex(currentNoteIndex);
-      currentNoteIndex = (currentNoteIndex + 1) % NoteSelectHandler.NOTE_INPUT_COUNT;
-    }
+    // function noteLoop() {
+    //   const secondsPerBeat = 60.0 / mainControls.values.tempo;
+    //   if (isPlaying) {
+    //     for (var curTrackIndex = 0; curTrackIndex < noteSelectHandler.trackCount; curTrackIndex++) {
+    //       // console.log("Play note in track", curTrackIndex);
+    //       if (noteSelectHandler.isTrackMuted[curTrackIndex]) {
+    //         // Don't play muted tracks.
+    //         continue;
+    //       }
+    //       playCurrentNote(curTrackIndex);
+    //     }
+    //     // playCurrentNote(0);
+    //     nextNote();
+    //     if (currentNoteIndex === 0 && singleLoopControl.checked) {
+    //       singleLoopControl.checked = false;
+    //       isPlaying = false;
+    //       updatePlayingDisplay();
+    //     } else {
+    //       window.setTimeout(function () {
+    //         noteLoop();
+    //       }, secondsPerBeat * 1000);
+    //     }
+    //   }
+    // }
 
-    function playCurrentNote(curTrackIndex) {
-      var curTrack = noteSelectHandler.tracks[curTrackIndex];
-      var curNote = curTrack.currentNotes[currentNoteIndex];
-      // delayAmountGain.value = curTrack.delayValues.amount;
-      console.log("curTrack.vibratoValues", curTrack.vibratoValues); // , vibratoAmount, vibratoSpeed);
+    // function nextNote() {
+    //   noteSelectHandler.setPlayingNoteIndex(currentNoteIndex);
+    //   currentNoteIndex = (currentNoteIndex + 1) % NoteSelectHandler.NOTE_INPUT_COUNT;
+    // }
 
-      console.log("curNote", curNote);
-      if (!curNote || curNote.noteIndex < 1 || curNote.noteIndex >= noteValues.length) {
-        console.info("Note at index " + currentNoteIndex + " not set.");
-        return;
-      }
-      const noteLengthFactor = curNote.lengthFactor;
-      if (noteLengthFactor <= 0.0) {
-        return;
-      }
-      const osc = mainControls.context.createOscillator();
-      const noteGain = mainControls.context.createGain();
-      noteGain.gain.setValueAtTime(0, 0);
-      noteGain.gain.linearRampToValueAtTime(
-        curTrack.envelope.sustainLevel,
-        mainControls.context.currentTime + curTrack.envelope.noteLength * curTrack.envelope.attackTime * noteLengthFactor
-      );
-      // console.log("envelopeHandler.envelope", envelopeHandler.envelope, "noteLengthFactor", noteLengthFactor);
-      noteGain.gain.setValueAtTime(
-        curTrack.envelope.sustainLevel,
-        mainControls.context.currentTime +
-          (curTrack.envelope.noteLength - curTrack.envelope.noteLength * curTrack.envelope.releaseTime) * noteLengthFactor
-      );
-      noteGain.gain.linearRampToValueAtTime(
-        0,
-        mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor
-      );
+    // function playCurrentNote(curTrackIndex) {
+    //   var curTrack = noteSelectHandler.tracks[curTrackIndex];
+    //   var curNote = curTrack.currentNotes[currentNoteIndex];
+    //   // delayAmountGain.value = curTrack.delayValues.amount;
+    //   console.log("curTrack.vibratoValues", curTrack.vibratoValues); // , vibratoAmount, vibratoSpeed);
 
-      var lfoGain = mainControls.context.createGain();
-      // lfoGain.gain.setValueAtTime(vibratoAmount, 0);
-      lfoGain.gain.setValueAtTime(curTrack.vibratoValues.amount, 0);
-      lfoGain.connect(osc.frequency);
+    //   console.log("curNote", curNote);
+    //   if (!curNote || curNote.noteIndex < 1 || curNote.noteIndex >= noteValues.length) {
+    //     console.info("Note at index " + currentNoteIndex + " not set.");
+    //     return;
+    //   }
+    //   const noteLengthFactor = curNote.lengthFactor;
+    //   if (noteLengthFactor <= 0.0) {
+    //     return;
+    //   }
+    //   const osc = mainControls.context.createOscillator();
+    //   const noteGain = mainControls.context.createGain();
+    //   noteGain.gain.setValueAtTime(0, 0);
+    //   noteGain.gain.linearRampToValueAtTime(
+    //     curTrack.envelope.sustainLevel,
+    //     mainControls.context.currentTime + curTrack.envelope.noteLength * curTrack.envelope.attackTime * noteLengthFactor
+    //   );
+    //   // console.log("envelopeHandler.envelope", envelopeHandler.envelope, "noteLengthFactor", noteLengthFactor);
+    //   noteGain.gain.setValueAtTime(
+    //     curTrack.envelope.sustainLevel,
+    //     mainControls.context.currentTime +
+    //       (curTrack.envelope.noteLength - curTrack.envelope.noteLength * curTrack.envelope.releaseTime) * noteLengthFactor
+    //   );
+    //   noteGain.gain.linearRampToValueAtTime(
+    //     0,
+    //     mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor
+    //   );
 
-      var lfo = mainControls.context.createOscillator();
-      // lfo.frequency.setValueAtTime(vibratoSpeed, 0);
-      lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed, 0);
-      lfo.start(0);
-      // lfo.stop(context.currentTime + envelopeHandler.envelope.noteLength);
-      lfo.stop(mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
-      lfo.connect(lfoGain);
+    //   var lfoGain = mainControls.context.createGain();
+    //   // lfoGain.gain.setValueAtTime(vibratoAmount, 0);
+    //   lfoGain.gain.setValueAtTime(curTrack.vibratoValues.amount, 0);
+    //   lfoGain.connect(osc.frequency);
 
-      // osc.type = waveform;
-      osc.type = curTrack.oscillator.waveform;
-      console.log("curNote", curNote);
-      osc.frequency.setValueAtTime(Object.values(noteValues)[`${curNote.noteIndex}`], 0);
+    //   var lfo = mainControls.context.createOscillator();
+    //   // lfo.frequency.setValueAtTime(vibratoSpeed, 0);
+    //   lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed, 0);
+    //   lfo.start(0);
+    //   // lfo.stop(context.currentTime + envelopeHandler.envelope.noteLength);
+    //   lfo.stop(mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
+    //   lfo.connect(lfoGain);
 
-      osc.start(0);
-      osc.stop(mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
-      osc.connect(noteGain);
+    //   // osc.type = waveform;
+    //   osc.type = curTrack.oscillator.waveform;
+    //   console.log("curNote", curNote);
+    //   osc.frequency.setValueAtTime(Object.values(noteValues)[`${curNote.noteIndex}`], 0);
 
-      noteGain.connect(mainControls.masterVolume);
-      noteGain.connect(delay);
-    }
-    // ### END SYNTH
+    //   osc.start(0);
+    //   osc.stop(mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
+    //   osc.connect(noteGain);
+
+    //   noteGain.connect(mainControls.masterVolume);
+    //   noteGain.connect(delay);
+    // }
+    // // ### END SYNTH
 
     // ### BEGIN DIALOGS AND OTHER INPUT
     var modal = new Modal();
@@ -345,7 +347,7 @@
       var trackCountInput = document.createElement("input");
       trackCountInput.setAttribute("id", "track-count-input");
       trackCountInput.setAttribute("type", "number");
-      trackCountInput.value = noteSelectHandler.trackCount;
+      trackCountInput.value = audioControl.noteSelectHandler.trackCount;
       modal.setTitle("Track count");
       modal.setFooter("");
       modal.setActions([
@@ -353,7 +355,8 @@
         {
           label: "Change",
           action: function () {
-            setTrackCount(trackCountInput.value);
+            // setTrackCount(trackCountInput.value);
+            audioControl.setTrackCount(trackCountInput.value);
             modal.close();
           }
         }

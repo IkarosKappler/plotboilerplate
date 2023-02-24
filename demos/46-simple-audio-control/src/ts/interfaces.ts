@@ -3,6 +3,8 @@
  * @version 1.0.0
  */
 
+export type Waveform = "triangle" | "square" | "sine" | "sawtooth";
+
 export interface Note {
   //   frequency: number;
   index: number; // The index in the noteValues array
@@ -30,7 +32,7 @@ export interface MainSettings {
 export interface TrackPreset {
   envelope: EnvelopeSettings;
   mainValues: MainSettings;
-  oscillator: { waveform: "triangle" | "square" | "sine" | "sawtooth" };
+  oscillator: { waveform: Waveform };
   noteValues: Array<{ value: string; lengthFactor: number }>;
   vibratoValues: { amount: number; speed: number };
   // delayValues: { amount: number; time: number; feedback: number };

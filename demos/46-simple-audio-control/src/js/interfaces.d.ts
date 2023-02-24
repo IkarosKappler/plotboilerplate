@@ -2,6 +2,7 @@
  * @author  Ikaros Kappler
  * @version 1.0.0
  */
+export declare type Waveform = "triangle" | "square" | "sine" | "sawtooth";
 export interface Note {
     index: number;
     frequency: number;
@@ -25,7 +26,7 @@ export interface TrackPreset {
     envelope: EnvelopeSettings;
     mainValues: MainSettings;
     oscillator: {
-        waveform: "triangle" | "square" | "sine" | "sawtooth";
+        waveform: Waveform;
     };
     noteValues: Array<{
         value: string;

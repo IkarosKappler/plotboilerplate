@@ -193,7 +193,7 @@ const presetsLeChuck: TrackPreset = {
   noteValues: [
     { value: "C4", lengthFactor: 0.5 },
     { value: "C4", lengthFactor: 1.0 },
-    { value: "E4", lengthFactor: 1.0 },
+    { value: "D#4/Eb4", lengthFactor: 1.0 },
     { value: "G4", lengthFactor: 1.5 },
     { value: "F#4/Gb4", lengthFactor: 1.0 },
     { value: "F#4/Gb4", lengthFactor: 1.0 },
