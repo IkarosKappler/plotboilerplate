@@ -13,18 +13,19 @@ exports.NoteSelectHandler = void 0;
 var cloneObject_1 = require("./cloneObject");
 var noteValues_1 = require("./noteValues");
 var presets_1 = require("./presets");
-var NOTE_INPUT_COUNT = 16;
+var DEFAULT_NOTE_INPUT_COUNT = 16;
 var NoteSelectHandler = /** @class */ (function () {
     function NoteSelectHandler(initialPreset, trackCount, onTrackSelected) {
         this.trackCount = trackCount || 1;
         this.selectedTrackIndex = 0;
+        this.noteInputCount = DEFAULT_NOTE_INPUT_COUNT;
         this._onTrackSelected = onTrackSelected;
         if (typeof trackCount === "undefined") {
             console.info("[NoteSelectHandler] `trackCount` not provided, using default setting 1.");
         }
-        this._createNoteSelectsDOM(initialPreset);
+        this._createNoteSelectsDOM(initialPreset, initialPreset.noteValues.length);
     }
-    NoteSelectHandler.prototype._createNoteSelectsDOM = function (preset) {
+    NoteSelectHandler.prototype._createNoteSelectsDOM = function (preset, noteInputCount) {
         var _this = this;
         this.setCurrentNotesFromPreset(preset);
         var _self = this;
@@ -65,7 +66,7 @@ var NoteSelectHandler = /** @class */ (function () {
         this._noteSelects = [];
         this.isTrackMuted = [];
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            createNoteSelectRow(noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange, handleTrackSelectedChange);
+            createNoteSelectRow(noteSelectsTable, trackIndex, noteInputCount, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange, handleTrackSelectedChange);
             this._noteSelects[trackIndex] = document.querySelectorAll("select[data-trackindex='" + trackIndex + "'].note-select");
             this.isTrackMuted.push(false);
         }
@@ -78,9 +79,11 @@ var NoteSelectHandler = /** @class */ (function () {
         this.setNoteSelects();
         this.setCurrentNoteFreuqencyDisplays();
     };
-    NoteSelectHandler.prototype.setTrackCount = function (preset, newTrackCount) {
+    NoteSelectHandler.prototype.setTrackCount = function (preset, newTrackCount, newNoteInputCount) {
+        console.log("setTrackCount", newTrackCount, "newNoteInputCount", newNoteInputCount);
         this.trackCount = newTrackCount;
-        this._createNoteSelectsDOM(preset);
+        this.noteInputCount = newNoteInputCount;
+        this._createNoteSelectsDOM(preset, newNoteInputCount);
         this.setCurrentNotesFromPreset(preset);
     };
     NoteSelectHandler.prototype.setCurrentNotesFromPreset = function (preset) {
@@ -98,7 +101,8 @@ var NoteSelectHandler = /** @class */ (function () {
             };
             // track.envelope = { preset.envelope};
             this.tracks.push(track);
-            track.currentNotes = presets_1.convertPresetToNotes(NOTE_INPUT_COUNT, preset.noteValues);
+            // track.currentNotes = convertPresetToNotes(DEFAULT_NOTE_INPUT_COUNT, preset.noteValues);
+            track.currentNotes = presets_1.convertPresetToNotes(this.noteInputCount, preset.noteValues);
             if (trackIndex === 1) {
                 // For testing: transpose the first track one octave down
                 for (var i = 0; i < track.currentNotes.length; i++) {
@@ -138,7 +142,9 @@ var NoteSelectHandler = /** @class */ (function () {
     };
     NoteSelectHandler.prototype.setCurrentNoteLengthInputs = function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            for (var i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
+            // for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
+            for (var i = 0; i < this.noteInputCount; i++) {
+                console.log("i", i, "trackIndex", trackIndex, this.tracks[trackIndex].currentNotes);
                 // this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
                 this._noteLengthSliders[trackIndex][i].value = String(this.tracks[trackIndex].currentNotes[i].lengthFactor);
                 this.setNoteLengthDisplay(trackIndex, i);
@@ -175,14 +181,15 @@ var NoteSelectHandler = /** @class */ (function () {
         }
         console.log("this.tracks", this.tracks);
     };
-    NoteSelectHandler.prototype.setPlayingNoteIndex = function (noteIndex) {
+    NoteSelectHandler.prototype.setPlayingNoteDisplay = function (playingNoteIndex) {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-            this._noteSelects[trackIndex][noteIndex].classList.add("note-is-playing");
-            if (this._noteSelects[trackIndex][noteIndex - 1]) {
-                this._noteSelects[trackIndex][noteIndex - 1].classList.remove("note-is-playing");
-            }
-            else {
-                this._noteSelects[trackIndex][NOTE_INPUT_COUNT - 1].classList.remove("note-is-playing");
+            for (var noteIndex = 0; noteIndex < this._noteSelects[trackIndex].length; noteIndex++) {
+                if (playingNoteIndex === noteIndex) {
+                    this._noteSelects[trackIndex][noteIndex].classList.add("note-is-playing");
+                }
+                else {
+                    this._noteSelects[trackIndex][noteIndex].classList.remove("note-is-playing");
+                }
             }
         }
     };
@@ -205,7 +212,7 @@ var emptyElement = function (element) {
  * @param {HTMLTableElement} noteSelectsTable - The table element from the DOM.
  * @param {function} handleNoteSelectChange - A callback to handle note value changes.
  */
-var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange, handleTrackSelectChange) {
+var createNoteSelectRow = function (noteSelectsTable, trackIndex, noteInputCount, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange, handleTrackSelectChange) {
     // Create the table row
     var noteTableRow = document.createElement("tr");
     noteTableRow.classList.add("noteTableRow", "noteTableRow-" + trackIndex);
@@ -251,7 +258,7 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
     labelCell.appendChild(labelCellDiv);
     noteTableRow.appendChild(labelCell);
     // Now create n cells for n notes
-    for (var i = 0; i < NOTE_INPUT_COUNT; i++) {
+    for (var i = 0; i < noteInputCount; i++) {
         var select = document.createElement("select");
         select.id = "note " + (i + 1);
         select.setAttribute("data-index", "" + i);
@@ -307,5 +314,5 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, handleNoteSele
     labelCell.appendChild(labelCellDiv);
     noteTableRow.appendChild(labelCell);
 };
-NoteSelectHandler.NOTE_INPUT_COUNT = NOTE_INPUT_COUNT;
+NoteSelectHandler.DEFAULT_NOTE_INPUT_COUNT = DEFAULT_NOTE_INPUT_COUNT;
 //# sourceMappingURL=NoteSelectHandler.js.map

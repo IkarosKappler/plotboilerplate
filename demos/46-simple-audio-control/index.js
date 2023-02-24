@@ -340,8 +340,8 @@
     // ### BEGIN DIALOGS AND OTHER INPUT
     var modal = new Modal();
     // +---------------------------------------------------------------------------------
-    // | This is the callback to use when the user wants to insert
-    // | path data into the dialog (modal).
+    // | This is the callback to use when the user wants to change the track count
+    // | (using a modal dialog).
     // +-------------------------------
     var showTrackCountDialog = function () {
       var trackCountInput = document.createElement("input");
@@ -356,7 +356,7 @@
           label: "Change",
           action: function () {
             // setTrackCount(trackCountInput.value);
-            audioControl.setTrackCount(trackCountInput.value);
+            audioControl.setTrackCount(Number(trackCountInput.value));
             modal.close();
           }
         }
@@ -371,6 +371,40 @@
     var editTrackCountButton = document.querySelector("#edit-track-count-button");
     console.log("editTrackCountButton", editTrackCountButton);
     editTrackCountButton.addEventListener("click", showTrackCountDialog);
+    // ### END DIALOGS AND OTHER INPUT
+
+    // +---------------------------------------------------------------------------------
+    // | This is the callback to use when the user wants to change the note input count
+    // | (using a modal dialog).
+    // +-------------------------------
+    var showNoteInputCountDialog = function () {
+      var noteInputCountInput = document.createElement("input");
+      noteInputCountInput.setAttribute("id", "note-input-count-input");
+      noteInputCountInput.setAttribute("type", "number");
+      noteInputCountInput.value = audioControl.noteSelectHandler.noteInputCount;
+      modal.setTitle("Note count (each track)");
+      modal.setFooter("");
+      modal.setActions([
+        Modal.ACTION_CANCEL,
+        {
+          label: "Change",
+          action: function () {
+            // setTrackCount(trackCountInput.value);
+            audioControl.setNoteInputCount(Number(noteInputCountInput.value));
+            modal.close();
+          }
+        }
+      ]);
+      modal.setBody(noteInputCountInput);
+      if (modal.modalElements.modal.body.content) {
+        modal.modalElements.modal.body.content.style.display = "flex";
+        modal.modalElements.modal.body.content.style.justifyContent = "center";
+      }
+      modal.open();
+    };
+    var editNoteInputCountButton = document.querySelector("#edit-note-input-count-button");
+    // console.log("editNoteInputCountButton", editNoteInputCountButton);
+    editNoteInputCountButton.addEventListener("click", showNoteInputCountDialog);
     // ### END DIALOGS AND OTHER INPUT
   };
 

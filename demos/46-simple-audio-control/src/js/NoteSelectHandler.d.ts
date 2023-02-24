@@ -13,13 +13,14 @@ export declare class NoteSelectHandler {
     trackCount: number;
     isTrackMuted: Array<boolean>;
     selectedTrackIndex: number;
+    noteInputCount: number;
     private _onTrackSelected;
     private _noteSelects;
     private _noteLengthSliders;
-    static NOTE_INPUT_COUNT: number;
+    static DEFAULT_NOTE_INPUT_COUNT: number;
     constructor(initialPreset: TrackPreset, trackCount: number, onTrackSelected: (selectedTrack: Track, selectedTrackIndex: number) => void);
     private _createNoteSelectsDOM;
-    setTrackCount(preset: TrackPreset, newTrackCount: number): void;
+    setTrackCount(preset: TrackPreset, newTrackCount: number, newNoteInputCount: number): void;
     setCurrentNotesFromPreset(preset: TrackPreset): void;
     setFromPreset(preset: TrackPreset): void;
     setNoteSelects(): void;
@@ -27,6 +28,6 @@ export declare class NoteSelectHandler {
     setCurrentNoteLengthInputs(): void;
     setCurrentNoteFreuqencyDisplays(): void;
     setCurrentNoteLengths(): void;
-    setPlayingNoteIndex(noteIndex: number): void;
+    setPlayingNoteDisplay(playingNoteIndex: number): void;
     setNoteLengthDisplay(trackIndex: number, noteIndex: number): void;
 }

@@ -250,13 +250,13 @@ select:after {
     color: var(--value-color);
 }
 
-#edit-track-count-button {
+#edit-track-count-button, #edit-note-input-count-button  {
     border: 1px solid var(--select-border-color);
     background: none;
     color: var(--text-color);
 }
 
-#track-count-input {
+#track-count-input, #note-input-count-input  {
     font-size : 42pt;
     width : 50%;
     text-align: center;

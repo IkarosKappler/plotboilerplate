@@ -245,7 +245,11 @@ export const convertPresetToNotes = (NOTE_INPUT_COUNT, preset): NoteConfig[] => 
     // C4 is at index 48
     // return 48 + Math.floor(Math.random() * 12);
     //   return { identifier: key, frequency: noteValues[key], index: index };
-    return { noteIndex: locateNoteByIdentifier(preset[index].value), lengthFactor: preset[index].lengthFactor };
+    if (index >= 0 && index < preset.length) {
+      return { noteIndex: locateNoteByIdentifier(preset[index].value), lengthFactor: preset[index].lengthFactor };
+    } else {
+      return { noteIndex: -1, lengthFactor: 0 };
+    }
   });
   return notes;
 };
