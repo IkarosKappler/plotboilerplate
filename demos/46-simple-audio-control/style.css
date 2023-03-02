@@ -182,6 +182,13 @@ input[type=range][orient=vertical]
     padding: 0 5px;
 }
 
+select.note-select {
+    margin-top: 1.0em;
+}
+
+select.preset-select {
+    margin-bottom: 2.0em;
+}
 
 /* custom-select  */
 select {
@@ -197,7 +204,6 @@ select {
 select {
     width: auto;
     margin: 0;
-    margin-top: 1.0em;
     outline: none;
     cursor: pointer;
     border: none;
@@ -312,4 +318,28 @@ input[type="radio"].isactive-radio:checked + label {
 /* Highlight the complete track that's currently selected */
 tr.selected-track td {
     background-color: var(--highlight-color);
+}
+
+#presets-container {
+    
+}
+
+#io-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#button-export {
+
+}
+
+#button-import {
+    
+}
+
+#file-input-hidden {
+    visibility: hidden;
+    width: 0px;
+    height: 0px;
 }

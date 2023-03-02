@@ -40,4 +40,17 @@ export interface TrackPreset {
 
 export interface Track extends Pick<TrackPreset, "envelope" | "mainValues" | "oscillator" | "vibratoValues"> {
   currentNotes: Array<NoteConfig>;
+  isMuted: boolean;
+}
+
+export interface NotesIOFormat {
+  tracks: Array<TrackPreset>;
+  trackCount: number;
+  isTrackMuted: Array<boolean>;
+  noteInputCount: number;
+}
+
+export interface AudioIOFormat {
+  version: string;
+  notes: NotesIOFormat;
 }

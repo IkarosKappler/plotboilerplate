@@ -144,7 +144,12 @@ exports.locateNoteByIdentifier = locateNoteByIdentifier;
 var getNoteByIndex = function (index) {
     var keys = Object.keys(exports.noteValues);
     var key = keys[index];
-    return { identifier: key, frequency: exports.noteValues[key], index: index };
+    if (key) {
+        return { identifier: key, frequency: exports.noteValues[key], index: index };
+    }
+    else {
+        return null;
+    }
 };
 exports.getNoteByIndex = getNoteByIndex;
 //# sourceMappingURL=noteValues.js.map

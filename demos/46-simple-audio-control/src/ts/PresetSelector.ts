@@ -24,7 +24,7 @@ export class PresetSelector {
     const select = document.createElement("select");
     // select.id = `note ${i + 1}`;
     // select.setAttribute("data-index", i);
-    // select.classList.add("note-select");
+    select.classList.add("preset-select");
     select.value = selectedKey;
     for (let j = 0; j < keys.length; j++) {
       const option: HTMLOptionElement = document.createElement("option");

@@ -5,10 +5,12 @@
  * @version  1.0.0
  **/
 import { NoteSelectHandler } from "./NoteSelectHandler";
+import { AudioIOFormat } from "./interfaces";
 export declare class AudioControl {
     noteSelectHandler: NoteSelectHandler;
     private envelopeHandler;
     private setTrackCount;
     private setNoteInputCount;
     constructor(GUP: Record<string, string>, isDarkmode: boolean);
+    getIOFormat(): AudioIOFormat;
 }

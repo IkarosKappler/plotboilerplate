@@ -143,8 +143,12 @@ export const locateNoteByIdentifier = (name: string): number => {
   return -1;
 };
 
-export const getNoteByIndex = (index: number): Note => {
+export const getNoteByIndex = (index: number): Note | null => {
   var keys = Object.keys(noteValues);
   const key: string = keys[index];
-  return { identifier: key, frequency: noteValues[key], index: index };
+  if (key) {
+    return { identifier: key, frequency: noteValues[key], index: index };
+  } else {
+    return null;
+  }
 };

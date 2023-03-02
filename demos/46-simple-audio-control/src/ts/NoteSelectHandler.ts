@@ -9,7 +9,7 @@
  */
 
 import { cloneObject } from "./cloneObject";
-import { Track, TrackPreset } from "./interfaces";
+import { NoteConfig, NotesIOFormat, Track, TrackPreset } from "./interfaces";
 import { getNoteByIndex, noteValues } from "./noteValues";
 import { convertPresetToNotes } from "./presets";
 
@@ -18,7 +18,7 @@ const DEFAULT_NOTE_INPUT_COUNT = 16;
 export class NoteSelectHandler {
   tracks: Array<Track>;
   trackCount: number;
-  isTrackMuted: Array<boolean>;
+  // isTrackMuted: Array<boolean>;
   selectedTrackIndex: number;
   noteInputCount: number;
   private _onTrackSelected: (selectedTrack: Track, selectedTrackIndex: number) => void;
@@ -43,31 +43,56 @@ export class NoteSelectHandler {
     this._createNoteSelectsDOM(initialPreset, initialPreset.noteValues.length);
   }
 
+  getNotesIOFormat(): NotesIOFormat {
+    return {
+      tracks: this.tracks.map((track: Track) => {
+        return track2Preset(track); // cloneTrack(track);
+      }),
+      trackCount: this.trackCount,
+      noteInputCount: this.noteInputCount,
+      isTrackMuted: this.tracks.map((track: Track) => {
+        return track.isMuted;
+      })
+    };
+  }
+
+  /**
+   * Create/Recreate the whole note selector table DOM.
+   *
+   * @param {TrackPreset} preset
+   * @param {number} noteInputCount
+   */
   private _createNoteSelectsDOM(preset: TrackPreset, noteInputCount: number) {
     this.setCurrentNotesFromPreset(preset);
-    var _self = this;
+    const _self = this;
     const handleNoteSelectChange = event => {
       console.log("event", event, event.target.value);
-      var noteIndex = event.target.value;
-      var affectedTrackIndex = event.target.getAttribute("data-trackIndex");
+      const noteIndex = event.target.value;
+      const affectedTrackIndex = event.target.getAttribute("data-trackIndex");
       console.log("affectedTrackIndex", affectedTrackIndex);
-      var selectIndex = event.target.getAttribute("data-index");
+      const selectIndex = event.target.getAttribute("data-index");
       for (var trackIndex = 0; trackIndex < _self.trackCount; trackIndex++) {
         // _self.currentNotes[selectTrackIndex][selectIndex].noteIndex = noteIndex;
         _self.tracks[affectedTrackIndex].currentNotes[selectIndex].noteIndex = noteIndex;
       }
-      var note = getNoteByIndex(noteIndex);
-      _self._noteSelects[affectedTrackIndex][selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
-      _self.setCurrentNoteFreuqencyDisplays();
+      const note = getNoteByIndex(noteIndex);
+      if (note) {
+        _self._noteSelects[affectedTrackIndex][selectIndex].setAttribute("title", `${note.identifier} @${note.frequency}Hz`);
+        _self.setCurrentNoteFreuqencyDisplays();
+      } else {
+        console.warn("Cannot handle note select change. noteIndex is invalid:", noteIndex);
+      }
     };
 
-    function handleNoteDurationChange() {
+    const handleNoteDurationChange = (_inputElement: HTMLInputElement, _noteIndex: number) => {
+      console.log("Handle note length", _noteIndex);
       _self.setCurrentNoteLengths();
-    }
+    };
 
     var handleTrackMutedChange = (trackIndex: number, isChecked: boolean) => {
       console.log("is muted", isChecked);
-      this.isTrackMuted[trackIndex] = isChecked;
+      // this.isTrackMuted[trackIndex] = isChecked;
+      this.tracks[trackIndex].isMuted = isChecked;
     };
 
     const handleTrackSelectedChange = (trackIndex: number, checked: boolean) => {
@@ -84,7 +109,7 @@ export class NoteSelectHandler {
     const noteSelectsTable = document.querySelector("#note-selects-table") as HTMLTableElement;
     emptyElement(noteSelectsTable);
     this._noteSelects = [];
-    this.isTrackMuted = [];
+    // this.isTrackMuted = [];
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       createNoteSelectRow(
         noteSelectsTable,
@@ -96,7 +121,7 @@ export class NoteSelectHandler {
         handleTrackSelectedChange
       );
       this._noteSelects[trackIndex] = document.querySelectorAll(`select[data-trackindex='${trackIndex}'].note-select`);
-      this.isTrackMuted.push(false);
+      // this.isTrackMuted.push(false);
     }
 
     this._noteLengthSliders = [];
@@ -128,8 +153,9 @@ export class NoteSelectHandler {
         envelope: cloneObject(preset.envelope),
         mainValues: cloneObject(preset.mainValues),
         oscillator: cloneObject(preset.oscillator),
-        vibratoValues: cloneObject(preset.vibratoValues)
+        vibratoValues: cloneObject(preset.vibratoValues),
         // delayValues: cloneObject(preset.delayValues)
+        isMuted: false
       };
       // track.envelope = { preset.envelope};
       this.tracks.push(track);
@@ -154,12 +180,8 @@ export class NoteSelectHandler {
 
   setNoteSelects() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-      // for (let i = 0; i < this.currentNotes[trackIndex].length; i++) {
       for (let i = 0; i < this.tracks[trackIndex].currentNotes.length; i++) {
-        // const noteIndex = this.currentNotes[trackIndex][i].noteIndex;
         const noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
-
-        // console.log("i noteIndex", i, noteIndex);
         this._noteSelects[trackIndex][i].value = `${noteIndex}`;
         const noteIdentifier = Object.keys(noteValues)[noteIndex];
         const noteFrequency = noteValues[noteIdentifier];
@@ -171,7 +193,6 @@ export class NoteSelectHandler {
   setCurrentNotes() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this._noteSelects.length; i++) {
-        // this.currentNotes[trackIndex][i].noteIndex = Number(this._noteSelects[trackIndex][i].value);
         this.tracks[trackIndex].currentNotes[i].noteIndex = Number(this._noteSelects[trackIndex][i].value);
       }
     }
@@ -179,25 +200,19 @@ export class NoteSelectHandler {
 
   setCurrentNoteLengthInputs() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
-      // for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
       for (let i = 0; i < this.noteInputCount; i++) {
         console.log("i", i, "trackIndex", trackIndex, this.tracks[trackIndex].currentNotes);
-        // this._noteLengthSliders[trackIndex][i].value = String(this.currentNotes[trackIndex][i].lengthFactor);
         this._noteLengthSliders[trackIndex][i].value = String(this.tracks[trackIndex].currentNotes[i].lengthFactor);
-
         this.setNoteLengthDisplay(trackIndex, i);
-
-        // const noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
-        // const note = getNoteByIndex(noteIndex);
-        // const noteFrequencyDisplay = document.querySelector(`#note-frequency-display-${trackIndex}-${i}`) as HTMLDivElement;
-        // noteFrequencyDisplay.innerHTML = `${note.frequency}`;
       }
     }
     console.log("this.tracks", this.tracks);
   }
 
+  /**
+   * Update all displays for note length.
+   */
   setCurrentNoteFreuqencyDisplays() {
-    console.log("setCurrentNoteFreuqencyDisplays");
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
         const noteIndex = this.tracks[trackIndex].currentNotes[i].noteIndex;
@@ -212,6 +227,9 @@ export class NoteSelectHandler {
     }
   }
 
+  /**
+   * Set the stored note length from the settings in the note sliders.
+   */
   setCurrentNoteLengths() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this._noteLengthSliders[trackIndex].length; i++) {
@@ -256,8 +274,8 @@ const createNoteSelectRow = (
   noteSelectsTable: HTMLTableElement,
   trackIndex: number,
   noteInputCount: number,
-  handleNoteSelectChange,
-  handleNoteDurationChange,
+  handleNoteSelectChange: (event: Event) => void,
+  handleNoteDurationChange: (inputElement: HTMLInputElement, noteIndex: number) => void,
   handleTrackMutedChange: (trackIndex: number, checked: boolean) => void,
   handleTrackSelectChange: (trackIndex: number, checked: boolean) => void
 ) => {
@@ -323,6 +341,7 @@ const createNoteSelectRow = (
       option.innerText = `${Object.keys(noteValues)[j]}`;
       select.appendChild(option);
       select.addEventListener("change", handleNoteSelectChange);
+      // select.addEventListener("change", (event:Event) => {});
     }
     // Create duration slider
     // <input type="range" id="attack-control" value="0.3" min="0" max="0.5" step="0.02"><br></br>
@@ -336,9 +355,10 @@ const createNoteSelectRow = (
     lengthSlider.classList.add(`note_duration_slider_${trackIndex}-${i + 1}`);
     lengthSlider.value = "1.0";
     lengthSlider.step = "0.1";
-    lengthSlider.addEventListener("input", function () {
-      handleNoteDurationChange();
-    });
+    const noteDurationChangeHandler = (lengthSlider: HTMLInputElement, noteIndex: number) => {
+      return () => handleNoteDurationChange(lengthSlider, noteIndex);
+    };
+    lengthSlider.addEventListener("input", noteDurationChangeHandler(lengthSlider, i));
     var sliderValueDisplay = document.createElement("span");
     sliderValueDisplay.innerHTML = "1.0";
     sliderValueDisplay.id = `note-length-display-${trackIndex}-${i + 1}`;
@@ -371,3 +391,37 @@ const createNoteSelectRow = (
 };
 
 NoteSelectHandler.DEFAULT_NOTE_INPUT_COUNT = DEFAULT_NOTE_INPUT_COUNT;
+
+// const cloneTrack = (track: Track): Track => {
+//   return {
+//     envelope: cloneObject(track.envelope),
+//     mainValues: cloneObject(track.mainValues),
+//     oscillator: cloneObject(track.oscillator),
+//     vibratoValues: cloneObject(track.vibratoValues),
+//     currentNotes: cloneArray(track.currentNotes),
+//     isMuted: track.isMuted
+//   };
+// };
+
+const track2Preset = (track: Track): TrackPreset => {
+  return {
+    envelope: cloneObject(track.envelope),
+    mainValues: cloneObject(track.mainValues),
+    oscillator: cloneObject(track.oscillator),
+    vibratoValues: cloneObject(track.vibratoValues),
+    // currentNotes: cloneArray(track.currentNotes),
+    noteValues: track.currentNotes.map((noteConfig: NoteConfig) => {
+      const note = getNoteByIndex(noteConfig.noteIndex);
+      return { value: note ? note.identifier : "", lengthFactor: noteConfig.lengthFactor };
+    })
+    // isMuted: track.isMuted
+  };
+};
+
+const cloneArray = <T>(arr: Array<T>): Array<T> => {
+  return arr.map((elem: T) => elem);
+};
+
+// const cloneObject = <T>(onbj: T): T => {
+//   return Object.assign({}, onbj);
+// };

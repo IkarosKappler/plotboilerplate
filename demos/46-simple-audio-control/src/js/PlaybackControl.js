@@ -61,7 +61,8 @@ var PlaybackControl = /** @class */ (function () {
             if (_self.isPlaying) {
                 for (var curTrackIndex = 0; curTrackIndex < _self.noteSelectHandler.trackCount; curTrackIndex++) {
                     // console.log("Play note in track", curTrackIndex);
-                    if (_self.noteSelectHandler.isTrackMuted[curTrackIndex]) {
+                    // if (_self.noteSelectHandler.isTrackMuted[curTrackIndex]) {
+                    if (_self.noteSelectHandler.tracks[curTrackIndex].isMuted) {
                         // Don't play muted tracks.
                         continue;
                     }

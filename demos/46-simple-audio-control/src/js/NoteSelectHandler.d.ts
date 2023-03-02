@@ -7,11 +7,10 @@
  * @modified 2023-02-04 Ported to Typescript.
  * @version  1.0.1
  */
-import { Track, TrackPreset } from "./interfaces";
+import { NotesIOFormat, Track, TrackPreset } from "./interfaces";
 export declare class NoteSelectHandler {
     tracks: Array<Track>;
     trackCount: number;
-    isTrackMuted: Array<boolean>;
     selectedTrackIndex: number;
     noteInputCount: number;
     private _onTrackSelected;
@@ -19,6 +18,13 @@ export declare class NoteSelectHandler {
     private _noteLengthSliders;
     static DEFAULT_NOTE_INPUT_COUNT: number;
     constructor(initialPreset: TrackPreset, trackCount: number, onTrackSelected: (selectedTrack: Track, selectedTrackIndex: number) => void);
+    getNotesIOFormat(): NotesIOFormat;
+    /**
+     * Create/Recreate the whole note selector table DOM.
+     *
+     * @param {TrackPreset} preset
+     * @param {number} noteInputCount
+     */
     private _createNoteSelectsDOM;
     setTrackCount(preset: TrackPreset, newTrackCount: number, newNoteInputCount: number): void;
     setCurrentNotesFromPreset(preset: TrackPreset): void;
@@ -26,7 +32,13 @@ export declare class NoteSelectHandler {
     setNoteSelects(): void;
     setCurrentNotes(): void;
     setCurrentNoteLengthInputs(): void;
+    /**
+     * Update all displays for note length.
+     */
     setCurrentNoteFreuqencyDisplays(): void;
+    /**
+     * Set the stored note length from the settings in the note sliders.
+     */
     setCurrentNoteLengths(): void;
     setPlayingNoteDisplay(playingNoteIndex: number): void;
     setNoteLengthDisplay(trackIndex: number, noteIndex: number): void;

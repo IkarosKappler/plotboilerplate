@@ -8,7 +8,7 @@
 import { NoteSelectHandler } from "./NoteSelectHandler";
 import { EnvelopeHandler } from "./EnvelopeHandler";
 import { getDefaultPreset } from "./presets";
-import { Waveform } from "./interfaces";
+import { AudioIOFormat, Waveform } from "./interfaces";
 import { MainControls } from "./MainControls";
 import { PresetSelector } from "./PresetSelector";
 import { PlaybackControl } from "./PlaybackControl";
@@ -223,4 +223,13 @@ export class AudioControl {
     feedbackControl.addEventListener("input", handleFeedbackChanged);
     handleFeedbackChanged();
   } // END constructor
+
+  getIOFormat(): AudioIOFormat {
+    return {
+      version: "0.0.1",
+      notes: this.noteSelectHandler.getNotesIOFormat()
+      // TODO ...
+      // delay?
+    };
+  }
 }

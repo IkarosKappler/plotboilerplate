@@ -21,7 +21,7 @@ var PresetSelector = /** @class */ (function () {
         var select = document.createElement("select");
         // select.id = `note ${i + 1}`;
         // select.setAttribute("data-index", i);
-        // select.classList.add("note-select");
+        select.classList.add("preset-select");
         select.value = selectedKey;
         for (var j = 0; j < keys.length; j++) {
             var option = document.createElement("option");

@@ -34,6 +34,7 @@
     <script src="../../src/cjs/utils/gup.js"></script>
     <script src="../../src/cjs/utils/datastructures/Color.js"></script>
     <script src="../../src/cjs/utils/algorithms/arrayShuffle.js"></script>
+    <script src="../../src/cjs/utils/io/FileDrop.js"></script>
 
     <!-- For development -->
     <script src="../../src/cjs/UIDGenerator.js"></script>
@@ -183,7 +184,14 @@
         </div>
       </div>
       Presets<br>
-      <div id="presets-container"></div>
+      <div id="io-container">
+        <div id="presets-container"></div>
+        <div>
+          <button id="button-export">Export</button>
+          <button id="button-import">Import</button>
+          <input type="file" id="file-input-hidden" />
+        </div>
+      </div>
     </div>
     
   </body>

@@ -110,4 +110,4 @@ export declare const noteValues: {
     B8: number;
 };
 export declare const locateNoteByIdentifier: (name: string) => number;
-export declare const getNoteByIndex: (index: number) => Note;
+export declare const getNoteByIndex: (index: number) => Note | null;

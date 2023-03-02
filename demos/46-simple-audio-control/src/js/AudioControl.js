@@ -196,6 +196,14 @@ var AudioControl = /** @class */ (function () {
         feedbackControl.addEventListener("input", handleFeedbackChanged);
         handleFeedbackChanged();
     } // END constructor
+    AudioControl.prototype.getIOFormat = function () {
+        return {
+            version: "0.0.1",
+            notes: this.noteSelectHandler.getNotesIOFormat()
+            // TODO ...
+            // delay?
+        };
+    };
     return AudioControl;
 }());
 exports.AudioControl = AudioControl;
