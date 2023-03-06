@@ -13,5 +13,6 @@ export declare class AudioControl {
     private setNoteInputCount;
     getIOFormat: () => AudioIOFormat;
     setFromIO: (audioData: AudioIOFormat) => void;
+    delay: DelayNode;
     constructor(GUP: Record<string, string>, isDarkmode: boolean);
 }

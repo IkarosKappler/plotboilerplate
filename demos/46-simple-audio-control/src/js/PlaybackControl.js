@@ -18,13 +18,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PlaybackControl = void 0;
 var noteValues_1 = require("./noteValues");
 var PlaybackControl = /** @class */ (function () {
-    function PlaybackControl(_mainControls, _noteSelectHandler) {
+    function PlaybackControl(audioControl, _mainControls, _noteSelectHandler) {
         this.currentNoteIndex = 0;
         this.isPlaying = false;
         this.mainControls = _mainControls;
         this.noteSelectHandler = _noteSelectHandler;
         var _self = this;
-        var delay = this.mainControls.context.createDelay();
+        // const delay = this.mainControls.context.createDelay();
         var singleLoopControl = document.querySelector("#single-loop-only");
         // LOOP CONTROLS
         var resetButton = document.querySelector("#reset-button");
@@ -125,16 +125,6 @@ var PlaybackControl = /** @class */ (function () {
                 // Just play a constant frequency-
                 lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed, 0);
             }
-            // This changes the tremo frequency over time :)
-            // Todo: re-enable
-            /*
-            const tuneLength = curTrack.envelope.noteLength * noteLengthFactor;
-            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 4, 0);
-            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 2, tuneLength / 4);
-            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 1, (tuneLength / 4) * 2);
-            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 2, (tuneLength / 4) * 3);
-            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 4, tuneLength);
-            */
             lfo.start(0);
             // lfo.stop(context.currentTime + this.envelopeHandler.envelope.noteLength);
             lfo.stop(_self.mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
@@ -146,7 +136,8 @@ var PlaybackControl = /** @class */ (function () {
             osc.stop(_self.mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
             osc.connect(noteGain);
             noteGain.connect(_self.mainControls.masterVolume);
-            noteGain.connect(delay);
+            // noteGain.connect(delay);
+            noteGain.connect(audioControl.delay);
         }
         // ### END SYNTH
     } // END constructor

@@ -17,6 +17,7 @@
 import { NoteSelectHandler } from "./NoteSelectHandler";
 import { MainControls } from "./MainControls";
 import { noteValues } from "./noteValues";
+import { AudioControl } from "./AudioControl";
 
 export class PlaybackControl {
   private mainControls: MainControls;
@@ -25,13 +26,13 @@ export class PlaybackControl {
   private currentNoteIndex: number = 0;
   private isPlaying: boolean = false;
 
-  constructor(_mainControls: MainControls, _noteSelectHandler: NoteSelectHandler) {
+  constructor(audioControl: AudioControl, _mainControls: MainControls, _noteSelectHandler: NoteSelectHandler) {
     this.mainControls = _mainControls;
     this.noteSelectHandler = _noteSelectHandler;
 
     const _self = this;
 
-    const delay = this.mainControls.context.createDelay();
+    // const delay = this.mainControls.context.createDelay();
 
     const singleLoopControl = document.querySelector("#single-loop-only") as HTMLInputElement;
 
@@ -150,16 +151,6 @@ export class PlaybackControl {
         // Just play a constant frequency-
         lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed, 0);
       }
-      // This changes the tremo frequency over time :)
-      // Todo: re-enable
-      /* 
-      const tuneLength = curTrack.envelope.noteLength * noteLengthFactor;
-      lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 4, 0);
-      lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 2, tuneLength / 4);
-      lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 1, (tuneLength / 4) * 2);
-      lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 2, (tuneLength / 4) * 3);
-      lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 4, tuneLength);
-      */
 
       lfo.start(0);
       // lfo.stop(context.currentTime + this.envelopeHandler.envelope.noteLength);
@@ -175,7 +166,8 @@ export class PlaybackControl {
       osc.connect(noteGain);
 
       noteGain.connect(_self.mainControls.masterVolume);
-      noteGain.connect(delay);
+      // noteGain.connect(delay);
+      noteGain.connect(audioControl.delay);
     }
     // ### END SYNTH
   } // END constructor

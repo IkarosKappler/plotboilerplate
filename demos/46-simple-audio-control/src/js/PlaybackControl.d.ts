@@ -15,11 +15,12 @@
  **/
 import { NoteSelectHandler } from "./NoteSelectHandler";
 import { MainControls } from "./MainControls";
+import { AudioControl } from "./AudioControl";
 export declare class PlaybackControl {
     private mainControls;
     private noteSelectHandler;
     private currentNoteIndex;
     private isPlaying;
-    constructor(_mainControls: MainControls, _noteSelectHandler: NoteSelectHandler);
+    constructor(audioControl: AudioControl, _mainControls: MainControls, _noteSelectHandler: NoteSelectHandler);
     resetLoop(): void;
 }

@@ -20,6 +20,7 @@ export class AudioControl {
   private setNoteInputCount: (newNoteInputCount: number) => void;
   getIOFormat: () => AudioIOFormat;
   setFromIO: (audioData: AudioIOFormat) => void;
+  delay: DelayNode;
 
   constructor(GUP: Record<string, string>, isDarkmode: boolean) {
     const _self = this;
@@ -102,7 +103,7 @@ export class AudioControl {
     this.envelopeHandler.setValues(initialPreset.envelope);
     setOscillatorValues(initialPreset.oscillator);
 
-    const playbackControl = new PlaybackControl(mainControls, this.noteSelectHandler);
+    const playbackControl = new PlaybackControl(this, mainControls, this.noteSelectHandler);
 
     // TODO: convert to class method!
     this.setTrackCount = (newTrackCount: number) => {
@@ -224,42 +225,27 @@ export class AudioControl {
     };
     // ---END--- VIBRATO FRERQUENCY-MODULATOR SELECT
 
-    // var handleVibratoFrequencyModulationChange = function () {
-    //   var vibratoAmount = Number(vibratoFrequencyModulationControl.value);
-    //   console.log("handleVibratoFrquencyModulationChange", vibratoFrequencyModulationControl.value);
-    //   _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex].vibratoValues.amount = vibratoAmount;
-    //   // const vibratoAmountDisplay = document.querySelector("#display-vibrato-frequency-modulation-control") as HTMLElement;
-    //   // vibratoAmountDisplay.innerHTML = `${vibratoAmount}`;
-    // };
-    // vibratoFrequencyModulationControl.addEventListener("input", handleVibratoFrequencyModulationChange);
-    // handleVibratoFrequencyModulationChange();
-    // var setVibratoFrequencyModulation = function (method) {
-    //   vibratoFrequencyModulationControl.value = method;
-    //   handleVibratoFrequencyModulationChange();
-    // };
-
     // Delay
     const delayAmountControl = document.querySelector("#delay-amount-control") as HTMLInputElement;
     const delayTimeControl = document.querySelector("#delay-time-control") as HTMLInputElement;
     const feedbackControl = document.querySelector("#feedback-control") as HTMLInputElement;
-    const delay = mainControls.context.createDelay();
+    // const delay = mainControls.context.createDelay();
+    _self.delay = mainControls.context.createDelay();
     const feedback = mainControls.context.createGain();
     const delayAmountGain = mainControls.context.createGain();
 
-    delayAmountGain.connect(delay);
-    delay.connect(feedback);
-    feedback.connect(delay);
-    delay.connect(mainControls.masterVolume);
+    delayAmountGain.connect(_self.delay);
+    _self.delay.connect(feedback);
+    feedback.connect(_self.delay);
+    _self.delay.connect(mainControls.masterVolume);
 
-    delay.delayTime.value = 0;
+    _self.delay.delayTime.value = 0;
     delayAmountGain.gain.value = 0;
     feedback.gain.value = 0;
 
     var handleDelayAmountChange = function () {
-      // delayAmountGain.value = delayAmountControl.value;
-      // CHECK: I CHANGED THIS
       delayAmountGain.gain.value = Number(delayAmountControl.value);
-      // this.noteSelectHandler.tracks[this.noteSelectHandler.selectedTrackIndex].delayValues.amount = delayAmountControl.value; // delayAmountGain.value;
+      console.log("delayAmountGain.gain.value", delayAmountGain.gain.value);
       const delayAmountControlDisplay = document.querySelector("#display-delay-amount-control") as HTMLElement;
       delayAmountControlDisplay.innerHTML = delayAmountControl.value; // delayAmountControl.value;
     };
@@ -267,7 +253,7 @@ export class AudioControl {
     handleDelayAmountChange();
 
     var handleDelayTimeChange = function () {
-      delay.delayTime.value = Number(delayTimeControl.value);
+      _self.delay.delayTime.value = Number(delayTimeControl.value);
       const delayTimeDisplay = document.querySelector("#display-delay-time-control") as HTMLElement;
       delayTimeDisplay.innerHTML = delayTimeControl.value;
     };
@@ -288,9 +274,9 @@ export class AudioControl {
         globalSettings: {
           mainSettings: mainControls.values,
           delaySettings: {
-            time: 0,
-            feedback: 0,
-            amount: 0
+            time: _self.delay.delayTime.value, // 0,
+            feedback: feedback.gain.value, // 0,
+            amount: delayAmountGain.gain.value // 0
           }
         },
         notes: this.noteSelectHandler.getNotesIOFormat()
@@ -313,16 +299,7 @@ export class AudioControl {
         console.warn("[AudioControl] Cannot load notes (no data given)");
       } else {
         setTracks(audioData.notes);
-        // updateFrequencyModulationDisplay();
-        // setTrackCountDisplay();
       }
-
-      // if (!audioData. || !audioData.notes) {
-      //   console.warn("[AudioControl] Cannot load notes (no data given)");
-      // } else {
-      //   setTracks(audioData.notes);
-      //   // setTrackCountDisplay();
-      // }
     };
   } // END constructor
 }
