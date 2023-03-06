@@ -108,6 +108,11 @@ h1, h2, h3 {
     outline: 2px solid #f00;
     background-color: var(--select-border-color);
 }
+
+.vibrato-modulation-pick input[type=radio]:checked + label img {
+    outline: 2px solid var(--select-border-color);
+    background-color: rgb(0, 102, 255);
+}
 /* --- END --- Waveform radio with images only */
 
 @media only screen and (min-width: 769px) {
@@ -319,6 +324,10 @@ input[type="radio"].isactive-radio:checked + label {
     height: 16px;
     padding: 0 0 0 0px;
     background-size: contain;
+}
+
+label.label-track-config-radio {
+    cursor: pointer;
 }
 
 /* Highlight the complete track that's currently selected */

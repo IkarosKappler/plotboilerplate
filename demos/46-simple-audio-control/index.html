@@ -172,6 +172,17 @@
           <input type="range" id="vibrato-amount-control" value="0" min="0" max="5" step="0.5"><br>
           <label for="vibrato-speed-control">Vibrato Speed</label> (<span id="display-vibrato-speed-control" class="value-display">-</span>)<br>
           <input type="range" id="vibrato-speed-control" value="10" min="0" max="30" step="0.5"><br>
+          <div class="flex-row flex-row-wrap">
+            <div class="waveform-pick vibrato-modulation-pick">
+              <input type="radio" id="full-linear-modulation" name="vibrato-frequency-modulation" value="full-linear"
+            checked>
+              <label for="full-linear-modulation"><img src="icons/freq_modulator_full.svg" title="Full range" /></label><br>
+            </div>
+            <div class="waveform-pick vibrato-modulation-pick">
+              <input type="radio" id="gaussian-modulation" name="vibrato-frequency-modulation" value="gaussian">
+              <label for="gaussian-modulation"><img src="icons/freq_modulator_gauss.svg" title="Under Gaussian Curve" /></label><br>
+            </div>
+          </div>
         </div>
         <div id="delay-options" class="d-block w-sm-50 w-md-33 w-lg-33">
           <h2>Delay (<span title="Global setting">G</span>)</h2>

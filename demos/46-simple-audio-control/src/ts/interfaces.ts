@@ -29,12 +29,14 @@ export interface MainSettings {
   masterVolume: number;
 }
 
+export type FrquencyModulation = "full-linear" | "gaussian";
+
 export interface TrackPreset {
   envelope: EnvelopeSettings;
   mainValues: MainSettings;
   oscillator: { waveform: Waveform };
   noteValues: Array<{ value: string; lengthFactor: number }>;
-  vibratoValues: { amount: number; speed: number };
+  vibratoValues: { amount: number; speed: number; modulation: FrquencyModulation };
   // delayValues: { amount: number; time: number; feedback: number };
 }
 

@@ -368,6 +368,7 @@ const createNoteSelectRow = (
   });
   var activeRadioboxLabel = document.createElement("label");
   activeRadioboxLabel.setAttribute("for", `isactive-radio-${trackIndex}`);
+  activeRadioboxLabel.classList.add("label-track-config-radio");
   labelCellDiv.appendChild(activeRadiobox);
   labelCellDiv.appendChild(activeRadioboxLabel);
   labelCell.classList.add("align-center");
@@ -438,24 +439,12 @@ const createNoteSelectRow = (
 
 NoteSelectHandler.DEFAULT_NOTE_INPUT_COUNT = DEFAULT_NOTE_INPUT_COUNT;
 
-// const cloneTrack = (track: Track): Track => {
-//   return {
-//     envelope: cloneObject(track.envelope),
-//     mainValues: cloneObject(track.mainValues),
-//     oscillator: cloneObject(track.oscillator),
-//     vibratoValues: cloneObject(track.vibratoValues),
-//     currentNotes: cloneArray(track.currentNotes),
-//     isMuted: track.isMuted
-//   };
-// };
-
 const track2Preset = (track: Track): TrackPreset => {
   return {
     envelope: cloneObject(track.envelope),
     mainValues: cloneObject(track.mainValues),
     oscillator: cloneObject(track.oscillator),
     vibratoValues: cloneObject(track.vibratoValues),
-    // currentNotes: cloneArray(track.currentNotes),
     noteValues: track.currentNotes.map((noteConfig: NoteConfig) => {
       const note = getNoteByIndex(noteConfig.noteIndex);
       return { value: note ? note.identifier : "", lengthFactor: noteConfig.lengthFactor };
@@ -464,10 +453,6 @@ const track2Preset = (track: Track): TrackPreset => {
   };
 };
 
-const cloneArray = <T>(arr: Array<T>): Array<T> => {
-  return arr.map((elem: T) => elem);
-};
-
-// const cloneObject = <T>(onbj: T): T => {
-//   return Object.assign({}, onbj);
+// const cloneArray = <T>(arr: Array<T>): Array<T> => {
+//   return arr.map((elem: T) => elem);
 // };

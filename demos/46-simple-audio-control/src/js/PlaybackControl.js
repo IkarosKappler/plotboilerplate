@@ -109,19 +109,38 @@ var PlaybackControl = /** @class */ (function () {
                 (curTrack.envelope.noteLength - curTrack.envelope.noteLength * curTrack.envelope.releaseTime) * noteLengthFactor);
             noteGain.gain.linearRampToValueAtTime(0, _self.mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
             var lfoGain = _self.mainControls.context.createGain();
-            // lfoGain.gain.setValueAtTime(vibratoAmount, 0);
             lfoGain.gain.setValueAtTime(curTrack.vibratoValues.amount, 0);
             lfoGain.connect(osc.frequency);
             var lfo = _self.mainControls.context.createOscillator();
-            // lfo.frequency.setValueAtTime(vibratoSpeed, 0);
-            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed, 0);
+            if (curTrack.vibratoValues.modulation === "gaussian") {
+                // This changes the tremo frequency over time :)
+                var tuneLength = curTrack.envelope.noteLength * noteLengthFactor;
+                lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 4, 0);
+                lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 2, tuneLength / 4);
+                lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 1, (tuneLength / 4) * 2);
+                lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 2, (tuneLength / 4) * 3);
+                lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 4, tuneLength);
+            }
+            else {
+                // Just play a constant frequency-
+                lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed, 0);
+            }
+            // This changes the tremo frequency over time :)
+            // Todo: re-enable
+            /*
+            const tuneLength = curTrack.envelope.noteLength * noteLengthFactor;
+            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 4, 0);
+            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 2, tuneLength / 4);
+            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 1, (tuneLength / 4) * 2);
+            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 2, (tuneLength / 4) * 3);
+            lfo.frequency.setValueAtTime(curTrack.vibratoValues.speed / 4, tuneLength);
+            */
             lfo.start(0);
             // lfo.stop(context.currentTime + this.envelopeHandler.envelope.noteLength);
             lfo.stop(_self.mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);
             lfo.connect(lfoGain);
-            // osc.type = waveform;
             osc.type = curTrack.oscillator.waveform;
-            console.log("curNote", curNote);
+            // console.log("curNote", curNote);
             osc.frequency.setValueAtTime(Object.values(noteValues_1.noteValues)["" + curNote.noteIndex], 0);
             osc.start(0);
             osc.stop(_self.mainControls.context.currentTime + curTrack.envelope.noteLength * noteLengthFactor);

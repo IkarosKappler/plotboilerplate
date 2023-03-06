@@ -317,6 +317,7 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, noteInputCount
     });
     var activeRadioboxLabel = document.createElement("label");
     activeRadioboxLabel.setAttribute("for", "isactive-radio-" + trackIndex);
+    activeRadioboxLabel.classList.add("label-track-config-radio");
     labelCellDiv.appendChild(activeRadiobox);
     labelCellDiv.appendChild(activeRadioboxLabel);
     labelCell.classList.add("align-center");
@@ -382,23 +383,12 @@ var createNoteSelectRow = function (noteSelectsTable, trackIndex, noteInputCount
     noteTableRow.appendChild(labelCell);
 };
 NoteSelectHandler.DEFAULT_NOTE_INPUT_COUNT = DEFAULT_NOTE_INPUT_COUNT;
-// const cloneTrack = (track: Track): Track => {
-//   return {
-//     envelope: cloneObject(track.envelope),
-//     mainValues: cloneObject(track.mainValues),
-//     oscillator: cloneObject(track.oscillator),
-//     vibratoValues: cloneObject(track.vibratoValues),
-//     currentNotes: cloneArray(track.currentNotes),
-//     isMuted: track.isMuted
-//   };
-// };
 var track2Preset = function (track) {
     return {
         envelope: cloneObject_1.cloneObject(track.envelope),
         mainValues: cloneObject_1.cloneObject(track.mainValues),
         oscillator: cloneObject_1.cloneObject(track.oscillator),
         vibratoValues: cloneObject_1.cloneObject(track.vibratoValues),
-        // currentNotes: cloneArray(track.currentNotes),
         noteValues: track.currentNotes.map(function (noteConfig) {
             var note = noteValues_1.getNoteByIndex(noteConfig.noteIndex);
             return { value: note ? note.identifier : "", lengthFactor: noteConfig.lengthFactor };
@@ -406,10 +396,7 @@ var track2Preset = function (track) {
         // isMuted: track.isMuted
     };
 };
-var cloneArray = function (arr) {
-    return arr.map(function (elem) { return elem; });
-};
-// const cloneObject = <T>(onbj: T): T => {
-//   return Object.assign({}, onbj);
+// const cloneArray = <T>(arr: Array<T>): Array<T> => {
+//   return arr.map((elem: T) => elem);
 // };
 //# sourceMappingURL=NoteSelectHandler.js.map

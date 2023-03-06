@@ -22,6 +22,7 @@ export interface MainSettings {
     tempo: number;
     masterVolume: number;
 }
+export declare type FrquencyModulation = "full-linear" | "gaussian";
 export interface TrackPreset {
     envelope: EnvelopeSettings;
     mainValues: MainSettings;
@@ -35,6 +36,7 @@ export interface TrackPreset {
     vibratoValues: {
         amount: number;
         speed: number;
+        modulation: FrquencyModulation;
     };
 }
 export interface Track extends Pick<TrackPreset, "envelope" | "mainValues" | "oscillator" | "vibratoValues"> {

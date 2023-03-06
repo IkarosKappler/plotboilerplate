@@ -37,15 +37,16 @@ var AudioControl = /** @class */ (function () {
             console.log("track selected", selectedTrackIndex);
             // Track selected
             _self.envelopeHandler.setValues(selectedTrack.envelope);
-            setVibratoAmount(selectedTrack.vibratoValues.amount);
+            setVibratoFrequencyModulation(selectedTrack.vibratoValues.amount);
             setVibratoSpeed(selectedTrack.vibratoValues.speed);
+            setVibratoFrequencyModulation(selectedTrack.vibratoValues.modulation);
             setOscillatorValues(selectedTrack.oscillator);
         };
         // NOTE SELECTS
         var initialPreset = presets_1.getDefaultPreset();
         var currentPreset = initialPreset;
         this.noteSelectHandler = new NoteSelectHandler_1.NoteSelectHandler(initialPreset, 2, handleTrackSelected);
-        // WAVEFORM SELECT
+        // ---BEGIN--- WAVEFORM SELECT
         var waveforms = document.getElementsByName("waveform");
         function handleWaveformChange() {
             console.log(
@@ -71,6 +72,7 @@ var AudioControl = /** @class */ (function () {
                 waveforms[i].checked = Boolean(waveforms[i].value === selectedTrack.oscillator.waveform);
             }
         };
+        // ---END--- WAVEFORM SELECT
         var setOscillatorValues = function (options) {
             if (options && typeof options.waveform !== "undefined") {
                 // waveform = options.waveform;
@@ -98,6 +100,7 @@ var AudioControl = /** @class */ (function () {
         var setTracks = function (noteValues) {
             _this.noteSelectHandler.setTracks(noteValues);
             setTrackCountDisplay();
+            updateFrequencyModulationDisplay();
         };
         var setTrackCountDisplay = function () {
             var trackCountDisplay = document.querySelector("#display-track-count");
@@ -136,6 +139,7 @@ var AudioControl = /** @class */ (function () {
         // let vibratoAmount = 0;
         var vibratoAmountControl = document.querySelector("#vibrato-amount-control");
         var vibratoSpeedControl = document.querySelector("#vibrato-speed-control");
+        // const vibratoFrequencyModulationControl = document.querySelector("#vibrato-frequency-modulation") as HTMLInputElement;
         var handleVibratoAmountChange = function () {
             var vibratoAmount = Number(vibratoAmountControl.value);
             console.log("handleVibratoAmountChange", vibratoAmountControl.value);
@@ -145,7 +149,8 @@ var AudioControl = /** @class */ (function () {
         };
         vibratoAmountControl.addEventListener("input", handleVibratoAmountChange);
         handleVibratoAmountChange();
-        var setVibratoAmount = function (amnt) {
+        var setVibratoFrequencyModulation = function (amnt) {
+            console.log("");
             vibratoAmountControl.value = amnt;
             handleVibratoAmountChange();
         };
@@ -153,7 +158,7 @@ var AudioControl = /** @class */ (function () {
             var vibratoSpeed = Number(vibratoSpeedControl.value);
             _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex].vibratoValues.speed = vibratoSpeed;
             var vibratoSpeedDisplay = document.querySelector("#display-vibrato-speed-control");
-            vibratoSpeedDisplay.innerHTML = "" + vibratoSpeed;
+            vibratoSpeedDisplay.innerHTML = vibratoSpeed + " Hz";
         };
         vibratoSpeedControl.addEventListener("input", handleVibratoSpeedChange);
         handleVibratoSpeedChange();
@@ -161,6 +166,46 @@ var AudioControl = /** @class */ (function () {
             vibratoSpeedControl.value = spd;
             handleVibratoSpeedChange();
         };
+        // ---BEGIN--- VIBRATO FRQUENCY-MODULATOR SELECT
+        var freuquencyModulatorMethods = document.getElementsByName("vibrato-frequency-modulation");
+        var handleFrequencyModulationChange = function () {
+            console.log(
+            // "this.noteSelectHandler.selectedTrackIndex",
+            // this.noteSelectHandler.selectedTrackIndex,
+            "freuquencyModulatorMethods.length", freuquencyModulatorMethods.length);
+            for (var i = 0; i < freuquencyModulatorMethods.length; i++) {
+                if (freuquencyModulatorMethods[i].checked) {
+                    _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex].vibratoValues.modulation =
+                        freuquencyModulatorMethods[i].value;
+                }
+            }
+            // console.log("waveform", waveform);
+        };
+        freuquencyModulatorMethods.forEach(function (freuquencyModulatorMethodInput) {
+            freuquencyModulatorMethodInput.addEventListener("change", function () {
+                handleFrequencyModulationChange();
+            });
+        });
+        var updateFrequencyModulationDisplay = function () {
+            var selectedTrack = _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex];
+            for (var i = 0; i < freuquencyModulatorMethods.length; i++) {
+                freuquencyModulatorMethods[i].checked = Boolean(freuquencyModulatorMethods[i].value === selectedTrack.vibratoValues.modulation);
+            }
+        };
+        // ---END--- VIBRATO FRERQUENCY-MODULATOR SELECT
+        // var handleVibratoFrequencyModulationChange = function () {
+        //   var vibratoAmount = Number(vibratoFrequencyModulationControl.value);
+        //   console.log("handleVibratoFrquencyModulationChange", vibratoFrequencyModulationControl.value);
+        //   _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex].vibratoValues.amount = vibratoAmount;
+        //   // const vibratoAmountDisplay = document.querySelector("#display-vibrato-frequency-modulation-control") as HTMLElement;
+        //   // vibratoAmountDisplay.innerHTML = `${vibratoAmount}`;
+        // };
+        // vibratoFrequencyModulationControl.addEventListener("input", handleVibratoFrequencyModulationChange);
+        // handleVibratoFrequencyModulationChange();
+        // var setVibratoFrequencyModulation = function (method) {
+        //   vibratoFrequencyModulationControl.value = method;
+        //   handleVibratoFrequencyModulationChange();
+        // };
         // Delay
         var delayAmountControl = document.querySelector("#delay-amount-control");
         var delayTimeControl = document.querySelector("#delay-time-control");
@@ -229,6 +274,7 @@ var AudioControl = /** @class */ (function () {
             }
             else {
                 setTracks(audioData.notes);
+                // updateFrequencyModulationDisplay();
                 // setTrackCountDisplay();
             }
             // if (!audioData. || !audioData.notes) {

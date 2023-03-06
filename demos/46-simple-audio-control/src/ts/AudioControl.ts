@@ -8,7 +8,7 @@
 import { NoteSelectHandler } from "./NoteSelectHandler";
 import { EnvelopeHandler } from "./EnvelopeHandler";
 import { getDefaultPreset } from "./presets";
-import { AudioIOFormat, NotesIOFormat, Waveform } from "./interfaces";
+import { AudioIOFormat, FrquencyModulation, NotesIOFormat, Track, Waveform } from "./interfaces";
 import { MainControls } from "./MainControls";
 import { PresetSelector } from "./PresetSelector";
 import { PlaybackControl } from "./PlaybackControl";
@@ -41,12 +41,13 @@ export class AudioControl {
      * @param {Track} selectedTrack
      * @param {number} selectedTrackIndex
      */
-    var handleTrackSelected = function (selectedTrack, selectedTrackIndex) {
+    const handleTrackSelected = (selectedTrack: Track, selectedTrackIndex: number) => {
       console.log("track selected", selectedTrackIndex);
       // Track selected
       _self.envelopeHandler.setValues(selectedTrack.envelope);
-      setVibratoAmount(selectedTrack.vibratoValues.amount);
+      setVibratoFrequencyModulation(selectedTrack.vibratoValues.amount);
       setVibratoSpeed(selectedTrack.vibratoValues.speed);
+      setVibratoFrequencyModulation(selectedTrack.vibratoValues.modulation);
       setOscillatorValues(selectedTrack.oscillator);
     };
 
@@ -55,7 +56,7 @@ export class AudioControl {
     var currentPreset = initialPreset;
     this.noteSelectHandler = new NoteSelectHandler(initialPreset, 2, handleTrackSelected);
 
-    // WAVEFORM SELECT
+    // ---BEGIN--- WAVEFORM SELECT
     const waveforms = document.getElementsByName("waveform") as NodeListOf<HTMLInputElement>;
     function handleWaveformChange() {
       console.log(
@@ -85,6 +86,7 @@ export class AudioControl {
         waveforms[i].checked = Boolean(waveforms[i].value === selectedTrack.oscillator.waveform);
       }
     };
+    // ---END--- WAVEFORM SELECT
 
     var setOscillatorValues = function (options) {
       if (options && typeof options.waveform !== "undefined") {
@@ -116,6 +118,7 @@ export class AudioControl {
     const setTracks = (noteValues: NotesIOFormat) => {
       this.noteSelectHandler.setTracks(noteValues);
       setTrackCountDisplay();
+      updateFrequencyModulationDisplay();
     };
     const setTrackCountDisplay = () => {
       const trackCountDisplay = document.querySelector("#display-track-count") as HTMLElement;
@@ -157,6 +160,7 @@ export class AudioControl {
     // let vibratoAmount = 0;
     const vibratoAmountControl = document.querySelector("#vibrato-amount-control") as HTMLInputElement;
     const vibratoSpeedControl = document.querySelector("#vibrato-speed-control") as HTMLInputElement;
+    // const vibratoFrequencyModulationControl = document.querySelector("#vibrato-frequency-modulation") as HTMLInputElement;
 
     var handleVibratoAmountChange = function () {
       var vibratoAmount = Number(vibratoAmountControl.value);
@@ -167,7 +171,8 @@ export class AudioControl {
     };
     vibratoAmountControl.addEventListener("input", handleVibratoAmountChange);
     handleVibratoAmountChange();
-    var setVibratoAmount = function (amnt) {
+    var setVibratoFrequencyModulation = function (amnt) {
+      console.log("");
       vibratoAmountControl.value = amnt;
       handleVibratoAmountChange();
     };
@@ -176,7 +181,7 @@ export class AudioControl {
       var vibratoSpeed = Number(vibratoSpeedControl.value);
       _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex].vibratoValues.speed = vibratoSpeed;
       const vibratoSpeedDisplay = document.querySelector("#display-vibrato-speed-control") as HTMLElement;
-      vibratoSpeedDisplay.innerHTML = `${vibratoSpeed}`;
+      vibratoSpeedDisplay.innerHTML = `${vibratoSpeed} Hz`;
     };
     vibratoSpeedControl.addEventListener("input", handleVibratoSpeedChange);
     handleVibratoSpeedChange();
@@ -184,6 +189,54 @@ export class AudioControl {
       vibratoSpeedControl.value = spd;
       handleVibratoSpeedChange();
     };
+
+    // ---BEGIN--- VIBRATO FRQUENCY-MODULATOR SELECT
+    const freuquencyModulatorMethods = document.getElementsByName("vibrato-frequency-modulation") as NodeListOf<HTMLInputElement>;
+    const handleFrequencyModulationChange = () => {
+      console.log(
+        // "this.noteSelectHandler.selectedTrackIndex",
+        // this.noteSelectHandler.selectedTrackIndex,
+        "freuquencyModulatorMethods.length",
+        freuquencyModulatorMethods.length
+      );
+      for (var i = 0; i < freuquencyModulatorMethods.length; i++) {
+        if (freuquencyModulatorMethods[i].checked) {
+          _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex].vibratoValues.modulation =
+            freuquencyModulatorMethods[i].value as FrquencyModulation;
+        }
+      }
+      // console.log("waveform", waveform);
+    };
+
+    freuquencyModulatorMethods.forEach(freuquencyModulatorMethodInput => {
+      freuquencyModulatorMethodInput.addEventListener("change", function () {
+        handleFrequencyModulationChange();
+      });
+    });
+
+    var updateFrequencyModulationDisplay = function () {
+      var selectedTrack = _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex];
+      for (var i = 0; i < freuquencyModulatorMethods.length; i++) {
+        freuquencyModulatorMethods[i].checked = Boolean(
+          freuquencyModulatorMethods[i].value === selectedTrack.vibratoValues.modulation
+        );
+      }
+    };
+    // ---END--- VIBRATO FRERQUENCY-MODULATOR SELECT
+
+    // var handleVibratoFrequencyModulationChange = function () {
+    //   var vibratoAmount = Number(vibratoFrequencyModulationControl.value);
+    //   console.log("handleVibratoFrquencyModulationChange", vibratoFrequencyModulationControl.value);
+    //   _self.noteSelectHandler.tracks[_self.noteSelectHandler.selectedTrackIndex].vibratoValues.amount = vibratoAmount;
+    //   // const vibratoAmountDisplay = document.querySelector("#display-vibrato-frequency-modulation-control") as HTMLElement;
+    //   // vibratoAmountDisplay.innerHTML = `${vibratoAmount}`;
+    // };
+    // vibratoFrequencyModulationControl.addEventListener("input", handleVibratoFrequencyModulationChange);
+    // handleVibratoFrequencyModulationChange();
+    // var setVibratoFrequencyModulation = function (method) {
+    //   vibratoFrequencyModulationControl.value = method;
+    //   handleVibratoFrequencyModulationChange();
+    // };
 
     // Delay
     const delayAmountControl = document.querySelector("#delay-amount-control") as HTMLInputElement;
@@ -260,6 +313,7 @@ export class AudioControl {
         console.warn("[AudioControl] Cannot load notes (no data given)");
       } else {
         setTracks(audioData.notes);
+        // updateFrequencyModulationDisplay();
         // setTrackCountDisplay();
       }
 
