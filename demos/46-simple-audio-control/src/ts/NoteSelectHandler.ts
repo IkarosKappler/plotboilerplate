@@ -247,7 +247,7 @@ export class NoteSelectHandler {
   setCurrentNoteLengthInputs() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this.noteInputCount; i++) {
-        console.log("i", i, "trackIndex", trackIndex, this.tracks[trackIndex].currentNotes);
+        // console.log("i", i, "trackIndex", trackIndex, this.tracks[trackIndex].currentNotes);
         this._noteLengthSliders[trackIndex][i].value = String(this.tracks[trackIndex].currentNotes[i].lengthFactor);
         this.setNoteLengthDisplay(trackIndex, i);
       }
