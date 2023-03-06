@@ -11,6 +11,7 @@ export declare class AudioControl {
     private envelopeHandler;
     private setTrackCount;
     private setNoteInputCount;
+    getIOFormat: () => AudioIOFormat;
+    setFromIO: (audioData: AudioIOFormat) => void;
     constructor(GUP: Record<string, string>, isDarkmode: boolean);
-    getIOFormat(): AudioIOFormat;
 }

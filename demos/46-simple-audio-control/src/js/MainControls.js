@@ -51,10 +51,17 @@ var MainControls = /** @class */ (function () {
         if (options && typeof options.tempo !== "undefined") {
             this.values.tempo = options.tempo;
         }
+        else {
+            console.warn("[MainControls] Cannot set tempo from options (no tempo setting given).");
+        }
         if (options && typeof options.masterVolume !== "undefined") {
             this.values.masterVolume = options.masterVolume;
-            this.masterVolume.gain.value = 0.2;
+            this.masterVolume.gain.value = options.masterVolume; // 0.2;
         }
+        else {
+            console.warn("[MainControls] Cannot set volume from options (no volume setting given).");
+        }
+        console.log("options.masterVolume", options.masterVolume);
         this._updateDisplays();
     };
     return MainControls;

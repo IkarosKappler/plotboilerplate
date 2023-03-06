@@ -47,7 +47,16 @@ export interface NotesIOFormat {
     isTrackMuted: Array<boolean>;
     noteInputCount: number;
 }
+export interface DelayIOFormat {
+    amount: number;
+    time: number;
+    feedback: number;
+}
 export interface AudioIOFormat {
     version: string;
+    globalSettings: {
+        mainSettings: MainSettings;
+        delaySettings: DelayIOFormat;
+    };
     notes: NotesIOFormat;
 }

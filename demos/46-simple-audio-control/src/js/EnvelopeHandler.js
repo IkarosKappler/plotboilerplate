@@ -16,16 +16,23 @@ var cloneObject_1 = require("./cloneObject");
 // import { Bounds } from "../../../../src/ts/Bounds";
 var EnvelopeHandler = /** @class */ (function () {
     function EnvelopeHandler(canvasId, GUP, backgroundColor, onEnvelopeChanged) {
+        var _this = this;
         this._updateDisplay = function () {
             console.log("update");
             var attackControlDisplay = document.querySelector("#display-attack-control");
-            attackControlDisplay.innerHTML = this.envelope.attackTime;
+            attackControlDisplay.innerHTML = this.envelope.attackTime.toFixed(2);
             var releaseControlDisplay = document.querySelector("#display-release-control");
-            releaseControlDisplay.innerHTML = this.envelope.releaseTime;
+            releaseControlDisplay.innerHTML = this.envelope.releaseTime.toFixed(2);
             var noteLengthControlDisplay = document.querySelector("#display-note-length-control");
-            noteLengthControlDisplay.innerHTML = this.envelope.noteLength;
+            noteLengthControlDisplay.innerHTML = this.envelope.noteLength.toFixed(2);
+            if (this.envelope.attackTime + this.envelope.releaseTime > this.envelope.noteLength) {
+                noteLengthControlDisplay.classList.add("value-error");
+            }
+            else {
+                noteLengthControlDisplay.classList.remove("value-error");
+            }
             var sustainLevelControlDisplay = document.querySelector("#display-sustain-level-control");
-            sustainLevelControlDisplay.innerHTML = this.envelope.sustainLevel;
+            sustainLevelControlDisplay.innerHTML = this.envelope.sustainLevel.toFixed(2);
         };
         // }, mkPlotBoilerplate:(config)=>void) {
         this.envelope = {
@@ -56,11 +63,20 @@ var EnvelopeHandler = /** @class */ (function () {
         // {Bounds}
         this.viewport = this.pb.viewport();
         var baseVert = new Vertex(0, 0);
-        baseVert.attr.draggable = false;
         this.attackTimeVert = new Vertex();
         this.releaseTimeVert = new Vertex();
         this.noteLengthVert = new Vertex();
+        baseVert.attr.draggable = false;
         this.noteLengthVert.attr.draggable = false;
+        this.attackTimeVert.listeners.addDragListener(function () {
+            _this.attackTimeVert.y = -1.0 * _this.viewport.height;
+            _this._updateValuesFromVertices();
+            _this._updateDisplay();
+        });
+        this.releaseTimeVert.listeners.addDragListener(function () {
+            _this._updateValuesFromVertices();
+            _this._updateDisplay();
+        });
         var envelopePolygon = new Polygon([baseVert, this.attackTimeVert, this.releaseTimeVert, this.noteLengthVert], true);
         this.pb.add(envelopePolygon);
         this.pb.drawConfig.polygon.lineWidth = 4.0;
@@ -114,6 +130,11 @@ var EnvelopeHandler = /** @class */ (function () {
         //   noteLengthVert.set(this.envelope.noteLength * viewport.width, -0.5 * viewport.height);
         this.noteLengthVert.set(this.viewport.width, 0.0);
     };
+    EnvelopeHandler.prototype._updateValuesFromVertices = function () {
+        this.envelope.attackTime = (this.attackTimeVert.x / this.viewport.width) * this.envelope.noteLength;
+        this.envelope.releaseTime = ((this.viewport.width - this.releaseTimeVert.x) / this.viewport.width) * this.envelope.noteLength;
+        this.envelope.sustainLevel = (this.viewport.height - this.releaseTimeVert.y) / this.viewport.height - 1.0;
+    };
     /**
      * Set the values of the envelope
      * @param {number?} options.attackTime (optional)
@@ -127,18 +148,30 @@ var EnvelopeHandler = /** @class */ (function () {
             this.envelope.attackTime = options.attackTime;
             this._attackControl.value = "" + options.attackTime;
         }
+        else {
+            console.warn("[Envelope] Cannot set attackTime from options (no attackTime setting given).");
+        }
         if (options && typeof options.releaseTime !== "undefined") {
             this.envelope.releaseTime = options.releaseTime;
             this._releaseControl.value = "" + options.releaseTime;
+        }
+        else {
+            console.warn("[Envelope] Cannot set releaseTime from options (no releaseTime setting given).");
         }
         if (options && typeof options.noteLength !== "undefined") {
             //   console.log("Set note length");
             this.envelope.noteLength = options.noteLength;
             this._noteLengthControl.value = "" + options.noteLength;
         }
+        else {
+            console.warn("[Envelope] Cannot set noteLength from options (no noteLength setting given).");
+        }
         if (options && typeof options.sustainLevel !== "undefined") {
             this.envelope.sustainLevel = options.sustainLevel;
             this._sustainLevelControl.value = "" + options.sustainLevel;
+        }
+        else {
+            console.warn("[Envelope] Cannot set sustainLevel from options (no sustainLevel setting given).");
         }
         // Adjust vertices to new points
         this._updateVertices();

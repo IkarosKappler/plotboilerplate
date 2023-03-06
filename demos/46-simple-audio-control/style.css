@@ -78,6 +78,12 @@ h1, h2, h3 {
     text-shadow: 2px 2px 6px var(--value-color);
 }
 
+.value-display.value-error {
+    color:#f00;
+}
+.value-display.value-error::after {
+    content: " !";
+}
 .waveform-pick {
     display: flex;
     width: 50%;

@@ -179,5 +179,16 @@
       false,
       false
     ]
+  },
+  "globalSettings": {
+    "mainSettings": {
+      "tempo": 100,
+      "masterVolume": 0.2
+    },
+    "delaySettings": {
+      "time": 0,
+      "feedback": 0,
+      "amount": 0
+    }
   }
 }

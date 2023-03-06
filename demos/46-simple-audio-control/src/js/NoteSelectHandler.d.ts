@@ -29,6 +29,7 @@ export declare class NoteSelectHandler {
     setTrackCount(preset: TrackPreset, newTrackCount: number, newNoteInputCount: number): void;
     setCurrentNotesFromPreset(preset: TrackPreset): void;
     setFromPreset(preset: TrackPreset): void;
+    setTracks(noteValues: NotesIOFormat): void;
     setNoteSelects(): void;
     setCurrentNotes(): void;
     setCurrentNoteLengthInputs(): void;

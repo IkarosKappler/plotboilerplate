@@ -178,6 +178,52 @@ export class NoteSelectHandler {
     this.setCurrentNoteFreuqencyDisplays();
   }
 
+  // Note At least one track must be present
+  // Note: all presets must have same length
+  setTracks(noteValues: NotesIOFormat) {
+    if (noteValues.tracks.length === 0) {
+      console.log("[NoteSelectHandler] Cannot load tracks (not track data given).");
+      return;
+    }
+    this.tracks = [];
+    this.trackCount = noteValues.trackCount;
+    this.noteInputCount = noteValues.noteInputCount;
+    this.selectedTrackIndex = 0;
+    const selectedPreset = noteValues.tracks[this.selectedTrackIndex];
+    this._createNoteSelectsDOM(selectedPreset, this.noteInputCount);
+    for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
+      // Important: create clones here (we don't want to change the preset if
+      //   the track settings get changed)
+      const preset: TrackPreset = noteValues.tracks[trackIndex];
+      const trackIsMuted =
+        trackIndex >= 0 && trackIndex < noteValues.isTrackMuted.length ? noteValues.isTrackMuted[trackIndex] : false;
+      const track: Track = {
+        currentNotes: convertPresetToNotes(this.noteInputCount, preset.noteValues),
+        envelope: cloneObject(preset.envelope),
+        mainValues: cloneObject(preset.mainValues),
+        oscillator: cloneObject(preset.oscillator),
+        vibratoValues: cloneObject(preset.vibratoValues),
+        // delayValues: cloneObject(preset.delayValues)
+        isMuted: trackIsMuted //  false
+      };
+      // const track : Track = noteValues.tracks[trackIndex];
+      // track.envelope = { preset.envelope};
+      this.tracks.push(track);
+      // track.currentNotes = convertPresetToNotes(DEFAULT_NOTE_INPUT_COUNT, preset.noteValues);
+      // track.currentNotes = convertPresetToNotes(this.noteInputCount, preset.noteValues);
+      // if (trackIndex === 1) {
+      //   // For testing: transpose the first track one octave down
+      //   for (var i = 0; i < track.currentNotes.length; i++) {
+      //     track.currentNotes[i].noteIndex -= 12;
+      //   }
+      // }
+    }
+    this.setCurrentNoteLengthInputs();
+    this.setNoteSelects();
+    this.setCurrentNoteFreuqencyDisplays();
+    this._onTrackSelected(this.tracks[this.selectedTrackIndex], this.selectedTrackIndex);
+  }
+
   setNoteSelects() {
     for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
       for (let i = 0; i < this.tracks[trackIndex].currentNotes.length; i++) {

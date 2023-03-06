@@ -8,7 +8,7 @@
 import { NoteSelectHandler } from "./NoteSelectHandler";
 import { EnvelopeHandler } from "./EnvelopeHandler";
 import { getDefaultPreset } from "./presets";
-import { AudioIOFormat, Waveform } from "./interfaces";
+import { AudioIOFormat, NotesIOFormat, Waveform } from "./interfaces";
 import { MainControls } from "./MainControls";
 import { PresetSelector } from "./PresetSelector";
 import { PlaybackControl } from "./PlaybackControl";
@@ -18,6 +18,8 @@ export class AudioControl {
   private envelopeHandler: EnvelopeHandler;
   private setTrackCount: (newTrackCount: number) => void;
   private setNoteInputCount: (newNoteInputCount: number) => void;
+  getIOFormat: () => AudioIOFormat;
+  setFromIO: (audioData: AudioIOFormat) => void;
 
   constructor(GUP: Record<string, string>, isDarkmode: boolean) {
     const _self = this;
@@ -109,6 +111,10 @@ export class AudioControl {
         return;
       }
       this.noteSelectHandler.setTrackCount(currentPreset, newTrackCount, newNoteInputCount);
+      setTrackCountDisplay();
+    };
+    const setTracks = (noteValues: NotesIOFormat) => {
+      this.noteSelectHandler.setTracks(noteValues);
       setTrackCountDisplay();
     };
     const setTrackCountDisplay = () => {
@@ -222,14 +228,47 @@ export class AudioControl {
     };
     feedbackControl.addEventListener("input", handleFeedbackChanged);
     handleFeedbackChanged();
-  } // END constructor
 
-  getIOFormat(): AudioIOFormat {
-    return {
-      version: "0.0.1",
-      notes: this.noteSelectHandler.getNotesIOFormat()
-      // TODO ...
-      // delay?
+    this.getIOFormat = (): AudioIOFormat => {
+      return {
+        version: "0.0.1",
+        globalSettings: {
+          mainSettings: mainControls.values,
+          delaySettings: {
+            time: 0,
+            feedback: 0,
+            amount: 0
+          }
+        },
+        notes: this.noteSelectHandler.getNotesIOFormat()
+      };
     };
-  }
+
+    this.setFromIO = (audioData: AudioIOFormat) => {
+      if (!audioData) {
+        console.warn("[AudioControl] Cannot load settings (no data given)");
+        return;
+      }
+
+      if (!audioData.globalSettings || !audioData.globalSettings.mainSettings) {
+        console.warn("[AudioControl] Cannot apply main settings (no data given)");
+      } else {
+        mainControls.setValues(audioData.globalSettings.mainSettings);
+      }
+
+      if (!audioData.notes || !audioData.notes) {
+        console.warn("[AudioControl] Cannot load notes (no data given)");
+      } else {
+        setTracks(audioData.notes);
+        // setTrackCountDisplay();
+      }
+
+      // if (!audioData. || !audioData.notes) {
+      //   console.warn("[AudioControl] Cannot load notes (no data given)");
+      // } else {
+      //   setTracks(audioData.notes);
+      //   // setTrackCountDisplay();
+      // }
+    };
+  } // END constructor
 }

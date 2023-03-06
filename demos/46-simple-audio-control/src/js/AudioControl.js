@@ -95,6 +95,10 @@ var AudioControl = /** @class */ (function () {
             _this.noteSelectHandler.setTrackCount(currentPreset, newTrackCount, newNoteInputCount);
             setTrackCountDisplay();
         };
+        var setTracks = function (noteValues) {
+            _this.noteSelectHandler.setTracks(noteValues);
+            setTrackCountDisplay();
+        };
         var setTrackCountDisplay = function () {
             var trackCountDisplay = document.querySelector("#display-track-count");
             trackCountDisplay.innerHTML = "" + _this.noteSelectHandler.trackCount;
@@ -195,15 +199,46 @@ var AudioControl = /** @class */ (function () {
         };
         feedbackControl.addEventListener("input", handleFeedbackChanged);
         handleFeedbackChanged();
-    } // END constructor
-    AudioControl.prototype.getIOFormat = function () {
-        return {
-            version: "0.0.1",
-            notes: this.noteSelectHandler.getNotesIOFormat()
-            // TODO ...
-            // delay?
+        this.getIOFormat = function () {
+            return {
+                version: "0.0.1",
+                globalSettings: {
+                    mainSettings: mainControls.values,
+                    delaySettings: {
+                        time: 0,
+                        feedback: 0,
+                        amount: 0
+                    }
+                },
+                notes: _this.noteSelectHandler.getNotesIOFormat()
+            };
         };
-    };
+        this.setFromIO = function (audioData) {
+            if (!audioData) {
+                console.warn("[AudioControl] Cannot load settings (no data given)");
+                return;
+            }
+            if (!audioData.globalSettings || !audioData.globalSettings.mainSettings) {
+                console.warn("[AudioControl] Cannot apply main settings (no data given)");
+            }
+            else {
+                mainControls.setValues(audioData.globalSettings.mainSettings);
+            }
+            if (!audioData.notes || !audioData.notes) {
+                console.warn("[AudioControl] Cannot load notes (no data given)");
+            }
+            else {
+                setTracks(audioData.notes);
+                // setTrackCountDisplay();
+            }
+            // if (!audioData. || !audioData.notes) {
+            //   console.warn("[AudioControl] Cannot load notes (no data given)");
+            // } else {
+            //   setTracks(audioData.notes);
+            //   // setTrackCountDisplay();
+            // }
+        };
+    } // END constructor
     return AudioControl;
 }());
 exports.AudioControl = AudioControl;

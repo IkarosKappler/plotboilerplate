@@ -20,6 +20,7 @@ export declare class EnvelopeHandler {
     constructor(canvasId: string, GUP: Record<string, string>, backgroundColor: string, onEnvelopeChanged: (newEnvelope: EnvelopeSettings) => void);
     private _fireEnvelopeChanged;
     _updateVertices(): void;
+    _updateValuesFromVertices(): void;
     _updateDisplay: () => void;
     /**
      * Set the values of the envelope
