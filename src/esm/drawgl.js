@@ -10,7 +10,8 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  0.0.8
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  0.0.9
  **/
 import { Vertex } from "./Vertex";
 /**
@@ -29,7 +30,7 @@ export class drawutilsgl {
      *
      * @constructor
      * @name drawutils
-     * @param {WebGLRenderingContext} context - The drawing context.
+     * @param {WebGLRenderingContext|null} context - The drawing context.
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
     constructor(context, fillShapes) {
@@ -111,7 +112,7 @@ export class drawutilsgl {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).es.
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).es.
      **/
     setCurrentId(uid) {
         // NOOP
@@ -123,7 +124,7 @@ export class drawutilsgl {
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      **/
     setCurrentClassName(className) {
         // NOOP

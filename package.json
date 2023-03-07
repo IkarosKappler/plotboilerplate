@@ -16,6 +16,7 @@
     "build-module": "npm run compile-typescript-module && npm run rollup-module",
     "compile-typescript-browser": "tsc -p tsconfig.browser.json",
     "compile-typescript-module": "tsc -p tsconfig.module.json",
+    "compile-typescript-demo": "cd bin && ./run-compile-demo-ts.sh",
     "mkdocs": "cd bin && ./run-mk-typedocs.sh",
     "server": "npx http-server",
     "test": "echo \"Error: no test specified\" && exit 1",

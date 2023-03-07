@@ -78,7 +78,11 @@
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
- * @version  1.17.0
+ * @modified 2023-02-04 Fixed a bug in the `drawDrawable` function; fill's current classname was not set.
+ * @modified 2023-02-10 Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
+ * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
+ * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
+ * @version  1.17.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -314,6 +318,8 @@ export declare class PlotBoilerplate {
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle touch events for you.
      * @param {boolean=} [config.enableKeys=true] - Indicates if the application should handle key events for you.
      * @param {boolean=} [config.enableMouseWheel=true] - Indicates if the application should handle mouse wheel events for you.
+     * @param {boolean=} [config.enablePan=true] - (default true) Set to false if you want to disable panning completely.
+     * @param {boolean=} [config.enableZoom=true] - (default true) Set to false if you want to disable zooming completely.
      * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features (not recommended).
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true).
      *                                                   Note that changes from the postDraw hook might not be visible in the export.

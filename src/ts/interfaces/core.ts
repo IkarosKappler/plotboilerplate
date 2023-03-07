@@ -17,6 +17,7 @@
  * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
  * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
  * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
+ * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
  **/
 
 import { Vertex } from "../Vertex";
@@ -102,40 +103,40 @@ export interface CanvasWrapper {
  */
 export interface Config {
   canvas: HTMLCanvasElement | string; //  Your canvas element in the DOM (required).
-  fullSize?: boolean; // If set to true the canvas will gain full window size.
-  fitToParent?: boolean; // If set to true the canvas will gain the size of its parent container (overrides fullSize).
-  scaleX?: number; // The initial x-zoom. Default is 1.0.
-  scaleY?: number; // The initial y-zoom. Default is 1.0.
-  offsetX?: number; // The initial x-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
-  offsetY?: number; // The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
-  rasterGrid?: boolean; // If set to true the background grid will be drawn rastered.
-  drawRaster?: boolean; // If set to false, no raster or grid will be drawn at all.
-  rasterScaleX?: number; // Define the default horizontal raster scale (default=1.0).
-  rasterScaleY?: number; // Define the default vertical raster scale (default=1.0).
-  rasterAdjustFactor?: number; // The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
-  drawOrigin?: boolean; // Draw a crosshair at (0,0).
-  autoAdjustOffset?: boolean; //  When set to true then the origin of the XY plane will
+  fullSize: boolean; // If set to true the canvas will gain full window size.
+  fitToParent: boolean; // If set to true the canvas will gain the size of its parent container (overrides fullSize).
+  scaleX: number; // The initial x-zoom. Default is 1.0.
+  scaleY: number; // The initial y-zoom. Default is 1.0.
+  offsetX: number; // The initial x-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
+  offsetY: number; // The initial y-offset. Default is 0.0. Note that autoAdjustOffset=true overrides these values.
+  rasterGrid: boolean; // If set to true the background grid will be drawn rastered.
+  drawRaster: boolean; // If set to false, no raster or grid will be drawn at all.
+  rasterScaleX: number; // Define the default horizontal raster scale (default=1.0).
+  rasterScaleY: number; // Define the default vertical raster scale (default=1.0).
+  rasterAdjustFactor: number; // The exponential limit for wrapping down the grid. (2.0 means: halve the grid each 2.0*n zoom step).
+  drawOrigin: boolean; // Draw a crosshair at (0,0).
+  autoAdjustOffset: boolean; //  When set to true then the origin of the XY plane will
   // be re-adjusted automatically (see the params
   // offsetAdjust{X,Y}Percent for more).
-  offsetAdjustXPercent?: number; // The x-fallback position for the origin after
+  offsetAdjustXPercent: number; // The x-fallback position for the origin after
   // resizing the canvas.
-  offsetAdjustYPercent?: number; // The y-fallback position for the origin after
+  offsetAdjustYPercent: number; // The y-fallback position for the origin after
   // resizing the canvas.
-  defaultCanvasWidth?: number; //  The canvas size fallback (width) if no automatic resizing
+  defaultCanvasWidth: number; //  The canvas size fallback (width) if no automatic resizing
   // is switched on.
-  defaultCanvasHeight?: number; //  The canvas size fallback (height) if no automatic resizing
+  defaultCanvasHeight: number; //  The canvas size fallback (height) if no automatic resizing
   // is switched on.
-  canvasWidthFactor?: number; // Scaling factor (width) upon the canvas size.
+  canvasWidthFactor: number; // Scaling factor (width) upon the canvas size.
   // In combination with cssScale{X,Y} this can be used to obtain
   // sub pixel resolutions for retina displays.
-  canvasHeightFactor?: number; // Scaling factor (height) upon the canvas size.
+  canvasHeightFactor: number; // Scaling factor (height) upon the canvas size.
   // In combination with cssScale{X,Y} this can be used to obtain
   // sub pixel resolutions for retina displays.
-  cssScaleX?: number; // Visually resize the canvas (horizontally) using CSS transforms (scale).
-  cssScaleY?: number; // Visually resize the canvas (vertically) using CSS transforms (scale).
-  cssUniformScale?: boolean; // CSS scale x and y obtaining aspect ratio.
-  backgroundColor?: string; // The backround color.
-  redrawOnResize?: boolean; //  Switch auto-redrawing on resize on/off (some applications
+  cssScaleX: number; // Visually resize the canvas (horizontally) using CSS transforms (scale).
+  cssScaleY: number; // Visually resize the canvas (vertically) using CSS transforms (scale).
+  cssUniformScale: boolean; // CSS scale x and y obtaining aspect ratio.
+  backgroundColor: string; // The backround color.
+  redrawOnResize: boolean; //  Switch auto-redrawing on resize on/off (some applications
   // might want to prevent automatic redrawing to avoid data loss from the draw buffer).
   preClear?: () => void; // A callback function that will be triggered just before the
   //    draw function clears the canvas (before anything else was drawn).
@@ -143,17 +144,19 @@ export interface Config {
   //    function starts.
   postDraw?: (draw: DrawLib<any>, fill: DrawLib<any>) => void; // A callback function that will be triggered right after the drawing
   //   process finished.
-  enableMouse?: boolean; // Indicates if the application should handle mouse events for you.
-  enableTouch?: boolean; // Indicates if the application should handle touch events for you.
-  enableKeys?: boolean; // Indicates if the application should handle key events for you.
-  enableMouseWheel?: boolean; // Indicates if the application should handle mouse wheel events for you.
+  enableMouse: boolean; // Indicates if the application should handle mouse events for you.
+  enableTouch: boolean; // Indicates if the application should handle touch events for you.
+  enableKeys: boolean; // Indicates if the application should handle key events for you.
+  enableMouseWheel: boolean; // Indicates if the application should handle mouse wheel events for you.
+  enableZoom: boolean; // default=true
+  enablePan: boolean; // default=true
   enableGL?: boolean; // Indicates if the application should use the experimental WebGL features (not recommended).
-  enableSVGExport?: boolean; // Indicates if the SVG export should be enabled (default is true).
+  enableSVGExport: boolean; // Indicates if the SVG export should be enabled (default is true).
   // Note that changes from the postDraw hook might not be visible in the export.
   saveFile?: () => void; // When called the save-file dialog will be triggered.
   setToRetina?: () => void; // When called the resolution will be set to retina.
 
-  autoDetectRetina?: boolean; // When set to true (default) the canvas will try to use the display's pixel ratio.
+  autoDetectRetina: boolean; // When set to true (default) the canvas will try to use the display's pixel ratio.
 }
 
 /**

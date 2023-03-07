@@ -1,0 +1,360 @@
+:root {
+    --text-color: #b900ff;
+    --value-color: #0088ff;
+    --select-border-color: #5900ff;
+    --highlight-color: #002c53;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body, option {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+h1, h2, h3 {
+    text-shadow: 2px 2px 6px var(--text-color);
+}
+
+#top-container, #bottom-container {
+    /* width: 100%; */
+    margin-left: 32px;
+    margin-right: 32px;
+}
+
+#top-container {
+    padding-top: 32px;
+    /* height: 80%; */
+}
+
+#bottom-container {
+    /* height: 20%; */
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-row-wrap {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.align-top {
+    vertical-align: top;
+}
+
+.align-right {
+    justify-content: end;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+.d-block {
+    display: block;
+}
+
+.d-none {
+    display: none;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.value-display {
+    color: var(--value-color);
+    font-weight: bold;
+    text-shadow: 2px 2px 6px var(--value-color);
+}
+
+.value-display.value-error {
+    color:#f00;
+}
+.value-display.value-error::after {
+    content: " !";
+}
+.waveform-pick {
+    display: flex;
+    width: 50%;
+}
+
+/* Waveform radio with images only */
+.waveform-pick input {
+   /* Hide radio button */
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.waveform-pick input[type=radio] + label img {
+    cursor: pointer;
+    width: 66%;
+    height: 66%;
+}
+  
+.waveform-pick input[type=radio]:checked + label img {
+    outline: 2px solid #f00;
+    background-color: var(--select-border-color);
+}
+
+.vibrato-modulation-pick input[type=radio]:checked + label img {
+    outline: 2px solid var(--select-border-color);
+    background-color: rgb(0, 102, 255);
+}
+/* --- END --- Waveform radio with images only */
+
+@media only screen and (min-width: 769px) {
+    /* STYLES HERE */
+    .w-lg-50 {
+        width: 50%;
+    }
+    .w-lg-33 {
+        width: 33%;
+    }
+}
+
+@media only screen and (min-width: 481px) and (max-width: 768px) { 
+    /* STYLES HERE */
+    .w-md-50 {
+        width: 50%;
+    }
+    .w-md-33 {
+        width: 33%;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    /* STYLES HERE */
+    .w-sm-50 {
+        width: 50%;
+    }
+}
+
+.playback-button {
+    background-color: transparent;
+    border: 0;
+}
+
+.playback-button:not(:disabled):hover {
+    background-color: #5900ff;
+}
+
+#envelope-options-left {
+    width: 35%;
+    display: flex;
+    flex-shrink: 1;
+    flex-direction: column;
+}
+
+#envelope-options-right {
+    width: 65%;
+    display: flex;
+    flex-grow: 1;
+} 
+
+body.darkmode {
+    background-color: #001240;
+    color: #b900ff;
+}
+
+#note-selects-table tr td div {
+    display: flex;
+    flex-direction: column; 
+}
+
+select.note-is-playing {
+    background-color: #5900ff;
+    color: black;
+}
+
+select.note-select {
+    width: 42px;
+    max-width: 42px;
+}
+
+input[type=range][orient=vertical]
+{
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* Chromium */
+    width: 8px;
+    height: 60px;
+    padding: 0 5px;
+}
+
+select.note-select {
+    margin-top: 1.0em;
+}
+
+select.preset-select {
+    margin-bottom: 2.0em;
+}
+
+/* custom-select  */
+select {
+    display: inline-block;
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    background-color: #1FBDED; 
+}
+
+select {
+    width: auto;
+    margin: 0;
+    outline: none;
+    cursor: pointer;
+    border: none;
+    border-top: 1px solid var(--select-border-color);
+    border-bottom: 1px solid var(--select-border-color);
+    border-radius: 0;
+    background-color: transparent;
+    color: var(--value-color);
+    /* removes the native down arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 0.01px;
+    text-overflow: '';
+    
+}
+select::-ms-expand {
+    display: none;
+}
+
+select:before,
+select:after {
+    position: absolute;
+    top: 50%;
+    right: 1em;
+    width: 0;
+    height: 0;
+    padding: 0;
+    content: '';
+    pointer-events: none;
+}
+
+select:before {
+    transform: translateY(-125%);
+    /* Styling the down arrow */
+    border-left: .25em solid transparent;
+    border-right: .25em solid transparent;
+
+}
+
+select:after {
+    /* Styling the down arrow */
+    border-left: .25em solid transparent;
+    border-right: .25em solid transparent;
+}
+
+.note-frequency-display {
+    font-size: 9pt;
+    /* height: 9pt; */
+    /* margin-top: -10px; */
+    color: var(--value-color);
+}
+
+#edit-track-count-button, #edit-note-input-count-button  {
+    border: 1px solid var(--select-border-color);
+    background: none;
+    color: var(--text-color);
+}
+
+#track-count-input, #note-input-count-input  {
+    font-size : 42pt;
+    width : 50%;
+    text-align: center;
+    color: var(--value-color);
+    background-color: #001240;
+}
+
+
+
+/* Checkboxes for is-muted */
+input[type="checkbox"].ismuted-checkbox {
+    visibility: hidden;
+}
+
+input[type="checkbox"].ismuted-checkbox:not(:checked) + label {
+    background: url('icons/unmuted.svg') 0 0px no-repeat;
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+}
+
+input[type="checkbox"].ismuted-checkbox:checked + label {
+    background: url('icons/muted.svg') 0 0px no-repeat;
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+}
+
+
+/* Radio buttons for is-active */
+input[type="radio"].isactive-radio {
+    visibility: hidden;
+}
+
+input[type="radio"].isactive-radio:not(:checked) + label {
+    background: url('icons/settings-icon-outline.svg') 0 0px no-repeat;
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+}
+
+input[type="radio"].isactive-radio:checked + label {
+    background: url('icons/settings-icon-filled.svg') 0 0px no-repeat;
+    width: 100%;
+    height: 16px;
+    padding: 0 0 0 0px;
+    background-size: contain;
+}
+
+label.label-track-config-radio {
+    cursor: pointer;
+}
+
+/* Highlight the complete track that's currently selected */
+tr.selected-track td {
+    background-color: var(--highlight-color);
+}
+
+#presets-container {
+    
+}
+
+#io-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#button-export {
+
+}
+
+#button-import {
+    
+}
+
+#file-input-hidden {
+    visibility: hidden;
+    width: 0px;
+    height: 0px;
+}

@@ -1622,8 +1622,7 @@ var BezierPath = /** @class */ (function () {
     BezierPath.fromReducedList = function (pointArray, adjustCircular) {
         // Convert to object
         var bezierPath = new BezierPath(null); // No points yet
-        // var firstStartPoint: Vertex;
-        var startPoint;
+        var startPoint = new Vertex_1.Vertex();
         var startControlPoint;
         var endControlPoint;
         var endPoint;
@@ -1645,7 +1644,7 @@ var BezierPath = /** @class */ (function () {
             startPoint = endPoint;
             i += 6;
         } while (i + 2 < pointArray.length);
-        bezierPath.adjustCircular = adjustCircular;
+        bezierPath.adjustCircular = adjustCircular !== null && adjustCircular !== void 0 ? adjustCircular : false;
         if (adjustCircular) {
             bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint = bezierPath.bezierCurves[0].startPoint;
         }
@@ -4231,7 +4230,11 @@ var __webpack_unused_export__;
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
- * @version  1.17.0
+ * @modified 2023-02-04 Fixed a bug in the `drawDrawable` function; fill's current classname was not set.
+ * @modified 2023-02-10 Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
+ * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
+ * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
+ * @version  1.17.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -4343,6 +4346,8 @@ var PlotBoilerplate = /** @class */ (function () {
      * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle touch events for you.
      * @param {boolean=} [config.enableKeys=true] - Indicates if the application should handle key events for you.
      * @param {boolean=} [config.enableMouseWheel=true] - Indicates if the application should handle mouse wheel events for you.
+     * @param {boolean=} [config.enablePan=true] - (default true) Set to false if you want to disable panning completely.
+     * @param {boolean=} [config.enableZoom=true] - (default true) Set to false if you want to disable zooming completely.
      * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features (not recommended).
      * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true).
      *                                                   Note that changes from the postDraw hook might not be visible in the export.
@@ -4423,6 +4428,8 @@ var PlotBoilerplate = /** @class */ (function () {
             enableTouch: f.bool(config, "enableTouch", true),
             enableKeys: f.bool(config, "enableKeys", true),
             enableMouseWheel: f.bool(config, "enableMouseWheel", true),
+            enableZoom: f.bool(config, "enableZoom", true),
+            enablePan: f.bool(config, "enablePan", true),
             // Experimental (and unfinished)
             enableGL: f.bool(config, "enableGL", false)
         }; // END confog
@@ -5087,7 +5094,7 @@ var PlotBoilerplate = /** @class */ (function () {
             this.draw.setCurrentId(d.uid);
             this.fill.setCurrentId(d.uid);
             this.draw.setCurrentClassName(d.className);
-            this.draw.setCurrentClassName(d.className);
+            this.fill.setCurrentClassName(d.className);
             this.drawDrawable(d, renderTime, draw, fill);
         }
     };
@@ -5108,7 +5115,13 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.drawDrawable = function (d, renderTime, draw, fill) {
         if (d instanceof BezierPath_1.BezierPath) {
+            var curveIndex = 0;
             for (var c in d.bezierCurves) {
+                // Restore these settings again in each loop (will be overwritten)
+                this.draw.setCurrentId(d.uid + "-" + curveIndex);
+                this.fill.setCurrentId(d.uid + "-" + curveIndex);
+                this.draw.setCurrentClassName(d.className);
+                this.fill.setCurrentClassName(d.className);
                 draw.cubicBezier(d.bezierCurves[c].startPoint, d.bezierCurves[c].endPoint, d.bezierCurves[c].startControlPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.color, this.drawConfig.bezier.lineWidth);
                 if (this.drawConfig.drawBezierHandlePoints && this.drawConfig.drawHandlePoints) {
                     if (d.bezierCurves[c].startPoint.attr.visible) {
@@ -5165,7 +5178,8 @@ var PlotBoilerplate = /** @class */ (function () {
                     draw.setCurrentClassName(d.className + "-end-line");
                     draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
                 }
-            }
+                curveIndex++;
+            } // END for
         }
         else if (d instanceof Polygon_1.Polygon) {
             draw.polygon(d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth);
@@ -5276,10 +5290,10 @@ var PlotBoilerplate = /** @class */ (function () {
         else {
             console.error("Cannot draw object. Unknown class.");
         }
-        draw.setCurrentClassName(undefined);
-        draw.setCurrentId(undefined);
-        fill.setCurrentClassName(undefined);
-        fill.setCurrentId(undefined);
+        draw.setCurrentClassName(null);
+        draw.setCurrentId(null);
+        fill.setCurrentClassName(null);
+        fill.setCurrentId(null);
     };
     /**
      * Draw the select-polygon (if there is one).
@@ -5369,8 +5383,8 @@ var PlotBoilerplate = /** @class */ (function () {
         this.drawSelectPolygon(draw);
         // Clear IDs and classnames (postDraw hook might draw somthing and the do not want
         // to interfered with that).
-        draw.setCurrentId(undefined);
-        draw.setCurrentClassName(undefined);
+        draw.setCurrentId(null);
+        draw.setCurrentClassName(null);
     }; // END redraw
     /**
      * This function clears the canvas with the configured background color.<br>
@@ -5507,7 +5521,7 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else if (_self.config.fitToParent) {
             // Set editor size
-            _self.canvas.style.position = "absolute";
+            _self.canvas.style.position = "static";
             var space = this.getAvailableContainerSpace();
             _self.canvas.style.width = ((_c = _self.config.canvasWidthFactor) !== null && _c !== void 0 ? _c : 1.0) * space.width + "px";
             _self.canvas.style.height = ((_d = _self.config.canvasHeightFactor) !== null && _d !== void 0 ? _d : 1.0) * space.height + "px";
@@ -5578,24 +5592,24 @@ var PlotBoilerplate = /** @class */ (function () {
      **/
     PlotBoilerplate.prototype.handleClick = function (e) {
         var _self = this;
-        var p = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
-        if (p) {
-            _self.vertices[p.vindex].listeners.fireClickEvent(e);
+        var point = this.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX || 1.0, _self.config.cssScaleY || 1.0));
+        if (point) {
+            _self.vertices[point.vindex].listeners.fireClickEvent(e);
             if (this.keyHandler && this.keyHandler.isDown("shift")) {
-                if (p.typeName == "bpath") {
-                    var vert = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
+                if (point.typeName == "bpath") {
+                    var vert = _self.paths[point.pindex].bezierCurves[point.cindex].getPointByID(point.pid);
                     if (vert.attr.selectable)
                         vert.attr.isSelected = !vert.attr.isSelected;
                 }
-                else if (p.typeName == "vertex") {
-                    var vert = _self.vertices[p.vindex];
+                else if (point.typeName == "vertex") {
+                    var vert = _self.vertices[point.vindex];
                     if (vert.attr.selectable)
                         vert.attr.isSelected = !vert.attr.isSelected;
                 }
                 _self.redraw();
             }
-            else if (this.keyHandler.isDown("y")) {
-                _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
+            else if (this.keyHandler && this.keyHandler.isDown("y")) {
+                _self.vertices[point.vindex].attr.bezierAutoAdjust = !_self.vertices[point.vindex].attr.bezierAutoAdjust;
                 _self.redraw();
             }
         }
@@ -5662,11 +5676,11 @@ var PlotBoilerplate = /** @class */ (function () {
         var _self = this;
         if (e.button != 0)
             return; // Only react on left mouse or touch events
-        var p = _self.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
-        if (!p)
+        var draggablePoint = _self.locatePointNear(_self.transformMousePosition(e.params.pos.x, e.params.pos.y), PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY));
+        if (!draggablePoint)
             return;
         // Drag all selected elements?
-        if (p.typeName == "vertex" && _self.vertices[p.vindex].attr.isSelected) {
+        if (draggablePoint.typeName == "vertex" && _self.vertices[draggablePoint.vindex].attr.isSelected) {
             // Multi drag
             // for( var i in _self.vertices ) {
             for (var i = 0; i < _self.vertices.length; i++) {
@@ -5678,13 +5692,15 @@ var PlotBoilerplate = /** @class */ (function () {
         }
         else {
             // Single drag
-            if (!_self.vertices[p.vindex].attr.draggable)
+            if (!_self.vertices[draggablePoint.vindex].attr.draggable)
                 return;
-            _self.draggedElements.push(p);
-            if (p.typeName == "bpath")
-                _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent(e);
-            else if (p.typeName == "vertex")
-                _self.vertices[p.vindex].listeners.fireDragStartEvent(e);
+            _self.draggedElements.push(draggablePoint);
+            if (draggablePoint.typeName == "bpath")
+                _self.paths[draggablePoint.pindex].bezierCurves[draggablePoint.cindex]
+                    .getPointByID(draggablePoint.pid)
+                    .listeners.fireDragStartEvent(e);
+            else if (draggablePoint.typeName == "vertex")
+                _self.vertices[draggablePoint.vindex].listeners.fireDragStartEvent(e);
         }
         _self.redraw();
     };
@@ -5711,7 +5727,10 @@ var PlotBoilerplate = /** @class */ (function () {
         //            not this one. So this tab will never receive any [Ctrl-down] events
         //            until next keypress; the implication is, that [Ctrl] would still
         //            considered to be pressed which is not true.
-        if (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar")) {
+        if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+            if (!this.config.enablePan) {
+                return;
+            }
             _self.setOffset(_self.draw.offset.clone().add(e.params.dragAmount));
             _self.redraw();
         }
@@ -5780,6 +5799,9 @@ var PlotBoilerplate = /** @class */ (function () {
      * @return {void}
      **/
     PlotBoilerplate.prototype.mouseWheelHandler = function (e) {
+        if (!this.config.enableZoom) {
+            return;
+        }
         var zoomStep = 1.25; // Make configurable?
         // CHANGED replaced _self by this
         var _self = this;
@@ -5845,6 +5867,7 @@ var PlotBoilerplate = /** @class */ (function () {
         this.setOffset({ x: newOffsetX, y: newOffsetY });
     };
     PlotBoilerplate.prototype.installInputListeners = function () {
+        var _this = this;
         var _self = this;
         if (this.config.enableMouse) {
             // Install a mouse handler on the canvas.
@@ -5919,6 +5942,9 @@ var PlotBoilerplate = /** @class */ (function () {
                             if (evt.touches.length == 1 && draggedElement) {
                                 evt.preventDefault();
                                 evt.stopPropagation();
+                                if (!touchDownPos || !touchMovePos) {
+                                    return;
+                                }
                                 var rel = relPos_1({ x: evt.touches[0].clientX, y: evt.touches[0].clientY });
                                 var trans = _self.transformMousePosition(rel.x, rel.y);
                                 var diff = new Vertex_1.Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
@@ -5943,6 +5969,9 @@ var PlotBoilerplate = /** @class */ (function () {
                                 touchMovePos = new Vertex_1.Vertex(rel);
                             }
                             else if (evt.touches.length == 2) {
+                                if (!_this.config.enablePan) {
+                                    return;
+                                }
                                 // If at least two fingers touch and move, then change the draw offset (panning).
                                 evt.preventDefault();
                                 evt.stopPropagation();
@@ -5955,6 +5984,9 @@ var PlotBoilerplate = /** @class */ (function () {
                         touchEnd: function (evt) {
                             // Note: e.touches.length is 0 here
                             if (draggedElement && draggedElement.typeName == "vertex") {
+                                if (!touchDownPos) {
+                                    return;
+                                }
                                 var draggingVertex = _self.vertices[draggedElement.vindex];
                                 var fakeEvent = {
                                     isTouchEvent: true,
@@ -5987,9 +6019,17 @@ var PlotBoilerplate = /** @class */ (function () {
                             multiTouchStartScale = null;
                         },
                         pinch: function (evt) {
+                            if (!_this.config.enableZoom) {
+                                return;
+                            }
+                            var touchItem0 = evt.touches.item(0);
+                            var touchItem1 = evt.touches.item(1);
+                            if (!evt.touches || !multiTouchStartScale || !touchItem0 || !touchItem1) {
+                                return;
+                            }
                             // For pinching there must be at least two touch items
-                            var fingerA = new Vertex_1.Vertex(evt.touches.item(0).clientX, evt.touches.item(0).clientY);
-                            var fingerB = new Vertex_1.Vertex(evt.touches.item(1).clientX, evt.touches.item(1).clientY);
+                            var fingerA = new Vertex_1.Vertex(touchItem0.clientX, touchItem0.clientY);
+                            var fingerB = new Vertex_1.Vertex(touchItem1.clientX, touchItem1.clientY);
                             var center = new Line_1.Line(fingerA, fingerB).vertAt(0.5);
                             _self.setZoom(multiTouchStartScale.x * evt.zoom, multiTouchStartScale.y * evt.zoom, center);
                             _self.redraw();
@@ -6138,8 +6178,10 @@ var PlotBoilerplate = /** @class */ (function () {
          **/
         setCSSscale: function (element, scaleX, scaleY) {
             element.style["transform-origin"] = "0 0";
-            if (scaleX == 1.0 && scaleY == 1.0)
-                element.style.transform = null;
+            if (scaleX == 1.0 && scaleY == 1.0) {
+                // element.style.transform = null;
+                element.style.removeProperty("transform");
+            }
             else
                 element.style.transform = "scale(" + scaleX + "," + scaleY + ")";
         },
@@ -7090,6 +7132,7 @@ var Triangle = /** @class */ (function () {
         var lineC = new Line_1.Line(this.c, this.a);
         var bisector1 = geomutils_1.geomutils.nsectAngle(this.b, this.a, this.c, 2)[0]; // bisector of first angle (in b)
         var bisector2 = geomutils_1.geomutils.nsectAngle(this.c, this.b, this.a, 2)[0]; // bisector of second angle (in c)
+        // Cast to non-null here because we know there _is_ an intersection
         var intersection = bisector1.intersection(bisector2);
         // Find the closest points on one of the polygon lines (all have same distance by construction)
         var circleIntersA = lineA.getClosestPoint(intersection);
@@ -9467,7 +9510,8 @@ exports.VertexListeners = VertexListeners;
  * @modified 2022-08-23 Fixed a type issue in the `polyline` function.
  * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
- * @version  1.12.3
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  1.12.4
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -9534,7 +9578,7 @@ var drawutils = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).
      **/
     drawutils.prototype.setCurrentId = function (uid) {
         // NOOP
@@ -9545,7 +9589,7 @@ var drawutils = /** @class */ (function () {
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      **/
     drawutils.prototype.setCurrentClassName = function (className) {
         // NOOP
@@ -10422,7 +10466,8 @@ exports.drawutils = drawutils;
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
- * @version  0.0.8
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  0.0.9
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilsgl = void 0;
@@ -10443,7 +10488,7 @@ var drawutilsgl = /** @class */ (function () {
      *
      * @constructor
      * @name drawutils
-     * @param {WebGLRenderingContext} context - The drawing context.
+     * @param {WebGLRenderingContext|null} context - The drawing context.
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
     function drawutilsgl(context, fillShapes) {
@@ -10525,7 +10570,7 @@ var drawutilsgl = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).es.
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).es.
      **/
     drawutilsgl.prototype.setCurrentId = function (uid) {
         // NOOP
@@ -10537,7 +10582,7 @@ var drawutilsgl = /** @class */ (function () {
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      **/
     drawutilsgl.prototype.setCurrentClassName = function (className) {
         // NOOP
@@ -11190,7 +11235,9 @@ var GLU = /** @class */ (function () {
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2022-11-10 Tweaking some type issues.
- * @version  1.6.2
+ * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  1.6.4
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -11228,7 +11275,7 @@ var drawutilssvg = /** @class */ (function () {
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
-        this.isSecondary = isSecondary;
+        this.isSecondary = Boolean(isSecondary);
         this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
@@ -11258,6 +11305,8 @@ var drawutilssvg = /** @class */ (function () {
         // Which default styles to add? -> All from the DrawConfig.
         // Compare with DrawConfig interface
         var keys = {
+            // "bezier": "CubicBezierCurve", // TODO: is this correct?
+            "bezierPath": "BezierPath",
             "polygon": "Polygon",
             "triangle": "Triangle",
             "ellipse": "Ellipse",
@@ -11323,6 +11372,9 @@ var drawutilssvg = /** @class */ (function () {
      * @param {string} nodeName - The expected node name.
      */
     drawutilssvg.prototype.findElement = function (key, nodeName) {
+        if (!key) {
+            return null;
+        }
         var node = this.cache.get(key);
         if (node && node.nodeName.toUpperCase() === nodeName.toUpperCase()) {
             this.cache.delete(key);
@@ -11397,8 +11449,8 @@ var drawutilssvg = /** @class */ (function () {
         else {
             node.setAttribute("class", className);
         }
-        node.setAttribute("fill", this.fillShapes ? color : "none");
-        node.setAttribute("stroke", this.fillShapes ? "none" : color);
+        node.setAttribute("fill", this.fillShapes && color ? color : "none");
+        node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
         node.setAttribute("stroke-width", "" + (lineWidth || 1));
         if (this.curId) {
             node.setAttribute("id", "" + this.curId); // Maybe React-style 'key' would be better?
@@ -11449,7 +11501,7 @@ var drawutilssvg = /** @class */ (function () {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).
      * @instance
      * @memberof drawutilssvg
      **/
@@ -11462,7 +11514,7 @@ var drawutilssvg = /** @class */ (function () {
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      * @instance
      * @memberof drawutilssvg
      **/
@@ -11715,7 +11767,7 @@ var drawutilssvg = /** @class */ (function () {
             this._y(endPoint.y)
         ];
         node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "cubierBezier", color, lineWidth);
+        return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
     };
     /**
      * Draw the given (cubic) Bézier path.

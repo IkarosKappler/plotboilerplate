@@ -17,6 +17,7 @@
  * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
  * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
  * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
+ * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
  **/
 export {};
 //# sourceMappingURL=core.js.map

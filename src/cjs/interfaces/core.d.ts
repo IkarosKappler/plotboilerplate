@@ -17,6 +17,7 @@
  * @modified 2022-08-01 Added `title` param to the `PBParams` interface.
  * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
  * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
+ * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
  **/
 import { Vertex } from "../Vertex";
 import { Vector } from "../Vector";
@@ -83,42 +84,44 @@ export interface CanvasWrapper {
  */
 export interface Config {
     canvas: HTMLCanvasElement | string;
-    fullSize?: boolean;
-    fitToParent?: boolean;
-    scaleX?: number;
-    scaleY?: number;
-    offsetX?: number;
-    offsetY?: number;
-    rasterGrid?: boolean;
-    drawRaster?: boolean;
-    rasterScaleX?: number;
-    rasterScaleY?: number;
-    rasterAdjustFactor?: number;
-    drawOrigin?: boolean;
-    autoAdjustOffset?: boolean;
-    offsetAdjustXPercent?: number;
-    offsetAdjustYPercent?: number;
-    defaultCanvasWidth?: number;
-    defaultCanvasHeight?: number;
-    canvasWidthFactor?: number;
-    canvasHeightFactor?: number;
-    cssScaleX?: number;
-    cssScaleY?: number;
-    cssUniformScale?: boolean;
-    backgroundColor?: string;
-    redrawOnResize?: boolean;
+    fullSize: boolean;
+    fitToParent: boolean;
+    scaleX: number;
+    scaleY: number;
+    offsetX: number;
+    offsetY: number;
+    rasterGrid: boolean;
+    drawRaster: boolean;
+    rasterScaleX: number;
+    rasterScaleY: number;
+    rasterAdjustFactor: number;
+    drawOrigin: boolean;
+    autoAdjustOffset: boolean;
+    offsetAdjustXPercent: number;
+    offsetAdjustYPercent: number;
+    defaultCanvasWidth: number;
+    defaultCanvasHeight: number;
+    canvasWidthFactor: number;
+    canvasHeightFactor: number;
+    cssScaleX: number;
+    cssScaleY: number;
+    cssUniformScale: boolean;
+    backgroundColor: string;
+    redrawOnResize: boolean;
     preClear?: () => void;
     preDraw?: (draw: DrawLib<any>, fill: DrawLib<any>) => void;
     postDraw?: (draw: DrawLib<any>, fill: DrawLib<any>) => void;
-    enableMouse?: boolean;
-    enableTouch?: boolean;
-    enableKeys?: boolean;
-    enableMouseWheel?: boolean;
+    enableMouse: boolean;
+    enableTouch: boolean;
+    enableKeys: boolean;
+    enableMouseWheel: boolean;
+    enableZoom: boolean;
+    enablePan: boolean;
     enableGL?: boolean;
-    enableSVGExport?: boolean;
+    enableSVGExport: boolean;
     saveFile?: () => void;
     setToRetina?: () => void;
-    autoDetectRetina?: boolean;
+    autoDetectRetina: boolean;
 }
 /**
  * For initialization the constructor needs a mix of config and draw-settings.

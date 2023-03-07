@@ -82,7 +82,7 @@
     var postDraw = function (draw, fill) {
       var p = path.getPointAt(config.t);
       draw.point(p, "rgba(0,0,0,1)");
-      var circle = getCircleAt(path, config.t);
+      var circle = getCircleAtBezierPath(path, config.t);
       // Catch unsafe circles with too large radii (towards infinity)
       pb.draw.circle(circle.center, circle.radius, "blue", 1);
       if (config.drawCircleCenter) {
@@ -94,26 +94,10 @@
         for (var j = 1; j <= 100; j++) {
           var t = j / 100;
           var p = path.getPointAt(t);
-          var circle = getCircleAt(path, t);
+          var circle = getCircleAtBezierPath(path, t);
           draw.line(p, circle.center, "rgba(0,164,64,0.5)", 1);
         }
       }
-    };
-
-    // +---------------------------------------------------------------------------------
-    // | Calculate (very simple approximation) the tangent circle at the given path
-    // | and position.
-    // +-------------------------------
-    var getCircleAt = function (path, t) {
-      var p = path.getPointAt(t);
-      // var p0 = path.getPointAt(Math.max(0, t - t * 0.1));
-      // console.log(path.totalArcLength);
-      // var p1 = path.getPointAt(Math.min(t + t * 0.1, path.totalArcLength));
-      var p0 = path.getPointAt(Math.max(0, t - t * 0.1));
-      var p1 = path.getPointAt(Math.min(t + (1 - t) * 0.1, path.totalArcLength));
-      var triangle = new Triangle(p0, p, p1);
-      var circle = triangle.getCircumcircle();
-      return circle;
     };
 
     // +---------------------------------------------------------------------------------

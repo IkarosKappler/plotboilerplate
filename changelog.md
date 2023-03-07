@@ -1,6 +1,19 @@
 # Changelog
 
-- 2023-01-17
+- 2023-03-06
+  - Finalizing the audio demo (demo-46).
+- 2023-02-10
+  - Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
+  - All non-function attributes of the `Config` interface are now mandatory.
+  - The methods `DrawLib.setCurrentClassName` and `DrawLib.setCurrentId` also accept `null` now.
+  - Cleaning up most type errors in the main class (mostly null checks).
+  - Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
+- 2023-02-04
+  - Fixed a bug in the `PlotBoilerplate.drawDrawable` function; fill's current classname was not set.
+  - drawutilssvg: Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
+- 2023-01-23
+  - Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
+- 2023-01-17 (v1.20.1)
   - 2023-01-17 Tweaking the demo `extended-elliptic-conversion`: adding large-arc-flag and sweep-flag.
   - Extending the `parseSVGPathData` and `splitSVGPathData` functions: basic path commands accepting additional sets of params now (ARC-command still missing).
 - 2023-01-03 (v1.20.0)

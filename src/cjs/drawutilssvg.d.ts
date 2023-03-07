@@ -35,7 +35,9 @@
  * @modified 2022-03-26 Added the `texturedPoly` function to draw textures polygons.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2022-11-10 Tweaking some type issues.
- * @version  1.6.2
+ * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
+ * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @version  1.6.4
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
@@ -128,7 +130,7 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     /**
      * The current drawable-ID. This can be any unique ID identifying the following drawn element.
      *
-     * @member {UID|undefined}
+     * @member {UID|null}
      * @memberof drawutilssvg
      * @instance
      */
@@ -268,22 +270,22 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      *
      * @name setCurrentId
      * @method
-     * @param {UID} uid - A UID identifying the currently drawn element(s).
+     * @param {UID|null} uid - A UID identifying the currently drawn element(s).
      * @instance
      * @memberof drawutilssvg
      **/
-    setCurrentId(uid: UID | undefined): void;
+    setCurrentId(uid: UID | null): void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * Determine the class name for further usage here.
      *
      * @name setCurrentClassName
      * @method
-     * @param {string} className - A class name for further custom use cases.
+     * @param {string|null} className - A class name for further custom use cases.
      * @instance
      * @memberof drawutilssvg
      **/
-    setCurrentClassName(className: string | undefined): void;
+    setCurrentClassName(className: string | null): void;
     /**
      * Called before each draw cycle.
      * This is required for compatibility with other draw classes in the library.

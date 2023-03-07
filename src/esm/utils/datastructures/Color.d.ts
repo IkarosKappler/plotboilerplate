@@ -16,7 +16,8 @@
  * @modified 2021-11-07 Added setRed, setGreen, setBlue, setHue, setSaturation, setLiminance functions.
  * @modified 2022-05-11 Modified the `clone` function by just copying the numeric calues, not re-calculating the whole color.
  * @modified 2022-05-11 Fixed the `interpolate` function.
- * @version 0.0.11
+ * @modified 2023-01-23 Added `Color.set(Color)` function to set all values (r,g,b,h,s,l,a) simultanoeusly.
+ * @version 0.0.12
  **/
 /**
  * @classdesc A color class, inspired by neolitec's Javascript class.
@@ -126,6 +127,7 @@ export declare class Color {
      * @return {number} A value between 0.0 and 1.0.
      */
     blue(): number;
+    set(color: Color): Color;
     setRed(r: number): this;
     setBlue(b: number): this;
     setAlpha(a: number): this;

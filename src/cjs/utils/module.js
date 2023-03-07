@@ -12,5 +12,7 @@
  * @date 2020-04-01
  **/
 
-var exports = globalThis.export = globalThis;
-var require = globalThis.require = function(...args) { return globalThis; };
+var exports = (globalThis.export = globalThis);
+var require = (globalThis.require = function (...args) {
+  return globalThis;
+});

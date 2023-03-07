@@ -78,7 +78,11 @@
  * @modified 2022-10-25 Added the `origin` to the default draw config.
  * @modified 2022-11-06 Adding an XML declaration to the SVG export routine.
  * @modified 2022-11-23 Added the `drawRaster` (default=true) option to the config/drawconfig.
- * @version  1.17.0
+ * @modified 2023-02-04 Fixed a bug in the `drawDrawable` function; fill's current classname was not set.
+ * @modified 2023-02-10 Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
+ * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
+ * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
+ * @version  1.17.2
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -377,6 +381,8 @@ export class PlotBoilerplate {
    * @param {boolean=} [config.enableTouch=true] - Indicates if the application should handle touch events for you.
    * @param {boolean=} [config.enableKeys=true] - Indicates if the application should handle key events for you.
    * @param {boolean=} [config.enableMouseWheel=true] - Indicates if the application should handle mouse wheel events for you.
+   * @param {boolean=} [config.enablePan=true] - (default true) Set to false if you want to disable panning completely.
+   * @param {boolean=} [config.enableZoom=true] - (default true) Set to false if you want to disable zooming completely.
    * @param {boolean=} [config.enableGL=false] - Indicates if the application should use the experimental WebGL features (not recommended).
    * @param {boolean=} [config.enableSVGExport=true] - Indicates if the SVG export should be enabled (default is true).
    *                                                   Note that changes from the postDraw hook might not be visible in the export.
@@ -450,6 +456,8 @@ export class PlotBoilerplate {
       enableTouch: f.bool(config, "enableTouch", true),
       enableKeys: f.bool(config, "enableKeys", true),
       enableMouseWheel: f.bool(config, "enableMouseWheel", true),
+      enableZoom: f.bool(config, "enableZoom", true), // default=true
+      enablePan: f.bool(config, "enablePan", true), // default=true
 
       // Experimental (and unfinished)
       enableGL: f.bool(config, "enableGL", false)
@@ -1140,7 +1148,7 @@ export class PlotBoilerplate {
       this.draw.setCurrentId(d.uid);
       this.fill.setCurrentId(d.uid);
       this.draw.setCurrentClassName(d.className);
-      this.draw.setCurrentClassName(d.className);
+      this.fill.setCurrentClassName(d.className);
       this.drawDrawable(d, renderTime, draw, fill);
     }
   }
@@ -1162,7 +1170,13 @@ export class PlotBoilerplate {
    **/
   drawDrawable(d: Drawable, renderTime: number, draw: DrawLib<any>, fill: DrawLib<any>) {
     if (d instanceof BezierPath) {
+      var curveIndex = 0;
       for (var c in d.bezierCurves) {
+        // Restore these settings again in each loop (will be overwritten)
+        this.draw.setCurrentId(`${d.uid}-${curveIndex}`);
+        this.fill.setCurrentId(`${d.uid}-${curveIndex}`);
+        this.draw.setCurrentClassName(d.className);
+        this.fill.setCurrentClassName(d.className);
         draw.cubicBezier(
           d.bezierCurves[c].startPoint,
           d.bezierCurves[c].endPoint,
@@ -1260,7 +1274,8 @@ export class PlotBoilerplate {
             this.drawConfig.bezier.handleLine.lineWidth
           );
         }
-      }
+        curveIndex++;
+      } // END for
     } else if (d instanceof Polygon) {
       draw.polygon(d, this.drawConfig.polygon.color, this.drawConfig.polygon.lineWidth);
       if (!this.drawConfig.drawHandlePoints) {
@@ -1375,10 +1390,10 @@ export class PlotBoilerplate {
     } else {
       console.error("Cannot draw object. Unknown class.");
     }
-    draw.setCurrentClassName(undefined);
-    draw.setCurrentId(undefined);
-    fill.setCurrentClassName(undefined);
-    fill.setCurrentId(undefined);
+    draw.setCurrentClassName(null);
+    draw.setCurrentId(null);
+    fill.setCurrentClassName(null);
+    fill.setCurrentId(null);
   }
 
   /**
@@ -1475,8 +1490,8 @@ export class PlotBoilerplate {
 
     // Clear IDs and classnames (postDraw hook might draw somthing and the do not want
     // to interfered with that).
-    draw.setCurrentId(undefined);
-    draw.setCurrentClassName(undefined);
+    draw.setCurrentId(null);
+    draw.setCurrentClassName(null);
   } // END redraw
 
   /**
@@ -1626,7 +1641,7 @@ export class PlotBoilerplate {
       _setSize(width, height);
     } else if (_self.config.fitToParent) {
       // Set editor size
-      _self.canvas.style.position = "absolute";
+      _self.canvas.style.position = "static";
       const space: XYDimension = this.getAvailableContainerSpace();
       _self.canvas.style.width = (_self.config.canvasWidthFactor ?? 1.0) * space.width + "px";
       _self.canvas.style.height = (_self.config.canvasHeightFactor ?? 1.0) * space.height + "px";
@@ -1697,23 +1712,23 @@ export class PlotBoilerplate {
    **/
   private handleClick(e: XMouseEvent) {
     const _self: PlotBoilerplate = this;
-    var p: IDraggable = this.locatePointNear(
+    var point: IDraggable | null = this.locatePointNear(
       _self.transformMousePosition(e.params.pos.x, e.params.pos.y),
-      PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY)
+      PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX || 1.0, _self.config.cssScaleY || 1.0)
     );
-    if (p) {
-      _self.vertices[p.vindex].listeners.fireClickEvent(e);
+    if (point) {
+      _self.vertices[point.vindex].listeners.fireClickEvent(e);
       if (this.keyHandler && this.keyHandler.isDown("shift")) {
-        if (p.typeName == "bpath") {
-          let vert: Vertex = _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid);
+        if (point.typeName == "bpath") {
+          let vert: Vertex = _self.paths[point.pindex].bezierCurves[point.cindex].getPointByID(point.pid);
           if (vert.attr.selectable) vert.attr.isSelected = !vert.attr.isSelected;
-        } else if (p.typeName == "vertex") {
-          let vert: Vertex = _self.vertices[p.vindex];
+        } else if (point.typeName == "vertex") {
+          let vert: Vertex = _self.vertices[point.vindex];
           if (vert.attr.selectable) vert.attr.isSelected = !vert.attr.isSelected;
         }
         _self.redraw();
-      } else if (this.keyHandler.isDown("y")) {
-        _self.vertices[p.vindex].attr.bezierAutoAdjust = !_self.vertices[p.vindex].attr.bezierAutoAdjust;
+      } else if (this.keyHandler && this.keyHandler.isDown("y")) {
+        _self.vertices[point.vindex].attr.bezierAutoAdjust = !_self.vertices[point.vindex].attr.bezierAutoAdjust;
         _self.redraw();
       }
     } else if (_self.selectPolygon != null) {
@@ -1782,13 +1797,13 @@ export class PlotBoilerplate {
   private mouseDownHandler(e: XMouseEvent) {
     const _self = this;
     if (e.button != 0) return; // Only react on left mouse or touch events
-    var p: IDraggable = _self.locatePointNear(
+    var draggablePoint: IDraggable | null = _self.locatePointNear(
       _self.transformMousePosition(e.params.pos.x, e.params.pos.y),
       PlotBoilerplate.DEFAULT_CLICK_TOLERANCE / Math.min(_self.config.cssScaleX, _self.config.cssScaleY)
     );
-    if (!p) return;
+    if (!draggablePoint) return;
     // Drag all selected elements?
-    if (p.typeName == "vertex" && _self.vertices[p.vindex].attr.isSelected) {
+    if (draggablePoint.typeName == "vertex" && _self.vertices[draggablePoint.vindex].attr.isSelected) {
       // Multi drag
       // for( var i in _self.vertices ) {
       for (var i = 0; i < _self.vertices.length; i++) {
@@ -1801,10 +1816,13 @@ export class PlotBoilerplate {
       }
     } else {
       // Single drag
-      if (!_self.vertices[p.vindex].attr.draggable) return;
-      _self.draggedElements.push(p);
-      if (p.typeName == "bpath") _self.paths[p.pindex].bezierCurves[p.cindex].getPointByID(p.pid).listeners.fireDragStartEvent(e);
-      else if (p.typeName == "vertex") _self.vertices[p.vindex].listeners.fireDragStartEvent(e);
+      if (!_self.vertices[draggablePoint.vindex].attr.draggable) return;
+      _self.draggedElements.push(draggablePoint);
+      if (draggablePoint.typeName == "bpath")
+        _self.paths[draggablePoint.pindex].bezierCurves[draggablePoint.cindex]
+          .getPointByID(draggablePoint.pid)
+          .listeners.fireDragStartEvent(e);
+      else if (draggablePoint.typeName == "vertex") _self.vertices[draggablePoint.vindex].listeners.fireDragStartEvent(e);
     }
     _self.redraw();
   }
@@ -1832,7 +1850,10 @@ export class PlotBoilerplate {
     //            not this one. So this tab will never receive any [Ctrl-down] events
     //            until next keypress; the implication is, that [Ctrl] would still
     //            considered to be pressed which is not true.
-    if (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar")) {
+    if (this.keyHandler && (this.keyHandler.isDown("alt") || this.keyHandler.isDown("spacebar"))) {
+      if (!this.config.enablePan) {
+        return;
+      }
       _self.setOffset(_self.draw.offset.clone().add(e.params.dragAmount));
       _self.redraw();
     } else {
@@ -1898,6 +1919,9 @@ export class PlotBoilerplate {
    * @return {void}
    **/
   private mouseWheelHandler(e: XMouseEvent) {
+    if (!this.config.enableZoom) {
+      return;
+    }
     var zoomStep: number = 1.25; // Make configurable?
     // CHANGED replaced _self by this
     const _self: PlotBoilerplate = this;
@@ -2045,6 +2069,9 @@ export class PlotBoilerplate {
               if (evt.touches.length == 1 && draggedElement) {
                 evt.preventDefault();
                 evt.stopPropagation();
+                if (!touchDownPos || !touchMovePos) {
+                  return;
+                }
                 var rel: XYCoords = relPos({ x: evt.touches[0].clientX, y: evt.touches[0].clientY });
                 var trans: XYCoords = _self.transformMousePosition(rel.x, rel.y);
                 var diff: Vertex = new Vertex(_self.transformMousePosition(touchMovePos.x, touchMovePos.y)).difference(trans);
@@ -2067,6 +2094,9 @@ export class PlotBoilerplate {
                 }
                 touchMovePos = new Vertex(rel);
               } else if (evt.touches.length == 2) {
+                if (!this.config.enablePan) {
+                  return;
+                }
                 // If at least two fingers touch and move, then change the draw offset (panning).
                 evt.preventDefault();
                 evt.stopPropagation();
@@ -2081,6 +2111,9 @@ export class PlotBoilerplate {
             touchEnd: (evt: TouchEvent) => {
               // Note: e.touches.length is 0 here
               if (draggedElement && draggedElement.typeName == "vertex") {
+                if (!touchDownPos) {
+                  return;
+                }
                 var draggingVertex: Vertex = _self.vertices[draggedElement.vindex];
                 var fakeEvent: VertEvent = {
                   isTouchEvent: true,
@@ -2112,9 +2145,17 @@ export class PlotBoilerplate {
               multiTouchStartScale = null;
             },
             pinch: (evt: TouchPinchEvent) => {
+              if (!this.config.enableZoom) {
+                return;
+              }
+              const touchItem0 = evt.touches.item(0);
+              const touchItem1 = evt.touches.item(1);
+              if (!evt.touches || !multiTouchStartScale || !touchItem0 || !touchItem1) {
+                return;
+              }
               // For pinching there must be at least two touch items
-              const fingerA: Vertex = new Vertex(evt.touches.item(0).clientX, evt.touches.item(0).clientY);
-              const fingerB: Vertex = new Vertex(evt.touches.item(1).clientX, evt.touches.item(1).clientY);
+              const fingerA: Vertex = new Vertex(touchItem0.clientX, touchItem0.clientY);
+              const fingerB: Vertex = new Vertex(touchItem1.clientX, touchItem1.clientY);
               const center: Vertex = new Line(fingerA, fingerB).vertAt(0.5);
               _self.setZoom(multiTouchStartScale.x * evt.zoom, multiTouchStartScale.y * evt.zoom, center);
               _self.redraw();
@@ -2224,8 +2265,10 @@ export class PlotBoilerplate {
      **/
     setCSSscale: (element: HTMLElement | SVGElement, scaleX: number, scaleY: number): void => {
       element.style["transform-origin"] = "0 0";
-      if (scaleX == 1.0 && scaleY == 1.0) element.style.transform = null;
-      else element.style.transform = "scale(" + scaleX + "," + scaleY + ")";
+      if (scaleX == 1.0 && scaleY == 1.0) {
+        // element.style.transform = null;
+        element.style.removeProperty("transform");
+      } else element.style.transform = "scale(" + scaleX + "," + scaleY + ")";
     },
 
     // A helper for fetching data from objects.

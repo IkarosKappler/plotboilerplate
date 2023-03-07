@@ -83,3 +83,18 @@ by generated files, compiled from Typescript.
 There is also a sandbox script, compiling and running the typescript files inside your browser. Please note that
 due to performance reasons it is not recommended to use this in production. Always compile your typescript files
 for this purpose.
+
+### Build single demo scripts
+
+It is now also possible to build demos in Typescript. You don't have to compile the whole
+library for this, just run this command:
+
+```bash
+./bin/run-compile-demo-ts.sh <path-to-demo-folder>
+```
+
+Example:
+
+```bash
+./bin/run-compile-demo-ts.sh demos/46-simple-audio-control/
+```

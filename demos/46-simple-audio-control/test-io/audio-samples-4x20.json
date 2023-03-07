@@ -1,0 +1,430 @@
+{
+  "version": "0.0.1",
+  "globalSettings": {
+    "mainSettings": {
+      "tempo": 100,
+      "masterVolume": 0.2
+    },
+    "delaySettings": {
+      "time": 0,
+      "feedback": 0,
+      "amount": 0
+    }
+  },
+  "notes": {
+    "tracks": [
+      {
+        "envelope": {
+          "attackTime": 0.2,
+          "noteLength": 1,
+          "releaseTime": 0.5,
+          "sustainLevel": 0.38
+        },
+        "mainValues": {
+          "tempo": 100,
+          "masterVolume": 0.2
+        },
+        "oscillator": {
+          "waveform": "triangle"
+        },
+        "vibratoValues": {
+          "amount": 0,
+          "speed": 10
+        },
+        "noteValues": [
+          {
+            "value": "C4",
+            "lengthFactor": 0.5
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D#4/Eb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "G4",
+            "lengthFactor": 1.5
+          },
+          {
+            "value": "F#4/Gb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F#4/Gb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "",
+            "lengthFactor": 0.5
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D#4/Eb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1.5
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          }
+        ]
+      },
+      {
+        "envelope": {
+          "attackTime": 0.2,
+          "noteLength": 1,
+          "releaseTime": 0.5,
+          "sustainLevel": 0.38
+        },
+        "mainValues": {
+          "tempo": 100,
+          "masterVolume": 0.2
+        },
+        "oscillator": {
+          "waveform": "triangle"
+        },
+        "vibratoValues": {
+          "amount": 0,
+          "speed": 10
+        },
+        "noteValues": [
+          {
+            "value": "C3",
+            "lengthFactor": 0.5
+          },
+          {
+            "value": "C3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D#3/Eb3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "G3",
+            "lengthFactor": 1.5
+          },
+          {
+            "value": "F#3/Gb3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F#3/Gb3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "",
+            "lengthFactor": 0.5
+          },
+          {
+            "value": "F3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D#3/Eb3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C3",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C3",
+            "lengthFactor": 1.5
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          }
+        ]
+      },
+      {
+        "envelope": {
+          "attackTime": 0.2,
+          "noteLength": 1,
+          "releaseTime": 0.5,
+          "sustainLevel": 0.38
+        },
+        "mainValues": {
+          "tempo": 100,
+          "masterVolume": 0.2
+        },
+        "oscillator": {
+          "waveform": "triangle"
+        },
+        "vibratoValues": {
+          "amount": 0,
+          "speed": 10
+        },
+        "noteValues": [
+          {
+            "value": "C4",
+            "lengthFactor": 0.5
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D#4/Eb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "G4",
+            "lengthFactor": 1.5
+          },
+          {
+            "value": "F#4/Gb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F#4/Gb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "",
+            "lengthFactor": 0.5
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D#4/Eb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1.5
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          }
+        ]
+      },
+      {
+        "envelope": {
+          "attackTime": 0.2,
+          "noteLength": 1,
+          "releaseTime": 0.5,
+          "sustainLevel": 0.38
+        },
+        "mainValues": {
+          "tempo": 100,
+          "masterVolume": 0.2
+        },
+        "oscillator": {
+          "waveform": "triangle"
+        },
+        "vibratoValues": {
+          "amount": 0,
+          "speed": 10
+        },
+        "noteValues": [
+          {
+            "value": "C4",
+            "lengthFactor": 0.5
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D#4/Eb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "G4",
+            "lengthFactor": 1.5
+          },
+          {
+            "value": "F#4/Gb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F#4/Gb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "",
+            "lengthFactor": 0.5
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "F4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "D#4/Eb4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1
+          },
+          {
+            "value": "C4",
+            "lengthFactor": 1.5
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          },
+          {
+            "value": "",
+            "lengthFactor": 0
+          }
+        ]
+      }
+    ],
+    "trackCount": 4,
+    "noteInputCount": 20,
+    "isTrackMuted": [
+      false,
+      false,
+      false,
+      false
+    ]
+  }
+}

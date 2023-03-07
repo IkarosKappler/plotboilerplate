@@ -1354,8 +1354,7 @@ export class BezierPath implements SVGSerializable {
     // Convert to object
     var bezierPath: BezierPath = new BezierPath(null); // No points yet
 
-    // var firstStartPoint: Vertex;
-    var startPoint: Vertex;
+    var startPoint: Vertex = new Vertex();
     var startControlPoint: Vertex;
     var endControlPoint: Vertex;
     var endPoint: Vertex;
@@ -1381,7 +1380,7 @@ export class BezierPath implements SVGSerializable {
 
       i += 6;
     } while (i + 2 < pointArray.length);
-    bezierPath.adjustCircular = adjustCircular;
+    bezierPath.adjustCircular = adjustCircular ?? false;
     if (adjustCircular) {
       bezierPath.bezierCurves[bezierPath.bezierCurves.length - 1].endPoint = bezierPath.bezierCurves[0].startPoint;
     }
