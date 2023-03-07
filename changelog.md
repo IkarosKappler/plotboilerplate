@@ -1,5 +1,7 @@
 # Changelog
 
+- 2023-03-06
+  - Finalizing the audio demo (demo-46).
 - 2023-02-10
   - Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
   - All non-function attributes of the `Config` interface are now mandatory.
