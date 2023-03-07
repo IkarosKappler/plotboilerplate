@@ -93,7 +93,6 @@ var NoteSelectHandler = /** @class */ (function () {
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
             createNoteSelectRow(noteSelectsTable, trackIndex, noteInputCount, handleNoteSelectChange, handleNoteDurationChange, handleTrackMutedChange, handleTrackSelectedChange);
             this._noteSelects[trackIndex] = document.querySelectorAll("select[data-trackindex='" + trackIndex + "'].note-select");
-            // this.isTrackMuted.push(false);
         }
         this._noteLengthSliders = [];
         for (var trackIndex = 0; trackIndex < this.trackCount; trackIndex++) {
@@ -122,12 +121,9 @@ var NoteSelectHandler = /** @class */ (function () {
                 mainValues: cloneObject_1.cloneObject(preset.mainValues),
                 oscillator: cloneObject_1.cloneObject(preset.oscillator),
                 vibratoValues: cloneObject_1.cloneObject(preset.vibratoValues),
-                // delayValues: cloneObject(preset.delayValues)
                 isMuted: false
             };
-            // track.envelope = { preset.envelope};
             this.tracks.push(track);
-            // track.currentNotes = convertPresetToNotes(DEFAULT_NOTE_INPUT_COUNT, preset.noteValues);
             track.currentNotes = presets_1.convertPresetToNotes(this.noteInputCount, preset.noteValues);
             if (trackIndex === 1) {
                 // For testing: transpose the first track one octave down
@@ -168,20 +164,9 @@ var NoteSelectHandler = /** @class */ (function () {
                 mainValues: cloneObject_1.cloneObject(preset.mainValues),
                 oscillator: cloneObject_1.cloneObject(preset.oscillator),
                 vibratoValues: cloneObject_1.cloneObject(preset.vibratoValues),
-                // delayValues: cloneObject(preset.delayValues)
-                isMuted: trackIsMuted //  false
+                isMuted: trackIsMuted
             };
-            // const track : Track = noteValues.tracks[trackIndex];
-            // track.envelope = { preset.envelope};
             this.tracks.push(track);
-            // track.currentNotes = convertPresetToNotes(DEFAULT_NOTE_INPUT_COUNT, preset.noteValues);
-            // track.currentNotes = convertPresetToNotes(this.noteInputCount, preset.noteValues);
-            // if (trackIndex === 1) {
-            //   // For testing: transpose the first track one octave down
-            //   for (var i = 0; i < track.currentNotes.length; i++) {
-            //     track.currentNotes[i].noteIndex -= 12;
-            //   }
-            // }
         }
         this.setCurrentNoteLengthInputs();
         this.setNoteSelects();
