@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2023-01-17
+date: 2023-08-14
 ---
 
 <h3>Basics</h3>
@@ -233,6 +233,16 @@ date: 2023-01-17
 <div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/44-truchet-tiles/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20221010-1-truchet-tiles-bright.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/45-bezier-curvature-animation/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20230123-0-curvature-bezier-path-animation.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/46-simple-audio-control/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20230201-synthesizer.png');"></div>
    </a>
 </div>
 <div class="demo-box">

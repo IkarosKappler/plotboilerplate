@@ -157,6 +157,10 @@ For a guide of how to [Getting Started click here](https://github.com/IkarosKapp
 
 A full working demo repository about the [Usage with Typescript is here](https://github.com/IkarosKappler/plotboilerplate-typescript-example "usage with Typescript is here").
 
+### Codepen Demos
+
+[Basic Setup in a Codepen.io demo](https://codepen.io/ikaroskappler/pen/ZEjamVb)
+
 ### Screenshot
 
 ![Simple Demo](https://plotboilerplate.io/repo/screenshots/screenshot-20190220_3_simpledemo.png "The simple demo")
@@ -358,6 +362,14 @@ var pb = new PlotBoilerplate({
   //   Indicates if the application should handle mouse wheelevents for you.
   enableMouseWheel: true,
 
+  // boolean (default true)
+  //    Use this to disable panning completely.
+  enablePan: true,
+
+  // boolean (default true)
+  //    Use this to disable zooming completely.
+  enableZoom: true,
+
   // Indicates if the SVG export should be enabled (default is true).
   enableSVGExport: true,
 
@@ -546,7 +558,8 @@ new MouseHandler(document.getElementById("mycanvas"))
 - [jburkardt](https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html "jburkardt") for the obj test files.
 - [@veltman](https://noahveltman.com/) for the awesome [geometric skeletonization article](https://observablehq.com/@veltman/centerline-labeling)
 - [girih-tiles-spatial.jpg from Lund University, Architecture, Spatial Experiments, 2016.](https://spatialexperiments.wordpress.com/2016/09/19/islamic-geometry/girih-tiles-4/)
-- [https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115] Josh Frank's regular expression for parsing SVG path data.
+- [Josh Frank's regular expression for parsing SVG path data.](https://javascript.plainenglish.io/june-3-parsing-and-validating-svg-paths-with-regex-7bd0e245115)
+- [Rick Moore for the useful javascript-synthesizer howto](https://medium.com/geekculture/building-a-modular-synth-with-web-audio-api-and-javascript-d38ccdeca9ea)
 
 ## Todos
 
@@ -559,6 +572,9 @@ new MouseHandler(document.getElementById("mycanvas"))
 - The minifid BBTree and BBTreeCollection files do not export anything. The un-minified does. Why that?
 - Arcs and ellipses break when non-uniform scaling (scalex!=scaley) is applied. Convert them to Bézier curves before drawing.
 - Currently no more known. Please report bugs.
+
+Oh look, a cat
+ᓚᘏᗢ
 ## Basics
 [How to use the basic classes](basics.html "How to use the basic classes")
 ## Changelog

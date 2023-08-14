@@ -70,13 +70,6 @@
     /* In comobination with JSDoc-CSS these would be overridden */
     float: right;
     line-height: 56px;
-    /*
-    float: right !important;
-    line-height: 56px !important;
-    width: auto !important; 
-    border-left: none !important;
-    padding-left: 0px !important;
-    margin-top: 0px !important; */
 
     .menu-icon {
         display: none;
@@ -89,6 +82,11 @@
         // Gaps between nav items, but not on the last one
         &:not(:last-child) {
             margin-right: 20px;
+        }
+
+        & .icon img {
+            width: 16px;
+            height: 16px;
         }
     }
 
