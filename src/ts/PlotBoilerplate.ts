@@ -2314,7 +2314,7 @@ export class PlotBoilerplate {
        * @param {boolean} fallback - A default value if the key does not exist.
        * @return {boolean}
        **/
-      bool: (obj: any, key: string, fallback: boolean) => {
+      bool: (obj: any, key: string, fallback: boolean | null) => {
         if (!obj.hasOwnProperty(key)) return fallback;
         if (typeof obj[key] == "boolean") return obj[key];
         else {

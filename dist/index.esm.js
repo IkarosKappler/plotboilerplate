@@ -1,18 +1,4 @@
 /**
- * @classdesc A static UIDGenerator.
- *
- * @author  Ikaros Kappler
- * @date    2021-01-20
- * @version 1.0.0
- */
-class UIDGenerator {
-    static next() {
-        return `${UIDGenerator.current++}`;
-    }
-}
-UIDGenerator.current = 0;
-
-/**
  * @author   Ikaros Kappler
  * @date     2018-08-26
  * @modified 2018-11-17 Added the 'isSelected' attribute.
@@ -64,6 +50,20 @@ VertexAttr.model = {
     isSelected: false,
     visible: true
 };
+
+/**
+ * @classdesc A static UIDGenerator.
+ *
+ * @author  Ikaros Kappler
+ * @date    2021-01-20
+ * @version 1.0.0
+ */
+class UIDGenerator {
+    static next() {
+        return `${UIDGenerator.current++}`;
+    }
+}
+UIDGenerator.current = 0;
 
 /**
  * @author   Ikaros Kappler
@@ -965,6 +965,441 @@ Vertex.utils = {
 };
 
 /**
+ * @author Ikaros Kappler
+ * @date   2020-03-24
+ * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
+ * @modified 2020-05-12 The angle(line) param was still not optional. Changed that.
+ * @modified 2020-11-11 Generalized the `add` and `sub` param from `Vertex` to `XYCoords`.
+ * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
+ * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
+ * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
+ * @modified 2021-01-20 Added UID.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @version 1.2.0
+ */
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requires UID
+ * @requires Vertex
+ * @requires XYCoords
+ */
+class VertTuple {
+    /**
+     * Creates an instance.
+     *
+     * @constructor
+     * @name VertTuple
+     * @param {Vertex} a The tuple's first point.
+     * @param {Vertex} b The tuple's second point.
+     **/
+    constructor(a, b, factory) {
+        this.uid = UIDGenerator.next();
+        this.a = a;
+        this.b = b;
+        this.factory = factory;
+    }
+    /**
+     * Get the length of this line.
+     *
+     * @method length
+     * @instance
+     * @memberof VertTuple
+     **/
+    length() {
+        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
+    }
+    /**
+     * Set the length of this vector to the given amount. This only works if this
+     * vector is not a null vector.
+     *
+     * @method setLength
+     * @param {number} length - The desired length.
+     * @memberof VertTuple
+     * @return {T} this (for chaining)
+     **/
+    setLength(length) {
+        return this.scale(length / this.length());
+    }
+    /**
+     * Substract the given vertex from this line's end points.
+     *
+     * @method sub
+     * @param {XYCoords} amount The amount (x,y) to substract.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    sub(amount) {
+        this.a.sub(amount);
+        this.b.sub(amount);
+        return this;
+    }
+    /**
+     * Add the given vertex to this line's end points.
+     *
+     * @method add
+     * @param {XYCoords} amount The amount (x,y) to add.
+     * @return {Line} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    add(amount) {
+        this.a.add(amount);
+        this.b.add(amount);
+        return this;
+    }
+    /**
+     * Normalize this line (set to length 1).
+     *
+     * @method normalize
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    normalize() {
+        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
+        return this;
+    }
+    /**
+     * Scale this line by the given factor.
+     *
+     * @method scale
+     * @param {number} factor The factor for scaling (1.0 means no scale).
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    scale(factor) {
+        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
+        return this;
+    }
+    /**
+     * Move this line to a new location.
+     *
+     * @method moveTo
+     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    moveTo(newA) {
+        let diff = this.a.difference(newA);
+        this.a.add(diff);
+        this.b.add(diff);
+        return this;
+    }
+    /**
+     * Get the angle between this and the passed line (in radians).
+     *
+     * @method angle
+     * @param {VertTuple} line - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
+     * @return {number} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    angle(line) {
+        if (line == null || typeof line == "undefined") {
+            line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
+        }
+        // Compute the angle from x axis and the return the difference :)
+        const v0 = this.b.clone().sub(this.a);
+        const v1 = line.b.clone().sub(line.a);
+        // Thank you, Javascript, for this second atan function. No additional math is needed here!
+        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
+        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
+    }
+    /**
+     * Get line point at position t in [0 ... 1]:<br>
+     * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
+     * <br>
+     * The counterpart of this function is Line.getClosestT(Vertex).
+     *
+     * @method vertAt
+     * @param {number} t The position scalar.
+     * @return {Vertex} The vertex a position t.
+     * @instance
+     * @memberof VertTuple
+     **/
+    vertAt(t) {
+        return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
+    }
+    /**
+     * Get the denominator of this and the given line.
+     *
+     * If the denominator is zero (or close to zero) both line are co-linear.
+     *
+     * @method denominator
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
+     * @return {Number}
+     **/
+    denominator(line) {
+        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
+        return (line.b.y - line.a.y) * (this.b.x - this.a.x) - (line.b.x - line.a.x) * (this.b.y - this.a.y);
+    }
+    /**
+     * Checks if this and the given line are co-linear.
+     *
+     * The constant Vertex.EPSILON is used for tolerance.
+     *
+     * @method colinear
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
+     * @return true if both lines are co-linear.
+     */
+    colinear(line) {
+        return Math.abs(this.denominator(line)) < Vertex.EPSILON;
+    }
+    /**
+     * Get the closest position T from this line to the specified point.
+     *
+     * The counterpart for this function is Line.vertAt(Number).
+     *
+     * @name getClosetT
+     * @method getClosestT
+     * @param {XYCoords} p The point (vertex) to measure the distance to.
+     * @return {number} The line position t of minimal distance to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    getClosestT(p) {
+        var l2 = VertTuple.vtutils.dist2(this.a, this.b);
+        if (l2 === 0)
+            return 0;
+        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
+        // Do not wrap to [0,1] here.
+        // Other results are of interest, too.
+        // t = Math.max(0, Math.min(1, t));
+        return t;
+    }
+    /**
+     * Check if the given point is located on this line. Optionally also check if
+     * that point is located between point `a` and `b`.
+     *
+     * @method hasPoint
+     * @param {Vertex} point The point to check.
+     * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
+     * @return {boolean} True if the given point is on this line.
+     * @instance
+     * @memberof VertTuple
+     */
+    hasPoint(point, insideBoundsOnly) {
+        const t = this.getClosestT(point);
+        // Compare to pointDistance?
+        if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
+            const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
+            return distance < Vertex.EPSILON && t >= 0 && t <= 1;
+        }
+        else {
+            return t >= 0 && t <= 1;
+        }
+    }
+    /**
+     * Get the closest point on this line to the specified point.
+     *
+     * @method getClosestPoint
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {Vertex} The point on the line that is closest to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    getClosestPoint(p) {
+        var t = this.getClosestT(p);
+        return this.vertAt(t);
+    }
+    /**
+     * The the minimal distance between this line and the specified point.
+     *
+     * @method pointDistance
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {number} The absolute minimal distance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    pointDistance(p) {
+        // Taken From:
+        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+        return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
+    }
+    /**
+     * Create a deep clone of this instance.
+     *
+     * @method cloneLine
+     * @return {T} A type safe clone if this instance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    clone() {
+        return this.factory(this.a.clone(), this.b.clone());
+    }
+    /**
+     * Create a string representation of this line.
+     *
+     * @method totring
+     * @return {string} The string representing this line.
+     * @instance
+     * @memberof VertTuple
+     **/
+    toString() {
+        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
+    }
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.a.destroy();
+        this.b.destroy();
+        this.isDestroyed = true;
+    }
+}
+/**
+ * @private
+ **/
+VertTuple.vtutils = {
+    dist2: (v, w) => {
+        return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+    }
+};
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2016-03-12
+ * @modified 2018-12-05 Refactored the code from the morley-triangle script.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
+ * @modified 2019-09-02 Added the Line.add( Vertex ) function.
+ * @modified 2019-09-02 Added the Line.denominator( Line ) function.
+ * @modified 2019-09-02 Added the Line.colinear( Line ) function.
+ * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
+ * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
+ * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
+ * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
+ * @version  2.3.0
+ *
+ * @file Line
+ * @public
+ **/
+/**
+ * @classdesc A line consists of two vertices a and b.<br>
+ * <br>
+ * This is some refactored code from my 'Morley Triangle' test<br>
+ *   https://github.com/IkarosKappler/morleys-trisector-theorem
+ *
+ * @requires Vertex
+ */
+class Line extends VertTuple {
+    /**
+     * Creates an instance of Line.
+     *
+     * @constructor
+     * @name Line
+     * @param {Vertex} a The line's first point.
+     * @param {Vertex} b The line's second point.
+     **/
+    constructor(a, b) {
+        super(a, b, (a, b) => new Line(a, b));
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Line";
+    }
+    /**
+     * Get the intersection if this line and the specified line.
+     *
+     * @method intersection
+     * @param {Line} line The second line.
+     * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
+     * @instance
+     * @memberof Line
+     **/
+    // !!! DO NOT MOVE TO VertTuple
+    intersection(line) {
+        const denominator = this.denominator(line);
+        if (denominator == 0) {
+            return null;
+        }
+        let a = this.a.y - line.a.y;
+        let b = this.a.x - line.a.x;
+        const numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
+        const numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
+        a = numerator1 / denominator; // NaN if parallel lines
+        b = numerator2 / denominator;
+        // Catch NaN?
+        const x = this.a.x + a * (this.b.x - this.a.x);
+        const y = this.a.y + a * (this.b.y - this.a.y);
+        if (isNaN(a) || isNaN(x) || isNaN(y)) {
+            return null;
+        }
+        // if we cast these lines infinitely in both directions, they intersect here:
+        return new Vertex(x, y);
+    }
+    //--- Implement PathSegment ---
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    getStartPoint() {
+        return this.a;
+    }
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    getEndPoint() {
+        return this.b;
+    }
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    getStartTangent() {
+        return this.b;
+    }
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    getEndTangent() {
+        return this.a;
+    }
+    /**
+     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
+     *
+     * @method reverse
+     * @memberof PathSegment
+     * @return {PathSegment} This path segment instance (for chaining).
+     */
+    reverse() {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
+    }
+}
+
+/**
  * @author   Ikaros Kappler
  * @date     2018-04-14
  * @modified 2018-11-17 Added the containsVert function.
@@ -990,7 +1425,9 @@ Vertex.utils = {
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-03-08 Added the `Polygon.clone()` function.
- * @version 1.10.0
+ * @modified 2023-09-25 Added the `Polygon.getInterpolationPolygon(number)` function.
+ * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line)` function.
+ * @version 1.11.0
  *
  * @file Polygon
  * @public
@@ -1191,6 +1628,72 @@ class Polygon {
             this.vertices[i].rotate(angle, center);
         }
         return this;
+    }
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with (no bounds, just an infinite line).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line) {
+        // Find the intersections of all lines inside the edge bounds
+        const intersectionPoints = [];
+        for (var i = 0; i < this.vertices.length; i++) {
+            const polyLine = new Line(this.vertices[i], this.vertices[(i + 1) % this.vertices.length]);
+            const intersection = polyLine.intersection(line);
+            // true => only inside bounds
+            // ignore last edge if open
+            if ((!this.isOpen || i + 1 !== this.vertices.length) && intersection !== null && polyLine.hasPoint(intersection, true)) {
+                intersectionPoints.push(intersection);
+            }
+        }
+        return intersectionPoints;
+    }
+    closestLinetIntersection(line) {
+        const allIntersections = this.lineIntersections(line);
+        if (allIntersections.length <= 0) {
+            // Empty polygon -> no intersections
+            return null;
+        }
+        // Find the closest intersection
+        let closestIntersection = new Vertex(Number.MAX_VALUE, Number.MAX_VALUE);
+        let curDist = Number.MAX_VALUE;
+        for (var i in allIntersections) {
+            const curVert = allIntersections[i];
+            const dist = curVert.distance(line.a);
+            if (dist < curDist && line.hasPoint(curVert)) {
+                curDist = dist;
+                closestIntersection = curVert;
+            }
+        }
+        return closestIntersection;
+    }
+    /**
+     * Construct a new polygon from this polygon with more vertices on each edge. The
+     * interpolation count determines the number of additional vertices on each edge.
+     * An interpolation count of `0` will return a polygon that equals the source
+     * polygon.
+     *
+     * @param {number} interpolationCount
+     * @returns {Polygon} A polygon with `interpolationCount` more vertices (as as factor).
+     */
+    getInterpolationPolygon(interpolationCount) {
+        const verts = [];
+        for (var i = 0; i < this.vertices.length; i++) {
+            const curVert = this.vertices[i];
+            const nextVert = this.vertices[(i + 1) % this.vertices.length];
+            verts.push(curVert.clone());
+            // Add interpolation points
+            if (!this.isOpen || i + 1 !== this.vertices.length) {
+                const lerpAmount = 1.0 / (interpolationCount + 1);
+                for (var j = 1; j <= interpolationCount; j++) {
+                    verts.push(curVert.clone().lerp(nextVert, lerpAmount * j));
+                }
+            }
+        }
+        return new Polygon(verts, this.isOpen);
     }
     /**
      * Convert this polygon into a new polygon with n evenly distributed vertices.
@@ -1567,308 +2070,6 @@ class Bounds {
         return new Bounds(origin !== null && origin !== void 0 ? origin : { x: 0, y: 0 }, { x: (origin ? origin.x : 0) + width, y: (origin ? origin.y : 0) + height });
     }
 } // END class bounds
-
-/**
- * @author Ikaros Kappler
- * @date   2020-03-24
- * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
- * @modified 2020-05-12 The angle(line) param was still not optional. Changed that.
- * @modified 2020-11-11 Generalized the `add` and `sub` param from `Vertex` to `XYCoords`.
- * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
- * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
- * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
- * @modified 2021-01-20 Added UID.
- * @modified 2022-02-02 Added the `destroy` method.
- * @version 1.2.0
- */
-/**
- * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
- * @abstract
- * @requires UID
- * @requires Vertex
- * @requires XYCoords
- */
-class VertTuple {
-    /**
-     * Creates an instance.
-     *
-     * @constructor
-     * @name VertTuple
-     * @param {Vertex} a The tuple's first point.
-     * @param {Vertex} b The tuple's second point.
-     **/
-    constructor(a, b, factory) {
-        this.uid = UIDGenerator.next();
-        this.a = a;
-        this.b = b;
-        this.factory = factory;
-    }
-    /**
-     * Get the length of this line.
-     *
-     * @method length
-     * @instance
-     * @memberof VertTuple
-     **/
-    length() {
-        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
-    }
-    /**
-     * Set the length of this vector to the given amount. This only works if this
-     * vector is not a null vector.
-     *
-     * @method setLength
-     * @param {number} length - The desired length.
-     * @memberof VertTuple
-     * @return {T} this (for chaining)
-     **/
-    setLength(length) {
-        return this.scale(length / this.length());
-    }
-    /**
-     * Substract the given vertex from this line's end points.
-     *
-     * @method sub
-     * @param {XYCoords} amount The amount (x,y) to substract.
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    sub(amount) {
-        this.a.sub(amount);
-        this.b.sub(amount);
-        return this;
-    }
-    /**
-     * Add the given vertex to this line's end points.
-     *
-     * @method add
-     * @param {XYCoords} amount The amount (x,y) to add.
-     * @return {Line} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    add(amount) {
-        this.a.add(amount);
-        this.b.add(amount);
-        return this;
-    }
-    /**
-     * Normalize this line (set to length 1).
-     *
-     * @method normalize
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    normalize() {
-        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
-        return this;
-    }
-    /**
-     * Scale this line by the given factor.
-     *
-     * @method scale
-     * @param {number} factor The factor for scaling (1.0 means no scale).
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    scale(factor) {
-        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
-        return this;
-    }
-    /**
-     * Move this line to a new location.
-     *
-     * @method moveTo
-     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    moveTo(newA) {
-        let diff = this.a.difference(newA);
-        this.a.add(diff);
-        this.b.add(diff);
-        return this;
-    }
-    /**
-     * Get the angle between this and the passed line (in radians).
-     *
-     * @method angle
-     * @param {VertTuple} line - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
-     * @return {number} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    angle(line) {
-        if (line == null || typeof line == "undefined") {
-            line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
-        }
-        // Compute the angle from x axis and the return the difference :)
-        const v0 = this.b.clone().sub(this.a);
-        const v1 = line.b.clone().sub(line.a);
-        // Thank you, Javascript, for this second atan function. No additional math is needed here!
-        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
-        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
-    }
-    /**
-     * Get line point at position t in [0 ... 1]:<br>
-     * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
-     * <br>
-     * The counterpart of this function is Line.getClosestT(Vertex).
-     *
-     * @method vertAt
-     * @param {number} t The position scalar.
-     * @return {Vertex} The vertex a position t.
-     * @instance
-     * @memberof VertTuple
-     **/
-    vertAt(t) {
-        return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
-    }
-    /**
-     * Get the denominator of this and the given line.
-     *
-     * If the denominator is zero (or close to zero) both line are co-linear.
-     *
-     * @method denominator
-     * @param {VertTuple} line
-     * @instance
-     * @memberof VertTuple
-     * @return {Number}
-     **/
-    denominator(line) {
-        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
-        return (line.b.y - line.a.y) * (this.b.x - this.a.x) - (line.b.x - line.a.x) * (this.b.y - this.a.y);
-    }
-    /**
-     * Checks if this and the given line are co-linear.
-     *
-     * The constant Vertex.EPSILON is used for tolerance.
-     *
-     * @method colinear
-     * @param {VertTuple} line
-     * @instance
-     * @memberof VertTuple
-     * @return true if both lines are co-linear.
-     */
-    colinear(line) {
-        return Math.abs(this.denominator(line)) < Vertex.EPSILON;
-    }
-    /**
-     * Get the closest position T from this line to the specified point.
-     *
-     * The counterpart for this function is Line.vertAt(Number).
-     *
-     * @name getClosetT
-     * @method getClosestT
-     * @param {XYCoords} p The point (vertex) to measure the distance to.
-     * @return {number} The line position t of minimal distance to p.
-     * @instance
-     * @memberof VertTuple
-     **/
-    getClosestT(p) {
-        var l2 = VertTuple.vtutils.dist2(this.a, this.b);
-        if (l2 === 0)
-            return 0;
-        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
-        // Do not wrap to [0,1] here.
-        // Other results are of interest, too.
-        // t = Math.max(0, Math.min(1, t));
-        return t;
-    }
-    /**
-     * Check if the given point is located on this line. Optionally also check if
-     * that point is located between point `a` and `b`.
-     *
-     * @method hasPoint
-     * @param {Vertex} point The point to check.
-     * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
-     * @return {boolean} True if the given point is on this line.
-     * @instance
-     * @memberof VertTuple
-     */
-    hasPoint(point, insideBoundsOnly) {
-        const t = this.getClosestT(point);
-        // Compare to pointDistance?
-        if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
-            const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
-            return distance < Vertex.EPSILON && t >= 0 && t <= 1;
-        }
-        else {
-            return t >= 0 && t <= 1;
-        }
-    }
-    /**
-     * Get the closest point on this line to the specified point.
-     *
-     * @method getClosestPoint
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {Vertex} The point on the line that is closest to p.
-     * @instance
-     * @memberof VertTuple
-     **/
-    getClosestPoint(p) {
-        var t = this.getClosestT(p);
-        return this.vertAt(t);
-    }
-    /**
-     * The the minimal distance between this line and the specified point.
-     *
-     * @method pointDistance
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {number} The absolute minimal distance.
-     * @instance
-     * @memberof VertTuple
-     **/
-    pointDistance(p) {
-        // Taken From:
-        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-        return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
-    }
-    /**
-     * Create a deep clone of this instance.
-     *
-     * @method cloneLine
-     * @return {T} A type safe clone if this instance.
-     * @instance
-     * @memberof VertTuple
-     **/
-    clone() {
-        return this.factory(this.a.clone(), this.b.clone());
-    }
-    /**
-     * Create a string representation of this line.
-     *
-     * @method totring
-     * @return {string} The string representing this line.
-     * @instance
-     * @memberof VertTuple
-     **/
-    toString() {
-        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
-    }
-    /**
-     * This function should invalidate any installed listeners and invalidate this object.
-     * After calling this function the object might not hold valid data any more and
-     * should not be used.
-     */
-    destroy() {
-        this.a.destroy();
-        this.b.destroy();
-        this.isDestroyed = true;
-    }
-}
-/**
- * @private
- **/
-VertTuple.vtutils = {
-    dist2: (v, w) => {
-        return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
-    }
-};
 
 /**
  * @author   Ikaros Kappler
@@ -3951,138 +4152,6 @@ BezierPath.START_CONTROL_POINT = 1;
 BezierPath.END_CONTROL_POINT = 2;
 /** @constant {number} */
 BezierPath.END_POINT = 3;
-
-/**
- * @author   Ikaros Kappler
- * @date     2016-03-12
- * @modified 2018-12-05 Refactored the code from the morley-triangle script.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
- * @modified 2019-09-02 Added the Line.add( Vertex ) function.
- * @modified 2019-09-02 Added the Line.denominator( Line ) function.
- * @modified 2019-09-02 Added the Line.colinear( Line ) function.
- * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
- * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
- * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
- * @modified 2022-02-02 Added the `destroy` method.
- * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
- * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
- * @version  2.3.0
- *
- * @file Line
- * @public
- **/
-/**
- * @classdesc A line consists of two vertices a and b.<br>
- * <br>
- * This is some refactored code from my 'Morley Triangle' test<br>
- *   https://github.com/IkarosKappler/morleys-trisector-theorem
- *
- * @requires Vertex
- */
-class Line extends VertTuple {
-    /**
-     * Creates an instance of Line.
-     *
-     * @constructor
-     * @name Line
-     * @param {Vertex} a The line's first point.
-     * @param {Vertex} b The line's second point.
-     **/
-    constructor(a, b) {
-        super(a, b, (a, b) => new Line(a, b));
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Line";
-    }
-    /**
-     * Get the intersection if this line and the specified line.
-     *
-     * @method intersection
-     * @param {Line} line The second line.
-     * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
-     * @instance
-     * @memberof Line
-     **/
-    // !!! DO NOT MOVE TO VertTuple
-    intersection(line) {
-        const denominator = this.denominator(line);
-        if (denominator == 0) {
-            return null;
-        }
-        let a = this.a.y - line.a.y;
-        let b = this.a.x - line.a.x;
-        const numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
-        const numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
-        a = numerator1 / denominator; // NaN if parallel lines
-        b = numerator2 / denominator;
-        // Catch NaN?
-        const x = this.a.x + a * (this.b.x - this.a.x);
-        const y = this.a.y + a * (this.b.y - this.a.y);
-        if (isNaN(a) || isNaN(x) || isNaN(y)) {
-            return null;
-        }
-        // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(x, y);
-    }
-    //--- Implement PathSegment ---
-    /**
-     * Get the start point of this path segment.
-     *
-     * @method getStartPoint
-     * @memberof PathSegment
-     * @return {Vertex} The start point of this path segment.
-     */
-    getStartPoint() {
-        return this.a;
-    }
-    /**
-     * Get the end point of this path segment.
-     *
-     * @method getEndPoint
-     * @memberof PathSegment
-     * @return {Vertex} The end point of this path segment.
-     */
-    getEndPoint() {
-        return this.b;
-    }
-    /**
-     * Get the tangent's end point at the start point of this segment.
-     *
-     * @method getStartTangent
-     * @memberof PathSegment
-     * @return {Vertex} The end point of the starting point's tangent.
-     */
-    getStartTangent() {
-        return this.b;
-    }
-    /**
-     * Get the tangent's end point at the end point of this segment.
-     *
-     * @method getEndTangent
-     * @memberof PathSegment
-     * @return {Vertex} The end point of the ending point's tangent.
-     */
-    getEndTangent() {
-        return this.a;
-    }
-    /**
-     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
-     *
-     * @method reverse
-     * @memberof PathSegment
-     * @return {PathSegment} This path segment instance (for chaining).
-     */
-    reverse() {
-        var tmp = this.a;
-        this.a = this.b;
-        this.b = tmp;
-        return this;
-    }
-}
 
 /**
  * @author   Ikaros Kappler
@@ -8961,7 +9030,8 @@ class PBImage {
  * @author   Ikaros Kappler
  * @date     2021-11-16
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  1.1.0
+ * @modified 2023-09-25 Fixed a type error in the constructor. Nothing vital.
+ * @version  1.1.1
  **/
 /**
  * @classdesc A simple text element: position, fontSize, fontFamily, color, textAlign, lineHeight and rotation.
@@ -8992,14 +9062,14 @@ class PBText {
         this.uid = UIDGenerator.next();
         this.text = text;
         this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex();
-        this.color = options.color;
-        this.fontFamily = options.fontFamily;
-        this.fontSize = options.fontSize;
-        this.fontStyle = options.fontStyle;
-        this.fontWeight = options.fontWeight;
-        this.lineHeight = options.lineHeight;
-        this.textAlign = options.textAlign;
-        this.rotation = options.rotation;
+        this.color = options === null || options === void 0 ? void 0 : options.color;
+        this.fontFamily = options === null || options === void 0 ? void 0 : options.fontFamily;
+        this.fontSize = options === null || options === void 0 ? void 0 : options.fontSize;
+        this.fontStyle = options === null || options === void 0 ? void 0 : options.fontStyle;
+        this.fontWeight = options === null || options === void 0 ? void 0 : options.fontWeight;
+        this.lineHeight = options === null || options === void 0 ? void 0 : options.lineHeight;
+        this.textAlign = options === null || options === void 0 ? void 0 : options.textAlign;
+        this.rotation = options === null || options === void 0 ? void 0 : options.rotation;
     }
     /**
      * This function should invalidate any installed listeners and invalidate this object.

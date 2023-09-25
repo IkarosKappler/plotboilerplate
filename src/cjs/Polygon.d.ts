@@ -24,13 +24,16 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-03-08 Added the `Polygon.clone()` function.
- * @version 1.10.0
+ * @modified 2023-09-25 Added the `Polygon.getInterpolationPolygon(number)` function.
+ * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line)` function.
+ * @version 1.11.0
  *
  * @file Polygon
  * @public
  **/
 import { BezierPath } from "./BezierPath";
 import { Bounds } from "./Bounds";
+import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
 import { XYCoords, SVGSerializable, UID } from "./interfaces";
 /**
@@ -202,6 +205,26 @@ export declare class Polygon implements SVGSerializable {
      * @return {Polygon} this, for chaining.
      **/
     rotate(angle: number, center: Vertex): Polygon;
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with (no bounds, just an infinite line).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line: VertTuple<any>): Array<Vertex>;
+    closestLinetIntersection(line: VertTuple<any>): Vertex | null;
+    /**
+     * Construct a new polygon from this polygon with more vertices on each edge. The
+     * interpolation count determines the number of additional vertices on each edge.
+     * An interpolation count of `0` will return a polygon that equals the source
+     * polygon.
+     *
+     * @param {number} interpolationCount
+     * @returns {Polygon} A polygon with `interpolationCount` more vertices (as as factor).
+     */
+    getInterpolationPolygon(interpolationCount: number): Polygon;
     /**
      * Convert this polygon into a new polygon with n evenly distributed vertices.
      *

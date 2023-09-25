@@ -2,7 +2,8 @@
  * @author   Ikaros Kappler
  * @date     2021-11-16
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  1.1.0
+ * @modified 2023-09-25 Fixed a type error in the constructor. Nothing vital.
+ * @version  1.1.1
  **/
 import { Vertex } from "./Vertex";
 import { FontOptions, FontStyle, FontWeight, SVGSerializable, UID } from "./interfaces";

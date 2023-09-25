@@ -2,7 +2,8 @@
  * @author   Ikaros Kappler
  * @date     2021-11-16
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  1.1.0
+ * @modified 2023-09-25 Fixed a type error in the constructor. Nothing vital.
+ * @version  1.1.1
  **/
 
 import { UIDGenerator } from "./UIDGenerator";
@@ -127,14 +128,14 @@ export class PBText implements SVGSerializable, FontOptions {
     this.uid = UIDGenerator.next();
     this.text = text;
     this.anchor = anchor ?? new Vertex();
-    this.color = options.color;
-    this.fontFamily = options.fontFamily;
-    this.fontSize = options.fontSize;
-    this.fontStyle = options.fontStyle;
-    this.fontWeight = options.fontWeight;
-    this.lineHeight = options.lineHeight;
-    this.textAlign = options.textAlign;
-    this.rotation = options.rotation;
+    this.color = options?.color;
+    this.fontFamily = options?.fontFamily;
+    this.fontSize = options?.fontSize;
+    this.fontStyle = options?.fontStyle;
+    this.fontWeight = options?.fontWeight;
+    this.lineHeight = options?.lineHeight;
+    this.textAlign = options?.textAlign;
+    this.rotation = options?.rotation;
   }
 
   /**

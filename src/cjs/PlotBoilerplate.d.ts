@@ -834,7 +834,7 @@ export declare class PlotBoilerplate {
              * @param {boolean} fallback - A default value if the key does not exist.
              * @return {boolean}
              **/
-            bool: (obj: any, key: string, fallback: boolean) => any;
+            bool: (obj: any, key: string, fallback: boolean | null) => any;
             /**
              * A helper function to the the object property function-value specified by the given key.
              *

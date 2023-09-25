@@ -25,7 +25,9 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-03-08 Added the `Polygon.clone()` function.
- * @version 1.10.0
+ * @modified 2023-09-25 Added the `Polygon.getInterpolationPolygon(number)` function.
+ * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line)` function.
+ * @version 1.11.0
  *
  * @file Polygon
  * @public
@@ -34,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Polygon = void 0;
 var BezierPath_1 = require("./BezierPath");
 var Bounds_1 = require("./Bounds");
+var Line_1 = require("./Line");
 var UIDGenerator_1 = require("./UIDGenerator");
 var Vertex_1 = require("./Vertex");
 /**
@@ -232,6 +235,72 @@ var Polygon = /** @class */ (function () {
             this.vertices[i].rotate(angle, center);
         }
         return this;
+    };
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with (no bounds, just an infinite line).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    Polygon.prototype.lineIntersections = function (line) {
+        // Find the intersections of all lines inside the edge bounds
+        var intersectionPoints = [];
+        for (var i = 0; i < this.vertices.length; i++) {
+            var polyLine = new Line_1.Line(this.vertices[i], this.vertices[(i + 1) % this.vertices.length]);
+            var intersection = polyLine.intersection(line);
+            // true => only inside bounds
+            // ignore last edge if open
+            if ((!this.isOpen || i + 1 !== this.vertices.length) && intersection !== null && polyLine.hasPoint(intersection, true)) {
+                intersectionPoints.push(intersection);
+            }
+        }
+        return intersectionPoints;
+    };
+    Polygon.prototype.closestLinetIntersection = function (line) {
+        var allIntersections = this.lineIntersections(line);
+        if (allIntersections.length <= 0) {
+            // Empty polygon -> no intersections
+            return null;
+        }
+        // Find the closest intersection
+        var closestIntersection = new Vertex_1.Vertex(Number.MAX_VALUE, Number.MAX_VALUE);
+        var curDist = Number.MAX_VALUE;
+        for (var i in allIntersections) {
+            var curVert = allIntersections[i];
+            var dist = curVert.distance(line.a);
+            if (dist < curDist && line.hasPoint(curVert)) {
+                curDist = dist;
+                closestIntersection = curVert;
+            }
+        }
+        return closestIntersection;
+    };
+    /**
+     * Construct a new polygon from this polygon with more vertices on each edge. The
+     * interpolation count determines the number of additional vertices on each edge.
+     * An interpolation count of `0` will return a polygon that equals the source
+     * polygon.
+     *
+     * @param {number} interpolationCount
+     * @returns {Polygon} A polygon with `interpolationCount` more vertices (as as factor).
+     */
+    Polygon.prototype.getInterpolationPolygon = function (interpolationCount) {
+        var verts = [];
+        for (var i = 0; i < this.vertices.length; i++) {
+            var curVert = this.vertices[i];
+            var nextVert = this.vertices[(i + 1) % this.vertices.length];
+            verts.push(curVert.clone());
+            // Add interpolation points
+            if (!this.isOpen || i + 1 !== this.vertices.length) {
+                var lerpAmount = 1.0 / (interpolationCount + 1);
+                for (var j = 1; j <= interpolationCount; j++) {
+                    verts.push(curVert.clone().lerp(nextVert, lerpAmount * j));
+                }
+            }
+        }
+        return new Polygon(verts, this.isOpen);
     };
     /**
      * Convert this polygon into a new polygon with n evenly distributed vertices.

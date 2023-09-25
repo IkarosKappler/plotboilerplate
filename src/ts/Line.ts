@@ -15,6 +15,7 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
  * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
  * @version  2.3.0
  *
  * @file Line
@@ -61,7 +62,7 @@ export class Line extends VertTuple<Line> implements SVGSerializable, PathSegmen
    * @memberof Line
    **/
   // !!! DO NOT MOVE TO VertTuple
-  intersection(line: Line): Vertex | null {
+  intersection(line: VertTuple<any>): Vertex | null {
     const denominator: number = this.denominator(line);
     if (denominator == 0) {
       return null;
