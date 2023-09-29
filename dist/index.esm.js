@@ -359,6 +359,7 @@ class VertexListeners {
  * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
  * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
+ * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @version  2.8.0
  *
  * @file Vertex
@@ -873,6 +874,19 @@ class Vertex {
     inv() {
         this.x = -this.x;
         this.y = -this.y;
+        return this;
+    }
+    /**
+     * Set both coordinates of this vertex to their absolute value (abs(x), abs(y)).
+     *
+     * @method abs
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     */
+    abs() {
+        this.x = Math.abs(this.x);
+        this.y = Math.abs(this.y);
         return this;
     }
     /**

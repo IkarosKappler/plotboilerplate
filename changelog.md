@@ -13,7 +13,8 @@
   - Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
   - Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
   - Added the `randomPoint(...)` function declaration to the IBounds interface.
-  - Added the `Bounds.randomPoint` method.
+  - Added the `Bounds.randomPoint(...)` method.
+  - Added the `Vertex.abs()` method as it seems useful.
 - 2023-09-25
   - Added the `Polygon.getInterpolationPolygon(number)` function.
   - Added the `detectDarkMode` helper function.
