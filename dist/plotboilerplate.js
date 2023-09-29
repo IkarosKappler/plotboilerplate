@@ -8593,6 +8593,7 @@ exports.VertTuple = VertTuple;
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+ * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
  * @version  2.8.0
  *
  * @file Vertex
@@ -9171,8 +9172,8 @@ var Vertex = /** @class */ (function () {
          * Example:
          *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
          *
-         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-         * @param {Vertex} zB - The end vertex of the vector.
+         * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+         * @param {XYCoords} zB - The end vertex of the vector.
          * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
          * @param {number} scaleX  - The horizontal scaling during draw.
          * @param {number} scaleY  - the vertical scaling during draw.
@@ -9600,7 +9601,8 @@ exports.VertexListeners = VertexListeners;
  * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  1.12.4
+ * @modified 2023-09-29 Removed unused method stub for texturedPoly helper function (cleanup).
+ * @version  1.13.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutils = void 0;
@@ -9687,8 +9689,8 @@ var drawutils = /** @class */ (function () {
      * Draw the line between the given two points with the specified (CSS-) color.
      *
      * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
+     * @param {XYCoords} zA - The start point of the line.
+     * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @param {number} lineWidth? - [optional] The line's width.
      * @return {void}
@@ -9709,8 +9711,8 @@ var drawutils = /** @class */ (function () {
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
      * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -9740,8 +9742,8 @@ var drawutils = /** @class */ (function () {
      *
      * @method image
      * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {XYCoords} position - The position to draw the the upper left corner at.
+     * @param {XYCoords} size - The x/y-size to draw the image with.
      * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
@@ -9771,7 +9773,7 @@ var drawutils = /** @class */ (function () {
      * @param {Image} textureImage - The image object to draw.
      * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
      * @param {Polygon} polygon - The polygon to use as clip path.
-     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
      * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
      * @return {void}
@@ -9780,10 +9782,9 @@ var drawutils = /** @class */ (function () {
      **/
     drawutils.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
         var basePolygonBounds = polygon.getBounds();
-        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-        // var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
-        // var rotationalOffset = { x: 0, y: 0 };
-        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+        // var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        var targetCenterDifference = new Vertex_1.Vertex(polygonPosition.x, polygonPosition.y).difference(basePolygonBounds.getCenter());
+        // var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
         // Get the position offset of the polygon
         var targetTextureSize = new Vertex_1.Vertex(textureSize.width, textureSize.height);
         // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
@@ -9806,53 +9807,83 @@ var drawutils = /** @class */ (function () {
         );
         this.ctx.restore();
     };
-    drawutils.prototype._texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter) {
-        if (rotationCenter === void 0) { rotationCenter = { x: 0, y: 0 }; }
-        var basePolygonBounds = polygon.getBounds();
-        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-        var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
-        // var rotationalOffset = { x: 0, y: 0 };
-        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
-        // Get the position offset of the polygon
-        var targetTextureSize = new Vertex_1.Vertex(textureSize.width, textureSize.height);
-        var targetTextureOffset = new Vertex_1.Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
-        this.ctx.save();
-        // this.ctx.translate(
-        //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
-        //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
-        // );
-        this.ctx.translate(this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x, this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y);
-        this.ctx.rotate(rotation);
-        drawutils.helpers.clipPoly(this.ctx, {
-            x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
-            y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
-        }, this.scale, polygon.vertices);
-        this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+    /*
+    _texturedPoly(
+      textureImage: HTMLImageElement,
+      textureSize: Bounds,
+      polygon: Polygon,
+      polygonPosition: XYCoords,
+      rotation: number,
+      rotationCenter: XYCoords = { x: 0, y: 0 }
+    ): void {
+      var basePolygonBounds = polygon.getBounds();
+      var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+      var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+      // var rotationalOffset = { x: 0, y: 0 };
+      var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+  
+      // Get the position offset of the polygon
+      var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+      var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+  
+      this.ctx.save();
+  
+      // this.ctx.translate(
+      //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+      //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+      // );
+      this.ctx.translate(
+        this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+        this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+      );
+      this.ctx.rotate(rotation);
+  
+      drawutils.helpers.clipPoly(
+        this.ctx,
+        {
+          x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
+          y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
+        },
+        this.scale,
+        polygon.vertices
+      );
+      this.ctx.drawImage(
+        textureImage,
+        0,
+        0,
+        textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
         textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-        (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x, (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y, targetTextureSize.x * this.scale.x, targetTextureSize.y * this.scale.y);
-        // const scaledTextureSize = new Bounds(
-        //   new Vertex(
-        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
-        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
-        //   ).scaleXY(this.scale, rotationCenter),
-        //   new Vertex(
-        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
-        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
-        //   ).scaleXY(this.scale, rotationCenter)
-        // );
-        // this.ctx.drawImage(
-        //   textureImage,
-        //   0,
-        //   0,
-        //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
-        //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-        //   scaledTextureSize.min.x,
-        //   scaledTextureSize.min.y,
-        //   scaledTextureSize.width,
-        //   scaledTextureSize.height
-        // );
-        this.ctx.restore();
-    };
+        (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x,
+        (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y,
+        targetTextureSize.x * this.scale.x,
+        targetTextureSize.y * this.scale.y
+      );
+  
+      // const scaledTextureSize = new Bounds(
+      //   new Vertex(
+      //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
+      //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
+      //   ).scaleXY(this.scale, rotationCenter),
+      //   new Vertex(
+      //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
+      //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
+      //   ).scaleXY(this.scale, rotationCenter)
+      // );
+      // this.ctx.drawImage(
+      //   textureImage,
+      //   0,
+      //   0,
+      //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+      //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+      //   scaledTextureSize.min.x,
+      //   scaledTextureSize.min.y,
+      //   scaledTextureSize.width,
+      //   scaledTextureSize.height
+      // );
+  
+      this.ctx.restore();
+    }
+    */
     /**
      * Draw a rectangle.
      *
@@ -9901,10 +9932,10 @@ var drawutils = /** @class */ (function () {
      * Draw the given (cubic) bézier curve.
      *
      * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
      * @return {void}
@@ -9930,9 +9961,9 @@ var drawutils = /** @class */ (function () {
      * Draw the given (quadratic) bézier curve.
      *
      * @method quadraticBezier
-     * @param {Vertex} startPoint   - The start point of the cubic Bézier curve
-     * @param {Vertex} controlPoint - The control point the cubic Bézier curve.
-     * @param {Vertex} endPoint     - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint   - The start point of the cubic Bézier curve
+     * @param {XYCoords} controlPoint - The control point the cubic Bézier curve.
+     * @param {XYCoords} endPoint     - The end control point the cubic Bézier curve.
      * @param {string} color        - The CSS color to draw the curve with.
      * @param {number|string} lineWidth - (optional) The line width to use.
      * @return {void}
@@ -9957,7 +9988,7 @@ var drawutils = /** @class */ (function () {
      * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
      *
      * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @return {void}
@@ -9991,8 +10022,8 @@ var drawutils = /** @class */ (function () {
      * The colors for this are fixed and cannot be specified.
      *
      * @method handle
-     * @param {Vertex} startPoint - The start of the handle.
-     * @param {Vertex} endPoint - The end point of the handle.
+     * @param {XYCoords} startPoint - The start of the handle.
+     * @param {XYCoords} endPoint - The end point of the handle.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -10007,8 +10038,8 @@ var drawutils = /** @class */ (function () {
      * Draw a handle line (with a light grey).
      *
      * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @param {XYCoords} startPoint - The start point to draw the handle at.
+     * @param {XYCoords} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -10021,7 +10052,7 @@ var drawutils = /** @class */ (function () {
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
      * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
+     * @param {XYCoords} p - The position to draw the dot at.
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
@@ -10041,7 +10072,7 @@ var drawutils = /** @class */ (function () {
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
      * @method point
-     * @param {Vertex} p - The position to draw the point at.
+     * @param {XYCoords} p - The position to draw the point at.
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
@@ -10061,7 +10092,7 @@ var drawutils = /** @class */ (function () {
      * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
      *
      * @method circle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number} lineWidth - The line width (optional, default=1).
@@ -10080,7 +10111,7 @@ var drawutils = /** @class */ (function () {
        * Draw a circular arc (section of a circle) with the given CSS color.
        *
        * @method circleArc
-       * @param {Vertex} center - The center of the circle.
+       * @param {XYCoords} center - The center of the circle.
        * @param {number} radius - The radius of the circle.
        * @param {number} startAngle - The angle to start at.
        * @param {number} endAngle - The angle to end at.
@@ -10106,7 +10137,7 @@ var drawutils = /** @class */ (function () {
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
+     * @param {XYCoords} center - The center of the ellipse.
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
@@ -10151,7 +10182,7 @@ var drawutils = /** @class */ (function () {
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
-     * @param {Vertex} center - The center of the grid.
+     * @param {XYCoords} center - The center of the grid.
      * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
      * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal grid size.
@@ -10186,7 +10217,7 @@ var drawutils = /** @class */ (function () {
      * This works analogue to the grid() function
      *
      * @method raster
-     * @param {Vertex} center - The center of the raster.
+     * @param {XYCoords} center - The center of the raster.
      * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
      * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal raster size.
@@ -10222,8 +10253,8 @@ var drawutils = /** @class */ (function () {
      * as even shaped diamonds.
      *
      * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {XYCoords} center - The center of the diamond.
+     * @param {number} size - The x/y-size of the diamond.
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
@@ -10247,8 +10278,8 @@ var drawutils = /** @class */ (function () {
      * as even shaped squares.
      *
      * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The x/y-size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
@@ -10269,7 +10300,7 @@ var drawutils = /** @class */ (function () {
      * as even shaped circles.
      *
      * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
@@ -10356,7 +10387,7 @@ var drawutils = /** @class */ (function () {
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices   - The polygon vertices to draw.
+     * @param {XYCoords[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
      * @param {string}   color      - The CSS color to draw the polygon with.
      * @param {number}   lineWidth  - The line width (default is 1.0);
@@ -10680,8 +10711,8 @@ var drawutilsgl = /** @class */ (function () {
      * Draw the line between the given two points with the specified (CSS-) color.
      *
      * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
+     * @param {XYCoords} zA - The start point of the line.
+     * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @return {void}
      * @instance
@@ -10730,8 +10761,8 @@ var drawutilsgl = /** @class */ (function () {
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
      * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @return {void}
      * @instance
@@ -10747,8 +10778,8 @@ var drawutilsgl = /** @class */ (function () {
      *
      * @method image
      * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {XYCoords} position - The position to draw the the upper left corner at.
+     * @param {XYCoords} size - The x/y-size to draw the image with.
      * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
      * @return {void}
      * @instance
@@ -10767,7 +10798,7 @@ var drawutilsgl = /** @class */ (function () {
      * @param {Image} textureImage - The image object to draw.
      * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
      * @param {Polygon} polygon - The polygon to use as clip path.
-     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
      * @return {void}
      * @instance
@@ -10794,10 +10825,10 @@ var drawutilsgl = /** @class */ (function () {
      * Draw the given (cubic) bézier curve.
      *
      * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {VertXYCoordsex} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -10815,7 +10846,7 @@ var drawutilsgl = /** @class */ (function () {
      * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
      *
      * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -10831,8 +10862,8 @@ var drawutilsgl = /** @class */ (function () {
      * The colors for this are fixed and cannot be specified.
      *
      * @method handle
-     * @param {Vertex} startPoint - The start of the handle.
-     * @param {Vertex} endPoint - The end point of the handle.
+     * @param {XYCoords} startPoint - The start of the handle.
+     * @param {XYCoords} endPoint - The end point of the handle.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -10844,8 +10875,8 @@ var drawutilsgl = /** @class */ (function () {
      * Draw a handle line (with a light grey).
      *
      * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @param {XYCoords} startPoint - The start point to draw the handle at.
+     * @param {XYCoords} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -10857,7 +10888,7 @@ var drawutilsgl = /** @class */ (function () {
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
      * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
+     * @param {XYCoords} p - The position to draw the dot at.
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
@@ -10870,7 +10901,7 @@ var drawutilsgl = /** @class */ (function () {
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
      * @method point
-     * @param {Vertex} p - The position to draw the point at.
+     * @param {XYCoords} p - The position to draw the point at.
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
@@ -10885,7 +10916,7 @@ var drawutilsgl = /** @class */ (function () {
      * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
      *
      * @method circle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -10900,7 +10931,7 @@ var drawutilsgl = /** @class */ (function () {
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
      * @method circleArc
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {number} startAngle - The angle to start at.
      * @param {number} endAngle - The angle to end at.
@@ -10916,7 +10947,7 @@ var drawutilsgl = /** @class */ (function () {
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
+     * @param {XYCoords} center - The center of the ellipse.
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
@@ -10936,7 +10967,7 @@ var drawutilsgl = /** @class */ (function () {
      *
      * @method square
      * @param {XYCords} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
+     * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -10962,7 +10993,7 @@ var drawutilsgl = /** @class */ (function () {
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
-     * @param {Vertex} center - The center of the grid.
+     * @param {XYCoords} center - The center of the grid.
      * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
      * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal grid size.
@@ -10981,7 +11012,7 @@ var drawutilsgl = /** @class */ (function () {
      * This works analogue to the grid() function
      *
      * @method raster
-     * @param {Vertex} center - The center of the raster.
+     * @param {XYCoords} center - The center of the raster.
      * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
      * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal raster size.
@@ -11002,8 +11033,8 @@ var drawutilsgl = /** @class */ (function () {
      * as even shaped diamonds.
      *
      * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {XYCoords} center - The center of the diamond.
+     * @param {number} size - The x/y-size of the diamond.
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
@@ -11020,8 +11051,8 @@ var drawutilsgl = /** @class */ (function () {
      * as even shaped squares.
      *
      * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The x/y-size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
@@ -11038,7 +11069,7 @@ var drawutilsgl = /** @class */ (function () {
      * as even shaped circles.
      *
      * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
@@ -11134,7 +11165,7 @@ var drawutilsgl = /** @class */ (function () {
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices - The polygon vertices to draw.
+     * @param {XYCoords[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
      * @param {number=}  lineWidth - (optional) The line width to use; default is 1.
@@ -11326,7 +11357,9 @@ var GLU = /** @class */ (function () {
  * @modified 2022-11-10 Tweaking some type issues.
  * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  1.6.4
+ * @modified 2023-09-29 Added initialization checks for null parameters.
+ * @modified 2023-09-29 Added a missing implementation to the `drawurilssvg.do(XYCoords,string)` function. Didn't draw anything.
+ * @version  1.6.6
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.drawutilssvg = void 0;
@@ -11369,6 +11402,9 @@ var drawutilssvg = /** @class */ (function () {
         this.cache = new Map();
         this.setSize(canvasSize);
         if (isSecondary) {
+            if (!gNode || !bufferGNode || !nodeDefs || !bufferNodeDefs) {
+                throw "Cannot create secondary svg draw lib with undefinde gNode|bufferGNode|nodeDefs|bufferNodeDefs.";
+            }
             this.gNode = gNode;
             this.bufferGNode = bufferGNode;
             this.nodeDefs = nodeDefs;
@@ -11569,7 +11605,7 @@ var drawutilssvg = /** @class */ (function () {
      * that under the hood the same gl context and gl program will be used.
      */
     drawutilssvg.prototype.copyInstance = function (fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig – this will work as long as `isSecondary===true`
         true, // isSecondary
         this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs);
         return copy;
@@ -11668,8 +11704,8 @@ var drawutilssvg = /** @class */ (function () {
      * Draw the line between the given two points with the specified (CSS-) color.
      *
      * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
+     * @param {XYCoords} zA - The start point of the line.
+     * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=1} lineWidth? - [optional] The line's width.
      * @return {void}
@@ -11688,8 +11724,8 @@ var drawutilssvg = /** @class */ (function () {
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
      * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -11717,8 +11753,8 @@ var drawutilssvg = /** @class */ (function () {
      *
      * @method image
      * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {XYCoords} position - The position to draw the the upper left corner at.
+     * @param {XYCoords} size - The x/y-size to draw the image with.
      * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
@@ -11763,16 +11799,16 @@ var drawutilssvg = /** @class */ (function () {
      * @param {Image} textureImage - The image object to draw.
      * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
      * @param {Polygon} polygon - The polygon to use as clip path.
-     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.texturedPoly = function (textureImage, textureSize, polygon, polygonPosition, rotation) {
-        var basePolygonBounds = polygon.getBounds();
+        // const basePolygonBounds: Bounds = polygon.getBounds();
         var rotatedScalingOrigin = new Vertex_1.Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
-        var rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
+        // const rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
         // Create something like this
         // ...
         //    <defs>
@@ -11827,10 +11863,10 @@ var drawutilssvg = /** @class */ (function () {
      * Draw the given (cubic) bézier curve.
      *
      * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
      * @return {void}
@@ -11866,7 +11902,7 @@ var drawutilssvg = /** @class */ (function () {
      * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
      *
      * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
      * @return {void}
@@ -11913,8 +11949,8 @@ var drawutilssvg = /** @class */ (function () {
      * Draw a handle line (with a light grey).
      *
      * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @param {XYCoords} startPoint - The start point to draw the handle at.
+     * @param {XYCoords} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
@@ -11926,7 +11962,7 @@ var drawutilssvg = /** @class */ (function () {
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
      * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
+     * @param {XYCoords} p - The position to draw the dot at.
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
@@ -11934,13 +11970,17 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.dot = function (p, color) {
         var node = this.makeNode("line");
+        node.setAttribute("x1", "" + this._x(p.x));
+        node.setAttribute("y1", "" + this._y(p.y));
+        node.setAttribute("x2", "" + this._x(p.x));
+        node.setAttribute("y2", "" + this._y(p.y));
         return this._bindFillDraw(node, "dot", color, 1);
     };
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
      * @method point
-     * @param {Vertex} p - The position to draw the point at.
+     * @param {XYCoords} p - The position to draw the point at.
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
@@ -11960,7 +12000,7 @@ var drawutilssvg = /** @class */ (function () {
      * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
      *
      * @method circle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -11980,7 +12020,7 @@ var drawutilssvg = /** @class */ (function () {
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
      * @method circleArc
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {number} startAngle - The angle to start at.
      * @param {number} endAngle - The angle to end at.
@@ -12000,7 +12040,7 @@ var drawutilssvg = /** @class */ (function () {
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
+     * @param {XYCoords} center - The center of the ellipse.
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
@@ -12030,7 +12070,7 @@ var drawutilssvg = /** @class */ (function () {
      *
      * @method square
      * @param {XYCoords} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
+     * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -12066,7 +12106,7 @@ var drawutilssvg = /** @class */ (function () {
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
-     * @param {Vertex} center - The center of the grid.
+     * @param {XYCoords} center - The center of the grid.
      * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
      * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal grid size.
@@ -12100,7 +12140,7 @@ var drawutilssvg = /** @class */ (function () {
      * This works analogue to the grid() function
      *
      * @method raster
-     * @param {Vertex} center - The center of the raster.
+     * @param {XYCoords} center - The center of the raster.
      * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
      * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal raster size.
@@ -12133,8 +12173,8 @@ var drawutilssvg = /** @class */ (function () {
      * as even shaped diamonds.
      *
      * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {XYCoords} center - The center of the diamond.
+     * @param {number} size - The x/y-size of the diamond.
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
@@ -12168,8 +12208,8 @@ var drawutilssvg = /** @class */ (function () {
      * as even shaped squares.
      *
      * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {XYCoords} size - The x/y-size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
@@ -12191,7 +12231,7 @@ var drawutilssvg = /** @class */ (function () {
      * as even shaped circles.
      *
      * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
@@ -12290,7 +12330,7 @@ var drawutilssvg = /** @class */ (function () {
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices - The polygon vertices to draw.
+     * @param {XYCoords[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -12435,7 +12475,7 @@ var drawutilssvg = /** @class */ (function () {
         }
         // Add a covering rect with the given background color
         this.curId = "background";
-        this.curClassName = undefined;
+        this.curClassName = null; // undefined;
         var node = this.makeNode("rect");
         // For some strange reason SVG rotation transforms use degrees instead of radians
         // Note that the background does not scale with the zoom level (always covers full element)
@@ -12447,7 +12487,7 @@ var drawutilssvg = /** @class */ (function () {
         this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute("fill", typeof color === "undefined" ? "none" : color);
         // Clear the current ID again
-        this.curId = undefined;
+        this.curId = null; // undefined;
     };
     /**
      * A private helper function to clear all SVG nodes from the &gt;g> node.

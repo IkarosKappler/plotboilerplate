@@ -3,6 +3,10 @@
 - 2023-09-29
   - (createGUI utils) Added try-catch for color attributes; invalid values might break construction of whole gui.
   - Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
+  - Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
+  - Added initialization checks for null parameters in `drawutilsvg` constructor.
+  - Added a missing implementation to the `drawurilssvg.do(XYCoords,string)` function. Didn't draw anything.
+  - (DrawLib interface, draw, drawgl and drawutilssvg class) Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
 - 2023-09-25
   - Added the `Polygon.getInterpolationPolygon(number)` function.
   - Added the `detectDarkMode` helper function.

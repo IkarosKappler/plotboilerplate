@@ -106,7 +106,7 @@
       if (closestIntersection) {
         draw.circle(closestIntersection, 5, "green", 2.0);
       } else {
-        console.log("No closest intersection found!");
+        // No closest intersection found.
       }
     };
 

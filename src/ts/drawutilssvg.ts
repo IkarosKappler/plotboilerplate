@@ -37,7 +37,10 @@
  * @modified 2022-11-10 Tweaking some type issues.
  * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  1.6.4
+ * @modified 2023-09-29 Added initialization checks for null parameters.
+ * @modified 2023-09-29 Added a missing implementation to the `drawurilssvg.do(XYCoords,string)` function. Didn't draw anything.
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @version  1.6.7
  **/
 
 import { CircleSector } from "./CircleSector";
@@ -223,6 +226,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     this.cache = new Map<UID, SVGElement>();
     this.setSize(canvasSize);
     if (isSecondary) {
+      if (!gNode || !bufferGNode || !nodeDefs || !bufferNodeDefs) {
+        throw "Cannot create secondary svg draw lib with undefinde gNode|bufferGNode|nodeDefs|bufferNodeDefs.";
+      }
       this.gNode = gNode;
       this.bufferGNode = bufferGNode;
       this.nodeDefs = nodeDefs;
@@ -437,7 +443,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       this.scale,
       this.canvasSize,
       fillShapes,
-      null, // no DrawConfig
+      null as any as DrawConfig, // no DrawConfig – this will work as long as `isSecondary===true`
       true, // isSecondary
       this.gNode,
       this.bufferGNode,
@@ -549,15 +555,15 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw the line between the given two points with the specified (CSS-) color.
    *
    * @method line
-   * @param {Vertex} zA - The start point of the line.
-   * @param {Vertex} zB - The end point of the line.
+   * @param {XYCoords} zA - The start point of the line.
+   * @param {XYCoords} zB - The end point of the line.
    * @param {string} color - Any valid CSS color string.
    * @param {number=1} lineWidth? - [optional] The line's width.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    **/
-  line(zA: Vertex, zB: Vertex, color: string, lineWidth?: number): SVGElement {
+  line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number): SVGElement {
     const line: SVGElement = this.makeNode("line");
     line.setAttribute("x1", `${this._x(zA.x)}`);
     line.setAttribute("y1", `${this._y(zA.y)}`);
@@ -571,15 +577,15 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
    *
    * @method arrow
-   * @param {Vertex} zA - The start point of the arrow-line.
-   * @param {Vertex} zB - The end point of the arrow-line.
+   * @param {XYCoords} zA - The start point of the arrow-line.
+   * @param {XYCoords} zB - The end point of the arrow-line.
    * @param {string} color - Any valid CSS color string.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    **/
-  arrow(zA: Vertex, zB: Vertex, color: string, lineWidth?: number): SVGElement {
+  arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number): SVGElement {
     const node: SVGElement = this.makeNode("path");
     var headlen: number = 8; // length of head in pixels
     var vertices: Array<Vertex> = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
@@ -601,14 +607,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    *
    * @method image
    * @param {Image} image - The image object to draw.
-   * @param {Vertex} position - The position to draw the the upper left corner at.
-   * @param {Vertex} size - The x/y-size to draw the image with.
+   * @param {XYCoords} position - The position to draw the the upper left corner at.
+   * @param {XYCoords} size - The x/y-size to draw the image with.
    * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    **/
-  image(image: HTMLImageElement, position: Vertex, size: Vertex, alpha: number = 1.0) {
+  image(image: HTMLImageElement, position: XYCoords, size: XYCoords, alpha: number = 1.0) {
     const node: SVGElement = this.makeNode("image");
 
     // We need to re-adjust the image if it was not yet fully loaded before.
@@ -618,7 +624,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
         const ratioY = size.y / image.naturalHeight;
         node.setAttribute("width", `${image.naturalWidth * this.scale.x}`);
         node.setAttribute("height", `${image.naturalHeight * this.scale.y}`);
-        node.setAttribute("display", null); // Dislay when loaded
+        node.setAttribute("display", null as any as string); // Dislay when loaded
         // if (alpha) {
         node.setAttribute("opacity", `${alpha}`);
         // }
@@ -648,7 +654,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {Image} textureImage - The image object to draw.
    * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
    * @param {Polygon} polygon - The polygon to use as clip path.
-   * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+   * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
    * @param {number} rotation - The rotation to use for the polygon (and for the texture).
    * @return {void}
    * @instance
@@ -658,12 +664,12 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     textureImage: HTMLImageElement,
     textureSize: Bounds,
     polygon: Polygon,
-    polygonPosition: Vertex,
+    polygonPosition: XYCoords,
     rotation: number
   ): SVGElement {
-    const basePolygonBounds: Bounds = polygon.getBounds();
+    // const basePolygonBounds: Bounds = polygon.getBounds();
     const rotatedScalingOrigin = new Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
-    const rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
+    // const rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
     // Create something like this
     // ...
     //    <defs>
@@ -727,10 +733,10 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw the given (cubic) bézier curve.
    *
    * @method cubicBezier
-   * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-   * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-   * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-   * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+   * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+   * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+   * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+   * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number} lineWidth - (optional) The line width to use.
    * @return {void}
@@ -738,10 +744,10 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @memberof drawutilssvg
    */
   cubicBezier(
-    startPoint: Vertex,
-    endPoint: Vertex,
-    startControlPoint: Vertex,
-    endControlPoint: Vertex,
+    startPoint: XYCoords,
+    endPoint: XYCoords,
+    startControlPoint: XYCoords,
+    endControlPoint: XYCoords,
     color: string,
     lineWidth?: number
   ): SVGElement {
@@ -781,14 +787,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
    *
    * @method cubicBezierPath
-   * @param {Vertex[]} path - The cubic bezier path as described above.
+   * @param {XYCoords[]} path - The cubic bezier path as described above.
    * @param {string} color - The CSS colot to draw the path with.
    * @param {number=1} lineWidth - (optional) The line width to use.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  cubicBezierPath(path: Array<Vertex>, color: string, lineWidth?: number): SVGElement {
+  cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number): SVGElement {
     const node: SVGElement = this.makeNode("path");
     if (!path || path.length == 0) return node;
 
@@ -796,9 +802,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     const d: Array<string | number> = ["M", this._x(path[0].x), this._y(path[0].y)];
 
     // Draw curve path
-    var endPoint: Vertex;
-    var startControlPoint: Vertex;
-    var endControlPoint: Vertex;
+    var endPoint: XYCoords;
+    var startControlPoint: XYCoords;
+    var endControlPoint: XYCoords;
     for (var i = 1; i < path.length; i += 3) {
       startControlPoint = path[i];
       endControlPoint = path[i + 1];
@@ -829,7 +835,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    * @memberof drawutilssvg
    */
-  handle(startPoint: Vertex, endPoint: Vertex): void {
+  handle(startPoint: XYCoords, endPoint: XYCoords): void {
     // TODO: redefine methods like these into an abstract class?
     this.point(startPoint, "rgb(0,32,192)");
     this.square(endPoint, 5, "rgba(0,128,192,0.5)");
@@ -839,13 +845,13 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw a handle line (with a light grey).
    *
    * @method handleLine
-   * @param {Vertex} startPoint - The start point to draw the handle at.
-   * @param {Vertex} endPoint - The end point to draw the handle at.
+   * @param {XYCoords} startPoint - The start point to draw the handle at.
+   * @param {XYCoords} endPoint - The end point to draw the handle at.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  handleLine(startPoint: Vertex, endPoint: Vertex): void {
+  handleLine(startPoint: XYCoords, endPoint: XYCoords): void {
     this.line(startPoint, endPoint, "rgb(192,192,192)");
   }
 
@@ -853,14 +859,18 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw a 1x1 dot with the specified (CSS-) color.
    *
    * @method dot
-   * @param {Vertex} p - The position to draw the dot at.
+   * @param {XYCoords} p - The position to draw the dot at.
    * @param {string} color - The CSS color to draw the dot with.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  dot(p: Vertex, color: string) {
+  dot(p: XYCoords, color: string) {
     const node: SVGElement = this.makeNode("line");
+    node.setAttribute("x1", `${this._x(p.x)}`);
+    node.setAttribute("y1", `${this._y(p.y)}`);
+    node.setAttribute("x2", `${this._x(p.x)}`);
+    node.setAttribute("y2", `${this._y(p.y)}`);
     return this._bindFillDraw(node, "dot", color, 1);
   }
 
@@ -868,13 +878,13 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw the given point with the specified (CSS-) color and radius 3.
    *
    * @method point
-   * @param {Vertex} p - The position to draw the point at.
+   * @param {XYCoords} p - The position to draw the point at.
    * @param {string} color - The CSS color to draw the point with.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  point(p: Vertex, color: string) {
+  point(p: XYCoords, color: string) {
     var radius: number = 3;
     const node: SVGElement = this.makeNode("circle");
     node.setAttribute("cx", `${this._x(p.x)}`);
@@ -889,7 +899,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
    *
    * @method circle
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -897,7 +907,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    * @memberof drawutilssvg
    */
-  circle(center: Vertex, radius: number, color: string, lineWidth?: number) {
+  circle(center: XYCoords, radius: number, color: string, lineWidth?: number) {
     // Todo: draw ellipse when scalex!=scaley
     const node: SVGElement = this.makeNode("circle");
     node.setAttribute("cx", `${this._x(center.x)}`);
@@ -911,7 +921,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw a circular arc (section of a circle) with the given CSS color.
    *
    * @method circleArc
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {number} startAngle - The angle to start at.
    * @param {number} endAngle - The angle to end at.
@@ -920,7 +930,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    * @memberof drawutilssvg
    */
-  circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) {
+  circleArc(center: XYCoords, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) {
     const node: SVGElement = this.makeNode("path");
     const arcData: SVGPathParams = CircleSector.circleSectorUtils.describeSVGArc(
       this._x(center.x),
@@ -937,7 +947,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw an ellipse with the specified (CSS-) color and thw two radii.
    *
    * @method ellipse
-   * @param {Vertex} center - The center of the ellipse.
+   * @param {XYCoords} center - The center of the ellipse.
    * @param {number} radiusX - The radius of the ellipse.
    * @param {number} radiusY - The radius of the ellipse.
    * @param {string} color - The CSS color to draw the ellipse with.
@@ -947,7 +957,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    * @memberof drawutilssvg
    */
-  ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) {
+  ellipse(center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) {
     if (typeof rotation === "undefined") {
       rotation = 0.0;
     }
@@ -969,7 +979,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    *
    * @method square
    * @param {XYCoords} center - The center of the square.
-   * @param {Vertex} size - The size of the square.
+   * @param {number} size - The size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
@@ -1009,7 +1019,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
    *
    * @method grid
-   * @param {Vertex} center - The center of the grid.
+   * @param {XYCoords} center - The center of the grid.
    * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
    * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
    * @param {number} sizeX - The horizontal grid size.
@@ -1019,7 +1029,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    * @memberof drawutilssvg
    */
-  grid(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string) {
+  grid(center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string) {
     const node: SVGElement = this.makeNode("path");
     const d: SVGPathParams = [];
 
@@ -1046,7 +1056,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * This works analogue to the grid() function
    *
    * @method raster
-   * @param {Vertex} center - The center of the raster.
+   * @param {XYCoords} center - The center of the raster.
    * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
    * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
    * @param {number} sizeX - The horizontal raster size.
@@ -1056,7 +1066,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    * @memberof drawutilssvg
    */
-  raster(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string) {
+  raster(center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string) {
     const node: SVGElement = this.makeNode("path");
     const d: SVGPathParams = [];
 
@@ -1083,14 +1093,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * as even shaped diamonds.
    *
    * @method diamondHandle
-   * @param {Vertex} center - The center of the diamond.
-   * @param {Vertex} size - The x/y-size of the diamond.
+   * @param {XYCoords} center - The center of the diamond.
+   * @param {number} size - The x/y-size of the diamond.
    * @param {string} color - The CSS color to draw the diamond with.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  diamondHandle(center: Vertex, size: number, color: string) {
+  diamondHandle(center: XYCoords, size: number, color: string) {
     const node: SVGElement = this.makeNode("path");
     const d: SVGPathParams = [
       "M",
@@ -1119,14 +1129,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * as even shaped squares.
    *
    * @method squareHandle
-   * @param {Vertex} center - The center of the square.
-   * @param {Vertex} size - The x/y-size of the square.
+   * @param {XYCoords} center - The center of the square.
+   * @param {XYCoords} size - The x/y-size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  squareHandle(center: Vertex, size: number, color: string) {
+  squareHandle(center: XYCoords, size: number, color: string) {
     const node: SVGElement = this.makeNode("rect");
     node.setAttribute("x", `${this._x(center.x) - size / 2.0}`);
     node.setAttribute("y", `${this._y(center.y) - size / 2.0}`);
@@ -1143,14 +1153,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * as even shaped circles.
    *
    * @method circleHandle
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  circleHandle(center: Vertex, radius: number, color: string) {
+  circleHandle(center: XYCoords, radius: number, color: string) {
     radius = radius || 3;
 
     const node: SVGElement = this.makeNode("circle");
@@ -1247,7 +1257,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * Draw a polygon line (alternative function to the polygon).
    *
    * @method polyline
-   * @param {Vertex[]} vertices - The polygon vertices to draw.
+   * @param {XYCoords[]} vertices - The polygon vertices to draw.
    * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
    * @param {string}   color    - The CSS color to draw the polygon with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -1255,7 +1265,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @instance
    * @memberof drawutilssvg
    */
-  polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): SVGElement {
+  polyline(vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number): SVGElement {
     const node: SVGElement = this.makeNode("path");
     if (vertices.length == 0) return node;
     // Draw curve
@@ -1413,7 +1423,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
 
     // Add a covering rect with the given background color
     this.curId = "background";
-    this.curClassName = undefined;
+    this.curClassName = null; // undefined;
     const node: SVGElement = this.makeNode("rect");
     // For some strange reason SVG rotation transforms use degrees instead of radians
     // Note that the background does not scale with the zoom level (always covers full element)
@@ -1426,7 +1436,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     this._bindFillDraw(node, this.curId, null, null);
     node.setAttribute("fill", typeof color === "undefined" ? "none" : color);
     // Clear the current ID again
-    this.curId = undefined;
+    this.curId = null; // undefined;
   }
 
   /**

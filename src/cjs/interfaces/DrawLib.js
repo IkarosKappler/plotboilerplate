@@ -20,6 +20,7 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @  line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=DrawLib.js.map

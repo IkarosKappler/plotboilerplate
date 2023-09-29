@@ -19,6 +19,7 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
  **/
 
 import { Bounds } from "../Bounds";
@@ -120,29 +121,29 @@ export interface DrawLib<R> {
    * Draw the line between the given two points with the specified (CSS-) color.
    *
    * @method line
-   * @param {Vertex} zA - The start point of the line.
-   * @param {Vertex} zB - The end point of the line.
+   * @param {XYCoords} zA - The start point of the line.
+   * @param {XYCoords} zB - The end point of the line.
    * @param {string} color - Any valid CSS color string.
    * @param {number=1} lineWidth? - [optional] The line's width.
    * @return {void}
    * @instance
    * @memberof DrawLib
    **/
-  line: (zA: Vertex, zB: Vertex, color: string, lineWidth?: number) => R;
+  line: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number) => R;
 
   /**
    * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
    *
    * @method arrow
-   * @param {Vertex} zA - The start point of the arrow-line.
-   * @param {Vertex} zB - The end point of the arrow-line.
+   * @param {XYCoords} zA - The start point of the arrow-line.
+   * @param {XYCoords} zB - The end point of the arrow-line.
    * @param {string} color - Any valid CSS color string.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
    * @memberof DrawLib
    **/
-  arrow: (zA: Vertex, zB: Vertex, color: string, lineWidth?: number) => R;
+  arrow: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number) => R;
 
   /**
    * Draw an image at the given position with the given size.<br>
@@ -151,14 +152,14 @@ export interface DrawLib<R> {
    *
    * @method image
    * @param {Image} image - The image object to draw.
-   * @param {Vertex} position - The position to draw the the upper left corner at.
-   * @param {Vertex} size - The x/y-size to draw the image with.
+   * @param {XYCoords} position - The position to draw the the upper left corner at.
+   * @param {XYCoords} size - The x/y-size to draw the image with.
    * @param {number=1.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
    * @return {void}
    * @instance
    * @memberof DrawLib
    **/
-  image: (image: HTMLImageElement, position: Vertex, size: Vertex, alpha?: number) => R;
+  image: (image: HTMLImageElement, position: XYCoords, size: XYCoords, alpha?: number) => R;
 
   /**
    * Draw an image at the given position with the given size.<br>
@@ -169,7 +170,7 @@ export interface DrawLib<R> {
    * @param {Image} textureImage - The image object to draw.
    * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
    * @param {Polygon} polygon - The polygon to use as clip path.
-   * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+   * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
    * @param {number} rotation - The rotation to use for the polygon (and for the texture).
    * @return {void}
    * @instance
@@ -179,7 +180,7 @@ export interface DrawLib<R> {
     textureImage: HTMLImageElement,
     textureSize: Bounds,
     polygon: Polygon,
-    polygonPosition: Vertex,
+    polygonPosition: XYCoords,
     rotation: number
   ) => R;
 
@@ -187,10 +188,10 @@ export interface DrawLib<R> {
    * Draw the given (cubic) bézier curve.
    *
    * @method cubicBezier
-   * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-   * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-   * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-   * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+   * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+   * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+   * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+   * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number} lineWidth - (optional) The line width to use.
    * @return {void}
@@ -198,10 +199,10 @@ export interface DrawLib<R> {
    * @memberof DrawLib
    */
   cubicBezier: (
-    startPoint: Vertex,
-    endPoint: Vertex,
-    startControlPoint: Vertex,
-    endControlPoint: Vertex,
+    startPoint: XYCoords,
+    endPoint: XYCoords,
+    startControlPoint: XYCoords,
+    endControlPoint: XYCoords,
     color: string,
     lineWidth?: number
   ) => R;
@@ -214,14 +215,14 @@ export interface DrawLib<R> {
    * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
    *
    * @method cubicBezierPath
-   * @param {Vertex[]} path - The cubic bezier path as described above.
+   * @param {XYCoords[]} path - The cubic bezier path as described above.
    * @param {string} color - The CSS colot to draw the path with.
    * @param {number=1} lineWidth - (optional) The line width to use.
    * @return {void}
    * @instance
    * @memberof DrawLib
    */
-  cubicBezierPath: (path: Array<Vertex>, color: string, lineWidth?: number) => R;
+  cubicBezierPath: (path: Array<XYCoords>, color: string, lineWidth?: number) => R;
 
   /**
    * Draw the given handle and handle point (used to draw interactive Bézier curves).
@@ -229,49 +230,49 @@ export interface DrawLib<R> {
    * The colors for this are fixed and cannot be specified.
    *
    * @method handle
-   * @param {Vertex} startPoint - The start of the handle.
-   * @param {Vertex} endPoint - The end point of the handle.
+   * @param {XYCoords} startPoint - The start of the handle.
+   * @param {XYCoords} endPoint - The end point of the handle.
    * @return {void}
    * @instance
    * @memberof DrawLib
    */
-  handle: (startPoint: Vertex, endPoint: Vertex) => R;
+  handle: (startPoint: XYCoords, endPoint: XYCoords) => R;
 
   /**
    * Draw a handle line (with a light grey).
    *
    * @method handleLine
-   * @param {Vertex} startPoint - The start point to draw the handle at.
-   * @param {Vertex} endPoint - The end point to draw the handle at.
+   * @param {XYCoords} startPoint - The start point to draw the handle at.
+   * @param {XYCoords} endPoint - The end point to draw the handle at.
    * @return {void}
    * @instance
    * @memberof DrawLib
    */
-  handleLine: (startPoint: Vertex, endPoint: Vertex) => R;
+  handleLine: (startPoint: XYCoords, endPoint: XYCoords) => R;
 
   /**
    * Draw a 1x1 dot with the specified (CSS-) color.
    *
    * @method dot
-   * @param {Vertex} p - The position to draw the dot at.
+   * @param {XYCoords} p - The position to draw the dot at.
    * @param {string} color - The CSS color to draw the dot with.
    * @return {void}
    * @instance
    * @memberof DrawLib
    */
-  dot: (p: Vertex, color: string) => R;
+  dot: (p: XYCoords, color: string) => R;
 
   /**
    * Draw the given point with the specified (CSS-) color and radius 3.
    *
    * @method point
-   * @param {Vertex} p - The position to draw the point at.
-   * @param {string} color - The CSS color to draw the point with.
+   * @param {XYCoords} p - The position to draw the point at.
+   * @param {XYCoords} color - The CSS color to draw the point with.
    * @return {void}
    * @instance
    * @memberof DrawLib
    */
-  point: (p: Vertex, color: string) => R;
+  point: (p: XYCoords, color: string) => R;
 
   /**
    * Draw a circle with the specified (CSS-) color and radius.<br>
@@ -279,7 +280,7 @@ export interface DrawLib<R> {
    * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
    *
    * @method circle
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -287,13 +288,13 @@ export interface DrawLib<R> {
    * @instance
    * @memberof DrawLib
    */
-  circle: (center: Vertex, radius: number, color: string, lineWidth?: number) => R;
+  circle: (center: XYCoords, radius: number, color: string, lineWidth?: number) => R;
 
   /**
    * Draw a circular arc (section of a circle) with the given CSS color.
    *
    * @method circleArc
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {number} startAngle - The angle to start at.
    * @param {number} endAngle - The angle to end at.
@@ -303,13 +304,13 @@ export interface DrawLib<R> {
    * @instance
    * @memberof DrawLib
    */
-  circleArc: (center: Vertex, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) => R;
+  circleArc: (center: XYCoords, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) => R;
 
   /**
    * Draw an ellipse with the specified (CSS-) color and thw two radii.
    *
    * @method ellipse
-   * @param {Vertex} center - The center of the ellipse.
+   * @param {XYCoords} center - The center of the ellipse.
    * @param {number} radiusX - The radius of the ellipse.
    * @param {number} radiusY - The radius of the ellipse.
    * @param {string} color - The CSS color to draw the ellipse with.
@@ -319,7 +320,7 @@ export interface DrawLib<R> {
    * @instance
    * @memberof DrawLib
    */
-  ellipse: (center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) => R;
+  ellipse: (center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) => R;
 
   /**
    * Draw square at the given center, size and with the specified (CSS-) color.<br>
@@ -356,7 +357,7 @@ export interface DrawLib<R> {
    * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
    *
    * @method grid
-   * @param {Vertex} center - The center of the grid.
+   * @param {XYCoords} center - The center of the grid.
    * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
    * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
    * @param {number} sizeX - The horizontal grid size.
@@ -366,7 +367,7 @@ export interface DrawLib<R> {
    * @instance
    * @memberof DrawLib
    */
-  grid: (center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string) => R;
+  grid: (center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string) => R;
 
   /**
    * Draw a raster of crosshairs in the given grid.<br>
@@ -374,7 +375,7 @@ export interface DrawLib<R> {
    * This works analogue to the grid() function
    *
    * @method raster
-   * @param {Vertex} center - The center of the raster.
+   * @param {XYCoords} center - The center of the raster.
    * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
    * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
    * @param {number} sizeX - The horizontal raster size.
@@ -384,7 +385,7 @@ export interface DrawLib<R> {
    * @instance
    * @memberof DrawLib
    */
-  raster: (center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string) => R;
+  raster: (center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string) => R;
 
   /**
    * Draw a diamond handle (square rotated by 45°) with the given CSS color.
@@ -394,14 +395,14 @@ export interface DrawLib<R> {
    * as even shaped diamonds.
    *
    * @method diamondHandle
-   * @param {Vertex} center - The center of the diamond.
-   * @param {Vertex} size - The x/y-size of the diamond.
+   * @param {XYCoords} center - The center of the diamond.
+   * @param {number} size - The x/y-size of the diamond.
    * @param {string} color - The CSS color to draw the diamond with.
    * @return {void}
    * @instance
    * @memberof DrawLib
    */
-  diamondHandle: (center: Vertex, size: number, color: string) => R;
+  diamondHandle: (center: XYCoords, size: number, color: string) => R;
 
   /**
    * Draw a square handle with the given CSS color.<br>
@@ -411,14 +412,14 @@ export interface DrawLib<R> {
    * as even shaped squares.
    *
    * @method squareHandle
-   * @param {Vertex} center - The center of the square.
-   * @param {Vertex} size - The x/y-size of the square.
+   * @param {XYCoords} center - The center of the square.
+   * @param {number} size - The x/y-size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @return {void}
    * @instance
    * @memberof DrawLib
    */
-  squareHandle: (center: Vertex, size: number, color: string) => R;
+  squareHandle: (center: XYCoords, size: number, color: string) => R;
 
   /**
    * Draw a circle handle with the given CSS color.<br>
@@ -428,14 +429,14 @@ export interface DrawLib<R> {
    * as even shaped circles.
    *
    * @method circleHandle
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @return {void}
    * @instance
    * @memberof DrawLib
    */
-  circleHandle: (center: Vertex, size: number, color: string) => R;
+  circleHandle: (center: XYCoords, size: number, color: string) => R;
 
   /**
    * Draw a crosshair with given radius and color at the given position.<br>
@@ -485,7 +486,7 @@ export interface DrawLib<R> {
    * Draw a polygon line (alternative function to the polygon).
    *
    * @method polyline
-   * @param {Vertex[]} vertices - The polygon vertices to draw.
+   * @param {XYCoords[]} vertices - The polygon vertices to draw.
    * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
    * @param {string}   color    - The CSS color to draw the polygon with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -493,7 +494,7 @@ export interface DrawLib<R> {
    * @instance
    * @memberof DrawLib
    */
-  polyline: (vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number) => R;
+  polyline: (vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number) => R;
 
   /**
    * Draw a text at the given relative position.
