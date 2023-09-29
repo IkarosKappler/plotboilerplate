@@ -9,7 +9,8 @@
  * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
- * @version 1.2.0
+ * @modified 2023-09-29 Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
+ * @version 1.2.1
  */
 
 import { Vertex } from "./Vertex";
@@ -277,11 +278,11 @@ export class VertTuple<T extends VertTuple<T>> {
   hasPoint(point: XYCoords, insideBoundsOnly?: boolean): boolean {
     const t: number = this.getClosestT(point);
     // Compare to pointDistance?
+    const distance: number = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
     if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
-      const distance: number = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
       return distance < Vertex.EPSILON && t >= 0 && t <= 1;
     } else {
-      return t >= 0 && t <= 1;
+      return distance < Vertex.EPSILON; // t >= 0 && t <= 1;
     }
   }
 

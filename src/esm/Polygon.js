@@ -25,7 +25,8 @@
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-03-08 Added the `Polygon.clone()` function.
  * @modified 2023-09-25 Added the `Polygon.getInterpolationPolygon(number)` function.
- * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line)` function.
+ * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
+ * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @version 1.11.0
  *
  * @file Polygon
@@ -238,10 +239,11 @@ export class Polygon {
      *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
      *
-     * @param {VertTuple} line - The line to find intersections with (no bounds, just an infinite line).
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
      * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
      */
-    lineIntersections(line) {
+    lineIntersections(line, inVectorBoundsOnly = false) {
         // Find the intersections of all lines inside the edge bounds
         const intersectionPoints = [];
         for (var i = 0; i < this.vertices.length; i++) {
@@ -249,14 +251,26 @@ export class Polygon {
             const intersection = polyLine.intersection(line);
             // true => only inside bounds
             // ignore last edge if open
-            if ((!this.isOpen || i + 1 !== this.vertices.length) && intersection !== null && polyLine.hasPoint(intersection, true)) {
+            if ((!this.isOpen || i + 1 !== this.vertices.length) &&
+                intersection !== null &&
+                polyLine.hasPoint(intersection, true) &&
+                (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
                 intersectionPoints.push(intersection);
             }
         }
         return intersectionPoints;
     }
-    closestLinetIntersection(line) {
-        const allIntersections = this.lineIntersections(line);
+    /**
+     * Get the closest line-polygon-intersection point (closest the line point A).
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    closestLineIntersection(line, inVectorBoundsOnly = false) {
+        const allIntersections = this.lineIntersections(line, inVectorBoundsOnly);
         if (allIntersections.length <= 0) {
             // Empty polygon -> no intersections
             return null;
@@ -267,7 +281,8 @@ export class Polygon {
         for (var i in allIntersections) {
             const curVert = allIntersections[i];
             const dist = curVert.distance(line.a);
-            if (dist < curDist && line.hasPoint(curVert)) {
+            if (dist < curDist) {
+                // && line.hasPoint(curVert)) {
                 curDist = dist;
                 closestIntersection = curVert;
             }

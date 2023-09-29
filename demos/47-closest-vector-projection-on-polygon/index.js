@@ -57,16 +57,18 @@
         GUP
       )
     );
+    pb.drawConfig.polygon.lineWidth = 3.0;
+    pb.drawConfig.vector.color = "#ff8800";
 
     // +---------------------------------------------------------------------------------
-    // | Create a random vertex inside the canvas viewport.
+    // | A global config that's attached to the dat.gui control interface.
     // +-------------------------------
-    var randomVertex = function () {
-      return new Vertex(
-        Math.random() * pb.canvasSize.width * 0.5 - (pb.canvasSize.width / 2) * 0.5,
-        Math.random() * pb.canvasSize.height * 0.5 - (pb.canvasSize.height / 2) * 0.5
-      );
-    };
+    var config = PlotBoilerplate.utils.safeMergeByKeys(
+      {
+        insideVectorBoundsOnly: true
+      },
+      GUP
+    );
 
     // Build the polygon
     const polygon = pb.viewport().toPolygon().getInterpolationPolygon(1);
@@ -95,13 +97,17 @@
     // +-------------------------------
     var postDraw = function (draw, fill) {
       // Find closest intersection point between vector and polygon
-      var intersections = polygon.lineIntersections(vec);
+      var intersections = polygon.lineIntersections(vec, config.insideVectorBoundsOnly);
       for (var i = 0; i < intersections.length; i++) {
-        draw.circle(intersections[i], 5, "red", 2.0);
+        draw.circle(intersections[i], 5, "orange", 2.0);
       }
 
-      const closestIntersection = polygon.closestLinetIntersection(vec);
-      draw.circle(closestIntersection, 5, "green", 2.0);
+      const closestIntersection = polygon.closestLineIntersection(vec, config.insideVectorBoundsOnly);
+      if (closestIntersection) {
+        draw.circle(closestIntersection, 5, "green", 2.0);
+      } else {
+        console.log("No closest intersection found!");
+      }
     };
 
     // +---------------------------------------------------------------------------------
@@ -118,6 +124,15 @@
       mouseX: 0,
       mouseY: 0
     };
+
+    // +---------------------------------------------------------------------------------
+    // | Initialize dat.gui
+    // +-------------------------------
+    {
+      var gui = pb.createGUI();
+      // prettier-ignore
+      gui.add(config, 'insideVectorBoundsOnly').listen().onChange(function() { pb.redraw(); }).name("insideVectorBoundsOnly").title("insideVectorBoundsOnly");
+    }
 
     pb.config.postDraw = postDraw;
     pb.redraw();

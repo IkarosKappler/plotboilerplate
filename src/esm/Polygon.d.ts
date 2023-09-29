@@ -25,7 +25,8 @@
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-03-08 Added the `Polygon.clone()` function.
  * @modified 2023-09-25 Added the `Polygon.getInterpolationPolygon(number)` function.
- * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line)` function.
+ * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
+ * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
  * @version 1.11.0
  *
  * @file Polygon
@@ -210,11 +211,21 @@ export declare class Polygon implements SVGSerializable {
      *
      * See demo `47-closest-vector-projection-on-polygon` for how it works.
      *
-     * @param {VertTuple} line - The line to find intersections with (no bounds, just an infinite line).
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
      * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
      */
-    lineIntersections(line: VertTuple<any>): Array<Vertex>;
-    closestLinetIntersection(line: VertTuple<any>): Vertex | null;
+    lineIntersections(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Array<Vertex>;
+    /**
+     * Get the closest line-polygon-intersection point (closest the line point A).
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    closestLineIntersection(line: VertTuple<any>, inVectorBoundsOnly?: boolean): Vertex | null;
     /**
      * Construct a new polygon from this polygon with more vertices on each edge. The
      * interpolation count determines the number of additional vertices on each edge.

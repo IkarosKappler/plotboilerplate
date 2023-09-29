@@ -1,13 +1,15 @@
 # Changelog
 
+- 2023-09-29
+  - (createGUI utils) Added try-catch for color attributes; invalid values might break construction of whole gui.
+  - Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
 - 2023-09-25
-
   - Added the `Polygon.getInterpolationPolygon(number)` function.
   - Added the `detectDarkMode` helper function.
   - Adding the demo `47-closest-vector-projection-on-polygon`.
   - Changed param type of `Line.intersection()` from Line to VertTuple.
   - Added `Polyon.lineIntersections(VertTuple)` function.
-
+  - Added the `Polygon.closestLineIntersection(Line,boolean)` function.
 - 2023-03-06
   - Finalizing the audio demo (demo-46).
 - 2023-02-10
