@@ -49,11 +49,16 @@
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
  * @modified 2023-09-29 Removed unused method stub for texturedPoly helper function (cleanup).
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @version  1.13.0
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
 import { drawutilssvg } from "./drawutilssvg";
+import { Vector } from "./Vector";
 // Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -160,18 +165,68 @@ export class drawutils {
      * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    arrow(zA, zB, color, lineWidth) {
-        var headlen = 8; // length of head in pixels
-        // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-        // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+    arrow(zA, zB, color, lineWidth, headLength = 8) {
+        // var headLength: number = 8; // length of head in pixels
         this.ctx.save();
         this.ctx.beginPath();
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
+        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        for (var i = 0; i < vertices.length; i++) {
+            this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
+        }
+        this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength) {
+        this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth);
+        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength);
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength = 8) {
+        // var headLength: number = 8; // length of head in pixels
+        this.ctx.save();
+        this.ctx.beginPath();
+        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        // for (var i = 0; i < vertices.length; i++) {
+        //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
+        // }
+        this.ctx.moveTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
         }

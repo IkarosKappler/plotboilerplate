@@ -7,6 +7,13 @@
   - Added initialization checks for null parameters in `drawutilsvg` constructor.
   - Added a missing implementation to the `drawurilssvg.do(XYCoords,string)` function. Didn't draw anything.
   - (DrawLib interface, draw, drawgl and drawutilssvg class) Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+  - Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
+  - Chaning param types in `Vector.utils.buildArrowHead()` from `Vertex` to the more generic `XYCoords`.
+  - Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+  - Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+  - Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+  - Added the `randomPoint(...)` function declaration to the IBounds interface.
+  - Added the `Bounds.randomPoint` method.
 - 2023-09-25
   - Added the `Polygon.getInterpolationPolygon(number)` function.
   - Added the `detectDarkMode` helper function.

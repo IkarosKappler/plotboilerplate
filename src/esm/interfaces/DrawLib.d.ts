@@ -19,7 +19,10 @@
  * @modified 2022-02-03 Added the `cross(...)` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @  line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  **/
 import { Bounds } from "../Bounds";
 import { Polygon } from "../Polygon";
@@ -114,18 +117,50 @@ export interface DrawLib<R> {
      **/
     line: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number) => R;
     /**
-     * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
+     * Draw a line and an arrow at the end (zB) of the given line width the specified (CSS-) color and size.
      *
      * @method arrow
      * @param {XYCoords} zA - The start point of the arrow-line.
      * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
-     * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
      * @return {void}
      * @instance
      * @memberof DrawLib
      **/
-    arrow: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number) => R;
+    arrow: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number) => R;
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow: (startPoint: XYCoords, endPoint: XYCoords, startControlPoint: XYCoords, endControlPoint: XYCoords, color: string, lineWidth?: number, headLength?: number) => R;
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number) => R;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>

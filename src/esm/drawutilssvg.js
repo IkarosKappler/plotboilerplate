@@ -39,7 +39,11 @@
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
  * @modified 2023-09-29 Added initialization checks for null parameters.
  * @modified 2023-09-29 Added a missing implementation to the `drawurilssvg.do(XYCoords,string)` function. Didn't draw anything.
- * @version  1.6.6
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @version  1.6.7
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -406,14 +410,15 @@ export class drawutilssvg {
      * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    arrow(zA, zB, color, lineWidth) {
+    arrow(zA, zB, color, lineWidth, headLength = 8) {
         const node = this.makeNode("path");
-        var headlen = 8; // length of head in pixels
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
+        // var headLength: number = 8; // length of head in pixels
+        var vertices = Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         const d = ["M", this._x(zA.x), this._y(zA.y)];
         for (var i = 0; i <= vertices.length; i++) {
             d.push("L");
@@ -423,6 +428,78 @@ export class drawutilssvg {
         }
         node.setAttribute("d", d.join(" "));
         return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength = 8) {
+        const node = this.makeNode("path");
+        // Draw curve
+        const d = [
+            "M",
+            this._x(startPoint.x),
+            this._y(startPoint.y),
+            "C",
+            this._x(startControlPoint.x),
+            this._y(startControlPoint.y),
+            this._x(endControlPoint.x),
+            this._y(endControlPoint.y),
+            this._x(endPoint.x),
+            this._y(endPoint.y)
+        ];
+        // var headLength: number = 8; // length of head in pixels
+        var vertices = Vertex.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
+        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+        // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
+        for (var i = 0; i <= vertices.length; i++) {
+            d.push("L");
+            // Note: only use offset here (the vertices are already scaled)
+            d.push(this.offset.x + vertices[i % vertices.length].x);
+            d.push(this.offset.y + vertices[i % vertices.length].y);
+        }
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cubicbezierarrow", color, lineWidth || 1);
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength = 8) {
+        const node = this.makeNode("path");
+        // var headLength: number = 8; // length of head in pixels
+        var vertices = Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+        const d = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
+        for (var i = 1; i <= vertices.length; i++) {
+            d.push("L");
+            // Note: only use offset here (the vertices are already scaled)
+            d.push(this.offset.x + vertices[i % vertices.length].x);
+            d.push(this.offset.y + vertices[i % vertices.length].y);
+        }
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1);
     }
     /**
      * Draw an image at the given position with the given size.<br>

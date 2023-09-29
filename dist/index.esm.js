@@ -941,7 +941,7 @@ Vertex.utils = {
      **/
     // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
     buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
-        // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+        console.warn("[DEPRECATION] Vertex.utils.buildArrowHead is deprecated. Please use Vector.utils.buildArrowHead instead.");
         var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         var vertices = [];
         vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
@@ -1976,7 +1976,8 @@ Polygon.utils = {
  * @modified 2022-02-01 Added the `toString` function.
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
- * @version  1.6.0
+ * @modified 2023-09-29 Added the `randomPoint` method.
+ * @version  1.7.0
  **/
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -2021,6 +2022,23 @@ class Bounds {
      */
     getCenter() {
         return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+    }
+    /**
+     * Generate a random point inside this bounds object. Safe areas at the border to avoid
+     * included.
+     *
+     * @method randomPoint
+     * @instance
+     * @memberof Bounds
+     * @param {horizontalSafeArea} - (optional) The horizonal (left and right) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval.
+     * @param {verticalSafeArea} - (optional) The vertical (top and bottom) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval
+     * @returns {Vertex} A pseudo random point inside these bounds.
+     */
+    randomPoint(horizontalSafeArea = 0, verticalSafeArea = 0) {
+        // Check if the safe areas are meant as percent
+        const absHorizontalSafeArea = horizontalSafeArea > 0 && horizontalSafeArea < 1 ? this.width * horizontalSafeArea : horizontalSafeArea;
+        const absVerticalSafeArea = verticalSafeArea > 0 && verticalSafeArea < 1 ? this.height * verticalSafeArea : verticalSafeArea;
+        return new Vertex(this.min.x + absHorizontalSafeArea + Math.random() * (this.width - 2 * absHorizontalSafeArea), this.min.y + absVerticalSafeArea + Math.random() * (this.height - 2 * absVerticalSafeArea));
     }
     /**
      * Convert these bounds to a human readable form.
@@ -2233,8 +2251,8 @@ Vector.utils = {
      * Example:
      *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
      *
-     * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-     * @param {Vertex} zB - The end vertex of the vector.
+     * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {XYCoords} zB - The end vertex of the vector.
      * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
      * @param {number} scaleX  - The horizontal scaling during draw.
      * @param {number} scaleY  - the vertical scaling during draw.
@@ -4564,7 +4582,11 @@ CircleSector.circleSectorUtils = {
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
  * @modified 2023-09-29 Added initialization checks for null parameters.
  * @modified 2023-09-29 Added a missing implementation to the `drawurilssvg.do(XYCoords,string)` function. Didn't draw anything.
- * @version  1.6.6
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @version  1.6.7
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -4927,14 +4949,15 @@ class drawutilssvg {
      * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    arrow(zA, zB, color, lineWidth) {
+    arrow(zA, zB, color, lineWidth, headLength = 8) {
         const node = this.makeNode("path");
-        var headlen = 8; // length of head in pixels
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
+        // var headLength: number = 8; // length of head in pixels
+        var vertices = Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         const d = ["M", this._x(zA.x), this._y(zA.y)];
         for (var i = 0; i <= vertices.length; i++) {
             d.push("L");
@@ -4944,6 +4967,78 @@ class drawutilssvg {
         }
         node.setAttribute("d", d.join(" "));
         return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength = 8) {
+        const node = this.makeNode("path");
+        // Draw curve
+        const d = [
+            "M",
+            this._x(startPoint.x),
+            this._y(startPoint.y),
+            "C",
+            this._x(startControlPoint.x),
+            this._y(startControlPoint.y),
+            this._x(endControlPoint.x),
+            this._y(endControlPoint.y),
+            this._x(endPoint.x),
+            this._y(endPoint.y)
+        ];
+        // var headLength: number = 8; // length of head in pixels
+        var vertices = Vertex.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
+        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+        // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
+        for (var i = 0; i <= vertices.length; i++) {
+            d.push("L");
+            // Note: only use offset here (the vertices are already scaled)
+            d.push(this.offset.x + vertices[i % vertices.length].x);
+            d.push(this.offset.y + vertices[i % vertices.length].y);
+        }
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "cubicbezierarrow", color, lineWidth || 1);
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength = 8) {
+        const node = this.makeNode("path");
+        // var headLength: number = 8; // length of head in pixels
+        var vertices = Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+        const d = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
+        for (var i = 1; i <= vertices.length; i++) {
+            d.push("L");
+            // Note: only use offset here (the vertices are already scaled)
+            d.push(this.offset.x + vertices[i % vertices.length].x);
+            d.push(this.offset.y + vertices[i % vertices.length].y);
+        }
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1);
     }
     /**
      * Draw an image at the given position with the given size.<br>
@@ -5946,6 +6041,10 @@ drawutilssvg.HEAD_XML = [
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
  * @modified 2023-09-29 Removed unused method stub for texturedPoly helper function (cleanup).
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @version  1.13.0
  **/
 // Todo: rename this class to Drawutils?
@@ -6054,18 +6153,68 @@ class drawutils {
      * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    arrow(zA, zB, color, lineWidth) {
-        var headlen = 8; // length of head in pixels
-        // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-        // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+    arrow(zA, zB, color, lineWidth, headLength = 8) {
+        // var headLength: number = 8; // length of head in pixels
         this.ctx.save();
         this.ctx.beginPath();
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
+        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        for (var i = 0; i < vertices.length; i++) {
+            this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
+        }
+        this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
+        this.ctx.lineWidth = lineWidth || 1;
+        this._fillOrDraw(color);
+        this.ctx.restore();
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength) {
+        this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth);
+        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength);
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength = 8) {
+        // var headLength: number = 8; // length of head in pixels
+        this.ctx.save();
+        this.ctx.beginPath();
+        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        // for (var i = 0; i < vertices.length; i++) {
+        //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
+        // }
+        this.ctx.moveTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
         }
@@ -6916,7 +7065,11 @@ drawutils.helpers = {
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  0.0.9
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @version  0.0.10
  **/
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
@@ -7090,11 +7243,47 @@ class drawutilsgl {
      * @param {XYCoords} zA - The start point of the arrow-line.
      * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
     arrow(zA, zB, color) {
+        // NOT YET IMPLEMENTED
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength) {
+        // NOT YET IMPLEMENTED
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength) {
         // NOT YET IMPLEMENTED
     }
     /**
@@ -10286,7 +10475,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2023-02-10 Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
  * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
  * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
- * @version  1.17.2
+ * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
+ * @version  1.17.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -10404,7 +10594,7 @@ class PlotBoilerplate {
             draggable: true,
             visible: true
         };
-        if (typeof config.canvas == "undefined") {
+        if (typeof config.canvas === "undefined") {
             throw "No canvas specified.";
         }
         /**
@@ -10555,7 +10745,10 @@ class PlotBoilerplate {
         // +-------------------------------
         this.grid = new Grid(new Vertex(0, 0), new Vertex(50, 50));
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
-        const canvasElement = typeof config.canvas == "string" ? document.querySelector(config.canvas) : config.canvas;
+        const canvasElement = typeof config.canvas === "string" ? document.querySelector(config.canvas) : config.canvas;
+        if (typeof canvasElement === "undefined") {
+            throw `Cannot initialize PlotBoilerplate with a null canvas (element "${config.canvas} not found).`;
+        }
         // Which renderer to use: Canvas2D, WebGL (experimental) or SVG?
         if (canvasElement.tagName.toLowerCase() === "canvas") {
             this.canvas = canvasElement;
@@ -12169,22 +12362,35 @@ PlotBoilerplate.utils = {
      **/
     safeMergeByKeys: (base, extension) => {
         for (var k in extension) {
-            if (!extension.hasOwnProperty(k))
+            if (!extension.hasOwnProperty(k)) {
                 continue;
+            }
             if (base.hasOwnProperty(k)) {
-                var typ = typeof base[k];
+                const typ = typeof base[k];
+                const extVal = extension[k];
                 try {
-                    if (typ == "boolean")
-                        base[k] = !!JSON.parse(extension[k]);
-                    else if (typ == "number")
-                        base[k] = JSON.parse(extension[k]) * 1;
-                    else if (typ == "function" && typeof extension[k] == "function")
+                    if (typ == "boolean") {
+                        if (typeof extVal === "string")
+                            base[k] = Boolean(!!JSON.parse(extVal));
+                        else
+                            base[k] = extVal;
+                    }
+                    else if (typ == "number") {
+                        if (typeof extVal === "string")
+                            base[k] = Number(JSON.parse(extVal) * 1);
+                        else
+                            base[k] = extension[k];
+                    }
+                    else if (typ == "function" && typeof extVal == "function") {
                         base[k] = extension[k];
-                    else
+                    }
+                    else {
+                        // Probably a sting
                         base[k] = extension[k];
+                    }
                 }
                 catch (e) {
-                    console.error("error in key ", k, extension[k], e);
+                    console.error("error in key ", k, extVal, e);
                 }
             }
             else {
@@ -12193,6 +12399,31 @@ PlotBoilerplate.utils = {
         }
         return base;
     },
+    /*
+    __safeMergeByKeys: <KeyType extends string | number | symbol, ValueType extends boolean | number | string | Function>(
+      base: Record<KeyType, ValueType>,
+      extension: Record<KeyType, string>
+    ): Record<KeyType, ValueType> => {
+      for (var k in extension) {
+        if (!extension.hasOwnProperty(k)) continue;
+        if (base.hasOwnProperty(k)) {
+          var typ = typeof base[k];
+          try {
+            if (typ == "boolean") base[k] = !!JSON.parse(extension[k]);
+            else if (typ == "number") base[k] = JSON.parse(extension[k]) * 1;
+            else if (typ == "function" && typeof extension[k] == "function") base[k] = extension[k];
+            else base[k] = extension[k];
+          } catch (e) {
+            console.error("error in key ", k, extension[k], e);
+          }
+        } else {
+          base[k] = extension[k];
+        }
+      }
+      return base;
+    },
+    *()
+
     /**
      * A helper function to scale elements (usually the canvas) using CSS.
      *

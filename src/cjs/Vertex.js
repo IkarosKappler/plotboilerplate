@@ -617,7 +617,7 @@ var Vertex = /** @class */ (function () {
          **/
         // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
         buildArrowHead: function (zA, zB, headlen, scaleX, scaleY) {
-            // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+            console.warn("[DEPRECATION] Vertex.utils.buildArrowHead is deprecated. Please use Vector.utils.buildArrowHead instead.");
             var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
             var vertices = [];
             vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));

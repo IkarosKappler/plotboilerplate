@@ -671,7 +671,7 @@ export class Vertex implements XYCoords, SVGSerializable {
      **/
     // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
     buildArrowHead: (zA: XYCoords, zB: XYCoords, headlen: number, scaleX: number, scaleY: number): Array<Vertex> => {
-      // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+      console.warn("[DEPRECATION] Vertex.utils.buildArrowHead is deprecated. Please use Vector.utils.buildArrowHead instead.");
       var angle: number = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
 
       var vertices: Array<Vertex> = [];

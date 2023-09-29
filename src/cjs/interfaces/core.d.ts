@@ -18,6 +18,7 @@
  * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
  * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
  * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
+ * @modified 2023-09-29 Added the `randomPoint(...)` function declaration to the IBounds interface.
  **/
 import { Vertex } from "../Vertex";
 import { Vector } from "../Vector";
@@ -63,6 +64,16 @@ export interface IBounds {
     min: XYCoords;
     max: XYCoords;
     getCenter(): Vertex;
+    /**
+     * Generate a random point inside this bounds object. Safe areas at the border to avoid
+     * included.
+     *
+     * @method randomPoint
+     * @param {horizontalSafeArea} - (optional) The horizonal (left and right) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval.
+     * @param {verticalSafeArea} - (optional) The vertical (top and bottom) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval
+     * @returns {Vertex} A pseudo random point inside these bounds.
+     */
+    randomPoint: (horizontalSafeArea?: number, verticalSafeArea?: number) => Vertex;
 }
 /**
  * The types that can be drawn and thus added to the draw queue.
@@ -82,8 +93,8 @@ export interface CanvasWrapper {
 /**
  * The config that's used by PB.
  */
-export interface Config {
-    canvas: HTMLCanvasElement | string;
+export interface Config extends Record<string, boolean | number | string | Function | HTMLCanvasElement | SVGElement | undefined> {
+    canvas: HTMLCanvasElement | SVGElement | string;
     fullSize: boolean;
     fitToParent: boolean;
     scaleX: number;

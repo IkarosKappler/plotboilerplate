@@ -65,7 +65,7 @@
     // +-------------------------------
     var config = PlotBoilerplate.utils.safeMergeByKeys(
       {
-        insideVectorBoundsOnly: true
+        insideVectorBoundsOnly: false
       },
       GUP
     );
