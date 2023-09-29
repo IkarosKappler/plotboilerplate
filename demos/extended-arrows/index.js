@@ -52,34 +52,29 @@
 
     const postDraw = function (draw, _fill) {
       // Draw a straight line with an arrow at the end ("Vector")
-      draw.arrow(line.a, line.b, "orange", 1, config.size);
+      draw.arrow(line.a, line.b, "orange", 3, config.size);
 
       // Draw a cubic Bézier curve (and handles) with an arrow at the end
-      draw.line(bezier.startPoint, bezier.startControlPoint, "rgba(128,128,128,0.333)", 1);
-      draw.line(bezier.endPoint, bezier.endControlPoint, "rgba(128,128,128,0.333)", 1);
+      draw.line(bezier.startPoint, bezier.startControlPoint, "rgba(128,128,128,0.333)", 3);
+      draw.line(bezier.endPoint, bezier.endControlPoint, "rgba(128,128,128,0.333)", 3);
       draw.cubicBezierArrow(
         bezier.startPoint,
         bezier.endPoint,
         bezier.startControlPoint,
         bezier.endControlPoint,
         "orange",
-        1,
+        3,
         config.size
       );
 
       // Just draw a plain arrow head
-      pb.draw.arrowHead(arrowHeadLine.a, arrowHeadLine.b, "orange", 1, config.size);
+      pb.draw.arrowHead(arrowHeadLine.a, arrowHeadLine.b, "orange", 3, config.size);
     };
 
     {
       var gui = pb.createGUI();
-      // prettier - ignore;
-      gui
-        .add(config, "size")
-        .min(1)
-        .max(100)
-        .step(1)
-        .listen()
+      // prettier-ignore
+      gui.add(config, "size").min(1).max(100).step(1) .listen()
         .onChange(function () {
           pb.redraw();
         });

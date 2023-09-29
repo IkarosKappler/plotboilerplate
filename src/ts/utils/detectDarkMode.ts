@@ -13,7 +13,8 @@ import PlotBoilerplate from "../PlotBoilerplate";
 export const detectDarkMode = (GUP?: Record<string, string>) => {
   // Respect overrides
   if (typeof GUP !== "undefined" && GUP.hasOwnProperty("darkmode") && GUP["darkmode"]) {
-    const overrideValue = PlotBoilerplate.utils.fetch.bool(GUP, "darkmode", null);
+    // const overrideValue = PlotBoilerplate.utils.fetch.bool(GUP, "darkmode", null);
+    const overrideValue = !!JSON.parse(GUP["darkmode"]);
     if (overrideValue !== null) {
       return overrideValue;
     }

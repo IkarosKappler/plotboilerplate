@@ -10,11 +10,11 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.detectDarkMode = void 0;
-var PlotBoilerplate_1 = require("../PlotBoilerplate");
 var detectDarkMode = function (GUP) {
     // Respect overrides
     if (typeof GUP !== "undefined" && GUP.hasOwnProperty("darkmode") && GUP["darkmode"]) {
-        var overrideValue = PlotBoilerplate_1.default.utils.fetch.bool(GUP, "darkmode", null);
+        // const overrideValue = PlotBoilerplate.utils.fetch.bool(GUP, "darkmode", null);
+        var overrideValue = !!JSON.parse(GUP["darkmode"]);
         if (overrideValue !== null) {
             return overrideValue;
         }

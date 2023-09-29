@@ -7,4 +7,4 @@
  * @param {Record<string,string>} GUP
  * @returns {boolean}
  */
-export declare const detectDarkMode: (GUP?: Record<string, string>) => any;
+export declare const detectDarkMode: (GUP?: Record<string, string>) => boolean;
