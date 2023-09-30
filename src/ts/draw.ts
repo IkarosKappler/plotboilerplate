@@ -60,7 +60,7 @@
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight, StrokeOptions } from "./interfaces";
 import { drawutilssvg } from "./drawutilssvg";
 import { Bounds } from "./Bounds";
 import { Vector } from "./Vector";
@@ -107,18 +107,18 @@ export class drawutils implements DrawLib<void> {
    */
   fillShapes: boolean;
 
-  /**
-   * @member {Array<number>}
-   * @memberof drawutils
-   * @type {boolean}
-   * @instance
-   */
-  private lineDash: Array<number>;
+  // /**
+  //  * @member {Array<number>}
+  //  * @memberof drawutils
+  //  * @type {boolean}
+  //  * @instance
+  //  */
+  // private lineDash: Array<number>;
 
-  /**
-   * Use this flag for internally enabling/disabling line dashes.
-   */
-  private lineDashEnabled: boolean = true;
+  // /**
+  //  * Use this flag for internally enabling/disabling line dashes.
+  //  */
+  // private lineDashEnabled: boolean = true;
 
   /**
    * The constructor.
@@ -130,10 +130,37 @@ export class drawutils implements DrawLib<void> {
    **/
   constructor(context: CanvasRenderingContext2D, fillShapes: boolean) {
     this.ctx = context;
-    this.lineDash = [];
+    // this.lineDash = [];
     this.offset = new Vertex(0, 0);
     this.scale = new Vertex(1, 1);
     this.fillShapes = fillShapes;
+  }
+
+  private applyStrokeOpts(strokeOptions?: StrokeOptions) {
+    this.ctx.setLineDash(strokeOptions?.dashArray ?? []);
+    this.ctx.lineDashOffset = strokeOptions?.dashOffset ?? 0;
+  }
+
+  // +---------------------------------------------------------------------------------
+  // | This is the final helper function for drawing and filling stuff. It is not
+  // | intended to be used from the outside.
+  // |
+  // | When in draw mode it draws the current shape.
+  // | When in fill mode it fills the current shape.
+  // |
+  // | This function is usually only called internally.
+  // |
+  // | @param color A stroke/fill color to use.
+  // +-------------------------------
+  // TODO: convert this to a STATIC function.
+  _fillOrDraw(color: string) {
+    if (this.fillShapes) {
+      this.ctx.fillStyle = color;
+      this.ctx.fill();
+    } else {
+      this.ctx.strokeStyle = color;
+      this.ctx.stroke();
+    }
   }
 
   /**
@@ -169,20 +196,20 @@ export class drawutils implements DrawLib<void> {
     this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
   }
 
-  /**
-   * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-   *
-   * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-   * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-   * for how line dashes work.
-   *
-   * @method
-   * @param {Array<number> lineDashes - The line-dash array configuration.
-   * @returns {void}
-   */
-  setLineDash(lineDash: Array<number>) {
-    this.lineDash = lineDash;
-  }
+  // /**
+  //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+  //  *
+  //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+  //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+  //  * for how line dashes work.
+  //  *
+  //  * @method
+  //  * @param {Array<number> lineDashes - The line-dash array configuration.
+  //  * @returns {void}
+  //  */
+  // setLineDash(lineDash: Array<number>) {
+  //   this.lineDash = lineDash;
+  // }
 
   /**
    * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -216,14 +243,16 @@ export class drawutils implements DrawLib<void> {
    * @param {XYCoords} zB - The end point of the line.
    * @param {string} color - Any valid CSS color string.
    * @param {number} lineWidth? - [optional] The line's width.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    **/
-  line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number) {
+  line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) {
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
     this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
     this.ctx.strokeStyle = color;
@@ -241,11 +270,13 @@ export class drawutils implements DrawLib<void> {
    * @param {string} color - Any valid CSS color string.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    **/
-  arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength: number = 8) {
+  arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength: number = 8, strokeOptions?: StrokeOptions) {
     // var headLength: number = 8; // length of head in pixels
 
     // this.ctx.save();
@@ -260,8 +291,8 @@ export class drawutils implements DrawLib<void> {
     // this.ctx.lineWidth = lineWidth || 1;
     // this._fillOrDraw(color);
     // this.ctx.restore();
-    this.line(zA, zB, color, lineWidth); // Will use dash configuration
-    this.arrowHead(zA, zB, color, lineWidth, headLength);
+    this.line(zA, zB, color, lineWidth, strokeOptions); // Will use dash configuration
+    this.arrowHead(zA, zB, color, lineWidth, headLength, undefined); // Will NOT use dash configuration
   }
 
   /**
@@ -275,6 +306,7 @@ export class drawutils implements DrawLib<void> {
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number} lineWidth - (optional) The line width to use.
    * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
    *
    * @return {void}
    * @instance
@@ -287,10 +319,13 @@ export class drawutils implements DrawLib<void> {
     endControlPoint: XYCoords,
     color: string,
     lineWidth?: number,
-    headLength?: number
+    headLength?: number,
+    strokeOptions?: StrokeOptions
   ) {
-    this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth);
-    this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength);
+    // Will use dash configuration
+    this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
+    // Will NOT use dash configuration
+    this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
   }
 
   /**
@@ -302,16 +337,26 @@ export class drawutils implements DrawLib<void> {
    * @param {string} color - Any valid CSS color string.
    * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
    * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof DrawLib
    **/
-  arrowHead(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength: number = 8) {
+  arrowHead(
+    zA: XYCoords,
+    zB: XYCoords,
+    color: string,
+    lineWidth?: number,
+    headLength: number = 8,
+    strokeOptions?: StrokeOptions
+  ) {
     // var headLength: number = 8; // length of head in pixels
 
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.setLineDash([]); // Clear line dash for arrow heads
+    // this.ctx.setLineDash([]); // Clear line dash for arrow heads
+    this.applyStrokeOpts(strokeOptions);
     var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
 
     // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
@@ -515,11 +560,23 @@ export class drawutils implements DrawLib<void> {
    * @param {number} height - The height of the rectangle.
    * @param {string} color - The color to use.
    * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {void}
+   * @instance
+   * @memberof drawutils
    **/
-  rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): void {
+  rect(
+    position: XYCoords,
+    width: number,
+    height: number,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
+  ): void {
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
     this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
     this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
@@ -529,28 +586,6 @@ export class drawutils implements DrawLib<void> {
     this.ctx.lineWidth = lineWidth || 1;
     this._fillOrDraw(color);
     this.ctx.restore();
-  }
-
-  // +---------------------------------------------------------------------------------
-  // | This is the final helper function for drawing and filling stuff. It is not
-  // | intended to be used from the outside.
-  // |
-  // | When in draw mode it draws the current shape.
-  // | When in fill mode it fills the current shape.
-  // |
-  // | This function is usually only called internally.
-  // |
-  // | @param color A stroke/fill color to use.
-  // +-------------------------------
-  // TODO: convert this to a STATIC function.
-  _fillOrDraw(color: string) {
-    if (this.fillShapes) {
-      this.ctx.fillStyle = color;
-      this.ctx.fill();
-    } else {
-      this.ctx.strokeStyle = color;
-      this.ctx.stroke();
-    }
   }
 
   /**
@@ -563,6 +598,8 @@ export class drawutils implements DrawLib<void> {
    * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number} lineWidth - (optional) The line width to use.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
@@ -573,7 +610,8 @@ export class drawutils implements DrawLib<void> {
     startControlPoint: XYCoords,
     endControlPoint: XYCoords,
     color: string,
-    lineWidth?: number
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
   ) {
     if (startPoint instanceof CubicBezierCurve) {
       this.cubicBezier(
@@ -589,7 +627,7 @@ export class drawutils implements DrawLib<void> {
     // Draw curve
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
     this.ctx.bezierCurveTo(
       this.offset.x + startControlPoint.x * this.scale.x,
@@ -614,15 +652,24 @@ export class drawutils implements DrawLib<void> {
    * @param {XYCoords} endPoint     - The end control point the cubic Bézier curve.
    * @param {string} color        - The CSS color to draw the curve with.
    * @param {number|string} lineWidth - (optional) The line width to use.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  quadraticBezier(startPoint: XYCoords, controlPoint: XYCoords, endPoint: XYCoords, color: string, lineWidth?: number) {
+  quadraticBezier(
+    startPoint: XYCoords,
+    controlPoint: XYCoords,
+    endPoint: XYCoords,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
+  ) {
     // Draw curve
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
     this.ctx.quadraticCurveTo(
       this.offset.x + controlPoint.x * this.scale.x,
@@ -646,11 +693,13 @@ export class drawutils implements DrawLib<void> {
    * @param {XYCoords[]} path - The cubic bezier path as described above.
    * @param {string} color - The CSS colot to draw the path with.
    * @param {number=1} lineWidth - (optional) The line width to use.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number) {
+  cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) {
     if (!path || path.length == 0) {
       return;
     }
@@ -660,7 +709,7 @@ export class drawutils implements DrawLib<void> {
     var endPoint: XYCoords;
     var startControlPoint: XYCoords;
     var endControlPoint: XYCoords;
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
     for (var i = 1; i < path.length; i += 3) {
       startControlPoint = path[i];
@@ -712,10 +761,7 @@ export class drawutils implements DrawLib<void> {
    */
   handleLine(startPoint: XYCoords, endPoint: XYCoords) {
     // Draw handle lines
-    // console.log("Draw handle line");
-    this.lineDashEnabled = false;
-    this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)");
-    this.lineDashEnabled = true;
+    this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)", undefined);
   }
 
   /**
@@ -770,12 +816,14 @@ export class drawutils implements DrawLib<void> {
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @param {number} lineWidth - The line width (optional, default=1).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  circle(center: XYCoords, radius: number, color: string, lineWidth?: number) {
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+  circle(center: XYCoords, radius: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) {
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.beginPath();
     this.ctx.ellipse(
       this.offset.x + center.x * this.scale.x,
@@ -792,20 +840,23 @@ export class drawutils implements DrawLib<void> {
   }
 
   /**
-     * Draw a circular arc (section of a circle) with the given CSS color.
-     *
-     * @method circleArc
-     * @param {XYCoords} center - The center of the circle.
-     * @param {number} radius - The radius of the circle.
-     * @param {number} startAngle - The angle to start at.
-     * @param {number} endAngle - The angle to end at.
-     * @param {string=#000000} color - The CSS color to draw the circle with.
-     * @param {number=1} lineWidth - The line width to use
-     // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-     * @return {void}
-     * @instance
-     * @memberof drawutils
-     */
+   * Draw a circular arc (section of a circle) with the given CSS color.
+   *
+   * @method circleArc
+   * @param {XYCoords} center - The center of the circle.
+   * @param {number} radius - The radius of the circle.
+   * @param {number} startAngle - The angle to start at.
+   * @param {number} endAngle - The angle to end at.
+   * @param {string=#000000} color - The CSS color to draw the circle with.
+   * @param {number=1} lineWidth - The line width to use
+   * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+   * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+   * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
+   *
+   * @return {void}
+   * @instance
+   * @memberof drawutils
+   */
   circleArc(
     center: XYCoords,
     radius: number,
@@ -813,12 +864,12 @@ export class drawutils implements DrawLib<void> {
     endAngle: number,
     color?: string,
     lineWidth?: number,
-    options?: { asSegment?: boolean }
+    options?: { asSegment?: boolean } & StrokeOptions
   ) {
     if (!options || !options.asSegment) {
       this.ctx.beginPath();
     }
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(options);
     this.ctx.ellipse(
       this.offset.x + center.x * this.scale.x,
       this.offset.y + center.y * this.scale.y,
@@ -846,15 +897,25 @@ export class drawutils implements DrawLib<void> {
    * @param {string} color - The CSS color to draw the ellipse with.
    * @param {number} lineWidth=1 - An optional line width param (default is 1).
    * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  ellipse(center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) {
+  ellipse(
+    center: XYCoords,
+    radiusX: number,
+    radiusY: number,
+    color: string,
+    lineWidth?: number,
+    rotation?: number,
+    strokeOptions?: StrokeOptions
+  ) {
     if (typeof rotation === "undefined") {
       rotation = 0.0;
     }
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.beginPath();
     this.ctx.ellipse(
       this.offset.x + center.x * this.scale.x,
@@ -880,12 +941,14 @@ export class drawutils implements DrawLib<void> {
    * @param {number} size - The size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @param {number} lineWidth - The line with to use (optional, default is 1).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  square(center: XYCoords, size: number, color: string, lineWidth?: number) {
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+  square(center: XYCoords, size: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) {
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.beginPath();
     this.ctx.rect(
       this.offset.x + (center.x - size / 2.0) * this.scale.x,
@@ -1117,12 +1180,14 @@ export class drawutils implements DrawLib<void> {
    * @param {Polygon}  polygon - The polygon to draw.
    * @param {string}   color - The CSS color to draw the polygon with.
    * @param {string}   lineWidth - The line width to use.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  polygon(polygon: Polygon, color: string, lineWidth?: number) {
-    this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+  polygon(polygon: Polygon, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) {
+    this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
   }
 
   /**
@@ -1133,16 +1198,18 @@ export class drawutils implements DrawLib<void> {
    * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
    * @param {string}   color      - The CSS color to draw the polygon with.
    * @param {number}   lineWidth  - The line width (default is 1.0);
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  polyline(vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number) {
+  polyline(vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) {
     if (vertices.length <= 1) {
       return;
     }
     this.ctx.save();
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(strokeOptions);
     this.ctx.beginPath();
     this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
     this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
@@ -1272,18 +1339,20 @@ export class drawutils implements DrawLib<void> {
    * @param {string=null} color - (optional) The color to draw this path with (default is null).
    * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
    * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+   * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+   * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
    * @instance
    * @memberof drawutils
    * @return {R} An instance representing the drawn path.
    */
-  path(pathData: SVGPathParams, color?: string, lineWidth?: number, options?: { inplace?: boolean }) {
+  path(pathData: SVGPathParams, color?: string, lineWidth?: number, options?: { inplace?: boolean } & StrokeOptions) {
     const d: SVGPathParams = options && options.inplace ? pathData : drawutilssvg.copyPathData(pathData);
     drawutilssvg.transformPathData(d, this.offset, this.scale);
     if (color) {
       this.ctx.strokeStyle = color;
     }
     this.ctx.lineWidth = lineWidth || 1;
-    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    this.applyStrokeOpts(options);
     if (this.fillShapes) {
       if (color) {
         this.ctx.fillStyle = color;

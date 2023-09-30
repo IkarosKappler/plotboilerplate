@@ -111,20 +111,20 @@ export class drawutilsgl {
     setConfiguration(configuration) {
         // TODO
     }
-    /**
-     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-     * for how line dashes work.
-     *
-     * @method
-     * @param {Array<number> lineDashes - The line-dash array configuration.
-     * @returns {void}
-     */
-    setLineDash(lineDashes) {
-        // TODO
-    }
+    // /**
+    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+    //  *
+    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    //  * for how line dashes work.
+    //  *
+    //  * @method
+    //  * @param {Array<number> lineDashes - The line-dash array configuration.
+    //  * @returns {void}
+    //  */
+    // setLineDash(lineDashes: Array<number>) {
+    //   // TODO
+    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.

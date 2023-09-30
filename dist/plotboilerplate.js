@@ -9705,6 +9705,17 @@ var Vector_1 = __webpack_require__(73);
  * @requires XYCoords
  */
 var drawutils = /** @class */ (function () {
+    // /**
+    //  * @member {Array<number>}
+    //  * @memberof drawutils
+    //  * @type {boolean}
+    //  * @instance
+    //  */
+    // private lineDash: Array<number>;
+    // /**
+    //  * Use this flag for internally enabling/disabling line dashes.
+    //  */
+    // private lineDashEnabled: boolean = true;
     /**
      * The constructor.
      *
@@ -9714,16 +9725,39 @@ var drawutils = /** @class */ (function () {
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
     function drawutils(context, fillShapes) {
-        /**
-         * Use this flag for internally enabling/disabling line dashes.
-         */
-        this.lineDashEnabled = true;
         this.ctx = context;
-        this.lineDash = [];
+        // this.lineDash = [];
         this.offset = new Vertex_1.Vertex(0, 0);
         this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
     }
+    drawutils.prototype.applyStrokeOpts = function (strokeOptions) {
+        var _a, _b;
+        this.ctx.setLineDash((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []);
+        this.ctx.lineDashOffset = (_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0;
+    };
+    // +---------------------------------------------------------------------------------
+    // | This is the final helper function for drawing and filling stuff. It is not
+    // | intended to be used from the outside.
+    // |
+    // | When in draw mode it draws the current shape.
+    // | When in fill mode it fills the current shape.
+    // |
+    // | This function is usually only called internally.
+    // |
+    // | @param color A stroke/fill color to use.
+    // +-------------------------------
+    // TODO: convert this to a STATIC function.
+    drawutils.prototype._fillOrDraw = function (color) {
+        if (this.fillShapes) {
+            this.ctx.fillStyle = color;
+            this.ctx.fill();
+        }
+        else {
+            this.ctx.strokeStyle = color;
+            this.ctx.stroke();
+        }
+    };
     /**
      * Called before each draw cycle.
      * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
@@ -9754,20 +9788,20 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.setConfiguration = function (configuration) {
         this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
     };
-    /**
-     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-     * for how line dashes work.
-     *
-     * @method
-     * @param {Array<number> lineDashes - The line-dash array configuration.
-     * @returns {void}
-     */
-    drawutils.prototype.setLineDash = function (lineDash) {
-        this.lineDash = lineDash;
-    };
+    // /**
+    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+    //  *
+    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    //  * for how line dashes work.
+    //  *
+    //  * @method
+    //  * @param {Array<number> lineDashes - The line-dash array configuration.
+    //  * @returns {void}
+    //  */
+    // setLineDash(lineDash: Array<number>) {
+    //   this.lineDash = lineDash;
+    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -9798,14 +9832,16 @@ var drawutils = /** @class */ (function () {
      * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @param {number} lineWidth? - [optional] The line's width.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    drawutils.prototype.line = function (zA, zB, color, lineWidth) {
+    drawutils.prototype.line = function (zA, zB, color, lineWidth, strokeOptions) {
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
         this.ctx.strokeStyle = color;
@@ -9822,11 +9858,13 @@ var drawutils = /** @class */ (function () {
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    drawutils.prototype.arrow = function (zA, zB, color, lineWidth, headLength) {
+    drawutils.prototype.arrow = function (zA, zB, color, lineWidth, headLength, strokeOptions) {
         // var headLength: number = 8; // length of head in pixels
         if (headLength === void 0) { headLength = 8; }
         // this.ctx.save();
@@ -9840,8 +9878,8 @@ var drawutils = /** @class */ (function () {
         // this.ctx.lineWidth = lineWidth || 1;
         // this._fillOrDraw(color);
         // this.ctx.restore();
-        this.line(zA, zB, color, lineWidth); // Will use dash configuration
-        this.arrowHead(zA, zB, color, lineWidth, headLength);
+        this.line(zA, zB, color, lineWidth, strokeOptions); // Will use dash configuration
+        this.arrowHead(zA, zB, color, lineWidth, headLength, undefined); // Will NOT use dash configuration
     };
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -9854,14 +9892,17 @@ var drawutils = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
      * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
      *
      * @return {void}
      * @instance
      * @memberof DrawLib
      */
-    drawutils.prototype.cubicBezierArrow = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength) {
-        this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth);
-        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength);
+    drawutils.prototype.cubicBezierArrow = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength, strokeOptions) {
+        // Will use dash configuration
+        this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
+        // Will NOT use dash configuration
+        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
     };
     /**
      * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
@@ -9872,16 +9913,19 @@ var drawutils = /** @class */ (function () {
      * @param {string} color - Any valid CSS color string.
      * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
      * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof DrawLib
      **/
-    drawutils.prototype.arrowHead = function (zA, zB, color, lineWidth, headLength) {
+    drawutils.prototype.arrowHead = function (zA, zB, color, lineWidth, headLength, strokeOptions) {
         // var headLength: number = 8; // length of head in pixels
         if (headLength === void 0) { headLength = 8; }
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.setLineDash([]); // Clear line dash for arrow heads
+        // this.ctx.setLineDash([]); // Clear line dash for arrow heads
+        this.applyStrokeOpts(strokeOptions);
         var vertices = Vector_1.Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         // for (var i = 0; i < vertices.length; i++) {
@@ -10053,11 +10097,16 @@ var drawutils = /** @class */ (function () {
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof drawutils
      **/
-    drawutils.prototype.rect = function (position, width, height, color, lineWidth) {
+    drawutils.prototype.rect = function (position, width, height, color, lineWidth, strokeOptions) {
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
@@ -10067,28 +10116,6 @@ var drawutils = /** @class */ (function () {
         this.ctx.lineWidth = lineWidth || 1;
         this._fillOrDraw(color);
         this.ctx.restore();
-    };
-    // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff. It is not
-    // | intended to be used from the outside.
-    // |
-    // | When in draw mode it draws the current shape.
-    // | When in fill mode it fills the current shape.
-    // |
-    // | This function is usually only called internally.
-    // |
-    // | @param color A stroke/fill color to use.
-    // +-------------------------------
-    // TODO: convert this to a STATIC function.
-    drawutils.prototype._fillOrDraw = function (color) {
-        if (this.fillShapes) {
-            this.ctx.fillStyle = color;
-            this.ctx.fill();
-        }
-        else {
-            this.ctx.strokeStyle = color;
-            this.ctx.stroke();
-        }
     };
     /**
      * Draw the given (cubic) bézier curve.
@@ -10100,11 +10127,13 @@ var drawutils = /** @class */ (function () {
      * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
+    drawutils.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions) {
         if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
             this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
             return;
@@ -10112,7 +10141,7 @@ var drawutils = /** @class */ (function () {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         //this.ctx.closePath();
@@ -10129,15 +10158,17 @@ var drawutils = /** @class */ (function () {
      * @param {XYCoords} endPoint     - The end control point the cubic Bézier curve.
      * @param {string} color        - The CSS color to draw the curve with.
      * @param {number|string} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.quadraticBezier = function (startPoint, controlPoint, endPoint, color, lineWidth) {
+    drawutils.prototype.quadraticBezier = function (startPoint, controlPoint, endPoint, color, lineWidth, strokeOptions) {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.quadraticCurveTo(this.offset.x + controlPoint.x * this.scale.x, this.offset.y + controlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         this.ctx.lineWidth = lineWidth || 2;
@@ -10155,11 +10186,13 @@ var drawutils = /** @class */ (function () {
      * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.cubicBezierPath = function (path, color, lineWidth) {
+    drawutils.prototype.cubicBezierPath = function (path, color, lineWidth, strokeOptions) {
         if (!path || path.length == 0) {
             return;
         }
@@ -10169,7 +10202,7 @@ var drawutils = /** @class */ (function () {
         var endPoint;
         var startControlPoint;
         var endControlPoint;
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
@@ -10212,10 +10245,7 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.handleLine = function (startPoint, endPoint) {
         // Draw handle lines
-        // console.log("Draw handle line");
-        this.lineDashEnabled = false;
-        this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)");
-        this.lineDashEnabled = true;
+        this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)", undefined);
     };
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -10267,12 +10297,14 @@ var drawutils = /** @class */ (function () {
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number} lineWidth - The line width (optional, default=1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.circle = function (center, radius, color, lineWidth) {
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    drawutils.prototype.circle = function (center, radius, color, lineWidth, strokeOptions) {
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -10280,25 +10312,28 @@ var drawutils = /** @class */ (function () {
         this._fillOrDraw(color);
     };
     /**
-       * Draw a circular arc (section of a circle) with the given CSS color.
-       *
-       * @method circleArc
-       * @param {XYCoords} center - The center of the circle.
-       * @param {number} radius - The radius of the circle.
-       * @param {number} startAngle - The angle to start at.
-       * @param {number} endAngle - The angle to end at.
-       * @param {string=#000000} color - The CSS color to draw the circle with.
-       * @param {number=1} lineWidth - The line width to use
-       // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-       * @return {void}
-       * @instance
-       * @memberof drawutils
-       */
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {XYCoords} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string=#000000} color - The CSS color to draw the circle with.
+     * @param {number=1} lineWidth - The line width to use
+     * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
+     *
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     drawutils.prototype.circleArc = function (center, radius, startAngle, endAngle, color, lineWidth, options) {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
         }
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(options);
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
         if (!options || !options.asSegment) {
             // this.ctx.closePath();
@@ -10316,15 +10351,17 @@ var drawutils = /** @class */ (function () {
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number} lineWidth=1 - An optional line width param (default is 1).
      * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth, rotation) {
+    drawutils.prototype.ellipse = function (center, radiusX, radiusY, color, lineWidth, rotation, strokeOptions) {
         if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, rotation, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -10341,12 +10378,14 @@ var drawutils = /** @class */ (function () {
      * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number} lineWidth - The line with to use (optional, default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.square = function (center, size, color, lineWidth) {
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+    drawutils.prototype.square = function (center, size, color, lineWidth, strokeOptions) {
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
         this.ctx.closePath();
@@ -10558,12 +10597,14 @@ var drawutils = /** @class */ (function () {
      * @param {Polygon}  polygon - The polygon to draw.
      * @param {string}   color - The CSS color to draw the polygon with.
      * @param {string}   lineWidth - The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.polygon = function (polygon, color, lineWidth) {
-        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    drawutils.prototype.polygon = function (polygon, color, lineWidth, strokeOptions) {
+        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
     };
     /**
      * Draw a polygon line (alternative function to the polygon).
@@ -10573,16 +10614,18 @@ var drawutils = /** @class */ (function () {
      * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
      * @param {string}   color      - The CSS color to draw the polygon with.
      * @param {number}   lineWidth  - The line width (default is 1.0);
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    drawutils.prototype.polyline = function (vertices, isOpen, color, lineWidth) {
+    drawutils.prototype.polyline = function (vertices, isOpen, color, lineWidth, strokeOptions) {
         if (vertices.length <= 1) {
             return;
         }
         this.ctx.save();
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
@@ -10694,6 +10737,8 @@ var drawutils = /** @class */ (function () {
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
      * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
@@ -10705,7 +10750,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.strokeStyle = color;
         }
         this.ctx.lineWidth = lineWidth || 1;
-        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
+        this.applyStrokeOpts(options);
         if (this.fillShapes) {
             if (color) {
                 this.ctx.fillStyle = color;
@@ -10873,20 +10918,20 @@ var drawutilsgl = /** @class */ (function () {
     drawutilsgl.prototype.setConfiguration = function (configuration) {
         // TODO
     };
-    /**
-     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-     * for how line dashes work.
-     *
-     * @method
-     * @param {Array<number> lineDashes - The line-dash array configuration.
-     * @returns {void}
-     */
-    drawutilsgl.prototype.setLineDash = function (lineDashes) {
-        // TODO
-    };
+    // /**
+    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+    //  *
+    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    //  * for how line dashes work.
+    //  *
+    //  * @method
+    //  * @param {Array<number> lineDashes - The line-dash array configuration.
+    //  * @returns {void}
+    //  */
+    // setLineDash(lineDashes: Array<number>) {
+    //   // TODO
+    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -11873,20 +11918,20 @@ var drawutilssvg = /** @class */ (function () {
     drawutilssvg.prototype.setConfiguration = function (configuration) {
         this.drawlibConfiguration = configuration;
     };
-    /**
-     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-     *
-     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-     * for how line dashes work.
-     *
-     * @method
-     * @param {Array<number> lineDashes - The line-dash array configuration.
-     * @returns {void}
-     */
-    drawutilssvg.prototype.setLineDash = function (lineDashes) {
-        this.lineDash = lineDashes;
-    };
+    // /**
+    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+    //  *
+    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    //  * for how line dashes work.
+    //  *
+    //  * @method
+    //  * @param {Array<number> lineDashes - The line-dash array configuration.
+    //  * @returns {void}
+    //  */
+    // setLineDash(lineDashes: Array<number>) {
+    //   this.lineDash = lineDashes;
+    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.

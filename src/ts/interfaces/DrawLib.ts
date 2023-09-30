@@ -24,6 +24,7 @@
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @    line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline
  **/
 
 import { Bounds } from "../Bounds";
@@ -56,6 +57,20 @@ export interface FontOptions {
 }
 
 /**
+ * Defines a line-dash configuration.
+ *
+ * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+ * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+ * for how line dashes work.
+ *
+ * Setting line-dash to empty array `[]` resets the dashing.
+ */
+export interface StrokeOptions {
+  dashOffset?: number;
+  dashArray?: Array<number>;
+}
+
+/**
  * An interface all drawing libraries must implement to be used with PlotBoilerplate.
  *
  * The generic type `R` specifies the return-types for all draw functions. Libraries might
@@ -77,20 +92,20 @@ export interface DrawLib<R> {
    */
   setConfiguration: (configuration: DrawLibConfiguration) => void;
 
-  /**
-   * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
-   *
-   * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
-   * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
-   * for how line dashes work.
-   *
-   * Setting line-dash to empty array `[]` resets the dashing.
-   *
-   * @method
-   * @param {Array<number> lineDashes - The line-dash array configuration.
-   * @returns {void}
-   */
-  setLineDash: (lineDashes: Array<number>) => void;
+  // /**
+  //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+  //  *
+  //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+  //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+  //  * for how line dashes work.
+  //  *
+  //  * Setting line-dash to empty array `[]` resets the dashing.
+  //  *
+  //  * @method
+  //  * @param {Array<number> lineDashes - The line-dash array configuration.
+  //  * @returns {void}
+  //  */
+  // setLineDash: (lineDashes: Array<number>) => void;
 
   /**
    * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -143,12 +158,13 @@ export interface DrawLib<R> {
    * @param {XYCoords} zA - The start point of the line.
    * @param {XYCoords} zB - The end point of the line.
    * @param {string} color - Any valid CSS color string.
-   * @param {number=1} lineWidth? - [optional] The line's width.
-   * @return {void}
+   * @param {number=1} lineWidth? - (optional) The line's width.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   * @return {R}
    * @instance
    * @memberof DrawLib
    **/
-  line: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number) => R;
+  line: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, strokeOptopns?: StrokeOptions) => R;
 
   /**
    * Draw a line and an arrow at the end (zB) of the given line width the specified (CSS-) color and size.
@@ -159,11 +175,12 @@ export interface DrawLib<R> {
    * @param {string} color - Any valid CSS color string.
    * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
    * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   * @return {R}
    * @instance
    * @memberof DrawLib
    **/
-  arrow: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number) => R;
+  arrow: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number, strokeOptopns?: StrokeOptions) => R;
 
   /**
    * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -176,8 +193,9 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number} lineWidth - (optional) The line width to use.
    * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
    *
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -188,7 +206,8 @@ export interface DrawLib<R> {
     endControlPoint: XYCoords,
     color: string,
     lineWidth?: number,
-    headLength?: number
+    headLength?: number,
+    strokeOptopns?: StrokeOptions
   ) => R;
 
   /**
@@ -200,11 +219,20 @@ export interface DrawLib<R> {
    * @param {string} color - Any valid CSS color string.
    * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
    * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    **/
-  arrowHead: (zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number) => R;
+  arrowHead: (
+    zA: XYCoords,
+    zB: XYCoords,
+    color: string,
+    lineWidth?: number,
+    headLength?: number,
+    strokeOptopns?: StrokeOptions
+  ) => R;
 
   /**
    * Draw an image at the given position with the given size.<br>
@@ -216,7 +244,7 @@ export interface DrawLib<R> {
    * @param {XYCoords} position - The position to draw the the upper left corner at.
    * @param {XYCoords} size - The x/y-size to draw the image with.
    * @param {number=1.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    **/
@@ -255,7 +283,9 @@ export interface DrawLib<R> {
    * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number} lineWidth - (optional) The line width to use.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -265,7 +295,8 @@ export interface DrawLib<R> {
     startControlPoint: XYCoords,
     endControlPoint: XYCoords,
     color: string,
-    lineWidth?: number
+    lineWidth?: number,
+    strokeOptopns?: StrokeOptions
   ) => R;
 
   /**
@@ -279,11 +310,13 @@ export interface DrawLib<R> {
    * @param {XYCoords[]} path - The cubic bezier path as described above.
    * @param {string} color - The CSS colot to draw the path with.
    * @param {number=1} lineWidth - (optional) The line width to use.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
-  cubicBezierPath: (path: Array<XYCoords>, color: string, lineWidth?: number) => R;
+  cubicBezierPath: (path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptopns?: StrokeOptions) => R;
 
   /**
    * Draw the given handle and handle point (used to draw interactive Bézier curves).
@@ -293,7 +326,7 @@ export interface DrawLib<R> {
    * @method handle
    * @param {XYCoords} startPoint - The start of the handle.
    * @param {XYCoords} endPoint - The end point of the handle.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -305,7 +338,7 @@ export interface DrawLib<R> {
    * @method handleLine
    * @param {XYCoords} startPoint - The start point to draw the handle at.
    * @param {XYCoords} endPoint - The end point to draw the handle at.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -317,7 +350,7 @@ export interface DrawLib<R> {
    * @method dot
    * @param {XYCoords} p - The position to draw the dot at.
    * @param {string} color - The CSS color to draw the dot with.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -329,7 +362,7 @@ export interface DrawLib<R> {
    * @method point
    * @param {XYCoords} p - The position to draw the point at.
    * @param {XYCoords} color - The CSS color to draw the point with.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -345,11 +378,13 @@ export interface DrawLib<R> {
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
-  circle: (center: XYCoords, radius: number, color: string, lineWidth?: number) => R;
+  circle: (center: XYCoords, radius: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) => R;
 
   /**
    * Draw a circular arc (section of a circle) with the given CSS color.
@@ -361,11 +396,21 @@ export interface DrawLib<R> {
    * @param {number} endAngle - The angle to end at.
    * @param {string} color - The CSS color to draw the circle with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
-  circleArc: (center: XYCoords, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) => R;
+  circleArc: (
+    center: XYCoords,
+    radius: number,
+    startAngle: number,
+    endAngle: number,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
+  ) => R;
 
   /**
    * Draw an ellipse with the specified (CSS-) color and thw two radii.
@@ -377,11 +422,21 @@ export interface DrawLib<R> {
    * @param {string} color - The CSS color to draw the ellipse with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
-  ellipse: (center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) => R;
+  ellipse: (
+    center: XYCoords,
+    radiusX: number,
+    radiusY: number,
+    color: string,
+    lineWidth?: number,
+    rotation?: number,
+    strokeOptions?: StrokeOptions
+  ) => R;
 
   /**
    * Draw square at the given center, size and with the specified (CSS-) color.<br>
@@ -393,11 +448,13 @@ export interface DrawLib<R> {
    * @param {number} size - The size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
-  square: (center: XYCoords, size: number, color: string, lineWidth?: number) => R;
+  square: (center: XYCoords, size: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) => R;
 
   /**
    * Draw a rectangle at the given left upper corner, with, height; and with the specified line width and (CSS-) color.<br>
@@ -408,11 +465,20 @@ export interface DrawLib<R> {
    * @param {number} height - The height of the rectangle.
    * @param {string} color - The CSS color to draw the rectangle with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
-  rect: (upperLeft: XYCoords, width: number, height: number, color: string, lineWidth?: number) => R;
+  rect: (
+    upperLeft: XYCoords,
+    width: number,
+    height: number,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
+  ) => R;
 
   /**
    * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
@@ -424,7 +490,7 @@ export interface DrawLib<R> {
    * @param {number} sizeX - The horizontal grid size.
    * @param {number} sizeY - The vertical grid size.
    * @param {string} color - The CSS color to draw the grid with.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -442,7 +508,7 @@ export interface DrawLib<R> {
    * @param {number} sizeX - The horizontal raster size.
    * @param {number} sizeY - The vertical raster size.
    * @param {string} color - The CSS color to draw the raster with.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -459,7 +525,7 @@ export interface DrawLib<R> {
    * @param {XYCoords} center - The center of the diamond.
    * @param {number} size - The x/y-size of the diamond.
    * @param {string} color - The CSS color to draw the diamond with.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -476,7 +542,7 @@ export interface DrawLib<R> {
    * @param {XYCoords} center - The center of the square.
    * @param {number} size - The x/y-size of the square.
    * @param {string} color - The CSS color to draw the square with.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -493,7 +559,7 @@ export interface DrawLib<R> {
    * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -509,7 +575,7 @@ export interface DrawLib<R> {
    * @param {number} radius - The radius of the crosshair.
    * @param {string} color - The CSS color to draw the crosshair with.
    * @param {number=0.5} lineWidth - (optional, default=0.5) The line width to use.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -525,7 +591,7 @@ export interface DrawLib<R> {
    * @param {number} radius - The radius of the crosshair.
    * @param {string} color - The CSS color to draw the crosshair with.
    * @param {number=1} lineWidth - (optional, default=1.0) The line width to use.
-   * @return {void}
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
@@ -537,11 +603,14 @@ export interface DrawLib<R> {
    * @method polygon
    * @param {Polygon} polygon - The polygon to draw.
    * @param {string} color - The CSS color to draw the polygon with.
-   * @return {void}
+   * @param {number=} lineWidth - The line width to draw this polygon with.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
-  polygon: (polygon: Polygon, color: string, lineWidth?: number) => R;
+  polygon: (polygon: Polygon, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) => R;
 
   /**
    * Draw a polygon line (alternative function to the polygon).
@@ -551,11 +620,13 @@ export interface DrawLib<R> {
    * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
    * @param {string}   color    - The CSS color to draw the polygon with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {R}
    * @instance
    * @memberof DrawLib
    */
-  polyline: (vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number) => R;
+  polyline: (vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) => R;
 
   /**
    * Draw a text at the given relative position.
@@ -601,11 +672,14 @@ export interface DrawLib<R> {
    * @param {string=null} color - (optional) The color to draw this path with (default is null).
    * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
    * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+   * @param {number=} options.dashOffset - See `StrokeOptions`.
+   * @param {number[]=} options.dashArray - See `StrokeOptions`.
+   *
    * @instance
    * @memberof DrawLib
    * @return {R} An instance representing the drawn path.
    */
-  path: (pathData: SVGPathParams, color?: string, lineWidth?: number, options?: { inplace?: boolean }) => R;
+  path: (pathData: SVGPathParams, color?: string, lineWidth?: number, options?: { inplace?: boolean } & StrokeOptions) => R;
 
   /**
    * Due to gl compatibility there is a generic 'clear' function required

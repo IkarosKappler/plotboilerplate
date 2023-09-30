@@ -59,14 +59,21 @@
 
     const preDraw = function (draw, _fill) {
       // Draw a straight line with an arrow at the end ("Vector")
-      draw.setLineDash([5, 15]);
     };
 
     const postDraw = function (draw, fill) {
       console.log("post draw");
-      // draw.setLineDash([5, 15]);
-      // draw.setLineDash([]);
-      draw.arrow(arrow.a, arrow.b, "red", 2, 8);
+      draw.arrow(arrow.a, arrow.b, "red", 2, config.size, { dashArray: [5, 15] });
+      draw.cubicBezierArrow(
+        bezier.startPoint,
+        bezier.endPoint,
+        bezier.startControlPoint,
+        bezier.endControlPoint,
+        "orange",
+        2,
+        config.size,
+        { dashArray: [5, 15] }
+      );
     };
 
     {
