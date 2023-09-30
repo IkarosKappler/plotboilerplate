@@ -23,6 +23,7 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  **/
 export {};
 //# sourceMappingURL=DrawLib.js.map

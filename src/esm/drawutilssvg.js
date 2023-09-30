@@ -43,12 +43,14 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  1.6.7
  **/
 import { CircleSector } from "./CircleSector";
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
 import { UIDGenerator } from "./UIDGenerator";
+import { Vector } from "./Vector";
 const RAD_TO_DEG = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -75,11 +77,16 @@ export class drawutilssvg {
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
     constructor(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs) {
+        /**
+         * Use this flag for internally enabling/disabling line dashes.
+         */
+        this.lineDashEnabled = true;
         this.svgNode = svgNode;
         this.offset = new Vertex(0, 0).set(offset);
         this.scale = new Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = Boolean(isSecondary);
+        this.lineDash = [];
         this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
@@ -227,6 +234,9 @@ export class drawutilssvg {
         if (this.drawlibConfiguration.blendMode) {
             node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
         }
+        if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
+            node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
+        }
         return node;
     }
     /**
@@ -301,6 +311,20 @@ export class drawutilssvg {
      */
     setConfiguration(configuration) {
         this.drawlibConfiguration = configuration;
+    }
+    /**
+     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+     * for how line dashes work.
+     *
+     * @method
+     * @param {Array<number> lineDashes - The line-dash array configuration.
+     * @returns {void}
+     */
+    setLineDash(lineDashes) {
+        this.lineDash = lineDashes;
     }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -416,18 +440,27 @@ export class drawutilssvg {
      * @memberof drawutilssvg
      **/
     arrow(zA, zB, color, lineWidth, headLength = 8) {
-        const node = this.makeNode("path");
-        // var headLength: number = 8; // length of head in pixels
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        const d = ["M", this._x(zA.x), this._y(zA.y)];
-        for (var i = 0; i <= vertices.length; i++) {
-            d.push("L");
-            // Note: only use offset here (the vertices are already scaled)
-            d.push(this.offset.x + vertices[i % vertices.length].x);
-            d.push(this.offset.y + vertices[i % vertices.length].y);
-        }
-        node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
+        // // this.lineDashEnabled = false;
+        // const node: SVGElement = this.makeNode("path");
+        // // var headLength: number = 8; // length of head in pixels
+        // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+        // for (var i = 0; i <= vertices.length; i++) {
+        //   d.push("L");
+        //   // Note: only use offset here (the vertices are already scaled)
+        //   d.push(this.offset.x + vertices[i % vertices.length].x);
+        //   d.push(this.offset.y + vertices[i % vertices.length].y);
+        // }
+        // node.setAttribute("d", d.join(" "));
+        // return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
+        const group = this.makeNode("g");
+        const line = this.line(zA, zB, color, lineWidth);
+        const arrowHead = this.arrowHead(zA, zB, color, lineWidth, headLength);
+        group.appendChild(line);
+        group.appendChild(arrowHead);
+        return this._bindFillDraw(group, "arrow", color, lineWidth || 1);
+        return group;
+        // return line; // OR RETURN ARROW OR GROUP; TODO
     }
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -461,7 +494,7 @@ export class drawutilssvg {
             this._y(endPoint.y)
         ];
         // var headLength: number = 8; // length of head in pixels
-        var vertices = Vertex.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
+        var vertices = Vector.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
         // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
         // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
         for (var i = 0; i <= vertices.length; i++) {
@@ -489,7 +522,7 @@ export class drawutilssvg {
     arrowHead(zA, zB, color, lineWidth, headLength = 8) {
         const node = this.makeNode("path");
         // var headLength: number = 8; // length of head in pixels
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
         const d = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
         for (var i = 1; i <= vertices.length; i++) {
@@ -709,7 +742,9 @@ export class drawutilssvg {
      * @memberof drawutilssvg
      */
     handleLine(startPoint, endPoint) {
-        this.line(startPoint, endPoint, "rgb(192,192,192)");
+        this.lineDashEnabled = false;
+        this.line(startPoint, endPoint, "rgb(128,128,128,0.5)");
+        this.lineDashEnabled = true;
     }
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -1445,6 +1480,9 @@ export class drawutilssvg {
             }
         } // END while
     } // END transformPathData
+    static nodeSupportsLineDash(nodeName) {
+        return ["line", "path", "circle", "ellipse"].includes(nodeName);
+    }
 }
 drawutilssvg.HEAD_XML = [
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',

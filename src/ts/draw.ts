@@ -53,6 +53,7 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  1.13.0
  **/
 
@@ -107,6 +108,19 @@ export class drawutils implements DrawLib<void> {
   fillShapes: boolean;
 
   /**
+   * @member {Array<number>}
+   * @memberof drawutils
+   * @type {boolean}
+   * @instance
+   */
+  private lineDash: Array<number>;
+
+  /**
+   * Use this flag for internally enabling/disabling line dashes.
+   */
+  private lineDashEnabled: boolean = true;
+
+  /**
    * The constructor.
    *
    * @constructor
@@ -116,6 +130,7 @@ export class drawutils implements DrawLib<void> {
    **/
   constructor(context: CanvasRenderingContext2D, fillShapes: boolean) {
     this.ctx = context;
+    this.lineDash = [];
     this.offset = new Vertex(0, 0);
     this.scale = new Vertex(1, 1);
     this.fillShapes = fillShapes;
@@ -152,6 +167,21 @@ export class drawutils implements DrawLib<void> {
    */
   setConfiguration(configuration: DrawLibConfiguration): void {
     this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
+  }
+
+  /**
+   * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+   *
+   * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+   * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+   * for how line dashes work.
+   *
+   * @method
+   * @param {Array<number> lineDashes - The line-dash array configuration.
+   * @returns {void}
+   */
+  setLineDash(lineDash: Array<number>) {
+    this.lineDash = lineDash;
   }
 
   /**
@@ -193,6 +223,7 @@ export class drawutils implements DrawLib<void> {
   line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number) {
     this.ctx.save();
     this.ctx.beginPath();
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
     this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
     this.ctx.strokeStyle = color;
@@ -217,18 +248,20 @@ export class drawutils implements DrawLib<void> {
   arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength: number = 8) {
     // var headLength: number = 8; // length of head in pixels
 
-    this.ctx.save();
-    this.ctx.beginPath();
-    var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+    // this.ctx.save();
+    // this.ctx.beginPath();
+    // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
 
-    this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-    for (var i = 0; i < vertices.length; i++) {
-      this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
-    }
-    this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
-    this.ctx.lineWidth = lineWidth || 1;
-    this._fillOrDraw(color);
-    this.ctx.restore();
+    // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+    // for (var i = 0; i < vertices.length; i++) {
+    //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
+    // }
+    // this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
+    // this.ctx.lineWidth = lineWidth || 1;
+    // this._fillOrDraw(color);
+    // this.ctx.restore();
+    this.line(zA, zB, color, lineWidth); // Will use dash configuration
+    this.arrowHead(zA, zB, color, lineWidth, headLength);
   }
 
   /**
@@ -278,6 +311,7 @@ export class drawutils implements DrawLib<void> {
 
     this.ctx.save();
     this.ctx.beginPath();
+    this.ctx.setLineDash([]); // Clear line dash for arrow heads
     var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
 
     // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
@@ -485,6 +519,7 @@ export class drawutils implements DrawLib<void> {
   rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): void {
     this.ctx.save();
     this.ctx.beginPath();
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
     this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
     this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
@@ -554,6 +589,7 @@ export class drawutils implements DrawLib<void> {
     // Draw curve
     this.ctx.save();
     this.ctx.beginPath();
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
     this.ctx.bezierCurveTo(
       this.offset.x + startControlPoint.x * this.scale.x,
@@ -586,6 +622,7 @@ export class drawutils implements DrawLib<void> {
     // Draw curve
     this.ctx.save();
     this.ctx.beginPath();
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
     this.ctx.quadraticCurveTo(
       this.offset.x + controlPoint.x * this.scale.x,
@@ -614,13 +651,16 @@ export class drawutils implements DrawLib<void> {
    * @memberof drawutils
    */
   cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number) {
-    if (!path || path.length == 0) return;
+    if (!path || path.length == 0) {
+      return;
+    }
     // Draw curve
     this.ctx.save();
     this.ctx.beginPath();
     var endPoint: XYCoords;
     var startControlPoint: XYCoords;
     var endControlPoint: XYCoords;
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
     for (var i = 1; i < path.length; i += 3) {
       startControlPoint = path[i];
@@ -672,7 +712,10 @@ export class drawutils implements DrawLib<void> {
    */
   handleLine(startPoint: XYCoords, endPoint: XYCoords) {
     // Draw handle lines
-    this.line(startPoint, endPoint, "rgb(192,192,192)");
+    // console.log("Draw handle line");
+    this.lineDashEnabled = false;
+    this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)");
+    this.lineDashEnabled = true;
   }
 
   /**
@@ -688,6 +731,7 @@ export class drawutils implements DrawLib<void> {
   dot(p: XYCoords, color: string) {
     this.ctx.save();
     this.ctx.beginPath();
+    this.ctx.setLineDash([]); // Clear line-dash settings
     this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
     this.ctx.lineTo(Math.round(this.offset.x + this.scale.x * p.x + 1), Math.round(this.offset.y + this.scale.y * p.y + 1));
     this.ctx.closePath();
@@ -708,6 +752,7 @@ export class drawutils implements DrawLib<void> {
    */
   point(p: XYCoords, color: string) {
     var radius: number = 3;
+    this.ctx.setLineDash([]); // Clear line-dash settings
     this.ctx.beginPath();
     this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
     this.ctx.closePath();
@@ -730,6 +775,7 @@ export class drawutils implements DrawLib<void> {
    * @memberof drawutils
    */
   circle(center: XYCoords, radius: number, color: string, lineWidth?: number) {
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.beginPath();
     this.ctx.ellipse(
       this.offset.x + center.x * this.scale.x,
@@ -772,6 +818,7 @@ export class drawutils implements DrawLib<void> {
     if (!options || !options.asSegment) {
       this.ctx.beginPath();
     }
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.ellipse(
       this.offset.x + center.x * this.scale.x,
       this.offset.y + center.y * this.scale.y,
@@ -807,6 +854,7 @@ export class drawutils implements DrawLib<void> {
     if (typeof rotation === "undefined") {
       rotation = 0.0;
     }
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.beginPath();
     this.ctx.ellipse(
       this.offset.x + center.x * this.scale.x,
@@ -837,6 +885,7 @@ export class drawutils implements DrawLib<void> {
    * @memberof drawutils
    */
   square(center: XYCoords, size: number, color: string, lineWidth?: number) {
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.beginPath();
     this.ctx.rect(
       this.offset.x + (center.x - size / 2.0) * this.scale.x,
@@ -864,6 +913,7 @@ export class drawutils implements DrawLib<void> {
    * @memberof drawutils
    */
   grid(center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string) {
+    this.ctx.setLineDash([]); // Clear line-dash settings
     this.ctx.beginPath();
     var yMin: number = -Math.ceil((height * 0.5) / sizeY) * sizeY;
     var yMax: number = height / 2;
@@ -902,6 +952,7 @@ export class drawutils implements DrawLib<void> {
    */
   raster(center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string) {
     this.ctx.save();
+    this.ctx.setLineDash([]); // Clear line-dash settings
     this.ctx.beginPath();
     for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
       for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
@@ -935,6 +986,7 @@ export class drawutils implements DrawLib<void> {
    * @memberof drawutils
    */
   diamondHandle(center: XYCoords, size: number, color: string) {
+    this.ctx.setLineDash([]); // Clear line-dash settings
     this.ctx.beginPath();
     this.ctx.moveTo(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y);
     this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - size / 2.0);
@@ -961,6 +1013,7 @@ export class drawutils implements DrawLib<void> {
    * @memberof drawutils
    */
   squareHandle(center: XYCoords, size: number, color: string) {
+    this.ctx.setLineDash([]); // Clear line-dash settings
     this.ctx.beginPath();
     this.ctx.rect(
       this.offset.x + center.x * this.scale.x - size / 2.0,
@@ -990,6 +1043,8 @@ export class drawutils implements DrawLib<void> {
    */
   circleHandle(center: XYCoords, radius: number, color: string) {
     radius = radius || 3;
+    this.ctx.setLineDash([]); // Clear line-dash settings
+
     this.ctx.beginPath();
     this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
     this.ctx.closePath();
@@ -1013,6 +1068,7 @@ export class drawutils implements DrawLib<void> {
    */
   crosshair(center: XYCoords, radius: number, color: string, lineWidth?: number) {
     this.ctx.save();
+    this.ctx.setLineDash([]); // Clear line-dash settings
     this.ctx.beginPath();
     this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
     this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y);
@@ -1041,6 +1097,7 @@ export class drawutils implements DrawLib<void> {
    */
   cross(center: XYCoords, radius: number, color: string, lineWidth?: number) {
     this.ctx.save();
+    this.ctx.setLineDash([]); // Clear line-dash settings
     this.ctx.beginPath();
     this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y - radius);
     this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y + radius);
@@ -1085,6 +1142,7 @@ export class drawutils implements DrawLib<void> {
       return;
     }
     this.ctx.save();
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     this.ctx.beginPath();
     this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
     this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
@@ -1225,6 +1283,7 @@ export class drawutils implements DrawLib<void> {
       this.ctx.strokeStyle = color;
     }
     this.ctx.lineWidth = lineWidth || 1;
+    this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
     if (this.fillShapes) {
       if (color) {
         this.ctx.fillStyle = color;

@@ -20,7 +20,6 @@
   let GUP = gup();
 
   window.addEventListener("load", function () {
-    let GUP = gup();
     var isDarkmode = detectDarkMode(GUP);
 
     // All config params are optional.

@@ -4489,6 +4489,10 @@ var PlotBoilerplate = /** @class */ (function () {
                     fill: true
                 }
             },
+            // bezierPath: {
+            //   color: "#0022a8",
+            //   lineWidth: 1
+            // },
             polygon: {
                 color: "#0022a8",
                 lineWidth: 1
@@ -5199,10 +5203,10 @@ var PlotBoilerplate = /** @class */ (function () {
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
                     draw.setCurrentId(d.uid + "_l0");
                     draw.setCurrentClassName(d.className + "-start-line");
-                    draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.handleLine(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint);
                     draw.setCurrentId(d.uid + "_l1");
                     draw.setCurrentClassName(d.className + "-end-line");
-                    draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.handleLine(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint);
                 }
                 curveIndex++;
             } // END for
@@ -5225,11 +5229,11 @@ var PlotBoilerplate = /** @class */ (function () {
                 draw.setCurrentId(d.uid + "_e0");
                 draw.setCurrentClassName(d.className + "-v-line");
                 // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
-                draw.line(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis, "#c8c8c8");
+                draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
                 draw.setCurrentId(d.uid + "_e1");
                 draw.setCurrentClassName(d.className + "-h-line");
                 // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
-                draw.line(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis, "#c8c8c8");
+                draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName("" + d.className);
@@ -7736,7 +7740,7 @@ var VEllipse = /** @class */ (function () {
             else {
                 var startTangent = this.tangentAt(curAngle);
                 var endTangent = this.tangentAt(nextAngle);
-                // Find intersection
+                // Find intersection (ignore that the result might be null in some extreme cases)
                 var intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
                 // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
@@ -9682,6 +9686,7 @@ exports.VertexListeners = VertexListeners;
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  1.13.0
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -9709,7 +9714,12 @@ var drawutils = /** @class */ (function () {
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
     function drawutils(context, fillShapes) {
+        /**
+         * Use this flag for internally enabling/disabling line dashes.
+         */
+        this.lineDashEnabled = true;
         this.ctx = context;
+        this.lineDash = [];
         this.offset = new Vertex_1.Vertex(0, 0);
         this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
@@ -9743,6 +9753,20 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.setConfiguration = function (configuration) {
         this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
+    };
+    /**
+     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+     * for how line dashes work.
+     *
+     * @method
+     * @param {Array<number> lineDashes - The line-dash array configuration.
+     * @returns {void}
+     */
+    drawutils.prototype.setLineDash = function (lineDash) {
+        this.lineDash = lineDash;
     };
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -9781,6 +9805,7 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.line = function (zA, zB, color, lineWidth) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
         this.ctx.strokeStyle = color;
@@ -9804,17 +9829,19 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.arrow = function (zA, zB, color, lineWidth, headLength) {
         // var headLength: number = 8; // length of head in pixels
         if (headLength === void 0) { headLength = 8; }
-        this.ctx.save();
-        this.ctx.beginPath();
-        var vertices = Vector_1.Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-        for (var i = 0; i < vertices.length; i++) {
-            this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
-        }
-        this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
-        this.ctx.lineWidth = lineWidth || 1;
-        this._fillOrDraw(color);
-        this.ctx.restore();
+        // this.ctx.save();
+        // this.ctx.beginPath();
+        // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        // for (var i = 0; i < vertices.length; i++) {
+        //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
+        // }
+        // this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
+        // this.ctx.lineWidth = lineWidth || 1;
+        // this._fillOrDraw(color);
+        // this.ctx.restore();
+        this.line(zA, zB, color, lineWidth); // Will use dash configuration
+        this.arrowHead(zA, zB, color, lineWidth, headLength);
     };
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -9854,6 +9881,7 @@ var drawutils = /** @class */ (function () {
         if (headLength === void 0) { headLength = 8; }
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash([]); // Clear line dash for arrow heads
         var vertices = Vector_1.Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         // for (var i = 0; i < vertices.length; i++) {
@@ -10029,6 +10057,7 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.rect = function (position, width, height, color, lineWidth) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
@@ -10083,6 +10112,7 @@ var drawutils = /** @class */ (function () {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         //this.ctx.closePath();
@@ -10107,6 +10137,7 @@ var drawutils = /** @class */ (function () {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.quadraticCurveTo(this.offset.x + controlPoint.x * this.scale.x, this.offset.y + controlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         this.ctx.lineWidth = lineWidth || 2;
@@ -10129,14 +10160,16 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.cubicBezierPath = function (path, color, lineWidth) {
-        if (!path || path.length == 0)
+        if (!path || path.length == 0) {
             return;
+        }
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
         var endPoint;
         var startControlPoint;
         var endControlPoint;
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
@@ -10179,7 +10212,10 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.handleLine = function (startPoint, endPoint) {
         // Draw handle lines
-        this.line(startPoint, endPoint, "rgb(192,192,192)");
+        // console.log("Draw handle line");
+        this.lineDashEnabled = false;
+        this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)");
+        this.lineDashEnabled = true;
     };
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -10194,6 +10230,7 @@ var drawutils = /** @class */ (function () {
     drawutils.prototype.dot = function (p, color) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
         this.ctx.lineTo(Math.round(this.offset.x + this.scale.x * p.x + 1), Math.round(this.offset.y + this.scale.y * p.y + 1));
         this.ctx.closePath();
@@ -10213,6 +10250,7 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.point = function (p, color) {
         var radius = 3;
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
@@ -10234,6 +10272,7 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.circle = function (center, radius, color, lineWidth) {
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -10259,6 +10298,7 @@ var drawutils = /** @class */ (function () {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
         }
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
         if (!options || !options.asSegment) {
             // this.ctx.closePath();
@@ -10284,6 +10324,7 @@ var drawutils = /** @class */ (function () {
         if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, rotation, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -10305,6 +10346,7 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.square = function (center, size, color, lineWidth) {
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
         this.ctx.closePath();
@@ -10326,6 +10368,7 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.grid = function (center, width, height, sizeX, sizeY, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
@@ -10362,6 +10405,7 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.raster = function (center, width, height, sizeX, sizeY, color) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
             for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
@@ -10394,6 +10438,7 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.diamondHandle = function (center, size, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - size / 2.0);
@@ -10419,6 +10464,7 @@ var drawutils = /** @class */ (function () {
      * @memberof drawutils
      */
     drawutils.prototype.squareHandle = function (center, size, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y - size / 2.0, size, size);
         this.ctx.closePath();
@@ -10442,6 +10488,7 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.circleHandle = function (center, radius, color) {
         radius = radius || 3;
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
@@ -10464,6 +10511,7 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.crosshair = function (center, radius, color, lineWidth) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y);
@@ -10491,6 +10539,7 @@ var drawutils = /** @class */ (function () {
      */
     drawutils.prototype.cross = function (center, radius, color, lineWidth) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y - radius);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y + radius);
@@ -10533,6 +10582,7 @@ var drawutils = /** @class */ (function () {
             return;
         }
         this.ctx.save();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.beginPath();
         this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
@@ -10655,6 +10705,7 @@ var drawutils = /** @class */ (function () {
             this.ctx.strokeStyle = color;
         }
         this.ctx.lineWidth = lineWidth || 1;
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         if (this.fillShapes) {
             if (color) {
                 this.ctx.fillStyle = color;
@@ -10724,6 +10775,7 @@ exports.drawutils = drawutils;
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  0.0.10
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -10819,6 +10871,20 @@ var drawutilsgl = /** @class */ (function () {
      * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
      */
     drawutilsgl.prototype.setConfiguration = function (configuration) {
+        // TODO
+    };
+    /**
+     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+     * for how line dashes work.
+     *
+     * @method
+     * @param {Array<number> lineDashes - The line-dash array configuration.
+     * @returns {void}
+     */
+    drawutilsgl.prototype.setLineDash = function (lineDashes) {
         // TODO
     };
     /**
@@ -11536,6 +11602,7 @@ var GLU = /** @class */ (function () {
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  1.6.7
  **/
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -11544,6 +11611,7 @@ var CircleSector_1 = __webpack_require__(946);
 var CubicBezierCurve_1 = __webpack_require__(510);
 var Vertex_1 = __webpack_require__(421);
 var UIDGenerator_1 = __webpack_require__(197);
+var Vector_1 = __webpack_require__(73);
 var RAD_TO_DEG = 180 / Math.PI;
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -11570,11 +11638,16 @@ var drawutilssvg = /** @class */ (function () {
      * @param {SVGGElement=} gNode - (optional) Primary and seconday instances share the same &lt;g> node.
      **/
     function drawutilssvg(svgNode, offset, scale, canvasSize, fillShapes, drawConfig, isSecondary, gNode, bufferGNode, nodeDefs, bufferNodeDefs) {
+        /**
+         * Use this flag for internally enabling/disabling line dashes.
+         */
+        this.lineDashEnabled = true;
         this.svgNode = svgNode;
         this.offset = new Vertex_1.Vertex(0, 0).set(offset);
         this.scale = new Vertex_1.Vertex(1, 1).set(scale);
         this.fillShapes = fillShapes;
         this.isSecondary = Boolean(isSecondary);
+        this.lineDash = [];
         this.drawlibConfiguration = {};
         this.cache = new Map();
         this.setSize(canvasSize);
@@ -11722,6 +11795,9 @@ var drawutilssvg = /** @class */ (function () {
         if (this.drawlibConfiguration.blendMode) {
             node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
         }
+        if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
+            node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
+        }
         return node;
     };
     /**
@@ -11796,6 +11872,20 @@ var drawutilssvg = /** @class */ (function () {
      */
     drawutilssvg.prototype.setConfiguration = function (configuration) {
         this.drawlibConfiguration = configuration;
+    };
+    /**
+     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+     * for how line dashes work.
+     *
+     * @method
+     * @param {Array<number> lineDashes - The line-dash array configuration.
+     * @returns {void}
+     */
+    drawutilssvg.prototype.setLineDash = function (lineDashes) {
+        this.lineDash = lineDashes;
     };
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -11911,19 +12001,28 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.arrow = function (zA, zB, color, lineWidth, headLength) {
+        // // this.lineDashEnabled = false;
+        // const node: SVGElement = this.makeNode("path");
+        // // var headLength: number = 8; // length of head in pixels
+        // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+        // for (var i = 0; i <= vertices.length; i++) {
+        //   d.push("L");
+        //   // Note: only use offset here (the vertices are already scaled)
+        //   d.push(this.offset.x + vertices[i % vertices.length].x);
+        //   d.push(this.offset.y + vertices[i % vertices.length].y);
+        // }
+        // node.setAttribute("d", d.join(" "));
+        // return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
         if (headLength === void 0) { headLength = 8; }
-        var node = this.makeNode("path");
-        // var headLength: number = 8; // length of head in pixels
-        var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        var d = ["M", this._x(zA.x), this._y(zA.y)];
-        for (var i = 0; i <= vertices.length; i++) {
-            d.push("L");
-            // Note: only use offset here (the vertices are already scaled)
-            d.push(this.offset.x + vertices[i % vertices.length].x);
-            d.push(this.offset.y + vertices[i % vertices.length].y);
-        }
-        node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
+        var group = this.makeNode("g");
+        var line = this.line(zA, zB, color, lineWidth);
+        var arrowHead = this.arrowHead(zA, zB, color, lineWidth, headLength);
+        group.appendChild(line);
+        group.appendChild(arrowHead);
+        return this._bindFillDraw(group, "arrow", color, lineWidth || 1);
+        return group;
+        // return line; // OR RETURN ARROW OR GROUP; TODO
     };
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -11958,7 +12057,7 @@ var drawutilssvg = /** @class */ (function () {
             this._y(endPoint.y)
         ];
         // var headLength: number = 8; // length of head in pixels
-        var vertices = Vertex_1.Vertex.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
+        var vertices = Vector_1.Vector.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
         // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
         // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
         for (var i = 0; i <= vertices.length; i++) {
@@ -11987,7 +12086,7 @@ var drawutilssvg = /** @class */ (function () {
         if (headLength === void 0) { headLength = 8; }
         var node = this.makeNode("path");
         // var headLength: number = 8; // length of head in pixels
-        var vertices = Vertex_1.Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        var vertices = Vector_1.Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
         var d = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
         for (var i = 1; i <= vertices.length; i++) {
@@ -12209,7 +12308,9 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.handleLine = function (startPoint, endPoint) {
-        this.line(startPoint, endPoint, "rgb(192,192,192)");
+        this.lineDashEnabled = false;
+        this.line(startPoint, endPoint, "rgb(128,128,128,0.5)");
+        this.lineDashEnabled = true;
     };
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -12945,6 +13046,9 @@ var drawutilssvg = /** @class */ (function () {
             }
         } // END while
     }; // END transformPathData
+    drawutilssvg.nodeSupportsLineDash = function (nodeName) {
+        return ["line", "path", "circle", "ellipse"].includes(nodeName);
+    };
     drawutilssvg.HEAD_XML = [
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
         '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" ',

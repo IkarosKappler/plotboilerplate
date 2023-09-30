@@ -43,6 +43,7 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  1.6.7
  **/
 import { Polygon } from "./Polygon";
@@ -120,6 +121,17 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      */
     fillShapes: boolean;
+    /**
+     * @member {Array<number>}
+     * @memberof drawutils
+     * @type {boolean}
+     * @instance
+     */
+    private lineDash;
+    /**
+     * Use this flag for internally enabling/disabling line dashes.
+     */
+    private lineDashEnabled;
     /**
      * @member {XYDimension}
      * @memberof drawutilssvg
@@ -270,6 +282,18 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
      */
     setConfiguration(configuration: DrawLibConfiguration): void;
+    /**
+     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+     * for how line dashes work.
+     *
+     * @method
+     * @param {Array<number> lineDashes - The line-dash array configuration.
+     * @returns {void}
+     */
+    setLineDash(lineDashes: Array<number>): void;
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -791,4 +815,5 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {XYCoords} scale - The scale factors (neutral is x=1, y=1).
      */
     static transformPathData(data: SVGPathParams, offset: XYCoords, scale: XYCoords): void;
+    private static nodeSupportsLineDash;
 }

@@ -16,6 +16,7 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  0.0.10
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -111,6 +112,20 @@ var drawutilsgl = /** @class */ (function () {
      * @param {DrawLibConfiguration} configuration - The new configuration settings to use for the next render methods.
      */
     drawutilsgl.prototype.setConfiguration = function (configuration) {
+        // TODO
+    };
+    /**
+     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+     * for how line dashes work.
+     *
+     * @method
+     * @param {Array<number> lineDashes - The line-dash array configuration.
+     * @returns {void}
+     */
+    drawutilsgl.prototype.setLineDash = function (lineDashes) {
         // TODO
     };
     /**

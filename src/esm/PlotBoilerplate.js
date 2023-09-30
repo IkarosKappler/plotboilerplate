@@ -314,6 +314,10 @@ export class PlotBoilerplate {
                     fill: true
                 }
             },
+            // bezierPath: {
+            //   color: "#0022a8",
+            //   lineWidth: 1
+            // },
             polygon: {
                 color: "#0022a8",
                 lineWidth: 1
@@ -1024,10 +1028,10 @@ export class PlotBoilerplate {
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
                     draw.setCurrentId(`${d.uid}_l0`);
                     draw.setCurrentClassName(`${d.className}-start-line`);
-                    draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.handleLine(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint);
                     draw.setCurrentId(`${d.uid}_l1`);
                     draw.setCurrentClassName(`${d.className}-end-line`);
-                    draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.handleLine(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint);
                 }
                 curveIndex++;
             } // END for
@@ -1050,11 +1054,11 @@ export class PlotBoilerplate {
                 draw.setCurrentId(`${d.uid}_e0`);
                 draw.setCurrentClassName(`${d.className}-v-line`);
                 // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
-                draw.line(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis, "#c8c8c8");
+                draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
                 draw.setCurrentId(`${d.uid}_e1`);
                 draw.setCurrentClassName(`${d.className}-h-line`);
                 // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
-                draw.line(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis, "#c8c8c8");
+                draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName(`${d.className}`);

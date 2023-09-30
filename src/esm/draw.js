@@ -53,6 +53,7 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  1.13.0
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -78,7 +79,12 @@ export class drawutils {
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
     constructor(context, fillShapes) {
+        /**
+         * Use this flag for internally enabling/disabling line dashes.
+         */
+        this.lineDashEnabled = true;
         this.ctx = context;
+        this.lineDash = [];
         this.offset = new Vertex(0, 0);
         this.scale = new Vertex(1, 1);
         this.fillShapes = fillShapes;
@@ -112,6 +118,20 @@ export class drawutils {
      */
     setConfiguration(configuration) {
         this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
+    }
+    /**
+     * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+     *
+     * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+     * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+     * for how line dashes work.
+     *
+     * @method
+     * @param {Array<number> lineDashes - The line-dash array configuration.
+     * @returns {void}
+     */
+    setLineDash(lineDash) {
+        this.lineDash = lineDash;
     }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
@@ -150,6 +170,7 @@ export class drawutils {
     line(zA, zB, color, lineWidth) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
         this.ctx.strokeStyle = color;
@@ -172,17 +193,19 @@ export class drawutils {
      **/
     arrow(zA, zB, color, lineWidth, headLength = 8) {
         // var headLength: number = 8; // length of head in pixels
-        this.ctx.save();
-        this.ctx.beginPath();
-        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-        for (var i = 0; i < vertices.length; i++) {
-            this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
-        }
-        this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
-        this.ctx.lineWidth = lineWidth || 1;
-        this._fillOrDraw(color);
-        this.ctx.restore();
+        // this.ctx.save();
+        // this.ctx.beginPath();
+        // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        // for (var i = 0; i < vertices.length; i++) {
+        //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
+        // }
+        // this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
+        // this.ctx.lineWidth = lineWidth || 1;
+        // this._fillOrDraw(color);
+        // this.ctx.restore();
+        this.line(zA, zB, color, lineWidth); // Will use dash configuration
+        this.arrowHead(zA, zB, color, lineWidth, headLength);
     }
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -221,6 +244,7 @@ export class drawutils {
         // var headLength: number = 8; // length of head in pixels
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash([]); // Clear line dash for arrow heads
         var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
         // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         // for (var i = 0; i < vertices.length; i++) {
@@ -395,6 +419,7 @@ export class drawutils {
     rect(position, width, height, color, lineWidth) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
@@ -449,6 +474,7 @@ export class drawutils {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         //this.ctx.closePath();
@@ -473,6 +499,7 @@ export class drawutils {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.quadraticCurveTo(this.offset.x + controlPoint.x * this.scale.x, this.offset.y + controlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         this.ctx.lineWidth = lineWidth || 2;
@@ -495,14 +522,16 @@ export class drawutils {
      * @memberof drawutils
      */
     cubicBezierPath(path, color, lineWidth) {
-        if (!path || path.length == 0)
+        if (!path || path.length == 0) {
             return;
+        }
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
         var endPoint;
         var startControlPoint;
         var endControlPoint;
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
@@ -545,7 +574,10 @@ export class drawutils {
      */
     handleLine(startPoint, endPoint) {
         // Draw handle lines
-        this.line(startPoint, endPoint, "rgb(192,192,192)");
+        // console.log("Draw handle line");
+        this.lineDashEnabled = false;
+        this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)");
+        this.lineDashEnabled = true;
     }
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
@@ -560,6 +592,7 @@ export class drawutils {
     dot(p, color) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
         this.ctx.lineTo(Math.round(this.offset.x + this.scale.x * p.x + 1), Math.round(this.offset.y + this.scale.y * p.y + 1));
         this.ctx.closePath();
@@ -579,6 +612,7 @@ export class drawutils {
      */
     point(p, color) {
         var radius = 3;
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
@@ -600,6 +634,7 @@ export class drawutils {
      * @memberof drawutils
      */
     circle(center, radius, color, lineWidth) {
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -625,6 +660,7 @@ export class drawutils {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
         }
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
         if (!options || !options.asSegment) {
             // this.ctx.closePath();
@@ -650,6 +686,7 @@ export class drawutils {
         if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, rotation, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -671,6 +708,7 @@ export class drawutils {
      * @memberof drawutils
      */
     square(center, size, color, lineWidth) {
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
         this.ctx.closePath();
@@ -692,6 +730,7 @@ export class drawutils {
      * @memberof drawutils
      */
     grid(center, width, height, sizeX, sizeY, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
@@ -728,6 +767,7 @@ export class drawutils {
      */
     raster(center, width, height, sizeX, sizeY, color) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
             for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
@@ -760,6 +800,7 @@ export class drawutils {
      * @memberof drawutils
      */
     diamondHandle(center, size, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - size / 2.0);
@@ -785,6 +826,7 @@ export class drawutils {
      * @memberof drawutils
      */
     squareHandle(center, size, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y - size / 2.0, size, size);
         this.ctx.closePath();
@@ -808,6 +850,7 @@ export class drawutils {
      */
     circleHandle(center, radius, color) {
         radius = radius || 3;
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
@@ -830,6 +873,7 @@ export class drawutils {
      */
     crosshair(center, radius, color, lineWidth) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y);
@@ -857,6 +901,7 @@ export class drawutils {
      */
     cross(center, radius, color, lineWidth) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y - radius);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y + radius);
@@ -899,6 +944,7 @@ export class drawutils {
             return;
         }
         this.ctx.save();
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         this.ctx.beginPath();
         this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
@@ -1021,6 +1067,7 @@ export class drawutils {
             this.ctx.strokeStyle = color;
         }
         this.ctx.lineWidth = lineWidth || 1;
+        this.ctx.setLineDash(this.lineDashEnabled ? this.lineDash : []);
         if (this.fillShapes) {
             if (color) {
                 this.ctx.fillStyle = color;

@@ -43,6 +43,7 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @version  1.6.7
  **/
 
@@ -64,6 +65,7 @@ import {
 } from "./interfaces";
 import { Bounds } from "./Bounds";
 import { UIDGenerator } from "./UIDGenerator";
+import { Vector } from "./Vector";
 
 const RAD_TO_DEG = 180 / Math.PI;
 
@@ -154,6 +156,19 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   fillShapes: boolean;
 
   /**
+   * @member {Array<number>}
+   * @memberof drawutils
+   * @type {boolean}
+   * @instance
+   */
+  private lineDash: Array<number>;
+
+  /**
+   * Use this flag for internally enabling/disabling line dashes.
+   */
+  private lineDashEnabled: boolean = true;
+
+  /**
    * @member {XYDimension}
    * @memberof drawutilssvg
    * @instance
@@ -224,6 +239,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     this.scale = new Vertex(1, 1).set(scale);
     this.fillShapes = fillShapes;
     this.isSecondary = Boolean(isSecondary);
+    this.lineDash = [];
 
     this.drawlibConfiguration = {} as DrawLibConfiguration;
     this.cache = new Map<UID, SVGElement>();
@@ -378,6 +394,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     if (this.drawlibConfiguration.blendMode) {
       node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
     }
+    if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
+      node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
+    }
     return node;
   }
 
@@ -465,6 +484,21 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    */
   setConfiguration(configuration: DrawLibConfiguration): void {
     this.drawlibConfiguration = configuration;
+  }
+
+  /**
+   * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+   *
+   * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+   * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+   * for how line dashes work.
+   *
+   * @method
+   * @param {Array<number> lineDashes - The line-dash array configuration.
+   * @returns {void}
+   */
+  setLineDash(lineDashes: Array<number>) {
+    this.lineDash = lineDashes;
   }
 
   /**
@@ -590,18 +624,30 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @memberof drawutilssvg
    **/
   arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength: number = 8): SVGElement {
-    const node: SVGElement = this.makeNode("path");
-    // var headLength: number = 8; // length of head in pixels
-    var vertices: Array<Vertex> = Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-    const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
-    for (var i = 0; i <= vertices.length; i++) {
-      d.push("L");
-      // Note: only use offset here (the vertices are already scaled)
-      d.push(this.offset.x + vertices[i % vertices.length].x);
-      d.push(this.offset.y + vertices[i % vertices.length].y);
-    }
-    node.setAttribute("d", d.join(" "));
-    return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
+    // // this.lineDashEnabled = false;
+    // const node: SVGElement = this.makeNode("path");
+    // // var headLength: number = 8; // length of head in pixels
+    // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+    // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+    // for (var i = 0; i <= vertices.length; i++) {
+    //   d.push("L");
+    //   // Note: only use offset here (the vertices are already scaled)
+    //   d.push(this.offset.x + vertices[i % vertices.length].x);
+    //   d.push(this.offset.y + vertices[i % vertices.length].y);
+    // }
+    // node.setAttribute("d", d.join(" "));
+    // return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
+
+    const group: SVGElement = this.makeNode("g");
+    const line = this.line(zA, zB, color, lineWidth);
+    const arrowHead = this.arrowHead(zA, zB, color, lineWidth, headLength);
+    group.appendChild(line);
+    group.appendChild(arrowHead);
+
+    return this._bindFillDraw(group, "arrow", color, lineWidth || 1);
+
+    return group;
+    // return line; // OR RETURN ARROW OR GROUP; TODO
   }
 
   /**
@@ -646,7 +692,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     ];
 
     // var headLength: number = 8; // length of head in pixels
-    var vertices: Array<Vertex> = Vertex.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
+    var vertices: Array<Vertex> = Vector.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
     // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
     // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
     for (var i = 0; i <= vertices.length; i++) {
@@ -675,7 +721,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   arrowHead(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength: number = 8): SVGElement {
     const node: SVGElement = this.makeNode("path");
     // var headLength: number = 8; // length of head in pixels
-    var vertices: Array<Vertex> = Vertex.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+    var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
     // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
     const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
     for (var i = 1; i <= vertices.length; i++) {
@@ -940,7 +986,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @memberof drawutilssvg
    */
   handleLine(startPoint: XYCoords, endPoint: XYCoords): void {
-    this.line(startPoint, endPoint, "rgb(192,192,192)");
+    this.lineDashEnabled = false;
+    this.line(startPoint, endPoint, "rgb(128,128,128,0.5)");
+    this.lineDashEnabled = true;
   }
 
   /**
@@ -1735,4 +1783,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       }
     } // END while
   } // END transformPathData
+
+  private static nodeSupportsLineDash(nodeName: string) {
+    return ["line", "path", "circle", "ellipse"].includes(nodeName);
+  }
 }
