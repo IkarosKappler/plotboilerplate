@@ -99,6 +99,11 @@ var drawutils = /** @class */ (function () {
         this.scale = new Vertex_1.Vertex(1, 1);
         this.fillShapes = fillShapes;
     }
+    /**
+     * A private helper method to apply stroke options to the current
+     * context.
+     * @param {StrokeOptions=} strokeOptions -
+     */
     drawutils.prototype.applyStrokeOpts = function (strokeOptions) {
         var _a, _b;
         this.ctx.setLineDash((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []);

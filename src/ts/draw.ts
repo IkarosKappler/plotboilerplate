@@ -136,6 +136,11 @@ export class drawutils implements DrawLib<void> {
     this.fillShapes = fillShapes;
   }
 
+  /**
+   * A private helper method to apply stroke options to the current
+   * context.
+   * @param {StrokeOptions=} strokeOptions -
+   */
   private applyStrokeOpts(strokeOptions?: StrokeOptions) {
     this.ctx.setLineDash(strokeOptions?.dashArray ?? []);
     this.ctx.lineDashOffset = strokeOptions?.dashOffset ?? 0;

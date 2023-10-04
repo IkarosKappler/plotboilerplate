@@ -49,12 +49,20 @@
     // pb.add(ellipse);
 
     var arrow = new Line(pb.viewport().randomPoint(0.1, 0.1), pb.viewport().randomPoint(0.1, 0.1));
-    pb.add(arrow.a, arrow.b);
+    pb.add([arrow.a, arrow.b]);
+    pb.add([bezier.startPoint, bezier.endPoint, bezier.startControlPoint, bezier.endControlPoint]);
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
       // The arrow head size
-      size: 8
+      size: 8,
+      dashArray1: 5,
+      dashArray2: 15,
+      dashOffset: 0
+    };
+
+    const getDashArray = () => {
+      return [config.dashArray1, config.dashArray2];
     };
 
     const preDraw = function (draw, _fill) {
@@ -63,7 +71,7 @@
 
     const postDraw = function (draw, fill) {
       console.log("post draw");
-      draw.arrow(arrow.a, arrow.b, "red", 2, config.size, { dashArray: [5, 15] });
+      draw.arrow(arrow.a, arrow.b, "red", 2, config.size, { dashArray: getDashArray() });
       draw.cubicBezierArrow(
         bezier.startPoint,
         bezier.endPoint,
@@ -72,17 +80,35 @@
         "orange",
         2,
         config.size,
-        { dashArray: [5, 15] }
+        { dashArray: getDashArray(), dashOffset: config.dashOffset }
       );
     };
 
     {
       var gui = pb.createGUI();
       // prettier-ignore
-      gui.add(config, "size").min(1).max(100).step(1) .listen()
+      gui.add(config, "size").min(1).max(100).step(1)
         .onChange(function () {
           pb.redraw();
         });
+
+      // prettier-ignore
+      gui.add(config, "dashArray1").min(0).max(50).step(1)
+        .onChange(function () {
+          pb.redraw();
+        });
+
+      // prettier-ignore
+      gui.add(config, "dashArray2").min(0).max(50).step(1)
+        .onChange(function () {
+          pb.redraw();
+        });
+
+      // prettier-ignore
+      gui.add(config, "dashOffset").min(0).max(100).step(1)
+      .onChange(function () {
+        pb.redraw();
+      });
     }
 
     pb.config.preDraw = preDraw;

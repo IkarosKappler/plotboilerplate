@@ -21,6 +21,7 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
+ * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
  * @version 2.7.1
  *
  * @file CubicBezierCurve
@@ -521,6 +522,42 @@ export class CubicBezierCurve implements PathSegment {
 
     // Note: my implementation does NOT normalize tangent vectors!
     return new Vertex(tX, tY);
+  }
+
+  trimStart(u: number): CubicBezierCurve {
+    // ...
+    return this;
+  }
+
+  trimStartBy(t: number): CubicBezierCurve {
+    // ...
+    return this;
+  }
+
+  trimEnd(u: number): CubicBezierCurve {
+    // ...
+    return this;
+  }
+
+  trimEndBy(t: number): CubicBezierCurve {
+    // ...
+    return this;
+  }
+
+  /**
+   * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
+   *
+   * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+   *
+   * @method getSubCurveAt
+   * @param {number} tStart – The start position of the desired sub curve (must be in [0..arcLength]).
+   * @param {number} tEnd – The end position if the desired cub curve (must be in [0..arcLength]).
+   * @instance
+   * @memberof CubicBezierCurve
+   * @return {CubicBezierCurve} The sub curve as a new curve.
+   **/
+  getSubCurve(uStart: number, uEnd: number): CubicBezierCurve {
+    return this.getSubCurveAt(this.convertU2T(uStart), this.convertU2T(uEnd));
   }
 
   /**

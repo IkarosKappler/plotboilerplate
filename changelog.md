@@ -1,5 +1,11 @@
 # Changelog
 
+- 2023-10-04
+  - Also adding the param `strokeOptions` to the default `drawutilssvg` library.
+- 2023-09-30
+  - Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
+  - Adding `DrawLib.strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+  - Also adding the param `strokeOptions` to the default `draw` library.
 - 2023-09-29
   - (createGUI utils) Added try-catch for color attributes; invalid values might break construction of whole gui.
   - Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!

@@ -61,7 +61,8 @@ import {
   UID,
   DrawLibConfiguration,
   FontStyle,
-  FontWeight
+  FontWeight,
+  StrokeOptions
 } from "./interfaces";
 import { Bounds } from "./Bounds";
 import { UIDGenerator } from "./UIDGenerator";
@@ -155,18 +156,18 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    */
   fillShapes: boolean;
 
-  /**
-   * @member {Array<number>}
-   * @memberof drawutils
-   * @type {boolean}
-   * @instance
-   */
-  private lineDash: Array<number>;
+  // /**
+  //  * @member {Array<number>}
+  //  * @memberof drawutils
+  //  * @type {boolean}
+  //  * @instance
+  //  */
+  // private lineDash: Array<number>;
 
-  /**
-   * Use this flag for internally enabling/disabling line dashes.
-   */
-  private lineDashEnabled: boolean = true;
+  // /**
+  //  * Use this flag for internally enabling/disabling line dashes.
+  //  */
+  // private lineDashEnabled: boolean = true;
 
   /**
    * @member {XYDimension}
@@ -239,7 +240,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     this.scale = new Vertex(1, 1).set(scale);
     this.fillShapes = fillShapes;
     this.isSecondary = Boolean(isSecondary);
-    this.lineDash = [];
 
     this.drawlibConfiguration = {} as DrawLibConfiguration;
     this.cache = new Map<UID, SVGElement>();
@@ -394,9 +394,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     if (this.drawlibConfiguration.blendMode) {
       node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
     }
-    if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
-      node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
-    }
+    // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
+    //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
+    // }
     return node;
   }
 
@@ -420,18 +420,26 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
    * @return {SVGElement} The node itself (for chaining).
    */
-  private _bindFillDraw(node: SVGElement, className: string, color?: string | null, lineWidth?: number | null): SVGElement {
+  private _bindFillDraw(
+    node: SVGElement,
+    className: string,
+    color?: string | null,
+    lineWidth?: number | null
+    // bindingParent?: SVGElement
+  ): SVGElement {
     if (this.curClassName) {
       node.setAttribute("class", `${className} ${this.curClassName}`);
     } else {
       node.setAttribute("class", className);
     }
+    // if (!isGroup) {
     node.setAttribute("fill", this.fillShapes && color ? color : "none");
     node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
     node.setAttribute("stroke-width", `${lineWidth || 1}`);
     if (this.curId) {
       node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
     }
+    // }
     if (!node.parentNode) {
       // Attach to DOM only if not already attached
       this.bufferGNode.appendChild(node);
@@ -581,6 +589,28 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     this.bufferedNodeDefs = tmpDefsNode;
   }
 
+  /**
+   * A private helper method to apply stroke options to the current
+   * context.
+   * @param {StrokeOptions=} strokeOptions -
+   */
+  private applyStrokeOpts(node: SVGElement, strokeOptions?: StrokeOptions) {
+    // this.ctx.setLineDash(strokeOptions?.dashArray ?? []);
+    // this.ctx.lineDashOffset = strokeOptions?.dashOffset ?? 0;
+
+    if (
+      strokeOptions &&
+      strokeOptions.dashArray &&
+      strokeOptions.dashArray.length > 0 &&
+      drawutilssvg.nodeSupportsLineDash(node.tagName)
+    ) {
+      node.setAttribute("stroke-dasharray", strokeOptions.dashArray.join(" "));
+      if (strokeOptions.dashOffset) {
+        node.setAttribute("stroke-dashoffset", `${strokeOptions.dashOffset}`);
+      }
+    }
+  }
+
   private _x(x: number): number {
     return this.offset.x + this.scale.x * x;
   }
@@ -596,12 +626,15 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {XYCoords} zB - The end point of the line.
    * @param {string} color - Any valid CSS color string.
    * @param {number=1} lineWidth? - [optional] The line's width.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    **/
-  line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number): SVGElement {
+  line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement {
     const line: SVGElement = this.makeNode("line");
+    this.applyStrokeOpts(line, strokeOptions);
     line.setAttribute("x1", `${this._x(zA.x)}`);
     line.setAttribute("y1", `${this._y(zA.y)}`);
     line.setAttribute("x2", `${this._x(zB.x)}`);
@@ -619,11 +652,20 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {string} color - Any valid CSS color string.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    **/
-  arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength: number = 8): SVGElement {
+  arrow(
+    zA: XYCoords,
+    zB: XYCoords,
+    color: string,
+    lineWidth?: number,
+    headLength: number = 8,
+    strokeOptions?: StrokeOptions
+  ): SVGElement {
     // // this.lineDashEnabled = false;
     // const node: SVGElement = this.makeNode("path");
     // // var headLength: number = 8; // length of head in pixels
@@ -639,8 +681,9 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     // return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
 
     const group: SVGElement = this.makeNode("g");
-    const line = this.line(zA, zB, color, lineWidth);
-    const arrowHead = this.arrowHead(zA, zB, color, lineWidth, headLength);
+    const line = this.line(zA, zB, color, lineWidth, strokeOptions); // Pass stroke options
+    const arrowHead = this.arrowHead(zA, zB, color, lineWidth, headLength); // Do NOT pass stroke options
+    // this._bindFillDraw(line, "lin")
     group.appendChild(line);
     group.appendChild(arrowHead);
 
@@ -661,6 +704,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number} lineWidth - (optional) The line width to use.
    * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
    *
    * @return {void}
    * @instance
@@ -673,36 +717,48 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     endControlPoint: XYCoords,
     color: string,
     lineWidth?: number,
-    headLength: number = 8
+    headLength: number = 8,
+    strokeOptions?: StrokeOptions
   ): SVGElement {
-    const node: SVGElement = this.makeNode("path");
+    // const node: SVGElement = this.makeNode("path");
+    // this.applyStrokeOpts(node, strokeOptions);
 
-    // Draw curve
-    const d: Array<string | number> = [
-      "M",
-      this._x(startPoint.x),
-      this._y(startPoint.y),
-      "C",
-      this._x(startControlPoint.x),
-      this._y(startControlPoint.y),
-      this._x(endControlPoint.x),
-      this._y(endControlPoint.y),
-      this._x(endPoint.x),
-      this._y(endPoint.y)
-    ];
+    // // Draw curve
+    // const d: Array<string | number> = [
+    //   "M",
+    //   this._x(startPoint.x),
+    //   this._y(startPoint.y),
+    //   "C",
+    //   this._x(startControlPoint.x),
+    //   this._y(startControlPoint.y),
+    //   this._x(endControlPoint.x),
+    //   this._y(endControlPoint.y),
+    //   this._x(endPoint.x),
+    //   this._y(endPoint.y)
+    // ];
 
-    // var headLength: number = 8; // length of head in pixels
-    var vertices: Array<Vertex> = Vector.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
-    // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
-    // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
-    for (var i = 0; i <= vertices.length; i++) {
-      d.push("L");
-      // Note: only use offset here (the vertices are already scaled)
-      d.push(this.offset.x + vertices[i % vertices.length].x);
-      d.push(this.offset.y + vertices[i % vertices.length].y);
-    }
-    node.setAttribute("d", d.join(" "));
-    return this._bindFillDraw(node, "cubicbezierarrow", color, lineWidth || 1);
+    // // var headLength: number = 8; // length of head in pixels
+    // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
+    // // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+    // // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
+    // for (var i = 0; i <= vertices.length; i++) {
+    //   d.push("L");
+    //   // Note: only use offset here (the vertices are already scaled)
+    //   d.push(this.offset.x + vertices[i % vertices.length].x);
+    //   d.push(this.offset.y + vertices[i % vertices.length].y);
+    // }
+    // node.setAttribute("d", d.join(" "));
+    // return this._bindFillDraw(node, "cubicbezierarrow", color, lineWidth || 1);
+
+    const group: SVGElement = this.makeNode("g");
+    const line = this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions); // Pass stroke options
+    const arrowHead = this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength); // Do NOT pass stroke options
+    group.appendChild(line);
+    group.appendChild(arrowHead);
+
+    return this._bindFillDraw(group, "arrow", color, lineWidth || 1);
+
+    return group;
   }
 
   /**
@@ -714,12 +770,23 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {string} color - Any valid CSS color string.
    * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
    * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof DrawLib
    **/
-  arrowHead(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength: number = 8): SVGElement {
+  arrowHead(
+    zA: XYCoords,
+    zB: XYCoords,
+    color: string,
+    lineWidth?: number,
+    headLength: number = 8,
+    strokeOptions?: StrokeOptions
+  ): SVGElement {
     const node: SVGElement = this.makeNode("path");
+    this.applyStrokeOpts(node, strokeOptions);
+
     // var headLength: number = 8; // length of head in pixels
     var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
     // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
@@ -873,6 +940,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number} lineWidth - (optional) The line width to use.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutilssvg
@@ -883,7 +952,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     startControlPoint: XYCoords,
     endControlPoint: XYCoords,
     color: string,
-    lineWidth?: number
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
   ): SVGElement {
     if (startPoint instanceof CubicBezierCurve) {
       return this.cubicBezier(
@@ -896,6 +966,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       );
     }
     const node: SVGElement = this.makeNode("path");
+    this.applyStrokeOpts(node, strokeOptions);
     // Draw curve
     const d: Array<string | number> = [
       "M",
@@ -924,13 +995,18 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {XYCoords[]} path - The cubic bezier path as described above.
    * @param {string} color - The CSS colot to draw the path with.
    * @param {number=1} lineWidth - (optional) The line width to use.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number): SVGElement {
+  cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement {
     const node: SVGElement = this.makeNode("path");
-    if (!path || path.length == 0) return node;
+    this.applyStrokeOpts(node, strokeOptions);
+    if (!path || path.length == 0) {
+      return node;
+    }
 
     // Draw curve
     const d: Array<string | number> = ["M", this._x(path[0].x), this._y(path[0].y)];
@@ -986,9 +1062,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @memberof drawutilssvg
    */
   handleLine(startPoint: XYCoords, endPoint: XYCoords): void {
-    this.lineDashEnabled = false;
     this.line(startPoint, endPoint, "rgb(128,128,128,0.5)");
-    this.lineDashEnabled = true;
   }
 
   /**
@@ -1039,13 +1113,17 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  circle(center: XYCoords, radius: number, color: string, lineWidth?: number) {
+  circle(center: XYCoords, radius: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions) {
     // Todo: draw ellipse when scalex!=scaley
     const node: SVGElement = this.makeNode("circle");
+    this.applyStrokeOpts(node, strokeOptions);
+
     node.setAttribute("cx", `${this._x(center.x)}`);
     node.setAttribute("cy", `${this._y(center.y)}`);
     node.setAttribute("r", `${radius * this.scale.x}`); // y?
@@ -1062,12 +1140,24 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {number} startAngle - The angle to start at.
    * @param {number} endAngle - The angle to end at.
    * @param {string} color - The CSS color to draw the circle with.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  circleArc(center: XYCoords, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) {
+  circleArc(
+    center: XYCoords,
+    radius: number,
+    startAngle: number,
+    endAngle: number,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
+  ) {
     const node: SVGElement = this.makeNode("path");
+    this.applyStrokeOpts(node, strokeOptions);
+
     const arcData: SVGPathParams = CircleSector.circleSectorUtils.describeSVGArc(
       this._x(center.x),
       this._y(center.y),
@@ -1089,15 +1179,27 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {string} color - The CSS color to draw the ellipse with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  ellipse(center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) {
+  ellipse(
+    center: XYCoords,
+    radiusX: number,
+    radiusY: number,
+    color: string,
+    lineWidth?: number,
+    rotation?: number,
+    strokeOptions?: StrokeOptions
+  ) {
     if (typeof rotation === "undefined") {
       rotation = 0.0;
     }
     const node: SVGElement = this.makeNode("ellipse");
+    this.applyStrokeOpts(node, strokeOptions);
+
     node.setAttribute("cx", `${this._x(center.x)}`);
     node.setAttribute("cy", `${this._y(center.y)}`);
     node.setAttribute("rx", `${radiusX * this.scale.x}`);
@@ -1118,12 +1220,16 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {number} size - The size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
-   * @return {void}
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {SVGElement}
    * @instance
    * @memberof drawutilssvg
    */
-  square(center: XYCoords, size: number, color: string, lineWidth?: number) {
+  square(center: XYCoords, size: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement {
     const node: SVGElement = this.makeNode("rectangle");
+    this.applyStrokeOpts(node, strokeOptions);
+
     node.setAttribute("x", `${this._x(center.x - size / 2.0)}`);
     node.setAttribute("y", `${this._y(center.y - size / 2.0)}`);
     node.setAttribute("width", `${size * this.scale.x}`);
@@ -1140,9 +1246,23 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {number} height - The height of the rectangle.
    * @param {string} color - The color to use.
    * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
+   * @return {SVGElement}
+   * @instance
+   * @memberof drawutilssvg
    **/
-  rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number) {
+  rect(
+    position: XYCoords,
+    width: number,
+    height: number,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
+  ): SVGElement {
     const node: SVGElement = this.makeNode("rect");
+    this.applyStrokeOpts(node, strokeOptions);
+
     node.setAttribute("x", `${this._x(position.x)}`);
     node.setAttribute("y", `${this._y(position.y)}`);
     node.setAttribute("width", `${width * this.scale.x}`);
@@ -1397,13 +1517,25 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
    * @param {string}   color    - The CSS color to draw the polygon with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+   * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+   *
    * @return {void}
    * @instance
    * @memberof drawutilssvg
    */
-  polyline(vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number): SVGElement {
+  polyline(
+    vertices: Array<XYCoords>,
+    isOpen: boolean,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
+  ): SVGElement {
     const node: SVGElement = this.makeNode("path");
-    if (vertices.length == 0) return node;
+    this.applyStrokeOpts(node, strokeOptions);
+
+    if (vertices.length == 0) {
+      return node;
+    }
     // Draw curve
     const d: Array<string | number> = ["M", this._x(vertices[0].x), this._y(vertices[0].y)];
     var n = vertices.length;
@@ -1526,12 +1658,17 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @param {string=null} color - (optional) The color to draw this path with (default is null).
    * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
    * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+   * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+   * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
+   *
    * @instance
    * @memberof drawutils
    * @return {R} An instance representing the drawn path.
    */
-  path(pathData: SVGPathParams, color?: string, lineWidth?: number, options?: { inplace?: boolean }): SVGElement {
+  path(pathData: SVGPathParams, color?: string, lineWidth?: number, options?: { inplace?: boolean } & StrokeOptions): SVGElement {
     const node: SVGElement = this.makeNode("path");
+    this.applyStrokeOpts(node, options);
+
     // Transform the path: in-place (fast) or copy (slower)
     const d: SVGPathParams = options && options.inplace ? pathData : drawutilssvg.copyPathData(pathData);
     drawutilssvg.transformPathData(d, this.offset, this.scale);
@@ -1785,6 +1922,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   } // END transformPathData
 
   private static nodeSupportsLineDash(nodeName: string) {
-    return ["line", "path", "circle", "ellipse"].includes(nodeName);
+    return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
   }
 }

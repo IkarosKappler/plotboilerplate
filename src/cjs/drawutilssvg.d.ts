@@ -48,7 +48,7 @@
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { DrawConfig, DrawLib, XYCoords, XYDimension, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight, StrokeOptions } from "./interfaces";
 import { Bounds } from "./Bounds";
 /**
  * @classdesc A helper class for basic SVG drawing operations. This class should
@@ -121,17 +121,6 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      */
     fillShapes: boolean;
-    /**
-     * @member {Array<number>}
-     * @memberof drawutils
-     * @type {boolean}
-     * @instance
-     */
-    private lineDash;
-    /**
-     * Use this flag for internally enabling/disabling line dashes.
-     */
-    private lineDashEnabled;
     /**
      * @member {XYDimension}
      * @memberof drawutilssvg
@@ -326,6 +315,12 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @instance
      **/
     endDrawCycle(renderTime: number): void;
+    /**
+     * A private helper method to apply stroke options to the current
+     * context.
+     * @param {StrokeOptions=} strokeOptions -
+     */
+    private applyStrokeOpts;
     private _x;
     private _y;
     /**
@@ -336,11 +331,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=1} lineWidth? - [optional] The line's width.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number): SVGElement;
+    line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
@@ -350,11 +347,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number): SVGElement;
+    arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
      *
@@ -366,12 +365,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
      * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
      *
      * @return {void}
      * @instance
      * @memberof DrawLib
      */
-    cubicBezierArrow(startPoint: XYCoords, endPoint: XYCoords, startControlPoint: XYCoords, endControlPoint: XYCoords, color: string, lineWidth?: number, headLength?: number): SVGElement;
+    cubicBezierArrow(startPoint: XYCoords, endPoint: XYCoords, startControlPoint: XYCoords, endControlPoint: XYCoords, color: string, lineWidth?: number, headLength?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
      *
@@ -381,11 +381,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - Any valid CSS color string.
      * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
      * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof DrawLib
      **/
-    arrowHead(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number): SVGElement;
+    arrowHead(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -427,11 +429,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezier(startPoint: XYCoords, endPoint: XYCoords, startControlPoint: XYCoords, endControlPoint: XYCoords, color: string, lineWidth?: number): SVGElement;
+    cubicBezier(startPoint: XYCoords, endPoint: XYCoords, startControlPoint: XYCoords, endControlPoint: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -443,11 +447,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number): SVGElement;
+    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
@@ -504,11 +510,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    circle(center: XYCoords, radius: number, color: string, lineWidth?: number): SVGElement;
+    circle(center: XYCoords, radius: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
@@ -518,11 +526,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} startAngle - The angle to start at.
      * @param {number} endAngle - The angle to end at.
      * @param {string} color - The CSS color to draw the circle with.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    circleArc(center: XYCoords, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number): SVGElement;
+    circleArc(center: XYCoords, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
@@ -533,11 +543,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    ellipse(center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number): SVGElement;
+    ellipse(center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -548,11 +560,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
-     * @return {void}
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {SVGElement}
      * @instance
      * @memberof drawutilssvg
      */
-    square(center: XYCoords, size: number, color: string, lineWidth?: number): SVGElement;
+    square(center: XYCoords, size: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw a rectangle.
      *
@@ -561,8 +575,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {SVGElement}
+     * @instance
+     * @memberof drawutilssvg
      **/
-    rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): SVGElement;
+    rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
@@ -693,11 +712,13 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    polyline(vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number): SVGElement;
+    polyline(vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement;
     /**
      * Draw a text at the given relative position.
      *
@@ -749,13 +770,16 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
      * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
+     *
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
      */
     path(pathData: SVGPathParams, color?: string, lineWidth?: number, options?: {
         inplace?: boolean;
-    }): SVGElement;
+    } & StrokeOptions): SVGElement;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.

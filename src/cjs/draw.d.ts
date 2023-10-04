@@ -106,6 +106,11 @@ export declare class drawutils implements DrawLib<void> {
      * @param {boolean} fillShaped - Indicates if the constructed drawutils should fill all drawn shapes (if possible).
      **/
     constructor(context: CanvasRenderingContext2D, fillShapes: boolean);
+    /**
+     * A private helper method to apply stroke options to the current
+     * context.
+     * @param {StrokeOptions=} strokeOptions -
+     */
     private applyStrokeOpts;
     _fillOrDraw(color: string): void;
     /**

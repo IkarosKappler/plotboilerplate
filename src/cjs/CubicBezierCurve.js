@@ -22,6 +22,7 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
+ * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
  * @version 2.7.1
  *
  * @file CubicBezierCurve
@@ -414,6 +415,37 @@ var CubicBezierCurve = /** @class */ (function () {
         var tY = -3 * a.y * nt2 + b.y * (3 * nt2 - 6 * (t - t2)) + c.y * (6 * (t - t2) - 3 * t2) + 3 * d.y * t2;
         // Note: my implementation does NOT normalize tangent vectors!
         return new Vertex_1.Vertex(tX, tY);
+    };
+    CubicBezierCurve.prototype.trimStart = function (u) {
+        // ...
+        return this;
+    };
+    CubicBezierCurve.prototype.trimStartBy = function (t) {
+        // ...
+        return this;
+    };
+    CubicBezierCurve.prototype.trimEnd = function (u) {
+        // ...
+        return this;
+    };
+    CubicBezierCurve.prototype.trimEndBy = function (t) {
+        // ...
+        return this;
+    };
+    /**
+     * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
+     *
+     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+     *
+     * @method getSubCurveAt
+     * @param {number} tStart – The start position of the desired sub curve (must be in [0..arcLength]).
+     * @param {number} tEnd – The end position if the desired cub curve (must be in [0..arcLength]).
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} The sub curve as a new curve.
+     **/
+    CubicBezierCurve.prototype.getSubCurve = function (uStart, uEnd) {
+        return this.getSubCurveAt(this.convertU2T(uStart), this.convertU2T(uEnd));
     };
     /**
      * Get a sub curve at the given start end end offsets (values between 0.0 and 1.0).
