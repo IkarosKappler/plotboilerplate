@@ -44,7 +44,8 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
- * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ *
  * @version  1.6.7
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -257,9 +258,61 @@ var drawutilssvg = /** @class */ (function () {
      * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
      * @return {SVGElement} The node itself (for chaining).
      */
-    drawutilssvg.prototype._bindFillDraw = function (node, className, color, lineWidth
+    drawutilssvg.prototype._bindFillDraw = function (node, className, color, lineWidth, strokeOptions
     // bindingParent?: SVGElement
     ) {
+        /* if (this.curClassName) {
+          node.setAttribute("class", `${className} ${this.curClassName}`);
+        } else {
+          node.setAttribute("class", className);
+        }
+        // if (!isGroup) {
+        node.setAttribute("fill", this.fillShapes && color ? color : "none");
+        node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
+        node.setAttribute("stroke-width", `${lineWidth || 1}`);
+        if (this.curId) {
+          node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
+        }
+        // }
+        if (!node.parentNode) {
+          // Attach to DOM only if not already attached
+          this.bufferGNode.appendChild(node);
+        }
+        return node;
+        */
+        this._configureNode(node, className, this.fillShapes, color, lineWidth, strokeOptions);
+        return this._bindNode(node, undefined); // this.gNode);
+    };
+    drawutilssvg.prototype._bindNode = function (node, bindingParent) {
+        /* if (this.curClassName) {
+          node.setAttribute("class", `${className} ${this.curClassName}`);
+        } else {
+          node.setAttribute("class", className);
+        }
+        // if (!isGroup) {
+        node.setAttribute("fill", this.fillShapes && color ? color : "none");
+        node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
+        node.setAttribute("stroke-width", `${lineWidth || 1}`);
+        if (this.curId) {
+          node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
+        }
+        // }
+        if (!node.parentNode) {
+          // Attach to DOM only if not already attached
+          this.bufferGNode.appendChild(node);
+        }
+        return node;
+        */
+        // return this._configureNode(node, className, this.fillShapes, color, lineWidth);
+        if (!node.parentNode) {
+            // Attach to DOM only if not already attached
+            (bindingParent !== null && bindingParent !== void 0 ? bindingParent : this.bufferGNode).appendChild(node);
+        }
+        return node;
+    };
+    drawutilssvg.prototype._configureNode = function (node, className, fillMode, 
+    // bindingParent: SVGElement,
+    color, lineWidth, strokeOptions) {
         if (this.curClassName) {
             node.setAttribute("class", className + " " + this.curClassName);
         }
@@ -267,17 +320,18 @@ var drawutilssvg = /** @class */ (function () {
             node.setAttribute("class", className);
         }
         // if (!isGroup) {
-        node.setAttribute("fill", this.fillShapes && color ? color : "none");
-        node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
+        node.setAttribute("fill", fillMode && color ? color : "none");
+        node.setAttribute("stroke", fillMode ? "none" : color || "none");
         node.setAttribute("stroke-width", "" + (lineWidth || 1));
         if (this.curId) {
             node.setAttribute("id", "" + this.curId); // Maybe React-style 'key' would be better?
         }
         // }
-        if (!node.parentNode) {
-            // Attach to DOM only if not already attached
-            this.bufferGNode.appendChild(node);
-        }
+        // if (!node.parentNode) {
+        //   // Attach to DOM only if not already attached
+        //   bindingParent.appendChild(node);
+        // }
+        this.applyStrokeOpts(node, strokeOptions);
         return node;
     };
     /**
@@ -441,13 +495,14 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.line = function (zA, zB, color, lineWidth, strokeOptions) {
-        var line = this.makeNode("line");
-        this.applyStrokeOpts(line, strokeOptions);
-        line.setAttribute("x1", "" + this._x(zA.x));
-        line.setAttribute("y1", "" + this._y(zA.y));
-        line.setAttribute("x2", "" + this._x(zB.x));
-        line.setAttribute("y2", "" + this._y(zB.y));
-        return this._bindFillDraw(line, "line", color, lineWidth || 1);
+        // const line: SVGElement = this.makeNode("line");
+        // this.applyStrokeOpts(line, strokeOptions);
+        // line.setAttribute("x1", `${this._x(zA.x)}`);
+        // line.setAttribute("y1", `${this._y(zA.y)}`);
+        // line.setAttribute("x2", `${this._x(zB.x)}`);
+        // line.setAttribute("y2", `${this._y(zB.y)}`);
+        var line = this.makeLineNode(zA, zB, color, lineWidth, strokeOptions);
+        return this._bindFillDraw(line, "line", color, lineWidth || 1, strokeOptions);
     };
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
@@ -465,27 +520,14 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      **/
     drawutilssvg.prototype.arrow = function (zA, zB, color, lineWidth, headLength, strokeOptions) {
-        // // this.lineDashEnabled = false;
-        // const node: SVGElement = this.makeNode("path");
-        // // var headLength: number = 8; // length of head in pixels
-        // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
-        // for (var i = 0; i <= vertices.length; i++) {
-        //   d.push("L");
-        //   // Note: only use offset here (the vertices are already scaled)
-        //   d.push(this.offset.x + vertices[i % vertices.length].x);
-        //   d.push(this.offset.y + vertices[i % vertices.length].y);
-        // }
-        // node.setAttribute("d", d.join(" "));
-        // return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
         if (headLength === void 0) { headLength = 8; }
         var group = this.makeNode("g");
-        var line = this.line(zA, zB, color, lineWidth, strokeOptions); // Pass stroke options
-        var arrowHead = this.arrowHead(zA, zB, color, lineWidth, headLength); // Do NOT pass stroke options
-        // this._bindFillDraw(line, "lin")
+        var arrowHeadBasePosition = { x: 0, y: 0 };
+        var arrowHead = this.makeArrowHeadNode(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        var line = this.makeLineNode(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions);
         group.appendChild(line);
         group.appendChild(arrowHead);
-        return this._bindFillDraw(group, "arrow", color, lineWidth || 1);
+        this._bindNode(group, undefined);
         return group;
         // return line; // OR RETURN ARROW OR GROUP; TODO
     };
@@ -507,40 +549,13 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof DrawLib
      */
     drawutilssvg.prototype.cubicBezierArrow = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength, strokeOptions) {
-        // const node: SVGElement = this.makeNode("path");
-        // this.applyStrokeOpts(node, strokeOptions);
         if (headLength === void 0) { headLength = 8; }
-        // // Draw curve
-        // const d: Array<string | number> = [
-        //   "M",
-        //   this._x(startPoint.x),
-        //   this._y(startPoint.y),
-        //   "C",
-        //   this._x(startControlPoint.x),
-        //   this._y(startControlPoint.y),
-        //   this._x(endControlPoint.x),
-        //   this._y(endControlPoint.y),
-        //   this._x(endPoint.x),
-        //   this._y(endPoint.y)
-        // ];
-        // // var headLength: number = 8; // length of head in pixels
-        // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
-        // // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
-        // // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
-        // for (var i = 0; i <= vertices.length; i++) {
-        //   d.push("L");
-        //   // Note: only use offset here (the vertices are already scaled)
-        //   d.push(this.offset.x + vertices[i % vertices.length].x);
-        //   d.push(this.offset.y + vertices[i % vertices.length].y);
-        // }
-        // node.setAttribute("d", d.join(" "));
-        // return this._bindFillDraw(node, "cubicbezierarrow", color, lineWidth || 1);
         var group = this.makeNode("g");
-        var line = this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions); // Pass stroke options
-        var arrowHead = this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength); // Do NOT pass stroke options
-        group.appendChild(line);
+        var bezier = this.makeCubicBezierNode(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
+        var arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
+        group.appendChild(bezier);
         group.appendChild(arrowHead);
-        return this._bindFillDraw(group, "arrow", color, lineWidth || 1);
+        this._bindNode(group, undefined);
         return group;
     };
     /**
@@ -560,20 +575,8 @@ var drawutilssvg = /** @class */ (function () {
      **/
     drawutilssvg.prototype.arrowHead = function (zA, zB, color, lineWidth, headLength, strokeOptions) {
         if (headLength === void 0) { headLength = 8; }
-        var node = this.makeNode("path");
-        this.applyStrokeOpts(node, strokeOptions);
-        // var headLength: number = 8; // length of head in pixels
-        var vertices = Vector_1.Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
-        var d = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
-        for (var i = 1; i <= vertices.length; i++) {
-            d.push("L");
-            // Note: only use offset here (the vertices are already scaled)
-            d.push(this.offset.x + vertices[i % vertices.length].x);
-            d.push(this.offset.y + vertices[i % vertices.length].y);
-        }
-        node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1);
+        var node = this.makeArrowHeadNode(zA, zB, color, lineWidth, headLength, strokeOptions);
+        return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1, strokeOptions);
     };
     /**
      * Draw an image at the given position with the given size.<br>
@@ -705,26 +708,8 @@ var drawutilssvg = /** @class */ (function () {
      * @memberof drawutilssvg
      */
     drawutilssvg.prototype.cubicBezier = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions) {
-        if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
-            return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
-        }
-        var node = this.makeNode("path");
-        this.applyStrokeOpts(node, strokeOptions);
-        // Draw curve
-        var d = [
-            "M",
-            this._x(startPoint.x),
-            this._y(startPoint.y),
-            "C",
-            this._x(startControlPoint.x),
-            this._y(startControlPoint.y),
-            this._x(endControlPoint.x),
-            this._y(endControlPoint.y),
-            this._x(endPoint.x),
-            this._y(endPoint.y)
-        ];
-        node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
+        var node = this.makeCubicBezierNode(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
+        return this._bindNode(node, undefined);
     };
     /**
      * Draw the given (cubic) Bézier path.
@@ -1556,6 +1541,79 @@ var drawutilssvg = /** @class */ (function () {
     }; // END transformPathData
     drawutilssvg.nodeSupportsLineDash = function (nodeName) {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    };
+    /**
+     * Creates a basic <line> node with start and end coordinates.
+     */
+    drawutilssvg.prototype.makeLineNode = function (zA, zB, color, lineWidth, strokeOptions) {
+        var line = this.makeNode("line");
+        line.setAttribute("x1", "" + this._x(zA.x));
+        line.setAttribute("y1", "" + this._y(zA.y));
+        line.setAttribute("x2", "" + this._x(zB.x));
+        line.setAttribute("y2", "" + this._y(zB.y));
+        this._configureNode(line, "line", this.fillShapes, color, lineWidth || 1, strokeOptions);
+        return line;
+    };
+    /**
+     * Creates a basic <line> node with start and end coordinates.
+     */
+    drawutilssvg.prototype.makePathNode = function (pathString, color, lineWidth, strokeOptions, classNameOverride) {
+        var line = this.makeNode("path");
+        line.setAttribute("d", pathString);
+        this._configureNode(line, classNameOverride !== null && classNameOverride !== void 0 ? classNameOverride : "path", this.fillShapes, color, lineWidth || 1, strokeOptions);
+        return line;
+    };
+    drawutilssvg.prototype.makeArrowHeadNode = function (zA, zB, color, lineWidth, headLength, strokeOptions, arrowHeadBasePositionBuffer) {
+        /*
+        const node: SVGElement = this.makeNode("path");
+        this.applyStrokeOpts(node, strokeOptions);
+        */
+        if (headLength === void 0) { headLength = 8; }
+        // var headLength: number = 8; // length of head in pixels
+        var vertices = Vector_1.Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+        var d = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
+        if (arrowHeadBasePositionBuffer) {
+            arrowHeadBasePositionBuffer.x = vertices[0].x;
+            arrowHeadBasePositionBuffer.y = vertices[0].y;
+        }
+        for (var i = 1; i <= vertices.length; i++) {
+            d.push("L");
+            // Note: only use offset here (the vertices are already scaled)
+            d.push(this.offset.x + vertices[i % vertices.length].x);
+            d.push(this.offset.y + vertices[i % vertices.length].y);
+        }
+        /*
+        node.setAttribute("d", d.join(" "));
+        return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1);
+        */
+        var node = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "arrowhead");
+        // return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1, strokeOptions);
+        return node;
+    };
+    drawutilssvg.prototype.makeCubicBezierNode = function (startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions) {
+        if (startPoint instanceof CubicBezierCurve_1.CubicBezierCurve) {
+            return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
+        }
+        // const node: SVGElement = this.makeNode("path");
+        // this.applyStrokeOpts(node, strokeOptions);
+        // Draw curve
+        var d = [
+            "M",
+            this._x(startPoint.x),
+            this._y(startPoint.y),
+            "C",
+            this._x(startControlPoint.x),
+            this._y(startControlPoint.y),
+            this._x(endControlPoint.x),
+            this._y(endControlPoint.y),
+            this._x(endPoint.x),
+            this._y(endPoint.y)
+        ];
+        // node.setAttribute("d", d.join(" "));
+        // return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
+        var node = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "cubicBezier");
+        return node;
     };
     drawutilssvg.HEAD_XML = [
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',

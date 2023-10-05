@@ -56,13 +56,14 @@
     var config = {
       // The arrow head size
       size: 8,
+      enableDash: true,
       dashArray1: 5,
       dashArray2: 15,
       dashOffset: 0
     };
 
-    const getDashArray = () => {
-      return [config.dashArray1, config.dashArray2];
+    const getStrokeOptions = () => {
+      return config.enableDash ? { dashOffset: config.dashOffset, dashArray: [config.dashArray1, config.dashArray2] } : null;
     };
 
     const preDraw = function (draw, _fill) {
@@ -71,7 +72,7 @@
 
     const postDraw = function (draw, fill) {
       console.log("post draw");
-      draw.arrow(arrow.a, arrow.b, "red", 2, config.size, { dashArray: getDashArray() });
+      draw.arrow(arrow.a, arrow.b, "red", 2, config.size, getStrokeOptions());
       draw.cubicBezierArrow(
         bezier.startPoint,
         bezier.endPoint,
@@ -80,7 +81,7 @@
         "orange",
         2,
         config.size,
-        { dashArray: getDashArray(), dashOffset: config.dashOffset }
+        getStrokeOptions()
       );
     };
 
@@ -88,6 +89,12 @@
       var gui = pb.createGUI();
       // prettier-ignore
       gui.add(config, "size").min(1).max(100).step(1)
+        .onChange(function () {
+          pb.redraw();
+        });
+
+      // prettier-ignore
+      gui.add(config, "enableDash")
         .onChange(function () {
           pb.redraw();
         });

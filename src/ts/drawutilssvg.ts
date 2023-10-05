@@ -425,10 +425,11 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     node: SVGElement,
     className: string,
     color?: string | null,
-    lineWidth?: number | null
+    lineWidth?: number | null,
+    strokeOptions?: StrokeOptions
     // bindingParent?: SVGElement
   ): SVGElement {
-    if (this.curClassName) {
+    /* if (this.curClassName) {
       node.setAttribute("class", `${className} ${this.curClassName}`);
     } else {
       node.setAttribute("class", className);
@@ -445,6 +446,67 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       // Attach to DOM only if not already attached
       this.bufferGNode.appendChild(node);
     }
+    return node;
+    */
+    this._configureNode(node, className, this.fillShapes, color, lineWidth, strokeOptions);
+    return this._bindNode(node, undefined); // this.gNode);
+  }
+
+  private _bindNode(node: SVGElement, bindingParent?: SVGElement): SVGElement {
+    /* if (this.curClassName) {
+      node.setAttribute("class", `${className} ${this.curClassName}`);
+    } else {
+      node.setAttribute("class", className);
+    }
+    // if (!isGroup) {
+    node.setAttribute("fill", this.fillShapes && color ? color : "none");
+    node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
+    node.setAttribute("stroke-width", `${lineWidth || 1}`);
+    if (this.curId) {
+      node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
+    }
+    // }
+    if (!node.parentNode) {
+      // Attach to DOM only if not already attached
+      this.bufferGNode.appendChild(node);
+    }
+    return node;
+    */
+    // return this._configureNode(node, className, this.fillShapes, color, lineWidth);
+    if (!node.parentNode) {
+      // Attach to DOM only if not already attached
+      (bindingParent ?? this.bufferGNode).appendChild(node);
+    }
+    return node;
+  }
+
+  private _configureNode(
+    node: SVGElement,
+    className: string,
+    fillMode: boolean,
+    // bindingParent: SVGElement,
+    color?: string | null,
+    lineWidth?: number | null,
+    strokeOptions?: StrokeOptions
+  ): SVGElement {
+    if (this.curClassName) {
+      node.setAttribute("class", `${className} ${this.curClassName}`);
+    } else {
+      node.setAttribute("class", className);
+    }
+    // if (!isGroup) {
+    node.setAttribute("fill", fillMode && color ? color : "none");
+    node.setAttribute("stroke", fillMode ? "none" : color || "none");
+    node.setAttribute("stroke-width", `${lineWidth || 1}`);
+    if (this.curId) {
+      node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
+    }
+    // }
+    // if (!node.parentNode) {
+    //   // Attach to DOM only if not already attached
+    //   bindingParent.appendChild(node);
+    // }
+    this.applyStrokeOpts(node, strokeOptions);
     return node;
   }
 
@@ -634,14 +696,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
    * @memberof drawutilssvg
    **/
   line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement {
-    const line: SVGElement = this.makeNode("line");
-    this.applyStrokeOpts(line, strokeOptions);
-    line.setAttribute("x1", `${this._x(zA.x)}`);
-    line.setAttribute("y1", `${this._y(zA.y)}`);
-    line.setAttribute("x2", `${this._x(zB.x)}`);
-    line.setAttribute("y2", `${this._y(zB.y)}`);
-
-    return this._bindFillDraw(line, "line", color, lineWidth || 1);
+    // const line: SVGElement = this.makeNode("line");
+    // this.applyStrokeOpts(line, strokeOptions);
+    // line.setAttribute("x1", `${this._x(zA.x)}`);
+    // line.setAttribute("y1", `${this._y(zA.y)}`);
+    // line.setAttribute("x2", `${this._x(zB.x)}`);
+    // line.setAttribute("y2", `${this._y(zB.y)}`);
+    const line = this.makeLineNode(zA, zB, color, lineWidth, strokeOptions);
+    return this._bindFillDraw(line, "line", color, lineWidth || 1, strokeOptions);
   }
 
   /**
@@ -667,31 +729,14 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     headLength: number = 8,
     strokeOptions?: StrokeOptions
   ): SVGElement {
-    // // this.lineDashEnabled = false;
-    // const node: SVGElement = this.makeNode("path");
-    // // var headLength: number = 8; // length of head in pixels
-    // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-    // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
-    // for (var i = 0; i <= vertices.length; i++) {
-    //   d.push("L");
-    //   // Note: only use offset here (the vertices are already scaled)
-    //   d.push(this.offset.x + vertices[i % vertices.length].x);
-    //   d.push(this.offset.y + vertices[i % vertices.length].y);
-    // }
-    // node.setAttribute("d", d.join(" "));
-    // return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
-
     const group: SVGElement = this.makeNode("g");
-    const line = this.line(zA, zB, color, lineWidth, strokeOptions); // Pass stroke options
-    const arrowHead = this.arrowHead(zA, zB, color, lineWidth, headLength); // Do NOT pass stroke options
-    // this._bindFillDraw(line, "lin")
+    const arrowHeadBasePosition: XYCoords = { x: 0, y: 0 };
+    const arrowHead: SVGElement = this.makeArrowHeadNode(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+    const line: SVGElement = this.makeLineNode(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions);
     group.appendChild(line);
     group.appendChild(arrowHead);
-
-    return this._bindFillDraw(group, "arrow", color, lineWidth || 1);
-
+    this._bindNode(group, undefined);
     return group;
-    // return line; // OR RETURN ARROW OR GROUP; TODO
   }
 
   /**
@@ -721,44 +766,20 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     headLength: number = 8,
     strokeOptions?: StrokeOptions
   ): SVGElement {
-    // const node: SVGElement = this.makeNode("path");
-    // this.applyStrokeOpts(node, strokeOptions);
-
-    // // Draw curve
-    // const d: Array<string | number> = [
-    //   "M",
-    //   this._x(startPoint.x),
-    //   this._y(startPoint.y),
-    //   "C",
-    //   this._x(startControlPoint.x),
-    //   this._y(startControlPoint.y),
-    //   this._x(endControlPoint.x),
-    //   this._y(endControlPoint.y),
-    //   this._x(endPoint.x),
-    //   this._y(endPoint.y)
-    // ];
-
-    // // var headLength: number = 8; // length of head in pixels
-    // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(endControlPoint, endPoint, headLength, this.scale.x, this.scale.y);
-    // // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
-    // // const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
-    // for (var i = 0; i <= vertices.length; i++) {
-    //   d.push("L");
-    //   // Note: only use offset here (the vertices are already scaled)
-    //   d.push(this.offset.x + vertices[i % vertices.length].x);
-    //   d.push(this.offset.y + vertices[i % vertices.length].y);
-    // }
-    // node.setAttribute("d", d.join(" "));
-    // return this._bindFillDraw(node, "cubicbezierarrow", color, lineWidth || 1);
-
     const group: SVGElement = this.makeNode("g");
-    const line = this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions); // Pass stroke options
-    const arrowHead = this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength); // Do NOT pass stroke options
-    group.appendChild(line);
+    const bezier: SVGElement = this.makeCubicBezierNode(
+      startPoint,
+      endPoint,
+      startControlPoint,
+      endControlPoint,
+      color,
+      lineWidth,
+      strokeOptions
+    );
+    const arrowHead: SVGElement = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
+    group.appendChild(bezier);
     group.appendChild(arrowHead);
-
-    return this._bindFillDraw(group, "arrow", color, lineWidth || 1);
-
+    this._bindNode(group, undefined);
     return group;
   }
 
@@ -785,21 +806,8 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     headLength: number = 8,
     strokeOptions?: StrokeOptions
   ): SVGElement {
-    const node: SVGElement = this.makeNode("path");
-    this.applyStrokeOpts(node, strokeOptions);
-
-    // var headLength: number = 8; // length of head in pixels
-    var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-    // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
-    const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
-    for (var i = 1; i <= vertices.length; i++) {
-      d.push("L");
-      // Note: only use offset here (the vertices are already scaled)
-      d.push(this.offset.x + vertices[i % vertices.length].x);
-      d.push(this.offset.y + vertices[i % vertices.length].y);
-    }
-    node.setAttribute("d", d.join(" "));
-    return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1);
+    const node: SVGElement = this.makeArrowHeadNode(zA, zB, color, lineWidth, headLength, strokeOptions);
+    return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1, strokeOptions);
   }
 
   /**
@@ -956,33 +964,16 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     lineWidth?: number,
     strokeOptions?: StrokeOptions
   ): SVGElement {
-    if (startPoint instanceof CubicBezierCurve) {
-      return this.cubicBezier(
-        startPoint.startPoint,
-        startPoint.endPoint,
-        startPoint.startControlPoint,
-        startPoint.endControlPoint,
-        color,
-        lineWidth
-      );
-    }
-    const node: SVGElement = this.makeNode("path");
-    this.applyStrokeOpts(node, strokeOptions);
-    // Draw curve
-    const d: Array<string | number> = [
-      "M",
-      this._x(startPoint.x),
-      this._y(startPoint.y),
-      "C",
-      this._x(startControlPoint.x),
-      this._y(startControlPoint.y),
-      this._x(endControlPoint.x),
-      this._y(endControlPoint.y),
-      this._x(endPoint.x),
-      this._y(endPoint.y)
-    ];
-    node.setAttribute("d", d.join(" "));
-    return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
+    const node: SVGElement = this.makeCubicBezierNode(
+      startPoint,
+      endPoint,
+      startControlPoint,
+      endControlPoint,
+      color,
+      lineWidth,
+      strokeOptions
+    );
+    return this._bindNode(node, undefined);
   }
 
   /**
@@ -1926,7 +1917,109 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
   }
 
-  // private static make = {
+  /**
+   * Creates a basic <line> node with start and end coordinates.
+   */
+  private makeLineNode(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): SVGElement {
+    const line: SVGElement = this.makeNode("line");
+    line.setAttribute("x1", `${this._x(zA.x)}`);
+    line.setAttribute("y1", `${this._y(zA.y)}`);
+    line.setAttribute("x2", `${this._x(zB.x)}`);
+    line.setAttribute("y2", `${this._y(zB.y)}`);
+    this._configureNode(line, "line", this.fillShapes, color, lineWidth || 1, strokeOptions);
+    return line;
+  }
 
-  // }
+  /**
+   * Creates a basic <line> node with start and end coordinates.
+   */
+  private makePathNode(
+    pathString: string,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions,
+    classNameOverride?: string
+  ): SVGElement {
+    const line: SVGElement = this.makeNode("path");
+    line.setAttribute("d", pathString);
+    this._configureNode(line, classNameOverride ?? "path", this.fillShapes, color, lineWidth || 1, strokeOptions);
+    return line;
+  }
+
+  private makeArrowHeadNode(
+    zA: XYCoords,
+    zB: XYCoords,
+    color: string,
+    lineWidth?: number,
+    headLength: number = 8,
+    strokeOptions?: StrokeOptions,
+    arrowHeadBasePositionBuffer?: XYCoords
+  ): SVGElement {
+    /*
+    const node: SVGElement = this.makeNode("path");
+    this.applyStrokeOpts(node, strokeOptions);
+    */
+
+    // var headLength: number = 8; // length of head in pixels
+    var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+    // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
+    const d: Array<string | number> = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
+    if (arrowHeadBasePositionBuffer) {
+      arrowHeadBasePositionBuffer.x = vertices[0].x;
+      arrowHeadBasePositionBuffer.y = vertices[0].y;
+    }
+    for (var i = 1; i <= vertices.length; i++) {
+      d.push("L");
+      // Note: only use offset here (the vertices are already scaled)
+      d.push(this.offset.x + vertices[i % vertices.length].x);
+      d.push(this.offset.y + vertices[i % vertices.length].y);
+    }
+    /*
+    node.setAttribute("d", d.join(" "));
+    return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1);
+    */
+    const node: SVGElement = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "arrowhead");
+    // return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1, strokeOptions);
+    return node;
+  }
+
+  private makeCubicBezierNode(
+    startPoint: XYCoords,
+    endPoint: XYCoords,
+    startControlPoint: XYCoords,
+    endControlPoint: XYCoords,
+    color: string,
+    lineWidth?: number,
+    strokeOptions?: StrokeOptions
+  ): SVGElement {
+    if (startPoint instanceof CubicBezierCurve) {
+      return this.cubicBezier(
+        startPoint.startPoint,
+        startPoint.endPoint,
+        startPoint.startControlPoint,
+        startPoint.endControlPoint,
+        color,
+        lineWidth
+      );
+    }
+    // const node: SVGElement = this.makeNode("path");
+    // this.applyStrokeOpts(node, strokeOptions);
+    // Draw curve
+    const d: Array<string | number> = [
+      "M",
+      this._x(startPoint.x),
+      this._y(startPoint.y),
+      "C",
+      this._x(startControlPoint.x),
+      this._y(startControlPoint.y),
+      this._x(endControlPoint.x),
+      this._y(endControlPoint.y),
+      this._x(endPoint.x),
+      this._y(endPoint.y)
+    ];
+    // node.setAttribute("d", d.join(" "));
+    // return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
+    const node: SVGElement = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "cubicBezier");
+    return node;
+  }
 }

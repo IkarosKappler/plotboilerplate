@@ -43,7 +43,8 @@
  * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
  * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
- * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ *
  * @version  1.6.7
  **/
 import { Polygon } from "./Polygon";
@@ -249,6 +250,8 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @return {SVGElement} The node itself (for chaining).
      */
     private _bindFillDraw;
+    private _bindNode;
+    private _configureNode;
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.
      *
@@ -828,4 +831,14 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      */
     static transformPathData(data: SVGPathParams, offset: XYCoords, scale: XYCoords): void;
     private static nodeSupportsLineDash;
+    /**
+     * Creates a basic <line> node with start and end coordinates.
+     */
+    private makeLineNode;
+    /**
+     * Creates a basic <line> node with start and end coordinates.
+     */
+    private makePathNode;
+    private makeArrowHeadNode;
+    private makeCubicBezierNode;
 }
