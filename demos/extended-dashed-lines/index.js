@@ -25,8 +25,16 @@
       )
     );
 
-    // Create a line for a linear arrow
-    var line = new Line(pb.viewport().randomPoint(0.1, 0.1), pb.viewport().randomPoint(0.1, 0.1));
+    // Create a Bézier curve for curved arrow
+    var pathPoints = [
+      pb.viewport().randomPoint(0.1, 0.1), // s
+      pb.viewport().randomPoint(0.1, 0.1), // sc
+      pb.viewport().randomPoint(0.1, 0.1), // ec
+      pb.viewport().randomPoint(0.1, 0.1), // e & s
+      pb.viewport().randomPoint(0.1, 0.1), // sc
+      pb.viewport().randomPoint(0.1, 0.1), // ec
+      pb.viewport().randomPoint(0.1, 0.1) // e & s
+    ];
 
     // Create a Bézier curve for curved arrow
     var bezier = new CubicBezierCurve(
@@ -42,15 +50,15 @@
     // TODO: add ellipse
     const ellipse = new VEllipse(pb.viewport().randomPoint(0.1, 0.1), new Vertex(150, 75));
 
-    // Add important control points to the canvas
-    // pb.add(line);
-    // pb.add(BezierPath.fromArray([bezier]));
-    // pb.add(circle);
-    // pb.add(ellipse);
+    const bPath = BezierPath.fromArray([bezier]);
 
     var arrow = new Line(pb.viewport().randomPoint(0.1, 0.1), pb.viewport().randomPoint(0.1, 0.1));
+
+    // Add important control points to the canvas
     pb.add([arrow.a, arrow.b]);
     pb.add([bezier.startPoint, bezier.endPoint, bezier.startControlPoint, bezier.endControlPoint]);
+    pb.add([circle.center]);
+    pb.add([ellipse.center, ellipse.axis]);
 
     // Create a config: we want to have control about the arrow head size in this demo
     var config = {
@@ -83,6 +91,17 @@
         config.size,
         getStrokeOptions()
       );
+      draw.circle(circle.center, circle.radius, "green", 2, getStrokeOptions());
+      draw.ellipse(
+        ellipse.center,
+        ellipse.axis.x - ellipse.center.x,
+        ellipse.axis.y - ellipse.center.y,
+        "lightgreen",
+        2,
+        ellipse.rotation,
+        getStrokeOptions()
+      );
+      draw.cubicBezierPath(pathPoints, "yellow", 2, getStrokeOptions());
     };
 
     {

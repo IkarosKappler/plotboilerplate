@@ -250,7 +250,32 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
      * @return {SVGElement} The node itself (for chaining).
      */
     private _bindFillDraw;
+    /**
+     * Bind this given node to a parent. If no parent is passed then the global
+     * node buffer will be used.
+     *
+     * @method _bindNode
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The SVG node to bind.
+     * @param {SVGElement=} bindingParent - (optional) You may pass node other than the glober buffer node.
+     * @returns {SVGElement} The passed node itself.
+     */
     private _bindNode;
+    /**
+     * Add custom CSS class names and the globally defined CSS classname to the
+     * given node.
+     *
+     * @method addCSSClasses
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The SVG node to bind.
+     * @param {string} className - The additional custom classname to add.
+     * @returns {void}
+     */
+    private _addCSSClasses;
     private _configureNode;
     /**
      * Sets the size and view box of the document. Call this if canvas size changes.

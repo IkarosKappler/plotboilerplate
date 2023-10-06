@@ -414,57 +414,49 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     color?: string | null,
     lineWidth?: number | null,
     strokeOptions?: StrokeOptions
-    // bindingParent?: SVGElement
   ): SVGElement {
-    /* if (this.curClassName) {
-      node.setAttribute("class", `${className} ${this.curClassName}`);
-    } else {
-      node.setAttribute("class", className);
-    }
-    // if (!isGroup) {
-    node.setAttribute("fill", this.fillShapes && color ? color : "none");
-    node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
-    node.setAttribute("stroke-width", `${lineWidth || 1}`);
-    if (this.curId) {
-      node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
-    }
-    // }
-    if (!node.parentNode) {
-      // Attach to DOM only if not already attached
-      this.bufferGNode.appendChild(node);
-    }
-    return node;
-    */
     this._configureNode(node, className, this.fillShapes, color, lineWidth, strokeOptions);
-    return this._bindNode(node, undefined); // this.gNode);
+    return this._bindNode(node, undefined);
   }
 
+  /**
+   * Bind this given node to a parent. If no parent is passed then the global
+   * node buffer will be used.
+   *
+   * @method _bindNode
+   * @private
+   * @instance
+   * @memberof drawutilssvg
+   * @param {SVGElement} node - The SVG node to bind.
+   * @param {SVGElement=} bindingParent - (optional) You may pass node other than the glober buffer node.
+   * @returns {SVGElement} The passed node itself.
+   */
   private _bindNode(node: SVGElement, bindingParent?: SVGElement): SVGElement {
-    /* if (this.curClassName) {
-      node.setAttribute("class", `${className} ${this.curClassName}`);
-    } else {
-      node.setAttribute("class", className);
-    }
-    // if (!isGroup) {
-    node.setAttribute("fill", this.fillShapes && color ? color : "none");
-    node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
-    node.setAttribute("stroke-width", `${lineWidth || 1}`);
-    if (this.curId) {
-      node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
-    }
-    // }
-    if (!node.parentNode) {
-      // Attach to DOM only if not already attached
-      this.bufferGNode.appendChild(node);
-    }
-    return node;
-    */
-    // return this._configureNode(node, className, this.fillShapes, color, lineWidth);
     if (!node.parentNode) {
       // Attach to DOM only if not already attached
       (bindingParent ?? this.bufferGNode).appendChild(node);
     }
     return node;
+  }
+
+  /**
+   * Add custom CSS class names and the globally defined CSS classname to the
+   * given node.
+   *
+   * @method addCSSClasses
+   * @private
+   * @instance
+   * @memberof drawutilssvg
+   * @param {SVGElement} node - The SVG node to bind.
+   * @param {string} className - The additional custom classname to add.
+   * @returns {void}
+   */
+  private _addCSSClasses(node: SVGElement, className: string) {
+    if (this.curClassName) {
+      node.setAttribute("class", `${className} ${this.curClassName}`);
+    } else {
+      node.setAttribute("class", className);
+    }
   }
 
   private _configureNode(
@@ -475,11 +467,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     lineWidth?: number | null,
     strokeOptions?: StrokeOptions
   ): SVGElement {
-    if (this.curClassName) {
-      node.setAttribute("class", `${className} ${this.curClassName}`);
-    } else {
-      node.setAttribute("class", className);
-    }
+    this._addCSSClasses(node, className);
     node.setAttribute("fill", fillMode && color ? color : "none");
     node.setAttribute("stroke", fillMode ? "none" : color || "none");
     node.setAttribute("stroke-width", `${lineWidth || 1}`);
@@ -720,6 +708,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     const line: SVGElement = this.makeLineNode(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions);
     group.appendChild(line);
     group.appendChild(arrowHead);
+    this._addCSSClasses(group, "linear-arrow");
     this._bindNode(group, undefined);
     return group;
   }
@@ -765,6 +754,7 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
     const arrowHead: SVGElement = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
     group.appendChild(bezier);
     group.appendChild(arrowHead);
+    this._addCSSClasses(group, "cubicbezier-arrow");
     this._bindNode(group, undefined);
     return group;
   }
@@ -2043,8 +2033,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
         lineWidth
       );
     }
-    // const node: SVGElement = this.makeNode("path");
-    // this.applyStrokeOpts(node, strokeOptions);
     // Draw curve
     const d: Array<string | number> = [
       "M",
@@ -2058,8 +2046,6 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
       this._x(endPoint.x),
       this._y(endPoint.y)
     ];
-    // node.setAttribute("d", d.join(" "));
-    // return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
     const node: SVGElement = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "cubicBezier");
     return node;
   }

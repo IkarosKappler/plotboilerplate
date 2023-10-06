@@ -3026,7 +3026,8 @@ CubicBezierCurve.END_POINT = 3;
  * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.5.0
+ * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
+ * @version 2.6.0
  *
  * @file BezierPath
  * @public
@@ -3224,215 +3225,6 @@ class BezierPath {
         return this.bezierCurves[curveIndex];
     }
     /**
-     * Remove the end point of this path (which removes the last curve from this path).<br>
-     * <br>
-     * Please note that this function does never remove the first curve, thus the path
-     * cannot be empty after this call.
-     *
-     * @method removeEndPoint
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} Indicating if the last curve was removed.
-     **/
-    /*
-      BezierPath.prototype.removeEndPoint = function() {
-      if( this.bezierCurves.length <= 1 )
-          return false;
-      
-      var newArray = [ this.bezierCurves.length-1 ];
-      for( var i = 0; i < this.bezierCurves.length-1; i++ ) {
-          newArray[i] = this.bezierCurves[i];
-      }
-      
-      // Update arc length
-      this.totalArcLength -= this.bezierCurves[ this.bezierCurves.length-1 ].getLength();
-      this.bezierCurves = newArray;
-      return true;
-      }
-      */
-    /**
-     * Remove the start point of this path (which removes the first curve from this path).<br>
-     * <br>
-     * Please note that this function does never remove the last curve, thus the path
-     * cannot be empty after this call.<br>
-     *
-     * @method removeStartPoint
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} Indicating if the first curve was removed.
-     **/
-    /*
-      BezierPath.prototype.removeStartPoint = function() {
-  
-      if( this.bezierCurves.length <= 1 )
-          return false;
-  
-      var newArray = [ this.bezierCurves.length-1 ];
-      for( var i = 1; i < this.bezierCurves.length; i++ ) {
-  
-          newArray[i-1] = this.bezierCurves[i];
-  
-      }
-      
-      // Update arc length
-      this.totalArcLength -= this.bezierCurves[ 0 ].getLength();
-      this.bezierCurves = newArray;
-      
-      return true;
-      }
-      */
-    /**
-     * Removes a path point inside the path.
-     *
-     * This function joins the bezier curve at the given index with
-     * its predecessor, which means that the start point at the given
-     * curve index will be removed.
-     *
-     * @method joinAt
-     * @param {number} curveIndex - The index of the curve to be joined with its predecessor.
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} True if the passed index indicated an inner vertex and the two curves were joined.
-     **/
-    /*
-      BezierPath.prototype.joinAt = function( curveIndex ) {
-  
-      if( curveIndex < 0 || curveIndex >= this.bezierCurves.length )
-          return false;
-      
-      var leftCurve  = this.bezierCurves[ curveIndex-1 ];
-      var rightCurve = this.bezierCurves[ curveIndex ];
-  
-      // Make the length of the new handle double that long
-      var leftControlPoint = leftCurve.getStartControlPoint().clone();
-      leftControlPoint.sub( leftCurve.getStartPoint() );
-      leftControlPoint.multiplyScalar( 2.0 );
-      leftControlPoint.add( leftCurve.getStartPoint() );
-      
-      var rightControlPoint = rightCurve.getEndControlPoint().clone();
-      rightControlPoint.sub( rightCurve.getEndPoint() );
-      rightControlPoint.multiplyScalar( 2.0 );
-      rightControlPoint.add( rightCurve.getEndPoint() );
-  
-      var newCurve = new IKRS.CubicBezierCurve( leftCurve.getStartPoint(),
-                            rightCurve.getEndPoint(),
-                            leftControlPoint,
-                            rightControlPoint
-                          );
-      // Place into array
-      var newArray = [ this.bezierCurves.length - 1 ];
-  
-      for( var i = 0; i < curveIndex-1; i++ )
-          newArray[ i ] = this.bezierCurves[i];
-      
-      newArray[ curveIndex-1 ] = newCurve;
-      
-      // Shift trailing curves left
-      for( var i = curveIndex; i+1 < this.bezierCurves.length; i++ )
-          newArray[ i ] = this.bezierCurves[ i+1 ];
-          
-      this.bezierCurves = newArray;
-      this.updateArcLengths();
-  
-      return true;
-      }
-      */
-    /**
-     * Add a new inner curve point to the path.<br>
-     * <br>
-     * This function splits the bezier curve at the given index and given
-     * curve segment index.
-     *
-     * @method splitAt
-     * @param {number} curveIndex - The index of the curve to split.
-     * @param {nunber} segmentIndex - The index of the curve segment where the split should be performed.
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} True if the passed indices were valid and the path was split.
-     **/
-    /*
-      BezierPath.prototype.splitAt = function( curveIndex,
-                           segmentIndex
-                         ) {
-      // Must be a valid curve index
-      if( curveIndex < 0 || curveIndex >= this.bezierCurves.length )
-          return false;
-  
-      var oldCurve = this.bezierCurves[ curveIndex ];
-  
-      // Segment must be an INNER point!
-      // (the outer points are already bezier end/start points!)
-      if( segmentIndex < 1 || segmentIndex-1 >= oldCurve.segmentCache.length )
-          return false;
-  
-      // Make room for a new curve
-      for( var c = this.bezierCurves.length; c > curveIndex; c-- ) {
-          // Move one position to the right
-          this.bezierCurves[ c ] = this.bezierCurves[ c-1 ];
-      }
-  
-      // Accumulate segment lengths
-      var u = 0;
-      for( var i = 0; i < segmentIndex; i++ )
-          u += oldCurve.segmentLengths[i];
-      //var tangent = oldCurve.getTangentAt( u );
-      var tangent = oldCurve.getTangent( u );
-      tangent = tangent.multiplyScalar( 0.25 );
-  
-      var leftEndControlPoint = oldCurve.segmentCache[ segmentIndex ].clone();
-      leftEndControlPoint.sub( tangent );
-      
-      var rightStartControlPoint = oldCurve.segmentCache[ segmentIndex ].clone();
-      rightStartControlPoint.add( tangent );
-      
-      // Make the old existing handles a quarter that long
-      var leftStartControlPoint = oldCurve.getStartControlPoint().clone();
-      // move to (0,0)
-      leftStartControlPoint.sub( oldCurve.getStartPoint() );
-      leftStartControlPoint.multiplyScalar( 0.25 );
-      leftStartControlPoint.add( oldCurve.getStartPoint() );
-  
-      var rightEndControlPoint = oldCurve.getEndControlPoint().clone();
-      // move to (0,0)
-      rightEndControlPoint.sub( oldCurve.getEndPoint() );
-      rightEndControlPoint.multiplyScalar( 0.25 );
-      rightEndControlPoint.add( oldCurve.getEndPoint() );
-  
-      var newLeft  = new CubicBezierCurve( oldCurve.getStartPoint(),                      // old start point
-                           oldCurve.segmentCache[ segmentIndex ],         // new end point
-                           leftStartControlPoint,                         // old start control point
-                           leftEndControlPoint                            // new end control point
-                         );
-      var newRight = new CubicBezierCurve( oldCurve.segmentCache[ segmentIndex ],         // new start point
-                           oldCurve.getEndPoint(),                        // old end point
-                           rightStartControlPoint,                        // new start control point
-                           rightEndControlPoint                           // old end control point
-                         );
-      
-      // Insert split curve(s) at free index
-      this.bezierCurves[ curveIndex ]     = newLeft;
-      this.bezierCurves[ curveIndex + 1 ] = newRight;
-      
-      // Update total arc length, even if there is only a very little change!
-      this.totalArcLength -= oldCurve.getLength();
-      this.totalArcLength += newLeft.getLength();
-      this.totalArcLength += newRight.getLength();
-  
-      return true;
-      };
-      */
-    /*
-      insertVertexAt( t:number ) : void {
-      console.log('Inserting vertex at', t );
-      // Find the curve index
-      var u : number = 0;
-      var curveIndex : number = -1;
-      var localT : number = 0.0;
-      for( var i = 0; curveIndex == -1 && i < this.bezierCurves.length; i++ ) {
-          
-      }
-      }; */
-    /**
      * Move the whole bezier path by the given (x,y)-amount.
      *
      * @method translate
@@ -3466,22 +3258,6 @@ class BezierPath {
      * @return {BezierPath} this for chaining.
      **/
     scale(anchor, scaleFactor) {
-        // var scaleFactors : XYCoords = { x : scaleFactor, y : scaleFactor };
-        // for (var i = 0; i < this.bezierCurves.length; i++) {
-        //   var curve = this.bezierCurves[i];
-        //   curve.getStartPoint().scale(scaleFactor, anchor);
-        //   curve.getStartControlPoint().scale(scaleFactor, anchor);
-        //   curve.getEndControlPoint().scale(scaleFactor, anchor);
-        //   // Do NOT scale the end point here!
-        //   // Don't forget that the curves are connected and on curve's end point
-        //   // the the successor's start point (same instance)!
-        // }
-        // // Finally move the last end point (was not scaled yet)
-        // if (this.bezierCurves.length > 0 && !this.adjustCircular) {
-        //   this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scale(scaleFactor, anchor);
-        // }
-        // this.updateArcLengths();
-        // return this;
         return this.scaleXY({ x: scaleFactor, y: scaleFactor }, anchor);
     }
     /**
@@ -4017,12 +3793,50 @@ class BezierPath {
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
+     *
+     * @method destroy
+     * @instance
+     * @memberof BezierPath
      */
     destroy() {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             this.bezierCurves[i].destroy();
         }
         this.isDestroyed = true;
+    }
+    /**
+     * Convert this path to an array of path points that can be drawn by the default DrawLib
+     * implementations.
+     *
+     * @method toPathPoints
+     * @instance
+     * @memberof BezierPath
+     * @return {Array<XYCoords>}
+     */
+    toPathPoints() {
+        if (this.bezierCurves.length === 0) {
+            return [];
+        }
+        if (this.bezierCurves.length === 1) {
+            return [
+                this.bezierCurves[0].startPoint,
+                this.bezierCurves[0].startControlPoint,
+                this.bezierCurves[0].endControlPoint,
+                this.bezierCurves[0].endPoint
+            ];
+        }
+        const arr = [];
+        arr.push(this.bezierCurves[0].startPoint);
+        arr.push(this.bezierCurves[0].startControlPoint);
+        for (var i = 1; i < this.bezierCurves.length; i++) {
+            arr.push(this.bezierCurves[i - 1].endControlPoint);
+            arr.push(this.bezierCurves[i - 1].endPoint);
+            arr.push(this.bezierCurves[i].startPoint);
+            arr.push(this.bezierCurves[i].startControlPoint);
+        }
+        arr.push(this.bezierCurves[0].endControlPoint);
+        arr.push(this.bezierCurves[0].endPoint);
+        return arr;
     }
     /**
      * Create a JSON string representation of this bézier curve.
@@ -4075,11 +3889,13 @@ class BezierPath {
      * @return {BezierPath} The bezier path instance retrieved from the array data.
      **/
     static fromArray(obj) {
-        if (!Array.isArray(obj))
+        if (!Array.isArray(obj)) {
             throw "[BezierPath.fromArray] Passed object must be an array.";
+        }
         const arr = obj; // FORCE?
-        if (arr.length < 1)
+        if (arr.length < 1) {
             throw "[BezierPath.fromArray] Passed array must contain at least one bezier curve (has " + arr.length + ").";
+        }
         // Create an empty bezier path
         var bPath = new BezierPath(undefined);
         var lastCurve = null;
@@ -4839,65 +4655,51 @@ class drawutilssvg {
      * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
      * @return {SVGElement} The node itself (for chaining).
      */
-    _bindFillDraw(node, className, color, lineWidth, strokeOptions
-    // bindingParent?: SVGElement
-    ) {
-        /* if (this.curClassName) {
-          node.setAttribute("class", `${className} ${this.curClassName}`);
-        } else {
-          node.setAttribute("class", className);
-        }
-        // if (!isGroup) {
-        node.setAttribute("fill", this.fillShapes && color ? color : "none");
-        node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
-        node.setAttribute("stroke-width", `${lineWidth || 1}`);
-        if (this.curId) {
-          node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
-        }
-        // }
-        if (!node.parentNode) {
-          // Attach to DOM only if not already attached
-          this.bufferGNode.appendChild(node);
-        }
-        return node;
-        */
+    _bindFillDraw(node, className, color, lineWidth, strokeOptions) {
         this._configureNode(node, className, this.fillShapes, color, lineWidth, strokeOptions);
-        return this._bindNode(node, undefined); // this.gNode);
+        return this._bindNode(node, undefined);
     }
+    /**
+     * Bind this given node to a parent. If no parent is passed then the global
+     * node buffer will be used.
+     *
+     * @method _bindNode
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The SVG node to bind.
+     * @param {SVGElement=} bindingParent - (optional) You may pass node other than the glober buffer node.
+     * @returns {SVGElement} The passed node itself.
+     */
     _bindNode(node, bindingParent) {
-        /* if (this.curClassName) {
-          node.setAttribute("class", `${className} ${this.curClassName}`);
-        } else {
-          node.setAttribute("class", className);
-        }
-        // if (!isGroup) {
-        node.setAttribute("fill", this.fillShapes && color ? color : "none");
-        node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
-        node.setAttribute("stroke-width", `${lineWidth || 1}`);
-        if (this.curId) {
-          node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
-        }
-        // }
-        if (!node.parentNode) {
-          // Attach to DOM only if not already attached
-          this.bufferGNode.appendChild(node);
-        }
-        return node;
-        */
-        // return this._configureNode(node, className, this.fillShapes, color, lineWidth);
         if (!node.parentNode) {
             // Attach to DOM only if not already attached
             (bindingParent !== null && bindingParent !== void 0 ? bindingParent : this.bufferGNode).appendChild(node);
         }
         return node;
     }
-    _configureNode(node, className, fillMode, color, lineWidth, strokeOptions) {
+    /**
+     * Add custom CSS class names and the globally defined CSS classname to the
+     * given node.
+     *
+     * @method addCSSClasses
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The SVG node to bind.
+     * @param {string} className - The additional custom classname to add.
+     * @returns {void}
+     */
+    _addCSSClasses(node, className) {
         if (this.curClassName) {
             node.setAttribute("class", `${className} ${this.curClassName}`);
         }
         else {
             node.setAttribute("class", className);
         }
+    }
+    _configureNode(node, className, fillMode, color, lineWidth, strokeOptions) {
+        this._addCSSClasses(node, className);
         node.setAttribute("fill", fillMode && color ? color : "none");
         node.setAttribute("stroke", fillMode ? "none" : color || "none");
         node.setAttribute("stroke-width", `${lineWidth || 1}`);
@@ -5102,6 +4904,7 @@ class drawutilssvg {
         const line = this.makeLineNode(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions);
         group.appendChild(line);
         group.appendChild(arrowHead);
+        this._addCSSClasses(group, "linear-arrow");
         this._bindNode(group, undefined);
         return group;
     }
@@ -5129,6 +4932,7 @@ class drawutilssvg {
         const arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
         group.appendChild(bezier);
         group.appendChild(arrowHead);
+        this._addCSSClasses(group, "cubicbezier-arrow");
         this._bindNode(group, undefined);
         return group;
     }
@@ -6212,8 +6016,6 @@ class drawutilssvg {
         if (startPoint instanceof CubicBezierCurve) {
             return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
         }
-        // const node: SVGElement = this.makeNode("path");
-        // this.applyStrokeOpts(node, strokeOptions);
         // Draw curve
         const d = [
             "M",
@@ -6227,8 +6029,6 @@ class drawutilssvg {
             this._x(endPoint.x),
             this._y(endPoint.y)
         ];
-        // node.setAttribute("d", d.join(" "));
-        // return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
         const node = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "cubicBezier");
         return node;
     }

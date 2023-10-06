@@ -1,5 +1,7 @@
 # Changelog
 
+- 2023-10-06
+  - Adding the `BezierPath.toPathPoints()` method.
 - 2023-10-04
   - Also adding the param `strokeOptions` to the default `drawutilssvg` library.
 - 2023-09-30
