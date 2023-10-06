@@ -71,17 +71,6 @@ import { Vector } from "./Vector";
  * @requires XYCoords
  */
 export class drawutils {
-    // /**
-    //  * @member {Array<number>}
-    //  * @memberof drawutils
-    //  * @type {boolean}
-    //  * @instance
-    //  */
-    // private lineDash: Array<number>;
-    // /**
-    //  * Use this flag for internally enabling/disabling line dashes.
-    //  */
-    // private lineDashEnabled: boolean = true;
     /**
      * The constructor.
      *
@@ -104,8 +93,12 @@ export class drawutils {
      */
     applyStrokeOpts(strokeOptions) {
         var _a, _b;
-        this.ctx.setLineDash((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []);
-        this.ctx.lineDashOffset = (_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0;
+        this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map((dashArrayElem) => {
+            // Note assume scale.x === scale.y
+            // Invariant scale makes funny stuff anyway.
+            return dashArrayElem * this.scale.x;
+        }));
+        this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
     }
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not

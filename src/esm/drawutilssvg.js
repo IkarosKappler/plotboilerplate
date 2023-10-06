@@ -307,27 +307,19 @@ export class drawutilssvg {
         }
         return node;
     }
-    _configureNode(node, className, fillMode, 
-    // bindingParent: SVGElement,
-    color, lineWidth, strokeOptions) {
+    _configureNode(node, className, fillMode, color, lineWidth, strokeOptions) {
         if (this.curClassName) {
             node.setAttribute("class", `${className} ${this.curClassName}`);
         }
         else {
             node.setAttribute("class", className);
         }
-        // if (!isGroup) {
         node.setAttribute("fill", fillMode && color ? color : "none");
         node.setAttribute("stroke", fillMode ? "none" : color || "none");
         node.setAttribute("stroke-width", `${lineWidth || 1}`);
         if (this.curId) {
             node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
         }
-        // }
-        // if (!node.parentNode) {
-        //   // Attach to DOM only if not already attached
-        //   bindingParent.appendChild(node);
-        // }
         this.applyStrokeOpts(node, strokeOptions);
         return node;
     }
@@ -459,15 +451,17 @@ export class drawutilssvg {
      * @param {StrokeOptions=} strokeOptions -
      */
     applyStrokeOpts(node, strokeOptions) {
-        // this.ctx.setLineDash(strokeOptions?.dashArray ?? []);
-        // this.ctx.lineDashOffset = strokeOptions?.dashOffset ?? 0;
         if (strokeOptions &&
             strokeOptions.dashArray &&
             strokeOptions.dashArray.length > 0 &&
             drawutilssvg.nodeSupportsLineDash(node.tagName)) {
-            node.setAttribute("stroke-dasharray", strokeOptions.dashArray.join(" "));
+            node.setAttribute("stroke-dasharray", strokeOptions.dashArray
+                .map((dashArayElem) => {
+                return dashArayElem * this.scale.x;
+            })
+                .join(" "));
             if (strokeOptions.dashOffset) {
-                node.setAttribute("stroke-dashoffset", `${strokeOptions.dashOffset}`);
+                node.setAttribute("stroke-dashoffset", `${strokeOptions.dashOffset * this.scale.x}`);
             }
         }
     }
@@ -519,13 +513,13 @@ export class drawutilssvg {
     arrow(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
         const group = this.makeNode("g");
         const arrowHeadBasePosition = { x: 0, y: 0 };
+        // Just create the child nodes, don't bind them to the root node.
         const arrowHead = this.makeArrowHeadNode(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
         const line = this.makeLineNode(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions);
         group.appendChild(line);
         group.appendChild(arrowHead);
         this._bindNode(group, undefined);
         return group;
-        // return line; // OR RETURN ARROW OR GROUP; TODO
     }
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -546,6 +540,7 @@ export class drawutilssvg {
      */
     cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength = 8, strokeOptions) {
         const group = this.makeNode("g");
+        // Just create the child nodes, don't bind them to the root node.
         const bezier = this.makeCubicBezierNode(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
         const arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
         group.appendChild(bezier);
@@ -1535,38 +1530,73 @@ export class drawutilssvg {
         return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
     }
     /**
-     * Creates a basic <line> node with start and end coordinates.
+     * Creates a basic <line> node with start and end coordinates. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeLineNode
+     * @param {XYCoords} zA - The line's start position.
+     * @param {XYCoords} zB - The line's start position.
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @return {SVGLineElement}
+     * @instance
+     * @memberof drawutilssvg
      */
-    makeLineNode(zA, zB, color, lineWidth, strokeOptions) {
+    makeLineNode(zA, zB, color, lineWidth, strokeOptions, classNameOverride) {
         const line = this.makeNode("line");
         line.setAttribute("x1", `${this._x(zA.x)}`);
         line.setAttribute("y1", `${this._y(zA.y)}`);
         line.setAttribute("x2", `${this._x(zB.x)}`);
         line.setAttribute("y2", `${this._y(zB.y)}`);
-        this._configureNode(line, "line", this.fillShapes, color, lineWidth || 1, strokeOptions);
+        this._configureNode(line, classNameOverride !== null && classNameOverride !== void 0 ? classNameOverride : "line", this.fillShapes, color, lineWidth || 1, strokeOptions);
         return line;
     }
     /**
-     * Creates a basic <line> node with start and end coordinates.
+     * Creates a basic <path> node with given path string data. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makePathNode
+     * @param {string} pathString - The path data (must be a valid path data string).
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
      */
     makePathNode(pathString, color, lineWidth, strokeOptions, classNameOverride) {
-        const line = this.makeNode("path");
-        line.setAttribute("d", pathString);
-        this._configureNode(line, classNameOverride !== null && classNameOverride !== void 0 ? classNameOverride : "path", this.fillShapes, color, lineWidth || 1, strokeOptions);
-        return line;
+        const path = this.makeNode("path");
+        path.setAttribute("d", pathString);
+        this._configureNode(path, classNameOverride !== null && classNameOverride !== void 0 ? classNameOverride : "path", this.fillShapes, color, lineWidth || 1, strokeOptions);
+        return path;
     }
+    /**
+     * Creates a basic arrow head node (<path> node) at the end of the given line coordinates. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeArrowHeadNode
+     * @param {string} pathString - The path data (must be a valid path data string).
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {number=8} headLength - (optional) The length of the arrow head; if none is specified then the head will be 8 absolute units long.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
+     */
     makeArrowHeadNode(zA, zB, color, lineWidth, headLength = 8, strokeOptions, arrowHeadBasePositionBuffer) {
-        /*
-        const node: SVGElement = this.makeNode("path");
-        this.applyStrokeOpts(node, strokeOptions);
-        */
-        // var headLength: number = 8; // length of head in pixels
         var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        // const d: Array<string | number> = ["M", this._x(zA.x), this._y(zA.y)];
         const d = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
         if (arrowHeadBasePositionBuffer) {
-            arrowHeadBasePositionBuffer.x = vertices[0].x;
-            arrowHeadBasePositionBuffer.y = vertices[0].y;
+            arrowHeadBasePositionBuffer.x = vertices[0].x / this.scale.x;
+            arrowHeadBasePositionBuffer.y = vertices[0].y / this.scale.y;
         }
         for (var i = 1; i <= vertices.length; i++) {
             d.push("L");
@@ -1574,14 +1604,28 @@ export class drawutilssvg {
             d.push(this.offset.x + vertices[i % vertices.length].x);
             d.push(this.offset.y + vertices[i % vertices.length].y);
         }
-        /*
-        node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1);
-        */
         const node = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "arrowhead");
-        // return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1, strokeOptions);
         return node;
     }
+    /**
+     * Creates a basic cubic Bézier path node (<path> node) with the given cubic Bézier data. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeCubicBezierNode
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
+     */
     makeCubicBezierNode(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions) {
         if (startPoint instanceof CubicBezierCurve) {
             return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);

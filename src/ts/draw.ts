@@ -108,19 +108,6 @@ export class drawutils implements DrawLib<void> {
    */
   fillShapes: boolean;
 
-  // /**
-  //  * @member {Array<number>}
-  //  * @memberof drawutils
-  //  * @type {boolean}
-  //  * @instance
-  //  */
-  // private lineDash: Array<number>;
-
-  // /**
-  //  * Use this flag for internally enabling/disabling line dashes.
-  //  */
-  // private lineDashEnabled: boolean = true;
-
   /**
    * The constructor.
    *
@@ -143,8 +130,14 @@ export class drawutils implements DrawLib<void> {
    * @param {StrokeOptions=} strokeOptions -
    */
   private applyStrokeOpts(strokeOptions?: StrokeOptions) {
-    this.ctx.setLineDash(strokeOptions?.dashArray ?? []);
-    this.ctx.lineDashOffset = strokeOptions?.dashOffset ?? 0;
+    this.ctx.setLineDash(
+      (strokeOptions?.dashArray ?? []).map((dashArrayElem: number) => {
+        // Note assume scale.x === scale.y
+        // Invariant scale makes funny stuff anyway.
+        return dashArrayElem * this.scale.x;
+      })
+    );
+    this.ctx.lineDashOffset = (strokeOptions?.dashOffset ?? 0) * this.scale.x;
   }
 
   // +---------------------------------------------------------------------------------

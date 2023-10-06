@@ -832,13 +832,73 @@ export declare class drawutilssvg implements DrawLib<void | SVGElement> {
     static transformPathData(data: SVGPathParams, offset: XYCoords, scale: XYCoords): void;
     private static nodeSupportsLineDash;
     /**
-     * Creates a basic <line> node with start and end coordinates.
+     * Creates a basic <line> node with start and end coordinates. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeLineNode
+     * @param {XYCoords} zA - The line's start position.
+     * @param {XYCoords} zB - The line's start position.
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @return {SVGLineElement}
+     * @instance
+     * @memberof drawutilssvg
      */
     private makeLineNode;
     /**
-     * Creates a basic <line> node with start and end coordinates.
+     * Creates a basic <path> node with given path string data. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makePathNode
+     * @param {string} pathString - The path data (must be a valid path data string).
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
      */
     private makePathNode;
+    /**
+     * Creates a basic arrow head node (<path> node) at the end of the given line coordinates. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeArrowHeadNode
+     * @param {string} pathString - The path data (must be a valid path data string).
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {number=8} headLength - (optional) The length of the arrow head; if none is specified then the head will be 8 absolute units long.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
+     */
     private makeArrowHeadNode;
+    /**
+     * Creates a basic cubic Bézier path node (<path> node) with the given cubic Bézier data. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeCubicBezierNode
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
+     */
     private makeCubicBezierNode;
 }

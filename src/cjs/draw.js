@@ -74,17 +74,6 @@ var Vector_1 = require("./Vector");
  * @requires XYCoords
  */
 var drawutils = /** @class */ (function () {
-    // /**
-    //  * @member {Array<number>}
-    //  * @memberof drawutils
-    //  * @type {boolean}
-    //  * @instance
-    //  */
-    // private lineDash: Array<number>;
-    // /**
-    //  * Use this flag for internally enabling/disabling line dashes.
-    //  */
-    // private lineDashEnabled: boolean = true;
     /**
      * The constructor.
      *
@@ -106,9 +95,14 @@ var drawutils = /** @class */ (function () {
      * @param {StrokeOptions=} strokeOptions -
      */
     drawutils.prototype.applyStrokeOpts = function (strokeOptions) {
+        var _this = this;
         var _a, _b;
-        this.ctx.setLineDash((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []);
-        this.ctx.lineDashOffset = (_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0;
+        this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map(function (dashArrayElem) {
+            // Note assume scale.x === scale.y
+            // Invariant scale makes funny stuff anyway.
+            return dashArrayElem * _this.scale.x;
+        }));
+        this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
     };
     // +---------------------------------------------------------------------------------
     // | This is the final helper function for drawing and filling stuff. It is not
