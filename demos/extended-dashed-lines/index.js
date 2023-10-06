@@ -94,8 +94,8 @@
       draw.circle(circle.center, circle.radius, "green", 2, getStrokeOptions());
       draw.ellipse(
         ellipse.center,
-        ellipse.axis.x - ellipse.center.x,
-        ellipse.axis.y - ellipse.center.y,
+        Math.abs(ellipse.axis.x - ellipse.center.x),
+        Math.abs(ellipse.axis.y - ellipse.center.y),
         "lightgreen",
         2,
         ellipse.rotation,

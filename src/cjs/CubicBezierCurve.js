@@ -416,20 +416,24 @@ var CubicBezierCurve = /** @class */ (function () {
         // Note: my implementation does NOT normalize tangent vectors!
         return new Vertex_1.Vertex(tX, tY);
     };
-    CubicBezierCurve.prototype.trimStart = function (u) {
-        // ...
-        return this;
-    };
-    CubicBezierCurve.prototype.trimStartBy = function (t) {
-        // ...
-        return this;
-    };
-    CubicBezierCurve.prototype.trimEnd = function (u) {
-        // ...
-        return this;
+    /*
+    trimStart(u: number): CubicBezierCurve {
+      // ...
+      return this;
+    }
+  
+    trimStartBy(t: number): CubicBezierCurve {
+      // ...
+      return this;
+    }
+    */
+    CubicBezierCurve.prototype.trimEnd = function (uValue) {
+        return this.trimEndBy(this.convertU2T(uValue));
     };
     CubicBezierCurve.prototype.trimEndBy = function (t) {
-        // ...
+        var subCurve = this.getSubCurve(0.0, t);
+        this.endPoint.set(subCurve.endPoint);
+        this.endControlPoint.set(subCurve.endControlPoint);
         return this;
     };
     /**
@@ -437,7 +441,7 @@ var CubicBezierCurve = /** @class */ (function () {
      *
      * tStart >= tEnd is allowed, you will get a reversed sub curve then.
      *
-     * @method getSubCurveAt
+     * @method getSubCurve
      * @param {number} tStart – The start position of the desired sub curve (must be in [0..arcLength]).
      * @param {number} tEnd – The end position if the desired cub curve (must be in [0..arcLength]).
      * @instance

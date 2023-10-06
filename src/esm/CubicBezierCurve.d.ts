@@ -322,16 +322,14 @@ export declare class CubicBezierCurve implements PathSegment {
      * @return {Vertex}
      **/
     getTangentAt(t: number): Vertex;
-    trimStart(u: number): CubicBezierCurve;
-    trimStartBy(t: number): CubicBezierCurve;
-    trimEnd(u: number): CubicBezierCurve;
+    trimEnd(uValue: number): CubicBezierCurve;
     trimEndBy(t: number): CubicBezierCurve;
     /**
      * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
      *
      * tStart >= tEnd is allowed, you will get a reversed sub curve then.
      *
-     * @method getSubCurveAt
+     * @method getSubCurve
      * @param {number} tStart – The start position of the desired sub curve (must be in [0..arcLength]).
      * @param {number} tEnd – The end position if the desired cub curve (must be in [0..arcLength]).
      * @instance
