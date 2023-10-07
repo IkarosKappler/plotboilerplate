@@ -742,16 +742,26 @@ export class drawutilssvg implements DrawLib<void | SVGElement> {
   ): SVGElement {
     const group: SVGElement = this.makeNode("g");
     // Just create the child nodes, don't bind them to the root node.
+    const arrowHeadBasePosition = new Vertex(0, 0);
+    const arrowHead: SVGElement = this.makeArrowHeadNode(
+      endControlPoint,
+      endPoint,
+      color,
+      lineWidth,
+      headLength,
+      undefined,
+      arrowHeadBasePosition
+    );
+    const diff = arrowHeadBasePosition.difference(endPoint);
     const bezier: SVGElement = this.makeCubicBezierNode(
       startPoint,
-      endPoint,
+      { x: endPoint.x - diff.x, y: endPoint.y - diff.y },
       startControlPoint,
-      endControlPoint,
+      { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y },
       color,
       lineWidth,
       strokeOptions
     );
-    const arrowHead: SVGElement = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
     group.appendChild(bezier);
     group.appendChild(arrowHead);
     this._addCSSClasses(group, "cubicbezier-arrow");

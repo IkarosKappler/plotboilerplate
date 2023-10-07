@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html class="fullscreen">
   <head>
-    <title>2D Plotting Boilerplate – How to draw dashed lines</title>
+    <title>2D Plotting Boilerplate – How to trim Bézier curves</title>
     <meta charset="UTF-8">
-    <meta name="description" content="A demo about drawing dashes lines  with PlotBoilerplate.js.">
-    <meta name="keywords" content="plotboilerplate, Vertex, usage, howto, docs, documentation">
+    <meta name="description" content="A demo about drawing trimmed Bézier curves with PlotBoilerplate.js.">
+    <meta name="keywords" content="plotboilerplate, Bézier, curve, trim, usage, howto, docs, documentation">
     <meta name="author" content="Ikaros Kappler">
-    <meta name="date" content="2023-09-29">
-    <meta name="docinfo" content="Draw dashed lines (howto).">
+    <meta name="date" content="2023-10-07">
+    <meta name="docinfo" content="Trim Bézier curves (howto).">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@humanearthpig">
     <meta name="twitter:creator" content="@humanearthpig">
     <meta property="og:url" content="https://www.plotboilerplate.de">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="A demo about drawing dashed lines with PlotBoilerplate.js.">
-    <meta property="og:description" content="A demo about drawing dashed lines with PlotBoilerplate.js.">
-    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20231007-0-dashed-lines.png">
+    <meta property="og:title" content="A demo about drawing trimmed Bézier curves with PlotBoilerplate.js.">
+    <meta property="og:description" content="A demo about drawing trimmed Bézier curves with PlotBoilerplate.js.">
+    <meta property="og:image" content="https://plotboilerplate.io/repo/screenshots/screenshot-20231007-0-trim-bezier-curves.png">
 
     <!-- Polyfills for IE -->
     <script src="../../lib/globalthis-polyfill.min.js"></script> 
@@ -39,6 +39,7 @@
     <script src="../../src/cjs/utils/module.js"></script>
     <script src="../../src/cjs/utils/gup.js"></script>
     <script src="../../src/cjs/utils/detectDarkMode.js"></script>
+    <script src="../../src/cjs/utils/algorithms/getContrastColor.js"></script>
 
 
     <!-- For production -->
@@ -49,6 +50,8 @@
     <link rel="stylesheet" type="text/css" media="screen" href="../style.css"> 
   </head>
   <body class="fullscreen">
+    <input type="file" name="file" id="file" data-type="image-upload" style="display: none;">
+
     <canvas id="my-canvas" width="1024" height="768">Your browser does not support the canvas tag.</canvas>
   </body>
 </html>

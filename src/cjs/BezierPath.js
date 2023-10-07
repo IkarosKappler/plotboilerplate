@@ -25,6 +25,7 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
+ * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
  * @version 2.6.0
  *
  * @file BezierPath
@@ -62,7 +63,7 @@ var BezierPath = /** @class */ (function () {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    function BezierPath(pathPoints) {
+    function BezierPath() {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -75,9 +76,11 @@ var BezierPath = /** @class */ (function () {
         this.END_CONTROL_POINT = 2;
         /** @constant {number} */
         this.END_POINT = 3;
+        // pathPoints: Array<Vertex> | undefined | null) {
         this.uid = UIDGenerator_1.UIDGenerator.next();
-        if (!pathPoints)
-            pathPoints = [];
+        // if (!pathPoints) {
+        //   pathPoints = [];
+        // }
         this.totalArcLength = 0.0;
         // Set this flag to true if you want the first point and
         // last point of the path to be auto adjusted, too.
@@ -759,7 +762,7 @@ var BezierPath = /** @class */ (function () {
      * @return {BezierPath}
      **/
     BezierPath.prototype.clone = function () {
-        var path = new BezierPath(undefined);
+        var path = new BezierPath(); // undefined);
         for (var i = 0; i < this.bezierCurves.length; i++) {
             path.bezierCurves.push(this.bezierCurves[i].clone());
             // Connect splines
@@ -885,6 +888,20 @@ var BezierPath = /** @class */ (function () {
         return BezierPath.fromArray(obj);
     };
     /**
+     * Construct a new path with a single curve. Adding more curves is always possible.
+     *
+     * @method fromCurve
+     * @param {CubicBezierCurve} curve - The curve to construct a new path from.
+     * @static
+     * @memberof BezierPath
+     * @return {BezierPath} The constructed bezier path instance.
+     */
+    BezierPath.fromCurve = function (curve) {
+        var path = new BezierPath(); // []);
+        path.addCurve(curve);
+        return path;
+    };
+    /**
      * Create a BezierPath instance from the given array.
      *
      * @method fromArray
@@ -903,7 +920,7 @@ var BezierPath = /** @class */ (function () {
             throw "[BezierPath.fromArray] Passed array must contain at least one bezier curve (has " + arr.length + ").";
         }
         // Create an empty bezier path
-        var bPath = new BezierPath(undefined);
+        var bPath = new BezierPath(); // undefined);
         var lastCurve = null;
         for (var i = 0; i < arr.length; i++) {
             // Convert object (or array?) to bezier curve
@@ -1013,7 +1030,7 @@ var BezierPath = /** @class */ (function () {
      */
     BezierPath.fromReducedList = function (pointArray, adjustCircular) {
         // Convert to object
-        var bezierPath = new BezierPath(null); // No points yet
+        var bezierPath = new BezierPath(); // null); // No points yet
         var startPoint = new Vertex_1.Vertex();
         var startControlPoint;
         var endControlPoint;

@@ -534,8 +534,10 @@ var drawutilssvg = /** @class */ (function () {
         if (headLength === void 0) { headLength = 8; }
         var group = this.makeNode("g");
         // Just create the child nodes, don't bind them to the root node.
-        var bezier = this.makeCubicBezierNode(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
-        var arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
+        var arrowHeadBasePosition = new Vertex_1.Vertex(0, 0);
+        var arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        var diff = arrowHeadBasePosition.difference(endPoint);
+        var bezier = this.makeCubicBezierNode(startPoint, { x: endPoint.x - diff.x, y: endPoint.y - diff.y }, startControlPoint, { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y }, color, lineWidth, strokeOptions);
         group.appendChild(bezier);
         group.appendChild(arrowHead);
         this._addCSSClasses(group, "cubicbezier-arrow");

@@ -24,6 +24,7 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
+ * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
  * @version 2.6.0
  *
  * @file BezierPath
@@ -509,6 +510,16 @@ export declare class BezierPath implements SVGSerializable {
      * @return {BezierPath} The parsed bezier path instance.
      **/
     static fromJSON(jsonString: string): BezierPath;
+    /**
+     * Construct a new path with a single curve. Adding more curves is always possible.
+     *
+     * @method fromCurve
+     * @param {CubicBezierCurve} curve - The curve to construct a new path from.
+     * @static
+     * @memberof BezierPath
+     * @return {BezierPath} The constructed bezier path instance.
+     */
+    static fromCurve(curve: CubicBezierCurve): BezierPath;
     /**
      * Create a BezierPath instance from the given array.
      *

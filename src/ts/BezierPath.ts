@@ -24,6 +24,7 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
+ * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
  * @version 2.6.0
  *
  * @file BezierPath
@@ -140,10 +141,13 @@ export class BezierPath implements SVGSerializable {
    * @name BezierPath
    * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
    **/
-  private constructor(pathPoints: Array<Vertex> | undefined | null) {
+  private constructor() {
+    // pathPoints: Array<Vertex> | undefined | null) {
     this.uid = UIDGenerator.next();
 
-    if (!pathPoints) pathPoints = [];
+    // if (!pathPoints) {
+    //   pathPoints = [];
+    // }
     this.totalArcLength = 0.0;
     // Set this flag to true if you want the first point and
     // last point of the path to be auto adjusted, too.
@@ -901,7 +905,7 @@ export class BezierPath implements SVGSerializable {
    * @return {BezierPath}
    **/
   clone(): BezierPath {
-    var path: BezierPath = new BezierPath(undefined);
+    var path: BezierPath = new BezierPath(); // undefined);
     for (var i = 0; i < this.bezierCurves.length; i++) {
       path.bezierCurves.push(this.bezierCurves[i].clone());
       // Connect splines
@@ -1025,6 +1029,21 @@ export class BezierPath implements SVGSerializable {
   }
 
   /**
+   * Construct a new path with a single curve. Adding more curves is always possible.
+   *
+   * @method fromCurve
+   * @param {CubicBezierCurve} curve - The curve to construct a new path from.
+   * @static
+   * @memberof BezierPath
+   * @return {BezierPath} The constructed bezier path instance.
+   */
+  static fromCurve(curve: CubicBezierCurve): BezierPath {
+    const path = new BezierPath(); // []);
+    path.addCurve(curve);
+    return path;
+  }
+
+  /**
    * Create a BezierPath instance from the given array.
    *
    * @method fromArray
@@ -1046,7 +1065,7 @@ export class BezierPath implements SVGSerializable {
     }
 
     // Create an empty bezier path
-    var bPath: BezierPath = new BezierPath(undefined);
+    var bPath: BezierPath = new BezierPath(); // undefined);
     var lastCurve: CubicBezierCurve | null = null;
     for (var i = 0; i < arr.length; i++) {
       // Convert object (or array?) to bezier curve
@@ -1164,7 +1183,7 @@ export class BezierPath implements SVGSerializable {
    */
   static fromReducedList(pointArray: Array<number>, adjustCircular?: boolean): BezierPath {
     // Convert to object
-    var bezierPath: BezierPath = new BezierPath(null); // No points yet
+    var bezierPath: BezierPath = new BezierPath(); // null); // No points yet
 
     var startPoint: Vertex = new Vertex();
     var startControlPoint: Vertex;

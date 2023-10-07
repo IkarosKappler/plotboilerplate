@@ -1,5 +1,8 @@
 # Changelog
 
+- 2023-10-07
+  - Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
+  - Adding the extended demo: Trimming Bézier curves.
 - 2023-10-06
   - Adding the `BezierPath.toPathPoints()` method.
 - 2023-10-04

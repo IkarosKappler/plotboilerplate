@@ -1,10 +1,10 @@
 /**
- * A script for demonstrating the basic usage of the Vertex class.
+ * A script for demonstrating the basic usage of dashed lines.
  *
  * @requires PlotBoilerplate, gup, dat.gui,
  *
  * @author   Ikaros Kappler
- * @date     2020-05-18
+ * @date     2020-09-29
  * @version  1.0.0
  **/
 
@@ -47,10 +47,7 @@
     // Add a circle
     var circle = new Circle(pb.viewport().randomPoint(0.1, 0.1), 150);
 
-    // TODO: add ellipse
     const ellipse = new VEllipse(pb.viewport().randomPoint(0.1, 0.1), new Vertex(150, 75));
-
-    const bPath = BezierPath.fromArray([bezier]);
 
     var arrow = new Line(pb.viewport().randomPoint(0.1, 0.1), pb.viewport().randomPoint(0.1, 0.1));
 
@@ -70,16 +67,15 @@
       dashOffset: 0
     };
 
-    const getStrokeOptions = () => {
+    var getStrokeOptions = function () {
       return config.enableDash ? { dashOffset: config.dashOffset, dashArray: [config.dashArray1, config.dashArray2] } : null;
     };
 
-    const preDraw = function (draw, _fill) {
-      // Draw a straight line with an arrow at the end ("Vector")
+    var preDraw = function (_draw, _fill) {
+      // NOOP in this demo
     };
 
-    const postDraw = function (draw, fill) {
-      console.log("post draw");
+    var postDraw = function (draw, _fill) {
       draw.arrow(arrow.a, arrow.b, "red", 2, config.size, getStrokeOptions());
       draw.cubicBezierArrow(
         bezier.startPoint,

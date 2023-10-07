@@ -22,6 +22,7 @@
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
  * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
+ * @modified 2023-10-07 Added the `trimEnd`, `trimEndBy`
  * @version 2.7.1
  *
  * @file CubicBezierCurve
@@ -322,8 +323,56 @@ export declare class CubicBezierCurve implements PathSegment {
      * @return {Vertex}
      **/
     getTangentAt(t: number): Vertex;
+    /**
+     * Trim off a start section of this curve. The position parameter `uValue` is the absolute position on the
+     * curve in `[0...arcLength]`.
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * Note this function just converts the absolute parameter to a relative one and call `trimStartAt`.
+     *
+     * @method trimStart
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} uValue - The absolute position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimStart(uValue: number): CubicBezierCurve;
+    /**
+     * Trim off a start section of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * @method trimStartAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} t - The relative position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimStartAt(t: number): CubicBezierCurve;
+    /**
+     * Trim off the end of this curve. The position parameter `uValue` is the absolute position on the
+     * curve in `[0...arcLength]`.
+     * The remaining curve will be the one in the bounds `[0,uValue]` (so `[1.0-uValue,1.0]` is cut off).
+     *
+     * Note this function just converts the absolute parameter to a relative one and call `trimEndAt`.
+     *
+     * @method trimEnd
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} uValue - The absolute position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
     trimEnd(uValue: number): CubicBezierCurve;
-    trimEndBy(t: number): CubicBezierCurve;
+    /**
+     * Trim off the end of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[0,t]` (so `[1.0-t,1.0]` is cut off).
+     *
+     * @method trimEndAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} t - The relative position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimEndAt(t: number): CubicBezierCurve;
     /**
      * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
      *
@@ -494,4 +543,8 @@ export declare class CubicBezierCurve implements PathSegment {
      * @return {CubicBezierCurve}
      **/
     static fromArray(arr: Array<Vertex>): CubicBezierCurve;
+    /**
+     * Helper utils.
+     */
+    private static utils;
 }

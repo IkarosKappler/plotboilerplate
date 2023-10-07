@@ -22,6 +22,7 @@
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
  * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
+ * @modified 2023-10-07 Added the `trimEnd`, `trimEndBy`
  * @version 2.7.1
  *
  * @file CubicBezierCurve
@@ -413,24 +414,74 @@ export class CubicBezierCurve {
         // Note: my implementation does NOT normalize tangent vectors!
         return new Vertex(tX, tY);
     }
-    /*
-    trimStart(u: number): CubicBezierCurve {
-      // ...
-      return this;
+    /**
+     * Trim off a start section of this curve. The position parameter `uValue` is the absolute position on the
+     * curve in `[0...arcLength]`.
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * Note this function just converts the absolute parameter to a relative one and call `trimStartAt`.
+     *
+     * @method trimStart
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} uValue - The absolute position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimStart(uValue) {
+        return this.trimStartAt(this.convertU2T(uValue));
     }
-  
-    trimStartBy(t: number): CubicBezierCurve {
-      // ...
-      return this;
+    /**
+     * Trim off a start section of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * @method trimStartAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} t - The relative position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimStartAt(t) {
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, t, 1.0);
+        this.startPoint.set(subCurbePoints[0]);
+        this.startControlPoint.set(subCurbePoints[2]);
+        this.endPoint.set(subCurbePoints[1]);
+        this.endControlPoint.set(subCurbePoints[3]);
+        this.updateArcLengths();
+        return this;
     }
-    */
+    /**
+     * Trim off the end of this curve. The position parameter `uValue` is the absolute position on the
+     * curve in `[0...arcLength]`.
+     * The remaining curve will be the one in the bounds `[0,uValue]` (so `[1.0-uValue,1.0]` is cut off).
+     *
+     * Note this function just converts the absolute parameter to a relative one and call `trimEndAt`.
+     *
+     * @method trimEnd
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} uValue - The absolute position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
     trimEnd(uValue) {
-        return this.trimEndBy(this.convertU2T(uValue));
+        return this.trimEndAt(this.convertU2T(uValue));
     }
-    trimEndBy(t) {
-        const subCurve = this.getSubCurve(0.0, t);
-        this.endPoint.set(subCurve.endPoint);
-        this.endControlPoint.set(subCurve.endControlPoint);
+    /**
+     * Trim off the end of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[0,t]` (so `[1.0-t,1.0]` is cut off).
+     *
+     * @method trimEndAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} t - The relative position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimEndAt(t) {
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, 0.0, t);
+        this.startPoint.set(subCurbePoints[0]);
+        this.startControlPoint.set(subCurbePoints[2]);
+        this.endPoint.set(subCurbePoints[1]);
+        this.endControlPoint.set(subCurbePoints[3]);
+        this.updateArcLengths();
         return this;
     }
     /**
@@ -461,17 +512,19 @@ export class CubicBezierCurve {
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
     getSubCurveAt(tStart, tEnd) {
-        const startVec = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        const endVec = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
-        // Tangents are relative. Make absolute.
-        startVec.b.add(startVec.a);
-        endVec.b.add(endVec.a);
-        // This 'splits' the curve at the given point at t.
-        startVec.scale(0.33333333 * (tEnd - tStart));
-        endVec.scale(0.33333333 * (tEnd - tStart));
-        // Draw the bezier curve
-        // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
-        return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        // const startVec: Vector = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
+        // const endVec: Vector = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
+        // // Tangents are relative. Make absolute.
+        // startVec.b.add(startVec.a);
+        // endVec.b.add(endVec.a);
+        // // This 'splits' the curve at the given point at t.
+        // startVec.scale(0.33333333 * (tEnd - tStart));
+        // endVec.scale(0.33333333 * (tEnd - tStart));
+        // // Draw the bezier curve
+        // // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
+        // return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, tEnd);
+        return new CubicBezierCurve(subCurbePoints[0], subCurbePoints[1], subCurbePoints[2], subCurbePoints[3]);
     }
     /**
      * Convert a relative curve position u to the absolute curve position t.
@@ -724,4 +777,33 @@ CubicBezierCurve.START_CONTROL_POINT = 1;
 CubicBezierCurve.END_CONTROL_POINT = 2;
 /** @constant {number} */
 CubicBezierCurve.END_POINT = 3;
+/**
+ * Helper utils.
+ */
+CubicBezierCurve.utils = {
+    /**
+     * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
+     *
+     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+     *
+     * @method getSubCurvePointsAt
+     * @param {CubicBezierCurve} curve – The curve to get the sub curve points from.
+     * @param {number} tStart – The start offset of the desired sub curve (must be in [0..1]).
+     * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} The sub curve as a new curve.
+     **/
+    getSubCurvePointsAt: (curve, tStart, tEnd) => {
+        const startVec = new Vector(curve.getPointAt(tStart), curve.getTangentAt(tStart));
+        const endVec = new Vector(curve.getPointAt(tEnd), curve.getTangentAt(tEnd).inv());
+        // Tangents are relative. Make absolute.
+        startVec.b.add(startVec.a);
+        endVec.b.add(endVec.a);
+        // This 'splits' the curve at the given point at t.
+        startVec.scale(0.33333333 * (tEnd - tStart));
+        endVec.scale(0.33333333 * (tEnd - tStart));
+        return [startVec.a, endVec.a, startVec.b, endVec.b];
+    }
+};
 //# sourceMappingURL=CubicBezierCurve.js.map

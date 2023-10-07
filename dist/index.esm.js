@@ -2306,6 +2306,7 @@ Vector.utils = {
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
  * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
+ * @modified 2023-10-07 Added the `trimEnd`, `trimEndBy`
  * @version 2.7.1
  *
  * @file CubicBezierCurve
@@ -2693,24 +2694,74 @@ class CubicBezierCurve {
         // Note: my implementation does NOT normalize tangent vectors!
         return new Vertex(tX, tY);
     }
-    /*
-    trimStart(u: number): CubicBezierCurve {
-      // ...
-      return this;
+    /**
+     * Trim off a start section of this curve. The position parameter `uValue` is the absolute position on the
+     * curve in `[0...arcLength]`.
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * Note this function just converts the absolute parameter to a relative one and call `trimStartAt`.
+     *
+     * @method trimStart
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} uValue - The absolute position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimStart(uValue) {
+        return this.trimStartAt(this.convertU2T(uValue));
     }
-  
-    trimStartBy(t: number): CubicBezierCurve {
-      // ...
-      return this;
+    /**
+     * Trim off a start section of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * @method trimStartAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} t - The relative position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimStartAt(t) {
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, t, 1.0);
+        this.startPoint.set(subCurbePoints[0]);
+        this.startControlPoint.set(subCurbePoints[2]);
+        this.endPoint.set(subCurbePoints[1]);
+        this.endControlPoint.set(subCurbePoints[3]);
+        this.updateArcLengths();
+        return this;
     }
-    */
+    /**
+     * Trim off the end of this curve. The position parameter `uValue` is the absolute position on the
+     * curve in `[0...arcLength]`.
+     * The remaining curve will be the one in the bounds `[0,uValue]` (so `[1.0-uValue,1.0]` is cut off).
+     *
+     * Note this function just converts the absolute parameter to a relative one and call `trimEndAt`.
+     *
+     * @method trimEnd
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} uValue - The absolute position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
     trimEnd(uValue) {
-        return this.trimEndBy(this.convertU2T(uValue));
+        return this.trimEndAt(this.convertU2T(uValue));
     }
-    trimEndBy(t) {
-        const subCurve = this.getSubCurve(0.0, t);
-        this.endPoint.set(subCurve.endPoint);
-        this.endControlPoint.set(subCurve.endControlPoint);
+    /**
+     * Trim off the end of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[0,t]` (so `[1.0-t,1.0]` is cut off).
+     *
+     * @method trimEndAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} t - The relative position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimEndAt(t) {
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, 0.0, t);
+        this.startPoint.set(subCurbePoints[0]);
+        this.startControlPoint.set(subCurbePoints[2]);
+        this.endPoint.set(subCurbePoints[1]);
+        this.endControlPoint.set(subCurbePoints[3]);
+        this.updateArcLengths();
         return this;
     }
     /**
@@ -2741,17 +2792,19 @@ class CubicBezierCurve {
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
     getSubCurveAt(tStart, tEnd) {
-        const startVec = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        const endVec = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
-        // Tangents are relative. Make absolute.
-        startVec.b.add(startVec.a);
-        endVec.b.add(endVec.a);
-        // This 'splits' the curve at the given point at t.
-        startVec.scale(0.33333333 * (tEnd - tStart));
-        endVec.scale(0.33333333 * (tEnd - tStart));
-        // Draw the bezier curve
-        // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
-        return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        // const startVec: Vector = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
+        // const endVec: Vector = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
+        // // Tangents are relative. Make absolute.
+        // startVec.b.add(startVec.a);
+        // endVec.b.add(endVec.a);
+        // // This 'splits' the curve at the given point at t.
+        // startVec.scale(0.33333333 * (tEnd - tStart));
+        // endVec.scale(0.33333333 * (tEnd - tStart));
+        // // Draw the bezier curve
+        // // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
+        // return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, tEnd);
+        return new CubicBezierCurve(subCurbePoints[0], subCurbePoints[1], subCurbePoints[2], subCurbePoints[3]);
     }
     /**
      * Convert a relative curve position u to the absolute curve position t.
@@ -3004,6 +3057,35 @@ CubicBezierCurve.START_CONTROL_POINT = 1;
 CubicBezierCurve.END_CONTROL_POINT = 2;
 /** @constant {number} */
 CubicBezierCurve.END_POINT = 3;
+/**
+ * Helper utils.
+ */
+CubicBezierCurve.utils = {
+    /**
+     * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
+     *
+     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+     *
+     * @method getSubCurvePointsAt
+     * @param {CubicBezierCurve} curve – The curve to get the sub curve points from.
+     * @param {number} tStart – The start offset of the desired sub curve (must be in [0..1]).
+     * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} The sub curve as a new curve.
+     **/
+    getSubCurvePointsAt: (curve, tStart, tEnd) => {
+        const startVec = new Vector(curve.getPointAt(tStart), curve.getTangentAt(tStart));
+        const endVec = new Vector(curve.getPointAt(tEnd), curve.getTangentAt(tEnd).inv());
+        // Tangents are relative. Make absolute.
+        startVec.b.add(startVec.a);
+        endVec.b.add(endVec.a);
+        // This 'splits' the curve at the given point at t.
+        startVec.scale(0.33333333 * (tEnd - tStart));
+        endVec.scale(0.33333333 * (tEnd - tStart));
+        return [startVec.a, endVec.a, startVec.b, endVec.b];
+    }
+};
 
 /**
  * @author Ikaros Kappler
@@ -3031,6 +3113,7 @@ CubicBezierCurve.END_POINT = 3;
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
+ * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
  * @version 2.6.0
  *
  * @file BezierPath
@@ -3062,7 +3145,7 @@ class BezierPath {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    constructor(pathPoints) {
+    constructor() {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -3075,7 +3158,11 @@ class BezierPath {
         this.END_CONTROL_POINT = 2;
         /** @constant {number} */
         this.END_POINT = 3;
+        // pathPoints: Array<Vertex> | undefined | null) {
         this.uid = UIDGenerator.next();
+        // if (!pathPoints) {
+        //   pathPoints = [];
+        // }
         this.totalArcLength = 0.0;
         // Set this flag to true if you want the first point and
         // last point of the path to be auto adjusted, too.
@@ -3757,7 +3844,7 @@ class BezierPath {
      * @return {BezierPath}
      **/
     clone() {
-        var path = new BezierPath(undefined);
+        var path = new BezierPath(); // undefined);
         for (var i = 0; i < this.bezierCurves.length; i++) {
             path.bezierCurves.push(this.bezierCurves[i].clone());
             // Connect splines
@@ -3883,6 +3970,20 @@ class BezierPath {
         return BezierPath.fromArray(obj);
     }
     /**
+     * Construct a new path with a single curve. Adding more curves is always possible.
+     *
+     * @method fromCurve
+     * @param {CubicBezierCurve} curve - The curve to construct a new path from.
+     * @static
+     * @memberof BezierPath
+     * @return {BezierPath} The constructed bezier path instance.
+     */
+    static fromCurve(curve) {
+        const path = new BezierPath(); // []);
+        path.addCurve(curve);
+        return path;
+    }
+    /**
      * Create a BezierPath instance from the given array.
      *
      * @method fromArray
@@ -3901,7 +4002,7 @@ class BezierPath {
             throw "[BezierPath.fromArray] Passed array must contain at least one bezier curve (has " + arr.length + ").";
         }
         // Create an empty bezier path
-        var bPath = new BezierPath(undefined);
+        var bPath = new BezierPath(); // undefined);
         var lastCurve = null;
         for (var i = 0; i < arr.length; i++) {
             // Convert object (or array?) to bezier curve
@@ -4011,7 +4112,7 @@ class BezierPath {
      */
     static fromReducedList(pointArray, adjustCircular) {
         // Convert to object
-        var bezierPath = new BezierPath(null); // No points yet
+        var bezierPath = new BezierPath(); // null); // No points yet
         var startPoint = new Vertex();
         var startControlPoint;
         var endControlPoint;
@@ -4932,8 +5033,10 @@ class drawutilssvg {
     cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength = 8, strokeOptions) {
         const group = this.makeNode("g");
         // Just create the child nodes, don't bind them to the root node.
-        const bezier = this.makeCubicBezierNode(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
-        const arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
+        const arrowHeadBasePosition = new Vertex(0, 0);
+        const arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        const diff = arrowHeadBasePosition.difference(endPoint);
+        const bezier = this.makeCubicBezierNode(startPoint, { x: endPoint.x - diff.x, y: endPoint.y - diff.y }, startControlPoint, { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y }, color, lineWidth, strokeOptions);
         group.appendChild(bezier);
         group.appendChild(arrowHead);
         this._addCSSClasses(group, "cubicbezier-arrow");
@@ -6101,6 +6204,7 @@ drawutilssvg.HEAD_XML = [
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @version  1.13.0
  **/
 // Todo: rename this class to Drawutils?
@@ -6271,20 +6375,9 @@ class drawutils {
      * @memberof drawutils
      **/
     arrow(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
-        // var headLength: number = 8; // length of head in pixels
-        // this.ctx.save();
-        // this.ctx.beginPath();
-        // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-        // for (var i = 0; i < vertices.length; i++) {
-        //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
-        // }
-        // this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
-        // this.ctx.lineWidth = lineWidth || 1;
-        // this._fillOrDraw(color);
-        // this.ctx.restore();
-        this.line(zA, zB, color, lineWidth, strokeOptions); // Will use dash configuration
-        this.arrowHead(zA, zB, color, lineWidth, headLength, undefined); // Will NOT use dash configuration
+        const arrowHeadBasePosition = new Vertex(0, 0);
+        this.arrowHead(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition); // Will NOT use dash configuration
+        this.line(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions); // Will use dash configuration
     }
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -6304,10 +6397,12 @@ class drawutils {
      * @memberof DrawLib
      */
     cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength, strokeOptions) {
-        // Will use dash configuration
-        this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
+        const arrowHeadBasePosition = new Vertex(0, 0);
         // Will NOT use dash configuration
-        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
+        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        const diff = arrowHeadBasePosition.difference(endPoint);
+        // Will use dash configuration
+        this.cubicBezier(startPoint, { x: endPoint.x - diff.x, y: endPoint.y - diff.y }, startControlPoint, { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y }, color, lineWidth, strokeOptions);
     }
     /**
      * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
@@ -6319,22 +6414,22 @@ class drawutils {
      * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
      * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
      * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
      *
      * @return {void}
      * @instance
      * @memberof DrawLib
      **/
-    arrowHead(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
+    arrowHead(zA, zB, color, lineWidth, headLength = 8, strokeOptions, arrowHeadBasePositionBuffer) {
         // var headLength: number = 8; // length of head in pixels
         this.ctx.save();
         this.ctx.beginPath();
-        // this.ctx.setLineDash([]); // Clear line dash for arrow heads
         this.applyStrokeOpts(strokeOptions);
         var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-        // for (var i = 0; i < vertices.length; i++) {
-        //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
-        // }
+        if (arrowHeadBasePositionBuffer) {
+            arrowHeadBasePositionBuffer.x = vertices[0].x / this.scale.x;
+            arrowHeadBasePositionBuffer.y = vertices[0].y / this.scale.y;
+        }
         this.ctx.moveTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);

@@ -55,6 +55,7 @@
  * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
  * @modified 2023-09-29 Added the `lineDashes` attribute.
  * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
  * @version  1.13.0
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
@@ -229,20 +230,9 @@ export class drawutils {
      * @memberof drawutils
      **/
     arrow(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
-        // var headLength: number = 8; // length of head in pixels
-        // this.ctx.save();
-        // this.ctx.beginPath();
-        // var vertices: Array<Vertex> = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-        // for (var i = 0; i < vertices.length; i++) {
-        //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
-        // }
-        // this.ctx.lineTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
-        // this.ctx.lineWidth = lineWidth || 1;
-        // this._fillOrDraw(color);
-        // this.ctx.restore();
-        this.line(zA, zB, color, lineWidth, strokeOptions); // Will use dash configuration
-        this.arrowHead(zA, zB, color, lineWidth, headLength, undefined); // Will NOT use dash configuration
+        const arrowHeadBasePosition = new Vertex(0, 0);
+        this.arrowHead(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition); // Will NOT use dash configuration
+        this.line(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions); // Will use dash configuration
     }
     /**
      * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
@@ -262,10 +252,12 @@ export class drawutils {
      * @memberof DrawLib
      */
     cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength, strokeOptions) {
-        // Will use dash configuration
-        this.cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
+        const arrowHeadBasePosition = new Vertex(0, 0);
         // Will NOT use dash configuration
-        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined);
+        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        const diff = arrowHeadBasePosition.difference(endPoint);
+        // Will use dash configuration
+        this.cubicBezier(startPoint, { x: endPoint.x - diff.x, y: endPoint.y - diff.y }, startControlPoint, { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y }, color, lineWidth, strokeOptions);
     }
     /**
      * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
@@ -277,22 +269,22 @@ export class drawutils {
      * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
      * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
      * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
      *
      * @return {void}
      * @instance
      * @memberof DrawLib
      **/
-    arrowHead(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
+    arrowHead(zA, zB, color, lineWidth, headLength = 8, strokeOptions, arrowHeadBasePositionBuffer) {
         // var headLength: number = 8; // length of head in pixels
         this.ctx.save();
         this.ctx.beginPath();
-        // this.ctx.setLineDash([]); // Clear line dash for arrow heads
         this.applyStrokeOpts(strokeOptions);
         var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
-        // this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
-        // for (var i = 0; i < vertices.length; i++) {
-        //   this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
-        // }
+        if (arrowHeadBasePositionBuffer) {
+            arrowHeadBasePositionBuffer.x = vertices[0].x / this.scale.x;
+            arrowHeadBasePositionBuffer.y = vertices[0].y / this.scale.y;
+        }
         this.ctx.moveTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
