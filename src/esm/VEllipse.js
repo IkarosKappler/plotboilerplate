@@ -324,7 +324,7 @@ export class VEllipse {
             else {
                 let startTangent = this.tangentAt(curAngle);
                 let endTangent = this.tangentAt(nextAngle);
-                // Find intersection
+                // Find intersection (ignore that the result might be null in some extreme cases)
                 let intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
                 // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.

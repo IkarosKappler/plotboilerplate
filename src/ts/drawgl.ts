@@ -11,22 +11,17 @@
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  0.0.9
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @version  0.0.10
  **/
 
-import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import {
-  DrawLib,
-  XYCoords,
-  SVGPathParams,
-  SVGSerializable,
-  UID,
-  DrawLibConfiguration,
-  FontStyle,
-  FontWeight
-} from "./interfaces";
+import { DrawLib, XYCoords, SVGPathParams, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
 import { Bounds } from "./Bounds";
 
 /**
@@ -110,8 +105,8 @@ export class drawutilsgl implements DrawLib<void> {
     // This needs to be considered in the overlying component; both draw-instances need to
     // share their gl context.
     // That's what the copyInstace(boolean) method is good for.
-    this._vertShader = this.glutils.compileShader(drawutilsgl.vertCode, this.gl.VERTEX_SHADER);
-    this._fragShader = this.glutils.compileShader(drawutilsgl.fragCode, this.gl.FRAGMENT_SHADER);
+    this._vertShader = this.glutils.compileShader(drawutilsgl.vertCode, this.gl.VERTEX_SHADER) as WebGLShader;
+    this._fragShader = this.glutils.compileShader(drawutilsgl.fragCode, this.gl.FRAGMENT_SHADER) as WebGLShader;
     this._program = this.glutils.makeProgram(this._vertShader, this._fragShader);
 
     // Create an empty buffer object
@@ -134,7 +129,7 @@ export class drawutilsgl implements DrawLib<void> {
    * that under the hood the same gl context and gl program will be used.
    */
   copyInstance(fillShapes: boolean): drawutilsgl {
-    var copy: drawutilsgl = new drawutilsgl(null, fillShapes);
+    var copy: drawutilsgl = new drawutilsgl(null as any as WebGLRenderingContext, fillShapes);
     copy.gl = this.gl;
     copy.glutils = this.glutils;
     copy._vertShader = this._vertShader;
@@ -177,6 +172,21 @@ export class drawutilsgl implements DrawLib<void> {
     // TODO
   }
 
+  // /**
+  //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+  //  *
+  //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+  //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+  //  * for how line dashes work.
+  //  *
+  //  * @method
+  //  * @param {Array<number> lineDashes - The line-dash array configuration.
+  //  * @returns {void}
+  //  */
+  // setLineDash(lineDashes: Array<number>) {
+  //   // TODO
+  // }
+
   /**
    * This method shouled be called each time the currently drawn `Drawable` changes.
    * It is used by some libraries for identifying elemente on re-renders.
@@ -206,14 +216,14 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw the line between the given two points with the specified (CSS-) color.
    *
    * @method line
-   * @param {Vertex} zA - The start point of the line.
-   * @param {Vertex} zB - The end point of the line.
+   * @param {XYCoords} zA - The start point of the line.
+   * @param {XYCoords} zB - The end point of the line.
    * @param {string} color - Any valid CSS color string.
    * @return {void}
    * @instance
    * @memberof drawutils
    **/
-  line(zA: Vertex, zB: Vertex, color: string) {
+  line(zA: XYCoords, zB: XYCoords, color: string) {
     const vertices: Float32Array = new Float32Array(6);
     vertices[0] = this._x2rel(zA.x);
     vertices[1] = this._y2rel(zA.y);
@@ -261,14 +271,60 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
    *
    * @method arrow
-   * @param {Vertex} zA - The start point of the arrow-line.
-   * @param {Vertex} zB - The end point of the arrow-line.
+   * @param {XYCoords} zA - The start point of the arrow-line.
+   * @param {XYCoords} zB - The end point of the arrow-line.
    * @param {string} color - Any valid CSS color string.
+   * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
    * @return {void}
    * @instance
    * @memberof drawutils
    **/
-  arrow(zA: Vertex, zB: Vertex, color: string) {
+  arrow(zA: XYCoords, zB: XYCoords, color: string) {
+    // NOT YET IMPLEMENTED
+  }
+
+  /**
+   * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+   *
+   * @method cubicBezierArrow
+   * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+   * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+   * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+   * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+   * @param {string} color - The CSS color to draw the curve with.
+   * @param {number} lineWidth - (optional) The line width to use.
+   * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+   *
+   * @return {void}
+   * @instance
+   * @memberof DrawLib
+   */
+  cubicBezierArrow(
+    startPoint: XYCoords,
+    endPoint: XYCoords,
+    startControlPoint: XYCoords,
+    endControlPoint: XYCoords,
+    color: string,
+    lineWidth?: number,
+    headLength?: number
+  ) {
+    // NOT YET IMPLEMENTED
+  }
+
+  /**
+   * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+   *
+   * @method arrow
+   * @param {XYCoords} zA - The start point of the arrow-line.
+   * @param {XYCoords} zB - The end point of the arrow-line.
+   * @param {string} color - Any valid CSS color string.
+   * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+   * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+   * @return {void}
+   * @instance
+   * @memberof DrawLib
+   **/
+  arrowHead(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number) {
     // NOT YET IMPLEMENTED
   }
 
@@ -279,14 +335,14 @@ export class drawutilsgl implements DrawLib<void> {
    *
    * @method image
    * @param {Image} image - The image object to draw.
-   * @param {Vertex} position - The position to draw the the upper left corner at.
-   * @param {Vertex} size - The x/y-size to draw the image with.
+   * @param {XYCoords} position - The position to draw the the upper left corner at.
+   * @param {XYCoords} size - The x/y-size to draw the image with.
    * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
    * @return {void}
    * @instance
    * @memberof drawutils
    **/
-  image(image: HTMLImageElement, position: Vertex, size: Vertex, alpha: number = 0.0) {
+  image(image: HTMLImageElement, position: XYCoords, size: XYCoords, alpha: number = 0.0) {
     // NOT YET IMPLEMENTED
   }
 
@@ -299,13 +355,19 @@ export class drawutilsgl implements DrawLib<void> {
    * @param {Image} textureImage - The image object to draw.
    * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
    * @param {Polygon} polygon - The polygon to use as clip path.
-   * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+   * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
    * @param {number} rotation - The rotation to use for the polygon (and for the texture).
    * @return {void}
    * @instance
    * @memberof drawutilsgl
    **/
-  texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number) {
+  texturedPoly(
+    textureImage: HTMLImageElement,
+    textureSize: Bounds,
+    polygon: Polygon,
+    polygonPosition: XYCoords,
+    rotation: number
+  ) {
     // NOT YET IMPLEMENTED
   }
 
@@ -328,10 +390,10 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw the given (cubic) bézier curve.
    *
    * @method cubicBezier
-   * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-   * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-   * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-   * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+   * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+   * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+   * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+   * @param {VertXYCoordsex} endControlPoint   - The end control point the cubic Bézier curve.
    * @param {string} color - The CSS color to draw the curve with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
@@ -339,10 +401,10 @@ export class drawutilsgl implements DrawLib<void> {
    * @memberof drawutils
    */
   cubicBezier(
-    startPoint: Vertex,
-    endPoint: Vertex,
-    startControlPoint: Vertex,
-    endControlPoint: Vertex,
+    startPoint: XYCoords,
+    endPoint: XYCoords,
+    startControlPoint: XYCoords,
+    endControlPoint: XYCoords,
     color: string,
     lineWidth?: number
   ) {
@@ -357,14 +419,14 @@ export class drawutilsgl implements DrawLib<void> {
    * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
    *
    * @method cubicBezierPath
-   * @param {Vertex[]} path - The cubic bezier path as described above.
+   * @param {XYCoords[]} path - The cubic bezier path as described above.
    * @param {string} color - The CSS colot to draw the path with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  cubicBezierPath(path: Array<Vertex>, color: string, lineWidth?: number) {
+  cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number) {
     // NOT YET IMPLEMENTED
   }
 
@@ -374,13 +436,13 @@ export class drawutilsgl implements DrawLib<void> {
    * The colors for this are fixed and cannot be specified.
    *
    * @method handle
-   * @param {Vertex} startPoint - The start of the handle.
-   * @param {Vertex} endPoint - The end point of the handle.
+   * @param {XYCoords} startPoint - The start of the handle.
+   * @param {XYCoords} endPoint - The end point of the handle.
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  handle(startPoint: Vertex, endPoint: Vertex) {
+  handle(startPoint: XYCoords, endPoint: XYCoords) {
     // NOT YET IMPLEMENTED
   }
 
@@ -388,13 +450,13 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw a handle line (with a light grey).
    *
    * @method handleLine
-   * @param {Vertex} startPoint - The start point to draw the handle at.
-   * @param {Vertex} endPoint - The end point to draw the handle at.
+   * @param {XYCoords} startPoint - The start point to draw the handle at.
+   * @param {XYCoords} endPoint - The end point to draw the handle at.
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  handleLine(startPoint: Vertex, endPoint: Vertex) {
+  handleLine(startPoint: XYCoords, endPoint: XYCoords) {
     // NOT YET IMPLEMENTED
   }
 
@@ -402,13 +464,13 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw a 1x1 dot with the specified (CSS-) color.
    *
    * @method dot
-   * @param {Vertex} p - The position to draw the dot at.
+   * @param {XYCoords} p - The position to draw the dot at.
    * @param {string} color - The CSS color to draw the dot with.
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  dot(p: Vertex, color: string) {
+  dot(p: XYCoords, color: string) {
     // NOT YET IMPLEMENTED
   }
 
@@ -416,13 +478,13 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw the given point with the specified (CSS-) color and radius 3.
    *
    * @method point
-   * @param {Vertex} p - The position to draw the point at.
+   * @param {XYCoords} p - The position to draw the point at.
    * @param {string} color - The CSS color to draw the point with.
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  point(p: Vertex, color: string) {
+  point(p: XYCoords, color: string) {
     // NOT YET IMPLEMENTED
   }
 
@@ -432,7 +494,7 @@ export class drawutilsgl implements DrawLib<void> {
    * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
    *
    * @method circle
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -440,7 +502,7 @@ export class drawutilsgl implements DrawLib<void> {
    * @instance
    * @memberof drawutils
    */
-  circle(center: Vertex, radius: number, color: string, lineWidth?: number) {
+  circle(center: XYCoords, radius: number, color: string, lineWidth?: number) {
     // NOT YET IMPLEMENTED
   }
 
@@ -448,7 +510,7 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw a circular arc (section of a circle) with the given CSS color.
    *
    * @method circleArc
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {number} startAngle - The angle to start at.
    * @param {number} endAngle - The angle to end at.
@@ -457,7 +519,7 @@ export class drawutilsgl implements DrawLib<void> {
    * @instance
    * @memberof drawutils
    */
-  circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) {
+  circleArc(center: XYCoords, radius: number, startAngle: number, endAngle: number, color: string, lineWidth?: number) {
     // NOT YET IMPLEMENTED
   }
 
@@ -465,7 +527,7 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw an ellipse with the specified (CSS-) color and thw two radii.
    *
    * @method ellipse
-   * @param {Vertex} center - The center of the ellipse.
+   * @param {XYCoords} center - The center of the ellipse.
    * @param {number} radiusX - The radius of the ellipse.
    * @param {number} radiusY - The radius of the ellipse.
    * @param {string} color - The CSS color to draw the ellipse with.
@@ -475,7 +537,7 @@ export class drawutilsgl implements DrawLib<void> {
    * @instance
    * @memberof drawutils
    */
-  ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) {
+  ellipse(center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number) {
     // NOT YET IMPLEMENTED
   }
 
@@ -486,7 +548,7 @@ export class drawutilsgl implements DrawLib<void> {
    *
    * @method square
    * @param {XYCords} center - The center of the square.
-   * @param {Vertex} size - The size of the square.
+   * @param {number} size - The size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @param {number=} lineWidth - (optional) The line width to use; default is 1.
    * @return {void}
@@ -514,7 +576,7 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
    *
    * @method grid
-   * @param {Vertex} center - The center of the grid.
+   * @param {XYCoords} center - The center of the grid.
    * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
    * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
    * @param {number} sizeX - The horizontal grid size.
@@ -524,7 +586,7 @@ export class drawutilsgl implements DrawLib<void> {
    * @instance
    * @memberof drawutils
    */
-  grid(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string) {
+  grid(center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string) {
     // NOT YET IMPLEMENTED
   }
 
@@ -534,7 +596,7 @@ export class drawutilsgl implements DrawLib<void> {
    * This works analogue to the grid() function
    *
    * @method raster
-   * @param {Vertex} center - The center of the raster.
+   * @param {XYCoords} center - The center of the raster.
    * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
    * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
    * @param {number} sizeX - The horizontal raster size.
@@ -544,7 +606,7 @@ export class drawutilsgl implements DrawLib<void> {
    * @instance
    * @memberof drawutils
    */
-  raster(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string) {
+  raster(center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string) {
     // NOT YET IMPLEMENTED
   }
 
@@ -556,14 +618,14 @@ export class drawutilsgl implements DrawLib<void> {
    * as even shaped diamonds.
    *
    * @method diamondHandle
-   * @param {Vertex} center - The center of the diamond.
-   * @param {Vertex} size - The x/y-size of the diamond.
+   * @param {XYCoords} center - The center of the diamond.
+   * @param {number} size - The x/y-size of the diamond.
    * @param {string} color - The CSS color to draw the diamond with.
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  diamondHandle(center: Vertex, size: number, color: string) {
+  diamondHandle(center: XYCoords, size: number, color: string) {
     // NOT YET IMPLEMENTED
   }
 
@@ -575,14 +637,14 @@ export class drawutilsgl implements DrawLib<void> {
    * as even shaped squares.
    *
    * @method squareHandle
-   * @param {Vertex} center - The center of the square.
-   * @param {Vertex} size - The x/y-size of the square.
+   * @param {XYCoords} center - The center of the square.
+   * @param {number} size - The x/y-size of the square.
    * @param {string} color - The CSS color to draw the square with.
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  squareHandle(center: Vertex, size: number, color: string) {
+  squareHandle(center: XYCoords, size: number, color: string) {
     // NOT YET IMPLEMENTED
   }
 
@@ -594,14 +656,14 @@ export class drawutilsgl implements DrawLib<void> {
    * as even shaped circles.
    *
    * @method circleHandle
-   * @param {Vertex} center - The center of the circle.
+   * @param {XYCoords} center - The center of the circle.
    * @param {number} radius - The radius of the circle.
    * @param {string} color - The CSS color to draw the circle with.
    * @return {void}
    * @instance
    * @memberof drawutils
    */
-  circleHandle(center: Vertex, size: number, color: string) {
+  circleHandle(center: XYCoords, size: number, color: string) {
     // NOT YET IMPLEMENTED
   }
 
@@ -697,7 +759,7 @@ export class drawutilsgl implements DrawLib<void> {
    * Draw a polygon line (alternative function to the polygon).
    *
    * @method polyline
-   * @param {Vertex[]} vertices - The polygon vertices to draw.
+   * @param {XYCoords[]} vertices - The polygon vertices to draw.
    * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
    * @param {string}   color    - The CSS color to draw the polygon with.
    * @param {number=}  lineWidth - (optional) The line width to use; default is 1.
@@ -705,7 +767,7 @@ export class drawutilsgl implements DrawLib<void> {
    * @instance
    * @memberof drawutils
    */
-  polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number) {
+  polyline(vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number) {
     // NOT YET IMPLEMENTED
   }
 
@@ -816,7 +878,7 @@ class GLU {
 
   bufferData(verts: Float32Array): WebGLBuffer {
     // Create an empty buffer object
-    var vbuffer: WebGLBuffer = this.gl.createBuffer();
+    var vbuffer: WebGLBuffer = this.gl.createBuffer() as WebGLBuffer;
     // Bind appropriate array buffer to it
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, vbuffer);
     // Pass the vertex data to the buffer
@@ -827,9 +889,9 @@ class GLU {
   }
 
   /*=================== Shaders ====================*/
-  compileShader(shaderCode: string, shaderType: any): WebGLShader {
+  compileShader(shaderCode: string, shaderType: any): WebGLShader | null {
     // Create a vertex shader object
-    var shader: WebGLShader = this.gl.createShader(shaderType);
+    var shader: WebGLShader = this.gl.createShader(shaderType) as WebGLShader;
     // Attach vertex shader source code
     this.gl.shaderSource(shader, shaderCode);
     // Compile the vertex shader
@@ -846,7 +908,7 @@ class GLU {
   makeProgram(vertShader: WebGLShader, fragShader: WebGLShader): WebGLProgram {
     // Create a shader program object to store
     // the combined shader program
-    var program: WebGLProgram = this.gl.createProgram();
+    var program: WebGLProgram = this.gl.createProgram() as WebGLProgram;
 
     // Attach a vertex shader
     this.gl.attachShader(program, vertShader);

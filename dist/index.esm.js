@@ -1,18 +1,4 @@
 /**
- * @classdesc A static UIDGenerator.
- *
- * @author  Ikaros Kappler
- * @date    2021-01-20
- * @version 1.0.0
- */
-class UIDGenerator {
-    static next() {
-        return `${UIDGenerator.current++}`;
-    }
-}
-UIDGenerator.current = 0;
-
-/**
  * @author   Ikaros Kappler
  * @date     2018-08-26
  * @modified 2018-11-17 Added the 'isSelected' attribute.
@@ -64,6 +50,20 @@ VertexAttr.model = {
     isSelected: false,
     visible: true
 };
+
+/**
+ * @classdesc A static UIDGenerator.
+ *
+ * @author  Ikaros Kappler
+ * @date    2021-01-20
+ * @version 1.0.0
+ */
+class UIDGenerator {
+    static next() {
+        return `${UIDGenerator.current++}`;
+    }
+}
+UIDGenerator.current = 0;
 
 /**
  * @author   Ikaros Kappler
@@ -358,6 +358,8 @@ class VertexListeners {
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+ * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
+ * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @version  2.8.0
  *
  * @file Vertex
@@ -875,6 +877,19 @@ class Vertex {
         return this;
     }
     /**
+     * Set both coordinates of this vertex to their absolute value (abs(x), abs(y)).
+     *
+     * @method abs
+     * @return {Vertex} this
+     * @instance
+     * @memberof Vertex
+     */
+    abs() {
+        this.x = Math.abs(this.x);
+        this.y = Math.abs(this.y);
+        return this;
+    }
+    /**
      * Get a string representation of this vertex.
      *
      * @method toString
@@ -932,15 +947,15 @@ Vertex.utils = {
      * Example:
      *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
      *
-     * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-     * @param {Vertex} zB - The end vertex of the vector.
+     * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {XYCoords} zB - The end vertex of the vector.
      * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
      * @param {number} scaleX  - The horizontal scaling during draw.
      * @param {number} scaleY  - the vertical scaling during draw.
      **/
     // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
     buildArrowHead: (zA, zB, headlen, scaleX, scaleY) => {
-        // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+        console.warn("[DEPRECATION] Vertex.utils.buildArrowHead is deprecated. Please use Vector.utils.buildArrowHead instead.");
         var angle = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
         var vertices = [];
         vertices.push(new Vertex(zB.x * scaleX - headlen * Math.cos(angle), zB.y * scaleY - headlen * Math.sin(angle)));
@@ -963,6 +978,442 @@ Vertex.utils = {
         }));
     }
 };
+
+/**
+ * @author Ikaros Kappler
+ * @date   2020-03-24
+ * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
+ * @modified 2020-05-12 The angle(line) param was still not optional. Changed that.
+ * @modified 2020-11-11 Generalized the `add` and `sub` param from `Vertex` to `XYCoords`.
+ * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
+ * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
+ * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
+ * @modified 2021-01-20 Added UID.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2023-09-29 Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
+ * @version 1.2.1
+ */
+/**
+ * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
+ * @abstract
+ * @requires UID
+ * @requires Vertex
+ * @requires XYCoords
+ */
+class VertTuple {
+    /**
+     * Creates an instance.
+     *
+     * @constructor
+     * @name VertTuple
+     * @param {Vertex} a The tuple's first point.
+     * @param {Vertex} b The tuple's second point.
+     **/
+    constructor(a, b, factory) {
+        this.uid = UIDGenerator.next();
+        this.a = a;
+        this.b = b;
+        this.factory = factory;
+    }
+    /**
+     * Get the length of this line.
+     *
+     * @method length
+     * @instance
+     * @memberof VertTuple
+     **/
+    length() {
+        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
+    }
+    /**
+     * Set the length of this vector to the given amount. This only works if this
+     * vector is not a null vector.
+     *
+     * @method setLength
+     * @param {number} length - The desired length.
+     * @memberof VertTuple
+     * @return {T} this (for chaining)
+     **/
+    setLength(length) {
+        return this.scale(length / this.length());
+    }
+    /**
+     * Substract the given vertex from this line's end points.
+     *
+     * @method sub
+     * @param {XYCoords} amount The amount (x,y) to substract.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    sub(amount) {
+        this.a.sub(amount);
+        this.b.sub(amount);
+        return this;
+    }
+    /**
+     * Add the given vertex to this line's end points.
+     *
+     * @method add
+     * @param {XYCoords} amount The amount (x,y) to add.
+     * @return {Line} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    add(amount) {
+        this.a.add(amount);
+        this.b.add(amount);
+        return this;
+    }
+    /**
+     * Normalize this line (set to length 1).
+     *
+     * @method normalize
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    normalize() {
+        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
+        return this;
+    }
+    /**
+     * Scale this line by the given factor.
+     *
+     * @method scale
+     * @param {number} factor The factor for scaling (1.0 means no scale).
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    scale(factor) {
+        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
+        return this;
+    }
+    /**
+     * Move this line to a new location.
+     *
+     * @method moveTo
+     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
+     * @return {VertTuple} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    moveTo(newA) {
+        let diff = this.a.difference(newA);
+        this.a.add(diff);
+        this.b.add(diff);
+        return this;
+    }
+    /**
+     * Get the angle between this and the passed line (in radians).
+     *
+     * @method angle
+     * @param {VertTuple} line - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
+     * @return {number} this
+     * @instance
+     * @memberof VertTuple
+     **/
+    angle(line) {
+        if (line == null || typeof line == "undefined") {
+            line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
+        }
+        // Compute the angle from x axis and the return the difference :)
+        const v0 = this.b.clone().sub(this.a);
+        const v1 = line.b.clone().sub(line.a);
+        // Thank you, Javascript, for this second atan function. No additional math is needed here!
+        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
+        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
+    }
+    /**
+     * Get line point at position t in [0 ... 1]:<br>
+     * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
+     * <br>
+     * The counterpart of this function is Line.getClosestT(Vertex).
+     *
+     * @method vertAt
+     * @param {number} t The position scalar.
+     * @return {Vertex} The vertex a position t.
+     * @instance
+     * @memberof VertTuple
+     **/
+    vertAt(t) {
+        return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
+    }
+    /**
+     * Get the denominator of this and the given line.
+     *
+     * If the denominator is zero (or close to zero) both line are co-linear.
+     *
+     * @method denominator
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
+     * @return {Number}
+     **/
+    denominator(line) {
+        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
+        return (line.b.y - line.a.y) * (this.b.x - this.a.x) - (line.b.x - line.a.x) * (this.b.y - this.a.y);
+    }
+    /**
+     * Checks if this and the given line are co-linear.
+     *
+     * The constant Vertex.EPSILON is used for tolerance.
+     *
+     * @method colinear
+     * @param {VertTuple} line
+     * @instance
+     * @memberof VertTuple
+     * @return true if both lines are co-linear.
+     */
+    colinear(line) {
+        return Math.abs(this.denominator(line)) < Vertex.EPSILON;
+    }
+    /**
+     * Get the closest position T from this line to the specified point.
+     *
+     * The counterpart for this function is Line.vertAt(Number).
+     *
+     * @name getClosetT
+     * @method getClosestT
+     * @param {XYCoords} p The point (vertex) to measure the distance to.
+     * @return {number} The line position t of minimal distance to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    getClosestT(p) {
+        var l2 = VertTuple.vtutils.dist2(this.a, this.b);
+        if (l2 === 0)
+            return 0;
+        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
+        // Do not wrap to [0,1] here.
+        // Other results are of interest, too.
+        // t = Math.max(0, Math.min(1, t));
+        return t;
+    }
+    /**
+     * Check if the given point is located on this line. Optionally also check if
+     * that point is located between point `a` and `b`.
+     *
+     * @method hasPoint
+     * @param {Vertex} point The point to check.
+     * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
+     * @return {boolean} True if the given point is on this line.
+     * @instance
+     * @memberof VertTuple
+     */
+    hasPoint(point, insideBoundsOnly) {
+        const t = this.getClosestT(point);
+        // Compare to pointDistance?
+        const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
+        if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
+            return distance < Vertex.EPSILON && t >= 0 && t <= 1;
+        }
+        else {
+            return distance < Vertex.EPSILON; // t >= 0 && t <= 1;
+        }
+    }
+    /**
+     * Get the closest point on this line to the specified point.
+     *
+     * @method getClosestPoint
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {Vertex} The point on the line that is closest to p.
+     * @instance
+     * @memberof VertTuple
+     **/
+    getClosestPoint(p) {
+        var t = this.getClosestT(p);
+        return this.vertAt(t);
+    }
+    /**
+     * The the minimal distance between this line and the specified point.
+     *
+     * @method pointDistance
+     * @param {Vertex} p The point (vertex) to measre the distance to.
+     * @return {number} The absolute minimal distance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    pointDistance(p) {
+        // Taken From:
+        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+        return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
+    }
+    /**
+     * Create a deep clone of this instance.
+     *
+     * @method cloneLine
+     * @return {T} A type safe clone if this instance.
+     * @instance
+     * @memberof VertTuple
+     **/
+    clone() {
+        return this.factory(this.a.clone(), this.b.clone());
+    }
+    /**
+     * Create a string representation of this line.
+     *
+     * @method totring
+     * @return {string} The string representing this line.
+     * @instance
+     * @memberof VertTuple
+     **/
+    toString() {
+        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
+    }
+    /**
+     * This function should invalidate any installed listeners and invalidate this object.
+     * After calling this function the object might not hold valid data any more and
+     * should not be used.
+     */
+    destroy() {
+        this.a.destroy();
+        this.b.destroy();
+        this.isDestroyed = true;
+    }
+}
+/**
+ * @private
+ **/
+VertTuple.vtutils = {
+    dist2: (v, w) => {
+        return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
+    }
+};
+
+/**
+ * @author   Ikaros Kappler
+ * @date     2016-03-12
+ * @modified 2018-12-05 Refactored the code from the morley-triangle script.
+ * @modified 2019-03-20 Added JSDoc tags.
+ * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
+ * @modified 2019-09-02 Added the Line.add( Vertex ) function.
+ * @modified 2019-09-02 Added the Line.denominator( Line ) function.
+ * @modified 2019-09-02 Added the Line.colinear( Line ) function.
+ * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
+ * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
+ * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
+ * @modified 2020-03-23 Ported to Typescript from JS.
+ * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
+ * @modified 2022-02-02 Added the `destroy` method.
+ * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
+ * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
+ * @modified 2023-09-25 Changed param type of `intersection()` from Line to VertTuple.
+ * @version  2.3.0
+ *
+ * @file Line
+ * @public
+ **/
+/**
+ * @classdesc A line consists of two vertices a and b.<br>
+ * <br>
+ * This is some refactored code from my 'Morley Triangle' test<br>
+ *   https://github.com/IkarosKappler/morleys-trisector-theorem
+ *
+ * @requires Vertex
+ */
+class Line extends VertTuple {
+    /**
+     * Creates an instance of Line.
+     *
+     * @constructor
+     * @name Line
+     * @param {Vertex} a The line's first point.
+     * @param {Vertex} b The line's second point.
+     **/
+    constructor(a, b) {
+        super(a, b, (a, b) => new Line(a, b));
+        /**
+         * Required to generate proper CSS classes and other class related IDs.
+         **/
+        this.className = "Line";
+    }
+    /**
+     * Get the intersection if this line and the specified line.
+     *
+     * @method intersection
+     * @param {Line} line The second line.
+     * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
+     * @instance
+     * @memberof Line
+     **/
+    // !!! DO NOT MOVE TO VertTuple
+    intersection(line) {
+        const denominator = this.denominator(line);
+        if (denominator == 0) {
+            return null;
+        }
+        let a = this.a.y - line.a.y;
+        let b = this.a.x - line.a.x;
+        const numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
+        const numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
+        a = numerator1 / denominator; // NaN if parallel lines
+        b = numerator2 / denominator;
+        // Catch NaN?
+        const x = this.a.x + a * (this.b.x - this.a.x);
+        const y = this.a.y + a * (this.b.y - this.a.y);
+        if (isNaN(a) || isNaN(x) || isNaN(y)) {
+            return null;
+        }
+        // if we cast these lines infinitely in both directions, they intersect here:
+        return new Vertex(x, y);
+    }
+    //--- Implement PathSegment ---
+    /**
+     * Get the start point of this path segment.
+     *
+     * @method getStartPoint
+     * @memberof PathSegment
+     * @return {Vertex} The start point of this path segment.
+     */
+    getStartPoint() {
+        return this.a;
+    }
+    /**
+     * Get the end point of this path segment.
+     *
+     * @method getEndPoint
+     * @memberof PathSegment
+     * @return {Vertex} The end point of this path segment.
+     */
+    getEndPoint() {
+        return this.b;
+    }
+    /**
+     * Get the tangent's end point at the start point of this segment.
+     *
+     * @method getStartTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the starting point's tangent.
+     */
+    getStartTangent() {
+        return this.b;
+    }
+    /**
+     * Get the tangent's end point at the end point of this segment.
+     *
+     * @method getEndTangent
+     * @memberof PathSegment
+     * @return {Vertex} The end point of the ending point's tangent.
+     */
+    getEndTangent() {
+        return this.a;
+    }
+    /**
+     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
+     *
+     * @method reverse
+     * @memberof PathSegment
+     * @return {PathSegment} This path segment instance (for chaining).
+     */
+    reverse() {
+        var tmp = this.a;
+        this.a = this.b;
+        this.b = tmp;
+        return this;
+    }
+}
 
 /**
  * @author   Ikaros Kappler
@@ -990,7 +1441,10 @@ Vertex.utils = {
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Polygon.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-03-08 Added the `Polygon.clone()` function.
- * @version 1.10.0
+ * @modified 2023-09-25 Added the `Polygon.getInterpolationPolygon(number)` function.
+ * @modified 2023-09-25 Added the `Polygon.lineIntersections(Line,boolean)` function.
+ * @modified 2023-09-29 Added the `Polygon.closestLineIntersection(Line,boolean)` function.
+ * @version 1.11.0
  *
  * @file Polygon
  * @public
@@ -1191,6 +1645,86 @@ class Polygon {
             this.vertices[i].rotate(angle, center);
         }
         return this;
+    }
+    /**
+     * Get all line intersections with this polygon.
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are returned (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    lineIntersections(line, inVectorBoundsOnly = false) {
+        // Find the intersections of all lines inside the edge bounds
+        const intersectionPoints = [];
+        for (var i = 0; i < this.vertices.length; i++) {
+            const polyLine = new Line(this.vertices[i], this.vertices[(i + 1) % this.vertices.length]);
+            const intersection = polyLine.intersection(line);
+            // true => only inside bounds
+            // ignore last edge if open
+            if ((!this.isOpen || i + 1 !== this.vertices.length) &&
+                intersection !== null &&
+                polyLine.hasPoint(intersection, true) &&
+                (!inVectorBoundsOnly || line.hasPoint(intersection, inVectorBoundsOnly))) {
+                intersectionPoints.push(intersection);
+            }
+        }
+        return intersectionPoints;
+    }
+    /**
+     * Get the closest line-polygon-intersection point (closest the line point A).
+     *
+     * See demo `47-closest-vector-projection-on-polygon` for how it works.
+     *
+     * @param {VertTuple} line - The line to find intersections with.
+     * @param {boolean} inVectorBoundsOnly - If set to true only intersecion points on the passed vector are considered (located strictly between start and end vertex).
+     * @returns {Array<Vertex>} - An array of all intersections within the polygon bounds.
+     */
+    closestLineIntersection(line, inVectorBoundsOnly = false) {
+        const allIntersections = this.lineIntersections(line, inVectorBoundsOnly);
+        if (allIntersections.length <= 0) {
+            // Empty polygon -> no intersections
+            return null;
+        }
+        // Find the closest intersection
+        let closestIntersection = new Vertex(Number.MAX_VALUE, Number.MAX_VALUE);
+        let curDist = Number.MAX_VALUE;
+        for (var i in allIntersections) {
+            const curVert = allIntersections[i];
+            const dist = curVert.distance(line.a);
+            if (dist < curDist) {
+                // && line.hasPoint(curVert)) {
+                curDist = dist;
+                closestIntersection = curVert;
+            }
+        }
+        return closestIntersection;
+    }
+    /**
+     * Construct a new polygon from this polygon with more vertices on each edge. The
+     * interpolation count determines the number of additional vertices on each edge.
+     * An interpolation count of `0` will return a polygon that equals the source
+     * polygon.
+     *
+     * @param {number} interpolationCount
+     * @returns {Polygon} A polygon with `interpolationCount` more vertices (as as factor).
+     */
+    getInterpolationPolygon(interpolationCount) {
+        const verts = [];
+        for (var i = 0; i < this.vertices.length; i++) {
+            const curVert = this.vertices[i];
+            const nextVert = this.vertices[(i + 1) % this.vertices.length];
+            verts.push(curVert.clone());
+            // Add interpolation points
+            if (!this.isOpen || i + 1 !== this.vertices.length) {
+                const lerpAmount = 1.0 / (interpolationCount + 1);
+                for (var j = 1; j <= interpolationCount; j++) {
+                    verts.push(curVert.clone().lerp(nextVert, lerpAmount * j));
+                }
+            }
+        }
+        return new Polygon(verts, this.isOpen);
     }
     /**
      * Convert this polygon into a new polygon with n evenly distributed vertices.
@@ -1456,7 +1990,8 @@ Polygon.utils = {
  * @modified 2022-02-01 Added the `toString` function.
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
- * @version  1.6.0
+ * @modified 2023-09-29 Added the `randomPoint` method.
+ * @version  1.7.0
  **/
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -1501,6 +2036,23 @@ class Bounds {
      */
     getCenter() {
         return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+    }
+    /**
+     * Generate a random point inside this bounds object. Safe areas at the border to avoid
+     * included.
+     *
+     * @method randomPoint
+     * @instance
+     * @memberof Bounds
+     * @param {horizontalSafeArea} - (optional) The horizonal (left and right) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval.
+     * @param {verticalSafeArea} - (optional) The vertical (top and bottom) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval
+     * @returns {Vertex} A pseudo random point inside these bounds.
+     */
+    randomPoint(horizontalSafeArea = 0, verticalSafeArea = 0) {
+        // Check if the safe areas are meant as percent
+        const absHorizontalSafeArea = horizontalSafeArea > 0 && horizontalSafeArea < 1 ? this.width * horizontalSafeArea : horizontalSafeArea;
+        const absVerticalSafeArea = verticalSafeArea > 0 && verticalSafeArea < 1 ? this.height * verticalSafeArea : verticalSafeArea;
+        return new Vertex(this.min.x + absHorizontalSafeArea + Math.random() * (this.width - 2 * absHorizontalSafeArea), this.min.y + absVerticalSafeArea + Math.random() * (this.height - 2 * absVerticalSafeArea));
     }
     /**
      * Convert these bounds to a human readable form.
@@ -1567,308 +2119,6 @@ class Bounds {
         return new Bounds(origin !== null && origin !== void 0 ? origin : { x: 0, y: 0 }, { x: (origin ? origin.x : 0) + width, y: (origin ? origin.y : 0) + height });
     }
 } // END class bounds
-
-/**
- * @author Ikaros Kappler
- * @date   2020-03-24
- * @modified 2020-05-04 Fixed a serious bug in the pointDistance function.
- * @modified 2020-05-12 The angle(line) param was still not optional. Changed that.
- * @modified 2020-11-11 Generalized the `add` and `sub` param from `Vertex` to `XYCoords`.
- * @modified 2020-12-04 Changed`vtutils.dist2` params from `Vertex` to `XYCoords` (generalized).
- * @modified 2020-12-04 Changed `getClosestT` param from `Vertex` to `XYCoords` (generalized).
- * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
- * @modified 2021-01-20 Added UID.
- * @modified 2022-02-02 Added the `destroy` method.
- * @version 1.2.0
- */
-/**
- * @classdesc An abstract base classes for vertex tuple constructs, like Lines or Vectors.
- * @abstract
- * @requires UID
- * @requires Vertex
- * @requires XYCoords
- */
-class VertTuple {
-    /**
-     * Creates an instance.
-     *
-     * @constructor
-     * @name VertTuple
-     * @param {Vertex} a The tuple's first point.
-     * @param {Vertex} b The tuple's second point.
-     **/
-    constructor(a, b, factory) {
-        this.uid = UIDGenerator.next();
-        this.a = a;
-        this.b = b;
-        this.factory = factory;
-    }
-    /**
-     * Get the length of this line.
-     *
-     * @method length
-     * @instance
-     * @memberof VertTuple
-     **/
-    length() {
-        return Math.sqrt(Math.pow(this.b.x - this.a.x, 2) + Math.pow(this.b.y - this.a.y, 2));
-    }
-    /**
-     * Set the length of this vector to the given amount. This only works if this
-     * vector is not a null vector.
-     *
-     * @method setLength
-     * @param {number} length - The desired length.
-     * @memberof VertTuple
-     * @return {T} this (for chaining)
-     **/
-    setLength(length) {
-        return this.scale(length / this.length());
-    }
-    /**
-     * Substract the given vertex from this line's end points.
-     *
-     * @method sub
-     * @param {XYCoords} amount The amount (x,y) to substract.
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    sub(amount) {
-        this.a.sub(amount);
-        this.b.sub(amount);
-        return this;
-    }
-    /**
-     * Add the given vertex to this line's end points.
-     *
-     * @method add
-     * @param {XYCoords} amount The amount (x,y) to add.
-     * @return {Line} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    add(amount) {
-        this.a.add(amount);
-        this.b.add(amount);
-        return this;
-    }
-    /**
-     * Normalize this line (set to length 1).
-     *
-     * @method normalize
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    normalize() {
-        this.b.set(this.a.x + (this.b.x - this.a.x) / this.length(), this.a.y + (this.b.y - this.a.y) / this.length());
-        return this;
-    }
-    /**
-     * Scale this line by the given factor.
-     *
-     * @method scale
-     * @param {number} factor The factor for scaling (1.0 means no scale).
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    scale(factor) {
-        this.b.set(this.a.x + (this.b.x - this.a.x) * factor, this.a.y + (this.b.y - this.a.y) * factor);
-        return this;
-    }
-    /**
-     * Move this line to a new location.
-     *
-     * @method moveTo
-     * @param {Vertex} newA - The new desired location of 'a'. Vertex 'b' will be moved, too.
-     * @return {VertTuple} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    moveTo(newA) {
-        let diff = this.a.difference(newA);
-        this.a.add(diff);
-        this.b.add(diff);
-        return this;
-    }
-    /**
-     * Get the angle between this and the passed line (in radians).
-     *
-     * @method angle
-     * @param {VertTuple} line - (optional) The line to calculate the angle to. If null the baseline (x-axis) will be used.
-     * @return {number} this
-     * @instance
-     * @memberof VertTuple
-     **/
-    angle(line) {
-        if (line == null || typeof line == "undefined") {
-            line = this.factory(new Vertex(0, 0), new Vertex(100, 0));
-        }
-        // Compute the angle from x axis and the return the difference :)
-        const v0 = this.b.clone().sub(this.a);
-        const v1 = line.b.clone().sub(line.a);
-        // Thank you, Javascript, for this second atan function. No additional math is needed here!
-        // The result might be negative, but isn't it usually nicer to determine angles in positive values only?
-        return Math.atan2(v1.x, v1.y) - Math.atan2(v0.x, v0.y);
-    }
-    /**
-     * Get line point at position t in [0 ... 1]:<br>
-     * <pre>[P(0)]=[A]--------------------[P(t)]------[B]=[P(1)]</pre><br>
-     * <br>
-     * The counterpart of this function is Line.getClosestT(Vertex).
-     *
-     * @method vertAt
-     * @param {number} t The position scalar.
-     * @return {Vertex} The vertex a position t.
-     * @instance
-     * @memberof VertTuple
-     **/
-    vertAt(t) {
-        return new Vertex(this.a.x + (this.b.x - this.a.x) * t, this.a.y + (this.b.y - this.a.y) * t);
-    }
-    /**
-     * Get the denominator of this and the given line.
-     *
-     * If the denominator is zero (or close to zero) both line are co-linear.
-     *
-     * @method denominator
-     * @param {VertTuple} line
-     * @instance
-     * @memberof VertTuple
-     * @return {Number}
-     **/
-    denominator(line) {
-        // http://jsfiddle.net/justin_c_rounds/Gd2S2/
-        return (line.b.y - line.a.y) * (this.b.x - this.a.x) - (line.b.x - line.a.x) * (this.b.y - this.a.y);
-    }
-    /**
-     * Checks if this and the given line are co-linear.
-     *
-     * The constant Vertex.EPSILON is used for tolerance.
-     *
-     * @method colinear
-     * @param {VertTuple} line
-     * @instance
-     * @memberof VertTuple
-     * @return true if both lines are co-linear.
-     */
-    colinear(line) {
-        return Math.abs(this.denominator(line)) < Vertex.EPSILON;
-    }
-    /**
-     * Get the closest position T from this line to the specified point.
-     *
-     * The counterpart for this function is Line.vertAt(Number).
-     *
-     * @name getClosetT
-     * @method getClosestT
-     * @param {XYCoords} p The point (vertex) to measure the distance to.
-     * @return {number} The line position t of minimal distance to p.
-     * @instance
-     * @memberof VertTuple
-     **/
-    getClosestT(p) {
-        var l2 = VertTuple.vtutils.dist2(this.a, this.b);
-        if (l2 === 0)
-            return 0;
-        var t = ((p.x - this.a.x) * (this.b.x - this.a.x) + (p.y - this.a.y) * (this.b.y - this.a.y)) / l2;
-        // Do not wrap to [0,1] here.
-        // Other results are of interest, too.
-        // t = Math.max(0, Math.min(1, t));
-        return t;
-    }
-    /**
-     * Check if the given point is located on this line. Optionally also check if
-     * that point is located between point `a` and `b`.
-     *
-     * @method hasPoint
-     * @param {Vertex} point The point to check.
-     * @param {boolean=} insideBoundsOnly If set to to true (default=false) the point must be between start and end point of the line.
-     * @return {boolean} True if the given point is on this line.
-     * @instance
-     * @memberof VertTuple
-     */
-    hasPoint(point, insideBoundsOnly) {
-        const t = this.getClosestT(point);
-        // Compare to pointDistance?
-        if (typeof insideBoundsOnly !== "undefined" && insideBoundsOnly) {
-            const distance = Math.sqrt(VertTuple.vtutils.dist2(point, this.vertAt(t)));
-            return distance < Vertex.EPSILON && t >= 0 && t <= 1;
-        }
-        else {
-            return t >= 0 && t <= 1;
-        }
-    }
-    /**
-     * Get the closest point on this line to the specified point.
-     *
-     * @method getClosestPoint
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {Vertex} The point on the line that is closest to p.
-     * @instance
-     * @memberof VertTuple
-     **/
-    getClosestPoint(p) {
-        var t = this.getClosestT(p);
-        return this.vertAt(t);
-    }
-    /**
-     * The the minimal distance between this line and the specified point.
-     *
-     * @method pointDistance
-     * @param {Vertex} p The point (vertex) to measre the distance to.
-     * @return {number} The absolute minimal distance.
-     * @instance
-     * @memberof VertTuple
-     **/
-    pointDistance(p) {
-        // Taken From:
-        // https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-        return Math.sqrt(VertTuple.vtutils.dist2(p, this.vertAt(this.getClosestT(p))));
-    }
-    /**
-     * Create a deep clone of this instance.
-     *
-     * @method cloneLine
-     * @return {T} A type safe clone if this instance.
-     * @instance
-     * @memberof VertTuple
-     **/
-    clone() {
-        return this.factory(this.a.clone(), this.b.clone());
-    }
-    /**
-     * Create a string representation of this line.
-     *
-     * @method totring
-     * @return {string} The string representing this line.
-     * @instance
-     * @memberof VertTuple
-     **/
-    toString() {
-        return "{ a : " + this.a.toString() + ", b : " + this.b.toString() + " }";
-    }
-    /**
-     * This function should invalidate any installed listeners and invalidate this object.
-     * After calling this function the object might not hold valid data any more and
-     * should not be used.
-     */
-    destroy() {
-        this.a.destroy();
-        this.b.destroy();
-        this.isDestroyed = true;
-    }
-}
-/**
- * @private
- **/
-VertTuple.vtutils = {
-    dist2: (v, w) => {
-        return (v.x - w.x) * (v.x - w.x) + (v.y - w.y) * (v.y - w.y);
-    }
-};
 
 /**
  * @author   Ikaros Kappler
@@ -2015,8 +2265,8 @@ Vector.utils = {
      * Example:
      *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
      *
-     * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-     * @param {Vertex} zB - The end vertex of the vector.
+     * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {XYCoords} zB - The end vertex of the vector.
      * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
      * @param {number} scaleX  - The horizontal scaling during draw.
      * @param {number} scaleY  - the vertical scaling during draw.
@@ -2055,6 +2305,8 @@ Vector.utils = {
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
+ * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
+ * @modified 2023-10-07 Added the `trimEnd`, `trimEndBy`
  * @version 2.7.1
  *
  * @file CubicBezierCurve
@@ -2443,6 +2695,91 @@ class CubicBezierCurve {
         return new Vertex(tX, tY);
     }
     /**
+     * Trim off a start section of this curve. The position parameter `uValue` is the absolute position on the
+     * curve in `[0...arcLength]`.
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * Note this function just converts the absolute parameter to a relative one and call `trimStartAt`.
+     *
+     * @method trimStart
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} uValue - The absolute position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimStart(uValue) {
+        return this.trimStartAt(this.convertU2T(uValue));
+    }
+    /**
+     * Trim off a start section of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[uValue,1]` (so `[0.0,uValue]` is cut off).
+     *
+     * @method trimStartAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} t - The relative position parameter where to cut off the head curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimStartAt(t) {
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, t, 1.0);
+        this.startPoint.set(subCurbePoints[0]);
+        this.startControlPoint.set(subCurbePoints[2]);
+        this.endPoint.set(subCurbePoints[1]);
+        this.endControlPoint.set(subCurbePoints[3]);
+        this.updateArcLengths();
+        return this;
+    }
+    /**
+     * Trim off the end of this curve. The position parameter `uValue` is the absolute position on the
+     * curve in `[0...arcLength]`.
+     * The remaining curve will be the one in the bounds `[0,uValue]` (so `[1.0-uValue,1.0]` is cut off).
+     *
+     * Note this function just converts the absolute parameter to a relative one and call `trimEndAt`.
+     *
+     * @method trimEnd
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} uValue - The absolute position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimEnd(uValue) {
+        return this.trimEndAt(this.convertU2T(uValue));
+    }
+    /**
+     * Trim off the end of this curve. The position parameter `t` is the relative position in [0..1].
+     * The remaining curve will be the one in the bounds `[0,t]` (so `[1.0-t,1.0]` is cut off).
+     *
+     * @method trimEndAt
+     * @instance
+     * @memberof CubicBezierCurve
+     * @param {number} t - The relative position parameter where to cut off the tail curve.
+     * @returns {CubicBezierCurve} `this` for chanining.
+     */
+    trimEndAt(t) {
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, 0.0, t);
+        this.startPoint.set(subCurbePoints[0]);
+        this.startControlPoint.set(subCurbePoints[2]);
+        this.endPoint.set(subCurbePoints[1]);
+        this.endControlPoint.set(subCurbePoints[3]);
+        this.updateArcLengths();
+        return this;
+    }
+    /**
+     * Get a sub curve at the given start end end positions (values on the curve's length, between 0 and curve.arcLength).
+     *
+     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+     *
+     * @method getSubCurve
+     * @param {number} tStart – The start position of the desired sub curve (must be in [0..arcLength]).
+     * @param {number} tEnd – The end position if the desired cub curve (must be in [0..arcLength]).
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} The sub curve as a new curve.
+     **/
+    getSubCurve(uStart, uEnd) {
+        return this.getSubCurveAt(this.convertU2T(uStart), this.convertU2T(uEnd));
+    }
+    /**
      * Get a sub curve at the given start end end offsets (values between 0.0 and 1.0).
      *
      * tStart >= tEnd is allowed, you will get a reversed sub curve then.
@@ -2455,17 +2792,19 @@ class CubicBezierCurve {
      * @return {CubicBezierCurve} The sub curve as a new curve.
      **/
     getSubCurveAt(tStart, tEnd) {
-        const startVec = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
-        const endVec = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
-        // Tangents are relative. Make absolute.
-        startVec.b.add(startVec.a);
-        endVec.b.add(endVec.a);
-        // This 'splits' the curve at the given point at t.
-        startVec.scale(0.33333333 * (tEnd - tStart));
-        endVec.scale(0.33333333 * (tEnd - tStart));
-        // Draw the bezier curve
-        // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
-        return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        // const startVec: Vector = new Vector(this.getPointAt(tStart), this.getTangentAt(tStart));
+        // const endVec: Vector = new Vector(this.getPointAt(tEnd), this.getTangentAt(tEnd).inv());
+        // // Tangents are relative. Make absolute.
+        // startVec.b.add(startVec.a);
+        // endVec.b.add(endVec.a);
+        // // This 'splits' the curve at the given point at t.
+        // startVec.scale(0.33333333 * (tEnd - tStart));
+        // endVec.scale(0.33333333 * (tEnd - tStart));
+        // // Draw the bezier curve
+        // // pb.draw.cubicBezier( startVec.a, endVec.a, startVec.b, endVec.b, '#8800ff', 2 );
+        // return new CubicBezierCurve(startVec.a, endVec.a, startVec.b, endVec.b);
+        const subCurbePoints = CubicBezierCurve.utils.getSubCurvePointsAt(this, tStart, tEnd);
+        return new CubicBezierCurve(subCurbePoints[0], subCurbePoints[1], subCurbePoints[2], subCurbePoints[3]);
     }
     /**
      * Convert a relative curve position u to the absolute curve position t.
@@ -2718,6 +3057,35 @@ CubicBezierCurve.START_CONTROL_POINT = 1;
 CubicBezierCurve.END_CONTROL_POINT = 2;
 /** @constant {number} */
 CubicBezierCurve.END_POINT = 3;
+/**
+ * Helper utils.
+ */
+CubicBezierCurve.utils = {
+    /**
+     * Get the points of a sub curve at the given start end end offsets (values between 0.0 and 1.0).
+     *
+     * tStart >= tEnd is allowed, you will get a reversed sub curve then.
+     *
+     * @method getSubCurvePointsAt
+     * @param {CubicBezierCurve} curve – The curve to get the sub curve points from.
+     * @param {number} tStart – The start offset of the desired sub curve (must be in [0..1]).
+     * @param {number} tEnd – The end offset if the desired cub curve (must be in [0..1]).
+     * @instance
+     * @memberof CubicBezierCurve
+     * @return {CubicBezierCurve} The sub curve as a new curve.
+     **/
+    getSubCurvePointsAt: (curve, tStart, tEnd) => {
+        const startVec = new Vector(curve.getPointAt(tStart), curve.getTangentAt(tStart));
+        const endVec = new Vector(curve.getPointAt(tEnd), curve.getTangentAt(tEnd).inv());
+        // Tangents are relative. Make absolute.
+        startVec.b.add(startVec.a);
+        endVec.b.add(endVec.a);
+        // This 'splits' the curve at the given point at t.
+        startVec.scale(0.33333333 * (tEnd - tStart));
+        endVec.scale(0.33333333 * (tEnd - tStart));
+        return [startVec.a, endVec.a, startVec.b, endVec.b];
+    }
+};
 
 /**
  * @author Ikaros Kappler
@@ -2744,7 +3112,9 @@ CubicBezierCurve.END_POINT = 3;
  * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.5.0
+ * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
+ * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
+ * @version 2.6.0
  *
  * @file BezierPath
  * @public
@@ -2775,7 +3145,7 @@ class BezierPath {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    constructor(pathPoints) {
+    constructor() {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -2788,7 +3158,11 @@ class BezierPath {
         this.END_CONTROL_POINT = 2;
         /** @constant {number} */
         this.END_POINT = 3;
+        // pathPoints: Array<Vertex> | undefined | null) {
         this.uid = UIDGenerator.next();
+        // if (!pathPoints) {
+        //   pathPoints = [];
+        // }
         this.totalArcLength = 0.0;
         // Set this flag to true if you want the first point and
         // last point of the path to be auto adjusted, too.
@@ -2942,215 +3316,6 @@ class BezierPath {
         return this.bezierCurves[curveIndex];
     }
     /**
-     * Remove the end point of this path (which removes the last curve from this path).<br>
-     * <br>
-     * Please note that this function does never remove the first curve, thus the path
-     * cannot be empty after this call.
-     *
-     * @method removeEndPoint
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} Indicating if the last curve was removed.
-     **/
-    /*
-      BezierPath.prototype.removeEndPoint = function() {
-      if( this.bezierCurves.length <= 1 )
-          return false;
-      
-      var newArray = [ this.bezierCurves.length-1 ];
-      for( var i = 0; i < this.bezierCurves.length-1; i++ ) {
-          newArray[i] = this.bezierCurves[i];
-      }
-      
-      // Update arc length
-      this.totalArcLength -= this.bezierCurves[ this.bezierCurves.length-1 ].getLength();
-      this.bezierCurves = newArray;
-      return true;
-      }
-      */
-    /**
-     * Remove the start point of this path (which removes the first curve from this path).<br>
-     * <br>
-     * Please note that this function does never remove the last curve, thus the path
-     * cannot be empty after this call.<br>
-     *
-     * @method removeStartPoint
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} Indicating if the first curve was removed.
-     **/
-    /*
-      BezierPath.prototype.removeStartPoint = function() {
-  
-      if( this.bezierCurves.length <= 1 )
-          return false;
-  
-      var newArray = [ this.bezierCurves.length-1 ];
-      for( var i = 1; i < this.bezierCurves.length; i++ ) {
-  
-          newArray[i-1] = this.bezierCurves[i];
-  
-      }
-      
-      // Update arc length
-      this.totalArcLength -= this.bezierCurves[ 0 ].getLength();
-      this.bezierCurves = newArray;
-      
-      return true;
-      }
-      */
-    /**
-     * Removes a path point inside the path.
-     *
-     * This function joins the bezier curve at the given index with
-     * its predecessor, which means that the start point at the given
-     * curve index will be removed.
-     *
-     * @method joinAt
-     * @param {number} curveIndex - The index of the curve to be joined with its predecessor.
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} True if the passed index indicated an inner vertex and the two curves were joined.
-     **/
-    /*
-      BezierPath.prototype.joinAt = function( curveIndex ) {
-  
-      if( curveIndex < 0 || curveIndex >= this.bezierCurves.length )
-          return false;
-      
-      var leftCurve  = this.bezierCurves[ curveIndex-1 ];
-      var rightCurve = this.bezierCurves[ curveIndex ];
-  
-      // Make the length of the new handle double that long
-      var leftControlPoint = leftCurve.getStartControlPoint().clone();
-      leftControlPoint.sub( leftCurve.getStartPoint() );
-      leftControlPoint.multiplyScalar( 2.0 );
-      leftControlPoint.add( leftCurve.getStartPoint() );
-      
-      var rightControlPoint = rightCurve.getEndControlPoint().clone();
-      rightControlPoint.sub( rightCurve.getEndPoint() );
-      rightControlPoint.multiplyScalar( 2.0 );
-      rightControlPoint.add( rightCurve.getEndPoint() );
-  
-      var newCurve = new IKRS.CubicBezierCurve( leftCurve.getStartPoint(),
-                            rightCurve.getEndPoint(),
-                            leftControlPoint,
-                            rightControlPoint
-                          );
-      // Place into array
-      var newArray = [ this.bezierCurves.length - 1 ];
-  
-      for( var i = 0; i < curveIndex-1; i++ )
-          newArray[ i ] = this.bezierCurves[i];
-      
-      newArray[ curveIndex-1 ] = newCurve;
-      
-      // Shift trailing curves left
-      for( var i = curveIndex; i+1 < this.bezierCurves.length; i++ )
-          newArray[ i ] = this.bezierCurves[ i+1 ];
-          
-      this.bezierCurves = newArray;
-      this.updateArcLengths();
-  
-      return true;
-      }
-      */
-    /**
-     * Add a new inner curve point to the path.<br>
-     * <br>
-     * This function splits the bezier curve at the given index and given
-     * curve segment index.
-     *
-     * @method splitAt
-     * @param {number} curveIndex - The index of the curve to split.
-     * @param {nunber} segmentIndex - The index of the curve segment where the split should be performed.
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} True if the passed indices were valid and the path was split.
-     **/
-    /*
-      BezierPath.prototype.splitAt = function( curveIndex,
-                           segmentIndex
-                         ) {
-      // Must be a valid curve index
-      if( curveIndex < 0 || curveIndex >= this.bezierCurves.length )
-          return false;
-  
-      var oldCurve = this.bezierCurves[ curveIndex ];
-  
-      // Segment must be an INNER point!
-      // (the outer points are already bezier end/start points!)
-      if( segmentIndex < 1 || segmentIndex-1 >= oldCurve.segmentCache.length )
-          return false;
-  
-      // Make room for a new curve
-      for( var c = this.bezierCurves.length; c > curveIndex; c-- ) {
-          // Move one position to the right
-          this.bezierCurves[ c ] = this.bezierCurves[ c-1 ];
-      }
-  
-      // Accumulate segment lengths
-      var u = 0;
-      for( var i = 0; i < segmentIndex; i++ )
-          u += oldCurve.segmentLengths[i];
-      //var tangent = oldCurve.getTangentAt( u );
-      var tangent = oldCurve.getTangent( u );
-      tangent = tangent.multiplyScalar( 0.25 );
-  
-      var leftEndControlPoint = oldCurve.segmentCache[ segmentIndex ].clone();
-      leftEndControlPoint.sub( tangent );
-      
-      var rightStartControlPoint = oldCurve.segmentCache[ segmentIndex ].clone();
-      rightStartControlPoint.add( tangent );
-      
-      // Make the old existing handles a quarter that long
-      var leftStartControlPoint = oldCurve.getStartControlPoint().clone();
-      // move to (0,0)
-      leftStartControlPoint.sub( oldCurve.getStartPoint() );
-      leftStartControlPoint.multiplyScalar( 0.25 );
-      leftStartControlPoint.add( oldCurve.getStartPoint() );
-  
-      var rightEndControlPoint = oldCurve.getEndControlPoint().clone();
-      // move to (0,0)
-      rightEndControlPoint.sub( oldCurve.getEndPoint() );
-      rightEndControlPoint.multiplyScalar( 0.25 );
-      rightEndControlPoint.add( oldCurve.getEndPoint() );
-  
-      var newLeft  = new CubicBezierCurve( oldCurve.getStartPoint(),                      // old start point
-                           oldCurve.segmentCache[ segmentIndex ],         // new end point
-                           leftStartControlPoint,                         // old start control point
-                           leftEndControlPoint                            // new end control point
-                         );
-      var newRight = new CubicBezierCurve( oldCurve.segmentCache[ segmentIndex ],         // new start point
-                           oldCurve.getEndPoint(),                        // old end point
-                           rightStartControlPoint,                        // new start control point
-                           rightEndControlPoint                           // old end control point
-                         );
-      
-      // Insert split curve(s) at free index
-      this.bezierCurves[ curveIndex ]     = newLeft;
-      this.bezierCurves[ curveIndex + 1 ] = newRight;
-      
-      // Update total arc length, even if there is only a very little change!
-      this.totalArcLength -= oldCurve.getLength();
-      this.totalArcLength += newLeft.getLength();
-      this.totalArcLength += newRight.getLength();
-  
-      return true;
-      };
-      */
-    /*
-      insertVertexAt( t:number ) : void {
-      console.log('Inserting vertex at', t );
-      // Find the curve index
-      var u : number = 0;
-      var curveIndex : number = -1;
-      var localT : number = 0.0;
-      for( var i = 0; curveIndex == -1 && i < this.bezierCurves.length; i++ ) {
-          
-      }
-      }; */
-    /**
      * Move the whole bezier path by the given (x,y)-amount.
      *
      * @method translate
@@ -3184,22 +3349,6 @@ class BezierPath {
      * @return {BezierPath} this for chaining.
      **/
     scale(anchor, scaleFactor) {
-        // var scaleFactors : XYCoords = { x : scaleFactor, y : scaleFactor };
-        // for (var i = 0; i < this.bezierCurves.length; i++) {
-        //   var curve = this.bezierCurves[i];
-        //   curve.getStartPoint().scale(scaleFactor, anchor);
-        //   curve.getStartControlPoint().scale(scaleFactor, anchor);
-        //   curve.getEndControlPoint().scale(scaleFactor, anchor);
-        //   // Do NOT scale the end point here!
-        //   // Don't forget that the curves are connected and on curve's end point
-        //   // the the successor's start point (same instance)!
-        // }
-        // // Finally move the last end point (was not scaled yet)
-        // if (this.bezierCurves.length > 0 && !this.adjustCircular) {
-        //   this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scale(scaleFactor, anchor);
-        // }
-        // this.updateArcLengths();
-        // return this;
         return this.scaleXY({ x: scaleFactor, y: scaleFactor }, anchor);
     }
     /**
@@ -3695,7 +3844,7 @@ class BezierPath {
      * @return {BezierPath}
      **/
     clone() {
-        var path = new BezierPath(undefined);
+        var path = new BezierPath(); // undefined);
         for (var i = 0; i < this.bezierCurves.length; i++) {
             path.bezierCurves.push(this.bezierCurves[i].clone());
             // Connect splines
@@ -3735,12 +3884,50 @@ class BezierPath {
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
+     *
+     * @method destroy
+     * @instance
+     * @memberof BezierPath
      */
     destroy() {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             this.bezierCurves[i].destroy();
         }
         this.isDestroyed = true;
+    }
+    /**
+     * Convert this path to an array of path points that can be drawn by the default DrawLib
+     * implementations.
+     *
+     * @method toPathPoints
+     * @instance
+     * @memberof BezierPath
+     * @return {Array<XYCoords>}
+     */
+    toPathPoints() {
+        if (this.bezierCurves.length === 0) {
+            return [];
+        }
+        if (this.bezierCurves.length === 1) {
+            return [
+                this.bezierCurves[0].startPoint,
+                this.bezierCurves[0].startControlPoint,
+                this.bezierCurves[0].endControlPoint,
+                this.bezierCurves[0].endPoint
+            ];
+        }
+        const arr = [];
+        arr.push(this.bezierCurves[0].startPoint);
+        arr.push(this.bezierCurves[0].startControlPoint);
+        for (var i = 1; i < this.bezierCurves.length; i++) {
+            arr.push(this.bezierCurves[i - 1].endControlPoint);
+            arr.push(this.bezierCurves[i - 1].endPoint);
+            arr.push(this.bezierCurves[i].startPoint);
+            arr.push(this.bezierCurves[i].startControlPoint);
+        }
+        arr.push(this.bezierCurves[0].endControlPoint);
+        arr.push(this.bezierCurves[0].endPoint);
+        return arr;
     }
     /**
      * Create a JSON string representation of this bézier curve.
@@ -3783,6 +3970,20 @@ class BezierPath {
         return BezierPath.fromArray(obj);
     }
     /**
+     * Construct a new path with a single curve. Adding more curves is always possible.
+     *
+     * @method fromCurve
+     * @param {CubicBezierCurve} curve - The curve to construct a new path from.
+     * @static
+     * @memberof BezierPath
+     * @return {BezierPath} The constructed bezier path instance.
+     */
+    static fromCurve(curve) {
+        const path = new BezierPath(); // []);
+        path.addCurve(curve);
+        return path;
+    }
+    /**
      * Create a BezierPath instance from the given array.
      *
      * @method fromArray
@@ -3793,13 +3994,15 @@ class BezierPath {
      * @return {BezierPath} The bezier path instance retrieved from the array data.
      **/
     static fromArray(obj) {
-        if (!Array.isArray(obj))
+        if (!Array.isArray(obj)) {
             throw "[BezierPath.fromArray] Passed object must be an array.";
+        }
         const arr = obj; // FORCE?
-        if (arr.length < 1)
+        if (arr.length < 1) {
             throw "[BezierPath.fromArray] Passed array must contain at least one bezier curve (has " + arr.length + ").";
+        }
         // Create an empty bezier path
-        var bPath = new BezierPath(undefined);
+        var bPath = new BezierPath(); // undefined);
         var lastCurve = null;
         for (var i = 0; i < arr.length; i++) {
             // Convert object (or array?) to bezier curve
@@ -3909,7 +4112,7 @@ class BezierPath {
      */
     static fromReducedList(pointArray, adjustCircular) {
         // Convert to object
-        var bezierPath = new BezierPath(null); // No points yet
+        var bezierPath = new BezierPath(); // null); // No points yet
         var startPoint = new Vertex();
         var startControlPoint;
         var endControlPoint;
@@ -3951,138 +4154,6 @@ BezierPath.START_CONTROL_POINT = 1;
 BezierPath.END_CONTROL_POINT = 2;
 /** @constant {number} */
 BezierPath.END_POINT = 3;
-
-/**
- * @author   Ikaros Kappler
- * @date     2016-03-12
- * @modified 2018-12-05 Refactored the code from the morley-triangle script.
- * @modified 2019-03-20 Added JSDoc tags.
- * @modified 2019-04-28 Fixed a bug in the Line.sub( Vertex ) function (was not working).
- * @modified 2019-09-02 Added the Line.add( Vertex ) function.
- * @modified 2019-09-02 Added the Line.denominator( Line ) function.
- * @modified 2019-09-02 Added the Line.colinear( Line ) function.
- * @modified 2019-09-02 Fixed an error in the Line.intersection( Line ) function (class Point was renamed to Vertex).
- * @modified 2019-12-15 Added the Line.moveTo(Vertex) function.
- * @modified 2020-03-16 The Line.angle(Line) parameter is now optional. The baseline (x-axis) will be used if not defined.
- * @modified 2020-03-23 Ported to Typescript from JS.
- * @modified 2020-12-04 The `intersection` function returns undefined if both lines are parallel.
- * @modified 2022-02-02 Added the `destroy` method.
- * @modified 2022-10-09 Changed the actual return value of the `intersection` function to null (was undefined before).
- * @modified 2022-10-17 Adding these methods from the `PathSegment` interface: getStartPoint, getEndPoint, revert.
- * @version  2.3.0
- *
- * @file Line
- * @public
- **/
-/**
- * @classdesc A line consists of two vertices a and b.<br>
- * <br>
- * This is some refactored code from my 'Morley Triangle' test<br>
- *   https://github.com/IkarosKappler/morleys-trisector-theorem
- *
- * @requires Vertex
- */
-class Line extends VertTuple {
-    /**
-     * Creates an instance of Line.
-     *
-     * @constructor
-     * @name Line
-     * @param {Vertex} a The line's first point.
-     * @param {Vertex} b The line's second point.
-     **/
-    constructor(a, b) {
-        super(a, b, (a, b) => new Line(a, b));
-        /**
-         * Required to generate proper CSS classes and other class related IDs.
-         **/
-        this.className = "Line";
-    }
-    /**
-     * Get the intersection if this line and the specified line.
-     *
-     * @method intersection
-     * @param {Line} line The second line.
-     * @return {Vertex|undefined} The intersection (may lie outside the end-points) or `undefined` if both lines are parallel.
-     * @instance
-     * @memberof Line
-     **/
-    // !!! DO NOT MOVE TO VertTuple
-    intersection(line) {
-        const denominator = this.denominator(line);
-        if (denominator == 0) {
-            return null;
-        }
-        let a = this.a.y - line.a.y;
-        let b = this.a.x - line.a.x;
-        const numerator1 = (line.b.x - line.a.x) * a - (line.b.y - line.a.y) * b;
-        const numerator2 = (this.b.x - this.a.x) * a - (this.b.y - this.a.y) * b;
-        a = numerator1 / denominator; // NaN if parallel lines
-        b = numerator2 / denominator;
-        // Catch NaN?
-        const x = this.a.x + a * (this.b.x - this.a.x);
-        const y = this.a.y + a * (this.b.y - this.a.y);
-        if (isNaN(a) || isNaN(x) || isNaN(y)) {
-            return null;
-        }
-        // if we cast these lines infinitely in both directions, they intersect here:
-        return new Vertex(x, y);
-    }
-    //--- Implement PathSegment ---
-    /**
-     * Get the start point of this path segment.
-     *
-     * @method getStartPoint
-     * @memberof PathSegment
-     * @return {Vertex} The start point of this path segment.
-     */
-    getStartPoint() {
-        return this.a;
-    }
-    /**
-     * Get the end point of this path segment.
-     *
-     * @method getEndPoint
-     * @memberof PathSegment
-     * @return {Vertex} The end point of this path segment.
-     */
-    getEndPoint() {
-        return this.b;
-    }
-    /**
-     * Get the tangent's end point at the start point of this segment.
-     *
-     * @method getStartTangent
-     * @memberof PathSegment
-     * @return {Vertex} The end point of the starting point's tangent.
-     */
-    getStartTangent() {
-        return this.b;
-    }
-    /**
-     * Get the tangent's end point at the end point of this segment.
-     *
-     * @method getEndTangent
-     * @memberof PathSegment
-     * @return {Vertex} The end point of the ending point's tangent.
-     */
-    getEndTangent() {
-        return this.a;
-    }
-    /**
-     * Inverse this path segment (in-place) and return this same instance (useful for chaining).
-     *
-     * @method reverse
-     * @memberof PathSegment
-     * @return {PathSegment} This path segment instance (for chaining).
-     */
-    reverse() {
-        var tmp = this.a;
-        this.a = this.b;
-        this.b = tmp;
-        return this;
-    }
-}
 
 /**
  * @author   Ikaros Kappler
@@ -4476,7 +4547,15 @@ CircleSector.circleSectorUtils = {
  * @modified 2022-11-10 Tweaking some type issues.
  * @modified 2023-02-04 Fixed a typo in the CSS classname for cubic Bézier paths: cubicBezier (was cubierBezier).
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  1.6.4
+ * @modified 2023-09-29 Added initialization checks for null parameters.
+ * @modified 2023-09-29 Added a missing implementation to the `drawurilssvg.do(XYCoords,string)` function. Didn't draw anything.
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-10-04 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ *
+ * @version  1.6.7
  **/
 const RAD_TO_DEG = 180 / Math.PI;
 /**
@@ -4513,6 +4592,9 @@ class drawutilssvg {
         this.cache = new Map();
         this.setSize(canvasSize);
         if (isSecondary) {
+            if (!gNode || !bufferGNode || !nodeDefs || !bufferNodeDefs) {
+                throw "Cannot create secondary svg draw lib with undefinde gNode|bufferGNode|nodeDefs|bufferNodeDefs.";
+            }
             this.gNode = gNode;
             this.bufferGNode = bufferGNode;
             this.nodeDefs = nodeDefs;
@@ -4653,6 +4735,9 @@ class drawutilssvg {
         if (this.drawlibConfiguration.blendMode) {
             node.style["mix-blend-mode"] = this.drawlibConfiguration.blendMode;
         }
+        // if (this.lineDashEnabled && this.lineDash && this.lineDash.length > 0 && drawutilssvg.nodeSupportsLineDash(nodeName)) {
+        //   node.setAttribute("stroke-dasharray", this.lineDash.join(" "));
+        // }
         return node;
     }
     /**
@@ -4675,23 +4760,58 @@ class drawutilssvg {
      * @param {number=1} lineWidth - (optional) A line width to use for drawing (default is 1).
      * @return {SVGElement} The node itself (for chaining).
      */
-    _bindFillDraw(node, className, color, lineWidth) {
+    _bindFillDraw(node, className, color, lineWidth, strokeOptions) {
+        this._configureNode(node, className, this.fillShapes, color, lineWidth, strokeOptions);
+        return this._bindNode(node, undefined);
+    }
+    /**
+     * Bind this given node to a parent. If no parent is passed then the global
+     * node buffer will be used.
+     *
+     * @method _bindNode
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The SVG node to bind.
+     * @param {SVGElement=} bindingParent - (optional) You may pass node other than the glober buffer node.
+     * @returns {SVGElement} The passed node itself.
+     */
+    _bindNode(node, bindingParent) {
+        if (!node.parentNode) {
+            // Attach to DOM only if not already attached
+            (bindingParent !== null && bindingParent !== void 0 ? bindingParent : this.bufferGNode).appendChild(node);
+        }
+        return node;
+    }
+    /**
+     * Add custom CSS class names and the globally defined CSS classname to the
+     * given node.
+     *
+     * @method addCSSClasses
+     * @private
+     * @instance
+     * @memberof drawutilssvg
+     * @param {SVGElement} node - The SVG node to bind.
+     * @param {string} className - The additional custom classname to add.
+     * @returns {void}
+     */
+    _addCSSClasses(node, className) {
         if (this.curClassName) {
             node.setAttribute("class", `${className} ${this.curClassName}`);
         }
         else {
             node.setAttribute("class", className);
         }
-        node.setAttribute("fill", this.fillShapes && color ? color : "none");
-        node.setAttribute("stroke", this.fillShapes ? "none" : color || "none");
+    }
+    _configureNode(node, className, fillMode, color, lineWidth, strokeOptions) {
+        this._addCSSClasses(node, className);
+        node.setAttribute("fill", fillMode && color ? color : "none");
+        node.setAttribute("stroke", fillMode ? "none" : color || "none");
         node.setAttribute("stroke-width", `${lineWidth || 1}`);
         if (this.curId) {
             node.setAttribute("id", `${this.curId}`); // Maybe React-style 'key' would be better?
         }
-        if (!node.parentNode) {
-            // Attach to DOM only if not already attached
-            this.bufferGNode.appendChild(node);
-        }
+        this.applyStrokeOpts(node, strokeOptions);
         return node;
     }
     /**
@@ -4713,7 +4833,7 @@ class drawutilssvg {
      * that under the hood the same gl context and gl program will be used.
      */
     copyInstance(fillShapes) {
-        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig
+        var copy = new drawutilssvg(this.svgNode, this.offset, this.scale, this.canvasSize, fillShapes, null, // no DrawConfig – this will work as long as `isSecondary===true`
         true, // isSecondary
         this.gNode, this.bufferGNode, this.nodeDefs, this.bufferedNodeDefs);
         return copy;
@@ -4728,6 +4848,20 @@ class drawutilssvg {
     setConfiguration(configuration) {
         this.drawlibConfiguration = configuration;
     }
+    // /**
+    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+    //  *
+    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    //  * for how line dashes work.
+    //  *
+    //  * @method
+    //  * @param {Array<number> lineDashes - The line-dash array configuration.
+    //  * @returns {void}
+    //  */
+    // setLineDash(lineDashes: Array<number>) {
+    //   this.lineDash = lineDashes;
+    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -4802,6 +4936,26 @@ class drawutilssvg {
         this.nodeDefs = this.bufferedNodeDefs;
         this.bufferedNodeDefs = tmpDefsNode;
     }
+    /**
+     * A private helper method to apply stroke options to the current
+     * context.
+     * @param {StrokeOptions=} strokeOptions -
+     */
+    applyStrokeOpts(node, strokeOptions) {
+        if (strokeOptions &&
+            strokeOptions.dashArray &&
+            strokeOptions.dashArray.length > 0 &&
+            drawutilssvg.nodeSupportsLineDash(node.tagName)) {
+            node.setAttribute("stroke-dasharray", strokeOptions.dashArray
+                .map((dashArayElem) => {
+                return dashArayElem * this.scale.x;
+            })
+                .join(" "));
+            if (strokeOptions.dashOffset) {
+                node.setAttribute("stroke-dashoffset", `${strokeOptions.dashOffset * this.scale.x}`);
+            }
+        }
+    }
     _x(x) {
         return this.offset.x + this.scale.x * x;
     }
@@ -4812,47 +4966,101 @@ class drawutilssvg {
      * Draw the line between the given two points with the specified (CSS-) color.
      *
      * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
+     * @param {XYCoords} zA - The start point of the line.
+     * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=1} lineWidth? - [optional] The line's width.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    line(zA, zB, color, lineWidth) {
-        const line = this.makeNode("line");
-        line.setAttribute("x1", `${this._x(zA.x)}`);
-        line.setAttribute("y1", `${this._y(zA.y)}`);
-        line.setAttribute("x2", `${this._x(zB.x)}`);
-        line.setAttribute("y2", `${this._y(zB.y)}`);
-        return this._bindFillDraw(line, "line", color, lineWidth || 1);
+    line(zA, zB, color, lineWidth, strokeOptions) {
+        // const line: SVGElement = this.makeNode("line");
+        // this.applyStrokeOpts(line, strokeOptions);
+        // line.setAttribute("x1", `${this._x(zA.x)}`);
+        // line.setAttribute("y1", `${this._y(zA.y)}`);
+        // line.setAttribute("x2", `${this._x(zB.x)}`);
+        // line.setAttribute("y2", `${this._y(zB.y)}`);
+        const line = this.makeLineNode(zA, zB, color, lineWidth, strokeOptions);
+        return this._bindFillDraw(line, "line", color, lineWidth || 1, strokeOptions);
     }
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
      * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
-    arrow(zA, zB, color, lineWidth) {
-        const node = this.makeNode("path");
-        var headlen = 8; // length of head in pixels
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
-        const d = ["M", this._x(zA.x), this._y(zA.y)];
-        for (var i = 0; i <= vertices.length; i++) {
-            d.push("L");
-            // Note: only use offset here (the vertices are already scaled)
-            d.push(this.offset.x + vertices[i % vertices.length].x);
-            d.push(this.offset.y + vertices[i % vertices.length].y);
-        }
-        node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "arrow", color, lineWidth || 1);
+    arrow(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
+        const group = this.makeNode("g");
+        const arrowHeadBasePosition = { x: 0, y: 0 };
+        // Just create the child nodes, don't bind them to the root node.
+        const arrowHead = this.makeArrowHeadNode(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        const line = this.makeLineNode(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions);
+        group.appendChild(line);
+        group.appendChild(arrowHead);
+        this._addCSSClasses(group, "linear-arrow");
+        this._bindNode(group, undefined);
+        return group;
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength = 8, strokeOptions) {
+        const group = this.makeNode("g");
+        // Just create the child nodes, don't bind them to the root node.
+        const arrowHeadBasePosition = new Vertex(0, 0);
+        const arrowHead = this.makeArrowHeadNode(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        const diff = arrowHeadBasePosition.difference(endPoint);
+        const bezier = this.makeCubicBezierNode(startPoint, { x: endPoint.x - diff.x, y: endPoint.y - diff.y }, startControlPoint, { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y }, color, lineWidth, strokeOptions);
+        group.appendChild(bezier);
+        group.appendChild(arrowHead);
+        this._addCSSClasses(group, "cubicbezier-arrow");
+        this._bindNode(group, undefined);
+        return group;
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
+        const node = this.makeArrowHeadNode(zA, zB, color, lineWidth, headLength, strokeOptions);
+        return this._bindFillDraw(node, "arrowhead", color, lineWidth || 1, strokeOptions);
     }
     /**
      * Draw an image at the given position with the given size.<br>
@@ -4861,8 +5069,8 @@ class drawutilssvg {
      *
      * @method image
      * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {XYCoords} position - The position to draw the the upper left corner at.
+     * @param {XYCoords} size - The x/y-size to draw the image with.
      * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
@@ -4905,16 +5113,16 @@ class drawutilssvg {
      * @param {Image} textureImage - The image object to draw.
      * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
      * @param {Polygon} polygon - The polygon to use as clip path.
-     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      **/
     texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation) {
-        polygon.getBounds();
+        // const basePolygonBounds: Bounds = polygon.getBounds();
         const rotatedScalingOrigin = new Vertex(textureSize.min).clone().rotate(rotation, polygonPosition);
-        polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
+        // const rotationCenter = polygonPosition.clone().add(rotatedScalingOrigin.difference(textureSize.min).inv());
         // Create something like this
         // ...
         //    <defs>
@@ -4968,36 +5176,21 @@ class drawutilssvg {
      * Draw the given (cubic) bézier curve.
      *
      * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
-        if (startPoint instanceof CubicBezierCurve) {
-            return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
-        }
-        const node = this.makeNode("path");
-        // Draw curve
-        const d = [
-            "M",
-            this._x(startPoint.x),
-            this._y(startPoint.y),
-            "C",
-            this._x(startControlPoint.x),
-            this._y(startControlPoint.y),
-            this._x(endControlPoint.x),
-            this._y(endControlPoint.y),
-            this._x(endPoint.x),
-            this._y(endPoint.y)
-        ];
-        node.setAttribute("d", d.join(" "));
-        return this._bindFillDraw(node, "cubicBezier", color, lineWidth);
+    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions) {
+        const node = this.makeCubicBezierNode(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions);
+        return this._bindNode(node, undefined);
     }
     /**
      * Draw the given (cubic) Bézier path.
@@ -5007,17 +5200,21 @@ class drawutilssvg {
      * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
      *
      * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    cubicBezierPath(path, color, lineWidth) {
+    cubicBezierPath(path, color, lineWidth, strokeOptions) {
         const node = this.makeNode("path");
-        if (!path || path.length == 0)
+        this.applyStrokeOpts(node, strokeOptions);
+        if (!path || path.length == 0) {
             return node;
+        }
         // Draw curve
         const d = ["M", this._x(path[0].x), this._y(path[0].y)];
         // Draw curve path
@@ -5054,20 +5251,20 @@ class drawutilssvg {
      * Draw a handle line (with a light grey).
      *
      * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @param {XYCoords} startPoint - The start point to draw the handle at.
+     * @param {XYCoords} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
     handleLine(startPoint, endPoint) {
-        this.line(startPoint, endPoint, "rgb(192,192,192)");
+        this.line(startPoint, endPoint, "rgb(128,128,128,0.5)");
     }
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
      * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
+     * @param {XYCoords} p - The position to draw the dot at.
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
@@ -5075,13 +5272,17 @@ class drawutilssvg {
      */
     dot(p, color) {
         const node = this.makeNode("line");
+        node.setAttribute("x1", `${this._x(p.x)}`);
+        node.setAttribute("y1", `${this._y(p.y)}`);
+        node.setAttribute("x2", `${this._x(p.x)}`);
+        node.setAttribute("y2", `${this._y(p.y)}`);
         return this._bindFillDraw(node, "dot", color, 1);
     }
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
      * @method point
-     * @param {Vertex} p - The position to draw the point at.
+     * @param {XYCoords} p - The position to draw the point at.
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
@@ -5101,17 +5302,20 @@ class drawutilssvg {
      * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
      *
      * @method circle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    circle(center, radius, color, lineWidth) {
+    circle(center, radius, color, lineWidth, strokeOptions) {
         // Todo: draw ellipse when scalex!=scaley
         const node = this.makeNode("circle");
+        this.applyStrokeOpts(node, strokeOptions);
         node.setAttribute("cx", `${this._x(center.x)}`);
         node.setAttribute("cy", `${this._y(center.y)}`);
         node.setAttribute("r", `${radius * this.scale.x}`); // y?
@@ -5121,17 +5325,20 @@ class drawutilssvg {
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
      * @method circleArc
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {number} startAngle - The angle to start at.
      * @param {number} endAngle - The angle to end at.
      * @param {string} color - The CSS color to draw the circle with.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    circleArc(center, radius, startAngle, endAngle, color, lineWidth) {
+    circleArc(center, radius, startAngle, endAngle, color, lineWidth, strokeOptions) {
         const node = this.makeNode("path");
+        this.applyStrokeOpts(node, strokeOptions);
         const arcData = CircleSector.circleSectorUtils.describeSVGArc(this._x(center.x), this._y(center.y), radius * this.scale.x, // y?
         startAngle, endAngle);
         node.setAttribute("d", arcData.join(" "));
@@ -5141,21 +5348,24 @@ class drawutilssvg {
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
+     * @param {XYCoords} center - The center of the ellipse.
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
+    ellipse(center, radiusX, radiusY, color, lineWidth, rotation, strokeOptions) {
         if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
         const node = this.makeNode("ellipse");
+        this.applyStrokeOpts(node, strokeOptions);
         node.setAttribute("cx", `${this._x(center.x)}`);
         node.setAttribute("cy", `${this._y(center.y)}`);
         node.setAttribute("rx", `${radiusX * this.scale.x}`);
@@ -5171,15 +5381,18 @@ class drawutilssvg {
      *
      * @method square
      * @param {XYCoords} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
+     * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
-     * @return {void}
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {SVGElement}
      * @instance
      * @memberof drawutilssvg
      */
-    square(center, size, color, lineWidth) {
+    square(center, size, color, lineWidth, strokeOptions) {
         const node = this.makeNode("rectangle");
+        this.applyStrokeOpts(node, strokeOptions);
         node.setAttribute("x", `${this._x(center.x - size / 2.0)}`);
         node.setAttribute("y", `${this._y(center.y - size / 2.0)}`);
         node.setAttribute("width", `${size * this.scale.x}`);
@@ -5194,9 +5407,15 @@ class drawutilssvg {
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {SVGElement}
+     * @instance
+     * @memberof drawutilssvg
      **/
-    rect(position, width, height, color, lineWidth) {
+    rect(position, width, height, color, lineWidth, strokeOptions) {
         const node = this.makeNode("rect");
+        this.applyStrokeOpts(node, strokeOptions);
         node.setAttribute("x", `${this._x(position.x)}`);
         node.setAttribute("y", `${this._y(position.y)}`);
         node.setAttribute("width", `${width * this.scale.x}`);
@@ -5207,7 +5426,7 @@ class drawutilssvg {
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
-     * @param {Vertex} center - The center of the grid.
+     * @param {XYCoords} center - The center of the grid.
      * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
      * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal grid size.
@@ -5241,7 +5460,7 @@ class drawutilssvg {
      * This works analogue to the grid() function
      *
      * @method raster
-     * @param {Vertex} center - The center of the raster.
+     * @param {XYCoords} center - The center of the raster.
      * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
      * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal raster size.
@@ -5274,8 +5493,8 @@ class drawutilssvg {
      * as even shaped diamonds.
      *
      * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {XYCoords} center - The center of the diamond.
+     * @param {number} size - The x/y-size of the diamond.
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
@@ -5309,8 +5528,8 @@ class drawutilssvg {
      * as even shaped squares.
      *
      * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {XYCoords} size - The x/y-size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
@@ -5332,7 +5551,7 @@ class drawutilssvg {
      * as even shaped circles.
      *
      * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
@@ -5431,18 +5650,22 @@ class drawutilssvg {
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices - The polygon vertices to draw.
+     * @param {XYCoords[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutilssvg
      */
-    polyline(vertices, isOpen, color, lineWidth) {
+    polyline(vertices, isOpen, color, lineWidth, strokeOptions) {
         const node = this.makeNode("path");
-        if (vertices.length == 0)
+        this.applyStrokeOpts(node, strokeOptions);
+        if (vertices.length == 0) {
             return node;
+        }
         // Draw curve
         const d = ["M", this._x(vertices[0].x), this._y(vertices[0].y)];
         var n = vertices.length;
@@ -5545,12 +5768,16 @@ class drawutilssvg {
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
      * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
+     *
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
      */
     path(pathData, color, lineWidth, options) {
         const node = this.makeNode("path");
+        this.applyStrokeOpts(node, options);
         // Transform the path: in-place (fast) or copy (slower)
         const d = options && options.inplace ? pathData : drawutilssvg.copyPathData(pathData);
         drawutilssvg.transformPathData(d, this.offset, this.scale);
@@ -5576,7 +5803,7 @@ class drawutilssvg {
         }
         // Add a covering rect with the given background color
         this.curId = "background";
-        this.curClassName = undefined;
+        this.curClassName = null; // undefined;
         const node = this.makeNode("rect");
         // For some strange reason SVG rotation transforms use degrees instead of radians
         // Note that the background does not scale with the zoom level (always covers full element)
@@ -5588,7 +5815,7 @@ class drawutilssvg {
         this._bindFillDraw(node, this.curId, null, null);
         node.setAttribute("fill", typeof color === "undefined" ? "none" : color);
         // Clear the current ID again
-        this.curId = undefined;
+        this.curId = null; // undefined;
     }
     /**
      * A private helper function to clear all SVG nodes from the &gt;g> node.
@@ -5792,6 +6019,126 @@ class drawutilssvg {
             }
         } // END while
     } // END transformPathData
+    static nodeSupportsLineDash(nodeName) {
+        return ["line", "path", "circle", "ellipse", "rectangle", "rect"].includes(nodeName);
+    }
+    /**
+     * Creates a basic <line> node with start and end coordinates. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeLineNode
+     * @param {XYCoords} zA - The line's start position.
+     * @param {XYCoords} zB - The line's start position.
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @return {SVGLineElement}
+     * @instance
+     * @memberof drawutilssvg
+     */
+    makeLineNode(zA, zB, color, lineWidth, strokeOptions, classNameOverride) {
+        const line = this.makeNode("line");
+        line.setAttribute("x1", `${this._x(zA.x)}`);
+        line.setAttribute("y1", `${this._y(zA.y)}`);
+        line.setAttribute("x2", `${this._x(zB.x)}`);
+        line.setAttribute("y2", `${this._y(zB.y)}`);
+        this._configureNode(line, classNameOverride !== null && classNameOverride !== void 0 ? classNameOverride : "line", this.fillShapes, color, lineWidth || 1, strokeOptions);
+        return line;
+    }
+    /**
+     * Creates a basic <path> node with given path string data. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makePathNode
+     * @param {string} pathString - The path data (must be a valid path data string).
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
+     */
+    makePathNode(pathString, color, lineWidth, strokeOptions, classNameOverride) {
+        const path = this.makeNode("path");
+        path.setAttribute("d", pathString);
+        this._configureNode(path, classNameOverride !== null && classNameOverride !== void 0 ? classNameOverride : "path", this.fillShapes, color, lineWidth || 1, strokeOptions);
+        return path;
+    }
+    /**
+     * Creates a basic arrow head node (<path> node) at the end of the given line coordinates. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeArrowHeadNode
+     * @param {string} pathString - The path data (must be a valid path data string).
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {number=8} headLength - (optional) The length of the arrow head; if none is specified then the head will be 8 absolute units long.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
+     */
+    makeArrowHeadNode(zA, zB, color, lineWidth, headLength = 8, strokeOptions, arrowHeadBasePositionBuffer) {
+        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        const d = ["M", this.offset.x + vertices[0].x, this.offset.y + vertices[0].y];
+        if (arrowHeadBasePositionBuffer) {
+            arrowHeadBasePositionBuffer.x = vertices[0].x / this.scale.x;
+            arrowHeadBasePositionBuffer.y = vertices[0].y / this.scale.y;
+        }
+        for (var i = 1; i <= vertices.length; i++) {
+            d.push("L");
+            // Note: only use offset here (the vertices are already scaled)
+            d.push(this.offset.x + vertices[i % vertices.length].x);
+            d.push(this.offset.y + vertices[i % vertices.length].y);
+        }
+        const node = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "arrowhead");
+        return node;
+    }
+    /**
+     * Creates a basic cubic Bézier path node (<path> node) with the given cubic Bézier data. The created node will not
+     * be bound to any root node.
+     *
+     * @private
+     * @method makeCubicBezierNode
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the point with.
+     * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Additional stroke options to use.
+     * @param {string=} classNameOverride - (optional) If nothing is passed the default classname 'path' will be used.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     * @return {SVGPathElement}
+     * @instance
+     * @memberof drawutilssvg
+     */
+    makeCubicBezierNode(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions) {
+        if (startPoint instanceof CubicBezierCurve) {
+            return this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
+        }
+        // Draw curve
+        const d = [
+            "M",
+            this._x(startPoint.x),
+            this._y(startPoint.y),
+            "C",
+            this._x(startControlPoint.x),
+            this._y(startControlPoint.y),
+            this._x(endControlPoint.x),
+            this._y(endControlPoint.y),
+            this._x(endPoint.x),
+            this._y(endPoint.y)
+        ];
+        const node = this.makePathNode(d.join(" "), color, lineWidth, strokeOptions, "cubicBezier");
+        return node;
+    }
 }
 drawutilssvg.HEAD_XML = [
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
@@ -5850,7 +6197,15 @@ drawutilssvg.HEAD_XML = [
  * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  1.12.4
+ * @modified 2023-09-29 Removed unused method stub for texturedPoly helper function (cleanup).
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
+ * @version  1.13.0
  **/
 // Todo: rename this class to Drawutils?
 /**
@@ -5872,9 +6227,46 @@ class drawutils {
      **/
     constructor(context, fillShapes) {
         this.ctx = context;
+        // this.lineDash = [];
         this.offset = new Vertex(0, 0);
         this.scale = new Vertex(1, 1);
         this.fillShapes = fillShapes;
+    }
+    /**
+     * A private helper method to apply stroke options to the current
+     * context.
+     * @param {StrokeOptions=} strokeOptions -
+     */
+    applyStrokeOpts(strokeOptions) {
+        var _a, _b;
+        this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map((dashArrayElem) => {
+            // Note assume scale.x === scale.y
+            // Invariant scale makes funny stuff anyway.
+            return dashArrayElem * this.scale.x;
+        }));
+        this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
+    }
+    // +---------------------------------------------------------------------------------
+    // | This is the final helper function for drawing and filling stuff. It is not
+    // | intended to be used from the outside.
+    // |
+    // | When in draw mode it draws the current shape.
+    // | When in fill mode it fills the current shape.
+    // |
+    // | This function is usually only called internally.
+    // |
+    // | @param color A stroke/fill color to use.
+    // +-------------------------------
+    // TODO: convert this to a STATIC function.
+    _fillOrDraw(color) {
+        if (this.fillShapes) {
+            this.ctx.fillStyle = color;
+            this.ctx.fill();
+        }
+        else {
+            this.ctx.strokeStyle = color;
+            this.ctx.stroke();
+        }
     }
     /**
      * Called before each draw cycle.
@@ -5906,6 +6298,20 @@ class drawutils {
     setConfiguration(configuration) {
         this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
     }
+    // /**
+    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+    //  *
+    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    //  * for how line dashes work.
+    //  *
+    //  * @method
+    //  * @param {Array<number> lineDashes - The line-dash array configuration.
+    //  * @returns {void}
+    //  */
+    // setLineDash(lineDash: Array<number>) {
+    //   this.lineDash = lineDash;
+    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -5932,17 +6338,20 @@ class drawutils {
      * Draw the line between the given two points with the specified (CSS-) color.
      *
      * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
+     * @param {XYCoords} zA - The start point of the line.
+     * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @param {number} lineWidth? - [optional] The line's width.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    line(zA, zB, color, lineWidth) {
+    line(zA, zB, color, lineWidth, strokeOptions) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
         this.ctx.strokeStyle = color;
@@ -5954,22 +6363,74 @@ class drawutils {
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
      * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    arrow(zA, zB, color, lineWidth) {
-        var headlen = 8; // length of head in pixels
-        // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-        // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+    arrow(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
+        const arrowHeadBasePosition = new Vertex(0, 0);
+        this.arrowHead(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition); // Will NOT use dash configuration
+        this.line(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions); // Will use dash configuration
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength, strokeOptions) {
+        const arrowHeadBasePosition = new Vertex(0, 0);
+        // Will NOT use dash configuration
+        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        const diff = arrowHeadBasePosition.difference(endPoint);
+        // Will use dash configuration
+        this.cubicBezier(startPoint, { x: endPoint.x - diff.x, y: endPoint.y - diff.y }, startControlPoint, { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y }, color, lineWidth, strokeOptions);
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength = 8, strokeOptions, arrowHeadBasePositionBuffer) {
+        // var headLength: number = 8; // length of head in pixels
         this.ctx.save();
         this.ctx.beginPath();
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
-        this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        this.applyStrokeOpts(strokeOptions);
+        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        if (arrowHeadBasePositionBuffer) {
+            arrowHeadBasePositionBuffer.x = vertices[0].x / this.scale.x;
+            arrowHeadBasePositionBuffer.y = vertices[0].y / this.scale.y;
+        }
+        this.ctx.moveTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
         }
@@ -5985,8 +6446,8 @@ class drawutils {
      *
      * @method image
      * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {XYCoords} position - The position to draw the the upper left corner at.
+     * @param {XYCoords} size - The x/y-size to draw the image with.
      * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
@@ -6015,7 +6476,7 @@ class drawutils {
      * @param {Image} textureImage - The image object to draw.
      * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
      * @param {Polygon} polygon - The polygon to use as clip path.
-     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
      * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
      * @return {void}
@@ -6024,10 +6485,9 @@ class drawutils {
      **/
     texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation) {
         var basePolygonBounds = polygon.getBounds();
-        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-        // var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
-        // var rotationalOffset = { x: 0, y: 0 };
-        basePolygonBounds.getCenter().sub(targetCenterDifference);
+        // var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        new Vertex(polygonPosition.x, polygonPosition.y).difference(basePolygonBounds.getCenter());
+        // var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
         // Get the position offset of the polygon
         var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
         // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
@@ -6050,52 +6510,83 @@ class drawutils {
         );
         this.ctx.restore();
     }
-    _texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter = { x: 0, y: 0 }) {
-        var basePolygonBounds = polygon.getBounds();
-        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-        var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
-        // var rotationalOffset = { x: 0, y: 0 };
-        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
-        // Get the position offset of the polygon
-        var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
-        var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
-        this.ctx.save();
-        // this.ctx.translate(
-        //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
-        //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
-        // );
-        this.ctx.translate(this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x, this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y);
-        this.ctx.rotate(rotation);
-        drawutils.helpers.clipPoly(this.ctx, {
-            x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
-            y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
-        }, this.scale, polygon.vertices);
-        this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+    /*
+    _texturedPoly(
+      textureImage: HTMLImageElement,
+      textureSize: Bounds,
+      polygon: Polygon,
+      polygonPosition: XYCoords,
+      rotation: number,
+      rotationCenter: XYCoords = { x: 0, y: 0 }
+    ): void {
+      var basePolygonBounds = polygon.getBounds();
+      var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+      var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+      // var rotationalOffset = { x: 0, y: 0 };
+      var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+  
+      // Get the position offset of the polygon
+      var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+      var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+  
+      this.ctx.save();
+  
+      // this.ctx.translate(
+      //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+      //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+      // );
+      this.ctx.translate(
+        this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+        this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+      );
+      this.ctx.rotate(rotation);
+  
+      drawutils.helpers.clipPoly(
+        this.ctx,
+        {
+          x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
+          y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
+        },
+        this.scale,
+        polygon.vertices
+      );
+      this.ctx.drawImage(
+        textureImage,
+        0,
+        0,
+        textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
         textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-        (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x, (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y, targetTextureSize.x * this.scale.x, targetTextureSize.y * this.scale.y);
-        // const scaledTextureSize = new Bounds(
-        //   new Vertex(
-        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
-        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
-        //   ).scaleXY(this.scale, rotationCenter),
-        //   new Vertex(
-        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
-        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
-        //   ).scaleXY(this.scale, rotationCenter)
-        // );
-        // this.ctx.drawImage(
-        //   textureImage,
-        //   0,
-        //   0,
-        //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
-        //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-        //   scaledTextureSize.min.x,
-        //   scaledTextureSize.min.y,
-        //   scaledTextureSize.width,
-        //   scaledTextureSize.height
-        // );
-        this.ctx.restore();
+        (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x,
+        (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y,
+        targetTextureSize.x * this.scale.x,
+        targetTextureSize.y * this.scale.y
+      );
+  
+      // const scaledTextureSize = new Bounds(
+      //   new Vertex(
+      //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
+      //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
+      //   ).scaleXY(this.scale, rotationCenter),
+      //   new Vertex(
+      //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
+      //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
+      //   ).scaleXY(this.scale, rotationCenter)
+      // );
+      // this.ctx.drawImage(
+      //   textureImage,
+      //   0,
+      //   0,
+      //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+      //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+      //   scaledTextureSize.min.x,
+      //   scaledTextureSize.min.y,
+      //   scaledTextureSize.width,
+      //   scaledTextureSize.height
+      // );
+  
+      this.ctx.restore();
     }
+    */
     /**
      * Draw a rectangle.
      *
@@ -6104,10 +6595,16 @@ class drawutils {
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof drawutils
      **/
-    rect(position, width, height, color, lineWidth) {
+    rect(position, width, height, color, lineWidth, strokeOptions) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
@@ -6118,43 +6615,23 @@ class drawutils {
         this._fillOrDraw(color);
         this.ctx.restore();
     }
-    // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff. It is not
-    // | intended to be used from the outside.
-    // |
-    // | When in draw mode it draws the current shape.
-    // | When in fill mode it fills the current shape.
-    // |
-    // | This function is usually only called internally.
-    // |
-    // | @param color A stroke/fill color to use.
-    // +-------------------------------
-    // TODO: convert this to a STATIC function.
-    _fillOrDraw(color) {
-        if (this.fillShapes) {
-            this.ctx.fillStyle = color;
-            this.ctx.fill();
-        }
-        else {
-            this.ctx.strokeStyle = color;
-            this.ctx.stroke();
-        }
-    }
     /**
      * Draw the given (cubic) bézier curve.
      *
      * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
+    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions) {
         if (startPoint instanceof CubicBezierCurve) {
             this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
             return;
@@ -6162,6 +6639,7 @@ class drawutils {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         //this.ctx.closePath();
@@ -6173,19 +6651,22 @@ class drawutils {
      * Draw the given (quadratic) bézier curve.
      *
      * @method quadraticBezier
-     * @param {Vertex} startPoint   - The start point of the cubic Bézier curve
-     * @param {Vertex} controlPoint - The control point the cubic Bézier curve.
-     * @param {Vertex} endPoint     - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint   - The start point of the cubic Bézier curve
+     * @param {XYCoords} controlPoint - The control point the cubic Bézier curve.
+     * @param {XYCoords} endPoint     - The end control point the cubic Bézier curve.
      * @param {string} color        - The CSS color to draw the curve with.
      * @param {number|string} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    quadraticBezier(startPoint, controlPoint, endPoint, color, lineWidth) {
+    quadraticBezier(startPoint, controlPoint, endPoint, color, lineWidth, strokeOptions) {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.quadraticCurveTo(this.offset.x + controlPoint.x * this.scale.x, this.offset.y + controlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         this.ctx.lineWidth = lineWidth || 2;
@@ -6200,22 +6681,26 @@ class drawutils {
      * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
      *
      * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path, color, lineWidth) {
-        if (!path || path.length == 0)
+    cubicBezierPath(path, color, lineWidth, strokeOptions) {
+        if (!path || path.length == 0) {
             return;
+        }
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
         var endPoint;
         var startControlPoint;
         var endControlPoint;
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
@@ -6234,8 +6719,8 @@ class drawutils {
      * The colors for this are fixed and cannot be specified.
      *
      * @method handle
-     * @param {Vertex} startPoint - The start of the handle.
-     * @param {Vertex} endPoint - The end point of the handle.
+     * @param {XYCoords} startPoint - The start of the handle.
+     * @param {XYCoords} endPoint - The end point of the handle.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -6250,21 +6735,21 @@ class drawutils {
      * Draw a handle line (with a light grey).
      *
      * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @param {XYCoords} startPoint - The start point to draw the handle at.
+     * @param {XYCoords} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
     handleLine(startPoint, endPoint) {
         // Draw handle lines
-        this.line(startPoint, endPoint, "rgb(192,192,192)");
+        this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)", undefined);
     }
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
      * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
+     * @param {XYCoords} p - The position to draw the dot at.
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
@@ -6273,6 +6758,7 @@ class drawutils {
     dot(p, color) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
         this.ctx.lineTo(Math.round(this.offset.x + this.scale.x * p.x + 1), Math.round(this.offset.y + this.scale.y * p.y + 1));
         this.ctx.closePath();
@@ -6284,7 +6770,7 @@ class drawutils {
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
      * @method point
-     * @param {Vertex} p - The position to draw the point at.
+     * @param {XYCoords} p - The position to draw the point at.
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
@@ -6292,6 +6778,7 @@ class drawutils {
      */
     point(p, color) {
         var radius = 3;
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
@@ -6304,15 +6791,18 @@ class drawutils {
      * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
      *
      * @method circle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number} lineWidth - The line width (optional, default=1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    circle(center, radius, color, lineWidth) {
+    circle(center, radius, color, lineWidth, strokeOptions) {
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -6320,24 +6810,28 @@ class drawutils {
         this._fillOrDraw(color);
     }
     /**
-       * Draw a circular arc (section of a circle) with the given CSS color.
-       *
-       * @method circleArc
-       * @param {Vertex} center - The center of the circle.
-       * @param {number} radius - The radius of the circle.
-       * @param {number} startAngle - The angle to start at.
-       * @param {number} endAngle - The angle to end at.
-       * @param {string=#000000} color - The CSS color to draw the circle with.
-       * @param {number=1} lineWidth - The line width to use
-       // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-       * @return {void}
-       * @instance
-       * @memberof drawutils
-       */
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {XYCoords} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string=#000000} color - The CSS color to draw the circle with.
+     * @param {number=1} lineWidth - The line width to use
+     * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
+     *
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     circleArc(center, radius, startAngle, endAngle, color, lineWidth, options) {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
         }
+        this.applyStrokeOpts(options);
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
         if (!options || !options.asSegment) {
             // this.ctx.closePath();
@@ -6349,20 +6843,23 @@ class drawutils {
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
+     * @param {XYCoords} center - The center of the ellipse.
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number} lineWidth=1 - An optional line width param (default is 1).
      * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
+    ellipse(center, radiusX, radiusY, color, lineWidth, rotation, strokeOptions) {
         if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, rotation, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -6379,11 +6876,14 @@ class drawutils {
      * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number} lineWidth - The line with to use (optional, default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    square(center, size, color, lineWidth) {
+    square(center, size, color, lineWidth, strokeOptions) {
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
         this.ctx.closePath();
@@ -6394,7 +6894,7 @@ class drawutils {
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
-     * @param {Vertex} center - The center of the grid.
+     * @param {XYCoords} center - The center of the grid.
      * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
      * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal grid size.
@@ -6405,6 +6905,7 @@ class drawutils {
      * @memberof drawutils
      */
     grid(center, width, height, sizeX, sizeY, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
@@ -6429,7 +6930,7 @@ class drawutils {
      * This works analogue to the grid() function
      *
      * @method raster
-     * @param {Vertex} center - The center of the raster.
+     * @param {XYCoords} center - The center of the raster.
      * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
      * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal raster size.
@@ -6441,6 +6942,7 @@ class drawutils {
      */
     raster(center, width, height, sizeX, sizeY, color) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
             for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
@@ -6465,14 +6967,15 @@ class drawutils {
      * as even shaped diamonds.
      *
      * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {XYCoords} center - The center of the diamond.
+     * @param {number} size - The x/y-size of the diamond.
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
     diamondHandle(center, size, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - size / 2.0);
@@ -6490,14 +6993,15 @@ class drawutils {
      * as even shaped squares.
      *
      * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The x/y-size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
     squareHandle(center, size, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y - size / 2.0, size, size);
         this.ctx.closePath();
@@ -6512,7 +7016,7 @@ class drawutils {
      * as even shaped circles.
      *
      * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
@@ -6521,6 +7025,7 @@ class drawutils {
      */
     circleHandle(center, radius, color) {
         radius = radius || 3;
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
@@ -6543,6 +7048,7 @@ class drawutils {
      */
     crosshair(center, radius, color, lineWidth) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y);
@@ -6570,6 +7076,7 @@ class drawutils {
      */
     cross(center, radius, color, lineWidth) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y - radius);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y + radius);
@@ -6588,30 +7095,35 @@ class drawutils {
      * @param {Polygon}  polygon - The polygon to draw.
      * @param {string}   color - The CSS color to draw the polygon with.
      * @param {string}   lineWidth - The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polygon(polygon, color, lineWidth) {
-        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    polygon(polygon, color, lineWidth, strokeOptions) {
+        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
     }
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices   - The polygon vertices to draw.
+     * @param {XYCoords[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
      * @param {string}   color      - The CSS color to draw the polygon with.
      * @param {number}   lineWidth  - The line width (default is 1.0);
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polyline(vertices, isOpen, color, lineWidth) {
+    polyline(vertices, isOpen, color, lineWidth, strokeOptions) {
         if (vertices.length <= 1) {
             return;
         }
         this.ctx.save();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
@@ -6723,6 +7235,8 @@ class drawutils {
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
      * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
@@ -6734,6 +7248,7 @@ class drawutils {
             this.ctx.strokeStyle = color;
         }
         this.ctx.lineWidth = lineWidth || 1;
+        this.applyStrokeOpts(options);
         if (this.fillShapes) {
             if (color) {
                 this.ctx.fillStyle = color;
@@ -6790,7 +7305,12 @@ drawutils.helpers = {
  * @modified 2022-03-27 Added the `texturedPoly` function.
  * @modified 2022-07-26 Adding `alpha` to the `image(...)` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  0.0.9
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @version  0.0.10
  **/
 /**
  * @classdesc A wrapper class for basic drawing operations. This is the WebGL
@@ -6884,6 +7404,20 @@ class drawutilsgl {
     setConfiguration(configuration) {
         // TODO
     }
+    // /**
+    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+    //  *
+    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    //  * for how line dashes work.
+    //  *
+    //  * @method
+    //  * @param {Array<number> lineDashes - The line-dash array configuration.
+    //  * @returns {void}
+    //  */
+    // setLineDash(lineDashes: Array<number>) {
+    //   // TODO
+    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -6911,8 +7445,8 @@ class drawutilsgl {
      * Draw the line between the given two points with the specified (CSS-) color.
      *
      * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
+     * @param {XYCoords} zA - The start point of the line.
+     * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @return {void}
      * @instance
@@ -6961,14 +7495,50 @@ class drawutilsgl {
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
      * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
     arrow(zA, zB, color) {
+        // NOT YET IMPLEMENTED
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength) {
+        // NOT YET IMPLEMENTED
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength) {
         // NOT YET IMPLEMENTED
     }
     /**
@@ -6978,8 +7548,8 @@ class drawutilsgl {
      *
      * @method image
      * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {XYCoords} position - The position to draw the the upper left corner at.
+     * @param {XYCoords} size - The x/y-size to draw the image with.
      * @param {number=0.0} alpha - (optional, default=0.0) The transparency (0.0=opaque, 1.0=transparent).
      * @return {void}
      * @instance
@@ -6997,7 +7567,7 @@ class drawutilsgl {
      * @param {Image} textureImage - The image object to draw.
      * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
      * @param {Polygon} polygon - The polygon to use as clip path.
-     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
      * @return {void}
      * @instance
@@ -7024,10 +7594,10 @@ class drawutilsgl {
      * Draw the given (cubic) bézier curve.
      *
      * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {VertXYCoordsex} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -7045,7 +7615,7 @@ class drawutilsgl {
      * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
      *
      * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -7061,8 +7631,8 @@ class drawutilsgl {
      * The colors for this are fixed and cannot be specified.
      *
      * @method handle
-     * @param {Vertex} startPoint - The start of the handle.
-     * @param {Vertex} endPoint - The end point of the handle.
+     * @param {XYCoords} startPoint - The start of the handle.
+     * @param {XYCoords} endPoint - The end point of the handle.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -7074,8 +7644,8 @@ class drawutilsgl {
      * Draw a handle line (with a light grey).
      *
      * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @param {XYCoords} startPoint - The start point to draw the handle at.
+     * @param {XYCoords} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -7087,7 +7657,7 @@ class drawutilsgl {
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
      * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
+     * @param {XYCoords} p - The position to draw the dot at.
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
@@ -7100,7 +7670,7 @@ class drawutilsgl {
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
      * @method point
-     * @param {Vertex} p - The position to draw the point at.
+     * @param {XYCoords} p - The position to draw the point at.
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
@@ -7115,7 +7685,7 @@ class drawutilsgl {
      * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
      *
      * @method circle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
@@ -7130,7 +7700,7 @@ class drawutilsgl {
      * Draw a circular arc (section of a circle) with the given CSS color.
      *
      * @method circleArc
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {number} startAngle - The angle to start at.
      * @param {number} endAngle - The angle to end at.
@@ -7146,7 +7716,7 @@ class drawutilsgl {
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
+     * @param {XYCoords} center - The center of the ellipse.
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
@@ -7166,7 +7736,7 @@ class drawutilsgl {
      *
      * @method square
      * @param {XYCords} center - The center of the square.
-     * @param {Vertex} size - The size of the square.
+     * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
      * @return {void}
@@ -7192,7 +7762,7 @@ class drawutilsgl {
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
-     * @param {Vertex} center - The center of the grid.
+     * @param {XYCoords} center - The center of the grid.
      * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
      * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal grid size.
@@ -7211,7 +7781,7 @@ class drawutilsgl {
      * This works analogue to the grid() function
      *
      * @method raster
-     * @param {Vertex} center - The center of the raster.
+     * @param {XYCoords} center - The center of the raster.
      * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
      * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal raster size.
@@ -7232,8 +7802,8 @@ class drawutilsgl {
      * as even shaped diamonds.
      *
      * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {XYCoords} center - The center of the diamond.
+     * @param {number} size - The x/y-size of the diamond.
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
@@ -7250,8 +7820,8 @@ class drawutilsgl {
      * as even shaped squares.
      *
      * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The x/y-size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
@@ -7268,7 +7838,7 @@ class drawutilsgl {
      * as even shaped circles.
      *
      * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
@@ -7364,7 +7934,7 @@ class drawutilsgl {
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices - The polygon vertices to draw.
+     * @param {XYCoords[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen   - If true the polyline will not be closed at its end.
      * @param {string}   color    - The CSS color to draw the polygon with.
      * @param {number=}  lineWidth - (optional) The line width to use; default is 1.
@@ -8961,7 +9531,8 @@ class PBImage {
  * @author   Ikaros Kappler
  * @date     2021-11-16
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  1.1.0
+ * @modified 2023-09-25 Fixed a type error in the constructor. Nothing vital.
+ * @version  1.1.1
  **/
 /**
  * @classdesc A simple text element: position, fontSize, fontFamily, color, textAlign, lineHeight and rotation.
@@ -8992,14 +9563,14 @@ class PBText {
         this.uid = UIDGenerator.next();
         this.text = text;
         this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex();
-        this.color = options.color;
-        this.fontFamily = options.fontFamily;
-        this.fontSize = options.fontSize;
-        this.fontStyle = options.fontStyle;
-        this.fontWeight = options.fontWeight;
-        this.lineHeight = options.lineHeight;
-        this.textAlign = options.textAlign;
-        this.rotation = options.rotation;
+        this.color = options === null || options === void 0 ? void 0 : options.color;
+        this.fontFamily = options === null || options === void 0 ? void 0 : options.fontFamily;
+        this.fontSize = options === null || options === void 0 ? void 0 : options.fontSize;
+        this.fontStyle = options === null || options === void 0 ? void 0 : options.fontStyle;
+        this.fontWeight = options === null || options === void 0 ? void 0 : options.fontWeight;
+        this.lineHeight = options === null || options === void 0 ? void 0 : options.lineHeight;
+        this.textAlign = options === null || options === void 0 ? void 0 : options.textAlign;
+        this.rotation = options === null || options === void 0 ? void 0 : options.rotation;
     }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
@@ -9719,7 +10290,7 @@ class VEllipse {
             else {
                 let startTangent = this.tangentAt(curAngle);
                 let endTangent = this.tangentAt(nextAngle);
-                // Find intersection
+                // Find intersection (ignore that the result might be null in some extreme cases)
                 let intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
                 // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
@@ -10159,7 +10730,8 @@ VEllipseSector.ellipseSectorUtils = {
  * @modified 2023-02-10 Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
  * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
  * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
- * @version  1.17.2
+ * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
+ * @version  1.17.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -10277,7 +10849,7 @@ class PlotBoilerplate {
             draggable: true,
             visible: true
         };
-        if (typeof config.canvas == "undefined") {
+        if (typeof config.canvas === "undefined") {
             throw "No canvas specified.";
         }
         /**
@@ -10369,6 +10941,10 @@ class PlotBoilerplate {
                     fill: true
                 }
             },
+            // bezierPath: {
+            //   color: "#0022a8",
+            //   lineWidth: 1
+            // },
             polygon: {
                 color: "#0022a8",
                 lineWidth: 1
@@ -10428,7 +11004,10 @@ class PlotBoilerplate {
         // +-------------------------------
         this.grid = new Grid(new Vertex(0, 0), new Vertex(50, 50));
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
-        const canvasElement = typeof config.canvas == "string" ? document.querySelector(config.canvas) : config.canvas;
+        const canvasElement = typeof config.canvas === "string" ? document.querySelector(config.canvas) : config.canvas;
+        if (typeof canvasElement === "undefined") {
+            throw `Cannot initialize PlotBoilerplate with a null canvas (element "${config.canvas} not found).`;
+        }
         // Which renderer to use: Canvas2D, WebGL (experimental) or SVG?
         if (canvasElement.tagName.toLowerCase() === "canvas") {
             this.canvas = canvasElement;
@@ -11076,10 +11655,10 @@ class PlotBoilerplate {
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
                     draw.setCurrentId(`${d.uid}_l0`);
                     draw.setCurrentClassName(`${d.className}-start-line`);
-                    draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.handleLine(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint);
                     draw.setCurrentId(`${d.uid}_l1`);
                     draw.setCurrentClassName(`${d.className}-end-line`);
-                    draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.handleLine(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint);
                 }
                 curveIndex++;
             } // END for
@@ -11102,11 +11681,11 @@ class PlotBoilerplate {
                 draw.setCurrentId(`${d.uid}_e0`);
                 draw.setCurrentClassName(`${d.className}-v-line`);
                 // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
-                draw.line(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis, "#c8c8c8");
+                draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
                 draw.setCurrentId(`${d.uid}_e1`);
                 draw.setCurrentClassName(`${d.className}-h-line`);
                 // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
-                draw.line(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis, "#c8c8c8");
+                draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName(`${d.className}`);
@@ -12042,22 +12621,35 @@ PlotBoilerplate.utils = {
      **/
     safeMergeByKeys: (base, extension) => {
         for (var k in extension) {
-            if (!extension.hasOwnProperty(k))
+            if (!extension.hasOwnProperty(k)) {
                 continue;
+            }
             if (base.hasOwnProperty(k)) {
-                var typ = typeof base[k];
+                const typ = typeof base[k];
+                const extVal = extension[k];
                 try {
-                    if (typ == "boolean")
-                        base[k] = !!JSON.parse(extension[k]);
-                    else if (typ == "number")
-                        base[k] = JSON.parse(extension[k]) * 1;
-                    else if (typ == "function" && typeof extension[k] == "function")
+                    if (typ == "boolean") {
+                        if (typeof extVal === "string")
+                            base[k] = Boolean(!!JSON.parse(extVal));
+                        else
+                            base[k] = extVal;
+                    }
+                    else if (typ == "number") {
+                        if (typeof extVal === "string")
+                            base[k] = Number(JSON.parse(extVal) * 1);
+                        else
+                            base[k] = extension[k];
+                    }
+                    else if (typ == "function" && typeof extVal == "function") {
                         base[k] = extension[k];
-                    else
+                    }
+                    else {
+                        // Probably a sting
                         base[k] = extension[k];
+                    }
                 }
                 catch (e) {
-                    console.error("error in key ", k, extension[k], e);
+                    console.error("error in key ", k, extVal, e);
                 }
             }
             else {
@@ -12066,6 +12658,31 @@ PlotBoilerplate.utils = {
         }
         return base;
     },
+    /*
+    __safeMergeByKeys: <KeyType extends string | number | symbol, ValueType extends boolean | number | string | Function>(
+      base: Record<KeyType, ValueType>,
+      extension: Record<KeyType, string>
+    ): Record<KeyType, ValueType> => {
+      for (var k in extension) {
+        if (!extension.hasOwnProperty(k)) continue;
+        if (base.hasOwnProperty(k)) {
+          var typ = typeof base[k];
+          try {
+            if (typ == "boolean") base[k] = !!JSON.parse(extension[k]);
+            else if (typ == "number") base[k] = JSON.parse(extension[k]) * 1;
+            else if (typ == "function" && typeof extension[k] == "function") base[k] = extension[k];
+            else base[k] = extension[k];
+          } catch (e) {
+            console.error("error in key ", k, extension[k], e);
+          }
+        } else {
+          base[k] = extension[k];
+        }
+      }
+      return base;
+    },
+    *()
+
     /**
      * A helper function to scale elements (usually the canvas) using CSS.
      *

@@ -392,8 +392,8 @@ export class VEllipse implements SVGSerializable {
         let startTangent: Vector = this.tangentAt(curAngle);
         let endTangent: Vector = this.tangentAt(nextAngle);
 
-        // Find intersection
-        let intersection: Vertex | undefined = startTangent.intersection(endTangent);
+        // Find intersection (ignore that the result might be null in some extreme cases)
+        let intersection: Vertex = startTangent.intersection(endTangent) as Vertex;
         // What if intersection is undefined?
         // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.
 

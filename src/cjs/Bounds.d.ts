@@ -8,7 +8,8 @@
  * @modified 2022-02-01 Added the `toString` function.
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
- * @version  1.6.0
+ * @modified 2023-09-29 Added the `randomPoint` method.
+ * @version  1.7.0
  **/
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
@@ -76,6 +77,18 @@ export declare class Bounds implements IBounds, XYDimension {
      * @returns {Vertex} The center of these bounds.
      */
     getCenter(): Vertex;
+    /**
+     * Generate a random point inside this bounds object. Safe areas at the border to avoid
+     * included.
+     *
+     * @method randomPoint
+     * @instance
+     * @memberof Bounds
+     * @param {horizontalSafeArea} - (optional) The horizonal (left and right) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval.
+     * @param {verticalSafeArea} - (optional) The vertical (top and bottom) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval
+     * @returns {Vertex} A pseudo random point inside these bounds.
+     */
+    randomPoint(horizontalSafeArea?: number, verticalSafeArea?: number): Vertex;
     /**
      * Convert these bounds to a human readable form.
      *

@@ -19,7 +19,7 @@
  **/
 import { VertTuple } from "./VertTuple";
 import { Vertex } from "./Vertex";
-import { SVGSerializable } from "./interfaces";
+import { SVGSerializable, XYCoords } from "./interfaces";
 /**
  * @classdesc A vector (Vertex,Vertex) is a line with a visible direction.<br>
  *            <br>
@@ -105,12 +105,12 @@ export declare class Vector extends VertTuple<Vector> implements SVGSerializable
          * Example:
          *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
          *
-         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-         * @param {Vertex} zB - The end vertex of the vector.
+         * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+         * @param {XYCoords} zB - The end vertex of the vector.
          * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
          * @param {number} scaleX  - The horizontal scaling during draw.
          * @param {number} scaleY  - the vertical scaling during draw.
          **/
-        buildArrowHead: (zA: Vertex, zB: Vertex, headlen: number, scaleX: number, scaleY: number) => Vertex[];
+        buildArrowHead: (zA: XYCoords, zB: XYCoords, headlen: number, scaleX: number, scaleY: number) => Array<Vertex>;
     };
 }

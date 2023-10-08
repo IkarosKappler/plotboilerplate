@@ -162,8 +162,8 @@ var Vector = /** @class */ (function (_super) {
          * Example:
          *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
          *
-         * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-         * @param {Vertex} zB - The end vertex of the vector.
+         * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+         * @param {XYCoords} zB - The end vertex of the vector.
          * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
          * @param {number} scaleX  - The horizontal scaling during draw.
          * @param {number} scaleY  - the vertical scaling during draw.

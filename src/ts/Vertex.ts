@@ -29,6 +29,8 @@
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `Vertex.toSVGString` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-11-28 Added the `subXY`, `subX` and `subY` methods to the `Vertex` class.
+ * @modified 2023-09-29 Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
+ * @modified 2023-09-29 Added the `Vertex.abs()` method as it seems useful.
  * @version  2.8.0
  *
  * @file Vertex
@@ -608,6 +610,20 @@ export class Vertex implements XYCoords, SVGSerializable {
   }
 
   /**
+   * Set both coordinates of this vertex to their absolute value (abs(x), abs(y)).
+   *
+   * @method abs
+   * @return {Vertex} this
+   * @instance
+   * @memberof Vertex
+   */
+  abs(): Vertex {
+    this.x = Math.abs(this.x);
+    this.y = Math.abs(this.y);
+    return this;
+  }
+
+  /**
    * Get a string representation of this vertex.
    *
    * @method toString
@@ -662,15 +678,15 @@ export class Vertex implements XYCoords, SVGSerializable {
      * Example:
      *    buildArrowHead( new Vertex(0,0), new Vertex(50,100), 8, 1.0, 1.0 )
      *
-     * @param {Vertex} zA - The start vertex of the vector to calculate the arrow head for.
-     * @param {Vertex} zB - The end vertex of the vector.
+     * @param {XYCoords} zA - The start vertex of the vector to calculate the arrow head for.
+     * @param {XYCoords} zB - The end vertex of the vector.
      * @param {number} headlen - The length of the arrow head (along the vector direction. A good value is 12).
      * @param {number} scaleX  - The horizontal scaling during draw.
      * @param {number} scaleY  - the vertical scaling during draw.
      **/
     // @DEPRECATED: use Vector.utils.buildArrowHead instead!!!
-    buildArrowHead: (zA: Vertex, zB: Vertex, headlen: number, scaleX: number, scaleY: number): Array<Vertex> => {
-      // console.warn('This function is deprecated! Use Vector.utils.buildArrowHead instead!');
+    buildArrowHead: (zA: XYCoords, zB: XYCoords, headlen: number, scaleX: number, scaleY: number): Array<Vertex> => {
+      console.warn("[DEPRECATION] Vertex.utils.buildArrowHead is deprecated. Please use Vector.utils.buildArrowHead instead.");
       var angle: number = Math.atan2((zB.y - zA.y) * scaleY, (zB.x - zA.x) * scaleX);
 
       var vertices: Array<Vertex> = [];

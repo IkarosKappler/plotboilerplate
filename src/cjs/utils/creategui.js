@@ -7,7 +7,8 @@
  * @author   Ikaros Kappler
  * @date     2020-03-30
  * @modified 2020-04-03 Added empty default global object 'utils'. Added createGUI as an optional child.
- * @version  1.0.1
+ * @modified 2023-09-29 Added try-catch for color attributes; invalid values might break construction of whole gui.
+ * @version  1.0.2
  **/
 var utils = (globalThis.utils = globalThis.utils || {});
 
@@ -168,15 +169,20 @@ globalThis.utils.createGUI = function (pb, props) {
   const _addDrawConfigElement = function (fold, basePath, conf) {
     for (var i in conf) {
       if (typeof conf[i] == "object") {
-        if (conf[i].hasOwnProperty("color"))
-          fold
-            .addColor(conf[i], "color")
-            .onChange(function () {
-              _self.redraw();
-            })
-            .name(basePath + i + ".color")
-            .title(basePath + i + ".color")
-            .listen();
+        if (conf[i].hasOwnProperty("color")) {
+          try {
+            fold
+              .addColor(conf[i], "color")
+              .onChange(function () {
+                _self.redraw();
+              })
+              .name(basePath + i + ".color")
+              .title(basePath + i + ".color")
+              .listen();
+          } catch (e) {
+            console.error("[createGUI] Invalid color value, gui library cannot recognize.", conf[i]["color"]);
+          }
+        }
         if (conf[i].hasOwnProperty("lineWidth"))
           fold
             .add(conf[i], "lineWidth")

@@ -48,11 +48,19 @@
  * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  1.12.4
+ * @modified 2023-09-29 Removed unused method stub for texturedPoly helper function (cleanup).
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
+ * @version  1.13.0
  **/
 import { Polygon } from "./Polygon";
 import { Vertex } from "./Vertex";
-import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight } from "./interfaces";
+import { DrawLib, SVGPathParams, XYCoords, UID, DrawLibConfiguration, FontStyle, FontWeight, StrokeOptions } from "./interfaces";
 import { Bounds } from "./Bounds";
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -101,6 +109,13 @@ export declare class drawutils implements DrawLib<void> {
      **/
     constructor(context: CanvasRenderingContext2D, fillShapes: boolean);
     /**
+     * A private helper method to apply stroke options to the current
+     * context.
+     * @param {StrokeOptions=} strokeOptions -
+     */
+    private applyStrokeOpts;
+    _fillOrDraw(color: string): void;
+    /**
      * Called before each draw cycle.
      * @param {UID=} uid - (optional) A UID identifying the currently drawn element(s).
      **/
@@ -146,28 +161,68 @@ export declare class drawutils implements DrawLib<void> {
      * Draw the line between the given two points with the specified (CSS-) color.
      *
      * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
+     * @param {XYCoords} zA - The start point of the line.
+     * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @param {number} lineWidth? - [optional] The line's width.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    line(zA: Vertex, zB: Vertex, color: string, lineWidth?: number): void;
+    line(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
      * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    arrow(zA: Vertex, zB: Vertex, color: string, lineWidth?: number): void;
+    arrow(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number, strokeOptions?: StrokeOptions): void;
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint: XYCoords, endPoint: XYCoords, startControlPoint: XYCoords, endControlPoint: XYCoords, color: string, lineWidth?: number, headLength?: number, strokeOptions?: StrokeOptions): void;
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA: XYCoords, zB: XYCoords, color: string, lineWidth?: number, headLength?: number, strokeOptions?: StrokeOptions, arrowHeadBasePositionBuffer?: XYCoords): void;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -175,14 +230,14 @@ export declare class drawutils implements DrawLib<void> {
      *
      * @method image
      * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {XYCoords} position - The position to draw the the upper left corner at.
+     * @param {XYCoords} size - The x/y-size to draw the image with.
      * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    image(image: HTMLImageElement, position: Vertex, size: Vertex, alpha?: number): void;
+    image(image: HTMLImageElement, position: XYCoords, size: XYCoords, alpha?: number): void;
     /**
      * Draw an image at the given position with the given size.<br>
      * <br>
@@ -192,15 +247,14 @@ export declare class drawutils implements DrawLib<void> {
      * @param {Image} textureImage - The image object to draw.
      * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
      * @param {Polygon} polygon - The polygon to use as clip path.
-     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
      * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number): void;
-    _texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: Vertex, rotation: number, rotationCenter?: XYCoords): void;
+    texturedPoly(textureImage: HTMLImageElement, textureSize: Bounds, polygon: Polygon, polygonPosition: XYCoords, rotation: number): void;
     /**
      * Draw a rectangle.
      *
@@ -209,38 +263,46 @@ export declare class drawutils implements DrawLib<void> {
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof drawutils
      **/
-    rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number): void;
-    _fillOrDraw(color: string): void;
+    rect(position: XYCoords, width: number, height: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw the given (cubic) bézier curve.
      *
      * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    cubicBezier(startPoint: Vertex, endPoint: Vertex, startControlPoint: Vertex, endControlPoint: Vertex, color: string, lineWidth?: number): void;
+    cubicBezier(startPoint: XYCoords, endPoint: XYCoords, startControlPoint: XYCoords, endControlPoint: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw the given (quadratic) bézier curve.
      *
      * @method quadraticBezier
-     * @param {Vertex} startPoint   - The start point of the cubic Bézier curve
-     * @param {Vertex} controlPoint - The control point the cubic Bézier curve.
-     * @param {Vertex} endPoint     - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint   - The start point of the cubic Bézier curve
+     * @param {XYCoords} controlPoint - The control point the cubic Bézier curve.
+     * @param {XYCoords} endPoint     - The end control point the cubic Bézier curve.
      * @param {string} color        - The CSS color to draw the curve with.
      * @param {number|string} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    quadraticBezier(startPoint: Vertex, controlPoint: Vertex, endPoint: Vertex, color: string, lineWidth?: number): void;
+    quadraticBezier(startPoint: XYCoords, controlPoint: XYCoords, endPoint: XYCoords, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw the given (cubic) Bézier path.
      *
@@ -249,108 +311,117 @@ export declare class drawutils implements DrawLib<void> {
      * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
      *
      * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path: Array<Vertex>, color: string, lineWidth?: number): void;
+    cubicBezierPath(path: Array<XYCoords>, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw the given handle and handle point (used to draw interactive Bézier curves).
      *
      * The colors for this are fixed and cannot be specified.
      *
      * @method handle
-     * @param {Vertex} startPoint - The start of the handle.
-     * @param {Vertex} endPoint - The end point of the handle.
+     * @param {XYCoords} startPoint - The start of the handle.
+     * @param {XYCoords} endPoint - The end point of the handle.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    handle(startPoint: Vertex, endPoint: Vertex): void;
+    handle(startPoint: XYCoords, endPoint: XYCoords): void;
     /**
      * Draw a handle line (with a light grey).
      *
      * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @param {XYCoords} startPoint - The start point to draw the handle at.
+     * @param {XYCoords} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    handleLine(startPoint: Vertex, endPoint: Vertex): void;
+    handleLine(startPoint: XYCoords, endPoint: XYCoords): void;
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
      * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
+     * @param {XYCoords} p - The position to draw the dot at.
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    dot(p: Vertex, color: string): void;
+    dot(p: XYCoords, color: string): void;
     /**
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
      * @method point
-     * @param {Vertex} p - The position to draw the point at.
+     * @param {XYCoords} p - The position to draw the point at.
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    point(p: Vertex, color: string): void;
+    point(p: XYCoords, color: string): void;
     /**
      * Draw a circle with the specified (CSS-) color and radius.<br>
      * <br>
      * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
      *
      * @method circle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number} lineWidth - The line width (optional, default=1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    circle(center: Vertex, radius: number, color: string, lineWidth?: number): void;
+    circle(center: XYCoords, radius: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
-       * Draw a circular arc (section of a circle) with the given CSS color.
-       *
-       * @method circleArc
-       * @param {Vertex} center - The center of the circle.
-       * @param {number} radius - The radius of the circle.
-       * @param {number} startAngle - The angle to start at.
-       * @param {number} endAngle - The angle to end at.
-       * @param {string=#000000} color - The CSS color to draw the circle with.
-       * @param {number=1} lineWidth - The line width to use
-       // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-       * @return {void}
-       * @instance
-       * @memberof drawutils
-       */
-    circleArc(center: Vertex, radius: number, startAngle: number, endAngle: number, color?: string, lineWidth?: number, options?: {
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {XYCoords} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string=#000000} color - The CSS color to draw the circle with.
+     * @param {number=1} lineWidth - The line width to use
+     * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
+     *
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
+    circleArc(center: XYCoords, radius: number, startAngle: number, endAngle: number, color?: string, lineWidth?: number, options?: {
         asSegment?: boolean;
-    }): void;
+    } & StrokeOptions): void;
     /**
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
+     * @param {XYCoords} center - The center of the ellipse.
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number} lineWidth=1 - An optional line width param (default is 1).
      * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse(center: Vertex, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number): void;
+    ellipse(center: XYCoords, radiusX: number, radiusY: number, color: string, lineWidth?: number, rotation?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw square at the given center, size and with the specified (CSS-) color.<br>
      * <br>
@@ -361,16 +432,18 @@ export declare class drawutils implements DrawLib<void> {
      * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number} lineWidth - The line with to use (optional, default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    square(center: XYCoords, size: number, color: string, lineWidth?: number): void;
+    square(center: XYCoords, size: number, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
-     * @param {Vertex} center - The center of the grid.
+     * @param {XYCoords} center - The center of the grid.
      * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
      * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal grid size.
@@ -380,14 +453,14 @@ export declare class drawutils implements DrawLib<void> {
      * @instance
      * @memberof drawutils
      */
-    grid(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string): void;
+    grid(center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string): void;
     /**
      * Draw a raster of crosshairs in the given grid.<br>
      *
      * This works analogue to the grid() function
      *
      * @method raster
-     * @param {Vertex} center - The center of the raster.
+     * @param {XYCoords} center - The center of the raster.
      * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
      * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal raster size.
@@ -397,7 +470,7 @@ export declare class drawutils implements DrawLib<void> {
      * @instance
      * @memberof drawutils
      */
-    raster(center: Vertex, width: number, height: number, sizeX: number, sizeY: number, color: string): void;
+    raster(center: XYCoords, width: number, height: number, sizeX: number, sizeY: number, color: string): void;
     /**
      * Draw a diamond handle (square rotated by 45°) with the given CSS color.
      *
@@ -406,14 +479,14 @@ export declare class drawutils implements DrawLib<void> {
      * as even shaped diamonds.
      *
      * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {XYCoords} center - The center of the diamond.
+     * @param {number} size - The x/y-size of the diamond.
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    diamondHandle(center: Vertex, size: number, color: string): void;
+    diamondHandle(center: XYCoords, size: number, color: string): void;
     /**
      * Draw a square handle with the given CSS color.<br>
      * <br>
@@ -422,14 +495,14 @@ export declare class drawutils implements DrawLib<void> {
      * as even shaped squares.
      *
      * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The x/y-size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    squareHandle(center: Vertex, size: number, color: string): void;
+    squareHandle(center: XYCoords, size: number, color: string): void;
     /**
      * Draw a circle handle with the given CSS color.<br>
      * <br>
@@ -438,14 +511,14 @@ export declare class drawutils implements DrawLib<void> {
      * as even shaped circles.
      *
      * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    circleHandle(center: Vertex, radius: number, color: string): void;
+    circleHandle(center: XYCoords, radius: number, color: string): void;
     /**
      * Draw a crosshair with given radius and color at the given position.<br>
      * <br>
@@ -483,24 +556,28 @@ export declare class drawutils implements DrawLib<void> {
      * @param {Polygon}  polygon - The polygon to draw.
      * @param {string}   color - The CSS color to draw the polygon with.
      * @param {string}   lineWidth - The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polygon(polygon: Polygon, color: string, lineWidth?: number): void;
+    polygon(polygon: Polygon, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices   - The polygon vertices to draw.
+     * @param {XYCoords[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
      * @param {string}   color      - The CSS color to draw the polygon with.
      * @param {number}   lineWidth  - The line width (default is 1.0);
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polyline(vertices: Array<Vertex>, isOpen: boolean, color: string, lineWidth?: number): void;
+    polyline(vertices: Array<XYCoords>, isOpen: boolean, color: string, lineWidth?: number, strokeOptions?: StrokeOptions): void;
     /**
      * Draw a text at the given relative position.
      *
@@ -555,13 +632,15 @@ export declare class drawutils implements DrawLib<void> {
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
      * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
      */
     path(pathData: SVGPathParams, color?: string, lineWidth?: number, options?: {
         inplace?: boolean;
-    }): void;
+    } & StrokeOptions): void;
     /**
      * Due to gl compatibility there is a generic 'clear' function required
      * to avoid accessing the context object itself directly.

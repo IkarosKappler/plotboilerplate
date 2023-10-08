@@ -327,7 +327,7 @@ var VEllipse = /** @class */ (function () {
             else {
                 var startTangent = this.tangentAt(curAngle);
                 var endTangent = this.tangentAt(nextAngle);
-                // Find intersection
+                // Find intersection (ignore that the result might be null in some extreme cases)
                 var intersection = startTangent.intersection(endTangent);
                 // What if intersection is undefined?
                 // --> This *can* not happen if segmentCount > 2 and height and width of the ellipse are not zero.

@@ -82,7 +82,8 @@
  * @modified 2023-02-10 Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
  * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
  * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
- * @version  1.17.2
+ * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
+ * @version  1.17.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -796,17 +797,7 @@ export declare class PlotBoilerplate {
          * @param {Object} extension
          * @return {Object} base extended by the new attributes.
          **/
-        safeMergeByKeys: (base: Object, extension: Object) => Object;
-        /**
-         * A helper function to scale elements (usually the canvas) using CSS.
-         *
-         * transform-origin is at (0,0).
-         *
-         * @param {HTMLElement} element - The DOM element to scale.
-         * @param {number} scaleX The - X scale factor.
-         * @param {number} scaleY The - Y scale factor.
-         * @return {void}
-         **/
+        safeMergeByKeys: <KeyType_1 extends string | number | symbol, ValueType>(base: Record<KeyType_1, ValueType>, extension: Record<KeyType_1, ValueType>) => Record<KeyType_1, ValueType>;
         setCSSscale: (element: HTMLElement | SVGElement, scaleX: number, scaleY: number) => void;
         fetch: {
             /**
@@ -834,7 +825,7 @@ export declare class PlotBoilerplate {
              * @param {boolean} fallback - A default value if the key does not exist.
              * @return {boolean}
              **/
-            bool: (obj: any, key: string, fallback: boolean) => any;
+            bool: (obj: any, key: string, fallback: boolean | null) => any;
             /**
              * A helper function to the the object property function-value specified by the given key.
              *

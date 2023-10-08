@@ -24,7 +24,9 @@
  * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.5.0
+ * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
+ * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
+ * @version 2.6.0
  *
  * @file BezierPath
  * @public
@@ -61,7 +63,7 @@ var BezierPath = /** @class */ (function () {
      * @name BezierPath
      * @param {Vertex[]} pathPoints - An array of path vertices (no control points).
      **/
-    function BezierPath(pathPoints) {
+    function BezierPath() {
         /**
          * Required to generate proper CSS classes and other class related IDs.
          **/
@@ -74,9 +76,11 @@ var BezierPath = /** @class */ (function () {
         this.END_CONTROL_POINT = 2;
         /** @constant {number} */
         this.END_POINT = 3;
+        // pathPoints: Array<Vertex> | undefined | null) {
         this.uid = UIDGenerator_1.UIDGenerator.next();
-        if (!pathPoints)
-            pathPoints = [];
+        // if (!pathPoints) {
+        //   pathPoints = [];
+        // }
         this.totalArcLength = 0.0;
         // Set this flag to true if you want the first point and
         // last point of the path to be auto adjusted, too.
@@ -230,215 +234,6 @@ var BezierPath = /** @class */ (function () {
         return this.bezierCurves[curveIndex];
     };
     /**
-     * Remove the end point of this path (which removes the last curve from this path).<br>
-     * <br>
-     * Please note that this function does never remove the first curve, thus the path
-     * cannot be empty after this call.
-     *
-     * @method removeEndPoint
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} Indicating if the last curve was removed.
-     **/
-    /*
-      BezierPath.prototype.removeEndPoint = function() {
-      if( this.bezierCurves.length <= 1 )
-          return false;
-      
-      var newArray = [ this.bezierCurves.length-1 ];
-      for( var i = 0; i < this.bezierCurves.length-1; i++ ) {
-          newArray[i] = this.bezierCurves[i];
-      }
-      
-      // Update arc length
-      this.totalArcLength -= this.bezierCurves[ this.bezierCurves.length-1 ].getLength();
-      this.bezierCurves = newArray;
-      return true;
-      }
-      */
-    /**
-     * Remove the start point of this path (which removes the first curve from this path).<br>
-     * <br>
-     * Please note that this function does never remove the last curve, thus the path
-     * cannot be empty after this call.<br>
-     *
-     * @method removeStartPoint
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} Indicating if the first curve was removed.
-     **/
-    /*
-      BezierPath.prototype.removeStartPoint = function() {
-  
-      if( this.bezierCurves.length <= 1 )
-          return false;
-  
-      var newArray = [ this.bezierCurves.length-1 ];
-      for( var i = 1; i < this.bezierCurves.length; i++ ) {
-  
-          newArray[i-1] = this.bezierCurves[i];
-  
-      }
-      
-      // Update arc length
-      this.totalArcLength -= this.bezierCurves[ 0 ].getLength();
-      this.bezierCurves = newArray;
-      
-      return true;
-      }
-      */
-    /**
-     * Removes a path point inside the path.
-     *
-     * This function joins the bezier curve at the given index with
-     * its predecessor, which means that the start point at the given
-     * curve index will be removed.
-     *
-     * @method joinAt
-     * @param {number} curveIndex - The index of the curve to be joined with its predecessor.
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} True if the passed index indicated an inner vertex and the two curves were joined.
-     **/
-    /*
-      BezierPath.prototype.joinAt = function( curveIndex ) {
-  
-      if( curveIndex < 0 || curveIndex >= this.bezierCurves.length )
-          return false;
-      
-      var leftCurve  = this.bezierCurves[ curveIndex-1 ];
-      var rightCurve = this.bezierCurves[ curveIndex ];
-  
-      // Make the length of the new handle double that long
-      var leftControlPoint = leftCurve.getStartControlPoint().clone();
-      leftControlPoint.sub( leftCurve.getStartPoint() );
-      leftControlPoint.multiplyScalar( 2.0 );
-      leftControlPoint.add( leftCurve.getStartPoint() );
-      
-      var rightControlPoint = rightCurve.getEndControlPoint().clone();
-      rightControlPoint.sub( rightCurve.getEndPoint() );
-      rightControlPoint.multiplyScalar( 2.0 );
-      rightControlPoint.add( rightCurve.getEndPoint() );
-  
-      var newCurve = new IKRS.CubicBezierCurve( leftCurve.getStartPoint(),
-                            rightCurve.getEndPoint(),
-                            leftControlPoint,
-                            rightControlPoint
-                          );
-      // Place into array
-      var newArray = [ this.bezierCurves.length - 1 ];
-  
-      for( var i = 0; i < curveIndex-1; i++ )
-          newArray[ i ] = this.bezierCurves[i];
-      
-      newArray[ curveIndex-1 ] = newCurve;
-      
-      // Shift trailing curves left
-      for( var i = curveIndex; i+1 < this.bezierCurves.length; i++ )
-          newArray[ i ] = this.bezierCurves[ i+1 ];
-          
-      this.bezierCurves = newArray;
-      this.updateArcLengths();
-  
-      return true;
-      }
-      */
-    /**
-     * Add a new inner curve point to the path.<br>
-     * <br>
-     * This function splits the bezier curve at the given index and given
-     * curve segment index.
-     *
-     * @method splitAt
-     * @param {number} curveIndex - The index of the curve to split.
-     * @param {nunber} segmentIndex - The index of the curve segment where the split should be performed.
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} True if the passed indices were valid and the path was split.
-     **/
-    /*
-      BezierPath.prototype.splitAt = function( curveIndex,
-                           segmentIndex
-                         ) {
-      // Must be a valid curve index
-      if( curveIndex < 0 || curveIndex >= this.bezierCurves.length )
-          return false;
-  
-      var oldCurve = this.bezierCurves[ curveIndex ];
-  
-      // Segment must be an INNER point!
-      // (the outer points are already bezier end/start points!)
-      if( segmentIndex < 1 || segmentIndex-1 >= oldCurve.segmentCache.length )
-          return false;
-  
-      // Make room for a new curve
-      for( var c = this.bezierCurves.length; c > curveIndex; c-- ) {
-          // Move one position to the right
-          this.bezierCurves[ c ] = this.bezierCurves[ c-1 ];
-      }
-  
-      // Accumulate segment lengths
-      var u = 0;
-      for( var i = 0; i < segmentIndex; i++ )
-          u += oldCurve.segmentLengths[i];
-      //var tangent = oldCurve.getTangentAt( u );
-      var tangent = oldCurve.getTangent( u );
-      tangent = tangent.multiplyScalar( 0.25 );
-  
-      var leftEndControlPoint = oldCurve.segmentCache[ segmentIndex ].clone();
-      leftEndControlPoint.sub( tangent );
-      
-      var rightStartControlPoint = oldCurve.segmentCache[ segmentIndex ].clone();
-      rightStartControlPoint.add( tangent );
-      
-      // Make the old existing handles a quarter that long
-      var leftStartControlPoint = oldCurve.getStartControlPoint().clone();
-      // move to (0,0)
-      leftStartControlPoint.sub( oldCurve.getStartPoint() );
-      leftStartControlPoint.multiplyScalar( 0.25 );
-      leftStartControlPoint.add( oldCurve.getStartPoint() );
-  
-      var rightEndControlPoint = oldCurve.getEndControlPoint().clone();
-      // move to (0,0)
-      rightEndControlPoint.sub( oldCurve.getEndPoint() );
-      rightEndControlPoint.multiplyScalar( 0.25 );
-      rightEndControlPoint.add( oldCurve.getEndPoint() );
-  
-      var newLeft  = new CubicBezierCurve( oldCurve.getStartPoint(),                      // old start point
-                           oldCurve.segmentCache[ segmentIndex ],         // new end point
-                           leftStartControlPoint,                         // old start control point
-                           leftEndControlPoint                            // new end control point
-                         );
-      var newRight = new CubicBezierCurve( oldCurve.segmentCache[ segmentIndex ],         // new start point
-                           oldCurve.getEndPoint(),                        // old end point
-                           rightStartControlPoint,                        // new start control point
-                           rightEndControlPoint                           // old end control point
-                         );
-      
-      // Insert split curve(s) at free index
-      this.bezierCurves[ curveIndex ]     = newLeft;
-      this.bezierCurves[ curveIndex + 1 ] = newRight;
-      
-      // Update total arc length, even if there is only a very little change!
-      this.totalArcLength -= oldCurve.getLength();
-      this.totalArcLength += newLeft.getLength();
-      this.totalArcLength += newRight.getLength();
-  
-      return true;
-      };
-      */
-    /*
-      insertVertexAt( t:number ) : void {
-      console.log('Inserting vertex at', t );
-      // Find the curve index
-      var u : number = 0;
-      var curveIndex : number = -1;
-      var localT : number = 0.0;
-      for( var i = 0; curveIndex == -1 && i < this.bezierCurves.length; i++ ) {
-          
-      }
-      }; */
-    /**
      * Move the whole bezier path by the given (x,y)-amount.
      *
      * @method translate
@@ -472,22 +267,6 @@ var BezierPath = /** @class */ (function () {
      * @return {BezierPath} this for chaining.
      **/
     BezierPath.prototype.scale = function (anchor, scaleFactor) {
-        // var scaleFactors : XYCoords = { x : scaleFactor, y : scaleFactor };
-        // for (var i = 0; i < this.bezierCurves.length; i++) {
-        //   var curve = this.bezierCurves[i];
-        //   curve.getStartPoint().scale(scaleFactor, anchor);
-        //   curve.getStartControlPoint().scale(scaleFactor, anchor);
-        //   curve.getEndControlPoint().scale(scaleFactor, anchor);
-        //   // Do NOT scale the end point here!
-        //   // Don't forget that the curves are connected and on curve's end point
-        //   // the the successor's start point (same instance)!
-        // }
-        // // Finally move the last end point (was not scaled yet)
-        // if (this.bezierCurves.length > 0 && !this.adjustCircular) {
-        //   this.bezierCurves[this.bezierCurves.length - 1].getEndPoint().scale(scaleFactor, anchor);
-        // }
-        // this.updateArcLengths();
-        // return this;
         return this.scaleXY({ x: scaleFactor, y: scaleFactor }, anchor);
     };
     /**
@@ -983,7 +762,7 @@ var BezierPath = /** @class */ (function () {
      * @return {BezierPath}
      **/
     BezierPath.prototype.clone = function () {
-        var path = new BezierPath(undefined);
+        var path = new BezierPath(); // undefined);
         for (var i = 0; i < this.bezierCurves.length; i++) {
             path.bezierCurves.push(this.bezierCurves[i].clone());
             // Connect splines
@@ -1023,12 +802,50 @@ var BezierPath = /** @class */ (function () {
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
+     *
+     * @method destroy
+     * @instance
+     * @memberof BezierPath
      */
     BezierPath.prototype.destroy = function () {
         for (var i = 0; i < this.bezierCurves.length; i++) {
             this.bezierCurves[i].destroy();
         }
         this.isDestroyed = true;
+    };
+    /**
+     * Convert this path to an array of path points that can be drawn by the default DrawLib
+     * implementations.
+     *
+     * @method toPathPoints
+     * @instance
+     * @memberof BezierPath
+     * @return {Array<XYCoords>}
+     */
+    BezierPath.prototype.toPathPoints = function () {
+        if (this.bezierCurves.length === 0) {
+            return [];
+        }
+        if (this.bezierCurves.length === 1) {
+            return [
+                this.bezierCurves[0].startPoint,
+                this.bezierCurves[0].startControlPoint,
+                this.bezierCurves[0].endControlPoint,
+                this.bezierCurves[0].endPoint
+            ];
+        }
+        var arr = [];
+        arr.push(this.bezierCurves[0].startPoint);
+        arr.push(this.bezierCurves[0].startControlPoint);
+        for (var i = 1; i < this.bezierCurves.length; i++) {
+            arr.push(this.bezierCurves[i - 1].endControlPoint);
+            arr.push(this.bezierCurves[i - 1].endPoint);
+            arr.push(this.bezierCurves[i].startPoint);
+            arr.push(this.bezierCurves[i].startControlPoint);
+        }
+        arr.push(this.bezierCurves[0].endControlPoint);
+        arr.push(this.bezierCurves[0].endPoint);
+        return arr;
     };
     /**
      * Create a JSON string representation of this bézier curve.
@@ -1071,6 +888,20 @@ var BezierPath = /** @class */ (function () {
         return BezierPath.fromArray(obj);
     };
     /**
+     * Construct a new path with a single curve. Adding more curves is always possible.
+     *
+     * @method fromCurve
+     * @param {CubicBezierCurve} curve - The curve to construct a new path from.
+     * @static
+     * @memberof BezierPath
+     * @return {BezierPath} The constructed bezier path instance.
+     */
+    BezierPath.fromCurve = function (curve) {
+        var path = new BezierPath(); // []);
+        path.addCurve(curve);
+        return path;
+    };
+    /**
      * Create a BezierPath instance from the given array.
      *
      * @method fromArray
@@ -1081,13 +912,15 @@ var BezierPath = /** @class */ (function () {
      * @return {BezierPath} The bezier path instance retrieved from the array data.
      **/
     BezierPath.fromArray = function (obj) {
-        if (!Array.isArray(obj))
+        if (!Array.isArray(obj)) {
             throw "[BezierPath.fromArray] Passed object must be an array.";
+        }
         var arr = obj; // FORCE?
-        if (arr.length < 1)
+        if (arr.length < 1) {
             throw "[BezierPath.fromArray] Passed array must contain at least one bezier curve (has " + arr.length + ").";
+        }
         // Create an empty bezier path
-        var bPath = new BezierPath(undefined);
+        var bPath = new BezierPath(); // undefined);
         var lastCurve = null;
         for (var i = 0; i < arr.length; i++) {
             // Convert object (or array?) to bezier curve
@@ -1197,7 +1030,7 @@ var BezierPath = /** @class */ (function () {
      */
     BezierPath.fromReducedList = function (pointArray, adjustCircular) {
         // Convert to object
-        var bezierPath = new BezierPath(null); // No points yet
+        var bezierPath = new BezierPath(); // null); // No points yet
         var startPoint = new Vertex_1.Vertex();
         var startControlPoint;
         var endControlPoint;

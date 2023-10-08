@@ -83,7 +83,8 @@
  * @modified 2023-02-10 Fixing an issue of the `style.position` setting when `fitToParent=true` from `absolute` to `static` (default).
  * @modified 2023-02-10 Cleaning up most type errors in the main class (mostly null checks).
  * @modified 2023-02-10 Adding `enableZoom` and `enablePan` (both default true) to have the option to disable these functions.
- * @version  1.17.2
+ * @modified 2023-09-29 Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
+ * @version  1.17.3
  *
  * @file PlotBoilerplate
  * @fileoverview The main class.
@@ -223,7 +224,7 @@ var PlotBoilerplate = /** @class */ (function () {
             draggable: true,
             visible: true
         };
-        if (typeof config.canvas == "undefined") {
+        if (typeof config.canvas === "undefined") {
             throw "No canvas specified.";
         }
         /**
@@ -315,6 +316,10 @@ var PlotBoilerplate = /** @class */ (function () {
                     fill: true
                 }
             },
+            // bezierPath: {
+            //   color: "#0022a8",
+            //   lineWidth: 1
+            // },
             polygon: {
                 color: "#0022a8",
                 lineWidth: 1
@@ -374,7 +379,10 @@ var PlotBoilerplate = /** @class */ (function () {
         // +-------------------------------
         this.grid = new Grid_1.Grid(new Vertex_1.Vertex(0, 0), new Vertex_1.Vertex(50, 50));
         this.canvasSize = { width: PlotBoilerplate.DEFAULT_CANVAS_WIDTH, height: PlotBoilerplate.DEFAULT_CANVAS_HEIGHT };
-        var canvasElement = typeof config.canvas == "string" ? document.querySelector(config.canvas) : config.canvas;
+        var canvasElement = typeof config.canvas === "string" ? document.querySelector(config.canvas) : config.canvas;
+        if (typeof canvasElement === "undefined") {
+            throw "Cannot initialize PlotBoilerplate with a null canvas (element \"" + config.canvas + " not found).";
+        }
         // Which renderer to use: Canvas2D, WebGL (experimental) or SVG?
         if (canvasElement.tagName.toLowerCase() === "canvas") {
             this.canvas = canvasElement;
@@ -1022,10 +1030,10 @@ var PlotBoilerplate = /** @class */ (function () {
                 if (this.drawConfig.drawBezierHandleLines && this.drawConfig.drawHandleLines) {
                     draw.setCurrentId(d.uid + "_l0");
                     draw.setCurrentClassName(d.className + "-start-line");
-                    draw.line(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.handleLine(d.bezierCurves[c].startPoint, d.bezierCurves[c].startControlPoint);
                     draw.setCurrentId(d.uid + "_l1");
                     draw.setCurrentClassName(d.className + "-end-line");
-                    draw.line(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint, this.drawConfig.bezier.handleLine.color, this.drawConfig.bezier.handleLine.lineWidth);
+                    draw.handleLine(d.bezierCurves[c].endPoint, d.bezierCurves[c].endControlPoint);
                 }
                 curveIndex++;
             } // END for
@@ -1048,11 +1056,11 @@ var PlotBoilerplate = /** @class */ (function () {
                 draw.setCurrentId(d.uid + "_e0");
                 draw.setCurrentClassName(d.className + "-v-line");
                 // draw.line( d.center.clone().add(0,d.axis.y-d.center.y), d.axis, '#c8c8c8' );
-                draw.line(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis, "#c8c8c8");
+                draw.handleLine(d.center.clone().add(0, d.signedRadiusV()).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
                 draw.setCurrentId(d.uid + "_e1");
                 draw.setCurrentClassName(d.className + "-h-line");
                 // draw.line( d.center.clone().add(d.axis.x-d.center.x,0), d.axis, '#c8c8c8' );
-                draw.line(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis, "#c8c8c8");
+                draw.handleLine(d.center.clone().add(d.signedRadiusH(), 0).rotate(d.rotation, d.center), d.axis); // , "#c8c8c8");
             }
             draw.setCurrentId(d.uid);
             draw.setCurrentClassName("" + d.className);
@@ -1991,22 +1999,35 @@ var PlotBoilerplate = /** @class */ (function () {
          **/
         safeMergeByKeys: function (base, extension) {
             for (var k in extension) {
-                if (!extension.hasOwnProperty(k))
+                if (!extension.hasOwnProperty(k)) {
                     continue;
+                }
                 if (base.hasOwnProperty(k)) {
                     var typ = typeof base[k];
+                    var extVal = extension[k];
                     try {
-                        if (typ == "boolean")
-                            base[k] = !!JSON.parse(extension[k]);
-                        else if (typ == "number")
-                            base[k] = JSON.parse(extension[k]) * 1;
-                        else if (typ == "function" && typeof extension[k] == "function")
+                        if (typ == "boolean") {
+                            if (typeof extVal === "string")
+                                base[k] = Boolean(!!JSON.parse(extVal));
+                            else
+                                base[k] = extVal;
+                        }
+                        else if (typ == "number") {
+                            if (typeof extVal === "string")
+                                base[k] = Number(JSON.parse(extVal) * 1);
+                            else
+                                base[k] = extension[k];
+                        }
+                        else if (typ == "function" && typeof extVal == "function") {
                             base[k] = extension[k];
-                        else
+                        }
+                        else {
+                            // Probably a sting
                             base[k] = extension[k];
+                        }
                     }
                     catch (e) {
-                        console.error("error in key ", k, extension[k], e);
+                        console.error("error in key ", k, extVal, e);
                     }
                 }
                 else {
@@ -2015,6 +2036,31 @@ var PlotBoilerplate = /** @class */ (function () {
             }
             return base;
         },
+        /*
+        __safeMergeByKeys: <KeyType extends string | number | symbol, ValueType extends boolean | number | string | Function>(
+          base: Record<KeyType, ValueType>,
+          extension: Record<KeyType, string>
+        ): Record<KeyType, ValueType> => {
+          for (var k in extension) {
+            if (!extension.hasOwnProperty(k)) continue;
+            if (base.hasOwnProperty(k)) {
+              var typ = typeof base[k];
+              try {
+                if (typ == "boolean") base[k] = !!JSON.parse(extension[k]);
+                else if (typ == "number") base[k] = JSON.parse(extension[k]) * 1;
+                else if (typ == "function" && typeof extension[k] == "function") base[k] = extension[k];
+                else base[k] = extension[k];
+              } catch (e) {
+                console.error("error in key ", k, extension[k], e);
+              }
+            } else {
+              base[k] = extension[k];
+            }
+          }
+          return base;
+        },
+        *()
+    
         /**
          * A helper function to scale elements (usually the canvas) using CSS.
          *

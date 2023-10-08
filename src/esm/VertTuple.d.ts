@@ -9,7 +9,8 @@
  * @modified 2020-12-04 Added the `hasPoint(XYCoords)` function.
  * @modified 2021-01-20 Added UID.
  * @modified 2022-02-02 Added the `destroy` method.
- * @version 1.2.0
+ * @modified 2023-09-29 Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
+ * @version 1.2.1
  */
 import { Vertex } from "./Vertex";
 import { XYCoords, UID } from "./interfaces";

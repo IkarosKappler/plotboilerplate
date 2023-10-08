@@ -23,7 +23,9 @@
  * @modified 2022-01-31 Added `BezierPath.getEvenDistributionVertices(number)`.
  * @modified 2022-02-02 Added the `destroy` method.
  * @modified 2022-02-02 Cleared the `toSVGString` function (deprecated). Use `drawutilssvg` instead.
- * @version 2.5.0
+ * @modified 2023-10-06 Adding the `BezierPath.toPathPoints()` method.
+ * @modified 2023-10-07 Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
+ * @version 2.6.0
  *
  * @file BezierPath
  * @public
@@ -212,54 +214,6 @@ export declare class BezierPath implements SVGSerializable {
      * @return {CubicBezierCurve} The curve at the specified index.
      **/
     getCurveAt(curveIndex: number): CubicBezierCurve;
-    /**
-     * Remove the end point of this path (which removes the last curve from this path).<br>
-     * <br>
-     * Please note that this function does never remove the first curve, thus the path
-     * cannot be empty after this call.
-     *
-     * @method removeEndPoint
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} Indicating if the last curve was removed.
-     **/
-    /**
-     * Remove the start point of this path (which removes the first curve from this path).<br>
-     * <br>
-     * Please note that this function does never remove the last curve, thus the path
-     * cannot be empty after this call.<br>
-     *
-     * @method removeStartPoint
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} Indicating if the first curve was removed.
-     **/
-    /**
-     * Removes a path point inside the path.
-     *
-     * This function joins the bezier curve at the given index with
-     * its predecessor, which means that the start point at the given
-     * curve index will be removed.
-     *
-     * @method joinAt
-     * @param {number} curveIndex - The index of the curve to be joined with its predecessor.
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} True if the passed index indicated an inner vertex and the two curves were joined.
-     **/
-    /**
-     * Add a new inner curve point to the path.<br>
-     * <br>
-     * This function splits the bezier curve at the given index and given
-     * curve segment index.
-     *
-     * @method splitAt
-     * @param {number} curveIndex - The index of the curve to split.
-     * @param {nunber} segmentIndex - The index of the curve segment where the split should be performed.
-     * @instance
-     * @memberof BezierPath
-     * @return {boolean} True if the passed indices were valid and the path was split.
-     **/
     /**
      * Move the whole bezier path by the given (x,y)-amount.
      *
@@ -519,8 +473,22 @@ export declare class BezierPath implements SVGSerializable {
      * This function should invalidate any installed listeners and invalidate this object.
      * After calling this function the object might not hold valid data any more and
      * should not be used.
+     *
+     * @method destroy
+     * @instance
+     * @memberof BezierPath
      */
     destroy(): void;
+    /**
+     * Convert this path to an array of path points that can be drawn by the default DrawLib
+     * implementations.
+     *
+     * @method toPathPoints
+     * @instance
+     * @memberof BezierPath
+     * @return {Array<XYCoords>}
+     */
+    toPathPoints(): Array<XYCoords>;
     /**
      * Create a JSON string representation of this bézier curve.
      *
@@ -542,6 +510,16 @@ export declare class BezierPath implements SVGSerializable {
      * @return {BezierPath} The parsed bezier path instance.
      **/
     static fromJSON(jsonString: string): BezierPath;
+    /**
+     * Construct a new path with a single curve. Adding more curves is always possible.
+     *
+     * @method fromCurve
+     * @param {CubicBezierCurve} curve - The curve to construct a new path from.
+     * @static
+     * @memberof BezierPath
+     * @return {BezierPath} The constructed bezier path instance.
+     */
+    static fromCurve(curve: CubicBezierCurve): BezierPath;
     /**
      * Create a BezierPath instance from the given array.
      *

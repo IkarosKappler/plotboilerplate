@@ -48,11 +48,20 @@
  * @modified 2022-08-23 Fixed a type issue in the `setConfiguration` function.
  * @modified 2022-08-23 Fixed a type issue in the `path` function.
  * @modified 2023-02-10 The methods `setCurrentClassName` and `setCurrentId` also accept `null` now.
- * @version  1.12.4
+ * @modified 2023-09-29 Removed unused method stub for texturedPoly helper function (cleanup).
+ * @modified 2023-09-29 Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+ * @modified 2023-09-29 Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+ * @modified 2023-09-29 Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+ * @modified 2023-09-29 Added the `lineDashes` attribute.
+ * @modified 2023-09-30 Adding `strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+ * @modified 2023-10-07 Adding the optional `arrowHeadBasePositionBuffer` param to the arrowHead(...) method.
+ * @version  1.13.0
  **/
 import { CubicBezierCurve } from "./CubicBezierCurve";
 import { Vertex } from "./Vertex";
 import { drawutilssvg } from "./drawutilssvg";
+import { Vector } from "./Vector";
 // Todo: rename this class to Drawutils?
 /**
  * @classdesc A wrapper class for basic drawing operations.
@@ -73,9 +82,46 @@ export class drawutils {
      **/
     constructor(context, fillShapes) {
         this.ctx = context;
+        // this.lineDash = [];
         this.offset = new Vertex(0, 0);
         this.scale = new Vertex(1, 1);
         this.fillShapes = fillShapes;
+    }
+    /**
+     * A private helper method to apply stroke options to the current
+     * context.
+     * @param {StrokeOptions=} strokeOptions -
+     */
+    applyStrokeOpts(strokeOptions) {
+        var _a, _b;
+        this.ctx.setLineDash(((_a = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashArray) !== null && _a !== void 0 ? _a : []).map((dashArrayElem) => {
+            // Note assume scale.x === scale.y
+            // Invariant scale makes funny stuff anyway.
+            return dashArrayElem * this.scale.x;
+        }));
+        this.ctx.lineDashOffset = ((_b = strokeOptions === null || strokeOptions === void 0 ? void 0 : strokeOptions.dashOffset) !== null && _b !== void 0 ? _b : 0) * this.scale.x;
+    }
+    // +---------------------------------------------------------------------------------
+    // | This is the final helper function for drawing and filling stuff. It is not
+    // | intended to be used from the outside.
+    // |
+    // | When in draw mode it draws the current shape.
+    // | When in fill mode it fills the current shape.
+    // |
+    // | This function is usually only called internally.
+    // |
+    // | @param color A stroke/fill color to use.
+    // +-------------------------------
+    // TODO: convert this to a STATIC function.
+    _fillOrDraw(color) {
+        if (this.fillShapes) {
+            this.ctx.fillStyle = color;
+            this.ctx.fill();
+        }
+        else {
+            this.ctx.strokeStyle = color;
+            this.ctx.stroke();
+        }
     }
     /**
      * Called before each draw cycle.
@@ -107,6 +153,20 @@ export class drawutils {
     setConfiguration(configuration) {
         this.ctx.globalCompositeOperation = configuration.blendMode || "source-over";
     }
+    // /**
+    //  * Set or clear the line-dash configuration. Pass `null` for un-dashed lines.
+    //  *
+    //  * See https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray
+    //  * and https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+    //  * for how line dashes work.
+    //  *
+    //  * @method
+    //  * @param {Array<number> lineDashes - The line-dash array configuration.
+    //  * @returns {void}
+    //  */
+    // setLineDash(lineDash: Array<number>) {
+    //   this.lineDash = lineDash;
+    // }
     /**
      * This method shouled be called each time the currently drawn `Drawable` changes.
      * It is used by some libraries for identifying elemente on re-renders.
@@ -133,17 +193,20 @@ export class drawutils {
      * Draw the line between the given two points with the specified (CSS-) color.
      *
      * @method line
-     * @param {Vertex} zA - The start point of the line.
-     * @param {Vertex} zB - The end point of the line.
+     * @param {XYCoords} zA - The start point of the line.
+     * @param {XYCoords} zB - The end point of the line.
      * @param {string} color - Any valid CSS color string.
      * @param {number} lineWidth? - [optional] The line's width.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    line(zA, zB, color, lineWidth) {
+    line(zA, zB, color, lineWidth, strokeOptions) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + zB.x * this.scale.x, this.offset.y + zB.y * this.scale.y);
         this.ctx.strokeStyle = color;
@@ -155,22 +218,74 @@ export class drawutils {
      * Draw a line and an arrow at the end (zB) of the given line with the specified (CSS-) color.
      *
      * @method arrow
-     * @param {Vertex} zA - The start point of the arrow-line.
-     * @param {Vertex} zB - The end point of the arrow-line.
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
      * @param {string} color - Any valid CSS color string.
      * @param {number=} lineWidth - (optional) The line width to use; default is 1.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      **/
-    arrow(zA, zB, color, lineWidth) {
-        var headlen = 8; // length of head in pixels
-        // var vertices = PlotBoilerplate.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
-        // var vertices : Array<Vertex> = Vertex.utils.buildArrowHead( zA, zB, headlen, this.scale.x, this.scale.y );
+    arrow(zA, zB, color, lineWidth, headLength = 8, strokeOptions) {
+        const arrowHeadBasePosition = new Vertex(0, 0);
+        this.arrowHead(zA, zB, color, lineWidth, headLength, undefined, arrowHeadBasePosition); // Will NOT use dash configuration
+        this.line(zA, arrowHeadBasePosition, color, lineWidth, strokeOptions); // Will use dash configuration
+    }
+    /**
+     * Draw a cubic Bézier curve and and an arrow at the end (endControlPoint) of the given line width the specified (CSS-) color and arrow size.
+     *
+     * @method cubicBezierArrow
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {string} color - The CSS color to draw the curve with.
+     * @param {number} lineWidth - (optional) The line width to use.
+     * @param {headLength=8} headLength - (optional) The length of the arrow head (default is 8 units).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     */
+    cubicBezierArrow(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, headLength, strokeOptions) {
+        const arrowHeadBasePosition = new Vertex(0, 0);
+        // Will NOT use dash configuration
+        this.arrowHead(endControlPoint, endPoint, color, lineWidth, headLength, undefined, arrowHeadBasePosition);
+        const diff = arrowHeadBasePosition.difference(endPoint);
+        // Will use dash configuration
+        this.cubicBezier(startPoint, { x: endPoint.x - diff.x, y: endPoint.y - diff.y }, startControlPoint, { x: endControlPoint.x - diff.x, y: endControlPoint.y - diff.y }, color, lineWidth, strokeOptions);
+    }
+    /**
+     * Draw just an arrow head a the end of an imaginary line (zB) of the given line width the specified (CSS-) color and size.
+     *
+     * @method arrow
+     * @param {XYCoords} zA - The start point of the arrow-line.
+     * @param {XYCoords} zB - The end point of the arrow-line.
+     * @param {string} color - Any valid CSS color string.
+     * @param {number=1} lineWidth - (optional) The line width to use; default is 1.
+     * @param {number=8} headLength - (optional) The length of the arrow head (default is 8 pixels).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     * @param {XYCoords=} arrowHeadBasePositionBuffer - (optional) If not null, then this position will contain the arrow head's start point (after execution). Some sort of OUT variable.
+     *
+     * @return {void}
+     * @instance
+     * @memberof DrawLib
+     **/
+    arrowHead(zA, zB, color, lineWidth, headLength = 8, strokeOptions, arrowHeadBasePositionBuffer) {
+        // var headLength: number = 8; // length of head in pixels
         this.ctx.save();
         this.ctx.beginPath();
-        var vertices = Vertex.utils.buildArrowHead(zA, zB, headlen, this.scale.x, this.scale.y);
-        this.ctx.moveTo(this.offset.x + zA.x * this.scale.x, this.offset.y + zA.y * this.scale.y);
+        this.applyStrokeOpts(strokeOptions);
+        var vertices = Vector.utils.buildArrowHead(zA, zB, headLength, this.scale.x, this.scale.y);
+        if (arrowHeadBasePositionBuffer) {
+            arrowHeadBasePositionBuffer.x = vertices[0].x / this.scale.x;
+            arrowHeadBasePositionBuffer.y = vertices[0].y / this.scale.y;
+        }
+        this.ctx.moveTo(this.offset.x + vertices[0].x, this.offset.y + vertices[0].y);
         for (var i = 0; i < vertices.length; i++) {
             this.ctx.lineTo(this.offset.x + vertices[i].x, this.offset.y + vertices[i].y);
         }
@@ -186,8 +301,8 @@ export class drawutils {
      *
      * @method image
      * @param {Image} image - The image object to draw.
-     * @param {Vertex} position - The position to draw the the upper left corner at.
-     * @param {Vertex} size - The x/y-size to draw the image with.
+     * @param {XYCoords} position - The position to draw the the upper left corner at.
+     * @param {XYCoords} size - The x/y-size to draw the image with.
      * @param {number=0.0} alpha - (optional, default=0.0) The transparency (1.0=opaque, 0.0=transparent).
      * @return {void}
      * @instance
@@ -216,7 +331,7 @@ export class drawutils {
      * @param {Image} textureImage - The image object to draw.
      * @param {Bounds} textureSize - The texture size to use; these are the original bounds to map the polygon vertices to.
      * @param {Polygon} polygon - The polygon to use as clip path.
-     * @param {Vertex} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
+     * @param {XYCoords} polygonPosition - The polygon's position (relative), measured at the bounding box's center.
      * @param {number} rotation - The rotation to use for the polygon (and for the texture).
      * @param {XYCoords={x:0,y:0}} rotationCenter - (optional) The rotational center; default is center of bounding box.
      * @return {void}
@@ -225,10 +340,9 @@ export class drawutils {
      **/
     texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation) {
         var basePolygonBounds = polygon.getBounds();
-        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-        // var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
-        // var rotationalOffset = { x: 0, y: 0 };
-        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+        // var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+        var targetCenterDifference = new Vertex(polygonPosition.x, polygonPosition.y).difference(basePolygonBounds.getCenter());
+        // var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
         // Get the position offset of the polygon
         var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
         // var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
@@ -251,52 +365,83 @@ export class drawutils {
         );
         this.ctx.restore();
     }
-    _texturedPoly(textureImage, textureSize, polygon, polygonPosition, rotation, rotationCenter = { x: 0, y: 0 }) {
-        var basePolygonBounds = polygon.getBounds();
-        var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
-        var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
-        // var rotationalOffset = { x: 0, y: 0 };
-        var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
-        // Get the position offset of the polygon
-        var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
-        var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
-        this.ctx.save();
-        // this.ctx.translate(
-        //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
-        //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
-        // );
-        this.ctx.translate(this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x, this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y);
-        this.ctx.rotate(rotation);
-        drawutils.helpers.clipPoly(this.ctx, {
-            x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
-            y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
-        }, this.scale, polygon.vertices);
-        this.ctx.drawImage(textureImage, 0, 0, textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+    /*
+    _texturedPoly(
+      textureImage: HTMLImageElement,
+      textureSize: Bounds,
+      polygon: Polygon,
+      polygonPosition: XYCoords,
+      rotation: number,
+      rotationCenter: XYCoords = { x: 0, y: 0 }
+    ): void {
+      var basePolygonBounds = polygon.getBounds();
+      var targetCenterDifference = polygonPosition.clone().difference(basePolygonBounds.getCenter());
+      var rotationalOffset = rotationCenter ? polygonPosition.difference(rotationCenter) : { x: 0, y: 0 };
+      // var rotationalOffset = { x: 0, y: 0 };
+      var tileCenter = basePolygonBounds.getCenter().sub(targetCenterDifference);
+  
+      // Get the position offset of the polygon
+      var targetTextureSize = new Vertex(textureSize.width, textureSize.height);
+      var targetTextureOffset = new Vertex(-textureSize.width / 2, -textureSize.height / 2).sub(targetCenterDifference);
+  
+      this.ctx.save();
+  
+      // this.ctx.translate(
+      //   this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+      //   this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+      // );
+      this.ctx.translate(
+        this.offset.x + (tileCenter.x - rotationalOffset.x * 0 + targetTextureOffset.x * 0.0) * this.scale.x,
+        this.offset.y + (tileCenter.y - rotationalOffset.y * 0 + targetTextureOffset.y * 0.0) * this.scale.y
+      );
+      this.ctx.rotate(rotation);
+  
+      drawutils.helpers.clipPoly(
+        this.ctx,
+        {
+          x: (-targetCenterDifference.x * 1 - tileCenter.x - rotationalOffset.x) * this.scale.x,
+          y: (-targetCenterDifference.y * 1 - tileCenter.y - rotationalOffset.y) * this.scale.y
+        },
+        this.scale,
+        polygon.vertices
+      );
+      this.ctx.drawImage(
+        textureImage,
+        0,
+        0,
+        textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
         textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-        (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x, (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y, targetTextureSize.x * this.scale.x, targetTextureSize.y * this.scale.y);
-        // const scaledTextureSize = new Bounds(
-        //   new Vertex(
-        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
-        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
-        //   ).scaleXY(this.scale, rotationCenter),
-        //   new Vertex(
-        //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
-        //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
-        //   ).scaleXY(this.scale, rotationCenter)
-        // );
-        // this.ctx.drawImage(
-        //   textureImage,
-        //   0,
-        //   0,
-        //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
-        //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
-        //   scaledTextureSize.min.x,
-        //   scaledTextureSize.min.y,
-        //   scaledTextureSize.width,
-        //   scaledTextureSize.height
-        // );
-        this.ctx.restore();
+        (-polygonPosition.x + targetTextureOffset.x * 1 - rotationalOffset.x * 1) * this.scale.x,
+        (-polygonPosition.y + targetTextureOffset.y * 1 - rotationalOffset.y * 1) * this.scale.y,
+        targetTextureSize.x * this.scale.x,
+        targetTextureSize.y * this.scale.y
+      );
+  
+      // const scaledTextureSize = new Bounds(
+      //   new Vertex(
+      //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x,
+      //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y
+      //   ).scaleXY(this.scale, rotationCenter),
+      //   new Vertex(
+      //     -polygonPosition.x + targetTextureOffset.x - rotationalOffset.x + targetTextureSize.x,
+      //     -polygonPosition.y + targetTextureOffset.y - rotationalOffset.y + targetTextureSize.y
+      //   ).scaleXY(this.scale, rotationCenter)
+      // );
+      // this.ctx.drawImage(
+      //   textureImage,
+      //   0,
+      //   0,
+      //   textureImage.naturalWidth - 1, // There is this horrible Safari bug (fixed in newer versions)
+      //   textureImage.naturalHeight - 1, // To avoid errors substract 1 here.
+      //   scaledTextureSize.min.x,
+      //   scaledTextureSize.min.y,
+      //   scaledTextureSize.width,
+      //   scaledTextureSize.height
+      // );
+  
+      this.ctx.restore();
     }
+    */
     /**
      * Draw a rectangle.
      *
@@ -305,10 +450,16 @@ export class drawutils {
      * @param {number} height - The height of the rectangle.
      * @param {string} color - The color to use.
      * @param {number=1} lineWidth - (optional) The line with to use (default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
+     * @return {void}
+     * @instance
+     * @memberof drawutils
      **/
-    rect(position, width, height, color, lineWidth) {
+    rect(position, width, height, color, lineWidth, strokeOptions) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + position.x * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + position.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + (position.x + width) * this.scale.x, this.offset.y + (position.y + height) * this.scale.y);
@@ -319,43 +470,23 @@ export class drawutils {
         this._fillOrDraw(color);
         this.ctx.restore();
     }
-    // +---------------------------------------------------------------------------------
-    // | This is the final helper function for drawing and filling stuff. It is not
-    // | intended to be used from the outside.
-    // |
-    // | When in draw mode it draws the current shape.
-    // | When in fill mode it fills the current shape.
-    // |
-    // | This function is usually only called internally.
-    // |
-    // | @param color A stroke/fill color to use.
-    // +-------------------------------
-    // TODO: convert this to a STATIC function.
-    _fillOrDraw(color) {
-        if (this.fillShapes) {
-            this.ctx.fillStyle = color;
-            this.ctx.fill();
-        }
-        else {
-            this.ctx.strokeStyle = color;
-            this.ctx.stroke();
-        }
-    }
     /**
      * Draw the given (cubic) bézier curve.
      *
      * @method cubicBezier
-     * @param {Vertex} startPoint - The start point of the cubic Bézier curve
-     * @param {Vertex} endPoint   - The end point the cubic Bézier curve.
-     * @param {Vertex} startControlPoint - The start control point the cubic Bézier curve.
-     * @param {Vertex} endControlPoint   - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint - The start point of the cubic Bézier curve
+     * @param {XYCoords} endPoint   - The end point the cubic Bézier curve.
+     * @param {XYCoords} startControlPoint - The start control point the cubic Bézier curve.
+     * @param {XYCoords} endControlPoint   - The end control point the cubic Bézier curve.
      * @param {string} color - The CSS color to draw the curve with.
      * @param {number} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth) {
+    cubicBezier(startPoint, endPoint, startControlPoint, endControlPoint, color, lineWidth, strokeOptions) {
         if (startPoint instanceof CubicBezierCurve) {
             this.cubicBezier(startPoint.startPoint, startPoint.endPoint, startPoint.startControlPoint, startPoint.endControlPoint, color, lineWidth);
             return;
@@ -363,6 +494,7 @@ export class drawutils {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.bezierCurveTo(this.offset.x + startControlPoint.x * this.scale.x, this.offset.y + startControlPoint.y * this.scale.y, this.offset.x + endControlPoint.x * this.scale.x, this.offset.y + endControlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         //this.ctx.closePath();
@@ -374,19 +506,22 @@ export class drawutils {
      * Draw the given (quadratic) bézier curve.
      *
      * @method quadraticBezier
-     * @param {Vertex} startPoint   - The start point of the cubic Bézier curve
-     * @param {Vertex} controlPoint - The control point the cubic Bézier curve.
-     * @param {Vertex} endPoint     - The end control point the cubic Bézier curve.
+     * @param {XYCoords} startPoint   - The start point of the cubic Bézier curve
+     * @param {XYCoords} controlPoint - The control point the cubic Bézier curve.
+     * @param {XYCoords} endPoint     - The end control point the cubic Bézier curve.
      * @param {string} color        - The CSS color to draw the curve with.
      * @param {number|string} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    quadraticBezier(startPoint, controlPoint, endPoint, color, lineWidth) {
+    quadraticBezier(startPoint, controlPoint, endPoint, color, lineWidth, strokeOptions) {
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + startPoint.x * this.scale.x, this.offset.y + startPoint.y * this.scale.y);
         this.ctx.quadraticCurveTo(this.offset.x + controlPoint.x * this.scale.x, this.offset.y + controlPoint.y * this.scale.y, this.offset.x + endPoint.x * this.scale.x, this.offset.y + endPoint.y * this.scale.y);
         this.ctx.lineWidth = lineWidth || 2;
@@ -401,22 +536,26 @@ export class drawutils {
      * <pre> [ point1, point1_startControl, point2_endControl, point2, point2_startControl, point3_endControl, point3, ... pointN_endControl, pointN ]</pre>
      *
      * @method cubicBezierPath
-     * @param {Vertex[]} path - The cubic bezier path as described above.
+     * @param {XYCoords[]} path - The cubic bezier path as described above.
      * @param {string} color - The CSS colot to draw the path with.
      * @param {number=1} lineWidth - (optional) The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    cubicBezierPath(path, color, lineWidth) {
-        if (!path || path.length == 0)
+    cubicBezierPath(path, color, lineWidth, strokeOptions) {
+        if (!path || path.length == 0) {
             return;
+        }
         // Draw curve
         this.ctx.save();
         this.ctx.beginPath();
         var endPoint;
         var startControlPoint;
         var endControlPoint;
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.moveTo(this.offset.x + path[0].x * this.scale.x, this.offset.y + path[0].y * this.scale.y);
         for (var i = 1; i < path.length; i += 3) {
             startControlPoint = path[i];
@@ -435,8 +574,8 @@ export class drawutils {
      * The colors for this are fixed and cannot be specified.
      *
      * @method handle
-     * @param {Vertex} startPoint - The start of the handle.
-     * @param {Vertex} endPoint - The end point of the handle.
+     * @param {XYCoords} startPoint - The start of the handle.
+     * @param {XYCoords} endPoint - The end point of the handle.
      * @return {void}
      * @instance
      * @memberof drawutils
@@ -451,21 +590,21 @@ export class drawutils {
      * Draw a handle line (with a light grey).
      *
      * @method handleLine
-     * @param {Vertex} startPoint - The start point to draw the handle at.
-     * @param {Vertex} endPoint - The end point to draw the handle at.
+     * @param {XYCoords} startPoint - The start point to draw the handle at.
+     * @param {XYCoords} endPoint - The end point to draw the handle at.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
     handleLine(startPoint, endPoint) {
         // Draw handle lines
-        this.line(startPoint, endPoint, "rgb(192,192,192)");
+        this.line(startPoint, endPoint, "rgba(128,128,128, 0.5)", undefined);
     }
     /**
      * Draw a 1x1 dot with the specified (CSS-) color.
      *
      * @method dot
-     * @param {Vertex} p - The position to draw the dot at.
+     * @param {XYCoords} p - The position to draw the dot at.
      * @param {string} color - The CSS color to draw the dot with.
      * @return {void}
      * @instance
@@ -474,6 +613,7 @@ export class drawutils {
     dot(p, color) {
         this.ctx.save();
         this.ctx.beginPath();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.moveTo(Math.round(this.offset.x + this.scale.x * p.x), Math.round(this.offset.y + this.scale.y * p.y));
         this.ctx.lineTo(Math.round(this.offset.x + this.scale.x * p.x + 1), Math.round(this.offset.y + this.scale.y * p.y + 1));
         this.ctx.closePath();
@@ -485,7 +625,7 @@ export class drawutils {
      * Draw the given point with the specified (CSS-) color and radius 3.
      *
      * @method point
-     * @param {Vertex} p - The position to draw the point at.
+     * @param {XYCoords} p - The position to draw the point at.
      * @param {string} color - The CSS color to draw the point with.
      * @return {void}
      * @instance
@@ -493,6 +633,7 @@ export class drawutils {
      */
     point(p, color) {
         var radius = 3;
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + p.x * this.scale.x, this.offset.y + p.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
@@ -505,15 +646,18 @@ export class drawutils {
      * Note that if the x- and y- scales are different the result will be an ellipse rather than a circle.
      *
      * @method circle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @param {number} lineWidth - The line width (optional, default=1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    circle(center, radius, color, lineWidth) {
+    circle(center, radius, color, lineWidth, strokeOptions) {
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -521,24 +665,28 @@ export class drawutils {
         this._fillOrDraw(color);
     }
     /**
-       * Draw a circular arc (section of a circle) with the given CSS color.
-       *
-       * @method circleArc
-       * @param {Vertex} center - The center of the circle.
-       * @param {number} radius - The radius of the circle.
-       * @param {number} startAngle - The angle to start at.
-       * @param {number} endAngle - The angle to end at.
-       * @param {string=#000000} color - The CSS color to draw the circle with.
-       * @param {number=1} lineWidth - The line width to use
-       // * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
-       * @return {void}
-       * @instance
-       * @memberof drawutils
-       */
+     * Draw a circular arc (section of a circle) with the given CSS color.
+     *
+     * @method circleArc
+     * @param {XYCoords} center - The center of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {number} startAngle - The angle to start at.
+     * @param {number} endAngle - The angle to end at.
+     * @param {string=#000000} color - The CSS color to draw the circle with.
+     * @param {number=1} lineWidth - The line width to use
+     * @param {boolean=false} options.asSegment - If `true` then no beginPath and no draw will be applied (as part of larger path).
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
+     *
+     * @return {void}
+     * @instance
+     * @memberof drawutils
+     */
     circleArc(center, radius, startAngle, endAngle, color, lineWidth, options) {
         if (!options || !options.asSegment) {
             this.ctx.beginPath();
         }
+        this.applyStrokeOpts(options);
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius * this.scale.x, radius * this.scale.y, 0.0, startAngle, endAngle, false);
         if (!options || !options.asSegment) {
             // this.ctx.closePath();
@@ -550,20 +698,23 @@ export class drawutils {
      * Draw an ellipse with the specified (CSS-) color and thw two radii.
      *
      * @method ellipse
-     * @param {Vertex} center - The center of the ellipse.
+     * @param {XYCoords} center - The center of the ellipse.
      * @param {number} radiusX - The radius of the ellipse.
      * @param {number} radiusY - The radius of the ellipse.
      * @param {string} color - The CSS color to draw the ellipse with.
      * @param {number} lineWidth=1 - An optional line width param (default is 1).
      * @param {number=} rotation - (optional, default=0) The rotation of the ellipse.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    ellipse(center, radiusX, radiusY, color, lineWidth, rotation) {
+    ellipse(center, radiusX, radiusY, color, lineWidth, rotation, strokeOptions) {
         if (typeof rotation === "undefined") {
             rotation = 0.0;
         }
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.ellipse(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radiusX * this.scale.x, radiusY * this.scale.y, rotation, 0.0, Math.PI * 2);
         this.ctx.closePath();
@@ -580,11 +731,14 @@ export class drawutils {
      * @param {number} size - The size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @param {number} lineWidth - The line with to use (optional, default is 1).
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    square(center, size, color, lineWidth) {
+    square(center, size, color, lineWidth, strokeOptions) {
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + (center.x - size / 2.0) * this.scale.x, this.offset.y + (center.y - size / 2.0) * this.scale.y, size * this.scale.x, size * this.scale.y);
         this.ctx.closePath();
@@ -595,7 +749,7 @@ export class drawutils {
      * Draw a grid of horizontal and vertical lines with the given (CSS-) color.
      *
      * @method grid
-     * @param {Vertex} center - The center of the grid.
+     * @param {XYCoords} center - The center of the grid.
      * @param {number} width - The total width of the grid (width/2 each to the left and to the right).
      * @param {number} height - The total height of the grid (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal grid size.
@@ -606,6 +760,7 @@ export class drawutils {
      * @memberof drawutils
      */
     grid(center, width, height, sizeX, sizeY, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         var yMin = -Math.ceil((height * 0.5) / sizeY) * sizeY;
         var yMax = height / 2;
@@ -630,7 +785,7 @@ export class drawutils {
      * This works analogue to the grid() function
      *
      * @method raster
-     * @param {Vertex} center - The center of the raster.
+     * @param {XYCoords} center - The center of the raster.
      * @param {number} width - The total width of the raster (width/2 each to the left and to the right).
      * @param {number} height - The total height of the raster (height/2 each to the top and to the bottom).
      * @param {number} sizeX - The horizontal raster size.
@@ -642,6 +797,7 @@ export class drawutils {
      */
     raster(center, width, height, sizeX, sizeY, color) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         for (var x = -Math.ceil((width * 0.5) / sizeX) * sizeX; x < width / 2; x += sizeX) {
             for (var y = -Math.ceil((height * 0.5) / sizeY) * sizeY; y < height / 2; y += sizeY) {
@@ -666,14 +822,15 @@ export class drawutils {
      * as even shaped diamonds.
      *
      * @method diamondHandle
-     * @param {Vertex} center - The center of the diamond.
-     * @param {Vertex} size - The x/y-size of the diamond.
+     * @param {XYCoords} center - The center of the diamond.
+     * @param {number} size - The x/y-size of the diamond.
      * @param {string} color - The CSS color to draw the diamond with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
     diamondHandle(center, size, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y - size / 2.0);
@@ -691,14 +848,15 @@ export class drawutils {
      * as even shaped squares.
      *
      * @method squareHandle
-     * @param {Vertex} center - The center of the square.
-     * @param {Vertex} size - The x/y-size of the square.
+     * @param {XYCoords} center - The center of the square.
+     * @param {number} size - The x/y-size of the square.
      * @param {string} color - The CSS color to draw the square with.
      * @return {void}
      * @instance
      * @memberof drawutils
      */
     squareHandle(center, size, color) {
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.rect(this.offset.x + center.x * this.scale.x - size / 2.0, this.offset.y + center.y * this.scale.y - size / 2.0, size, size);
         this.ctx.closePath();
@@ -713,7 +871,7 @@ export class drawutils {
      * as even shaped circles.
      *
      * @method circleHandle
-     * @param {Vertex} center - The center of the circle.
+     * @param {XYCoords} center - The center of the circle.
      * @param {number} radius - The radius of the circle.
      * @param {string} color - The CSS color to draw the circle with.
      * @return {void}
@@ -722,6 +880,7 @@ export class drawutils {
      */
     circleHandle(center, radius, color) {
         radius = radius || 3;
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.arc(this.offset.x + center.x * this.scale.x, this.offset.y + center.y * this.scale.y, radius, 0, 2 * Math.PI, false);
         this.ctx.closePath();
@@ -744,6 +903,7 @@ export class drawutils {
      */
     crosshair(center, radius, color, lineWidth) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y);
@@ -771,6 +931,7 @@ export class drawutils {
      */
     cross(center, radius, color, lineWidth) {
         this.ctx.save();
+        this.ctx.setLineDash([]); // Clear line-dash settings
         this.ctx.beginPath();
         this.ctx.moveTo(this.offset.x + center.x * this.scale.x - radius, this.offset.y + center.y * this.scale.y - radius);
         this.ctx.lineTo(this.offset.x + center.x * this.scale.x + radius, this.offset.y + center.y * this.scale.y + radius);
@@ -789,30 +950,35 @@ export class drawutils {
      * @param {Polygon}  polygon - The polygon to draw.
      * @param {string}   color - The CSS color to draw the polygon with.
      * @param {string}   lineWidth - The line width to use.
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polygon(polygon, color, lineWidth) {
-        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth);
+    polygon(polygon, color, lineWidth, strokeOptions) {
+        this.polyline(polygon.vertices, polygon.isOpen, color, lineWidth, strokeOptions);
     }
     /**
      * Draw a polygon line (alternative function to the polygon).
      *
      * @method polyline
-     * @param {Vertex[]} vertices   - The polygon vertices to draw.
+     * @param {XYCoords[]} vertices - The polygon vertices to draw.
      * @param {boolan}   isOpen     - If true the polyline will not be closed at its end.
      * @param {string}   color      - The CSS color to draw the polygon with.
      * @param {number}   lineWidth  - The line width (default is 1.0);
+     * @param {StrokeOptions=} strokeOptions - (optional) Stroke settings to use.
+     *
      * @return {void}
      * @instance
      * @memberof drawutils
      */
-    polyline(vertices, isOpen, color, lineWidth) {
+    polyline(vertices, isOpen, color, lineWidth, strokeOptions) {
         if (vertices.length <= 1) {
             return;
         }
         this.ctx.save();
+        this.applyStrokeOpts(strokeOptions);
         this.ctx.beginPath();
         this.ctx.lineWidth = (lineWidth || 1.0) * this.scale.x;
         this.ctx.moveTo(this.offset.x + vertices[0].x * this.scale.x, this.offset.y + vertices[0].y * this.scale.y);
@@ -924,6 +1090,8 @@ export class drawutils {
      * @param {string=null} color - (optional) The color to draw this path with (default is null).
      * @param {number=1} lineWidth - (optional) the line width to use (default is 1).
      * @param {boolean=false} options.inplace - (optional) If set to true then path transforamtions (scale and translate) will be done in-place in the array. This can boost the performance.
+     * @param {number=} options.dashOffset - (optional) `See StrokeOptions`.
+     * @param {number=[]} options.dashArray - (optional) `See StrokeOptions`.
      * @instance
      * @memberof drawutils
      * @return {R} An instance representing the drawn path.
@@ -935,6 +1103,7 @@ export class drawutils {
             this.ctx.strokeStyle = color;
         }
         this.ctx.lineWidth = lineWidth || 1;
+        this.applyStrokeOpts(options);
         if (this.fillShapes) {
             if (color) {
                 this.ctx.fillStyle = color;

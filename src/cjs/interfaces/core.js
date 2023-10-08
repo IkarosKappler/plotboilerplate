@@ -19,6 +19,7 @@
  * @modified 2022-10-25 Added `origin` param to the `DrawConfig` interface.
  * @modified 2022-11-23 Added `drawRaster` to the `Config` interface.
  * @modified 2023-02-10 All non-function attributes of the `Config` interface are now mandatory.
+ * @modified 2023-09-29 Added the `randomPoint(...)` function declaration to the IBounds interface.
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=core.js.map

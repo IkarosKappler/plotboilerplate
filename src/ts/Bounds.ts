@@ -8,12 +8,14 @@
  * @modified 2022-02-01 Added the `toString` function.
  * @modified 2022-10-09 Added the `fromDimension` function.
  * @modified 2022-11-28 Added the `clone` method.
- * @version  1.6.0
+ * @modified 2023-09-29 Added the `randomPoint` method.
+ * @version  1.7.0
  **/
 
 import { Polygon } from "./Polygon";
 import { XYCoords, IBounds, XYDimension } from "./interfaces";
 import { Vertex } from "./Vertex";
+import { VertTuple } from "./VertTuple";
 
 /**
  * @classdesc A bounds class with min and max values. Implementing IBounds.
@@ -95,6 +97,28 @@ export class Bounds implements IBounds, XYDimension {
    */
   getCenter(): Vertex {
     return new Vertex(this.min.x + (this.max.x - this.min.x) / 2.0, this.min.y + (this.max.y - this.min.y) / 2);
+  }
+
+  /**
+   * Generate a random point inside this bounds object. Safe areas at the border to avoid
+   * included.
+   *
+   * @method randomPoint
+   * @instance
+   * @memberof Bounds
+   * @param {horizontalSafeArea} - (optional) The horizonal (left and right) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval.
+   * @param {verticalSafeArea} - (optional) The vertical (top and bottom) safe area. No vertex will be created here. Can be used as percent in (0.0 ... 0.1) interval
+   * @returns {Vertex} A pseudo random point inside these bounds.
+   */
+  randomPoint(horizontalSafeArea: number = 0, verticalSafeArea: number = 0): Vertex {
+    // Check if the safe areas are meant as percent
+    const absHorizontalSafeArea =
+      horizontalSafeArea > 0 && horizontalSafeArea < 1 ? this.width * horizontalSafeArea : horizontalSafeArea;
+    const absVerticalSafeArea = verticalSafeArea > 0 && verticalSafeArea < 1 ? this.height * verticalSafeArea : verticalSafeArea;
+    return new Vertex(
+      this.min.x + absHorizontalSafeArea + Math.random() * (this.width - 2 * absHorizontalSafeArea),
+      this.min.y + absVerticalSafeArea + Math.random() * (this.height - 2 * absVerticalSafeArea)
+    );
   }
 
   /**

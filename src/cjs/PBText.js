@@ -3,7 +3,8 @@
  * @author   Ikaros Kappler
  * @date     2021-11-16
  * @modified 2022-02-02 Added the `destroy` method.
- * @version  1.1.0
+ * @modified 2023-09-25 Fixed a type error in the constructor. Nothing vital.
+ * @version  1.1.1
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PBText = void 0;
@@ -38,14 +39,14 @@ var PBText = /** @class */ (function () {
         this.uid = UIDGenerator_1.UIDGenerator.next();
         this.text = text;
         this.anchor = anchor !== null && anchor !== void 0 ? anchor : new Vertex_1.Vertex();
-        this.color = options.color;
-        this.fontFamily = options.fontFamily;
-        this.fontSize = options.fontSize;
-        this.fontStyle = options.fontStyle;
-        this.fontWeight = options.fontWeight;
-        this.lineHeight = options.lineHeight;
-        this.textAlign = options.textAlign;
-        this.rotation = options.rotation;
+        this.color = options === null || options === void 0 ? void 0 : options.color;
+        this.fontFamily = options === null || options === void 0 ? void 0 : options.fontFamily;
+        this.fontSize = options === null || options === void 0 ? void 0 : options.fontSize;
+        this.fontStyle = options === null || options === void 0 ? void 0 : options.fontStyle;
+        this.fontWeight = options === null || options === void 0 ? void 0 : options.fontWeight;
+        this.lineHeight = options === null || options === void 0 ? void 0 : options.lineHeight;
+        this.textAlign = options === null || options === void 0 ? void 0 : options.textAlign;
+        this.rotation = options === null || options === void 0 ? void 0 : options.rotation;
     }
     /**
      * This function should invalidate any installed listeners and invalidate this object.
