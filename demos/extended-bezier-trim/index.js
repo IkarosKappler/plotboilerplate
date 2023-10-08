@@ -56,7 +56,6 @@
 
     var postDraw = function (draw, fill) {
       var contrastColor = getContrastColor(Color.parse(pb.config.backgroundColor)).cssRGB();
-      console.log(contrastColor);
       fill.text("Start A", bezierA.startPoint.x, bezierA.startPoint.y, {
         color: contrastColor
       });
