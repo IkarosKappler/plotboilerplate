@@ -3,6 +3,40 @@ layout: page
 ---
 # Changelog
 
+- 2023-10-07 [v1.21.0]
+  - Adding the `BezierPath.fromCurve(CubicBezierCurve)` static function.
+  - Adding the extended demo: Trimming Bézier curves.
+  - Adding the `CubicBezierCurve.trimEnd(number)`, `trimEndAt(number)`, `trimStart(number)`, `trimStartAt(number)` methods.
+- 2023-10-06
+  - Adding the `BezierPath.toPathPoints()` method.
+- 2023-10-04
+  - Also adding the param `strokeOptions` to the default `drawutilssvg` library.
+- 2023-09-30
+  - Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
+  - Adding `DrawLib.strokeOptions` param to these draw function: line, arrow, cubicBezierArrow, cubicBezier, cubicBezierPath, circle, circleArc, ellipse, square, rect, polygon, polyline.
+  - Also adding the param `strokeOptions` to the default `draw` library.
+- 2023-09-29
+  - (createGUI utils) Added try-catch for color attributes; invalid values might break construction of whole gui.
+  - Fixed a calculation error in the VertTuple.hasPoint() function; distance measure was broken!
+  - Downgraded types for the `Vertex.utils.buildArrowHead` function (replacing Vertex params by more generic XYCoords type).
+  - Added initialization checks for null parameters in `drawutilsvg` constructor.
+  - Added a missing implementation to the `drawurilssvg.do(XYCoords,string)` function. Didn't draw anything.
+  - (DrawLib interface, draw, drawgl and drawutilssvg class) Downgrading all `Vertex` param type to the more generic `XYCoords` type in these render functions: line, arrow, texturedPoly, cubicBezier, cubicBezierPath, handle, handleLine, dot, point, circle, circleArc, ellipse, grid, raster.
+  - Adding proper dicionary key and value types to the params of `PlotBoilerplate.utils.safeMergeByKeys` (was `object` before).
+  - Chaning param types in `Vector.utils.buildArrowHead()` from `Vertex` to the more generic `XYCoords`.
+  - Added the `headLength` parameter to the 'DrawLib.arrow()` function.
+  - Added the `arrowHead(...)` function to the 'DrawLib.arrow()` interface.
+  - Added the `cubicBezierArrow(...)` function to the 'DrawLib.arrow()` interface.
+  - Added the `randomPoint(...)` function declaration to the IBounds interface.
+  - Added the `Bounds.randomPoint(...)` method.
+  - Added the `Vertex.abs()` method as it seems useful.
+- 2023-09-25
+  - Added the `Polygon.getInterpolationPolygon(number)` function.
+  - Added the `detectDarkMode` helper function.
+  - Adding the demo `47-closest-vector-projection-on-polygon`.
+  - Changed param type of `Line.intersection()` from Line to VertTuple.
+  - Added `Polyon.lineIntersections(VertTuple)` function.
+  - Added the `Polygon.closestLineIntersection(Line,boolean)` function.
 - 2023-03-06
   - Finalizing the audio demo (demo-46).
 - 2023-02-10

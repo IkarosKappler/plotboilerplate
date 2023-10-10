@@ -1,7 +1,7 @@
 ---
 layout: demos
 permalink: /demos/
-date: 2023-08-14
+date: 2023-10-10
 ---
 
 <h3>Basics</h3>
@@ -246,8 +246,28 @@ date: 2023-08-14
    </a>
 </div>
 <div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/47-closest-vector-projection-on-polygon/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20230926-0-polygon-line-intersections.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/extended-arrows/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20230929-0-extented-arrow-demo.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/extended-bezier-trim/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20231007-0-trim-bezier-curves.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
    <a class="no-decoration" href="{{ '/repo/demos/extended-circle-line-intersection/index.html' | prepend: site.url }}">
       <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20220910-extended-circle-line-intersection.png');"></div>
+   </a>
+</div>
+<div class="demo-box">
+   <a class="no-decoration" href="{{ '/repo/demos/extended-dashed-lines/index.html' | prepend: site.url }}">
+      <div style="background-image: url('https://plotboilerplate.io/repo/screenshots/screenshot-20231007-0-dashed-lines.png');"></div>
    </a>
 </div>
 <div class="demo-box">

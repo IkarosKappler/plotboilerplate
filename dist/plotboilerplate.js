@@ -2065,8 +2065,8 @@ exports.CircleSector = CircleSector;
  * @modified 2022-02-02 Cleared the `toSVGPathData` function (deprecated). Use `drawutilssvg` instead.
  * @modified 2022-10-17 The `CubicBezierCurve` class now implements the new `PathSegment` interface.
  * @modified 2023-09-30 Added the function `CubicbezierCurve.getSubCurve(number,number)` – similar to `getSubCurveAt(...)` but with absolute position parameters.
- * @modified 2023-10-07 Added the `trimEnd`, `trimEndBy`
- * @version 2.7.1
+ * @modified 2023-10-07 Added the `trimEnd`, `trimEndAt`, `trimStart`, `trimStartAt` methods.
+ * @version 2.8.0
  *
  * @file CubicBezierCurve
  * @public
