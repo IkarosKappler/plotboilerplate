@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @author   Ikaros Kappler
  * @date     2023-10-28
@@ -11,13 +12,27 @@
     this.xSegmentCount = xSegmentCount || 16;
     this.ySegmentCount = ySegmentCount || 16;
 
+    // @private
+    this._minHeight = 0;
+    this._maxHeight = 0;
+    this._minX = 0;
+    this._maxX = 0;
+    this._minY = 0;
+    this._maxY = 0;
+
+    // Private
+    this._planeGeometry = null;
+
     // Map<string,texture>
     this.textureStore = new Map();
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.z = 50;
-    // this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+    var canvasBounds = this.canvas.parentElement.getBoundingClientRect();
+    let width = canvasBounds.width;
+    let height = canvasBounds.height;
+    this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    this.camera.position.z = 100;
+    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
 
     this.ambientLightA = new THREE.AmbientLight(0xffffff);
     this.ambientLightA.position.set(350, 350, 50);
@@ -41,6 +56,10 @@
 
     // Cache all geometries for later removal
     this.geometries = [];
+
+    // Will never be removed
+    const axesHelper = new THREE.AxesHelper(15);
+    this.scene.add(axesHelper);
 
     var _self = this;
     window.addEventListener("resize", function () {
@@ -72,22 +91,39 @@
     this.canvas.setAttribute("width", "" + width + "px");
     this.canvas.setAttribute("height", height + "px");
     this.camera.aspect = width / height;
+    // this.camera.lookAt(new THREE.Vector3(0, 0, 120));
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
     // What am I doing here?
     this.camera.setViewOffset(width, height, width / 4, height / 20, width, height);
   };
 
-  TerrainGeneration.prototype.getIndexFromBuffer = function (bufferIndex) {
+  TerrainGeneration.prototype.getIndicesFromBufferIndex = function (bufferIndex) {
     return { xIndex: Math.floor(bufferIndex % this.xSegmentCount), yIndex: Math.floor(bufferIndex / this.xSegmentCount) };
   };
 
-  TerrainGeneration.prototype.getPositionFromBuffer = function (bufferIndex) {
-    var index = this.getIndexFromBuffer(bufferIndex);
+  TerrainGeneration.prototype.getCoordsFromBufferIndex = function (bufferIndex) {
+    var index = this.getIndicesFromBufferIndex(bufferIndex);
     // Note that the xSegmentCount and ySegmentCount counts plane squares, each consisting of four vertices
     index.xRel = index.xIndex / (this.xSegmentCount - 1);
     index.yRel = index.yIndex / (this.ySegmentCount - 1);
     return index;
+  };
+
+  TerrainGeneration.prototype.getMinHeight = function () {
+    return this._minHeight;
+  };
+
+  TerrainGeneration.prototype.getMaxHeight = function () {
+    return this._maxHeight;
+  };
+
+  TerrainGeneration.prototype.getHeightValueAt = function (xIndex, yIndex, isDebug) {
+    var bufferIndex = yIndex * this.xSegmentCount + xIndex;
+    if (isDebug) {
+      console.log("xIndex", xIndex, "yIndex", yIndex, "bufferIndex", bufferIndex);
+    }
+    return this._planeGeometry ? this._planeGeometry.vertices[bufferIndex].z : NaN;
   };
 
   /**
@@ -102,24 +138,33 @@
   TerrainGeneration.prototype.rebuild = function (options) {
     this.removeCachedGeometries();
 
-    var geometry = new THREE.PlaneGeometry(60, 60, this.xSegmentCount - 1, this.ySegmentCount - 1);
-    for (var i = 0, l = geometry.vertices.length; i < l; i++) {
-      var relPos = this.getPositionFromBuffer(i);
-      console.log("relPos", relPos);
-      geometry.vertices[i].z = (Math.cos(relPos.xRel * 2 * Math.PI) + Math.cos(relPos.yRel * 2 * Math.PI)) * 10.0;
+    this._planeGeometry = new THREE.PlaneGeometry(60, 60, this.xSegmentCount - 1, this.ySegmentCount - 1);
+    this._maxHeight = Number.MIN_VALUE;
+    this._minHeight = Number.MAX_VALUE;
+    this._minX = 0.0;
+    this._maxX = 2 * Math.PI;
+    this._minY = 0.0;
+    this._maxY = 2 * Math.PI;
+    for (var i = 0, l = this._planeGeometry.vertices.length; i < l; i++) {
+      var relPos = this.getCoordsFromBufferIndex(i);
+      // console.log("relPos", relPos);
+      var xAbs = this._minX + (this._maxX - this._minX) * relPos.xRel;
+      var yAbs = this._minY + (this._maxY - this._minY) * relPos.yRel;
+      // console.log("xAbs", xAbs, "yAbs", yAbs);
+      this._planeGeometry.vertices[i].z = (Math.sin(xAbs) + Math.sin(yAbs)) * 10.0;
+      this._maxHeight = Math.max(this._maxHeight, this._planeGeometry.vertices[i].z);
+      this._minHeight = Math.min(this._minHeight, this._planeGeometry.vertices[i].z);
     }
     // geometry.translate(30, 30, 0);
     var material = new THREE.MeshPhongMaterial({
       color: 0xdddddd,
       wireframe: true
     });
-    var terrain = new THREE.Mesh(geometry, material);
+    var terrain = new THREE.Mesh(this._planeGeometry, material);
 
     // Assuming you already have your global scene, add the terrain to it
     this.scene.add(terrain);
     this.geometries.push(terrain);
-
-    this.camera.lookAt(terrain.position);
 
     var useTextureImage = options.useTextureImage && typeof options.textureImagePath != "undefined";
     var textureImagePath = typeof options.textureImagePath != "undefined" ? options.textureImagePath : null;
@@ -182,31 +227,6 @@
     }
     this.cachedGeometries = [];
   };
-
-  //   VoronoiGeneration.prototype.loadTextureImage = function (path) {
-  //     var texture = this.textureStore.get(path);
-  //     if (!texture) {
-  //       var loader = new THREE.TextureLoader();
-  //       var texture = loader.load(path);
-  //       this.textureStore.set(path, texture);
-  //     }
-  //     return texture;
-  //   };
-
-  /**
-   * Generate an STL string.
-   *
-   * @param {function} options.onComplete
-   **/
-  //   TerrainGeneration.prototype.generateSTL = function (options) {
-  //     var exporter = new THREE.STLExporter();
-  //     var stlData = exporter.parse(this.geometries[0]);
-  //     if (typeof options.onComplete === "function") {
-  //       options.onComplete(stlData);
-  //     } else {
-  //       console.warn("STL data was generated but no 'onComplete' callback was defined.");
-  //     }
-  //   };
 
   window.TerrainGeneration = TerrainGeneration;
 })();
